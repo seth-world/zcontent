@@ -1,0 +1,8 @@
+zcontent
+
+This directory contains zcontent manager library source filess
+bin : binary build space either debug or release
+zrandomfile : random (relative) file management
+zindexedfile : master file, index management, etc. 
+zcontentcommon : sources common to many modules / libraries
+zcontentlib : library build project
