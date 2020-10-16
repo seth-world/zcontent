@@ -104,7 +104,7 @@ ZStatus  importFieldfURF_T (typename std::enable_if_t<std::is_integral<_Tp>::val
                           uint16_t &pTargetArrayCount        // target array count
                           )
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 uint16_t wCanonical , wEffectiveUSize;
@@ -120,7 +120,7 @@ unsigned char* wData_Ptr=pURFData;
                                wEffectiveUSize,
                                wHeaderSize,
                                &wData_Ptr))!=ZS_SUCCESS)
-                                                {_RETURN_ wSt;}
+                                                {return  wSt;}
     // Get the target (natural) data characteristics : type, sizes, array count (NB: Source data infos is given by URF)
 
     wSt=_getZType_T<_Tp>(pValue,pTargetType,pTargetNSize,pTargetUSize,pTargetArrayCount); //
@@ -148,7 +148,7 @@ unsigned char* wData_Ptr=pURFData;
                                   decode_ZType(wSourceType),
                                   pTargetType,
                                   decode_ZType(pTargetType));
-            _RETURN_ ZS_INVTYPE;
+            return  ZS_INVTYPE;
             }
 
         // if atomic but different type then cast it to target type
@@ -158,10 +158,10 @@ unsigned char* wData_Ptr=pURFData;
         else
         _getAtomicNfU_T_Ptr<_Tp>(pValue,wData_Ptr,wSourceType); // if not, simply depack
     if (wSt!=ZS_SUCCESS)
-                _RETURN_ wSt;
+                return  wSt;
 
     pTargetArrayCount=1;
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 } //setFieldURF_T for Atomic
 
 
@@ -216,7 +216,7 @@ ZStatus  importFieldfURF_T (typename std::enable_if_t<std::is_class<_Tp>::value,
                           uint16_t &pTargetCapacity   // Capacity for target value
                           )
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 uint16_t wSourceCapacity , wEffectiveUSize;
@@ -234,12 +234,12 @@ unsigned char* wData_Ptr;
                                     wEffectiveUSize,
                                     wHeaderSize,
                                     &wData_Ptr))!=ZS_SUCCESS)
-                                                    {_RETURN_ wSt;}
+                                                    {return  wSt;}
     // Get the target (natural) data characteristics : type, sizes, array count (NB: Source data infos is given by URF)
 
     if (pTargetType&ZType_String)
                 {
-                _RETURN_ get_ZStringNfURF(&pValue,wSourceType,pURFData);
+                return  get_ZStringNfURF(&pValue,wSourceType,pURFData);
                 }
 
     /* if not strings, type must correspond strictly */
@@ -255,7 +255,7 @@ unsigned char* wData_Ptr;
                               pTargetType,
                               decode_ZType(pTargetType));
 
-        _RETURN_ ZS_INVTYPE;
+        return  ZS_INVTYPE;
         }
 
     wSt=_getZType_T<_Tp>(pValue,pTargetType,pTargetNSize,pTargetUSize,pTargetCapacity); //
@@ -286,29 +286,29 @@ unsigned char* wData_Ptr;
 
    case ZType_ZDateFull: // convert from source ZDateFull to...
    {
-       _RETURN_ get_121_ZDateFullNfURF(&pValue,pURFData);
+       return  get_121_ZDateFullNfURF(&pValue,pURFData);
    }
    case ZType_ZDate: // convert from source ZDateFull to...
    {
 
-       _RETURN_ get_121_ZDateNfURF(&pValue,pURFData);
+       return  get_121_ZDateNfURF(&pValue,pURFData);
    }
    case ZType_CheckSum: // convert from source ZDateFull to...
    {
-       _RETURN_ get_121_CheckSumNfURF(&pValue,pURFData);
+       return  get_121_CheckSumNfURF(&pValue,pURFData);
    }
 /*   case ZType_Utf8FixedString:
    case ZType_Utf16FixedString:
    case ZType_Utf32FixedString:
    {
-       _RETURN_ get_ZStringNfURF(&pValue,pURFData);
+       return  get_ZStringNfURF(&pValue,pURFData);
    }
 
    case ZType_Utf8VaryingString:
    case ZType_Utf16VaryingString:
    case ZType_Utf32VaryingString:
    {
-       _RETURN_ get_ZStringNfURF(&pValue,pURFData);
+       return  get_ZStringNfURF(&pValue,pURFData);
    }
 */
    default:
@@ -322,10 +322,10 @@ unsigned char* wData_Ptr;
                           pTargetType,
                           decode_ZType(pTargetType));
 
-    _RETURN_ ZS_INVTYPE;
+    return  ZS_INVTYPE;
     }
    }//switch
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 } //setFieldNfURF_T for Class
 
 
@@ -354,7 +354,7 @@ unsigned char* wData_Ptr=pURFData;
                                 wEffectiveUSize,
                                 wHeaderSize,
                                 &wData_Ptr))!=ZS_SUCCESS)
-                                                {_RETURN_ wSt;}
+                                                {return  wSt;}
     // Get the target (natural) data characteristics : type, sizes, array count (NB: Source data infos is given by URF)
 
     wSt=_getZType_T<_Tp>(pTargetNatural,pTargetType,pTargetNSize,pTargetUSize,pTargetArrayCount); //

@@ -145,7 +145,7 @@ ZStatus _getURFHeaderData(unsigned char* pURF_Ptr,
                                  uint64_t &pHeaderSize,
                                  unsigned char** pURFdDataPtr)
 {
-_MODULEINIT_
+
 
 URF_Fixed_Size_type     wFUniversalSize;
 URF_Varying_Size_type   wVUniversalSize;
@@ -167,7 +167,7 @@ unsigned char* wURFDataPtr;
         pEffectiveUSize=pCapacity=1;
         if (pURFdDataPtr)
                 *pURFdDataPtr=wURFDataPtr;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
 
     case ZType_ZDate:
         pHeaderSize= sizeof(ZTypeBase);
@@ -176,7 +176,7 @@ unsigned char* wURFDataPtr;
         wURFDataPtr=pURF_Ptr+pHeaderSize;
         if (pURFdDataPtr)
                 *pURFdDataPtr=wURFDataPtr;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
     case ZType_ZDateFull:
         pHeaderSize= sizeof(ZTypeBase);
         pUniversalSize=pNaturalSize=sizeof(uint64_t);
@@ -184,7 +184,7 @@ unsigned char* wURFDataPtr;
         wURFDataPtr=pURF_Ptr+pHeaderSize;
         if (pURFdDataPtr)
                 *pURFdDataPtr=wURFDataPtr;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
     case ZType_CheckSum:
         pHeaderSize= sizeof(ZTypeBase);
         pUniversalSize=pNaturalSize=sizeof(checkSum::content);
@@ -192,7 +192,7 @@ unsigned char* wURFDataPtr;
         wURFDataPtr=pURF_Ptr+pHeaderSize;
         if (pURFdDataPtr)
                 *pURFdDataPtr=wURFDataPtr;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
 /*    case ZType_VaryingCString: // varying strings & blobs  : only ZType_type plus uint64_t : effective size
         {
         pHeaderSize=sizeof(ZTypeBase)+sizeof(uint64_t);
@@ -208,7 +208,7 @@ unsigned char* wURFDataPtr;
         pCanonical=pEffectiveUSize=1;
         pNaturalSize=pUniversalSize=reverseByteOrder_Conditional<uint64_t>(wUSize);
         pEffectiveDataPtr=pURF_Ptr+pHeaderSize;
-        _RETURN_ pEffectiveDataPtr;*/
+        return  pEffectiveDataPtr;*/
 /*    case ZType_FixedCString: // fixed C strings : ZType + canonical size (uint16_t)+ effective size (uint16_t)
         {
         pHeaderSize=sizeof(ZTypeBase)+sizeof(uint16_t)+sizeof(uint16_t);
@@ -228,7 +228,7 @@ unsigned char* wURFDataPtr;
         if (pURFdDataPtr)
                 *pURFdDataPtr=wURFDataPtr;
 
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
     case ZType_CharFixedString: // fixed strings
     case ZType_Utf8FixedString:
     case ZType_Utf16FixedString:
@@ -241,7 +241,7 @@ unsigned char* wURFDataPtr;
         pUniversalSize=(uint64_t)wFUniversalSize;
         if (pURFdDataPtr)
                 *pURFdDataPtr=wURFDataPtr;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
 
     case ZType_CharVaryingString: // varying strings
     case ZType_Utf8VaryingString:
@@ -254,7 +254,7 @@ unsigned char* wURFDataPtr;
         pCapacity = 0;
         if (pURFdDataPtr)
                 *pURFdDataPtr=wURFDataPtr;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
     default: // varying strings & blobs
         break;
     }// switch
@@ -270,7 +270,7 @@ unsigned char* wURFDataPtr;
 //        *pURFDataPtr += pHeaderSize; // already done
         if (pURFdDataPtr)
                 *pURFdDataPtr=wURFDataPtr;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
 
     case ZType_Array: /* for array capacity contains the full byte size of array */
         pHeaderSize=sizeof(ZTypeBase)+sizeof(URF_Capacity_type);
@@ -279,7 +279,7 @@ unsigned char* wURFDataPtr;
         pNaturalSize= pEffectiveUSize =(uint64_t)pCapacity;
         if (pURFdDataPtr)
                 *pURFdDataPtr=wURFDataPtr;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
 
     default:    // Other types : data length is on uint16_t, canonical (array) count is systematically set to pUniversalSize
         {
@@ -287,7 +287,7 @@ unsigned char* wURFDataPtr;
                 _GET_FUNCTION_NAME_,
                 pZType,
                 decode_ZType(pZType));
-        _RETURN_ ZS_INVTYPE;
+        return  ZS_INVTYPE;
 /*        uint16_t wUSize_16;
         pHeaderSize=sizeof(ZTypeBase)+sizeof(uint16_t);
 
@@ -301,7 +301,7 @@ unsigned char* wURFDataPtr;
         }
     }// switch
 
-    _RETURN_ ZS_INVOP; // not understood - by the way not possible too.
+    return  ZS_INVOP; // not understood - by the way not possible too.
 }//_getURFHeaderData
 
 size_t  _getURFHeaderSize (ZTypeBase &pZType)
@@ -400,7 +400,7 @@ get_121_CheckSumNfURF(void* pValue,unsigned char* pURFData)
 ZStatus
 get_ZStringNfURF(void* pValue, ZTypeBase pType, unsigned char* pURFData)
 {
-_MODULEINIT_
+
 /*
 ZTypeBase wZTypeSource, wZTypeTarget;
 uint64_t wUniversalSize,wNaturalSize, wHeaderSize;
@@ -424,7 +424,7 @@ uint16_t wCanonical, wEffectiveUSize;
                               "Invalid fixed string object type <%X> <%s> while expecting one of String object.\n",
                               wZTypeTarget,
                               decode_ZType(wZTypeTarget));
-        _RETURN_ ZS_INVTYPE;
+        return  ZS_INVTYPE;
         
         }
 
@@ -435,21 +435,21 @@ uint16_t wCanonical, wEffectiveUSize;
     {
         case ZType_Char:
         case ZType_UChar:
-            _RETURN_ static_cast<utfVaryingString<char>*>(pValue)->_importURF(pURFData);
+            return  static_cast<utfVaryingString<char>*>(pValue)->_importURF(pURFData);
         case ZType_U8:
         case ZType_S8:
-            _RETURN_ static_cast<utfVaryingString<utf8_t>*>(pValue)->_importURF(pURFData);
+            return  static_cast<utfVaryingString<utf8_t>*>(pValue)->_importURF(pURFData);
         case ZType_U16:
         case ZType_S16:
-            _RETURN_ static_cast<utfVaryingString<utf16_t>*>(pValue)->_importURF(pURFData);
+            return  static_cast<utfVaryingString<utf16_t>*>(pValue)->_importURF(pURFData);
         case ZType_U32:
         case ZType_S32:
-            _RETURN_ static_cast<utfVaryingString<utf32_t>*>(pValue)->_importURF(pURFData);
+            return  static_cast<utfVaryingString<utf32_t>*>(pValue)->_importURF(pURFData);
     default:
         break;
         }
     }
-    _RETURN_ static_cast<utfStringHeader*>(pValue)->_importURFGeneric(pURFData);
+    return  static_cast<utfStringHeader*>(pValue)->_importURFGeneric(pURFData);
 }// get_ZStringNfURF
 /*
 ZStatus
@@ -512,7 +512,7 @@ get_121_utf32VaryingStringNfURF(void* pValue, unsigned char* pURFData)
 ZStatus
 _getZDateFullNfURF(void* pValue,unsigned char* pURFData,ZTypeBase pTargetType,uint64_t pTargetNSize,uint32_t pTargetArrayCount)
 {
-_MODULEINIT_
+
 
 ZDateFull wDate;
     wDate._importURF(pURFData);
@@ -521,19 +521,19 @@ ZDateFull wDate;
     case ZType_ZDateFull:
     {
     memmove(pValue,&wDate,sizeof(wDate));
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
     }
     case ZType_ZDate:
     {
      ZDate *wValue=static_cast<ZDate*>(pValue);
      wValue->fromZDateFull(wDate);
-     _RETURN_ ZS_SUCCESS;
+     return  ZS_SUCCESS;
     }
     case ZType_ArrayChar:
     {
        char* wNatural = static_cast<char*>(pValue);
        strncpy(wNatural,wDate.toFormatted().toCString_Strait(),pTargetNSize);
-       _RETURN_ ZS_SUCCESS;
+       return  ZS_SUCCESS;
     }
     case ZType_Utf8VaryingString:
     {
@@ -542,7 +542,7 @@ ZDateFull wDate;
         wValue->fromCString_PtrCount(wDateS.toString(),wDateS.size());
 */
         static_cast<utf8VaryingString*>(pValue)->strset(wDate.toFormatted().toString());
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
     }
     case ZType_Utf16VaryingString:
     {
@@ -551,7 +551,7 @@ ZDateFull wDate;
         wValue->fromCString_PtrCount(wDateS.toString(),wDateS.size());
 */
         static_cast<utf16VaryingString*>(pValue)->fromUtf8(wDate.toFormatted().toString());
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
     }
     case ZType_Utf32VaryingString:
     {
@@ -560,7 +560,7 @@ ZDateFull wDate;
         wValue->fromCString_PtrCount(wDateS.toString(),wDateS.size());
 */
         static_cast<utf32VaryingString*>(pValue)->fromUtf8(wDate.toFormatted().toString());
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
     }
 /*    case ZType_FixedCString:
     {
@@ -580,17 +580,17 @@ ZDateFull wDate;
                               decode_ZType(ZType_ZDateFull),
                               pTargetType,
                               decode_ZType(pTargetType));
-        _RETURN_ ZS_INVTYPE;
+        return  ZS_INVTYPE;
          }
     }//switch
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }//_getZDateFullNfU
 
 
 ZStatus
 _getZDateNfURF(void* pValue,unsigned char* pURFData,ZTypeBase pTargetType,uint64_t pTargetNSize,uint32_t pTargetArrayCount)
 {
-_MODULEINIT_
+
 
 ZDate wDate;
     wDate._importURF(pURFData);
@@ -601,26 +601,26 @@ ZDate wDate;
     case ZType_ZDate:
     {
     memmove(pValue,&wDate,sizeof(wDate));
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
     }
     case ZType_ZDateFull:
     {
      ZDateFull *wValue=static_cast<ZDateFull*>(pValue);
      wValue->fromZDate(wDate);
-     _RETURN_ ZS_SUCCESS;
+     return  ZS_SUCCESS;
     }
     case ZType_ArrayChar:
     {
 /*       char* wNatural = static_cast<char*>(pValue);
        descString wDateS =wDate.toFormatted().toString();*/
        strncpy((char*)pValue,wDate.toFormatted().toCString_Strait(),pTargetNSize);
-       _RETURN_ ZS_SUCCESS;
+       return  ZS_SUCCESS;
     }
     case ZType_Utf8FixedString:
     {
         utf8VaryingString* wValue=static_cast<utf8VaryingString*>(pValue);
         wValue->strset(wDate.toFormatted().toUtf());
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
     }
     case ZType_Utf16FixedString:
     {
@@ -631,7 +631,7 @@ ZDate wDate;
         memset (wPtrOut,0,wi);
         while ((wi -- )&&(*wPtrIn))
             *wPtrOut++=(utf16_t)*wPtrIn++;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
     }
     case ZType_Utf32FixedString:
     {
@@ -642,26 +642,26 @@ ZDate wDate;
         memset (wPtrOut,0,wi);
         while ((wi -- )&&(*wPtrIn))
             *wPtrOut++=(utf32_t)*wPtrIn++;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
     }
 
     case ZType_Utf8VaryingString:
     {
         utf8VaryingString* wValue=static_cast<utf8VaryingString*>(pValue);
         wValue->strset(wDate.toFormatted().toUtf());
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
     }
     case ZType_Utf16VaryingString:
     {
         utf16VaryingString* wValue=static_cast<utf16VaryingString*>(pValue);
         wValue->fromUtf8(wDate.toFormatted().toUtf());
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
     }
     case ZType_Utf32VaryingString:
     {
         utf32VaryingString* wValue=static_cast<utf32VaryingString*>(pValue);
         wValue->fromUtf8(wDate.toFormatted().toUtf());
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
     }
     default:
          {
@@ -671,7 +671,7 @@ ZDate wDate;
                               "Incompatible source and target data type : cannot convert from <%s> to <%s>.",
                               decode_ZType(ZType_ZDate),
                               decode_ZType(pTargetType));
-        _RETURN_ ZS_INVTYPE;
+        return  ZS_INVTYPE;
          }
     }//switch
 }//_getZDateNfU

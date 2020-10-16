@@ -918,13 +918,13 @@ ZDataBuffer wZDB;
                         wField->newCDataElement(wElement,"Data",wZDB,nullptr);
                         }
     }// for
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }//createXMLRecord
 
 void
 ZRecord::writeXML(FILE* pOutput)
 {
-_MODULEINIT_
+
 ZDataBuffer wZDB;
     fprintf (pOutput,
              "           <ZRecord>\n"
@@ -1014,7 +1014,7 @@ ZDataBuffer wZDB;
              }// for
     fprintf (pOutput,
               "          </ZRecord>\n");
-    _RETURN_;
+    return ;
 
 }//writeXML
 
@@ -1026,7 +1026,7 @@ ZDataBuffer wZDB;
 ZStatus
 ZRecord::_split(void)
 {
-_MODULEINIT_
+
 ZDataBuffer* wFieldURFData;
 
 size_t wURFSize=0;
@@ -1094,7 +1094,7 @@ size_t wFieldSize;
                               wHeaderSize,
                               nullptr);
         if (wSt!=ZS_SUCCESS)
-                        {_RETURN_ wSt;}
+                        {return  wSt;}
         wFieldSize = wUniversalSize+wHeaderSize;
         wFieldURFData=new ZDataBuffer(wURFDataPtr,wFieldSize); // get the whole field header + universal data
 
@@ -1120,7 +1120,7 @@ size_t wFieldSize;
     fprintf (stdout," Total fields processed <%d> missing fields <%d>\n",
              wTotalFields,
              wMissing);
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }// _split
 
 /**
@@ -1139,7 +1139,7 @@ size_t wFieldSize;
 ZStatus
 ZRecord::_aggregate(void)
 {
-_MODULEINIT_
+
 // debug data
     ZStatus wSt;
     ZTypeBase wType;
@@ -1230,7 +1230,7 @@ unsigned char* wURFEnd;
                                   wHeaderSize,
                                   nullptr);
             if (wSt!=ZS_SUCCESS)
-                        {_RETURN_ wSt;}
+                        {return  wSt;}
 
             wURFFieldSize= wHeaderSize + wUniversalSize;
             _ASSERT_((wOffset+wURFFieldSize) >= _Base::getByteSize(),\
@@ -1279,7 +1279,7 @@ unsigned char* wURFEnd;
     RecordMap();
 
 
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }// _aggregate
 
 /* ------- C interfaces -------------------*/
@@ -1370,7 +1370,7 @@ APICEXPORT ZStatus  setFieldURFfN (void* &pSourceNatural,
                           ZTypeBase& pTargetType,       // target type (given by RDic)
                           URF_Capacity_type &pTargetCapacity)  // target units count or array count (given by RDic)
 {
-_MODULEINIT_
+
 ZStatus wSt=ZS_SUCCESS;
 
 /* create URF header :
@@ -1384,7 +1384,7 @@ ZStatus wSt=ZS_SUCCESS;
 
 /*    wSt=_getZType_T<_Tp>(pSourceNatural,pSourceType,pSourceNSize,pSourceUSize,pSourceCapacity);
     if (wSt!=ZS_SUCCESS)
-                   { _RETURN_ wSt;}
+                   { return  wSt;}
 
     if (ZVerbose)
             printf ("%s-Class>> assigning field value from source type <%X> <%s> to target type <%X><%s>\n",
@@ -1400,14 +1400,14 @@ ZStatus wSt=ZS_SUCCESS;
         {
         case ZType_Blob:
             {
-            _RETURN_ (setFieldURFfBlob(&pSourceNatural,
+            return  (setFieldURFfBlob(&pSourceNatural,
                                      pTargetURFData,
                                      pSourceType,
                                      pTargetType));
             }//  case ZType_StdString:
         case ZType_StdString:
             {
-            _RETURN_ (setFieldURFfStdString(&pSourceNatural,
+            return  (setFieldURFfStdString(&pSourceNatural,
                                           pTargetURFData,
                                           pSourceNSize,
                                           pSourceUSize,
@@ -1421,7 +1421,7 @@ ZStatus wSt=ZS_SUCCESS;
                                   ZS_INVTYPE,
                                   Severity_Severe,
                                   " Unsupported object type <ZType_StdWString> for source object type. Please utfxxxStrings in place.");
-            _RETURN_ ZS_INVTYPE;
+            return  ZS_INVTYPE;
             }
 /*            return (setFieldURFfStdWString(&pNatural,
                                            pURFData,
@@ -1443,8 +1443,8 @@ ZStatus wSt=ZS_SUCCESS;
         case ZType_Utf32VaryingString:
             {
 //            utfStringHeader *wString=static_cast<utfStringHeader*>(wNaturalPtr);
-//            _RETURN_ wString->_exportURFGeneric(pTargetURFData);
-             _RETURN_ (setFieldURFfZString(&pSourceNatural,
+//            return  wString->_exportURFGeneric(pTargetURFData);
+             return  (setFieldURFfZString(&pSourceNatural,
                                            pTargetURFData,
                                            pTargetType,
                                            pTargetCapacity));
@@ -1506,21 +1506,21 @@ ZStatus wSt=ZS_SUCCESS;
 
         case ZType_ZDate:
             {
-        _RETURN_ (setFieldURFfZDate(&pSourceNatural,
+        return  (setFieldURFfZDate(&pSourceNatural,
                                     pTargetURFData,
                                     pSourceType,
                                     pTargetType));
             }
         case ZType_ZDateFull:
             {
-        _RETURN_ (setFieldURFfZDateFull(&pSourceNatural,
+        return  (setFieldURFfZDateFull(&pSourceNatural,
                                       pTargetURFData,
                                       pSourceType,
                                       pTargetType));
             }
         case ZType_CheckSum:
             {
-        _RETURN_ (setFieldURFfCheckSum(&pSourceNatural,
+        return  (setFieldURFfCheckSum(&pSourceNatural,
                                       pTargetURFData,
                                       pSourceType,
                                       pTargetType));
@@ -1533,11 +1533,11 @@ ZStatus wSt=ZS_SUCCESS;
                                   "Invalid source data type  <%s> given to convert to target type <%s>",
                                   decode_ZType(pSourceType),
                                   decode_ZType(pTargetType));
-            _RETURN_ ZS_INVTYPE;
+            return  ZS_INVTYPE;
             }
         }//switch (pSourceType)
 
-    _RETURN_ wSt;
+    return  wSt;
 
 }// setFieldURFfN for Classes
 

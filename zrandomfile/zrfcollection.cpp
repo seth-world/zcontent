@@ -35,8 +35,8 @@ void
 ZRFCollection::copy(ZRFCollection &pCollection)
 {
     clear();
-    _Base::_cloneFrom (pCollection);
-    Argument._cloneFrom(pCollection.Argument);
+    _Base::_copyFrom (pCollection);
+    Argument._copyFrom(pCollection.Argument);
 
 /*     for (long wi=0;wi<pCollection.size();wi++)
             {

@@ -77,7 +77,7 @@ ZSIndexCollection::initSearch(ZArray<ZSIndexResult> *pCollection)
         FCollection=true;
         if (InputCollection == nullptr)
                 InputCollection = new ZArray<ZSIndexResult>();
-        InputCollection->_cloneFrom(*pCollection);
+        InputCollection->_copyFrom(*pCollection);
         }
         else
         {
@@ -103,7 +103,7 @@ void
 ZSIndexCollection::copy(ZSIndexCollection &pCollection)
 {
     clear();
-    _Base::_cloneFrom(pCollection);
+    _Base::_copyFrom(pCollection);
     for (long wi=0;wi<pCollection.size();wi++)
             {
             newBlankElement();

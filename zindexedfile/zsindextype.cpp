@@ -480,7 +480,7 @@ ZSICBOwnData_Export wICB;
 ZStatus
 ZSICBOwnData::_importICBOwn(unsigned char* pZDBImport_Ptr)
 {
-_MODULEINIT_
+
 
     ZSICBOwnData_Export* wICBOwn_Import=(ZSICBOwnData_Export*)( pZDBImport_Ptr);
 
@@ -492,7 +492,7 @@ _MODULEINIT_
                                    Severity_Severe,
                                    "Error Index Control Block identification is bad. Value <%ld>  : File header appears to be corrupted - invalid BlockID",
                                    wICBOwn_Import->BlockID);
-            _RETURN_(ZS_BADICB);
+            return (ZS_BADICB);
             }
     if (wICBOwn_Import->StartSign != cst_ZSTART)    // has not to be reversed
             {
@@ -500,7 +500,7 @@ _MODULEINIT_
                                   ZS_BADFILEHEADER,
                                   Severity_Severe,
                                   "Error Index Control Block  : Index header appears to be corrupted - invalid ICB StartBlock");
-            _RETURN_(ZS_BADFILEHEADER);
+            return (ZS_BADFILEHEADER);
             }
 
     if (reverseByteOrder_Conditional<unsigned long>(wICBOwn_Import->ZMFVersion) != __ZMF_VERSION__)// HAS to be reversed
@@ -511,7 +511,7 @@ _MODULEINIT_
                                   "Error Index Control Block   : Found version <%ld> while current ZMF version is <%ld>",
                                   wICBOwn_Import->ZMFVersion,
                                   __ZMF_VERSION__);
-            _RETURN_(ZS_BADFILEVERSION);
+            return (ZS_BADFILEVERSION);
             }
 
 
@@ -531,7 +531,7 @@ _MODULEINIT_
 //    size_t wZKDicOffset = wSize+sizeof(ZSICBOwnData_Export); // ZKDic starts after varying string Index Name
 //    EndSign=wICB->EndSign;
 
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }// ZSICBOwnData::_importICBOwn
 
 
@@ -1730,7 +1730,7 @@ getAtomicZType_Sizes(ZTypeBase pType,
                      uint64_t& pNaturalSize,
                      uint64_t& pUniversalSize) // not a template
 {
-_MODULEINIT_
+
     ZTypeBase wType = pType & ZType_AtomicMask;
     switch (wType)
     {
@@ -1740,67 +1740,67 @@ _MODULEINIT_
         {
         pNaturalSize=sizeof(uint8_t);
         pUniversalSize = pNaturalSize;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
         }
     case ZType_S8 :
         {
         pNaturalSize=sizeof(uint8_t);
         pUniversalSize = pNaturalSize+1;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
         }
     case ZType_S16 :
         {
         pNaturalSize=sizeof(int16_t);
         pUniversalSize = pNaturalSize+1;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
         }
     case ZType_U16 :
         {
         pNaturalSize=sizeof(uint16_t);
         pUniversalSize = pNaturalSize;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
         }
     case ZType_S32 :
         {
         pNaturalSize=sizeof(int32_t);
         pUniversalSize = pNaturalSize+1;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
         }
     case ZType_U32 :
         {
         pNaturalSize=sizeof(uint32_t);
         pUniversalSize = pNaturalSize;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
         }
     case ZType_S64 :
         {
         pNaturalSize=sizeof(int64_t);
         pUniversalSize = pNaturalSize+1;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
         }
     case ZType_U64 :
         {
         pNaturalSize=sizeof(uint64_t);
         pUniversalSize = pNaturalSize;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
         }
     case ZType_Float :
         {
         pNaturalSize=sizeof(float);
         pUniversalSize = pNaturalSize+1;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
         }
     case ZType_Double :
         {
         pNaturalSize=sizeof(double);
         pUniversalSize = pNaturalSize+1;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
         }
     case ZType_LDouble :
         {
         pNaturalSize=sizeof(long double);
         pUniversalSize = pNaturalSize+1;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
         }
     default:
         {
@@ -1812,7 +1812,7 @@ _MODULEINIT_
                                 " Invalid type (hex)<%x> given type analysis is %s",
                                 pType,
                                 decode_ZType(pType));
-        _RETURN_ ZS_INVTYPE;
+        return  ZS_INVTYPE;
         }
     }// case
 return ZS_SUCCESS;

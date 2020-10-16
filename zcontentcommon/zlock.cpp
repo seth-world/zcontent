@@ -3,7 +3,7 @@
 #include <string.h>
 #include <ztoolset/charman.h>
 #include <zcontentcommon/zlock.h>
-
+/*
 const char *decode_ZLockReason(ZLock_Reason pReason)
 {
     switch (pReason)
@@ -22,7 +22,7 @@ const char *decode_ZLockReason(ZLock_Reason pReason)
         return "ZReason_Other";
     }
 }
-
+*/
 CharMan decode_ZLockMask(zlockmask_type pLock)
 {
     CharMan wCh;

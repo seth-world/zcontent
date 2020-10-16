@@ -77,14 +77,13 @@ ZJEventQueue::erase (const zrank_type pRank)
 void
 ZJEventQueue::enqueue (const ZJOperation &pZJOP,
                        pid_t pPid,
-                       ZUserId pUid,
-                       utfdescString &pUsername,
+                       const ZSystemUserId &pUid,
                        ZDataBuffer &pRecord,
                        const zrank_type pRank,
                        const zaddress_type pAddress,
                        const ssize_t pOffset)
 {
-    ZJEvent *wEvent = new ZJEvent (pZJOP,pPid,pUid,pUsername,pRecord,pRank,pAddress,pOffset);
+    ZJEvent *wEvent = new ZJEvent (pZJOP,pPid,pUid,pRecord,pRank,pAddress,pOffset);
 /*    wEvent->setData(pRecord);
     wEvent->Username = pUsername;
     wEvent->Pid = pPid;
@@ -106,7 +105,7 @@ ZJEventQueue::dequeue(ZJEvent &pEvent)
     pEvent.Header.Pid = Tab[0]->Header.Pid;
     pEvent.Header.DateTime = Tab[0]->Header.DateTime;
     pEvent.Header.Uid = Tab[0]->Header.Uid;
-    pEvent.Header.Username = Tab[0]->Header.Username;
+//    pEvent.Header.Username = Tab[0]->Header.Username;
     pEvent.Header.Rank= Tab[0]->Header.Rank;
     pEvent.Header.Address= Tab[0]->Header.Address;
 
@@ -161,7 +160,7 @@ ZStatus     wSt;
         ZException.exit_abort();
         }
     Username = wUserDesc->pw_name ;*/
-    Username = ZUser().setToCurrentUser().getName().toString();
+    Username = ZSystemUser().setToCurrentUser().getSystemName().toString();
 
     if ((wSt=setJournalLocalDirectoryPath())!=ZS_SUCCESS)
                             {
@@ -327,7 +326,7 @@ ZSJournal::end(void)
     if (JThread.Created)    // if journaling thread active
         {
         ZDataBuffer wRecord;
-        EvtQueue.enqueue(ZJOP_Close,Pid,Uid,Username,wRecord);  // enqueue termination message
+        EvtQueue.enqueue(ZJOP_Close,Pid,Uid,wRecord);  // enqueue termination message
         }
         else
         {
@@ -354,7 +353,7 @@ ZSJournal::enqueue (const ZJOperation pOperation,
                    const zaddress_type pAddress,
                    const ssize_t pOffset)
 {
-    EvtQueue.enqueue(pOperation,Pid,Uid,Username,pRecord,pRank,pAddress,pOffset);
+    EvtQueue.enqueue(pOperation,Pid,Uid,pRecord,pRank,pAddress,pOffset);
     CMtx.signal();
 }
 
@@ -377,7 +376,7 @@ ZSJournal::enqueueSetFieldValue (const ZJOperation pOperation,
 {
 ZDataBuffer pBuffer;
     packFieldValues(pBuffer,pFieldBefore,pFieldAfter);
-    EvtQueue.enqueue(pOperation,Pid,Uid,Username,pBuffer,pRank,pAddress,pOffset);
+    EvtQueue.enqueue(pOperation,Pid,Uid,pBuffer,pRank,pAddress,pOffset);
     CMtx.signal();
 }
 
@@ -520,7 +519,7 @@ ZDataBuffer wFieldAfter;
 
     fprintf (pOutput,
              "Rank| %60s |  Content dump |\n"
-             "    |   Pid   |   Uid  |  Username  |  Date and time | \n",
+             "    |   Pid   |   Uid  | Operation |  Date and time | rank    | address   |\n"
              "Header data");
 
     while (zgetNext(wRecord)==ZS_SUCCESS)
@@ -532,14 +531,13 @@ ZDataBuffer wFieldAfter;
             wFieldBefore.dumpHexa(0,30,wLineHexa,wLineChar);
             wFieldAfter.dumpHexa(0,30,wLineHexa2,wLineChar2);
             fprintf (pOutput,
-                     "%3ld|%6ld|%6ld|%20s|%17s|%10s|%3ld|%6lld|%6ld|%s %s\n",
+                     "%3ld|%6ld|%6s|%20s|%10s|%3ld|%6lld|%6ld|%s %s\n",
                      wRank,
                      wEvent.Header.Pid,
-                     wEvent.Header.Uid,
-                     wEvent.Header.Username.toCChar(),
-                     wEvent.Header.DateTime.toLocaleFormatted().toCChar(),
-                     wEvent.Header.DateTime,
+                     wEvent.Header.Uid.toString().toCChar(),
+//                     wEvent.Header.Username.toCChar(),
                      decode_ZJOP(wEvent.Header.Operation),
+                     wEvent.Header.DateTime.toLocaleFormatted().toCChar(),
                      wEvent.Header.Rank,
                      wEvent.Header.Address,
                      wEvent.Header.Offset,
@@ -552,14 +550,13 @@ ZDataBuffer wFieldAfter;
 
     wEvent.dumpHexa(0,30,wLineHexa,wLineChar);
     fprintf (pOutput,
-             "%3ld|%6ld|%6ld|%20s|%17s|%10s|%3ld|%6lld|%6ld|%s %s\n",
+             "%3ld|%6ld|%6s|%20s|%10s|%3ld|%6lld|%6ld|%s %s\n",
              wRank,
              wEvent.Header.Pid,
-             wEvent.Header.Uid,
-             wEvent.Header.Username.toCChar(),
-             wEvent.Header.DateTime.toLocaleFormatted().toCChar(),
-             wEvent.Header.DateTime,
+             wEvent.Header.Uid.toString().toCChar(),
+//             wEvent.Header.Username.toCChar(),
              decode_ZJOP(wEvent.Header.Operation),
+             wEvent.Header.DateTime.toLocaleFormatted().toCChar(),
              wEvent.Header.Rank,
              wEvent.Header.Address,
              wEvent.Header.Offset,

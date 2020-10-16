@@ -107,8 +107,7 @@ public:
     ZJEvent(void) {}
     ZJEvent (const ZJOperation             pOperation,
              pid_t                  pPid,
-             ZUserId                pUid,
-             utfdescString             pUsername,
+             const ZSystemUserId&   pUid,
              ZDataBuffer            &pRecord,
              const zrank_type       pRank,
              const zaddress_type    pAddress,
@@ -118,7 +117,7 @@ public:
         Header.Operation = pOperation;
         Header.Pid=pPid;
         Header.Uid=pUid;
-        Header.Username = pUsername;
+//        Header.Username = pUsername;
         Header.Rank = pRank;
         Header.Address = pAddress;
         Header.Offset   = pOffset;
@@ -137,8 +136,8 @@ public:
     ZJOperation     Operation;
     ZJState         State; //!< define the state of the journal record
     pid_t           Pid;
-    ZUserId         Uid;
-    utfdescString   Username;
+    ZSystemUserId   Uid;
+//    utfdescString   Username;
     ZDateFull       DateTime;
     zrank_type      Rank;
     zaddress_type   Address;
@@ -161,8 +160,7 @@ public:
 
     void enqueue (const ZJOperation &pZJOP,
                   pid_t pPid,
-                  ZUserId pUid,
-                  utfdescString &pUsername,
+                  const ZSystemUserId &pUid,
                   ZDataBuffer &pRecord,
                   const zrank_type pRank=-1,
                   const zaddress_type pAddress=-1,
@@ -238,7 +236,7 @@ public:
 
 protected:
     pid_t       Pid;
-    ZUserId     Uid;
+    ZSystemUserId     Uid;
     utfdescString  Username;
     ZSMasterFile* Father;
 //    uriString   URIJournal;

@@ -38,10 +38,10 @@ using namespace zbs ;
 
 long ZSIndexObjectTable::pop (void)
 {
-_MODULEINIT_
+
     if (size()<0)
             {
-            _RETURN_ -1;// Beware _RETURN_ is multiple instructions in debug mode
+            return  -1;// Beware return  is multiple instructions in debug mode
             }
     last()->~ZSIndexFile();
     if (last()!=nullptr)
@@ -49,23 +49,23 @@ _MODULEINIT_
             delete last();
             last()=nullptr;
             }
-    _RETURN_ _Base::pop();
+    return  _Base::pop();
 } // pop
 
 long ZSIndexObjectTable::erase (long pRank)
 {
-_MODULEINIT_
+
 
     if (pRank>lastIdx())
                 {
-                _RETURN_ -1;
+                return  -1;
                 }
     Tab[pRank]->~ZSIndexFile();
 
     if (Tab[pRank]!=nullptr)
             delete Tab[pRank];   // appearingly it puts the mess
     Tab[pRank]=nullptr; // just in case for avoiding double free
-    _RETURN_ _Base::erase(pRank);
+    return  _Base::erase(pRank);
 } // erase
 
 void ZSIndexObjectTable::clear(void)
@@ -81,15 +81,15 @@ void ZSIndexObjectTable::clear(void)
 
 long ZSIndexControlTable::erase(const long pIdx)
 {
-_MODULEINIT_
+
     if (Tab[pIdx]->ZKDic!=nullptr)
                         delete Tab[pIdx]->ZKDic;
     Tab[pIdx]->ZKDic=nullptr;
-    _RETURN_ _Base::erase(pIdx);
+    return  _Base::erase(pIdx);
 }
 long ZSIndexControlTable::push (ZSIndexControlBlock *pICB)
 {
-_MODULEINIT_
+
 /*    newBlankElement();
     last().clear(pMetaDic);  // set up ZICB and its Key Dictionnary
 
@@ -101,14 +101,14 @@ _MODULEINIT_
           wj++;
           }*/
     _Base::push(pICB);
-    _RETURN_ lastIdx();
+    return  lastIdx();
 }//push
 
 long ZSIndexControlTable::pop (void)
 {
     if (size()<1)
             {
-            _RETURN_ -1;
+            return  -1;
             }
     if (last()->ZKDic!=nullptr)
             {
@@ -131,7 +131,7 @@ long ZSIndexControlTable::zsearchIndexByName (const char* pName)
             {
             if (Tab[wi]->Name==pName)
                         {
-                        _RETURN_ wi;
+                        return  wi;
                         }
             }
 
@@ -272,7 +272,7 @@ ZDataBuffer wIndexPath;
 ZStatus
 ZSMCBOwnData::_import(unsigned char* pZDBImport_Ptr)
 {
-_MODULEINIT_
+
 ZStatus wSt;
     ZSMCBOwnData_Export* wMCB=(ZSMCBOwnData_Export*) pZDBImport_Ptr;
     printf ("%s>\n",_GET_FUNCTION_NAME_);
@@ -283,7 +283,7 @@ ZStatus wSt;
                                   ZS_BADFILEHEADER,
                                   Severity_Error,
                                   "Error Master Control Block  : file header appears to be corrupted - invalid MCB StartBlock");
-           _RETURN_(ZS_BADFILEHEADER);
+           return (ZS_BADFILEHEADER);
             }
     if (wMCB->BlockID != ZBID_MCB)
             {
@@ -292,7 +292,7 @@ ZStatus wSt;
                                    Severity_Error,
                                    "Error Master Control Block identification is bad. Value <%ld>  : File header appears to be corrupted - invalid BlockID",
                                    wMCB->BlockID);
-            _RETURN_ (ZS_BADICB);
+            return  (ZS_BADICB);
             }
     if (reverseByteOrder_Conditional<unsigned long>(wMCB->ZMFVersion)!= __ZMF_VERSION__)
             {
@@ -302,7 +302,7 @@ ZStatus wSt;
                                   "Error Master Control Block   : Found version <%ld> while current ZMF version is <%ld>",
                                   reverseByteOrder_Conditional<unsigned long>(wMCB->ZMFVersion),
                                   __ZMF_VERSION__);
-           _RETURN_(ZS_BADFILEVERSION);
+           return (ZS_BADFILEVERSION);
             }
 
 
@@ -324,7 +324,7 @@ ZStatus wSt;
     IndexFilePath.clear();
     IndexFilePath.fromStringCount(wMCB->IndexFilePath,wMCB->IndexFilePathSize);*/
 
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }//ZSMCBOwnData::_import
 
 /**
@@ -335,7 +335,7 @@ ZStatus wSt;
  */
 ZDataBuffer& ZSMasterControlBlock::_exportMCB(ZDataBuffer &pMCBContent)
 {
-_MODULEINIT_
+
 ZDataBuffer wExportContent;
 // set / reset IndexCount
 size_t wMetaDicOffset=0,wICBOffset =0;
@@ -387,7 +387,7 @@ size_t wMetaDicOffset=0,wICBOffset =0;
             wMCBOwn->JCBSize = reverseByteOrder_Conditional<size_t>(wJCB.Size); // update size of exported JCB in exported buffer
             }
 
-    _RETURN_ pMCBContent;
+    return  pMCBContent;
 }// _exportMCB
 
 /**
@@ -397,7 +397,7 @@ size_t wMetaDicOffset=0,wICBOffset =0;
 ZStatus
 ZSMasterControlBlock::_importMCB(ZDataBuffer& pBuffer)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 //long wIndexCountsv ;
@@ -410,7 +410,7 @@ if (ZVerbose)
     wSt=wMCBOwn._import(pBuffer.Data);  // needed to taken into account conversion to natural format
     if (wSt!=ZS_SUCCESS)
                 {
-                _RETURN_ wSt;
+                return  wSt;
                 }
     clear();
     memmove(this,&wMCBOwn,sizeof(ZSMCBOwnData));
@@ -440,7 +440,7 @@ if (ZVerbose)
         wSt=wICB->_importICB(&MetaDic,wPtr,wMCBOwn.ICBSize);
         Index.push(wICB);
         if (wSt!=ZS_SUCCESS)
-                    {  _RETURN_ wSt; }
+                    {  return  wSt; }
         wPtr = wPtr + wInSize ;    // adjust wPtr to next ZIndexControlBlock
 //        if (wPtr >= (pBuffer.Data+pBuffer.Size))
 //                        break;
@@ -454,7 +454,7 @@ if (ZVerbose)
             fprintf (stdout,
                      "%s-I- End import Master Control Block\n",_GET_FUNCTION_NAME_);
 
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }//_importMCB
 
 /**
@@ -599,7 +599,7 @@ ZSJournalControlBlock::_getExportSize()
 ZStatus
 ZSJournalControlBlock::_importJCB(ZDataBuffer& pJCBContent)
 {
-_MODULEINIT_
+
 //ZStatus wSt;
 //long wIndexCountsv ;
 
@@ -612,7 +612,7 @@ ZSJCBOwnData* wJCB =(ZSJCBOwnData*) pJCBContent.Data;
                                Severity_Error,
                                "Error Journal Control Block identification is bad. Value <%ld>  : File header appears to be corrupted - invalid BlockID",
                                wJCB->BlockID);
-        _RETURN_(ZS_BADICB);
+        return (ZS_BADICB);
         }
     if (wJCB->StartSign != cst_ZSTART)
         {
@@ -620,7 +620,7 @@ ZSJCBOwnData* wJCB =(ZSJCBOwnData*) pJCBContent.Data;
                               ZS_BADFILEHEADER,
                               Severity_Error,
                               "Error Journal Control Block  : Index header appears to be corrupted - invalid JCB StartBlock mark");
-       _RETURN_(ZS_BADFILEHEADER);
+       return (ZS_BADFILEHEADER);
         }
     if (wJCB->ZMFVersion!= __ZMF_VERSION__)
         {
@@ -630,13 +630,13 @@ ZSJCBOwnData* wJCB =(ZSJCBOwnData*) pJCBContent.Data;
                               "Error Journal Control Block   : Found version <%ld> while current ZMF version is <%ld>",
                               wJCB->ZMFVersion,
                               __ZMF_VERSION__);
-       _RETURN_(ZS_BADFILEVERSION);
+       return (ZS_BADFILEVERSION);
         }
 
     clear();
     memmove(this,pJCBContent.Data,sizeof(ZSJCBOwnData));
 
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }//_importJCB
 
 ZStatus
@@ -645,7 +645,7 @@ ZSJournalControlBlock::purge(const zrank_type pKeepRanks)
 
     if (Journal==nullptr)
                 {
-                return ZS_INVOP; // Beware _RETURN_ is multiple instructions in debug mode
+                return ZS_INVOP; // Beware return  is multiple instructions in debug mode
                 }
     return Journal->purge(pKeepRanks);
 }
@@ -725,7 +725,7 @@ ZSMasterFile:: ~ZSMasterFile(void)
 ZStatus
 ZSMasterFile::initJournaling (uriString &pJournalPath)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 bool wasOpen=true;
@@ -738,7 +738,7 @@ zmode_type wFormerMode=ZRF_Nothing;
                 wasOpen=false;
                 wSt = zopen(ZRF_Exclusive|ZRF_Write);
                 if (wSt!=ZS_SUCCESS)
-                            {_RETURN_ wSt;}// Beware _RETURN_ is multiple instructions in debug mode
+                            {return  wSt;}// Beware return  is multiple instructions in debug mode
             }
         else
         {
@@ -773,7 +773,7 @@ zmode_type wFormerMode=ZRF_Nothing;
                         fprintf (stderr,
                                  "setJournalingOn-W Warning journal file %s is already open.\n",
                                  ZMCB.ZJCB->Journal->getURIContent().toString());
-                        _RETURN_ ZS_SUCCESS;
+                        return  ZS_SUCCESS;
                         }
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_FILENOTOPEN,
@@ -781,14 +781,14 @@ zmode_type wFormerMode=ZRF_Nothing;
                                     " Journaling for file %s is set to started while journal file is marked as not open.",
                                     getURIContent().toString());
             ZException.exit_abort();
-//            _RETURN_ ZS_FILENOTOPEN;
+//            return  ZS_FILENOTOPEN;
             }
         } // else
     wSt=ZMCB.ZJCB->Journal->init();
     if (wSt!=ZS_SUCCESS)
         {
         ZException.addToLast("While initializing journaling");
-        _RETURN_ wSt;
+        return  wSt;
         }
 
 //    ZMCB.JournalingOn=true;
@@ -797,14 +797,14 @@ zmode_type wFormerMode=ZRF_Nothing;
 
     if (wSt!=ZS_SUCCESS)
                 {
-                    _RETURN_ wSt; // Beware _RETURN_ is multiple instructions in debug mode
+                    return  wSt; // Beware return  is multiple instructions in debug mode
                 }
     if (ZVerbose)
             fprintf(stdout,
                     "setJournalingOn-I-JCB Journaling set on within JournalingControlBlock\n");
 
     if (!wasOpen)  // if was not open close it
-                {_RETURN_ zclose();}
+                {return  zclose();}
 
     if (wFormerMode!=ZRF_Nothing) // if was open but not in appropriate mode
             {
@@ -830,7 +830,7 @@ zmode_type wFormerMode=ZRF_Nothing;
         ZException.printUserMessage(stderr);
 
         }// else
-    _RETURN_ wSt;
+    return  wSt;
 } // initJournaling
 
 ZStatus
@@ -851,7 +851,7 @@ if (!ZDescriptor._isOpen)
                                 Severity_Error,
                                 "File <%s> must be open to start/restart journaling.",
                                 getURIContent().toString());
-        _RETURN_ ZS_INVOP;
+        return  ZS_INVOP;
         }
 
     if (ZVerbose)
@@ -868,7 +868,7 @@ if (!ZDescriptor._isOpen)
                                         Severity_Error,
                                         "Journaling has not be defined for file %s. Cannot start/restart journaling.",
                                         getURIContent().toString());
-                _RETURN_ ZS_INVOP;
+                return  ZS_INVOP;
                 }
 
     if (ZMCB.ZJCB->Journal->JThread.getState() > ZTHS_Nothing)
@@ -882,21 +882,21 @@ if (!ZDescriptor._isOpen)
                         fprintf (stderr,
                                  "setJournalingOn-W Warning journal file %s is already open.\n",
                                  ZMCB.ZJCB->Journal->getURIContent().toString());
-                        _RETURN_ ZS_SUCCESS;
+                        return  ZS_SUCCESS;
                         }
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_FILENOTOPEN,
                                     Severity_Severe,
                                     " Setting journaling on : Journaling for file %s is started while journal file is marked as not open.",
                                     getURIContent().toString());
-            _RETURN_ ZS_FILENOTOPEN;
+            return  ZS_FILENOTOPEN;
             }
 
     wSt=ZMCB.ZJCB->Journal->init(true); // Journal file must exist
     if (wSt!=ZS_SUCCESS)
         {
         ZException.addToLast("While initializing journaling");
-        _RETURN_ wSt;
+        return  wSt;
         }
 
 
@@ -905,7 +905,7 @@ if (!ZDescriptor._isOpen)
  //   wSt=writeControlBlocks();
 
 //    if (wSt!=ZS_SUCCESS)
-//                  {  _RETURN_ wSt;}
+//                  {  return  wSt;}
 
     if (ZVerbose)
             fprintf(stdout,
@@ -931,14 +931,14 @@ if (!ZDescriptor._isOpen)
     }// else
 
 /*    if (!wasOpen)  // if ZSMasterFile was not open close it
-           { _RETURN_ zclose();}
+           { return  zclose();}
 
     if (wFormerMode!=ZRF_Nothing) // if ZSMasterFile was open but not in appropriate mode
             {
             zclose();       // close it
             wSt=zopen(wFormerMode); // re-open ZSMasterFile with former mode
             }*/
-    _RETURN_ wSt;
+    return  wSt;
 } // setJournalingOn
 
 #ifdef __COMMENT__
@@ -952,7 +952,7 @@ if (!ZDescriptor._isOpen)
 ZStatus
 ZSMasterFile::setJournalingLOn()
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 bool wasOpen=true;
@@ -960,7 +960,7 @@ zmode_type wFormerMode=ZRF_Nothing;
 // this does not touch integrity of files
 
 if (!ZDescriptor._isOpen)
-            {  _RETURN_ (ZS_INVOP);}
+            {  return  (ZS_INVOP);}
 
     if (ZVerbose)
             fprintf (stderr,
@@ -987,21 +987,21 @@ if (!ZDescriptor._isOpen)
                         fprintf (stderr,
                                  "setJournalingOn-W Warning journal file %s is already open.\n",
                                  ZMCB.ZJCB->Journal->getURIContent().toString());
-                        _RETURN_ ZS_SUCCESS;
+                        return  ZS_SUCCESS;
                         }
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_FILENOTOPEN,
                                     Severity_Severe,
                                     " Setting journaling on : Journaling for file %s is started while journal file is marked as not open.",
                                     getURIContent().toString());
-            _RETURN_ ZS_FILENOTOPEN;
+            return  ZS_FILENOTOPEN;
             }
     wSt=ZMCB.ZJCB->Journal->init(true); // journaling file must have been created elsewhere and must exist
     if (wSt!=ZS_SUCCESS)
         {
 
         ZException.addToLast("While initializing journaling");
-        _RETURN_ wSt;
+        return  wSt;
         }
 
 /*
@@ -1010,7 +1010,7 @@ if (!ZDescriptor._isOpen)
     wSt=writeControlBlocks();
 
     if (wSt!=ZS_SUCCESS)
-                 {   _RETURN_ wSt;}
+                 {   return  wSt;}
     if (ZVerbose)
             fprintf(stdout,
                     "setJournalingOn-I-MCB Journaling set on within MCB header \n");
@@ -1039,24 +1039,24 @@ if (!ZDescriptor._isOpen)
     }// else
 
     if (!wasOpen)  // if ZSMasterFile was not open close it
-            {   _RETURN_ zclose();}
+            {   return  zclose();}
 
     if (wFormerMode!=ZRF_Nothing) // if ZSMasterFile was open but not in appropriate mode
             {
             zclose();       // close it
             wSt=zopen(wFormerMode); // re-open ZSMasterFile with former mode
             }
-    _RETURN_ wSt;*/
+    return  wSt;*/
 } // setJournalingOn
 #endif // __COMMENT__
 
 ZStatus
 ZSMasterFile::setJournalingOff (void)
 {
-_MODULEINIT_
+
 
 //    if (!ZMCB.JournalingOn)
-//                  {  _RETURN_ ZS_SUCCESS;}
+//                  {  return  ZS_SUCCESS;}
 ZStatus wSt;
 bool wasOpen=true;
 zmode_type wFormerMode=ZRF_Nothing;
@@ -1068,7 +1068,7 @@ zmode_type wFormerMode=ZRF_Nothing;
                 wasOpen=false;
                 wSt = zopen(ZRF_Exclusive|ZRF_Write);
                 if (wSt!=ZS_SUCCESS)
-                            {_RETURN_ wSt; } // Beware _RETURN_ is multiple instructions in debug mode
+                            {return  wSt; } // Beware return  is multiple instructions in debug mode
             }
         else
         {
@@ -1087,9 +1087,9 @@ zmode_type wFormerMode=ZRF_Nothing;
                      "setJournalingOff-I Stopping journaling for file %s\n",
                      getURIContent().toString());
     if (ZMCB.ZJCB==nullptr)
-            { _RETURN_ ZS_SUCCESS;}  // Beware _RETURN_ is multiple instructions in debug mode
+            { return  ZS_SUCCESS;}  // Beware return  is multiple instructions in debug mode
     if (ZMCB.ZJCB->Journal==nullptr)
-            { _RETURN_ ZS_SUCCESS;}  // Beware _RETURN_ is multiple instructions in debug mode
+            { return  ZS_SUCCESS;}  // Beware return  is multiple instructions in debug mode
 
 /*    if (!ZMCB.JournalingOn)
             {
@@ -1101,10 +1101,10 @@ zmode_type wFormerMode=ZRF_Nothing;
                         fprintf (stderr,
                                  "setJournalingOn-W Warning Journaling stopped but journal file %s is open. closing file\n",
                                  Journal->getURIContent().toString());
-                        _RETURN_ Journal->zclose();
+                        return  Journal->zclose();
                         }
             delete Journal;
-            _RETURN_ ZS_SUCCESS;
+            return  ZS_SUCCESS;
             }*/
 
     delete ZMCB.ZJCB;  // deletes Journaling Control Block  AND ZJournal instance : send a ZJOP_Close to journal thread
@@ -1114,7 +1114,7 @@ zmode_type wFormerMode=ZRF_Nothing;
 //    ZMCB.JournalingOn=false;
     wSt=writeControlBlocks();
     if (wSt!=ZS_SUCCESS)
-                { _RETURN_ wSt;} // Beware _RETURN_ is multiple instructions in debug mode
+                { return  wSt;} // Beware return  is multiple instructions in debug mode
     if (ZVerbose)
             fprintf(stdout,
                     "setJournalingOn-I-MCB Journaling for file %s has been set off within MCB header \n",
@@ -1122,14 +1122,14 @@ zmode_type wFormerMode=ZRF_Nothing;
 
 
     if (!wasOpen)  // if was not open close it
-            { _RETURN_ zclose();} // Beware _RETURN_ is multiple instructions in debug mode
+            { return  zclose();} // Beware return  is multiple instructions in debug mode
 
     if (wFormerMode!=ZRF_Nothing) // if was open but not in appropriate mode
             {
             zclose();       // close it
             wSt=zopen(wFormerMode); // re-open with former mode
             }
-    _RETURN_ wSt;
+    return  wSt;
 } // setJournalingOff
 
 //----------- ZSMasterFile Index methods----------------
@@ -1156,7 +1156,7 @@ zmode_type wFormerMode=ZRF_Nothing;
 ZStatus
 ZSMasterFile::setIndexFilesDirectoryPath (uriString &pPath)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZDataBuffer wReserved;
@@ -1167,7 +1167,7 @@ ZDataBuffer wReserved;
                                     Severity_Error,
                                     " Cannot modify IndexFilesDirectoryPath while file is already open for file  <%s>",
                                     ZDescriptor.URIContent.toString());
-            _RETURN_ ZS_INVOP;
+            return  ZS_INVOP;
             }
     if (!pPath.isDirectory())
             {
@@ -1176,14 +1176,14 @@ ZDataBuffer wReserved;
                                     Severity_Error,
                                     " Cannot set IndexFilesDirectoryPath : path is not a valid directory. Content file is <%s>",
                                     ZDescriptor.URIContent.toString());
-            _RETURN_ ZS_NOTDIRECTORY;
+            return  ZS_NOTDIRECTORY;
             }
     wSt=_Base::_open(ZDescriptor,ZRF_Exclusive|ZRF_All,ZFT_ZSMasterFile);
     if (wSt!=ZS_SUCCESS)
         {
         ZException.addToLast("While openning for setting IndexFileDirectoryPath. File <%s>",
                                ZDescriptor.URIContent.toString());
-        _RETURN_ wSt;
+        return  wSt;
         }
     ZMCB.IndexFilePath = pPath;
 
@@ -1198,13 +1198,13 @@ ZDataBuffer wReserved;
                                 ZDescriptor.URIContent.toString());
         }
     _Base::_close(ZDescriptor);
-    _RETURN_ wSt;
+    return  wSt;
 }//setIndexFilesDirectoryPath
 
 ZStatus
 ZSMasterFile::setJournalLocalDirectoryPath (uriString &pPath)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZDataBuffer wReserved;
@@ -1215,7 +1215,7 @@ ZDataBuffer wReserved;
                                     Severity_Severe,
                                     " Cannot modify JournalingLocalDirectoryPath while Journaling is started for file  <%s>",
                                     getURIContent().toString());
-            _RETURN_ ZS_INVOP;
+            return  ZS_INVOP;
             }
     if (!pPath.isDirectory())
             {
@@ -1224,14 +1224,14 @@ ZDataBuffer wReserved;
                                     Severity_Error,
                                     " Cannot set JournalingLocalDirectoryPath : path is not a valid directory. Content file is <%s>",
                                     ZDescriptor.URIContent.toString());
-            _RETURN_ ZS_NOTDIRECTORY;
+            return  ZS_NOTDIRECTORY;
             }
     wSt=_Base::_open(ZDescriptor,ZRF_Exclusive|ZRF_All,ZFT_ZSMasterFile);
     if (wSt!=ZS_SUCCESS)
         {
         ZException.addToLast("While openning for setting JournalingLocalDirectoryPath. File <%s>",
                                getURIContent().toString());
-        _RETURN_ wSt;
+        return  wSt;
         }
     ZMCB.ZJCB->JournalLocalDirectoryPath = pPath;
 
@@ -1246,7 +1246,7 @@ ZDataBuffer wReserved;
                                 getURIContent().toString());
         }
     _Base::_close(ZDescriptor);
-    _RETURN_ wSt;
+    return  wSt;
 }//setJournalingLocalDirectoryPath
 
 
@@ -1261,16 +1261,16 @@ ZDataBuffer wReserved;
 ZStatus
 ZSMasterFile::readJCBfromHeader(void)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZDataBuffer wRawMCB;
     wSt=_Base::getReservedBlock(wRawMCB,true);
     if (wSt!=ZS_SUCCESS)
             {
-            _RETURN_ wSt;
+            return  wSt;
             }
-    _RETURN_ _getJCBfromReserved();
+    return  _getJCBfromReserved();
 }
 /**
  * @brief ZSMasterFile::_getJCBfromReserved updates Journaling control block if any with its content from ZReserved from Filedescriptor.
@@ -1280,19 +1280,19 @@ ZDataBuffer wRawMCB;
 ZStatus
 ZSMasterFile::_getJCBfromReserved(void)
 {
-_MODULEINIT_
+
 
     ZSMasterControlBlock* wMCB = (ZSMasterControlBlock*)ZDescriptor.ZReserved.Data;
 
     if (wMCB->JCBSize<1)  // no journaling
-                {_RETURN_ ZS_SUCCESS;} // Beware _RETURN_ is multiple instructions in debug mode
+                {return  ZS_SUCCESS;} // Beware return  is multiple instructions in debug mode
     if (ZMCB.ZJCB==nullptr)
                 {
                 ZMCB.ZJCB=new ZSJournalControlBlock;
                 }
     ZDataBuffer wJCBContent;
     wJCBContent.setData(ZDescriptor.ZReserved.Data+wMCB->JCBOffset,wMCB->JCBSize);
-    _RETURN_ ZMCB.ZJCB->_importJCB(wJCBContent);
+    return  ZMCB.ZJCB->_importJCB(wJCBContent);
 }
 
 
@@ -1309,7 +1309,7 @@ _MODULEINIT_
 ZStatus
 ZSMasterFile::writeControlBlocks(void)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZDataBuffer wReserved;
@@ -1325,7 +1325,7 @@ ZDataBuffer wReserved;
                                 " Cannot write Reserved Header (ZMasterControlBlock+ZSJournalControlBlock) to file header. Content file is <%s>",
                                 getURIContent().toString());
         }
-    _RETURN_ wSt;
+    return  wSt;
 }//writeControlBlocks
 
 /**
@@ -1337,7 +1337,7 @@ ZDataBuffer wReserved;
 ZStatus
 ZSMasterFile::readControlBlocks(void)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZDataBuffer wReserved;
@@ -1346,24 +1346,24 @@ ZDataBuffer wReserved;
     wSt=_Base::getReservedBlock(wReserved,true);
     if (wSt!=ZS_SUCCESS)
             {
-            _RETURN_ wSt;
+            return  wSt;
             }
 
     wSt=ZMCB._importMCB(wReserved);
     if (wSt!=ZS_SUCCESS)
             {
             ZException.addToLast(" While importing ZMCB");
-            _RETURN_ wSt;
+            return  wSt;
             }
     if (ZMCB.JCBOffset<1)
             {
             if (ZMCB.ZJCB!=nullptr)
                     delete ZMCB.ZJCB;
-             _RETURN_ wSt;
+             return  wSt;
             }
     ZDataBuffer wReservedJCB;
     wReservedJCB.setData(wReserved.Data+ZMCB.JCBOffset,ZMCB.JCBSize);
-    _RETURN_ ZMCB.ZJCB->_importJCB(wReservedJCB);
+    return  ZMCB.ZJCB->_importJCB(wReservedJCB);
 
 }// readControlBlocks
 
@@ -1406,7 +1406,7 @@ ZSMasterFile::_addIndexKeyDefinition (ZSIndexControlBlock* pZICB,
                                       utffieldNameString pIndexName,
                                       ZSort_Type pDuplicates)
 {
-_MODULEINIT_
+
 
     pZICB->clear(&ZMCB.MetaDic);
     pZICB->Name = pIndexName;
@@ -1420,7 +1420,7 @@ _MODULEINIT_
         }
         pZICB->ZKDic->_reComputeSize();
 
-        _RETURN_;
+        return ;
 }
 
 
@@ -1452,7 +1452,7 @@ ZSMasterFile::zcreateIndex (ZSKeyDictionary &pZIFField,  // contains the descrip
                            ZSort_Type pDuplicates,
                            bool pBackup)
 {
-_MODULEINIT_
+
 ZStatus wSt;
 ZSIndexControlBlock* wZICB=new ZSIndexControlBlock(&ZMCB.MetaDic);
 bool wIsOpen = isOpen();
@@ -1470,7 +1470,7 @@ long w1=0,w2=0;
                                  Severity_Severe,
                                  " ZSMasterFile <%s> is already open : must be closed before calling zcreateIndex",
                                  getURIContent().toString());
-        _RETURN_ ZS_MODEINVALID;
+        return  ZS_MODEINVALID;
         }
     wSt=zopen(ZRF_Exclusive|ZRF_All);
     if (wSt!=ZS_SUCCESS)
@@ -1479,7 +1479,7 @@ long w1=0,w2=0;
                                  pIndexName.toString(),
                                  ZDescriptor.URIContent.toString());
         ZException.setLastSeverity(Severity_Severe);
-        _RETURN_ wSt;
+        return  wSt;
         }
  /*       if (!isOpen())
                 {
@@ -1494,7 +1494,7 @@ long w1=0,w2=0;
                                          Severity_Error,
                                          " ZSMasterFile <%s> is open in bad mode for zcreateIndex. Must be (ZRF_Exclusive|ZRF_All) or closed",
                                          getURIContent().toString());
-                _RETURN_ ZS_MODEINVALID;
+                return  ZS_MODEINVALID;
                 }
         }//else
 */
@@ -1553,7 +1553,7 @@ long w1=0,w2=0;
                          ZMCB.Index.lastIdx(),
                          pIndexName);
     if (wSt!=ZS_SUCCESS)
-                {_RETURN_ wSt;} // Beware _RETURN_ is multiple instructions in debug mode
+                {return  wSt;} // Beware return  is multiple instructions in debug mode
 
 // compute the allocated size
     w1 = wIndexAllocatedSize =  _Base::getAllocatedBlocks();
@@ -1600,9 +1600,9 @@ zcreateIndexEnd:
     if (!wIsOpen)
             zclose();  // close everything and therefore update MCB in file
 
-    // else All dependent files are open with mode (ZRF_Exclusive | ZRF_All) when _RETURN_ing.
+    // else All dependent files are open with mode (ZRF_Exclusive | ZRF_All) when return ing.
 
-    _RETURN_ wSt;
+    return  wSt;
 zcreateIndexError:
 
     ZMCB.IndexObjects.last()->zclose();
@@ -1611,7 +1611,7 @@ zcreateIndexError:
     ZException.addToLast(" While creating new Index <%s> for MasterFile <%s>",
                              pIndexName.toString(),
                              ZDescriptor.URIContent.toString());
-    _RETURN_ wSt;
+    return  wSt;
 
 }//zcreateIndex
 
@@ -1643,11 +1643,11 @@ ZSMasterFile::zcreateIndex (ZSKeyDictionary& pZIFField,
                            ZSort_Type pDuplicates,
                            bool pBackup)
 {
-_MODULEINIT_
+
 
     utffieldNameString wIndexName;
     wIndexName = pIndexName;
-    _RETURN_  zcreateIndex (pZIFField,
+    return   zcreateIndex (pZIFField,
                           wIndexName,
                           pDuplicates,
                           pBackup);
@@ -1670,7 +1670,7 @@ _MODULEINIT_
 ZStatus
 ZSMasterFile::zremoveIndex (const long pIndexRank)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 zmode_type wMode = ZDescriptor.Mode;
@@ -1687,7 +1687,7 @@ int wRet;
                                      Severity_Error,
                                      " ZSMasterFile <%s> is open in bad mode for zcreateIndex. Must be (ZRF_Exclusive|ZRF_All) or closed",
                                      getURIContent().toString());
-            _RETURN_ ZS_MODEINVALID;
+            return  ZS_MODEINVALID;
             }
     if ((pIndexRank<0)||(pIndexRank>ZMCB.Index.size()))
             {
@@ -1698,16 +1698,16 @@ int wRet;
                                     pIndexRank,
                                     ZMCB.Index.lastIdx(),
                                     ZDescriptor.URIContent.toString());
-            _RETURN_ ZS_OUTBOUND;
+            return  ZS_OUTBOUND;
             }
 
     wSt= ZMCB.IndexObjects[pIndexRank]->zclose();  // close ZSIndexFile files to delete
     if (wSt!=ZS_SUCCESS)
-                { _RETURN_ wSt;} // Beware _RETURN_ is multiple instructions in debug mode
+                { return  wSt;} // Beware return  is multiple instructions in debug mode
 
     wSt=ZMCB.IndexObjects[pIndexRank]->zremoveFile();  // remove the files
     if (wSt!=ZS_SUCCESS)
-                { _RETURN_ wSt;} // Beware _RETURN_ is multiple instructions in debug mode
+                { return  wSt;} // Beware return  is multiple instructions in debug mode
 
  //   ZMCB.removeICB(pIndexRank); // removes Index stuff IndexObjects suff and deletes appropriately
 
@@ -1726,12 +1726,12 @@ int wRet;
         wSt=generateIndexURI(getURIContent(),ZMCB.IndexFilePath,NewIndexContent,wi,ZMCB.Index[wi]->Name);
         if (wSt!=ZS_SUCCESS)
                 {
-                _RETURN_ wSt;// Beware _RETURN_ is multiple instructions in debug mode
+                return  wSt;// Beware return  is multiple instructions in debug mode
                 }
         wSt=generateURIHeader(NewIndexContent,NewIndexHeader);
         if (wSt!=ZS_SUCCESS)
                 {
-                _RETURN_ wSt;// Beware _RETURN_ is multiple instructions in debug mode
+                return  wSt;// Beware return  is multiple instructions in debug mode
                 }
         ZMCB.IndexObjects[wi]->ZDescriptor.URIContent = NewIndexContent;
         ZMCB.IndexObjects[wi]->ZDescriptor.URIHeader = NewIndexHeader;
@@ -1781,7 +1781,7 @@ int wRet;
         }// for
 
     ZDataBuffer wMCBContent;
-    _RETURN_  _Base::updateReservedBlock(ZMCB._exportMCB(wMCBContent),true);
+    return   _Base::updateReservedBlock(ZMCB._exportMCB(wMCBContent),true);
 }//zremoveIndex
 
 //---------------------------------Utilities-----------------------------------------------------
@@ -1798,7 +1798,7 @@ int wRet;
 ZStatus
 ZSMasterFile::zclearMCB (FILE* pOutput)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZDataBuffer wMCBContent;
@@ -1841,7 +1841,7 @@ utfdescString wBase;
                                      Severity_Error,
                                      " ZSMasterFile <%s> is open in bad mode. Must be (ZRF_Exclusive|ZRF_All) or closed",
                                      ZDescriptor.URIContent.toString());
-            _RETURN_ ZS_MODEINVALID;
+            return  ZS_MODEINVALID;
             }
 
 
@@ -1873,7 +1873,7 @@ utfdescString wBase;
                 ZException.addToLast(" Index rank <%ld>. Clearing ZMasterControlBlock of file <%s>.",
                                        ZMCB.IndexObjects.lastIdx(),
                                        ZDescriptor.URIContent.toString());
-                _RETURN_ wSt;
+                return  wSt;
                 }// not ZS_SUCCESS
             if (ZVerbose)
                 {
@@ -1887,7 +1887,7 @@ utfdescString wBase;
     if (FOutput)
             fclose(wOutput);
     ZMCB.clear();
-    _RETURN_  _Base::updateReservedBlock(ZMCB._exportMCB(wMCBContent),true);
+    return   _Base::updateReservedBlock(ZMCB._exportMCB(wMCBContent),true);
 }//zclearMCB
 
 /**
@@ -1903,7 +1903,7 @@ utfdescString wBase;
 void
 ZSMasterFile::zdowngradeZMFtoZRF (const char* pZMFPath,FILE* pOutput)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZSMasterFile wMasterFile;
@@ -2008,7 +2008,7 @@ utfdescString wBase;
            ZException.clearStack();
    if (FOutput)
           fclose(wOutput);
-   _RETURN_;
+   return ;
 }//zdowngradeZMFtoZRF
 
 /**
@@ -2022,7 +2022,7 @@ utfdescString wBase;
 void
 ZSMasterFile::zupgradeZRFtoZMF (const char* pZRFPath,FILE* pOutput)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZSMasterFile wMasterFile;
@@ -2102,7 +2102,7 @@ utfdescString wBase;
            ZException.clearStack();
    if (FOutput)
            fclose(wOutput);
-   _RETURN_;
+   return ;
 }//zupgradeZRFtoZMF
 
 
@@ -2137,7 +2137,7 @@ ZSMasterFile::zrepairIndexes (const char *pZMFPath,
                              bool pRebuildAll,
                              FILE* pOutput)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZSMasterFile wMasterFile;
@@ -2255,7 +2255,7 @@ long wIndexProcessed = 0,wMissIndexFile = 0, wCorruptZICB = 0, wCreatedIndex = 0
                             wMasterFile.ZMCB.Index[IndexRank]->Name);
        if (wSt!=ZS_SUCCESS)
                {
-               _RETURN_ wSt;// Beware _RETURN_ is multiple instructions in debug mode
+               return  wSt;// Beware return  is multiple instructions in debug mode
                }
        fprintf (wOutput,
                 "%s>>   .....rank <%ld> processing index file <%s> \n",
@@ -2567,7 +2567,7 @@ EndRepairIndexes:
             ZException.clearStack();
     if (FOutput)
             fclose(wOutput);
-    _RETURN_ wSt;
+    return  wSt;
 
 ErrorRepairIndexes:
     fprintf (wOutput,"%s>>  **** Index repair ended with error ***\n",
@@ -2613,7 +2613,7 @@ ZSMasterFile::zcreate(ZMetaDic* pMetaDic,
                      bool pBackup,
                      bool pLeaveOpen)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZDataBuffer wMCBContent;
@@ -2623,7 +2623,7 @@ ZDataBuffer wMCBContent;
             {
             ZException.addToLast(" While creating Master file %s",
                                      getURIContent().toString());
-            _RETURN_ wSt;
+            return  wSt;
             }
 
     _Base::setCreateMaximum (pAllocatedBlocks,
@@ -2636,14 +2636,14 @@ ZDataBuffer wMCBContent;
             {
             ZException.addToLast(" While creating Master file %s",
                                      getURIContent().toString());
-            _RETURN_ wSt;
+            return  wSt;
             }
     wSt=_Base::_create(ZDescriptor,pInitialSize,ZFT_ZSMasterFile,pBackup,true); // calling ZRF base creation routine and it leave open
     if (wSt!=ZS_SUCCESS)
             {
             ZException.addToLast(" While creating Master file %s",
                                      getURIContent().toString());
-            _RETURN_ wSt;
+            return  wSt;
             }
 
     ZMCB.MetaDic.clear();
@@ -2661,7 +2661,7 @@ ZDataBuffer wMCBContent;
             _Base::_close(ZDescriptor);
             ZException.addToLast(" While creating Master file %s",
                                      getURIContent().toString());
-            _RETURN_ wSt;
+            return  wSt;
             }
 
 // Manage journaling for the being created file
@@ -2677,15 +2677,15 @@ ZDataBuffer wMCBContent;
                 {
                 ZException.addToLast(" while creating ZSMasterFile %s",
                                        getURIContent().toString());
-                _RETURN_ wSt;
+                return  wSt;
                 }
         }
 
     if (pLeaveOpen)
-            { _RETURN_ wSt;}
+            { return  wSt;}
 
 
-    _RETURN_  zclose();
+    return   zclose();
 }// zcreate
 
 /**
@@ -2699,7 +2699,7 @@ ZDataBuffer wMCBContent;
 ZStatus
 ZSMasterFile::zcreate (ZMetaDic* pMetaDic,const uriString pURI, const zsize_type pInitialSize, bool pBackup, bool pLeaveOpen)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZDataBuffer wMCBContent;
@@ -2709,14 +2709,14 @@ ZDataBuffer wMCBContent;
 
     wSt=_Base::setPath (pURI);
     if (wSt!=ZS_SUCCESS)
-                {_RETURN_(wSt);}
+                {return (wSt);}
     _Base::setCreateMinimum(pInitialSize);
     wSt=_Base::_create(ZDescriptor,pInitialSize,ZFT_ZSMasterFile,pBackup,true); // calling ZRF base creation routine and it leave open
     if (wSt!=ZS_SUCCESS)
             {
             ZException.addToLast(" While creating Master file %s",
                                      getURIContent().toString());
-            _RETURN_(wSt);
+            return (wSt);
             }
     /* ----------File is left open : so no necessity to open again
     wSt=_Base::_open(ZDescriptor,ZRF_Exclusive | ZRF_Write,ZFT_ZSMasterFile);
@@ -2724,7 +2724,7 @@ ZDataBuffer wMCBContent;
             {
             ZException.addToLast(" While creating Master file %s",
                                      ZMFURI.toString());
-            _RETURN_ wSt;
+            return  wSt;
             }
             */
 
@@ -2745,14 +2745,14 @@ ZDataBuffer wMCBContent;
                     {
                     ZException.addToLast(" While creating Master file %s",
                                              getURIContent().toString());
-                    _RETURN_ wSt;
+                    return  wSt;
                     }
 
-             _RETURN_ wSt;
+             return  wSt;
             }
     printf ("ZMasterFile::zclose \n");
     zclose(); // updates headers including reserved block
-    _RETURN_ wSt;
+    return  wSt;
 }//zcreate
 
 /**
@@ -2790,7 +2790,7 @@ uriString wURI(pPathName);
 ZSKey*
 ZSMasterFile::createZKeyByName (const char* pKeyName)
 {
-_MODULEINIT_
+
 
     long wi=0;
     for (;wi<ZMCB.Index.size();wi++)
@@ -2805,7 +2805,7 @@ _MODULEINIT_
                                         " Invalid key name while creating Key structure. Given name is %s", pKeyName);
                 ZException.exit_abort();
                 }
-    _RETURN_ (createZKey(wi));
+    return  (createZKey(wi));
 }
 /**
  * @brief ZSMasterFile::createZKey Creates a ZKey objects for the index corresponding to given index key rank.
@@ -2819,7 +2819,7 @@ _MODULEINIT_
 ZSKey*
 ZSMasterFile::createZKey (const long pKeyNumber)
 {
-_MODULEINIT_
+
 
     if (!isOpen())
         {
@@ -2828,7 +2828,7 @@ _MODULEINIT_
                                 Severity_Severe,
                                 " File must be open to created a ZKey object from file <%s>",
                                 ZDescriptor.URIContent.isEmpty()?"Unknown":ZDescriptor.URIContent.toCString_Strait());
-        _RETURN_ nullptr;
+        return  nullptr;
         }
     if (pKeyNumber> this->ZMCB.Index.size())
         {
@@ -2836,10 +2836,10 @@ _MODULEINIT_
                                 ZS_INVOP,
                                 Severity_Severe,
                                 " Invalid key number while creating Key structure. given value is %ld", pKeyNumber);
-        _RETURN_ nullptr;
+        return  nullptr;
         }
         ZSKey* wKey = new ZSKey(this,pKeyNumber);
-    _RETURN_ (wKey);
+    return  (wKey);
 }
 
 
@@ -2861,7 +2861,7 @@ _MODULEINIT_
 ZStatus
 ZSMasterFile::zprintIndexFieldValues (const zrank_type pIndex,const zrank_type pIdxRank,bool pHeader,bool pKeyDump,FILE *pOutput)
 {
-_MODULEINIT_
+
 
     if ((pIndex<0)||(pIndex>ZMCB.IndexObjects.lastIdx()))
                     {
@@ -2870,9 +2870,9 @@ _MODULEINIT_
                                             Severity_Error,
                                             " invalid index number %ld. Number of ZIndexes is %ld",
                                             ZMCB.IndexObjects.lastIdx());
-                    _RETURN_ ZS_INVOP;
+                    return  ZS_INVOP;
                     }
-    _RETURN_ (ZMCB.IndexObjects[pIndex]->zprintKeyFieldsValues(pIdxRank,pHeader,pKeyDump,pOutput));
+    return  (ZMCB.IndexObjects[pIndex]->zprintKeyFieldsValues(pIdxRank,pHeader,pKeyDump,pOutput));
 } //zprintIndexFieldValues
 
 
@@ -2886,7 +2886,7 @@ _MODULEINIT_
 ZStatus
 ZSMasterFile::zopen  (const uriString pURI, const int pMode)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZDataBuffer wRawMCB;
@@ -2895,7 +2895,7 @@ ZDataBuffer wRawMCB;
     wSt=_Base::_open (ZDescriptor,pMode,ZFT_ZSMasterFile);
     if (wSt!=ZS_SUCCESS)
             {
-            _RETURN_ wSt;// Beware _RETURN_ is multiple instructions in debug mode
+            return  wSt;// Beware return  is multiple instructions in debug mode
             }
 
 //    ZMFURI = pURI;
@@ -2903,12 +2903,12 @@ ZDataBuffer wRawMCB;
     wSt=_Base::getReservedBlock(wRawMCB,true);
     if (wSt!=ZS_SUCCESS)
             {
-            _RETURN_ wSt;// Beware _RETURN_ is multiple instructions in debug mode
+            return  wSt;// Beware return  is multiple instructions in debug mode
             }
 
     wSt=ZMCB._importMCB(wRawMCB);
     if (wSt!=ZS_SUCCESS)
-                    {_RETURN_ wSt;}// Beware _RETURN_ is multiple instructions in debug mode
+                    {return  wSt;}// Beware return  is multiple instructions in debug mode
 
 // MCB is loaded
 //----------Journaling----------------------
@@ -2921,7 +2921,7 @@ ZDataBuffer wRawMCB;
                 ZMCB.ZJCB->Journal=new ZSJournal(this);
                 wSt=ZMCB.ZJCB->Journal->init();
                 if (wSt!=ZS_SUCCESS)
-                        {_RETURN_ wSt;}// Beware _RETURN_ is multiple instructions in debug mode
+                        {return  wSt;}// Beware return  is multiple instructions in debug mode
                 ZMCB.ZJCB->Journal->start();
                 }
             else
@@ -2967,7 +2967,7 @@ long wi;
             wSt=generateIndexURI(getURIContent(),ZMCB.IndexFilePath,wIndexUri,wi,ZMCB.Index[wi]->Name);
             if (wSt!=ZS_SUCCESS)
                     {
-                    _RETURN_ wSt;// Beware _RETURN_ is multiple instructions in debug mode
+                    return  wSt;// Beware return  is multiple instructions in debug mode
                     }
             if (ZVerbose)
                         fprintf(stdout,"Opening Index file <%s>\n",(const char*)wIndexUri.toString());
@@ -2976,19 +2976,19 @@ long wi;
                     {
                     ZException.addToLast(" while opening index rank <%ld>", wi);
 // In case of open index error : close any already opened index file
-//              Then close master content file before _RETURN_ing
+//              Then close master content file before return ing
                     ZStatus wSvSt = wSt;
                     long wj;
                     for (wj = 0;wj < wi;wj++)
                                     ZMCB.IndexObjects[wj]->zclose();  // use the base ZRandomFile zclose routine
                      _Base::_close(ZDescriptor);
 
-                    _RETURN_ wSt;
+                    return  wSt;
                     }
             }// for
 
 
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }// zopen
 
 /**
@@ -2998,7 +2998,7 @@ long wi;
 ZStatus
 ZSMasterFile::zclose(void)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZStatus SavedSt=ZS_SUCCESS;
@@ -3012,7 +3012,7 @@ ZDataBuffer wMCBContent;
                                 ZS_INVOP,
                                 Severity_Error,
                                 " file is not open : cannot close it.");
-        _RETURN_ ZS_INVOP;
+        return  ZS_INVOP;
     }
     for (long wi=0;wi < ZMCB.IndexObjects.size();wi++)
             {
@@ -3033,7 +3033,7 @@ ZDataBuffer wMCBContent;
                 ZException.addToLast( " Writing Reserved header for ZSMasterFile %s",
                                         getURIContent().toString());
                 _Base::zclose();
-                _RETURN_ wSt;
+                return  wSt;
                 }
 
 // releasing index resources
@@ -3053,11 +3053,11 @@ ZDataBuffer wMCBContent;
     wSt=_Base::zclose();
     if (wSt!=ZS_SUCCESS)
             {
-            _RETURN_ wSt;// Beware _RETURN_ is multiple instructions in debug mode
+            return  wSt;// Beware return  is multiple instructions in debug mode
             }
     if (SavedSt!=ZS_SUCCESS)
-                { _RETURN_ SavedSt;}// Beware _RETURN_ is multiple instructions in debug mode
-    _RETURN_ ZS_SUCCESS;
+                { return  SavedSt;}// Beware return  is multiple instructions in debug mode
+    return  ZS_SUCCESS;
 }// zclose
 
 
@@ -3077,7 +3077,7 @@ ZDataBuffer wMCBContent;
 ZStatus
 ZSMasterFile::zget(ZRecord *pRecord, const zrank_type pZMFRank)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 //    wSt=_Base::zaddWithAddress (pRecord,wAddress);      // record must stay locked until successfull commit for indexes
@@ -3100,12 +3100,12 @@ long wi = 0;
                               ZS_BADCHECKSUM,
                               Severity_Severe,
                               "Record dictionary is not in line with ZSMasterFile dictionary : bad checksum");
-        _RETURN_ ZS_BADCHECKSUM;
+        return  ZS_BADCHECKSUM;
         }
     wSt=_Base::zget(pRecord->getBaseContent(),pZMFRank);
     if (wSt==ZS_SUCCESS)
             wSt=pRecord->_split();
-    _RETURN_ wSt;
+    return  wSt;
 }// ZSMasterFile::zget
 
 
@@ -3129,7 +3129,7 @@ If all indexes are successfully updated, then update on Master File is committed
 ZStatus
 ZSMasterFile::zinsert       (ZRecord* pRecord, const zrank_type pZMFRank)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 
@@ -3203,7 +3203,7 @@ long wi = 0;
             {
             _add_HardRollbackIndexes (ZMCB, IndexRankProcessed); // indexes are already committed so use hardRollback to counter pass
             }                                                    // don't care about the status . In case of error exception stack will trace it
-zinsert__RETURN_:
+zinsert_return :
     if (getJournalingStatus())
         {
         ZMCB.ZJCB->Journal->enqueue(ZJOP_Insert,pRecord->getBaseContent());
@@ -3212,7 +3212,7 @@ zinsert__RETURN_:
 zinsert_error:
     _Base::_unlockFile (_Base::ZDescriptor) ; // set Master file unlocked
     IndexItemList.clear();
-    _RETURN_ wSt;
+    return  wSt;
 }// zinsert
 //------------End insert sequence----------------------------------------------------
 
@@ -3233,7 +3233,7 @@ zinsert_error:
 ZStatus
 ZSMasterFile::zadd       (ZRecord* pRecord)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 //    wSt=_Base::zaddWithAddress (pRecord,wAddress);      // record must stay locked until successfull commit for indexes
@@ -3255,7 +3255,7 @@ long wi = 0;
                               Severity_Severe,
                               " File <%s> is not open while trying to access it",
                               getURIContent().toString());
-        _RETURN_ ZS_FILENOTOPEN;
+        return  ZS_FILENOTOPEN;
         }
 
     if (!pRecord->testCheckSum())
@@ -3264,7 +3264,7 @@ long wi = 0;
                               ZS_BADCHECKSUM,
                               Severity_Severe,
                               "Record dictionary is not in line with ZSMasterFile dictionary : bad checksum");
-        _RETURN_ ZS_BADCHECKSUM;
+        return  ZS_BADCHECKSUM;
         }
 
     pRecord->_aggregate();  /* serialize the fields from ZRecord memory storage to a ZDataBuffer record */
@@ -3335,7 +3335,7 @@ long wi = 0;
             {
             _add_HardRollbackIndexes (ZMCB, IndexRankProcessed);// indexes are already committed so use hardRollback regardless returned ZStatus
             }                                                   // don't care about the status . In case of error exception stack will trace it
-zadd__RETURN_:
+zadd_return :
     if (getJournalingStatus())
         {
         ZMCB.ZJCB->Journal->enqueue(ZJOP_Add,pRecord->getBaseContent());
@@ -3346,7 +3346,7 @@ zadd_error:
 //    while (IndexItemList.size()>0)
 //                delete IndexItemList.popR();
 
-    _RETURN_ wSt;
+    return  wSt;
 }// zadd
 
 /** @cond Development */
@@ -3354,7 +3354,7 @@ zadd_error:
 ZStatus
 ZSMasterFile::_add_CommitIndexes (ZSMasterControlBlock& pZMCB,ZArray <ZSIndexItem*>  &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 long wj = 0;
@@ -3397,10 +3397,10 @@ long wj = 0;
                                                                                         // regardless ZStatus (exception is on stack)
                     } //for
 
-                    _RETURN_ ZException.getLastStatus(); // _RETURN_ the very last status encountered
+                    return  ZException.getLastStatus(); // return  the very last status encountered
                 }//wSt
             } // for
-   _RETURN_ ZS_SUCCESS;
+   return  ZS_SUCCESS;
 } // _add_CommitIndexes
 
 /**
@@ -3416,7 +3416,7 @@ long wj = 0;
 ZStatus
 ZSMasterFile::_add_RollbackIndexes (ZSMasterControlBlock& pZMCB, ZArray<zrank_type> &pIndexRankProcessed)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 long wi = 0;
@@ -3440,7 +3440,7 @@ long wi = 0;
             pZMCB.IndexObjects[wi]->_addKeyValue_Rollback(pIndexRankProcessed[wi]); // rollback add on each index concerned
             }//for                                                                  // don't care about ZStatus: exception stack will track
 
-   _RETURN_ ZException.getLastStatus();
+   return  ZException.getLastStatus();
 } // _add_RollbackIndexes
 
 /**
@@ -3452,7 +3452,7 @@ long wi = 0;
 ZStatus
 ZSMasterFile::_add_HardRollbackIndexes (ZSMasterControlBlock& pZMCB, ZArray<zrank_type> &pIndexRankProcessed)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 long wi = 0;
@@ -3475,7 +3475,7 @@ long wi = 0;
             pZMCB.IndexObjects[wi]->_addKeyValue_HardRollback(pIndexRankProcessed[wi]); // hard rollback update on each already committed index
             }// for                                                                     // don't care about ZStatus: exception stack will track
 
-   _RETURN_ ZException.getLastStatus();
+   return  ZException.getLastStatus();
 
 } // _add_HardRollbackIndexes
 
@@ -3500,7 +3500,7 @@ long wi = 0;
 ZStatus
 ZSMasterFile::zreorgFile (bool pDump,FILE *pOutput)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 long wi = 0;
@@ -3516,7 +3516,7 @@ zmode_type wMode = ZRF_Nothing ;
              wasOpen=true;
              }
      if ((wSt=zopen(ZDescriptor.URIContent,ZRF_Exclusive|ZRF_Write))!=ZS_SUCCESS)
-                                                         {  _RETURN_ wSt;}
+                                                         {  return  wSt;}
 
 
      if (!ZDescriptor.ZFCB->GrabFreeSpace)        // activate grabFreeSpace if it has been set on
@@ -3569,7 +3569,7 @@ end_zreorgZMFFile:
     if (wasOpen)
             zopen(ZDescriptor.URIContent,wMode);
 
-    _RETURN_ ZException.getLastStatus();
+    return  ZException.getLastStatus();
 
 error_zreorgZMFFile:
     ZException.printUserMessage(pOutput);
@@ -3590,7 +3590,7 @@ error_zreorgZMFFile:
 ZStatus
 ZSMasterFile::zindexRebuild (const long pIndexRank,bool pStat, FILE *pOutput)
 {
-_MODULEINIT_
+
 
     if (!isOpen())
             {
@@ -3599,7 +3599,7 @@ _MODULEINIT_
                                     Severity_Severe,
                                     " File <%s> must be opened to use this function",
                                     ZDescriptor.URIContent.toString());
-            _RETURN_ ZS_INVOP;
+            return  ZS_INVOP;
             }
     if ((pIndexRank<0)||(pIndexRank>ZMCB.Index.size()))
             {
@@ -3610,9 +3610,9 @@ _MODULEINIT_
                                     pIndexRank,
                                     ZMCB.Index.lastIdx(),
                                     ZDescriptor.URIContent.toString());
-            _RETURN_ ZS_OUTBOUND;
+            return  ZS_OUTBOUND;
             }
- _RETURN_ ZMCB.IndexObjects[pIndexRank]->zrebuildIndex (pStat,pOutput);
+ return  ZMCB.IndexObjects[pIndexRank]->zrebuildIndex (pStat,pOutput);
 }//zindexRebuild
 
 
@@ -3652,7 +3652,7 @@ ZStatus
 ZSMasterFile::_removeByRank  (ZRecord *pZMFRecord,
                              const zrank_type pZMFRank)
 {
-_MODULEINIT_
+
 
 ZStatus     wSt;
 
@@ -3671,14 +3671,14 @@ ZBlock          wBlock;
     if (wSt!=ZS_SUCCESS)
             {
             _Base::_remove_Rollback(ZDescriptor,pZMFRank);
-            _RETURN_ wSt;
+            return  wSt;
             }
     wZMFIdxCommit = pZMFRank;
     wSt=_Base::_readBlockAt(ZDescriptor,wBlock,wZMFAddress);  // we know that it is locked as ZBS_BeingDeleted
     if (wSt!=ZS_SUCCESS)
             {
             _Base::_remove_Rollback(ZDescriptor,pZMFRank);
-            _RETURN_ wSt;
+            return  wSt;
             }
 
     pZMFRecord->setContent(wBlock.Content);
@@ -3696,7 +3696,7 @@ ZBlock          wBlock;
     {
         wSt = _keyValueExtraction(ZMCB.Index[wi]->ZKDic,pZMFRecord,wKeyContent);
         if (wSt!=ZS_SUCCESS)
-                        goto _removeByRank__RETURN_;
+                        goto _removeByRank_return ;
             wIndexItem = new ZSIndexItem ;
             wSt=ZMCB.IndexObjects[wi]->_removeKeyValue_Prepare(wKeyContent,
                                                                 wIndexItem,
@@ -3719,7 +3719,7 @@ ZBlock          wBlock;
 
                // _Base::_unlockFile (ZDescriptor) ; // unlock done in remove rollback
 
-                goto _removeByRank__RETURN_; ;   // and send appropriate status
+                goto _removeByRank_return ; ;   // and send appropriate status
                 }
      IndexRankProcessed.push(wIndex_Rank) ; // this index has been added to this rank
      IndexItemList.push(wIndexItem);        // with that key content
@@ -3736,14 +3736,14 @@ ZBlock          wBlock;
 
                 _Base::_remove_Rollback(ZDescriptor,wZMFIdxCommit); // an error occurred on indexes : rollback all MasterFile
                // _Base::_unlockFile (ZDescriptor) ; // unlock is done in rollback routine
-                goto _removeByRank__RETURN_;// if an error occurs here : this is a severe error that only may be caused by an HW or IO subsystem failure.
+                goto _removeByRank_return ;// if an error occurs here : this is a severe error that only may be caused by an HW or IO subsystem failure.
                 }
 
     wSt = _Base::_remove_Commit(ZDescriptor,wZMFIdxCommit);// accept update on Master File
     if (wSt!=ZS_SUCCESS)    // and if then an error occur : rollback all indexes and signal exception
             {
             _remove_HardRollbackIndexes (ZMCB, IndexItemList,IndexRankProcessed);    // indexes are already committed so use hardRollback to counter pass
-            goto _removeByRank__RETURN_;
+            goto _removeByRank_return ;
             }
 
     if (getJournalingStatus())
@@ -3751,14 +3751,14 @@ ZBlock          wBlock;
         ZMCB.ZJCB->Journal->enqueue(ZJOP_RemoveByRank,pZMFRecord->getBaseContent(),pZMFRank,wZMFAddress);
     }
 
-_removeByRank__RETURN_:
+_removeByRank_return :
     _Base::_unlockFile (ZDescriptor) ;
 /*
     while (IndexItemList.size()>0)
                   delete IndexItemList.popR();
 */
     IndexItemList.clear();
-    _RETURN_ wSt;
+    return  wSt;
 }// _removeByRank
 
 
@@ -3775,7 +3775,7 @@ _removeByRank__RETURN_:
 ZStatus
 ZSMasterFile::_remove_CommitIndexes (ZSMasterControlBlock& pZMCB, ZSIndexItemList & pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 long wj = 0;
@@ -3802,18 +3802,18 @@ long wj = 0;
                                                                                     // regardless ZStatus (exception is on stack)
                 }// for
 
-            _RETURN_ ZException.getLastStatus(); // _RETURN_ the very last status encountered
+            return  ZException.getLastStatus(); // return  the very last status encountered
             }//wSt
     } // Main for
 
-   _RETURN_ ZException.getLastStatus();
+   return  ZException.getLastStatus();
 } // _remove_CommitIndexes
 
 
 ZStatus
 ZSMasterFile::_remove_RollbackIndexes (ZSMasterControlBlock& pZMCB, ZArray<zrank_type> &pIndexRankProcessed)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 long wi = 0;
@@ -3837,7 +3837,7 @@ long wi = 0;
             pZMCB.IndexObjects[wi]->_removeKeyValue_Rollback(pIndexRankProcessed[wi]);  // rollback remove on each index concerned
             }// for                                                                     // don't care about ZStatus: exception stack will track
 
-   _RETURN_ ZException.getLastStatus();
+   return  ZException.getLastStatus();
 } // _remove_RollbackIndexes
 
 
@@ -3846,7 +3846,7 @@ ZSMasterFile::_remove_HardRollbackIndexes (ZSMasterControlBlock& pZMCB,
                                            ZArray<ZSIndexItem*> &pIndexItemList,
                                            ZArray<zrank_type> &pIndexRankProcessed)
 {
-_MODULEINIT_
+
 
 long wi = 0;
 
@@ -3869,7 +3869,7 @@ long wi = 0;
             pZMCB.IndexObjects[wi]->_removeKeyValue_HardRollback(pIndexItemList[wi],pIndexRankProcessed[wi]); // hard rollback update on each already committed index
             } // for                                                    // don't care about ZStatus: exception stack will track
 
-   _RETURN_ ZException.getLastStatus();
+   return  ZException.getLastStatus();
 } // _remove_HardRollbackIndexes
 
 //----------------End Remove sequence------------------------------------------------------
@@ -3881,7 +3881,7 @@ long wi = 0;
 ZStatus
 ZSMasterFile::zgenerateKeyValueList ( ZDataBuffer& pKey ,long pKeyNumber,int pCount,...)
 {
-_MODULEINIT_
+
 va_list args;
 va_start (args, pCount);
 ZArray<void*> wKeyValues;
@@ -3891,7 +3891,7 @@ ZArray<void*> wKeyValues;
         wKeyValues.push(va_arg(args,void*));
     }
  va_end(args);
- _RETURN_ (zgenerateKeyValue(ZMCB.Index[pKeyNumber],wKeyValues,pKey));
+ return  (zgenerateKeyValue(ZMCB.Index[pKeyNumber],wKeyValues,pKey));
 } // zgenerateKeyValue
 
 
@@ -3905,7 +3905,7 @@ ZArray<void*> wKeyValues;
 ZStatus
 ZSMasterFile::zgenerateKeyValue ( ZSIndexControlBlock& pICB,ZArray<void*> &pKeyValues,ZDataBuffer& pKey)
 {
-_MODULEINIT_
+
 ssize_t wKeyOffset = 0;
 
 // As there might be partial key search, we do not test wether all key fields are processed but only on maximum number of requested fields
@@ -3918,7 +3918,7 @@ ssize_t wKeyOffset = 0;
                                             " Number of requested fields for key is %ld while number of key fields is %ld",
                                             pKeyValues.size(),
                                             pICB.ZKDic->size());
-                    _RETURN_ ZS_INVOP;
+                    return  ZS_INVOP;
                    }
 
     pKey.clearData();
@@ -3932,7 +3932,7 @@ ssize_t wKeyOffset = 0;
         wKeyOffset += pICB.ZKDic->Tab[wi].NaturalSize;
         } // for
 
-    _RETURN_  ZS_SUCCESS;
+    return   ZS_SUCCESS;
 }//_generateKeyValue
 #endif // __COMMENT__
 /**
@@ -3963,7 +3963,7 @@ ZSMasterFile::zsearch(ZDataBuffer &pRecord,ZSKey *pKey)
 ZStatus
 ZSMasterFile::zsearch (ZDataBuffer &pRecord,ZDataBuffer &pKeyValue,const long pIndexNumber)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 //zaddress_type wAddress;
@@ -3971,8 +3971,8 @@ ZStatus wSt;
 ZSIndexResult wZIR;
     wSt = ZMCB.IndexObjects[pIndexNumber]->_search(pKeyValue,*ZMCB.IndexObjects[pIndexNumber],wZIR);
     if (wSt!=ZS_FOUND)
-            { _RETURN_ wSt;}
-    _RETURN_ zgetByAddress(pRecord,wZIR.ZMFAddress);
+            { return  wSt;}
+    return  zgetByAddress(pRecord,wZIR.ZMFAddress);
 }
 
 class ZSIndexCollection;
@@ -3995,10 +3995,10 @@ ZSMasterFile::zsearchAll (ZDataBuffer &pKeyValue,
                           ZSIndexCollection& pIndexCollection,
                           const ZMatchSize_type pZMS)
 {
-_MODULEINIT_
 
 
-    _RETURN_ ZMCB.IndexObjects[pIndexNumber]->_searchAll(pKeyValue,
+
+    return  ZMCB.IndexObjects[pIndexNumber]->_searchAll(pKeyValue,
                                                       *ZMCB.IndexObjects[pIndexNumber],
                                                       pIndexCollection,
                                                       pZMS);
@@ -4017,7 +4017,7 @@ _MODULEINIT_
 ZStatus
 ZSMasterFile::zsearchAll (ZSKey &pZKey,ZSIndexCollection& pIndexCollection)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 
@@ -4029,11 +4029,11 @@ ZStatus wSt;
     if (pZKey.FPartialKey)
             wZSC=ZMS_MatchKeySize ;
     wSt = ZMCB.IndexObjects[pZKey.IndexNumber]->_searchAll(pZKey,*ZMCB.IndexObjects[pZKey.IndexNumber],pIndexCollection,wZSC);
-    _RETURN_ wSt;
+    return  wSt;
 }//zsearchAll
 
 /**
- * @brief ZSMasterFile::zsearchFirst searches for first key value (in index key order) of pKey (see @ref ZKey) and _RETURN_s its corresponding ZSMasterFile record content.
+ * @brief ZSMasterFile::zsearchFirst searches for first key value (in index key order) of pKey (see @ref ZKey) and return s its corresponding ZSMasterFile record content.
  *
  * a Collection and its context ( see @ref ZSIndexCollection and @ref ZSIndexCollectionContext )
  * is created by 'new' instruction and needs to be mentionned when further calls to ZSMasterFile::zsearchNext() are made.
@@ -4068,7 +4068,7 @@ ZSMasterFile::zsearchFirst (ZSKey &pZKey,
                            ZDataBuffer& pRecord,
                            ZSIndexCollection *pCollection)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZSIndexResult wZIR;
@@ -4084,12 +4084,12 @@ ZSIndexResult wZIR;
                                                              wZIR,
                                                              wZMS);
     if (wSt!=ZS_FOUND)
-               { _RETURN_ wSt;}// Beware _RETURN_ is multiple instructions in debug mode
+               { return  wSt;}// Beware return  is multiple instructions in debug mode
 
     wSt=zgetByAddress(pRecord,wZIR.ZMFAddress);
     if (wSt!=ZS_SUCCESS)
-                {_RETURN_ wSt;}// Beware _RETURN_ is multiple instructions in debug mode
-    _RETURN_ ZS_FOUND;
+                {return  wSt;}// Beware return  is multiple instructions in debug mode
+    return  ZS_FOUND;
 }// zsearchFirst
 /**
  * @brief ZSMasterFile::zsearchNext
@@ -4116,7 +4116,7 @@ ZSMasterFile::zsearchNext (ZSKey &pZKey,
                           ZDataBuffer & pRecord,
                           ZSIndexCollection *pCollection)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZSIndexResult wZIR;
@@ -4127,19 +4127,19 @@ ZSIndexResult wZIR;
                                 ZS_INVOP,
                                 Severity_Severe,
                                 "Invalid collection/context : it must have been created using zsearchFirst");
-        _RETURN_ ZS_INVOP;
+        return  ZS_INVOP;
         }
 
     //pIndexCollection.ZIFFile = ZMCB.IndexObjects[pIndexNumber];// assign ZSIndexFile object to Collection : NB Collection is NOT in charge of opening or closing files
 
     wSt = ZMCB.IndexObjects[pZKey.IndexNumber]->_searchNext(wZIR,pCollection);
     if (wSt!=ZS_FOUND)
-                {_RETURN_ wSt;}// Beware _RETURN_ is multiple instructions in debug mode
+                {return  wSt;}// Beware return  is multiple instructions in debug mode
 
     wSt=zgetByAddress(pRecord,wZIR.ZMFAddress);
     if (wSt!=ZS_SUCCESS)
-                {_RETURN_ wSt;}// Beware _RETURN_ is multiple instructions in debug mode
-    _RETURN_ ZS_FOUND;
+                {return  wSt;}// Beware return  is multiple instructions in debug mode
+    return  ZS_FOUND;
 }// zsearchFirst
 
 
@@ -4150,9 +4150,9 @@ ZSIndexResult wZIR;
 
 
 /**
- * @brief ZSMasterFile::getKeyIndexFields _RETURN_s natural field values from a ZIndex key at rank pIndexRank for ZIndex pIndexNumber (key number)
+ * @brief ZSMasterFile::getKeyIndexFields return s natural field values from a ZIndex key at rank pIndexRank for ZIndex pIndexNumber (key number)
  * @note given rank is relative position of record within ZSIndexFile file and NOT relative position of record within ZSMasterFile file
- * @param[out] pKeyFieldValues   _RETURN_s natural field values concatenated within a ZDataBuffer
+ * @param[out] pKeyFieldValues   return s natural field values concatenated within a ZDataBuffer
  * @param[in] pIndexRank        Index key row
  * @param[in] pIndexNumber      ZIndex number (key number) - in definition order
  * @return a ZStatus
@@ -4160,16 +4160,16 @@ ZSIndexResult wZIR;
 ZStatus
 ZSMasterFile::getKeyIndexFields(ZDataBuffer &pKeyFieldValues, const zrank_type pIndexRank, const zrank_type pIndexNumber)
 {
-_MODULEINIT_
+
 
  ZStatus wSt;
  ZDataBuffer wIndexRawContent;
  ZSIndexItem  wIndexContent;
     wSt=ZMCB.IndexObjects[pIndexNumber]->_Base::zget(wIndexRawContent,pIndexRank);
     if (wSt!=ZS_SUCCESS)
-                {_RETURN_ wSt;}
+                {return  wSt;}
     wIndexContent.fromFileKey(wIndexRawContent);
-    _RETURN_ ZMCB.IndexObjects[pIndexNumber]->getKeyIndexFields(pKeyFieldValues,wIndexContent.KeyContent);
+    return  ZMCB.IndexObjects[pIndexNumber]->getKeyIndexFields(pKeyFieldValues,wIndexContent.KeyContent);
 }
 
 /**
@@ -4182,15 +4182,15 @@ _MODULEINIT_
 ZStatus
 ZSMasterFile::getRawIndex(ZSIndexItem &pIndexItem,const zrank_type pIndexRank,const zrank_type pIndexNumber)
 {
-_MODULEINIT_
+
 
     ZStatus wSt;
     ZDataBuffer wIndexContent;
     wSt=ZMCB.IndexObjects[pIndexNumber]->_Base::zget(wIndexContent,pIndexRank);
     if (wSt!=ZS_SUCCESS)
-                   { _RETURN_ wSt;}// Beware _RETURN_ is multiple instructions in debug mode
+                   { return  wSt;}// Beware return  is multiple instructions in debug mode
     pIndexItem.fromFileKey(wIndexContent);
-    _RETURN_ wSt;
+    return  wSt;
 }
 
 /** @} */ // ZSMasterFileGroup
@@ -4217,7 +4217,7 @@ void ZSMasterFile::ZMCBreport(void)
 void
 ZSMasterFile::_writeXML_ZRandomFileHeader(ZSMasterFile& pZMF,FILE *pOutput)
 {
-_MODULEINIT_
+
 
    ZRandomFile::_writeXML_ZRandomFileHeader(pZMF.ZDescriptor,pOutput);
 
@@ -4245,13 +4245,13 @@ _MODULEINIT_
             "         </Index>\n");
    fprintf (pOutput,
             "  </ZMasterControlBlock>\n");
-   _RETURN_;
+   return ;
 }//_writeXML_FileHeader
 
 void
 ZSMasterFile::_writeXML_Index(ZSMasterFile& pZMF,const long pIndexRank,FILE* pOutput)
 {
-_MODULEINIT_
+
     pZMF.ZMCB.Index[pIndexRank]->ZKDic->_reComputeSize();
     fprintf (pOutput,
              "         <IndexRank>\n"
@@ -4270,14 +4270,14 @@ _MODULEINIT_
     fprintf (pOutput,
              "         </IndexRank>\n");
 
-    _RETURN_ ;
+    return  ;
 }//_writeXML_Index
 
 #ifdef __COMMENT__
 void
 ZSMasterFile::_writeXML_KDic(ZSKeyDictionary* ZKDic,FILE* pOutput)
 {
-_MODULEINIT_
+
 
     ZKDic->_reComputeSize();
     fprintf (pOutput,
@@ -4312,13 +4312,13 @@ _MODULEINIT_
              }// for
     fprintf (pOutput,
               "          </ZKDic>\n");
-    _RETURN_;
+    return ;
 
 }//_writeXML_KDic
 void
 ZSMasterFile::_writeXML_MetaDic(ZMetaDic* ZMDic,FILE* pOutput)
 {
-_MODULEINIT_
+
 
     fprintf (pOutput,
              "           <ZMetaDic>\n"
@@ -4343,7 +4343,7 @@ _MODULEINIT_
              }// for
     fprintf (pOutput,
               "          </ZMetaDic>\n");
-    _RETURN_;
+    return ;
 
 }//_writeXML_KDic
 #endif // __COMMENT__
@@ -4360,7 +4360,7 @@ _MODULEINIT_
 ZStatus
 ZSMasterFile::zwriteXML_IndexDefinition(const long pIndexRank, FILE *pOutput)
 {
-_MODULEINIT_
+
 
 FILE* wOutput=pOutput;
 utfdescString OutPath;
@@ -4372,7 +4372,7 @@ utfdescString OutPath;
                                "Invalid index number <%ld> requested while index range is [0,%ld]",
                                pIndexRank,
                                ZMCB.IndexObjects.lastIdx());
-       _RETURN_ (ZS_INVOP);
+       return  (ZS_INVOP);
        }
     if (pOutput==nullptr)
     {
@@ -4411,7 +4411,7 @@ utfdescString OutPath;
 
     fprintf (stderr,"Xml index definition file <%s> has been created.\n",
                      OutPath.toString());
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }//zwriteXML_IndexDefinition
 
 /**
@@ -4423,7 +4423,7 @@ utfdescString OutPath;
 ZStatus
 ZSMasterFile::zwriteXML_IndexDictionary(const long pIndexRank, FILE *pOutput)
 {
-_MODULEINIT_
+
 
 FILE* wOutput=pOutput;
 utfdescString OutPath;
@@ -4435,7 +4435,7 @@ utfdescString OutPath;
                                "Invalid index number <%ld> requested while index range is [0,%ld]",
                                pIndexRank,
                                ZMCB.IndexObjects.lastIdx());
-       _RETURN_ (ZS_INVOP);
+       return  (ZS_INVOP);
        }
     if (pOutput==nullptr)
     {
@@ -4475,7 +4475,7 @@ utfdescString OutPath;
 
     fprintf (stderr,"Xml key dictionary definition file <%s> has been created.\n",
                      OutPath.toString());
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }//zwriteXML_IndexDictionary
 
 
@@ -4491,7 +4491,7 @@ utfdescString OutPath;
 void
 ZSMasterFile::zwriteXML_FileHeader(FILE *pOutput)
 {
-_MODULEINIT_
+
 
 FILE* wOutput=pOutput;
 utfdescString OutPath;
@@ -4532,7 +4532,7 @@ utfdescString OutPath;
 
     fprintf (stderr,"Xml header definition file <%s> has been created.\n",
                      OutPath.toString());
-    _RETURN_;
+    return ;
 }//zwriteXML_FileHeader
 /**
  * @brief ZSMasterFile::zwriteXML_FileHeader Static function : Generates the xml definition for a ZSMasterFile's header given by it path name pFilePath
@@ -4544,7 +4544,7 @@ utfdescString OutPath;
 void
 ZSMasterFile::zwriteXML_FileHeader(const char* pFilePath,FILE *pOutput)
 {
-_MODULEINIT_
+
 
 ZSMasterFile wZMF;
 ZStatus wSt;
@@ -4592,7 +4592,7 @@ utfdescString OutPath;
                 fclose(wOutput);
     fprintf (stderr,"Xml definition file <%s> has been created.\n",
                      OutPath.toString());
-    _RETURN_;
+    return ;
 }  // static zwriteXML_FileHeader
 
 #ifdef QT_CORE_LIB
@@ -4619,7 +4619,7 @@ utfdescString OutPath;
 ZStatus
 ZSMasterFile::_XMLzicmControl(const utf8_t* pFilePath,QDomDocument &XmlDoc,QDomNode &pFirstNode)
 {
-_MODULEINIT_
+
 
 uriString wUriPath;
 ZDataBuffer wXMLcontent;
@@ -4633,11 +4633,11 @@ ZStatus wSt;
                                     Severity_Error,
                                     " File <%s> does not exist while trying to load it",
                                     pFilePath);
-            _RETURN_ ZS_FILENOTEXIST;
+            return  ZS_FILENOTEXIST;
             }
     wSt=wUriPath.loadContent(wXMLcontent);
     if (wSt!=ZS_SUCCESS)
-                { _RETURN_ wSt;}// Beware _RETURN_ is multiple instructions in debug mode
+                { return  wSt;}// Beware return  is multiple instructions in debug mode
 QDomNode wNode;
 QString wN;
 //QDomDocument XmlDoc;
@@ -4678,7 +4678,7 @@ QDomNode wNodeRoot= XmlDoc.firstChildElement("zicm");
                                         Severity_Error,
                                         "In file %s : xml document is empty or errored",
                                         pFilePath);
-                _RETURN_ ZS_EMPTYFILE;
+                return  ZS_EMPTYFILE;
                 }
 QDomElement wElement;
 //    wNodeRoot=wNodeRoot.nextSiblingElement(); // first node is never an element
@@ -4692,7 +4692,7 @@ QDomElement wElement;
                                         "Bad xml document <%s>.Expected first element <zicm> not found. Found <%s>",
                                         pFilePath,
                                         wN.toStdString().c_str());
-                _RETURN_ ZS_XMLERROR;
+                return  ZS_XMLERROR;
                 }
 QString wAttribute;
     wAttribute = wElement.attribute("version");
@@ -4704,7 +4704,7 @@ QString wAttribute;
                                 "Bad xml document <%s>.Bad zicm version.Expected <2.00>  Found <%s>",
                                 pFilePath,
                                 wAttribute.toStdString().c_str());
-        _RETURN_ ZS_XMLERROR;
+        return  ZS_XMLERROR;
         }
     wNode = wNodeRoot.firstChildElement();
     wN= wNode.toElement().tagName(); // debug control of tag name
@@ -4716,12 +4716,12 @@ QString wAttribute;
                                 Severity_Error,
                                 "Bad xml document <%s>.Empty document no child to <zicm> tag found ",
                                 pFilePath);
-        _RETURN_ ZS_XMLERROR;
+        return  ZS_XMLERROR;
         }
 
 
     pFirstNode = wNode;
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 } //_XMLzicmControl
 
 /**
@@ -4736,8 +4736,8 @@ QString wAttribute;
  *  It delivers the ROOT node ELEMENT after having done the controls
  *
  * @param[in] pFilePath     a Cstring pointing to xml file to load and control
- * @param[out] XmlDoc       The XML document content loaded as a _RETURN_
- * @param[out] pNodeRoot   The First node under the root name to exploit as a _RETURN_
+ * @param[out] XmlDoc       The XML document content loaded as a return 
+ * @param[out] pNodeRoot   The First node under the root name to exploit as a return 
  * @param[in] pRootName      Root node tag name we are searching for
  * @param[in] pRootAttrName Root node Element attribute name. If nullptr then no control is made.
  * @param[in] pRootAttrValue Root node Element attribute expected value
@@ -4752,7 +4752,7 @@ ZSMasterFile::_XMLLoadAndControl(const utf8_t *pFilePath,
                    const utf8_t *pRootAttrValue,
                    FILE* pOutput)
 {
-_MODULEINIT_
+
 
 uriString wUriPath;
 ZDataBuffer wXMLcontent;
@@ -4776,7 +4776,7 @@ QString wAttribute;
                     "%s>> File <%s> does not exist while trying to load it\n",
                     _GET_FUNCTION_NAME_,
                     pFilePath);
-            _RETURN_ ZS_FILENOTEXIST;
+            return  ZS_FILENOTEXIST;
             }
     if (pOutput)
             fprintf(pOutput,"%s>> loading xml file %s\n",
@@ -4785,7 +4785,7 @@ QString wAttribute;
 
     wSt=wUriPath.loadContent(wXMLcontent);
     if (wSt!=ZS_SUCCESS)
-            {_RETURN_ wSt;} // Beware _RETURN_ is multiple instructions in debug mode
+            {return  wSt;} // Beware return  is multiple instructions in debug mode
 
 //QDomDocument XmlDoc;
 
@@ -4828,7 +4828,7 @@ bool NameSpaceProcessing = true; //option to be set at a higher level
                                         Severity_Error,
                                         "In file %s : xml document is empty or errored",
                                         pFilePath);
-                _RETURN_ ZS_EMPTYFILE;
+                return  ZS_EMPTYFILE;
                 }
 
     wElement=wRootNode.toElement();
@@ -4842,11 +4842,11 @@ bool NameSpaceProcessing = true; //option to be set at a higher level
                                         pFilePath,
                                         pRootName,
                                         wN.toStdString().c_str());
-                _RETURN_ ZS_XMLERROR;
+                return  ZS_XMLERROR;
                 }
 
     if (pRootAttrName==nullptr)         // if Optional attribute is omitted then no more control
-                    { _RETURN_ ZS_SUCCESS;}
+                    { return  ZS_SUCCESS;}
 
     wAttribute = wElement.attribute((const char*)pRootAttrName);
     if (wAttribute!=(const char*)pRootAttrValue)
@@ -4859,20 +4859,20 @@ bool NameSpaceProcessing = true; //option to be set at a higher level
                                 pRootAttrName,
                                 pRootAttrValue,
                                 wAttribute.toStdString().c_str());
-        _RETURN_ ZS_XMLERROR;
+        return  ZS_XMLERROR;
         }
     if (pOutput)
             fprintf(pOutput,"%s>> load and control on xml file %s has been done successfully\n",
                     _GET_FUNCTION_NAME_,
                     pFilePath);
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 } //_XMLControl
 
 
 ZStatus
 ZSMasterFile::_loadXML_Index(QDomNode &pIndexNode, ZSIndexControlBlock* pZICB,ZMetaDic* pMetaDic)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 QDomNode wNode;
@@ -4884,7 +4884,7 @@ QString wN;
                                 ZS_XMLERROR,
                                 Severity_Error,
                                 "xml document is corrupted.Expected children to <IndexRank> tag : no child found.");
-        _RETURN_ ZS_XMLERROR;
+        return  ZS_XMLERROR;
         }
     while (!wNode.isNull())
     {
@@ -4920,7 +4920,7 @@ QString wN;
 //$$$            wSt=_loadXMLDictionary(wNodeField,pZICB->ZKDic);
             if (wSt!=ZS_SUCCESS)
                         {
-                        _RETURN_ wSt;// Beware _RETURN_ is multiple instructions in debug mode
+                        return  wSt;// Beware return  is multiple instructions in debug mode
                         }
             break;
             }
@@ -4931,11 +4931,11 @@ QString wN;
                                     "XML error unknown tag name found %s  at line %d ",
                                     wN.toStdString().c_str(),
                                     wNode.lineNumber());
-            _RETURN_ ZS_XMLERROR;
+            return  ZS_XMLERROR;
         }//while true
     wNode=wNode.nextSiblingElement();
     }// while wNode is not null
-   _RETURN_ ZS_SUCCESS;
+   return  ZS_SUCCESS;
 }// _loadXML_Index
 
 /** @endcond */ // Development
@@ -4952,7 +4952,7 @@ QString wN;
 ZStatus
 ZSMasterFile::zloadXML_Index(const utf8_t *pFilePath, ZSIndexControlBlock &pZICB, ZMetaDic* pMetaDic)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 QString wN;
@@ -4963,7 +4963,7 @@ QDomNode wIndexNode;
 
     wSt=_XMLzicmControl(pFilePath,XmlDoc,wIndexNode);
     if (wSt!=ZS_SUCCESS)
-                { _RETURN_ wSt;}
+                { return  wSt;}
 
     if (wIndexNode.toElement().tagName()!="IndexRank")
         {
@@ -4973,7 +4973,7 @@ QDomNode wIndexNode;
                             "XML error : unknown tag name found %s  at line %d. Tag <IndexRank> was expected",
                             wN.toStdString().c_str(),
                             wNode.lineNumber());
-        _RETURN_ ZS_XMLERROR;
+        return  ZS_XMLERROR;
         } //  not IndexRank
 
 
@@ -4986,13 +4986,13 @@ QDomNode wIndexNode;
     if (wSt!=ZS_SUCCESS)
                 {
 //                delete pZICB;
-                _RETURN_ wSt;// Beware _RETURN_ is multiple instructions in debug mode
+                return  wSt;// Beware return  is multiple instructions in debug mode
                 }
 //    wIndexNode=wIndexNode.nextSibling();
 //    }// while wNode is not null
 
 
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 
 }//zloadXML_Index
 
@@ -5003,7 +5003,7 @@ QDomNode wIndexNode;
 ZStatus
 ZSMasterFile::_loadXMLKeyField(QDomNode& wNode, ZSKeyDictionary *&pZKDic)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 QString wN;
@@ -5016,7 +5016,7 @@ QDomElement wElement;
                                 ZS_XMLERROR,
                                 Severity_Error,
                                 "xml document is corrupted.Expected children to <KeyField> tag : no child found.");
-        _RETURN_ ZS_XMLERROR;
+        return  ZS_XMLERROR;
         }
 
 
@@ -5062,7 +5062,7 @@ QDomElement wElement;
             wS=wElement.text();
           wSt=encodeZTypeFromString (pZKDic->last().ZType ,wS);
           if (wSt!=ZS_SUCCESS)
-                  {  _RETURN_ wSt;}
+                  {  return  wSt;}
 
           break;
         }
@@ -5075,7 +5075,7 @@ QDomElement wElement;
         if (wSt!=ZS_SUCCESS)
                 {
                 pZKDic->pop();
-                _RETURN_ wSt;
+                return  wSt;
                 }
         break;
         }
@@ -5093,13 +5093,13 @@ QDomElement wElement;
 
     }// while wNode is not null
 
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }
 
 ZStatus
 ZSMasterFile::_loadXMLDictionary(QDomNode& wNode, ZSKeyDictionary *pZKDic)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 QString wN;
@@ -5113,7 +5113,7 @@ QDomNode wNodeField;
                                 ZS_XMLERROR,
                                 Severity_Error,
                                 "xml document is corrupted.Expected children to <ZKDic> tag : no child found.");
-        _RETURN_ ZS_XMLERROR;
+        return  ZS_XMLERROR;
         }
 
 
@@ -5142,7 +5142,7 @@ QDomNode wNodeField;
         if (wSt!=ZS_SUCCESS)
                 {
                 pZKDic->pop();
-                _RETURN_ wSt;
+                return  wSt;
                 }
         break;
         }
@@ -5161,7 +5161,7 @@ QDomNode wNodeField;
     }// while wNode is not null
 
 
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }// loadXMLDictionary
 
 /** @endcond */ // Development
@@ -5175,7 +5175,7 @@ QDomNode wNodeField;
 ZStatus
 ZSMasterFile::zloadXML_Dictionary(const char* pFilePath, ZSKeyDictionary &pZKDIC)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 QString wN;
@@ -5186,7 +5186,7 @@ QDomNode wIndexNode;
 
     wSt=_XMLzicmControl(pFilePath,XmlDoc,wIndexNode);
     if (wSt!=ZS_SUCCESS)
-                {_RETURN_ wSt;}// Beware _RETURN_ is multiple instructions in debug mode
+                {return  wSt;}// Beware return  is multiple instructions in debug mode
 
     wN = wIndexNode.toElement().tagName();
     if (wIndexNode.toElement().tagName()!="ZKDic")
@@ -5197,7 +5197,7 @@ QDomNode wIndexNode;
                             "XML error : unknown tag name found %s  at line %d. Tag <ZKDic> was expected",
                             wN.toStdString().c_str(),
                             wNode.lineNumber());
-        _RETURN_ ZS_XMLERROR;
+        return  ZS_XMLERROR;
         } //  not IndexRank
 
 
@@ -5211,13 +5211,13 @@ QDomNode wIndexNode;
     if (wSt!=ZS_SUCCESS)
                 {
 //                delete pZKDIC;
-                _RETURN_ wSt;
+                return  wSt;
                 }
 //    wIndexNode=wIndexNode.nextSibling();
 //    }// while wNode is not null
 
 
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 
 }//zloadXML_Dictionary
 
@@ -5247,7 +5247,7 @@ ZSMasterFile::zapplyXMLIndexRankDefinition(const char* pXMLPath,
                                           bool pRealRun,
                                           FILE*pOutput)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 uriString URIContent;
@@ -5314,7 +5314,7 @@ ZSMasterFile         wMasterFile;
     wSt=_XMLLoadAndControl(pXMLPath,XmlDoc,wRootNode,"zicm","version",__ZRF_XMLVERSION_CONTROL__,wOutput);
     if (wSt!=ZS_SUCCESS)
                 {
-                _RETURN_ wSt;// Beware _RETURN_ is multiple instructions in debug mode
+                return  wSt;// Beware return  is multiple instructions in debug mode
                 }
 
     wFirstlevelNode=wRootNode.firstChildElement("IndexRank");
@@ -5557,7 +5557,7 @@ EndzapplyXMLIndex:
         if (FOutput)
                 fclose(wOutput);
 
-    _RETURN_ wSt;
+    return  wSt;
 
 ErrorzapplyXMLIndex:
     fprintf(wOutput,
@@ -5580,7 +5580,7 @@ ZSMasterFile::zgetXMLIndexRank(ZSMasterFile &wMasterFile,
                               long &IndexRank,
                               FILE *wOutput)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 long    wKeyRank = 0;
@@ -5617,7 +5617,7 @@ utfdescString wTagValue;
                                 "xml document may be corrupted or incomplete.Expected mandatory field <Name> child to <IndexRank> tag : no child found.");
         wMissingTags++;
         IndexPresence = 4;
-        _RETURN_ ZS_XMLERROR;
+        return  ZS_XMLERROR;
         }
 
 //--------Search for index rank by its name
@@ -5680,7 +5680,7 @@ utfdescString wTagValue;
                              wZICB.Name.toString());
                 IndexPresence = 0;
                 fprintf (wOutput,wMessage.toString());
-                _RETURN_ ZS_SUCCESS;
+                return  ZS_SUCCESS;
                 }
             wMessage.add("%s>>   ****Error : It is requested to remove index rank <%ld> <%s> while this index does not exist in ZSMasterFile ****\n"
                          "                  Index definition is no more parsed\n",
@@ -5695,7 +5695,7 @@ utfdescString wTagValue;
                                     wZICB.Name.toString());
             fprintf (wOutput,wMessage.toString());
             IndexPresence = 4;
-            _RETURN_ ZS_INVOP;
+            return  ZS_INVOP;
             }
         } // ZS_SUCCESS
 //------------ End Tag Remove---------------------------------
@@ -5771,7 +5771,7 @@ utfdescString wTagValue;
             wMissMandatoryTags ++;
 
             IndexPresence = 4;
-            _RETURN_ ZS_XMLERROR;
+            return  ZS_XMLERROR;
             }// isNull
 
         wSixthlevelNode = wFifthlevelNode.firstChildElement("KeyField");  // an index must at least have one declared field
@@ -5793,7 +5793,7 @@ utfdescString wTagValue;
             wMissMandatoryTags ++;
 
             IndexPresence = 4;
-            _RETURN_ ZS_XMLERROR;
+            return  ZS_XMLERROR;
             }// isNull
 
         while (!wSixthlevelNode.isNull())
@@ -5870,7 +5870,7 @@ utfdescString wTagValue;
             wMissMandatoryTags++;
 
             IndexPresence = 4;
-            _RETURN_ ZS_XMLERROR;
+            return  ZS_XMLERROR;
              }
             else
             {
@@ -5901,7 +5901,7 @@ utfdescString wTagValue;
             wMissMandatoryTags++;
 
             IndexPresence = 4;
-            _RETURN_ ZS_XMLERROR;
+            return  ZS_XMLERROR;
              }
             else
             {
@@ -5933,7 +5933,7 @@ utfdescString wTagValue;
             wMissMandatoryTags++;
 
             IndexPresence = 4;
-            _RETURN_ ZS_XMLERROR;
+            return  ZS_XMLERROR;
              }
             else
             {
@@ -5965,7 +5965,7 @@ utfdescString wTagValue;
             wMissMandatoryTags++;
 
             IndexPresence = 4;
-            _RETURN_ ZS_XMLERROR;
+            return  ZS_XMLERROR;
              }
             else
             {
@@ -5990,7 +5990,7 @@ utfdescString wTagValue;
                 wMissMandatoryTags++;
 
                 IndexPresence = 4;
-                _RETURN_ ZS_XMLERROR;
+                return  ZS_XMLERROR;
                 }
                 else
             {
@@ -6015,8 +6015,8 @@ utfdescString wTagValue;
 //--------------- End ZKDic--------------------------------------------------------
 //--------------------Index Add------------------------------------------------------
 
-    if (IndexPresence == 3)     // Creation then _RETURN_
-                    {_RETURN_ wSt; }// Beware _RETURN_ is multiple instructions in debug mode
+    if (IndexPresence == 3)     // Creation then return 
+                    {return  wSt; }// Beware return  is multiple instructions in debug mode
  //--------Search for first difference in index
 
     if (wMasterFile.ZMCB.Index[IndexRank].ZKDic->size()!=wZICB.ZKDic->size())
@@ -6025,7 +6025,7 @@ utfdescString wTagValue;
                  "%s>>          Index has been modified and must be rebuilt\n",
                  _GET_FUNCTION_NAME_);
         IndexPresence = 2;
-        _RETURN_ wSt;
+        return  wSt;
         }
     for (long wi=0; wi < wZICB.ZKDic->size();wi++)
     {
@@ -6037,13 +6037,13 @@ utfdescString wTagValue;
                              "%s>>          Index has been modified and must be rebuilt\n",
                              _GET_FUNCTION_NAME_);
                     IndexPresence =2;
-                    _RETURN_ wSt;
+                    return  wSt;
                     }
     }//for
     fprintf (wOutput,
              "%s>>          Index has not been modified and do not need to be rebuilt\n",
              _GET_FUNCTION_NAME_);
-    _RETURN_ wSt;
+    return  wSt;
 }//zgetXMLIndexRank
 #endif // #endif // __COMMENT__
 
@@ -6065,7 +6065,7 @@ ZSMasterFile::zapplyXMLFileDefinition(const utf8_t* pXMLPath,
                                     bool pRealRun,
                                     FILE*pOutput)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 uriString URIContent;
@@ -6871,7 +6871,7 @@ EndzapplyXMLFile:
     if (FOutput)
             fclose(wOutput);
 
-    _RETURN_ wSt;
+    return  wSt;
 
 ErrorzapplyXMLFile:
     fprintf(wOutput,
@@ -6900,7 +6900,7 @@ ZSMasterFile::zapplyXMLFileDefinition_old(const utf8_t* pXMLPath,
                                     bool pRealRun,
                                     FILE*pOutput)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 uriString URIContent;
@@ -8144,7 +8144,7 @@ EndzapplyXMLFile:
     if (FOutput)
             fclose(wOutput);
 
-    _RETURN_ wSt;
+    return  wSt;
 
 ErrorzapplyXMLFile:
     fprintf(wOutput,
@@ -8181,14 +8181,14 @@ ErrorzapplyXMLFile:
 void
 ZSMasterFile::ZRFPMSIndexStats(const long pIndex,FILE* pOutput)
 {
-_MODULEINIT_
+
 
     if ((pIndex<0)||(pIndex>ZMCB.IndexObjects.size()))
     {
              fprintf(pOutput, " Performance Data report error for file <%s> : invalid index number <%ld>\n",
                      ZDescriptor.URIContent.toString(),
                      pIndex);
-             _RETURN_;
+             return ;
     }
     fprintf (pOutput,
              "\nPerformance report on index number <%ld> name <%s> for file <%s>\n"
@@ -8207,7 +8207,7 @@ _MODULEINIT_
 
 
     ZMCB.IndexObjects[pIndex]->ZDescriptor.ZPMS.reportDetails(pOutput);
-    _RETURN_;
+    return ;
 
 }// ZRFPMSIndexStats
 
@@ -8272,7 +8272,7 @@ _MODULEINIT_
  ZStatus
  ZSMasterFile::zstartIndexPMSMonitoring (const long pIndex)
  {
-_MODULEINIT_
+
      if ((pIndex<0)||(pIndex>ZMCB.IndexObjects.lastIdx()))
         {
         ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -8281,10 +8281,10 @@ _MODULEINIT_
                                 "Invalid index number <%ld> requested while index range is [0,%ld]",
                                 pIndex,
                                 ZMCB.IndexObjects.lastIdx());
-        _RETURN_ (ZS_INVOP);
+        return  (ZS_INVOP);
         }
      ZMCB.IndexObjects[pIndex]->ZPMSStats.init();
-     _RETURN_ ZS_SUCCESS;
+     return  ZS_SUCCESS;
  }//zstartIndexPMSMonitoring
  /**
    * @brief ZSMasterFile::zendIndexPMSMonitoring Ends current PMS monitoring session on the specific index given by its rank (pIndex)
@@ -8293,7 +8293,7 @@ _MODULEINIT_
 ZStatus
 ZSMasterFile::zstopIndexPMSMonitoring(const long pIndex)
 {
-_MODULEINIT_
+
   if ((pIndex<0)||(pIndex>ZMCB.IndexObjects.lastIdx()))
      {
      ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -8302,10 +8302,10 @@ _MODULEINIT_
                              "Invalid index number <%ld> requested while index range is [0,%ld]",
                              pIndex,
                              ZMCB.IndexObjects.lastIdx());
-     _RETURN_ (ZS_INVOP);
+     return  (ZS_INVOP);
      }
   ZMCB.IndexObjects[pIndex]->ZPMSStats.end();
-  _RETURN_ ZS_SUCCESS;
+  return  ZS_SUCCESS;
 }//zstopIndexPMSMonitoring
 
 /**
@@ -8316,7 +8316,7 @@ _MODULEINIT_
 ZStatus
 ZSMasterFile::zreportIndexPMSMonitoring (const long pIndex, FILE* pOutput)
 {
-_MODULEINIT_
+
    if ((pIndex<0)||(pIndex>ZMCB.IndexObjects.lastIdx()))
       {
       ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -8325,7 +8325,7 @@ _MODULEINIT_
                               "Invalid index number <%ld> requested while index range is [0,%ld]",
                               pIndex,
                               ZMCB.IndexObjects.lastIdx());
-      _RETURN_ (ZS_INVOP);
+      return  (ZS_INVOP);
       }
    fprintf(pOutput,
            "________________________________________________\n"
@@ -8337,7 +8337,7 @@ _MODULEINIT_
            ZMCB.Index[pIndex]->Name.toString(),
            decode_ZRFMode( ZDescriptor.Mode));
    ZMCB.IndexObjects[pIndex]->ZPMSStats.reportFull(pOutput);
-   _RETURN_ ZS_SUCCESS;
+   return  ZS_SUCCESS;
 }// zreportIndexPMSMonitoring
 
 /** @}*/ // ZMFSTATS

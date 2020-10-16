@@ -677,7 +677,7 @@ ZHeaderControlBlock::_export(ZDataBuffer& pZDBExport)
 ZStatus
 ZHeaderControlBlock::_import(unsigned char* pZDBImport_Ptr)
 {
-_MODULEINIT_
+
     ZHeaderControlBlock_Export* wHCB=(ZHeaderControlBlock_Export*)(pZDBImport_Ptr);
 //        StartSign = _reverseByteOrder_T<uint32_t>(wHCB->StartSign);
 //    StartSign = wHCB->StartSign;  // don't care reversing start sign or end sign : same as reversed
@@ -692,7 +692,7 @@ _MODULEINIT_
                               "invalid header block content found Start marker <%X> ZBlockID <%X>. One of these is invalid (or both are).",
                               wHCB->StartSign,
                               wHCB->BlockID);
-        _RETURN_ ZS_BADFILEHEADER;
+        return  ZS_BADFILEHEADER;
         }
     if (reverseByteOrder_Conditional<unsigned long>(wHCB->ZRFVersion)!=__ZRF_VERSION__)
         {
@@ -702,7 +702,7 @@ _MODULEINIT_
                               "invalid header block version : found version <%ld> while current version is <%ld>.",
                               wHCB->ZRFVersion,
                               __ZRF_VERSION__);
-        _RETURN_ ZS_BADFILEHEADER;
+        return  ZS_BADFILEHEADER;
         }
 
 //    BlockID = wHCB->BlockID;
@@ -714,7 +714,7 @@ _MODULEINIT_
 
 //    EndSign = wHCB->EndSign; // don't care reversing start sign or end sign : same as reversed
 
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }
 
 
@@ -1822,7 +1822,7 @@ ZRandomFile::_writeFileHeader(ZFileDescriptor &pDescriptor, bool pForceWrite)
 ZStatus
 ZRandomFile::_readFileLock(ZFileDescriptor &pDescriptor, lockPack_struct &pLockPack)
 {
-_MODULEINIT_
+
     printf ("ZRandomFile::_readFileLock\n");
 
     size_t wLockInfoOffset = sizeof (ZHeaderControlBlock_Export::StartSign);
@@ -1836,7 +1836,7 @@ _MODULEINIT_
                                   "Error positionning at Header address <%lld> of header file  <%s>",
                                   wLockInfoOffset,
                                   pDescriptor.URIHeader.toString());
-                 _RETURN_ (ZS_FILEPOSERR);
+                 return  (ZS_FILEPOSERR);
                  }
 
     ssize_t wSRead =read(pDescriptor.HeaderFd,(char *)&pLockPack,sizeof(lockPack_struct));  // read lock infos with packed structure
@@ -1850,19 +1850,19 @@ _MODULEINIT_
                                  "Error reading  Header control block address <%lld> file  <%s>",
                                  0L,
                                  pDescriptor.URIHeader.toString());
-                _RETURN_ (ZS_BADFILEHEADER);
+                return  (ZS_BADFILEHEADER);
                 }
 
     pLockPack.Lock=reverseByteOrder_Conditional<zlockmask_type>(pLockPack.Lock);
     pLockPack.LockOwner=reverseByteOrder_Conditional<pid_t>(pLockPack.LockOwner);
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 
 }//_readFileLock
 
 ZStatus
 ZRandomFile::_writeFileLock(ZFileDescriptor &pDescriptor, lockPack_struct &pLockPack)
 {
-_MODULEINIT_
+
 
     printf ("ZRandomFile::_writeFileLock\n");
     lockPack_struct wLockPack;
@@ -1880,7 +1880,7 @@ _MODULEINIT_
                                   "Error positionning at Header address <%lld> of header file  <%s>",
                                   wLockInfoOffset,
                                   pDescriptor.URIHeader.toString());
-                 _RETURN_ (ZS_FILEPOSERR);
+                 return  (ZS_FILEPOSERR);
                  }
     ssize_t wSWrite =write(pDescriptor.HeaderFd,(char *)&wLockPack,sizeof(lockPack_struct)); // write lock infos to file header s
      if (wSWrite<0)
@@ -1892,9 +1892,9 @@ _MODULEINIT_
                                  "Error while writing File Header block at address <%ld> to file header %s",
                                  wLockInfoOffset,
                                  pDescriptor.URIHeader.toString());
-             _RETURN_ (ZS_WRITEERROR);
+             return  (ZS_WRITEERROR);
              }
-     _RETURN_ ZS_SUCCESS;
+     return  ZS_SUCCESS;
 }//_writeFileLock
 
 /**
@@ -1907,7 +1907,7 @@ _MODULEINIT_
 ZStatus
 ZRandomFile::_writeReservedHeader(ZFileDescriptor &pDescriptor,bool pForceWrite)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ssize_t wSWrite;
@@ -1915,18 +1915,18 @@ ssize_t wSWrite;
     if (pDescriptor.Mode & ZRF_Exclusive)
            {
            if (!pForceWrite)
-                       {  _RETURN_ wSt;}
+                       {  return  wSt;}
 
            }
 
     //             ZReserved + ZFCB  + ZBAT content + ZFBT content + ZReserved
     //
     if (pDescriptor.ZReserved.Size==0)   // if there is a Reserved space
-                                {  _RETURN_ wSt;}
+                                {  return  wSt;}
 
 
     if ((wSt=_writeFileHeader(pDescriptor,pForceWrite))!=ZS_SUCCESS)
-                                    {  _RETURN_ wSt;}
+                                    {  return  wSt;}
 
     pDescriptor.ZPMS.HReservedWrites ++;
     wSWrite =write(pDescriptor.HeaderFd,pDescriptor.ZReserved.DataChar,pDescriptor.ZReserved.Size); // write Reserved infradata
@@ -1938,10 +1938,10 @@ ssize_t wSWrite;
                              Severity_Error,
                              "Error while writing Reserved infra data to file header %s",
                              pDescriptor.URIHeader.toString());
-            _RETURN_ (ZS_WRITEERROR);
+            return  (ZS_WRITEERROR);
             }
 
-    _RETURN_ _writeFileDescriptor(pDescriptor,pForceWrite); //! this is absolutely necessary because size of Reserved block may vary. A future optimization could test if Reserved block size has changed and will save to this occasion this access.
+    return  _writeFileDescriptor(pDescriptor,pForceWrite); //! this is absolutely necessary because size of Reserved block may vary. A future optimization could test if Reserved block size has changed and will save to this occasion this access.
 }// _writeReservedHeader
 
 /**
@@ -1961,7 +1961,7 @@ ssize_t wSWrite;
 ZStatus
 ZRandomFile::_writeFileDescriptor(ZFileDescriptor &pDescriptor, bool pForceWrite)
 {
-_MODULEINIT_
+
 
 // Data offsets are computed from Beginning of FCB that may vary is Header size and/or Reserved Data Size Change
 //
@@ -1976,7 +1976,7 @@ ssize_t wSWrite;
     if (pDescriptor.Mode & ZRF_Exclusive)
            {
            if (!pForceWrite)
-                       { _RETURN_ ZS_SUCCESS;}
+                       { return  ZS_SUCCESS;}
            }
 /*
  *  Export first the pools to ZDataBuffers
@@ -2035,7 +2035,7 @@ ssize_t wSWrite;
                                  "Error positionning at FileDescriptor address <%lld> of header file  <%s>",
                                  pDescriptor.ZHeader.OffsetFCB,
                                  pDescriptor.URIHeader.toString());
-                _RETURN_ (ZS_FILEPOSERR);
+                return  (ZS_FILEPOSERR);
                 }
 
     pDescriptor.ZPMS.HFDWrites ++;
@@ -2048,7 +2048,7 @@ ssize_t wSWrite;
                              Severity_Error,
                              "Error while writing FCB + block pools to file header %s",
                              pDescriptor.URIHeader.toString());
-            _RETURN_ (ZS_WRITEERROR);
+            return  (ZS_WRITEERROR);
             }
 
 //===============================================================================================================
@@ -2112,7 +2112,7 @@ ssize_t wSWrite;
 //=============================================================================================
 
     fdatasync(pDescriptor.HeaderFd);
-    _RETURN_ (ZS_SUCCESS);
+    return  (ZS_SUCCESS);
 }// _writeFileControlBlock
 
 /**
@@ -2124,7 +2124,7 @@ ssize_t wSWrite;
 ZStatus
 ZRandomFile::_writeFullFileHeader(ZFileDescriptor &pDescriptor, bool pForceWrite)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 
@@ -2133,11 +2133,11 @@ ZStatus wSt;
     if (pDescriptor.Mode & ZRF_Exclusive)
            {
            if (!pForceWrite)
-                            {  _RETURN_ ZS_SUCCESS;}
+                            {  return  ZS_SUCCESS;}
            }
 
     if ((wSt=_writeFileHeader(pDescriptor,pForceWrite))!=ZS_SUCCESS)
-                            { _RETURN_ wSt;}
+                            { return  wSt;}
 // if ZReserved contains something
     if (pDescriptor.ZReserved.Size > 0)
             {
@@ -2151,10 +2151,10 @@ ZStatus wSt;
                                  Severity_Error,
                                  "Error while writing Reserved infra data to file header during creation. File %s",
                                  pDescriptor.URIHeader.toString());
-                _RETURN_ (ZS_WRITEERROR);
+                return  (ZS_WRITEERROR);
                 }
             }
-    _RETURN_ (_writeFileDescriptor(pDescriptor,pForceWrite));
+    return  (_writeFileDescriptor(pDescriptor,pForceWrite));
 }//_writeFullFileHeader
 
 
@@ -2196,7 +2196,7 @@ ZRandomFile::updateReservedBlock(const ZDataBuffer &pReserved,bool pForceWrite)
 ZStatus
 ZRandomFile::_getFileHeader(ZFileDescriptor &pDescriptor,bool pForceRead)
 {
-_MODULEINIT_
+
 
 ZStatus wSt=ZS_SUCCESS;
 ZDataBuffer wZDB;
@@ -2204,7 +2204,7 @@ ZDataBuffer wZDB;
     if (pDescriptor.Mode & ZRF_Exclusive)
            {
            if (!pForceRead)
-                   {_RETURN_ ZS_SUCCESS;}//
+                   {return  ZS_SUCCESS;}//
            }
 
 
@@ -2220,7 +2220,7 @@ ZDataBuffer wZDB;
                                  0L,
                                  pDescriptor.URIHeader.toString()
                                  );
-                _RETURN_(ZS_FILEPOSERR);
+                return (ZS_FILEPOSERR);
                 }
     pDescriptor.ZPMS.HFHReads ++;
     ZHeaderControlBlock_Export wZHeaderExport;
@@ -2236,19 +2236,19 @@ ZDataBuffer wZDB;
                                  "Error reading  Header control block address <%lld> file  <%s>",
                                  0L,
                                  pDescriptor.URIHeader.toString());
-                _RETURN_ (ZS_BADFILEHEADER);
+                return  (ZS_BADFILEHEADER);
                 }
 
     // Controls about ZHeader integrity
 
    wSt=pDescriptor.ZHeader._import((unsigned char *)&wZHeaderExport);
 
-   _RETURN_ wSt;
+   return  wSt;
 }//_getFileHeader
 ZStatus
 ZRandomFile::_getFileHeader_Export(ZFileDescriptor &pDescriptor,ZHeaderControlBlock_Export* pHCB_Export)
 {
-_MODULEINIT_
+
 
 ZStatus wSt=ZS_SUCCESS;
 ZDataBuffer wZDB;
@@ -2267,7 +2267,7 @@ ZDataBuffer wZDB;
                                  0L,
                                  pDescriptor.URIHeader.toString()
                                  );
-                _RETURN_(ZS_FILEPOSERR);
+                return (ZS_FILEPOSERR);
                 }
     pDescriptor.ZPMS.HFHReads ++;
     ssize_t wSRead =read(pDescriptor.HeaderFd,(char *)pHCB_Export,sizeof(ZHeaderControlBlock_Export));  // read at first Header control block
@@ -2281,11 +2281,11 @@ ZDataBuffer wZDB;
                                  "Error reading  Header control block address <%lld> file  <%s>",
                                  0L,
                                  pDescriptor.URIHeader.toString());
-                _RETURN_ (ZS_BADFILEHEADER);
+                return  (ZS_BADFILEHEADER);
                 }
 
     // Controls about ZHeader integrity
-    _RETURN_ wSt;
+    return  wSt;
 }//_getFileHeader_Export
 /**
  * @brief ZRandomFile::_getFullFileHeader gets/refreshes the whole file header content into memory_order
@@ -2303,7 +2303,7 @@ ZDataBuffer wZDB;
 ZStatus
 ZRandomFile::_getFullFileHeader(ZFileDescriptor &pDescriptor, bool pForceRead)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 
@@ -2312,13 +2312,13 @@ ZStatus wSt;
     if (pDescriptor.Mode & ZRF_Exclusive)
            {
            if (!pForceRead)
-                       {  _RETURN_ ZS_SUCCESS;  }
+                       {  return  ZS_SUCCESS;  }
            }
     if ((wSt=_getFileHeader(pDescriptor,pForceRead))!=ZS_SUCCESS)
-                            {_RETURN_  wSt;}
+                            {return   wSt;}
     if ((wSt=_getReservedHeader (pDescriptor,pForceRead))!=ZS_SUCCESS)
-                            {_RETURN_  wSt;}
-    _RETURN_ _getFileControlBlock(pDescriptor,pForceRead);
+                            {return   wSt;}
+    return  _getFileControlBlock(pDescriptor,pForceRead);
 } // _getFullFileHeader
 /**
  * @brief ZRandomFile::getReservedBlock gets/refreshes the file header reserved block in memory
@@ -2339,7 +2339,7 @@ ZRandomFile::getReservedBlock(bool pForceRead)
 ZStatus
 ZRandomFile::getReservedBlock(ZDataBuffer& pReserved,bool pForceRead)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
     if (!isOpen())
@@ -2349,25 +2349,25 @@ ZStatus wSt;
                                 Severity_Severe,
                                 " File %s is not open while trying to get reserved header",
                                 getURIContent().toCChar());
-        _RETURN_ ZS_FILENOTOPEN ;
+        return  ZS_FILENOTOPEN ;
         }
     pReserved.clearData();
     wSt=_getReservedHeader(ZDescriptor,pForceRead);
     if (wSt!=ZS_SUCCESS)
-                { _RETURN_ wSt;}
+                { return  wSt;}
     pReserved = ZDescriptor.ZReserved ;
-   _RETURN_ wSt;
+   return  wSt;
 }
 
 ZStatus
 ZRandomFile::_getReservedHeader(ZFileDescriptor &pDescriptor, bool pForceRead)
 {
-_MODULEINIT_
+
 
     if (pDescriptor.Mode & ZRF_Exclusive)
            {
            if (!pForceRead)
-                   { _RETURN_ ZS_SUCCESS;}
+                   { return  ZS_SUCCESS;}
            }
     off_t wOff = lseek(pDescriptor.HeaderFd,(off_t)pDescriptor.ZHeader.OffsetReserved,SEEK_SET);
     if (wOff<0)
@@ -2381,7 +2381,7 @@ _MODULEINIT_
                                  pDescriptor.ZHeader.OffsetReserved,
                                  pDescriptor.URIHeader.toString()
                                  );
-                _RETURN_ (ZS_FILEPOSERR);
+                return  (ZS_FILEPOSERR);
                 }
     pDescriptor.ZPMS.HReservedReads += 1;
     pDescriptor.ZReserved.allocateBZero(pDescriptor.ZHeader.SizeReserved);
@@ -2394,10 +2394,10 @@ _MODULEINIT_
                                  Severity_Error,
                                  "Error reading  Header reserved infradata file  <%s>",
                                  pDescriptor.URIHeader.toString());
-                _RETURN_ (ZS_BADFILERESERVED);
+                return  (ZS_BADFILERESERVED);
                 }
 
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 } //_getReservedHeader
 
 /**
@@ -2414,12 +2414,12 @@ _MODULEINIT_
 ZStatus
 ZRandomFile::_getFileControlBlock (ZFileDescriptor &pDescriptor, bool pForceRead)
 {
-_MODULEINIT_
+
 
     if (pDescriptor.Mode & ZRF_Exclusive)
            {
            if (!pForceRead)
-                   {  _RETURN_ ZS_SUCCESS;}
+                   {  return  ZS_SUCCESS;}
            }
 
     off_t wOff = lseek(pDescriptor.HeaderFd,pDescriptor.ZHeader.OffsetFCB,SEEK_SET);
@@ -2434,7 +2434,7 @@ _MODULEINIT_
                                  0L,
                                  pDescriptor.URIHeader.toString()
                                  );
-                _RETURN_(ZS_FILEPOSERR);
+                return (ZS_FILEPOSERR);
                 }
 
     pDescriptor.setupFCB();
@@ -2454,7 +2454,7 @@ _MODULEINIT_
                                  "Error reading  Header control block address <%lld> file  <%s>",
                                  0L,
                                  pDescriptor.URIHeader.toString());
-                _RETURN_ (ZS_BADFILEHEADER);
+                return  (ZS_BADFILEHEADER);
                 }
     pDescriptor.ZFCB->_import(wZDB.Data);
 
@@ -2472,7 +2472,7 @@ _MODULEINIT_
                                  pDescriptor.ZFCB->ZBAT_DataOffset,
                                  pDescriptor.URIHeader.toString()
                                  );
-                _RETURN_ (ZS_FILEPOSERR);
+                return  (ZS_FILEPOSERR);
                 }
     wSRead =read(pDescriptor.HeaderFd,wBuffer.DataChar,pDescriptor.ZFCB->ZBAT_ExportSize);
 //    if ((wSRead<64)||(wSRead !=pDescriptor.ZFCB->ZBAT_ExportSize))
@@ -2487,7 +2487,7 @@ _MODULEINIT_
                                 pDescriptor.URIHeader.toString(),
                                 pDescriptor.ZFCB->ZBAT_ExportSize,
                                 wSRead);
-            _RETURN_ (ZS_BADFILEHEADER);
+            return  (ZS_BADFILEHEADER);
             }
 
     pDescriptor.ZBAT->_importPool(wBuffer.Data);
@@ -2506,7 +2506,7 @@ _MODULEINIT_
                              pDescriptor.URIHeader.toString(),
                                 pDescriptor.ZFCB->ZFBT_ExportSize,
                                 wSRead);
-            _RETURN_ (ZS_BADFILEHEADER);
+            return  (ZS_BADFILEHEADER);
             }
     pDescriptor.ZFBT->_importPool(wBuffer.Data);
 
@@ -2524,7 +2524,7 @@ _MODULEINIT_
                                 pDescriptor.URIHeader.toString(),
                                 pDescriptor.ZFCB->ZDBT_ExportSize,
                                 wSRead);
-            _RETURN_ (ZS_BADFILEHEADER);
+            return  (ZS_BADFILEHEADER);
             }
     pDescriptor.ZDBT->_importPool(wBuffer.Data);
 /*        ssize_t wSRead =read(pDescriptor.HeaderFd,(char *)pDescriptor.ZFCB,sizeof(ZFileControlBlock));  //! read at first Header control block
@@ -2602,7 +2602,7 @@ _MODULEINIT_
     pDescriptor.ZDBT->_import(wBuffer.Data);
 */
 
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }// _getFileDescriptor
 
 
@@ -2617,7 +2617,7 @@ _MODULEINIT_
 ZStatus
 ZRandomFile::_getBlockHeader(ZFileDescriptor &pDescriptor,  zaddress_type pAddress, ZBlockHeader &pBlockHeader)
 {
-_MODULEINIT_
+
 
 ssize_t wSRead;
 ZBlockHeader_Export wBlockHeadExp;
@@ -2635,7 +2635,7 @@ ZBlockHeader_Export wBlockHeadExp;
                                  pAddress,
                                  pDescriptor.URIContent.toString()
                                  );
-                _RETURN_ (ZS_FILEPOSERR);
+                return  (ZS_FILEPOSERR);
                 }
 
     pDescriptor.setPhysicalPosition((zaddress_type)wOff);
@@ -2651,7 +2651,7 @@ ZBlockHeader_Export wBlockHeadExp;
                              "Error reading block header :  address <%lld> for file <%s>\n",
                              pAddress,
                              pDescriptor.URIContent.toString());
-            _RETURN_ (ZS_READERROR);
+            return  (ZS_READERROR);
             }
     pDescriptor.ZPMS.CBHReadBytesSize += wSRead ;
 
@@ -2669,10 +2669,10 @@ ZBlockHeader_Export wBlockHeadExp;
                              "Block header has not been entirely read and has been truncated.",
                              pAddress,
                              pDescriptor.URIContent.toString());
-            _RETURN_ (ZS_READPARTIAL);
+            return  (ZS_READPARTIAL);
             }
 
-    _RETURN_ (ZS_SUCCESS);
+    return  (ZS_SUCCESS);
 } // _getBlockHeader
 
 
@@ -2705,9 +2705,9 @@ ZBlockHeader_Export wBlockHeadExp;
 ZStatus
 ZRandomFile::zopen(const zmode_type pMode)
 {
-_MODULEINIT_
 
-    _RETURN_ _open(ZDescriptor,pMode,ZFT_ZRandomFile);
+
+    return  _open(ZDescriptor,pMode,ZFT_ZRandomFile);
 
 }//zopen
 /**
@@ -2719,15 +2719,15 @@ _MODULEINIT_
 ZStatus
 ZRandomFile::zopen(const uriString &pFilename, const zmode_type pMode)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 
     if ((wSt=setPath(pFilename))!=ZS_SUCCESS)
-                                {    _RETURN_ wSt;}
+                                {    return  wSt;}
 
 
-    _RETURN_ (zopen(pMode));
+    return  (zopen(pMode));
 }//zopen
 /**
  * @brief ZRandomFile::zopen open file which name is given by pFilename as a C string to the mode pMode
@@ -2814,7 +2814,7 @@ ZRandomFile::_allocateFreeBlock (ZFileDescriptor &pDescriptor,
                                  long pZBATRank)
 
 {
-_MODULEINIT_
+
 
 zrank_type wZBATRank=pZBATRank;
 
@@ -2830,7 +2830,7 @@ zrank_type wZBATRank=pZBATRank;
                                            ZS_INVOP,
                                            Severity_Severe,
                                            "Invalid index for Free Block Table (ZFBT) %ld ",pZFBTRank);
-                    _RETURN_ -1;
+                    return  -1;
                     }
     if (pSize > pDescriptor.ZFBT->Tab[pZFBTRank].BlockSize)
                     {
@@ -2840,7 +2840,7 @@ zrank_type wZBATRank=pZBATRank;
                                            "Invalid Free Block to be allocated : size %lld while requested size is %lld",
                                            pDescriptor.ZFBT->Tab[pZFBTRank].BlockSize,
                                            pSize);
-                    _RETURN_ -1;
+                    return  -1;
                     }
     ZBlockDescriptor wBD;
 
@@ -2888,7 +2888,7 @@ zrank_type wZBATRank=pZBATRank;
 
               _cleanDeletedBlocks(pDescriptor,wBD);     //! remove deleted block included in free block from Recovery Pool
 
-              _RETURN_ (wZBATRank);              //! return ZBAT entry index created or reused
+              return  (wZBATRank);              //! return ZBAT entry index created or reused
             } // wS==0 : sizes are equal
 
 
@@ -2924,7 +2924,7 @@ zrank_type wZBATRank=pZBATRank;
 //      need to write block header here at new address : export is made within _writeBlockHeader
 
              if ( _writeBlockHeader(pDescriptor,(ZBlockHeader&)wRemainingFreeBlock,wRemainingFreeBlock.Address)!=ZS_SUCCESS)
-                                                         {  _RETURN_ -1;}
+                                                         {  return  -1;}
 
             if(__ZRFVERBOSE__)
                  _DBGPRINT(
@@ -2952,7 +2952,7 @@ zrank_type wZBATRank=pZBATRank;
 // need to update file control block too : take account of modified pools
  //    if ( _writeFileDescriptor(pDescriptor)!=ZS_SUCCESS)   // File descriptor will be written once commit has been done
  //                                                                           return -1;
-    _RETURN_ (wZBATRank);  //! returns the newly created or reused ZBAT entry allocated but not used
+    return  (wZBATRank);  //! returns the newly created or reused ZBAT entry allocated but not used
 }//_allocateFreeBlock
 
 
@@ -2970,7 +2970,7 @@ zrank_type wZBATRank=pZBATRank;
 ZStatus
 ZRandomFile::_seek(ZFileDescriptor &pDescriptor,zaddress_type pAddress)
 {
-_MODULEINIT_
+
 
     off_t wOff = lseek(pDescriptor.ContentFd,(off_t)( pAddress+pDescriptor.ZFCB->StartOfData),SEEK_SET);
     if (wOff<0)
@@ -2982,10 +2982,10 @@ _MODULEINIT_
                                 "Error while positionning file <%s> at address <%lld>",
                                 pDescriptor.URIContent.toString(),
                                 pAddress);
-                _RETURN_ (ZS_FILEPOSERR);
+                return  (ZS_FILEPOSERR);
                 }
     pDescriptor.setPhysicalPosition((zaddress_type)wOff);
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }//_seek
 
 /**
@@ -3019,7 +3019,7 @@ ZRandomFile::_read(ZFileDescriptor &pDescriptor,
                    ssize_t &pSizeRead,
                    ZPMSCounter_type pZPMSType)
 {
-_MODULEINIT_
+
 
 //    pDescriptor.ZPMS.UserReads += 1;
 
@@ -3035,7 +3035,7 @@ _MODULEINIT_
                              Severity_Severe,
                              "Error while reading file <%s>",
                              pDescriptor.URIContent.toString());
-            _RETURN_ (ZS_READERROR);
+            return  (ZS_READERROR);
             }
     pDescriptor.ZPMS.PMSCounterRead(pZPMSType,pSizeRead);
     pDescriptor.setPhysicalPosition((zaddress_type)lseek(pDescriptor.ContentFd,0L,SEEK_CUR));//! get current address
@@ -3044,12 +3044,12 @@ _MODULEINIT_
 
     if (pSizeRead==0)
             {
-            _RETURN_ ZS_EOF;
+            return  ZS_EOF;
             }
     if (pSizeRead<pSize)
-                {_RETURN_ ZS_READPARTIAL;} // not an error : expected size is not returned. EOF may have been found
+                {return  ZS_READPARTIAL;} // not an error : expected size is not returned. EOF may have been found
 
-_RETURN_ ZS_SUCCESS;
+return  ZS_SUCCESS;
 }//_read
 
 /**
@@ -3081,7 +3081,7 @@ ZRandomFile::_read(ZFileDescriptor &pDescriptor,
                    const ssize_t pSizeToRead,
                    ZPMSCounter_type pZPMSType)
 {
-_MODULEINIT_
+
 ssize_t wSRead=0;
 
 //    pDescriptor.ZPMS.UserReads += 1;
@@ -3157,12 +3157,12 @@ ZRandomFile::_readAt(ZFileDescriptor &pDescriptor,
                      zaddress_type pAddress,
                      ZPMSCounter_type pZPMSType)
 {
-_MODULEINIT_
+
 
     ZStatus wSt = _seek(pDescriptor,pAddress);
     if (wSt!=ZS_SUCCESS)
-                {   _RETURN_ wSt;   }
-    _RETURN_ _read(pDescriptor,pBuffer,pSize,pSizeRead,pZPMSType);
+                {   return  wSt;   }
+    return  _read(pDescriptor,pBuffer,pSize,pSizeRead,pZPMSType);
 }//_readAt
 
 
@@ -3222,7 +3222,7 @@ ZRandomFile::_readBlockAt(ZFileDescriptor &pDescriptor,
                      ZBlock &pBlock,
                      const zaddress_type pAddress)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ssize_t wSizeRead;
@@ -3234,21 +3234,21 @@ ZBlockHeader_Export wBlockHeadExp;
 
     wSt= _readAt(pDescriptor,&wBlockHeadExp,sizeof(ZBlockHeader_Export),wSizeRead,pAddress,ZPMS_BlockHeader);
     if (wSt!=ZS_SUCCESS)
-                {   _RETURN_ wSt;   }
+                {   return  wSt;   }
 
     wSt=ZBlockHeader::_importConvert(pBlock,&wBlockHeadExp);
 
 // Test wether given address correspond to effective beginning of a block with correct identification (Data block)
 
     if (wSt!=ZS_SUCCESS)
-                    {   _RETURN_ wSt;   }
+                    {   return  wSt;   }
 
 
 //    pDescriptor.ZPMS.CBHReadBytesSize +=wSizeRead ;
 
     wUserRecordSize = pBlock.BlockSize - sizeof(ZBlockHeader_Export);
     pBlock.allocate(wUserRecordSize);
-    _RETURN_ _read(pDescriptor,pBlock.Content,wUserRecordSize,ZPMS_User); // PMS counter are NOT updated within _read for user content values
+    return  _read(pDescriptor,pBlock.Content,wUserRecordSize,ZPMS_User); // PMS counter are NOT updated within _read for user content values
 
 }//_readBlockAt
 
@@ -3374,7 +3374,7 @@ ZStatus
 ZRandomFile::_freeBlock(ZFileDescriptor &pDescriptor,
                         zrank_type pRank)
 {
-_MODULEINIT_
+
 ZStatus wSt;
 ZBlockDescriptor wBS;
 ZBlockDescriptor_Export wBS_Exp;
@@ -3388,7 +3388,7 @@ ZBlockDescriptor_Export wBS_Exp;
     if (pDescriptor.ZFCB->GrabFreeSpace)
             {
             if ((wSt=_grabFreeSpaceLogical(pDescriptor,pRank,wBS))!=ZS_SUCCESS)
-                                                                        { _RETURN_ wSt;}
+                                                                        { return  wSt;}
 
             }
 
@@ -3407,7 +3407,7 @@ ZBlockDescriptor_Export wBS_Exp;
 
     wSt=_writeBlockHeader(pDescriptor,(ZBlockHeader&)wBlock,wBS.Address);
     if (wSt!=ZS_SUCCESS)
-                { _RETURN_ wSt;}
+                { return  wSt;}
 
 
     if (pDescriptor.ZFCB->HighwaterMarking)      //! if highwatermarking then set the file region to zero
@@ -3424,7 +3424,7 @@ ZBlockDescriptor_Export wBS_Exp;
                                          "Severe Error while high water marking freed block for file %s at address %lld",
                                          pDescriptor.URIContent.toString(),
                                          pDescriptor.getPhysicalPosition());
-                        _RETURN_ (ZS_WRITEERROR);
+                        return  (ZS_WRITEERROR);
                         }
 
             pDescriptor.ZPMS.HighWaterBytesSize += wSWrite;
@@ -3439,7 +3439,7 @@ ZBlockDescriptor_Export wBS_Exp;
                                          pDescriptor.getPhysicalPosition(),
                                          wBlock.DataSize(),
                                          wSWrite);
-                        _RETURN_ (ZS_WRITEPARTIAL);
+                        return  (ZS_WRITEPARTIAL);
                         }
  //           pDescriptor.incrementPosition( wSWrite );
 
@@ -3458,7 +3458,7 @@ ZBlockDescriptor_Export wBS_Exp;
     pDescriptor.LogicalPosition = -1;
     pDescriptor.PhysicalPosition = -1;
 
-    _RETURN_(_writeFileDescriptor(pDescriptor,true));
+    return (_writeFileDescriptor(pDescriptor,true));
 }//_freeBlock
 
 
@@ -3974,7 +3974,7 @@ ZRandomFile::_searchPreviousPhysicalBlock (ZFileDescriptor &pDescriptor,
                                    zaddress_type &pPreviousAddress,
                                    ZBlockHeader &pBlockHeader)
 {
-_MODULEINIT_
+
 
 ZStatus         wSt;
 ssize_t          wSizeToRead=0;
@@ -4032,7 +4032,7 @@ ssize_t wRewindQuota ;
     if ((wSt=_readAt(pDescriptor,wBuffer,wSizeToRead,wAddress,ZPMS_Other))!=ZS_SUCCESS)
                         {
                         if (wSt!=ZS_READPARTIAL)
-                                        {   _RETURN_(wSt);}
+                                        {   return (wSt);}
                         }
 // search for start of block sign : binary search on Start sign byte sequence
 //         searches until the beginning of this block to get the block just before the current one
@@ -4045,7 +4045,7 @@ ssize_t wRewindQuota ;
                     pPreviousAddress = pDescriptor.ZFCB->StartOfData ;
                     if(__ZRFVERBOSE__)
                             _DBGPRINT("%s : reaching beginning of data returning address %lld \n",_GET_FUNCTION_NAME_, pPreviousAddress);
-                    _RETURN_ (ZS_OUTBOUNDLOW);
+                    return  (ZS_OUTBOUNDLOW);
                     }
         wSizeToRead += wRewindQuota ;  // rewind again
         continue;
@@ -4061,12 +4061,12 @@ ssize_t wRewindQuota ;
 //     memmove(&pBlockHeader_Export,wBlockHeader_Export,sizeof(ZBlockHeader_Export));
     wSt=ZBlockHeader::_importConvert(pBlockHeader,wBlockHeader_Export);
     if (wSt!=ZS_SUCCESS)
-            {_RETURN_ wSt;}
+            {return  wSt;}
      pPreviousAddress = wAddress + wOffset;
     if(__ZRFVERBOSE__)
         _DBGPRINT("%s : found previous not deleted block returning address block header at address %lld \n",_GET_FUNCTION_NAME_, pPreviousAddress);
 
-    _RETURN_ (ZS_FOUND) ;
+    return  (ZS_FOUND) ;
 }//_searchPreviousPhysicalBlock
 
 
@@ -4112,7 +4112,7 @@ ZRandomFile::_searchNextPhysicalBlock (ZFileDescriptor &pDescriptor,
                                        zaddress_type &pNextAddress,
                                        ZBlockHeader &pBlockHeader)  // ZBlockDescriptor is a ZBlockHeader + Address of block as an offset in file
 {
-_MODULEINIT_
+
 ZStatus         wSt;
 ssize_t         wSizeToRead=0;
 size_t          wAdvanceQuota;
@@ -4138,7 +4138,7 @@ ZDataBuffer     wBuffer;
         if (wSt==ZS_EOF)
             {
                 pNextAddress = wAddress;
-                _RETURN_ (ZS_EOF);
+                return  (ZS_EOF);
             }
         if (wSt==ZS_READPARTIAL)
            {
@@ -4146,19 +4146,19 @@ ZDataBuffer     wBuffer;
             if (wOffset<0)
                 {
                 pNextAddress = wBuffer.Size + wAddress ;
-                _RETURN_ (ZS_EOF);
+                return  (ZS_EOF);
                 }
                 else
                 {
                  pNextAddress = wAddress + wOffset;
                  wSt=pBlockHeader._importConvert(pBlockHeader,(ZBlockHeader_Export*)&wBuffer.DataChar[wOffset]);
                  if (wSt!=ZS_SUCCESS)
-                             { _RETURN_(wSt); }
+                             { return (wSt); }
 //                           memmove(&pBlockHeader,&wBuffer.DataChar[wOffset],sizeof(ZBlockHeader));
-                 _RETURN_ (ZS_FOUND) ;
+                 return  (ZS_FOUND) ;
                  }
            }// ZS_READPARTIAL
-        _RETURN_ wSt;  // file error to be returned
+        return  wSt;  // file error to be returned
         }
 
       wOffset=wBuffer.bsearch(wStartSign,4L,0L);
@@ -4171,9 +4171,9 @@ ZDataBuffer     wBuffer;
      pNextAddress = wAddress + wOffset;
      wSt=pBlockHeader._importConvert(pBlockHeader,(ZBlockHeader_Export*)&wBuffer.DataChar[wOffset]);
      if (wSt!=ZS_SUCCESS)
-                 { _RETURN_(wSt); }
+                 { return (wSt); }
 //     memmove(&pBlockHeader,&wBuffer.DataChar[wOffset],sizeof(ZBlockHeader));
-    _RETURN_ (ZS_FOUND) ;
+    return  (ZS_FOUND) ;
 }//_searchNextPhysicalBlock
 
 
@@ -4224,7 +4224,7 @@ ZRandomFile::_getFreeBlock (ZFileDescriptor &pDescriptor,
                             zrank_type pZBATRank,
                             const zaddress_type pBaseAddress)
 {
-_MODULEINIT_
+
 
 zrank_type wIdx;
 // debug
@@ -4246,7 +4246,7 @@ zrank_type wIdx;
 
                         wIdx= _allocateFreeBlock(pDescriptor, wi,pSize,pZBATRank);
                         if (wIdx<0)
-                                {  _RETURN_ (wIdx);}
+                                {  return  (wIdx);}
 
 //---------File descriptor will be updated once commit has been done
 //
@@ -4256,7 +4256,7 @@ zrank_type wIdx;
                         pBlock = pDescriptor.ZBAT->Tab[wIdx];
 
                         pDescriptor.ZPMS.FreeMatches ++;
-                        _RETURN_ wIdx;
+                        return  wIdx;
                         }// if pSize
             }
 
@@ -4286,7 +4286,7 @@ if ((wNewOffset=(zaddress_type)lseek(pDescriptor.ContentFd,0L,SEEK_END))<0)    /
                                 " Severe error while positionning to end of file %s",
                                 pDescriptor.URIContent.toString());
 
-                _RETURN_ (ZS_FILEPOSERR);
+                return  (ZS_FILEPOSERR);
                 }
 
     wBlock.Address = wNewOffset;
@@ -4313,7 +4313,7 @@ if ((wNewOffset=(zaddress_type)lseek(pDescriptor.ContentFd,0L,SEEK_END))<0)    /
     {
   wSt=_getExtent(pDescriptor,wBlockMan,wNeededExtent); // request an extension of at least pSize space
   if (wSt!=ZS_SUCCESS)
-                { _RETURN_ -1; }
+                { return  -1; }
     }
     long wZBATIndex = pZBATRank;
 
@@ -4347,10 +4347,10 @@ if ((wNewOffset=(zaddress_type)lseek(pDescriptor.ContentFd,0L,SEEK_END))<0)    /
 //
 //   if (_writeFileDescriptor(pDescriptor) != ZS_SUCCESS)      // write back FCB to header file
 //            {
-//            { _RETURN_ (-1);}
+//            { return  (-1);}
 //            }
 
-    _RETURN_ (wZBATIndex);  // if OK : return index of free block allocated to ZBAT : either lastIdx() or the result of inserted block index
+    return  (wZBATIndex);  // if OK : return index of free block allocated to ZBAT : either lastIdx() or the result of inserted block index
 } // _getFreeBlock
 
 
@@ -4380,7 +4380,7 @@ ZRandomFile::_getExtent(ZFileDescriptor &pDescriptor,
                         ZBlockDescriptor &pBlockMin,
                         const size_t pSize)
 {
-_MODULEINIT_
+
 
 // test if needed space fits into one extent
 //
@@ -4397,7 +4397,7 @@ zaddress_type    wNewOffset;
                                     pDescriptor.URIContent.toString());
 
 
-                    _RETURN_  (ZS_FILEPOSERR);
+                    return   (ZS_FILEPOSERR);
                     }
 
     int wS = posix_fallocate(pDescriptor.ContentFd,wNewOffset,pSize);
@@ -4409,7 +4409,7 @@ zaddress_type    wNewOffset;
                     Severity_Severe,
                     " Severe error while allocating (posix_fallocate) disk space size %ld to end of file %s",
                     pDescriptor.URIContent.toString());
-    _RETURN_ (ZS_WRITEERROR);
+    return  (ZS_WRITEERROR);
     }
     wExtentSize=pSize;
 
@@ -4428,7 +4428,7 @@ zaddress_type    wNewOffset;
                                  Severity_Severe,
                                  " Severe error while extending file %s",
                                  pDescriptor.URIContent.toString());
-                _RETURN_ (ZS_WRITEERROR);
+                return  (ZS_WRITEERROR);
                 }
 
     fdatasync(pDescriptor.ContentFd);
@@ -4440,7 +4440,7 @@ zaddress_type    wNewOffset;
 
     if(__ZRFVERBOSE__)
         _DBGPRINT(" extended file from offset %lld for size %lld for requested size %lld\n", wNewOffset, wExtentSize, pSize);
-    _RETURN_  ZS_SUCCESS;
+    return   ZS_SUCCESS;
 }//_getExtent
 //! @endcond // Development
 
@@ -4544,15 +4544,15 @@ ZStatus wSt;
 ZStatus
 ZRandomFile::_add(ZFileDescriptor &pDescriptor,ZDataBuffer &pUserBuffer,zaddress_type &pAddress)
 {
-_MODULEINIT_
+
 
 ZStatus         wSt;
 long            wIdxCommit;
 
   wSt= _add2PhasesCommit_Prepare(pDescriptor,pUserBuffer,wIdxCommit,pAddress);
   if (wSt!=ZS_SUCCESS)
-              {  _RETURN_ wSt;  }
-  _RETURN_ _add2PhasesCommit_Commit(pDescriptor,pUserBuffer,wIdxCommit,pAddress);
+              {  return  wSt;  }
+  return  _add2PhasesCommit_Commit(pDescriptor,pUserBuffer,wIdxCommit,pAddress);
 }//_add
 
 
@@ -4577,7 +4577,7 @@ ZRandomFile::_add2PhasesCommit_Prepare(ZFileDescriptor &pDescriptor,
                                        zrank_type &pIdxCommit,
                                        zaddress_type &pLogicalAddress)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 //------ Lock file for adding record-----------------
@@ -4585,7 +4585,7 @@ ZStatus wSt;
 //
     wSt = _lockFile( pDescriptor,ZLock_ReadWrite);
     if (wSt!=ZS_SUCCESS)
-                { _RETURN_  wSt;}
+                { return   wSt;}
 
     size_t wNeededSize = pUserBuffer.Size + sizeof(ZBlockHeader_Export);
 
@@ -4594,7 +4594,7 @@ ZBlockMin_struct    wBlockMin;
     pIdxCommit=_getFreeBlock (pDescriptor,
                              wNeededSize,wBlockMin,-1); // scan FreeTable for available block in holes, or give the first address at the end or extend the file according extentquota to get available space
     if (pIdxCommit<0)
-            {_RETURN_ ZException.getLastStatus();}
+            {return  ZException.getLastStatus();}
 
     pDescriptor.ZBAT->Tab[pIdxCommit].State     = ZBS_Allocated ;
     pDescriptor.ZBAT->Tab[pIdxCommit].Pid       = pDescriptor.Pid;
@@ -4610,7 +4610,7 @@ ZBlockMin_struct    wBlockMin;
     pLogicalAddress = pDescriptor.setLogicalFromPhysical( pDescriptor.ZBAT->Tab[pIdxCommit].Address) ;
     pDescriptor.CurrentRank = pIdxCommit;
 
-    _RETURN_  ZS_SUCCESS;
+    return   ZS_SUCCESS;
 }//_add2PhasesCommit_prepare
 /**
  * @brief ZRandomFile::_add2PhasesCommit_Commit Physically writes the record (and block) content to content file using information given from add_Prepare
@@ -4630,7 +4630,7 @@ ZRandomFile::_add2PhasesCommit_Commit(ZFileDescriptor &pDescriptor,
                                       const zrank_type pIdxCommit,
                                       zaddress_type &pLogicalAddress)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZBlock  wBlock;
@@ -4642,7 +4642,7 @@ ZBlock  wBlock;
     wBlock.State = ZBS_Used ;
     wBlock.Content=pUserBuffer;
     if ((wSt=_writeBlockAt(pDescriptor,wBlock,pDescriptor.ZBAT->Tab[pIdxCommit].Address))!=ZS_SUCCESS)
-                                {   _RETURN_ wSt;}
+                                {   return  wSt;}
 
     pDescriptor.ZFCB->UsedSize += wBlock.BlockSize ;
 
@@ -4652,10 +4652,10 @@ ZBlock  wBlock;
     if (wSt!=ZS_SUCCESS)
             {
              _unlockFile(pDescriptor);
-            _RETURN_ wSt;
+            return  wSt;
             }
 
-    _RETURN_ _unlockFile(pDescriptor);
+    return  _unlockFile(pDescriptor);
 
 }//_add2PhasesCommit_commit
 
@@ -5166,14 +5166,14 @@ ZRandomFile::_writeBlockAt(ZFileDescriptor& pDescriptor,
                          ZBlock &pBlock,
                          const zaddress_type pAddress)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 
     pBlock.BlockSize = pBlock.Content.Size + sizeof(ZBlockHeader_Export);
     wSt=_writeBlockHeader(pDescriptor,(ZBlockHeader&)pBlock,pAddress);
     if (wSt!=ZS_SUCCESS)
-                { _RETURN_ wSt;}
+                { return  wSt;}
 
     ssize_t wSWrite= write(pDescriptor.ContentFd,pBlock.Content.DataChar,pBlock.Content.Size);// then write block user content
     if (wSWrite <0 )
@@ -5187,7 +5187,7 @@ ZStatus wSt;
                           pDescriptor.PhysicalPosition,
                           pBlock.BlockSize);
 
-         _RETURN_ wSt;
+         return  wSt;
         }
     pDescriptor.ZPMS.PMSCounterWrite(ZPMS_User,wSWrite);
     pDescriptor.incrementPosition(wSWrite);
@@ -5205,10 +5205,10 @@ ZStatus wSt;
                           pBlock.BlockSize,
                           wSWrite);
 
-         _RETURN_ ZS_WRITEPARTIAL;
+         return  ZS_WRITEPARTIAL;
         }
 
-    _RETURN_(ZS_SUCCESS);
+    return (ZS_SUCCESS);
 }//_writeBlockAt
 
 
@@ -5227,10 +5227,10 @@ ZRandomFile::_writeBlockHeader(ZFileDescriptor& pDescriptor,
                                ZBlockHeader &pBlockHeader,
                                const zaddress_type pAddress)
 {
-_MODULEINIT_
+
     ZStatus wSt = _seek(pDescriptor,pAddress);
     if (wSt!=ZS_SUCCESS)
-                {_RETURN_ wSt;}
+                {return  wSt;}
 
     ZBlockHeader_Export wBlockExp;
 
@@ -5248,7 +5248,7 @@ _MODULEINIT_
                           "Error while writing block header address %lld file <%s>",
                          pAddress,
                          pDescriptor.URIContent.toString());
-         _RETURN_ ZS_WRITEERROR;
+         return  ZS_WRITEERROR;
         }
 
 //    pDescriptor.ZPMS.CBHWriteBytesSize += wSWrite;
@@ -5269,10 +5269,10 @@ _MODULEINIT_
                              sizeof(ZBlockHeader_Export),
                              wSWrite,
                              pDescriptor.URIContent.toString());
-        _RETURN_ ZS_WRITEPARTIAL;
+        return  ZS_WRITEPARTIAL;
         }
 
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }//_writeBlockHeader
 
 //! @endcond
@@ -5291,7 +5291,7 @@ _MODULEINIT_
 ZStatus
 ZRandomFile::zgetBlockDescriptor (const zrank_type pRank, ZBlockDescriptor &pBlockDescriptor)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
     if ((wSt=ZDescriptor.testRank(pRank,_GET_FUNCTION_NAME_))!=ZS_SUCCESS)
@@ -5302,7 +5302,7 @@ ZStatus wSt;
                                    "Invalid block rank value %ld. Out of file boundaries for file %s",
                                    pRank,
                                    ZDescriptor.URIContent.toString());
-            _RETURN_ (wSt);
+            return  (wSt);
             }
 
 // got to manage locking there
@@ -5310,7 +5310,7 @@ ZStatus wSt;
 //    ZDescriptor.setIndex(pRank);
 
     pBlockDescriptor = ZDescriptor.ZBAT->Tab[pRank];
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 
 }// zgetBlockDescriptor
 
@@ -5327,7 +5327,7 @@ ZStatus wSt;
 ZStatus
 ZRandomFile::zgetFreeBlockDescriptor (const zrank_type pRank, ZBlockDescriptor &pBlockDescriptor)
 {
-_MODULEINIT_
+
 ZStatus wSt =ZS_SUCCESS ;
 
          if (pRank<0)
@@ -5343,7 +5343,7 @@ ZStatus wSt =ZS_SUCCESS ;
                                    "Invalid free block rank value %ld. Out of boundaries for file %s",
                                    pRank,
                                    ZDescriptor.URIContent.toString());
-            _RETURN_(wSt);
+            return (wSt);
             }
 
 //===== got to manage locking there ==================
@@ -5351,7 +5351,7 @@ ZStatus wSt =ZS_SUCCESS ;
 //    ZDescriptor.setIndex(pRank);
 
     pBlockDescriptor = ZDescriptor.ZFBT->Tab[pRank];
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 
 
 }// zgetFreeBlockDescriptor
@@ -5369,7 +5369,7 @@ ZStatus wSt =ZS_SUCCESS ;
 ZStatus
 ZRandomFile::zrecover (const zrank_type pRank,  long &pZBATIdx)
 {
-_MODULEINIT_
+
 
 ZStatus wSt =ZS_SUCCESS ;
 
@@ -5386,16 +5386,16 @@ ZStatus wSt =ZS_SUCCESS ;
                                    "Invalid free block rank value %ld. Out of boundaries for file %s",
                                    pRank,
                                    ZDescriptor.URIContent.toString());
-            _RETURN_ (wSt);
+            return  (wSt);
             }
 
 //========== got to manage locking there =============================
 
     if ((wSt=_recoverFreeBlock (ZDescriptor,pRank))!=ZS_SUCCESS)
-                                   { _RETURN_ wSt;}//
+                                   { return  wSt;}//
 
     pZBATIdx=ZDescriptor.ZBAT->lastIdx();
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }// zrecover
 
 ZStatus
@@ -5499,7 +5499,7 @@ zrank_type      wRank;
 ZStatus
 ZRandomFile::zgetNext (void* pUserRecord, size_t &pSize)
 {
-_MODULEINIT_
+
 
 ZStatus         wSt;
 ZBlock          wBlock;
@@ -5510,7 +5510,7 @@ zrank_type      wRank;
                       wBlock,
                       wRank,
                       wAddress))!=ZS_SUCCESS)
-                                       { _RETURN_ wSt; }//
+                                       { return  wSt; }//
     if ((pUserRecord=malloc (wBlock.DataSize()))==nullptr)
         {
         ZException.getErrno(errno,
@@ -5523,7 +5523,7 @@ zrank_type      wRank;
     memmove(pUserRecord,wBlock.DataChar(),wBlock.DataSize());
     pSize=wBlock.DataSize();
 
-    _RETURN_ (ZS_SUCCESS);
+    return  (ZS_SUCCESS);
 }//zgetNext
 /**
  * @brief ZRandomFile::zgetNextWAddress gets the next record from current position and returns user's content as well as its address.
@@ -5632,7 +5632,7 @@ ZBlock  wBlock;
 ZStatus
 ZRandomFile::zgetSingleField (ZDataBuffer& pFieldContent, const zrank_type pRank, const ssize_t pOffset, const ssize_t &pLength, const int pLock)
 {
-_MODULEINIT_
+
     if ((pRank>ZDescriptor.ZBAT->size())||(pRank<0))
     {
         ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -5641,7 +5641,7 @@ _MODULEINIT_
                                 "Invalid relative record number <%ld> while Used pool size is [0,<%ld>]",
                                 pRank,
                                 ZDescriptor.ZBAT->lastIdx());
-        _RETURN_ ZS_OUTBOUND;
+        return  ZS_OUTBOUND;
     }
 
 //     zaddress_type wLogical = setPhysicalFromLogical(pAddress);
@@ -5660,11 +5660,11 @@ _MODULEINIT_
                                  wFieldAddress,
                                  ZDescriptor.URIContent.toString()
                                  );
-                _RETURN_(ZS_FILEPOSERR);
+                return (ZS_FILEPOSERR);
                 }
 
     // then just read from file the segment of data on field length
-    _RETURN_ _read(ZDescriptor,           // allocate pLength for field buffer, reads then manage errors if ever - updates stats
+    return  _read(ZDescriptor,           // allocate pLength for field buffer, reads then manage errors if ever - updates stats
                  pFieldContent,
                  pLength,
                  ZPMS_Field);
@@ -5689,7 +5689,7 @@ ZRandomFile::zwriteSingleField (ZDataBuffer& pFieldContent,
                                 const ssize_t &pLength,
                                 int &pLock)
 {
-_MODULEINIT_
+
     if ((pRank>ZDescriptor.ZBAT->size())||(pRank<0))
     {
         ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -5698,7 +5698,7 @@ _MODULEINIT_
                                 "Invalid relative record number <%ld> while Used pool size is <%ld>",
                                 pRank,
                                 ZDescriptor.ZBAT->size());
-        _RETURN_ ZS_INVADDRESS;
+        return  ZS_INVADDRESS;
     }
 
 //     zaddress_type wLogical = setPhysicalFromLogical(pAddress);
@@ -5717,11 +5717,11 @@ _MODULEINIT_
                                  wFieldAddress,
                                  ZDescriptor.URIContent.toString()
                                  );
-                _RETURN_(ZS_FILEPOSERR);
+                return (ZS_FILEPOSERR);
                 }
 
     // then just read from file the segment of data on field length
-    _RETURN_ _read(ZDescriptor,           // allocate pLength for field buffer, reads then manage errors if ever - updates stats
+    return  _read(ZDescriptor,           // allocate pLength for field buffer, reads then manage errors if ever - updates stats
                  pFieldContent,
                  pLength,
                  ZPMS_Field);
@@ -5759,7 +5759,7 @@ ZRandomFile::zaddWithAddress (ZDataBuffer&pRecord, zaddress_type &pAddress)
 ZStatus
 ZRandomFile::zgetLast (ZDataBuffer &pRecord,zrank_type &pRank)
 {
-_MODULEINIT_
+
 
     if (ZDescriptor.ZBAT->isEmpty())
             {
@@ -5768,11 +5768,11 @@ _MODULEINIT_
                                     Severity_Error,
                                     " File is empty. Cannot get last record for file <%s>",
                                     ZDescriptor.URIContent.toString());
-             _RETURN_ ZS_OUTBOUND;
+             return  ZS_OUTBOUND;
              }
      ZDescriptor.CurrentRank = ZDescriptor.ZBAT->lastIdx();
      pRank= ZDescriptor.CurrentRank;
-     _RETURN_ zget(pRecord,ZDescriptor.ZBAT->lastIdx());
+     return  zget(pRecord,ZDescriptor.ZBAT->lastIdx());
 }//zgetLast
 /**
  * @brief ZRandomFile::zgetLast returns the record at the last logical position (rank) within the file
@@ -5785,7 +5785,7 @@ _MODULEINIT_
 ZStatus
 ZRandomFile::zgetLastWAddress (ZDataBuffer &pRecord, zrank_type &pRank, zaddress_type& pAddress)
 {
-_MODULEINIT_
+
     if (ZDescriptor.ZBAT->isEmpty())
             {
             ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -5793,11 +5793,11 @@ _MODULEINIT_
                                     Severity_Error,
                                     " File is empty. Cannot get last record for file <%s>",
                                     ZDescriptor.URIContent.toString());
-             _RETURN_ ZS_OUTBOUND;
+             return  ZS_OUTBOUND;
              }
      ZDescriptor.CurrentRank = ZDescriptor.ZBAT->lastIdx();
      pRank = ZDescriptor.CurrentRank;
-     _RETURN_ zgetWAddress(pRecord,ZDescriptor.CurrentRank,pAddress);
+     return  zgetWAddress(pRecord,ZDescriptor.CurrentRank,pAddress);
 }//zgetLast
 /**
  * @brief ZRandomFile::zgetPrevious returns the previous record from the current logical position (rank) within the file
@@ -5810,7 +5810,7 @@ _MODULEINIT_
 ZStatus
 ZRandomFile::zgetPrevious (ZDataBuffer &pRecord,const int pLock)
 {
-_MODULEINIT_
+
     if (ZDescriptor.CurrentRank==0)
             {
             ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -5818,10 +5818,10 @@ _MODULEINIT_
                                     Severity_Error,
                                     "Already at first record : cannot get Previous record for file <%s>",
                                     ZDescriptor.URIContent.toString());
-             _RETURN_ ZS_OUTBOUNDLOW;
+             return  ZS_OUTBOUNDLOW;
              }
     ZDescriptor.CurrentRank--;
-    _RETURN_ zget(pRecord,ZDescriptor.CurrentRank);
+    return  zget(pRecord,ZDescriptor.CurrentRank);
 }//zgetPrevious
 
 
@@ -5847,7 +5847,7 @@ ZRandomFile::_getByRank(ZFileDescriptor & pDescriptor,
                   const long pRank,
                   zaddress_type &pAddress)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
     if ((wSt=pDescriptor.testRank(pRank,_GET_FUNCTION_NAME_))!=ZS_SUCCESS)
@@ -5857,7 +5857,7 @@ ZStatus wSt;
                                        decode_ZStatus(wSt),
                                        pDescriptor.URIContent.toString());
 
-                _RETURN_(wSt); // can be out of boundaries (program issue) OR locked for deletion - locked for creation (concurrent access)
+                return (wSt); // can be out of boundaries (program issue) OR locked for deletion - locked for creation (concurrent access)
                 }
 
     pDescriptor.setRank(pRank);
@@ -5866,7 +5866,7 @@ ZStatus wSt;
                 _lock(pDescriptor,pRank,pLock,false);
 */
     pAddress = pDescriptor.ZBAT->Tab[pRank].Address;
-    _RETURN_ (_readBlockAt(pDescriptor,
+    return  (_readBlockAt(pDescriptor,
                         pBlock,
                         pDescriptor.ZBAT->Tab[pRank].Address));
 
@@ -5949,7 +5949,7 @@ ZStatus
 ZRandomFile::_open(ZFileDescriptor &pDescriptor,
                    const zmode_type pMode, const ZFile_type pFileType, bool pLockRegardless)
 {
-_MODULEINIT_
+
 
 ZStatus wSt=ZS_SUCCESS;
 
@@ -5961,7 +5961,7 @@ ZStatus wSt=ZS_SUCCESS;
                                 "Cannot open <%s>.It is already open with mode <%s>",
                                 pDescriptor.URIContent.toString(),
                                 decode_ZRFMode(pDescriptor.Mode));
-        _RETURN_ (ZS_ERROPEN);
+        return  (ZS_ERROPEN);
         }
     pDescriptor.CurrentRank = -1;
 
@@ -5974,7 +5974,7 @@ ZStatus wSt=ZS_SUCCESS;
                                    Severity_Error,
                                    "File <%s> does not exist. It must exist to be opened. Use zcreate with appropriate options.",
                                    pDescriptor.URIContent.toString());
-            _RETURN_ (ZS_FILENOTEXIST);
+            return  (ZS_FILENOTEXIST);
             }
 
     pDescriptor.ContentFd = open(pDescriptor.URIContent.toCString_Strait(),O_RDWR);
@@ -5987,12 +5987,12 @@ ZStatus wSt=ZS_SUCCESS;
                                Severity_Severe,
                                "Error opening file <%s> ",
                                pDescriptor.URIContent.toString());
-               _RETURN_ (ZS_ERROPEN);
+               return  (ZS_ERROPEN);
                }
 
     wSt = generateURIHeader (pDescriptor.URIContent,pDescriptor.URIHeader);
     if (wSt!=ZS_SUCCESS)
-                {_RETURN_ wSt;}
+                {return  wSt;}
     pDescriptor.HeaderFd = open(pDescriptor.URIHeader.toCString_Strait(),O_RDWR);
     if (pDescriptor.HeaderFd < 0)
             {
@@ -6005,14 +6005,14 @@ ZStatus wSt=ZS_SUCCESS;
             pDescriptor._isOpen=false;
             close(pDescriptor.ContentFd);
 
-            _RETURN_ (ZS_ERROPEN);
+            return  (ZS_ERROPEN);
             }
 
     pDescriptor.setupFCB();  // update pDescriptor
 
     wSt=_getFullFileHeader(pDescriptor,true);  // get header and force read pForceRead = true, whatever the open mode is
     if (wSt!=ZS_SUCCESS)
-                {_RETURN_ wSt;}
+                {return  wSt;}
     if (!pLockRegardless)
     {
     if (pDescriptor.ZHeader.Lock & ZRF_Exclusive)
@@ -6030,7 +6030,7 @@ ZStatus wSt=ZS_SUCCESS;
                                                 pDescriptor.URIContent.toString(),
                                                 decode_ZLockMask (pDescriptor.ZHeader.Lock).toChar()
                                                 );
-                        _RETURN_ ZS_LOCKED;
+                        return  ZS_LOCKED;
                         }
     }
 //-----------------------------File type test------------------------------------
@@ -6050,7 +6050,7 @@ ZStatus wSt=ZS_SUCCESS;
                                     pDescriptor.URIContent.toString(),
                                     decode_ZFile_type (pFileType),
                                     decode_ZFile_type (pDescriptor.ZHeader.FileType));
-            _RETURN_ ZS_BADFILETYPE;
+            return  ZS_BADFILETYPE;
             }
 //    fprintf (stdout,"%s>> file type is <%d>  requested file type is <%d>\n",_GET_FUNCTION_NAME_,pDescriptor.ZHeader.FileType,pFileType);
     switch (pDescriptor.ZHeader.FileType)
@@ -6076,7 +6076,7 @@ ZStatus wSt=ZS_SUCCESS;
                                             pDescriptor.URIContent.toString(),
                                             decode_ZFile_type (pDescriptor.ZHeader.FileType),
                                             decode_ZFile_type (pFileType));
-                    _RETURN_ ZS_MODEINVALID;
+                    return  ZS_MODEINVALID;
                     }
                 ZException.setMessage(_GET_FUNCTION_NAME_,
                                         ZS_FILETYPEWARN,
@@ -6099,7 +6099,7 @@ ZStatus wSt=ZS_SUCCESS;
                                     pDescriptor.URIContent.toString(),
                                     decode_ZFile_type (pFileType),
                                     decode_ZFile_type (pDescriptor.ZHeader.FileType));
-            _RETURN_ ZS_BADFILETYPE;
+            return  ZS_BADFILETYPE;
 
             }// case ZFT_ZRandomFile
 
@@ -6125,7 +6125,7 @@ ZStatus wSt=ZS_SUCCESS;
                                             decode_ZFile_type (pDescriptor.ZHeader.FileType),
                                             decode_ZFile_type (pFileType),
                                             decode_ZRFMode(pMode));
-                    _RETURN_ ZS_MODEINVALID;
+                    return  ZS_MODEINVALID;
                     }
                 // up to here file is opened as ZRF_Read_Only
 
@@ -6150,7 +6150,7 @@ ZStatus wSt=ZS_SUCCESS;
                                     pDescriptor.URIContent.toString(),
                                     decode_ZFile_type (pFileType),
                                     decode_ZFile_type (pDescriptor.ZHeader.FileType));
-            _RETURN_ ZS_BADFILETYPE;
+            return  ZS_BADFILETYPE;
             }// ZFT_ZMasterFile
 
         case ZFT_ZIndexFile :
@@ -6175,7 +6175,7 @@ ZStatus wSt=ZS_SUCCESS;
                                             decode_ZFile_type (pDescriptor.ZHeader.FileType),
                                             decode_ZFile_type (pFileType),
                                             decode_ZRFMode(pMode));
-                    _RETURN_ ZS_MODEINVALID;
+                    return  ZS_MODEINVALID;
                     }
                 // up to here file is opened as ZRF_Read_Only
 
@@ -6200,7 +6200,7 @@ ZStatus wSt=ZS_SUCCESS;
                                     pDescriptor.URIContent.toString(),
                                     decode_ZFile_type (pFileType),
                                     decode_ZFile_type (pDescriptor.ZHeader.FileType));
-            _RETURN_ ZS_BADFILETYPE;
+            return  ZS_BADFILETYPE;
             }// ZFT_ZIndexFile
     case ZFT_ZSMasterFile :
         {
@@ -6224,7 +6224,7 @@ ZStatus wSt=ZS_SUCCESS;
                                         decode_ZFile_type (pDescriptor.ZHeader.FileType),
                                         decode_ZFile_type (pFileType),
                                         decode_ZRFMode(pMode));
-                _RETURN_ ZS_MODEINVALID;
+                return  ZS_MODEINVALID;
                 }
             // up to here file is opened as ZRF_Read_Only
 
@@ -6249,7 +6249,7 @@ ZStatus wSt=ZS_SUCCESS;
                                 pDescriptor.URIContent.toString(),
                                 decode_ZFile_type (pFileType),
                                 decode_ZFile_type (pDescriptor.ZHeader.FileType));
-        _RETURN_ ZS_BADFILETYPE;
+        return  ZS_BADFILETYPE;
         }// ZFT_ZSMasterFile
     case ZFT_ZSIndexFile :
         {
@@ -6273,7 +6273,7 @@ ZStatus wSt=ZS_SUCCESS;
                                         decode_ZFile_type (pDescriptor.ZHeader.FileType),
                                         decode_ZFile_type (pFileType),
                                         decode_ZRFMode(pMode));
-                _RETURN_ ZS_MODEINVALID;
+                return  ZS_MODEINVALID;
                 }
             // up to here file is opened as ZRF_Read_Only
 
@@ -6298,7 +6298,7 @@ ZStatus wSt=ZS_SUCCESS;
                                 pDescriptor.URIContent.toString(),
                                 decode_ZFile_type (pFileType),
                                 decode_ZFile_type (pDescriptor.ZHeader.FileType));
-        _RETURN_ ZS_BADFILETYPE;
+        return  ZS_BADFILETYPE;
         }// ZFT_ZSIndexFile
     default:
         {
@@ -6313,7 +6313,7 @@ ZStatus wSt=ZS_SUCCESS;
                                 pDescriptor.URIContent.toString(),
                                 decode_ZFile_type (pFileType),
                                 decode_ZFile_type (pDescriptor.ZHeader.FileType));
-        _RETURN_ ZS_BADFILETYPE;
+        return  ZS_BADFILETYPE;
         }
 
     }//switch
@@ -6333,7 +6333,7 @@ ZStatus wSt=ZS_SUCCESS;
 
     ZRFPool->addOpenFile(&pDescriptor);
 
-    _RETURN_ wSt;  // do not write file descriptor
+    return  wSt;  // do not write file descriptor
 //    return(_writeFileDescriptor(pDescriptor,true));  // force to write file descriptor whatever open mode is (pForceRead = true)
 }//_open
 
@@ -6341,7 +6341,7 @@ ZStatus wSt=ZS_SUCCESS;
 ZStatus
 ZRandomFile::_close(ZFileDescriptor &pDescriptor)
 {
-_MODULEINIT_
+
 ZStatus wSt;
 
 
@@ -6356,7 +6356,7 @@ ZStatus wSt;
         }
 
     pDescriptor.ZHeader.Lock = ZLock_Nolock;
-    pDescriptor.Mode = ZMode_Nothing;
+    pDescriptor.Mode = ZRF_Nothing;
 
 //    _unlockAll(pDescriptor,false);
 
@@ -6372,7 +6372,7 @@ ZStatus wSt;
     ZRFPool->removeFileByFd(pDescriptor.ContentFd);
 
     pDescriptor.clearPartial();
-    _RETURN_ wSt;
+    return  wSt;
 }//_close
 
 /** !@endcond  */ // Development
@@ -6418,7 +6418,7 @@ ZFileDescriptor::testRank(zrank_type pRank, const char* pModule)
 ZStatus
 ZRandomFile::_lockFile (ZFileDescriptor &pDescriptor,const  zlockmask_type pLock, bool pForceWrite)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 
@@ -6427,7 +6427,7 @@ ZStatus wSt;
         {
         pDescriptor.ZHeader.Lock = pLock;
         pDescriptor.ZHeader.LockOwner = pDescriptor.Pid;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
         }
 
 lockPack_struct wLockInfos;
@@ -6435,7 +6435,7 @@ lockPack_struct wLockInfos;
 //    wSt= _getFileHeader(pDescriptor,pForceWrite); // pForceWrite = pForceRead
     wSt=_readFileLock(pDescriptor,wLockInfos);
     if (wSt!=ZS_SUCCESS)
-                    { _RETURN_ wSt;}
+                    { return  wSt;}
     pDescriptor.ZHeader.Lock = wLockInfos.Lock;
     pDescriptor.ZHeader.LockOwner = wLockInfos.LockOwner;
 
@@ -6450,21 +6450,21 @@ lockPack_struct wLockInfos;
                                 pDescriptor.ZHeader.LockOwner,
                                 pDescriptor.URIHeader.toString(),
                                   decode_ZLockMask (pDescriptor.ZHeader.Lock).toChar());
-        _RETURN_ ZS_LOCKED;
+        return  ZS_LOCKED;
         }
     }
     pDescriptor.ZHeader.Lock = wLockInfos.Lock = pLock;
     pDescriptor.ZHeader.LockOwner=wLockInfos.LockOwner= pDescriptor.Pid;
 
 
-    _RETURN_ _writeFileLock(pDescriptor,wLockInfos);
+    return  _writeFileLock(pDescriptor,wLockInfos);
 }// _lockFile
 
 
 ZStatus
 ZRandomFile::_unlockFile (ZFileDescriptor &pDescriptor,bool pForceWrite)
 {
-_MODULEINIT_
+
 ZStatus wSt;
 
     printf ("%s\n",_GET_FUNCTION_NAME_);
@@ -6473,7 +6473,7 @@ ZStatus wSt;
         {
         pDescriptor.ZHeader.Lock = ZLock_Nolock;
         pDescriptor.ZHeader.LockOwner =(pid_t)0;
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
         }
 
 lockPack_struct wLockInfos;
@@ -6481,7 +6481,7 @@ lockPack_struct wLockInfos;
 //    wSt= _getFileHeader(pDescriptor,pForceWrite); // pForceWrite = pForceRead
     wSt=_readFileLock(pDescriptor,wLockInfos);
     if (wSt!=ZS_SUCCESS)
-                {   _RETURN_ wSt;}
+                {   return  wSt;}
     pDescriptor.ZHeader.Lock = wLockInfos.Lock;
     pDescriptor.ZHeader.LockOwner = wLockInfos.LockOwner;
 
@@ -6496,14 +6496,14 @@ lockPack_struct wLockInfos;
                                 pDescriptor.ZHeader.LockOwner,
                                 pDescriptor.URIHeader.toString(),
                                 decode_ZLockMask (pDescriptor.ZHeader.Lock).toChar());
-        _RETURN_ ZS_LOCKED;
+        return  ZS_LOCKED;
         }
     }
     pDescriptor.ZHeader.Lock = wLockInfos.Lock = ZLock_Nolock;
     pDescriptor.ZHeader.LockOwner=wLockInfos.LockOwner= (pid_t)0;
 
 
-    _RETURN_ _writeFileLock(pDescriptor,wLockInfos);
+    return  _writeFileLock(pDescriptor,wLockInfos);
 
 }//_unlockFile
 
@@ -6986,7 +6986,7 @@ zaddress_type wAddress;
 void
 ZRandomFile::zsurfaceScan(uriString pURIContent, FILE *pOutput) //! dump another ZRF
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 
@@ -7016,7 +7016,7 @@ ZFileDescriptor wDescriptor;
     _headerDump(wDescriptor,pOutput);
     _surfaceScan(wDescriptor,pOutput);
     _close(wDescriptor);
-    _RETURN_;
+    return ;
 
 }//zsurfaceScan
 
@@ -7025,7 +7025,7 @@ ZFileDescriptor wDescriptor;
 void
 ZRandomFile::_surfaceScan(ZFileDescriptor &pDescriptor,FILE* pOutput)
  {
-_MODULEINIT_
+
 
 ZStatus wSt;
 
@@ -7133,7 +7133,7 @@ zaddress_type wTheoricAddress = 0;
         {
         ZException.printUserMessage(pOutput);
         }
-    _RETURN_;
+    return ;
 } // _physicalcontentDump
 
 //! @endcond
@@ -7208,7 +7208,7 @@ ZFileDescriptor wDescriptor;
 void
 ZRandomFile::zheaderDump(uriString &pURIContent, FILE* pOutput)
 {
-_MODULEINIT_
+
 ZStatus wSt;
 
 ZFileDescriptor wDescriptor;
@@ -7219,9 +7219,7 @@ ZFileDescriptor wDescriptor;
     wSt=_open(wDescriptor,ZRF_Read_Only,ZFT_ZRandomFile);
     if (wSt!=ZS_SUCCESS)
                 {
-                ZException.printUserMessage(stderr);
-                if (ZException.getLastSeverity()>Severity_Warning)
-                                                   _ABORT_;
+                ZException.exit_abort();
                 }
 
     if ((wSt=_getFullFileHeader(wDescriptor))!=ZS_SUCCESS)
@@ -7229,10 +7227,7 @@ ZFileDescriptor wDescriptor;
                 ZException.addToLast("Error while getting header %s for ZRF file %s",
                                             wDescriptor.URIHeader.toString(),
                                             wDescriptor.URIContent.toString());
-                ZException.printUserMessage(pOutput);
-                if (ZException.getLastSeverity()>Severity_Warning)
-                                                            { _ABORT_;}
-                _RETURN_ ;
+                ZException.exit_abort();
                 }
 
     fprintf(pOutput,
@@ -7243,7 +7238,7 @@ ZFileDescriptor wDescriptor;
 
     _headerDump(wDescriptor,pOutput);
     _close(wDescriptor);
-    _RETURN_;
+    return ;
 
 }//zheaderDump
 
@@ -7566,14 +7561,14 @@ ZRandomFile::_moveBlock (ZFileDescriptor &pDescriptor,
                          const zaddress_type pTo,
                          bool pCreateZFBTEntry)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZBlock wBlock;
 ZBlockDescriptor wBD;
     wSt=_readBlockAt(pDescriptor,wBlock,pFrom); // read the block to move
     if (wSt!=ZS_SUCCESS)
-            { _RETURN_ wSt;}
+            { return  wSt;}
 
     wBD = wBlock;
     wBD.Address = pFrom;
@@ -7601,9 +7596,9 @@ ZBlockDescriptor wBD;
                 }
     wSt=_writeBlockHeader(pDescriptor,wBD,pFrom); // mark it as deleted
     if (wSt!=ZS_SUCCESS)
-                { _RETURN_ wSt;}
+                { return  wSt;}
 
-    _RETURN_ _writeBlockAt(pDescriptor,wBlock,pTo);  // move it to its new address
+    return  _writeBlockAt(pDescriptor,wBlock,pTo);  // move it to its new address
 
 }//_moveBlock
 
@@ -7636,7 +7631,7 @@ ZBlockDescriptor wBD;
 ZStatus
 ZRandomFile::zheaderRebuild(uriString pContentURI,bool pDump, FILE*pOutput)
 {
-_MODULEINIT_
+
 ZStatus wSt;
 ZFileDescriptor wDescriptor;
 int wS;
@@ -7662,7 +7657,7 @@ zsize_type wOldSize;
                                    "File <%s> does not exist. It must exist to be opened.",
                                    wDescriptor.URIContent.toString());
             ZException.printUserMessage(pOutput);
-            _RETURN_ (ZS_FILENOTEXIST);
+            return  (ZS_FILENOTEXIST);
             }
     wDescriptor.ContentFd = open(wDescriptor.URIContent.toCString_Strait(),O_RDONLY);       // open content file for read only
     if (wDescriptor.ContentFd<0)
@@ -7673,7 +7668,7 @@ zsize_type wOldSize;
                              Severity_Severe,
                              " Error opening ZRandomFile content file %s ",
                              wDescriptor.URIContent.toString());
-            _RETURN_ ZS_ERROPEN;
+            return  ZS_ERROPEN;
             }
     if (pDump)
         _surfaceScan(wDescriptor,pOutput);
@@ -7706,7 +7701,7 @@ zsize_type wOldSize;
                         "Error while positionning file <%s> at address <%lld>",
                         wDescriptor.URIContent.toString(),
                         wAddress);
-        _RETURN_ (ZS_FILEPOSERR);
+        return  (ZS_FILEPOSERR);
         }
     while (true)
         {
@@ -7836,7 +7831,7 @@ end_zheaderRebuild:
      _writeFileHeader(wDescriptor,true);
     close (wDescriptor.HeaderFd);
     close (wDescriptor.ContentFd);
-    _RETURN_ wSt;
+    return  wSt;
 error_zheaderRebuild:
     ZException.printUserMessage(pOutput);
     goto end_zheaderRebuild;
@@ -8034,7 +8029,7 @@ ZStatus wSt;
 ZStatus
 ZRandomFile::ztruncateFile(ZFileDescriptor &pDescriptor, const zsize_type pFreeSpace, FILE*pOutput)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 // search for highest address block within both pools
@@ -8051,7 +8046,7 @@ zsize_type wFreeSpace = (pFreeSpace < 0)?pDescriptor.ZFCB->BlockTargetSize : pFr
                                     " Requested free block size to truncate file has an invalid size %lld. It must be at least %ld",
                                     wFreeSpace,
                                     (sizeof(ZBlockHeader_Export)+2));
-            _RETURN_ ZS_INVSIZE;
+            return  ZS_INVSIZE;
             }
 
     for (long wi=0 ;wi<(pDescriptor.ZBAT->size()-1);wi++)
@@ -8079,7 +8074,7 @@ zsize_type wFreeSpace = (pFreeSpace < 0)?pDescriptor.ZFCB->BlockTargetSize : pFr
                  wHighBlock.Address,
                  wHighBlock.BlockSize,
                  decode_ZBS(wHighBlock.State));
-         _RETURN_ ZS_SUCCESS;
+         return  ZS_SUCCESS;
         }
 // We've got a candidate for being the last block to truncate
     if (wHighBlock.BlockSize < wFreeSpace)
@@ -8093,7 +8088,7 @@ zsize_type wFreeSpace = (pFreeSpace < 0)?pDescriptor.ZFCB->BlockTargetSize : pFr
                      wHighBlock.BlockSize,
                      decode_ZBS(wHighBlock.State),
                      pFreeSpace);
-            _RETURN_ ZS_SUCCESS;
+            return  ZS_SUCCESS;
             }
 
 
@@ -8119,7 +8114,7 @@ zsize_type wFreeSpace = (pFreeSpace < 0)?pDescriptor.ZFCB->BlockTargetSize : pFr
     wSt=_writeBlockHeader(pDescriptor,wHighBlock,wHighBlock.Address);
     if (wSt!=ZS_SUCCESS)
             {
-            _RETURN_ wSt;
+            return  wSt;
             }
 
     fprintf (pOutput,
@@ -8136,7 +8131,7 @@ zsize_type wFreeSpace = (pFreeSpace < 0)?pDescriptor.ZFCB->BlockTargetSize : pFr
     pDescriptor.LogicalPosition = -1;
     pDescriptor.PhysicalPosition = -1;
 
-    _RETURN_ (_writeFileDescriptor(pDescriptor,true));
+    return  (_writeFileDescriptor(pDescriptor,true));
 } //ztruncateFile
 
 
@@ -8176,7 +8171,7 @@ zsize_type wFreeSpace = (pFreeSpace < 0)?pDescriptor.ZFCB->BlockTargetSize : pFr
 ZStatus
 ZRandomFile::zclearFile(const zsize_type pSize)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 long wi;
@@ -8213,7 +8208,7 @@ bool FOpen = false;
                     wSt=_freeBlock_Commit(ZDescriptor,wi);
                     }
     if (wSt!=ZS_SUCCESS)
-                { _RETURN_ wSt;}
+                { return  wSt;}
 
 //  Computing size of the mega free block
 //          size of content file  - ZDescriptor.ZFCB->StartOfData
@@ -8237,7 +8232,7 @@ bool FOpen = false;
 
             wSt=ZS_FILEPOSERR;
             zclose();
-            _RETURN_ wSt;
+            return  wSt;
             }
 
     // user requested pSize bytes
@@ -8258,7 +8253,7 @@ bool FOpen = false;
                                 ZDescriptor.URIContent.toString());
                 wSt= ZS_WRITEERROR;
                 zclose();
-                _RETURN_ wSt;
+                return  wSt;
                 }
         }
 // create one block with all the available space
@@ -8279,7 +8274,7 @@ bool FOpen = false;
     if (wSt!=ZS_SUCCESS)
                 {
                 zclose();
-                _RETURN_ wSt;
+                return  wSt;
                 }
 // Then reset all pools
 //
@@ -8298,7 +8293,7 @@ bool FOpen = false;
         if (wSt!=ZS_SUCCESS)
                     {
                     zclose();
-                    _RETURN_ wSt;
+                    return  wSt;
                     }
         }// if HighWaterMarking
 
@@ -8313,8 +8308,8 @@ bool FOpen = false;
     zclose();                           // nb zclose write the whole file header
 
     if (FOpen)     // if file was open re-open in same mode
-            { _RETURN_ _open(ZDescriptor,wMode,wZFT);}
-    _RETURN_ ZS_SUCCESS;
+            { return  _open(ZDescriptor,wMode,wZFT);}
+    return  ZS_SUCCESS;
 }// zclearFile
 
 /**
@@ -8360,16 +8355,16 @@ bool FOpen = false;
 ZStatus
 ZRandomFile::zreorgUriFile (uriString &pURI, bool pDump, FILE *pOutput)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZFileDescriptor wZDescriptor;
 
     wSt=wZDescriptor.setPath(pURI);
     if (wSt!=ZS_SUCCESS)
-                { _RETURN_ wSt;}
+                { return  wSt;}
 
-    _RETURN_ _reorgFile(wZDescriptor,pDump,pOutput);
+    return  _reorgFile(wZDescriptor,pDump,pOutput);
 }
 
 /**
@@ -8440,7 +8435,7 @@ ZRandomFile::zreorgFile(FILE*pOutput)
 ZStatus
 ZRandomFile::_reorgFile(ZFileDescriptor& pDescriptor,bool pDump,FILE*pOutput)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 bool wgrabFreeSpaceSet = false ;
@@ -8483,14 +8478,14 @@ ZFile_type wFileType = ZFT_ZRandomFile;
     _close (pDescriptor);
     if (wasOpen)
             _open(pDescriptor,wMode,wFileType);
-    _RETURN_ (wSt);
+    return  (wSt);
 } // _reorgFile
 
 
 ZStatus
 ZRandomFile::_reorgFileInternals(ZFileDescriptor& pDescriptor,bool pDump,FILE*pOutput)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 zrank_type    wZBATIdx = 0;
@@ -8651,7 +8646,7 @@ zsize_type wFileSize = pDescriptor.getAllocatedSize(); // get initial allocated 
     wZABlocksMove[wi].State = ZBS_Deleted;
     wSt=_writeBlockHeader(pDescriptor,wZABlocksMove[wi],wZABlocksMove[wi].Address);
     if (wSt!=ZS_SUCCESS)
-                    {_RETURN_ wSt;}
+                    {return  wSt;}
     pDescriptor.ZFBT->erase(wZAIdx[wi]); // this is now a hole
     wZABlocksMove.erase(wi);    // and forget it
     wZAIdx.erase(wi);           // its index too
@@ -8702,7 +8697,7 @@ zsize_type wFileSize = pDescriptor.getAllocatedSize(); // get initial allocated 
         wZABlocksMove.erase(wi);
         wZAIdx.erase(wi);           // its rank too
         if (wSt!=ZS_SUCCESS)
-                        {    _RETURN_ wSt;}
+                        {    return  wSt;}
         }//while
     // space for writing block is now free
     // move the block to its new position
@@ -8741,7 +8736,7 @@ zsize_type wFileSize = pDescriptor.getAllocatedSize(); // get initial allocated 
 
     pDescriptor.ZBAT->Tab[wZBATIdx].Address = wCurrentAddress;  // update pool with the new address
     if (wSt!=ZS_SUCCESS)
-                    { _RETURN_ wSt;}
+                    { return  wSt;}
 
     wCurrentAddress += pDescriptor.ZBAT->Tab[wZBATIdx].BlockSize ;    // ready for next block
 
@@ -8788,7 +8783,7 @@ zsize_type wFileSize = pDescriptor.getAllocatedSize(); // get initial allocated 
          pDescriptor.ZFBT->Tab[wi].State = ZBS_Deleted;
          wSt=_writeBlockHeader(pDescriptor,pDescriptor.ZFBT->Tab[wi],pDescriptor.ZFBT->Tab[wi].Address);
          if (wSt!=ZS_SUCCESS)
-                     { _RETURN_ wSt;}
+                     { return  wSt;}
      }
      pDescriptor.ZFBT->clear();
      if (__ZRFVERBOSE__)
@@ -8815,14 +8810,14 @@ zsize_type wFileSize = pDescriptor.getAllocatedSize(); // get initial allocated 
 
 
                 wSt=ZS_FILEPOSERR;
-                _RETURN_ wSt;
+                return  wSt;
                 }
 //
     wCurrentBlock.BlockSize -= wCurrentAddress;
     pDescriptor.ZFBT->push(wCurrentBlock);
     wSt=_writeBlockHeader(pDescriptor,wCurrentBlock,wCurrentAddress);
     if (wSt!=ZS_SUCCESS)
-                { _RETURN_ wSt;}
+                { return  wSt;}
     if (__ZRFVERBOSE__)
         fprintf (pOutput,
              " creating one free block gathering all available space\n"
@@ -8832,7 +8827,7 @@ zsize_type wFileSize = pDescriptor.getAllocatedSize(); // get initial allocated 
 
     wSt=_writeFileHeader(pDescriptor,true);
     if (wSt!=ZS_SUCCESS)
-                {  _RETURN_ wSt;}
+                {  return  wSt;}
     fprintf (pOutput,
              "  Physical file surface reorganization finished successfully\n");
 
@@ -8855,7 +8850,7 @@ zsize_type wFileSize = pDescriptor.getAllocatedSize(); // get initial allocated 
     {
         wSt=ztruncateFile(pDescriptor,wS,pOutput);
         if (wSt!=ZS_SUCCESS)
-                    {  _RETURN_ wSt;}
+                    {  return  wSt;}
     }
     }
 
@@ -8896,7 +8891,7 @@ zsize_type wFileSize = pDescriptor.getAllocatedSize(); // get initial allocated 
     pDescriptor.CurrentRank = -1;
     pDescriptor.LogicalPosition = -1;
     pDescriptor.PhysicalPosition = -1;
-    _RETURN_ wSt;
+    return  wSt;
 } // _reorgFileInternals
 
 /** @cond Test
@@ -8933,7 +8928,7 @@ ZRandomFile::putTheMess (void)
 ZStatus
 ZRandomFile::_highwaterMark_Block (ZFileDescriptor &pDescriptor,const zsize_type pFreeUserSize)
 {
-_MODULEINIT_
+
 
 ZDataBuffer wHWBuffer;
 ssize_t     wSWrite;
@@ -8959,7 +8954,7 @@ zsize_type  wFreeUserSize=pFreeUserSize;
                                          "Severe Error while high water marking freed block for file %s at address %lld",
                                          pDescriptor.URIContent.toString(),
                                          pDescriptor.getPhysicalPosition());
-                         _RETURN_ (ZS_WRITEERROR);
+                         return  (ZS_WRITEERROR);
                         }
 
                 pDescriptor.incrementPhysicalPosition(wSWrite);
@@ -8980,10 +8975,10 @@ zsize_type  wFreeUserSize=pFreeUserSize;
                              "Severe Error while high water marking freed block for file %s at address %lld",
                              pDescriptor.URIContent.toString(),
                              pDescriptor.getPhysicalPosition());
-            _RETURN_ (ZS_WRITEERROR);
+            return  (ZS_WRITEERROR);
             }
     pDescriptor.incrementPhysicalPosition(wSWrite);
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }
 
 /** @endcond  */

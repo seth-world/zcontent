@@ -145,7 +145,7 @@ public:
     zsize_type          BlockSize;      // total size of the physical block, ZBH_Export size+user content size
     ZBlockState_type    State;          // state of the block see @ref ZBlockState_type
     zlockmask_type          Lock;           // relates to ZLockMask_type (zlockmanager.h)
-    ZLock_Reason        LockReason;     // RFFU (zlockmanager.h)
+//    ZLock_Reason        LockReason;     // RFFU (zlockmanager.h)
     pid_t               Pid;            // process identification that locked the block
 };
 class ZBlockDescriptor_Export: public ZBlockHeader_Export
@@ -171,7 +171,7 @@ public:
     //                                       ZBlockHeader_Export plus user content size
     ZBlockState_type    State;          // state of the block see @ref ZBlockState_type
     zlockmask_type          Lock;           // relates to ZLockMask_type (zlockmanager.h)
-    ZLock_Reason        LockReason;     // RFFU (zlockmanager.h)
+//    ZLock_Reason        LockReason;     // RFFU (zlockmanager.h)
     pid_t               Pid;            // process identification that locked the block
 
 
@@ -214,7 +214,7 @@ public:
         pOut->BlockSize=reverseByteOrder_Conditional<zsize_type>(pIn.BlockSize);
         pOut->State= pIn.State;   // unsigned char
         pOut->Lock=reverseByteOrder_Conditional<zlockmask_type>(pIn.Lock);
-        pOut->LockReason=pIn.LockReason; // unsigned char
+//        pOut->LockReason=pIn.LockReason; // unsigned char
         pOut->Pid=reverseByteOrder_Conditional<pid_t>(pIn.Pid);
 
         return *pOut;
@@ -222,7 +222,7 @@ public:
 
     static ZStatus _importConvert(ZBlockHeader& pOut,ZBlockHeader_Export* pIn)
     {
-        _MODULEINIT_
+
         memset(&pOut,0,sizeof(ZBlockHeader));
         if ((pIn->StartBlock!=cst_ZSTART)||(pIn->BlockID!=ZBID_Data))
                     {
@@ -232,7 +232,7 @@ public:
                                           "Invalid block format: invalid marker  Startblock<%X> or BlockId<%X>",
                                           pIn->StartBlock,
                                           pIn->BlockID);
-                    _RETURN_ ZS_INVBLOCKADDR;
+                    return  ZS_INVBLOCKADDR;
                     }
 //        pOut.StartBlock = pIn->StartBlock;
 //        pOut.BlockID= pIn->BlockID;   // unsigned char
@@ -240,10 +240,10 @@ public:
         pOut.BlockSize=reverseByteOrder_Conditional<zsize_type>(pOut.BlockSize);
         pOut.State= pIn->State;   // unsigned char
         pOut.Lock=reverseByteOrder_Conditional<zlockmask_type>(pIn->Lock);
-        pOut.LockReason=pIn->LockReason; // unsigned char
+//        pOut.LockReason=pIn->LockReason; // unsigned char
         pOut.Pid=reverseByteOrder_Conditional<pid_t>(pIn->Pid);
 
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
     }//_importConvert
 };
 
@@ -288,7 +288,7 @@ public:
         pOut->BlockSize=reverseByteOrder_Conditional<zsize_type>(pIn.BlockSize);
         pOut->State= pIn.State;   // unsigned char
         pOut->Lock=reverseByteOrder_Conditional<zlockmask_type>(pIn.Lock);
-        pOut->LockReason=pIn.LockReason; // unsigned char
+//        pOut->LockReason=pIn.LockReason; // unsigned char
         pOut->Pid=reverseByteOrder_Conditional<pid_t>(pIn.Pid);
         // specific to ZBlockDescriptor
         pOut->Address=reverseByteOrder_Conditional<zaddress_type>(pIn.Address);
@@ -298,7 +298,7 @@ public:
 
     static ZStatus _importConvert(ZBlockDescriptor& pOut,ZBlockDescriptor_Export* pIn)
     {
-        _MODULEINIT_
+
         if ((pIn->StartBlock!=cst_ZSTART)||(pIn->BlockID!=ZBID_Data))
                     {
                     ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -307,7 +307,7 @@ public:
                                           "Invalid block format: invalid marker  Startblock<%X> or BlockId<%X>",
                                           pIn->StartBlock,
                                           pIn->BlockID);
-                    _RETURN_ ZS_INVBLOCKADDR;
+                    return  ZS_INVBLOCKADDR;
                     }
         memset(&pOut,0,sizeof(ZBlockDescriptor));
 //        pOut.StartBlock = _reverseByteOrder_T<int32_t>(pIn->StartBlock);
@@ -315,11 +315,11 @@ public:
         pOut.BlockSize=reverseByteOrder_Conditional<zsize_type>(pIn->BlockSize);
         pOut.State= pIn->State;   // unsigned char
         pOut.Lock=reverseByteOrder_Conditional<zlockmask_type>(pIn->Lock);
-        pOut.LockReason=pIn->LockReason; // unsigned char
+//        pOut.LockReason=pIn->LockReason; // unsigned char
         pOut.Pid=reverseByteOrder_Conditional<pid_t>(pIn->Pid);
         // specific to ZBlockDescriptor
         pOut.Address=reverseByteOrder_Conditional<zaddress_type>(pIn->Address);
-        _RETURN_ ZS_SUCCESS;
+        return  ZS_SUCCESS;
     }//_importConvert
 
 

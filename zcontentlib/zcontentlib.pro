@@ -134,7 +134,7 @@ OLDHEADERS += \
     $$ZBASESYSTEM_ROOT/ztoolset/cescapedstring.h \
     $$ZBASESYSTEM_ROOT/ztoolset/zmodulestack.h \
     $$ZBASESYSTEM_ROOT/ztoolset/zlimit.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zuser.h \
+    $$ZBASESYSTEM_ROOT/ztoolset/ZSystemUser.h \
     $$ZBASESYSTEM_ROOT/ztoolset/checksum.h \
     $$ZBASESYSTEM_ROOT/ztoolset/ztime.h \
     $$ZBASESYSTEM_ROOT/zthread/zthreadexithandler.h \
@@ -282,7 +282,7 @@ OLDSOURCE +=  \
     $$ZBASESYSTEM_ROOT/ztoolset/zdate.cpp \
     $$ZBASESYSTEM_ROOT/ztoolset/cescapedstring.cpp \
     $$ZBASESYSTEM_ROOT/ztoolset/zmodulestack.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/zuser.cpp \
+    $$ZBASESYSTEM_ROOT/ztoolset/ZSystemUser.cpp \
     $$ZBASESYSTEM_ROOT/ztoolset/zerror.cpp \
     $$ZBASESYSTEM_ROOT/ztoolset/checksum.cpp \
     $$ZBASESYSTEM_ROOT/zio/zdir.cpp \

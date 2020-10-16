@@ -54,7 +54,7 @@ zstatistics::operator - (zstatistics &pPMSIn)
     wzstatistics1.ExtentWrites -= pPMSIn.ExtentWrites;
     wzstatistics1.ExtentSize -= pPMSIn.ExtentSize;
     wzstatistics1.FreeMatches -= pPMSIn.FreeMatches;
-    _RETURN_ wzstatistics1 ;
+    return  wzstatistics1 ;
  }
 
 /**
@@ -291,7 +291,7 @@ size_t wSize;
 ZDataBuffer&
 ZSIndexControlBlock::_exportICB(ZDataBuffer &pICBContent)
 {
-_MODULEINIT_
+
 
 ZDataBuffer     wZDB;
 
@@ -309,7 +309,7 @@ ZDataBuffer     wZDB;
 
         fprintf (stderr,"\n _export ICB\n %s\n %s\n=============\n",wHexa.DataChar,wAscii.DataChar);
 */
-        _RETURN_ pICBContent;
+        return  pICBContent;
 }// _exportICB
 
 /**
@@ -324,7 +324,7 @@ ZDataBuffer     wZDB;
 ZStatus
 ZSIndexControlBlock::_importICB (ZMetaDic*pMetaDic,ZDataBuffer& pRawICB, size_t &pImportedSize, size_t pOffset)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 //-------ICB Integrity controls are done within ZSICBOwnData::_importIDBOwn() method --------------
@@ -333,7 +333,7 @@ ZStatus wSt;
     ZSICBOwnData wICBOwn;
 
     if ((wSt=wICBOwn._importICBOwn(pRawICB.Data+pOffset))!=ZS_SUCCESS)
-                                                              { _RETURN_ wSt;}
+                                                              { return  wSt;}
 
 
     clear(pMetaDic);  // reset ZIndexControlBlock - reset Key Dictionary - setup MetaDic for record dictionary
@@ -348,7 +348,7 @@ ZStatus wSt;
     CheckSum = pRawICB.newcheckSum();
 
 //    return ZS_SUCCESS;
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }// _import from a ZDataBuffer
 
 /**
@@ -363,7 +363,7 @@ ZSIndexControlBlock::_importICB (ZMetaDic* pMetaDic,unsigned char* pBuffer,size_
 {
 //-------ICB Integrity controls--------------
 // What if an index is added or suppressed by another process during a ZMasterFile open session ??? Not possible: File must be open in Exclusive mode (Mandatory)
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZSICBOwnData wICBOwn;
@@ -372,7 +372,7 @@ size_t wZDicSize;
     wSt=wICBOwn._importICBOwn(pBuffer); // all controls about markers, version level and block identification are made within _importICBOwn
     if (wSt!=ZS_SUCCESS)
         {
-        _RETURN_ wSt;  // beware that _RETURN_ expands in mult-instructions statement
+        return  wSt;  // beware that return  expands in mult-instructions statement
         }
 
     clear(pMetaDic);  // reset ZIndexControlBlock and reset Key Dictionary
@@ -395,7 +395,7 @@ size_t wZDicSize;
     wZDB.setData(pBuffer,pImportedSize);
     CheckSum = wZDB.newcheckSum();
 
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }// _import from pointer
 
 
@@ -424,7 +424,7 @@ ZStatus
 ZSIndexControlBlock::zkeyValueExtraction (ZRecord *pRecord, ZDataBuffer& pKey)
 {
 
- //   _RETURN_ _keyValueExtraction(this->ZKDic,pRecord,pKey);
+ //   return  _keyValueExtraction(this->ZKDic,pRecord,pKey);
     return     _keyValueExtraction(this->ZKDic,pRecord,pKey);
 
 }
@@ -436,7 +436,7 @@ ZSIndexControlBlock::zkeyValueExtraction (ZRecord *pRecord, ZDataBuffer& pKey)
 
 ZSIndexFile::ZSIndexFile  (void *pFather): ZRandomFile()
 {
-_MODULEINIT_
+
     ZMFFather=pFather;
     if (pFather==nullptr)
                 {
@@ -447,13 +447,13 @@ _MODULEINIT_
             this->~ZSIndexFile();
             ZException.exit_abort();
                 }
-    _RETURN_;
+    return ;
 }// ZIF CTOR
 
 
 ZSIndexFile::ZSIndexFile  (void *pFather, ZSIndexControlBlock* pZICB): ZRandomFile()
 {
-_MODULEINIT_
+
     ZMFFather=pFather;
 
     if (pFather==nullptr)
@@ -475,8 +475,8 @@ _MODULEINIT_
                 this->~ZSIndexFile();
                 ZException.exit_abort();
                     }
-//    _RETURN_;
-    _RETURN_;
+//    return ;
+    return ;
 }// ZIF CTOR 2 w
 
 
@@ -516,7 +516,7 @@ ZSIndexFile::setICB (ZSIndexControlBlock *pICB)
 ZStatus
 ZSIndexFile::zrebuildIndex(bool pStat, FILE*pOutput)
 {
-_MODULEINIT_
+
 ZStatus         wSt = ZS_SUCCESS;
 ZRecord*        wRecord = static_cast<ZSMasterFile*>(ZMFFather)->generateZRecord();
 zrank_type      wZMFRank = 0;
@@ -533,7 +533,7 @@ long            wIndexCount=0;
                                     "Request to rebuild file <%s> while open mode is invalid <%s>. Must be (ZRF_Exclusive | ZRF_All)",
                                     ZDescriptor.URIContent.toString(),
                                     decode_ZRFMode(ZDescriptor.Mode));
-            _RETURN_ ZS_MODEINVALID;
+            return  ZS_MODEINVALID;
             }
     if (pStat)
             ZPMSStats.init();
@@ -563,7 +563,7 @@ long            wIndexCount=0;
                     wFather->getURIContent().toString());
 
 
-            _RETURN_ ZS_SUCCESS;
+            return  ZS_SUCCESS;
             }
 
 
@@ -592,12 +592,12 @@ long            wIndexCount=0;
             {
             fprintf (pOutput," ----- index rebuild ended with error --------\n");
             ZException.printUserMessage();
-            _RETURN_ wSt;
+            return  wSt;
             }
     fprintf (pOutput," ---------Successfull end rebuilding process for Index <%s>------------\n",
                ZICB->Name.toString());
-//    _RETURN_ wSt;
-    _RETURN_ wSt;
+//    return  wSt;
+    return  wSt;
 
 }//zrebuildIndex
 
@@ -609,9 +609,9 @@ long            wIndexCount=0;
 ZStatus
 ZSIndexFile::removeIndexFiles(void)
 {
-_MODULEINIT_
-//    _RETURN_ _Base::zremoveFile();
-_RETURN_ _Base::zremoveFile();
+
+//    return  _Base::zremoveFile();
+return  _Base::zremoveFile();
 }
 
 /**
@@ -640,7 +640,7 @@ ZSIndexFile::zcreateIndex(ZSIndexControlBlock *pICB,
                          bool pReplace,
                          bool pLeaveOpen)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 
@@ -651,7 +651,7 @@ ZStatus wSt;
                 ZException.addToLast(" While Creating ZSIndexFile %s\n",
                                          pIndexUri.toString());
                 ZException.setLastSeverity(Severity_Severe);
-                _RETURN_ wSt;
+                return  wSt;
                 }
 //  ZSIndexFile Record size is KeySize (sum of fields lengths) plus size of a zaddress_type (pointer to Master File record)
 
@@ -668,7 +668,7 @@ ZStatus wSt;
                 ZException.addToLast(" While Creating ZSIndexFile %s\n",
                                          pIndexUri.toString());
                 ZException.setLastSeverity(Severity_Severe);
-                _RETURN_ wSt;
+                return  wSt;
                 }
     wSt=_Base::_open(ZDescriptor,(ZRF_Exclusive | ZRF_All),ZFT_ZSIndexFile);
     if (wSt!=ZS_SUCCESS)
@@ -676,7 +676,7 @@ ZStatus wSt;
                 ZException.addToLast(" While Creating ZSIndexFile %s\n",
                                          pIndexUri.toString());
                 ZException.setLastSeverity(Severity_Severe);
-                _RETURN_ wSt;
+                return  wSt;
                 }
 //
 // now need to write the updated ICB to Index Header
@@ -687,20 +687,20 @@ ZStatus wSt;
                 ZException.addToLast(" While Creating ZSIndexFile %s\n",
                                          pIndexUri.toString());
                 ZException.setLastSeverity(Severity_Severe);
-                _RETURN_ wSt;
+                return  wSt;
                 }
 
     if (!pLeaveOpen)
-//            _RETURN_  _Base::zclose();
-            _RETURN_  _Base::zclose();
-//    _RETURN_ ZS_SUCCESS;
-_RETURN_ ZS_SUCCESS;
+//            return   _Base::zclose();
+            return   _Base::zclose();
+//    return  ZS_SUCCESS;
+return  ZS_SUCCESS;
 }//zcreateIndexFile
 
 ZStatus
 ZSIndexFile::openIndexFile(uriString &pIndexUri,const int pMode)
 {
-_MODULEINIT_
+
 ZStatus wSt;
 
     IndexUri = pIndexUri;
@@ -711,7 +711,7 @@ ZStatus wSt;
                 ZException.addToLast(" setting path for ZSIndexFile %s\n",
                                          pIndexUri.toString());
                 ZException.setLastSeverity(Severity_Severe);
-                _RETURN_ wSt;
+                return  wSt;
                 }
     wSt=_Base::_open(ZDescriptor,pMode,ZFT_ZSIndexFile);
     if (wSt!=ZS_SUCCESS)
@@ -720,7 +720,7 @@ ZStatus wSt;
                 ZException.addToLast(" Openning ZSIndexFile %s\n",
                                          pIndexUri.toString());
                 ZException.setLastSeverity(Severity_Severe);
-                _RETURN_ wSt;
+                return  wSt;
                 }
 // --------- Need to read ICB and check whether it is ok with the given ICB --------------
 
@@ -735,7 +735,7 @@ ZStatus wSt;
                  ZException.addToLast( " Reading Reserved header zone ZSIndexFile %s",
                                         pIndexUri.toString());
                  ZException.setLastSeverity(Severity_Severe);
-                _RETURN_ wSt;
+                return  wSt;
                 }
     checkSum* wLocalCheckSum = wRawICB.newcheckSum();// compute checksum on it
     if ((*ZICB->CheckSum)!=(*wLocalCheckSum))   // compare with ZMF Father's checkSum
@@ -782,7 +782,7 @@ ZStatus wSt;
                               );
         ZException.setComplement ("Index file found is not aligned with corresponding ZSMasterFile file index definition");
         ZException.setLastSeverity(Severity_Severe);
-        _RETURN_ ZS_BADICB;
+        return  ZS_BADICB;
         }
         else
             fprintf (stdout,"%s>> ICB unitary control check passed. Checksums were wrong for one reason but ICB content is aligned\n",_GET_FUNCTION_NAME_);
@@ -792,7 +792,7 @@ ZStatus wSt;
 
     ZPMSStats.PMSBase= &ZDescriptor.ZPMS ;
 
-    _RETURN_ ZS_SUCCESS ;
+    return  ZS_SUCCESS ;
 }//zopenIndexFile
 
 
@@ -800,7 +800,7 @@ ZStatus wSt;
 ZStatus
 ZSIndexFile::closeIndexFile(void)
 {
-_MODULEINIT_
+
 ZStatus wSt;
 ZDataBuffer wICBContent;
 //
@@ -811,10 +811,10 @@ ZDataBuffer wICBContent;
                 {
                 ZException.addToLast( " Writing Reserved header for ZSIndexFile %s",IndexUri.toString());
                 ZException.setLastSeverity(Severity_Severe);
-                _RETURN_ wSt;
+                return  wSt;
                 }
 
-    _RETURN_ _Base::zclose();
+    return  _Base::zclose();
 }//closeIndexFile
 /**
  * @brief ZSIndexFile::writeIndexControlBlock
@@ -826,7 +826,7 @@ ZDataBuffer wICBContent;
 ZStatus
 ZSIndexFile::writeIndexControlBlock(checkSum **pCheckSum)
 {
-_MODULEINIT_
+
 ZStatus wSt;
 ZDataBuffer wICBContent;
 //
@@ -840,14 +840,14 @@ ZDataBuffer wICBContent;
                 {
                 ZException.addToLast (" Writing Reserved header zone ZSIndexFile %s",IndexUri.toString());
                 ZException.setLastSeverity(Severity_Severe);
-                _RETURN_ wSt;
+                return  wSt;
                 }
     if (pCheckSum==nullptr)
         {
-        _RETURN_ ZS_SUCCESS;        // no checkSum requested
+        return  ZS_SUCCESS;        // no checkSum requested
         }
    *(pCheckSum) = wICBContent.newcheckSum();  // else compute checksum and return pointer to it (pointer to pointer)
-    _RETURN_ ZS_SUCCESS;
+    return  ZS_SUCCESS;
 }//writeIndexControlBlock
 
 
@@ -857,18 +857,18 @@ ZDataBuffer wICBContent;
 ZStatus
 ZSIndexFile::removeRollback         (ZDataBuffer& pRecord , long &pZMFRank,zaddress_type &pAddress)
 {
-    _RETURN_ (addIndexValue(pRecord,pZMFRank,pAddress));
+    return  (addIndexValue(pRecord,pZMFRank,pAddress));
 }
 ZStatus
 ZSIndexFile::insertRollback         (ZDataBuffer& pRecord , long &pZMFRank,zaddress_type &pAddress)
 {
-    _RETURN_ (removeIndexValue(pRecord,pZMFRank,pAddress));
+    return  (removeIndexValue(pRecord,pZMFRank,pAddress));
 }
 */
 ZStatus
 ZSIndexFile::removeIndexValue        (const ZDataBuffer& pKey , zaddress_type &pAddress)
 {
-_MODULEINIT_
+
 ZStatus         wSt;
 
 ZSIndexCollection wZIRList(this);
@@ -880,7 +880,7 @@ ZSIndexResult wZIR;
             {
             wSt=_searchAll(pKey,*this,wZIRList,ZMS_MatchIndexSize);
             if (wSt!=ZS_FOUND)
-                        {_RETURN_ wSt;}
+                        {return  wSt;}
             wZIR.IndexRank = -1;
             if (pAddress==-1)       // if no ZMF address specified get the first one to be removed
                         {
@@ -907,7 +907,7 @@ ZSIndexResult wZIR;
                                                 ZICB->Name.toString()
                                                 );
                         ZException.setLastSeverity(Severity_Severe);
-                        _RETURN_ (ZS_INVADDRESS); // pAddress has not been matched
+                        return  (ZS_INVADDRESS); // pAddress has not been matched
                         }
                     } // else
             }// if duplicates
@@ -916,11 +916,11 @@ ZSIndexResult wZIR;
 //        wSt=_search(pKey,*this,wZIR,ZMS_MatchIndexSize);
         wSt=_search(pKey,*this,wZIR);
         if (wSt!=ZS_FOUND)
-                    {  _RETURN_ wSt;}
+                    {  return  wSt;}
             }
 // At this stage we have one ZIR with the IndexRank to remove within ZSIndexFile
 
-    _RETURN_ (_Base::zremove(wZIR.IndexRank));
+    return  (_Base::zremove(wZIR.IndexRank));
 }// removeIndexValue
 
 
@@ -944,7 +944,7 @@ ZSIndexResult wZIR;
 ZStatus
 ZSIndexFile::_addKeyValue(ZRecord* pZMFRecord,  zrank_type& pIndexRank, zaddress_type pZMFAddress)
 {
-_MODULEINIT_
+
 long ZJoinIndex;
 ZStatus wSt;
 
@@ -956,10 +956,10 @@ zrank_type wIndexIdxCommit;
 
     wSt=_addKeyValue_Prepare(pZMFRecord,wIndexItem,wIndexIdxCommit,pZMFAddress);
     if (wSt!=ZS_SUCCESS)
-                  {  _RETURN_ wSt;}// Beware _RETURN_ is multiple instructions in debug mode
+                  {  return  wSt;}// Beware return  is multiple instructions in debug mode
     wSt= _addKeyValue_Commit(wIndexItem,wIndexIdxCommit);
     delete wIndexItem;
-    _RETURN_ wSt;
+    return  wSt;
 }// _addKeyValue
 
 
@@ -970,7 +970,7 @@ zrank_type wIndexIdxCommit;
 ZStatus
 ZSIndexFile::_addKeyValue(ZDataBuffer &pElement,  long& pIndexRank, zaddress_type pZMFAddress)
 {
-_MODULEINIT_
+
 
 long ZJoinIndex;
 ZStatus wSt;
@@ -1007,7 +1007,7 @@ zaddress_type wAddress;
 #if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
                                         _Mtx.unlock();
 #endif
-                                        _RETURN_(wSt); // error is managed at ZMF level
+                                        return (wSt); // error is managed at ZMF level
                                         }
                 break;
                 }
@@ -1021,7 +1021,7 @@ zaddress_type wAddress;
 #if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
                                         _Mtx.unlock();
 #endif
-                                        _RETURN_(wSt); // error is managed at ZMF level
+                                        return (wSt); // error is managed at ZMF level
                                         }
                 break;
                 }
@@ -1033,7 +1033,7 @@ zaddress_type wAddress;
 #if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
                             _Mtx.unlock();
 #endif
-                            _RETURN_(wSt); // error is managed at ZMF level
+                            return (wSt); // error is managed at ZMF level
                             }
 //                ZJoinIndex=wRes.ZIdx;
                 break;
@@ -1045,7 +1045,7 @@ zaddress_type wAddress;
 #if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
                             _Mtx.unlock();
 #endif
-                            _RETURN_ (ZS_DUPLICATEKEY);
+                            return  (ZS_DUPLICATEKEY);
                             }
                 wZIXOp=ZO_Insert ;
                 if ((wSt=_Base::_insert(_Base::ZDescriptor,wZI.toFileKey(),wRes.ZIdx,wAddress))!=ZS_SUCCESS)     // insert at position returned by seekGeneric
@@ -1053,7 +1053,7 @@ zaddress_type wAddress;
 #if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
                              _Mtx.unlock();
 #endif
-                            _RETURN_(wSt); // error is managed at ZAM level
+                            return (wSt); // error is managed at ZAM level
                             }
 //                ZJoinIndex=wRes.ZIdx;
                 break;
@@ -1063,7 +1063,7 @@ zaddress_type wAddress;
 #if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
                  _Mtx.unlock();
 #endif
-                _RETURN_(ZS_INVOP);
+                return (ZS_INVOP);
                 }
             }// switch
 
@@ -1080,7 +1080,7 @@ zaddress_type wAddress;
 #if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
     _Mtx.unlock();
 #endif
-    _RETURN_(ZS_SUCCESS);
+    return (ZS_SUCCESS);
 
 }//ZSIndexFile::_addKeyValue
 #endif //__COMMENT__
@@ -1114,7 +1114,7 @@ ZSIndexFile::_addKeyValue_Prepare(ZRecord *pZMFRecord,
                                  zrank_type &pIndexCommit,
                                  const zaddress_type pZMFAddress)
 {
-_MODULEINIT_
+
 
 zrank_type ZJoinIndex;
 ZStatus wSt;
@@ -1222,7 +1222,7 @@ ZIFCompare wZIFCompare = ZKeyCompareBinary;
     if (wSt!=ZS_SUCCESS)
                 {
                 goto _addKeyValuePrepareReturn;     // not necessary for the moment but RFFU
- //               _RETURN_(wSt); // error is managed at ZMF level
+ //               return (wSt); // error is managed at ZMF level
                 }
 
 /*
@@ -1250,7 +1250,7 @@ _addKeyValuePrepareReturn:
     pStats.Timer.getDeltaTime();
     pStats = ZDescriptor.ZPMS- wPMS ;  // just give the delta : ZRFPMS is a base for zstatistics
     ZPMSStats += pStats;*/
-    _RETURN_ (wSt) ;
+    return  (wSt) ;
 
 }//_addKeyValue_Prepare
 
@@ -1258,7 +1258,7 @@ _addKeyValuePrepareReturn:
 ZStatus
 ZSIndexFile::_addKeyValue_Commit(ZSIndexItem *pIndexItem, const zrank_type pIndexCommit)
 {
-_MODULEINIT_
+
 ZStatus wSt;
 zaddress_type wAddress; // local index address : of no use there
 
@@ -1272,13 +1272,13 @@ zaddress_type wAddress; // local index address : of no use there
             }
 // history and journaling take place here
 
-    _RETURN_ wSt;
+    return  wSt;
 } // _addKeyValue_Commit
 
 ZStatus
 ZSIndexFile::_addKeyValue_Rollback(const zrank_type pIndexCommit)
 {
-_MODULEINIT_
+
 ZStatus wSt;
     wSt=_Base::_add2PhasesCommit_Rollback (_Base::ZDescriptor,pIndexCommit);
     if (wSt!=ZS_SUCCESS)
@@ -1291,7 +1291,7 @@ ZStatus wSt;
 
 // No history and no journaling for indexes
 
-    _RETURN_ wSt;
+    return  wSt;
 } // _addKeyValue_Rollback
 
 /**
@@ -1307,7 +1307,7 @@ ZStatus wSt;
 ZStatus
 ZSIndexFile::_addKeyValue_HardRollback(const zrank_type pIndexCommit)
 {
-_MODULEINIT_
+
     if (ZVerbose)
             fprintf (stdout,"Index addKeyValue Hard rollback : removing index <%s> rank <%ld>\n",
                      ZICB->Name.toString(),
@@ -1321,7 +1321,7 @@ ZStatus wSt =_Base::_remove(_Base::ZDescriptor,pIndexCommit);
                                                  pIndexCommit);
             ZException.setLastSeverity(Severity_Severe);
             }
-   _RETURN_ wSt;
+   return  wSt;
 } // _addKeyValue_HardRollback
 
 //------------------End Add sequence-----------------------------------------
@@ -1359,7 +1359,7 @@ ZSIndexFile::_removeKeyValue_Prepare(ZDataBuffer & pKey,
                                     long& pIndexRank,
                                     zaddress_type &pZMFAddress)
 {
-_MODULEINIT_
+
 long ZJoinIndex;
 ZStatus wSt;
 ZResult wRes;
@@ -1381,7 +1381,7 @@ ZSIndexResult wZIR;
                                     "During remove operation : Index value not found on index name <%s>",
                                      ZICB->Name.toString());
             ZException.setLastSeverity(Severity_Severe);
-            _RETURN_ wSt;
+            return  wSt;
             } // wSt!=ZS_FOUND
 
 #if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
@@ -1400,14 +1400,14 @@ ZSIndexResult wZIR;
     _Mtx.unlock();
 #endif
 
-    _RETURN_ wSt;
+    return  wSt;
 }//_removeKeyValue_Prepare
 
 
 ZStatus
 ZSIndexFile::_removeKeyValue_Commit(const zrank_type pIndexCommit)
 {
-_MODULEINIT_
+
 zrank_type ZJoinIndex;
 ZStatus wSt;
 
@@ -1429,7 +1429,7 @@ ZStatus wSt;
         ZException.setLastSeverity(Severity_Severe);
         }
 
-     _RETURN_(wSt);
+     return (wSt);
 
 }//ZSIndexFile::_removeKeyValue_Prepare
 /**
@@ -1440,7 +1440,7 @@ ZStatus wSt;
 ZStatus
 ZSIndexFile::_removeKeyValue_Rollback(const zrank_type pIndexCommit)
 {
-_MODULEINIT_
+
 zrank_type ZJoinIndex;
 ZStatus wSt;
 
@@ -1462,7 +1462,7 @@ ZStatus wSt;
         ZException.last().Severity=Severity_Severe;
         }
 
-    _RETURN_ wSt;
+    return  wSt;
 }//_removeKeyValue_Rollback
 
 /**
@@ -1474,7 +1474,7 @@ ZStatus wSt;
 ZStatus
 ZSIndexFile::_removeKeyValue_HardRollback(ZSIndexItem* pIndexItem, const zrank_type pIndexCommit)
 {
-_MODULEINIT_
+
 
 zrank_type ZJoinIndex;
 zaddress_type wAddress;  // not used : only for compatibility purpose
@@ -1499,7 +1499,7 @@ ZStatus wSt;
         ZException.setLastSeverity(Severity_Severe);
         }
 
-     _RETURN_ wSt ;
+     return  wSt ;
 
 }//_removeKeyValue_HardRollback
 
@@ -1512,7 +1512,7 @@ namespace zbs{
 /** @cond Development
  * @brief _KeyValueExtraction Extracts the Key value from ZMasterFile record data using dictionnary CZKeyDictionary fields definition
  *
- * _RETURN_s the concaneted key value in pKey ZDataBuffer.
+ * return s the concaneted key value in pKey ZDataBuffer.
  * - Key fields are extracted from the ZMasterFile user record .
  * - They are converted appropriately whenever required using base internal conversion routines according Dictionary data type ( ZType_type ):
  *    + atomic fields _getAtomicFromRecord()
@@ -1520,7 +1520,7 @@ namespace zbs{
  *    + for data type Class (ZType_type) : data is simply mass-moved to key without any conversion
  *
  * @note As we are processing variable length records, if a defined key field points outside the record length,
- *       then its _RETURN_ing key value is set to binary zero on the corresponding length of the field within returned Key value.
+ *       then its return ing key value is set to binary zero on the corresponding length of the field within returned Key value.
  *
  *
  *
@@ -1532,7 +1532,7 @@ namespace zbs{
 inline
 ZStatus _keyValueExtraction(ZSKeyDictionary* pZKDic, ZRecord *pRecord, ZDataBuffer& pKey)
 {
-_MODULEINIT_
+
 
 ZStatus wSt;
 size_t wKeyOffset = 0;
@@ -1550,7 +1550,7 @@ ZDataBuffer wFieldUValue;
                                      ZS_BADICB,
                                      Severity_Severe,
                                      " Index Control Block appears to be malformed. Fields list is empty");
-            _RETURN_ ZS_BADICB;
+            return  ZS_BADICB;
             }
 
     if (!pZKDic->Recomputed)
@@ -1571,7 +1571,7 @@ ZDataBuffer wFieldUValue;
 
 
 
-_RETURN_ ZS_SUCCESS;
+return  ZS_SUCCESS;
 }//zKeyValueExtraction
 
 /** @endcond */
@@ -1660,7 +1660,7 @@ ZSIndexFile::_search(const ZDataBuffer &pKey,
                   ZSIndexResult &pZIR,
                   const zlockmask_type pLock)
 {
-_MODULEINIT_
+
 
 ZStatus     wSt= ZS_NOTFOUND;
 
@@ -1678,7 +1678,7 @@ long whigh = 0;
 long wlow = 0;
 long wpivot = 0;
 
-//_MODULEINIT_  ;
+//  ;
 
     if (pZIF.getSize()==0)
                     {
@@ -1723,7 +1723,7 @@ long wpivot = 0;
                     goto _search_Return;
                     }
         if (wR<0)
-                {_RETURN_ ZS_OUTBOUNDLOW;}
+                {return  ZS_OUTBOUNDLOW;}
 
          pZIR.IndexRank = whigh ;
 
@@ -1740,7 +1740,7 @@ long wpivot = 0;
                 goto _search_Return;
                 }
          if (wR>0)
-                 {_RETURN_ ZS_OUTBOUNDHIGH;}
+                 {return  ZS_OUTBOUNDHIGH;}
 
         wpivot = ((whigh-wlow)/2) +wlow ;
 
@@ -1768,7 +1768,7 @@ long wpivot = 0;
             if ((whigh-wlow)==1)
                     {
                     pZIR.IndexRank = wpivot ;
-                    _RETURN_ ZS_NOTFOUND;
+                    return  ZS_NOTFOUND;
                     }
 
             wpivot = ((whigh-wlow)/2) + wlow ;
@@ -1785,7 +1785,7 @@ long wpivot = 0;
     pZIR.IndexRank = wpivot;
     pZIF.ZPMSStats.Reads ++;
     if ((wSt=pZIF.zget(wIndexRecord,wpivot))!=ZS_SUCCESS)
-                                                { _RETURN_ wSt;}
+                                                { return  wSt;}
     wIndexItem.fromFileKey(wIndexRecord);
     wR= wZIFCompare(pKey,wIndexItem.KeyContent,wCompareSize);
 
@@ -1797,7 +1797,7 @@ long wpivot = 0;
 
             pZIF.ZPMSStats.Reads ++;
             if ((wSt=pZIF.zget(wIndexRecord,wpivot))!=ZS_SUCCESS)
-                                                       { _RETURN_ wSt;}
+                                                       { return  wSt;}
             wIndexItem.fromFileKey(wIndexRecord);
             wR= wZIFCompare(pKey,wIndexItem.KeyContent,wCompareSize);
              }
@@ -1809,23 +1809,23 @@ long wpivot = 0;
        else
         {
         pZIR.IndexRank = wpivot ; // because only 2 slots between wlow and whigh remain and we should insert before whigh
-        _RETURN_ ZS_NOTFOUND ;
+        return  ZS_NOTFOUND ;
         }
 
 _search_Return:
     pZIR.ZMFAddress = wIndexItem.ZMFaddress ;
 /*    if ((wSt=ZS_FOUND)&&(pLock != ZLock_Nolock ))
             {
-            _RETURN_ static_cast<ZMasterFile*>(pZIF.ZMFFather)->zlockByAddress(wIndexItem.ZMFaddress,pLock); // lock corresponding ZMasterFile address with given lock mask
+            return  static_cast<ZMasterFile*>(pZIF.ZMFFather)->zlockByAddress(wIndexItem.ZMFaddress,pLock); // lock corresponding ZMasterFile address with given lock mask
             }*/
-    _RETURN_ (wSt) ;
+    return  (wSt) ;
 }// _search
 
 /**
  * @brief ZSIndexFile::_searchAll  Search for ALL index ranks matching EXACTLY a certain key value. Key value cannot be partial.
  * The size of Index key value defines the length to compare with given key value pKey.
  *
- * @par _RETURN_s
+ * @par return s
  * - a ZSIndexCollection gathering a collection of ZSIndexResult_struct i. e. :
  *   + ZSIndexFile ranks of indexes matching key value
  *   + ZMasterFile corresponding address
@@ -1837,7 +1837,7 @@ _search_Return:
  *  - Key index values are first searched with no lock.
  *  - When collection has been found, then whole collection is locked if necessary (pLock != ZLock_Nolock)
  *  - Locks do not appy on indexes by on ZMasterFile main content
- *  - In case of error (may be already locked), already locked collection items are unlocked before _RETURN_ing errored ZStatus.
+ *  - In case of error (may be already locked), already locked collection items are unlocked before return ing errored ZStatus.
  *
  * @param[in] pKey key content to find. Key has to be formatted using _formatKeyContent() routine
  * @param[in] pZIF ZSIndexFile object to search on
@@ -1861,7 +1861,7 @@ ZSIndexFile::_searchAll(const ZDataBuffer        &pKey,     // key content to fi
                        ZSIndexCollection &pCollection,
                        const ZMatchSize_type    pZMS)
 {
-_MODULEINIT_
+
 
 ZStatus     wSt=ZS_NOTFOUND;
 //long        wIndexRank;
@@ -1879,14 +1879,14 @@ zrank_type whigh ;
 zrank_type wlow ;
 zrank_type wpivot;
 zrank_type wIndexFound=0;
-//_MODULEINIT_
+//
 
 
     pCollection.ZMS = pZMS;
     if (pZMS==ZMS_MatchIndexSize)
             {
             if (pKey.Size!=pZIF.ZICB->ZKDic->KeyUniversalSize)
-                        {_RETURN_ ZS_INVSIZE ;}//
+                        {return  ZS_INVSIZE ;}//
             }
 
 //-----------Comparison routine selection------------------------------------
@@ -1938,7 +1938,7 @@ zrank_type wIndexFound=0;
         if (wR<0)
             {
             pCollection.setStatus(ZS_OUTBOUNDLOW) ;
-            _RETURN_ ZS_OUTBOUNDLOW ;
+            return  ZS_OUTBOUNDLOW ;
             }// if wR<0
 
 // get highest rank (lastIdx())
@@ -1958,7 +1958,7 @@ zrank_type wIndexFound=0;
      if (wR>0)
          {
          pCollection.setStatus(ZS_OUTBOUNDHIGH) ;
-         _RETURN_ ZS_OUTBOUNDHIGH ;
+         return  ZS_OUTBOUNDHIGH ;
          }// if wR>0
 
      while ((whigh-wlow)>2) //---------------------Main loop around wpivot-----------
@@ -1988,7 +1988,7 @@ zrank_type wIndexFound=0;
         if ((whigh-wlow)==1)
                 {
                 pCollection.setStatus(ZS_NOTFOUND);
-                _RETURN_ ZS_NOTFOUND ;
+                return  ZS_NOTFOUND ;
                 }
 
         wpivot = ((whigh-wlow)/2) + wlow ;
@@ -1999,7 +1999,7 @@ zrank_type wIndexFound=0;
 //--------------------------Collection Post processing--------------------
     if (pCollection.getStatus()!=ZS_FOUND)
         {
-        _RETURN_ pCollection.getStatus();
+        return  pCollection.getStatus();
         }
 _searchAllBackProcess:
     /*
@@ -2067,19 +2067,19 @@ _searchAllBackProcess:
 _searchAll_Return:
 //    if (pLock != ZLock_Nolock )
 //            pCollection.zlockAll(pLock);    // lock corresponding Collection with given lock mask if necessary
-    _RETURN_ (pCollection.getStatus()) ;
+    return  (pCollection.getStatus()) ;
 
 _searchAllError:
 //    if (pLock != ZLock_Nolock )
 //            pCollection.zunlockAll();    // lock corresponding Collection with given lock mask if necessary
 
-    _RETURN_ (pCollection.getStatus());
+    return  (pCollection.getStatus());
 }// _searchAll using ZSIndexFile
 
 
 
 /**
- * @brief ZSIndexFile::_searchFirst search ZSIndexFile pZIF for a first match of pKey (first in key order) and _RETURN_s a ZSIndexResult
+ * @brief ZSIndexFile::_searchFirst search ZSIndexFile pZIF for a first match of pKey (first in key order) and return s a ZSIndexResult
  * - ZSIndexFile rank : index file relative position of key found
  * - ZMasterFile corresponding record (block) address
  *
@@ -2129,7 +2129,7 @@ ZSIndexFile::_searchFirst(const ZDataBuffer        &pKey,     // key content to 
                          const ZMatchSize_type    pZMS)
 
 {
-_MODULEINIT_
+
 
 ZStatus     wSt=ZS_NOTFOUND;
 //long        wIndexRank;
@@ -2145,7 +2145,7 @@ int wR;
 zrank_type whigh ;
 zrank_type wlow ;
 zrank_type wpivot;
-//_MODULEINIT_
+//
 
 //-----------Initialization Section---------------------------------
 
@@ -2182,14 +2182,14 @@ zrank_type wpivot;
     if (pZMS==ZMS_MatchIndexSize)
             {
             if (pKey.Size!=pZIF.ZICB->ZKDic->KeyUniversalSize)
-                                        {_RETURN_ ZS_INVSIZE ;}//
+                                        {return  ZS_INVSIZE ;}//
             }
 //-----------End Initialization Section---------------------------------
 
     if (pZIF.getSize()==0)
                     {
                     pCollection->setStatus(ZS_OUTBOUNDHIGH );
-                    _RETURN_ ZS_OUTBOUNDHIGH;
+                    return  ZS_OUTBOUNDHIGH;
                     }
 
 
@@ -2199,7 +2199,7 @@ zrank_type wpivot;
     pZIR.IndexRank= wlow ;
     pZIF.ZPMSStats.Reads ++;
     if (pCollection->setStatus(pZIF.zget(wIndexRecord,pZIR.IndexRank))!=ZS_SUCCESS)
-                                                            {_RETURN_ pCollection->getStatus();}//
+                                                            {return  pCollection->getStatus();}//
     wIndexItem.fromFileKey(wIndexRecord);
     wR= wZIFCompare((ZDataBuffer&)pKey,wIndexItem.KeyContent,wCompareSize);
 
@@ -2212,13 +2212,13 @@ zrank_type wpivot;
     if (wR<0)
         {
         pCollection->setStatus( ZS_OUTBOUNDLOW);
-       _RETURN_ ZS_OUTBOUNDLOW;
+       return  ZS_OUTBOUNDLOW;
         }// if wR<0
 
      pZIR.IndexRank = whigh ;
      pZIF.ZPMSStats.Reads ++;
      if (pCollection->setStatus(pZIF.zget(wIndexRecord,pZIR.IndexRank))!=ZS_SUCCESS)
-                                                         {_RETURN_ pCollection->getStatus();}
+                                                         {return  pCollection->getStatus();}
      wIndexItem.fromFileKey(wIndexRecord);
      wR= wZIFCompare((ZDataBuffer&)pKey,wIndexItem.KeyContent,wCompareSize);
 
@@ -2230,7 +2230,7 @@ zrank_type wpivot;
      if (wR>0)
          {
          pCollection->setStatus( ZS_OUTBOUNDHIGH);
-        _RETURN_ ZS_OUTBOUNDHIGH;
+        return  ZS_OUTBOUNDHIGH;
          }// if wR>0
 
     wpivot = ((whigh-wlow)/2) +wlow ;
@@ -2240,7 +2240,7 @@ zrank_type wpivot;
         pZIR.IndexRank = wpivot ;
         pZIF.ZPMSStats.Reads ++;
         if (pCollection->setStatus(pZIF.zget(wIndexRecord,pZIR.IndexRank))!=ZS_SUCCESS)
-                                                            {_RETURN_ pCollection->getStatus();}
+                                                            {return  pCollection->getStatus();}
         wIndexItem.fromFileKey(wIndexRecord);
         wR= wZIFCompare((ZDataBuffer&)pKey,wIndexItem.KeyContent,wCompareSize);
         if (wR==0)
@@ -2260,7 +2260,7 @@ zrank_type wpivot;
         if ((whigh-wlow)==1)
                 {
                 pCollection->setStatus( ZS_NOTFOUND);
-                _RETURN_ ZS_NOTFOUND;
+                return  ZS_NOTFOUND;
                 }
 
         wpivot = ((whigh-wlow)/2) + wlow ;
@@ -2270,7 +2270,7 @@ zrank_type wpivot;
         } // while (whigh-wlow)>2--------Main loop around pivot------------------
 
     if (pCollection->getStatus()!=ZS_FOUND)
-                        { _RETURN_ pCollection->getStatus();}
+                        { return  pCollection->getStatus();}
 _searchFirstBackProcess:
 /*
  *
@@ -2309,7 +2309,7 @@ _searchFirstBackProcess:
         pCollection->setStatus(static_cast<ZMasterFile *>(pCollection->ZIFFile->ZMFFather)->zlockByAddress(pZIR.ZMFAddress,pLock));
         if (pCollection->getStatus()!=ZS_SUCCESS)
             {
-            _RETURN_ pCollection->getStatus();
+            return  pCollection->getStatus();
             }
         }// !=ZLock_Nolock
 */
@@ -2317,7 +2317,7 @@ _searchFirstBackProcess:
 
 //    ZException.clearStack();
 
-    _RETURN_ pCollection->setStatus(ZS_FOUND);
+    return  pCollection->setStatus(ZS_FOUND);
 
 }// _searchFirst
 /**
@@ -2341,11 +2341,11 @@ ZStatus
 ZSIndexFile::_searchNext (ZSIndexResult       &pZIR,
                          ZSIndexCollection*  pCollection)
 {
-_MODULEINIT_
+
 ZSIndexItem wIndexItem ;
 ZDataBuffer wIndexRecord;
 
-//_MODULEINIT_
+//
 
 //-----------Initialization Section---------------------------------
 
@@ -2355,14 +2355,14 @@ ZDataBuffer wIndexRecord;
                                 ZS_INVOP,
                                 Severity_Severe,
                                 " Cannot invoke _searchNext without having Collection / Context : invoke first _searchFirst ");
-        _RETURN_ ZS_INVOP;
+        return  ZS_INVOP;
         } // pCollection == nullptr
 
 //-----------End Initialization Section---------------------------------
 
     pCollection->Context.Op = ZCOP_GetNext ;
-    if (pCollection->getStatus()!=ZS_FOUND)  // if nothing has been found or error : _RETURN_ not found
-                    {_RETURN_ pCollection->getStatus();}
+    if (pCollection->getStatus()!=ZS_FOUND)  // if nothing has been found or error : return  not found
+                    {return  pCollection->getStatus();}
 
 
 
@@ -2374,7 +2374,7 @@ ZDataBuffer wIndexRecord;
     if (pCollection->Context.CurrentZIFrank > pCollection->ZIFFile->lastIdx())
         {
         pCollection->Context.CurrentZIFrank=pCollection->ZIFFile->lastIdx();
-        _RETURN_ pCollection->setStatus(ZS_EOF);
+        return  pCollection->setStatus(ZS_EOF);
         }
     pCollection->ZIFFile->ZPMSStats.Reads ++;
     pCollection->setStatus(pCollection->ZIFFile->zget(wIndexRecord,pCollection->Context.CurrentZIFrank));
@@ -2394,7 +2394,7 @@ ZDataBuffer wIndexRecord;
                 pCollection->setStatus (static_cast<ZMasterFile *>(pCollection->ZIFFile->ZMFFather)->zlockByAddress(pZIR.ZMFAddress));
                 if (pCollection->getStatus()!=ZS_SUCCESS)
                     {
-                    _RETURN_ pCollection->getStatus ();
+                    return  pCollection->getStatus ();
                     }
                 }// !=ZLock_Nolock
 */
@@ -2405,7 +2405,7 @@ ZDataBuffer wIndexRecord;
         else
         pCollection->setStatus(ZS_OUTBOUNDHIGH);
 
-    _RETURN_ pCollection->getStatus();
+    return  pCollection->getStatus();
 
 }// _searchNext
 
@@ -2437,7 +2437,7 @@ ZSIndexFile::_searchIntervalAll  (const ZDataBuffer      &pKeyLow,  // Lowest ke
                                  ZSIndexCollection       *pCollection,   // enriched collection of reference (ZSIndexFile rank, ZMasterFile record address)
                                  const bool             pExclude) // Exclude KeyLow and KeyHigh value from selection (i. e. > pKeyLow and < pKeyHigh)
 {
-_MODULEINIT_
+
 
 ZStatus      wSt;
 ZSIndexResult wZIR;
@@ -2449,12 +2449,12 @@ ZSIndexResult wZIR;
                              wZIR,
                              pExclude);
     if (wSt!=ZS_FOUND)
-                { _RETURN_ wSt;}
+                { return  wSt;}
     while (wSt==ZS_FOUND)
         {
         wSt=_searchIntervalNext(wZIR,pCollection);
         }
-    _RETURN_ (wSt==ZS_EOF)?ZS_FOUND:wSt;
+    return  (wSt==ZS_EOF)?ZS_FOUND:wSt;
 
 }// _searchIntervalAll
 
@@ -2479,7 +2479,7 @@ ZSIndexFile::_searchIntervalFirst(const ZDataBuffer      &pKeyLow,  // Lowest ke
                                  const bool             pExclude)// Exclude KeyLow and KeyHigh value from selection (i. e. > pKeyLow and < pKeyHigh)
 
 {
-_MODULEINIT_
+
 
 ZSIndexItem wIndexItem ;
 ZDataBuffer wIndexRecord;
@@ -2495,7 +2495,7 @@ int wR;
 zrank_type whigh ;
 zrank_type wlow ;
 zrank_type wpivot;
-//_MODULEINIT_
+//
 
 //-----------Initialization Section---------------------------------
     if (pCollection!=nullptr)
@@ -2531,7 +2531,7 @@ zrank_type wpivot;
     if (pZIF.getSize()==0)
                     {
                     pCollection->setStatus(ZS_OUTBOUNDHIGH );
-                    _RETURN_ ZS_OUTBOUNDHIGH;
+                    return  ZS_OUTBOUNDHIGH;
                     }
 
 
@@ -2545,7 +2545,7 @@ zrank_type wpivot;
         pCollection->Context.CurrentZIFrank = wlow;
         pZIF.ZPMSStats.Reads ++;
         if (pCollection->setStatus(pZIF.zget(wIndexRecord,pZIR.IndexRank))!=ZS_SUCCESS)
-                                                            { _RETURN_ pCollection->getStatus();}
+                                                            { return  pCollection->getStatus();}
         wIndexItem.fromFileKey(wIndexRecord);
         wR= wZIFCompare((ZDataBuffer&)pKeyLow,wIndexItem.KeyContent,wCompareSize);
 
@@ -2558,14 +2558,14 @@ zrank_type wpivot;
         if (wR<0)
             {
             pCollection->setStatus(ZS_OUTBOUNDLOW);
-                                {_RETURN_ ZS_OUTBOUNDLOW;}
+                                {return  ZS_OUTBOUNDLOW;}
             }// if wR==0
 // test high
      pZIR.IndexRank = whigh ;
      pCollection->Context.CurrentZIFrank = whigh;
      pZIF.ZPMSStats.Reads ++;
      if (pCollection->setStatus(pZIF.zget(wIndexRecord,pZIR.IndexRank))!=ZS_SUCCESS)
-                                                         {  _RETURN_ pCollection->getStatus();}
+                                                         {  return  pCollection->getStatus();}
      wIndexItem.fromFileKey(wIndexRecord);
      wR= wZIFCompare((ZDataBuffer&)pKeyLow,wIndexItem.KeyContent,wCompareSize);
 //     wR= _Compare::_compare(&pKey,&pZTab[whigh]._Key) ;
@@ -2590,7 +2590,7 @@ zrank_type wpivot;
         pCollection->Context.CurrentZIFrank = wpivot;
         pZIF.ZPMSStats.Reads ++;
         if (pCollection->setStatus(pZIF.zget(wIndexRecord,pZIR.IndexRank))!=ZS_SUCCESS)
-                                                        { _RETURN_ pCollection->getStatus();}
+                                                        { return  pCollection->getStatus();}
         wIndexItem.fromFileKey(wIndexRecord);
         wR= wZIFCompare((ZDataBuffer&)pKeyLow,wIndexItem.KeyContent,wCompareSize);
 
@@ -2672,7 +2672,7 @@ _searchIntervalFirstBackProcess:
            if (wZIFCompare((ZDataBuffer&)pKeyHigh,wIndexItem.KeyContent,wCompareSize) >= 0)  // Interval excludes high key value
                                    {
                                    pCollection->setStatus(ZS_NOTFOUND);
-                                   _RETURN_ ZS_NOTFOUND;
+                                   return  ZS_NOTFOUND;
                                    }
             }
               else
@@ -2680,7 +2680,7 @@ _searchIntervalFirstBackProcess:
            if (wZIFCompare((ZDataBuffer&)pKeyHigh,wIndexItem.KeyContent,wCompareSize)> 0) // Interval includes high key value
                                    {
                                    pCollection->setStatus(ZS_NOTFOUND);
-                                   _RETURN_ ZS_NOTFOUND;
+                                   return  ZS_NOTFOUND;
                                    }
             }
     pCollection->setStatus(ZS_FOUND);
@@ -2693,7 +2693,7 @@ _searchIntervalFirstBackProcess:
         pCollection->setStatus(static_cast<ZMasterFile *>(pCollection->ZIFFile->ZMFFather)->zlockByAddress(pZIR.ZMFAddress,pLock));
         if (pCollection->getStatus()!=ZS_SUCCESS)
             {
-            _RETURN_ pCollection->getStatus();
+            return  pCollection->getStatus();
             }
         }// !=ZLock_Nolock
 */
@@ -2701,7 +2701,7 @@ _searchIntervalFirstBackProcess:
 
     ZException.clearStack();
 
-    _RETURN_ pCollection->setStatus(ZS_FOUND);
+    return  pCollection->setStatus(ZS_FOUND);
 
 }// _searchIntervalFirst
 
@@ -2715,12 +2715,12 @@ ZStatus
 ZSIndexFile::_searchIntervalNext (ZSIndexResult       &pZIR,
                                  ZSIndexCollection*  pCollection)
 {
-_MODULEINIT_
+
 
 ZSIndexItem wIndexItem ;
 ZDataBuffer wIndexRecord;
 
-//_MODULEINIT_
+//
 
 //-----------Initialization Section---------------------------------
 
@@ -2730,13 +2730,13 @@ ZDataBuffer wIndexRecord;
                                 ZS_INVOP,
                                 Severity_Severe,
                                 " Cannot invoke _searchNext without having Collection / Context : invoke first _searchFirst ");
-        _RETURN_ ZS_INVOP;
+        return  ZS_INVOP;
         } // pCollection == nullptr
 
 //-----------End Initialization Section---------------------------------
 
-    if (pCollection->getStatus()!=ZS_FOUND)  // if nothing has been found or error : _RETURN_ not found
-                        { _RETURN_ pCollection->getStatus();}
+    if (pCollection->getStatus()!=ZS_FOUND)  // if nothing has been found or error : return  not found
+                        { return  pCollection->getStatus();}
 
 
     pCollection->Context.Op = pCollection->Context.Op & ~ ZCOP_GetFirst ;   // clear ZCOP_GetFirst
@@ -2750,7 +2750,7 @@ ZDataBuffer wIndexRecord;
     if (pCollection->Context.CurrentZIFrank > pCollection->ZIFFile->lastIdx())
         {
         pCollection->Context.CurrentZIFrank=pCollection->ZIFFile->lastIdx();
-        _RETURN_ pCollection->setStatus(ZS_EOF);
+        return  pCollection->setStatus(ZS_EOF);
         }
 
     pCollection->ZIFFile->ZPMSStats.Reads ++;
@@ -2765,7 +2765,7 @@ ZDataBuffer wIndexRecord;
                if (pCollection->Context.Compare(pCollection->Context.KeyHigh,wIndexItem.KeyContent,pCollection->Context.CompareSize)>0)  // Interval excludes high key value
                                        {
                                        pCollection->setStatus(ZS_EOF);
-                                       _RETURN_ ZS_EOF;
+                                       return  ZS_EOF;
                                        }
                 }
                   else
@@ -2773,7 +2773,7 @@ ZDataBuffer wIndexRecord;
                if (pCollection->Context.Compare(pCollection->Context.KeyHigh,wIndexItem.KeyContent,pCollection->Context.CompareSize)>=0) // Interval includes high key value
                                        {
                                        pCollection->setStatus(ZS_EOF);
-                                       _RETURN_ ZS_EOF;
+                                       return  ZS_EOF;
                                        }
                 }
             pZIR.IndexRank = pCollection->ZIFFile->ZDescriptor.getCurrentRank();
@@ -2786,7 +2786,7 @@ ZDataBuffer wIndexRecord;
                 pCollection->setStatus (static_cast<ZMasterFile *>(pCollection->ZIFFile->ZMFFather)->zlockByAddress(pZIR.ZMFAddress,pCollection->getLock()));
                 if (pCollection->getStatus()!=ZS_SUCCESS)
                     {
-                    _RETURN_ pCollection->getStatus ();
+                    return  pCollection->getStatus ();
                     }
                 }// !=ZLock_Nolock
 */
@@ -2795,7 +2795,7 @@ ZDataBuffer wIndexRecord;
 
         }// if
 
-    _RETURN_ pCollection->getStatus();
+    return  pCollection->getStatus();
 
 }// _searchIntervalNext
 
@@ -2814,7 +2814,7 @@ ZDataBuffer wIndexRecord;
 ZStatus
 ZSIndexFile::getKeyIndexFields(ZDataBuffer &pIndexContent,ZDataBuffer& pKeyValue)
 {
-_MODULEINIT_
+
 
 ZStatus wSt=ZS_SUCCESS;
 ZDataBuffer wFieldValue ;
@@ -2825,7 +2825,7 @@ ZDataBuffer wFieldValue ;
     if (wSt==ZS_SUCCESS)
             pIndexContent.appendData(wFieldValue);
     }
-    _RETURN_ wSt;
+    return  wSt;
 }
 
 /**
@@ -2845,7 +2845,7 @@ ZDataBuffer wFieldValue ;
  ZStatus
  ZSIndexFile::zprintKeyFieldsValues (const zrank_type pRank,bool pHeader,bool pKeyDump,FILE*pOutput)
  {
-_MODULEINIT_
+
 
 ZStatus wSt;
 ZBlock wBlock;
@@ -2858,7 +2858,7 @@ zaddress_type wIdxAddress;
 
      wSt=_getByRank(ZDescriptor,wBlock,pRank,wIdxAddress);
      if (wSt!=ZS_SUCCESS)
-                 {_RETURN_ wSt;}
+                 {return  wSt;}
 
      memmove(&wZMFAddress,wBlock.Content.Data,sizeof(zaddress_type));
      wZMFAddress = reverseByteOrder_Conditional<zaddress_type>(wZMFAddress);
@@ -2870,7 +2870,7 @@ zaddress_type wIdxAddress;
 // we have to skip zaddress_type field in from of key record (ZMF address) to isolate only Key content
      wKeyContent.setData(wBlock.Content.Data + sizeof(zaddress_type),wBlock.Content.Size-sizeof(zaddress_type));
 
-    _RETURN_   _printKeyFieldsValues(&wKeyContent,ZICB,pHeader,pKeyDump,pOutput);
+    return    _printKeyFieldsValues(&wKeyContent,ZICB,pHeader,pKeyDump,pOutput);
 }
 
 namespace zbs {
@@ -2969,7 +2969,7 @@ ZDataBuffer wPrintableField;
             {
             checkSum wChk(wKeyContent->Data+wKeyOffset,wUSize);
 //            memmove(wChk.content,wKeyContent->DataChar +wKeyOffset,wUSize);
-            fprintf (pOutput,wChk.toHex());
+            fprintf (pOutput,wChk.toHexa());
             break;
             }
         case ZType_ZDate:
@@ -3025,7 +3025,7 @@ ZDataBuffer wPrintableField;
      if (pKeyDump)
                  wKeyContent->Dump();
 
-     _RETURN_ ZS_SUCCESS;
+     return  ZS_SUCCESS;
  }//_printKeyFieldsValues
 
 }// namespace zbs

@@ -57,7 +57,7 @@ public:
     ZSSearchArgument(void) {}
     ~ZSSearchArgument(void) {clear();}
 
-    using _Base::_cloneFrom ;
+    using _Base::_copyFrom ;
     using _Base::clone ;
 
     void clear(void)

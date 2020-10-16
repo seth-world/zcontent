@@ -23,9 +23,9 @@ setFieldURFfZString(void* pSourceNaturalPtr,
                     ZTypeBase pTargetType,
                     URF_Capacity_type pTargetCapacity)
 {
-_MODULEINIT_
+
            utfStringHeader *wString=static_cast<utfStringHeader*>(pSourceNaturalPtr);
-            _RETURN_ wString->_exportURFAnyGeneric(pTargetURFData,pTargetType,pTargetCapacity);
+            return  wString->_exportURFAnyGeneric(pTargetURFData,pTargetType,pTargetCapacity);
 }
 
 ZStatus

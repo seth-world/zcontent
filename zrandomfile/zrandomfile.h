@@ -16,7 +16,7 @@
 #include <ztoolset/zexceptionmin.h>
 #include <ztoolset/uristring.h>
 #include <zrandomfile/zrandomfiletypes.h>
-#include <ztoolset/zuser.h>
+#include <ztoolset/zsystemuser.h>
 
 #ifndef ZRANDOMFILE_CPP
 
@@ -465,11 +465,11 @@ struct ZFDOwnData {             // following is not saved on file and therefore 
     int     ContentFd=0L;
     FILE*   FHeader=nullptr;
     int     HeaderFd=0L;
-    pid_t   Pid;                        /**< pid of current process owning ZFileDescriptor instance (set at object instantiation )  : other processes are collaborative processes sharing info with it */
-//    uid_t   Uid;                        /**< uid of current process owning ZFileDescriptor instance (set at object instantiation ) */
-    ZUserId Uid;                        /**< uid of current process owning ZFileDescriptor instance (set at object instantiation ) */
-    utfcodeString Username;                /**< current system username */
-    bool    _isOpen = false;            /**< True when file is open , false if closed */
+    pid_t   Pid;                /**< pid of current process owning ZFileDescriptor instance (set at object instantiation )  : other processes are collaborative processes sharing info with it */
+//    uid_t   Uid;              /**< uid of current process owning ZFileDescriptor instance (set at object instantiation ) */
+    ZSystemUser     Uid;        /**< uid of current process owning ZFileDescriptor instance (set at object instantiation ) */
+//    utfcodeString   Username;   /**< current system username */
+    bool    _isOpen = false;    /**< True when file is open , false if closed */
     zmode_type   Mode    = ZRF_Nothing; /**< Mode mask (int32_t) the file has been openned for see: @ref ZRFMode_type */
     ZHeaderControlBlock ZHeader;
 //    zaddress_type       OffsetFCB=0L;  /**< offset to ZFCB : OL if no derived class infradata space allocation. Else gives the size of reserved space.
@@ -586,9 +586,9 @@ protected:
                         LogicalPosition = -1;
                         _isOpen = false ;
                         Pid= getpid();  // get current pid for ZFileDescriptor
-                        Uid.current();
-                        ZUser wUser;
-                        Username = wUser.setToCurrentUser().getName().toString();
+                        Uid.setToCurrentUser();
+//                        ZSystemUser wUser;
+//                        Uid.Username = wUser.setToCurrentUser().getName().toString();
                         return;
                       }
     /**

@@ -5,6 +5,9 @@
 
 //#include <zcontentcommon/zidentity.h>
 #include <ztoolset/zutfstrings.h> // for utfcodeString
+#include <zxml/zxml.h>
+
+#include <ztoolset/zaierrors.h>
 
 typedef int64_t Resourceid_type;
 typedef uint64_t ZEntity_type;
@@ -13,6 +16,7 @@ typedef int64_t DataRank_type;
 
 const ZEntity_type cst_EntityInvalid=0;
 const Resourceid_type cst_ResourceInvalid = INT64_MIN;
+const Resourceid_type cst_PureEntity = -1;
 const DataRank_type cst_DataRankInvalid = INT64_MIN;
 
 #ifndef ZRESOURCE_CPP
@@ -30,18 +34,27 @@ class ZResource
 //    : public  ZIdentity /* unique resource id regardless entity type - initially set to invalid */
 {
 public:
+/* no memory alignment to avoid undesired bytes with garbage between components
+ * Remark : memset() cannot be used for ZResource object because it has virtual methods and will overwrite VTable content
+ */
+#pragma pack(push)
+#pragma pack(0)         // no memory alignment
     Resourceid_type id = cst_ResourceInvalid;
     ZEntity_type Entity = cst_EntityInvalid; /* entity type : defined by application */
+#pragma pack(pop) // end no memory alignment
+
  //   DataRank_type DataRank = -1; /* reference to data rank (either ZAM rank or MasterFile rank */
 
     ZResource() {clear();}
-    ZResource(Resourceid_type pResourceid, ZEntity_type pEntity)
+    virtual ~ZResource() {} /* mandatory because ZResource has virtual methods */
+
+    ZResource(const Resourceid_type pResourceid, const ZEntity_type pEntity)
     {
-        memset(this, 0, sizeof(ZResource));
+// NO: Do not use   memset(this, 0, sizeof(ZResource));
         id = pResourceid;
         Entity = pEntity;
     }
-    ZResource( ZEntity_type pEntity)
+    ZResource(const ZEntity_type pEntity)
     {
         Entity = pEntity;
     }
@@ -50,7 +63,7 @@ public:
 
     ZResource &_copyFrom(const ZResource &pIn)
     {
-        memset(this, 0, sizeof(ZResource));
+// NO: Do not use   memset(this, 0, sizeof(ZResource));
         id = pIn.id;
         Entity = pIn.Entity;
 //        DataRank = pIn.DataRank;
@@ -58,49 +71,50 @@ public:
     }
     ZResource &_copyFrom(const ZResource &&pIn)
     {
-        memset(this, 0, sizeof(ZResource));
+// NO: Do not use    memset(this, 0, sizeof(ZResource));
         id = pIn.id;
         Entity = pIn.Entity;
  //       DataRank = pIn.DataRank;
         return *this;
     }
-    ZResource &operator=(ZResource &pIn) { return _copyFrom(pIn); }
+
+    void setPureEntity(const ZEntity_type pEntity)
+    {
+        id = cst_PureEntity;
+        Entity = pEntity;
+    }
+    bool isPureEntity(void) const { return (id == cst_PureEntity); }
     //    ZResource(Entity_type pEntity, utfcodeString &pCode) { pEntity = pCode.toLong(); }
 
-    friend class ZLockManager;
-private:
-    ZResource &getNew()
+
+protected:
+    static ZResource getNew(const ZEntity_type pEntity)
     {
-        id = getUniqueResourceId();
-        return *this;
+        ZResource wR;
+        wR.id = getUniqueResourceId();
+        wR.Entity=pEntity;
+        return wR;
     }
 
-    static ZResource &getNew(ZEntity_type pEntity)
-    {
-        ZResource wResource;
-        wResource.id = getUniqueResourceId();
-        wResource.Entity = pEntity;
-        return wResource;
-    }
 public:
     //    ZResourceid (ZEntity_type pEntity, Docid_type &pDocid) {fromDocid(pEntity,pDocid);}
     utfcodeString tocodeString (void)
         {
             utfcodeString pString ;
-            pString.sprintf("%08lX-%08lX",Entity,id);
+            pString.sprintf("0x%08lX-0x%08lX",Entity,id);
             return pString;
         }
 
     void clear(void)
     {
-        memset(this, 0, sizeof(ZResource));
+//        memset(this, 0, sizeof(ZResource));
         id = cst_ResourceInvalid;
         Entity = 0;
 //        DataRank = 0;
     }
 
-    bool isValid() { return id != cst_ResourceInvalid;}
-    bool isInvalid() { return id == cst_ResourceInvalid; }
+    bool isValid() const { return id != cst_ResourceInvalid;}
+    bool isInvalid() const  { return id == cst_ResourceInvalid; }
 
     void setInvalid()
     {
@@ -112,9 +126,11 @@ public:
     ZResource &operator=(const ZResource &pIn) { return _copyFrom(pIn); }
     ZResource &operator=(const ZResource &&pIn) { return _copyFrom(pIn); }
 
-    bool operator==(const ZResource &pIn) { return compare(pIn)==0; }
+    bool operator==(const ZResource &pIn) const { return compare(pIn)==0; }
 
-    /** @brief compare() This routine is mandatory for ZResource to be used as ZMIndex key component */
+    /** @brief compare() This routine is mandatory for ZResource to be used as ZMIndex key component
+     *         Nota Bene : it has to be const
+     */
     int compare(const ZResource& pKey2) const {
             if (id == pKey2.id) {
                 if (Entity == pKey2.Entity)
@@ -128,26 +144,18 @@ public:
             }
             return 1;
         }
-/*
-    static int compare(const ZResource& pKey1,const ZResource& pKey2)
-        {
-            if (pKey1.id == pKey2.id) {
-                if (pKey1.Entity == pKey2.Entity)
-                    return 0;
-                if (pKey1.Entity < pKey2.Entity)
-                    return -1;
-                return 1;
-            }
-            if (pKey1.id < pKey2.id) {
-                return -1;
-            }
-            return 1;
-        }
-*/
 
-    utf8String toXML(int pLevel);
-    utf8String toStr() const;
-    utf8String toHexa() const;
+    /* virtual methods : to be replaced by derived classes own methods */
+    virtual utf8String toXml(int pLevel);
+    virtual int fromXml(zxmlElement *pRootNode, const char *pChildName,ZaiErrors *pErrorlog);
+
+    static int fromXmltoHexa(zxmlElement *pRootNode,
+            const char *pChildName,
+            utfcodeString &wCode,
+            ZaiErrors *pErrorlog);
+
+    virtual utf8String toStr() const;
+    virtual utf8String toHexa() const;
 
     /** @brief toKey() gets only ZResource::id (int this order) converted to universal format (Nota Bene : resource id is unique)*/
     ZDataBuffer toKey();

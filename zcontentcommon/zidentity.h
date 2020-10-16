@@ -3,6 +3,9 @@
 #include <limits.h>
 #include <ztoolset/zutfstrings.h>
 
+#include <zxml/zxml.h>
+#include <ztoolset/zaierrors.h>
+
 typedef int64_t      Identity_type;
 
 const Identity_type cst_IdentityInvalid = INT64_MIN;
@@ -60,9 +63,22 @@ public:
         fromString (pId.toCChar(),10);
         return *this;
     }
-
+    ZIdentity &operator=(const ZIdentity &pId)
+    {
+        id = pId.id;
+        return *this;
+    }
+    ZIdentity &operator=(const ZIdentity &&pId)
+    {
+        id = pId.id;
+        return *this;
+    }
     CharMan toStr();
     CharMan toHexa();
+
+    utf8String toXml(const char *pName, int pLevel);
+    int fromXml(zxmlElement *pRootNode, const char *pChildName, ZaiErrors *pErrorlog);
+
 
     int compare(ZIdentity &pIn) const { return id - pIn.id; }
 

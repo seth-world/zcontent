@@ -6,6 +6,10 @@
 #include <ztoolset/zutfstrings.h>
 #include <zcontentcommon/zresource.h>
 
+typedef long            zrank_type;     //!< Block record rank data type NB: could be negative if unknown
+typedef long long       zaddress_type;  //!< ZRandomFile address data type : nb : could be negative if unknown
+typedef long long       zsize_type;     //!< ZRandomFile size data type
+
 /*
  *                  Identity generic format
  *                      |
@@ -96,14 +100,15 @@ public:
         return (*this);
     }
 
-    int compare(ZLockid &pIn) const { return int(id - pIn.id); }
+    ZLockid &_copyFrom(const ZLockid &pIn) { id = pIn.id; }
+    int compare(const ZLockid &pIn) const { return int(id - pIn.id); }
 
     bool operator==(const ZLockid &pId) { return (id == pId.id); }
     bool operator!=(const ZLockid &pId) { return !(id == pId.id); }
 };
 
 
-
+/*
 enum ZLock_Reason : uint8_t {
     ZReason_Nothing = 0,
     ZReason_Read = 1,
@@ -112,17 +117,19 @@ enum ZLock_Reason : uint8_t {
     ZReason_Create = 8,
     ZReason_Other  = 0x10
 };
-
+*/
 typedef uint8_t         zlockmask_type ;
 
 enum ZLockMask : zlockmask_type
 {
     ZLock_Nothing   = 0,            //!< NOP
     ZLock_Nolock    = 0,            //!< no lock has been requested for this resource
-    ZLock_Read      = 0x02,         //!< cannot read the resource
-    ZLock_Modify    = 0x04,         //!< cannot write/modify the resource
+    ZLock_Delete    = 0x01,         //!< cannot delete resource. Can read everything and modify -except indeed the resource identification-
+    ZLock__Modify_  = 0x02,         //!< cannot write/modify the resource
+    ZLock_Modify    = 0x03,         //!< cannot modify , so cannot delete : only read is allowed
+    ZLock__Read_    = 0x04,        //!< cannot read the resource
+    ZLock_Read      = 0x07,         //!< cannot read the resource, so cannot write and delete also
     ZLock_Write     = ZLock_Modify, //!< idem for easy naming use
-    ZLock_Delete    = 0x08,         //!< cannot delete resource. Can read everything and modify -except indeed the resource identification-
     ZLock_All       = ZLock_Read|ZLock_Write|ZLock_Delete,          //!< cannot do anything
     ZLock_Exclusive = 0x10,         //!< for compatibility with ZRF_Exclusive
     ZLock_ReadWrite = ZLock_Read | ZLock_Modify,  //!< self explainatory
@@ -142,15 +149,15 @@ class ZLock
         Lockid = pIn.Lockid;
         Mask = pIn.Mask;
         Owner = pIn.Owner;
-        Reason = pIn.Reason;
+//        Reason = pIn.Reason;
         DataRank = pIn.DataRank;
     }
 public:
     ZResource       Resourceid;
     ZLockid         Lockid;
     zlockmask_type  Mask;
-    UserId_type     Owner;
-    ZLock_Reason    Reason;
+    ZResource       Owner;  /* Owner User must be a resource defined by application and not system user */
+//    ZLock_Reason    Reason;
     DataRank_type   DataRank;
 
     ZLock (void) {clear();}
@@ -163,7 +170,7 @@ public:
         Lockid.clear();
         Mask=ZLock_Nothing;
         Owner=cst_IdentityInvalid;
-        Reason=ZReason_Nothing;
+//        Reason=ZReason_Nothing;
         DataRank = cst_DataRankInvalid;
     }
 
@@ -171,10 +178,10 @@ public:
     ZLock &operator=(const ZLock &&pIn) { return _copyFrom(pIn); }
 };
 
-
+/*
 const char *
 decode_ZLockReason(ZLock_Reason pReason);
-
+*/
 
 #endif // ZLOCK_H
 
