@@ -488,7 +488,7 @@ ZSIndexFile::setIndexURI  (uriString &pURI)
 }
 
 void
-ZSIndexFile::setIndexName  (utffieldNameString &pName)
+ZSIndexFile::setIndexName  (utf8String &pName)
 {
     ZICB->Name = pName;
     return ;
@@ -540,7 +540,7 @@ long            wIndexCount=0;
     fprintf (pOutput,
              "______________Rebuilding Index <%s>_______________\n"
                " File is %s \n",
-               ZICB->Name.toString(),
+               ZICB->Name.toCChar(),
                ZDescriptor.URIContent.toString());
     ZSMasterFile* wFather = static_cast <ZSMasterFile*> (ZMFFather);
     zsize_type wFatherSize = wFather->getSize();
@@ -595,7 +595,7 @@ long            wIndexCount=0;
             return  wSt;
             }
     fprintf (pOutput," ---------Successfull end rebuilding process for Index <%s>------------\n",
-               ZICB->Name.toString());
+               ZICB->Name.toCChar());
 //    return  wSt;
     return  wSt;
 
@@ -904,7 +904,7 @@ ZSIndexResult wZIR;
                                                 Severity_Error,
                                                 " given MasterFile's Address %ld has not been matched in index <%s>",
                                                 pAddress,
-                                                ZICB->Name.toString()
+                                                ZICB->Name.toCChar()
                                                 );
                         ZException.setLastSeverity(Severity_Severe);
                         return  (ZS_INVADDRESS); // pAddress has not been matched
@@ -1239,7 +1239,7 @@ _addKeyValuePrepareReturn:
     if (wSt!=ZS_SUCCESS)
         if (!ZException.stackIsEmpty())
             ZException.addToLast(" during Index _addKeyValue_Prepare on index <%s> ",
-                                                 ZICB->Name.toString());
+                                                 ZICB->Name.toCChar());
 #if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
     _Mtx.unlock();
 #endif
@@ -1266,7 +1266,7 @@ zaddress_type wAddress; // local index address : of no use there
     if (wSt!=ZS_SUCCESS)
             {
             ZException.addToLast(" during Index _addKeyValue_Commit on index <%s> rank <%02ld> ",
-                                                 ZICB->Name.toString(),
+                                                 ZICB->Name.toCChar(),
                                                  pIndexCommit);
             ZException.setLastSeverity(Severity_Severe);
             }
@@ -1284,7 +1284,7 @@ ZStatus wSt;
     if (wSt!=ZS_SUCCESS)
             {
             ZException.addToLast(" during Index _addKeyValue_Rollback (Soft rollback) on index <%s> rank <%02ld> ",
-                                                 ZICB->Name.toString(),
+                                                 ZICB->Name.toCChar(),
                                                  pIndexCommit);
             ZException.setLastSeverity(Severity_Severe);
             }
@@ -1310,14 +1310,14 @@ ZSIndexFile::_addKeyValue_HardRollback(const zrank_type pIndexCommit)
 
     if (ZVerbose)
             fprintf (stdout,"Index addKeyValue Hard rollback : removing index <%s> rank <%ld>\n",
-                     ZICB->Name.toString(),
+                     ZICB->Name.toCChar(),
                     pIndexCommit);
 
 ZStatus wSt =_Base::_remove(_Base::ZDescriptor,pIndexCommit);
     if (wSt!=ZS_SUCCESS)
             {
             ZException.addToLast(" during Index _addKeyValue_HardRollback (hard rollback) on index <%s> rank <%02ld> ",
-                                                 ZICB->Name.toString(),
+                                                 ZICB->Name.toCChar(),
                                                  pIndexCommit);
             ZException.setLastSeverity(Severity_Severe);
             }
@@ -1379,7 +1379,7 @@ ZSIndexResult wZIR;
                                     wRes.ZSt,
                                     Severity_Error,
                                     "During remove operation : Index value not found on index name <%s>",
-                                     ZICB->Name.toString());
+                                     ZICB->Name.toCChar());
             ZException.setLastSeverity(Severity_Severe);
             return  wSt;
             } // wSt!=ZS_FOUND
@@ -1424,7 +1424,7 @@ ZStatus wSt;
     if (wSt!=ZS_SUCCESS)
         {
         ZException.addToLast(" during removeKeyValue_Commit on index <%s> number <%02ld> ",
-                                             ZICB->Name.toString(),
+                                             ZICB->Name.toCChar(),
                                              pIndexCommit);
         ZException.setLastSeverity(Severity_Severe);
         }
@@ -1457,7 +1457,7 @@ ZStatus wSt;
     if (wSt!=ZS_SUCCESS)
         {
         ZException.addToLast(" during removeKeyValue_Rollback (soft rollback) on index <%s> number <%02ld> ",
-                                             ZICB->Name.toString(),
+                                             ZICB->Name.toCChar(),
                                              pIndexCommit);
         ZException.last().Severity=Severity_Severe;
         }
@@ -1494,7 +1494,7 @@ ZStatus wSt;
     if (wSt!=ZS_SUCCESS)
         {
         ZException.addToLast(" during _removeKeyValue_HardRollback (hard rollback) on index <%s> number <%02ld> ",
-                                             ZICB->Name.toString(),
+                                             ZICB->Name.toCChar(),
                                              pIndexCommit);
         ZException.setLastSeverity(Severity_Severe);
         }
@@ -2886,7 +2886,7 @@ ZDataBuffer wPrintableField;
      fprintf (pOutput,
               "------------------------------- Index description ------------------------------------\n"
               " Index name %s\n",
-              ZICB->Name.toString());
+              ZICB->Name.toCChar());
      for (long wi=0;wi<ZICB->ZKDic->size();wi++)
      {
      wMDicRank=    ZICB->ZKDic->Tab[wi].MDicRank;
@@ -2894,7 +2894,7 @@ ZDataBuffer wPrintableField;
               " Field order <%ld> Metadic rank <%ld> name <%s> Data type <%s> \n",
               wi,
               wMDicRank,
-              ZICB->MetaDic->Tab[wMDicRank].Name.toString(),
+              ZICB->MetaDic->Tab[wMDicRank].Name.toCChar(),
               decode_ZType( ZICB->MetaDic->Tab[wMDicRank].ZType));
      }// for
      fprintf (pOutput,
@@ -2913,7 +2913,7 @@ ZDataBuffer wPrintableField;
               wi,
               wMDicRank,
               cst_fieldnamelen,
-              ZICB->MetaDic->Tab[wMDicRank].Name.toString());
+              ZICB->MetaDic->Tab[wMDicRank].Name.toCChar());
 
      while (true)
      {

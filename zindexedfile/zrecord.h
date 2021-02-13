@@ -591,7 +591,7 @@ ZRecord::getFieldValuebyRank_T (_Tp& pTargetNatural, const long pRank)
     printf("%s>> getting value from record for field rank <%ld> dicitionary name is <%s>\n",
            _GET_FUNCTION_NAME_,
            pRank,
-           (const char*)RDic->Tab[pRank].MDicRank->Name.toString());
+           (const char*)RDic->Tab[pRank].MDicRank->Name.toCChar());
 
 uint64_t    wTargetNSize, wTargetUSize;
 uint16_t    wTargetUnitsCount;

@@ -254,14 +254,14 @@ void ZMetaDic ::print (FILE* pOutput)
     for (long wi=0;wi<size();wi++)
     {
 /*    if (Tab[wi].ZType & ZType_Array) */
-/*        const char* wName=(const char*)Tab[wi].Name.toString();
+/*        const char* wName=(const char*)Tab[wi].Name.toCChar();
         printf ("%s 0x%X \n",wName,Tab[wi].ZType);
 */
         fprintf (pOutput,
                  " <%2ld> %25s %12s"
                  " %9ld %9d %9ld %9ld <%s>\n",
                  wi,
-                 (char*)Tab[wi].Name.toString(),
+                 (char*)Tab[wi].Name.toCChar(),
                  Tab[wi].KeyEligible==true?"Yes":"No",
                  Tab[wi].HeaderSize,
                  Tab[wi].Capacity,
@@ -275,7 +275,7 @@ void ZMetaDic ::print (FILE* pOutput)
              Tab[wi].Offset,
              Tab[wi].Length,
              "--",
-             Tab[wi].Name.toString(),
+             Tab[wi].Name.toCChar(),
              decode_ZType( Tab[wi].ZType));*/
     }// for
     fprintf (pOutput,
@@ -326,7 +326,7 @@ ZDataBuffer wZDBName;
     pOut->NaturalSize=reverseByteOrder_Conditional<uint64_t>(pIn.NaturalSize);
 
     memset (pOut->Name,0,cst_fieldnamelen+1);
-    pIn.Name._exportUVF(&wZDBName);
+    wZDBName=pIn.Name._exportUVF();
     memmove(pOut->Name,wZDBName.Data,wZDBName.Size);
 
     pOut->KeyEligible = pIn.KeyEligible;
@@ -422,7 +422,7 @@ ZMetaDic::writeXML(FILE* pOutput)
              "              </Field>\n"
              ,
              wd,
-             Tab[wd].Name.toString() ,
+             Tab[wd].Name.toCChar() ,
              Tab[wd].Capacity,
              Tab[wd].HeaderSize,
              Tab[wd].UniversalSize,

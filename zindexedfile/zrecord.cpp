@@ -852,7 +852,7 @@ ZRecord::printRecordData(FILE*pOutput)
                 "%4ld>  %25s %25s\n"
                 "      Size and offsets...<%10ld> <%10d> <%10ld> <%10ld> <%10ld\n>",
                 wi,
-                RDic->Tab[wi].MDicRank->Name.toString(),
+                RDic->Tab[wi].MDicRank->Name.toCChar(),
                 decode_ZType(RDic->Tab[wi].MDicRank->ZType),
                 RDic->Tab[wi].URFOffset,
                 RDic->Tab[wi].MDicRank->Capacity,
@@ -864,7 +864,7 @@ ZRecord::printRecordData(FILE*pOutput)
                      "%ld>   %s %s\n"
                      "            <field absent from record>\n",
                      wi,
-                     RDic->Tab[wi].MDicRank->Name.toString(),
+                     RDic->Tab[wi].MDicRank->Name.toCChar(),
                      decode_ZType(RDic->Tab[wi].MDicRank->ZType));
     }
 
@@ -885,7 +885,7 @@ ZDataBuffer wZDB;
                 wRecord->addChild((zxmlNodePtr)wField);
                 wRecord->newElementTextsprintf(wElement,"Rank",nullptr,"%ld",wi);
                 wElement->newComment(wNode, "not modifiable : only field position in ZKDic is taken");
-                wField->newElementTextChild(wElement,"Name",(const char*)RDic->Tab[wi].MDicRank->Name.toString());
+                wField->newElementTextChild(wElement,"Name",(const char*)RDic->Tab[wi].MDicRank->Name.toCChar());
                 wField->newElementTextChild(wElement,"Presence",(FieldPresence->test(wi)?"Yes":"No"));
                 if (!FieldPresence->test(wi))
                     {
@@ -940,7 +940,7 @@ ZDataBuffer wZDB;
                          "                <Name>%s</Name>\n"
                          "                <Presence>%s</Presence>\n",
                          wi,
-                         RDic->Tab[wi].MDicRank->Name.toString() ,
+                         RDic->Tab[wi].MDicRank->Name.toCChar() ,
                          "No");
 
                 continue;
@@ -965,7 +965,7 @@ ZDataBuffer wZDB;
              "                <Data>"
              ,
              wi,
-             RDic->Tab[wi].MDicRank->Name.toString() ,
+             RDic->Tab[wi].MDicRank->Name.toCChar() ,
              "Yes",
              RDic->Tab[wi].MDicRank->Capacity,
              RDic->Tab[wi].MDicRank->HeaderSize,
@@ -979,7 +979,7 @@ ZDataBuffer wZDB;
              );
 
             fprintf (stdout," field name <%s> \n",
-                     RDic->Tab[wi].MDicRank->Name.toString());
+                     RDic->Tab[wi].MDicRank->Name.toCChar());
 
             wZDB.Dump(20,500,stdout);
             /* Any utf8 string or char string : non encoding. in all other cases :B64 encoding (utf16 utf32 strings and blobs)*/
@@ -1081,7 +1081,7 @@ size_t wFieldSize;
                 continue;
                 }
 
-        fprintf (stdout," processing <%s> rank <%ld>\n",RDic->Tab[wi].MDicRank->Name.toString(),wi);
+        fprintf (stdout," processing <%s> rank <%ld>\n",RDic->Tab[wi].MDicRank->Name.toCChar(),wi);
         RDic->Tab[wi].URFOffset=wOffset;
         wURFDataPtr= _Base::Data+wOffset;
 

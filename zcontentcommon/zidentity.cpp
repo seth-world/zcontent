@@ -4,7 +4,7 @@
 #include <zxml/zxmlprimitives.h>
 #include <zindexedfile/zdatatype.h>
 #include <zxml/zxml.h>
-
+#ifdef __COMMENT__
 #ifdef QT_CORE_LIB
 QString     ZIdentity::toQString(void)
 {
@@ -36,6 +36,7 @@ ZIdentity& ZIdentity::fromQString (const QString pInput)
     return(*this);
 }
 #endif // QT_CORE_LIB
+#endif // __COMMENT__
 CharMan ZIdentity::toStr()
 {
     CharMan wId;
@@ -80,4 +81,19 @@ int ZIdentity::fromXml(zxmlElement *pRootNode, const char *pChildName, ZaiErrors
     return 0;
 }
 
+ZDataBuffer ZIdentity::_export()
+{
+  ZDataBuffer wReturn;
+  Resourceid_type wId=reverseByteOrder_Conditional<Identity_type>(id);
+  wReturn.setData(&wId,sizeof(Identity_type));
+  return wReturn;
+}
 
+size_t     ZIdentity::_import(unsigned char* pUniversalPtr)
+{
+  unsigned char* wPtrIn=pUniversalPtr;
+  Identity_type wId;
+  memmove(&wId,wPtrIn,sizeof(Identity_type));
+  id=reverseByteOrder_Conditional<ZEntity_type>(wId);
+  return sizeof(Identity_type);
+}

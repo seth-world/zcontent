@@ -73,8 +73,8 @@ public:
 
    ZStatus keyValueExtraction(ZRecord *pRecord) ;
 
-   ZStatus setFieldValue (const long pFieldRank,auto pValue, const long pArraySize=-1);
-   ZStatus setFieldValue (const utf8_t* pFieldName,auto pValue, const long pArraySize=-1);
+//   ZStatus setFieldValue (const long pFieldRank,auto pValue, const long pArraySize=-1);
+//   ZStatus setFieldValue (const utf8_t* pFieldName,auto pValue, const long pArraySize=-1);
 
    ZStatus setKeyPartial (const ssize_t pFieldRank ,const ssize_t pLength);
    ZStatus setKeyPartial (const utf8_t* pFieldName,ssize_t pLength);

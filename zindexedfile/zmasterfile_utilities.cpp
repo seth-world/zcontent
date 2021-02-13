@@ -3,6 +3,9 @@
 #include <zindexedfile/zmasterfile_utilities.h>
 #include <zindexedfile/zindexcollection.h>
 #include <zindexedfile/zsmasterfile.h>
+#include <zxml/zxml.h>
+#include <zxml/zxmlprimitives.h>
+#include <ztoolset/zaierrors.h>
 /**
   @ingroup ZMFPhysical
   @{ */
@@ -18,13 +21,13 @@
  * @param[in] pMasterRootName   a descString containing the father ZSMasterFile's root name
  * @param[in] pRank             Index rank
  * @param[in] pIndexName        Index user name : could be empty
- * @return a descString with the appropriate ZSIndexFile root name
+ * @return an utf8String with the appropriate ZSIndexFile root name
  */
-utfdescString& generateIndexRootName(utfdescString& wIndexRootName,
-                                    utfdescString &pMasterRootName,
-                                     const long pRank,
-                                     utffieldNameString &pIndexName)
+utf8String generateIndexRootName(utf8String &pMasterRootName,
+                                 const long pRank,
+                                 utf8String &pIndexName)
 {
+  utf8String wIndexRootName;
     wIndexRootName = pMasterRootName;
     wIndexRootName += (utf8_t)'-';
     if (pIndexName.isEmpty())
@@ -33,7 +36,7 @@ utfdescString& generateIndexRootName(utfdescString& wIndexRootName,
                 }
             else
                 {
-                wIndexRootName += pIndexName.toString();
+                wIndexRootName += pIndexName.toCChar();
                 }
     wIndexRootName += (utf8_t)'-';
     wIndexRootName.addsprintf("%02ld",pRank);
@@ -65,11 +68,11 @@ generateIndexURI(uriString pMasterFileUri,
                  uriString &pDirectory,
                  uriString &pZSIndexFileUri,
                  const long pRank,
-                 utffieldNameString& pIndexName)
+                 utf8String& pIndexName)
 {
 uriString  wPath_Uri;
-utfdescString wMasterName;
-utfdescString wMasterExt;
+utf8String wMasterName;
+utf8String wMasterExt;
 
 
     if (pDirectory.isEmpty())
@@ -81,8 +84,8 @@ utfdescString wMasterExt;
     pZSIndexFileUri.fromQString(wUrl.toString(QUrl::PreferLocalFile));
     pZSIndexFileUri.addConditionalDirectoryDelimiter() ;
 
-    wMasterName = pMasterFileUri.getBasename();
-    wMasterExt=pMasterFileUri.getFileExtension();
+    wMasterName = pMasterFileUri.getBasename().toCChar();
+    wMasterExt=pMasterFileUri.getFileExtension().toCChar();
     const utf8_t* wExt=(const utf8_t*)__ZINDEX_FILEEXTENSION__;
     wExt++;                             // skip the '.' char
     if (wMasterExt==wExt)
@@ -91,15 +94,15 @@ utfdescString wMasterExt;
                                          ZS_INVNAME,
                                          Severity_Error,
                                          " Invalid ZSMasterFile name extension %s for name %s",
-                                         wMasterExt.toString(),
-                                         pMasterFileUri.toString()
+                                         wMasterExt.toCChar(),
+                                         pMasterFileUri.toCChar()
                                          );
                 return ZS_INVNAME;
                 }
 
-    utfdescString wM;
-    wM=generateIndexRootName(wM,wMasterName,pRank,pIndexName);
-    pZSIndexFileUri += wM;
+    utf8String wM;
+    wM=generateIndexRootName(wMasterName,pRank,pIndexName);
+    pZSIndexFileUri += wM.toCChar();
 
     return(ZS_SUCCESS);
 } //generateIndexURI
@@ -228,7 +231,57 @@ const char *decode_ZCOP (uint16_t pZCOP)
 
 //} // namespace zbs
 /** @cond Development */
+#ifdef __COMMENT__
+/**
+ * @brief getChildElementValue gets from Node pNodeWork the content into pContent of a child node Element with name pTagName
+ * @param wNodeWork father node to get the child element from
+ * @param wTagName tag name of the child node to get the content from
+ * @param wContent QString to receive the content of the element
+ * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
+ */
+ZStatus
+getChildElementValue(zxmlNode& pNodeWork,const char*pTagName,QString &pContent, bool pMandatory)
+{
+  zxmlNode* wNodeDetail;
+  zxmlElement* wElement;
+  QString wName;
 
+  ZStatus wSt = pNodeWork.getChildByName(wNodeDetail,pTagName);
+  if (wSt!=ZS_SUCCESS)
+  {
+    if (pMandatory)
+    {
+      ZException.setMessage(_GET_FUNCTION_NAME_,
+          ZS_XMLERROR,
+          Severity_Error,
+          "xml document may be corrupted or incomplete.Expected <%s> child to <%s> tag : child not found.",
+          pTagName,
+          pNodeWork.getName().toCChar());
+      return ZS_XMLERROR;
+    }
+    else
+      return ZS_NOTFOUND;
+  }
+  wElement=(zxmlElement*)wNodeDetail;
+  wName=wNodeDetail->getName().toCChar();
+  pContent=wElement->getFirstText();
+  if (pContent.isEmpty())
+  {
+    if (pMandatory)
+    {
+      ZException.setMessage(_GET_FUNCTION_NAME_,
+          ZS_XMLERROR,
+          Severity_Error,
+          "Warning: xml document may be incomplete.Expected <%s> child to <%s> tag : child content is empty.",
+          pTagName,
+          pNodeWork.toElement().tagName().toStdString().c_str());
+      return ZS_XMLERROR;
+    }
+    else
+      return ZS_NOTFOUND;
+  }
+  return ZS_SUCCESS;
+} // getChildElementValue
 /**
  * @brief getChildElementValue gets from Node pNodeWork the content into pContent of a child node Element with name pTagName
  * @param wNodeWork father node to get the child element from
@@ -238,7 +291,7 @@ const char *decode_ZCOP (uint16_t pZCOP)
  */
 ZStatus
 getChildElementValue(QDomNode pNodeWork,const char*pTagName,QString &pContent, bool pMandatory)
-{
+{ 
 QDomNode wNodeDetail;
 QDomElement wElement;
 QString wName;
@@ -284,6 +337,7 @@ getChildElementValue(QDomNode pNodeWork,const utf8_t*pTagName,QString &pContent,
 {
     return getChildElementValue(pNodeWork,(const char*)pTagName,pContent, pMandatory);
 }
+#endif // __COMMENT__
 /**
  * @brief _testXMLZFileControlBlock
  * @param pFCB
@@ -295,183 +349,110 @@ getChildElementValue(QDomNode pNodeWork,const utf8_t*pTagName,QString &pContent,
  */
 ZStatus
 _testXMLZFileControlBlock(ZFileControlBlock *pFCB,
-                          QDomNode pFirstNode,
+                          zxmlNode *pFileDescNode,
                           long &pMissingTags,
                           bool pRealRun,
-                          FILE*pOutput)
+                          FILE* pOutput,
+                          ZaiErrors* pErrorLog)
 {
 ZStatus wSt;
 QString wContent;
 
-QDomNode wNodeWork;
-QDomNode wSecondlevelNode;
-utfmessageString wMessage;
-utfdescString wTagName;
+zxmlNode* wFCBNode=nullptr;
+//zxmlNode* wFileDescNode=nullptr;
+utf8String wMessage;
+utf8String wTagName;
 //--------------ZFileControlBlock modifiable fields----------------
 
-        wSecondlevelNode = pFirstNode.firstChildElement("ZFileDescriptor");
+    pErrorLog->setErrorLogContext("_testXMLZFileControlBlock");
+    pErrorLog->setAutoPrintOn(true);
+/*
+    wSt=pFileNode->getChildByName(wFileDescNode,"ZFileDescriptor");
+    if (wSt!=ZS_SUCCESS)
+        {
+          pErrorLog->errorLog("xml document may be corrupted or incomplete.Expected <ZFileDescriptor>.");
+          ZException.setMessage(_GET_FUNCTION_NAME_,
+              wSt,
+              Severity_Error,
+              "xml document may be corrupted or incomplete.Expected <ZFileDescriptor>.");
+          return wSt;
+          }
+*/
+    fprintf (pOutput,"%s>> processing <ZFileControlBlock>\n",_GET_FUNCTION_NAME_);
 
-        fprintf (pOutput,"%s>> processing <ZFileControlBlock>\n",
-                 _GET_FUNCTION_NAME_);
-
-       wNodeWork = wSecondlevelNode.firstChildElement("ZFileControlBlock");
-       if (wNodeWork.isNull())
-           {
-           ZException.setMessage(_GET_FUNCTION_NAME_,
-                                   ZS_XMLERROR,
+    wSt=pFileDescNode->getChildByName(wFCBNode,"ZFileControlBlock");
+//       wNodeWork = wFileDescNode.firstChildElement("ZFileControlBlock");
+    if (wSt!=ZS_SUCCESS)
+        {
+        pErrorLog->errorLog("xml document may be corrupted or incomplete.Expected <ZFileControlBlock>.");
+        ZException.setMessage(_GET_FUNCTION_NAME_,
+                                   wSt,
                                    Severity_Error,
                                    "xml document may be corrupted or incomplete.Expected <ZFileControlBlock> child to <File> tag : no child found.");
-           return ZS_XMLERROR; // we must explore all document before returning
-           }
+        return wSt; // we must explore all document before returning
+        }
 
-
-       wTagName = (const utf8_t*)"BlockExtentQuota";
-       wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
-       if (wSt!=ZS_SUCCESS)
+    if (XMLgetChildULong((zxmlElement*)wFCBNode,"AllocatedBlocks",pFCB->AllocatedBlocks,pErrorLog)<0)
            {
-           fprintf(pOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged\n",
-                   _GET_FUNCTION_NAME_,
-                   wTagName.toString());
-           pMissingTags ++;
+             fprintf(pOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged\n",
+                 _GET_FUNCTION_NAME_,
+                 "AllocatedBlocks");
+             pMissingTags ++;
            }
-       else
-       {
-
-       wMessage.sprintf("       <%s>  ",
-                    wTagName.toString());
-       if (pFCB->BlockExtentQuota==wContent.toLong())
-                   wMessage.addsprintf( " <%ld> ==unchanged== \n",
-                                 pFCB->BlockExtentQuota);
-               else
-               {
-               wMessage.addsprintf(" current <%ld> modified to <%ld>\n",
-                            pFCB->BlockExtentQuota,
-                            wContent.toLong());
-               if (pRealRun)
-                    {
-                    pFCB->BlockExtentQuota = wContent.toLong();
-                    }
-               }
-       fprintf(pOutput,wMessage.toCString_Strait());
-       }// else field----------------------------------------------------
-
-       wTagName = (const utf8_t*)"InitialSize";
-       wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
-       if (wSt!=ZS_SUCCESS)
+    if (XMLgetChildULong((zxmlElement*)wFCBNode,"BlockExtentQuota",pFCB->BlockExtentQuota,pErrorLog)<0)
            {
-           fprintf(pOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged\n",
-                   _GET_FUNCTION_NAME_,
-                   wTagName.toString());
-           pMissingTags ++;
+             fprintf(pOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged\n",
+                 _GET_FUNCTION_NAME_,
+                 "BlockExtendQuota");
+             pMissingTags ++;
            }
-       else
-       {
-       wMessage.sprintf("       <%s>  ",
-                    wTagName.toString());
-       if (pFCB->InitialSize==wContent.toLong())
-                   wMessage.addsprintf( " <%ld> ==unchanged== \n",
-                                 pFCB->InitialSize);
-               else
-                {
-                   wMessage.addsprintf(" current <%ld> modified to <%ld>\n",
-                                pFCB->InitialSize,
-                                wContent.toLong());
-               if (pRealRun)
-                    {
-                    pFCB->InitialSize = wContent.toLong();
-                    }
-                }
-       fprintf(pOutput,wMessage.toCString_Strait());
-       }// else field----------------------------------------------------
-
-       wTagName = (const utf8_t*)"BlockTargetSize";
-       wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
-       if (wSt!=ZS_SUCCESS)
+    if (XMLgetChildULong((zxmlElement*)wFCBNode,"BlockExtentQuota",pFCB->BlockExtentQuota,pErrorLog)<0)
            {
-           fprintf(pOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged\n",
-                   _GET_FUNCTION_NAME_,
-                   wTagName.toString());
-           pMissingTags ++;
+             fprintf(pOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged\n",
+                 _GET_FUNCTION_NAME_,
+                 "BlockExtendQuota");
+             pMissingTags ++;
            }
-       else
-       {
-       wMessage.sprintf("       <%s>  ",
-                    wTagName.toString());
-       if (pFCB->BlockTargetSize==wContent.toLong())
-                   wMessage.addsprintf( " <%ld> ==unchanged== \n",
-                                 pFCB->BlockTargetSize);
-               else
-                {
-                   wMessage.addsprintf(" current <%ld> modified to <%ld>\n",
-                                pFCB->BlockTargetSize,
-                                wContent.toLong());
-               if (pRealRun)
-                    {
-                    pFCB->BlockTargetSize = wContent.toLong();
-                    }
-                }
-       fprintf(pOutput,wMessage.toCString_Strait());
-       }// else field----------------------------------------------------
-
-       wTagName = (const utf8_t*)"HighwaterMarking";
-       wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
-       if (wSt!=ZS_SUCCESS)
+    unsigned long wL;
+    if (XMLgetChildULong((zxmlElement*)wFCBNode,"InitialSize",wL,pErrorLog)<0)
            {
-           fprintf(pOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged\n",
-                   _GET_FUNCTION_NAME_,
-                   wTagName.toString());
-           pMissingTags ++;
+             fprintf(pOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged\n",
+                 _GET_FUNCTION_NAME_,
+                 "InitialSize");
+             pMissingTags ++;
            }
-       else
-       {
-       wMessage.sprintf("       parameter <%s>  ",
-                    wTagName.toString());
-       if (pFCB->HighwaterMarking==(wContent=="true"))
-                   wMessage.addsprintf( " <%s> ==unchanged== \n",
-                                 pFCB->HighwaterMarking?"true":"false");
-               else
-                    {
-                   wMessage.addsprintf(" current <%s> modified to <%s>\n",
-                                pFCB->HighwaterMarking?"true":"false",
-                                wContent=="true"?"true":"false");
-                   if (pRealRun)
-                        {
-                        pFCB->HighwaterMarking = (wContent=="true");
-                        }
-                    }
-       fprintf(pOutput,wMessage.toCString_Strait());
-       }// else field----------------------------------------------------
+           else
+             pFCB->InitialSize= wL;
 
-       wTagName = (const utf8_t*)"GrabFreeSpace";
-       wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
-       if (wSt!=ZS_SUCCESS)
+    if (XMLgetChildULong((zxmlElement*)wFCBNode,"BlockTargetSize",pFCB->BlockTargetSize,pErrorLog)<0)
            {
-           fprintf(pOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged\n",
-                   _GET_FUNCTION_NAME_,
-                   wTagName.toString());
-           pMissingTags ++;
+             fprintf(pOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged\n",
+                 _GET_FUNCTION_NAME_,
+                 "BlockTargetSize");
+             pMissingTags ++;
            }
-       else
-       {
-       wMessage.clear();
-       wMessage.sprintf("       parameter <%s>  ",
-                    wTagName.toString());
-       if (pFCB->GrabFreeSpace==(wContent=="true"))
-                   wMessage.addsprintf( " <%s> ==unchanged== \n",
-                                 pFCB->GrabFreeSpace?"true":"false");
-               else
-                    {
-                   wMessage.addsprintf(" current <%s> modified to <%s>\n",
-                                pFCB->GrabFreeSpace?"true":"false",
-                                wContent=="true"?"true":"false");
-                   if (pRealRun)
-                        {
-                        pFCB->GrabFreeSpace = (wContent=="true");
-                        }
-                    }
-       fprintf(pOutput,wMessage.toCString_Strait());
-       }// else field----------------------------------------------------------
+    bool wBool;
+    if (XMLgetChildBool((zxmlElement*)wFCBNode,"HighwaterMarking",wBool,pErrorLog)<0)
+           {
+             fprintf(pOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged\n",
+                 _GET_FUNCTION_NAME_,
+                 "HighwaterMarking");
+             pMissingTags ++;
+           }
+           else
+             pFCB->HighwaterMarking=wBool;
 
+    if (XMLgetChildBool((zxmlElement*)wFCBNode,"GrabFreeSpace",wBool,pErrorLog)<0)
+           {
+             fprintf(pOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged\n",
+                 _GET_FUNCTION_NAME_,
+                 "GrabFreeSpace");
+             pMissingTags ++;
+           }
+           else
+             pFCB->GrabFreeSpace=wBool;
+
+    XMLderegister(wFCBNode);
     //--------------End ZFileControlBlock modifiable fields----------------
    return ZS_SUCCESS;
 }//_testXMLZFileControlBlock
@@ -487,76 +468,84 @@ utfdescString wTagName;
  * @param[out] pURIContent  selected content file path
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
-ZStatus _testXMLZFileDescriptor (QDomNode pFistNode, const utf8_t *pFilePath, const utf8_t *pZFile_type, uriString &pURIContent, FILE* pOutput)
+ZStatus _testXMLZFileDescriptor (zxmlNode *pFileNode,
+                                const utf8_t *pFilePath,
+                                const utf8_t *pZFile_type,
+                                uriString &pURIContent,
+                                FILE* pOutput,
+                                ZaiErrors* pErrorLog)
 {
 ZStatus wSt;
 
-QString wContent;
+//QString wContent;
+utf8String wContent;
+zxmlNode * wFileDescNode=nullptr;
+zxmlNode * wHCBNode=nullptr;
 
-QDomNode wSecondlevelNode;
-QDomNode wThirdlevelNode;
+pErrorLog->setAutoPrintOn(true);
+pErrorLog->setErrorLogContext("_testXMLZFileDescriptor");
 
     fprintf (pOutput,"%s>> processing node <ZFileDescriptor>  \n",
              _GET_FUNCTION_NAME_);
 
-    wSecondlevelNode = pFistNode.firstChildElement("ZFileDescriptor");
-    if (wSecondlevelNode.isNull())
-        {
-        fprintf(pOutput,"   ****Error*** Missing <ZFileDescriptor> ******\n");
-        ZException.setMessage(_GET_FUNCTION_NAME_,
-                                ZS_XMLERROR,
-                                Severity_Error,
-                                "xml document may be corrupted or incomplete.Expected <ZFileControlBlock> child to <File> tag : no child found.");
-        return(ZS_XMLERROR);
-        }// isNull
-
-    wThirdlevelNode = wSecondlevelNode.firstChildElement("ZHeaderControlBlock");
-    if (wThirdlevelNode.isNull())
-        {
-        fprintf(pOutput,"   ****Error*** Missing <ZHeaderControlBlock> ******\n");
-        ZException.setMessage(_GET_FUNCTION_NAME_,
-                                ZS_XMLERROR,
-                                Severity_Error,
-                                "xml document may be corrupted or incomplete.Expected <ZHeaderControlBlock> child to <ZFileDescriptor> tag : no child found.");
-        return(ZS_XMLERROR);
-        }// isNull
-
-    wSt=getChildElementValue(wThirdlevelNode,"FileType",wContent);
+    wSt=pFileNode->getChildByName(wFileDescNode,"ZFileDescriptor");
     if (wSt!=ZS_SUCCESS)
-        {
-        fprintf(pOutput,"   ****Error*** Missing <FileType> ******\n");
+    {
+      pErrorLog->errorLog("xml document may be corrupted or incomplete.Expected <ZFileDescriptor>.");
+      ZException.setMessage(_GET_FUNCTION_NAME_,
+          wSt,
+          Severity_Error,
+          "xml document may be corrupted or incomplete.Expected <ZFileDescriptor>.");
+      return wSt;
+    }
+
+    wSt=wFileDescNode->getChildByName(wHCBNode,"ZHeaderControlBlock");
+    if (wSt!=ZS_SUCCESS)
+    {
+      pErrorLog->errorLog("   ****Error*** Missing <ZHeaderControlBlock> ******");
+      ZException.setMessage(_GET_FUNCTION_NAME_,
+          wSt,
+          Severity_Error,
+          "xml document may be corrupted or incomplete.Expected <ZHeaderControlBlock> child to <ZFileDescriptor> tag : no child found.");
+
+      return wSt;
+    }
+
+    if (XMLgetChildText((zxmlElement *)wHCBNode,"FileType",wContent,pErrorLog))
+      {
+        pErrorLog->errorLog("   ****Error*** Missing <FileType> ******");
         ZException.setMessage(_GET_FUNCTION_NAME_,
-                                ZS_XMLERROR,
-                                Severity_Error,
-                                "xml document may be corrupted or incomplete.Expected <FileType> child to <ZHeaderControlBlock> tag : no child found.");
-        return(ZS_XMLERROR);
-        }// !ZS_SUCCESS
-    if (wContent!=(const char*)pZFile_type)
+            ZS_INVTYPE,
+            Severity_Error,
+            "xml document may be corrupted or incomplete.Expected <FileType> child to <ZHeaderControlBlock> tag : no child found.");
+        return(ZS_INVTYPE);
+      }// !ZS_SUCCESS
+
+    if (wContent!=pZFile_type)
         {
-        fprintf(pOutput,"   ****Error*** Invalid <FileType> ******\n");
+        pErrorLog->errorLog("   ****Error*** Invalid <FileType> ******");
         ZException.setMessage(_GET_FUNCTION_NAME_,
-                                ZS_XMLERROR,
+                                ZS_INVTYPE,
                                 Severity_Error,
                                 "Invalid <FileType> must be <%s> found <%s>.",
                                 pZFile_type,
-                                wContent.toStdString().c_str());
-        return(ZS_XMLERROR);
+                                wContent.toCChar());
+        return(ZS_INVTYPE);
         }
 
 
     if (pFilePath==nullptr)
             {
-            wSt=getChildElementValue(wSecondlevelNode,"URIContent",wContent);
-            if (wSt!=ZS_SUCCESS)
-                {
-                ZException.setMessage(_GET_FUNCTION_NAME_,
-                                        ZS_XMLERROR,
-                                        Severity_Error,
-                                        "No file path has been specified and xml file does not contain a valid <URIContent> field.",
-                                        wContent.toStdString().c_str());
-                                        ZException.exit_abort();
-                }
-            pURIContent.fromQString( wContent) ;
+            if (XMLgetChildText((zxmlElement *)wHCBNode,"URIContent",wContent,pErrorLog))
+            {
+              pErrorLog->errorLog("No file path has been specified and xml file does not contain a valid <URIContent> field.");
+              ZException.setMessage(_GET_FUNCTION_NAME_,
+                  ZS_NOTFOUND,
+                  Severity_Error,
+                  "No file path has been specified and xml file does not contain a valid <URIContent> field.");
+              return(ZS_NOTFOUND);
+            }// !ZS_SUCCESS
+            pURIContent=wContent.toCChar() ;
             }
         else
             {

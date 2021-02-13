@@ -44,14 +44,14 @@ long wMDicRank=0;
     for (long wi=0;wi<size();wi++)
             {
             wMDicRank= Tab[wi].MDicRank;
-            if (MetaDic->Tab[wMDicRank].Name==pFieldName.toString())
+            if (MetaDic->Tab[wMDicRank].Name==pFieldName.toCChar())
                                                 return wi;
             }
     ZException.setMessage(_GET_FUNCTION_NAME_,
                             ZS_INVNAME,
                             Severity_Error,
                             " Field name <%s> does not exist within ZDictionary",
-                            pFieldName.toString());
+                            pFieldName.toCChar());
 
     return -1;
 }
@@ -82,7 +82,7 @@ void ZSKeyDictionary ::print (FILE* pOutput)
              Tab[wi].NaturalSize,
              Tab[wi].UniversalSize,
              Tab[wi].ArrayCount,
-             Tab[wi].Name.toString(),
+             Tab[wi].Name.toCChar(),
              decode_ZType( Tab[wi].ZType));
 /*    else
         fprintf (pOutput,
@@ -91,7 +91,7 @@ void ZSKeyDictionary ::print (FILE* pOutput)
              Tab[wi].Offset,
              Tab[wi].Length,
              "--",
-             Tab[wi].Name.toString(),
+             Tab[wi].Name.toCChar(),
              decode_ZType( Tab[wi].ZType));*/
     }// for
     fprintf (pOutput,
@@ -162,7 +162,7 @@ ZSIndexField_struct wField;
                                   Severity_Error,
                                   "Field rank <%ld> <%s> is not eligible to be a key field",
                                   pMDicRank,
-                                  MetaDic->Tab[pMDicRank].Name.toString());
+                                  MetaDic->Tab[pMDicRank].Name.toCChar());
             return ZS_INVINDEX;
             }
     wField.ZType=MetaDic->Tab[pMDicRank].ZType;
@@ -458,7 +458,7 @@ ZSICBOwnData_Export wICB;
 
     memset(&wICB,0,sizeof(ZSICBOwnData_Export));
 
-    Name._exportUVF(&wIndexName);
+    wIndexName=Name._exportUVF();
     ICBTotalSize = wIndexName.Size+sizeof(ZSICBOwnData_Export);
     ZKDicOffset = ICBTotalSize;
     wICB.clear();
@@ -1627,9 +1627,10 @@ case ZType_Float :
 return pOutValue;
 }//_printArrayValueFromKey
 
+template <class _Tp>
 static inline
 ZDataBuffer&
-_convertAtomicEdian(ZDataBuffer& pData,auto &pValue, ZSIndexField_struct & pField)
+_convertAtomicEdian(ZDataBuffer& pData,_Tp &pValue, ZSIndexField_struct & pField)
  {
 decltype(pValue) wValue = pValue;
 
@@ -1653,9 +1654,9 @@ decltype(pValue) wValue = pValue;
             }
     return pData;
 }//_convertAtomic_Edian
-
+template <class _Tp>
 ZDataBuffer&
-_convertAtomicNOEndian(ZDataBuffer& pData,auto pValue, ZSIndexField_struct & pField)
+_convertAtomicNOEndian(ZDataBuffer& pData,_Tp pValue, ZSIndexField_struct & pField)
  {
 decltype(pValue) wValue = pValue;
 

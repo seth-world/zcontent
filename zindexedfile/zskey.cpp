@@ -61,7 +61,7 @@ ZSKey::ZSKey(ZSMasterFile *pZMF, const long pKeyRank)
                                     ZS_INVOP,
                                     Severity_Fatal,
                                     " Key dictionary for index <%s> contains no elements",
-                                    ZICB->Name.toString()
+                                    ZICB->Name.toCChar()
                                     );
             ZException.exit_abort();
             }
@@ -217,14 +217,14 @@ ZRecord *wRecord = ZMF->generateZRecord();
      fprintf (pOutput,
               "_______________________________________________________________________________________\n"
               " Index name %s\n",
-              ZICB->Name.toString());
+              ZICB->Name.toCChar());
      for (long wi=0;wi<ZICB->ZKDic->size();wi++)
      {
      wMDicRank= ZICB->ZKDic->Tab[wi].MDicRank;
      fprintf (pOutput,
               " Field order %ld  name <%s> Data type <%s> \n",
               wi,
-              wRecord->RDic->Tab[wMDicRank].MDicRank->Name.toString(),
+              wRecord->RDic->Tab[wMDicRank].MDicRank->Name.toCChar(),
               decode_ZType( wRecord->RDic->Tab[wMDicRank].MDicRank->ZType));
      }// for
      fprintf (pOutput,
@@ -244,7 +244,7 @@ size_t wKeyFieldOffset = 0;
      fprintf (pOutput,
               "      field order <%ld>  <%s> value ",
               wi,
-              wRecord->RDic->Tab[wMDicRank].MDicRank->Name.toString());
+              wRecord->RDic->Tab[wMDicRank].MDicRank->Name.toCChar());
      if (!FieldPresence[wi])
             {
             fprintf(pOutput,
@@ -889,11 +889,13 @@ ssize_t wNaturalSize, wUniversalSize,wArrayCount;
  * A negative value means 'omitted'. Defaulted to -1.
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.@see ZBSError
  */
+/*template <class _Tp>
 ZStatus
-ZSKey::setFieldValue (const long pFieldRank,auto pValue, const long pArrayCount)
+ZSKey::setFieldValue (const long pFieldRank,_Tp pValue, const long pArrayCount)
 {
     return zsetKeyFieldValue<decltype(pValue)>(pValue,*this,pFieldRank,pArrayCount);
 }
+*/
 /**
  * @brief ZKey::setFieldValue loads the value (auto) pValue to the key field (defined in key dictionary)
  * with a name that matches given string.
@@ -923,7 +925,7 @@ ZSKey::setFieldValue (const long pFieldRank,auto pValue, const long pArrayCount)
  * A negative value means 'omitted'. Defaulted to -1.
 * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.@see ZBSError
  */
-ZStatus
+/*ZStatus
 ZSKey::setFieldValue (const utf8_t *pFieldName, auto pValue, const long pArrayCount)
 {
     long wFieldRank=ZICB->ZKDic->zsearchFieldByName((const utf8_t*)pFieldName);
@@ -931,7 +933,7 @@ ZSKey::setFieldValue (const utf8_t *pFieldName, auto pValue, const long pArrayCo
             return ZException.getLastStatus();
     return zsetKeyFieldValue<decltype(pValue)>(pValue,*this,wFieldRank,pArrayCount);
 }
-
+*/
 
 
 

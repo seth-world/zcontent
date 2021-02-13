@@ -378,7 +378,7 @@ struct ZSICBOwnData{
     ZIFKeyType_type         KeyType;            //!< RFFU
     uint8_t                 AutoRebuild=false;  //!< RFFU
     ZSort_Type              Duplicates;         //!< Index key is allowing duplicates (ZST_DUPLICATES) or is not allowing duplicates (ZST_NODUPLICATES)
-    utffieldNameString      Name;               //!< Name for the index
+    utf8String              Name;               //!< Name for the index
 //    uint32_t                EndSign=cst_ZEND ;  //!< ZICB block end marker
 
     ZDataBuffer& _exportICBOwn(ZDataBuffer& pZDBExport);

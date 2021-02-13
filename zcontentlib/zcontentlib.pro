@@ -25,8 +25,8 @@
 PYTHON = python3.7
 
                                                                                                               ...
-QT += core gui xml
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+#QT += core gui xml
+#greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TEMPLATE = lib
 CONFIG += c++17 shared dll

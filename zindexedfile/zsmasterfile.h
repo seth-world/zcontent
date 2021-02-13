@@ -11,16 +11,18 @@
 #include <zindexedfile/zskey.h>
 #include <ztoolset/zutfstrings.h>
 
-#ifdef QT_CORE_LIB
-#include <zxml/qxmlutilities.h>
-#endif // QT_CORE_LIB
+#include <ztoolset/zaierrors.h>
 
+/*#ifdef QT_CORE_LIB
+//#include <zxml/qxmlutilities.h>
+#endif // QT_CORE_LIB
+*/
 //------------------Generic Functions--------------------------
 
 
-utfdescString& generateIndexRootName(utfdescString& wIndexRootName, utfdescString &pMasterRootName, const long pRank, utffieldNameString &pIndexName);
+utf8String generateIndexRootName(utf8String &pMasterRootName, const long pRank, utf8String &pIndexName);
 
-ZStatus generateIndexURI(uriString pMasterUri, uriString &pDirectory, uriString &pZIndexFileUri, const long pRank, utffieldNameString &pIndexName);
+ZStatus generateIndexURI(uriString pMasterUri, uriString &pDirectory, uriString &pZIndexFileUri, const long pRank, utf8String &pIndexName);
 
 
 namespace zbs //========================================================================
@@ -346,7 +348,7 @@ typedef ZRandomFile _Base ;
 #endif // __COMMENT__
     void _addIndexKeyDefinition (ZSIndexControlBlock* pZICB,
                        ZSKeyDictionary &pZKDic,
-                       utffieldNameString pIndexName,
+                       utf8String &pIndexName,
 //RFFU                 bool pAutoRebuild,
                        ZSort_Type pDuplicates);
 
@@ -379,7 +381,7 @@ typedef ZRandomFile _Base ;
     ZStatus zcreate (ZMetaDic *pMetaDic,const char* pPathName, const zsize_type pInitialSize, bool pBackup=false, bool pLeaveOpen=false);
 
     ZStatus zcreateIndex (ZSKeyDictionary& pZIFField,
-                          utffieldNameString &pIndexName,
+                          utf8String &pIndexName,
 // RFFU                   bool pAutorebuild,
                           ZSort_Type pDuplicates,
                           bool pBackup);
@@ -485,11 +487,11 @@ typedef ZRandomFile _Base ;
     static
     void zwriteXML_FileHeader(const char *pFilePath, FILE *pOutput=nullptr) ;
 
-#ifdef QT_CORE_LIB
+//#ifdef QT_CORE_LIB
     static
-    ZStatus _loadXMLKeyField(QDomNode &wNode, ZSKeyDictionary*&pZKDic);
+    ZStatus _loadXMLKeyField(zxmlNode* &wNode, ZSKeyDictionary*&pZKDic);
     static
-    ZStatus _loadXMLDictionary(QDomNode &wNode, ZSKeyDictionary *pZKDic);
+    ZStatus _loadXMLDictionary(zxmlNode* &wNode, ZSKeyDictionary *pZKDic);
 
     static
     ZStatus zapplyXMLFileDefinition(const utf8_t *pXMLPath, const utf8_t *pContentFilePath=nullptr, bool pRealRun=false, FILE *pOutput=nullptr);
@@ -500,22 +502,22 @@ typedef ZRandomFile _Base ;
     static
     ZStatus zloadXML_Dictionary(const utf8_t* pFilePath, ZSKeyDictionary &pZKDIC, ZMetaDic *pMetaDic);
     static
-    ZStatus _XMLzicmControl(const utf8_t *pFilePath, QDomDocument &XmlDoc, QDomNode &pFirstNode);
+    ZStatus _XMLzicmControl(const utf8_t *pFilePath, zxmlDoc* &XmlDoc, zxmlNode* &pFirstNode);
     static
     ZStatus
     _XMLLoadAndControl(const utf8_t* pFilePath,
-                       QDomDocument &XmlDoc,
-                       QDomNode & wRootNode,
+                       zxmlDoc* &XmlDoc,
+                       zxmlNode* &wRootNode,
                        const utf8_t* pRootName,
                        const utf8_t* pRootAttrName,
                        const utf8_t* pRootAttrValue,
                        FILE* pOutput=nullptr);
     static
-    ZStatus _loadXML_Index(QDomNode &pIndexNode, ZSIndexControlBlock *pZICB, ZMetaDic *pMetaDic);
+    ZStatus _loadXML_Index(zxmlNode* &pIndexNode, ZSIndexControlBlock *pZICB, ZMetaDic *pMetaDic);
     static
     ZStatus zgetXMLIndexRank(ZSMasterFile &wMasterFile,
                              ZSIndexControlBlock &wZICB,
-                             QDomNode pNode,
+                             zxmlNode* &pNode,
                              long &wMissingTags,
                              long &wMissMandatoryTags,
                              char &IndexPresence,
@@ -527,7 +529,7 @@ typedef ZRandomFile _Base ;
                                               bool pRealRun,
                                               FILE*pOutput);
 
-#endif
+//#endif
 
 //-------- Stats-----------------------------------------------
 
@@ -725,6 +727,7 @@ public:
     ZSMasterControlBlock ZMCB;      //< Master Control Block : all data is there
     zstatistics          ZPMSStats; //< Statistical data
 
+    ZaiErrors           ErrorLog;
 }; //--------------------end class ZSMasterFile-------------------------------
 
 

@@ -218,7 +218,7 @@ public:
     using _Base::isOpen;
 
     ZStatus setIndexURI(uriString &pUri);
-    void setIndexName (utffieldNameString &pName);
+    void setIndexName (utf8String &pName);
     void setICB (ZSIndexControlBlock *pICB);
 
     ZStatus removeIndexFiles(void);

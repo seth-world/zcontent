@@ -86,7 +86,7 @@ public:
     inline bool operator == ( unsigned long pId2) {return (id==pId2);}
     inline bool operator != ( ZIdentity &pId2) {return !(id==pId2.id);}
     inline bool operator != ( unsigned long pId2) {return !(id==pId2);}
-
+#ifdef __COMMENT__
 #ifdef QT_CORE_LIB
     QString toQString(void);
     QString toQStringShort(void);
@@ -94,6 +94,10 @@ public:
     ZIdentity &fromQString(const QString pQString);
     ZIdentity &operator = (const QString pQString) {id = pQString.toLong(nullptr,16);return *this;}
 #endif // QT_CORE_LIB
+#endif // __COMMENT__
+
+    ZDataBuffer _export();
+    size_t      _import(unsigned char* pUniversalPtr);
 
 };
 

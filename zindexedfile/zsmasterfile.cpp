@@ -9,6 +9,10 @@
 #include <QUrl>
 #include <zindexedfile/zmasterfile_utilities.h>
 
+#include <zxml/zxmlprimitives.h>
+
+#include <zxml/zxml.h>
+
 bool ZMFStatistics = false;
 
 /** @addtogroup ZBSOptions Setting Options for runtime
@@ -247,7 +251,7 @@ ZDataBuffer wIndexPath;
     wMCB.StartSign=cst_ZSTART ;
     wMCB.BlockID=ZBID_MCB;
     wMCB.ZMFVersion=reverseByteOrder_Conditional<unsigned long>(__ZMF_VERSION__);
-    IndexFilePath._exportUVF(&wIndexPath);
+    wIndexPath=IndexFilePath._exportUVF();
 
     MDicOffset=MCBSize=  sizeof(ZSMCBOwnData_Export) + wIndexPath.Size ;
 
@@ -474,7 +478,7 @@ ZSMasterControlBlock::report(FILE*pOutput)
                   "<%2ld> <%5ld> <%20s> <%s> \n",
                  wi,
                   MetaDic[wi].Capacity,
-                 MetaDic[wi].Name.toString(),
+                 MetaDic[wi].Name.toCChar(),
                  decode_ZType(MetaDic[wi].ZType));
         }
 
@@ -487,7 +491,7 @@ ZSMasterControlBlock::report(FILE*pOutput)
                   "Index Rank <%2ld> <%20s>\n"
                  "          <%15s> <%15s> Index Record size <%ld>\n",
                  wi,
-                 Index[wi]->Name.toString(),
+                 Index[wi]->Name.toCChar(),
                  Index[wi]->Duplicates==ZST_DUPLICATES?"Duplicates":"No Duplicates",
                  Index[wi]->AutoRebuild?"Autorebuild":"NoAutorebuild",
                  Index[wi]->IndexRecordSize());
@@ -503,7 +507,7 @@ ZSMasterControlBlock::report(FILE*pOutput)
          fprintf (pOutput,
                  "    <%ld> <%15s>  %5ld %5ld %s\n",
                  wj,
-                 MetaDic.Tab[Index[wi]->ZKDic->Tab[wj].MDicRank].Name.toString(),
+                 MetaDic.Tab[Index[wi]->ZKDic->Tab[wj].MDicRank].Name.toCChar(),
                  Index[wi]->ZKDic->Tab[wj].NaturalSize,
                  Index[wi]->ZKDic->Tab[wj].UniversalSize,
 //                 Index[wi].ZKDic->Tab[wj].RecordOffset,
@@ -1403,7 +1407,7 @@ ZSMasterFile::_addIndexField (ZArray<ZSIndexField_struct>& pZIFField,utfdescStri
 void
 ZSMasterFile::_addIndexKeyDefinition (ZSIndexControlBlock* pZICB,
                                       ZSKeyDictionary& pZKDic,
-                                      utffieldNameString pIndexName,
+                                      utf8String& pIndexName,
                                       ZSort_Type pDuplicates)
 {
 
@@ -1447,7 +1451,7 @@ ZSMasterFile::_addIndexKeyDefinition (ZSIndexControlBlock* pZICB,
  */
 ZStatus
 ZSMasterFile::zcreateIndex (ZSKeyDictionary &pZIFField,  // contains the description of index key to add (multi fields)
-                           utffieldNameString &pIndexName,
+                           utf8String &pIndexName,
 //                          bool pAutorebuild,
                            ZSort_Type pDuplicates,
                            bool pBackup)
@@ -1476,7 +1480,7 @@ long w1=0,w2=0;
     if (wSt!=ZS_SUCCESS)
         {
         ZException.addToLast(" While creating new Index <%s> for MasterFile <%s>",
-                                 pIndexName.toString(),
+                                 pIndexName.toCChar(),
                                  ZDescriptor.URIContent.toString());
         ZException.setLastSeverity(Severity_Severe);
         return  wSt;
@@ -1506,7 +1510,7 @@ long w1=0,w2=0;
                                         ZS_INVNAME,
                                         Severity_Error,
                                         " Ambiguous index name <%s>. Index name already exist at Index rank <%ld>. Please use zremoveIndex first.\n",
-                                        pIndexName.toString(),
+                                        pIndexName.toCChar(),
                                         wi);
                 wSt= ZS_INVNAME;
                 goto zcreateIndexEnd ;
@@ -1609,7 +1613,7 @@ zcreateIndexError:
     ZMCB.IndexObjects.pop() ; // destroy the ZSIndexFile object
     ZMCB.popICB(); // destroy created ICB
     ZException.addToLast(" While creating new Index <%s> for MasterFile <%s>",
-                             pIndexName.toString(),
+                             pIndexName.toCChar(),
                              ZDescriptor.URIContent.toString());
     return  wSt;
 
@@ -1645,7 +1649,7 @@ ZSMasterFile::zcreateIndex (ZSKeyDictionary& pZIFField,
 {
 
 
-    utffieldNameString wIndexName;
+    utf8String wIndexName;
     wIndexName = pIndexName;
     return   zcreateIndex (pZIFField,
                           wIndexName,
@@ -2519,7 +2523,7 @@ long wIndexProcessed = 0,wMissIndexFile = 0, wCorruptZICB = 0, wCreatedIndex = 0
                 fprintf (wOutput,"%s>>   Rebuilding index rank <%ld> <%s> \n",
                          _GET_FUNCTION_NAME_,
                          wi,
-                         wMasterFile.ZMCB.Index[wi]->Name.toString());
+                         wMasterFile.ZMCB.Index[wi]->Name.toCChar());
 
                 wSt=wMasterFile.zindexRebuild(wi,ZMFStatistics,wOutput);
                 if (wSt!=ZS_SUCCESS)
@@ -2529,7 +2533,7 @@ long wIndexProcessed = 0,wMissIndexFile = 0, wCorruptZICB = 0, wCreatedIndex = 0
                              "          Status is <%s>\n",
                              _GET_FUNCTION_NAME_,
                              wi,
-                             wMasterFile.ZMCB.Index[wi]->Name.toString(),
+                             wMasterFile.ZMCB.Index[wi]->Name.toCChar(),
                              decode_ZStatus(wSt));
                     goto ErrorRepairIndexes;
                     }
@@ -3538,7 +3542,7 @@ zmode_type wMode = ZRF_Nothing ;
                {
 //               ZException_sv = ZException; // in case of error : store the exception but continue rolling back other indexes
                ZException.addToLast(" during Index rebuild on index <%s> number <%02ld> ",
-                                           ZMCB.Index[wi]->Name.toString(),
+                                           ZMCB.Index[wi]->Name.toCChar(),
                                            wi);
                }
 
@@ -4218,7 +4222,6 @@ void
 ZSMasterFile::_writeXML_ZRandomFileHeader(ZSMasterFile& pZMF,FILE *pOutput)
 {
 
-
    ZRandomFile::_writeXML_ZRandomFileHeader(pZMF.ZDescriptor,pOutput);
 
    fprintf (pOutput,
@@ -4260,7 +4263,7 @@ ZSMasterFile::_writeXML_Index(ZSMasterFile& pZMF,const long pIndexRank,FILE* pOu
              "           <Duplicates>%s</Duplicates> <!-- warning modification of this field must be cautiously done see documentation -->\n"
              "           <AutoRebuild>%s</AutoRebuild>\n",
              pIndexRank,
-             pZMF.ZMCB.Index[pIndexRank]->Name.toString(),
+             pZMF.ZMCB.Index[pIndexRank]->Name.toCChar(),
              pZMF.ZMCB.Index[pIndexRank]->Duplicates==ZST_DUPLICATES?"ZST_DUPLICATES":"ZST_NODUPLICATES",
              pZMF.ZMCB.Index[pIndexRank]->AutoRebuild?"true":"false"
              );
@@ -4302,7 +4305,7 @@ ZSMasterFile::_writeXML_KDic(ZSKeyDictionary* ZKDic,FILE* pOutput)
              "              </KeyField>\n"
              ,
              wd,
-             ZKDic->Tab[wd].Name.toString() ,
+             ZKDic->Tab[wd].Name.toCChar() ,
              ZKDic->Tab[wd].NaturalSize,
              ZKDic->Tab[wd].UniversalSize,
              ZKDic->Tab[wd].ArrayCount,
@@ -4383,7 +4386,7 @@ utfdescString OutPath;
         OutPath = uriOutput.getDirectoryPath().toCChar();
         OutPath += OutBase;
         OutPath += "-";
-        OutPath += ZMCB.Index[pIndexRank]->Name.toString();
+        OutPath += ZMCB.Index[pIndexRank]->Name.toCChar();
         OutPath.addsprintf("%02ld",pIndexRank);
         OutPath += ".xml";
         wOutput = fopen(OutPath.toCChar(),"w");
@@ -4446,7 +4449,7 @@ utfdescString OutPath;
         OutPath = uriOutput.getDirectoryPath().toCChar();
         OutPath += OutBase;
         OutPath += "-";
-        OutPath += ZMCB.Index[pIndexRank]->Name.toString();
+        OutPath += ZMCB.Index[pIndexRank]->Name.toCChar();
         OutPath.addsprintf("%02ld",pIndexRank);
         OutPath.add((const utf8_t*)"-kdic");
         OutPath += (const utf8_t*)".xml";
@@ -4745,8 +4748,8 @@ QString wAttribute;
  */
 ZStatus
 ZSMasterFile::_XMLLoadAndControl(const utf8_t *pFilePath,
-                   QDomDocument &XmlDoc,
-                   QDomNode & wRootNode,
+                   zxmlDoc* &XmlDoc,
+                   zxmlNode* & wRootNode,
                    const utf8_t *pRootName,
                    const utf8_t *pRootAttrName,
                    const utf8_t *pRootAttrValue,
@@ -5392,7 +5395,7 @@ BackProcess_zapplyXMLIndex:
                  "%s>>          Suppressing Index rank <%ld> <%s> ...",
                  _GET_FUNCTION_NAME_,
                  IndexRank,
-                 wZICB.Name.toString());
+                 wZICB.Name.toCChar());
         if (pRealRun)
             {
              wSt=   wMasterFile.zremoveIndex(IndexRank);
@@ -5409,7 +5412,7 @@ BackProcess_zapplyXMLIndex:
                       "%s>>   Index rank <%ld> <%s> successfully removed.",
                       _GET_FUNCTION_NAME_,
                       IndexRank,
-                      wZICB.Name.toString());
+                      wZICB.Name.toCChar());
             }
             else
             fprintf(wOutput,"\n");
@@ -5421,7 +5424,7 @@ BackProcess_zapplyXMLIndex:
                  "%s>>          Nothing to do for Index rank <%ld> <%s>.\n",
                  _GET_FUNCTION_NAME_,
                  IndexRank,
-                 wZICB.Name.toString());
+                 wZICB.Name.toCChar());
         break;
     }
     case 2:
@@ -5430,7 +5433,7 @@ BackProcess_zapplyXMLIndex:
             "%s>>           Index rank <%ld> Name <%s> is to be modified into Master file structure ...",
             _GET_FUNCTION_NAME_,
             IndexRank,
-            wMasterFile.ZMCB.Index[IndexRank].Name.toString());
+            wMasterFile.ZMCB.Index[IndexRank].Name.toCChar());
 
     if (pRealRun)
         {
@@ -5451,7 +5454,7 @@ BackProcess_zapplyXMLIndex:
                 "%s>>           Index rank <%ld> <%s> : Index control block is to be modified into index file structure ...",
                 _GET_FUNCTION_NAME_,
                 IndexRank,
-                wMasterFile.ZMCB.Index[IndexRank].Name.toString());
+                wMasterFile.ZMCB.Index[IndexRank].Name.toCChar());
         if (pRealRun)
             {
             wMasterFile.ZMCB.IndexObjects[IndexRank]->setICB(&wMasterFile.ZMCB.Index[IndexRank]);
@@ -5474,7 +5477,7 @@ BackProcess_zapplyXMLIndex:
             "%s>>           Index rank <%ld> Name <%s> is to be rebuilt\n",
             _GET_FUNCTION_NAME_,
             IndexRank,
-            wMasterFile.ZMCB.Index[IndexRank].Name.toString());
+            wMasterFile.ZMCB.Index[IndexRank].Name.toCChar());
     if (pRealRun)
         {
          wSt=wMasterFile.zindexRebuild(IndexRank,ZMFStatistics,wOutput);
@@ -5496,12 +5499,12 @@ BackProcess_zapplyXMLIndex:
     fprintf (wOutput,
              "%s>>          Index <%s> is to be created and rebuilt.\n",
              _GET_FUNCTION_NAME_,
-             wZICB.Name.toString());
+             wZICB.Name.toCChar());
     if (pRealRun)
     {
     wZICB.ZKDic->_reComputeSize();
     wSt=wMasterFile.zcreateIndex(*wZICB.ZKDic,
-                                 wZICB.Name.toString(),
+                                 wZICB.Name.toCChar(),
                                  wZICB.Duplicates,
                                  false);
     if (wSt!=ZS_SUCCESS)
@@ -5605,12 +5608,12 @@ utfdescString wTagValue;
     wNodeWork = pNode;
 
     wTagName = "Name";
-    wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+    wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
     if (wSt!=ZS_SUCCESS)
         {
         fprintf(wOutput,"%s>>**** Failed to get parameter <%s> - stopping process\n",
                 _GET_FUNCTION_NAME_,
-                wTagName.toString());
+                wTagName.toCChar());
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                 ZS_XMLERROR,
                                 Severity_Fatal,
@@ -5626,7 +5629,7 @@ utfdescString wTagValue;
 
     wMessage.clear();
     wMessage.add("       parameter <%s>  ",
-                 wTagName.toString());
+                 wTagName.toCChar());
     wMessage.add(" value <%s>\n",
                  wContent.toStdString().c_str());
     fprintf(wOutput,wMessage.toString());
@@ -5651,21 +5654,21 @@ utfdescString wTagValue;
             fprintf(wOutput,
                     "%s>>       Found index name <%s> to be modified at Index rank <%ld> \n",
                     _GET_FUNCTION_NAME_,
-                    wZICB.Name.toString(),
+                    wZICB.Name.toCChar(),
                     IndexRank);
             }// else
 
     fprintf(wOutput,wMessage.toString());
 //---------Search for tag Remove --------------------------------------
     wTagName = "Remove";
-    wSt=getChildElementValue(pNode,wTagName.toString(),wContent,false); // not mandatory
+    wSt=getChildElementValue(pNode,wTagName.toCChar(),wContent,false); // not mandatory
     if (wSt==ZS_SUCCESS)
         {
         wTagValue = wContent;
         wMessage.clear();
         wMessage.add("%s>>        Found tag <%s> value <%s> \n",
                      _GET_FUNCTION_NAME_,
-                     wTagName.toString(),
+                     wTagName.toCChar(),
                      wTagValue.toString());
 
         FRemove = (wTagValue=="true");
@@ -5677,7 +5680,7 @@ utfdescString wTagValue;
                              "                  Index definition is no more parsed\n",
                              _GET_FUNCTION_NAME_,
                              IndexRank,
-                             wZICB.Name.toString());
+                             wZICB.Name.toCChar());
                 IndexPresence = 0;
                 fprintf (wOutput,wMessage.toString());
                 return  ZS_SUCCESS;
@@ -5686,13 +5689,13 @@ utfdescString wTagValue;
                          "                  Index definition is no more parsed\n",
                          _GET_FUNCTION_NAME_,
                          IndexRank,
-                         wZICB.Name.toString());
+                         wZICB.Name.toCChar());
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_INVOP,
                                     Severity_Error,
                                     "It is requested to remove index rank <%ld> <%s> while this index does not exist in ZSMasterFile\n",
                                     IndexRank,
-                                    wZICB.Name.toString());
+                                    wZICB.Name.toCChar());
             fprintf (wOutput,wMessage.toString());
             IndexPresence = 4;
             return  ZS_INVOP;
@@ -5706,12 +5709,12 @@ utfdescString wTagValue;
 
 //--------------------Adding Index---------------------------------
         wTagName = "Duplicates";
-        wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+        wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
         if (wSt!=ZS_SUCCESS)
             {
             fprintf(wOutput,"%s>>**** Failed to get parameter <%s> default value <%s> applied\n",
                     _GET_FUNCTION_NAME_,
-                    wTagName.toString(),
+                    wTagName.toCChar(),
                     "ZST_DUPLICATES");
             wMissingTags++;
             }
@@ -5719,7 +5722,7 @@ utfdescString wTagValue;
             {
             wMessage.clear();
             wMessage.add("       parameter <%s>  ",
-                         wTagName.toString());
+                         wTagName.toCChar());
 
             wZICB.Duplicates = encode_ZST(wContent.toStdString().c_str());
 
@@ -5729,12 +5732,12 @@ utfdescString wTagValue;
             fprintf(wOutput,wMessage.toString());
             }// else---------------------------------------------
         wTagName = "AutoRebuild";
-        wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+        wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
         if (wSt!=ZS_SUCCESS)
             {
             fprintf(wOutput,"%s>>**** Failed to get parameter <%s> default value <%s> applied \n",
                     _GET_FUNCTION_NAME_,
-                    wTagName.toString(),
+                    wTagName.toCChar(),
                     "false");
              wMissingTags++;
              }
@@ -5742,7 +5745,7 @@ utfdescString wTagValue;
             {
             wMessage.clear();
             wMessage.add("       parameter <%s>  ",  // field does not exist in file
-                         wTagName.toString());
+                         wTagName.toCChar());
             wMessage.add(" value <%s>\n",
                          wContent.toStdString().c_str());
             fprintf(wOutput,wMessage.toString());
@@ -5758,14 +5761,14 @@ utfdescString wTagValue;
                     "%s>>   ****Error No Dictionary found in Index definition. Rank <%ld> name <%s>. Index definition is corrupted******\n",
                     _GET_FUNCTION_NAME_,
                     IndexRank,
-                    wZICB.Name.toString());
+                    wZICB.Name.toCChar());
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_XMLERROR,
                                     Severity_Error,
                                     "**** No Dictionary found in Index definition. Rank <%ld> <%s>  **** Failed to get Mandatory parameter <%s> Index will not be built",
                                     IndexRank,
-                                    wZICB.Name.toString(),
-                                    wTagName.toString()
+                                    wZICB.Name.toCChar(),
+                                    wTagName.toCChar()
                                     );
             wMissingTags++;
             wMissMandatoryTags ++;
@@ -5786,7 +5789,7 @@ utfdescString wTagValue;
                                     ZS_XMLERROR,
                                     Severity_Error,
                                     "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                    wTagName.toString(),
+                                    wTagName.toCChar(),
                                     IndexRank
                                     );
             wMissingTags++;
@@ -5803,12 +5806,12 @@ utfdescString wTagValue;
         wNodeWork= wSixthlevelNode;
 
         wTagName = "Name";
-        wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+        wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
         if (wSt!=ZS_SUCCESS)
             {
             fprintf(wOutput,"%s>>****Warning*** Failed to get parameter <%s>. Field rank <%ld> will miss its name.\n",
                     _GET_FUNCTION_NAME_,
-                    wTagName.toString(),
+                    wTagName.toCChar(),
                     wKeyRank);
              wMissingTags++;
              }
@@ -5816,7 +5819,7 @@ utfdescString wTagValue;
             {
             wMessage.clear();
             wMessage.add("       parameter <%s>  ",
-                         wTagName.toString());
+                         wTagName.toCChar());
             wMessage.add(" value <%s>\n",
                          wContent.toStdString().c_str());
             fprintf(wOutput,wMessage.toString());
@@ -5825,17 +5828,17 @@ utfdescString wTagValue;
 
             }// else-----------------------------------------------
         wTagName = "NaturalSize";
-        wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+        wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
         if (wSt!=ZS_SUCCESS)
             {
             fprintf(wOutput,"%s>>**** Failed to get Mandatory parameter <%s> Index will not be built\n",
                     _GET_FUNCTION_NAME_,
-                    wTagName.toString());
+                    wTagName.toCChar());
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_XMLERROR,
                                     Severity_Error,
                                     "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                    wTagName.toString(),
+                                    wTagName.toCChar(),
                                     IndexRank
                                     );
             wMissingTags++;
@@ -5845,7 +5848,7 @@ utfdescString wTagValue;
             {
             wMessage.clear();
             wMessage.add("       parameter <%s>  ",
-                         wTagName.toString());
+                         wTagName.toCChar());
             wMessage.add(" value <%ld>\n",
                          wContent.toLong());
             fprintf(wOutput,wMessage.toString());
@@ -5853,17 +5856,17 @@ utfdescString wTagValue;
             wField.NaturalSize = wContent.toLong();
             }// else-----------------------------------------------
         wTagName = "UniversalSize";
-        wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+        wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
         if (wSt!=ZS_SUCCESS)
             {
             fprintf(wOutput,"%s>>**** Failed to get Mandatory parameter <%s> Index will not be built\n",
                     _GET_FUNCTION_NAME_,
-                    wTagName.toString());
+                    wTagName.toCChar());
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_XMLERROR,
                                     Severity_Error,
                                     "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                    wTagName.toString(),
+                                    wTagName.toCChar(),
                                     IndexRank
                                     );
             wMissingTags++;
@@ -5876,7 +5879,7 @@ utfdescString wTagValue;
             {
             wMessage.clear();
             wMessage.add("       parameter <%s>  ",
-                         wTagName.toString());
+                         wTagName.toCChar());
             wMessage.add(" value <%ld>\n",
                          wContent.toLong());
             fprintf(wOutput,wMessage.toString());
@@ -5884,17 +5887,17 @@ utfdescString wTagValue;
             wField.UniversalSize = wContent.toLong();
             }// else-----------------------------------------------
         wTagName = "ArrayCount";
-        wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+        wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
         if (wSt!=ZS_SUCCESS)
             {
             fprintf(wOutput,"%s>>**** Failed to get Mandatory parameter <%s> Index will not be built\n",
                     _GET_FUNCTION_NAME_,
-                    wTagName.toString());
+                    wTagName.toCChar());
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_XMLERROR,
                                     Severity_Error,
                                     "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                    wTagName.toString(),
+                                    wTagName.toCChar(),
                                     IndexRank
                                     );
             wMissingTags++;
@@ -5907,7 +5910,7 @@ utfdescString wTagValue;
             {
             wMessage.clear();
             wMessage.add("       parameter <%s>  ",
-                         wTagName.toString());
+                         wTagName.toCChar());
             wMessage.add(" value <%ld>\n",
                          wContent.toLong());
             fprintf(wOutput,wMessage.toString());
@@ -5916,17 +5919,17 @@ utfdescString wTagValue;
             }// else-----------------------------------------------
 
         wTagName = "RecordOffset";
-        wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+        wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
         if (wSt!=ZS_SUCCESS)
             {
             fprintf(wOutput,"%s>>**** Failed to get Mandatory parameter <%s> Index will not be built\n",
                     _GET_FUNCTION_NAME_,
-                    wTagName.toString());
+                    wTagName.toCChar());
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_XMLERROR,
                                     Severity_Error,
                                     "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                    wTagName.toString(),
+                                    wTagName.toCChar(),
                                     IndexRank
                                     );
             wMissingTags++;
@@ -5939,7 +5942,7 @@ utfdescString wTagValue;
             {
             wMessage.clear();
             wMessage.add("       parameter <%s>  ",
-                         wTagName.toString());
+                         wTagName.toCChar());
             wMessage.add(" value <%ld>\n",
                          wContent.toLong());
             fprintf(wOutput,wMessage.toString());
@@ -5948,17 +5951,17 @@ utfdescString wTagValue;
             }// else-----------------------------------------------
 
         wTagName = "ZType";
-        wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+        wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
         if (wSt!=ZS_SUCCESS)
             {
             fprintf(wOutput,"%s>>**** Failed to get Mandatory parameter <%s> Index will not be built\n",
                     _GET_FUNCTION_NAME_,
-                    wTagName.toString());
+                    wTagName.toCChar());
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_XMLERROR,
                                     Severity_Error,
                                     "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                    wTagName.toString(),
+                                    wTagName.toCChar(),
                                     IndexRank
                                     );
             wMissingTags++;
@@ -5976,13 +5979,13 @@ utfdescString wTagValue;
                 {
                 fprintf(wOutput,"%s>>**** parameter <%s> is errored with status <%s> Index will not be built\n",
                         _GET_FUNCTION_NAME_,
-                        wTagName.toString(),
+                        wTagName.toCChar(),
                         decode_ZStatus(wSt));
                 ZException.setMessage(_GET_FUNCTION_NAME_,
                                         wSt,
                                         Severity_Error,
                                         "**** **** parameter <%s> is errored with status <%s> Index will not be built for index rank <%ld> **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                        wTagName.toString(),
+                                        wTagName.toCChar(),
                                         decode_ZStatus(wSt),
                                         IndexRank
                                         );
@@ -5996,7 +5999,7 @@ utfdescString wTagValue;
             {
             wMessage.clear();
             wMessage.add("       parameter <%s>  ",
-                         wTagName.toString());
+                         wTagName.toCChar());
             wMessage.add(" value <%ld> <%s>\n",
                          wZType,
                          decode_ZType(wZType));
@@ -6238,7 +6241,7 @@ ZSKeyDictionary     wZKDic(&wMasterFile.ZMCB.MetaDic);
         {
         fprintf(wOutput,"%s>>**** Failed to get parameter <%s>. It will remain unchanged\n",
                 _GET_FUNCTION_NAME_,
-                wTagName.toString());
+                wTagName.toCChar());
         wMissingTags++;
         }
     else
@@ -6268,7 +6271,7 @@ ZSKeyDictionary     wZKDic(&wMasterFile.ZMCB.MetaDic);
         {
         fprintf(wOutput,"%s>>Warning: Failed to get optional parameter <%s>. It will remain unchanged.\n",
                 _GET_FUNCTION_NAME_,
-                wTagName.toString());
+                wTagName.toCChar());
         wMissingTags++;
         }
     else
@@ -6343,12 +6346,12 @@ ZSKeyDictionary     wZKDic(&wMasterFile.ZMCB.MetaDic);
     wNodeWork = wThirdlevelNode;
 
     wTagName = (const utf8_t*)"JournalLocalDirectoryPath";
-    wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+    wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
     if (wSt!=ZS_SUCCESS)
         {
         fprintf(wOutput,"%s>>**** Failed to get parameter <%s>.JournalLocalDirectoryPath will be set to ZSMasterFile's default directory path\n",
                 _GET_FUNCTION_NAME_,
-                wTagName.toString());
+                wTagName.toCChar());
         wMissingTags++;
         }
     else
@@ -6378,12 +6381,12 @@ ZSKeyDictionary     wZKDic(&wMasterFile.ZMCB.MetaDic);
     fprintf(wOutput,wMessage.toCString_Strait());
     }// else field----------------------------------------------------
     wTagName = (const utf8_t*)"JournalKeep";
-    wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+    wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
     if (wSt!=ZS_SUCCESS)
         {
         fprintf(wOutput,"%s>>Warning: Failed to get optional parameter <%s>. It will remain unchanged or will be set to its default value (-1).\n",
                 _GET_FUNCTION_NAME_,
-                wTagName.toString());
+                wTagName.toCChar());
         wMissingTags++;
         }
     else
@@ -6439,12 +6442,12 @@ ZSKeyDictionary     wZKDic(&wMasterFile.ZMCB.MetaDic);
     wJRM=new ZRemoteMirroring;
 
     wTagName = (const utf8_t*)"JournalHostAddressType";
-    wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+    wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
     if (wSt!=ZS_SUCCESS)
         {
         fprintf(wOutput,"%s>>Warning: Failed to get optional parameter <%s>. It will remain unchanged or will be set to its default value (-1).\n",
                 _GET_FUNCTION_NAME_,
-                wTagName.toString());
+                wTagName.toCChar());
         wMissingTags++;
         }
     else
@@ -6452,7 +6455,7 @@ ZSKeyDictionary     wZKDic(&wMasterFile.ZMCB.MetaDic);
     wJRM->AddressType.encode(wContent);
     wMessage.clear();
     wMessage.addsprintf("       parameter <%s>  ",
-                 wTagName.toString());
+                 wTagName.toCChar());
     if (wMasterFile.ZMCB.ZJCB->Remote==nullptr)
                 {
         wMessage.addsprintf(" to be created with value <%s>\n",
@@ -6607,7 +6610,7 @@ ZSKeyDictionary     wZKDic(&wMasterFile.ZMCB.MetaDic);
                      "%s>>          Suppressing Index rank <%ld> <%s> ...",
                      _GET_FUNCTION_NAME_,
                      IndexRank,
-                     wZICB->Name.toString());
+                     wZICB->Name.toCChar());
             if (pRealRun)
                 {
                  wSt=   wMasterFile.zremoveIndex(IndexRank);
@@ -6624,7 +6627,7 @@ ZSKeyDictionary     wZKDic(&wMasterFile.ZMCB.MetaDic);
                           "%s>>   Index rank <%ld> <%s> successfully removed.",
                           _GET_FUNCTION_NAME_,
                           IndexRank,
-                          wZICB->Name.toString());
+                          wZICB->Name.toCChar());
 
                  IndexPresence.erase(IndexRank);
                 }
@@ -6638,7 +6641,7 @@ ZSKeyDictionary     wZKDic(&wMasterFile.ZMCB.MetaDic);
                      "%s>>          Nothing to do for Index rank <%ld> <%s>.\n",
                      _GET_FUNCTION_NAME_,
                      IndexRank,
-                     wZICB->Name.toString());
+                     wZICB->Name.toCChar());
             IndexPresence[IndexRank] = 1 ;
             break;
         }
@@ -6648,7 +6651,7 @@ ZSKeyDictionary     wZKDic(&wMasterFile.ZMCB.MetaDic);
                 "%s>>           Index rank <%ld> Name <%s> is to be modified into Master file structure ...",
                 _GET_FUNCTION_NAME_,
                 IndexRank,
-                wMasterFile.ZMCB.Index[IndexRank]->Name.toString());
+                wMasterFile.ZMCB.Index[IndexRank]->Name.toCChar());
 
         IndexPresence[IndexRank] = 2 ; // index modified to be rebuilt
 
@@ -6671,7 +6674,7 @@ ZSKeyDictionary     wZKDic(&wMasterFile.ZMCB.MetaDic);
                     "%s>>           Index rank <%ld> <%s> : Index control block is to be modified into index file structure ...",
                     _GET_FUNCTION_NAME_,
                     IndexRank,
-                    wMasterFile.ZMCB.Index[IndexRank]->Name.toString());
+                    wMasterFile.ZMCB.Index[IndexRank]->Name.toCChar());
             if (pRealRun)
                 {
                 wMasterFile.ZMCB.IndexObjects[IndexRank]->setICB(wMasterFile.ZMCB.Index[IndexRank]);
@@ -6694,7 +6697,7 @@ ZSKeyDictionary     wZKDic(&wMasterFile.ZMCB.MetaDic);
                 "%s>>           Index rank <%ld> Name <%s> is to be rebuilt\n",
                 _GET_FUNCTION_NAME_,
                 IndexRank,
-                wMasterFile.ZMCB.Index[IndexRank]->Name.toString());
+                wMasterFile.ZMCB.Index[IndexRank]->Name.toCChar());
         if (pRealRun)
             {
              wSt=wMasterFile.zindexRebuild(IndexRank,ZMFStatistics,wOutput);
@@ -6716,7 +6719,7 @@ ZSKeyDictionary     wZKDic(&wMasterFile.ZMCB.MetaDic);
         fprintf (wOutput,
                  "%s>>          Index <%s> is to be created and rebuilt.\n",
                  _GET_FUNCTION_NAME_,
-                 wZICB->Name.toString());
+                 wZICB->Name.toCChar());
 
 
         IndexPresence.push(3);
@@ -6724,7 +6727,7 @@ ZSKeyDictionary     wZKDic(&wMasterFile.ZMCB.MetaDic);
         {
         wZICB->ZKDic->_reComputeSize();
         wSt=wMasterFile.zcreateIndex(*wZICB->ZKDic,
-                                     wZICB->Name.toString(),
+                                     wZICB->Name,
                                      wZICB->Duplicates,
                                      false);
         if (wSt!=ZS_SUCCESS)
@@ -6779,7 +6782,7 @@ BackProcess_zapplyXMLFile:
                     "%s>>     Index rank <%ld> Name <%s> is to be deleted\n",
                     _GET_FUNCTION_NAME_,
                     wi,
-                    wMasterFile.ZMCB.Index[wi]->Name.toString());
+                    wMasterFile.ZMCB.Index[wi]->Name.toCChar());
             wDestroyedIndexes ++;
 
             if (pRealRun)
@@ -6820,7 +6823,7 @@ BackProcess_zapplyXMLFile:
                     "%s>>     Index rank <%ld> Name <%s> is to be rebuilt\n",
                     _GET_FUNCTION_NAME_,
                     wi,
-                    wMasterFile.ZMCB.Index[wi]->Name.toString());
+                    wMasterFile.ZMCB.Index[wi]->Name.toCChar());
             if (pRealRun)
                 {
                  wSt=wMasterFile.zindexRebuild(wi,ZMFStatistics,wOutput);
@@ -7074,19 +7077,19 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
     wNodeWork = wSecondlevelNode;
 
     wTagName = (const utf8_t*)"HistoryOn";
-    wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+    wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
     if (wSt!=ZS_SUCCESS)
         {
         fprintf(wOutput,"%s>>**** Failed to get parameter <%s>. It will remain unchanged\n",
                 _GET_FUNCTION_NAME_,
-                wTagName.toString());
+                wTagName.toCChar());
         wMissingTags++;
         }
     else
     {
     wMessage.clear();
     wMessage.addsprintf("       parameter <%s>  ",
-                 wTagName.toString());
+                 wTagName.toCChar());
     if (wMasterFile.ZMCB.HistoryOn==(wContent=="true"))
                 wMessage.addsprintf( " <%s> ==unchanged== \n",
                               wMasterFile.ZMCB.HistoryOn?"true":"false");
@@ -7104,12 +7107,12 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
     }// else field----------------------------------------------------
 
     wTagName = (const utf8_t*)"JournalingOn";
-    wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+    wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
     if (wSt!=ZS_SUCCESS)
         {
         fprintf(wOutput,"%s>>**** Failed to get parameter <%s>.It will remain unchanged\n",
                 _GET_FUNCTION_NAME_,
-                wTagName.toString());
+                wTagName.toCChar());
         wMissingTags++;
         }
     else
@@ -7134,7 +7137,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
     }// else field----------------------------------------------------
 
     wTagName = (const utf8_t*)"IndexFileDirectoryPath";
-    wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+    wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
     if (wSt!=ZS_SUCCESS)
         {
         fprintf(wOutput,"%s>>Warning: Failed to get optional parameter <%s>. It will remain unchanged.\n",
@@ -7146,7 +7149,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
     {
     wMessage.clear();
     wMessage.addsprintf("       parameter <%s>  ",
-                 wTagName.toString());
+                 wTagName.toCChar());
     if (wMasterFile.ZMCB.IndexFilePath.toQString()==wContent)
                 wMessage.addsprintf( " <%s> ==unchanged== \n",
                               wMasterFile.ZMCB.IndexFilePath.toString());
@@ -7215,12 +7218,12 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
         wNodeWork = wFourthlevelNode;
 
         wTagName = (const utf8_t*)"Name";
-        wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+        wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
         if (wSt!=ZS_SUCCESS)
             {
             fprintf(wOutput,"%s>>**** Failed to get parameter <%s> - stopping process\n",
                     _GET_FUNCTION_NAME_,
-                    wTagName.toString());
+                    wTagName.toCChar());
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_XMLERROR,
                                     Severity_Fatal,
@@ -7238,7 +7241,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 fprintf(wOutput,
                         "%s>> Index name <%s> will be added to Index at rank <%ld> \n",
                         _GET_FUNCTION_NAME_,
-                        wTagName.toString(),
+                        wTagName.toCChar(),
                         wMasterFile.ZMCB.Index.lastIdx());
 
                 IndexPresence.push(1);      // Index will be created(and rebuilt) and does not have to to be rebuilt - pushed on index presence list
@@ -7248,7 +7251,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
 
                 wMessage.clear();
                 wMessage.addsprintf("       parameter <%s>  ",
-                             wTagName.toString());
+                             wTagName.toCChar());
                 wMessage.addsprintf(" adding value <%s>\n",
                              wContent.toUtf8().data());
                 wZICB.Name.fromQString(wContent);
@@ -7260,13 +7263,13 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
 
                 wMessage.clear();
                 wMessage.addsprintf("       parameter <%s>  ",
-                             wTagName.toString());
+                             wTagName.toCChar());
                  if (wMasterFile.ZMCB.Index[IndexRank]->Name.toQString()==wContent)
                              wMessage.addsprintf( " <%s> ==unchanged== \n",
-                                           wMasterFile.ZMCB.Index[IndexRank]->Name.toString());
+                                           wMasterFile.ZMCB.Index[IndexRank]->Name.toCChar());
                         else
                             wMessage.addsprintf(" current <%s> modified to <%s>\n",
-                                         wMasterFile.ZMCB.Index[IndexRank]->Name.toString(),
+                                         wMasterFile.ZMCB.Index[IndexRank]->Name.toCChar(),
                                          wContent.toStdString().c_str());
 
                 }
@@ -7281,7 +7284,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
             FIndexRebuild = true;
 
             wTagName = (const utf8_t*)"Duplicates";
-            wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+            wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
             if (wSt!=ZS_SUCCESS)
                 {
                 fprintf(wOutput,"%s>>**** Failed to get parameter <%s> default value <%s> applied\n",
@@ -7294,7 +7297,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 {
                 wMessage.clear();
                 wMessage.addsprintf("       parameter <%s>  ",
-                             wTagName.toString());
+                             wTagName.toCChar());
 
                 wZICB.Duplicates = encode_ZST(wContent.toStdString().c_str());
 
@@ -7304,7 +7307,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 fprintf(wOutput,wMessage.toCString_Strait());
                 }// else---------------------------------------------
             wTagName = (const utf8_t*)"AutoRebuild";
-            wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+            wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
             if (wSt!=ZS_SUCCESS)
                 {
                 fprintf(wOutput,"%s>>**** Failed to get parameter <%s> default value <%s> applied \n",
@@ -7317,7 +7320,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 {
                 wMessage.clear();
                 wMessage.addsprintf("       parameter <%s>  ",  // field does not exist in file
-                             wTagName.toString());
+                             wTagName.toCChar());
                 wMessage.addsprintf(" adding value <%s>\n",
                              wContent.toStdString().c_str());
                 fprintf(wOutput,wMessage.toCString_Strait());
@@ -7337,7 +7340,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                                         ZS_XMLERROR,
                                         Severity_Error,
                                         "**** No Dictionary found in Index number <%ld> definition **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                        wTagName.toString(),
+                                        wTagName.toCChar(),
                                         IndexRank
                                         );
                 wMissingTags++;
@@ -7358,7 +7361,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                                         ZS_XMLERROR,
                                         Severity_Error,
                                         "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                        wTagName.toString(),
+                                        wTagName.toCChar(),
                                         IndexRank
                                         );
                 wMissingTags++;
@@ -7374,19 +7377,19 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
             wNodeWork= wSixthlevelNode;
 
             wTagName = (const utf8_t*)"Name";
-            wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+            wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
             if (wSt!=ZS_SUCCESS)
                 {
                 fprintf(wOutput,"%s>>**** Failed to get parameter <%s>. It will remain unchanged.\n",
                         _GET_FUNCTION_NAME_,
-                        wTagName.toString());
+                        wTagName.toCChar());
                  wMissingTags++;
                  }
                 else
                 {
                 wMessage.clear();
                 wMessage.addsprintf("       parameter <%s>  ",
-                             wTagName.toString());
+                             wTagName.toCChar());
                 wMessage.addsprintf(" adding value <%s>\n",
                              wContent.toStdString().c_str());
                 fprintf(wOutput,wMessage.toCString_Strait());
@@ -7395,17 +7398,17 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
 
                 }// else-----------------------------------------------
             wTagName = (const utf8_t*)"NaturalSize";
-            wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+            wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
             if (wSt!=ZS_SUCCESS)
                 {
                 fprintf(wOutput,"%s>>**** Failed to get Mandatory parameter <%s> Index will not be built\n",
                         _GET_FUNCTION_NAME_,
-                        wTagName.toString());
+                        wTagName.toCChar());
                 ZException.setMessage(_GET_FUNCTION_NAME_,
                                         ZS_XMLERROR,
                                         Severity_Error,
                                         "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                        wTagName.toString(),
+                                        wTagName.toCChar(),
                                         IndexRank
                                         );
                 wMissingTags++;
@@ -7416,7 +7419,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 {
                 wMessage.clear();
                 wMessage.addsprintf("       parameter <%s>  ",
-                             wTagName.toString());
+                             wTagName.toCChar());
                 wMessage.addsprintf(" adding value <%ld>\n",
                              wContent.toLong());
                 fprintf(wOutput,wMessage.toCString_Strait());
@@ -7424,17 +7427,17 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 wField.NaturalSize = wContent.toLong();
                 }// else-----------------------------------------------
             wTagName = (const utf8_t*)"UniversalSize";
-            wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+            wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
             if (wSt!=ZS_SUCCESS)
                 {
                 fprintf(wOutput,"%s>>**** Failed to get Mandatory parameter <%s> Index will not be built\n",
                         _GET_FUNCTION_NAME_,
-                        wTagName.toString());
+                        wTagName.toCChar());
                 ZException.setMessage(_GET_FUNCTION_NAME_,
                                         ZS_XMLERROR,
                                         Severity_Error,
                                         "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                        wTagName.toString(),
+                                        wTagName.toCChar(),
                                         IndexRank
                                         );
                 wMissingTags++;
@@ -7444,7 +7447,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 else
                 {
                 wMessage.sprintf("       parameter <%s>  ",
-                             wTagName.toString());
+                             wTagName.toCChar());
                 wMessage.addsprintf(" adding value <%ld>\n",
                              wContent.toLong());
                 fprintf(wOutput,wMessage.toCString_Strait());
@@ -7452,17 +7455,17 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 wField.UniversalSize = wContent.toLong();
                 }// else-----------------------------------------------
             wTagName = (const utf8_t*)"ArrayCount";
-            wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+            wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
             if (wSt!=ZS_SUCCESS)
                 {
                 fprintf(wOutput,"%s>>**** Failed to get Mandatory parameter <%s> Index will not be built\n",
                         _GET_FUNCTION_NAME_,
-                        wTagName.toString());
+                        wTagName.toCChar());
                 ZException.setMessage(_GET_FUNCTION_NAME_,
                                         ZS_XMLERROR,
                                         Severity_Error,
                                         "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                        wTagName.toString(),
+                                        wTagName.toCChar(),
                                         IndexRank
                                         );
                 wMissingTags++;
@@ -7472,7 +7475,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 else
                 {
                 wMessage.sprintf("       parameter <%s>  ",
-                             wTagName.toString());
+                             wTagName.toCChar());
                 wMessage.addsprintf(" adding value <%ld>\n",
                              wContent.toLong());
                 fprintf(wOutput,wMessage.toCString_Strait());
@@ -7480,17 +7483,17 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 wField.ArrayCount = wContent.toLong();
                 }// else-----------------------------------------------
             wTagName = (const utf8_t*)"RecordOffset";
-            wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+            wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
             if (wSt!=ZS_SUCCESS)
                 {
                 fprintf(wOutput,"%s>>**** Failed to get Mandatory parameter <%s> Index will not be built\n",
                         _GET_FUNCTION_NAME_,
-                        wTagName.toString());
+                        wTagName.toCChar());
                 ZException.setMessage(_GET_FUNCTION_NAME_,
                                         ZS_XMLERROR,
                                         Severity_Error,
                                         "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                        wTagName.toString(),
+                                        wTagName.toCChar(),
                                         IndexRank
                                         );
                 wMissingTags++;
@@ -7500,7 +7503,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 else
                 {
                 wMessage.sprintf("       parameter <%s>  ",
-                             wTagName.toString());
+                             wTagName.toCChar());
                 wMessage.addsprintf(" adding value <%ld>\n",
                              wContent.toLong());
                 fprintf(wOutput,wMessage.toCString_Strait());
@@ -7509,17 +7512,17 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 }// else-----------------------------------------------
 
             wTagName = (const utf8_t*)"ZType";
-            wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+            wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
             if (wSt!=ZS_SUCCESS)
                 {
                 fprintf(wOutput,"%s>>**** Failed to get Mandatory parameter <%s> Index will not be built\n",
                         _GET_FUNCTION_NAME_,
-                        wTagName.toString());
+                        wTagName.toCChar());
                 ZException.setMessage(_GET_FUNCTION_NAME_,
                                         ZS_XMLERROR,
                                         Severity_Error,
                                         "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                        wTagName.toString(),
+                                        wTagName.toCChar(),
                                         IndexRank
                                         );
                 wMissingTags++;
@@ -7536,13 +7539,13 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                     {
                     fprintf(wOutput,"%s>>**** parameter <%s> is errored with status <%s> Index will not be built\n",
                             _GET_FUNCTION_NAME_,
-                            wTagName.toString(),
+                            wTagName.toCChar(),
                             decode_ZStatus(wSt));
                     ZException.setMessage(_GET_FUNCTION_NAME_,
                                             wSt,
                                             Severity_Error,
                                             "**** **** parameter <%s> is errored with status <%s> Index will not be built for index rank <%ld> **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                            wTagName.toString(),
+                                            wTagName.toCChar(),
                                             decode_ZStatus(wSt),
                                             IndexRank
                                             );
@@ -7553,7 +7556,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                     else
                     {
                     wMessage.sprintf("       parameter <%s>  ",
-                                 wTagName.toString());
+                                 wTagName.toCChar());
                     wMessage.addsprintf(" adding value <%ld> <%s>\n",
                                  wZType,
                                  decode_ZType(wZType));
@@ -7582,7 +7585,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
             {
                 fprintf(wOutput,"%s>>    Index <%s> rank <%ld> is to be created\n",
                         _GET_FUNCTION_NAME_,
-                        wZICB.Name.toString(),
+                        wZICB.Name.toCChar(),
                         IndexRank
                         );
 
@@ -7590,7 +7593,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                         {
                 fprintf(wOutput,"%s>>    Adding Index <%s>\n",
                         _GET_FUNCTION_NAME_,
-                        wZICB.Name.toString());
+                        wZICB.Name.toCChar());
 
                 wSt =wMasterFile.zcreateIndex (wZKDic,  // contains the description of index key to add (multi fields)
                                                wZICB.Name,
@@ -7601,7 +7604,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                             {
                     fprintf(wOutput,"%s>>    *********Fatal error creation of Index <%s> rank <%ld> ended with error\n",
                             _GET_FUNCTION_NAME_,
-                            wZICB.Name.toString(),
+                            wZICB.Name.toCChar(),
                             IndexRank
 
 
@@ -7621,18 +7624,18 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
 // Rule to change duplicate field : ZST_NODUPLICATES  -> ZST_DUPLICATES     : OK
 //                                  ZST_DUPLICATES    -> ZST_NODUPLICATES   : Not allowed. delete index and recreate one
         wTagName = (const utf8_t*)"Duplicates";
-        wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+        wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
         if (wSt!=ZS_SUCCESS)
             {
             fprintf(wOutput,"%s>>**** Failed to get parameter <%s> parameter will remain unchanged\n",
                     _GET_FUNCTION_NAME_,
-                    wTagName.toString());
+                    wTagName.toCChar());
             wMissingTags++;
             }
         else
         {
         wMessage.sprintf("       parameter <%s>  ",
-                     wTagName.toString());
+                     wTagName.toCChar());
         if (wMasterFile.ZMCB.Index[IndexRank]->Duplicates==encode_ZST( wContent.toStdString().c_str()))
                                 wMessage.addsprintf( " <%s> ==unchanged== \n",
                                               decode_ZST(wMasterFile.ZMCB.Index[IndexRank]->Duplicates));
@@ -7650,7 +7653,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                                             wSt,
                                             Severity_Error,
                                             "Changing index <%s> parameter to <%s> parameter is not allowed for index rank <%ld>. It will remain unchanged",
-                                            wTagName.toString(),
+                                            wTagName.toCChar(),
                                             wContent.toStdString().c_str(),
                                             IndexRank);
                     }
@@ -7667,18 +7670,18 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
         }// else field----------------------------------------------------------
 
         wTagName = (const utf8_t*)"AutoRebuild";
-        wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+        wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
         if (wSt!=ZS_SUCCESS)
             {
             fprintf(wOutput,"%s>>**** Failed to get parameter <%s> parameter will remain unchanged\n",
                     _GET_FUNCTION_NAME_,
-                    wTagName.toString());
+                    wTagName.toCChar());
             wMissingTags++;
             }
         else
         {
         wMessage.sprintf("       parameter <%s>  ",
-                     wTagName.toString());
+                     wTagName.toCChar());
         if (wMasterFile.ZMCB.Index[IndexRank]->AutoRebuild==(wContent=="true"))
                     wMessage.addsprintf( " <%s> ==unchanged== \n",
                                   wMasterFile.ZMCB.Index[IndexRank]->AutoRebuild?"true":"false");
@@ -7725,7 +7728,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                                         ZS_XMLERROR,
                                         Severity_Error,
                                         "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                        wTagName.toString(),
+                                        wTagName.toCChar(),
                                         IndexRank
                                         );
                 wMissingTags++;
@@ -7744,7 +7747,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 {
                 fprintf(wOutput,"%s>>       Adding Field to index key dictionary for Index name <%s>.\n",
                         _GET_FUNCTION_NAME_,
-                        wTagName.toString());
+                        wTagName.toCChar());
                 if (pRealRun)
                         {
                         wMasterFile.ZMCB.Index[IndexRank].ZKDic->newBlankElement();
@@ -7754,26 +7757,26 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 } // wKeyRank > ZKDic size
 
             wTagName = "Name";
-            wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+            wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
             if (wSt!=ZS_SUCCESS)
                 {
                 fprintf(wOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged Or omitted.\n",
                         _GET_FUNCTION_NAME_,
-                        wTagName.toString());
+                        wTagName.toCChar());
                 wMissingTags++;
                 }
             else
             {
             wMessage.clear();
             wMessage.add("       parameter <%s>  ",
-                         wTagName.toString());
+                         wTagName.toCChar());
             if (wMasterFile.ZMCB.Index[IndexRank].ZKDic->Tab[wKeyRank].Name== wContent.toStdString().c_str())
                         wMessage.add( " <%s> ==unchanged== \n",
-                                      wMasterFile.ZMCB.Index[IndexRank].ZKDic->Tab[wKeyRank].Name.toString());
+                                      wMasterFile.ZMCB.Index[IndexRank].ZKDic->Tab[wKeyRank].Name.toCChar());
                     else
                     {
                     wMessage.add(" current <%s> modified to <%s>\n",
-                                 wMasterFile.ZMCB.Index[IndexRank].ZKDic->Tab[wKeyRank].Name.toString(),
+                                 wMasterFile.ZMCB.Index[IndexRank].ZKDic->Tab[wKeyRank].Name.toCChar(),
                                  wContent.toStdString().c_str());
                     if (pRealRun)
                         {
@@ -7787,7 +7790,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
             }//else----------------------------------------------------------------------------
 
             wTagName = "NaturalSize";
-            wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+            wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
             if (wSt!=ZS_SUCCESS)
                 {
                 if (FAddField)
@@ -7796,7 +7799,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                                             ZS_XMLERROR,
                                             Severity_Fatal,
                                             "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Aborting process without saving file header.",
-                                            wTagName.toString(),
+                                            wTagName.toCChar(),
                                             IndexRank
                                             );
                     ZException.exit_abort();
@@ -7804,14 +7807,14 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
 
                 fprintf(wOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged\n",
                         _GET_FUNCTION_NAME_,
-                        wTagName.toString());
+                        wTagName.toCChar());
                 wMissingTags++;
                  }
                 else
                 {
                 wMessage.clear();
                 wMessage.add("       parameter <%s>  ",
-                             wTagName.toString());
+                             wTagName.toCChar());
                 if (wMasterFile.ZMCB.Index[IndexRank].ZKDic->Tab[wKeyRank].NaturalSize== wContent.toLong())
                         wMessage.add( " <%ld> ==unchanged== \n",
                                       wMasterFile.ZMCB.Index[IndexRank].ZKDic->Tab[wKeyRank].NaturalSize);
@@ -7831,7 +7834,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
 
 
             wTagName = "UniversalSize";
-            wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+            wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
             if (wSt!=ZS_SUCCESS)
                 {
                 if (FAddField)
@@ -7840,21 +7843,21 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                                             ZS_XMLERROR,
                                             Severity_Fatal,
                                             "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Aborting process without saving file header.",
-                                            wTagName.toString(),
+                                            wTagName.toCChar(),
                                             IndexRank
                                             );
                     ZException.exit_abort();
                     }
                 fprintf(wOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged\n",
                         _GET_FUNCTION_NAME_,
-                        wTagName.toString());
+                        wTagName.toCChar());
                 wMissingTags++;
                  }
                 else
                 {
                 wMessage.clear();
                 wMessage.add("       parameter <%s>  ",
-                             wTagName.toString());
+                             wTagName.toCChar());
                 if (wMasterFile.ZMCB.Index[IndexRank].ZKDic->Tab[wKeyRank].UniversalSize== wContent.toLong())
                             wMessage.add( " <%ld> ==unchanged== \n",
                                           wMasterFile.ZMCB.Index[IndexRank].ZKDic->Tab[wKeyRank].UniversalSize);
@@ -7873,7 +7876,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 }// else-----------------------------------------------
 
             wTagName = "ArrayCount";
-            wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+            wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
             if (wSt!=ZS_SUCCESS)
                 {
                 if (FAddField)
@@ -7882,21 +7885,21 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                                             ZS_XMLERROR,
                                             Severity_Fatal,
                                             "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Aborting process without saving file header.",
-                                            wTagName.toString(),
+                                            wTagName.toCChar(),
                                             IndexRank
                                             );
                     ZException.exit_abort();
                     }
                 fprintf(wOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged\n",
                         _GET_FUNCTION_NAME_,
-                        wTagName.toString());
+                        wTagName.toCChar());
                 wMissingTags++;
                  }
                 else
                 {
                 wMessage.clear();
                 wMessage.add("       parameter <%s>  ",
-                             wTagName.toString());
+                             wTagName.toCChar());
                 if (wMasterFile.ZMCB.Index[IndexRank].ZKDic->Tab[wKeyRank].ArrayCount== wContent.toLong())
                             wMessage.add( " <%ld> ==unchanged== \n",
                                           wMasterFile.ZMCB.Index[IndexRank].ZKDic->Tab[wKeyRank].ArrayCount);
@@ -7915,7 +7918,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 }// else-----------------------------------------------
 
             wTagName = "RecordOffset";
-            wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+            wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
             if (wSt!=ZS_SUCCESS)
                 {
                 if (FAddField)
@@ -7924,21 +7927,21 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                                             ZS_XMLERROR,
                                             Severity_Fatal,
                                             "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Aborting process without saving file header.",
-                                            wTagName.toString(),
+                                            wTagName.toCChar(),
                                             IndexRank
                                             );
                     ZException.exit_abort();
                     }
                 fprintf(wOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged.\n",
                         _GET_FUNCTION_NAME_,
-                        wTagName.toString());
+                        wTagName.toCChar());
                 wMissingTags++;
                  }
                 else
                 {
                 wMessage.clear();
                 wMessage.add("       parameter <%s>  ",
-                             wTagName.toString());
+                             wTagName.toCChar());
                 if (wMasterFile.ZMCB.Index[IndexRank].ZKDic->Tab[wKeyRank].RecordOffset== wContent.toLong())
                             wMessage.add( " <%ld> ==unchanged== \n",
                                           wMasterFile.ZMCB.Index[IndexRank].ZKDic->Tab[wKeyRank].RecordOffset);
@@ -7958,7 +7961,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                 }// else-----------------------------------------------
 
             wTagName = "ZType";
-            wSt=getChildElementValue(wNodeWork,wTagName.toString(),wContent);
+            wSt=getChildElementValue(wNodeWork,wTagName.toCChar(),wContent);
             if (wSt!=ZS_SUCCESS)
                 {
                 if (FAddField)
@@ -7967,14 +7970,14 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                                             ZS_XMLERROR,
                                             Severity_Fatal,
                                             "**** Failed to get Mandatory parameter <%s> for index rank <%ld> **** Aborting process without saving file header.",
-                                            wTagName.toString(),
+                                            wTagName.toCChar(),
                                             IndexRank
                                             );
                     ZException.exit_abort();
                     }
                 fprintf(wOutput,"%s>>**** Failed to get parameter <%s>. Parameter will remain unchanged.\n",
                         _GET_FUNCTION_NAME_,
-                        wTagName.toString());
+                        wTagName.toCChar());
                 wMissingTags++;
                  }
                 else
@@ -7986,13 +7989,13 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                     {
                     fprintf(wOutput,"%s>>**** parameter <%s> is errored with status <%s> Field will not be changed\n",
                             _GET_FUNCTION_NAME_,
-                            wTagName.toString(),
+                            wTagName.toCChar(),
                             decode_ZStatus(wSt));
                     ZException.setMessage(_GET_FUNCTION_NAME_,
                                             wSt,
                                             Severity_Error,
                                             "**** **** parameter <%s> is errored with status <%s> Field will not be changed for index rank <%ld> **** Failed to get Mandatory parameter <%s> Index will not be built",
-                                            wTagName.toString(),
+                                            wTagName.toCChar(),
                                             decode_ZStatus(wSt),
                                             IndexRank
                                             );
@@ -8002,7 +8005,7 @@ ZSIndexControlBlock  wZICB(&wMasterFile.ZMCB.MetaDic);
                     {
                     wMessage.clear();
                     wMessage.add("       parameter <%s>  ",
-                                 wTagName.toString());
+                                 wTagName.toCChar());
 
                     if (wMasterFile.ZMCB.Index[IndexRank].ZKDic->Tab[wKeyRank].ZType== wZType)
                                 wMessage.add( " <%s> ==unchanged== \n",
@@ -8052,7 +8055,7 @@ BackProcess_zapplyXMLFile:
                     "%s>>     Index rank <%ld> Name <%s> is to be deleted\n",
                     _GET_FUNCTION_NAME_,
                     wi,
-                    wMasterFile.ZMCB.Index[wi]->Name.toString());
+                    wMasterFile.ZMCB.Index[wi]->Name.toCChar());
             wDestroyedIndexes ++;
 
             if (pRealRun)
@@ -8093,7 +8096,7 @@ BackProcess_zapplyXMLFile:
                     "%s>>     Index rank <%ld> Name <%s> is to be rebuilt\n",
                     _GET_FUNCTION_NAME_,
                     wi,
-                    wMasterFile.ZMCB.Index[wi]->Name.toString());
+                    wMasterFile.ZMCB.Index[wi]->Name.toCChar());
             if (pRealRun)
                 {
                  wSt=wMasterFile.zindexRebuild(wi,ZMFStatistics,wOutput);
@@ -8199,7 +8202,7 @@ ZSMasterFile::ZRFPMSIndexStats(const long pIndex,FILE* pOutput)
              "________________________________________________\n",
              pIndex,
 
-             ZMCB.Index[pIndex]->Name.toString(),
+             ZMCB.Index[pIndex]->Name.toCChar(),
              ZDescriptor.URIHeader.toString(),
              ZMCB.IndexObjects[pIndex]->getURIContent().toString(),
              ZMCB.IndexObjects[pIndex]->getURIHeader().toString()
@@ -8334,7 +8337,7 @@ ZSMasterFile::zreportIndexPMSMonitoring (const long pIndex, FILE* pOutput)
            "   File open mode    %s\n",
            ZDescriptor.URIContent.toString(),
            pIndex,
-           ZMCB.Index[pIndex]->Name.toString(),
+           ZMCB.Index[pIndex]->Name.toCChar(),
            decode_ZRFMode( ZDescriptor.Mode));
    ZMCB.IndexObjects[pIndex]->ZPMSStats.reportFull(pOutput);
    return  ZS_SUCCESS;
