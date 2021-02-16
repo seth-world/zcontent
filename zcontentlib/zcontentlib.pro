@@ -222,7 +222,11 @@ HEADERS += \
     ../zcontentcommon/zresource.h \
     ../zcontentcommon/zresult.h \
     ../zcontentcommon/zresult.h \
+    ../zfielddescription.h \
     ../zindexedfile/zdatatype.h \
+    ../zindexedfile/zindexcontrolblock.h \
+    ../zindexedfile/zindexfield.h \
+    ../zindexedfile/zkeydictionary.h \
     ../zindexedfile/zmasterfile_utilities.h \
     ../zindexedfile/zmetadic.h \
     ../zindexedfile/zmf_limits.h \
@@ -236,7 +240,12 @@ HEADERS += \
     ../zindexedfile/zskey.h \
     ../zindexedfile/zsmasterfile.h \
     ../zindexedfile/zurffromnatural.h \
+    ../zrandomfile/zblock.h \
+    ../zrandomfile/zfilecontrolblock.h \
+    ../zrandomfile/zfiledescriptor.h \
+    ../zrandomfile/zheadercontrolblock.h \
     ../zrandomfile/zrandomlockfile.h \
+    ../zrandomfile/zrfpms.h \
     ../zrandomfile/zsrfcollection.h \
     ../zrandomfile/zssearchargument.h \
     ../zrandomfile/zrandomfile.h \
@@ -322,7 +331,11 @@ SOURCES += \
     ../zcontentcommon/zoperation.cpp \
     ../zcontentcommon/zresource.cpp \
     ../zcontentcommon/zresult.cpp \
+    ../zfielddescription.cpp \
     ../zindexedfile/zdatatype.cpp \
+    ../zindexedfile/zindexcontrolblock.cpp \
+    ../zindexedfile/zindexfield.cpp \
+    ../zindexedfile/zkeydictionary.cpp \
     ../zindexedfile/zmasterfile_utilities.cpp \
     ../zindexedfile/zmetadic.cpp \
     ../zindexedfile/znaturalfromurf.cpp \
@@ -334,9 +347,14 @@ SOURCES += \
     ../zindexedfile/zskey.cpp \
     ../zindexedfile/zsmasterfile.cpp \
     ../zindexedfile/zurffromnatural.cpp \
+    ../zrandomfile/zblock.cpp \
+    ../zrandomfile/zfilecontrolblock.cpp \
+    ../zrandomfile/zfiledescriptor.cpp \
+    ../zrandomfile/zheadercontrolblock.cpp \
     ../zrandomfile/zrandomfile.cpp \
     ../zrandomfile/zrandomlockfile.cpp \
     ../zrandomfile/zrfcollection.cpp \
+    ../zrandomfile/zrfpms.cpp \
     ../zrandomfile/zssearchargument.cpp
 
 FURTHER_CPP=         ../zrandomfile/zrandomlockfile.cpp

@@ -181,7 +181,7 @@ public:
 
 using namespace zbs ;
 
-typedef utfdescString ZFieldName_type ;
+typedef utf8String ZFieldName_type ;
 
 
 

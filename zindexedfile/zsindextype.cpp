@@ -3,538 +3,17 @@
 
 #include <zindexedfile/zsindextype.h>
 #include <zindexedfile/zmetadic.h>
+#include <zindexedfile/zindexfield.h>
+#include <zindexedfile/zkeydictionary.h>
+
 /** @addtogroup ZSIndexFileGroup
 
 @{ */
 
-/**
- * @brief ZKeyDictionary::zgetFieldRank gets a field position (rank) in the key dictionary using its field name
- *
- * @param[in] pFieldName a Cstring that qualifies the name of the field. This name is given while creating the index dictionary.
- * @return the field position (rank) in dictionary. returns -1 if field name has not been found.
- */
-long
-ZSKeyDictionary::zsearchFieldByName(const utf8_t *pFieldName)
-{
-    long wMDicRank=0;
-        for (long wi=0;wi<size();wi++)
-                {
-                wMDicRank= Tab[wi].MDicRank;
-                if (MetaDic->Tab[wMDicRank].Name==pFieldName)
-                                                    return wi;
-                }
-    ZException.setMessage(_GET_FUNCTION_NAME_,
-                            ZS_INVNAME,
-                            Severity_Error,
-                            " Field name <%s> does not exist within ZDictionary",
-                            pFieldName);
-
-    return -1;
-}
-/**
- * @brief CZKeyDictionary::zgetFieldRank gets a field position (rank) in the key dictionary using its field name
- *
- * @param[in] pFieldName a Cstring that qualifies the name of the field. This name is given while creating the index dictionary.
- * @return the field position (rank) in dictionary. returns -1 if field name has not been found.
- */
-long
-ZSKeyDictionary::zsearchFieldByName(utfdescString &pFieldName)
-{
-long wMDicRank=0;
-    for (long wi=0;wi<size();wi++)
-            {
-            wMDicRank= Tab[wi].MDicRank;
-            if (MetaDic->Tab[wMDicRank].Name==pFieldName.toCChar())
-                                                return wi;
-            }
-    ZException.setMessage(_GET_FUNCTION_NAME_,
-                            ZS_INVNAME,
-                            Severity_Error,
-                            " Field name <%s> does not exist within ZDictionary",
-                            pFieldName.toCChar());
-
-    return -1;
-}
-#ifdef __COMMENT__
-/**
- * @brief CZKeyDictionary::print Reports the content of CZKeyDictionary for all fields
- * @param[in] pOutput   a FILE* pointer where the reporting will be made. Defaulted to stdout.
- */
-void ZSKeyDictionary ::print (FILE* pOutput)
-{
-    fprintf (pOutput,
-             "-----------------------ZKeyFieldList content-------------------\n"
-             " %4s %8s %8s %8s %8s %17s %5s\n",
-             "rank",
-             "Offset",
-             "Natural",
-             "Internal",
-             "Array nb",
-             "Name",
-             "ZType");
-    for (long wi=0;wi<size();wi++)
-    {
-/*    if (Tab[wi].ZType & ZType_Array) */
-        fprintf (pOutput,
-             " <%2ld> %8ld %8ld %8ld %8d <%15s> <%s>\n",
-             wi,
-             Tab[wi].RecordOffset,
-             Tab[wi].NaturalSize,
-             Tab[wi].UniversalSize,
-             Tab[wi].ArrayCount,
-             Tab[wi].Name.toCChar(),
-             decode_ZType( Tab[wi].ZType));
-/*    else
-        fprintf (pOutput,
-             " <%2ld> %8ld %8ld %8s <%15s> <%s>\n",
-             wi,
-             Tab[wi].Offset,
-             Tab[wi].Length,
-             "--",
-             Tab[wi].Name.toCChar(),
-             decode_ZType( Tab[wi].ZType));*/
-    }// for
-    fprintf (pOutput,
-             "---------------------------------------------------------------\n");
-    return;
-}
-#endif // __COMMENT__
-/**
- * @brief CZKeyDictionary::fieldKeyOffset this routine gives the offset from the beginning of the Key record for the field at Key Dictionary rank pRank.
- * @param[in] pRank relative position (rank) of the field within key dictionary
- * @return the offset from the beginning of the Key for the field at Key Dictionary rank pRank. Returns -1 if field rank is out of dictionary boundaries.
- */
-ssize_t ZSKeyDictionary ::fieldKeyOffset (const long pRank)
-{
-// compute offset of requested Field within Key
-
-ssize_t wKeyOffset = 0;
-
-for (long wi=0;wi<size();wi++)
-           {
-           if (wi==pRank)
-                    return wKeyOffset;
-           wKeyOffset += Tab[wi].UniversalSize; // KeySize contains the overall size of data field stored in key whatever its type could be
-           } // for
-return (-1); // pRank is out of dictionary boundaries
-} //fieldOffset
-
-
-ZStatus
-ZSKeyDictionary::addFieldToZDicByName (const utf8_t* pFieldName)
-{
-
-ZSIndexField_struct wField;
-    if (MetaDic==nullptr)
-            {
-            return ZS_INVVALUE;
-            }
-    zrank_type wMRank=MetaDic->searchFieldByName(pFieldName);
-    if (wMRank<0)
-            return ZS_NOTFOUND;
-
-    return addFieldToZDicByRank (wMRank);
-}//addFieldToZDicByName
-
-ZStatus
-ZSKeyDictionary::addFieldToZDicByRank (const zrank_type pMDicRank)
-{
-
-ZSIndexField_struct wField;
-    if (MetaDic==nullptr)
-    {
-    return ZS_INVVALUE;
-    }
-    if ((pMDicRank>=MetaDic->size())||(pMDicRank<0))
-            {
-            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                  ZS_OUTBOUND,
-                                  Severity_Error,
-                                  "Meta dictionary rank <%ld> is not a valid index value",
-                                  pMDicRank);
-            return ZS_OUTBOUND;
-            }
-    if (!MetaDic->Tab[pMDicRank].KeyEligible)
-            {
-
-            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                  ZS_INVINDEX,
-                                  Severity_Error,
-                                  "Field rank <%ld> <%s> is not eligible to be a key field",
-                                  pMDicRank,
-                                  MetaDic->Tab[pMDicRank].Name.toCChar());
-            return ZS_INVINDEX;
-            }
-    wField.ZType=MetaDic->Tab[pMDicRank].ZType;
-    wField.UniversalSize=MetaDic->Tab[pMDicRank].UniversalSize;
-    wField.NaturalSize=MetaDic->Tab[pMDicRank].NaturalSize;
-    wField.ArrayCount=MetaDic->Tab[pMDicRank].Capacity;
-    wField.MDicRank = pMDicRank;
-    push(wField);
-    Recomputed=false;
-    return ZS_SUCCESS;
-}// addFieldToZDicByRank
-
-#ifdef __COMMENT__
-/**
- * @brief CZKeyDictionary::fieldRecordOffset this routine gives the offset from the beginning of the ZMasterFile user's record for the field at Key Dictionary rank pRank.
- * @param[in] pRank relative position (rank) of the field within key dictionary
- * @return the offset from the beginning of the ZMasterFile user's record for the field at Key Dictionary rank pRank. Returns -1 if field rank is out of dictionary boundaries.
- */
-ssize_t ZSKeyDictionary ::fieldRecordOffset (const long pRank)
-{
-
-    return MDic->Tab[pRank].DataOffset;
-
-} //fieldOffset
-#endif //__COMMENT__
-#ifdef __COMMENT__
-/**
- * @brief CZKeyDictionary::zremoveField removes a field which name corresponds to pFieldName from the current key dictionary
- * @param[in] pFieldName user name for the field to be removed from dictionary
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
-ZStatus
-ZSKeyDictionary::zremoveField (const char *pFieldName)
-{
-
-    long wRank = zsearchFieldByName(pFieldName);
-    if (wRank<0)
-            return ZS_INVNAME;
-
-    erase(wRank);
-    _reComputeSize();
-    return ZS_SUCCESS;
-}//zremoveField
-
-/**
- * @brief CZKeyDictionary::zsetField For a key dictionary field given by its rank pFieldRank sets its attribute given by pZKD to pValue
- * @param[in] pFieldRank Key field rank to modify attribute
- * @param[in] pZKD       a ZKeyDic_type describing the attribute to modify
- * @param[in] pValue     Key field attribute value
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
-ZStatus
-ZSKeyDictionary::zsetField (const long pFieldRank,ZKeyDic_type pZKD,auto pValue)
-{
-ZStatus wSt = ZS_SUCCESS;
-    if ((pFieldRank<0)||(pFieldRank>lastIdx()))
-        {
-        ZException.setMessage(_GET_FUNCTION_NAME_,
-                                ZS_OUTBOUND,
-                                Severity_Error,
-                                "Given field rank <%ld> is out of Key dictionary boundaries [0,%ld]",
-                                pFieldRank,
-                                lastIdx());
-        return (ZS_OUTBOUND);
-        }
-    switch (pZKD)
-    {
-    case ZKD_ArraySize :
-    {
-        Tab[pFieldRank].ArrayCount = pValue;
-        return ZS_SUCCESS;
-    }
-    case ZKD_UniversalSize :
-    {
-        Tab[pFieldRank].UniversalSize = pValue;
-        return ZS_SUCCESS;
-    }
-    case ZKD_NaturalSize :
-    {
-        Tab[pFieldRank].NaturalSize = pValue;
-        return ZS_SUCCESS;
-    }
-    case ZKD_RecordOffset :
-    {
-        Tab[pFieldRank].RecordOffset = pValue;
-        return ZS_SUCCESS;
-    }
-    case ZKD_ZType :
-    {
-        Tab[pFieldRank].ZType = pValue;
-        if (!(Tab[pFieldRank].ZType&ZType_NegateStructure)) // atomic value ?
-            {
-            Tab[pFieldRank].ArrayCount = 1;
-            wSt=getAtomicZType_Sizes(Tab[pFieldRank].ZType,Tab[pFieldRank].NaturalSize,Tab[pFieldRank].UniversalSize);
-            if (wSt!=ZS_SUCCESS)
-                    return wSt;
-            }
-        return ZS_SUCCESS;
-    }
-    default:
-    {
-    ZException.setMessage(_GET_FUNCTION_NAME_,
-                            ZS_INVTYPE,
-                            Severity_Error,
-                            " Invalid ZKeyDic_type <%ld> ",
-                            pZKD);
-    return ZS_INVTYPE;
-    }
-    }//case
-}//zsetField
-#endif // __COMMENT__
-
-/** @cond Development
- * @brief CZKeyDictionary::_reComputeSize computes the total sizes : Natural size and Internal size for the whole key
- */
-void
-ZSKeyDictionary::_reComputeSize (void)
-{
-    KeyNaturalSize=0;
-    KeyUniversalSize=0;
-
-    for (long wi=0;wi<size(); wi++)
-                { // only ZKDic at record level may be a certain value for field sizes
-                Tab[wi].KeyOffset= KeyUniversalSize;
-
-                KeyNaturalSize +=(size_t) getNaturalSize(wi) ;
-                KeyUniversalSize += (size_t)getUniversalSize(wi) ;
-
-                /*KeyNaturalSize += Tab[wi].NaturalSize;
-                KeyUniversalSize += Tab[wi].UniversalSize;*/
-                }
-    Recomputed=true;
-    return;
-}// _reComputeSize
-
-ZDataBuffer&
-ZSKeyDictionary::_export(ZDataBuffer& pZDBExport)
-{
-ZDataBuffer wZDB;       // exporting each rank of dictionnary : each field definition
-/*size_t wSize=_reverseByteOrder_T<size_t>(KDicSize);
-
-    pZDBExport.setData(&wSize,sizeof(wSize)); // reserve a size_t first (DicSize) and disregard the other values (computed)
-
-    for (long wi=0;wi<size();wi++)
-        {
-        pZDBExport.appendData(Tab[wi]._export(wZDB));
-        }
-*/
-unsigned char* wBuffer;
-size_t wBufferSize;
-     ZAexportCurrent((_Base*)this,
-                            wBuffer,
-                            wBufferSize,
-                            &ZSIndexField_struct::_exportConvert);
-     pZDBExport.setData(wBuffer,wBufferSize);
-     free(wBuffer);
-     return pZDBExport;
-}
-size_t
-ZSKeyDictionary::_import(unsigned char* pZDBImport_Ptr)
-{
-    size_t wDicSize=ZAimport((_Base*)this,
-                               pZDBImport_Ptr,
-                               &ZSIndexField_struct::_importConvert);
-
-    _reComputeSize();
-    return wDicSize;
-}
-
-
-
-/** @endcond */
-
-
-
-
-ZSIndexControlBlock::ZSIndexControlBlock (ZMetaDic *pMetaDic)
-{
-    clear(pMetaDic);
-    return;
-}
-ZSIndexControlBlock::~ZSIndexControlBlock (void)
-{
-/*    if (ZKDic!=nullptr)
-                {
-                delete ZKDic ;
-                ZKDic=nullptr;
-                }*/
-    if (CheckSum!=nullptr)
-                delete CheckSum;
-    MetaDic=nullptr; //MetaDic refers to ZSMasterFile::MetaDic
-    return;
-}
-/**
- * @brief ZIndexControlBlock::clear Resets ZIndexControlBlock to initial data - reset Key Dictionnary
- */
-void
-ZSIndexControlBlock::clear(ZMetaDic*pMetaDic)
-{
-
-    ZSICBOwnData::clear();
-    MetaDic = pMetaDic;
-    if (ZKDic!=nullptr)
-                {
-                delete ZKDic ;
-                ZKDic = nullptr;
-                }
-    ZKDic = new ZSKeyDictionary(pMetaDic) ;
-    return;
-}//clear
-
-ZSIndexField_strOut
-ZSIndexField_struct::_exportConvert(ZSIndexField_struct& pIn,ZSIndexField_strOut* pOut)
-{
-
-    memset(pOut,0,sizeof(ZSIndexField_strOut));
-    pOut->MDicRank=reverseByteOrder_Conditional<size_t>(pIn.MDicRank);
-    pOut->NaturalSize=reverseByteOrder_Conditional<uint64_t>(pIn.NaturalSize);
-    pOut->UniversalSize=reverseByteOrder_Conditional<uint64_t>(pIn.UniversalSize);
-    pOut->ArrayCount=reverseByteOrder_Conditional<uint32_t>(pIn.ArrayCount);
-    pOut->ZType=reverseByteOrder_Conditional<ZTypeBase>(pIn.ZType);
-    return *pOut;
-}
-ZSIndexField_struct
-ZSIndexField_struct::_importConvert(ZSIndexField_struct& pOut,ZSIndexField_strOut* pIn)
-{
-
-    memset(&pOut,0,sizeof(ZSIndexField_struct));
-    pOut.MDicRank=reverseByteOrder_Conditional<size_t>(pIn->MDicRank);
-    pOut.NaturalSize=reverseByteOrder_Conditional<uint64_t>(pIn->NaturalSize);
-    pOut.UniversalSize=reverseByteOrder_Conditional<uint64_t>(pIn->UniversalSize);
-    pOut.ArrayCount=reverseByteOrder_Conditional<uint32_t>(pIn->ArrayCount);
-    pOut.ZType=reverseByteOrder_Conditional<ZTypeBase>(pIn->ZType);
-    return pOut;
-}
-
-ZDataBuffer&
-ZSIndexField_struct::_export(ZDataBuffer& pZDBExport)
-{
-    ZSIndexField_struct wIFS;
-    memset(&wIFS,0,sizeof(ZSIndexField_struct));
-    wIFS.MDicRank=reverseByteOrder_Conditional<size_t>(MDicRank);
-    wIFS.NaturalSize=reverseByteOrder_Conditional<uint64_t>(NaturalSize);
-    wIFS.UniversalSize=reverseByteOrder_Conditional<uint64_t>(UniversalSize);
-    wIFS.KeyOffset=reverseByteOrder_Conditional<uint64_t>(KeyOffset);
-    wIFS.ArrayCount=reverseByteOrder_Conditional<uint32_t>(ArrayCount);
-    wIFS.ZType=reverseByteOrder_Conditional<ZTypeBase>(ZType);
-
-//    wIFS.RecordOffset=_reverseByteOrder_T<uint64_t>(RecordOffset);
-//    wIFS.Name=Name;
-    pZDBExport.setData(&wIFS,sizeof(wIFS));
-    return pZDBExport;
-}
-ZSIndexField_struct&
-ZSIndexField_struct::_import(unsigned char* pZDBImport_Ptr)
-{
-    ZSIndexField_struct* wIFS=(ZSIndexField_struct*) pZDBImport_Ptr;
-    memset(this,0,sizeof(ZSIndexField_struct));
-    MDicRank=reverseByteOrder_Conditional<size_t>(wIFS->MDicRank);
-    NaturalSize=reverseByteOrder_Conditional<uint64_t>(wIFS->NaturalSize);
-    UniversalSize=reverseByteOrder_Conditional<uint64_t>(wIFS->UniversalSize);
-    KeyOffset=reverseByteOrder_Conditional<uint64_t>(wIFS->KeyOffset);
-    ArrayCount=reverseByteOrder_Conditional<uint32_t>(wIFS->ArrayCount);
-    ZType=reverseByteOrder_Conditional<ZTypeBase>(wIFS->ZType);
-//    RecordOffset=_reverseByteOrder_T<uint64_t>(wIFS->RecordOffset);
-//    Name=wIFS->Name;  // Name is a descString
-    return *this;
-}
 
 
 
 //------------- End CZKeyDictionary---------------------------------------
-void
-ZSICBOwnData_Export::clear(void)
-{
-    BlockID=ZBID_ICB;
-    ZMFVersion =  __ZMF_VERSION__ ;
-//    Name.clear();   // index name is not defined in ICB export structure : got from ICB memory structure and exported as Universal string
-    BlockID = ZBID_ICB;
-    StartSign=cst_ZSTART;
-    Duplicates = ZST_NODUPLICATES;
-    AutoRebuild = false;
-    ICBTotalSize =0;
-    ZKDicOffset=0;
-//    Name=nullptr;
-    return;
-}//clear
-ZDataBuffer&
-ZSICBOwnData::_exportICBOwn(ZDataBuffer& pZDBExport)
-{
-ZDataBuffer wIndexName;
-ZSICBOwnData_Export wICB;
-
-    memset(&wICB,0,sizeof(ZSICBOwnData_Export));
-
-    wIndexName=Name._exportUVF();
-    ICBTotalSize = wIndexName.Size+sizeof(ZSICBOwnData_Export);
-    ZKDicOffset = ICBTotalSize;
-    wICB.clear();
-
-    wICB.BlockID=ZBID_ICB ;   // uint8_t
-    wICB.ZMFVersion=reverseByteOrder_Conditional<unsigned long>(__ZMF_VERSION__);
-    wICB.ICBTotalSize=reverseByteOrder_Conditional<size_t>(ICBTotalSize);
-    wICB.ZKDicOffset=reverseByteOrder_Conditional<size_t>(ZKDicOffset);
-
-    wICB.AutoRebuild=AutoRebuild; // uint8_t
-    wICB.Duplicates=Duplicates; // uint8_t
-    wICB.KeyType=KeyType; // uint8_t
-//    wICB.EndSign=EndSign;
-    pZDBExport.setData(&wICB,sizeof(wICB));
-
-    pZDBExport.appendData(wIndexName);
-    return pZDBExport;
-}// ZSICBOwnData::_exportICBOwn
-ZStatus
-ZSICBOwnData::_importICBOwn(unsigned char* pZDBImport_Ptr)
-{
-
-
-    ZSICBOwnData_Export* wICBOwn_Import=(ZSICBOwnData_Export*)( pZDBImport_Ptr);
-
-    clear();
-    if (wICBOwn_Import->BlockID != ZBID_ICB) // has not to be reversed
-            {
-            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                   ZS_BADICB,
-                                   Severity_Severe,
-                                   "Error Index Control Block identification is bad. Value <%ld>  : File header appears to be corrupted - invalid BlockID",
-                                   wICBOwn_Import->BlockID);
-            return (ZS_BADICB);
-            }
-    if (wICBOwn_Import->StartSign != cst_ZSTART)    // has not to be reversed
-            {
-            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                  ZS_BADFILEHEADER,
-                                  Severity_Severe,
-                                  "Error Index Control Block  : Index header appears to be corrupted - invalid ICB StartBlock");
-            return (ZS_BADFILEHEADER);
-            }
-
-    if (reverseByteOrder_Conditional<unsigned long>(wICBOwn_Import->ZMFVersion) != __ZMF_VERSION__)// HAS to be reversed
-            {
-            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                  ZS_BADFILEVERSION,
-                                  Severity_Severe,
-                                  "Error Index Control Block   : Found version <%ld> while current ZMF version is <%ld>",
-                                  wICBOwn_Import->ZMFVersion,
-                                  __ZMF_VERSION__);
-            return (ZS_BADFILEVERSION);
-            }
-
-
-
-    ICBTotalSize=reverseByteOrder_Conditional<size_t>(wICBOwn_Import->ICBTotalSize);
-    ZKDicOffset=reverseByteOrder_Conditional<size_t>(wICBOwn_Import->ZKDicOffset);
-
-    AutoRebuild=wICBOwn_Import->AutoRebuild;  // uint8_t
-    Duplicates=wICBOwn_Import->Duplicates; // uint8_t
-    KeyType=wICBOwn_Import->KeyType; // uint8_t
-
-    unsigned char* wPtr=pZDBImport_Ptr+sizeof(ZSICBOwnData_Export); // index Name is stored just after ZSICBOwnData_Export structure
-                                                                    // format is Universal format with leading size (uint16_t)
-
-    size_t wSize=Name._importUVF(wPtr);  // Name is stored after ZSICBOwnData_Export as a varying number of byte (uint16_t is leading string size)
-
-//    size_t wZKDicOffset = wSize+sizeof(ZSICBOwnData_Export); // ZKDic starts after varying string Index Name
-//    EndSign=wICB->EndSign;
-
-    return  ZS_SUCCESS;
-}// ZSICBOwnData::_importICBOwn
-
-
 
 
 
@@ -822,7 +301,7 @@ Size of the returned ZDataBuffer content is
  * @param pField    ZIndex Key dictionary rank describing the data to extract.
  * @return          A reference to ZDataBuffer containing the packed data field.
  */
-ZDataBuffer &_getArrayFromRecord(ZDataBuffer &pInData,ZDataBuffer &pOutData,ZSIndexField_struct & pField)
+ZDataBuffer &_getArrayFromRecord(ZDataBuffer &pInData,ZDataBuffer &pOutData,ZSIndexField & pField)
 {
 size_t wOffset=0;
  ZTypeBase wZType = pField.ZType;
@@ -843,7 +322,7 @@ size_t wOffset=0;
  long wEltOffsetIn=wOffset;
 ZDataBuffer wDBElt;
 //ZDataBuffer wDBIn;
-ZSIndexField_struct wField;
+ZSIndexField wField;
 
 //    wDBIn.setData(pInData.Data+pField.Offset,pField.NaturalSize);
 
@@ -983,7 +462,7 @@ ZSIndexField_struct wField;
  * @param[in] pField    ZIndex Key dictionary rank (ZIndexField_struct) describing the data field to extract.
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
-ZStatus _getAtomicFromRecord(ZDataBuffer &pInData,ZDataBuffer &pOutData,ZSIndexField_struct & pField)
+ZStatus _getAtomicFromRecord(ZDataBuffer &pInData,ZDataBuffer &pOutData,ZSIndexField & pField)
 {
 size_t wOffset=0;
  ZTypeBase wZType = pField.ZType;
@@ -1276,7 +755,7 @@ ZDataBuffer wDBIn;
 
 ssize_t KeyDataSize = (ssize_t)((float)pFieldList[pRank].UniversalSize / (float)pFieldList[pRank].ArrayCount) ; //! compute data size in key format
 
-ZSIndexField_struct wField;
+ZSIndexField wField;
     ssize_t wOffset = pFieldList.fieldKeyOffset(pRank) ;
     wDBIn.setData((pInData.Data+wOffset),pFieldList[pRank].UniversalSize);
 
@@ -1630,7 +1109,7 @@ return pOutValue;
 template <class _Tp>
 static inline
 ZDataBuffer&
-_convertAtomicEdian(ZDataBuffer& pData,_Tp &pValue, ZSIndexField_struct & pField)
+_convertAtomicEdian(ZDataBuffer& pData,_Tp &pValue, ZSIndexField & pField)
  {
 decltype(pValue) wValue = pValue;
 
@@ -1656,7 +1135,7 @@ decltype(pValue) wValue = pValue;
 }//_convertAtomic_Edian
 template <class _Tp>
 ZDataBuffer&
-_convertAtomicNOEndian(ZDataBuffer& pData,_Tp pValue, ZSIndexField_struct & pField)
+_convertAtomicNOEndian(ZDataBuffer& pData,_Tp pValue, ZSIndexField & pField)
  {
 decltype(pValue) wValue = pValue;
 
@@ -1680,7 +1159,7 @@ decltype(pValue) wValue = pValue;
 
 template <typename _Tp>
 ZDataBuffer &
-_convert(typename std::enable_if<std::is_integral<_Tp>::value, _Tp>::type &pValue,ZSIndexField_struct pField,ZDataBuffer &pData) {
+_convert(typename std::enable_if<std::is_integral<_Tp>::value, _Tp>::type &pValue,ZSIndexField pField,ZDataBuffer &pData) {
   // an implementation for integral types (int, char, unsigned, etc.)
     if (is_little_endian()) // if system uses little endian integral internal representation
             {

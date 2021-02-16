@@ -7,6 +7,8 @@
 #include <zrandomfile/zrandomfile.h>
 #include <ztoolset/ztimer.h> // to get ZTimer
 
+#include <zindexedfile/zindexcontrolblock.h>
+
 //#include <ztoolset/zsacommon.h> // for types and getDataType
 
 //#include <zam/zam_include.h> // for ZOp

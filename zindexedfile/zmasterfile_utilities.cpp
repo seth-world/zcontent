@@ -482,27 +482,36 @@ utf8String wContent;
 zxmlNode * wFileDescNode=nullptr;
 zxmlNode * wHCBNode=nullptr;
 
+ZFileDescriptor wFileDescriptor;
+
 pErrorLog->setAutoPrintOn(true);
 pErrorLog->setErrorLogContext("_testXMLZFileDescriptor");
 
-    fprintf (pOutput,"%s>> processing node <ZFileDescriptor>  \n",
+    if (pFileNode->getName()!="zfile")
+      {
+      pErrorLog->errorLog("_testXMLZFileDescriptor-E-INVROOT Invalid root node <%s> while expected <file>.");
+      return ZS_INVVALUE;
+      }
+
+    fprintf (pOutput,"%s>> processing node <zfiledescriptor>  \n",
              _GET_FUNCTION_NAME_);
 
-    wSt=pFileNode->getChildByName(wFileDescNode,"ZFileDescriptor");
+    wSt=pFileNode->getChildByName(wFileDescNode,"zfiledescriptor");
     if (wSt!=ZS_SUCCESS)
     {
-      pErrorLog->errorLog("xml document may be corrupted or incomplete.Expected <ZFileDescriptor>.");
+      pErrorLog->errorLog("xml document may be corrupted or incomplete.Expected <zfiledescriptor>.");
       ZException.setMessage(_GET_FUNCTION_NAME_,
           wSt,
           Severity_Error,
-          "xml document may be corrupted or incomplete.Expected <ZFileDescriptor>.");
+          "xml document may be corrupted or incomplete.Expected <zfiledescriptor>.");
       return wSt;
     }
 
-    wSt=wFileDescNode->getChildByName(wHCBNode,"ZHeaderControlBlock");
+
+    wSt=wFileDescNode->getChildByName(wHCBNode,"zheadercontrolblock");
     if (wSt!=ZS_SUCCESS)
     {
-      pErrorLog->errorLog("   ****Error*** Missing <ZHeaderControlBlock> ******");
+      pErrorLog->errorLog("   ****Error*** Missing <zheadercontrolblock> ******");
       ZException.setMessage(_GET_FUNCTION_NAME_,
           wSt,
           Severity_Error,
@@ -511,23 +520,23 @@ pErrorLog->setErrorLogContext("_testXMLZFileDescriptor");
       return wSt;
     }
 
-    if (XMLgetChildText((zxmlElement *)wHCBNode,"FileType",wContent,pErrorLog))
+    if (XMLgetChildText((zxmlElement *)wHCBNode,"filetype",wContent,pErrorLog))
       {
-        pErrorLog->errorLog("   ****Error*** Missing <FileType> ******");
+        pErrorLog->errorLog("   ****Error*** Missing <filetype> ******");
         ZException.setMessage(_GET_FUNCTION_NAME_,
             ZS_INVTYPE,
             Severity_Error,
-            "xml document may be corrupted or incomplete.Expected <FileType> child to <ZHeaderControlBlock> tag : no child found.");
+            "xml document may be corrupted or incomplete.Expected <filetype> child to <zheadercontrolblock> tag : no child found.");
         return(ZS_INVTYPE);
       }// !ZS_SUCCESS
 
     if (wContent!=pZFile_type)
         {
-        pErrorLog->errorLog("   ****Error*** Invalid <FileType> ******");
+        pErrorLog->errorLog("   ****Error*** Invalid <filetype> ******");
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                 ZS_INVTYPE,
                                 Severity_Error,
-                                "Invalid <FileType> must be <%s> found <%s>.",
+                                "Invalid <filetype> must be <%s> found <%s>.",
                                 pZFile_type,
                                 wContent.toCChar());
         return(ZS_INVTYPE);
@@ -536,13 +545,13 @@ pErrorLog->setErrorLogContext("_testXMLZFileDescriptor");
 
     if (pFilePath==nullptr)
             {
-            if (XMLgetChildText((zxmlElement *)wHCBNode,"URIContent",wContent,pErrorLog))
+            if (XMLgetChildText((zxmlElement *)wHCBNode,"uricontent",wContent,pErrorLog))
             {
-              pErrorLog->errorLog("No file path has been specified and xml file does not contain a valid <URIContent> field.");
+              pErrorLog->errorLog("No file path has been specified and xml file does not contain a valid <uricontent> field.");
               ZException.setMessage(_GET_FUNCTION_NAME_,
                   ZS_NOTFOUND,
                   Severity_Error,
-                  "No file path has been specified and xml file does not contain a valid <URIContent> field.");
+                  "No file path has been specified and xml file does not contain a valid <uricontent> field.");
               return(ZS_NOTFOUND);
             }// !ZS_SUCCESS
             pURIContent=wContent.toCChar() ;

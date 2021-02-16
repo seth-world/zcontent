@@ -1,11 +1,15 @@
 #ifndef ZMETADIC_H
 #define ZMETADIC_H
+
+#include <stdlib.h> //for atexit() and uintxx_t
+
 #include <zindexedfile/zdatatype.h>
 #include <ztoolset/zarray.h>
-#include <stdlib.h> //for atexit()
+
+#include <zfielddescription.h>
+
 
 namespace zbs {
-
 /*
 struct atomicField_struct{
     ZType_type      Type;
@@ -38,83 +42,23 @@ union fieldDef
     stringField_struct String;
     blobField_struct   Blob;
 };*/
-#pragma pack(push)
-#pragma pack(0)
-struct FieldDesc_Export{
-    ZTypeBase       ZType;
-    uint32_t        ArrayCount; //< if data type is Array then count the rows 0 if not an array
-    uint64_t        HeaderSize; //< Size of field header
-    uint64_t        UniversalSize;  //< Only if ZType is fixed length. Otherwise set to 0
-    uint64_t        NaturalSize;                    //< idem
-    uint8_t         KeyEligible=false ;             //< could be set as Key field
-    char            Name[cst_fieldnamelen+1+sizeof(uint16_t)];       //< Name of the field aligned to take care of utfdescString export
 
-};
-#pragma pack(pop)
-/**
- * @brief The fieldDesc_struct struct Field definition for ZMetaDic
- *
- *  see ZIndexField_struct in <zindextype.h>
- *  see ZType_type
- *
- *  Nota Bene :
- *  As fields may have varying length, offet and lengths for each field are volatile data.
- *  It is available at ZRecord level within ZRecordDictionary.
- *
- *
- */
-class FieldDescription
-{
-    FieldDescription& _copyFrom(FieldDescription& pIn)
-    {
-        ZType=pIn.ZType;
-        Capacity=pIn.Capacity;
-        HeaderSize=pIn.HeaderSize;
-        UniversalSize=pIn.UniversalSize;
-        NaturalSize=pIn.NaturalSize;
-        KeyEligible=pIn.KeyEligible;
-        Name=pIn.Name;
-    }
-public:
-    FieldDescription() = default;
-    FieldDescription (FieldDescription& pIn) { _copyFrom(pIn); }
-    FieldDescription (FieldDescription&& pIn) { _copyFrom(pIn); }
-
-    FieldDescription& operator = (FieldDescription& pIn) { _copyFrom(pIn); }
-    FieldDescription& operator = (FieldDescription&& pIn) { _copyFrom(pIn); }
-
-    ZTypeBase           ZType;
-    URF_Capacity_type   Capacity; //!< if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if an atomic
-    uint64_t            HeaderSize;         //!< Size of field header
-    uint64_t            UniversalSize;      //!< Only if ZType is fixed length. Otherwise set to 0
-    uint64_t            NaturalSize;        //!< Only if ZType is fixed length. Otherwise set to 0
-    ZBool               KeyEligible=false ; //!< May be used as Key field
-    utffieldNameString  Name;            //!< Name of the field
-
-
-
-    bool isAtomic(void) {return ZType & ZType_Atomic ;}
-    bool isArray(void) {return ZType & ZType_Array ;}
-    bool isByteSeq(void) {return ZType & ZType_ByteSeq ;}
-    bool isBlob(void) {return ZType & ZType_Blob ;}
-    bool isErrored(void){return (ZType==ZType_Unknown)||(ZType&ZType_Class);}  // ZType_Class is not allowed
-    bool isVarying() {return (ZType&ZType_VaryingLength);}
-    bool isSigned(void) {return ZType & ZType_Signed ;}
-    bool isEndian(void) {return ZType & ZType_Endian ;}
-
-    void clear() {ZType=0; Capacity=0;HeaderSize=0;UniversalSize=0;NaturalSize=0; KeyEligible=false;Name.clear();}
-    static FieldDesc_Export _exportConvert(FieldDescription&pIn,FieldDesc_Export* pOut);
-    static FieldDescription _importConvert(FieldDescription& pOut,FieldDesc_Export* pIn);
-};
 
 /**
- * @brief The ZMetaDic class this class holds and manage the metadata definition for a ZSMasterFile.
+ * @brief The ZMetaDic class this class holds and manage the data definition for a ZSMasterFile.
  */
-class ZMetaDic : public ZArray <FieldDescription>
+class ZMetaDic : public ZArray <ZFieldDescription>
 {
 public:
+    typedef ZArray <ZFieldDescription> _Base ;
+    ZMetaDic& _copyFrom(const ZMetaDic& pIn) ;
     ZMetaDic() {}
     ~ZMetaDic() {if (CheckSum!=nullptr)delete CheckSum;}
+
+    ZMetaDic(const ZMetaDic& pIn) {_copyFrom(pIn);}
+    ZMetaDic(const ZMetaDic&& pIn) {_copyFrom(pIn);}
+    ZMetaDic&  operator = (const ZMetaDic& pIn) { return _copyFrom(pIn);}
+
 
     checkSum *CheckSum=nullptr;
 
@@ -129,8 +73,8 @@ public:
             return;
             }
 
-    void insertField(FieldDescription &pFieldDef,const long pRank) {insert(pFieldDef,pRank);}
-    void addField(FieldDescription &pFieldDef){push(pFieldDef);}
+    void insertField(ZFieldDescription &pFieldDef,const long pRank) {insert(pFieldDef,pRank);}
+    void addField(ZFieldDescription &pFieldDef){push(pFieldDef);}
 
     long CurrentRank=0;
 
@@ -157,6 +101,10 @@ public:
     ZStatus removeFieldByRank (const long pFieldRank);
 
     long searchFieldByName(const utf8_t* pFieldName) ;
+
+
+    utf8String toXml(int pLevel);
+    int fromXml(zxmlNode* pIndexRankNode,ZaiErrors* pErrorlog);
 
     ZDataBuffer& _export(ZDataBuffer& pZDBExport) ;
     size_t _import (unsigned char* pZDBImport_Ptr);

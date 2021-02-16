@@ -398,7 +398,7 @@ get_121_CheckSumNfURF(void* pValue,unsigned char* pURFData)
 }
 
 ZStatus
-get_ZStringNfURF(void* pValue, ZTypeBase pType, unsigned char* pURFData)
+get_ZStringNfURF(void* pValue, ZTypeBase pType, unsigned char* &pURFData)
 {
 
 /*
@@ -435,16 +435,24 @@ uint16_t wCanonical, wEffectiveUSize;
     {
         case ZType_Char:
         case ZType_UChar:
-            return  static_cast<utfVaryingString<char>*>(pValue)->_importURF(pURFData);
+          if (static_cast<utfVaryingString<char>*>(pValue)->_importURF(pURFData)==0)
+            return ZS_ERROR;
+          return ZS_SUCCESS;
         case ZType_U8:
         case ZType_S8:
-            return  static_cast<utfVaryingString<utf8_t>*>(pValue)->_importURF(pURFData);
+          if (static_cast<utfVaryingString<utf8_t>*>(pValue)->_importURF(pURFData)==0)
+            return ZS_ERROR;
+          return ZS_SUCCESS;
         case ZType_U16:
         case ZType_S16:
-            return  static_cast<utfVaryingString<utf16_t>*>(pValue)->_importURF(pURFData);
+          if (static_cast<utfVaryingString<utf16_t>*>(pValue)->_importURF(pURFData)==0)
+            return ZS_ERROR;
+          return ZS_SUCCESS;
         case ZType_U32:
         case ZType_S32:
-            return  static_cast<utfVaryingString<utf32_t>*>(pValue)->_importURF(pURFData);
+          if (static_cast<utfVaryingString<utf32_t>*>(pValue)->_importURF(pURFData)==0)
+            return ZS_ERROR;
+          return ZS_SUCCESS;
     default:
         break;
         }

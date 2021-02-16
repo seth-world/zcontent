@@ -7,8 +7,8 @@
 #include <zcontentcommon/zresource.h>
 
 typedef long            zrank_type;     //!< Block record rank data type NB: could be negative if unknown
-typedef long long       zaddress_type;  //!< ZRandomFile address data type : nb : could be negative if unknown
-typedef long long       zsize_type;     //!< ZRandomFile size data type
+typedef int64_t         zaddress_type;  //!< ZRandomFile address data type : nb : could be negative if unknown
+typedef uint64_t        zsize_type;     //!< ZRandomFile size data type
 
 /*
  *                  Identity generic format
@@ -41,27 +41,34 @@ const ZLockid_type      cst_LockPending = -0x01;
 struct ZLockid
 {
 public:
-    ZLockid_type id;
+    ZLockid_type  id;
+    ZResource     Owner;
 
-    ZLockid(void) { id = 0; }
-    ZLockid(ZLockid_type pId) { id = pId; }
-    ZLockid(const ZLockid &pIn) { id = pIn.id; }
-    ZLockid(const ZLockid &&pIn) { id = pIn.id; }
+    ZLockid(void) { id = 0; Owner.setInvalid();}
+    ZLockid(ZLockid_type pId,const ZResource& pOwner) { id = pId; Owner=pOwner;}
+    ZLockid(const ZLockid &pIn) { _copyFrom(pIn); }
+    ZLockid(const ZLockid &&pIn) { _copyFrom(pIn); }
 
+    ZLockid &_copyFrom(const ZLockid &pIn);
 
     bool isValid(void) const { return (!(id < 0)); }
     bool isInvalid(void) const { return (id == cst_LockInvalid); }
     bool isPending(void) const { return (id == cst_LockPending); }
 
 
-    void setInvalid(void) { id = cst_LockInvalid; }
+    void setInvalid(void) { id = cst_LockInvalid; Owner.setInvalid();}
     void setPending(void) { id = cst_LockPending; }
-    void clear(void) { id = cst_LockInvalid; }
+    void clear(void) { id = cst_LockInvalid; Owner.setInvalid();}
 
     ZLockid getNext(void)
     {
         id++;
         return (*this);
+    }
+    ZLockid getNext(const ZResource& pOwner)
+    {
+      id++;
+      return ZLockid(id,pOwner);
     }
 
     ZLockid clearid(void)
@@ -77,34 +84,17 @@ public:
         return wid;
     }
 
-    ZLockid &operator=(ZLockid &pIn)
-    {
-        id = pIn.id;
-        return (*this);
-    }
+    ZLockid &operator=(const ZLockid &pIn) {return _copyFrom(pIn);}
+    ZLockid &operator=(const ZLockid &&pIn){return _copyFrom(pIn);}
 
-    ZLockid &operator=(ZLockid &&pIn)
-    {
-        id = pIn.id;
-        return (*this);
-    }
-
-    ZLockid &operator=(long pId)
-    {
-        id = pId;
-        return (*this);
-    }
-    ZLockid &operator=(const ZLockid &pId)
-    {
-        id = pId.id;
-        return (*this);
-    }
-
-    ZLockid &_copyFrom(const ZLockid &pIn) { id = pIn.id; }
     int compare(const ZLockid &pIn) const { return int(id - pIn.id); }
 
     bool operator==(const ZLockid &pId) { return (id == pId.id); }
     bool operator!=(const ZLockid &pId) { return !(id == pId.id); }
+
+    ZDataBuffer _export() const ;
+    size_t      _import(unsigned char* &pUniversalPtr);
+
 };
 
 
@@ -148,7 +138,7 @@ class ZLock
         Resourceid = pIn.Resourceid;
         Lockid = pIn.Lockid;
         Mask = pIn.Mask;
-        Owner = pIn.Owner;
+//        Owner = pIn.Owner;
 //        Reason = pIn.Reason;
         DataRank = pIn.DataRank;
     }
@@ -156,7 +146,7 @@ public:
     ZResource       Resourceid;
     ZLockid         Lockid;
     zlockmask_type  Mask;
-    ZResource       Owner;  /* Owner User must be a resource defined by application and not system user */
+//    ZResource       Owner;  /* Owner is set within ZLockid */
 //    ZLock_Reason    Reason;
     DataRank_type   DataRank;
 
@@ -169,7 +159,7 @@ public:
         Resourceid.clear();
         Lockid.clear();
         Mask=ZLock_Nothing;
-        Owner=cst_IdentityInvalid;
+//        Owner=cst_IdentityInvalid;
 //        Reason=ZReason_Nothing;
         DataRank = cst_DataRankInvalid;
     }

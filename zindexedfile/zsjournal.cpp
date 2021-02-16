@@ -160,7 +160,7 @@ ZStatus     wSt;
         ZException.exit_abort();
         }
     Username = wUserDesc->pw_name ;*/
-    Username = ZSystemUser().setToCurrentUser().getSystemName().toString();
+    Username = ZSystemUser().setToCurrentUser().getSystemName();
 
     if ((wSt=setJournalLocalDirectoryPath())!=ZS_SUCCESS)
                             {

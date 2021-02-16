@@ -1,7 +1,7 @@
 #ifndef ZDATATYPE_CPP
 #define ZDATATYPE_CPP
 
-#include <zindexedfile/zindextype.h>
+#include <zindexedfile/zsindextype.h>
 #include <zindexedfile/zsindexfile.h>
 
 inline
@@ -170,7 +170,7 @@ std::string*wString=    static_cast<std::string*>(pIndata) ;
 }
 
 template  <class _Tp>
-ZStatus _getByteSequenceFromRecord (typename std::enable_if_t<std::is_pointer<_Tp>::value,_Tp>  pInData, const ssize_t pSize, ZDataBuffer &pOutData, ZIndexField& pField)
+ZStatus _getByteSequenceFromRecord (typename std::enable_if_t<std::is_pointer<_Tp>::value,_Tp>  pInData, const ssize_t pSize, ZDataBuffer &pOutData, ZSIndexField& pField)
 {
     pOutData.setData(pInData,pSize);
     return ZS_SUCCESS;

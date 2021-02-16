@@ -43,7 +43,7 @@ namespace zbs {
  @endverbatim
  *
  */
-struct _RDicFieldBase {FieldDescription* MDicRank;} ;//!< Pointer to MDicRank
+struct _RDicFieldBase {ZFieldDescription* MDicRank;} ;//!< Pointer to MDicRank
 struct recordFieldDesc_struct : public _RDicFieldBase
 {
     uint64_t            URFOffset;              //!< Raw offset from beginning of record

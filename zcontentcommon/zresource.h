@@ -161,6 +161,10 @@ public:
     ZDataBuffer toKey();
     /** @brief  toFullKey() gets ZResource::Entity+ZResource::id (int this order) converted to universal format */
     ZDataBuffer toFullKey();
+
+    ZDataBuffer _export() const;
+    /** @brief _import imports from serialized data pUniversalPtr. Updates pointer to first byte after imported data*/
+    size_t      _import(unsigned char* &pUniversalPtr);
 };
 
 #endif // ZRESOURCE_H

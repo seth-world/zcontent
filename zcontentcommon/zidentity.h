@@ -96,8 +96,8 @@ public:
 #endif // QT_CORE_LIB
 #endif // __COMMENT__
 
-    ZDataBuffer _export();
-    size_t      _import(unsigned char* pUniversalPtr);
+    ZDataBuffer _export() const;
+    size_t      _import(unsigned char* &pUniversalPtr);
 
 };
 

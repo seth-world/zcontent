@@ -12,6 +12,7 @@
 #include <ztoolset/zutfstrings.h>
 
 #include <ztoolset/zaierrors.h>
+#include <zxml/zxml.h>
 
 /*#ifdef QT_CORE_LIB
 //#include <zxml/qxmlutilities.h>
@@ -31,6 +32,8 @@ namespace zbs //================================================================
 
 
 #include <zindexedfile/zmetadic.h>
+#include <zindexedfile/zindexcontrolblock.h>
+
 /**
  * @brief The ZSMasterFile class Structured Master file or ZSMF
  *
@@ -82,30 +85,7 @@ public:
     long pop (void);
     void clear (void) ;
 
-}; // ZIndexControlTable
-class ZSIndexControlTable : private ZArray<ZSIndexControlBlock*>
-
-{
-    typedef ZArray<ZSIndexControlBlock*> _Base ;
-public:
-    ZSIndexControlTable() {}
-    ~ZSIndexControlTable() {}
-//    using _Base::push;  // push is overloaded
-    using _Base::newBlankElement;
-    using _Base::size;
-    using _Base::last;
-    using _Base::lastIdx;
-    using _Base::operator [];
-    //using ZIndexControlBlock::clear;
-
-    long erase(const long pIdx) ;
-    long push (ZSIndexControlBlock *pICB);
-    long pop (void);
-    void clear (void) ;
-
-    long zsearchIndexByName (const char* pName);
-
-}; // ZIndexControlTable
+}; // ZSKeyDictionaryTable
 
 #ifndef ZREMOTEMIRRORING
 #define ZREMOTEMIRRORING
@@ -215,7 +195,8 @@ struct ZSMCBOwnData{                         // will be the first block of data 
 //    uriString               JournalPath;        // see ZJCB - Directory path for journal file. If empty, then directory path of main content file is taken
 //    uint32_t                EndSign=cst_ZEND ;
     ZDataBuffer& _export(ZDataBuffer& pZDBExport);
-    ZStatus _import(unsigned char* pZDBImport_Ptr);
+    /** _import imports from serialized data. Updates pZDBImport_Ptr to first byte after imported data */
+    ZStatus _import(unsigned char *&pZDBImport_Ptr);
 
 };
 
@@ -250,6 +231,13 @@ public:
 
     void clear(void);
 
+    utf8String toXml(int pLevel);
+    /**
+     * @brief fromXml loads header control block from its xml definition and return 0 when successfull.
+     * When errors returns <>0 and pErrlog contains appropriate error messages.
+     * pHeaderRootNode xml node root for the hcb, typically <headercontrolblock> tag. No validation is made on root node for its name value.
+     */
+    int fromXml(zxmlNode* pFDBRootNode, ZaiErrors* pErrorlog);
 
     ZDataBuffer& _exportMCB (ZDataBuffer &pMCBContent);
     ZStatus     _importMCB  (ZDataBuffer& pBuffer);
@@ -498,22 +486,43 @@ typedef ZRandomFile _Base ;
     static
     ZStatus zapplyXMLFileDefinition_old(const utf8_t *pXMLPath, const utf8_t*pContentFilePath=nullptr, bool pRealRun=false, FILE *pOutput=nullptr);
     static
-    ZStatus zloadXML_Index(const utf8_t* pFilePath, ZSIndexControlBlock &wZICB, ZMetaDic *pMetaDic);
+    int zextractXML_MetaDic(const utf8_t *pFilePath,
+                            zbs::ZMetaDic* &pMetaDic,
+                            ZaiErrors* pErrorlog);
+    static
+    int zextractXML_AllIndexes(const utf8_t* pFilePath,
+                                zbs::ZArray<ZSIndexControlBlock *> &pZICBList,
+                                ZMetaDic *pMetaDic,
+                                ZaiErrors* pErrorlog);
     static
     ZStatus zloadXML_Dictionary(const utf8_t* pFilePath, ZSKeyDictionary &pZKDIC, ZMetaDic *pMetaDic);
     static
-    ZStatus _XMLzicmControl(const utf8_t *pFilePath, zxmlDoc* &XmlDoc, zxmlNode* &pFirstNode);
+    ZStatus _XMLzicmControl(const utf8_t *pFilePath,
+                            zxmlDoc* &pXmlDoc,
+                            zxmlElement* &pFirstElement,
+                            ZaiErrors *pErrorlog);
     static
     ZStatus
     _XMLLoadAndControl(const utf8_t* pFilePath,
-                       zxmlDoc* &XmlDoc,
-                       zxmlNode* &wRootNode,
+                       zxmlDoc*     &pXmlDoc,
+                       zxmlElement *&pRootElement,
                        const utf8_t* pRootName,
                        const utf8_t* pRootAttrName,
                        const utf8_t* pRootAttrValue,
+                       ZaiErrors *pErrorLog,
                        FILE* pOutput=nullptr);
     static
-    ZStatus _loadXML_Index(zxmlNode* &pIndexNode, ZSIndexControlBlock *pZICB, ZMetaDic *pMetaDic);
+    ZStatus zloadXML_AllIndexes(const utf8_t *pFilePath,
+                                zbs::ZArray<ZSIndexControlBlock *> &pZICBList,
+                                ZMetaDic *pMetaDic,
+                                ZaiErrors *pErrorlog);
+    static
+    zxmlNode* _searchForChildTag(zxmlNode *pTopNode, const char *pTag);
+    static
+    int _loadXML_OneIndex(zxmlNode* &pIndexRankNode,
+                          ZSIndexControlBlock *&pZICB,
+                          ZMetaDic *pMetaDic,
+                          ZaiErrors *pErrorlog);
     static
     ZStatus zgetXMLIndexRank(ZSMasterFile &wMasterFile,
                              ZSIndexControlBlock &wZICB,

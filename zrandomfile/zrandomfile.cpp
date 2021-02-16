@@ -11,8 +11,192 @@
 
 #include <stdio.h>
 #include <unistd.h>
+
+#include <zxml/zxmlprimitives.h>
+
 //===================== Open ZRandomFiles management====================================================
 namespace zbs { // see <ztoolset/zmodulestack.h> for global/external conditional definition  (__USE_ZRANDOMFILE__ must be defined in zconfig.h)
+
+
+ZFDOwnData& ZFDOwnData::_copyFrom(const ZFDOwnData& pIn)
+{
+  FContent=pIn.FContent;
+  ContentFd=pIn.ContentFd;
+  FHeader=pIn.FHeader;
+  HeaderFd=pIn.HeaderFd;
+  Pid=pIn.Pid;
+  Uid=pIn.Uid;
+  _isOpen=pIn._isOpen;
+  Mode=pIn.Mode;
+
+  ZHeader=pIn.ZHeader;
+  ZFCB=pIn.ZFCB;
+  ZBAT=pIn.ZBAT;
+  ZFBT=pIn.ZFBT;
+  ZDBT=pIn.ZDBT;
+  ZReserved=pIn.ZReserved;
+  ZBlockLock=pIn.ZBlockLock;
+  PhysicalPosition=pIn.PhysicalPosition;
+  LogicalPosition=pIn.LogicalPosition;
+  CurrentRank=pIn.CurrentRank;
+
+  return *this;
+}
+utf8String ZFDOwnData::toXml(int pLevel)
+{
+  int wLevel=pLevel;
+  utf8String wReturn;
+  wReturn = fmtXMLnode("zfdowndata",pLevel);
+  wLevel++;
+
+
+  wReturn+=ZHeader.toXml(wLevel);
+
+  wReturn+=ZFCB->toXml(wLevel);
+
+/* see if it is really required */
+  wReturn+=fmtXMLint64("physicalposition",  PhysicalPosition,wLevel);  /* uint8_t */
+  wReturn+=fmtXMLint64("logicalposition",LogicalPosition,wLevel);
+  wReturn+=fmtXMLlong("currentrank",CurrentRank,wLevel);
+/* end see if it is really required */
+  wReturn += fmtXMLendnode("zfdowndata",pLevel);
+/* end see if it is really required */
+  wReturn += ZHeader.toXml(wLevel);
+
+  return wReturn;
+}//ZFDOwnData::toXml
+
+utf8String ZFileDescriptor::toXml(int pLevel)
+{
+  int wLevel=pLevel;
+  utf8String wReturn;
+  wReturn = fmtXMLnode("zfiledescriptor",pLevel);
+  wLevel++;
+
+  /* NB: Lock and LockOwner are not exported to xml */
+
+  wReturn+=fmtXMLchar("uricontent",  URIContent.toCChar(),wLevel);  /* uint8_t */
+  wReturn+=fmtXMLchar("uriheader",URIHeader.toCChar(),wLevel);
+  wReturn+=fmtXMLchar("uridirectorypath",URIDirectoryPath.toCChar(),wLevel);
+
+  wReturn+=ZFDOwnData::toXml(wLevel);
+
+  wReturn += fmtXMLendnode("zfiledescriptor",pLevel);
+  return wReturn;
+}//ZFileDescriptor::toXml
+/**
+ * @brief fromXml loads ZFDOwnData from its xml definition and return 0 when successfull.
+ * When errors returns <>0 and pErrlog contains appropriate error messages.
+ * pHeaderRootNode xml node root for the hcb, typically <headercontrolblock> tag. No validation is made on root node for its name value.
+ */
+int ZFDOwnData::fromXml(zxmlNode* pFDBRootNode,ZaiErrors* pErrorlog)
+{
+  zxmlElement *wRootNode;
+  utfcodeString wXmlHexaId;
+  utf8String wValue;
+  utfcodeString wCValue;
+  bool wBool;
+  unsigned int wInt;
+  ZStatus wSt = pFDBRootNode->getChildByName((zxmlNode *&) wRootNode, "zfdowndata");
+  if (wSt != ZS_SUCCESS) {
+    pErrorlog->logZStatus(
+        ZAIES_Error,
+        wSt,
+        "ZFDOwnData::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
+        "<%s>",
+        "zfdowndata",
+        decode_ZStatus(wSt));
+    return -1;
+  }
+
+  if (ZHeader.fromXml(wRootNode,pErrorlog)!=0)
+    return -1;
+
+  if (ZFCB==nullptr)
+      ZFCB=new ZFileControlBlock;
+
+  if (ZFCB->fromXml(wRootNode,pErrorlog)!=0)
+          return -1;
+/* see if it is really required */
+  if (XMLgetChildInt64(wRootNode, "physicalposition", PhysicalPosition, pErrorlog) < 0) {
+    fprintf(stderr,
+        "ZFDOwnData::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+        "default.",
+        "physicalposition");
+  }
+  if (XMLgetChildInt64(wRootNode, "logicalposition", LogicalPosition, pErrorlog) < 0) {
+    fprintf(stderr,
+        "ZFDOwnData::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+        "default.",
+        "logicalposition");
+  }
+  if (XMLgetChildLong(wRootNode, "currentrank", CurrentRank, pErrorlog) < 0) {
+    fprintf(stderr,
+        "ZFDOwnData::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+        "default.",
+        "currentrank");
+  }
+/* end see if it is really required */
+
+  return (int)pErrorlog->hasError();
+}//ZFDOwnData::fromXml
+
+int ZFileDescriptor::fromXml(zxmlNode* pFDRootNode,ZaiErrors* pErrorlog)
+{
+  zxmlElement *wRootNode;
+  utfcodeString wXmlHexaId;
+  utf8String wValue;
+  utfcodeString wCValue;
+  bool wBool;
+  unsigned int wInt;
+  ZStatus wSt = pFDRootNode->getChildByName((zxmlNode *&) wRootNode, "zfiledescriptor");
+  if (wSt != ZS_SUCCESS) {
+    pErrorlog->logZStatus(
+        ZAIES_Error,
+        wSt,
+        "ZFileDescriptor::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
+        "<%s>",
+        "zfiledescriptor",
+        decode_ZStatus(wSt));
+    return -1;
+  }
+
+  if (ZFDOwnData::fromXml(wRootNode,pErrorlog)!=0)
+    return -1;
+
+  if (ZHeader.fromXml(wRootNode,pErrorlog)!=0)
+    return -1;
+
+  if (XMLgetChildText(wRootNode, "uricontent", wValue, pErrorlog) < 0) {
+    fprintf(stderr,
+        "ZFileDescriptor::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+        "default.",
+        "uricontent");
+      }
+      else
+        URIContent=wValue.toCChar();
+
+    if (XMLgetChildText(wRootNode, "uriheader", wValue, pErrorlog) < 0) {
+      fprintf(stderr,
+          "ZFileDescriptor::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+          "default.",
+          "uriheader");
+      }
+      else
+        URIHeader=wValue.toCChar();
+
+      if (XMLgetChildText(wRootNode, "uridirectorypath", wValue, pErrorlog) < 0) {
+        fprintf(stderr,
+            "ZFileDescriptor::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+            "default.",
+            "uridirectorypath");
+      }
+      else
+        URIDirectoryPath=wValue.toCChar();
+
+
+  return (int)pErrorlog->hasError();
+}//ZFDOwnData::fromXml
 
 //OpenZRFPool GZRFPool;
 //ZOpenZRFPool* ZRFPool=&GZRFPool;
@@ -237,266 +421,6 @@ namespace zbs {
 
 
 
-//----------ZRFPMS---------------------------------
-
-/**
- * @brief ZRFPMS::operator - Operator overload : subtracts two ZRFPMS
- * @param pPMSIn
- * @return
- */
-ZRFPMS
-ZRFPMS::operator - (ZRFPMS &pPMSIn)
-    {
-    ZRFPMS wZRFPMS1;
-    wZRFPMS1 = *this;
-    wZRFPMS1.HFHReads -= pPMSIn.HFHReads;
-    wZRFPMS1.HFHWrites -= pPMSIn.HFHWrites;
-    wZRFPMS1.HReservedReads -= pPMSIn.HReservedReads;
-    wZRFPMS1.HReservedWrites -= pPMSIn.HReservedWrites;
-    wZRFPMS1.HFDReads -= pPMSIn.HFDReads;
-    wZRFPMS1.HFDWrites -= pPMSIn.HFDWrites;
-    wZRFPMS1.CBHReads -= pPMSIn.CBHReads;
-    wZRFPMS1.CBHReadBytesSize -= pPMSIn.CBHReadBytesSize;
-    wZRFPMS1.CBHWrites -= pPMSIn.CBHWrites;
-    wZRFPMS1.CBHWriteBytesSize -= pPMSIn.CBHWriteBytesSize;
-    wZRFPMS1.UserReads -= pPMSIn.UserReads;
-    wZRFPMS1.UserWrites -= pPMSIn.UserWrites;
-    wZRFPMS1.UserWriteSize -= pPMSIn.UserWriteSize;
-    wZRFPMS1.UserReadSize -= pPMSIn.UserReadSize;
-    wZRFPMS1.FieldReads -= pPMSIn.FieldReads;
-    wZRFPMS1.FieldWrites -= pPMSIn.FieldWrites;
-    wZRFPMS1.FieldWriteSize -= pPMSIn.FieldWriteSize;
-    wZRFPMS1.FieldReadSize -= pPMSIn.FieldReadSize;
-    wZRFPMS1.HighWaterWrites -= pPMSIn.HighWaterWrites;
-    wZRFPMS1.HighWaterBytesSize -= pPMSIn.HighWaterBytesSize;
-    wZRFPMS1.ExtentWrites -= pPMSIn.ExtentWrites;
-    wZRFPMS1.ExtentSize -= pPMSIn.ExtentSize;
-    wZRFPMS1.FreeMatches -= pPMSIn.FreeMatches;
-    return wZRFPMS1 ;
- }
-/**
- * @brief ZRFPMS::operator + operator overload : adds two ZRFPMS
- * @param pPMSIn
- * @return
- */
-ZRFPMS
-ZRFPMS::operator + (ZRFPMS &pPMSIn)
-    {
-    ZRFPMS wZRFPMS1;
-    wZRFPMS1 = *this;
-    wZRFPMS1.HFHReads += pPMSIn.HFHReads;
-    wZRFPMS1.HFHWrites += pPMSIn.HFHWrites;
-    wZRFPMS1.HReservedReads += pPMSIn.HReservedReads;
-    wZRFPMS1.HReservedWrites += pPMSIn.HReservedWrites;
-    wZRFPMS1.HFDReads += pPMSIn.HFDReads;
-    wZRFPMS1.HFDWrites += pPMSIn.HFDWrites;
-    wZRFPMS1.CBHReads += pPMSIn.CBHReads;
-    wZRFPMS1.CBHReadBytesSize += pPMSIn.CBHReadBytesSize;
-    wZRFPMS1.CBHWrites += pPMSIn.CBHWrites;
-    wZRFPMS1.CBHWriteBytesSize += pPMSIn.CBHWriteBytesSize;
-    wZRFPMS1.UserReads += pPMSIn.UserReads;
-    wZRFPMS1.UserWrites += pPMSIn.UserWrites;
-    wZRFPMS1.UserWriteSize += pPMSIn.UserWriteSize;
-    wZRFPMS1.UserReadSize += pPMSIn.UserReadSize;
-    wZRFPMS1.FieldReads += pPMSIn.FieldReads;
-    wZRFPMS1.FieldWrites += pPMSIn.FieldWrites;
-    wZRFPMS1.FieldWriteSize += pPMSIn.FieldWriteSize;
-    wZRFPMS1.FieldReadSize += pPMSIn.FieldReadSize;
-    wZRFPMS1.HighWaterWrites += pPMSIn.HighWaterWrites;
-    wZRFPMS1.HighWaterBytesSize += pPMSIn.HighWaterBytesSize;
-    wZRFPMS1.ExtentWrites += pPMSIn.ExtentWrites;
-    wZRFPMS1.ExtentSize += pPMSIn.ExtentSize;
-    wZRFPMS1.FreeMatches += pPMSIn.FreeMatches;
-    return wZRFPMS1 ;
- }
-
-/**
- * @brief ZRFPMS::reportDetails detailed report of PMS data
- * @param[in] pOutput   a FILE* pointer where the reporting will be made. Defaulted to stdout.
- */
-void
-ZRFPMS::reportDetails (FILE*pOutput)
-{
-    long long wAverageUserWrite;
-    if ((UserWrites)==0)
-                wAverageUserWrite = 0;
-        else
-        wAverageUserWrite=(long long)((float)UserWriteSize / (float)UserWrites);
-    long long wAverageUserRead;
-    if ((UserReads)==0)
-                wAverageUserRead = 0;
-        else
-        wAverageUserRead=(long long)((float)UserReadSize / (float)UserReads);
-    long long wAverageExtent;
-    if ((ExtentWrites)==0)
-                wAverageExtent = 0;
-        else
-        wAverageExtent=(long long)((float)ExtentSize / (float)ExtentWrites);
-
-    long long wAverageFieldRead;
-    if (FieldReads  ==0)
-                wAverageFieldRead = 0;
-        else
-        wAverageFieldRead=(long long)((float)FieldReadSize / (float)FieldReads);
-
-    long long wAverageFieldWrite;
-    if (FieldWrites  ==0)
-                wAverageFieldWrite = 0;
-        else
-        wAverageFieldWrite=(long long)((float)FieldWriteSize / (float)FieldWrites);
-
-    fprintf (pOutput,
-             "________________________________________________\n"
-             " Header\n"
-             "   File header reads          %10ld\n"
-             "               writes         %10ld\n"
-             "   File lock info read        %10ld\n"
-             "                  write       %10ld\n"
-             "   File descriptor reads      %10ld\n"
-             "                   writes     %10ld\n"
-             "   Reserved block reads       %10ld\n"
-             "                  writes      %10ld\n"
-             " Content\n"
-             "   Block header reads         %10ld\n"
-             "                size          %10lld\n"
-             "                writes        %10ld\n"
-             "                size          %10lld\n"
-             "   User content reads         %10ld\n"
-             "                size          %10lld\n"
-             "             average/read     %10lld\n"
-
-             "   User content writes        %10ld\n"
-             "                size          %10lld\n"
-             "             average/write    %10lld\n"
-
-             "   Field content reads        %10ld\n"
-             "                size          %10lld\n"
-             "             average/read     %10lld\n"
-
-             "   Field content writes       %10ld\n"
-             "                size          %10lld\n"
-             "             average/write    %10lld\n"
-
-             "   Highwater marking writes   %10ld\n"
-
-             "                     size     %10lld\n"
-
-             "   Free pool matches          %10ld\n"
-             "   Free pool mismatches :\n"
-             "   Extent writes              %10ld\n"
-             "          size                %10lld\n"
-             "      extent average/write    %10lld\n"
-
-             "________________________________________________\n",
-
-             HFHReads,
-             HFHWrites,
-             LockReads,
-             LockWrites,
-             HFDReads,
-             HFDWrites,
-             HReservedReads,
-             HReservedWrites,
-
-             CBHReads,
-             CBHReadBytesSize,
-             CBHWrites,
-             CBHWriteBytesSize,
-
-             UserReads,
-             UserReadSize,
-             wAverageUserRead,
-
-             UserWrites,
-             UserWriteSize,
-             wAverageUserWrite,
-
-             FieldReads,
-             FieldReadSize,
-             wAverageFieldRead,
-
-             FieldWrites,
-             FieldWriteSize,
-             wAverageFieldWrite,
-
-             HighWaterWrites,
-//             pDescriptor.ZFCB->HighwaterMarking?"<On>":"<Off>",
-             HighWaterBytesSize,
-
-             FreeMatches,
-             ExtentWrites,
-             ExtentSize,
-             wAverageExtent
-             );
-
-    return ;
-}
-
-//! @cond Development
-
-void
-ZRFPMS::PMSCounterRead(ZPMSCounter_type pC, const zsize_type pSize)
-{
-    switch (pC)
-    {
-    case ZPMS_BlockHeader :
-            {
-            CBHReads += 1;
-            CBHReadBytesSize += pSize;
-            return;
-            }
-    case ZPMS_User :
-            {
-            UserReads += 1;
-            UserReadSize += pSize;
-            return;
-            }
-    case ZPMS_Field :
-            {
-            FieldReads += 1;
-            FieldReadSize += pSize;
-            return;
-            }
-    default:
-    {
-        return;
-    }
-
-     }
-} //PMSCounterRead
-void
-ZRFPMS::PMSCounterWrite(ZPMSCounter_type pC, const zsize_type pSize)
-{
-    switch (pC)
-    {
-    case ZPMS_BlockHeader :
-            {
-            CBHWrites += 1;
-            CBHWriteBytesSize += pSize;
-            return;
-            }
-    case ZPMS_User :
-            {
-            UserWrites += 1;
-            UserWriteSize += pSize;
-            return;
-            }
-    case ZPMS_Field :
-            {
-            FieldWrites += 1;
-            FieldWriteSize += pSize;
-            return;
-            }
-    default:
-    {
-        return;
-    }
-     }
-} //PMSCounterWrite
-
-//! @endcond
-
-//----------End ZRFPMS---------------------------------
 //================================= ZBlockPool =====================
 
 /**
@@ -641,309 +565,6 @@ return ZAE.FullSize;
 }// _importPool
 
 //======================= ZHeaderControlBlock ================================================
-
-void ZHeaderControlBlock::clear(void)
-{
-    memset(this,0,sizeof(ZHeaderControlBlock));
-//    StartSign=cst_ZSTART;
-//    BlockID = ZBID_FileHeader ;
-//    ZRFVersion=__ZRF_VERSION__;
-//    EndSign=cst_ZEND;
-    OffsetReserved = sizeof(ZHeaderControlBlock_Export); // because Reserved block just starts after ZHeaderControlBlock
-    return;
-}
-ZDataBuffer&
-ZHeaderControlBlock::_export(ZDataBuffer& pZDBExport)
-{
-    ZHeaderControlBlock_Export wHCB;
-    wHCB.StartSign = cst_ZSTART;// don't care reversing start sign or end sign : same as reversed
-
-    wHCB.Lock = reverseByteOrder_Conditional<zlockmask_type>(Lock);
-    wHCB.LockOwner = reverseByteOrder_Conditional<pid_t>(LockOwner);
-
-    wHCB.BlockID = ZBID_FileHeader;
-    wHCB.ZRFVersion = reverseByteOrder_Conditional<unsigned long>(__ZRF_VERSION__);
-    wHCB.FileType = FileType;
-    wHCB.OffsetFCB = reverseByteOrder_Conditional<zaddress_type>(OffsetFCB);
-//    wHCB.OffsetReserved = _reverseByteOrder_T<zaddress_type>(OffsetReserved);
-    wHCB.OffsetReserved = reverseByteOrder_Conditional<zaddress_type>(sizeof(ZHeaderControlBlock_Export));
-    wHCB.SizeReserved = reverseByteOrder_Conditional<zsize_type>(SizeReserved);
-
-    wHCB.EndSign = cst_ZEND;// don't care reversing start sign or end sign : same as reversed
-    pZDBExport.setData(&wHCB,sizeof(wHCB));
-
-    return pZDBExport;
-}
-ZStatus
-ZHeaderControlBlock::_import(unsigned char* pZDBImport_Ptr)
-{
-
-    ZHeaderControlBlock_Export* wHCB=(ZHeaderControlBlock_Export*)(pZDBImport_Ptr);
-//        StartSign = _reverseByteOrder_T<uint32_t>(wHCB->StartSign);
-//    StartSign = wHCB->StartSign;  // don't care reversing start sign or end sign : same as reversed
-
-    Lock = reverseByteOrder_Conditional<zlockmask_type>(wHCB->Lock);
-    LockOwner = reverseByteOrder_Conditional<pid_t>(wHCB->LockOwner);
-    if ((wHCB->BlockID!=ZBID_FileHeader)||(wHCB->StartSign!=cst_ZSTART))
-        {
-        ZException.setMessage(_GET_FUNCTION_NAME_,
-                              ZS_BADFILEHEADER,
-                              Severity_Severe,
-                              "invalid header block content found Start marker <%X> ZBlockID <%X>. One of these is invalid (or both are).",
-                              wHCB->StartSign,
-                              wHCB->BlockID);
-        return  ZS_BADFILEHEADER;
-        }
-    if (reverseByteOrder_Conditional<unsigned long>(wHCB->ZRFVersion)!=__ZRF_VERSION__)
-        {
-        ZException.setMessage(_GET_FUNCTION_NAME_,
-                              ZS_BADFILEHEADER,
-                              Severity_Severe,
-                              "invalid header block version : found version <%ld> while current version is <%ld>.",
-                              wHCB->ZRFVersion,
-                              __ZRF_VERSION__);
-        return  ZS_BADFILEHEADER;
-        }
-
-//    BlockID = wHCB->BlockID;
-//    ZRFVersion = _reverseByteOrder_T<unsigned long>(wHCB->ZRFVersion);
-    FileType = wHCB->FileType;
-    OffsetFCB = reverseByteOrder_Conditional<zaddress_type>(wHCB->OffsetFCB);
-    OffsetReserved = reverseByteOrder_Conditional<zaddress_type>(wHCB->OffsetReserved);
-    SizeReserved = reverseByteOrder_Conditional<zsize_type>(wHCB->SizeReserved);
-
-//    EndSign = wHCB->EndSign; // don't care reversing start sign or end sign : same as reversed
-
-    return  ZS_SUCCESS;
-}
-
-
-//=========================== ZFileControlBlock Export import==========================================
-
-ZDataBuffer&
-ZFileControlBlock::_export(ZDataBuffer& pZDBExport)
-{
-    ZFileControlBlock_Export wFCB;
-    wFCB.StartSign=StartSign;// don't care reversing start sign or end sign : same as reversed
-    wFCB.BlockID=BlockID;
-
-    wFCB.StartOfData=reverseByteOrder_Conditional<zaddress_type>(StartOfData);
-    wFCB.AllocatedBlocks=reverseByteOrder_Conditional<unsigned long>(AllocatedBlocks);
-    wFCB.BlockExtentQuota=reverseByteOrder_Conditional<unsigned long>(BlockExtentQuota);
-    wFCB.ZBAT_DataOffset=reverseByteOrder_Conditional<size_t>(ZBAT_DataOffset);
-    wFCB.ZBAT_ExportSize=reverseByteOrder_Conditional<size_t>(ZBAT_ExportSize);
-    wFCB.ZFBT_DataOffset=reverseByteOrder_Conditional<size_t>(ZFBT_DataOffset);
-    wFCB.ZFBT_ExportSize=reverseByteOrder_Conditional<size_t>(ZFBT_ExportSize);
-    wFCB.ZDBT_DataOffset=reverseByteOrder_Conditional<size_t>(ZDBT_DataOffset);
-    wFCB.ZDBT_ExportSize=reverseByteOrder_Conditional<size_t>(ZDBT_ExportSize);
-    wFCB.ZReserved_DataOffset=reverseByteOrder_Conditional<size_t>(ZReserved_DataOffset);
-    wFCB.ZReserved_ExportSize=reverseByteOrder_Conditional<size_t>(ZReserved_ExportSize);
-    wFCB.InitialSize=reverseByteOrder_Conditional<zsize_type>(InitialSize);
-    wFCB.AllocatedSize=reverseByteOrder_Conditional<zsize_type>(AllocatedSize);
-    wFCB.UsedSize=reverseByteOrder_Conditional<zsize_type>(UsedSize);
-    wFCB.MinSize=reverseByteOrder_Conditional<size_t>(MinSize);
-    wFCB.MaxSize=reverseByteOrder_Conditional<size_t>(MaxSize);
-    wFCB.BlockTargetSize=reverseByteOrder_Conditional<size_t>(BlockTargetSize);
-    wFCB.HighwaterMarking=HighwaterMarking;
-    wFCB.GrabFreeSpace=GrabFreeSpace;
-    wFCB.EndSign=EndSign;// don't care reversing start sign or end sign : same as reversed
-    pZDBExport.setData(&wFCB,sizeof(wFCB));
-
-    return pZDBExport;
-}// ZFileControlBlock::_export
-
-ZFileControlBlock&
-ZFileControlBlock::_import(unsigned char* pZDBImport_Ptr)
-{
-    ZFileControlBlock_Export* wFCB=(ZFileControlBlock_Export*) pZDBImport_Ptr;
-
-//    StartSign=_reverseByteOrder_T<uint32_t>(wFCB->StartSign);
-    StartSign=wFCB->StartSign;
-
-    BlockID=wFCB->BlockID;
-
-    StartOfData=wFCB->StartOfData;// don't care reversing start sign or end sign : same as reversed
-    AllocatedBlocks=reverseByteOrder_Conditional<unsigned long>(wFCB->AllocatedBlocks);
-    BlockExtentQuota=reverseByteOrder_Conditional<unsigned long>(wFCB->BlockExtentQuota);
-    ZBAT_DataOffset=reverseByteOrder_Conditional<size_t>(wFCB->ZBAT_DataOffset);
-    ZBAT_ExportSize=reverseByteOrder_Conditional<size_t>(wFCB->ZBAT_ExportSize);
-    ZFBT_DataOffset=reverseByteOrder_Conditional<size_t>(wFCB->ZFBT_DataOffset);
-    ZFBT_ExportSize=reverseByteOrder_Conditional<size_t>(wFCB->ZFBT_ExportSize);
-    ZDBT_DataOffset=reverseByteOrder_Conditional<size_t>(wFCB->ZDBT_DataOffset);
-    ZDBT_ExportSize=reverseByteOrder_Conditional<size_t>(wFCB->ZDBT_ExportSize);
-    ZReserved_DataOffset=reverseByteOrder_Conditional<size_t>(wFCB->ZReserved_DataOffset);
-    ZReserved_ExportSize=reverseByteOrder_Conditional<size_t>(wFCB->ZReserved_ExportSize);
-    InitialSize=reverseByteOrder_Conditional<zsize_type>(wFCB->InitialSize);
-    AllocatedSize=reverseByteOrder_Conditional<zsize_type>(wFCB->AllocatedSize);
-    UsedSize=reverseByteOrder_Conditional<zsize_type>(wFCB->UsedSize);
-    MinSize=reverseByteOrder_Conditional<size_t>(wFCB->MinSize);
-    MaxSize=reverseByteOrder_Conditional<size_t>(wFCB->MaxSize);
-    BlockTargetSize=reverseByteOrder_Conditional<size_t>(wFCB->BlockTargetSize);
-    HighwaterMarking=wFCB->HighwaterMarking;
-    GrabFreeSpace=wFCB->GrabFreeSpace;
-//    EndSign=_reverseByteOrder_T<uint32_t>(wFCB->EndSign);
-    EndSign=wFCB->EndSign;// don't care reversing start sign or end sign : same as reversed
-
-    return *this;
-}// ZFileControlBlock::_import
-
-//=========================== ZFileControlBlock Export import==========================================
-/**
- * @brief ZFileDescriptor::_exportFCB Exports the operational data of file descriptor :
- *                      File control block (FCB)
- *                      pools : ZBAT   active blocks pool
- *                              ZFBT   free blocks pool
- *                              ZDBT   deleted blocks pool
- * @param pZDBExport
- * @return
- */
-ZDataBuffer&
-ZFileDescriptor::_exportFCB(ZDataBuffer& pZDBExport)
-{
-    printf ("ZFileDescriptor::_exportFCB>>\n");
-    ZFileControlBlock wFileControlBlock;
-
-    wFileControlBlock.ZBAT_DataOffset =  sizeof(ZFileControlBlock_Export);  // ZBAT data Pool is stored first just after ZFCB
-
-    wFileControlBlock.AllocatedBlocks =ZBAT->getAllocation();
-    wFileControlBlock.BlockExtentQuota = ZBAT->getQuota();
-
-    ZDataBuffer wZBAT_export;
-    ZBAT->_exportPool(wZBAT_export);
-    wFileControlBlock.ZBAT_ExportSize = wZBAT_export.getByteSize();
-
-    wFileControlBlock.ZFBT_DataOffset = (zaddress_type)(ZFCB->ZBAT_DataOffset
-                                                       +ZFCB->ZBAT_ExportSize); // then ZFBT
-    //    wFileControlBlock.ZFBT_ExportSize = ZFBT->_getExportAllocatedSize();
-    ZDataBuffer wZFBT_export;
-    ZFBT->_exportPool(wZFBT_export);
-    wFileControlBlock.ZFBT_ExportSize = wZFBT_export.getByteSize();
-
-    wFileControlBlock.ZDBT_DataOffset = (zaddress_type)(ZFCB->ZFBT_DataOffset
-                                                       +ZFCB->ZFBT_ExportSize); // then ZDBT
-    //    wFileControlBlock.ZDBT_ExportSize = ZDBT->_getExportAllocatedSize();
-    ZDataBuffer wZDBT_export;
-    ZFBT->_exportPool(wZDBT_export);
-    wFileControlBlock.ZDBT_ExportSize = wZDBT_export.getByteSize();
-
-    wFileControlBlock._export(pZDBExport);
-
-    pZDBExport.appendData(wZBAT_export);
-    pZDBExport.appendData(wZFBT_export);
-    pZDBExport.appendData(wZDBT_export);
-    return pZDBExport;
-}// ZFileDescriptor::_exportFCB
-
-ZFileDescriptor&
-ZFileDescriptor::_importFCB(unsigned char* pFileControlBlock_Ptr)
-{
-    printf ("ZFileDescriptor::_importFCB>>\n");
-    ZFileControlBlock* wFileControlBlock=( ZFileControlBlock* )pFileControlBlock_Ptr; // for debug
-    setupFCB();
-    ZFCB->_import(pFileControlBlock_Ptr);
-
-    ZBAT->_importPool(pFileControlBlock_Ptr+ZFCB->ZBAT_DataOffset);
-
-    ZFBT->_importPool(pFileControlBlock_Ptr+ZFCB->ZFBT_DataOffset);
-
-    ZDBT->_importPool(pFileControlBlock_Ptr+ZFCB->ZDBT_DataOffset);
-
-    return *this;
-}// ZFileDescriptor::_importFCB
-
-//=================ZFileDescriptor===============================================
-void
-ZFileDescriptor::setupFCB (void)
-    {
-    if (ZFCB!=nullptr)
-                delete ZFCB;
-        ZFCB=new ZFileControlBlock;
-        if (ZBAT!=nullptr)
-                    delete ZBAT;
-        ZBAT=new ZBlockAccessTable;
-        if (ZFBT!=nullptr)
-                    delete ZFBT;
-        ZFBT=new ZFreeBlockPool;
-        if (ZDBT!=nullptr)
-                    delete ZDBT;
-        ZDBT=new ZDeletedBlockPool;
-        return;
-//           ZReserved.clear();  // Reserved header is fully managed by derived classes
-    }
-
-inline void
-ZFileDescriptor::clearFCB (void)
-{
-    ZBlockLock.clear();
-    ZReserved.clear();
-    if (ZFCB!=nullptr)
-                delete ZFCB;
-    if (ZBAT!=nullptr)
-                delete ZBAT;
-    if (ZFBT!=nullptr)
-                delete ZFBT;
-    if (ZDBT!=nullptr)
-                delete ZDBT;
-
-
-    ZFCB = nullptr;
-    ZBAT = nullptr;
-    ZFBT = nullptr;
-    ZDBT = nullptr;
-
-    return;
-}
-
-/**
- * @brief ZFileDescriptor::setPath for a ZRandomFile, set up the different pathes environment using a given uriString.
- *  This uriString will name the content file (main data file) @see ZRFPhysical
- * @param[in] pURIPath an uriString containing the path of the file
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
-ZStatus
-ZFileDescriptor::setPath (uriString &pURIPath)
-{
-    if (_isOpen)
-            {
-            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                    ZS_INVOP,
-                                    Severity_Error,
-                                    "File <%s> is already open.Cannot change to path <%s>",
-                                    URIContent.toString(),
-                                    pURIPath.toString());
-            return ZS_INVOP;
-            }
-    Pid = getpid();
-//    utfdescString wDInfo;
-   const utf8_t* wExtension=(const utf8_t*)__HEADER_FILEEXTENSION__;
-    if (wExtension[0]=='.')
-            wExtension++;       // +1 because we should miss the '.' char
-//    if (!strcmp(wExtension,(char*)pURIPath.getFileExtension().toString()))
-    if (pURIPath.getFileExtension()==wExtension)
-
-                    {
-                    ZException.setMessage(_GET_FUNCTION_NAME_,
-                                            ZS_INVNAME,
-                                            Severity_Error,
-                                            "File name is malformed. Extension <%s> is reserved while given file name is <%s>",
-                                            __HEADER_FILEEXTENSION__,
-                                            pURIPath.toString());
-                    return ZS_INVNAME;
-                    }
-
-    URIContent = pURIPath;
-
-    URIDirectoryPath = URIContent.getDirectoryPath().toString();
-
-    if (URIDirectoryPath.isEmpty())  // if directory path is not mentionned : then current working directory is taken
-        {
-        char wB[cst_filename_max];
-        URIDirectoryPath = (const utf8_t*)getcwd(wB,cst_filename_max);
-        URIContent.setDirectoryPath(URIDirectoryPath);
-        }
-
-    return generateURIHeader( pURIPath,URIHeader);
-}// ZFileDescriptor::setPath
 
 
 
@@ -8982,6 +8603,80 @@ zsize_type  wFreeUserSize=pFreeUserSize;
 }
 
 /** @endcond  */
+/*
+int ZRandomFile::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog)
+{
+  zxmlElement *wRootNode;
+  utfcodeString wXmlHexaId;
+  utf8String wValue;
+  utfcodeString wCValue;
+  bool wBool;
+  unsigned int wInt;
+  ZStatus wSt = pIndexRankNode->getChildByName((zxmlNode *&) wRootNode, "icbowndata");
+  if (wSt != ZS_SUCCESS) {
+    pErrorlog->logZStatus(
+        ZAIES_Error,
+        wSt,
+        "FieldDescription::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
+        "<%s>",
+        "icbowndata",
+        decode_ZStatus(wSt));
+    return -1;
+  }
+  if (XMLgetChildText(wRootNode, "name", Name, pErrorlog) < 0) {
+    fprintf(stderr,
+        "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+        "default.",
+        "name");
+  }
+
+
+
+  if (XMLgetChildULong(wRootNode, "icbtotalsize", ICBTotalSize, pErrorlog)< 0) {
+    fprintf(stderr,
+        "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+        "default.",
+        "icbtotalsize");
+  }
+  if (XMLgetChildULong(wRootNode, "zkdicoffset", ZKDicOffset, pErrorlog)< 0) {
+    fprintf(stderr,
+        "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+        "default.",
+        "zkdicoffset");
+  }
+
+
+  if (XMLgetChildUInt(wRootNode, "keytype", wInt, pErrorlog)< 0) {
+    fprintf(stderr,
+        "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+        "default.",
+        "keytype");
+  }
+  else
+    KeyType = (ZIFKeyType_type)wInt;
+
+  if (XMLgetChildUInt(wRootNode, "autorebuild", wInt, pErrorlog)< 0) {
+    fprintf(stderr,
+        "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+        "default.",
+        "autorebuild");
+  }
+  else
+    AutoRebuild = (uint8_t)wInt;
+
+  if (XMLgetChildUInt(wRootNode, "duplicates", wInt, pErrorlog)< 0) {
+    fprintf(stderr,
+        "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+        "default.",
+        "duplicates");
+  }
+  else
+    Duplicates = (ZSort_Type)wInt;
+
+  return (int)pErrorlog->hasError();
+}//ZRandomFile::fromXml
+
+*/
 
 /** @} ZRFUtilities */
 

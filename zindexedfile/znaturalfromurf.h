@@ -34,7 +34,7 @@ ZStatus get_121_ZDateNfURF(void* pValue, unsigned char *pURFData);
 
 ZStatus get_121_CheckSumNfURF(void* pValue,unsigned char* pURFData);
 
-ZStatus get_ZStringNfURF(void* pValue, ZTypeBase pType,unsigned char* pURFData);
+ZStatus get_ZStringNfURF(void* pValue, ZTypeBase pType, unsigned char *&pURFData);
 /*ZStatus get_121_utf16FixedStringNfURF(void* pValue, unsigned char* pURFData);
 ZStatus get_121_utf32FixedStringNfURF(void* pValue, unsigned char* pURFData);
 

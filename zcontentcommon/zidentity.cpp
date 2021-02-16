@@ -81,7 +81,7 @@ int ZIdentity::fromXml(zxmlElement *pRootNode, const char *pChildName, ZaiErrors
     return 0;
 }
 
-ZDataBuffer ZIdentity::_export()
+ZDataBuffer ZIdentity::_export() const
 {
   ZDataBuffer wReturn;
   Resourceid_type wId=reverseByteOrder_Conditional<Identity_type>(id);
@@ -89,11 +89,12 @@ ZDataBuffer ZIdentity::_export()
   return wReturn;
 }
 
-size_t     ZIdentity::_import(unsigned char* pUniversalPtr)
+size_t     ZIdentity::_import(unsigned char *&pUniversalPtr)
 {
   unsigned char* wPtrIn=pUniversalPtr;
   Identity_type wId;
   memmove(&wId,wPtrIn,sizeof(Identity_type));
   id=reverseByteOrder_Conditional<ZEntity_type>(wId);
+  pUniversalPtr += sizeof(Identity_type);
   return sizeof(Identity_type);
 }

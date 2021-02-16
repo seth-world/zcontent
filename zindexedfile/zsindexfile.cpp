@@ -291,8 +291,6 @@ size_t wSize;
 ZDataBuffer&
 ZSIndexControlBlock::_exportICB(ZDataBuffer &pICBContent)
 {
-
-
 ZDataBuffer     wZDB;
 
     _exportICBOwn(pICBContent);  // export ICB own data in universal format
@@ -300,8 +298,8 @@ ZDataBuffer     wZDB;
     ZKDic->_export(wZDB);       // export key dictionary
     pICBContent.appendData(wZDB);    // append it to ICBExchange ZDataBuffer
 
-        ZSICBOwnData_Export* wICB = (ZSICBOwnData_Export*) pICBContent.Data;
-        wICB->ICBTotalSize = reverseByteOrder_Conditional<size_t>( pICBContent.Size);  // update size of exported ICB into ICBExchange ZDataBuffer
+    ZSICBOwnData_Export* wICB = (ZSICBOwnData_Export*) pICBContent.Data;
+    wICB->ICBTotalSize = reverseByteOrder_Conditional<size_t>( pICBContent.Size);  // update size of exported ICB into ICBExchange ZDataBuffer
 
 /*        ZDataBuffer wHexa;
         ZDataBuffer wAscii;
@@ -401,7 +399,7 @@ size_t wZDicSize;
 
 
 /**
- * @brief ZIndexControlBlock::zKeyValueExtraction Extracts the Key value from ZMasterFile record data using dictionnary CZKeyDictionary fields definition
+ * @brief ZSIndexControlBlock::zKeyValueExtraction Extracts the Key value from ZMasterFile record data using dictionnary CZKeyDictionary fields definition
  *
  * Returns the concaneted key value in pKey ZDataBuffer.
  * - Key fields are extracted from the ZMasterFile user record .

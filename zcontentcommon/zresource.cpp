@@ -136,4 +136,31 @@ ZDataBuffer ZResource::toFullKey()
     return wOutValue;
 }
 
+
+ZDataBuffer ZResource::_export() const
+{
+  ZDataBuffer wReturn;
+  ZEntity_type wEntity=reverseByteOrder_Conditional<ZEntity_type>(Entity);
+  wReturn.appendData(&wEntity,sizeof (ZEntity_type));
+  Resourceid_type wId=reverseByteOrder_Conditional<Resourceid_type>(id);
+  wReturn.setData(&wId,sizeof(Resourceid_type));
+  return wReturn;
+}
+
+size_t ZResource::_import(unsigned char *&pUniversalPtr)
+{
+  unsigned char* wPtrIn=pUniversalPtr;
+  ZEntity_type wEntity;
+  Resourceid_type wId;
+  memmove(&wEntity,wPtrIn,sizeof(ZEntity_type));
+  Entity=reverseByteOrder_Conditional<ZEntity_type>(wEntity);
+  wPtrIn += sizeof(ZEntity_type);
+  memmove(&wId,wPtrIn,sizeof(Resourceid_type));
+  id = reverseByteOrder_Conditional<Resourceid_type>(wId);
+  pUniversalPtr += sizeof(ZEntity_type)+sizeof(Resourceid_type);
+  return sizeof(ZEntity_type)+sizeof(Resourceid_type);
+}
+
+
+
 #endif // ZRESOURCE_CPP

@@ -237,7 +237,7 @@ public:
 protected:
     pid_t       Pid;
     ZSystemUserId     Uid;
-    utfdescString  Username;
+    utf8String    Username;
     ZSMasterFile* Father;
 //    uriString   URIJournal;
 };

@@ -15,12 +15,25 @@ enum ZSA_Action { ZSA_NoAction      =   0,
                   ZSA_Insert        =   4,
                   ZSA_Remove        =   0x10};
 
-struct ZResult{
+class ZResult
+{
+public:
+
     ZStatus     ZSt=ZS_NOTHING ;
     ZSA_Action  ZA =ZSA_NoAction ;
     long        ZIdx=cst_InvalidRank ;
     int         ZIterations;
+    ZResult() {clear();}
+    ZResult(const ZResult& pIn) {_copyFrom(pIn);}
+    ZResult(const ZResult&& pIn) {_copyFrom(pIn);}
 
+    ZResult& _copyFrom(const ZResult& pIn);
+    ZResult& operator = (const ZResult& pIn) {_copyFrom(pIn);}
+    ZResult& operator = (const ZResult&& pIn) {_copyFrom(pIn);}
+
+    void clear();
+
+    bool isInvalid()  {return ZIdx == cst_InvalidRank;}
     bool isFound() { return ZSt == ZS_FOUND; }
     bool notFound() { return ZSt != ZS_FOUND; }
     bool isSuccess() { return (ZSt == ZS_SUCCESS)||(ZSt == ZS_FOUND); }

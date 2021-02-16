@@ -6,12 +6,12 @@
 
 #include <zrandomfile/zrfcollection.h>
 #include <zindexedfile/zsjournal.h>
-#include <QUrl>
+//#include <QUrl>
 #include <zindexedfile/zmasterfile_utilities.h>
 
 #include <zxml/zxmlprimitives.h>
 
-#include <zxml/zxml.h>
+
 
 bool ZMFStatistics = false;
 
@@ -274,7 +274,7 @@ ZDataBuffer wIndexPath;
 }//ZSMCBOwnData::_export
 
 ZStatus
-ZSMCBOwnData::_import(unsigned char* pZDBImport_Ptr)
+ZSMCBOwnData::_import(unsigned char* &pZDBImport_Ptr)
 {
 
 ZStatus wSt;
@@ -320,7 +320,8 @@ ZStatus wSt;
     IndexCount=reverseByteOrder_Conditional<size_t>(wMCB->IndexCount);
 
     HistoryOn=wMCB->HistoryOn;  // uint8_t used as boolean
-    IndexFilePath._importUVF(pZDBImport_Ptr+sizeof(ZSMCBOwnData_Export));
+    pZDBImport_Ptr+=sizeof(ZSMCBOwnData_Export);
+    IndexFilePath._importUVF(pZDBImport_Ptr);
 
 /*    wMCB->IndexFilePathSize=_reverseByteOrder_T<uint16_t>(wMCB->IndexFilePathSize);
     wMCB->IndexFilePath=(char*) (wMCB + offsetof(ZSMCBOwnData_Export,IndexFilePath));
@@ -4226,10 +4227,10 @@ ZSMasterFile::_writeXML_ZRandomFileHeader(ZSMasterFile& pZMF,FILE *pOutput)
 
    fprintf (pOutput,
 
-            "  <ZMasterControlBlock>\n"
-            "         <HistoryOn>%s</HistoryOn>\n"
-            "         <JournalingOn>%s</JournalingOn>\n"
-            "         <IndexFileDirectoryPath>%s</IndexFileDirectoryPath>\n"
+            "  <zmastercontrolblock>\n"
+            "         <historyon>%s</historyon>\n"
+            "         <journalingon>%s</journalingon>\n"
+            "         <indexfiledirectorypath>%s</indexfiledirectorypath>\n"
             ,
 
             pZMF.ZMCB.HistoryOn?"true":"false",
@@ -4239,15 +4240,15 @@ ZSMasterFile::_writeXML_ZRandomFileHeader(ZSMasterFile& pZMF,FILE *pOutput)
 
    fprintf (pOutput,
             "         <!-- Changing IndexRank position in a file description has no impact -->\n"
-            "         <Index>\n");
+            "         <index>\n");
    for (long wi=0;wi<pZMF.ZMCB.Index.size();wi++)
    {
    _writeXML_Index(pZMF,wi,pOutput);
    }//for wi
    fprintf (pOutput,
-            "         </Index>\n");
+            "         </index>\n");
    fprintf (pOutput,
-            "  </ZMasterControlBlock>\n");
+            "  </zmastercontrolblock>\n");
    return ;
 }//_writeXML_FileHeader
 
@@ -4257,21 +4258,21 @@ ZSMasterFile::_writeXML_Index(ZSMasterFile& pZMF,const long pIndexRank,FILE* pOu
 
     pZMF.ZMCB.Index[pIndexRank]->ZKDic->_reComputeSize();
     fprintf (pOutput,
-             "         <IndexRank>\n"
-             "           <Rank>%ld</Rank> <!-- not significant -->\n"
-             "           <Name>%s</Name> <!-- warning modification of this field implies index duplication see documentation -->\n"
-             "           <Duplicates>%s</Duplicates> <!-- warning modification of this field must be cautiously done see documentation -->\n"
-             "           <AutoRebuild>%s</AutoRebuild>\n",
+             "         <indexrank>\n"
+             "           <rank>%ld</rank> <!-- not significant -->\n"
+             "           <name>%s</name> <!-- warning modification of this field implies index duplication see documentation -->\n"
+             "           <duplicates>%s</duplicates> <!-- warning modification of this field must be cautiously done see documentation -->\n"
+             "           <autorebuild>%s</autorebuild>\n",
              pIndexRank,
              pZMF.ZMCB.Index[pIndexRank]->Name.toCChar(),
-             pZMF.ZMCB.Index[pIndexRank]->Duplicates==ZST_DUPLICATES?"ZST_DUPLICATES":"ZST_NODUPLICATES",
+             pZMF.ZMCB.Index[pIndexRank]->Duplicates==ZST_DUPLICATES?"zst_duplicates":"zst_noduplicates",
              pZMF.ZMCB.Index[pIndexRank]->AutoRebuild?"true":"false"
              );
 
  //$$$           _writeXML_KDic(pZMF.ZMCB.Index[pIndexRank].ZKDic,pOutput);
 
     fprintf (pOutput,
-             "         </IndexRank>\n");
+             "         </indexrank>\n");
 
     return  ;
 }//_writeXML_Index
@@ -4598,7 +4599,6 @@ utfdescString OutPath;
     return ;
 }  // static zwriteXML_FileHeader
 
-#ifdef QT_CORE_LIB
 
 /*----------------------------------------------------------------------------------------------
  *  Warning : never use QDomNode::cloneNode (true) . It generates SIGEV after combined 2 usages
@@ -4609,122 +4609,35 @@ utfdescString OutPath;
  * @brief ZSMasterFile::_XMLzicmControl Loads an XML document and Makes all XML controls to have an appropriate <zicm> document
  *
  *  Controls are made on
- *  - xml coherence
+ *  - xml parsing coherence
  *  - zicm version attribute
  *
  *  It delivers the FIRST child node ELEMENT AFTER root node element <zicm>, without controlling either tag name or content
  *
  * @param[in] pFilePath     a Cstring pointing to xml file to load and control
  * @param[out] XmlDoc       The XML document content loaded as a return
- * @param[out] pFirstNode   The First node to exploit as a return
- * @return
+ * @param[out] pFirstElement   The Root Element to exploit as a return (<zicm version=...>)
+ * @return a ZStatus
  */
 ZStatus
-ZSMasterFile::_XMLzicmControl(const utf8_t* pFilePath,QDomDocument &XmlDoc,QDomNode &pFirstNode)
+ZSMasterFile::_XMLzicmControl(const utf8_t* pFilePath,
+                              zxmlDoc* &    pXmlDoc,
+                              zxmlElement* &pFirstElement,
+                              ZaiErrors*    pErrorlog)
 {
-
 
 uriString wUriPath;
 ZDataBuffer wXMLcontent;
 ZStatus wSt;
-    wUriPath =(const utf8_t*) pFilePath;
-//    wUriPath = "/home/gerard/uncryptedparams.xml";
-    if (!wUriPath.exists())
-            {
-            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                    ZS_FILENOTEXIST,
-                                    Severity_Error,
-                                    " File <%s> does not exist while trying to load it",
-                                    pFilePath);
-            return  ZS_FILENOTEXIST;
-            }
-    wSt=wUriPath.loadContent(wXMLcontent);
-    if (wSt!=ZS_SUCCESS)
-                { return  wSt;}// Beware return  is multiple instructions in debug mode
-QDomNode wNode;
-QString wN;
-//QDomDocument XmlDoc;
 
-
-QString ErrorMsg;
-int ErrLine=0;
-int ErrColumn=0;
-bool Result = true;
-bool NameSpaceProcessing = true; //option to be set at a higher level
-    XmlDoc.clear();
-    Result = XmlDoc.setContent(   wXMLcontent.toQByteArray(),
-                                        NameSpaceProcessing,
-                                        &ErrorMsg,
-                                        &ErrLine,
-                                        &ErrColumn) ;
-
-    if (!Result)
-                {
-                ZException.setComplement(
-                        "line %d Column %d Xml error >>",
-                        ErrLine,
-                        ErrColumn,
-                        ErrorMsg.toUtf8().data());
-                ZException.setMessage(_GET_FUNCTION_NAME_,
-                                        ZS_XMLERROR,
-                                        Severity_Warning,
-                                        " XML Error(s) have been reported : ");
-                }
-
-
-QDomNode wNodeRoot= XmlDoc.firstChildElement("zicm");
-
-    if (wNodeRoot.isNull())
-                {
-                ZException.setMessage(_GET_FUNCTION_NAME_,
-                                        ZS_EMPTYFILE,
-                                        Severity_Error,
-                                        "In file %s : xml document is empty or errored",
-                                        pFilePath);
-                return  ZS_EMPTYFILE;
-                }
-QDomElement wElement;
-//    wNodeRoot=wNodeRoot.nextSiblingElement(); // first node is never an element
-    wElement=wNodeRoot.toElement();
-    wN= wElement.tagName();
-    if (wN!="zicm")
-                {
-                ZException.setMessage(_GET_FUNCTION_NAME_,
-                                        ZS_XMLERROR,
-                                        Severity_Error,
-                                        "Bad xml document <%s>.Expected first element <zicm> not found. Found <%s>",
-                                        pFilePath,
-                                        wN.toStdString().c_str());
-                return  ZS_XMLERROR;
-                }
-QString wAttribute;
-    wAttribute = wElement.attribute("version");
-    if (wAttribute!=__ZRF_XMLVERSION_CONTROL__)
-        {
-        ZException.setMessage(_GET_FUNCTION_NAME_,
-                                ZS_XMLERROR,
-                                Severity_Error,
-                                "Bad xml document <%s>.Bad zicm version.Expected <2.00>  Found <%s>",
-                                pFilePath,
-                                wAttribute.toStdString().c_str());
-        return  ZS_XMLERROR;
-        }
-    wNode = wNodeRoot.firstChildElement();
-    wN= wNode.toElement().tagName(); // debug control of tag name
-
-    if (wNode.isNull())
-        {
-        ZException.setMessage(_GET_FUNCTION_NAME_,
-                                ZS_XMLERROR,
-                                Severity_Error,
-                                "Bad xml document <%s>.Empty document no child to <zicm> tag found ",
-                                pFilePath);
-        return  ZS_XMLERROR;
-        }
-
-
-    pFirstNode = wNode;
-    return  ZS_SUCCESS;
+    return _XMLLoadAndControl(pFilePath,
+                              pXmlDoc,
+                              pFirstElement,
+                              (const utf8_t *)"zicm",
+                              (const utf8_t *)"version",
+                              (const utf8_t *)"2.00",
+                              pErrorlog,
+                              nullptr);
 } //_XMLzicmControl
 
 /**
@@ -4736,24 +4649,27 @@ QString wAttribute;
  *  - Root node tag name validity using pRootName
  *  - Root node Element attribute. Optional control : if pRootAttrName is omitted (nullptr), no control is done.
  *
- *  It delivers the ROOT node ELEMENT after having done the controls
+ *  It delivers the ROOT node ELEMENT after having done the controls against
+ *    - root element name
+ *    - root element attribute name and value
  *
  * @param[in] pFilePath     a Cstring pointing to xml file to load and control
- * @param[out] XmlDoc       The XML document content loaded as a return 
- * @param[out] pNodeRoot   The First node under the root name to exploit as a return 
- * @param[in] pRootName      Root node tag name we are searching for
+ * @param[out]pXmlDoc       The XML document content loaded as a return
+ * @param[out]pRootElement  The First node under the root name to exploit as a return
+ * @param[in] pRootName     Root node tag name we are searching for
  * @param[in] pRootAttrName Root node Element attribute name. If nullptr then no control is made.
  * @param[in] pRootAttrValue Root node Element attribute expected value
  * @return
  */
 ZStatus
 ZSMasterFile::_XMLLoadAndControl(const utf8_t *pFilePath,
-                   zxmlDoc* &XmlDoc,
-                   zxmlNode* & wRootNode,
-                   const utf8_t *pRootName,
-                   const utf8_t *pRootAttrName,
-                   const utf8_t *pRootAttrValue,
-                   FILE* pOutput)
+                                 zxmlDoc* &    pXmlDoc,
+                                 zxmlElement* &pRootElement,
+                                 const utf8_t *pRootName,
+                                 const utf8_t *pRootAttrName,
+                                 const utf8_t *pRootAttrValue,
+                                 ZaiErrors*   pErrorLog,
+                                 FILE*        pOutput)
 {
 
 
@@ -4761,240 +4677,306 @@ uriString wUriPath;
 ZDataBuffer wXMLcontent;
 ZStatus wSt;
 
-QDomElement wElement;
+zxmlElement* wElement=nullptr;
 
-QString wN;
-QString wAttribute;
+utf8String wN;
+utf8String wAttribute;
 
     wUriPath = (const utf8_t*)pFilePath;
 
     if (!wUriPath.exists())
             {
+            pErrorLog->errorLog("_XMLLoadAndControl-E-FILNTFND File <%s> does not exist while trying to load it.",pFilePath);
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_FILENOTEXIST,
                                     Severity_Error,
                                     " File <%s> does not exist while trying to load it",
                                     pFilePath);
-            fprintf(pOutput,
-                    "%s>> File <%s> does not exist while trying to load it\n",
-                    _GET_FUNCTION_NAME_,
-                    pFilePath);
             return  ZS_FILENOTEXIST;
             }
     if (pOutput)
-            fprintf(pOutput,"%s>> loading xml file %s\n",
-                    _GET_FUNCTION_NAME_,
+      pErrorLog->infoLog("_XMLLoadAndControl-I-LDFIL loading xml file %s",
                     pFilePath);
 
     wSt=wUriPath.loadContent(wXMLcontent);
     if (wSt!=ZS_SUCCESS)
-            {return  wSt;} // Beware return  is multiple instructions in debug mode
-
-//QDomDocument XmlDoc;
-
-
-QString ErrorMsg;
-int ErrLine=0;
-int ErrColumn=0;
-bool Result = true;
-bool NameSpaceProcessing = true; //option to be set at a higher level
-
-    XmlDoc.clear();
-    Result = XmlDoc.setContent(   wXMLcontent.toQByteArray(),
-                                        NameSpaceProcessing,
-                                        &ErrorMsg,
-                                        &ErrLine,
-                                        &ErrColumn) ;
-
-    if (!Result)
-                {
-                ZException.setComplement(
-                        "line %d Column %d Xml error >> %s",
-                        ErrLine,
-                        ErrColumn,
-                        ErrorMsg.toStdString().c_str());
-                ZException.setMessage(_GET_FUNCTION_NAME_,
-                                        ZS_XMLERROR,
-                                        Severity_Warning,
-                                        " XML Error(s) have been reported : ");
-                if (pOutput)
-                        ZException.printLastUserMessage(pOutput);
-                }// !Result
-
-
-    wRootNode= XmlDoc.firstChildElement((const char*)pRootName);
-
-    if (wRootNode.isNull())
-                {
-                ZException.setMessage(_GET_FUNCTION_NAME_,
-                                        ZS_EMPTYFILE,
-                                        Severity_Error,
-                                        "In file %s : xml document is empty or errored",
-                                        pFilePath);
-                return  ZS_EMPTYFILE;
-                }
-
-    wElement=wRootNode.toElement();
-    wN= wElement.tagName();
-    if (wN!=(const char*)pRootName)
-                {
-                ZException.setMessage(_GET_FUNCTION_NAME_,
-                                        ZS_XMLERROR,
-                                        Severity_Error,
-                                        "Bad xml document <%s>.Expected first element <%s> not found. Found <%s>",
-                                        pFilePath,
-                                        pRootName,
-                                        wN.toStdString().c_str());
-                return  ZS_XMLERROR;
-                }
-
-    if (pRootAttrName==nullptr)         // if Optional attribute is omitted then no more control
-                    { return  ZS_SUCCESS;}
-
-    wAttribute = wElement.attribute((const char*)pRootAttrName);
-    if (wAttribute!=(const char*)pRootAttrValue)
+            {
+            pErrorLog->infoLog("_XMLLoadAndControl-E-LDFIL Error loading file %s",
+            pFilePath);
+            return  wSt;
+            }
+    pXmlDoc=new zxmlDoc;
+    wSt=pXmlDoc->ParseXMLDocFromMemory(wXMLcontent.DataChar,wXMLcontent.Size,"utf8",0);
+    if (wSt!=ZS_SUCCESS)
         {
-        ZException.setMessage(_GET_FUNCTION_NAME_,
-                                ZS_XMLERROR,
-                                Severity_Error,
-                                "Bad xml document <%s>.Bad root node attribute <%s>.Expected <%s>  Found <%s>",
-                                pFilePath,
-                                pRootAttrName,
-                                pRootAttrValue,
-                                wAttribute.toStdString().c_str());
-        return  ZS_XMLERROR;
+          pErrorLog->infoLog("_XMLLoadAndControl-E-PARSDOC Error parsing xml document",
+              pFilePath);
+          ZException.setMessage(_GET_FUNCTION_NAME_,
+              wSt,
+              Severity_Error,
+              " XML Error(s) have been reported while parsing document");
+          return  wSt;
         }
-    if (pOutput)
+
+    wSt=pXmlDoc->getRootElement(pRootElement);
+    if (wSt!=ZS_SUCCESS)
+      {
+        pErrorLog->infoLog("_XMLLoadAndControl-E-ROOTELT Root element not found in xml document <%s>",
+            pFilePath);
+        ZException.setMessage(_GET_FUNCTION_NAME_,
+            wSt,
+            Severity_Error,
+            "Root element not found in xml document <%s>",
+            pFilePath);
+        delete pXmlDoc;
+        return wSt;
+      }
+  if (pRootName!=nullptr)
+    {
+    if (pRootElement->getName()!=pRootName)
+      {
+      pErrorLog->infoLog("_XMLLoadAndControl-E-ROOTELT Root element <%s> not found in xml document <%s>",
+          pRootName,
+          pFilePath);
+      ZException.setMessage(_GET_FUNCTION_NAME_,
+          wSt,
+          Severity_Error,
+          "Root element <%s> not found in xml document <%s>",
+          pRootName,
+          pFilePath);
+      XMLderegister(pRootElement);
+      delete pXmlDoc;
+      return wSt;
+      }
+    if (pRootAttrName!=nullptr)
+          {
+          wSt=pRootElement->getAttributeValue(pRootAttrName,wAttribute);
+          if (wSt!=ZS_SUCCESS)
+              {
+              pErrorLog->errorLog("_XMLLoadAndControl-E-ATTRMIS Root element attribute <%s> not found in xml document <%s>",
+                    pRootAttrName,
+                    pFilePath);
+                ZException.setMessage(_GET_FUNCTION_NAME_,
+                    wSt,
+                    Severity_Error,
+                    "Root element attribute <%s> not found in xml document <%s>",
+                    pRootAttrName,
+                    pFilePath);
+                XMLderegister(pRootElement);
+                delete pXmlDoc;
+                return wSt;
+              }
+          if ((pRootAttrValue!=nullptr) && (wAttribute!=pRootAttrValue))
+            {
+              pErrorLog->errorLog("_XMLLoadAndControl-E-ATTRVAL Root element attribute <%s> has wrong value <%s> while <%s> was expected in xml document <%s>",
+                  pRootAttrName,
+                  wAttribute.toCChar(),
+                  pRootAttrValue,
+                  pFilePath);
+              ZException.setMessage(_GET_FUNCTION_NAME_,
+                  wSt,
+                  Severity_Error,
+                  "Root element attribute <%s> has wrong value <%s> while <%s> was expected in xml document <%s>",
+                  pRootAttrName,
+                  wAttribute.toCChar(),
+                  pRootAttrValue,
+                  pFilePath);
+              XMLderegister(pRootElement);
+              delete pXmlDoc;
+              return ZS_INVVALUE;
+            }
+          }//if (pRootAttrName!=nullptr)
+    }//if (pRootName!=nullptr
+
+
+  if (pOutput)
             fprintf(pOutput,"%s>> load and control on xml file %s has been done successfully\n",
                     _GET_FUNCTION_NAME_,
                     pFilePath);
-    return  ZS_SUCCESS;
-} //_XMLControl
+  return  ZS_SUCCESS;
+} //_XMLLoadAndControl
 
-
-ZStatus
-ZSMasterFile::_loadXML_Index(QDomNode &pIndexNode, ZSIndexControlBlock* pZICB,ZMetaDic* pMetaDic)
+/**
+ * @brief ZSMasterFile::_loadXML_OneIndex input node pIndexNode must be <indexrank> tag.
+ *    pZICB is returned with a new ICB (that must be deleted later on), or nullptr if errors occurred
+ * @param pIndexNode
+ * @param pZICB
+ * @param pMetaDic
+ * @param pErrorLog
+ * @return
+ */
+int
+ZSMasterFile::_loadXML_OneIndex(zxmlNode* &pIndexRankNode,
+                                ZSIndexControlBlock*& pZICB,
+                                ZMetaDic* pMetaDic,
+                                ZaiErrors* pErrorlog)
 {
 
 
-ZStatus wSt;
-QDomNode wNode;
-QString wN;
-    wNode = pIndexNode.firstChildElement();
-    if (wNode.isNull())
-        {
-        ZException.setMessage(_GET_FUNCTION_NAME_,
-                                ZS_XMLERROR,
-                                Severity_Error,
-                                "xml document is corrupted.Expected children to <IndexRank> tag : no child found.");
-        return  ZS_XMLERROR;
-        }
-    while (!wNode.isNull())
+  if (pIndexRankNode->getName()!="indexrank")
     {
-        while (true)
-        {
-            wN=wNode.toElement().tagName();
-            if (wN=="Rank")
-            {
-            break; // of no use
-            }
-            if (wN=="Name")
-            {
-              pZICB->Name=wNode.toElement().text();
-              break;
-            }
-            if (wN=="Duplicates")
-            {
-              if (wNode.toElement().text()=="ZST_NODUPLICATES")
-                        pZICB->Duplicates = ZST_NODUPLICATES ;
-                    else
-                        pZICB->Duplicates = ZST_DUPLICATES ;
-              break;
-            }
-            if (wN=="AutoRebuild")
-            {
-            pZICB->AutoRebuild = (wNode.toElement().text()=="true");
-            break;
-            }
-            if (wN=="ZKDic")
-            {
-            QDomNode wNodeField = wNode;
-            pZICB->ZKDic=new ZSKeyDictionary(pMetaDic);
-//$$$            wSt=_loadXMLDictionary(wNodeField,pZICB->ZKDic);
-            if (wSt!=ZS_SUCCESS)
-                        {
-                        return  wSt;// Beware return  is multiple instructions in debug mode
-                        }
-            break;
-            }
+    pErrorlog->errorLog("Invalid index node name <%s> while expected <index>",pIndexRankNode->getName().toCChar());
+    return ZS_INVNAME;
+    }
+  if (pZICB==nullptr)
+    {
+    pErrorlog->errorLog("Invalid Index Control Block (nullptr) ");
+    return ZS_INVVALUE;
+    }
 
-            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                    ZS_XMLERROR,
-                                    Severity_Error,
-                                    "XML error unknown tag name found %s  at line %d ",
-                                    wN.toStdString().c_str(),
-                                    wNode.lineNumber());
-            return  ZS_XMLERROR;
-        }//while true
-    wNode=wNode.nextSiblingElement();
-    }// while wNode is not null
-   return  ZS_SUCCESS;
+    pZICB=new ZSIndexControlBlock(pMetaDic);
+    return pZICB->fromXml(pIndexRankNode,pErrorlog);
 }// _loadXML_Index
 
 /** @endcond */ // Development
 
+/** copied to zxmlNode
+ * @brief ZSMasterFile::_searchForChildTag recursively scans xml tree (children and sibling nodes)
+ *  for a specific node with name pTag
+ *  and returns the first node found within xml tree that has name equal to tag or returns nullptr if not found.
+ * @param pTopNode top level node to start search from : NB: this node is not deregistrered by the routine.
+ * Returned node must be deregistrated.
+ */
+zxmlNode*
+ZSMasterFile::_searchForChildTag(zxmlNode* pTopNode, const char* pTag)
+{
+  zxmlNode* wNode;
+  zxmlNode* wNode1=nullptr;
+  if (pTopNode->getName()==pTag)
+    return pTopNode;
+  ZStatus wSt=pTopNode->getFirstChild(wNode);
+  while ((wSt==ZS_SUCCESS)&&(wNode->getName()!=pTag))
+    {
+    if (_searchForChildTag(wNode,pTag)!=nullptr)
+      return wNode;
+    wSt=wNode->getNextNode(wNode1);
+    XMLderegister(wNode);
+    wNode=wNode1;
+    }
+  return nullptr;
+}//_searchForChildTag
 /**
- * @brief ZSMasterFile::zloadXML_Index creates a ZIndexControlBlock instance and loads it data from the xml file pointed by pFilePath
+ * @brief ZSMasterFile::zextractXML_MetaDic parses and explore a masterfile xml definition pFilePath
+ *   and extracts master file record dictionary definition (ZMetaDic) regardless where it is located
+ *   returns a pointer to ZMetaDic with loaded data. This created object needs to be later on deleted.
  *
- * Created ZIndex
+ * @param[in] pFilePath xml file to load
+ * @param[out] pMetaDic the ZMetaDic loaded with record dictionary data contained in xml file
+ * @return
+ */
+int
+ZSMasterFile::zextractXML_MetaDic(const utf8_t *pFilePath,
+                                  zbs::ZMetaDic* &pMetaDic,
+                                  ZaiErrors* pErrorlog)
+{
+
+  ZaiErrors ErrorLog;
+  ZStatus wSt;
+  //QString wN;
+  zxmlDoc* wXmlDoc=nullptr;
+  zxmlNode* wTopIndexNode=nullptr;
+  zxmlNode* wIndexRank=nullptr;
+  zxmlNode* wIndexRank1=nullptr;
+  zxmlElement* wIndexFirstElement=nullptr;
+
+
+  ErrorLog.setErrorLogContext("zextractXML_MetaDic");
+  ErrorLog.setAutoPrintOn(true);
+
+  wSt=_XMLzicmControl(pFilePath,wXmlDoc,wIndexFirstElement,pErrorlog);
+  if (wSt!=ZS_SUCCESS)
+    {
+    return  wSt;
+    }
+
+  /* find xml subset with <index> tag */
+  wTopIndexNode = _searchForChildTag((zxmlNode*)wIndexFirstElement,"metadic");
+  if (wTopIndexNode==nullptr)
+  {
+    ErrorLog.errorLog("zloadXML_AllIndexes-E-NOTFND <metadic> tag has not be found within xml file <%s>.",pFilePath);
+    XMLderegister(wIndexFirstElement);
+    return ZS_NOTFOUND;
+  }
+
+  int wRet=0;
+
+  if (pMetaDic==nullptr)
+    pMetaDic = new ZMetaDic;
+
+  pMetaDic->clear();
+
+  wRet=pMetaDic->fromXml(wTopIndexNode,pErrorlog);
+
+  XMLderegister(wIndexFirstElement);
+  XMLderegister(wTopIndexNode);
+
+  return  wRet;
+}//zextractXML_MetaDic
+
+/**
+ * @brief ZSMasterFile::zloadXML_Index parses and explore a masterfile xml definition pFilePath
+ *   and extracts all indexes definitions regardless where they are located
+ *   returns an array of pointers to ZSIndexControlBlock with loaded data.
+ *   These pointers need to be deleted later on.
  *
  * @param[in] pFilePath xml file to load
  * @param[out] pZICB the ZIndexControlBlock populated with data contained in xml file
  * @return
  */
-ZStatus
-ZSMasterFile::zloadXML_Index(const utf8_t *pFilePath, ZSIndexControlBlock &pZICB, ZMetaDic* pMetaDic)
+int
+ZSMasterFile::zextractXML_AllIndexes(const utf8_t *pFilePath,
+                                  zbs::ZArray<ZSIndexControlBlock *> &pZICBList,
+                                  ZMetaDic* pMetaDic,
+                                  ZaiErrors* pErrorlog)
 {
 
-
+ZaiErrors ErrorLog;
 ZStatus wSt;
-QString wN;
-QDomDocument XmlDoc;
-QDomNode wNode;
-QDomNode wIndexNode;
+//QString wN;
+zxmlDoc* wXmlDoc=nullptr;
+zxmlNode* wTopIndexNode=nullptr;
+zxmlNode* wIndexRank=nullptr;
+zxmlNode* wIndexRank1=nullptr;
+zxmlElement* wIndexFirstElement=nullptr;
+ZSIndexControlBlock* wZICB=nullptr;
 
+  pZICBList.clear();
 
-    wSt=_XMLzicmControl(pFilePath,XmlDoc,wIndexNode);
+  ErrorLog.setErrorLogContext("zloadXML_Index");
+  ErrorLog.setAutoPrintOn(true);
+
+    wSt=_XMLzicmControl(pFilePath,wXmlDoc,wIndexFirstElement,pErrorlog);
     if (wSt!=ZS_SUCCESS)
                 { return  wSt;}
 
-    if (wIndexNode.toElement().tagName()!="IndexRank")
-        {
-        ZException.setMessage(_GET_FUNCTION_NAME_,
-                            ZS_XMLERROR,
-                            Severity_Error,
-                            "XML error : unknown tag name found %s  at line %d. Tag <IndexRank> was expected",
-                            wN.toStdString().c_str(),
-                            wNode.lineNumber());
-        return  ZS_XMLERROR;
-        } //  not IndexRank
+    /* find xml subset with <index> tag */
+    wTopIndexNode = _searchForChildTag((zxmlNode*)wIndexFirstElement,"index");
+    if (wTopIndexNode==nullptr)
+    {
+      ErrorLog.errorLog("zloadXML_AllIndexes-E-NOTFND <index> tag has not be found within xml file <%s>.",pFilePath);
+      return ZS_NOTFOUND;
+    }
 
-
-//    pZICB= new ZIndexControlBlock;
-
-//    while (!wIndexNode.isNull())
-//    {
-    wNode = wIndexNode;
-    wSt=_loadXML_Index(wNode,&pZICB,pMetaDic);
+    /* scan all indexes <indexrank> tag within xml subset */
+    wSt=wTopIndexNode->getFirstChild(wIndexRank);
     if (wSt!=ZS_SUCCESS)
-                {
-//                delete pZICB;
-                return  wSt;// Beware return  is multiple instructions in debug mode
-                }
-//    wIndexNode=wIndexNode.nextSibling();
-//    }// while wNode is not null
-
-
+    {
+      ErrorLog.errorLog("zloadXML_AllIndexes-E-CORRUPT  Cannot find <indexrank> tag xml file <%s>.",pFilePath);
+      return ZS_CORRUPTED;
+    }
+    int wRet=0;
+    while (wSt==ZS_SUCCESS)
+    {
+      if (wIndexRank->getName()=="indexrank")
+      {
+        wRet=_loadXML_OneIndex(wTopIndexNode,wZICB,pMetaDic,pErrorlog);
+        if (wRet==0)
+          pZICBList.push(wZICB);
+      }
+      wSt=wIndexRank1->getNextNode(wIndexRank);
+      XMLderegister(wIndexRank);
+      wIndexRank=wIndexRank1;
+    }
     return  ZS_SUCCESS;
 
 }//zloadXML_Index
@@ -6064,18 +6046,18 @@ utfdescString wTagValue;
  */
 ZStatus
 ZSMasterFile::zapplyXMLFileDefinition(const utf8_t* pXMLPath,
-                                    const utf8_t *pContentFilePath,
-                                    bool pRealRun,
-                                    FILE*pOutput)
+                                      const utf8_t *pContentFilePath,
+                                      bool pRealRun,
+                                      FILE*pOutput)
 {
-
-
-ZStatus wSt;
-uriString URIContent;
-uriString wURIOutput;
-utfdescString wBase;
+ZStatus     wSt;
+uriString   URIContent;
+uriString   wURIOutput;
+utf8String  wBase;
 FILE* wOutput;
 bool FOutput=false;
+
+ZaiErrors wErrorLog;
 
 long    IndexRank=0,
         wAddedIndexes=0 ,
@@ -6085,40 +6067,41 @@ long    IndexRank=0,
         wMissMandatoryTags=0,
         wIndexProcessed=0;
 
-QString wContent;
-QDomDocument XmlDoc;
-QDomNode wRootNode;
-QDomNode wFirstlevelNode;
-QDomNode wSecondlevelNode;
-QDomNode wThirdlevelNode;
-QDomNode wFourthlevelNode;
-QDomNode wNodeWork;
+utf8String wContent;
+zxmlDoc* XmlDoc=nullptr;
+zxmlElement* wRootElement=nullptr;
+zxmlNode* wFileNode=nullptr;
+zxmlNode* wSecondlevelNode=nullptr;
+zxmlNode* wThirdlevelNode=nullptr;
+zxmlNode* wFourthlevelNode=nullptr;
+zxmlNode* wNodeWork=nullptr;
 
-utfmessageString wMessage;
-utfdescString wTagName;
+utf8String wMessage;
+utf8String wTagName;
 
 // 0 : Index to be deleted     1 : Index present but not to be rebuilt    2 : Index to be built or rebuilt -  3 : Index created (therefore rebuilt)
 ZArray<char> IndexPresence ;
 char wIndexPresence;
 
-
-
-ZSMasterFile         wMasterFile;
+ZSMasterFile          wMasterFile;
 ZSIndexControlBlock*  wZICB=new ZSIndexControlBlock(&wMasterFile.ZMCB.MetaDic);
-ZSKeyDictionary     wZKDic(&wMasterFile.ZMCB.MetaDic);
+ZSKeyDictionary       wZKDic(&wMasterFile.ZMCB.MetaDic);
+
+    wErrorLog.setErrorLogContext("zapplyXMLFileDefinition");
+    wErrorLog.setAutoPrintOn(true);
 
     wOutput=pOutput;
     if (pOutput==nullptr)
         {
         wURIOutput=(const utf8_t*)pXMLPath;
         wBase=wURIOutput.getBasename().toCChar();
-        wBase+=(const utf8_t*)".xmllog";
+        wBase+=".xmllog";
         wOutput=fopen(wBase.toCChar(),"w");
         if (wOutput==nullptr)
-                    {
+            {
             wOutput=stdout;
-            fprintf(wOutput," cannot open file <%s> redirected to stdout\n",wBase.toString());
-                    }
+            fprintf(wOutput," cannot open file <%s> redirected to stdout\n",wBase.toCChar());
+            }
         else
         {
             FOutput=true;
@@ -6142,28 +6125,34 @@ ZSKeyDictionary     wZKDic(&wMasterFile.ZMCB.MetaDic);
             fprintf(wOutput," Real Run : file structure is to be modified  \n");
         else
             fprintf(wOutput,"***test*** no update is done  \n");
-
-    wSt=_XMLLoadAndControl(pXMLPath,XmlDoc,wRootNode,(const utf8_t*)"zicm",(const utf8_t*)"version",(const utf8_t*)__ZRF_XMLVERSION_CONTROL__,wOutput);
+#ifdef __TEMPORARY_COMMENT__
+    wSt=_XMLLoadAndControl(pXMLPath,
+                          XmlDoc,
+                          wRootElement,
+                          (const utf8_t*)"zicm",
+                          (const utf8_t*)"version",
+                          (const utf8_t*)__ZRF_XMLVERSION_CONTROL__,
+                          &wErrorLog,
+                          wOutput);
     if (wSt!=ZS_SUCCESS)
-                {
                 goto ErrorzapplyXMLFile;
-                }
 
-    wFirstlevelNode=wRootNode.firstChildElement("File");
+    wSt=wRootElement->getChildByName(wFileNode,"zfile");
+    if (wSt!=ZS_SUCCESS)
+      {
+        ZException.setMessage(_GET_FUNCTION_NAME_,
+            ZS_XMLERROR,
+            Severity_Error,
+            "XML error : corrupted or empty file <%s>. Mandatory tag <file> was expected and not found.",
+            pXMLPath);
+        XMLderegister(wRootElement);
+        goto ErrorzapplyXMLFile;
+      }
 
-    if (wFirstlevelNode.isNull())
-        {
-            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                ZS_XMLERROR,
-                                Severity_Error,
-                                "XML error : corrupted or empty file <%s>. Mandatory tag <File> was expected and not found.",
-                                pXMLPath);
-            goto ErrorzapplyXMLFile;
-        }
 
 //---------ZRandomFile Content (ZFileDescriptor)------------------------
 
-    wSt=_testXMLZFileDescriptor(wFirstlevelNode,pContentFilePath,(const utf8_t*)"ZFT_ZSMasterFile",URIContent,wOutput);
+    wSt=_testXMLZFileDescriptor(wFileNode,pContentFilePath,(const utf8_t*)"ZFT_ZSMasterFile",URIContent,wOutput,&wErrorLog);
 
     fprintf (wOutput,"%s>> starting processing ZSMasterFile <%s>   \n",
              _GET_FUNCTION_NAME_,
@@ -6874,6 +6863,7 @@ EndzapplyXMLFile:
     if (FOutput)
             fclose(wOutput);
 
+    delete wZICB;
     return  wSt;
 
 ErrorzapplyXMLFile:
@@ -6883,9 +6873,9 @@ ErrorzapplyXMLFile:
 
     wMasterFile.zclose();
     goto EndzapplyXMLFile;
-
+#endif // __TEMPORARY_COMMENT__
 }// zapplyXMLFileDefinition
-
+#ifdef __COMMENT__
 
 /**
  * @brief ZSMasterFile::zapplyXMLFileDefinition Static method that tests or applies an xml file give by pFilePath to change parameters of an existing file
@@ -8157,12 +8147,11 @@ ErrorzapplyXMLFile:
     wMasterFile.zclose();
     goto EndzapplyXMLFile;
 
-}// zapplyXMLFileDefinition
-
+}// zapplyXMLFileDefinition_old
+#endif
 
 /** @} */ // group XMLGroup
 
-#endif // QT_CORE_LIB
 
 
 

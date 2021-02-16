@@ -2,7 +2,8 @@
 #define ZMETADIC_CPP
 
 #include <zindexedfile/zmetadic.h>
-#include <zindexedfile/zdatatype.h>
+
+#include <ztoolset/zutfstrings.h>
 
 using namespace zbs;
 
@@ -22,7 +23,7 @@ ZMetaDic::addField (const utf8_t*pFieldName,
                    const size_t pUniversalSize,
                    const URF_Array_Count_type pArrayCount)
 {
-    FieldDescription wField;
+    ZFieldDescription wField;
     if (pFieldName==nullptr)
             wField.Name.clear();
         else
@@ -234,7 +235,7 @@ ZMetaDic::searchFieldByName(const utf8_t* pFieldName)
 }//zsearchFieldByName
 
 /**
- * @brief CZKeyDictionary::print Reports the content of CZKeyDictionary for all fields
+ * @brief ZMetaDic::print Reports the content of ZMetaDic for all fields
  * @param[in] pOutput   a FILE* pointer where the reporting will be made. Defaulted to stdout.
  */
 void ZMetaDic ::print (FILE* pOutput)
@@ -283,7 +284,7 @@ void ZMetaDic ::print (FILE* pOutput)
     return;
 }
 /**
- * @brief CZKeyDictionary::zremoveField removes a field which name corresponds to pFieldName from the current key dictionary
+ * @brief ZMetaDic::zremoveField removes a field which name corresponds to pFieldName from the current key dictionary
  * @param[in] pFieldName user name for the field to be removed from dictionary
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
@@ -311,49 +312,6 @@ ZMetaDic::removeFieldByRank (const long pFieldRank)
 }//removeFieldByRank
 
 
-/** @cond Development
- * @brief fieldDesc_struct::_export exports a field description (a rank of ZKeyDictionary) to a out structure
- */
-FieldDesc_Export
-FieldDescription::_exportConvert(FieldDescription&pIn,FieldDesc_Export* pOut)
-{
-ZDataBuffer wZDBName;
-
-    pOut->ZType=reverseByteOrder_Conditional<ZTypeBase>(pIn.ZType);
-    pOut->ArrayCount=reverseByteOrder_Conditional<URF_Array_Count_type>(pIn.Capacity);
-    pOut->HeaderSize=reverseByteOrder_Conditional<uint64_t>(pIn.HeaderSize);
-    pOut->UniversalSize=reverseByteOrder_Conditional<uint64_t>(pIn.UniversalSize);
-    pOut->NaturalSize=reverseByteOrder_Conditional<uint64_t>(pIn.NaturalSize);
-
-    memset (pOut->Name,0,cst_fieldnamelen+1);
-    wZDBName=pIn.Name._exportUVF();
-    memmove(pOut->Name,wZDBName.Data,wZDBName.Size);
-
-    pOut->KeyEligible = pIn.KeyEligible;
-    return *pOut;
-}//fieldDesc_struct::_exportConvert
-/**
- * @brief fieldDesc_struct::_import imports a field description (a rank of ZKeyDictionary) from a out structure
- * @param pOut
- * @return
- */
-FieldDescription
-FieldDescription::_importConvert(FieldDescription& pOut,FieldDesc_Export* pIn)
-{
-    pOut.clear();
-    pOut.ZType=reverseByteOrder_Conditional<ZTypeBase>(pIn->ZType);
-    pOut.Capacity=reverseByteOrder_Conditional<URF_Array_Count_type>(pIn->ArrayCount);
-    pOut.ZType=reverseByteOrder_Conditional<ZTypeBase>(pIn->ZType);
-    pOut.HeaderSize=reverseByteOrder_Conditional<uint64_t>(pIn->HeaderSize);
-    pOut.NaturalSize=reverseByteOrder_Conditional<uint64_t>(pIn->NaturalSize);
-    pOut.UniversalSize=reverseByteOrder_Conditional<uint64_t>(pIn->UniversalSize);
-
-    pOut.Name._importUVF((unsigned char*)pIn->Name);
-
-    pOut.KeyEligible = pIn->KeyEligible;
-    return pOut;
-}//fieldDesc_struct::_import
-
 
 /**
  * @brief ZMetaDic::_export export Meta dictionary and returns a ZDataBuffer containing exported dictionary data
@@ -366,10 +324,10 @@ ZMetaDic::_export(ZDataBuffer& pZDBExport)
 {
     unsigned char*wBuf=nullptr;
     size_t wBufSize=0;
-    ZAexportCurrent<FieldDescription,FieldDesc_Export>((ZArray <FieldDescription>*)this,
+    ZAexportCurrent<ZFieldDescription,FieldDesc_Export>((ZArray <ZFieldDescription>*)this,
                                                         wBuf,
                                                         wBufSize,
-                                                        &FieldDescription::_exportConvert);
+                                                        &ZFieldDescription::_exportConvert);
     pZDBExport.setData(wBuf,wBufSize);
     free(wBuf);             // mandatory : release allocated memory
     return pZDBExport;
@@ -384,10 +342,10 @@ ZMetaDic::_import(unsigned char* pZDBImport_Ptr)
 {
     ZAExport wZAE;
     // import dictionary content
-    size_t wSize= ZAimport<FieldDesc_Export,FieldDescription>
-                        ((ZArray <FieldDescription>*)this,
+    size_t wSize= ZAimport<FieldDesc_Export,ZFieldDescription>
+                        ((ZArray <ZFieldDescription>*)this,
                          pZDBImport_Ptr,
-                         &FieldDescription::_importConvert,
+                         &ZFieldDescription::_importConvert,
                          &wZAE);
 // get checkSum for meta dictionary and store it
     ZDataBuffer wZDB(pZDBImport_Ptr,wZAE.FullSize);
@@ -440,6 +398,25 @@ ZMetaDic::writeXML(FILE* pOutput)
 /** @endcond */
 
 
+ZMetaDic&
+ZMetaDic::_copyFrom( const ZMetaDic& pIn)
+{
+
+  if (CheckSum!=nullptr)
+    {
+    delete CheckSum;
+    CheckSum=nullptr;
+    }
+  if (pIn.CheckSum!=nullptr)
+    CheckSum = new checkSum(*pIn.CheckSum);
+
+  _Base::clear();
+  for (long wi=0;wi<count();wi++)
+    push(ZFieldDescription(pIn.Tab[wi]));
+
+  return *this;
+}//_copyFrom
+
 /* ------- C interfaces -------------------*/
 zbs::ZArray<ZMetaDic*> ZMetaDicList;
 
@@ -488,6 +465,85 @@ void deleteZMetaDic(void* pMetaDic)
     return ;
 }//deleteZMetaDic
 
+
+utf8String ZMetaDic::toXml(int pLevel)
+{
+  int wLevel=pLevel;
+  utf8String wReturn;
+  ZDataBuffer wB64;
+  wReturn = fmtXMLnode("metadic",pLevel);
+  wLevel++;
+ /* if (CheckSum!=nullptr)
+      {
+      wB64.setCheckSum(*CheckSum);
+      wB64.encryptB64();
+      wReturn+=fmtXMLchar("checksum",wB64.DataChar,wLevel);
+      }
+      else
+      wReturn+=fmtXMLchar("checksum","none",wLevel);
+*/
+  wReturn = fmtXMLnode("dicfields",wLevel);
+  /* key fields */
+  for (long wi=0;wi < count();wi++)
+    wReturn += Tab[wi].toXml(wLevel+1);
+  wReturn = fmtXMLendnode("dicfields",wLevel);
+
+  wReturn += fmtXMLendnode("metadic",pLevel);
+  return wReturn;
+} // ZMetaDic::toXml
+
+int ZMetaDic::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog)
+{
+  zxmlElement *wRootNode=nullptr;
+  zxmlElement *wFieldsRootNode=nullptr;
+  zxmlElement *wSingleFieldNode=nullptr;
+  zxmlElement *wSwapNode=nullptr;
+  utfcodeString wXmlHexaId;
+  ZFieldDescription wFD;
+  utf8String wValue;
+  utfcodeString wCValue;
+  bool wBool;
+  unsigned int wInt;
+  ZStatus wSt = pIndexRankNode->getChildByName((zxmlNode *&) wRootNode, "keydictionary");
+  if (wSt != ZS_SUCCESS) {
+    pErrorlog->logZStatus(
+        ZAIES_Error,
+        wSt,
+        "ZMetaDic::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
+        "<%s>",
+        "keydictionary",
+        decode_ZStatus(wSt));
+    return -1;
+  }
+
+  wSt=wRootNode->getChildByName((zxmlNode*&)wFieldsRootNode,"dicfields");
+  if (wSt!=ZS_SUCCESS)
+  {
+    pErrorlog->logZStatus(
+        ZAIES_Error,
+        wSt,
+        "ZMetaDic::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
+        "<%s>",
+        "dicfields",
+        decode_ZStatus(wSt));
+    return -1;
+  }
+
+  wSt=wFieldsRootNode->getFirstChild((zxmlNode*&)wSingleFieldNode);
+  long wi=0;
+  clear();  /* clear dictionary definitions */
+  while (wSt==ZS_SUCCESS)
+  {
+    wFD.clear();
+    if (wFD.fromXml(wSingleFieldNode,pErrorlog)==0)
+      push(wFD);
+    wSt=wSingleFieldNode->getNextNode((zxmlNode*&)wSwapNode);
+    XMLderegister(wSingleFieldNode);
+    wSingleFieldNode=wSwapNode;
+  }
+  XMLderegister(wRootNode);
+  return (int)pErrorlog->hasError();
+}//ZMetaDic::fromXml
 
 
 
