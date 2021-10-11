@@ -8,11 +8,19 @@
 #include <zindexedfile/zskey.h>
 #include <znet/zbasenet/znetcommon.h>
 #include <zindexedfile/zmetadic.h>
-#include <zindexedfile/zskey.h>
+
 #include <ztoolset/zutfstrings.h>
 
 #include <ztoolset/zaierrors.h>
 #include <zxml/zxml.h>
+
+#include <zindexedfile/zsmastercontrolblock.h>
+#include <zindexedfile/zindexcontrolblock.h>
+
+#include <zindexedfile/zmetadic.h>
+#include <zindexedfile/zkeydictionary.h>
+
+#include <zindexedfile/zrawmasterfile.h>
 
 /*#ifdef QT_CORE_LIB
 //#include <zxml/qxmlutilities.h>
@@ -21,9 +29,9 @@
 //------------------Generic Functions--------------------------
 
 
-utf8String generateIndexRootName(utf8String &pMasterRootName, const long pRank, utf8String &pIndexName);
+utf8String generateIndexRootName(utf8String &pMasterRootName, const long pRank, const utf8String &pIndexName);
 
-ZStatus generateIndexURI(uriString pMasterUri, uriString &pDirectory, uriString &pZIndexFileUri, const long pRank, utf8String &pIndexName);
+ZStatus generateIndexURI(uriString pMasterUri, uriString &pDirectory, uriString &pZIndexFileUri, const long pRank, const utf8String &pIndexName);
 
 
 namespace zbs //========================================================================
@@ -31,11 +39,10 @@ namespace zbs //================================================================
 
 
 
-#include <zindexedfile/zmetadic.h>
-#include <zindexedfile/zindexcontrolblock.h>
+
 
 /**
- * @brief The ZSMasterFile class Structured Master file or ZSMF
+ * @brief The ZSMasterFile class Structured Master file : a dictionarized version of ZRawMasterFile
  *
  *  - has a metadictionary describing its content (mandatory)
  *  - data is stored using Universal Record Format (URF)
@@ -47,225 +54,36 @@ namespace zbs //================================================================
  *          the order of key dictionary defines the order of fields within the key sorting order
  */
 
-//-----------------Indexes ----------------------------------
 
-class ZSIndexObjectTable :  private ZArray<ZSIndexFile*>
-{
-typedef ZArray<ZSIndexFile*> _Base ;
-public:
-    ZSIndexObjectTable() {}
-    ~ZSIndexObjectTable() {}// just to call the base destructor
-    using _Base::push;
-    using _Base::size;
-    using _Base::last;
-    using _Base::lastIdx;
-    using _Base::newBlankElement;
-    using _Base::operator [];
-
-    long pop (void);
-    long erase (long pRank);
-    void clear(void);
-} ;
-
-class ZSKeyDictionaryTable : private ZArray<ZSKeyDictionary>
-
-{
-    typedef ZArray<ZSKeyDictionary> _Base ;
-public:
-//    using _Base::push;  // push is overloaded
-    using _Base::size;
-    using _Base::last;
-    using _Base::lastIdx;
-    using _Base::newBlankElement;
-    using _Base::operator [];
-    //using ZIndexControlBlock::clear;
-
-    long erase(const long pIdx) ;
-    long push (ZSKeyDictionary &pICB);
-    long pop (void);
-    void clear (void) ;
-
-}; // ZSKeyDictionaryTable
-
-#ifndef ZREMOTEMIRRORING
-#define ZREMOTEMIRRORING
-class ZRemoteMirroring
-{
-public:
-    int8_t              Protocol;
-    ZHAT                AddressType;
-    char Host[256]="";
-    char Port[25]="";
-    char Authenticate[512]="";
-    char SSLKey [128]="";
-    char SSLVector[128]="";
-};
-
-#endif //ZREMOTEMIRRORING
-
-/**
- * @brief The ZSJournalControlBlock class this object is part of file header and is present (not nullptr) when ZMasterFile has journaling option on.
- *
- */
-
-
-struct ZSJCBOwnData{                         // will be the first block of data for ZJCB
-    uint32_t                StartSign ;
-    ZBlockID                BlockID;
-    unsigned long           ZMFVersion;
-    size_t                  JCBSize;
-    uint8_t                 JournalingOn=false;         //!< Journaling is started (true) or not (false)
-    uriString               JournalLocalDirectoryPath;  //!< Directory path for journal file. If empty, then directory path of main content file is taken
-    uint8_t                 Keep=false;                 // uint8_t used as bool
-
-    ZDataBuffer& _export(ZDataBuffer& pZDBExport);
-
-    ZSJCBOwnData& _import(unsigned char* pZDBImport_Ptr);
-
-};
-class ZSJournal;
-class ZRemoteMirroring;
-class ZSJournalControlBlock : public ZSJCBOwnData
-{
-public:
-    friend class ZSJournal;
-    ZSJournalControlBlock (void) {clear();}
-    ~ZSJournalControlBlock(void) ;
-
-    void clear(void);
-
-    ZDataBuffer& _exportJCB(ZDataBuffer &pJCBContent);
-    size_t _getExportSize();
-    ZStatus _importJCB (ZDataBuffer &pJCBContent);
-
-    void report(FILE *pOutput=stdout);
-
-    void setParameters (uriString &pJournalPath);
-    void setRemoteMirroring (int8_t pProtocol,
-                             char* pHost,
-                             char* pPort,
-                             char* pAuthenticate,
-                             char* pSSLKey,
-                             char* pSSLVector);
-
-    ZStatus purge(const zrank_type pKeepRanks=-1);
-    ZSJournal            * Journal=nullptr;
-    ZRemoteMirroring    *Remote=nullptr;
-} ;
-#pragma pack(push)
-#pragma pack(0)
-struct ZSMCBOwnData_Export{                         // will be the first block of data for ZSMCB
-    uint32_t                StartSign ;
-    ZBlockID                BlockID;
-    unsigned long           ZMFVersion;
-    size_t                  MCBSize;
-    size_t                  MDicOffset;
-    size_t                  MDicSize;
-    size_t                  ICBOffset;
-    size_t                  ICBSize;
-    ssize_t                 JCBOffset;
-    ssize_t                 JCBSize;
-    size_t                  IndexCount;
-
-    uint8_t                 HistoryOn=false;
-
-// ===========IndexFilePath is exported as Universal value using uriString::_exportUniversal()=======
-//                     leading uint16_t size then string content WITHOUT '\0' ending char
-};
-#pragma pack(pop)
-
-
-struct ZSMCBOwnData{                         // will be the first block of data for ZSMCB
-//    uint32_t                StartSign=cst_ZSTART ;
-//    ZBlockID                BlockID;
-//    unsigned long           ZMFVersion;
-    size_t                  MCBSize;      // contains size of exported - imported  MCB
-    //                                includes varying size of index path (varying string)
-    size_t                  MDicOffset;
-    size_t                  MDicSize;
-    size_t                  ICBOffset;
-    size_t                  ICBSize;
-    ssize_t                 JCBOffset;
-    ssize_t                 JCBSize;
-    size_t                  IndexCount;
-
-    uint8_t                 HistoryOn=false;
-//    uint8_t                    JournalingOn=false; //  will define wether update or load ZSJournalControlBlock from header while updating/reading ZMasterControlBlock
-    uriString               IndexFilePath;        // Directory path for index files. If empty, then directory path of main content file is taken
-//    uriString               JournalPath;        // see ZJCB - Directory path for journal file. If empty, then directory path of main content file is taken
-//    uint32_t                EndSign=cst_ZEND ;
-    ZDataBuffer& _export(ZDataBuffer& pZDBExport);
-    /** _import imports from serialized data. Updates pZDBImport_Ptr to first byte after imported data */
-    ZStatus _import(unsigned char *&pZDBImport_Ptr);
-
-};
-
-//-----------------Master control block-------------------------------------
-
-/**
- * @brief The ZSMasterFileControlBlock class Master File Control Block contains all operational infradata necessary for a master file to operate.
- *
- *  ZMCB is stored within reserved block in Master File header.
- *
- *  As it is a permanent infradata, it is stored BEFORE ZFCB structure.
- *
- */
-class ZSMasterControlBlock : public ZSMCBOwnData
-{
-public:
-    friend class ZSJournal;
-//  Index list
-    ZMetaDic                        MetaDic;        // Mandatory Meta Dictionary
-//    checkSum*                       MDicCheckSum=nullptr;
-    ZSIndexControlTable             Index;          // List of Indexes definition content
-    ZSIndexObjectTable              IndexObjects;   // List of effective index objects that will manage physical ZSIndexFile
-    ZSJournalControlBlock*          ZJCB=nullptr;  // journaling is defined here. If no journaling, stays to nullptr
-
-    ZSMasterControlBlock (void) {clear();}
-    ~ZSMasterControlBlock(void) ;
-
-    void pushICBtoIndex(ZSIndexControlBlock *pICB);
-    void removeICB(const long pRank);
-
-    long popICB(void);
-
-    void clear(void);
-
-    utf8String toXml(int pLevel);
-    /**
-     * @brief fromXml loads header control block from its xml definition and return 0 when successfull.
-     * When errors returns <>0 and pErrlog contains appropriate error messages.
-     * pHeaderRootNode xml node root for the hcb, typically <headercontrolblock> tag. No validation is made on root node for its name value.
-     */
-    int fromXml(zxmlNode* pFDBRootNode, ZaiErrors* pErrorlog);
-
-    ZDataBuffer& _exportMCB (ZDataBuffer &pMCBContent);
-    ZStatus     _importMCB  (ZDataBuffer& pBuffer);
-
-    void report(FILE *pOutput=stdout);
-} ;
-
-
-//=================================ZSMasterFile===============================
-//
-//class ZSKey;
 
 /**
  * @brief The ZSMasterFile class This is the master object derived from ZRandomFile that allows to extend it to index management
+ *
+ *  ZRecord : operations are done using dictionary (meta dictionary and key dictionaries )
+ *  As a result, dictionary processing gives a ZRawRecord or uses as input a ZRawRecord.
+ *
+ *  ZRawRecord : operations are done without dictionaries, record and keys contents are directly fed by application.
+ *  Manages low level operations using key buffers and record buffer.
+ *
+ *
+ *
+ *
  * @see @ref ZSMasterFileGroup
  *
  */
-class ZSMasterFile : protected ZRandomFile  // cannot publicly access to ZRandomFile data & methods
+//class ZSMasterFile : protected ZRandomFile  // cannot publicly access to ZRandomFile data & methods
+class ZSMasterFile : public ZRawMasterFile
 {
 
 public:
     friend class ZSKey;
     friend class ZSIndexCollection;
     friend class ZSJournal;
-typedef ZRandomFile _Base ;
+
+typedef ZRawMasterFile _Base ;
 
     ZSMasterFile(void) ;
-    ZSMasterFile(uriString pURI);
+//    ZSMasterFile(uriString pURI);
     ZSMasterFile(bool pHistory) ;
     ~ZSMasterFile(void);
 
@@ -314,14 +132,15 @@ typedef ZRandomFile _Base ;
 //    using _Base::zclearFile;  // for tests only : must be suppressed imperatively
 
 //--------------Setting parameters------------------------------------
-    ZStatus  setParameters (const bool pGrabFreeSpace,
-                            const bool pHighwaterMarking,
-                            const ssize_t pBlockTargetSize)
-    { return _Base::_setParameters(ZDescriptor,
-                                   ZFT_ZSMasterFile,
+    ZStatus  setFCBParameters (const bool pGrabFreeSpace,
+                              const bool pHighwaterMarking,
+                              const size_t pBlockTargetSize,
+                              const size_t pBlockExtentQuota)
+    { return _Base::_setParameters(ZFT_ZSMasterFile,
                                    pGrabFreeSpace,
                                    pHighwaterMarking,
-                                   pBlockTargetSize);}
+                                   pBlockTargetSize,
+                                   pBlockExtentQuota);}
 
     ZStatus setIndexFilesDirectoryPath (uriString &pPath);
     ZStatus setJournalLocalDirectoryPath (uriString &pPath);
@@ -335,10 +154,11 @@ typedef ZRandomFile _Base ;
     void _addIndexField (ZArray<ZSIndexField_struct>& pZIFField, descString &pName, size_t pOffset, size_t pLength);
 #endif // __COMMENT__
     void _addIndexKeyDefinition (ZSIndexControlBlock* pZICB,
-                       ZSKeyDictionary &pZKDic,
-                       utf8String &pIndexName,
+                                  ZSKeyDictionary &pZKDic,
+                                  utf8String &pIndexName,
+                                  uint32_t pKeyUniversalSize,
 //RFFU                 bool pAutoRebuild,
-                       ZSort_Type pDuplicates);
+                                  ZSort_Type pDuplicates);
 
     ZStatus zprintIndexFieldValues (const zrank_type pIndex, const zrank_type pIdxRank, bool pHeader=true, bool pKeyDump=false,FILE *pOutput=stdout);
     /**
@@ -346,11 +166,10 @@ typedef ZRandomFile _Base ;
      * @param pIndex Index number within ZSMasterFile to return the size for
      * @return
      */
-    ssize_t    zgetIndexSize(const zrank_type pIndexRank) {return ZMCB.IndexObjects[pIndexRank]->getSize();}
-    ZSKeyDictionary * zgetKeyDictionary(const zrank_type pIndexRank) {return ZMCB.Index[pIndexRank]->ZKDic ;}
+    ssize_t    zgetIndexCount(const zrank_type pIndexRank) {return ZMCB.IndexTable[pIndexRank]->getRecordCount();}
+ //   ZSKeyDictionary * zgetKeyDictionary(const zrank_type pIndexRank) {return ZMCB.IndexTable[pIndexRank]->ZKDic ;}
 
-
-    ZSIndexFile* zgetIndexObject(const zrank_type pIndexRank) {return ZMCB.IndexObjects[pIndexRank];}
+    ZRawIndexFile* zgetIndexFile(const zrank_type pIndexRank) {return ZMCB.IndexTable[pIndexRank];}
 
     ZStatus zcreate(ZMetaDic *pMetaDic,
                     const uriString pURI,
@@ -368,29 +187,32 @@ typedef ZRandomFile _Base ;
 
     ZStatus zcreate (ZMetaDic *pMetaDic,const char* pPathName, const zsize_type pInitialSize, bool pBackup=false, bool pLeaveOpen=false);
 
-    ZStatus zcreateIndex (ZSKeyDictionary& pZIFField,
-                          utf8String &pIndexName,
+    ZStatus zcreateIndex (ZSKeyDictionary* pKeyDic,
+                          const utf8String &pIndexName,
 // RFFU                   bool pAutorebuild,
                           ZSort_Type pDuplicates,
                           bool pBackup);
 
 // overload of previous function
-
-    ZStatus zcreateIndex (ZSKeyDictionary &pZIFField,
+#ifdef __COMMENT__
+    ZStatus zcreateIndex (ZSKeyDictionary &pZKDic,
                           const utf8_t *pIndexName,
 // RFFU                   bool pAutorebuild,
                           ZSort_Type pDuplicates,
                           bool pBackup=true);
-
+#endif // __COMMENT__
 
     ZStatus zopen       (const uriString pURI, const int pMode=ZRF_All); // superseeds ZRandomfile zopen
     ZStatus zopen       (const int pMode=ZRF_All) {return (zopen(getURIContent(),pMode));}
 //    ZStatus zopen       (const int pMode=ZRF_All) {return zopen(ZDescriptor.URIContent,pMode);}
 
-    ZStatus zadd         (ZRecord *pRecord );
-    ZStatus zinsert     (ZRecord *pRecord, const zrank_type pZMFRank);
+    ZStatus zadd      (ZRecord *pRecord );
+    ZStatus zinsert   (ZRecord *pRecord, const zrank_type pZMFRank);
+    ZStatus zget      (ZRecord* pRecord, const zrank_type pZMFRank);
 
-    ZStatus zget        (ZRecord* pRecord, const zrank_type pZMFRank);
+    ZStatus zaddRaw   (ZRawRecord &pRecord);
+    ZStatus _insertRaw(ZRawRecord &pRecord, const zrank_type pZMFRank);
+    ZStatus _getRaw   (ZRawRecord &pRecord, const zrank_type pZMFRank);
 
     ZStatus zremoveByRank     (const zrank_type pZMFRank) ;
     ZStatus zremoveByRankR    (ZRecord *pZMFRecord, const zrank_type pZMFRank);
@@ -467,15 +289,16 @@ typedef ZRandomFile _Base ;
 
     void _writeXML_MetaDic(ZMetaDic* ZMDic,FILE* pOutput);
 
-    void _writeXML_KDic(ZSKeyDictionary* ZKDic,FILE* pOutput);
+    void _writeXML_KDic(ZSKeyDictionary* ZKDic, FILE* pOutput);
 
-    ZStatus zwriteXML_IndexDefinition(const long pIndexRank, FILE *pOutput=nullptr);
-    void zwriteXML_FileHeader(FILE *pOutput=nullptr) ;
-    ZStatus zwriteXML_IndexDictionary(const long pIndexRank, FILE *pOutput=nullptr);
+    ZStatus generateXML_IndexDefinition(const long pIndexRank, const char *pFilename);
+    
+    void XmlWriteFileDefinition(FILE *pOutput=nullptr) ;
+    ZStatus generateXML_IndexDefinition(const long pIndexRank, FILE *pOutput=nullptr);
     static
-    void zwriteXML_FileHeader(const char *pFilePath, FILE *pOutput=nullptr) ;
+    void XmlWriteFileDefinition(const char *pFilePath, FILE *pOutput=nullptr) ;
 
-//#ifdef QT_CORE_LIB
+
     static
     ZStatus _loadXMLKeyField(zxmlNode* &wNode, ZSKeyDictionary*&pZKDic);
     static
@@ -486,24 +309,20 @@ typedef ZRandomFile _Base ;
     static
     ZStatus zapplyXMLFileDefinition_old(const utf8_t *pXMLPath, const utf8_t*pContentFilePath=nullptr, bool pRealRun=false, FILE *pOutput=nullptr);
     static
-    int zextractXML_MetaDic(const utf8_t *pFilePath,
-                            zbs::ZMetaDic* &pMetaDic,
+    int zextractXML_MetaDic(const char *pFilePath,
+                            ZMetaDic* &pMetaDic,
                             ZaiErrors* pErrorlog);
     static
-    int zextractXML_AllIndexes(const utf8_t* pFilePath,
-                                zbs::ZArray<ZSIndexControlBlock *> &pZICBList,
+    int zextractXML_AllIndexes(const char *pFilePath,
+                                ZArray<ZSIndexControlBlock *> &pZICBList,
                                 ZMetaDic *pMetaDic,
                                 ZaiErrors* pErrorlog);
     static
     ZStatus zloadXML_Dictionary(const utf8_t* pFilePath, ZSKeyDictionary &pZKDIC, ZMetaDic *pMetaDic);
-    static
-    ZStatus _XMLzicmControl(const utf8_t *pFilePath,
-                            zxmlDoc* &pXmlDoc,
-                            zxmlElement* &pFirstElement,
-                            ZaiErrors *pErrorlog);
+
     static
     ZStatus
-    _XMLLoadAndControl(const utf8_t* pFilePath,
+    _XMLLoadAndControl(const char *pFilePath,
                        zxmlDoc*     &pXmlDoc,
                        zxmlElement *&pRootElement,
                        const utf8_t* pRootName,
@@ -518,11 +337,7 @@ typedef ZRandomFile _Base ;
                                 ZaiErrors *pErrorlog);
     static
     zxmlNode* _searchForChildTag(zxmlNode *pTopNode, const char *pTag);
-    static
-    int _loadXML_OneIndex(zxmlNode* &pIndexRankNode,
-                          ZSIndexControlBlock *&pZICB,
-                          ZMetaDic *pMetaDic,
-                          ZaiErrors *pErrorlog);
+
     static
     ZStatus zgetXMLIndexRank(ZSMasterFile &wMasterFile,
                              ZSIndexControlBlock &wZICB,
@@ -532,12 +347,12 @@ typedef ZRandomFile _Base ;
                              char &IndexPresence,
                              long &IndexRank,
                              FILE*wOutput);
-    static
+/*    static
     ZStatus zapplyXMLIndexRankDefinition(const char* pXMLPath,
                                               const char *pContentFilePath,
                                               bool pRealRun,
                                               FILE*pOutput);
-
+*/
 //#endif
 
 //-------- Stats-----------------------------------------------
@@ -566,24 +381,6 @@ typedef ZRandomFile _Base ;
 // -------------------ZSMasterFile operators-------------------------
 
 /**
-  * @brief operator [] Returns a reference to a ZDataBuffer containing the record pointed by pIndex rank in ZBlockAccessTable pool,
-  *                    while base ZArray operator  [] returns a reference to the rank.
-  *
-  *                    As it uses ZRandomFile::CurrentRecord data structure this is NOT usable within a multi thread context.
-  *
-  *                    ZAM rank cannot be modified (because of potential Keys modification): use replace() method instead.
-  * @warning not usable in a multi threading context.
-  *
-  * @param pIndex
-  * @return a Reference to a ZDataBuffer (Field CurrentRecord)
-  */
-     ZDataBuffer&  operator [] (const long pIndex) { zget(CurrentRecord,pIndex);return CurrentRecord;}   // resulting _Type cannot be modified : use replace() method instead
-
-
-//friend ZDataBuffer& operator << (ZDataBuffer &pRes,ZSMasterFile &pZMF);
-
-//friend ZStatus operator << (ZSMasterFile &pZMF,ZDataBuffer& pInput);
-/**
  * @brief operator << Adds a new record (ZDataBuffer) at the logical end of the ZSMasterFile. Equivalent to push
  * @param pZMF
  * @param pInput
@@ -611,20 +408,21 @@ friend ZStatus operator << (ZSMasterFile &pZMF,ZRecord& pInput)
 
 //------------Add sequence---------------------------------------
 /** @cond Development */
-    static inline
-    ZStatus _add_RollbackIndexes (ZSMasterControlBlock &pZMCB, ZArray<zrank_type> &pIndexRankProcessed);
-    static inline
-    ZStatus _add_HardRollbackIndexes (ZSMasterControlBlock &pZMCB, ZArray<zrank_type> &pIndexRankProcessed);
-    static inline
-    ZStatus _add_CommitIndexes (ZSMasterControlBlock& pZMCB, ZArray <ZSIndexItem*>  &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed);
+    ZStatus _add_RollbackIndexes ( ZArray<zrank_type> &pIndexRankProcessed);
+    ZStatus _add_HardRollbackIndexes (ZArray<zrank_type> &pIndexRankProcessed);
+    ZStatus _add_CommitIndexes (ZArray <ZSIndexItem*>  &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed);
 
 //-----------End Add sequence------------------------------------
 
 // ----------Remove sequence-------------------------------------
 
-    inline
+
 //    ZStatus _removeByRank  (ZFileDescriptor &pDescriptor, ZMasterControlBlock &pZMCB, ZDataBuffer &pZMFRecord, const long pZMFRank);
     ZStatus _removeByRank  (ZRecord *pZMFRecord, const zrank_type pZMFRank);
+
+    ZStatus _removeByRankRaw  (ZRawRecord *pZMFRecord, const zrank_type pZMFRank);
+
+
     static inline
     ZStatus _remove_RollbackIndexes (ZSMasterControlBlock &pZMCB, ZArray<zrank_type> &pIndexRankProcessed);
     static inline
@@ -662,81 +460,9 @@ friend ZStatus operator << (ZSMasterFile &pZMF,ZRecord& pInput)
     ZStatus _seek (ZSMasterControlBlock &pMCB, long pIndexNumber, const ZDataBuffer &pKey,ZDataBuffer &pUserRecord);
 
 
-//-------------Threads Lock management---------------------------
-
-#ifdef __USE_ZTHREAD__
-void ZMFlock(void)
-{
-/*        if (ZJournaling->ZFJournaling)
-                    {
-                    ZJournaling->_Mtx.lock();
-                    }
-       if (ZHistory!=nullptr)
-                    ZHistory->_Mtx.lock();*/
-        _Mtx.lock();
-
-        return;
-}
-
-void ZMFunlock(void)
-{
-    _Mtx.unlock();
-    return;
-}
-#endif // __USE_ZTHREAD__
+    ZRecord* generateRecord();
 
 
-//======================Journaling=======================================
-
-
-bool getJournalingStatus (void)
-{
-    return(ZMCB.ZJCB!=nullptr);
-}
-
-ZStatus journalingSetup (uriString &pJournalPath);
-
-ZStatus setJournalingOn (void);
-
-ZStatus initJournaling (uriString &pJournalPath);
-
-ZStatus setJournalingOff (void);
-
-ZRecord * generateZRecord(void)
-{
-    return new ZRecord (&ZMCB.MetaDic);
-}
-
-// =======================Data fields======================================
-
-
-private:
-    using _Base::operator = ;
-
-#ifdef __USE_ZTHREAD__
-    ZMutex    _Mtx;
-#endif
-
-
-protected:
-
-    /* for below see into ZMasterControlBlock  */
-//    ZSJournalControlBlock* ZJCB=nullptr; //!< Journaling data : if exists, is part of ZSMasterFile header
-
-//    uriString           ZMFURI; //!< uriString with the current full path of ZSMasterFile. redundant with ZRandomFile URIContent. Removed
-
-//    ZJournal*           Journal=nullptr;  // see ZJCB
-//    bool                FJournal=false;   // see ZJCB::JournalingOn
-//    uriString           JournalPath;      // see ZJCB::JournalPath
-
-public:
-
-// permanent public data
-//
-    ZSMasterControlBlock ZMCB;      //< Master Control Block : all data is there
-    zstatistics          ZPMSStats; //< Statistical data
-
-    ZaiErrors           ErrorLog;
 }; //--------------------end class ZSMasterFile-------------------------------
 
 
@@ -745,4 +471,5 @@ public:
 // =====================end ZSMasterFile===============================
 
 } // namespace zbs
+
 #endif // ZSMASTERFILE_H

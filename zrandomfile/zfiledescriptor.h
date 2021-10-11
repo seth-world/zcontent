@@ -64,13 +64,20 @@ public:
 
 
   ZDataBuffer& _exportPool(ZDataBuffer&pZDBExport);
-  size_t _importPool(unsigned char *pBuffer);
+  size_t _importPool(unsigned char *&pBuffer);
 };
 
 typedef ZBlockPool ZBlockAccessTable;     //!< Blocks access table pool : contains references to any used block in file (Primary pool)
 typedef ZBlockPool ZFreeBlockPool;        //!< Free blocks pool : contains references to any free space in file  (Primary pool)
 typedef ZBlockPool ZDeletedBlockPool;     //!< Deleted blocks pool : keep references to dead blocks included into free blocks (Secondary pool)
 
+enum ZHeaderAccess_type : uint8_t
+{
+  ZHAC_Nothing = 0,
+  ZHAC_HCB = 1,
+  ZHAC_FCB = 2,
+  ZHAC_RESERVED= 4
+};
 
 /**
  * @brief The ZFileDescriptor class ZFileDescriptor (further abbreviated ZFD) owns operational infradata IN PROCESS MEMORY to manage behavior of ZRandomFile.
@@ -99,15 +106,14 @@ class ZFDOwnData  // following is not saved on file and therefore doesn't need t
 {
 public:
   FILE*   FContent=nullptr;
-  int     ContentFd=0L;
+  int     ContentFd=0;
   FILE*   FHeader=nullptr;
-  int     HeaderFd=0L;
-  pid_t   Pid;                /**< pid of current process owning ZFileDescriptor instance (set at object instantiation )  : other processes are collaborative processes sharing info with it */
-  //    uid_t   Uid;              /**< uid of current process owning ZFileDescriptor instance (set at object instantiation ) */
-  ZSystemUser     Uid;        /**< uid of current process owning ZFileDescriptor instance (set at object instantiation ) */
-  //    utfcodeString   Username;   /**< current system username */
-  bool    _isOpen = false;    /**< True when file is open , false if closed */
-  zmode_type   Mode    = ZRF_Nothing; /**< Mode mask (int32_t) the file has been openned for see: @ref ZRFMode_type */
+  int     HeaderFd=0;
+  pid_t   Pid;                      /* pid of current process owning ZFileDescriptor instance (set at object instantiation )  : other processes are collaborative processes sharing info with it */
+  ZSystemUser     Uid;              /* uid of current process owning ZFileDescriptor instance (set at object instantiation ) */
+  bool    _isOpen = false;          /* True when file is open , false if closed */
+  uint8_t HeaderAccessed=ZHAC_Nothing;  /*  has not been accessed : set to false by close operation - set to true at first access to header data */
+  zmode_type   Mode  = ZRF_Nothing;     /* Mode mask (int32_t) the file has been openned for see: @ref ZRFMode_type */
   ZHeaderControlBlock ZHeader;
   //    zaddress_type       OffsetFCB=0L;  /**< offset to ZFCB : OL if no derived class infradata space allocation. Else gives the size of reserved space.
   ZFileControlBlock*  ZFCB=nullptr;
@@ -128,6 +134,7 @@ public:
   ZFDOwnData(const ZFDOwnData&& pIn) {_copyFrom(pIn);}
 
   ZFDOwnData& _copyFrom(const ZFDOwnData& pIn);
+
   utf8String toXml(int pLevel);
   /**
    * @brief fromXml loads header control block from its xml definition and return 0 when successfull.
@@ -137,10 +144,13 @@ public:
   int fromXml(zxmlNode* pFDBRootNode, ZaiErrors* pErrorlog);
 
 };//ZFDOwnData
-class ZFileDescriptor: public ZFDOwnData
+
+
+class ZFileDescriptor : public ZFDOwnData
 {
   friend class ZRandomFile;
   friend class ZMasterFile;
+  friend class ZRawMasterFile;
   friend class ZIndexFile;
   friend class ZSMasterFile;
   friend class ZSIndexFile;
@@ -161,14 +171,8 @@ public:
   ZFileDescriptor(const ZFileDescriptor& pIn) {_copyFrom(pIn);}
   ZFileDescriptor(const ZFileDescriptor&& pIn) {_copyFrom(pIn);}
 
-  ZFileDescriptor& _copyFrom(const ZFileDescriptor& pIn)
-  {
-    ZFDOwnData::_copyFrom(pIn);
-    URIContent = pIn.URIContent;
-    URIHeader = pIn.URIHeader;
-    URIDirectoryPath = pIn.URIDirectoryPath;
-    return *this;
-  }
+  ZFileDescriptor& _copyFrom(const ZFileDescriptor& pIn);
+
 
   ZFileDescriptor& operator = (const ZFileDescriptor &pIn)
   {
@@ -176,31 +180,38 @@ public:
     return _copyFrom(pIn);
   }
 
+  ZStatus _close();
+  void _forceClose();
+
   //------------------uriStrings------------------------------------
   uriString& getURIContent(void) {return URIContent;}
 
 
   zmode_type       getMode (void) {return Mode;} /**< @brief getMode returns the file's open mode as a zmode */
 
+  /** @brief getPhysicalPosition returns the current physical position */
   inline
-      zaddress_type    getPhysicalPosition(void) {return PhysicalPosition;} /**< @brief returns the current physical position */
+      zaddress_type    getPhysicalPosition(void) {return PhysicalPosition;}
 
+  /** @brief getLogicalPosition returns the current logical position */
   inline
-      zaddress_type    getLogicalPosition(void) {return LogicalPosition;} /**< @brief returns the current logical position */
+      zaddress_type    getLogicalPosition(void) {return LogicalPosition;}
 
+  /** @brief getAllocatedSize returns the current allocated size (content physical file size) */
   inline
-      zsize_type       getAllocatedSize(void) { return lseek(ContentFd,0L,SEEK_END);} /**< returns the current allocated size (content physical file size) */
-
+      zsize_type       getAllocatedSize(void) { return lseek(ContentFd,0L,SEEK_END);}
   inline
       long             getCurrentRank(void) {return CurrentRank;} /**< @brief returns the current relative rank */
 
+  /** @brief getCurrentPhysicalAddress  returns the current physical address corresponding to current rank */
   inline
-      zaddress_type    getCurrentPhysicalAddress(void)    /**< returns the current physical address corresponding to current rank */
-  {if (CurrentRank<0)
+      zaddress_type    getCurrentPhysicalAddress(void)
+  {
+    if (CurrentRank<0)
       return -1;
     return (ZBAT->Tab[CurrentRank].Address);}
   inline
-      zaddress_type    getCurrentLogicalAddress(void)
+      zaddress_type    getCurrfromXmlentLogicalAddress(void)
   {
     if (CurrentRank<0)
       return -1;
@@ -225,7 +236,7 @@ public:
   {PhysicalPosition += pIncrement; LogicalPosition += pIncrement; return;}
 
   /**
-     * @brief resetPosition get the start of data physical address as Physical Position and align logicalPosition
+     * @brief resetPosition gefromXmlt the start of data physical address as Physical Position and align logicalPosition
      * @return
      */
   inline
@@ -267,33 +278,24 @@ public:
      * @brief clearPartial reset (set to zero) partially until uriString section ZFileControlBlock in order to keep uriStrings pathes  for file.
      *      This routine is used by ZRandomFile::_close method in order to offer the possibility to re-open the file without specifying again pathname.
      */
-  inline
-      void clearPartial (void)
-  { clearFCB();
+  void clearPartial (void);
 
-    memset (this,0,(sizeof(ZFDOwnData)));
-    CurrentRank=-1;
-    PhysicalPosition = -1;
-    LogicalPosition = -1;
-    _isOpen = false ;
-    Pid= getpid();  // get current pid for ZFileDescriptor
-  }
 
-  virtual ZStatus setPath (uriString &pURIPath);
+  virtual ZStatus setPath (const uriString &pURIPath);
   void setupFCB (void);
   void clearFCB (void);
 
-  utf8String toXml(int pLevel);
+  utf8String toXml(int pLevel, bool pComment=true);
   /**
-     * @brief fromXml loads header control block from its xml definition and return 0 when successfull.
+     * @brief fromXml loads file descriptor from its xml definition and returns ZS_SUCCESS when successfull.
      * When errors returns <>0 and pErrlog contains appropriate error messages.
      * pHeaderRootNode xml node root for the hcb, typically <headercontrolblock> tag. No validation is made on root node for its name value.
      */
-  int fromXml(zxmlNode* pFDRootNode, ZaiErrors* pErrorlog);
+  ZStatus fromXml(zxmlNode* pFDRootNode, ZaiErrors* pErrorlog);
 
 
   ZDataBuffer& _exportFCB(ZDataBuffer& pZDBExport);
-  ZFileDescriptor& _importFCB(unsigned char* pFileControlBlock_Ptr);
+  ZFileDescriptor& _importFCB(unsigned char *pPtrIn);
 
 
 };//ZFileDescriptor

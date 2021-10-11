@@ -147,6 +147,26 @@ ZDataBuffer ZResource::_export() const
   return wReturn;
 }
 
+unsigned char* ZResource::_export(unsigned char*& pBuffer,size_t & pSize) const
+{
+  errno=0;
+  pSize = sizeof(ZEntity_type)+sizeof(Resourceid_type);
+  unsigned char* wBuffer=pBuffer =(unsigned char*) malloc(pSize);
+  if (pBuffer==nullptr)
+    {
+    pSize=0;
+    errno=ENOMEM;
+    return pBuffer;
+    }
+  ZEntity_type wEntity=reverseByteOrder_Conditional<ZEntity_type>(Entity);
+  Resourceid_type wId=reverseByteOrder_Conditional<Resourceid_type>(id);
+  memmove(wBuffer,&wEntity,sizeof(wEntity));
+  wBuffer += sizeof(wEntity);
+  memmove(wBuffer,&wId,sizeof(Resourceid_type));
+  wBuffer += sizeof(Resourceid_type);
+  return pBuffer;
+}
+
 size_t ZResource::_import(unsigned char *&pUniversalPtr)
 {
   unsigned char* wPtrIn=pUniversalPtr;
@@ -161,6 +181,47 @@ size_t ZResource::_import(unsigned char *&pUniversalPtr)
   return sizeof(ZEntity_type)+sizeof(Resourceid_type);
 }
 
+
+ZDataBuffer* ZResource::_exportURF(ZDataBuffer* pReturn) const
+{
+  unsigned char* wPtrOut=pReturn->extend(sizeof(ZTypeBase)+sizeof(ZEntity_type)+sizeof(Resourceid_type));
+  _exportAtomicPtr<ZTypeBase>(ZType_Resource, wPtrOut);
+  _exportAtomicPtr<ZEntity_type>(Entity, wPtrOut);
+  _exportAtomicPtr<Resourceid_type>(id, wPtrOut);
+  return pReturn;
+}
+
+unsigned char* ZResource::_exportURF(unsigned char*& pBuffer,size_t & pSize) const
+{
+  errno=0;
+  pSize = sizeof(ZTypeBase)+sizeof(ZEntity_type)+sizeof(Resourceid_type);
+  unsigned char* wPtrOut=pBuffer =(unsigned char*) malloc(pSize);
+  if (pBuffer==nullptr)
+  {
+    pSize=0;
+    errno=ENOMEM;
+    return pBuffer;
+  }
+  _exportAtomicPtr<ZTypeBase>(ZType_Resource, wPtrOut);
+  _exportAtomicPtr<ZEntity_type>(Entity, wPtrOut);
+  _exportAtomicPtr<Resourceid_type>(id, wPtrOut);
+  return pBuffer;
+}
+
+ssize_t ZResource::_importURF(unsigned char *&pUniversalPtr)
+{
+  ZTypeBase wType;
+  _importAtomic<ZTypeBase>(wType, pUniversalPtr);
+  if (wType!=ZType_Resource)
+    {
+    fprintf(stderr,"ZResource::_importURF-E-INVTYP Invalid data type found while expecting <ZType_Resource>.\n");
+    return -1;
+    }
+
+  _importAtomic<ZEntity_type>(Entity, pUniversalPtr);
+  _importAtomic<Resourceid_type>(id, pUniversalPtr);
+  return sizeof(ZTypeBase)+sizeof(ZEntity_type)+sizeof(Resourceid_type);
+}
 
 
 #endif // ZRESOURCE_CPP

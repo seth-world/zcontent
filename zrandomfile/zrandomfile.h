@@ -141,14 +141,15 @@ class ZRFCollection;
  * @see ZRFPhysical
  *
  */
-class ZRandomFile
+class ZRandomFile : protected ZFileDescriptor
 {
- friend class ZFileDescriptor ;
+// friend class ZFileDescriptor ;
  friend class ZIndexFile;
- friend class ZMasterFile;
 
  friend class ZSIndexFile;
  friend class ZSMasterFile;
+
+ friend class ZRawMasterFile;
 
  friend class ZOpenZRFPool;
 public:
@@ -165,76 +166,100 @@ public:
  //--------------End Shared section -----------------
 protected:
 
- ZFileDescriptor ZDescriptor;
+// ZFileDescriptor ZDescriptor;
+
+protected:
+   ZRandomFile(ZFile_type pType) {setFileType(pType);}
 
 public:
+  ZRandomFile() {setFileType(ZFT_ZRandomFile) ;   }
 
-    ZRandomFile() {    }
-    ZRandomFile(uriString pURI) ;
-    ~ZRandomFile(void)
+//    ZRandomFile(uriString pURI) ;
+  ~ZRandomFile(void)
     {
-        if (ZDescriptor._isOpen)
+        if (_isOpen)
              {
-             _close(ZDescriptor);
-            }
+             _forceClose();
+             }
     }
+
+
+  uint8_t  getFileType() {return ZHeader.FileType;}
+
+  ZFileControlBlock* getFCB() {return ZFCB ;}
+
+protected:  void setFileType(ZFile_type pType) {ZHeader.FileType=pType;}
+
+public:
 
 //! @cond Test
     void putTheMess (void);
 //! @endcond
-
-    ZStatus setPath (uriString pURIPath);
 
 //----------------Set parameters------------------------------------
 
     ZStatus setHighwaterMarking (const bool pHighwaterMarking);
     ZStatus setGrabFreeSpace (const bool pGrabFreeSpace) ;
     ZStatus setBlockTargetSize (const ssize_t pBlockTargetSize) ;
+    ZStatus setBlockExtentQuota (const size_t pBlockExtentQuota);
 
-    ZStatus _setParameters (ZFileDescriptor &pDescriptor,
-                            ZFile_type pFileType,
+    /**
+     * @brief _setParameters sets modifiable ZRandomFile parameters once file has been created.
+     *
+     *  This base routine allows to set the only FCB parameters that could be changed during ZRandomFile lifecycle
+     *  after having been created.
+     * @param pGrabFreeSpace
+     * @param pHighwaterMarking
+     * @param pBlockTargetSize  updated if and only if greater than zero (cannot be zero)
+     * @param pBlockExtentQuota updated if and only if greater than zero (cannot be zero)
+     * @return ZStatus error cases from _open() and _writeFileDescriptor()
+     * @see _open @errors
+     */
+
+    ZStatus _setParameters (ZFile_type pFileType,
                             const bool pGrabFreeSpace,
                             const bool pHighwaterMarking,
-                            const ssize_t pBlockTargetSize);
+                            const size_t pBlockTargetSize,
+                            const size_t pBlockExtentQuota);
 //----------------Get parameters------------------------------------
 
     /**
      * @brief getAllocatedBlocks Returns the current parameter AllocatedBlocks from file descriptor in memory (no access to file header)
      * @return AllocatedBlocks parameter
      */
-    long getAllocatedBlocks(void) {return ZDescriptor.ZFCB->AllocatedBlocks;}
+    long getAllocatedBlocks(void) {return ZFCB->AllocatedBlocks;}
     /**
      * @brief getBlockExtentQuota  Returns the current parameter BlockExtentQuota from file descriptor in memory (no access to file header)
      * @return BlockExtentQuota
      */
-    long getBlockExtentQuota(void) {return ZDescriptor.ZFCB->BlockExtentQuota;}
+    long getBlockExtentQuota(void) {return ZFCB->BlockExtentQuota;}
 
-//    zsize_type getAllocatedSize(void) {return ZDescriptor.ZFCB->AllocatedSize;}
+//    zsize_type getAllocatedSize(void) {return ZFCB->AllocatedSize;}
     /**
      * @brief getAllocatedSize Returns the current effective content file size (AllocatedSize) for the file descriptor (content file is accessed).
      * @return AllocatedSize
      */
-    zsize_type getAllocatedSize(void) {return ZDescriptor.getAllocatedSize();}
+    zsize_type getAllocatedSize(void) {return getAllocatedSize();}
     /**
      * @brief getBlockTargetSize  Returns the current parameter BlockTargetSize from file descriptor in memory (no access to file header)
      * @return BlockTargetSize
      */
-    zsize_type getBlockTargetSize(void) {return ZDescriptor.ZFCB->BlockTargetSize;}
+    zsize_type getBlockTargetSize(void) {return ZFCB->BlockTargetSize;}
     /**
      * @brief getInitialSize  Returns parameter InitialSize from file descriptor in memory (no access to file header)
      * @return BlockTargetSize
      */
-    zsize_type getInitialSize(void) {return ZDescriptor.ZFCB->InitialSize;}
+    zsize_type getInitialSize(void) {return ZFCB->InitialSize;}
     /**
      * @brief getHighwaterMarking Returns the current option HighwaterMarking from file descriptor in memory (no access to file header)
      * @return true if option is set and false if not
      */
-    bool getHighwaterMarking(void) {return ZDescriptor.ZFCB->HighwaterMarking;}
+    bool getHighwaterMarking(void) {return ZFCB->HighwaterMarking;}
     /**
      * @brief getGrabFreeSpace Returns the current option HighwaterMarking from file descriptor in memory (no access to file header)
      * @return  true if option is set and false if not
      */
-    bool getGrabFreeSpace(void) {return ZDescriptor.ZFCB->GrabFreeSpace;}
+    bool getGrabFreeSpace(void) {return ZFCB->GrabFreeSpace;}
 
 
 //-------------Lock management----------------------------
@@ -248,28 +273,26 @@ public:
  * @param[in] pForceWrite force to write file's header in any case
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
-    ZStatus zlockFile(const zlockmask_type pLock,bool pForceWrite=true) {return _lockFile(ZDescriptor,pLock,pForceWrite);}
+    ZStatus zlockFile(const zlockmask_type pLock,bool pForceWrite=true) {return _lockFile(pLock,pForceWrite);}
 /**
  * @brief zunlockFile Unlocks the whole file see @ref ZLockMask_type
  * @param[in] pForceWrite force to write file's header in any case
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 
-    ZStatus zunlockFile(bool pForceWrite=true) {return _unlockFile(ZDescriptor,pForceWrite);}
+    ZStatus zunlockFile(bool pForceWrite=true) {return _unlockFile(pForceWrite);}
 
-static
-    ZStatus _unlockFile (ZFileDescriptor &pDescriptor, bool pForceWrite=true);
+    ZStatus _unlockFile (bool pForceWrite=true);
 
-static
-    ZStatus _lockFile (ZFileDescriptor &pDescriptor, const zlockmask_type pLock, bool pForceWrite=true);
 
-static
-    bool _isFileLocked (ZFileDescriptor &pDescriptor, bool pForceRead=true);
+    ZStatus _lockFile (const zlockmask_type pLock, bool pForceWrite=true);
 
-    static
-    ZStatus _writeFileLock(ZFileDescriptor &pDescriptor, lockPack_struct &pLockPack);
-    static
-    ZStatus _readFileLock(ZFileDescriptor &pDescriptor, lockPack_struct &pLockPack);
+
+    bool _isFileLocked ( bool pForceRead=true);
+
+    ZStatus _writeFileLock(lockPack_struct &pLockPack);
+
+    ZStatus _readFileLock(lockPack_struct &pLockPack);
 
 
 
@@ -328,17 +351,72 @@ static
                      bool pBackup=false,
                      bool pLeaveOpen=false) ;
 
-    ZStatus zremoveFile (void) ;
+    /** @brief zremoveFile removes files (content file and header file) for currently openned ZRandomFile  */
+    ZStatus _removeFile (ZaiErrors *pErrorLog=nullptr) ;
+    /**
+     * @brief ZRandomFile::_removeFile definitively remove ZRandomFile structure (content and header files) whose content is pContentPath.
+     * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
+     * @errors :
+     *    ZS_INVOP :        file is already open when trying to open it
+     *    ZS_FILENOTEXIST : file does not exist while it must exist for requested open mode
+     *    ZS_ERROPEN :    low level file I/O error : errno is captured and system message is provided.
+     *    ZS_LOCKED :     file is locked
+     *    ZS_BADFILETYPE : file type is not what expected.
+     *    ZS_MODEINVALID : open mode is incompatible with requested operation or open mode is not allowed by file lock.
+     *
+     *    ZS_FILEERROR  : cannot physically remove file (either content or header) ZException is loaded with errno and appropriate error explainations.
+     */
+    ZStatus _removeFile (const char* pContentPath, ZaiErrors *pErrorLog=nullptr) ;
+
+    /** @brief removeFile static method that definitively removes ZRandomFile structure (content and header files) whose content is pContentPath.
+     *  @see _removeFile
+     */
+    static ZStatus removeFile (const char* pContentPath, ZaiErrors *pErrorLog=nullptr)
+    {
+      ZRandomFile wZRF;
+      return wZRF._removeFile(pContentPath,pErrorLog);
+    }
+
+    /**
+     * @brief ZRandomFile::_renameBck local method that renames ZRandomFile structure (content and header files) whose content is pContentPath
+     * renaming with a special extension suffix given by pBckExt plus a incremental 2 digit value as follows :
+     *  <base filename>.<extension>_<pBckExt><nn>
+     *
+     * pBckExt is defaulted to string "bck".
+     *
+     * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
+     * @errors :
+     *    ZS_INVOP :        file is already open when trying to open it
+     *    ZS_FILENOTEXIST : file does not exist while it must exist for requested open mode
+     *    ZS_ERROPEN :    low level file I/O error : errno is captured and system message is provided.
+     *    ZS_LOCKED :     file is locked
+     *    ZS_BADFILETYPE : file type is not what expected.
+     *    ZS_MODEINVALID : open mode is incompatible with requested operation or open mode is not allowed by file lock.
+     *
+     *    ZS_FILEERROR  : cannot physically remove file (either content or header) ZException is loaded with errno and appropriate error explainations.
+     */
+    ZStatus _renameBck(ZaiErrors *pErrorLog=nullptr, const char *pBckExt="bck");
+
+    /** @brief renameBck static method that renames component files pointed by pContentPath as content file to a backup version whose extension is suffixed using pBckExt.
+     *  @see _renameBck
+     */
+    static ZStatus renameBck(const char* pContentPath, ZaiErrors *pErrorLog=nullptr, const char *pBckExt="bck");
+
 
     /**
      * @brief isOpen test whether file is open or not
      * @return true if file is open false if not
      */
-    bool            isOpen(void)  {return ZDescriptor._isOpen;}
+    bool            isOpen(void)  {return _isOpen;}
     /**
      * @brief getMode returns the open mode of the file as a zmode_type
      */
-    zmode_type    getMode(void) { return (zmode_type)ZDescriptor.Mode;}
+    zmode_type    getOpenMode(void)
+    {
+      if (!_isOpen)
+        return ZRF_NotOpen;
+      return (zmode_type)Mode;
+    }
     ZStatus zopen(const zmode_type pMode);
     ZStatus zopen(const char *pFilename,const zmode_type pMode);
     ZStatus zopen(const uriString &pFilename,const zmode_type pMode);
@@ -352,7 +430,7 @@ static
     ZStatus zgetNext (void* pUserRecord, size_t& pSize);
     ZStatus zgetNext (ZDataBuffer &pUserRecord);
 
-    void    zrewind (void) { ZDescriptor.setRank(0L); }
+    void    zrewind (void) { setRank(0L); }
 
     ZStatus zgetByAddress (ZDataBuffer&pRecord, zaddress_type pAddress);
 
@@ -361,7 +439,7 @@ static
     ZStatus zgetLastWAddress(ZDataBuffer &pRecord, zrank_type &pRank,zaddress_type &pAddress);
     ZStatus zgetPreviousWAddress(ZDataBuffer &pRecord, zrank_type &pRank, zaddress_type &pAddress);
 
-    zrank_type searchBlockRankByAddress (ZFileDescriptor &pDescriptor, zaddress_type pAddress);
+    zrank_type searchBlockRankByAddress ( zaddress_type pAddress);
 
 
     ZStatus zaddWithAddress (ZDataBuffer&pRecord, zaddress_type &pAddress);
@@ -418,23 +496,22 @@ static
 
 
     // ----------File space management------------------------------
-     inline
-    ZStatus _moveBlock (ZFileDescriptor &pDescriptor,
-                        const zaddress_type pFrom,
+
+    ZStatus _moveBlock (const zaddress_type pFrom,
                         const zaddress_type pTo,
                         bool pCreateZFBTEntry=true);
 
     ZStatus zclearFile(const zsize_type pSize=-1) ;
 
 
-    ZStatus zcloneFile (ZFileDescriptor &pDescriptor,const zsize_type pFreeSpace=-1,FILE*pOutput=stdout) ; // will clone the whole ZRandomFile and leave pFreeSpace free byte allocation
+    ZStatus zcloneFile (const zsize_type pFreeSpace=-1, FILE*pOutput=stdout) ; // will clone the whole ZRandomFile and leave pFreeSpace free byte allocation
 
-    ZStatus zcloneFile (const zsize_type pFreeSpace=-1,FILE*pOutput=stdout) ; // will clone the whole ZRandomFile and leave pFreeSpace free byte allocation
+ //   ZStatus zcloneFile (ZRandomFile &pDescriptor, const zsize_type pFreeSpace=-1, FILE*pOutput=stdout) ; // will clone the whole ZRandomFile and leave pFreeSpace free byte allocation
 
 
-    ZStatus ztruncateFile (ZFileDescriptor &pDescriptor,const zsize_type pFreeSpace=-1,FILE*pOutput=stdout) ; // will truncate the whole ZRandomFile to pSize byte allocation
+    ZStatus ztruncateFile (const zsize_type pFreeSpace=-1,FILE*pOutput=stdout) ; // will truncate the whole ZRandomFile to pSize byte allocation
 
-    ZStatus zextendFile (ZFileDescriptor &pDescriptor, const zsize_type pFreeSpace) ;
+    ZStatus zextendFile (const zsize_type pFreeSpace) ;
 
     ZStatus zreorgFile (FILE *pOutput=stdout) ; // reorganize the current file
 
@@ -450,10 +527,10 @@ static
     }
 
 protected:
-     inline
-    ZStatus _reorgFile (ZFileDescriptor &pDescriptor, bool pDump=false, FILE *pOutput=stdout) ;
 
-    ZStatus _reorgFileInternals(ZFileDescriptor& pDescriptor,bool pDump,FILE*pOutput);
+    ZStatus _reorgFile (bool pDump=false, FILE *pOutput=stdout) ;
+
+    ZStatus _reorgFileInternals(bool pDump, FILE*pOutput);
 public:
     //-----------------get routines-----------------------------------
     /**
@@ -461,31 +538,31 @@ public:
      * @return
      */
 
-    uriString &getURIContent(void) {return (ZDescriptor.URIContent);}
+    uriString &getURIContent(void) {return (URIContent);}
     /**
      * @brief getURIHeader returns by value the uriString for the header file with its current full path
      * @return
      */
-    uriString getURIHeader(void) {return (ZDescriptor.URIHeader);}
+    uriString getURIHeader(void) {return (URIHeader);}
     /**
      * @brief getFileDescriptor returns a reference to the current ZFileDescriptor
      * @return
      */
 
-    ZFileDescriptor & getFileDescriptor(void) {return ZDescriptor;}
+    ZFileDescriptor & getFileDescriptor(void) {return *this;}
 
     /**
      * @brief zgetUsedSize returns the used space of the file
      *      Only space allocated to ZBlockAccessTable is returned here
      */
 
-    zsize_type zgetUsedSize(void)       { if (ZDescriptor.ZFCB == nullptr ) return -1; return (ZDescriptor.ZFCB->UsedSize);}
+    zsize_type zgetUsedSize(void)       { if (ZFCB == nullptr ) return -1; return (ZFCB->UsedSize);}
     /**
      * @brief zgetAllocatedSize returns the total physical space taken by the ZRandomFile content file.
      * @return
      */
 
-    zsize_type zgetAllocatedSize(void)  { if (ZDescriptor.ZFCB == nullptr ) return -1; return (ZDescriptor.getAllocatedSize());}
+    zsize_type zgetAllocatedSize(void)  { if (ZFCB == nullptr ) return -1; return (getAllocatedSize());}
     /**
      * @brief zgetCurrentRank returns the current rank in ZBlockAccessTable
      *  Each read, write or delete affects this value.
@@ -493,59 +570,50 @@ public:
      * @return the current rank in ZBlockAccessTable
      */
 
-    zrank_type          zgetCurrentRank(void)  {return ZDescriptor.getCurrentRank(); }
+    zrank_type          zgetCurrentRank(void)  {return getCurrentRank(); }
     /**
      * @brief zgetCurrentLogicalPosition returns the current logical address within the file
      *  Each read, write or delete affects this value.
      * @return
      */
 
-    zaddress_type zgetCurrentLogicalPosition (void) {return (ZDescriptor.getCurrentLogicalAddress()) ; }
+     zaddress_type zgetCurrentLogicalPosition (void) {return (getLogicalPosition()) ; }
     /**
      * @brief setLogicalFromPhysical converts a physical to a logical address
      * @param pPhysical physical address to convert
      * @return  the logical address
      */
 
-    zaddress_type setLogicalFromPhysical (zaddress_type pPhysical) {return (ZDescriptor.setLogicalFromPhysical(pPhysical)) ; }
+    zaddress_type setLogicalFromPhysical (zaddress_type pPhysical) {return (setLogicalFromPhysical(pPhysical)) ; }
     /**
      * @brief setPhysicalFromLogical converts a physical to a logical address
      * @param pLogical logical address to convert
      * @return the physical address duly converted
      */
 
-    zaddress_type setPhysicalFromLogical (zaddress_type pLogical) {return (ZDescriptor.setLogicalFromPhysical(pLogical)) ;}
+    zaddress_type setPhysicalFromLogical (zaddress_type pLogical) {return (setLogicalFromPhysical(pLogical)) ;}
     /**
      * @brief getAddressFromRank  returns the physical address within file of the relative position of record given by pRank
      * @param pRank  Record's relative position within ZBlockAccessTable (ZBAT)
      * @return      the physical address of the record (beginning of block)
      */
 
-    zaddress_type getAddressFromRank(const zrank_type pRank) {return (ZDescriptor.ZBAT->Tab[pRank].Address) ;}
+    zaddress_type getAddressFromRank(const zrank_type pRank) {return (ZBAT->Tab[pRank].Address) ;}
     /**
      * @brief getRankFromAddress  returns the relative position of record (rank) coresponding to the given physical address within ZRandomFile file
      * @param pAddress    the physical address of the record (beginning of block)
      * @return      Record's relative position within ZBlockAccessTable (ZBAT) if found or -1 if address does not correspond to a valid block address.
      */
-    static
-    long getRankFromAddress(ZFileDescriptor *pDescriptor,const zaddress_type pAddress)
-                {
-                for (long wi=0;wi<pDescriptor->ZBAT->size();wi++)
-                            if (pDescriptor->ZBAT->Tab[wi].Address==pAddress)
-                                            return wi;
-                ZException.setMessage(_GET_FUNCTION_NAME_,
-                                        ZS_INVADDRESS,
-                                        Severity_Error,
-                                        " Address <%lld> does not correspond to a valid block address ",
-                                        pAddress);
-                return (-1) ;}
+
+    long getRankFromAddress(const zaddress_type pAddress);
+
 /**
  * @brief zgetCurrentPosition return the current logical address to which is set the current ZRandomFile address.
             This value is updated by any read or write operation and points to the actual block having last been accessed.
             ZRandomFile::zremove operation sets logical position to -1, so that return value of zgetCurrentPosition is not usable in that case.
  * @return
  */
-    zaddress_type zgetCurrentPosition(void)  {return ZDescriptor.LogicalPosition; }
+    zaddress_type zgetCurrentPosition(void)  {return LogicalPosition; }
 
 
 
@@ -554,16 +622,16 @@ public:
 //
 
     //! @brief lastIdx gets the rank of last used record in pool
-    zrank_type lastIdx(void)           {return (ZDescriptor.ZBAT->lastIdx()); }
+    zrank_type lastIdx(void)           {return (ZBAT->lastIdx()); }
     //!@brief UsedSize  gets the total used space in file (does not take into account free blocks space)
-    zsize_type UsedSize(void)    { if (ZDescriptor.ZFCB == nullptr ) return -1; return (ZDescriptor.ZFCB->UsedSize);}
+    zsize_type UsedSize(void)    { if (ZFCB == nullptr ) return -1; return (ZFCB->UsedSize);}
     //! @brief size  gets the number of used records in used blocks pool
-    long getSize(void)              {return (ZDescriptor.ZBAT->size()); }
-    long getRecordCount(void)       {return (ZDescriptor.ZBAT->size()); }
+    long getSize(void)              {return (ZBAT->size()); }
+    long getRecordCount(void)       {return (ZBAT->size()); }
     //!@brief isEmpty Returns true if ZRandomFile has no record in used blocks pool
-    bool isEmpty(void)           {return (ZDescriptor.ZBAT->size()==0); }
+    bool isEmpty(void)           {return (ZBAT->size()==0); }
     //! @brief freepoolSize gets the number of free blocks in pool
-    ssize_t freepoolSize(void)      {return (ZDescriptor.ZFBT->size()); }
+    ssize_t freepoolSize(void)      {return (ZFBT->size()); }
 
 
 
@@ -602,22 +670,48 @@ public:
      * @param pRecord ZDataBuffer containing users record to add
      * @return a reference to the ZRandomFile
      */
-    ZRandomFile & operator << (ZDataBuffer &pRecord) {ZStatus wSt;
-                                                      wSt=zadd(pRecord);
-                                                      if (wSt!=ZS_SUCCESS)
-                                                                      ZException.exit_abort();
-                                                      return *this;}
+    ZRandomFile & operator << (ZDataBuffer &pRecord)
+      {
+      ZStatus wSt = zadd(pRecord);
+        if (wSt!=ZS_SUCCESS)
+          ZException.exit_abort();
+        return *this;
+      }
 
 
 //----------------------------XML Routines-------------------------------------
 
 
-    void zwriteXML_FileHeader(const char* pFilePath, FILE *pOutput);
+    /** @brief XmlSaveToFile() Exports ZRandomFile parameters to full Xml formatted file */
+    ZStatus XmlSaveToFile(uriString &pXmlFile,bool pComment=true);
+    /** @brief XmlSaveToFile() Exports all ZRandomFile parameters to full Xml formatted string */
+    utf8String XmlSaveToString(bool pComment=true);
+  /**
+   * @brief toXml writes ZRandomFile definition as xml at level (indentation) pLevel.
+   * If pComment is set to true, then available explainations are commented in output xml code.
+   * @return an utf8String with xml definition
+   */
+    utf8String toXml(int pLevel, bool pComment=true);
 
-    void zwriteXML_FileHeader(FILE *pOutput);
+/** @remark :   fromXml() means nothing for a ZRandomFile or a ZMasterFile :
+ *              see creation from xml or modification from xml */
+/*  These routines does not exist
+    ZStatus fromXml(zxmlElement *pRootNode, ZaiErrors *pErrorlog);
+    ZStatus XmlLoadFromString(const utf8String &pXmlString, ZaiErrors *pErrorLog);
+    ZStatus XmlLoadFromFile(uriString &pXmlFile, ZaiErrors* pErrorLog );
+*/
 
-    void _writeXML_ZRandomFileHeader(ZFileDescriptor &pDescriptor, FILE *pOutput);
 
+/**
+ * @brief ZRandomFile::XmlWriteFileDefinition Static function : Generates the xml definition for a ZRandomFile given by it path name pZRandomFileName
+ * @note the ZMasterFile is opened for read only ZRF_Read_Only then closed.
+ *
+ * @param[in] pFilePath points to a valid file to generate the definition from
+ * @param[in] pOutput stdout or stderr . If nullptr, then an xml file is generated named <directory path><base name>.xml
+ */
+    static ZStatus XmlWriteFileDefinition(const char* pZRandomFileName, ZaiErrors &pErrorlog);
+
+    ZStatus XmlWriteFileDefinition(FILE *pOutput);
 
 
 //--------------------- statistical  functions----------------------------------
@@ -625,14 +719,14 @@ public:
 
     void    ZRFPMSReport( FILE *pOutput=stdout);
 
-    ZStatus ZRFstat(const uriString& pFilename,FILE* pOutput=stdout);
-    ZStatus ZRFstat (const char *pFilePath, FILE* pOutput=stdout)
+    static ZStatus ZRFstat(const uriString &pFilename, FILE* pOutput=stdout);
+/*    ZStatus ZRFstat (const char *pFilePath, FILE* pOutput=stdout)
         {
         uriString wFilePath;
         wFilePath=(const utf8_t*)pFilePath;
         return ZRFstat(wFilePath,pOutput);
         }
-
+*/
 
     ZStatus zgetBlockDescriptor (const zrank_type pRank, ZBlockDescriptor &pBlockDescriptor);
     ZStatus zgetFreeBlockDescriptor (const zrank_type pRank, ZBlockDescriptor &pBlockDescriptor);
@@ -645,31 +739,31 @@ public:
     void zheaderDump(FILE* pOutput=stdout);
     void zcontentDump(const int pColumn=16,FILE* pOutput=stdout);
 
-    void zsurfaceScan(uriString pURIContent, FILE *pOutput=stdout);
-    void zsurfaceScan(const char* pFilename, FILE *pOutput=stdout)
+    static void zsurfaceScan(const uriString pURIContent, FILE *pOutput=stdout);
+/*    void zsurfaceScan(const char* pFilename, FILE *pOutput=stdout)
     {
         uriString wFilename;
         wFilename = (const utf8_t*)pFilename;
         zsurfaceScan(wFilename,pOutput);
     }
+*/
 
-protected:
-    void _surfaceScan(ZFileDescriptor &pDescriptor, FILE *pOutput=stdout);
+    void _surfaceScan(FILE *pOutput=stdout);
 
 public:
 //--------------Dump any ZRF given by its uriString pathname - static methods -------------------------
 //
 
-    void zblockDump (uriString pURIContent, const long pRank, const int pColumn=16, FILE* pOutput=stdout);
-    void zblockDump (const char *pFilePath,const long pBlockNum,const int pColumn=16, FILE* pOutput=stdout)
+    static void zblockDump (const uriString& pURIContent, const long pRank, const int pColumn=16, FILE* pOutput=stdout);
+/*    void zblockDump (const char *pFilePath,const long pBlockNum,const int pColumn=16, FILE* pOutput=stdout)
         {
         uriString wFilePath;
         wFilePath=(const utf8_t*)pFilePath;
         zblockDump(wFilePath,pBlockNum,pColumn,pOutput);
         return;
         }
-
-    void zfullDump(uriString pURIContent, const int pColumn=16, FILE* pOutput=stdout);
+*/
+    static void zfullDump(const uriString pURIContent, const int pColumn=16, FILE* pOutput=stdout);
     void zfullDump (const char *pFilePath, const int pColumn=16, FILE* pOutput=stdout)
         {
         uriString wFilePath;
@@ -679,15 +773,15 @@ public:
         }
 
 
-    void zheaderDump(uriString &pURIContent, FILE* pOutput=stdout);
-    void zheaderDump (const char *pFilePath, FILE* pOutput=stdout)
+    static void zheaderDump(uriString &pURIContent, FILE* pOutput=stdout);
+    static void zheaderDump (const char *pFilePath, FILE* pOutput=stdout)
         {
         uriString wFilePath;
         wFilePath=(const utf8_t*)pFilePath;
         zheaderDump(wFilePath,pOutput);
         return;
         }
-    void zcontentDump(uriString pURIContent, int pColumn=16, FILE* pOutput=stdout);
+static    void zcontentDump(uriString pURIContent, int pColumn=16, FILE* pOutput=stdout);
     void zcontentDump (const char *pFilePath, int pColumn=16, FILE* pOutput=stdout)
         {
         uriString wFilePath;
@@ -697,8 +791,8 @@ public:
         }
 protected:
 
-    void _headerDump(ZFileDescriptor &pDescriptor, FILE* pOutput=stdout);
-    void _fullcontentDump(ZFileDescriptor &pDescriptor, const int pColumn=16, FILE* pOutput=stdout);
+    void _headerDump( FILE* pOutput=stdout);
+    void _fullcontentDump( const int pColumn=16, FILE* pOutput=stdout);
     void _dumpOneDataBlock(ZBlock &pBlock, ZDataBuffer &pRulerHexa, ZDataBuffer &pRulerAscii, const int pColumn=16, FILE *pOutput=stdout);
 
 //-----------End Dump---------------------------------------------
@@ -711,13 +805,13 @@ protected:
 
     void setReservedContent (const ZDataBuffer &pReserved)
     {
-        ZDescriptor.ZReserved = pReserved ;
+        ZReserved = pReserved ;
         return;
     }
 
     const ZDataBuffer& getReservedContent (void)
     {
-        return ZDescriptor.ZReserved  ;
+        return ZReserved  ;
     }
     ZStatus getReservedBlock (bool pForceRead) ;
     ZStatus getReservedBlock (ZDataBuffer& pReserved, bool pForceRead);
@@ -729,68 +823,56 @@ protected:
     ZStatus updateReservedBlock(const ZDataBuffer &pReserved, bool pForceWrite);
 
 
-//static
-    ZStatus _open(ZFileDescriptor &pDescriptor,
-                  const zmode_type pMode,
+
+    ZStatus _open(const zmode_type pMode,
                   const ZFile_type pFileType,
                   bool pLockRegardless=false);
-static
-    ZStatus _close(ZFileDescriptor &pDescriptor);
-static
-    ZStatus _getByRank(ZFileDescriptor & pDescriptor,
-                 ZBlock &pBlock,
+
+    ZStatus _close();
+
+    ZStatus _getByRank(ZBlock &pBlock,
                  const long pRank,
                  zaddress_type &pAddress);
 
-static
-    ZStatus _getByAddress (ZFileDescriptor & pDescriptor,
-                           ZBlock &pBlock,
-                           const zaddress_type pAddress);
-static
-    ZStatus _add(ZFileDescriptor &pDescriptor, ZDataBuffer &pUserBuffer, zaddress_type &pAddress);
 
-static
-    ZStatus _getNext(ZFileDescriptor &pDescriptor, // updated
-                     ZBlock &pBlock,               // write
+    ZStatus _getByAddress (ZBlock &pBlock, const zaddress_type pAddress);
+
+    ZStatus _add( ZDataBuffer &pUserBuffer, zaddress_type &pAddress);
+
+
+    ZStatus _getNext(ZBlock &pBlock,               // write
                      zrank_type &pRank,
                      zaddress_type &pAddress);                 // read
 
 
 //-----------Internal routines-------------------------------
-static
-    ZStatus _add2PhasesCommit_Prepare  (ZFileDescriptor &pDescriptor,
-                                        const ZDataBuffer &pUserBuffer,
-                                        zrank_type &pIdxCommit,
-                                        zaddress_type &pLogicalAddress);
-static
-    ZStatus _add2PhasesCommit_Commit(ZFileDescriptor &pDescriptor,
-                                      const ZDataBuffer &pUserBuffer,
-                                      const zrank_type pIdxCommit,
-                                      zaddress_type &pLogicalAddress);
-static
-    ZStatus _add2PhasesCommit_Rollback(ZFileDescriptor &pDescriptor,
-                                       const zrank_type pIdxCommit);
 
-static
-    ZStatus _insert(ZFileDescriptor &pDescriptor,
-                    const ZDataBuffer &pUserBuffer,
+    ZStatus _add2PhasesCommit_Prepare  (const ZDataBuffer &pUserBuffer,
+                                        zrank_type &pZBATIndex,
+                                        zaddress_type &pLogicalAddress);
+
+    ZStatus _add2PhasesCommit_Commit(const ZDataBuffer &pUserBuffer,
+                                      const zrank_type pZBATIndex,
+                                      zaddress_type &pLogicalAddress);
+
+    ZStatus _add2PhasesCommit_Rollback(const zrank_type pZBATIndex);
+
+
+    ZStatus _insert(const ZDataBuffer &pUserBuffer,
                     const zrank_type pRank,
                     zaddress_type &pLogicalAddress);
 
-static
-    ZStatus _insert2PhasesCommit_Prepare(ZFileDescriptor &pDescriptor,
-                                        const ZDataBuffer &pUserBuffer,
-                                        const zrank_type pRank,
-                                        zrank_type &pIdxCommit,
-                                        zaddress_type &pLogicalAddress);
-static
-    ZStatus _insert2PhasesCommit_Commit(ZFileDescriptor &pDescriptor,
-                                       const ZDataBuffer &pUserBuffer,
-                                       const zrank_type pIdxCommit);
 
-static
-    ZStatus _insert2PhasesCommit_Rollback(ZFileDescriptor &pDescriptor,
-                                         const zrank_type pIdxCommit);
+    ZStatus _insert2PhasesCommit_Prepare(const ZDataBuffer &pUserBuffer,
+                                        const zrank_type pRank,
+                                        zrank_type &pZBATIndex,
+                                        zaddress_type &pLogicalAddress);
+
+    ZStatus _insert2PhasesCommit_Commit(const ZDataBuffer &pUserBuffer,
+                                       const zrank_type pZBATIndex);
+
+
+    ZStatus _insert2PhasesCommit_Rollback(const zrank_type pZBATIndex);
 
 
 /*     inline
@@ -798,200 +880,191 @@ static
      inline
     void    _removeByAddress_Rollback(ZFileDescriptor &pDescriptor,ZDataBuffer &pUserBuffer,long &pIdxCommit,zaddress_type &pAddress);
 */
-static
-    ZStatus _remove(ZFileDescriptor &pDescriptor, const zrank_type pRank);
 
-static
-    ZStatus _remove_Prepare(ZFileDescriptor &pDescriptor, const zrank_type pRank, zaddress_type &pLogicalAddress);
-static
-    ZStatus _removeR(ZFileDescriptor &pDescriptor,ZDataBuffer &pUserBuffer,const zrank_type pRank);
-
-static
-    ZStatus _removeR_Prepare(ZFileDescriptor &pDescriptor,ZDataBuffer &pUserBuffer,const zrank_type pRank,zaddress_type &pAddress);
-
-static
-    ZStatus _removeRByAddress(ZFileDescriptor &pDescriptor,ZDataBuffer &pUserBuffer,zrank_type &pIdxCommit,const zaddress_type pAddress);
-
-static
-    ZStatus _removeRByAddress_Prepare(ZFileDescriptor &pDescriptor,ZDataBuffer &pUserBuffer,zrank_type &pIdxCommit,const zaddress_type pAddress);
-
-static
-    ZStatus _removeByAddress(ZFileDescriptor &pDescriptor, const zaddress_type &pAddress);
-static
-    ZStatus _removeByAddress_Prepare(ZFileDescriptor &pDescriptor, zrank_type &pIdxCommit, const zaddress_type pAddress);
+    ZStatus _remove(const zrank_type pRank);
+    ZStatus _remove_Prepare(const zrank_type pRank, zaddress_type &pLogicalAddress);
+    ZStatus _removeR(ZDataBuffer &pUserBuffer,const zrank_type pRank);
 
 
-static
-    ZStatus _remove_Commit(ZFileDescriptor &pDescriptor, const zrank_type pIdxCommit);
-static
-    ZStatus _remove_Rollback(ZFileDescriptor &pDescriptor, const zrank_type pIdxCommit);
+    ZStatus _removeR_Prepare(ZDataBuffer &pUserBuffer, const zrank_type pRank, zaddress_type &pAddress);
 
-static
-    ZStatus _create (ZFileDescriptor &pDescriptor,
-                     const zsize_type pInitialSize,
+
+    ZStatus _removeRByAddress(ZDataBuffer &pUserBuffer, zrank_type &pIdxCommit, const zaddress_type pAddress);
+
+    ZStatus _removeRByAddress_Prepare(ZDataBuffer &pUserBuffer, zrank_type &pIdxCommit, const zaddress_type pAddress);
+
+
+    ZStatus _removeByAddress( const zaddress_type &pAddress);
+
+    ZStatus _removeByAddress_Prepare(zrank_type &pIdxCommit, const zaddress_type pAddress);
+
+
+
+    ZStatus _remove_Commit(const zrank_type pIdxCommit);
+
+    ZStatus _remove_Rollback(const zrank_type pIdxCommit);
+
+
+    ZStatus _create (const zsize_type pInitialSize,
                      ZFile_type pFileType,
                      bool pBackup,
                      bool pLeaveOpen) ;
  //   ZStatus _extend (zoffset_type pSize) ;
 
-static
-    long _getFreeBlock(ZFileDescriptor &pDescriptor,
-                       const size_t pSize,
+// obtains a free block of pSize  (within ZFBT) and moves it to ZBAT
+
+    long _getFreeBlock(const size_t pSize,
                        ZBlockMin_struct &pBlock,
                        zrank_type pZBATRank=-1,
-                       const zaddress_type pBaseAddress=-1);// obtains a free block of pSize  (within ZFBT) and moves it to ZBAT
-static
-    ZStatus _getExtent(ZFileDescriptor &pDescriptor,
-                       ZBlockDescriptor &pBlockMin,
+                       const zaddress_type pBaseAddress=-1);
+
+    ZStatus _getExtent(ZBlockDescriptor &pBlockMin,
                        const size_t pSize);     //! get a free block extension with size greater or equal to pSize (according ExtentQuotaSize)
-static
-    long _allocateFreeBlock (ZFileDescriptor &pDescriptor,
-                             zrank_type pZFBTRank,
+
+    long _allocateFreeBlock (zrank_type pZFBTRank,
                              zsize_type pSize,
                              long pZBATRank=-1);// allocates a free block to used block (from ZFBT to ZBAT) at rank pZBABRank, or by push (pZBABRank=-1)
 
-     static
-    void    _freeBlock_Prepare (ZFileDescriptor &pDescriptor,
-                                zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
-     static
-    void    _freeBlock_Rollback(ZFileDescriptor &pDescriptor,
-                                zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
-     static
-    ZStatus _freeBlock_Commit  (ZFileDescriptor &pDescriptor,
-                                zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
-    static
-    ZStatus _freeBlock(ZFileDescriptor &pDescriptor,
-                       zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
+    void _cleanDeletedBlocks(ZBlockDescriptor &pBD);
 
-     static
-    ZStatus _grabFreeSpacePhysical(ZFileDescriptor &pDescriptor,
-                                   zrank_type pRank,
+    void _freeBlock_Prepare (zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
+
+    void _freeBlock_Rollback(zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
+
+    ZStatus _freeBlock_Commit  (zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
+
+    ZStatus _freeBlock(zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
+
+
+    ZStatus _grabFreeSpacePhysical(zrank_type pRank,
                                    ZBlockDescriptor &pBS);   // reference to aggregated block to be freed : output
-     static
-    ZStatus _grabFreeSpaceLogical(ZFileDescriptor &pDescriptor,
-                                  zrank_type pRank,
+
+    ZStatus _grabFreeSpaceLogical(zrank_type pRank,
                                   ZBlockDescriptor &pBS);   // reference to aggregated block to be freed : output
 
-     static
-    ZStatus _searchPreviousPhysicalBlock (ZFileDescriptor &pDescriptor,
-                                  zaddress_type pCurrentAddress,
+
+    ZStatus _searchPreviousPhysicalBlock (zaddress_type pCurrentAddress,
                                   zaddress_type &pPreviousAddress,   // Previous physical block address found in file or Start of Data : output
                                   ZBlockHeader &pBlockHeader);      // block header : output - updated if any else left
 
-     static
-    ZStatus _searchPreviousBlock (ZFileDescriptor &pDescriptor,
-                                   zrank_type pRank,
+      ZStatus _searchPreviousBlock (zrank_type pRank,
                                    zaddress_type &pPreviousAddress,
                                    ZBlockHeader &pBlockHeader);
 
-     static
-    ZStatus _searchNextBlock (ZFileDescriptor &pDescriptor,
-                              zrank_type pRank,
+
+    ZStatus _searchNextBlock (zrank_type pRank,
                               zaddress_type &pNextAddress,   //! Next physical block address found in file or End of file : output
                               ZBlockHeader &pBlockHeader);  //! block header : output - updated if any else left
 
 
-     static
-    ZStatus _searchNextPhysicalBlock (ZFileDescriptor &pDescriptor,
-                                      zaddress_type pAddress,                     //! Address to start searching for for next block
+
+    ZStatus _searchNextPhysicalBlock (zaddress_type pAddress,                     //! Address to start searching for for next block
                                       zaddress_type &pNextAddress,
                                       ZBlockHeader &pBlockHeader) ;
 
-     static
-    ZStatus _getBlockHeader(ZFileDescriptor &pDescriptor,
-                            zaddress_type pAddress,
+
+    ZStatus _getBlockHeader(zaddress_type pAddress,
                             ZBlockHeader &pBlockHeader);
 
-     static ZStatus
-     _getBlockHeader_Export(ZFileDescriptor &pDescriptor,
-                            zaddress_type pAddress,
+/*     ZStatus
+     _getBlockHeader_Export(zaddress_type pAddress,
                             ZBlockHeader_Export &pBlockHeader_Export);
 
-     static
-    ZStatus _writeBlockAt(ZFileDescriptor &pDescriptor,
-                        ZBlock &pBlock,
+*/
+    ZStatus _writeBlockAt(ZBlock &pBlock,
                         const zaddress_type pAddress);
 
-    static ZStatus _writeBlockHeader(ZFileDescriptor &pDescriptor,
-                              ZBlockHeader &pBlockHeader,
+    ZStatus _writeBlockHeader(ZBlockHeader &pBlockHeader,
                               const zaddress_type pAddress);
-     static
-    ZStatus _markBlockAsDeleted (ZFileDescriptor &pDescriptor, zrank_type pRank);
 
-     static
-    ZStatus _markFreeBlockAsDeleted (ZFileDescriptor &pDescriptor, zrank_type pRank);
-     static
-    ZStatus _markDeletedBlockAsFree (ZFileDescriptor &pDescriptor, zrank_type pRank);
-     static
-    ZStatus _markFreeBlockAsUsed (ZFileDescriptor &pDescriptor, zrank_type pRank);
-
-     static
-    ZStatus _recoverFreeBlock (ZFileDescriptor &pDescriptor, zrank_type pRank);
-
-     static
-    ZStatus _highwaterMark_Block (ZFileDescriptor &pDescriptor,const zsize_type pFreeUserSize);
-
-// ------------file header operations-----------------------
+    ZStatus _markBlockAsDeleted ( zrank_type pRank);
 
 
-     static
-    ZStatus _getFullFileHeader(ZFileDescriptor &pDescriptor, bool pForceRead=false);
+    ZStatus _markFreeBlockAsDeleted ( zrank_type pRank);
+    ZStatus _markDeletedBlockAsFree ( zrank_type pRank);
+    ZStatus _markFreeBlockAsUsed ( zrank_type pRank);
 
-     static
-    ZStatus _getFileHeader(ZFileDescriptor &pDescriptor, bool pForceRead);
+    ZStatus _recoverFreeBlock ( zrank_type pRank);
 
-    static
-    ZStatus _getFileHeader_Export(ZFileDescriptor &pDescriptor,ZHeaderControlBlock_Export* pHCB_Export);
 
-     static
-    ZStatus _getReservedHeader(ZFileDescriptor &pDescriptor, bool pForceRead);
+    ZStatus _highwaterMark_Block (const zsize_type pFreeUserSize);
 
-    static ZStatus _getFileControlBlock(ZFileDescriptor &pDescriptor, bool pForceRead);
+// ------------header file  operations-----------------------
 
 
 
-    static ZStatus _writeFullFileHeader(ZFileDescriptor &pDescriptor, bool pForceWrite);// should be a duplicate of _writeReservedHeader but must be kept for logic
+    ZStatus _getFullFileHeader( bool pForceRead=false);
+
+    ZStatus _loadHeaderFile(ZDataBuffer &pHeader);
+
+    ZStatus _getHeaderControlBlock(bool pForceRead);
 
 
-    static ZStatus _writeFileHeader(ZFileDescriptor &pDescriptor, bool pForceWrite);
-
-    static ZStatus _writeReservedHeader(ZFileDescriptor &pDescriptor,bool pForceWrite); // corresponds to a full header write because reserved header is positionned before file descriptor
-
-    static ZStatus _writeFileDescriptor(ZFileDescriptor &pDescriptor, bool pForceWrite);
+    ZStatus _getFileHeader_Export(ZHeaderControlBlock_Export* pHCB_Export);
 
 
+    ZStatus _getReservedHeader(bool pForceRead);
+
+    ZStatus _getFileControlBlock(bool pForceRead);
+
+    ZStatus _updateFileControlBlock();
 
 
-    static ZStatus _seek(ZFileDescriptor &pDescriptor, zaddress_type pAddress);
+
+    ZStatus _writeFullFileHeader(bool pForceWrite);// should be a duplicate of _writeReservedHeader but must be kept for logic
 
 
-    static ZStatus _read(ZFileDescriptor &pDescriptor,
-                  void* pBuffer,
+    ZStatus _writeFileHeader(bool pForceWrite);
+
+    ZStatus _writeReservedHeader(bool pForceWrite); // corresponds to a full header write because reserved header is positionned before file descriptor
+
+/**
+ * @brief ZRandomFile::_writeFileDescriptor
+ *
+ *     writing header. For information :
+
+               ZFileHeader + ZReserved + ZFCB  + ZBAT content + ZFBT content
+
+               This information is written at offset OffsetFCB, in order to skip Reserved block.
+
+ *
+ * @param[in] pDescriptor   File descriptor for wich Reserved infra data block will be written
+ * @param[out] pForceWrite  if true : will write any time. if false and file is opened in exclusive mode : will not write
+ * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
+ * @errors
+ *  - ZS_FILEPOSERR bad positionning during lseek operation ZException is set
+ *  - ZS_WRITEERROR error writing FCB + block pools to header file ZException is set
+ */
+    ZStatus _writeFileDescriptor(bool pForceWrite);
+
+
+
+
+    ZStatus _seek(zaddress_type pAddress);
+
+
+    ZStatus _read(void* pBuffer,
                   const size_t pSize,
                   ssize_t& pSizeToRead,
                   ZPMSCounter_type pZPMSType);
-    static
-    ZStatus _read(ZFileDescriptor &pDescriptor,
-                  ZDataBuffer& pBuffer,
+
+    ZStatus _read(ZDataBuffer& pBuffer,
                   const ssize_t pSizeToRead,
                   ZPMSCounter_type pZPMSType);
 
-    static
-    ZStatus _readAt(ZFileDescriptor &pDescriptor,
-                    void* pBuffer,
+
+    ZStatus _readAt(void* pBuffer,
                     size_t pSize,
                     ssize_t& pSizeRead,
                     zaddress_type pAddress,
                     ZPMSCounter_type pZPMSType);
-     static
-    ZStatus _readAt(ZFileDescriptor &pDescriptor,
-                    ZDataBuffer& pBuffer,
+
+    ZStatus _readAt(ZDataBuffer& pBuffer,
                     ssize_t &pSizeRead,
                     zaddress_type pAddress,
                     ZPMSCounter_type pZPMSType);
-     static
-    ZStatus _readBlockAt(ZFileDescriptor &pDescriptor,
-                         ZBlock &pBlock,
+
+    ZStatus _readBlockAt(ZBlock &pBlock,
                          const zaddress_type pAddress);
 
 

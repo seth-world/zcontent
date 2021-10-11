@@ -965,4 +965,56 @@ setFieldURFfZString(void* pSourceNaturalPtr,
                                            pArrayCount);
 }// setFieldURFfN_A
 */
+
+
+
+template <class _Tp>
+ZDataBuffer& _atomictoURF (typename std::enable_if_t<std::is_integral<_Tp>::value|std::is_floating_point<_Tp>::value,_Tp> pIn,ZDataBuffer& pOut)
+{
+  size_t wNaturalSize,wUniversalSize,wArrayCount;
+  _Tp wValue , wValue2 ;
+
+  unsigned char* wPtr=nullptr;
+
+  ZTypeBase wType;
+  bool wIsSigned=false;
+
+  _getZType_T<_Tp>(pIn,wType,wNaturalSize,wUniversalSize,wArrayCount);
+
+  wIsSigned = wType & ZType_Signed ;
+
+  if ((wType & ZType_Endian)&&is_little_endian())    // only if system is little endian and data type is subject to endian reverse byte conversion
+    wValue2= reverseByteOrder_Conditional<_Tp>(wValue2);
+
+  wPtr=pOut.allocate(wUniversalSize+sizeof(ZTypeBase));   // unsigned means size + sign byte
+
+  wType = reverseByteOrder_Conditional<ZTypeBase>(wType);
+  memmove(wPtr,&wType,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+
+  wValue2 = pIn;
+
+  if (wIsSigned)
+    {
+    if (pIn < 0)  // if negative value
+      {
+      wValue2 = -pIn;
+      wPtr[0]=0; // sign byte is set to Zero
+      wValue2=_negate (wValue2); // mandatory otherwise -120 is greater than -110
+      }
+    else
+      {
+      wPtr[0]=1;
+      }
+    wPtr++;
+    }
+
+  memmove(wPtr,&wValue2,sizeof(_Tp)); // skip the sign byte and store value (absolute value)
+  return pOut;
+} //_atomictoURF
+
+
+
+
+
 #endif // ZURFFROMNATURAL_H

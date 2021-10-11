@@ -6,6 +6,7 @@
 #include <ztoolset/zbasedatatypes.h>
 #include <znet/zbasenet/znetcommon.h>
 
+
 #define __JOURNAL_EXT__                 "jnl"
 #define __JOURNAL_ENDOFFILEPATH__       "_jnl.jnl"
 
@@ -178,12 +179,12 @@ public:
     ZMutex Mtx;
 };
 
-class ZSMasterFile;
+class ZRawMasterFile;
 class ZSJournal :  protected ZRandomFile
 {
 typedef ZRandomFile _Base;
 public:
-    ZSJournal(ZSMasterFile* pFather) {Father = pFather;}
+    ZSJournal(ZRawMasterFile* pFather) {Father = pFather;}
 
 //                                    CMtx.init(false);}
 
@@ -192,7 +193,7 @@ public:
     ZStatus setUp(uriString &pJournalPath);
 
     ZStatus init(const bool pmustExist=false);
-    ZStatus reset(ZSMasterFile* pFather);
+    ZStatus reset(ZRawMasterFile* pFather);
     ZStatus start(void);
     void    end(void);
 
@@ -238,13 +239,9 @@ protected:
     pid_t       Pid;
     ZSystemUserId     Uid;
     utf8String    Username;
-    ZSMasterFile* Father;
+    ZRawMasterFile* Father;
 //    uriString   URIJournal;
 };
-
-
-
-
 
 
 } //zbs

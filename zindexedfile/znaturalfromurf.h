@@ -606,4 +606,8 @@ unsigned char* wData_Ptr= _getURFHeaderData(pURFData,
 #endif //__DEPRECATED_FIELD_CONVERSION__
 
 
+ZStatus
+getUniversalFromURF (ZDataBuffer &pValue,unsigned char* pDataPtr,bool pTruncate,unsigned char** pDataPtrOut=nullptr);
+
+
 #endif // ZNATURALFROMURF_H

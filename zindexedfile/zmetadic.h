@@ -6,8 +6,9 @@
 #include <zindexedfile/zdatatype.h>
 #include <ztoolset/zarray.h>
 
-#include <zfielddescription.h>
+#include <zindexedfile/zfielddescription.h>
 
+#include <zindexedfile/zkeydictionary.h>
 
 namespace zbs {
 /*
@@ -60,7 +61,8 @@ public:
     ZMetaDic&  operator = (const ZMetaDic& pIn) { return _copyFrom(pIn);}
 
 
-    checkSum *CheckSum=nullptr;
+    checkSum *  CheckSum=nullptr;/* to check if meta dictionary has changed or not */
+    utf8String  DicName;         /* name of the entity described by meta dic */
 
     checkSum* getCheckSum(void) {return CheckSum;}
     void generateCheckSum (void)
@@ -102,19 +104,23 @@ public:
 
     long searchFieldByName(const utf8_t* pFieldName) ;
 
+    long searchFieldByHash(const md5& pHash);
+
+#define getFieldByHash searchFieldByHash
+#define getFieldByName searchFieldByName
 
     utf8String toXml(int pLevel);
-    int fromXml(zxmlNode* pIndexRankNode,ZaiErrors* pErrorlog);
+    ZStatus fromXml(zxmlNode* pDicRootNode, ZaiErrors* pErrorlog, ZaiE_Severity pSeverity);
 
     ZDataBuffer& _export(ZDataBuffer& pZDBExport) ;
-    size_t _import (unsigned char* pZDBImport_Ptr);
+    size_t _import (unsigned char* &pZDBImport_Ptr);
 
-    void clear (void) { clear(); return;}
+    void clear (void) { _Base::clear(); return;}
 
     static size_t _computeFieldHeaderSize (const ZTypeBase pType);
 
     void writeXML (FILE* pOutput=stdout) ;
-};
+}; // ZMetaDic
 
 
 template <class _Tp> // template needs to be expanded here
@@ -153,6 +159,8 @@ ZTypeBase wType;
     return addField(pFieldName,wType,wNaturalSize,wUniversalSize,wArrayCount);
 }
 */
+
+
 
 /* ------------- C interfaces to ZMetadic -----------------------_*/
 

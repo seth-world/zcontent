@@ -5,6 +5,10 @@
 #include <zindexedfile/zmetadic.h>
 #include <zindexedfile/zindexfield.h>
 #include <zindexedfile/zkeydictionary.h>
+#include <zindexedfile/zmfdictionary.h>
+
+#include <zindexedfile/zfullindexfield.h>
+#include <zindexedfile/zsindexfile.h>
 
 /** @addtogroup ZSIndexFileGroup
 
@@ -85,7 +89,7 @@ _Tp _getKeyAFR(unsigned char* pInData,/*const ssize_t pSize,*/ ZDataBuffer &pOut
             if (wValue<0)  // if negative value
                     {
                     pOutData.Data[0]=0; // sign byte is set to Zero
-                    _negate (wValue2);
+                    wValue2=_negate (wValue2);
                     }
                 else
                     pOutData.Data[0]=1;
@@ -143,31 +147,33 @@ Data value byte order is reversed according Endian convention IF NECESSARY (syst
  * @param pField        Key Dictionary rank content
  * @return The obtained value with _Tp template parameter type.
  */
-static inline
-_Tp _getValueAFK (ZDataBuffer &pKeyData,const long pRank,ZSKeyDictionary & pKFieldList)
+_Tp _getValueAFK (ZDataBuffer &pKeyData,const long pRank,ZSIndexFile* pZIF)
 {
     _Tp wValue;
     ZDataBuffer wDBV;
-    ssize_t wFieldOffset = pKFieldList.fieldKeyOffset(pRank);
 
-    if (wFieldOffset<0)
+    ZFullIndexField wField;
+    wField.set(pZIF,pRank);
+
+    ssize_t wFieldOffset = wField.KeyOffset;
+
+    if ((wFieldOffset<0)||((wFieldOffset + wField.UniversalSize)>pZIF->KeyUniversalSize))
             {
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_OUTBOUND,
-                                    Severity_Fatal,
-                                    " Field rank is out of key dictionary boundaries while computing field offset given rank <%ld> vs dicionary size <%ld>",
-                                    pRank,
-                                    pKFieldList.size());
-            ZException.exit_abort();
+                                    Severity_Severe,
+                                    " Field rank is out of key dictionary boundaries while computing field offset given rank <%ld> vs dictionary size <%ld>",
+            pZIF->KeyUniversalSize);
+            return ZS_OUTBOUND;
             }
 
-    wDBV.setData(pKeyData.Data+wFieldOffset,pKFieldList[pRank].UniversalSize);
+    wDBV.setData(pKeyData.Data+wField.KeyOffset,wField.UniversalSize);
 
 //    wDBV.Dump();
-    if (pKFieldList[pRank].ZType & ZType_Signed)
+    if (wField.ZType & ZType_Signed)
             {
             memmove(&wValue,(wDBV.Data+1),sizeof(_Tp));
-            if (pKFieldList[pRank].ZType & ZType_Endian)   // and data type is subject to endian reverse byte conversion
+            if (wField.ZType & ZType_Endian)   // and data type is subject to endian reverse byte conversion
 //                if (is_little_endian())             // only if system is little endian
                               wValue=reverseByteOrder_Conditional<_Tp>(wValue);
             if (wDBV.Data[0]==0)  // signed negative value
@@ -197,11 +203,13 @@ _Tp _getValueAFK (ZDataBuffer &pKeyData,const long pRank,ZSKeyDictionary & pKFie
           if (pKFieldList[pRank].ZType & ZType_Endian)   //! and data type is subject to endian reverse byte conversion
                          _reverseByteOrder_Ptr(wDBV.Data,sizeof(_Tp));
 */
-    if (pKFieldList[pRank].ZType & ZType_Endian)   //! and data type is subject to endian reverse byte conversion
+    if (wField.ZType & ZType_Endian)   //! and data type is subject to endian reverse byte conversion
                     wValue=reverseByteOrder_Conditional<_Tp>(wValue);
 //    wValue = static_cast<_Tp>(*wDBV.Data);
     return wValue;
 } // _getValueAFK
+
+
 /**
  * @brief _getValueAAFK  get Array Atomic ( value ) From  Key
  *
@@ -226,36 +234,37 @@ Data value byte order is reversed according Endian convention IF NECESSARY (syst
  */
 template <class _Tp>
 static inline
-_Tp _getValueAAFK (ZDataBuffer &pKeyData,const long pIndex,const long pRank,ZSKeyDictionary & pKFieldList)
+_Tp _getValueAAFK (ZDataBuffer &pKeyData,const long pIndex,const long pRank,ZSIndexFile* pZIF)
 {
     _Tp wValue;
     ZDataBuffer wDBV;
+    ZFullIndexField wField;
+    wField.set(pZIF,pRank);
 //    ssize_t wFieldOffset = pFieldList.fieldKeyOffset(pRank);
-    ssize_t wElementSize = pKFieldList[pRank].UniversalSize / pKFieldList[pRank].ArrayCount; // unary element size within array
-    ssize_t wFieldOffset = pKFieldList.fieldKeyOffset(pRank) + (wElementSize*pIndex) ;
+    ssize_t wElementSize = wField.UniversalSize / wField.Capacity; // unary element size within array
+    ssize_t wFieldOffset = wField.KeyOffset + (wElementSize*pIndex) ;
 
 
-    if ((wFieldOffset<0)||(pIndex>pKFieldList[pRank].ArrayCount))
-            {
-            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                    ZS_OUTBOUND,
-                                    Severity_Fatal,
-                                    " Field rank is out of key dictionary boundaries while computing field offset given rank <%ld> vs dicionary size <%ld>",
-                                    pRank,
-                                    pKFieldList.size());
-            ZException.exit_abort();
-            }
+    if ((wFieldOffset<0)||((wFieldOffset + wField.UniversalSize)>pZIF->KeyUniversalSize))
+    {
+      ZException.setMessage(_GET_FUNCTION_NAME_,
+          ZS_OUTBOUND,
+          Severity_Severe,
+          " Field rank is out of key dictionary boundaries while computing field offset given rank <%ld> vs dictionary size <%ld>",
+          pZIF->KeyUniversalSize);
+      return ZS_OUTBOUND;
+    }
 
 //    wDBV.setData(pKeyData.Data+wFieldOffset,pFieldList[pRank].KeySize);
-    wDBV.setData(pKeyData.Data+wFieldOffset,wElementSize);
+    wDBV.setData(pKeyData.Data+wField.KeyOffset,wField.UniversalSize);
 
-    if (pKFieldList[pRank].ZType & ZType_Signed)
+    if (wField.ZType & ZType_Signed)
             {
             if (wDBV.Data[0]==0)  // signed negative value
                     {
                     _negate(wDBV.Data+1,wDBV.Size-1);
                     if (is_little_endian())             // only if system is little endian
-                          if (pKFieldList[pRank].ZType & ZType_Endian)   // and data type is subject to endian reverse byte conversion
+                          if (wField.ZType & ZType_Endian)   // and data type is subject to endian reverse byte conversion
                                         _reverseByteOrder_Ptr(wDBV.Data+1,(ssize_t)(wDBV.Size-1));
                     memmove(&wValue,(wDBV.Data+1),sizeof(_Tp));
                     wValue = -wValue;
@@ -264,7 +273,7 @@ _Tp _getValueAAFK (ZDataBuffer &pKeyData,const long pIndex,const long pRank,ZSKe
                 else // it is a positive value
                 {
                 if (is_little_endian())             // only if system is little endian
-                      if (pKFieldList[pRank].ZType & ZType_Endian)   //! and data type is subject to endian reverse byte conversion
+                      if (wField.ZType & ZType_Endian)   //! and data type is subject to endian reverse byte conversion
                                     _reverseByteOrder_Ptr(wDBV.Data+1,wDBV.Size-1);
                 memmove(&wValue,(wDBV.Data+1),sizeof(_Tp));
                 return wValue;
@@ -274,7 +283,7 @@ _Tp _getValueAAFK (ZDataBuffer &pKeyData,const long pIndex,const long pRank,ZSKe
 
     memmove(&wValue,(pKeyData.Data+wFieldOffset),sizeof(wValue));
     if (is_little_endian())             //! only if system is little endian
-          if (pKFieldList[pRank].ZType & ZType_Endian)   //! and data type is subject to endian reverse byte conversion
+          if (wField.ZType & ZType_Endian)   //! and data type is subject to endian reverse byte conversion
                          _reverseByteOrder_Ptr(wDBV.Data,sizeof(_Tp));
 
     wValue = static_cast<_Tp>(*wDBV.Data);
@@ -301,7 +310,7 @@ Size of the returned ZDataBuffer content is
  * @param pField    ZIndex Key dictionary rank describing the data to extract.
  * @return          A reference to ZDataBuffer containing the packed data field.
  */
-ZDataBuffer &_getArrayFromRecord(ZDataBuffer &pInData,ZDataBuffer &pOutData,ZSIndexField & pField)
+ZDataBuffer &_getArrayFromRecord(ZDataBuffer &pInData,ZDataBuffer &pOutData,ZFullIndexField & pField)
 {
 size_t wOffset=0;
  ZTypeBase wZType = pField.ZType;
@@ -333,7 +342,7 @@ ZSIndexField wField;
                                         }
 
  pOutData.clear();
- for (long wi=0;wi<pField.ArrayCount;wi++)
+ for (long wi=0;wi<pField.Capacity;wi++)
  {
  switch (wZType)
  {
@@ -462,7 +471,7 @@ ZSIndexField wField;
  * @param[in] pField    ZIndex Key dictionary rank (ZIndexField_struct) describing the data field to extract.
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
-ZStatus _getAtomicFromRecord(ZDataBuffer &pInData,ZDataBuffer &pOutData,ZSIndexField & pField)
+ZStatus _getAtomicFromRecord(ZDataBuffer &pInData,ZDataBuffer &pOutData,ZFieldDescription & pField)
 {
 size_t wOffset=0;
  ZTypeBase wZType = pField.ZType;
@@ -566,16 +575,19 @@ case ZType_Float :
  * @param[in] pFieldList Index dictionary as a CZKeyDictionary object. It is necessary to have here the whole dictionary and not only field definition.
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
-ZStatus _getFieldValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSKeyDictionary & pFieldList)
+ZStatus _getFieldValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSIndexFile* pZIF)
 {
-    ZTypeBase wZType = pFieldList[pRank].ZType;
+  ZFullIndexField wField;
+
+  wField.set(pZIF,pRank);
+    ZTypeBase wZType = wField.ZType;
 
     if (wZType & ZType_Atomic)
-            return _getAtomicValueFromKey(pKeyData,AVFKValue,pRank,pFieldList);
+            return _getAtomicValueFromKey(pKeyData,AVFKValue,pRank,pZIF);
     if (wZType & ZType_Array)
-            return _getArrayValueFromKey(pKeyData,AVFKValue,pRank,pFieldList);
+            return _getArrayValueFromKey(pKeyData,AVFKValue,pRank,pZIF);
     if (wZType & ZType_Class)
-            return _getClassValueFromKey(pKeyData,AVFKValue,pRank,pFieldList);
+            return _getClassValueFromKey(pKeyData,AVFKValue,pRank,pZIF);
 
 }//_getValueFromKey
 
@@ -590,10 +602,13 @@ ZStatus _getFieldValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,cons
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSErrorSError
  */
 
-ZStatus _getAtomicValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSKeyDictionary & pFieldList)
+ZStatus _getAtomicValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSIndexFile* pZIF)
 {
 
- ZTypeBase wZType = pFieldList[pRank].ZType;
+  ZFullIndexField wField;
+
+  wField.set(pZIF,pRank);
+ ZTypeBase wZType = wField.ZType;
 
  if (!(wZType & ZType_Atomic))
         {
@@ -601,8 +616,8 @@ ZStatus _getAtomicValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,con
                                  ZS_INVTYPE,
                                  Severity_Fatal,
                                  "Invalid ZType <%ld> <%s> encountered while processing key data. Type is NOT ATOMIC.",
-                                 pFieldList[pRank].ZType,
-                                 decode_ZType(pFieldList[pRank].ZType));
+                                 wField.ZType,
+                                 decode_ZType(wField.ZType));
          return ZS_INVTYPE;
         }
  wZType = wZType &(~ZType_Atomic) ;  //! negate ZType_Atomic : do not need it anymore
@@ -613,68 +628,68 @@ ZStatus _getAtomicValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,con
  {
 case ZType_U8 :
          {
-         uint8_t wValue= _getValueAFK<uint8_t>(pKeyData,pRank,pFieldList);
+         uint8_t wValue= _getValueAFK<uint8_t>(pKeyData,pRank,pZIF);
          AVFKValue.setData( &wValue, sizeof(wValue));
          break;
          }
 case ZType_S8 :
         {
-         int8_t wValue= _getValueAFK<int8_t>(pKeyData,pRank,pFieldList);
+         int8_t wValue= _getValueAFK<int8_t>(pKeyData,pRank,pZIF);
         AVFKValue.setData( &wValue, sizeof(wValue));
          break;
         }
 
  case ZType_U16 :
           {
-          uint16_t wValue= _getValueAFK<uint16_t>(pKeyData,pRank,pFieldList);
+          uint16_t wValue= _getValueAFK<uint16_t>(pKeyData,pRank,pZIF);
           AVFKValue.setData( &wValue, sizeof(wValue));
           break;
           }
  case ZType_S16 :
          {
-         int16_t wValue= _getValueAFK<int16_t>(pKeyData,pRank,pFieldList);
+         int16_t wValue= _getValueAFK<int16_t>(pKeyData,pRank,pZIF);
          AVFKValue.setData( &wValue, sizeof(wValue));
          break;
          }
  case ZType_U32 :
           {
-         uint32_t wValue= _getValueAFK<uint32_t>(pKeyData,pRank,pFieldList);
+         uint32_t wValue= _getValueAFK<uint32_t>(pKeyData,pRank,pZIF);
          AVFKValue.setData( &wValue, sizeof(wValue));
          break;
           }
  case ZType_S32 :
          {
-         int32_t wValue= _getValueAFK<int32_t>(pKeyData,pRank,pFieldList);
+         int32_t wValue= _getValueAFK<int32_t>(pKeyData,pRank,pZIF);
          AVFKValue.setData( &wValue, sizeof(wValue));
          break;
          }
  case ZType_U64 :
           {
-         uint64_t wValue= _getValueAFK<uint64_t>(pKeyData,pRank,pFieldList);
+         uint64_t wValue= _getValueAFK<uint64_t>(pKeyData,pRank,pZIF);
          AVFKValue.setData( &wValue, sizeof(wValue));
          break;
           }
  case ZType_S64 :
          {
-         int64_t wValue= _getValueAFK<int64_t>(pKeyData,pRank,pFieldList);
+         int64_t wValue= _getValueAFK<int64_t>(pKeyData,pRank,pZIF);
          AVFKValue.setData( &wValue, sizeof(wValue));
          break;
          }
 case ZType_Float :
              {
-             float wValue= _getValueAFK<float>(pKeyData,pRank,pFieldList);
+             float wValue= _getValueAFK<float>(pKeyData,pRank,pZIF);
              AVFKValue.setData( &wValue, sizeof(wValue));
              break;
              }
  case ZType_Double :
               {
-             double wValue= _getValueAFK<double>(pKeyData,pRank,pFieldList);
+             double wValue= _getValueAFK<double>(pKeyData,pRank,pZIF);
              AVFKValue.setData( &wValue, sizeof(wValue));
              break;
               }
  case ZType_LDouble :
               {
-             long double wValue= _getValueAFK<long double>(pKeyData,pRank,pFieldList);
+             long double wValue= _getValueAFK<long double>(pKeyData,pRank,pZIF);
              AVFKValue.setData( &wValue, sizeof(wValue));
              break;
               }
@@ -688,8 +703,8 @@ case ZType_Float :
                                      ZS_INVTYPE,
                                      Severity_Fatal,
                                      "Invalid ZType <%ld> <%s> encountered while processing key data",
-                                     pFieldList[pRank].ZType,
-                                     decode_ZType(pFieldList[pRank].ZType));
+                                     wField.ZType,
+                                     decode_ZType(wField.ZType));
              return ZS_INVTYPE;
              }
 
@@ -705,20 +720,23 @@ case ZType_Float :
  * @param[in] pFieldList Index dictionary as a CZKeyDictionary object. It is necessary to have here the whole dictionary and not only field definition.
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSErrorSError
  */
-ZStatus _getClassValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSKeyDictionary & pFieldList)
+ZStatus _getClassValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSIndexFile* pZIF)
 {
-    if (!(pFieldList[pRank].ZType & ZType_Class))
+  ZFullIndexField wField;
+  wField.set(pZIF,pRank);
+
+    if (!(wField.ZType & ZType_Class))
            {
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_INVTYPE,
                                     Severity_Fatal,
                                     "Invalid ZType <%ld> <%s> encountered while processing key data. Type is NOT CLASS.",
-                                    pFieldList[pRank].ZType,
-                                    decode_ZType(pFieldList[pRank].ZType));
+                                    wField.ZType,
+                                    decode_ZType(wField.ZType));
             return ZS_INVTYPE;
            }
 
-    AVFKValue.setData(&pKeyData.Data[pFieldList.fieldKeyOffset(pRank)],pFieldList[pRank].UniversalSize);
+    AVFKValue.setData(&pKeyData.Data[wField.KeyOffset],wField.UniversalSize);
     return ZS_SUCCESS;
 }//_getClassValueFromKey
 
@@ -731,10 +749,13 @@ ZStatus _getClassValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,cons
  * @param[in] pFieldList Index dictionary as a CZKeyDictionary object. It is necessary to have here the whole dictionary and not only field definition.
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSErrorSError
  */
-ZStatus _getArrayValueFromKey(ZDataBuffer &pInData,ZDataBuffer &pOutData,const long pRank,ZSKeyDictionary & pFieldList)
+ZStatus _getArrayValueFromKey(ZDataBuffer &pInData,ZDataBuffer &pOutData,const long pRank,ZSIndexFile* pZIF)
 {
 
- ZTypeBase wZType = pFieldList[pRank].ZType;
+  ZFullIndexField wField;
+  wField.set(pZIF,pRank);
+
+ ZTypeBase wZType = wField.ZType;
 
  if (!(wZType & ZType_Array))
         {
@@ -742,8 +763,8 @@ ZStatus _getArrayValueFromKey(ZDataBuffer &pInData,ZDataBuffer &pOutData,const l
                                  ZS_INVTYPE,
                                  Severity_Fatal,
                                  "Invalid ZType <%ld> <%s> encountered while processing record data. Type is NOT ARRAY.",
-                                 pFieldList[pRank].ZType,
-                                 decode_ZType(pFieldList[pRank].ZType));
+                                 wField.ZType,
+                                 decode_ZType(wField.ZType));
          return ZS_INVTYPE;
         }
  wZType = wZType &(~ZType_Array) ;  // negate ZType_Array : do not need it anymore
@@ -753,11 +774,10 @@ ZStatus _getArrayValueFromKey(ZDataBuffer &pInData,ZDataBuffer &pOutData,const l
 
 ZDataBuffer wDBIn;
 
-ssize_t KeyDataSize = (ssize_t)((float)pFieldList[pRank].UniversalSize / (float)pFieldList[pRank].ArrayCount) ; //! compute data size in key format
+ssize_t KeyDataSize = (ssize_t)((float)wField.UniversalSize / (float)wField.Capacity) ; //! compute data size in key format
 
-ZSIndexField wField;
-    ssize_t wOffset = pFieldList.fieldKeyOffset(pRank) ;
-    wDBIn.setData((pInData.Data+wOffset),pFieldList[pRank].UniversalSize);
+    ssize_t wOffset = wField.KeyOffset ;
+    wDBIn.setData((pInData.Data+wOffset),wField.UniversalSize);
 
  pOutData.clear();
 
@@ -767,7 +787,7 @@ ZSIndexField wField;
         return ZS_SUCCESS;
         }
 
- for (long wi=0;wi<pFieldList[pRank].ArrayCount;wi++)
+ for (long wi=0;wi<wField.Capacity;wi++)
  {
  switch (wZType)
  {
@@ -775,14 +795,14 @@ ZSIndexField wField;
     case ZType_UChar:
     case ZType_U8 :
              {
-             uint8_t wValue = _getValueAAFK<uint8_t>(wDBIn,wi,pRank,pFieldList);
+             uint8_t wValue = _getValueAAFK<uint8_t>(wDBIn,wi,pRank,pZIF);
              pOutData.appendData(&wValue,sizeof(wValue));
              wEltOffsetKey += KeyDataSize;
              break;
              }
     case ZType_S8 :
             {
-             int8_t wValue = _getValueAAFK<int8_t>(wDBIn,wi,pRank,pFieldList);
+             int8_t wValue = _getValueAAFK<int8_t>(wDBIn,wi,pRank,pZIF);
              pOutData.appendData(&wValue,sizeof(wValue));
              wEltOffsetKey += KeyDataSize;
              break;
@@ -790,63 +810,63 @@ ZSIndexField wField;
 
      case ZType_U16 :
               {
-             uint16_t wValue = _getValueAAFK<uint16_t>(wDBIn,wi,pRank,pFieldList);
+             uint16_t wValue = _getValueAAFK<uint16_t>(wDBIn,wi,pRank,pZIF);
              pOutData.appendData(&wValue,sizeof(wValue));
              wEltOffsetKey += KeyDataSize;
              break;
               }
      case ZType_S16 :
              {
-             int16_t wValue = _getValueAAFK<int16_t>(wDBIn,wi,pRank,pFieldList);
+             int16_t wValue = _getValueAAFK<int16_t>(wDBIn,wi,pRank,pZIF);
              pOutData.appendData(&wValue,sizeof(wValue));
              wEltOffsetKey += KeyDataSize;
              break;
              }
      case ZType_U32 :
               {
-             uint32_t wValue = _getValueAAFK<uint32_t>(wDBIn,wi,pRank,pFieldList);
+             uint32_t wValue = _getValueAAFK<uint32_t>(wDBIn,wi,pRank,pZIF);
              pOutData.appendData(&wValue,sizeof(wValue));
              wEltOffsetKey += KeyDataSize;
              break;
               }
      case ZType_S32 :
              {
-             int32_t wValue = _getValueAAFK<int32_t>(wDBIn,wi,pRank,pFieldList);
+             int32_t wValue = _getValueAAFK<int32_t>(wDBIn,wi,pRank,pZIF);
              pOutData.appendData(&wValue,sizeof(wValue));
              wEltOffsetKey += KeyDataSize;
              break;
              }
      case ZType_U64 :
               {
-             uint64_t wValue = _getValueAAFK<uint64_t>(wDBIn,wi,pRank,pFieldList);
+             uint64_t wValue = _getValueAAFK<uint64_t>(wDBIn,wi,pRank,pZIF);
              pOutData.appendData(&wValue,sizeof(wValue));
              wEltOffsetKey += KeyDataSize;
              break;
               }
      case ZType_S64 :
              {
-             int64_t wValue = _getValueAAFK<int64_t>(wDBIn,wi,pRank,pFieldList);
+             int64_t wValue = _getValueAAFK<int64_t>(wDBIn,wi,pRank,pZIF);
              pOutData.appendData(&wValue,sizeof(wValue));
              wEltOffsetKey += KeyDataSize;
              break;
              }
     case ZType_Float :
                  {
-                 float wValue = _getValueAAFK<float>(wDBIn,wi,pRank,pFieldList);
+                 float wValue = _getValueAAFK<float>(wDBIn,wi,pRank,pZIF);
                  pOutData.appendData(&wValue,sizeof(wValue));
                  wEltOffsetKey += KeyDataSize;
                  break;
                  }
      case ZType_Double :
                   {
-                 double wValue = _getValueAAFK<double>(wDBIn,wi,pRank,pFieldList);
+                 double wValue = _getValueAAFK<double>(wDBIn,wi,pRank,pZIF);
                  pOutData.appendData(&wValue,sizeof(wValue));
                  wEltOffsetKey += KeyDataSize;
                  break;
                   }
      case ZType_LDouble :
                   {
-                 long double wValue = _getValueAAFK<long double>(wDBIn,wi,pRank,pFieldList);
+                 long double wValue = _getValueAAFK<long double>(wDBIn,wi,pRank,pZIF);
                  pOutData.appendData(&wValue,sizeof(wValue));
                  wEltOffsetKey += KeyDataSize;
                  break;
@@ -858,8 +878,8 @@ ZSIndexField wField;
                                              ZS_INVTYPE,
                                              Severity_Fatal,
                                              "Invalid ZType <%ld> <%s> encountered while processing record data",
-                                             pFieldList[pRank].ZType,
-                                             decode_ZType(pFieldList[pRank].ZType));
+                                             wField.ZType,
+                                             decode_ZType(wField.ZType));
                      return ZS_INVTYPE;
                  }
 
@@ -879,10 +899,14 @@ ZSIndexField wField;
  * @return          A reference to ZDataBuffer containing the packed data field.
  */
 
-ZDataBuffer& _printAtomicValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &pOutValue,const long pRank, ZSKeyDictionary & pFieldList)
+ZDataBuffer& _printAtomicValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &pOutValue,const long pRank, ZSIndexFile* pZIF)
 {
 utfdescString AVFKValue;
- ZTypeBase wZType = pFieldList[pRank].ZType;
+
+  ZFullIndexField wField;
+  wField.set(pZIF,pRank);
+
+ ZTypeBase wZType = wField.ZType;
 
  if (!(wZType & ZType_Atomic))
         {
@@ -890,8 +914,8 @@ utfdescString AVFKValue;
                                  ZS_INVTYPE,
                                  Severity_Fatal,
                                  "Invalid ZType <%ld> <%s> encountered while processing key data. Type is NOT ATOMIC.",
-                                 pFieldList[pRank].ZType,
-                                 decode_ZType(pFieldList[pRank].ZType));
+                                 wField.ZType,
+                                 decode_ZType(wField.ZType));
          ZException.exit_abort();
         }
  wZType = wZType &(~ZType_Atomic) ;  // negate ZType_Atomic : do not need it anymore
@@ -900,58 +924,58 @@ utfdescString AVFKValue;
  {
 case ZType_U8 :
          {
-         AVFKValue.sprintf("<%uc> ", _getValueAFK<uint8_t>(pKeyData,pRank,pFieldList));
+         AVFKValue.sprintf("<%uc> ", _getValueAFK<uint8_t>(pKeyData,pRank,pZIF));
          break;
          }
 case ZType_S8 :
         {
-         AVFKValue.sprintf("<%c> ",_getValueAFK<int8_t>(pKeyData,pRank,pFieldList));
+         AVFKValue.sprintf("<%c> ",_getValueAFK<int8_t>(pKeyData,pRank,pZIF));
          break;
         }
 
  case ZType_U16 :
           {
-          AVFKValue.sprintf("<%ud> ",_getValueAFK<uint16_t>(pKeyData,pRank,pFieldList));
+          AVFKValue.sprintf("<%ud> ",_getValueAFK<uint16_t>(pKeyData,pRank,pZIF));
           break;
           }
  case ZType_S16 :
          {
-         AVFKValue.sprintf("<%d> ",_getValueAFK<int16_t>(pKeyData,pRank,pFieldList));
+         AVFKValue.sprintf("<%d> ",_getValueAFK<int16_t>(pKeyData,pRank,pZIF));
          break;
          }
  case ZType_U32 :
           {
-         AVFKValue.sprintf("<%uld> ",_getValueAFK<uint32_t>(pKeyData,pRank,pFieldList));
+         AVFKValue.sprintf("<%uld> ",_getValueAFK<uint32_t>(pKeyData,pRank,pZIF));
          break;
           }
  case ZType_S32 :
          {
-         AVFKValue.sprintf("<%ld> ",_getValueAFK<int32_t>(pKeyData,pRank,pFieldList));
+         AVFKValue.sprintf("<%ld> ",_getValueAFK<int32_t>(pKeyData,pRank,pZIF));
          break;
          }
  case ZType_U64 :
           {
-         AVFKValue.sprintf("<%ulld> ",_getValueAFK<uint64_t>(pKeyData,pRank,pFieldList));
+         AVFKValue.sprintf("<%ulld> ",_getValueAFK<uint64_t>(pKeyData,pRank,pZIF));
          break;
           }
  case ZType_S64 :
          {
-         AVFKValue.sprintf("<%lld> ",_getValueAFK<int64_t>(pKeyData,pRank,pFieldList));
+         AVFKValue.sprintf("<%lld> ",_getValueAFK<int64_t>(pKeyData,pRank,pZIF));
          break;
          }
 case ZType_Float :
              {
-             AVFKValue.sprintf("<%f> ",_getValueAFK<float>(pKeyData,pRank,pFieldList));
+             AVFKValue.sprintf("<%f> ",_getValueAFK<float>(pKeyData,pRank,pZIF));
              break;
              }
  case ZType_Double :
               {
-             AVFKValue.sprintf("<%g> ",_getValueAFK<double>(pKeyData,pRank,pFieldList));
+             AVFKValue.sprintf("<%g> ",_getValueAFK<double>(pKeyData,pRank,pZIF));
              break;
               }
  case ZType_LDouble :
               {
-             AVFKValue.sprintf("<%g> ",_getValueAFK<long double>(pKeyData,pRank,pFieldList));
+             AVFKValue.sprintf("<%g> ",_getValueAFK<long double>(pKeyData,pRank,pZIF));
              break;
               }
 
@@ -962,8 +986,8 @@ case ZType_Float :
                                      ZS_INVTYPE,
                                      Severity_Fatal,
                                      "Invalid ZType <%ld> <%s> encountered while processing key data",
-                                     pFieldList[pRank].ZType,
-                                     decode_ZType(pFieldList[pRank].ZType));
+                                     wField.ZType,
+                                     decode_ZType(wField.ZType));
              break;
              }
 
@@ -985,10 +1009,13 @@ case ZType_Float :
  * @param[in] pKFieldList Index dictionary as a ZSKeyDictionary object. It is necessary to have here the whole dictionary and not only field definition.
  * @return a reference to pOutValue ZDataBuffer
  */
-ZDataBuffer& _printArrayValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &pOutValue,const long pRank, ZSKeyDictionary & pKFieldList)
+ZDataBuffer& _printArrayValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &pOutValue,const long pRank, ZSIndexFile* pZIF)
 {
-utfdescString wEltValue;
- ZTypeBase wZType = pKFieldList[pRank].ZType;
+  utfdescString wEltValue;
+  ZFullIndexField wField;
+  wField.set(pZIF,pRank);
+
+  ZTypeBase wZType = wField.ZType;
 
  if (!(wZType & ZType_Array))
         {
@@ -996,8 +1023,8 @@ utfdescString wEltValue;
                                  ZS_INVTYPE,
                                  Severity_Fatal,
                                  "Invalid ZType <%ld> <%s> encountered while processing key data. Type is NOT AN ARRAY.",
-                                 pKFieldList[pRank].ZType,
-                                 decode_ZType(pKFieldList[pRank].ZType));
+                                 wField.ZType,
+                                 decode_ZType(wField.ZType));
          ZException.exit_abort();
         }
 
@@ -1010,80 +1037,80 @@ utfdescString wEltValue;
 
  if (wZType==ZType_Char)
   {
-      size_t wFieldArrayCount = pKFieldList[pRank].ArrayCount ;
-      size_t wFieldOffset = pKFieldList.fieldKeyOffset(pRank)  ;
+      size_t wFieldArrayCount = wField.Capacity ;
+      size_t wFieldOffset = wField.KeyOffset  ;
       snprintf(pOutValue.DataChar,wFieldArrayCount, "<%s>",(pKeyData.DataChar+wFieldOffset));
       return pOutValue;
   }
  if (wZType==ZType_WChar)
    {
-       size_t wFieldArrayCount = pKFieldList[pRank].ArrayCount ;
-       size_t wFieldOffset = pKFieldList.fieldKeyOffset(pRank)  ;
-       swprintf(pOutValue.WDataChar,wFieldArrayCount,L"<%s>", (pKeyData.DataChar+wFieldOffset));
+       size_t wFieldArrayCount = wField.Capacity ;
+//       size_t wFieldOffset = wField.KeyOffset  ;
+       swprintf(pOutValue.WDataChar,wFieldArrayCount,L"<%s>", (pKeyData.DataChar+wField.KeyOffset));
        return pOutValue;
    }
 
  // then other types
 
-for (long wi=0;wi<pKFieldList[pRank].ArrayCount;wi++)
+for (long wi=0;wi<wField.Capacity;wi++)
 {
  switch (wZType)
     {
 case ZType_UChar:
 case ZType_U8 :
          {
-         wEltValue.sprintf("<%uc> ", _getValueAAFK<uint8_t>(pKeyData,wi,pRank,pKFieldList));
+         wEltValue.sprintf("<%uc> ", _getValueAAFK<uint8_t>(pKeyData,wi,pRank,pZIF));
          break;
          }
 case ZType_S8 :
         {
-         wEltValue.sprintf("<%c> ",_getValueAAFK<int8_t>(pKeyData,wi,pRank,pKFieldList));
+         wEltValue.sprintf("<%c> ",_getValueAAFK<int8_t>(pKeyData,wi,pRank,pZIF));
          break;
         }
 
  case ZType_U16 :
           {
-          wEltValue.sprintf("<%ud> ",_getValueAAFK<uint16_t>(pKeyData,wi,pRank,pKFieldList));
+          wEltValue.sprintf("<%ud> ",_getValueAAFK<uint16_t>(pKeyData,wi,pRank,pZIF));
           break;
           }
  case ZType_S16 :
          {
-         wEltValue.sprintf("<%d> ",_getValueAAFK<int16_t>(pKeyData,wi,pRank,pKFieldList));
+         wEltValue.sprintf("<%d> ",_getValueAAFK<int16_t>(pKeyData,wi,pRank,pZIF));
          break;
          }
  case ZType_U32 :
           {
-         wEltValue.sprintf("<%uld> ",_getValueAAFK<uint32_t>(pKeyData,wi,pRank,pKFieldList));
+         wEltValue.sprintf("<%uld> ",_getValueAAFK<uint32_t>(pKeyData,wi,pRank,pZIF));
          break;
           }
  case ZType_S32 :
          {
-         wEltValue.sprintf("<%ld> ",_getValueAAFK<int32_t>(pKeyData,wi,pRank,pKFieldList));
+         wEltValue.sprintf("<%ld> ",_getValueAAFK<int32_t>(pKeyData,wi,pRank,pZIF));
          break;
          }
  case ZType_U64 :
           {
-         wEltValue.sprintf("%ulld ",_getValueAAFK<uint64_t>(pKeyData,wi,pRank,pKFieldList));
+         wEltValue.sprintf("%ulld ",_getValueAAFK<uint64_t>(pKeyData,wi,pRank,pZIF));
          break;
           }
  case ZType_S64 :
          {
-         wEltValue.sprintf("<%lld> ",_getValueAAFK<int64_t>(pKeyData,wi,pRank,pKFieldList));
+         wEltValue.sprintf("<%lld> ",_getValueAAFK<int64_t>(pKeyData,wi,pRank,pZIF));
          break;
          }
 case ZType_Float :
              {
-             wEltValue.sprintf("<%f> ",_getValueAAFK<float>(pKeyData,wi,pRank,pKFieldList));
+             wEltValue.sprintf("<%f> ",_getValueAAFK<float>(pKeyData,wi,pRank,pZIF));
              break;
              }
  case ZType_Double :
               {
-             wEltValue.sprintf("<%g> ",_getValueAAFK<double>(pKeyData,wi,pRank,pKFieldList));
+             wEltValue.sprintf("<%g> ",_getValueAAFK<double>(pKeyData,wi,pRank,pZIF));
              break;
               }
  case ZType_LDouble :
               {
-             wEltValue.sprintf("<%g> ",_getValueAAFK<long double>(pKeyData,wi,pRank,pKFieldList));
+             wEltValue.sprintf("<%g> ",_getValueAAFK<long double>(pKeyData,wi,pRank,pZIF));
              break;
               }
 
@@ -1093,8 +1120,8 @@ case ZType_Float :
                                          ZS_INVTYPE,
                                          Severity_Fatal,
                                          "Invalid ZType <%ld> <%s> encountered while processing key data",
-                                         pKFieldList[pRank].ZType,
-                                         decode_ZType(pKFieldList[pRank].ZType));
+                                         wField.ZType,
+                                         decode_ZType(wField.ZType));
                  ZException.exit_abort();
              }
 
@@ -1107,9 +1134,8 @@ return pOutValue;
 }//_printArrayValueFromKey
 
 template <class _Tp>
-static inline
 ZDataBuffer&
-_convertAtomicEdian(ZDataBuffer& pData,_Tp &pValue, ZSIndexField & pField)
+_convertAtomicEdian(ZDataBuffer& pData,_Tp &pValue, ZFullIndexField & pField)
  {
 decltype(pValue) wValue = pValue;
 
@@ -1135,7 +1161,7 @@ decltype(pValue) wValue = pValue;
 }//_convertAtomic_Edian
 template <class _Tp>
 ZDataBuffer&
-_convertAtomicNOEndian(ZDataBuffer& pData,_Tp pValue, ZSIndexField & pField)
+_convertAtomicNOEndian(ZDataBuffer& pData,_Tp pValue, ZFullIndexField & pField)
  {
 decltype(pValue) wValue = pValue;
 

@@ -9,11 +9,11 @@ ZRandomLockFile::ZRandomLockFile()
 }
 
 ZStatus
-ZRandomLockFile::_getLockStatusByAddress(ZFileDescriptor &pDescriptor,const zaddress_type pAddress, zlockmask_type &pLock,pid_t &pPid)
+ZRandomLockFile::_getLockStatusByAddress(const zaddress_type pAddress, zlockmask_type &pLock,pid_t &pPid)
 {
 ZBlockHeader wBlockHeader;
 ZStatus wSt;
-    wSt=_getBlockHeader(pDescriptor,pAddress,wBlockHeader);
+    wSt=_getBlockHeader(pAddress,wBlockHeader);
     if (wSt!=ZS_SUCCESS)
                 return wSt;
     pLock= wBlockHeader.Lock;
@@ -27,18 +27,18 @@ ZStatus wSt;
     return _getStatusFromLock(pLock);
 }
 
-inline ZStatus ZRandomLockFile::_lockZBAT(ZFileDescriptor &pDescriptor,const zaddress_type pAddress,const zlockmask_type pLock)
+inline ZStatus ZRandomLockFile::_lockZBAT(const zaddress_type pAddress,const zlockmask_type pLock)
 {
     ZStatus wSt;
     ZBlockHeader wBlockHeader;
     //  wSt= _getBlockHeader(pDescriptor,pDescriptor.ZBAT->Tab[pRank].Address,wBlockHeader);
-    wSt= _getBlockHeader(pDescriptor,pAddress,wBlockHeader);
+    wSt= _getBlockHeader(pAddress,wBlockHeader);
     if (wSt!=ZS_SUCCESS)
     {
         return wSt;
     }
     if (wBlockHeader.Lock!=ZLock_Nolock)
-        if (wBlockHeader.Pid!=pDescriptor.Pid)
+        if (wBlockHeader.Pid!=Pid)
         {
             wSt=(ZStatus)_getStatusFromLock(pLock);
             ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -52,39 +52,53 @@ inline ZStatus ZRandomLockFile::_lockZBAT(ZFileDescriptor &pDescriptor,const zad
     wLock.Lock = pLock;
     //    wLock.Address = pDescriptor.ZBAT->Tab[pRank].Address;
     wLock.Address = pAddress;
-    pDescriptor.ZBlockLock.push(wLock);
+    ZBlockLock.push(wLock);
 
-    long wRank = getRankFromAddress(&pDescriptor,pAddress);
-    pDescriptor.ZBAT->Tab[wRank].Lock = pLock;
-    pDescriptor.ZBAT->Tab[wRank].Pid = pDescriptor.Pid;
+    long wRank = getRankFromAddress(pAddress);
+    ZBAT->Tab[wRank].Lock = pLock;
+    ZBAT->Tab[wRank].Pid = Pid;
 
     wBlockHeader.Lock = pLock;
-    wBlockHeader.Pid = pDescriptor.Pid;
+    wBlockHeader.Pid = Pid;
 
-    return _writeBlockHeader(pDescriptor,wBlockHeader,pAddress);
+    return _writeBlockHeader(wBlockHeader,pAddress);
 }//ZRandomLockFile::_lockZBAT
+/*
+long
+ZRandomLockFile::getRankFromAddress(const zaddress_type pAddress)
+{
+  for (long wi=0;wi<ZBAT->size();wi++)
+    if (ZBAT->Tab[wi].Address==pAddress)
+      return wi;
+  ZException.setMessage(_GET_FUNCTION_NAME_,
+      ZS_INVADDRESS,
+      Severity_Error,
+      " Address <%lld> does not correspond to a valid block address ",
+      pAddress);
+  return (-1) ;
+}
+*/
 
-inline ZStatus ZRandomLockFile::_lock(ZFileDescriptor &pDescriptor,
-                                      const zaddress_type pAddress,
+ZStatus ZRandomLockFile::_lock(const zaddress_type pAddress,
                                       const zlockmask_type pLock,
                                       bool pForceWrite)
 {
     ZStatusBase wSt;
     ZBlockHeader wBlockHeader;
     ZLock_struct wlockS;
-    for (long wi = 0; wi < pDescriptor.ZBlockLock.size(); wi++) {
-        if (pDescriptor.ZBlockLock[wi].Address == pAddress) {
-            pDescriptor.ZBlockLock.erase((size_t) wi); // if a lock already exist remove it
+    for (long wi = 0; wi < ZBlockLock.size(); wi++) {
+        if (ZBlockLock[wi].Address == pAddress) {
+            ZBlockLock.erase((size_t) wi); // if a lock already exist remove it
             break;
         }
     }
 
-    wSt = _getBlockHeader(pDescriptor, pAddress, wBlockHeader);
+    wSt = _getBlockHeader(pAddress, wBlockHeader);
     if (wSt != ZS_SUCCESS) {
         return (ZStatus) wSt;
     }
     if (wBlockHeader.Lock != ZLock_Nolock)
-        if (wBlockHeader.Pid != pDescriptor.Pid) {
+        if (wBlockHeader.Pid != Pid) {
             wSt = ZS_LOCKED;
             if (wBlockHeader.Lock & ZLock_Read)
                 wSt |= (ZStatusBase) ZS_LOCKREAD;
@@ -97,26 +111,26 @@ inline ZStatus ZRandomLockFile::_lock(ZFileDescriptor &pDescriptor,
                 (ZStatus) wSt,
                 Severity_Error,
                 "Cannot lock record. Already locked by another process lock mask is <%s>",
-                decode_ZLockMask(wBlockHeader.Lock));
+                decode_ZLockMask(wBlockHeader.Lock).toChar());
             return (ZStatus) wSt;
         }
 
     wBlockHeader.Lock = pLock;
-    wBlockHeader.Pid = pDescriptor.Pid;
+    wBlockHeader.Pid = Pid;
 
-    wSt = _writeBlockHeader(pDescriptor, wBlockHeader, pAddress);
+    wSt = _writeBlockHeader(wBlockHeader, pAddress);
     return (ZStatus) wSt;
     if (wSt != ZS_SUCCESS)
 
-        wSt = _lockZBAT(pDescriptor, pAddress, pLock);
+        wSt = _lockZBAT( pAddress, pLock);
     if (wSt != ZS_SUCCESS)
         return (ZStatus) wSt;
 
     wlockS.Lock = pLock;
 //    wlockS.Rank = pRank;
     wlockS.Address = pAddress;
-    pDescriptor.ZBlockLock.push(wlockS);
-    return (_writeFileDescriptor(pDescriptor,pForceWrite));
+    ZBlockLock.push(wlockS);
+    return (_writeFileDescriptor(pForceWrite));
 }//_lock
 
 

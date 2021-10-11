@@ -8,15 +8,21 @@
 
 #include <ztoolset/utfstringcommon.h> // for routines setURFxxx getURFxxx
 
+#include <zindexedfile/zsmasterfile.h> // for ZSMasterControlBlock
+
+#include <zindexedfile/zmfdictionary.h>
+
 /** @addtogroup ZSMASTERFILEGROUP @{ */
 
 
-ZRecordDic::ZRecordDic(ZMetaDic* pMetaDic)
+using namespace  zbs;
+
+ZRecordDic::ZRecordDic(ZMFDictionary *pMasterDic)
 {
 recordFieldDesc_struct wField;
-  MetaDic=pMetaDic;
+  MasterDic=pMasterDic;
 
-  if (pMetaDic==nullptr)
+  if (pMasterDic==nullptr)
       {
         ZException.setMessage(_GET_FUNCTION_NAME_,
                               ZS_BADCHECKSUM,
@@ -24,7 +30,7 @@ recordFieldDesc_struct wField;
                               "Given Meta Dictionary is nullptr while initializing a ZRecord Dictionary.");
         ZException.exit_abort();
       }
-  if (pMetaDic->CheckSum==nullptr)
+  if (pMasterDic->CheckSum==nullptr)
     {
       ZException.setMessage(_GET_FUNCTION_NAME_,
                             ZS_BADCHECKSUM,
@@ -33,11 +39,11 @@ recordFieldDesc_struct wField;
       ZException.exit_abort();
     }
   CheckSum=new checkSum;
-  memmove (CheckSum->content ,pMetaDic->CheckSum->content,sizeof(CheckSum->content));
-  for (long wi=0;wi <pMetaDic->size();wi++)
+  memmove (CheckSum->content ,pMasterDic->CheckSum->content,sizeof(CheckSum->content));
+  for (long wi=0;wi <pMasterDic->size();wi++)
         {
         wField.clear();
-        wField.MDicRank=&pMetaDic->Tab[wi];
+        wField.MDicRank=&pMasterDic->Tab[wi];
         push(wField);
         }
 
@@ -57,11 +63,11 @@ if (CheckSum!=nullptr)
 }// ~ZRecordDic
 
 long
-ZRecordDic::getFieldByName(const char*pName)
+ZRecordDic::getFieldByName(const char*pName) const
 {
     for(long wi=0;wi<size();wi++)
         {
-        if (Tab[wi].MDicRank->Name==(const utf8_t*)pName)
+      if (Tab[wi].MDicRank->hasName(pName))
                       return wi;
         }
     return -1;
@@ -81,19 +87,23 @@ ZRecordDic::reset(void)
         }
 }// reset
 
-
-ZRecord::ZRecord(ZMetaDic* pMetaDic)
+ZRecord::ZRecord(ZSMasterFile *pZMF) : ZRawRecord(pZMF)
 {
- MetaDic=pMetaDic;
-
- RDic=new ZRecordDic(pMetaDic);
- FieldPresence=new ZBitset(MetaDic->size());
- MetaDicCheckSum = MetaDic->getCheckSum();
- init();
+  if (pZMF->ZMCB.MasterDic==nullptr)
+    {
+    ZException.setMessage("ZRecord::ZRecord",
+          ZS_BADDIC,
+        Severity_Fatal,
+        "Usage of ZRecord is conditionned to Master dictionary existence.");
+    ZException.exit_abort();
+    }
+  ZRawRecord::setup();
+  RDic=new ZRecordDic(pZMF->ZMCB.MasterDic);
+  RDic->reset();
+  MetaDicCheckSum = pZMF->ZMCB.MasterDic->getCheckSum();
 }
 ZRecord::~ZRecord()
 {
-    reset();
     if (FieldPresence!=nullptr)
                     delete FieldPresence;
     if (RDic!=nullptr)
@@ -101,16 +111,7 @@ ZRecord::~ZRecord()
     if (MetaDicCheckSum!=nullptr)
                     delete MetaDicCheckSum;
 }
-void
-ZRecord::init(void)
-{
-    if (FieldPresence==nullptr)
-                FieldPresence=new ZBitset(MetaDic->size());
-    FieldPresence->clear();
-    _Base::reset();
-    RDic->reset();
-    CurrentRank=0;
-}
+
 /**
  * @brief _setupRecordData extract data type (ZType_type)
  *  extract data actual size if necessary
@@ -119,10 +120,10 @@ ZRecord::init(void)
  *   NB: size is atomic natural size in bytes + 1 byte if signed
  *   NB2: for atomic data type
  *
- *  - blob : size is store on a uint64_t (unsigned) size is stored as atomic universal size (Endian free)
+ *  - blob : size is stored on a uint64_t (unsigned) size is stored as atomic universal size (Endian free)
  *  - String array : size is stored on uint32_t  (unsigned) size is stored as atomic universal size(Endian free)
  *  - WCHAR string array : effective size in bytes is stored on uint32_t.
- *      Effective size is NOT the number of characters (that will take 2 bytes) by the size in bytes.
+ *      Effective size is NOT the number of characters (that will take 2 bytes) but the size in bytes.
  *      Number of characters is deduced from effective size / 2 (size of WCHAR).
 @verbatim
 
@@ -162,20 +163,30 @@ ZRecord::init(void)
 void
 ZRecord::_setupRecordData(void)
 {
-
-    if (MetaDic==nullptr)
+/*
+    if (MCB==nullptr)
         {
         ZException.setMessage(_GET_FUNCTION_NAME_,
                               ZS_INVOP,
                               Severity_Fatal,
-                              "Meta dictionary has not been set while accessing ZRecord");
+                              "Reference to Master Control Block has not been set while accessing ZRecord");
         ZException.exit_abort();
         }
-    if (RDic==nullptr)
+        */
+  if (RawMasterFile->ZMCB.MasterDic==nullptr)    /* ZRecord usage implies that meta dictionary has been defined */
+    {
+      ZException.setMessage(_GET_FUNCTION_NAME_,
+          ZS_INVOP,
+          Severity_Fatal,
+          "No meta dictionary has been defined for this file while accessing ZRecord.Use ZRawRecord instead.");
+      ZException.exit_abort();
+    }
+
+  if (RDic==nullptr)
         {
-        RDic=new ZRecordDic(MetaDic);
+        RDic=new ZRecordDic(RawMasterFile->ZMCB.MasterDic);
         }
-    CurrentRank=0;
+    Rank=0;
     
     uint64_t wOffset=0;
     ssize_t wFieldRank =0;
@@ -186,12 +197,12 @@ ZRecord::_setupRecordData(void)
     unsigned char* wPtr =nullptr;
     ZTypeBase wTypeStructure;
 
-    RDic->TotalRecordSize=_Base::Size;
+    RDic->TotalRecordSize=Content.Size;
 
     if (FieldPresence!=nullptr)
                 delete FieldPresence;
     FieldPresence=new ZBitset();
-    wPtr=FieldPresence->_importURF(_Base::Data);
+    wPtr=FieldPresence->_importURF(Content.Data);
 
     wOffset = FieldPresence->getExportSize();
 // get fields (that are present within the record) and setup record dictionary
@@ -199,7 +210,7 @@ ZRecord::_setupRecordData(void)
 
     // Nota Bene : if fields have been added, FieldPresence is not extended,
     //              So additional fields will be considered as missing (upper limit is FieldPresence->CurrentBitSize)
-    while ((wFieldRank<RDic->size())&&(wOffset<_Base::Size)&&(wFieldRank < (ssize_t)FieldPresence->EffectiveBitSize))
+    while ((wFieldRank<RDic->size())&&(wOffset< Content.Size )&&(wFieldRank < (ssize_t)FieldPresence->EffectiveBitSize))
         {
         if (!FieldPresence->test(wFieldRank))
                         {
@@ -208,7 +219,7 @@ ZRecord::_setupRecordData(void)
                         }
         RDic->Tab[wFieldRank].URFOffset=wOffset;
 
-        wPtr=(_Base::Data + wOffset);
+        wPtr=(Content.Data + wOffset);
 
         memmove(&wType,wPtr,sizeof(ZTypeBase));
         wType=reverseByteOrder_Conditional<ZTypeBase>(wType);
@@ -413,7 +424,6 @@ ZRecord::_setupRecordData(void)
             RDic->Tab[wFieldRank].DataOffset= wOffset+sizeof(ZTypeBase)+sizeof(uint32_t);
             break;
             }
-
         }// switch
         break;  // for switch
         }// while true
@@ -456,23 +466,23 @@ getStringNfU (ZDataBuffer&pNatural,ZDataBuffer& pUniversal,ZTypeBase pType)
                         return pNatural;
                         }
     if (pType&ZType_WUChar)
+            {
+            if (is_little_endian())
+                {
+                size_t wArrayCount = pUniversal.Size/sizeof(unsigned wchar_t);
+                unsigned char* wPtr=pUniversal.Data;
+                for (size_t wi=0;wi<wArrayCount;wi++)
                         {
-                        if (is_little_endian())
-                            {
-                            size_t wArrayCount = pUniversal.Size/sizeof(unsigned wchar_t);
-                            unsigned char* wPtr=pUniversal.Data;
-                            for (size_t wi=0;wi<wArrayCount;wi++)
-                                    {
-                                    size_t wASize=getAtomicNaturalSize(ZType_WChar);
-                                    unsigned wchar_t wCh= reverseByteOrder_Ptr<unsigned wchar_t>(wPtr);
-                                    pNatural.appendData(&wCh,sizeof(wCh));
-                                    wPtr += wASize;
-                                    }
-                            }
-                        else
-                            pNatural=pUniversal;
-                        return pNatural;
+                        size_t wASize=getAtomicNaturalSize(ZType_WChar);
+                        unsigned wchar_t wCh= reverseByteOrder_Ptr<unsigned wchar_t>(wPtr);
+                        pNatural.appendData(&wCh,sizeof(wCh));
+                        wPtr += wASize;
                         }
+                }
+            else
+                pNatural=pUniversal;
+            return pNatural;
+            }//if (pType&ZType_WUChar)
 }//getStringNfU
 /**
  * @brief ZRecord::getUniversalfromRaw gets universal value
@@ -490,7 +500,6 @@ ZRecord::getURFFieldFromRawRecord (unsigned char* pDataPtr,ZDataBuffer &pURFData
                     return nullptr;
 
 unsigned char* wURFDataPtr=pDataPtr;
-unsigned char* wEffectiveDataPtr;
 ZTypeBase wType;
 uint64_t wUniversalSize, wNaturalSize, wHeaderSize;
 uint16_t wCapacity, wEffectiveUSize;
@@ -535,7 +544,10 @@ ZRecord::getUniversalbyRank (ZDataBuffer &pValue,const long pRank,bool pTruncate
                               "trying to access field rank out of record dictionary boundaries");
         return ZS_OUTBOUND;
         }
-    if ((pRank>=FieldPresence->EffectiveBitSize)||(!FieldPresence->test(pRank)))
+
+    /* test field presence : if FieldPresence is omitted then all fields are reputated present */
+    if (FieldPresence!=nullptr)
+      if ((pRank>=FieldPresence->EffectiveBitSize)||(!FieldPresence->test(pRank)))
                             return ZS_FIELDMISSING;
 
     unsigned char*wDataPtr=RDic->Tab[pRank].URFData->Data;
@@ -554,6 +566,7 @@ ZRecord::getUniversalbyRank (ZDataBuffer &pValue,const long pRank,bool pTruncate
         else
             return utf8FixedString<cst_desclen>::getUniversalFromURF(ZType_Utf8FixedString,RDic->Tab[pRank].URFData->Data,pValue);
         }//ZType_Utf8FixedString
+
     case ZType_Utf16FixedString:
         {
         if (pTruncate)
@@ -701,6 +714,7 @@ ZRecord::getURFbyRank (ZDataBuffer &pValue,const long pRank)
     pValue.setData(*RDic->Tab[pRank].URFData);
     return ZS_SUCCESS;
 }//getURFbyRank
+
 #include <zxml/zxml.h>
 
 void
@@ -710,24 +724,22 @@ ZRecord::RecordMap(FILE*pOutput)
     ZTypeBase wType;
     uint64_t wUniversalSize, wNaturalSize, wHeaderSize;
     uint16_t wCapacity, wEffectiveUSize;
-    size_t wFieldSize;
-    unsigned char* wEffectiveDataPtr;
 
-    unsigned char* wURFDataPtr= _Base::Data;
-    unsigned char* wEndPtr= _Base::Data + _Base::Size;
+    unsigned char* wURFDataPtr= Content.Data;
+    unsigned char* wEndPtr= Content.Data + Content.Size;
     int wi=0;
     size_t wOffset=0;
     ZBitset wBitset;
     wURFDataPtr=wBitset._importURF(wURFDataPtr);
 
-    wOffset = wURFDataPtr-_Base::Data;
+    wOffset = wURFDataPtr-Content.Data;
     fprintf(pOutput,
             "-------------------------------------------------------------------\n"
             "                         Record map\n"
             "-------------------------------------------------------------------\n"
             "Record full size %ld\n"
             " Presence bitset............\n",
-            _Base::Size);
+            Content.Size);
     wBitset.print(pOutput);
 
     for (ssize_t wRank=0;wRank<RDic->lastIdx();wRank++)
@@ -735,7 +747,7 @@ ZRecord::RecordMap(FILE*pOutput)
         fprintf (pOutput,
                  " Field # <%ld>  <%s> presence <%s>\n",
                  wRank,
-                 (char*)RDic->Tab[wRank].MDicRank->Name.toUtf(),
+                 RDic->Tab[wRank].MDicRank->getName().toCChar(),
                  wBitset.test(wRank)?"Yes":"No");
         }
 
@@ -824,7 +836,7 @@ ZRecord::RecordMap(FILE*pOutput)
     fprintf (stdout,
              "-------------------------------------------------------------------\n"
              " Record surface map stopped at record offset <%ld>\n"
-             " %ld fields were found on record surface.\n"
+             " %d fields were found on record surface.\n"
              "-------------------------------------------------------------------\n",
              wOffset,
              wi);
@@ -852,7 +864,7 @@ ZRecord::printRecordData(FILE*pOutput)
                 "%4ld>  %25s %25s\n"
                 "      Size and offsets...<%10ld> <%10d> <%10ld> <%10ld> <%10ld\n>",
                 wi,
-                RDic->Tab[wi].MDicRank->Name.toCChar(),
+                RDic->Tab[wi].MDicRank->getName().toCChar(),
                 decode_ZType(RDic->Tab[wi].MDicRank->ZType),
                 RDic->Tab[wi].URFOffset,
                 RDic->Tab[wi].MDicRank->Capacity,
@@ -864,7 +876,7 @@ ZRecord::printRecordData(FILE*pOutput)
                      "%ld>   %s %s\n"
                      "            <field absent from record>\n",
                      wi,
-                     RDic->Tab[wi].MDicRank->Name.toCChar(),
+                     RDic->Tab[wi].MDicRank->getName().toCChar(),
                      decode_ZType(RDic->Tab[wi].MDicRank->ZType));
     }
 
@@ -885,7 +897,7 @@ ZDataBuffer wZDB;
                 wRecord->addChild((zxmlNodePtr)wField);
                 wRecord->newElementTextsprintf(wElement,"Rank",nullptr,"%ld",wi);
                 wElement->newComment(wNode, "not modifiable : only field position in ZKDic is taken");
-                wField->newElementTextChild(wElement,"Name",(const char*)RDic->Tab[wi].MDicRank->Name.toCChar());
+                wField->newElementTextChild(wElement,"Name",(const char*)RDic->Tab[wi].MDicRank->getName().toCChar());
                 wField->newElementTextChild(wElement,"Presence",(FieldPresence->test(wi)?"Yes":"No"));
                 if (!FieldPresence->test(wi))
                     {
@@ -932,6 +944,7 @@ ZDataBuffer wZDB;
      for (long wi=0;wi<RDic->size();wi++) // dictionary detail
              {
             std::cout.flush();
+            if (FieldPresence!=nullptr)
             if (!FieldPresence->test(wi))
                 {
                 fprintf (pOutput,
@@ -940,7 +953,7 @@ ZDataBuffer wZDB;
                          "                <Name>%s</Name>\n"
                          "                <Presence>%s</Presence>\n",
                          wi,
-                         RDic->Tab[wi].MDicRank->Name.toCChar() ,
+                  RDic->Tab[wi].MDicRank->getName().toCChar() ,
                          "No");
 
                 continue;
@@ -965,7 +978,7 @@ ZDataBuffer wZDB;
              "                <Data>"
              ,
              wi,
-             RDic->Tab[wi].MDicRank->Name.toCChar() ,
+             RDic->Tab[wi].MDicRank->getName().toCChar() ,
              "Yes",
              RDic->Tab[wi].MDicRank->Capacity,
              RDic->Tab[wi].MDicRank->HeaderSize,
@@ -979,7 +992,7 @@ ZDataBuffer wZDB;
              );
 
             fprintf (stdout," field name <%s> \n",
-                     RDic->Tab[wi].MDicRank->Name.toCChar());
+                     RDic->Tab[wi].MDicRank->getName().toCChar());
 
             wZDB.Dump(20,500,stdout);
             /* Any utf8 string or char string : non encoding. in all other cases :B64 encoding (utf16 utf32 strings and blobs)*/
@@ -1040,8 +1053,10 @@ uint64_t wUniversalSize, wNaturalSize, wHeaderSize;
 uint16_t wCanonical, wEffectiveUSize;
 size_t wFieldSize;
 
+    if (Content.isEmpty())
+      return ZS_EMPTY;
 
-    unsigned char*wURFDataPtr = _Base::Data;
+    unsigned char*wURFDataPtr = Content.Data;
     if (RDic==nullptr)
         {
         ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -1050,13 +1065,13 @@ size_t wFieldSize;
                               " Record dictionary is null, while trying to split record in fields.");
         ZException.exit_abort();
         }
-    if (_Base::isEmpty())
-                    return ZS_EMPTY;
+
 
     if (FieldPresence!=nullptr)
                     delete FieldPresence;
     FieldPresence=new ZBitset;
-    if((wURFDataPtr=FieldPresence->_importURF(wURFDataPtr))==nullptr)
+
+    if(FieldPresence->_importURF(wURFDataPtr)==nullptr)
         {
         ZException.setMessage(_GET_FUNCTION_NAME_,
                               ZS_FILEERROR,
@@ -1065,7 +1080,7 @@ size_t wFieldSize;
         ZException.exit_abort();
         }
 
-    wOffset=(size_t)(wURFDataPtr-_Base::Data);
+    wOffset=(size_t)(wURFDataPtr-Content.Data);
     for (size_t wi=0;wi<RDic->size();wi++)
         {
         wTotalFields ++;
@@ -1076,14 +1091,14 @@ size_t wFieldSize;
                 {
                 printf ("field index <%ld> name <%s> is missing.\n",
                         wi,
-                        (char*)RDic->Tab[wi].MDicRank->Name.toUtf());
+                        (char*)RDic->Tab[wi].MDicRank->getName().toCChar());
                 wMissing++;
                 continue;
                 }
 
-        fprintf (stdout," processing <%s> rank <%ld>\n",RDic->Tab[wi].MDicRank->Name.toCChar(),wi);
+        fprintf (stdout," processing <%s> rank <%ld>\n",RDic->Tab[wi].MDicRank->getName().toCChar(),wi);
         RDic->Tab[wi].URFOffset=wOffset;
-        wURFDataPtr= _Base::Data+wOffset;
+        wURFDataPtr= Content.Data+wOffset;
 
         wSt=_getURFHeaderData(wURFDataPtr,
                               wType,
@@ -1122,6 +1137,8 @@ size_t wFieldSize;
              wMissing);
     return  ZS_SUCCESS;
 }// _split
+
+
 
 /**
  * @brief ZRecord::_aggregate  concatenate fields into base ZDataBuffer in order to be written on file
@@ -1170,11 +1187,11 @@ unsigned char* wURFEnd;
                               " Record dictionary is null, while trying to aggregate record.");
         ZException.exit_abort();
         }
-    _Base::clear(); /* reset main ZDataBuffer to null */
+    Content.clear(); /* reset main ZDataBuffer to null */
 
-    _Base::setData(FieldPresence->_exportURF(getBaseContent()));  // export bitset as first record element
+    Content.setData(FieldPresence->_exportURF(Content));  // export bitset as first record element
 
-    wOffset= _Base::getByteSize();
+    wOffset= Content.getByteSize();
 
 /*    compute record size : */
     uint64_t wURFDataSize=0;
@@ -1191,10 +1208,10 @@ unsigned char* wURFEnd;
             }
         }//for (long wi=0;wi < RDic->size();wi++)
 
-    wURFDataPtr=_Base::extendBZero(wURFDataSize + 1);
+    wURFDataPtr=Content.extendBZero(wURFDataSize + 1);
     wURFEnd=wURFDataPtr + wURFDataSize ;
 
-    wMaxOffset=_Base::getByteSize();
+    wMaxOffset=Content.getByteSize();
 
 
 
@@ -1208,18 +1225,18 @@ unsigned char* wURFEnd;
                 if (ZVerbose)
                     fprintf(stderr,
                         "%s>> Warning: URF data for field #%ld %s is null, while its presence is set.\n",
-                        _GET_FUNCTION_NAME_, wi,(char*)RDic->Tab[wi].MDicRank->Name.toUtf());
+                        _GET_FUNCTION_NAME_, wi,(char*)RDic->Tab[wi].MDicRank->getName().toCChar());
 
                 ZException.setMessage(_GET_FUNCTION_NAME_,
                                       ZS_FIELDMISSING,
                                       Severity_Fatal,
                                       " URF data for field #%ld %s is null, while its presence is set.",
-                                      wi,(char*)RDic->Tab[wi].MDicRank->Name.toUtf());
+                                      wi,(char*)RDic->Tab[wi].MDicRank->getName().toCChar());
                 continue;
                 }
             if (ZVerbose)
                 fprintf(stdout ,"%s>>Field <%ld> <%s> setting content.\n",
-                        _GET_FUNCTION_NAME_, wi,(char*)RDic->Tab[wi].MDicRank->Name.toUtf());
+                        _GET_FUNCTION_NAME_, wi,(char*)RDic->Tab[wi].MDicRank->getName().toCChar());
 
             wSt=_getURFHeaderData(RDic->Tab[wi].URFData->getData(),
                                   wType,
@@ -1233,9 +1250,9 @@ unsigned char* wURFEnd;
                         {return  wSt;}
 
             wURFFieldSize= wHeaderSize + wUniversalSize;
-            _ASSERT_((wOffset+wURFFieldSize) >= _Base::getByteSize(),\
+            _ASSERT_((wOffset+wURFFieldSize) >= Content.getByteSize(),\
                      " Record buffer capacity overflow. Record size %ld - Offset %ld - Field URF size %ld",\
-                     _Base::getByteSize(),wOffset,wURFFieldSize);
+                     Content.getByteSize(),wOffset,wURFFieldSize)
 
 
 
@@ -1259,7 +1276,7 @@ unsigned char* wURFEnd;
 
             RDic->Tab[wi].URFData->Dump(16,150);
 
-        wOffset += wURFFieldSize;
+            wOffset += wURFFieldSize;
             wURFDataPtr += wURFFieldSize;
 
             }//if (FieldPresence->test(wi))
@@ -1267,20 +1284,69 @@ unsigned char* wURFEnd;
             if (ZVerbose)
                 fprintf(stderr,
                     "%s>> field #%ld %s is not present.\n",
-                    _GET_FUNCTION_NAME_, wi,(char*)RDic->Tab[wi].MDicRank->Name.toUtf());;
+                    _GET_FUNCTION_NAME_, wi,(char*)RDic->Tab[wi].MDicRank->getName().toCChar());
         }// for (long wi=0;(wi < RDic->size()) && (wURFDataPtr < wURFEnd);wi++)
 
     if (ZVerbose)
             fprintf (stdout,"%s> Record : URF data size %ld Allocated size %ld\n",
                      _GET_FUNCTION_NAME_,
                      wOffset,
-                     _Base::Size);
+                     Content.Size);
     printf (" Record surface check\n");
     RecordMap();
 
 
     return  ZS_SUCCESS;
 }// _aggregate
+
+/** @cond Development
+ * @brief _extractAllKeys Extracts all Keys value from ZMasterFile record data using dictionnary ZSKeyDictionary fields definition
+ *
+ * return s the concaneted key value in pKey ZDataBuffer.
+ * - Key fields are extracted from the ZMasterFile user record .
+ * - They are converted appropriately whenever required using base internal conversion routines according Dictionary data type ( ZType_type ):
+ *    + atomic fields _getAtomicFromRecord()
+ *    + arrays _getArrayFromRecord()
+ *    + for data type Class (ZType_type) : data is simply mass-moved to key without any conversion
+ *
+ * @note As we are processing variable length records, if a defined key field points outside the record length,
+ *       then its return ing key value is set to binary zero on the corresponding length of the field within returned Key value.
+ *
+ *  After routine completion, KeyValue[].KeyContent buffer are setup and ready to be written on index files.
+ */
+void
+ZRecord::_extractAllKeys(void)
+{
+  ZStatus wSt=ZS_SUCCESS;
+  long wRDicRank=0;
+  size_t wKeyOffset = 0;
+  ZSKeyDictionary* wZKDic;
+  ZDataBuffer wFieldUValue;
+
+  /* compute offset of all record fields : some fields may be of variable length */
+
+  for (long wi=0 ; wi < RawMasterFile->ZMCB.IndexCount ; wi++)
+  {
+//   wZKDic=MCB->Index[wi]->ZKDic;
+
+    wZKDic =  RawMasterFile->ZMCB.MasterDic->KeyDic[wi];
+
+    KeyValue[wi]->KeyContent.reset();
+//    KeyValue[wi]->KeyContent.allocateBZero(MCB->Index[wi]->KeyUniversalSize+1);
+    KeyValue[wi]->KeyContent.allocateBZero(RawMasterFile->ZMCB.IndexTable[wi]->KeyUniversalSize+1);
+    for (long wj=0;wj<wZKDic->count();wj++)
+      {
+      wRDicRank=wZKDic->Tab[wj].MDicRank;
+      getUniversalbyRank(wFieldUValue,wRDicRank);
+      KeyValue[wi]->KeyContent.changeData(wFieldUValue,wKeyOffset);
+      wKeyOffset += RDic->Tab[wRDicRank].MDicRank->UniversalSize;
+      }
+  }
+  return ;
+}// _extractAllKeys
+
+
+
 
 /* ------- C interfaces -------------------*/
 zbs::ZArray<ZRecord*> ZRecordList;
@@ -1306,10 +1372,10 @@ CFUNCTOR void deleteZRecordAll()
 }//deleteZRecordAll
 
 APICEXPORT
-void* createZRecord(void* pMetaDic)
+void* createZRecord(void* pZMF)
 {
-    ZMetaDic* wMetaDic= static_cast <ZMetaDic*> (pMetaDic);
-    ZRecord* wRecord = new ZRecord(wMetaDic);
+    ZSMasterFile* wMasterFile= static_cast <ZSMasterFile*> (pZMF);
+    ZRecord* wRecord = new ZRecord(wMasterFile);
     if (!isZRecordInit())
                     initZRecord();
     ZRecordList.push (wRecord);
@@ -1540,6 +1606,9 @@ ZStatus wSt=ZS_SUCCESS;
     return  wSt;
 
 }// setFieldURFfN for Classes
+
+
+
 
 
 /** @} */

@@ -11,7 +11,7 @@
 /**
 @weakgroup ZSKey class  this object manages one key (given by KeyNumber) for a ZSMasterFile using its ZSIndexControlBlock (ZICB)
  *
- *  ZKey class is used to format a key content for being used with ZMasterFile in queries.
+ *  ZKey class is used to form#include <zindexedfile/zsindexitem.h>at a key content for being used with ZMasterFile in queries.
  *  A key is dedicated to a ZSMasterFile for a dedicated Index
  *
  *
@@ -40,6 +40,7 @@
  *  Partial key option is set with ZKey::setKeyPartial() routine.
  *
  */
+namespace zbs {
 
 class ZSKey : public ZDataBuffer
 {
@@ -49,8 +50,8 @@ class ZSKey : public ZDataBuffer
     typedef ZDataBuffer _Base;
 public:
 
-    ZSKey(ZSMasterFile *pZMF, const long pKeyRank) ;
-    ZSIndexControlBlock *ZICB;          //!<  pointer to ZSMasterFile ZICB element (also stored within ZIndexFile )
+    ZSKey(ZSMasterFile  *pZMF, const long pKeyRank) ;
+    ZRawIndexFile       *ZIF=nullptr;          //!<  pointer to ZSMasterFile ZICB element (also stored within ZIndexFile )
     ZSMasterFile*        ZMF;           //!< pointer to ZSMasterFile
     long                IndexNumber;    //!<  ZMasterFile Index number (rank)
 
@@ -71,7 +72,7 @@ public:
    using ZDataBuffer::clearData;
    using ZDataBuffer::Dump;
 
-   ZStatus keyValueExtraction(ZRecord *pRecord) ;
+//   ZStatus keyValueExtraction(ZRecord *pRecord) ;
 
 //   ZStatus setFieldValue (const long pFieldRank,auto pValue, const long pArraySize=-1);
 //   ZStatus setFieldValue (const utf8_t* pFieldName,auto pValue, const long pArraySize=-1);
@@ -107,5 +108,5 @@ public:
 
 };
 
-
+} // namespace zbs
 #endif // ZSKEY_H

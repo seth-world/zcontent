@@ -52,6 +52,31 @@ ZFileControlBlock& ZFileControlBlock::_copyFrom(const ZFileControlBlock& pIn)
 
 
 
+FCBParams
+ZFileControlBlock::getUseableParams()
+{
+  FCBParams wReturn;
+  wReturn.AllocatedBlocks = AllocatedBlocks;
+  wReturn.BlockExtentQuota = BlockExtentQuota;
+  wReturn.InitialSize = InitialSize;
+  wReturn.BlockTargetSize = BlockTargetSize;
+  wReturn.HighwaterMarking = HighwaterMarking;
+  wReturn.GrabFreeSpace = GrabFreeSpace;
+  return wReturn;
+}
+
+void
+ZFileControlBlock::setUseableParams(const FCBParams& pIn)
+{
+  AllocatedBlocks = pIn.AllocatedBlocks;
+  BlockExtentQuota = pIn.BlockExtentQuota;
+  InitialSize = pIn.InitialSize;
+  BlockTargetSize = pIn.BlockTargetSize;
+  HighwaterMarking = pIn.HighwaterMarking;
+  GrabFreeSpace = pIn.GrabFreeSpace;
+}
+
+
 
 
 //=========================== ZFileControlBlock Export import==========================================
@@ -89,7 +114,7 @@ ZFileControlBlock::_export(ZDataBuffer& pZDBExport)
 }// ZFileControlBlock::_export
 
 ZFileControlBlock&
-ZFileControlBlock::_import(unsigned char* pZDBImport_Ptr)
+ZFileControlBlock::_import(unsigned char* &pZDBImport_Ptr)
 {
   ZFileControlBlock_Export* wFCB=(ZFileControlBlock_Export*) pZDBImport_Ptr;
 
@@ -120,13 +145,15 @@ ZFileControlBlock::_import(unsigned char* pZDBImport_Ptr)
   //    EndSign=_reverseByteOrder_T<uint32_t>(wFCB->EndSign);
   EndSign=wFCB->EndSign;// don't care reversing start sign or end sign : same as reversed
 
+  pZDBImport_Ptr += sizeof(ZFileControlBlock_Export);
+
   return *this;
 }// ZFileControlBlock::_import
 
 
 //-------------xml export import ----------------------------
 
-utf8String ZFileControlBlock::toXml(int pLevel)
+utf8String ZFileControlBlock::toXml(int pLevel,bool pComment)
 {
   int wLevel=pLevel;
   utf8String wReturn;
@@ -135,32 +162,45 @@ utf8String ZFileControlBlock::toXml(int pLevel)
 
   /* NB: StartSign and BlockID are not exported to xml */
   wReturn+=fmtXMLint64("startofdata",StartOfData,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn,"FYI : offset where Data storage starts - cannot be modified.");
+
+  if (pComment)
+    wReturn+=fmtXMLcomment(" required fields for ZRandomFile creation : see ZRandomFile::setCreateMaximum() ",wLevel);
 
   wReturn+=fmtXMLulong("allocatedblocks",AllocatedBlocks,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn," required at creation time : for ZBAT & ZFBT : available allocated slots in ZBAT and ZFBT");
   wReturn+=fmtXMLulong("blockextentquota",BlockExtentQuota,wLevel);
-
-  wReturn+=fmtXMLulong("zbatdataoffset",ZBAT_DataOffset,wLevel);
-  wReturn+=fmtXMLulong("zbatexportsize",ZBAT_ExportSize,wLevel);
-
-  wReturn+=fmtXMLulong("zfbtdataoffset",ZFBT_DataOffset,wLevel);
-  wReturn+=fmtXMLulong("zfbtexportsize",ZFBT_ExportSize,wLevel);
-
-  wReturn+=fmtXMLulong("zdbtdataoffset",ZDBT_DataOffset,wLevel);
-  wReturn+=fmtXMLulong("zdbtexportsize",ZDBT_ExportSize,wLevel);
-
-  wReturn+=fmtXMLulong("zreserveddataoffset",ZReserved_DataOffset,wLevel);
-  wReturn+=fmtXMLulong("zreservedexportsize",ZReserved_ExportSize,wLevel);
-
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn,"  required at creation time : :  for ZBAT & ZFBT : initial extension quota ");
   wReturn+=fmtXMLlong("initialsize",InitialSize,wLevel);
-  wReturn+=fmtXMLlong("allocatedsize",AllocatedSize,wLevel);
-  wReturn+=fmtXMLlong("usedsize",UsedSize,wLevel);
-
-  wReturn+=fmtXMLulong("minsize",MinSize,wLevel);
-  wReturn+=fmtXMLulong("maxsize",MaxSize,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn,"  required at creation time : Initial Size allocated to file during creation : file is created to this size then truncated to size 0 to reserve allocation on disk ");
   wReturn+=fmtXMLulong("blocktargetsize",BlockTargetSize,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn," required at creation time : Block target size (user defined value) Foreseen medium size of blocks in a varying block context.");
 
   wReturn+=fmtXMLbool("highwatermarking",(bool)HighwaterMarking,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn," required at creation time : highwater marking when blocks are deleted (overwritten with binary zeroes) ");
   wReturn+=fmtXMLbool("grabfreespace",(bool)GrabFreeSpace,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn," required at creation time : option - when set forces to collect free space before block allocation ");
+
+  wReturn+=fmtXMLlong("allocatedsize",AllocatedSize,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn,"  FYI: currently allocated space ");
+  wReturn+=fmtXMLlong("usedsize",UsedSize,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn,"  FYI: currently used space  ");
+
+  wReturn+=fmtXMLulong("minsize",MinSize,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn," FYI:  stats : minimum block size ");
+  wReturn+=fmtXMLulong("maxsize",MaxSize,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn," FYI:  stats : maximum block size ");
 
   wReturn += fmtXMLendnode("zfilecontrolblock",pLevel);
   return wReturn;
@@ -174,7 +214,6 @@ int ZFileControlBlock::fromXml(zxmlNode* pFCBRootNode, ZaiErrors* pErrorlog)
   utf8String wValue;
   utfcodeString wCValue;
   bool wBool;
-  unsigned int wInt;
   ZStatus wSt = pFCBRootNode->getChildByName((zxmlNode *&) wRootNode, "zfilecontrolblock");
   if (wSt != ZS_SUCCESS) {
     pErrorlog->logZStatus(
@@ -186,78 +225,81 @@ int ZFileControlBlock::fromXml(zxmlNode* pFCBRootNode, ZaiErrors* pErrorlog)
         decode_ZStatus(wSt));
     return -1;
   }
-
+/*
   if (XMLgetChildInt64(wRootNode, "startofdata", StartOfData, pErrorlog)< 0) {
     fprintf(stderr,
         "ZFileControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-        "default.",
+        "current value.",
         "startofdata");
     }
+*/
   if (XMLgetChildULong(wRootNode, "blockextentquota", BlockExtentQuota, pErrorlog)< 0) {
     fprintf(stderr,
         "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-        "default.",
+        "current value.",
         "blockextentquota");
     }
 
+/*
   if (XMLgetChildULong(wRootNode, "zbatdataoffset", ZBAT_DataOffset, pErrorlog)< 0) {
       fprintf(stderr,
           "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-          "default.",
+          "current value.",
           "zbatdataoffset");
     }
   if (XMLgetChildULong(wRootNode, "zbatexportsize", ZBAT_ExportSize, pErrorlog)< 0) {
       fprintf(stderr,
           "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-          "default.",
+          "current value.",
           "zbatexportsize");
     }
   if (XMLgetChildULong(wRootNode, "zfbtdataoffset", ZFBT_DataOffset, pErrorlog)< 0) {
       fprintf(stderr,
           "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-          "default.",
+          "current value.",
           "zfbtdataoffset");
     }
   if (XMLgetChildULong(wRootNode, "zfbtexportsize", ZFBT_ExportSize, pErrorlog)< 0) {
       fprintf(stderr,
           "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-          "default.",
+          "current value.",
           "zfbtexportsize");
     }
   if (XMLgetChildULong(wRootNode, "zdbtdataoffset", ZDBT_DataOffset, pErrorlog)< 0) {
       fprintf(stderr,
           "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-          "default.",
+          "current value.",
           "zdbtdataoffset");
     }
   if (XMLgetChildULong(wRootNode, "zdbtexportsize", ZDBT_ExportSize, pErrorlog)< 0) {
       fprintf(stderr,
           "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-          "default.",
+          "current value.",
           "zdbtexportsize");
     }
   if (XMLgetChildULong(wRootNode, "zreserveddataoffset", ZReserved_DataOffset, pErrorlog)< 0) {
       fprintf(stderr,
           "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-          "default.",
+          "current value.",
           "zreserveddataoffset");
     }
   if (XMLgetChildULong(wRootNode, "zreservedexportsize", ZReserved_ExportSize, pErrorlog)< 0) {
       fprintf(stderr,
           "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-          "default.",
+          "current value.",
           "zreservedexportsize");
     }
+*/
   if (XMLgetChildULong(wRootNode, "initialsize", InitialSize, pErrorlog)< 0) {
       fprintf(stderr,
           "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-          "default.",
+          "current value.",
           "initialsize");
     }
   if (XMLgetChildULong(wRootNode, "allocatedsize", AllocatedSize, pErrorlog)< 0) {
       fprintf(stderr,
           "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-          "default.",
+          "current value.",
           "allocatedsize");
     }
   if (XMLgetChildULong(wRootNode, "usedsize", UsedSize, pErrorlog)< 0) {
@@ -266,6 +308,7 @@ int ZFileControlBlock::fromXml(zxmlNode* pFCBRootNode, ZaiErrors* pErrorlog)
           "default.",
           "usedsize");
     }
+/*
     if (XMLgetChildULong(wRootNode, "minsize", MinSize, pErrorlog)< 0) {
       fprintf(stderr,
           "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
@@ -275,20 +318,21 @@ int ZFileControlBlock::fromXml(zxmlNode* pFCBRootNode, ZaiErrors* pErrorlog)
     if (XMLgetChildULong(wRootNode, "maxsize", MaxSize, pErrorlog)< 0) {
       fprintf(stderr,
           "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-          "default.",
+          "current value.",
           "maxsize");
     }
+*/
     if (XMLgetChildULong(wRootNode, "blocktargetsize", BlockTargetSize, pErrorlog)< 0) {
       fprintf(stderr,
           "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-          "default.",
+          "current value.",
           "blocktargetsize");
     }
 
   if (XMLgetChildBool(wRootNode, "highwatermarking", wBool, pErrorlog)< 0) {
       fprintf(stderr,
           "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-          "default.",
+          "current value.",
           "highwatermarking");
       }
       else
@@ -297,7 +341,7 @@ int ZFileControlBlock::fromXml(zxmlNode* pFCBRootNode, ZaiErrors* pErrorlog)
     if (XMLgetChildBool(wRootNode, "grabfreespace", wBool, pErrorlog)< 0) {
       fprintf(stderr,
           "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-          "default.",
+          "current value.",
           "grabfreespace");
       }
       else

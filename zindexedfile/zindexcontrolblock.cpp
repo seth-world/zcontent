@@ -1,14 +1,16 @@
 #include "zindexcontrolblock.h"
-
+#include <zindexedfile/zmfdictionary.h>
+#include <zxml/zxmlprimitives.h>
 
 ZSICBOwnData& ZSICBOwnData::_copyFrom(const ZSICBOwnData &pIn)
 {
-  ICBTotalSize=pIn.ICBTotalSize;
-  ZKDicOffset=pIn.ZKDicOffset;
-  KeyType=pIn.KeyType;
-  AutoRebuild=pIn.AutoRebuild;
+//  ICBTotalSize=pIn.ICBTotalSize;
+//  ZKDicOffset=pIn.ZKDicOffset;
+ // KeyType=pIn.KeyType;
+ // AutoRebuild=pIn.AutoRebuild;
   Duplicates=pIn.Duplicates;
-  Name=pIn.Name;
+  KeyUniversalSize=pIn.KeyUniversalSize;
+  IndexName=pIn.IndexName;
   return *this;
 }
 
@@ -18,60 +20,99 @@ ZSICBOwnData_Export::clear(void)
   BlockID=ZBID_ICB;
   ZMFVersion =  __ZMF_VERSION__ ;
   //    Name.clear();   // index name is not defined in ICB export structure : got from ICB memory structure and exported as Universal string
-  BlockID = ZBID_ICB;
   StartSign=cst_ZSTART;
   Duplicates = ZST_NODUPLICATES;
-  AutoRebuild = false;
+//  AutoRebuild = false;
   ICBTotalSize =0;
+  KeyUniversalSize=0;
   ZKDicOffset=0;
   //    Name=nullptr;
   return;
 }//clear
-ZDataBuffer&
-ZSICBOwnData::_exportICBOwn(ZDataBuffer& pZDBExport)
+
+
+
+ZSICBOwnData_Export& ZSICBOwnData_Export::_copyFrom(const ZSICBOwnData_Export& pIn)
 {
-  ZDataBuffer wIndexName;
+  StartSign=pIn.StartSign;
+  BlockID=pIn.BlockID;
+  ZMFVersion=pIn.ZMFVersion;
+  ICBTotalSize=pIn.ICBTotalSize;
+  ZKDicOffset=pIn.ZKDicOffset;
+  KeyUniversalSize = pIn.KeyUniversalSize;
+//  AutoRebuild=pIn.AutoRebuild;  /* uint8_t */
+  Duplicates=pIn.Duplicates;    /* uint8_t */
+
+  return *this;
+}
+
+ZSICBOwnData_Export& ZSICBOwnData_Export::_copyFrom(const ZSICBOwnData* pIn)
+{
+
+  StartSign=cst_ZSTART;
+  BlockID=ZBID_MCB;
+  ZMFVersion=__ZMF_VERSION__;
+
+  ICBTotalSize = uint32_t(sizeof(ZSICBOwnData_Export) + pIn->IndexName._getexportUVFSize());
+
+  ZKDicOffset=(int32_t)ICBTotalSize;
+//  HasKeyDictionary=pIn->HasKeyDictionary; /* uint8_t from bool */
+  KeyUniversalSize = pIn->KeyUniversalSize;
+//  AutoRebuild=pIn->AutoRebuild;  /* uint8_t */
+  Duplicates=pIn->Duplicates;      /* uint8_t */
+  return *this;
+}
+
+
+
+ZSICBOwnData_Export& ZSICBOwnData_Export::_reverseConditional()
+{
+  if (!is_little_endian())
+    return *this;
+  StartSign=reverseByteOrder_Conditional<uint32_t>(StartSign);
+  ZMFVersion=reverseByteOrder_Conditional<uint32_t>(ZMFVersion);
+  ICBTotalSize=reverseByteOrder_Conditional<uint32_t>(ICBTotalSize);
+  ZKDicOffset=reverseByteOrder_Conditional<int32_t>(ZKDicOffset);
+  KeyUniversalSize=reverseByteOrder_Conditional<uint32_t>(KeyUniversalSize);
+/* other fields are uint8_t */
+
+  return *this;
+}
+
+
+
+
+ZDataBuffer&
+ZSICBOwnData::_exportAppend(ZDataBuffer& pZDBExport)
+{
+  pZDBExport.reset();
   ZSICBOwnData_Export wICB;
 
-  memset(&wICB,0,sizeof(ZSICBOwnData_Export));
+  wICB._copyFrom(this);
 
-  wIndexName=Name._exportUVF();
-  ICBTotalSize = wIndexName.Size+sizeof(ZSICBOwnData_Export);
-  ZKDicOffset = ICBTotalSize;
-  wICB.clear();
+ // wICB.ZKDicOffset = wICB.ICBTotalSize = sizeof(ZSICBOwnData_Export) +IndexName._getexportUVFSize();
 
-  wICB.BlockID=ZBID_ICB ;   // uint8_t
-  wICB.ZMFVersion=reverseByteOrder_Conditional<unsigned long>(__ZMF_VERSION__);
-  wICB.ICBTotalSize=reverseByteOrder_Conditional<size_t>(ICBTotalSize);
-  wICB.ZKDicOffset=reverseByteOrder_Conditional<size_t>(ZKDicOffset);
+  wICB._reverseConditional();
+  pZDBExport.setData(&wICB,sizeof(ZSICBOwnData_Export));
+  return IndexName._exportAppendUVF(pZDBExport);
+}// ZSICBOwnData::_exportAppend
 
-  wICB.AutoRebuild=AutoRebuild; // uint8_t
-  wICB.Duplicates=Duplicates; // uint8_t
-  wICB.KeyType=KeyType; // uint8_t
-  //    wICB.EndSign=EndSign;
-  pZDBExport.setData(&wICB,sizeof(wICB));
-
-  pZDBExport.appendData(wIndexName);
-  return pZDBExport;
-}// ZSICBOwnData::_exportICBOwn
 ZStatus
-ZSICBOwnData::_importICBOwn(unsigned char* pZDBImport_Ptr)
+ZSICBOwnData::_import(unsigned char* &pPtrIn)
 {
-
-
-  ZSICBOwnData_Export* wICBOwn_Import=(ZSICBOwnData_Export*)( pZDBImport_Ptr);
+  ZSICBOwnData_Export* wICBE=(ZSICBOwnData_Export*)( pPtrIn);
 
   clear();
-  if (wICBOwn_Import->BlockID != ZBID_ICB) // has not to be reversed
+  if (wICBE->BlockID != ZBID_ICB) // uint8_t : has not to be reversed
   {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_BADICB,
         Severity_Severe,
-        "Error Index Control Block identification is bad. Value <%ld>  : File header appears to be corrupted - invalid BlockID",
-        wICBOwn_Import->BlockID);
+        "Error Index Control Block identification is bad. Value <%d>  : File header appears to be corrupted - invalid BlockID",
+        wICBE->BlockID);
     return (ZS_BADICB);
   }
-  if (wICBOwn_Import->StartSign != cst_ZSTART)    // has not to be reversed
+  if (wICBE->StartSign != cst_ZSTART)    // has not to be reversed
   {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_BADFILEHEADER,
@@ -80,156 +121,220 @@ ZSICBOwnData::_importICBOwn(unsigned char* pZDBImport_Ptr)
     return (ZS_BADFILEHEADER);
   }
 
-  if (reverseByteOrder_Conditional<unsigned long>(wICBOwn_Import->ZMFVersion) != __ZMF_VERSION__)// HAS to be reversed
-  {
+  wICBE->_reverseConditional();
+
+  if (wICBE->ZMFVersion != __ZMF_VERSION__)// HAS to be reversed
+    {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_BADFILEVERSION,
         Severity_Severe,
         "Error Index Control Block   : Found version <%ld> while current ZMF version is <%ld>",
-        wICBOwn_Import->ZMFVersion,
+        wICBE->ZMFVersion,
         __ZMF_VERSION__);
     return (ZS_BADFILEVERSION);
-  }
+    }
 
+  uint32_t wICBTotalSize=wICBE->ICBTotalSize;
+  uint32_t wZKDicOffset=wICBE->ZKDicOffset;
 
+  KeyUniversalSize=wICBE->KeyUniversalSize;
 
-  ICBTotalSize=reverseByteOrder_Conditional<size_t>(wICBOwn_Import->ICBTotalSize);
-  ZKDicOffset=reverseByteOrder_Conditional<size_t>(wICBOwn_Import->ZKDicOffset);
+//  AutoRebuild=wICBOwn_Import->AutoRebuild;  // uint8_t
+  Duplicates=wICBE->Duplicates; // uint8_t
+//  KeyType=wICBOwn_Import->KeyType; // uint8_t
 
-  AutoRebuild=wICBOwn_Import->AutoRebuild;  // uint8_t
-  Duplicates=wICBOwn_Import->Duplicates; // uint8_t
-  KeyType=wICBOwn_Import->KeyType; // uint8_t
+  pPtrIn+=sizeof(ZSICBOwnData_Export); // index Name is stored just after ZSICBOwnData_Export structure
+      // format is Universal format with leading unit size and text size (uint16_t)
 
-  unsigned char* wPtr=pZDBImport_Ptr+sizeof(ZSICBOwnData_Export); // index Name is stored just after ZSICBOwnData_Export structure
-      // format is Universal format with leading size (uint16_t)
-
-  size_t wSize=Name._importUVF(wPtr);  // Name is stored after ZSICBOwnData_Export as a varying number of byte (uint16_t is leading string size)
-
-  //    size_t wZKDicOffset = wSize+sizeof(ZSICBOwnData_Export); // ZKDic starts after varying string Index Name
-  //    EndSign=wICB->EndSign;
+  IndexName._importUVF(pPtrIn);  // Name is stored after ZSICBOwnData_Export as a varying number of byte (uint16_t is leading string size)
 
   return  ZS_SUCCESS;
 }// ZSICBOwnData::_importICBOwn
 
+ZStatus
+ZSIndexControlBlock::_import(unsigned char* &pPtrIn)
+{
+  ZSICBOwnData_Export* wICBE=(ZSICBOwnData_Export*)( pPtrIn);
 
+  if (wICBE->BlockID != ZBID_ICB) // uint8_t :not to be reversed
+  {
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        ZS_BADICB,
+        Severity_Severe,
+        "Error Index Control Block identification is bad. Value <%d>  : File header appears to be corrupted - invalid BlockID",
+        wICBE->BlockID);
+    return (ZS_BADICB);
+  }
+  if (wICBE->StartSign != cst_ZSTART)    // not to be reversed : palyndroma
+  {
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        ZS_BADFILEHEADER,
+        Severity_Severe,
+        "Error Index Control Block  : Index header appears to be corrupted - invalid ICB StartBlock");
+    return (ZS_BADFILEHEADER);
+  }
 
+  wICBE->_reverseConditional();
 
-utf8String ZSIndexControlBlock::toXml(int pLevel)
+  if (wICBE->ZMFVersion != __ZMF_VERSION__)// HAS to be reversed
+  {
+    ZException.setMessage("ZSIndexControlBlock::_import",
+        ZS_BADFILEVERSION,
+        Severity_Severe,
+        "Error Index Control Block   : Found version <%ld> while current ZMF version is <%ld>",
+        wICBE->ZMFVersion,
+        __ZMF_VERSION__);
+    return (ZS_BADFILEVERSION);
+  }
+
+  uint32_t wICBTotalSize=wICBE->ICBTotalSize;
+  unsigned char* wPtrEnd=pPtrIn+wICBTotalSize;
+
+  KeyUniversalSize=wICBE->KeyUniversalSize;
+
+  //  AutoRebuild=wICBOwn_Import->AutoRebuild;  // uint8_t
+  Duplicates=wICBE->Duplicates; // uint8_t
+  //  KeyType=wICBOwn_Import->KeyType; // uint8_t
+
+  pPtrIn+=sizeof(ZSICBOwnData_Export); // index Name is stored just after ZSICBOwnData_Export structure
+      // format is Universal format with leading unit size and text size (uint16_t)
+
+  IndexName._importUVF(pPtrIn);  // Name is stored after ZSICBOwnData_Export as a varying number of byte (uint16_t is leading string size)
+                                  // NB: pPtrIn is updated
+
+  /* take care of key dictionary */
+
+  if (wICBE->ZKDicOffset < 0)
+  {
+    /* see the case of a ZKDic is existing while it is declared by import as non existing */
+    return  ZS_SUCCESS;
+  }
+/*
+  if (ZKDic != nullptr)
+    delete ZKDic;
+
+  ZKDic=new ZSKeyDictionary(pMetaDic);
+
+  ZKDic->_import(pPtrIn);
+
+*/
+  return  ZS_SUCCESS;
+}// ZSIndexControlBlock::_importICBOwn
+
+/*
+ <indexcontrolblock> <!-- no dictionary in index control block -->
+    <indexname> </indexname>
+    <keyuniversalsize> </keyuniversalsize>
+    <duplicates> </duplicates>
+  </indexcontrolblock>
+*/
+utf8String ZSIndexControlBlock::toXml(int pLevel,bool pComment)
 {
   int wLevel=pLevel;
   utf8String wReturn;
   wReturn = fmtXMLnode("indexcontrolblock",pLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn," no dictionary in index control block");
   wLevel++;
-  wReturn += ZSICBOwnData::toXml(wLevel);
+//  wReturn += ZSICBOwnData::toXml(wLevel); /* see if it makes sense to keep zsicbowndata as a specific section */
+  wReturn+=fmtXMLchar("indexname",IndexName.toCChar(),wLevel);
 
-  wReturn += ZKDic->toXml(wLevel);
+  //wReturn+=fmtXMLuint32("icbtotalsize",ICBTotalSize,wLevel);
+  //wReturn+=fmtXMLint32("zkdicoffset",ZKDicOffset,wLevel);
+  wReturn+=fmtXMLuint32("keyuniversalsize",KeyUniversalSize,wLevel);
+
+  //  wReturn+=fmtXMLuint("keytype",  KeyType,wLevel);  /* uint8_t */
+  //  wReturn+=fmtXMLuint("autorebuild",AutoRebuild,wLevel);  /* uint16 must be casted */
+  wReturn+=fmtXMLuint("duplicates",Duplicates,wLevel);
 
   wReturn += fmtXMLendnode("indexcontrolblock",pLevel);
   return wReturn;
 } // toXml
 
-int ZSIndexControlBlock::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog)
+ZStatus ZSIndexControlBlock::fromXml(zxmlNode* pIndexNode, ZaiErrors* pErrorlog)
 {
-  zxmlElement *wRootNode;
+  zxmlElement *wRootNode=nullptr;
   utfcodeString wXmlHexaId;
   utf8String wValue;
   utfcodeString wCValue;
-  bool wBool;
-  unsigned int wInt;
-  ZStatus wSt = pIndexRankNode->getChildByName((zxmlNode *&) wRootNode, "fielddescription");
+  uint32_t wInt=0;
+
+  ZStatus wSt = pIndexNode->getName()=="indexcontrolblock"?ZS_SUCCESS:ZS_INVNAME;
   if (wSt != ZS_SUCCESS) {
     pErrorlog->logZStatus(
         ZAIES_Error,
         wSt,
-        "FieldDescription::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
+        "ZSIndexControlBlock::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
         "<%s>",
-        "fielddescription",
+        "indexcontrolblock",
         decode_ZStatus(wSt));
-    return -1;
+    return ZS_XMLERROR;
   }
-  if (ZSICBOwnData::fromXml(wRootNode, pErrorlog) != 0)
-    return -1;
-  if (ZKDic->fromXml(wRootNode, pErrorlog)!= 0)
-    return -1;
-  return (int)pErrorlog->hasError();
+//  if (ZSICBOwnData::fromXml(wRootNode, pErrorlog) != 0)
+//    return ZS_XMLERROR;
+
+  if (XMLgetChildText(wRootNode, "indexname", IndexName, pErrorlog) < 0)
+    {
+      pErrorlog->errorLog("ZSIndexControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter <%s>.\n","indexname");
+    }
+
+
+  if (XMLgetChildUInt(wRootNode, "keyuniversalsize", KeyUniversalSize, pErrorlog)< 0)
+    {
+      pErrorlog->errorLog("ZSIndexControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter <%s>.\n","keyuniversalsize");
+    }
+  if (XMLgetChildUInt(wRootNode, "duplicates", wInt, pErrorlog)< 0)
+    {
+      pErrorlog->warningLog("ZSIndexControlBlock::fromXml-W-CNTFINDPAR Cannot find parameter <%s>. Will stay to its default.\n","duplicates");
+//      Duplicates = ZST_NODUPLICATES;
+    }
+    else
+      Duplicates = (ZSort_Type)wInt;
+
+    return pErrorlog->hasError()?ZS_XMLERROR:ZS_SUCCESS;
 }//fromXml
 
 ZSIndexControlBlock&
 ZSIndexControlBlock::_copyFrom( const ZSIndexControlBlock& pIn)
 {
   ZSICBOwnData::_copyFrom(pIn);
-  if (ZKDic!=nullptr)
-    delete ZKDic;
-  if (pIn.ZKDic!=nullptr)
-  {
-    ZKDic->_copyFrom(*pIn.ZKDic);
-  }
-  if (CheckSum!=nullptr)
-  {
-    delete CheckSum;
-    CheckSum=nullptr;
-  }
-  if (pIn.CheckSum)
-    CheckSum = new checkSum(*pIn.CheckSum);
-  if (MetaDic!=nullptr)
-  {
-    delete MetaDic;
-    MetaDic=nullptr;
-  }
-  if (pIn.MetaDic!=nullptr)
-    MetaDic=new ZMetaDic(*pIn.MetaDic);
-
   return *this;
 }//_copyFrom
 
 
-
-ZSIndexControlBlock::ZSIndexControlBlock (ZMetaDic *pMetaDic)
-{
-  clear(pMetaDic);
-  return;
-}
 ZSIndexControlBlock::~ZSIndexControlBlock (void)
 {
-  /*    if (ZKDic!=nullptr)
-                {
-                delete ZKDic ;
-                ZKDic=nullptr;
-                }*/
+
   if (CheckSum!=nullptr)
     delete CheckSum;
-  MetaDic=nullptr; //MetaDic refers to ZSMasterFile::MetaDic
+
   return;
 }
-/**
- * @brief ZIndexControlBlock::clear Resets ZIndexControlBlock to initial data - reset Key Dictionnary
- */
-void
-ZSIndexControlBlock::clear(ZMetaDic*pMetaDic)
-{
 
-  ZSICBOwnData::clear();
-  MetaDic = pMetaDic;
-  if (ZKDic!=nullptr)
-  {
-    delete ZKDic ;
-    ZKDic = nullptr;
-  }
-  ZKDic = new ZSKeyDictionary(pMetaDic) ;
+
+void ZSIndexControlBlock::newKeyDic(ZSKeyDictionary *pZKDic,ZMetaDic* pMetaDic)
+{
+  if (KeyDic)
+    delete KeyDic;
+  KeyDic=new ZSKeyDictionary(pMetaDic);
+  KeyDic->_copyFrom(*pZKDic);
+  KeyDic->MetaDic=pMetaDic;
   return;
-}//clear
+}
 
 // computes and return the effective size of a ZIndex key record
 // variable fields length impose to compute record size at record level
 ssize_t ZSIndexControlBlock::IndexRecordSize (void)
-
 {
-  if (ZKDic==nullptr)
-    return 0;
-  ZKDic->_reComputeSize();
-  return (ZKDic->KeyUniversalSize + sizeof(zaddress_type));
+  return (KeyUniversalSize + sizeof(zaddress_type));
 }//IndexRecordSize
-
+/*
+<icbowndata>
+  <indexname> </indexname>
+  <keyuniversalsize> </keyuniversalsize>
+  <duplicates> </duplicates>
+</icbowndata>
+*/
 
 utf8String ZSICBOwnData::toXml(int pLevel)
 {
@@ -237,20 +342,21 @@ utf8String ZSICBOwnData::toXml(int pLevel)
   utf8String wReturn;
   wReturn = fmtXMLnode("icbowndata",pLevel);
   wLevel++;
-  wReturn+=fmtXMLchar("name",Name.toCChar(),wLevel);
+  wReturn+=fmtXMLchar("indexname",IndexName.toCChar(),wLevel);
 
-  wReturn+=fmtXMLuint64("icbtotalsize",ICBTotalSize,wLevel);
-  wReturn+=fmtXMLuint64("zkdicoffset",ZKDicOffset,wLevel);
+  //wReturn+=fmtXMLuint32("icbtotalsize",ICBTotalSize,wLevel);
+  //wReturn+=fmtXMLint32("zkdicoffset",ZKDicOffset,wLevel);
+  wReturn+=fmtXMLuint32("keyuniversalsize",KeyUniversalSize,wLevel);
 
-  wReturn+=fmtXMLuint("keytype",  KeyType,wLevel);  /* uint8_t */
-  wReturn+=fmtXMLuint("autorebuild",AutoRebuild,wLevel);  /* uint16 must be casted */
+//  wReturn+=fmtXMLuint("keytype",  KeyType,wLevel);  /* uint8_t */
+//  wReturn+=fmtXMLuint("autorebuild",AutoRebuild,wLevel);  /* uint16 must be casted */
   wReturn+=fmtXMLuint("duplicates",Duplicates,wLevel);
 
   wReturn += fmtXMLendnode("icbowndata",pLevel);
   return wReturn;
 } // ZSICBOwnData::toXml
 
-int ZSICBOwnData::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog)
+ZStatus ZSICBOwnData::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog)
 {
   zxmlElement *wRootNode;
   utfcodeString wXmlHexaId;
@@ -263,36 +369,30 @@ int ZSICBOwnData::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog)
     pErrorlog->logZStatus(
         ZAIES_Error,
         wSt,
-        "FieldDescription::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
+        "ZSICBOwnData::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
         "<%s>",
         "icbowndata",
         decode_ZStatus(wSt));
-    return -1;
+    return wSt;
   }
-  if (XMLgetChildText(wRootNode, "name", Name, pErrorlog) < 0) {
-    fprintf(stderr,
-        "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-        "default.",
-        "name");
-  }
+  if (XMLgetChildText(wRootNode, "indexname", IndexName, pErrorlog) < 0)
+    {
+    pErrorlog->errorLog("ZSICBOwnData::fromXml-E-CNTFINDPAR Cannot find parameter <%s>.\n","indexname");
+    }
 
 
-
-  if (XMLgetChildULong(wRootNode, "icbtotalsize", ICBTotalSize, pErrorlog)< 0) {
-    fprintf(stderr,
-        "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-        "default.",
-        "icbtotalsize");
-  }
-  if (XMLgetChildULong(wRootNode, "zkdicoffset", ZKDicOffset, pErrorlog)< 0) {
-    fprintf(stderr,
-        "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-        "default.",
-        "zkdicoffset");
-  }
-
-
-  if (XMLgetChildUInt(wRootNode, "keytype", wInt, pErrorlog)< 0) {
+  if (XMLgetChildUInt(wRootNode, "keyuniversalsize", KeyUniversalSize, pErrorlog)< 0)
+    {
+    pErrorlog->errorLog("ZSICBOwnData::fromXml-E-CNTFINDPAR Cannot find parameter <%s>.\n","keyuniversalsize");
+    }
+  if (XMLgetChildUInt(wRootNode, "duplicates", wInt, pErrorlog)< 0)
+    {
+    pErrorlog->warningLog("ZSICBOwnData::fromXml-W-CNTFINDPAR Cannot find parameter <%s>. Will stay to its default.\n","duplicates");
+    Duplicates = ZST_NODUPLICATES;
+    }
+  else
+    Duplicates = (ZSort_Type)wInt;
+/*  if (XMLgetChildUInt(wRootNode, "keytype", wInt, pErrorlog)< 0) {
     fprintf(stderr,
         "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
         "default.",
@@ -309,16 +409,151 @@ int ZSICBOwnData::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog)
   }
   else
     AutoRebuild = (uint8_t)wInt;
+*/
 
-  if (XMLgetChildUInt(wRootNode, "duplicates", wInt, pErrorlog)< 0) {
-    fprintf(stderr,
-        "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-        "default.",
-        "duplicates");
-  }
-  else
-    Duplicates = (ZSort_Type)wInt;
 
-  return (int)pErrorlog->hasError();
+  return pErrorlog->hasError()?ZS_XMLERROR:ZS_SUCCESS;
 }//ZSICBOwnData::fromXml
+#ifdef __COMMENT__
+//----------------ZIndexControlTable--------------------------
 
+long ZSIndexControlTable::erase(const long pIdx)
+{
+
+/*  if (Tab[pIdx]->ZKDic!=nullptr)
+    delete Tab[pIdx]->ZKDic;
+  Tab[pIdx]->ZKDic=nullptr; */
+  return  _Base::erase(pIdx);
+}
+long ZSIndexControlTable::push (ZSIndexControlBlock *pICB)
+{
+
+  /*    newBlankElement();
+    last().clear(pMetaDic);  // set up ZICB and its Key Dictionnary
+
+  memmove (&last(),pICB,sizeof(ZSICBOwnData));
+  long wj = 0 ;
+  while (wj<pICB.ZKDic->size())
+  {
+    last().ZKDic->push(pICB.ZKDic->Tab[wj]);
+    wj++;
+  }*/
+      _Base::push(pICB);
+  return  lastIdx();
+}//push
+
+long ZSIndexControlTable::pop (void)
+{
+  if (size()<1)
+    return  -1;
+/*                              done within ZSIndexControlBlock DTOR
+  if (last()->ZKDic!=nullptr)
+    {
+    delete last()->ZKDic ;
+    last()->ZKDic=nullptr;
+    }*/
+  return _Base::pop();
+}
+void ZSIndexControlTable::clear (void)
+{
+  while (size()>0)
+    ZSIndexControlTable::pop();
+  return;
+}
+
+long ZSIndexControlTable::zsearchIndexByName (const char* pName)
+{
+  for (long wi =0;wi<size();wi++)
+  {
+    if (Tab[wi]->IndexName==pName)
+      return  wi;
+
+  }
+
+  return -1;
+}//zsearchIndexByName
+long ZSIndexControlTable::zsearchCaseIndexByName (const char* pName)
+{
+  for (long wi =0;wi<size();wi++)
+  {
+    if (Tab[wi]->IndexName.isEqualCase((const utf8_t*)pName))
+    {
+      return  wi;
+    }
+  }
+
+  return -1;
+}//zsearchIndexByName
+
+#endif
+/*
+<indexcontroltable>
+  <indexcontrolblock> <!-- no dictionary in index control block -->
+    <indexname> </indexname>
+    <keyuniversalsize> </keyuniversalsize>
+    <duplicates> </duplicates>
+  </indexcontrolblock>
+...
+  <indexcontrolblock> <!-- no dictionary in index control block -->
+    <indexname> </indexname>
+    <keyuniversalsize> </keyuniversalsize>
+    <duplicates> </duplicates>
+  </indexcontrolblock>
+</indexcontroltable>
+*/
+#ifdef __COMMENT__
+utf8String ZSIndexControlTable::toXml(int pLevel)
+{
+  int wLevel=pLevel;
+  utf8String wReturn;
+  wReturn = fmtXMLnode("indexcontroltable",pLevel);
+  wLevel++;
+
+  for (long wi=0;wi<count();wi++)
+    wReturn+=Tab[wi]->toXml(wLevel);
+
+  wReturn += fmtXMLendnode("indexcontroltable",pLevel);
+  return wReturn;
+} // toXml
+
+ZStatus ZSIndexControlTable::fromXml(zxmlNode* pRootNode, ZaiErrors* pErrorlog)
+{
+  zxmlElement *wRootNode;
+  zxmlNode* wNode;
+  ZSIndexControlBlock wICB;
+  long wIndexRank=0;
+
+  ZStatus wSt = pRootNode->getChildByName((zxmlNode *&) wRootNode, "indexcontroltable");
+  if (wSt != ZS_SUCCESS) {
+    pErrorlog->logZStatus(
+        ZAIES_Error,
+        wSt,
+        "ZSIndexControlTable::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
+        "<%s>",
+        "indexcontroltable",
+        decode_ZStatus(wSt));
+    return ZS_XMLERROR;
+  }
+  ZNodeCollection wNC =  wRootNode->getAllChildren("indexcontrolblock");
+
+  wSt=ZS_SUCCESS;
+  while ((wNC.count() > 0)&&(wSt==ZS_SUCCESS))
+  {
+    wNode=wNC.popR();
+
+    wSt=wICB.fromXml(wNode,pErrorlog);
+    if (wSt==ZS_SUCCESS)
+    {
+      if ((wIndexRank=zsearchCaseIndexByName(wICB.IndexName.toCChar()))>=0)
+        Tab[wIndexRank]->_copyFrom(wICB);
+      else
+        push(new ZSIndexControlBlock(wICB));
+    }
+    XMLderegister(wNode);
+  }// while
+
+  return pErrorlog->hasError()?ZS_XMLERROR:ZS_SUCCESS;
+}//fromXml
+#endif // __COMMENT__
+
+//-----------End ZIndexControlTable --------------------

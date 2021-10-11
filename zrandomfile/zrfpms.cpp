@@ -2,10 +2,41 @@
 
 ZRFPMS::ZRFPMS()
 {
-
+  clear();
 }
 
 //----------ZRFPMS---------------------------------
+
+
+ZRFPMS& ZRFPMS::_copyFrom(const ZRFPMS& pIn)
+{
+  HFHReads=pIn.HFHReads;
+  HFHWrites=pIn.HFHWrites;
+  LockReads=pIn.LockReads;
+  LockWrites=pIn.LockWrites;
+  HReservedReads=pIn.HReservedReads;
+  HReservedWrites=pIn.HReservedWrites;
+  HFDReads=pIn.HFDReads;
+  HFDWrites=pIn.HFDWrites;
+  CBHReads=pIn.CBHReads;
+  CBHReadBytesSize=pIn.CBHReadBytesSize;
+  CBHWrites=pIn.CBHWrites;
+  CBHWriteBytesSize=pIn.CBHWriteBytesSize;
+  UserReads=pIn.UserReads;
+  UserReadSize=pIn.UserReadSize;
+  UserWrites=pIn.UserWrites;
+  UserWriteSize=pIn.UserWriteSize;
+  HighWaterWrites=pIn.HighWaterWrites;
+  HighWaterBytesSize=pIn.HighWaterBytesSize;
+  ExtentWrites=pIn.ExtentWrites;
+  ExtentSize=pIn.ExtentSize;
+  FreeMatches=pIn.FreeMatches;
+  FieldReads=pIn.FieldReads;
+  FieldReadSize=pIn.FieldReadSize;
+  FieldWrites=pIn.FieldWrites;
+  FieldWriteSize=pIn.FieldWriteSize;
+  return *this;
+}
 
 /**
  * @brief ZRFPMS::operator - Operator overload : subtracts two ZRFPMS
@@ -13,7 +44,7 @@ ZRFPMS::ZRFPMS()
  * @return
  */
 ZRFPMS
-ZRFPMS::operator - (ZRFPMS &pPMSIn)
+ZRFPMS::operator - (const ZRFPMS &pPMSIn)
 {
   ZRFPMS wZRFPMS1;
   wZRFPMS1 = *this;
@@ -48,7 +79,7 @@ ZRFPMS::operator - (ZRFPMS &pPMSIn)
  * @return
  */
 ZRFPMS
-ZRFPMS::operator + (ZRFPMS &pPMSIn)
+ZRFPMS::operator + (const ZRFPMS &pPMSIn)
 {
   ZRFPMS wZRFPMS1;
   wZRFPMS1 = *this;

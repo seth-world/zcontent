@@ -19,7 +19,7 @@ class ZHeaderControlBlock_Export
 public:
   uint32_t                StartSign   = cst_ZSTART;       /**< check for block start */
 
-  zlockmask_type              Lock    = ZLock_Nolock ;        /**< Lock mask (int32_t) at file header level (Exclusive lock) @see ZLockMask_type one lock at a time is authorized */
+  zlockmask_type          Lock    = ZLock_Nolock ;        /**< Lock mask (int32_t) at file header level (Exclusive lock) @see ZLockMask_type one lock at a time is authorized */
   pid_t                   LockOwner = 0L;                 /**< Owner process for the lock */
 
   ZBlockID                BlockID     = ZBID_FileHeader;  /**< identification is file header */
@@ -30,6 +30,16 @@ public:
   zsize_type              SizeReserved = 0L;              /**< Size of ZReserved section in file */
 
   uint32_t                EndSign     = cst_ZEND;         /**< check for block end */
+
+  ZHeaderControlBlock_Export()=default;
+  ZHeaderControlBlock_Export(ZHeaderControlBlock_Export& pIn) {_copyFrom(pIn);}
+
+  ZHeaderControlBlock_Export& operator=(ZHeaderControlBlock_Export& pIn) {return _copyFrom(pIn);}
+
+  void _convert();
+
+  ZHeaderControlBlock_Export& _copyFrom(ZHeaderControlBlock_Export& pIn);
+
 };
 #pragma pack(pop)
 /**

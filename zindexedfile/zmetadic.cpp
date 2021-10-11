@@ -4,6 +4,7 @@
 #include <zindexedfile/zmetadic.h>
 
 #include <ztoolset/zutfstrings.h>
+#include <zxml/zxmlprimitives.h>
 
 using namespace zbs;
 
@@ -25,23 +26,16 @@ ZMetaDic::addField (const utf8_t*pFieldName,
 {
     ZFieldDescription wField;
     if (pFieldName==nullptr)
-            wField.Name.clear();
-        else
-        {
-        wField.Name=pFieldName;
-        if (strlen((const char*)pFieldName)>cst_fieldnamelen)
-            {
-            fprintf (stderr,"%s-W-ERRLEN field name <%s> is too long for meta dictionary naming standard.\n"
-                     "Field name truncated to <%s>",
-                     _GET_FUNCTION_NAME_,
-                     pFieldName,
-                     (char*)wField.Name.toUtf());
-            }
-        }
+      {
+      fprintf (stderr,"ZMetaDic::addField-S-NULNAM Severe error field name is null.\n");
+      return ZS_NULLPTR;
+      }
 
-    wField.ZType=pType;
-    wField.HeaderSize = _getURFHeaderSize(wField.ZType);
-    if (wField.ZType&ZType_VaryingLength)
+  wField.setFieldName(pFieldName);
+
+  wField.ZType=pType;
+  wField.HeaderSize = _getURFHeaderSize(wField.ZType);
+  if (wField.ZType&ZType_VaryingLength)
         {
         wField.NaturalSize=0;
         wField.UniversalSize=0;
@@ -221,7 +215,7 @@ ZMetaDic::searchFieldByName(const utf8_t* pFieldName)
             return (zrank_type)-1;
     for (long wi=0;wi<size();wi++)
             {
-        if (Tab[wi].Name==pFieldName)
+      if (Tab[wi].getName()==pFieldName)
 //        if (!strcmp((char*)Tab[wi].Name.content,pFieldName))
                                             return (zrank_type)wi;
             }
@@ -233,6 +227,16 @@ ZMetaDic::searchFieldByName(const utf8_t* pFieldName)
 
     return (zrank_type)-1;
 }//zsearchFieldByName
+
+long ZMetaDic::searchFieldByHash(const md5& pHash)
+{
+  for (long wi=0;wi<size();wi++)
+    {
+    if (Tab[wi].Hash==pHash)
+      return wi;
+    }
+  return -1;
+}
 
 /**
  * @brief ZMetaDic::print Reports the content of ZMetaDic for all fields
@@ -262,7 +266,7 @@ void ZMetaDic ::print (FILE* pOutput)
                  " <%2ld> %25s %12s"
                  " %9ld %9d %9ld %9ld <%s>\n",
                  wi,
-                 (char*)Tab[wi].Name.toCChar(),
+                 Tab[wi].getName().toCChar(),
                  Tab[wi].KeyEligible==true?"Yes":"No",
                  Tab[wi].HeaderSize,
                  Tab[wi].Capacity,
@@ -322,9 +326,11 @@ ZMetaDic::removeFieldByRank (const long pFieldRank)
 ZDataBuffer&
 ZMetaDic::_export(ZDataBuffer& pZDBExport)
 {
-    unsigned char*wBuf=nullptr;
-    size_t wBufSize=0;
-    ZAexportCurrent<ZFieldDescription,FieldDesc_Export>((ZArray <ZFieldDescription>*)this,
+  if (isEmpty())
+    return pZDBExport;
+  unsigned char*wBuf=nullptr;
+  size_t wBufSize=0;
+  ZAexportCurrent<ZFieldDescription,FieldDesc_Export>((ZArray <ZFieldDescription>*)this,
                                                         wBuf,
                                                         wBufSize,
                                                         &ZFieldDescription::_exportConvert);
@@ -338,17 +344,18 @@ ZMetaDic::_export(ZDataBuffer& pZDBExport)
  * @return
  */
 size_t
-ZMetaDic::_import(unsigned char* pZDBImport_Ptr)
+ZMetaDic::_import(unsigned char *&pZDBImport_Ptr)
 {
     ZAExport wZAE;
+    unsigned char * wPtr=pZDBImport_Ptr; /* save pointer to start of imported block (for checksum computation) */
     // import dictionary content
     size_t wSize= ZAimport<FieldDesc_Export,ZFieldDescription>
                         ((ZArray <ZFieldDescription>*)this,
-                         pZDBImport_Ptr,
+                         pZDBImport_Ptr,                      /* input pointer is updated */
                          &ZFieldDescription::_importConvert,
                          &wZAE);
 // get checkSum for meta dictionary and store it
-    ZDataBuffer wZDB(pZDBImport_Ptr,wZAE.FullSize);
+    ZDataBuffer wZDB(wPtr,wZAE.FullSize);
     if (CheckSum!=nullptr)
                 {
                 delete CheckSum;
@@ -380,7 +387,7 @@ ZMetaDic::writeXML(FILE* pOutput)
              "              </Field>\n"
              ,
              wd,
-             Tab[wd].Name.toCChar() ,
+             Tab[wd].getName().toCChar() ,
              Tab[wd].Capacity,
              Tab[wd].HeaderSize,
              Tab[wd].UniversalSize,
@@ -466,6 +473,22 @@ void deleteZMetaDic(void* pMetaDic)
 }//deleteZMetaDic
 
 
+/*
+  <metadic>
+    <dicfields>   <!-- dicfields is required for future use in case of adding parameters to metadic -->
+      <field>
+        <name>%s</name>
+        <capacity>%d</capacity> <!-- if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+        <headersize>%ld</headersize>
+        <naturalsize>%ld</naturalsize>
+        <universalsize>%ld</universalsize>
+        <ztype>%s</ztype>   <!-- see ZType_type definition : converted to its value number -->
+        <hash>%s</hash>
+      </field>
+    </dicfields>
+  </metadic>
+*/
+
 utf8String ZMetaDic::toXml(int pLevel)
 {
   int wLevel=pLevel;
@@ -473,28 +496,24 @@ utf8String ZMetaDic::toXml(int pLevel)
   ZDataBuffer wB64;
   wReturn = fmtXMLnode("metadic",pLevel);
   wLevel++;
- /* if (CheckSum!=nullptr)
-      {
-      wB64.setCheckSum(*CheckSum);
-      wB64.encryptB64();
-      wReturn+=fmtXMLchar("checksum",wB64.DataChar,wLevel);
-      }
-      else
-      wReturn+=fmtXMLchar("checksum","none",wLevel);
-*/
-  wReturn = fmtXMLnode("dicfields",wLevel);
-  /* key fields */
-  for (long wi=0;wi < count();wi++)
-    wReturn += Tab[wi].toXml(wLevel+1);
-  wReturn = fmtXMLendnode("dicfields",wLevel);
 
+  wReturn += fmtXMLchar("dicname",DicName.toCChar(),wLevel);
+
+  wReturn += fmtXMLnode("dicfields",wLevel);
+  /* key fields */
+  wLevel++;
+  for (long wi=0;wi < count();wi++)
+    wReturn += Tab[wi].toXml(wLevel);
+  wLevel--;
+  wReturn += fmtXMLendnode("dicfields",wLevel);
   wReturn += fmtXMLendnode("metadic",pLevel);
+
   return wReturn;
 } // ZMetaDic::toXml
 
-int ZMetaDic::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog)
+ZStatus ZMetaDic::fromXml(zxmlNode* pDicRootNode, ZaiErrors* pErrorlog,ZaiE_Severity pSeverity)
 {
-  zxmlElement *wRootNode=nullptr;
+  zxmlElement *wMetaDicNode=nullptr;
   zxmlElement *wFieldsRootNode=nullptr;
   zxmlElement *wSingleFieldNode=nullptr;
   zxmlElement *wSwapNode=nullptr;
@@ -502,47 +521,65 @@ int ZMetaDic::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog)
   ZFieldDescription wFD;
   utf8String wValue;
   utfcodeString wCValue;
-  bool wBool;
-  unsigned int wInt;
-  ZStatus wSt = pIndexRankNode->getChildByName((zxmlNode *&) wRootNode, "keydictionary");
-  if (wSt != ZS_SUCCESS) {
-    pErrorlog->logZStatus(
-        ZAIES_Error,
-        wSt,
-        "ZMetaDic::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
-        "<%s>",
-        "keydictionary",
-        decode_ZStatus(wSt));
-    return -1;
-  }
+  int wErroredFields=0;
 
-  wSt=wRootNode->getChildByName((zxmlNode*&)wFieldsRootNode,"dicfields");
+  ZStatus wSt = pDicRootNode->getChildByName((zxmlNode *&) wMetaDicNode, "metadic");
+  if (wSt != ZS_SUCCESS)
+    {
+    pErrorlog->logZStatus(pSeverity,
+                          ZS_XMLINVROOTNAME,
+                          "ZMetaDic::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
+                          "metadic",
+                          decode_ZStatus(ZS_XMLINVROOTNAME));
+    return wSt;
+    }
+
+  if (XMLgetChildText(wMetaDicNode,"dicname",DicName,pErrorlog,ZAIES_Warning) <0)
+    {
+    pErrorlog->logZStatus(ZAIES_Warning,
+        ZS_XMLWARNING,
+        "ZMetaDic::fromXml-W-CNTFINDND Error cannot find node element with name <%s>. Dictionary name will stay empty,",
+        "dicname");
+    DicName.clear();
+    }
+
+
+  wSt=wMetaDicNode->getChildByName((zxmlNode*&)wFieldsRootNode,"dicfields");
   if (wSt!=ZS_SUCCESS)
   {
-    pErrorlog->logZStatus(
-        ZAIES_Error,
-        wSt,
-        "ZMetaDic::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
-        "<%s>",
-        "dicfields",
-        decode_ZStatus(wSt));
-    return -1;
+    pErrorlog->logZStatus(pSeverity,
+                          ZS_XMLMISSREQ,
+                          "ZMetaDic::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
+                          "dicfields",
+                          decode_ZStatus(wSt));
+    return ZS_XMLMISSREQ;
   }
 
   wSt=wFieldsRootNode->getFirstChild((zxmlNode*&)wSingleFieldNode);
-  long wi=0;
+
   clear();  /* clear dictionary definitions */
   while (wSt==ZS_SUCCESS)
-  {
+    {
     wFD.clear();
     if (wFD.fromXml(wSingleFieldNode,pErrorlog)==0)
       push(wFD);
+    else
+      wErroredFields ++;
+
     wSt=wSingleFieldNode->getNextNode((zxmlNode*&)wSwapNode);
     XMLderegister(wSingleFieldNode);
     wSingleFieldNode=wSwapNode;
-  }
-  XMLderegister(wRootNode);
-  return (int)pErrorlog->hasError();
+    }
+  pErrorlog->textLog("ZMetaDic::fromXml___________Field definitions load report____________________\n"
+                     " Dictionary name %s.\n"
+                     " %ld loaded.\n"
+                     " %d errored and not loaded.",
+                      DicName.isEmpty()?"<no name>":DicName.toCChar(),
+                      count(),
+                      wErroredFields);
+  XMLderegister(wMetaDicNode);
+  XMLderegister(wFieldsRootNode);
+  return pErrorlog->hasError()?ZS_XMLERROR:ZS_SUCCESS;
 }//ZMetaDic::fromXml
 
 

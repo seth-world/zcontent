@@ -5,6 +5,7 @@
 #include <zrandomfile/zrandomfile.h>
 #include <ztoolset/zbasedatatypes.h>
 #include <znet/zbasenet/znetcommon.h>
+#include <ztoolset/userid.h>
 
 #define __JOURNAL_EXT__                 "jnl"
 #define __JOURNAL_ENDOFFILEPATH__       "_jnl.jnl"
@@ -107,8 +108,8 @@ public:
     ZJEvent(void) {}
     ZJEvent (const ZJOperation             pOperation,
              pid_t                  pPid,
-             ZUserId                pUid,
-             utfdescString             pUsername,
+             ZSystemUserId          pUid,
+             utfdescString          pUsername,
              ZDataBuffer            &pRecord,
              const zrank_type       pRank,
              const zaddress_type    pAddress,

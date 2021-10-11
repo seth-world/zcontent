@@ -1,31 +1,67 @@
 #include "zkeydictionary.h"
 
+#include <zindexedfile/zmetadic.h>
+#include <zxml/zxmlprimitives.h>
+
+using namespace zbs;
+
 ZSKeyDictionary::ZSKeyDictionary(ZMetaDic*pMDic)
 {
 MetaDic=pMDic;
 }
+ZSKeyDictionary::ZSKeyDictionary(ZSKeyDictionary* pIn)
+{
+  _copyFrom(*pIn);
+}
+ZSKeyDictionary::ZSKeyDictionary(ZSKeyDictionary& pIn)
+{
+  _copyFrom(pIn);
+}
+
+ZTypeBase ZSKeyDictionary::getType(const long pKFieldRank)
+{
+  long wRank =Tab[pKFieldRank].MDicRank;
+  return (MetaDic->Tab[wRank].ZType);
+}
+uint64_t ZSKeyDictionary::getUniversalSize(const long pKFieldRank)
+{
+  long wRank =Tab[pKFieldRank].MDicRank;
+  return (MetaDic->Tab[wRank].UniversalSize);
+}
+uint64_t ZSKeyDictionary::getNaturalSize(const long pKFieldRank)
+{
+  long wRank =Tab[pKFieldRank].MDicRank;
+  return (MetaDic->Tab[wRank].NaturalSize);
+}
+uint32_t ZSKeyDictionary::computeKeyUniversalSize()
+{
+  uint64_t wUSize=0;
+  for (long wi = 0; wi < count(); wi++)
+            wUSize += getUniversalSize(wi);
+  return uint32_t(wUSize);
+}
 
 /** @cond Development
- * @brief CZKeyDictionary::_reComputeSize computes the total sizes : Natural size and Internal size for the whole key
+ * @brief ZSKeyDictionary::_reComputeSize computes Universal key size for the index key. Returns computed size.
  */
-void
-ZSKeyDictionary::_reComputeSize (void)
+uint32_t
+ZSKeyDictionary::_reComputeKeySize (void)
 {
-  KeyNaturalSize=0;
-  KeyUniversalSize=0;
+//  KeyNaturalSize=0;
+  uint32_t wKeyUniversalSize=0;
 
   for (long wi=0;wi<size(); wi++)
   { // only ZKDic at record level may be a certain value for field sizes
-    Tab[wi].KeyOffset= KeyUniversalSize;
+    Tab[wi].KeyOffset= wKeyUniversalSize;
 
-    KeyNaturalSize +=(size_t) getNaturalSize(wi) ;
-    KeyUniversalSize += (size_t)getUniversalSize(wi) ;
+//    KeyNaturalSize +=(size_t) getNaturalSize(wi) ; don't care about natural size
+    wKeyUniversalSize += (uint32_t)getUniversalSize(wi) ;
 
     /*KeyNaturalSize += Tab[wi].NaturalSize;
                 KeyUniversalSize += Tab[wi].UniversalSize;*/
   }
   Recomputed=true;
-  return;
+  return wKeyUniversalSize;
 }// _reComputeSize
 
 #ifdef __COMMENT__
@@ -45,7 +81,7 @@ ssize_t ZSKeyDictionary ::fieldRecordOffset (const long pRank)
 /**
  * @brief CZKeyDictionary::zremoveField removes a field which name corresponds to pFieldName from the current key dictionary
  * @param[in] pFieldName user name for the field to be removed from dictionary
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
+ * @return  a ZStatunamespace zbss. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
 ZSKeyDictionary::zremoveField (const char *pFieldName)
@@ -57,7 +93,7 @@ ZSKeyDictionary::zremoveField (const char *pFieldName)
 
   erase(wRank);
   _reComputeSize();
-  return ZS_SUCCESS;
+  return ZS_SUCCESS;namespace zbs
 }//zremoveField
 
 /**
@@ -66,7 +102,7 @@ ZSKeyDictionary::zremoveField (const char *pFieldName)
  * @param[in] pZKD       a ZKeyDic_type describing the attribute to modify
  * @param[in] pValue     Key field attribute value
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
+ */namespace zbs
 ZStatus
 ZSKeyDictionary::zsetField (const long pFieldRank,ZKeyDic_type pZKD,auto pValue)
 {
@@ -129,60 +165,111 @@ ZSKeyDictionary::zsetField (const long pFieldRank,ZKeyDic_type pZKD,auto pValue)
 #endif // __COMMENT__
 
 ZDataBuffer&
-ZSKeyDictionary::_export(ZDataBuffer& pZDBExport)
+ZSKeyDictionary::_exportAppend(ZDataBuffer& pZDBExport)
 {
-  ZDataBuffer wZDB;       // exporting each rank of dictionnary : each field definition
-  /*size_t wSize=_reverseByteOrder_T<size_t>(KDicSize);
+// exporting each rank of dictionnary : each field definition
 
-  pZDBExport.setData(&wSize,sizeof(wSize)); // reserve a size_t first (DicSize) and disregard the other values (computed)
-
-  for (long wi=0;wi<size();wi++)
-  {
-    pZDBExport.appendData(Tab[wi]._export(wZDB));
-  }
-  */
-      unsigned char* wBuffer;
+  unsigned char* wBuffer;
   size_t wBufferSize;
   ZAexportCurrent((_Base*)this,
       wBuffer,
       wBufferSize,
       &ZSIndexField::_exportConvert);
-  pZDBExport.setData(wBuffer,wBufferSize);
+  pZDBExport.appendData(wBuffer,wBufferSize);
   free(wBuffer);
   return pZDBExport;
 }
+ZDataBuffer
+ZSKeyDictionary::_export()
+{
+  // exporting each rank of dictionnary : each field definition
+  ZDataBuffer wZDB;
+  return _exportAppend(wZDB);
+}
 size_t
-ZSKeyDictionary::_import(unsigned char* pZDBImport_Ptr)
+ZSKeyDictionary::_import(unsigned char* &pZDBImport_Ptr)
 {
   size_t wDicSize=ZAimport((_Base*)this,
-      pZDBImport_Ptr,
-      &ZSIndexField::_importConvert);
+                          pZDBImport_Ptr,                   /* pointer is updated */
+                          &ZSIndexField::_importConvert);
 
-  _reComputeSize();
+  _reComputeKeySize();
+
   return wDicSize;
 }
 
-utf8String ZSKeyDictionary::toXml(int pLevel)
+/*
+ *    Key dictionary schema for one index key
+ *
+  <key>
+    <rank>n</rank>
+    <indexname> </indexname>  <!-- link to index control block indexname field -_>
+    <keyfields>
+      <field>
+        <fieldrank>n<fieldrank>
+                <name>name of the field from meta dic</name> <--! from metadic -->
+                <ztype> </ztype> <--! from meta dic not used -->
+                <universalsize> </universalsize>  <--! from meta dic not used -->
+                <mdicrank> </mdicrank>
+                <hash>hhhhhhhhhh</hash> <--! hexa value -->
+      </field>
+      <field>
+                <name>name of the field from meta dic</name> <--! from metadic -->
+                <ztype> </ztype> <--! from meta dic not used -->
+                <universalsize> </universalsize>  <--! from meta dic not used -->
+                <mdicrank> </mdicrank>
+                <hash>hhhhhhhhhh</hash> <--! hexa value -->
+      </field>
+    </keyfields>
+  </key>
+
+ */
+
+utf8String ZSKeyDictionary::toXml(int pLevel,int pRank, bool pComment)
 {
   int wLevel=pLevel;
   utf8String wReturn;
-  wReturn = fmtXMLnode("keydictionary",pLevel);
+  wReturn = fmtXMLnode("key",pLevel);
   wLevel++;
-  wReturn+=fmtXMLuint64("kdicsize",KDicSize,wLevel);
-  wReturn+=fmtXMLuint64("keynaturalsize",KeyNaturalSize,wLevel);
-  wReturn+=fmtXMLuint64("keyuniversalsize",KeyUniversalSize,wLevel);
+//  wReturn+=fmtXMLuint64("kdicsize",KDicSize,wLevel);    // KDicSize is export size : dont care
+//  wReturn+=fmtXMLuint64("keynaturalsize",KeyNaturalSize,wLevel);
+//  wReturn+=fmtXMLuint64("keyuniversalsize",KeyUniversalSize,wLevel);  // KeyUniversalSize is stored within ICB
 
-  wReturn = fmtXMLnode("keyfields",wLevel);
+  wReturn += fmtXMLchar("indexname",IndexName.toCChar(), wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn," link to index control block indexname field ");
+
+  wReturn += fmtXMLnode("keyfields",wLevel);
   /* key fields */
   for (long wi=0;wi < count();wi++)
-    wReturn += Tab[wi].toXml(wLevel+1);
-  wReturn = fmtXMLendnode("keyfields",wLevel);
+    {
+    wReturn += fmtXMLnode("field",wLevel+1);
+    /* dump values from ZIndexField */
+    wReturn +=fmtXMLlong("mdicrank",Tab[wi].MDicRank,wLevel+2);
+    wReturn +=fmtXMLmd5("hash",Tab[wi].Hash,wLevel+2);
+    wReturn +=fmtXMLuint32("keyoffset",Tab[wi].KeyOffset,wLevel+2);
 
-  wReturn += fmtXMLendnode("keydictionary",pLevel);
+    /* get infos from mdic concerning this field (not required) */
+    if (pComment)
+      wReturn += fmtXMLcomment(" hereafter optional fields from MetaDic describing key field ",wLevel+2);
+    long wI = Tab[wi].MDicRank;
+    wReturn +=fmtXMLchar("name",MetaDic->Tab[wI].getName().toCChar(),wLevel+2);
+    wReturn +=fmtXMLuint32("ztype",MetaDic->Tab[wI].ZType,wLevel+2);    /* ZTypeBase = uint32_t*/
+    utf8String wZTStr;
+    wZTStr.sprintf(" ZType_type <%s> converted to its value number",decode_ZType(MetaDic->Tab[wI].ZType));
+    fmtXMLaddInlineComment(wReturn,wZTStr.toCChar());
+    wReturn +=fmtXMLuint64("universalsize",MetaDic->Tab[wI].UniversalSize,wLevel+2);
+
+    wReturn += fmtXMLendnode("field",wLevel+1);
+    }
+
+  wReturn += fmtXMLendnode("keyfields",wLevel);
+
+  wReturn += fmtXMLendnode("key",pLevel);
   return wReturn;
 } // ZSKeyDictionary::toXml
 
-int ZSKeyDictionary::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog)
+ZStatus ZSKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
 {
   zxmlElement *wRootNode=nullptr;
   zxmlElement *wFieldsRootNode=nullptr;
@@ -194,56 +281,96 @@ int ZSKeyDictionary::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog)
   ZSIndexField wIFld;
   bool wBool;
   unsigned int wInt;
-  ZStatus wSt = pIndexRankNode->getChildByName((zxmlNode *&) wRootNode, "keydictionary");
+
+  ZStatus wSt = pKeyDicNode->getChildByName((zxmlNode *&) wRootNode, "keydictionary");
   if (wSt != ZS_SUCCESS) {
     pErrorlog->logZStatus(
         ZAIES_Error,
         wSt,
-        "ZSKeyDictionary::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
-        "<%s>",
+        "ZSKeyDictionary::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
         "keydictionary",
         decode_ZStatus(wSt));
-    return -1;
-  }
-  if (XMLgetChildULong(wRootNode, "kdicsize", KDicSize, pErrorlog)< 0) {
-    fprintf(stderr,
-        "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-        "default.",
-        "kdicsize");
-  }
-  if (XMLgetChildULong(wRootNode, "keynaturalsize", KeyNaturalSize, pErrorlog)< 0) {
-    fprintf(stderr,
-        "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-        "default.",
-        "keynaturalsize");
-  }
-  if (XMLgetChildULong(wRootNode, "keyuniversalsize", KeyUniversalSize, pErrorlog)< 0) {
-    fprintf(stderr,
-        "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
-        "default.",
-        "keyuniversalsize");
-  }
+    return wSt;
+    }
 
-  wSt=wRootNode->getChildByName((zxmlNode*&)wFieldsRootNode,"keyfields");
-  if (wSt!=ZS_SUCCESS)
-  {
-    pErrorlog->errorLog("ZSKeyDictionary::fromXml-E-NDNTFND Node <keyfields> not found.");
-    return -1;
-  }
-  clear(); /* reset all index field definitions */
-  wSt=wFieldsRootNode->getFirstChild((zxmlNode*&)wSingleFieldNode);
-  long wi=0;
-  while (wSt==ZS_SUCCESS)
-  {
-    wIFld.clear();
-    if (wIFld.fromXml(wSingleFieldNode,pErrorlog)==0)
-      push(wIFld);
-    wSt=wSingleFieldNode->getNextNode((zxmlNode*&)wSwapNode);
-    XMLderegister(wSingleFieldNode);
-    wSingleFieldNode=wSwapNode;
-  }
+    if (XMLgetChildText(wSingleFieldNode,"indexname",IndexName,pErrorlog,ZAIES_Error)<0)
+      {
+      pErrorlog->logZStatus(ZAIES_Error, ZS_XMLMISSREQ,"ZSKeyDictionary::fromXml-E-MISSREQFLD Missing mandatory field <indexname>");
+      return ZS_XMLMISSREQ;
+      }
+
+
+
+    wSt = wRootNode->getChildByName((zxmlNode *&) wFieldsRootNode, "keyfields");
+    if (wSt != ZS_SUCCESS) {
+      pErrorlog->logZStatus(
+          ZAIES_Error,
+          wSt,
+          "ZSKeyDictionary::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
+          "<%s>",
+          "keyfields",
+          decode_ZStatus(wSt));
+      return wSt;
+    }
+    wSt=wFieldsRootNode->getFirstChildElement(wSwapNode);
+
+    while (wSt==ZS_SUCCESS)
+      {
+      utf8String wName;
+      wSingleFieldNode=wSwapNode;
+      if (wSingleFieldNode->getName()=="field")
+        {
+        wIFld.clear();
+        XMLgetChildMd5(wSingleFieldNode,"hash",wIFld.Hash,pErrorlog,ZAIES_Error);
+        XMLgetChildUInt(wSingleFieldNode,"keyoffset",wIFld.KeyOffset,pErrorlog,ZAIES_Error);
+        /* search within Meta Dic for hash code */
+        bool wF=false;
+        for (long wi=0;wi < MetaDic->count();wi++)
+          {
+          if (MetaDic->Tab[wi].Hash==wIFld.Hash)
+            {
+            wF=true;
+            wIFld.MDicRank=uint32_t(wi);
+            break;
+            }
+          }//for
+
+          if (!wF) /* hash not successfull :try by name */
+          {
+            XMLgetChildText(wSingleFieldNode,"name",wName,pErrorlog,ZAIES_Error);
+            for (long wi=0;wi < MetaDic->count();wi++)
+            {
+              if (MetaDic->Tab[wi].getName()==wName)
+              {
+                wF=true;
+                wIFld.MDicRank=uint32_t(wi);
+                break;
+              }
+            }//for
+          }
+
+          if (!wF) /* name not successfull : error */
+          {
+            XMLgetChildUInt(wSingleFieldNode,"mdicrank",wIFld.MDicRank,pErrorlog,ZAIES_Error);
+            pErrorlog->logZStatus(ZAIES_Error,ZS_NOTFOUND,
+                "ZSKeyDictionary::fromXml-E-NTFND Key field name <%s> hash <%s> declared meta dic rank <%s> has not been found within meta dictionary",
+                wName.toCChar(),
+                wIFld.Hash.toHexa().toChar(),
+                wIFld.MDicRank);
+          }
+          else
+            push(wIFld);
+
+        }//if (wSingleFieldNode->getName()=="field")
+
+      wSwapNode=nullptr;
+      wSt=wSingleFieldNode->getNextElementSibling(wSwapNode);
+      XMLderegister(wSingleFieldNode);
+      wSingleFieldNode=wSwapNode;
+      }//while (wSt==ZS_SUCCESS)
+
   XMLderegister(wRootNode);
-  return (int)pErrorlog->hasError();
+  return pErrorlog->hasError()?ZS_XMLERROR:ZS_SUCCESS;
 }//ZSKeyDictionary::fromXml
 
 
@@ -260,7 +387,7 @@ ZSKeyDictionary::zsearchFieldByName(const utf8_t *pFieldName) const
   for (long wi=0;wi<size();wi++)
   {
     wMDicRank= Tab[wi].MDicRank;
-    if (MetaDic->Tab[wMDicRank].Name==pFieldName)
+    if (MetaDic->Tab[wMDicRank].getName()==pFieldName)
       return wi;
   }
   return -1;
@@ -278,7 +405,7 @@ ZSKeyDictionary::zsearchFieldByName(const utf8String &pFieldName) const
   for (long wi=0;wi<size();wi++)
   {
     wMDicRank= Tab[wi].MDicRank;
-    if (MetaDic->Tab[wMDicRank].Name==pFieldName)
+    if (MetaDic->Tab[wMDicRank].getName()==pFieldName)
       return wi;
   }
   return -1;
@@ -327,26 +454,56 @@ void ZSKeyDictionary ::print (FILE* pOutput)
   return;
 }
 #endif // __COMMENT__
-/**
- * @brief CZKeyDictionary::fieldKeyOffset this routine gives the offset from the beginning of the Key record for the field at Key Dictionary rank pRank.
- * @param[in] pRank relative position (rank) of the field within key dictionary
- * @return the offset from the beginning of the Key for the field at Key Dictionary rank pRank. Returns -1 if field rank is out of dictionary boundaries.
- */
-ssize_t ZSKeyDictionary ::fieldKeyOffset (const long pRank)
+
+ZSKeyDictionary& ZSKeyDictionary ::_copyFrom( ZSKeyDictionary& pIn)
+{
+ // KDicSize=pIn.KDicSize;
+//  KeyNaturalSize=pIn.KeyNaturalSize;
+//  KeyUniversalSize=pIn.KeyUniversalSize;
+  Recomputed=pIn.Recomputed;
+  Status = pIn.Status;
+  MetaDic=pIn.MetaDic;
+  _Base::_copyFrom(pIn);
+  return *this;
+} //fieldOffset
+
+bool ZSKeyDictionary ::hasSameContentAs(ZSKeyDictionary*pKey)
+{
+  if (count()!=pKey->count())
+    return false;
+
+  for (long wi=0;wi<count();wi++)
+    {
+    long wMDicRank= Tab[wi].MDicRank;
+    long wMDicRankIn= pKey->Tab[wi].MDicRank;
+    if (MetaDic->Tab[wMDicRank].ZType!=pKey->MetaDic->Tab[wMDicRankIn].ZType)
+      return false;
+    if (MetaDic->Tab[wMDicRank].UniversalSize!=pKey->MetaDic->Tab[wMDicRankIn].UniversalSize)
+      return false;
+    if (MetaDic->Tab[wMDicRank].Capacity!=pKey->MetaDic->Tab[wMDicRankIn].Capacity)
+      return false;
+    if (Tab[wi].KeyOffset!=pKey->Tab[wi].KeyOffset)
+      return false;
+    }
+  return true;
+}
+
+
+uint32_t ZSKeyDictionary::computeKeyOffsets()
 {
   // compute offset of requested Field within Key
 
-  ssize_t wKeyOffset = 0;
+  uint32_t wKeyOffset = 0;
+  long wi=0;
 
-  for (long wi=0;wi<size();wi++)
-  {
-    if (wi==pRank)
-      return wKeyOffset;
-    wKeyOffset += Tab[wi].UniversalSize; // KeySize contains the overall size of data field stored in key whatever its type could be
-  } // for
-  return (-1); // pRank is out of dictionary boundaries
-} //fieldOffset
-
+  while (wi < count())
+    {
+    Tab[wi].KeyOffset=wKeyOffset;
+    wKeyOffset += MetaDic->Tab[Tab[wi].MDicRank].UniversalSize;
+    wi++;
+    }
+  return wKeyOffset;  // computed key size
+} //computeKeyOffsets
 
 ZStatus
 ZSKeyDictionary::addFieldToZDicByName (const utf8_t* pFieldName)
@@ -367,11 +524,10 @@ ZSKeyDictionary::addFieldToZDicByName (const utf8_t* pFieldName)
 ZStatus
 ZSKeyDictionary::addFieldToZDicByRank (const zrank_type pMDicRank)
 {
-
   ZSIndexField wField;
   if (MetaDic==nullptr)
   {
-    return ZS_INVVALUE;
+    return ZS_NULLPTR;
   }
   if ((pMDicRank>=MetaDic->size())||(pMDicRank<0))
   {
@@ -382,23 +538,27 @@ ZSKeyDictionary::addFieldToZDicByRank (const zrank_type pMDicRank)
         pMDicRank);
     return ZS_OUTBOUND;
   }
-  if (!MetaDic->Tab[pMDicRank].KeyEligible)
-  {
 
+  if (!MetaDic->Tab[pMDicRank].KeyEligible)
+    if (!isKeyEligible( MetaDic->Tab[pMDicRank].ZType))
+    {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_INVINDEX,
         Severity_Error,
         "Field rank <%ld> <%s> is not eligible to be a key field",
         pMDicRank,
-        MetaDic->Tab[pMDicRank].Name.toCChar());
-    return ZS_INVINDEX;
-  }
-  wField.ZType=MetaDic->Tab[pMDicRank].ZType;
+        MetaDic->Tab[pMDicRank].getName().toCChar());
+    return ZS_INVTYPE;
+    }
+/*  wField.ZType=MetaDic->Tab[pMDicRank].ZType;
   wField.UniversalSize=MetaDic->Tab[pMDicRank].UniversalSize;
   wField.NaturalSize=MetaDic->Tab[pMDicRank].NaturalSize;
-  wField.ArrayCount=MetaDic->Tab[pMDicRank].Capacity;
+  wField.ArrayCount=MetaDic->Tab[pMDicRank].Capacity;*/
   wField.MDicRank = pMDicRank;
+  wField.Hash = MetaDic->Tab[pMDicRank].Hash ;
+  /* KeyOffset is left to Zero */
   push(wField);
+  computeKeyOffsets();
   Recomputed=false;
   return ZS_SUCCESS;
 }// addFieldToZDicByRank

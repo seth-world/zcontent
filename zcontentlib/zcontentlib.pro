@@ -222,22 +222,33 @@ HEADERS += \
     ../zcontentcommon/zresource.h \
     ../zcontentcommon/zresult.h \
     ../zcontentcommon/zresult.h \
-    ../zfielddescription.h \
     ../zindexedfile/zdatatype.h \
+    ../zindexedfile/zfielddescription.h \
+    ../zindexedfile/zfullindexfield.h \
     ../zindexedfile/zindexcontrolblock.h \
+    ../zindexedfile/zindexdata.h \
     ../zindexedfile/zindexfield.h \
     ../zindexedfile/zkeydictionary.h \
     ../zindexedfile/zmasterfile_utilities.h \
+    ../zindexedfile/zmasterfiletype.h \
     ../zindexedfile/zmetadic.h \
     ../zindexedfile/zmf_limits.h \
+    ../zindexedfile/zmfdictionary.h \
+    ../zindexedfile/zmfstats.h \
     ../zindexedfile/znaturalfromurf.h \
+    ../zindexedfile/zrawindexfile.h \
+    ../zindexedfile/zrawmasterfile.h \
+    ../zindexedfile/zrawrecord.h \
     ../zindexedfile/zrecord.h \
 #    ../zindexedfile/zsifgeneric.h \
     ../zindexedfile/zsindexcollection.h \
     ../zindexedfile/zsindexfile.h \
+    ../zindexedfile/zsindexitem.h \
     ../zindexedfile/zsindextype.h \
     ../zindexedfile/zsjournal.h \
+    ../zindexedfile/zsjournalcontrolblock.h \
     ../zindexedfile/zskey.h \
+    ../zindexedfile/zsmastercontrolblock.h \
     ../zindexedfile/zsmasterfile.h \
     ../zindexedfile/zurffromnatural.h \
     ../zrandomfile/zblock.h \
@@ -331,20 +342,29 @@ SOURCES += \
     ../zcontentcommon/zoperation.cpp \
     ../zcontentcommon/zresource.cpp \
     ../zcontentcommon/zresult.cpp \
-    ../zfielddescription.cpp \
     ../zindexedfile/zdatatype.cpp \
+    ../zindexedfile/zfielddescription.cpp \
+    ../zindexedfile/zfullindexfield.cpp \
     ../zindexedfile/zindexcontrolblock.cpp \
     ../zindexedfile/zindexfield.cpp \
     ../zindexedfile/zkeydictionary.cpp \
     ../zindexedfile/zmasterfile_utilities.cpp \
     ../zindexedfile/zmetadic.cpp \
+    ../zindexedfile/zmfdictionary.cpp \
+    ../zindexedfile/zmfstats.cpp \
     ../zindexedfile/znaturalfromurf.cpp \
+    ../zindexedfile/zrawindexfile.cpp \
+    ../zindexedfile/zrawmasterfile.cpp \
+    ../zindexedfile/zrawrecord.cpp \
     ../zindexedfile/zrecord.cpp \
     ../zindexedfile/zsindexcollection.cpp \
     ../zindexedfile/zsindexfile.cpp \
+    ../zindexedfile/zsindexitem.cpp \
     ../zindexedfile/zsindextype.cpp \
     ../zindexedfile/zsjournal.cpp \
+    ../zindexedfile/zsjournalcontrolblock.cpp \
     ../zindexedfile/zskey.cpp \
+    ../zindexedfile/zsmastercontrolblock.cpp \
     ../zindexedfile/zsmasterfile.cpp \
     ../zindexedfile/zurffromnatural.cpp \
     ../zrandomfile/zblock.cpp \

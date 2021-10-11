@@ -39,8 +39,8 @@ public:
  */
 #pragma pack(push)
 #pragma pack(0)         // no memory alignment
-    Resourceid_type id = cst_ResourceInvalid;
     ZEntity_type Entity = cst_EntityInvalid; /* entity type : defined by application */
+    Resourceid_type id = cst_ResourceInvalid;
 #pragma pack(pop) // end no memory alignment
 
  //   DataRank_type DataRank = -1; /* reference to data rank (either ZAM rank or MasterFile rank */
@@ -162,9 +162,27 @@ public:
     /** @brief  toFullKey() gets ZResource::Entity+ZResource::id (int this order) converted to universal format */
     ZDataBuffer toFullKey();
 
+    unsigned char* _export(unsigned char*& pBuffer,size_t & pSize) const;
     ZDataBuffer _export() const;
     /** @brief _import imports from serialized data pUniversalPtr. Updates pointer to first byte after imported data*/
     size_t      _import(unsigned char* &pUniversalPtr);
+
+    /**
+     * @brief _exportURF
+     *  URF format for ZResource :  size if fixed and known
+     *
+     *  <ZType_Resource>
+     *  <ZEntity_type>
+     *  <Resourceid_type>
+     *
+     * @param pBuffer
+     * @param pSize
+     * @return
+     */
+    unsigned char* _exportURF(unsigned char*& pBuffer,size_t & pSize) const;
+    ZDataBuffer *_exportURF(ZDataBuffer *pReturn) const;
+    /** @brief _import imports from serialized data pUniversalPtr. Updates pointer to first byte after imported data*/
+    ssize_t      _importURF(unsigned char* &pUniversalPtr);
 };
 
 #endif // ZRESOURCE_H

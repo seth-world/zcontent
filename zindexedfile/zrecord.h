@@ -1,6 +1,8 @@
 #ifndef ZRECORD_H
 #define ZRECORD_H
 
+#include <stdlib.h> //for atexit()
+
 #include <zindexedfile/zmfconfig.h>
 #include <ztoolset/zerror.h>
 #include <zindexedfile/zmetadic.h>
@@ -10,7 +12,10 @@
 #include <zindexedfile/znaturalfromurf.h>
 #include <zxml/zxml.h>
 
-#include <stdlib.h> //for atexit()
+#include <zindexedfile/zsindexfile.h>
+
+#include <zindexedfile/zrawrecord.h>
+#include <zindexedfile/zmfdictionary.h>
 
 namespace zbs {
 /** @addtogroup ZSMASTERFILEGROUP @{
@@ -21,7 +26,7 @@ namespace zbs {
  *
 @verbatim
 
-            +---------+                                                 |           Physical record
+            +---------+                                                 |           Physical record (Universal values)
             |         |                                                 +---------------------------------------------->
             |         |                                                  /                       ^
             | MetaDic | ----------------------------------------+      zget                      |
@@ -73,7 +78,7 @@ struct recordFieldDesc_struct : public _RDicFieldBase
     }
 };
 
-
+class ZMFDictionary;
 /**
  * @brief The ZRecordDic class Record dictionary
  * According the fact that each record may have varying sized field and that fields may be present or not record per record,
@@ -84,25 +89,24 @@ class ZRecordDic : public ZArray <recordFieldDesc_struct>
 public:
 int64_t TotalRecordSize=0;
 
-    ZRecordDic(ZMetaDic* pMetaDic);
+    ZRecordDic(ZMFDictionary* pMasterDic);
     ~ZRecordDic();
 
-    long getFieldByName(const char*pName);
+    long getFieldByName(const char*pName) const;
 //    ZType_type getType(const long pRank) {return Tab[pRank].ZType;}
 
     void reset(void);
     bool testCheckSum(void)
     {
-        if (MetaDic==nullptr)
+        if (MasterDic==nullptr)
                 return false;
-        if (memcmp(CheckSum->content,MetaDic->CheckSum->content,sizeof(CheckSum->content)))
+        if (memcmp(CheckSum->content,MasterDic->CheckSum->content,sizeof(CheckSum->content)))
                         return false;
         return true;
     }
 
-
-    ZMetaDic*   MetaDic=nullptr;
-    checkSum *CheckSum=nullptr;
+    ZMFDictionary   *MasterDic=nullptr;
+    checkSum        *CheckSum=nullptr;
 };
 
 
@@ -148,7 +152,7 @@ int64_t TotalRecordSize=0;
                |  |   |   +-------> Data : content
                |  |   |   |
 Fixed string|----|--|--|-------->
-
+            0    4  6  8
      Varying string
 
                +----------------------> ZType_type (ZTypeBase-uint32_t)
@@ -168,6 +172,19 @@ Varying Strg|----|--------|---------->
                |      |      |
     ByteSeq |----|--------|---------->
             0    4        12
+
+
+known fixed classes : Ex ZResource -
+Known classes have a defined, known fixed size
+                                                                                            derived           derived
+
+          +----------------------> ZType_type (ZTypeBase-uint32_t)
+          |
+          |      +--------> Data (fields in UVF format)
+          |      |
+class  |----|---------->
+       0    4
+
 
 */
 
@@ -190,24 +207,20 @@ Varying Strg|----|--------|---------->
  *
  *
  */
+class ZSMasterControlBlock;
 
-class ZRecord : public ZDataBuffer
+class ZRecord : public ZRawRecord
 {
 public:
-    typedef ZDataBuffer _Base;
-
-    ZRecord(ZMetaDic *pMetaDic);
-
-
+    ZRecord(ZSMasterFile *pMCB);
     ZRecord& operator = (const ZDataBuffer &pDataBuffer)
-                        { allocate(pDataBuffer.Size);
-                        memmove(_Base::Data,pDataBuffer.Data,Size);
-                        return(*this);}
+    {
+      Content.reset();
+      Content.setData(pDataBuffer);
+      return(*this);
+    }
     ~ZRecord() ;
 
-/*    ZStatus getFieldbyName(ZDataBuffer& pNatural,const char* pName) {}
-    ZStatus getFirstField (ZDataBuffer& pNatural) {}
-    ZStatus getNextField (ZDataBuffer& pNatural) {}*/
 
     bool testCheckSum(void)
     {
@@ -218,8 +231,7 @@ public:
                 }
         return(RDic->testCheckSum());
     }
-    ZDataBuffer& getBaseContent(void) {return (ZDataBuffer &) *this;}
-    ZRecord& setContent(ZDataBuffer& pZDB) { setData(pZDB);  return  *this;}
+
 
     template <class _Tp>
     ZStatus getFieldPtrValuebyRank_T (_Tp &pNatural, const long pRank,const uint32_t pArrayCount) ;
@@ -259,28 +271,28 @@ public:
     ZStatus setFieldBlobbyRank_T  (_Tp& pBlob,const long pRank);
 */
     void _setupRecordData(void) ;
-    void init(void);
-    void clearInit(void) ;
+
     ZStatus _aggregate(void);
     ZStatus _split(void);
 
-
+    void _extractAllKeys();
 
     void printRecordData(FILE *pOuput=stdout);
     void RecordMap(FILE *pOuput=stdout);
     ZStatus createXMLRecord(zxmlElementPtr &wRecord);
     void writeXML(FILE* pOutput=stdout);
-    ZDataBuffer& _getBase(void) {return (ZDataBuffer&)*this;}
+
+    ZDataBuffer& getRecordContent(void) {return (ZDataBuffer &) Content;}
+    ZRecord& setRecordContent(ZDataBuffer& pZDB) { Content.setData(pZDB);  return  *this;}
+
 
 //protected:
-    ZRecordDic* RDic=nullptr;
-    ZMetaDic*   MetaDic=nullptr;
-    ZBitset*    FieldPresence=nullptr;
-    long        CurrentRank;
-    checkSum*   MetaDicCheckSum=nullptr;
+    ZRecordDic*             RDic=nullptr;
+    checkSum*               MetaDicCheckSum=nullptr;
 };
 
-
+ZStatus
+getUniversalbyField (ZDataBuffer &pValue,bool pTruncate);
 
 
 
@@ -355,14 +367,14 @@ ZDataBuffer* wURFData_Ptr=nullptr;
         fprintf(stdout,"%s-I Field %ld %s content has been replaced  \n",
                 _GET_FUNCTION_NAME_,
                 pRank,
-                (char*)RDic->Tab[pRank].MDicRank->Name.toUtf());
+              (char*)RDic->Tab[pRank].MDicRank->getName().toUtf());
         }
     else
         {
             printf ("%s-I Field %ld %s is created and declared present.\n",
                     _GET_FUNCTION_NAME_,
                     pRank,
-                    (char*)RDic->Tab[pRank].MDicRank->Name.toUtf());
+                    (char*)RDic->Tab[pRank].MDicRank->getName().toUtf());
         }
     }//if (ZVerbose)
 
@@ -591,7 +603,7 @@ ZRecord::getFieldValuebyRank_T (_Tp& pTargetNatural, const long pRank)
     printf("%s>> getting value from record for field rank <%ld> dicitionary name is <%s>\n",
            _GET_FUNCTION_NAME_,
            pRank,
-           (const char*)RDic->Tab[pRank].MDicRank->Name.toCChar());
+           (const char*)RDic->Tab[pRank].MDicRank->getName().toCChar());
 
 uint64_t    wTargetNSize, wTargetUSize;
 uint16_t    wTargetUnitsCount;
@@ -829,7 +841,8 @@ ZStatus _setFieldByteSeqUfN_T(unsigned char* pInData_Ptr,
 
 
 
-} // zbs
+} // namespace zbs
+
 /** @} */
 
 /* --------------------------C interfaces to ZRecord------------------------------------
@@ -838,7 +851,7 @@ ZStatus _setFieldByteSeqUfN_T(unsigned char* pInData_Ptr,
 
 CFUNCTOR  void deleteZRecordAll();
 
-APICEXPORT void* createZRecord(void* pMetaDic);
+APICEXPORT void* createZRecord(void* pZMF);
 
 APICEXPORT void deleteZRecord(void* pZRecord);
 

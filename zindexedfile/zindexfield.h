@@ -2,22 +2,31 @@
 #define ZINDEXFIELD_H
 
 #include <zindexedfile/zsindextype.h>
-
-
-typedef utf8String ZFieldName_type ;
+#include <zcrypt/checksum.h>
+#include <zindexedfile/zfielddescription.h>
 
 #pragma pack(push)
 #pragma pack(0)
-struct ZSIndexField_strOut
+/* no MDic rank is stored */
+struct ZSIndexField_Out
 {
-    size_t      MDicRank;       //!< reference to Metadictionary row
-    uint64_t    NaturalSize;    //!< Length of the Field to extract from the record : natural size is the canonical data size and not the size of the data once it has been reprocessed for key usage. @note Special case for char and uchar : Sizes are equal to Cstring size (obtained with strlen).
-    uint64_t    UniversalSize;  //!< length of the field when stored into Key (Field dictionary internal format size)
-    uint32_t    ArrayCount;      //!< in case of ZType is ZType_Array : number of elements in the Array(Atomic size can be computed then using NaturalSize / ArraySize or KeySize / ArraySize ). For other storage type, this field is set to 1.
-    ZTypeBase   ZType;           //!< Type mask of the Field @see ZType_type
+//    size_t      MDicRank;       //!< reference to Metadictionary row
+//    uint64_t    NaturalSize;    //!< Length of the Field to extract from the record : natural size is the canonical data size and not the size of the data once it has been reprocessed for key usage. @note Special case for char and uchar : Sizes are equal to Cstring size (obtained with strlen).
+//    uint64_t    UniversalSize;  //!< length of the field when stored into Key (Field dictionary internal format size)
+//    uint32_t    ArrayCount;      //!< in case of ZType is ZType_Array : number of elements in the Array(Atomic size can be computed then using NaturalSize / ArraySize or KeySize / ArraySize ). For other storage type, this field is set to 1.
+//    ZTypeBase   ZType;           //!< Type mask of the Field @see ZType_type
 
-    ZDataBuffer& _export(ZDataBuffer& pZDBExport);
 
+    uint32_t    MDicRank;
+    uint32_t    KeyOffset;      //!< Offset of the Field from the beginning of Key record
+    char        Hash[cst_md5];
+
+    void clear()
+    {
+      memset(Hash,0,sizeof(Hash));
+      KeyOffset=0;
+      MDicRank=0;
+    }
 };
 #pragma pack(pop)
 
@@ -41,44 +50,65 @@ struct ZSIndexField_strOut
 
  */
 
+namespace zbs {
+
+#pragma pack(push)
+#pragma pack(0)
+class ZSIndexField_exp
+{
+public:
+
+  ZSIndexField_exp()
+  {
+    MDicRank=0;
+    KeyOffset=0;
+    memset(Hash,0,cst_md5);
+  }
+  uint32_t    MDicRank=0;     //!< reference to Metadictionary row
+  uint32_t    KeyOffset=0;    //!< Offset of the Field from the beginning of Key record
+  char        Hash[cst_md5];  //!< reference to Metadic field
+//  uint64_t    NaturalSize;    //!< Length of the Field to extract from the record : natural size is the canonical data size and not the size of the data once it has been reprocessed for key usage. @note Special case for char and uchar : Sizes are equal to Cstring size (obtained with strlen).
+//  uint64_t    UniversalSize;  //!< length of the field when stored into Key (Field dictionary internal format size)
+//  uint32_t    ArrayCount;     //!< in case of ZType is ZType_Array : number of elements in the Array(Atomic size can be computed then using NaturalSize / ArraySize or KeySize / ArraySize ). For other storage type, this field is set to 1.
+//  ZTypeBase   ZType;          //!< Type mask of the Field @see ZType_type
+};
+#pragma pack(pop)
+
 class ZSIndexField
 {
 public:
-  ZSIndexField& _copyFrom(ZSIndexField& pIn);
+  ZSIndexField& _copyFrom(const ZSIndexField& pIn);
   ZSIndexField()=default;
-  ZSIndexField(ZSIndexField& pIn) {_copyFrom(pIn);}
-  ZSIndexField(ZSIndexField&& pIn) {_copyFrom(pIn);}
+  ZSIndexField(const ZSIndexField& pIn) {_copyFrom(pIn);}
+  ZSIndexField(const ZSIndexField&& pIn) {_copyFrom(pIn);}
 
-  ZSIndexField& operator = (ZSIndexField& pIn) {return _copyFrom(pIn);}
+  ZSIndexField& operator = (const ZSIndexField& pIn) {return _copyFrom(pIn);}
 
-
-    size_t      MDicRank;       //!< reference to Metadictionary row
-    uint64_t    NaturalSize;    //!< Length of the Field to extract from the record : natural size is the canonical data size and not the size of the data once it has been reprocessed for key usage. @note Special case for char and uchar : Sizes are equal to Cstring size (obtained with strlen).
-    uint64_t    UniversalSize;  //!< length of the field when stored into Key (Field dictionary internal format size)
-    uint32_t    ArrayCount;     //!< in case of ZType is ZType_Array : number of elements in the Array(Atomic size can be computed then using NaturalSize / ArraySize or KeySize / ArraySize ). For other storage type, this field is set to 1.
-    ZTypeBase   ZType;          //!< Type mask of the Field @see ZType_type
-    uint64_t    KeyOffset;      //!< Offset of the Field from the beginning of Key record
-//    ZFieldName_type  Name;      //!< short string (max 15 char) containing the name of the field (for readability purpose, not necessary for key processing)
-
-/*    bool isAtomic(void) {return ZType & ZType_Atomic ;}
-    bool isArray(void) {return ZType & ZType_Array ;}
-    bool isSigned(void) {return ZType & ZType_Signed ;}
-    bool isEndian(void) {return ZType & ZType_Endian ;}
-    bool isUnknown(void){return (ZType==ZType_Unknown);}*/
 
     void clear();
 
+/* to and from Xml are managed within zkeydictionary
     utf8String toXml(int pLevel);
     int fromXml(zxmlElement* pFieldNode, ZaiErrors* pErrorlog);
+*/
+    ZDataBuffer& _export(ZDataBuffer& pZDBExport) const;
+    ZDataBuffer _export() const;
 
-    ZDataBuffer& _export(ZDataBuffer& pZDBExport);
+    static ZSIndexField_Out _exportConvert(ZSIndexField& pIn, ZSIndexField_Out *pOut);
+    static ZSIndexField _importConvert(ZSIndexField& pOut, ZSIndexField_Out *pIn);
 
-    static ZSIndexField_strOut _exportConvert(ZSIndexField& pIn, ZSIndexField_strOut *pOut);
-    static ZSIndexField _importConvert(ZSIndexField& pOut, ZSIndexField_strOut *pIn);
+    size_t _import(unsigned char *&pPtrIn);
 
-    ZSIndexField& _import(unsigned char* pZDBImport_Ptr);
+
+    uint32_t    MDicRank=0;       //!< reference to Metadictionary row : not stored in XML
+    uint32_t    KeyOffset=0;      //!< Offset of the Field from the beginning of Key record computed using universal formats
+    md5         Hash;             //!< unique reference to meta dictionary field definition (stored in XML)
+//    uint64_t    NaturalSize=0;    //!< Length of the Field to extract from the record : natural size is the canonical data size and not the size of the data once it has been reprocessed for key usage. @note Special case for char and uchar : Sizes are equal to Cstring size (obtained with strlen).
+//    uint64_t    UniversalSize=0;  //!< length of the field when stored into Key (Field dictionary internal format size)
+//    ZTypeBase   ZType=0;          //!< Type mask of the Field @see ZType_type
 
 };
 
 
+} // namespace zbs
 #endif // ZINDEXFIELD_H

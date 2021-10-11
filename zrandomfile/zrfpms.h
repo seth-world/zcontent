@@ -25,6 +25,9 @@ class ZRFPMS
 {
 public:
   ZRFPMS();
+  ZRFPMS(const ZRFPMS& pIn) {_copyFrom(pIn);}
+  ZRFPMS& _copyFrom(const ZRFPMS& pIn) ;
+
   long        HFHReads;       /**< file header reads (pure header block) */
   long        HFHWrites;      /**< file header writes (pure header block) */
 
@@ -61,9 +64,9 @@ public:
   zsize_type  FieldWriteSize;  /**< total of single field content writes in bytes */
 
 
-  ZRFPMS & operator = (ZRFPMS &pPMSIn) {memmove (this,&pPMSIn,sizeof(ZRFPMS)); return *this;}
-  ZRFPMS  operator - (ZRFPMS &pPMSIn);
-  ZRFPMS  operator + (ZRFPMS &pPMSIn);
+  ZRFPMS & operator = (const ZRFPMS &pIn) {return _copyFrom(pIn);}
+  ZRFPMS  operator - (const ZRFPMS &pPMSIn);
+  ZRFPMS  operator + (const ZRFPMS &pPMSIn);
 
   void clear(void) {memset(this,0,sizeof(ZRFPMS)); return;}
   void reportDetails (FILE*pOutput=stdout);

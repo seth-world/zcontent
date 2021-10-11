@@ -2,10 +2,12 @@
 #define ZSINDEXCOLLECTION_CPP
 
 
-#include <zindexedfile/zsindexfile.h>
+#include <zindexedfile/zrawindexfile.h>
 #include <zindexedfile/zsmasterfile.h>
 #include <zindexedfile/zsindexcollection.h>
 #include <zindexedfile/zsjournal.h>
+#include <zindexedfile/zsjournalcontrolblock.h>
+
 
 using namespace zbs;
 
@@ -27,7 +29,7 @@ ZSIndexCollection::clear(void)
 }// clear
 
 
-ZSIndexCollection::ZSIndexCollection(ZSIndexFile *pZIFFile)
+ZSIndexCollection::ZSIndexCollection(ZRawIndexFile *pZIFFile)
 {
     clear();
     ZIFFile=pZIFFile;
@@ -37,7 +39,7 @@ ZSIndexCollection::ZSIndexCollection(ZSIndexFile *pZIFFile)
 ZSIndexCollection::ZSIndexCollection(ZSMasterFile &pZMFFile,const long pIndexRank)
 {
 
-    ZSIndexCollection(pZMFFile.ZMCB.IndexObjects[pIndexRank]);
+    ZSIndexCollection(pZMFFile.ZMCB.IndexTable[pIndexRank]);
     return;
 }
 
@@ -870,9 +872,9 @@ ZDataBuffer wFormerFieldValue;
 
 // here check if massive change will affect one of defined key fields for ZSMasterFile
 
-/*    for (zrank_type wi=0;wi<wMasterFile->ZMCB.Index.size();wi++)
+/*    for (zrank_type wi=0;wi<wMasterFile->ZMCB.IndexTable.size();wi++)
         {
-        wZKDic = wMasterFile->ZMCB.Index[wi].ZKDic;
+        wZKDic = wMasterFile->ZMCB.IndexTable[wi].ZKDic;
         for (long wj=0;wi<wZKDic->size();wj++)
                 {
                 if ((pOffset > wZKDic->fieldRecordOffset(wj))&&(pOffset < wZKDic->fieldRecordOffset(wj)))
@@ -885,7 +887,7 @@ ZDataBuffer wFormerFieldValue;
 
    for (Context.BaseIndex=0;Context.BaseIndex < size();Context.BaseIndex++)
        {
-       Context.ZSt=wMasterFile->_getByAddress(wMasterFile->ZDescriptor,wBlock,Tab[Context.BaseIndex].ZMFAddress);
+       Context.ZSt=wMasterFile->_getByAddress(wBlock,Tab[Context.BaseIndex].ZMFAddress);
        if (Context.ZSt!=ZS_SUCCESS)
                    {
                    return getStatus();
@@ -910,7 +912,7 @@ ZDataBuffer wFormerFieldValue;
                                     wSize=wBlock.Content.Size-pOffset;
        wBlock.Content.changeData(pFieldValue.Data,wSize,pOffset);
 
-       wSt=wMasterFile->_writeBlockAt(wMasterFile->ZDescriptor,wBlock,Tab[Context.BaseIndex].ZMFAddress);
+       wSt=wMasterFile->_writeBlockAt(wBlock,Tab[Context.BaseIndex].ZMFAddress);
        if (wSt!=ZS_SUCCESS)
                 return wSt;
 

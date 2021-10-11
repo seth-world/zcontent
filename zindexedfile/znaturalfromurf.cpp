@@ -306,7 +306,6 @@ unsigned char* wURFDataPtr;
 
 size_t  _getURFHeaderSize (ZTypeBase &pZType)
 {
-
 ZTypeBase wType,wStructType;
 size_t wHeaderSize;
     wType=pZType;
@@ -370,6 +369,142 @@ size_t wHeaderSize;
     }// while true
     return wHeaderSize;
 }//_getURFHeaderSize
+
+
+ZStatus
+getUniversalFromURF (ZDataBuffer &pValue,unsigned char* pDataPtr,bool pTruncate,unsigned char** pDataPtrOut)
+{
+
+  if (pDataPtr==nullptr)
+    return ZS_NULLPTR;
+  ZTypeBase wType;
+  memmove(&wType,pDataPtr,sizeof(ZTypeBase));
+  wType=reverseByteOrder_Conditional<ZTypeBase>(wType);
+
+  switch (wType)
+  {
+  case ZType_Utf8FixedString:
+  {
+    if (pTruncate)
+      return utfStringHeader::getUniversalFromURF(ZType_Utf8FixedString,pDataPtr,pValue,pDataPtrOut);
+    else
+      return utf8FixedString<cst_desclen>::getUniversalFromURF(ZType_Utf8FixedString,pDataPtr,pValue,pDataPtrOut);
+  }//ZType_Utf8FixedString
+
+  case ZType_Utf16FixedString:
+  {
+    if (pTruncate)
+      return utf16FixedString<cst_desclen>::getUniversalFromURF_Truncated(ZType_Utf16FixedString,pDataPtr,pValue,pDataPtrOut);
+    else
+      return utf16FixedString<cst_desclen>::getUniversalFromURF(ZType_Utf16FixedString,pDataPtr,pValue,pDataPtrOut);
+  }//ZType_Utf16FixedString
+  case ZType_Utf32FixedString:
+  {
+    if (pTruncate)
+      return utf32FixedString<cst_desclen>::getUniversalFromURF_Truncated(ZType_Utf32FixedString,pDataPtr,pValue,pDataPtrOut);
+    else
+      return utf32FixedString<cst_desclen>::getUniversalFromURF(ZType_Utf16FixedString,pDataPtr,pValue,pDataPtrOut);
+  }//ZType_Utf32FixedString
+  case ZType_Utf8VaryingString:
+  {
+    return utfStringHeader::getUniversalFromURF(ZType_Utf8VaryingString,pDataPtr,pValue,pDataPtrOut);
+
+  }//ZType_Utf8VaryingString
+  case ZType_Utf16VaryingString:
+  {
+    return utf16VaryingString::getUniversalFromURF(ZType_Utf16VaryingString,pDataPtr,pValue,pDataPtrOut);
+  }//ZType_Utf16VaryingString
+  case ZType_Utf32VaryingString:
+  {
+    return utf32VaryingString::getUniversalFromURF(ZType_Utf32VaryingString,pDataPtr,pValue,pDataPtrOut);
+  }//ZType_Utf32VaryingString
+    /*
+    case ZType_FixedCString:
+        {
+        if (pTruncate)
+            return templateString<cst_desclen>::getUniversalFromURF_Truncated(RDic->Tab[pRank].URFData->Data,pValue);
+        else
+            return templateString<cst_desclen>::getUniversalFromURF(RDic->Tab[pRank].URFData->Data,pValue);
+        }//ZType_FixedCString
+
+  case ZType_FixedWString:
+  {
+    if (pTruncate)
+      return templateWString<cst_desclen>::getUniversalFromURF_Truncated(RDic->Tab[pRank].URFData->Data,pValue);
+    else
+      return templateWString<cst_desclen>::getUniversalFromURF(RDic->Tab[pRank].URFData->Data,pValue);
+  }//ZType_FixedCWtring
+
+  case ZType_VaryingCString:
+  {
+    return varyingCString::getUniversalFromURF(wDataPtr,pValue);
+  }//ZType_VaryingCString
+
+  case ZType_VaryingWString:
+  {
+    return varyingWString::getUniversalFromURF(wDataPtr,pValue);
+  }//ZType_VaryingWString
+    */
+
+  case ZType_ZDate:
+    {
+      return ZDate::getUniversalFromURF(pDataPtr,pValue,pDataPtrOut);
+    }
+  case ZType_ZDateFull:
+  {
+    return ZDateFull::getUniversalFromURF(pDataPtr,pValue,pDataPtrOut);
+  }
+  case ZType_CheckSum:
+  {
+    return checkSum::getUniversalFromURF(pDataPtr,pValue,pDataPtrOut);
+  }
+
+  case ZType_Blob:
+  {
+    return ZBlob::getUniversalFromURF(pDataPtr,pValue,pDataPtrOut);
+  }
+
+  }// switch (wType)
+
+
+
+  if (wType&ZType_Atomic)
+  {
+    ZTypeBase wTypeAtomic=wType&ZType_AtomicMask;
+    size_t wUSize=getAtomicUniversalSize(wTypeAtomic);
+    pValue.setData(pDataPtr+sizeof(ZTypeBase),wUSize);
+
+    if (pDataPtrOut)
+    {
+      *pDataPtrOut = pDataPtr +sizeof(ZTypeBase)+ wUSize;
+    }
+    return ZS_SUCCESS;
+  }
+
+  if (wType&ZType_Array)
+  {
+    ZTypeBase wTypeAtomic=wType&ZType_AtomicMask;
+    size_t wUSize=getAtomicUniversalSize(wTypeAtomic);
+    pDataPtr += sizeof (ZTypeBase);
+    uint16_t wArrayCount;
+    memmove(&wArrayCount,pDataPtr,sizeof(wArrayCount));
+    wArrayCount=reverseByteOrder_Conditional<uint16_t>(wArrayCount);
+    wUSize=wUSize*wArrayCount;
+    pDataPtr += sizeof (uint16_t);
+    pValue.setData(pDataPtr,wUSize);
+
+    if (pDataPtrOut)
+    {
+      *pDataPtrOut = pDataPtr + wUSize;
+    }
+
+    return ZS_SUCCESS;
+  }
+
+  return ZS_INVTYPE;
+}//getUniversalbyField
+
+
 
 /**
  *  One to one conversion routines for =====object classes======

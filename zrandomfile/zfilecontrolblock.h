@@ -5,6 +5,41 @@
 #include <stdint.h>
 #include <ztoolset/zdatabuffer.h>
 #include <zrandomfile/zrandomfiletypes.h>
+class ZFileControlBlock;
+/**
+ * @brief The FCBParams class holds File Control Block parameters that may be modified for a ZRandom File.
+ */
+class FCBParams
+{
+public:
+  FCBParams()=default;
+  FCBParams(const FCBParams& pIn) {_copyFrom(pIn);}
+  FCBParams(const FCBParams&& pIn) {_copyFrom(pIn);}
+
+  FCBParams& _copyFrom(const FCBParams& pIn)
+  {
+    AllocatedBlocks=pIn.AllocatedBlocks;
+    InitialSize=pIn.InitialSize;
+
+    BlockExtentQuota=pIn.BlockExtentQuota;
+    BlockTargetSize=pIn.BlockTargetSize;
+    HighwaterMarking=pIn.HighwaterMarking;
+    GrabFreeSpace=pIn.HighwaterMarking;
+    return *this;
+  }
+
+  FCBParams& operator = (const FCBParams& pIn) { return _copyFrom(pIn);}
+  FCBParams& operator = (const FCBParams&& pIn) { return _copyFrom(pIn);}
+
+  unsigned long   AllocatedBlocks=cst_ZRF_default_allocation;  /**< for ZBAT & ZFBT : initial number of available allocated slots in ZBAT and ZFBT */
+  unsigned long   BlockExtentQuota=cst_ZRF_default_extentquota;/**< for ZBAT & ZFBT : initial extension quota */
+  zsize_type      InitialSize=0;              /**< Initial Size allocated to file during creation : file is created to this size then truncated to size 0 to reserve allocation on disk */
+  size_t          BlockTargetSize=0;          /**< Block target size (user defined value) Foreseen medium size of blocks in a varying block context. */
+
+  bool            HighwaterMarking=false;   /**< mark to zero the whole deleted block content when removed */
+  bool            GrabFreeSpace=false;      /**< attempts to grab free space and holes at each block free operation */
+};
+
 
 #pragma pack(push)
 #pragma pack(0)
@@ -129,11 +164,19 @@ public:
     ZBlockID       BlockID;               /**< Block id is set to ZBID_FCB */
 //private:
 /* copied and exported to xml */
-    zaddress_type  StartOfData;           /**< offset where Data storage starts : 0L */
+    zaddress_type  StartOfData;               /**< offset where Data storage starts : 0L */
 public:
-    unsigned long   AllocatedBlocks;            /**< for ZBAT & ZFBT : initial number of available allocated slots in ZBAT and ZFBT */
-    unsigned long   BlockExtentQuota;           /**< for ZBAT & ZFBT : initial extension quota */
 
+    unsigned long   AllocatedBlocks;          /**< for ZBAT & ZFBT : initial number of available allocated slots in ZBAT and ZFBT */
+    unsigned long   BlockExtentQuota;         /**< for ZBAT & ZFBT : initial extension quota */
+    zsize_type      InitialSize;              /**< Initial Size allocated to file during creation : file is created to this size then truncated to size 0 to reserve allocation on disk */
+    size_t          BlockTargetSize;          /**< Block target size (user defined value) Foreseen medium size of blocks in a varying block context. */
+
+    uint8_t         HighwaterMarking;         /**< mark to zero the whole deleted block content when removed */
+    uint8_t         GrabFreeSpace;            /**< attempts to grab free space and holes at each block free operation */
+
+
+/* Following data is not exported to xml */
     size_t          ZBAT_DataOffset;            /**< Written on file header : Offset to Blocks Access Table array since begining of ZFCB */
     size_t          ZBAT_ExportSize;            /**<  Written on file header : size in bytes of ZBAT : to be written on file. This size is the global ZArray size in bytes */
 
@@ -146,23 +189,21 @@ public:
     size_t          ZReserved_DataOffset;      /**<  Written on file header : Reserved space address . Must be 0L */
     size_t          ZReserved_ExportSize;      /**<  given by _getReservedSize */
 
+/* End following data is not exported to xml */
+
 //    void             (*_getReserved) (ZDataBuffer &) ;// routine to load zreserved from derived class
 
-    zsize_type    InitialSize;                  /**< Initial Size allocated to file during creation : file is created to this size then truncated to size 0 to reserve allocation on disk */
-    zsize_type    AllocatedSize;              /**< Total current allocated size in bytes for file */
-    zsize_type    UsedSize;                   /**< Total of currently used size within file in bytes */
+    zsize_type    AllocatedSize;          /**< Total current allocated size in bytes for file */
+    zsize_type    UsedSize;               /**< Total of currently used size within file in bytes */
 //    zsize_type    ExtentSizeQuota;            // extent quota size in bytes for file : no more used
 
-    size_t   MinSize;                    /**< statistical value : minimum length of block record in file  (existing statistic) */
-    size_t   MaxSize;                    /**< statistical value : maximum length of block record in file (existing statistic ) */
-    size_t   BlockTargetSize;           /**< Block target size (user defined value) Foreseen medium size of blocks in a varying block context. */
+    size_t   MinSize;                     /**< statistical value : minimum length of block record in file  (existing statistic) */
+    size_t   MaxSize;                     /**< statistical value : maximum length of block record in file (existing statistic ) */
 
 /*    bool            History;
     bool            Autocommit;
     bool            Journaling;*/  // ZRandomFile Does NOT have journaling, history, autocommit : see ZMasterFile instead
 
-    uint8_t         HighwaterMarking;           /**< mark to zero the whole deleted block content when removed */
-    uint8_t         GrabFreeSpace;              /**< attempts to grab free space and holes at each block free operation */
 /* not copied neither exported to xml */
     uint32_t        EndSign=cst_ZEND;           /**< EndSign word that marks end of data */
 
@@ -175,7 +216,12 @@ public:
 
   void clear(void) ;
 
-  utf8String toXml(int pLevel);
+  FCBParams getUseableParams();
+  void setUseableParams(const FCBParams& pIn);
+
+
+  /* NB: if pComment is set to true, then xml code is commented, if not, no comment is generated */
+  utf8String toXml(int pLevel, bool pComment=false);
     /**
      * @brief fromXml loads header control block from its xml definition and return 0 when successfull.
      * When errors returns <>0 and pErrlog contains appropriate error messages.
@@ -184,8 +230,8 @@ public:
   int fromXml(zxmlNode* pFCBRootNode, ZaiErrors* pErrorlog);
 
   ZDataBuffer& _export(ZDataBuffer& pZDBExport);
-  ZFileControlBlock& _import(unsigned char* pZDBImport_Ptr);
-};
+  ZFileControlBlock& _import(unsigned char *&pZDBImport_Ptr);
+}; // ZFileControlBlock
 
 
 #endif // ZFILECONTROLBLOCK_H

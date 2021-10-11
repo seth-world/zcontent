@@ -44,24 +44,24 @@ public:
  */
   ZStatus zlock (const long pRank,const zlockmask_type pLock)
     {
-        return _lock(ZDescriptor,pRank,pLock,!(getMode()&ZRF_Exclusive));
+        return _lock(pRank,pLock,!(getOpenMode()&ZRF_Exclusive));
     }
 
     ZStatus zlockByAddress (const zaddress_type pAddress,const zlockmask_type pLock)
     {
-        long wRank = getRankFromAddress(&ZDescriptor,pAddress);
+        long wRank = getRankFromAddress(pAddress);
         if (wRank<0)
         {
             ZException.addToLast(" While trying to lock by address.");
             return ZException.getLastStatus();
         }
 
-        return _lock(ZDescriptor,wRank,pLock,!(getMode()&ZRF_Exclusive)); // NB: Force header write if mode is not ZRF_Exclusive
+        return _lock(wRank,pLock,!(getOpenMode()&ZRF_Exclusive)); // NB: Force header write if mode is not ZRF_Exclusive
     }// zlockByAddress
 
     bool _isLockedByAddress(ZFileDescriptor &pDescriptor,const zaddress_type pAddress);
 
-    ZStatus _getLockStatusByAddress(ZFileDescriptor &pDescriptor,const zaddress_type pAddress, zlockmask_type &pLock,pid_t &pPid);
+    ZStatus _getLockStatusByAddress(const zaddress_type pAddress, zlockmask_type &pLock, pid_t &pPid);
 
 /**
  * @brief zunlockByAddress Unlocks a record pointed by its address.
@@ -71,19 +71,19 @@ public:
  */
     ZStatus zunlockByAddress (const zaddress_type pAddress)
     {
-        long wRank = getRankFromAddress(&ZDescriptor,pAddress);
+        long wRank = getRankFromAddress(pAddress);
         if (wRank<0)
             {
             ZException.addToLast(" While trying to lock by address.");
             return ZException.getLastStatus();
             }
 
-        return _unlock(ZDescriptor,wRank,!(getMode()&ZRF_Exclusive)); // NB: Force header write if mode is not ZRF_Exclusive
+        return _unlock(wRank,!(getOpenMode()&ZRF_Exclusive)); // NB: Force header write if mode is not ZRF_Exclusive
     } // zunlockByAddress
 
     ZStatus zunlock (const long pRank)
     {
-        return _unlock(ZDescriptor,pRank,!(getMode()&ZRF_Exclusive));
+        return _unlock(pRank,!(getOpenMode()&ZRF_Exclusive));
     } // zunlock
 /**
   * @brief zunlockAll Unlocks all locks for the process for the file
@@ -92,7 +92,7 @@ public:
   */
     ZStatus zunlockAll (void)
     {
-        return _unlockAll(ZDescriptor,!(getMode()&ZRF_Exclusive));
+        return _unlockAll(!(getOpenMode()&ZRF_Exclusive));
     }// zunlockAll
 
 /**
@@ -102,16 +102,16 @@ public:
   * @param[in] pForceWrite if this option is set to true, then it forces File Descriptor to be written on file
   * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
   */
- static inline
-  ZStatus _unlockAll(ZFileDescriptor &pDescriptor, bool pForceWrite=true )
+
+  ZStatus _unlockAll(bool pForceWrite=true )
 
   {
-      while (pDescriptor.ZBlockLock.size()>0)
+      while (ZBlockLock.size()>0)
                     {
-                  _unlockZBAT(pDescriptor,pDescriptor.ZBlockLock.last().Address);
-                  pDescriptor.ZBlockLock.pop();
+                  _unlockZBAT(ZBlockLock.last().Address);
+                  ZBlockLock.pop();
                     }
-     return (_writeFileDescriptor(pDescriptor,pForceWrite));
+      return (_writeFileDescriptor(pForceWrite));
   }
 /**
 * @brief _unlock Releases the lock set to block of rank pRank
@@ -122,28 +122,28 @@ public:
 * @param[in] pForceWrite if this option is set to true, then it forces File Descriptor to be written on file
 * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
 */
- static inline
-  ZStatus _unlock(ZFileDescriptor &pDescriptor ,const zaddress_type pAddress,bool pForceWrite=true)
+
+  ZStatus _unlock(const zaddress_type pAddress,bool pForceWrite=true)
   {
  ZStatus wSt;
  long  wi;
  bool wFound = false;
-    for (wi=0;wi<pDescriptor.ZBlockLock.size();wi++)
+    for (wi=0;wi<ZBlockLock.size();wi++)
                     {
-                if (pDescriptor.ZBlockLock[wi].Address==pAddress)
+                if (ZBlockLock[wi].Address==pAddress)
                                     {
-                                    pDescriptor.ZBlockLock.erase(wi);
+                                    ZBlockLock.erase(wi);
                                     wFound = true;
                                     break;
                                     }
                     }
     if (!wFound)
                             return ZS_SUCCESS;      // no lock found for this ZBAT rank;
-    wSt=_unlockZBAT(pDescriptor,pAddress);
+    wSt=_unlockZBAT(pAddress);
     if (wSt!= ZS_SUCCESS)
                 return wSt;
 
-    return (_writeFileDescriptor(pDescriptor,pForceWrite));
+    return (_writeFileDescriptor(pForceWrite));
 
   }// _unlock
  /**
@@ -153,18 +153,18 @@ public:
   * @param[in] pRank rank of block to unlock in ZBAT
   * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
   */
- static inline
-  ZStatus _unlockZBAT(ZFileDescriptor &pDescriptor,const zaddress_type pAddress )
+ inline
+  ZStatus _unlockZBAT(const zaddress_type pAddress )
   {
-    long wRank = getRankFromAddress(&pDescriptor,pAddress);
+    long wRank = getRankFromAddress(pAddress);
     if (wRank<0)
         {
         ZException.addToLast("While unlocking ZBAT (%s)",_GET_FUNCTION_NAME_);
         ZException.exit_abort();
         }
-    pDescriptor.ZBAT->Tab[wRank].Lock = ZLock_Nothing;
-    pDescriptor.ZBAT->Tab[wRank].Pid = 0L;
-    return _writeBlockHeader(pDescriptor,pDescriptor.ZBAT->Tab[wRank],pDescriptor.ZBAT->Tab[wRank].Address);
+    ZBAT->Tab[wRank].Lock = ZLock_Nothing;
+    ZBAT->Tab[wRank].Pid = 0L;
+    return _writeBlockHeader(ZBAT->Tab[wRank],ZBAT->Tab[wRank].Address);
   }
 
 inline
@@ -192,8 +192,7 @@ ZStatusBase wSt;
   * @param[in] pLock      lock mask
   * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
   */
- inline ZStatus _lockZBAT(ZFileDescriptor &pDescriptor,
-                          const zaddress_type pAddress,
+ inline ZStatus _lockZBAT(const zaddress_type pAddress,
                           const zlockmask_type pLock);
 
  /**
@@ -288,8 +287,7 @@ inline
   * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message. see: @ref ZBSError
  * @return
  */
-ZStatus _lock(ZFileDescriptor &pDescriptor,
-                const zaddress_type pAddress,
+ZStatus _lock(const zaddress_type pAddress,
                 const zlockmask_type pLock,
                 bool pForceWrite = true);
 

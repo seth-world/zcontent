@@ -10,13 +10,9 @@
 #include <ztoolset/zexceptionmin.h>
 #include <zcontentcommon/zlock.h>
 
-//#include <ztoolset/zlockmanager.h>
-
 
 #define __ZRF_VERSION__  2000UL
-#define __ZRF_XMLVERSION__  "\"2.00\""
-//#define __ZRF_XMLVERSION_CONTROL__  (const utf8_t*)"2.00"
-
+#define __ZRF_VERSION_CHAR__  "\"2.00\""
 #define __ZRF_XMLVERSION_CONTROL__  "2.00"
 
 
@@ -37,12 +33,16 @@ typedef int64_t   zaddress_type;  //!< ZRandomFile address data type : nb : coul
 typedef uint64_t  zsize_type;     //!< ZRandomFile size data type
 
 typedef uint8_t   zlockmask_type ;    //!< refers to ZLockMask_type
-typedef uint32_t  zmode_type ;    //!< refers to ZRFMode_type
+typedef uint32_t  zmode_type ;        //!< refers to ZRFMode_type
 
 const uint32_t     cst_ZSTART = 0xF5F5F5F5;  //!< Begin marker of a data structure on file
-const uint32_t     cst_ZEND   = 0xF0F0F0F0;  //!< End marker of a data structure on file
+const uint32_t     cst_ZEND   = 0xF0F0F0F0;  //!< End marker of a data structure on file : does not have to be reversed
 
 const uint8_t      cst_ZSTART_BYTE = 0xF5;
+
+
+const long        cst_ZRF_default_allocation=10;
+const long        cst_ZRF_default_extentquota=5;
 
 
 /** @cond Development
@@ -81,6 +81,7 @@ enum ZBlockID : uint8_t
 enum ZRFMode_type : zmode_type
 {
     ZRF_Nothing          =   0,  //!< NOP
+    ZRF_NotOpen          =0xFF00,//!< file not open
     ZRF_Read_Only        =   1,  //!< file is open for read only
     ZRF_Write_Only       =   2,  //!< file is open  write only ( This value is not operational )
     ZRF_Delete_Only      =   4,  //!< file is open for read and delete mode
@@ -111,8 +112,12 @@ enum ZFile_type : uint8_t
     ZFT_ZRandomFile = 1,    //!< file is ZRandomFile
     ZFT_ZMasterFile = 2,    //!< file is ZMasterFile
     ZFT_ZIndexFile  = 4,    //!< file is ZIndexFile
-    ZFT_ZSMasterFile = 8,   //!< file is Structured Master File
-    ZFT_ZSIndexFile = 0x10  //!< file is Structured index File
+    ZFT_ZRawMasterFile=2,   //!< file is raw master file (keys are only defined by their universal size)
+    ZFT_ZDicMasterFile=8,   //!< this file uses a dictionary
+    ZFT_ZSMasterFile = ZFT_ZDicMasterFile|ZFT_ZRawMasterFile,   //!< file is Structured Master File using a dictionary
+    ZFT_ZSIndexFile = 0x10,  //!< file is Structured index File
+
+    ZFT_Any         = 0xFF  //!< all file types allowed
 };
 
 
@@ -144,7 +149,7 @@ const char * decode_ZRFMode (zmode_type pZRF);
 zmode_type encode_ZRFMode (char* pZRF);
 
 
-const char * decode_ZFile_type (ZFile_type pType);
+const char * decode_ZFile_type (uint8_t pType);
 ZFile_type encode_ZFile_type (char * pType);
 
 /** @}  */ //  ZRandomFileGroup

@@ -51,16 +51,47 @@ ZHeaderControlBlock::_export(ZDataBuffer& pZDBExport)
 
   return pZDBExport;
 }
+
+ZHeaderControlBlock_Export&
+ZHeaderControlBlock_Export::_copyFrom(ZHeaderControlBlock_Export& pIn)
+{
+  StartSign=pIn.StartSign;
+  BlockID=pIn.BlockID;
+
+  ZRFVersion=pIn.ZRFVersion;
+  FileType = pIn.FileType; /* FileType does not need to be reversed */
+  OffsetFCB = pIn.OffsetFCB;
+  OffsetReserved = pIn.OffsetReserved;
+  SizeReserved = pIn.SizeReserved;
+  Lock = pIn.Lock;
+  LockOwner = pIn.LockOwner;
+
+  EndSign=pIn.EndSign;
+  return *this;
+}
+
+void
+ZHeaderControlBlock_Export::_convert()
+{
+/* BlockID and  StartSign (palyndroma) do not need to be reversed */
+  ZRFVersion=reverseByteOrder_Conditional<unsigned long>(ZRFVersion);
+//  FileType = FileType; /* FileType does not need to be reversed */
+  OffsetFCB = reverseByteOrder_Conditional<zaddress_type>(OffsetFCB);
+  OffsetReserved = reverseByteOrder_Conditional<zaddress_type>(OffsetReserved);
+  SizeReserved = reverseByteOrder_Conditional<zsize_type>(SizeReserved);
+  Lock = reverseByteOrder_Conditional<zlockmask_type>(Lock);
+  LockOwner = reverseByteOrder_Conditional<pid_t>(LockOwner);
+} //_convert
+
+
 ZStatus
 ZHeaderControlBlock::_import(unsigned char* pZDBImport_Ptr)
 {
 
   ZHeaderControlBlock_Export* wHCB=(ZHeaderControlBlock_Export*)(pZDBImport_Ptr);
-  //        StartSign = _reverseByteOrder_T<uint32_t>(wHCB->StartSign);
-  //    StartSign = wHCB->StartSign;  // don't care reversing start sign or end sign : same as reversed
 
-  Lock = reverseByteOrder_Conditional<zlockmask_type>(wHCB->Lock);
-  LockOwner = reverseByteOrder_Conditional<pid_t>(wHCB->LockOwner);
+  wHCB->_convert();
+
   if ((wHCB->BlockID!=ZBID_FileHeader)||(wHCB->StartSign!=cst_ZSTART))
   {
     ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -71,7 +102,7 @@ ZHeaderControlBlock::_import(unsigned char* pZDBImport_Ptr)
         wHCB->BlockID);
     return  ZS_BADFILEHEADER;
   }
-  if (reverseByteOrder_Conditional<unsigned long>(wHCB->ZRFVersion)!=__ZRF_VERSION__)
+  if (wHCB->ZRFVersion!=__ZRF_VERSION__)
   {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_BADFILEHEADER,
@@ -82,14 +113,6 @@ ZHeaderControlBlock::_import(unsigned char* pZDBImport_Ptr)
     return  ZS_BADFILEHEADER;
   }
 
-  //    BlockID = wHCB->BlockID;
-  //    ZRFVersion = _reverseByteOrder_T<unsigned long>(wHCB->ZRFVersion);
-  FileType = wHCB->FileType;
-  OffsetFCB = reverseByteOrder_Conditional<zaddress_type>(wHCB->OffsetFCB);
-  OffsetReserved = reverseByteOrder_Conditional<zaddress_type>(wHCB->OffsetReserved);
-  SizeReserved = reverseByteOrder_Conditional<zsize_type>(wHCB->SizeReserved);
-
-  //    EndSign = wHCB->EndSign; // don't care reversing start sign or end sign : same as reversed
 
   return  ZS_SUCCESS;
 }
@@ -99,11 +122,14 @@ utf8String ZHeaderControlBlock::toXml(int pLevel)
   int wLevel=pLevel;
   utf8String wReturn;
   wReturn = fmtXMLnode("zheadercontrolblock",pLevel);
+//  fmtXMLaddInlineComment(wReturn," all children fields of zheadercontrolblock are not modifiable ");
   wLevel++;
 
   /* NB: Lock and LockOwner are not exported to xml */
 
   wReturn+=fmtXMLuint("filetype",  FileType,wLevel);  /* uint8_t */
+  wReturn+=fmtXMLulong("zrfversion",  __ZRF_VERSION__,wLevel);  /* unsigned long */
+
   wReturn+=fmtXMLuint64("offsetfcb",OffsetFCB,wLevel);
   wReturn+=fmtXMLuint64("offsetreserved",OffsetReserved,wLevel);
 

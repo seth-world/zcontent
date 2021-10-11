@@ -51,18 +51,19 @@ ZFileDescriptor::_exportFCB(ZDataBuffer& pZDBExport)
 }// ZFileDescriptor::_exportFCB
 
 ZFileDescriptor&
-ZFileDescriptor::_importFCB(unsigned char* pFileControlBlock_Ptr)
+ZFileDescriptor::_importFCB(unsigned char* pPtrIn)
 {
   printf ("ZFileDescriptor::_importFCB>>\n");
-  ZFileControlBlock* wFileControlBlock=( ZFileControlBlock* )pFileControlBlock_Ptr; // for debug
+  ZFileControlBlock* wFileControlBlock=( ZFileControlBlock* )pPtrIn; // for debug
   setupFCB();
-  ZFCB->_import(pFileControlBlock_Ptr);
+  unsigned char* wPtrIn=pPtrIn;
+  ZFCB->_import(wPtrIn);
 
-  ZBAT->_importPool(pFileControlBlock_Ptr+ZFCB->ZBAT_DataOffset);
+  ZBAT->_importPool(wPtrIn);
 
-  ZFBT->_importPool(pFileControlBlock_Ptr+ZFCB->ZFBT_DataOffset);
+  ZFBT->_importPool(wPtrIn);
 
-  ZDBT->_importPool(pFileControlBlock_Ptr+ZFCB->ZDBT_DataOffset);
+  ZDBT->_importPool(wPtrIn);
 
   return *this;
 }// ZFileDescriptor::_importFCB
@@ -85,6 +86,16 @@ ZFileDescriptor::setupFCB (void)
   ZDBT=new ZDeletedBlockPool;
   return;
   //           ZReserved.clear();  // Reserved header is fully managed by derived classes
+}
+
+
+ZFileDescriptor& ZFileDescriptor::_copyFrom(const ZFileDescriptor& pIn)
+{
+  ZFDOwnData::_copyFrom((const ZFDOwnData&)pIn);
+  URIContent = pIn.URIContent;
+  URIHeader = pIn.URIHeader;
+  URIDirectoryPath = pIn.URIDirectoryPath;
+  return *this;
 }
 
 void
@@ -110,6 +121,61 @@ ZFileDescriptor::clearFCB (void)
   return;
 }
 
+
+void ZFileDescriptor::clearPartial (void)
+{
+  clearFCB();
+
+//  memset (this,0,(sizeof(ZFDOwnData)));
+  CurrentRank=-1;
+  PhysicalPosition = -1;
+  LogicalPosition = -1;
+  _isOpen = false ;
+  HeaderAccessed = false;
+
+  Pid= getpid();  // get current pid for ZFileDescriptor
+}
+
+
+ZStatus
+ZFileDescriptor::_close()
+{
+  if (close (ContentFd) < 0)
+  {
+    ZException.getErrno(errno,
+        "ZFileDescriptor._close",
+        ZS_FILEERROR,
+        Severity_Severe,
+        "System error closing file <%s>",URIContent.toCChar());
+    return ZS_FILEERROR;
+  }
+  if (close (HeaderFd) < 0)
+  {
+    ZException.getErrno(errno,
+        "ZFileDescriptor._close",
+        ZS_FILEERROR,
+        Severity_Severe,
+        "System error closing file <%s>",URIHeader.toCChar());
+    return ZS_FILEERROR;
+  }
+  _isOpen=false;
+  HeaderAccessed = false;
+  ZRFPool->removeFileByFd(ContentFd);
+  clearPartial();
+  return ZS_SUCCESS;
+}
+
+void
+ZFileDescriptor::_forceClose()
+{
+  close (ContentFd);
+  close (HeaderFd);
+  _isOpen=false;
+  HeaderAccessed = false;
+  ZRFPool->removeFileByFd(ContentFd);
+  clearPartial();
+}
+
 /**
  * @brief ZFileDescriptor::setPath for a ZRandomFile, set up the different pathes environment using a given uriString.
  *  This uriString will name the content file (main data file) @see ZRFPhysical
@@ -117,7 +183,7 @@ ZFileDescriptor::clearFCB (void)
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZFileDescriptor::setPath (uriString &pURIPath)
+ZFileDescriptor::setPath (const uriString &pURIPath)
 {
   if (_isOpen)
   {
@@ -125,8 +191,8 @@ ZFileDescriptor::setPath (uriString &pURIPath)
         ZS_INVOP,
         Severity_Error,
         "File <%s> is already open.Cannot change to path <%s>",
-        URIContent.toString(),
-        pURIPath.toString());
+        URIContent.toCChar(),
+        pURIPath.toCChar());
     return ZS_INVOP;
   }
   Pid = getpid();
@@ -143,7 +209,7 @@ ZFileDescriptor::setPath (uriString &pURIPath)
         Severity_Error,
         "File name is malformed. Extension <%s> is reserved while given file name is <%s>",
         __HEADER_FILEEXTENSION__,
-        pURIPath.toString());
+        pURIPath.toCChar());
     return ZS_INVNAME;
   }
 

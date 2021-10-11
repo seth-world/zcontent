@@ -2,7 +2,7 @@
 #define ZJOURNAL_DOC_H
 
 namespace zbs {
-/** @defgoup JournalingGroup Journaling for ZMasterFile
+/** @defgoup JournalingGroup Journaling for master files
  * @ingroup ZMasterFileGroup
  *
  * Journaling for ZMasterFile allows to :
@@ -41,9 +41,6 @@ namespace zbs {
  *
  *
  */
-
-
-
 
 
 

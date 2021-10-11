@@ -1935,7 +1935,7 @@ _Tp _getAtomicUfN_T(unsigned char* pInData, ZDataBuffer &pUniversalData,const ZT
             if (wValue<0)  // if negative value
                     {
                     pUniversalData.Data[0]=0; // sign byte is set to Zero
-                    _negate (wValue2); // mandatory otherwise -120 is greater than -110
+                    wValue2=_negate (wValue2); // mandatory otherwise -120 is greater than -110
                     }
                 else
                     pUniversalData.Data[0]=1;
@@ -2103,7 +2103,7 @@ _Tp _getAtomicNfU_T_Ptr (typename std::enable_if_t<std::is_integral<_Tp>::value|
                 }// while
             if (pUniversal_Ptr[0]==0)  // signed negative value
                     {
-                    _negate(pValue); // mandatory otherwise -120 is greater than -110
+                    pValue=_negate(pValue); // mandatory otherwise -120 is greater than -110
                     return -pValue;
                     }
                 else // it is a positive value
@@ -2127,6 +2127,10 @@ _Tp _getAtomicNfU_T_Ptr (typename std::enable_if_t<std::is_integral<_Tp>::value|
     }// while
     return pValue;
 } // _getAtomicNfU_T_Ptr
+
+
+
+
 
 /*template <class _Tp>
 static inline
@@ -2836,4 +2840,283 @@ ZTypeBase wSourceType = pSourceType & ZType_AtomicMask;
          }
     }// switch*/
 }// _castAtomicValue
+
+
+
+
+/* universal signed 16 bits */
+#pragma pack(push)
+#pragma pack(0)
+class US8
+{
+public:
+  uint8_t   Sign;
+  uint8_t  Value;
+  US8() {}
+  US8(const US8& pIn) {_copyFrom(pIn);}
+  US8& _copyFrom(const US8& pIn)
+  {
+    Sign=pIn.Sign;
+    Value=pIn.Value;
+  }
+  US8& operator = (const US8& pIn) {return _copyFrom(pIn);}
+  US8& operator = (const int8_t& pIn) {return fromNatural(pIn);}
+
+  US8& fromNatural(int8_t pN)
+  {
+    if (pN<0)  // if negative value
+    {
+      Sign=0; // sign byte is set to Zero
+      Value=-pN;
+      Value=_negate (Value); // mandatory otherwise -120 is greater than -110
+      return *this;
+    }
+
+    /* positive value */
+    Sign=1;
+    Value=pN;
+    return *this;
+  }
+  int8_t toNatural()
+  {
+    if (Sign>0)
+      return int8_t(Value);
+
+    Value=_negate (Value);
+    return - int8_t(Value);
+  }
+};
+
+class US16
+{
+public:
+  uint8_t   Sign;
+  uint16_t  Value;
+  US16() {}
+  US16(const US16& pIn) {_copyFrom(pIn);}
+  US16(int16_t pIn) {fromNatural(pIn);}
+  US16& _copyFrom(const US16& pIn);
+  US16& operator = (const US16& pIn) {return _copyFrom(pIn);}
+  US16& operator = (const int16_t& pIn) {return fromNatural(pIn);}
+
+  size_t getSize() {return sizeof(uint16_t)+1;}
+
+  US16& fromNatural(int16_t pN);
+  int16_t toNatural();
+
+  ZDataBuffer _export();
+  size_t _import(unsigned char* &pIn);
+
+  static ZDataBuffer _exportURF(int16_t pValue);
+  static ZDataBuffer& _exportURF(int16_t pValue,ZDataBuffer& pBuf);
+
+  ZDataBuffer _exportURF();
+  ZDataBuffer& _exportURF(ZDataBuffer& pOut);
+  ssize_t _importURF(unsigned char* &pIn);
+  static ssize_t _importURF(int16_t& pValue,unsigned char* &pIn);
+};
+
+class UU16
+{
+public:
+  uint16_t  Value;
+  UU16() {}
+  UU16(const UU16& pIn) {_copyFrom(pIn);}
+  UU16(uint16_t pIn) {fromNatural(pIn);}
+  UU16& _copyFrom(const UU16& pIn);
+  UU16& operator = (const UU16& pIn) {return _copyFrom(pIn);}
+  UU16& operator = (const uint16_t& pIn) {return fromNatural(pIn);}
+
+  size_t getSize() {return sizeof(uint16_t);}
+
+  UU16& fromNatural(uint16_t pN);
+  uint16_t toNatural();
+
+  ZDataBuffer _export();
+  size_t _import(unsigned char* &pIn);
+
+  static ZDataBuffer _exportURF(uint16_t pValue);
+  static ZDataBuffer& _exportURF(uint16_t pValue,ZDataBuffer& pBuf);
+
+  ZDataBuffer _exportURF();
+  ZDataBuffer& _exportURF(ZDataBuffer& pOut);
+  ssize_t _importURF(unsigned char* &pIn);
+  static ssize_t _importURF(uint16_t& pValue,unsigned char* &pIn);
+
+};
+class US32
+{
+public:
+  uint8_t   Sign;
+  uint32_t  Value;
+  US32() {}
+  US32(const US32& pIn) {_copyFrom(pIn);}
+  US32(int32_t pIn) {fromNatural(pIn);}
+  US32& _copyFrom(const US32& pIn);
+  US32& operator = (const US32& pIn) {return _copyFrom(pIn);}
+  US32& operator = (const int32_t& pIn) {return fromNatural(pIn);}
+
+  size_t getSize() {return sizeof(uint32_t)+1;}
+
+  US32& fromNatural(int32_t pN);
+  int32_t toNatural();
+
+  ZDataBuffer _export();
+  size_t _import(unsigned char* &pIn);
+
+  static ZDataBuffer _exportURF(int32_t pValue);
+  static ZDataBuffer& _exportURF(int32_t pValue,ZDataBuffer& pBuf);
+
+  ZDataBuffer _exportURF();
+  ZDataBuffer& _exportURF(ZDataBuffer& pOut);
+  ssize_t _importURF(unsigned char* &pIn);
+  static ssize_t _importURF(int32_t& pValue,unsigned char* &pIn);
+};
+class UU32
+{
+public:
+  uint32_t  Value;
+  UU32() {}
+  UU32(const UU32& pIn) {_copyFrom(pIn);}
+  UU32(float pIn) {fromNatural(pIn);}
+  UU32& _copyFrom(const UU32& pIn);
+  UU32& operator = (const UU32& pIn) {return _copyFrom(pIn);}
+  UU32& operator = (const uint32_t& pIn) {return fromNatural(pIn);}
+
+  size_t getSize() {return sizeof(uint32_t);}
+
+  UU32& fromNatural(uint32_t pN);
+  uint32_t toNatural();
+
+  ZDataBuffer _export();
+  size_t _import(unsigned char* &pIn);
+
+  static ZDataBuffer _exportURF(uint32_t pValue);
+  static ZDataBuffer& _exportURF(uint32_t pValue,ZDataBuffer& pBuf);
+
+  ZDataBuffer _exportURF();
+  ZDataBuffer& _exportURF(ZDataBuffer& pOut);
+  ssize_t _importURF(unsigned char* &pIn);
+  static ssize_t _importURF(uint32_t& pValue,unsigned char* &pIn);
+};
+
+class US64
+{
+public:
+  uint8_t   Sign;
+  uint64_t  Value;
+  US64() {}
+  US64(const US64& pIn) {_copyFrom(pIn);}
+  US64(int64_t pIn) {fromNatural(pIn);}
+
+  US64& _copyFrom(const US64& pIn);
+  US64& operator = (const US64& pIn) {return _copyFrom(pIn);}
+  US64& operator = (const int64_t& pIn) {return fromNatural(pIn);}
+
+  size_t getSize() {return sizeof(uint64_t)+1;}
+
+  US64& fromNatural(int64_t pN);
+  int64_t toNatural();
+
+  ZDataBuffer _export();
+  size_t _import(unsigned char* &pIn);
+
+  static ZDataBuffer _exportURF(int64_t pValue);
+  static ZDataBuffer& _exportURF(int64_t pValue,ZDataBuffer& pBuf);
+
+  ZDataBuffer _exportURF();
+  ZDataBuffer& _exportURF(ZDataBuffer& pOut);
+  ssize_t _importURF(unsigned char* &pIn);
+  static ssize_t _importURF(int64_t& pValue,unsigned char* &pIn);
+
+};
+class UU64
+{
+public:
+  uint64_t  Value;
+  UU64() {}
+  UU64(const US64& pIn) {_copyFrom(pIn);}
+  UU64& _copyFrom(const UU64& pIn);
+  UU64& operator = (const UU64& pIn) {return _copyFrom(pIn);}
+  UU64& operator = (const uint64_t& pIn) {return fromNatural(pIn);}
+
+  size_t getSize() {return sizeof(uint64_t);}
+
+  UU64& fromNatural(uint64_t pN);
+  uint64_t toNatural() { return reverseByteOrder_Conditional(Value);}
+
+  ZDataBuffer _export();
+  size_t _import(unsigned char* &pIn);
+
+  static ZDataBuffer _exportURF(uint64_t pValue);
+  static ZDataBuffer& _exportURF(uint64_t pValue,ZDataBuffer& pBuf);
+
+  ZDataBuffer _exportURF();
+  ZDataBuffer& _exportURF(ZDataBuffer& pOut);
+  ssize_t _importURF(unsigned char* &pIn);
+  static ssize_t _importURF(uint64_t& pValue,unsigned char* &pIn);
+
+};
+
+
+class UFloat
+{
+public:
+  uint8_t   Sign;
+  float     Value;
+  UFloat() {}
+  UFloat(const UFloat& pIn) {_copyFrom(pIn);}
+  UFloat(float pIn) {fromNatural(pIn);}
+  UFloat& _copyFrom(const UFloat& pIn);
+  UFloat& operator = (const UFloat& pIn) {return _copyFrom(pIn);}
+  UFloat& operator = (const float& pIn) {return fromNatural(pIn);}
+
+  size_t getSize() {return sizeof(float)+1;}
+
+  UFloat& fromNatural(float pN);
+  float toNatural();
+
+  ZDataBuffer _export();
+  size_t _import(unsigned char* &pIn);
+
+  static ZDataBuffer _exportURF(float pValue);
+  static ZDataBuffer& _exportURF(float pValue,ZDataBuffer& pBuf);
+
+  ZDataBuffer _exportURF();
+  ZDataBuffer& _exportURF(ZDataBuffer& pOut);
+  ssize_t _importURF(unsigned char* &pIn);
+  static ssize_t _importURF(float& pValue,unsigned char* &pIn);
+};
+class UDouble
+{
+public:
+  uint8_t   Sign;
+  double    Value;
+  UDouble() {}
+  UDouble(const UDouble& pIn) {_copyFrom(pIn);}
+  UDouble(double pIn) {fromNatural(pIn);}
+  UDouble& _copyFrom(const UDouble& pIn);
+  UDouble& operator = (const UDouble& pIn) {return _copyFrom(pIn);}
+  UDouble& operator = (const double& pIn) {return fromNatural(pIn);}
+
+  size_t getSize() {return sizeof(double)+1;}
+
+  UDouble& fromNatural(double pN);
+  double toNatural();
+
+  ZDataBuffer _export();
+  size_t _import(unsigned char* &pIn);
+
+  static ZDataBuffer _exportURF(double pValue);
+  static ZDataBuffer& _exportURF(double pValue,ZDataBuffer& pBuf);
+
+  ZDataBuffer _exportURF();
+  ZDataBuffer& _exportURF(ZDataBuffer& pOut);
+  ssize_t _importURF(unsigned char* &pIn);
+  static ssize_t _importURF(double& pValue,unsigned char* &pIn);
+};
+#pragma pack(pop)
+
+
+
 #endif // ZDATATYPE_H

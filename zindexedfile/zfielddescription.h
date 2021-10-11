@@ -2,9 +2,11 @@
 #define ZFIELDDESCRIPTION_H
 
 #include <stdlib.h> //for atexit()
+#include <sys/types.h>
 
-#include <zxml/zxml.h>
-#include <zxml/zxmlprimitives.h>
+#include <ztoolset/ztypetype.h>
+#include <ztoolset/zutfstrings.h>
+#include <ztoolset/zaierrors.h>
 
 namespace zbs {
 #pragma pack(push)
@@ -35,23 +37,17 @@ struct FieldDesc_Export{
  */
 class ZFieldDescription
 {
-  ZFieldDescription& _copyFrom(ZFieldDescription& pIn)
-  {
-    ZType=pIn.ZType;
-    Capacity=pIn.Capacity;
-    HeaderSize=pIn.HeaderSize;
-    UniversalSize=pIn.UniversalSize;
-    NaturalSize=pIn.NaturalSize;
-    KeyEligible=pIn.KeyEligible;
-    Name=pIn.Name;
-  }
+
+
 public:
   ZFieldDescription() = default;
   ZFieldDescription (ZFieldDescription& pIn) { _copyFrom(pIn); }
   ZFieldDescription (ZFieldDescription&& pIn) { _copyFrom(pIn); }
 
-  ZFieldDescription& operator = (ZFieldDescription& pIn) { _copyFrom(pIn); }
-  ZFieldDescription& operator = (ZFieldDescription&& pIn) { _copyFrom(pIn); }
+  ZFieldDescription& _copyFrom(ZFieldDescription& pIn);
+
+  ZFieldDescription& operator = (ZFieldDescription& pIn) { return _copyFrom(pIn); }
+  ZFieldDescription& operator = (ZFieldDescription&& pIn) { return _copyFrom(pIn); }
 
   ZTypeBase           ZType;
   URF_Capacity_type   Capacity;           //!< if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if an atomic
@@ -59,8 +55,14 @@ public:
   uint64_t            UniversalSize;      //!< Only if ZType is fixed length. Otherwise set to 0
   uint64_t            NaturalSize;        //!< Only if ZType is fixed length. Otherwise set to 0
   ZBool               KeyEligible=false ; //!< May be used as Key field (true) or not (false)
-  utf8String          Name;               //!< Name of the field
 
+private: utf8String          Name;        //!< Name of the field
+public:  md5                 Hash;        //!< unique hashcode value for the field.
+
+  void setFieldName(const utf8String& pName);
+  utf8String& getName() {return Name;}
+  bool hasName(const char* pName) const { return Name==pName; }
+  bool hasName(const utf8String& pName) const { return Name==pName.toCChar(); }
 
   bool isAtomic(void) {return ZType & ZType_Atomic ;}
   bool isArray(void) {return ZType & ZType_Array ;}
@@ -71,10 +73,10 @@ public:
   bool isSigned(void) {return ZType & ZType_Signed ;}
   bool isEndian(void) {return ZType & ZType_Endian ;}
 
-  void clear() {ZType=0; Capacity=0;HeaderSize=0;UniversalSize=0;NaturalSize=0; KeyEligible=false;Name.clear();}
+  void clear() {ZType=0; Capacity=0;HeaderSize=0;UniversalSize=0;NaturalSize=0; KeyEligible=false;Name.clear(); Hash.clear();}
 
-  utf8String toXml(int pLevel);
-  int fromXml(zxmlNode* pRootNode,ZaiErrors* pErrorlog);
+  utf8String toXml(int pLevel, bool pComment=true);
+  ZStatus fromXml(zxmlNode* pRootNode, ZaiErrors* pErrorlog, ZaiE_Severity pSeverity=ZAIES_Error);
 
   static FieldDesc_Export _exportConvert(ZFieldDescription&pIn,FieldDesc_Export* pOut);
   static ZFieldDescription _importConvert(ZFieldDescription& pOut,FieldDesc_Export* pIn);

@@ -1,162 +1,22 @@
-#ifndef ZSIndexFile_H
-#define ZSIndexFile_H
+#ifndef ZSINDEXFILE_H
+#define ZSINDEXFILE_H
 
 #include <zindexedfile/zmfconfig.h>
 
-#include <cstdarg>
-#include <zrandomfile/zrandomfile.h>
-#include <ztoolset/ztimer.h> // to get ZTimer
+#include <zindexedfile/zrawindexfile.h>
 
-#include <zindexedfile/zindexcontrolblock.h>
 
-//#include <ztoolset/zsacommon.h> // for types and getDataType
 
-//#include <zam/zam_include.h> // for ZOp
 
-#include <zindexedfile/zsindextype.h>
-
-#include <zindexedfile/zsindexcollection.h>
-
-#include <zcontentcommon/zoperation.h>
-
-/*
-#ifdef ZVerbose
-extern ZVerbose_type ZVerbose;
-extern FILE* ZVerboseOutput;
-#endif
-*/
-#ifndef ZSMASTERFILE_CPP
-    extern bool ZMFStatistics;
-
-#endif
-
-    void    setZVerbose(ZVerbose_type pVerbose) ;
-    void    setZMFStatistics (bool pStatistics) ;
+//=================================ZSIndexFile===============================
 
 namespace zbs {
-
-/**
-* @addtogroup ZMFSTATS
- * @brief The zstatistics struct This object is used to store statistic on performance during searches on Indexes for a ZMasterFile
- *
-
- *
- *  Each high level operation (zsearch, zadd, etc...) gives its own zstatistics values, specific to the operation,
- * whatever the result is, even in case of failure.
- *
- *
- * As it accesses ZRandomFile, it collects also the whole ZRFPMS data set for the operation.
- *
- *
- */
-#ifndef ZMFSTATS
-#define ZMFSTATS
-struct zstatistics : ZRFPMS
-{
-    long    Iterations;     //!< Number of iterations a seek operation needed
-    //
-    long    Reads;          //!< Number of ZRandomFile read accesses : zget
-    long    Writes;         //!< Number of ZRandomFile write accesses : zwrite
-    long    Removes;        //!< Number of ZRandomFile remove accesses : zremove
-    ZTimer  Timer;          //!< Timer set for the operation
-    ZTime   Delta;          //!< Elapsed
-    ZRFPMS  *PMSBase;       //!< pointer to a ZRandomFile PMS base
-    ZRFPMS  PMSStart;
-
-    zstatistics(void) {clear();  return;}
-
-    void clear (void) {memset(this,0,sizeof(zstatistics)); return;}
-
-    void setPMSBase (ZRFPMS  *pZPMS) {PMSBase=pZPMS; return;}
-
-
-    void init (void) ;
-    zstatistics & end(void);
-
-    void reportShort(FILE* pOutput=stdout);
-    void reportFull(FILE* pOutput=stdout);
-
-    zstatistics & operator = (ZRFPMS pPMSIn) { memmove (this,&pPMSIn,sizeof(ZRFPMS)); return *this;}
-    zstatistics & operator = (zstatistics pStatIn) { memmove (this,&pStatIn,sizeof(zstatistics)); return *this;}
-
-    zstatistics  operator - (zstatistics &pStatIn);
-    zstatistics  operator + (zstatistics &pStatIn);
-
-    zstatistics& operator -= (zstatistics &pPMSIn);
-    zstatistics& operator += (zstatistics &pPMSIn);
-
-};
-
-#endif // ZMFSTATS
-
-
-//------- Index & key data structure definitions--------------
 
 /** @addtogroup ZIndexGroup
  *
  * @{
  *
 */
-
-
-
-
-
-/**
- @brief The ZIndexItem class  Main Input/Ouput for indexes. It relates to ZRecord.
-The key effective content as it will be stored using ZSIndexFile object (and not its Fields structure definition).
-
-*/
-class ZSIndexItem : public ZDataBuffer
-{
-public:
-        zaddress_type ZMFaddress;    //!< Master file block record address to link index key with
-        ZOp           Operation;     //!< this is NOT stored on index file (see toFileKey() method) but only for history & journaling purpose
-        ZDataBuffer   KeyContent;    //!< extracted key content from user record according key extraction rules. Size of content is fixed and value is ZIndexControlBlock::KeySize.
-
-
-
-       void clear (void) {KeyContent.clearData(); ZMFaddress=0L; Operation = ZO_Nothing;
-                          //State = ZAMNothing;
-                          return;}
-       ZDataBuffer& toFileKey(void);
-       ZSIndexItem&  fromFileKey (ZDataBuffer &pFileKey);
-
-private:
-//        ZDataBuffer Exchange;
-};
-
-class ZSIndexItemList : public ZArray<ZSIndexItem*>
-{
-typedef ZArray<ZSIndexItem*> _Base;
-public:
-    ~ZSIndexItemList(void)
-        {
-        clear();
-        }
-
-    void clear(void)
-        {
-        while (size()>0)
-        delete popRP(&wItem);
-        _Base::clear();
-        }
-
-ZSIndexItem* wItem;
-};
-
-
-
-
-
-//--------------Generic Functions--------------------------------------------------
-
-
-ZStatus _keyValueExtraction(ZSKeyDictionary* pZKDic, ZRecord *pRecord, ZDataBuffer& pKey);
-
-
-//=================================ZSIndexFile===============================
-
 
 
 /**
@@ -173,16 +33,22 @@ Integrity controls are done to garanty an alignment with its ZMasterFile father.
 @note this class is transparently created and used from ZMasterFile class object using appropriate ZMF routines.
 
  */
+//class ZSIndexControlBlock;
+class ZSIndexItem;
+class ZRecord;
+class ZRawRecord;
+class ZRawMasterFile;
 
-class ZSIndexFile : protected ZRandomFile
+class ZSIndexFile : public ZRawIndexFile
 {
 friend class ZSIndexCollection;
+friend class ZRawMasterFile;
+friend class ZSMasterFile;
+
 protected:
-        typedef ZRandomFile                   _Base   ;
+        typedef ZRawIndexFile                   _Base   ;
 public:
-    friend class ZSMasterFile;
-    ZSIndexControlBlock                    *ZICB=nullptr;    //!< ZICB pointer to ZMF father's ZICB content
-    zstatistics                            ZPMSStats;       //!< statistical structure
+
 /**
  * @brief ZSIndexFile first constructor version : the common one.
  *          It sets up the ZSIndexFile parameters AND rebuild the index if pAutoRebuild is set to true (default value is true).
@@ -195,12 +61,15 @@ public:
  * @param[in] pFather ZAM to which the ZIX refers
  * @param[in] pDuplicates ZSort_Type defining how duplicates will be managed. (set to ZST_DUPLICATES by default)
  */
-    ZSIndexFile  (void *pFather);
-    ZSIndexFile  (void *pFather,ZSIndexControlBlock* pZICB);
+    ZSIndexFile  (ZSMasterFile *pFather);
+    ZSIndexFile  (ZSMasterFile *pFather,ZSIndexControlBlock& pZICB);
+    ZSIndexFile  (ZSMasterFile *pFather,ZSKeyDictionary* pKDic, int pKeyUniversalsize,const utf8String &pIndexName ,ZSort_Type pDuplicates=ZST_NODUPLICATES);
+
 
     ~ZSIndexFile() {}
     //~ZSIndexFile() {if (ZMFFather!=nullptr)
     //                             _deregister();}
+
 
     using _Base::getSize ;
     using _Base::getAllocatedBlocks;
@@ -219,142 +88,100 @@ public:
 
     using _Base::isOpen;
 
-    ZStatus setIndexURI(uriString &pUri);
-    void setIndexName (utf8String &pName);
-    void setICB (ZSIndexControlBlock *pICB);
+    using _Base::getFCB;
+    using _Base::getFileType;
 
-    ZStatus removeIndexFiles(void);
 
-    ZFileDescriptor& getIndexFileDescriptor(void) {return _Base::ZDescriptor;}
+    ZStatus _keyValueExtraction(ZRecord &pRecord, ZDataBuffer& pKeyOut);
 
-    zrank_type getCurrentRank (void) {return ZDescriptor.CurrentRank;}
 
-    ZStatus zcreateIndex(ZSIndexControlBlock *pICB,
-                         uriString &pIndexUri,
-                         long pAllocatedBlocks,
-                         long pBlockExtentQuota,
-                         zsize_type pInitialSize,
-                         bool pHighwaterMarking=false,
-                         bool pGrabFreeSpace=false,
-                         bool pReplace=false,
-                         bool pLeaveOpen=true);
-
-    ZStatus zrebuildIndex (bool pStat=false, FILE *pOutput=stdout) ;
-
-    ZStatus openIndexFile (uriString &pIndexUri, const int pMode);
-    ZStatus closeIndexFile (void);
-
-    ZStatus writeIndexControlBlock(checkSum **pCheckSum=nullptr);
-
-    ZStatus removeIndexValue    (const ZDataBuffer& pKey , zaddress_type &pAddress);
-//    ZStatus insertIndexValue    (ZDataBuffer& pRecord ,zaddress_type &pAddress, long &pZMFRank);
-
-/*    ZStatus addRollback         (ZDataBuffer& pRecord , long &pZMFRank,zaddress_type &pAddress);
-    ZStatus removeRollback      (ZDataBuffer& pRecord , long &pZMFRank,zaddress_type &pAddress);
-    ZStatus insertRollback      (ZDataBuffer& pRecord , long &pZMFRank,zaddress_type &pAddress);
-*/
-    ZStatus searchIndex     (ZDataBuffer& KeyValue);
-
-    ZStatus clearIndexFile  (void);
-/** @cond Development */
-    ZStatus _addKeyValue(ZRecord *pZMFRecord, zrank_type &pIndexRank, const zaddress_type pZMFAddress);
-
-    ZStatus _addKeyValue_Prepare(ZRecord *pElement, ZSIndexItem *&pIndexItem, zrank_type &pIndexCommit, const zaddress_type pZMFAddress);
-    ZStatus _addKeyValue_Commit(ZSIndexItem* pIndexItem, const zrank_type pIndexCommit);
-    ZStatus _addKeyValue_Rollback(const zrank_type pIndexCommit);
-    ZStatus _addKeyValue_HardRollback(const zrank_type pIndexCommit);
-
-    ZStatus _removeKeyValue_Prepare (ZDataBuffer &pKey, ZSIndexItem *&pIndexItem, long &pIndexRank, zaddress_type &pZMFAddress);
-    ZStatus _removeKeyValue_Commit  (const zrank_type pIndexCommit);
-    ZStatus _removeKeyValue_Rollback( const zrank_type pIndexCommit);
-    ZStatus _removeKeyValue_HardRollback(ZSIndexItem *pIndexItem, const zrank_type pIndexCommit);
-/** @endcond */
-
-    ZStatus getKeyIndexFields(ZDataBuffer &pIndexContent,ZDataBuffer& pKeyValue);
-    ZStatus zprintKeyFieldsValues (const zrank_type pRank, bool pHeader=true, bool pKeyDump=false, FILE*pOutput=stdout) ;
-
-    static inline
-    ZStatus
-    _search(const ZDataBuffer &pKey,
-            ZSIndexFile &pZIF,
-            ZSIndexResult &pZIR,
-//            ZIFCompare pZIFCompare = ZKeyCompareBinary,
-            const zlockmask_type pLock=ZLock_Nolock);
-
-    static
-    ZStatus
-    _searchAll(const ZDataBuffer &pKey,
-               ZSIndexFile &pZIF,
-               ZSIndexCollection &pCollection,
-               const ZMatchSize_type pZMS= ZMS_MatchIndexSize);
-    static
-    ZStatus
-    _searchNext(const ZDataBuffer &pKey,
+ZStatus _search( const ZDataBuffer &pKey,
                 ZSIndexFile &pZIF,
-                ZSIndexCollection &pCollection,
-                const ZMatchSize_type pZSC );
+                ZSIndexResult &pZIR,
+                const zlockmask_type pLock) ;
 
-    static
-    ZStatus _searchFirst (const ZDataBuffer        &pKey,     // key content to find out in index
-                          ZSIndexFile               &pZIF,
-                          ZSIndexCollection         *pCollection,
-                          ZSIndexResult             &pZIR, const ZMatchSize_type pZMS) ;
-    static
-    ZStatus _searchNext (ZSIndexResult             &pZIR,
-                         ZSIndexCollection *pCollection) ;
+ZStatus _searchFirst(const ZDataBuffer        &pKey,     // key content to find out in index
+        ZSIndexFile               &pZIF,     // pointer to ZIndexControlBlock containing index description
+        ZSIndexCollection         *pCollection,
+        ZSIndexResult             &pZIR,
+        const ZMatchSize_type    pZMS);
 
-    static
-    ZStatus _searchIntervalFirst (const ZDataBuffer        &pKeyLow,     // lowest value of key content to find out in index
-                                  const ZDataBuffer        &pKeyHigh,    // highest value of key content to find out in index
-                                  ZSIndexFile               &pZIF,       // ZSIndexFile object to search on
-                                  ZSIndexCollection         *pCollection, // collection and context
-                                  ZSIndexResult             &pZIR,       // First (in key order) index rank & ZMF addresses found matching key value
-                                  const bool               pExclude); // Exclude KeyLow and KeyHigh value from selection (i. e. > pKeyLow and < pKeyHigh)
+ZStatus _searchNext (ZSIndexResult       &pZIR,
+                      ZSIndexCollection*  pCollection);
 
 
+ZStatus _searchAll(const ZDataBuffer        &pKey,     // key content to find out in index
+                  ZSIndexFile               &pZIF,     // pointer to ZIndexControlBlock containing index description
+                  ZSIndexCollection &pCollection,
+                  const ZMatchSize_type    pZMS);
 
-    static
-    ZStatus _searchIntervalNext (ZSIndexResult       &pZIR,
-                                 ZSIndexCollection   *pCollection) ;
+ZStatus _searchIntervalFirst(const ZDataBuffer      &pKeyLow,  // Lowest key content value to find out in index
+                            const ZDataBuffer      &pKeyHigh, // Highest key content value to find out in index
+                            ZSIndexFile             &pZIF,     // pointer to ZIndexControlBlock containing index description
+                            ZSIndexCollection       *pCollection,   // enriched collection of reference (ZSIndexFile rank, ZMasterFile record address)
+                            ZSIndexResult           &pZIR,
+                            const bool             pExclude);
 
-    static
-    ZStatus _searchIntervalAll   (const ZDataBuffer        &pKeyLow,     // lowest value of key content to find out in index
-                                  const ZDataBuffer        &pKeyHigh,    // highest value of key content to find out in index
-                                  ZSIndexFile               &pZIF,       // ZSIndexFile object to search on
-                                  ZSIndexCollection         *pCollection, // collection and context
-                                  const bool               pExclude); // Exclude KeyLow and KeyHigh value from selection (i. e. > pKeyLow and < pKeyHigh)
+ZStatus _searchIntervalNext (ZSIndexResult       &pZIR,ZSIndexCollection*  pCollection);
 
 
-private:
-   void*                        ZMFFather=nullptr;   // pointer to ZMasterFile that instantiated the ZSIndexFile object
-   uriString                    IndexUri;    // current Index File uri to be passed to ZRandomFile
+ZStatus _searchIntervalAll (const ZDataBuffer      &pKeyLow,  // Lowest key content value to find out in index
+                            const ZDataBuffer      &pKeyHigh, // Highest key content value to find out in index
+                            ZSIndexFile             &pZIF,     // pointer to ZIndexControlBlock containing index description
+                            ZSIndexCollection       *pCollection,   // enriched collection of reference (ZSIndexFile rank, ZMasterFile record address)
+                            const bool             pExclude); // Exclude KeyLow and KeyHigh value from selection (i. e. > pKeyLow and < pKeyHigh)
 
-#ifdef __USE_ZTHREAD__
-    ZMutex _Mtx;
-#endif
 
-    ZStatus _addRebuild(ZDataBuffer &pElement, size_t pZAMIdx);
-    ZStatus _rebuildReverse(void);
-    ZStatus _updateZReverse(ZOp pZAMOp,ZOp pZIXOp, size_t pZAMIdx, size_t pIdx);
-    long _lookupZMFIdx (size_t pZMFIdx);
+ZStatus getUniversalbyRank (ZDataBuffer &pOutValue,
+                            ZBitset* pFieldPresence,
+                            const long pKeyRank,
+                            const long pFieldRank,
+                            bool pTruncate);
 
-    ZStatus _alignZSIndexFile(ZOp pZAMOp,ZOp pZIXOp, size_t pZAMIdx, size_t pZIXIdx);
+ZStatus addKeyValue(ZRecord *pZMFRecord, zaddress_type pZMFAddress);
+ZStatus _addKeyValue_Prepare(ZSIndexItem *&pIndexItem, zrank_type &pZBATIndex, const zaddress_type pZMFAddress);
+ZStatus _addKeyValue_Commit(ZSIndexItem *pIndexItem, const zrank_type pZBATIndex);
+ZStatus _addKeyValue_Rollback(const zrank_type pIndexCommit);
 
-private:
-    long            IndexCommitRank;
-    zaddress_type   ZMFAddress;
-    ZDataBuffer     CurrentKeyContent;
+ZStatus _addKeyValue_HardRollback(const zrank_type pIndexCommit);
+
+ZStatus _removeKeyValue_Prepare(ZDataBuffer & pKey,
+                                ZSIndexItem* &pIndexItem,
+                                long& pIndexRank,
+                                zaddress_type &pZMFAddress);
+
+ZStatus _removeKeyValue_Commit(const zrank_type pIndexCommit);
+ZStatus _removeKeyValue_Rollback(const zrank_type pIndexCommit);
+ZStatus _removeKeyValue_HardRollback(ZSIndexItem* pIndexItem, const zrank_type pIndexCommit);
+
+ZStatus _removeIndexItem_Prepare(ZSIndexItem &pIndexItem,long & pIndexRank);
+ZStatus removeIndexValue        (const ZDataBuffer& pKey , zaddress_type &pAddress);
+
+ZStatus zrebuildIndex(bool pStat, FILE*pOutput);
+
+/**
+ * @brief ZSIndexFile::_extractKeys extracts all defined keys from pRecordContent using pMasterDic givin pKeysContent as a result.
+ * @param pRecordContent
+ * @param pMasterDic
+ * @param pKeysContent
+ * @return
+ */
+ZStatus _extractKey(ZRecord *pRecord, ZDataBuffer& pKeyContent);
+
+
+ZStatus getKeyIndexFields(ZDataBuffer &pIndexContent,ZDataBuffer& pKeyValue);
+ZStatus zprintKeyFieldsValues (const zrank_type pRank,bool pHeader,bool pKeyDump,FILE*pOutput);
+
 };// class ZSIndexFile
 
-/** @} */ // ZIndexGroup
 
-//--------------Functions------------------------
-
-
-ZStatus _printKeyFieldsValues (ZDataBuffer *wKeyContent,ZSIndexControlBlock* ZICB, bool pHeader,bool pKeyDump,FILE*pOutput);
 
 
 } // namespace zbs
 
 
-#endif  //ZSIndexFile_H
+
+ZStatus
+_printKeyFieldsValues (ZDataBuffer* wKeyContent,ZSIndexFile* pZIF, bool pHeader,bool pKeyDump,FILE*pOutput);
+
+#endif  //ZSINDEXFILE_H

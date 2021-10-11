@@ -16,7 +16,7 @@ int ZKeyCompareAlpha (const ZDataBuffer &pKey1,ZDataBuffer &pKey2,ssize_t pSize)
 
 typedef int  (*ZIFCompare) (const ZDataBuffer &pKey1,ZDataBuffer &pKey2,ssize_t pSize);
 
-class ZSIndexFile;
+class ZRawIndexFile;
 class ZSMasterFile;
 class ZSIndexCollection;
 
@@ -66,8 +66,8 @@ public:
     ZSIndexResult(void) {reset();}
     ~ZSIndexResult(void) {}
 
-    zrank_type       IndexRank; //!< ZIndexFile rank
-    zaddress_type ZMFAddress;   //!< Corresponding ZMasterFile address
+    zrank_type      IndexRank; //!< ZIndexFile rank
+    zaddress_type   ZMFAddress;//!< Corresponding ZMasterFile address
 
     static
     ZSIndexResult create(zaddress_type pZMFAddress,zrank_type pIndexRank)
@@ -198,9 +198,12 @@ class ZSIndexCollection : public ZArray<ZSIndexResult>  // Ranks of the correspo
 
     friend class ZSMasterFile;
     friend class ZSIndexFile;
+    friend class ZRawMasterFile;
+    friend class ZRawIndexFile;
+
 public:
     ZSIndexCollection(void) {ZIFFile=nullptr;}
-    ZSIndexCollection(ZSIndexFile *pZIFFile) ;
+    ZSIndexCollection(ZRawIndexFile *pZIFFile) ;
     ZSIndexCollection(ZSMasterFile &pZMFFile, const long pIndexRank) ;
 
     ~ZSIndexCollection(void) { if (InputCollection!=nullptr)
@@ -267,7 +270,7 @@ public:
 //    void setLock(zlock_type pLock)      {Context.Lock = pLock;}
 
 private:
-    ZSIndexFile *ZIFFile=nullptr;    //!< ZIndexFile file to work with
+    ZRawIndexFile *ZIFFile=nullptr;    //!< ZIndexFile file to work with
     ZSSearchArgument Argument;       //!< stores the evaluation conditions for the current collection : one collection has one search argument data structure
 
     ZArray<ZSIndexResult> *InputCollection=nullptr; //!< stores the collection as Input to work with for evaluating ranks. If nullptr the whole set of ZRF ranks is taken

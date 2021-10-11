@@ -3,6 +3,7 @@
 
 #include <zindexedfile/zsjournal.h>
 #include <zindexedfile/zsmasterfile.h>
+#include <zindexedfile/zsjournalcontrolblock.h>
 
 using namespace zbs;
 
@@ -281,7 +282,7 @@ ZSJournal::start(void)
 
 
 ZStatus
-ZSJournal::reset(ZSMasterFile* pFather)
+ZSJournal::reset(ZRawMasterFile *pFather)
 {
 //uriString   wURIFather;
 uriString   wURIJournal;
@@ -323,7 +324,7 @@ ZStatus     wSt;
 void
 ZSJournal::end(void)
 {
-    if (JThread.Created)    // if journaling thread active
+  if (JThread.isCreated())    // if journaling thread active
         {
         ZDataBuffer wRecord;
         EvtQueue.enqueue(ZJOP_Close,Pid,Uid,wRecord);  // enqueue termination message
@@ -804,68 +805,5 @@ ZProtocol::encode (const char *pString)
  
 
 
-const char*
-ZHAT::decode (void)
-{
-    Buf.clear();
-    if (Type==ZHAT_Nothing)
-                return "ZHAT_Nothing";
-
-    if (Type&ZHAT_IPV6)
-            {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZHAT_IPV6";
-            }
-    if (Type&ZHAT_IPV4)
-            {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZHAT_IPV4";
-            }
-    if (Type&ZHAT_Default)
-            {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZHAT_Default";
-            }
-
-    if (Buf.isEmpty())
-                {
-                return "Unknown ZJState";
-                }
-    return Buf.toCString_Strait();
-
-}// decode
-ZHAT &
-ZHAT::encode (utf8_t *pString)
-{
-    Type = ZHAT_Nothing;
-    if (pString==nullptr)
-                {
-                    return *this;
-                }
-    if (utfStrlen<utf8_t>(pString)==0)
-                {
-                    return *this;
-                }
-utfdescString wBuf;
-    wBuf.clear();
-    wBuf = pString;
-    wBuf.toUpper();
-    if (wBuf=="ZHAT_Nothing")
-            {
-                return *this;
-            }
-    if (Buf.contains((utf8_t*)"ZHAT_IPV4"))
-                     Type |= ZHAT_IPV4;
-    if (Buf.contains((utf8_t*)"ZHAT_IPV6"))
-                     Type |= ZHAT_IPV6;
-    if (Buf.contains((utf8_t*)"ZHAT_Default"))
-                     Type |= ZHAT_Default;
-
-    return *this;
-
-}// encode
 //! @} JournalingGroup
 #endif // ZSJOURNAL_CPP

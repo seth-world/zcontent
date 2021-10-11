@@ -447,11 +447,12 @@ case ZType_Float :
 
 }//_getAtomicUfN
 
+
 //------------------------------- Conversion back from key to natural value--------------------------------------------------------------
 
 
 /**
- * @brief _getAtomicValueFromKey Obtains a single Atomic field value from a Key content (pKeyData) using its key dictionary definition (CZKeyDictionary and pRank).
+ * @brief _getAtomicNfU Obtains a single Atomic field value from a Universal content (pUniversal) .
  *
  * @param[out] pUniversal raw key content of the universal formatted value (excepted address)
  * @param[in] pNatural a ZDataBuffer containing field value in natural format ready to be used by application program
@@ -1330,6 +1331,820 @@ ZStatus _getBitsetType(void*pValue, ZTypeBase &pType, uint64_t &pNaturalSize , u
     return ZS_SUCCESS;
 }
 
+
+/* signed integer 16 */
+
+US16& US16::_copyFrom(const US16& pIn)
+{
+  Sign=pIn.Sign;
+  Value=pIn.Value;
+}
+US16& US16::fromNatural(int16_t pN)
+{
+  if (pN<0)  // if negative value
+  {
+    Sign=0; // sign byte is set to Zero
+    Value=-pN;
+    Value=_negate (Value); // mandatory otherwise -120 is greater than -110
+    Value = reverseByteOrder_Conditional(Value);
+    return *this;
+  }
+
+  /* positive value */
+  Sign=1;
+  Value=pN;
+  Value = reverseByteOrder_Conditional(Value);
+  return *this;
+}
+int16_t US16::toNatural()
+{
+  int16_t wValue = int16_t(reverseByteOrder_Conditional(Value));
+  if (Sign > 0)
+    return wValue;
+
+  wValue=_negate (wValue);
+  return - wValue;
+}
+ZDataBuffer US16::_export()
+{
+  return ZDataBuffer(this,getSize());
+}
+size_t US16::_import(unsigned char* &pIn)
+{
+  memmove (this,pIn,getSize());
+  pIn += getSize();
+  return getSize();
+}
+ZDataBuffer US16::_exportURF()
+{
+  ZDataBuffer pOut;
+  unsigned char* wPtr=pOut.extend(getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_S16;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,this,getSize());
+  return pOut;
+}
+ZDataBuffer& US16::_exportURF(ZDataBuffer& pOut)
+{
+  unsigned char* wPtr=pOut.extend(getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_S16;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,this,getSize());
+  return pOut;
+}
+
+ZDataBuffer US16::_exportURF(int16_t pValue)
+{
+  ZDataBuffer pBuf;
+  US32 pOut(pValue);
+  unsigned char* wPtr=pBuf.extend(pOut.getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_S16;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,&pOut,pOut.getSize());
+  return pBuf;
+}
+ZDataBuffer& US16::_exportURF(int16_t pValue,ZDataBuffer& pBuf)
+{
+  US32 pOut(pValue);
+  unsigned char* wPtr=pBuf.extend(pOut.getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_S16;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,&pOut,pOut.getSize());
+  return pBuf;
+}
+
+ssize_t US16::_importURF(unsigned char* &pIn)
+{
+  ZTypeBase wT;
+  memmove(&wT,pIn,sizeof(ZTypeBase));
+  if (wT!=ZType_S16)
+    return -1;
+  pIn += sizeof(ZTypeBase);
+  memmove (this,pIn,getSize());
+  pIn += getSize();
+  return getSize()+sizeof(ZTypeBase);
+}
+ssize_t US16::_importURF(int16_t& pValue,unsigned char* &pIn)
+{
+  ZTypeBase wT;
+  memmove(&wT,pIn,sizeof(ZTypeBase));
+  if (wT!=ZType_S16)
+    return -1;
+  pIn += sizeof(ZTypeBase);
+  memmove (&pValue,pIn,sizeof(US16));
+  pIn += sizeof(US16);
+  return sizeof(US16)+sizeof(ZTypeBase);
+}
+
+
+/* unsigned integer 16 */
+
+UU16& UU16::_copyFrom(const UU16& pIn)
+{
+  Value=pIn.Value;
+}
+UU16& UU16::fromNatural(uint16_t pN)
+{
+  /* positive value */
+  Value=pN;
+  Value = reverseByteOrder_Conditional(Value);
+  return *this;
+}
+
+ZDataBuffer UU16::_export()
+{
+  return ZDataBuffer(this,getSize());
+}
+size_t UU16::_import(unsigned char* &pIn)
+{
+  memmove (this,pIn,getSize());
+  pIn += getSize();
+  return getSize();
+}
+ZDataBuffer UU16::_exportURF()
+{
+  ZDataBuffer pOut;
+  unsigned char* wPtr=pOut.extend(getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_U16;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,this,getSize());
+  return pOut;
+}
+ZDataBuffer& UU16::_exportURF(ZDataBuffer& pOut)
+{
+  unsigned char* wPtr=pOut.extend(getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_U16;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,this,getSize());
+  return pOut;
+}
+
+ZDataBuffer UU16::_exportURF(uint16_t pValue)
+{
+  ZDataBuffer pBuf;
+  UU32 pOut(pValue);
+  unsigned char* wPtr=pBuf.extend(pOut.getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_U16;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,&pOut,pOut.getSize());
+  return pBuf;
+}
+ZDataBuffer& UU16::_exportURF(uint16_t pValue,ZDataBuffer& pBuf)
+{
+  UU32 pOut(pValue);
+  unsigned char* wPtr=pBuf.extend(pOut.getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_U16;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,&pOut,pOut.getSize());
+  return pBuf;
+}
+
+ssize_t UU16::_importURF(unsigned char* &pIn)
+{
+  ZTypeBase wT;
+  memmove(&wT,pIn,sizeof(ZTypeBase));
+  if (wT!=ZType_U16)
+    return -1;
+  pIn += sizeof(ZTypeBase);
+  memmove (this,pIn,getSize());
+  pIn += getSize();
+  return getSize()+sizeof(ZTypeBase);
+}
+ssize_t UU16::_importURF(uint16_t& pValue,unsigned char* &pIn)
+{
+  ZTypeBase wT;
+  memmove(&wT,pIn,sizeof(ZTypeBase));
+  if (wT!=ZType_U16)
+    return -1;
+  pIn += sizeof(ZTypeBase);
+  memmove (&pValue,pIn,sizeof(UU16));
+  pIn += sizeof(UU16);
+  return sizeof(UU16)+sizeof(ZTypeBase);
+}
+
+/* signed integer 32 */
+
+US32& US32::_copyFrom(const US32& pIn)
+{
+  Sign=pIn.Sign;
+  Value=pIn.Value;
+}
+US32& US32::fromNatural(int32_t pN)
+{
+  if (pN<0)  // if negative value
+  {
+    Sign=0; // sign byte is set to Zero
+    Value=-pN;
+    Value=_negate (Value); // mandatory otherwise -120 is greater than -110
+    Value = reverseByteOrder_Conditional(Value);
+    return *this;
+  }
+
+  /* positive value */
+  Sign=1;
+  Value=pN;
+  Value = reverseByteOrder_Conditional(Value);
+  return *this;
+}
+int32_t US32::toNatural()
+{
+  int32_t wValue = int32_t(reverseByteOrder_Conditional(Value));
+  if (Sign > 0)
+    return wValue;
+
+  wValue=_negate (wValue);
+  return - wValue;
+}
+ZDataBuffer US32::_export()
+{
+  return ZDataBuffer(this,getSize());
+}
+size_t US32::_import(unsigned char* &pIn)
+{
+  memmove (this,pIn,getSize());
+  pIn += getSize();
+  return getSize();
+}
+ZDataBuffer US32::_exportURF()
+{
+  ZDataBuffer pOut;
+  unsigned char* wPtr=pOut.extend(getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_S32;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,this,getSize());
+  return pOut;
+}
+ZDataBuffer& US32::_exportURF(ZDataBuffer& pOut)
+{
+  unsigned char* wPtr=pOut.extend(getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_S32;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,this,getSize());
+  return pOut;
+}
+
+ZDataBuffer US32::_exportURF(int32_t pValue)
+{
+  ZDataBuffer pBuf;
+  US32 pOut(pValue);
+  unsigned char* wPtr=pBuf.extend(pOut.getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_S32;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,&pOut,pOut.getSize());
+  return pBuf;
+}
+ZDataBuffer& US32::_exportURF(int32_t pValue,ZDataBuffer& pBuf)
+{
+  US32 pOut(pValue);
+  unsigned char* wPtr=pBuf.extend(pOut.getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_S32;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,&pOut,pOut.getSize());
+  return pBuf;
+}
+
+ssize_t US32::_importURF(unsigned char* &pIn)
+{
+  ZTypeBase wT;
+  memmove(&wT,pIn,sizeof(ZTypeBase));
+  if (wT!=ZType_S32)
+    return -1;
+  pIn += sizeof(ZTypeBase);
+  memmove (this,pIn,getSize());
+  pIn += getSize();
+  return getSize()+sizeof(ZTypeBase);
+}
+ssize_t US32::_importURF(int32_t& pValue,unsigned char* &pIn)
+{
+  ZTypeBase wT;
+  memmove(&wT,pIn,sizeof(ZTypeBase));
+  if (wT!=ZType_S32)
+    return -1;
+  pIn += sizeof(ZTypeBase);
+  memmove (&pValue,pIn,sizeof(US32));
+  pIn += sizeof(US32);
+  return sizeof(US32)+sizeof(ZTypeBase);
+}
+
+
+/* unsigned integer 32 */
+
+UU32& UU32::_copyFrom(const UU32& pIn)
+{
+  Value=pIn.Value;
+}
+UU32& UU32::fromNatural(uint32_t pN)
+{
+  /* positive value */
+  Value=pN;
+  Value = reverseByteOrder_Conditional(Value);
+  return *this;
+}
+
+ZDataBuffer UU32::_export()
+{
+  return ZDataBuffer(this,getSize());
+}
+size_t UU32::_import(unsigned char* &pIn)
+{
+  memmove (this,pIn,getSize());
+  pIn += getSize();
+  return getSize();
+}
+ZDataBuffer UU32::_exportURF()
+{
+  ZDataBuffer pOut;
+  unsigned char* wPtr=pOut.extend(getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_U32;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,this,getSize());
+  return pOut;
+}
+ZDataBuffer& UU32::_exportURF(ZDataBuffer& pOut)
+{
+  unsigned char* wPtr=pOut.extend(getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_U32;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,this,getSize());
+  return pOut;
+}
+
+ZDataBuffer UU32::_exportURF(uint32_t pValue)
+{
+  ZDataBuffer pBuf;
+  UU32 pOut(pValue);
+  unsigned char* wPtr=pBuf.extend(pOut.getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_U32;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,&pOut,pOut.getSize());
+  return pBuf;
+}
+ZDataBuffer& UU32::_exportURF(uint32_t pValue,ZDataBuffer& pBuf)
+{
+  UU32 pOut(pValue);
+  unsigned char* wPtr=pBuf.extend(pOut.getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_U32;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,&pOut,pOut.getSize());
+  return pBuf;
+}
+
+ssize_t UU32::_importURF(unsigned char* &pIn)
+{
+  ZTypeBase wT;
+  memmove(&wT,pIn,sizeof(ZTypeBase));
+  if (wT!=ZType_U32)
+    return -1;
+  pIn += sizeof(ZTypeBase);
+  memmove (this,pIn,getSize());
+  pIn += getSize();
+  return getSize()+sizeof(ZTypeBase);
+}
+ssize_t UU32::_importURF(uint32_t& pValue,unsigned char* &pIn)
+{
+  ZTypeBase wT;
+  memmove(&wT,pIn,sizeof(ZTypeBase));
+  if (wT!=ZType_U32)
+    return -1;
+  pIn += sizeof(ZTypeBase);
+  memmove (&pValue,pIn,sizeof(UU32));
+  pIn += sizeof(UU32);
+  return sizeof(UU32)+sizeof(ZTypeBase);
+}
+
+
+
+/* signed integer 64 */
+
+US64& US64::_copyFrom(const US64& pIn)
+{
+  Sign=pIn.Sign;
+  Value=pIn.Value;
+}
+US64& US64::fromNatural(int64_t pN)
+{
+  if (pN<0)  // if negative value
+  {
+    Sign=0; // sign byte is set to Zero
+    Value=-pN;
+    Value=_negate (Value); // mandatory otherwise -120 is greater than -110
+    Value = reverseByteOrder_Conditional(Value);
+    return *this;
+  }
+
+  /* positive value */
+  Sign=1;
+  Value=pN;
+  Value = reverseByteOrder_Conditional(Value);
+  return *this;
+}
+int64_t US64::toNatural()
+{
+  int64_t wValue = int64_t(reverseByteOrder_Conditional(Value));
+  if (Sign > 0)
+    return wValue;
+
+  wValue=_negate (wValue);
+  return - wValue;
+}
+ZDataBuffer US64::_export()
+{
+  return ZDataBuffer(this,getSize());
+}
+size_t US64::_import(unsigned char* &pIn)
+{
+  memmove (this,pIn,getSize());
+  pIn += getSize();
+  return getSize();
+}
+ZDataBuffer US64::_exportURF()
+{
+  ZDataBuffer pOut;
+  unsigned char* wPtr=pOut.extend(getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_S64;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,this,getSize());
+  return pOut;
+}
+ZDataBuffer& US64::_exportURF(ZDataBuffer& pOut)
+{
+  unsigned char* wPtr=pOut.extend(getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_S64;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,this,getSize());
+  return pOut;
+}
+
+ZDataBuffer US64::_exportURF(int64_t pValue)
+{
+  ZDataBuffer pBuf;
+  US64 pOut(pValue);
+  unsigned char* wPtr=pBuf.extend(pOut.getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_S64;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,&pOut,pOut.getSize());
+  return pBuf;
+}
+ZDataBuffer& US64::_exportURF(int64_t pValue,ZDataBuffer& pBuf)
+{
+  US64 pOut(pValue);
+  unsigned char* wPtr=pBuf.extend(pOut.getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_S64;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,&pOut,pOut.getSize());
+  return pBuf;
+}
+
+ssize_t US64::_importURF(unsigned char* &pIn)
+{
+  ZTypeBase wT;
+  memmove(&wT,pIn,sizeof(ZTypeBase));
+  if (wT!=ZType_S64)
+    return -1;
+  pIn += sizeof(ZTypeBase);
+  memmove (this,pIn,getSize());
+  pIn += getSize();
+  return getSize()+sizeof(ZTypeBase);
+}
+ssize_t US64::_importURF(int64_t& pValue,unsigned char* &pIn)
+{
+  ZTypeBase wT;
+  memmove(&wT,pIn,sizeof(ZTypeBase));
+  if (wT!=ZType_S64)
+    return -1;
+  pIn += sizeof(ZTypeBase);
+  memmove (&pValue,pIn,sizeof(US64));
+  pIn += sizeof(US64);
+  return sizeof(US64)+sizeof(ZTypeBase);
+}
+
+
+/* unsigned integer 64 */
+
+UU64& UU64::_copyFrom(const UU64& pIn)
+{
+  Value=pIn.Value;
+}
+UU64& UU64::fromNatural(uint64_t pN)
+{
+  /* positive value */
+  Value=pN;
+  Value = reverseByteOrder_Conditional(Value);
+  return *this;
+}
+
+ZDataBuffer UU64::_export()
+{
+  return ZDataBuffer(this,getSize());
+}
+size_t UU64::_import(unsigned char* &pIn)
+{
+  memmove (this,pIn,getSize());
+  pIn += getSize();
+  return getSize();
+}
+ZDataBuffer UU64::_exportURF()
+{
+  ZDataBuffer pOut;
+  unsigned char* wPtr=pOut.extend(getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_U64;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,this,getSize());
+  return pOut;
+}
+ZDataBuffer& UU64::_exportURF(ZDataBuffer& pOut)
+{
+  unsigned char* wPtr=pOut.extend(getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_U64;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,this,getSize());
+  return pOut;
+}
+
+ZDataBuffer UU64::_exportURF(uint64_t pValue)
+{
+  ZDataBuffer pBuf;
+  US64 pOut(pValue);
+  unsigned char* wPtr=pBuf.extend(pOut.getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_U64;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,&pOut,pOut.getSize());
+  return pBuf;
+}
+ZDataBuffer& UU64::_exportURF(uint64_t pValue,ZDataBuffer& pBuf)
+{
+  UU64 pOut(pValue);
+  unsigned char* wPtr=pBuf.extend(pOut.getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_U64;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,&pOut,pOut.getSize());
+  return pBuf;
+}
+
+ssize_t UU64::_importURF(unsigned char* &pIn)
+{
+  ZTypeBase wT;
+  memmove(&wT,pIn,sizeof(ZTypeBase));
+  if (wT!=ZType_U64)
+    return -1;
+  pIn += sizeof(ZTypeBase);
+  memmove (this,pIn,getSize());
+  pIn += getSize();
+  return getSize()+sizeof(ZTypeBase);
+}
+ssize_t UU64::_importURF(uint64_t& pValue,unsigned char* &pIn)
+{
+  ZTypeBase wT;
+  memmove(&wT,pIn,sizeof(ZTypeBase));
+  if (wT!=ZType_U64)
+    return -1;
+  pIn += sizeof(ZTypeBase);
+  memmove (&pValue,pIn,sizeof(UU64));
+  pIn += sizeof(US64);
+  return sizeof(US64)+sizeof(ZTypeBase);
+}
+
+
+
+/* float */
+
+UFloat& UFloat::_copyFrom(const UFloat& pIn)
+{
+  Sign=pIn.Sign;
+  Value=pIn.Value;
+}
+UFloat& UFloat::fromNatural(float pN)
+{
+  if (pN<0)  // if negative value
+  {
+    Sign=0; // sign byte is set to Zero
+    Value=-pN;
+    Value=_negate (Value); // mandatory otherwise -120 is greater than -110
+    Value = reverseByteOrder_Conditional(Value);
+    return *this;
+  }
+
+  /* positive value */
+  Sign=1;
+  Value=pN;
+  Value = reverseByteOrder_Conditional(Value);
+  return *this;
+}
+float UFloat::toNatural()
+{
+  float wValue = float(reverseByteOrder_Conditional(Value));
+  if (Sign > 0)
+    return wValue;
+
+  wValue=_negate (wValue);
+  return - wValue;
+}
+ZDataBuffer UFloat::_export()
+{
+  return ZDataBuffer(this,getSize());
+}
+size_t UFloat::_import(unsigned char* &pIn)
+{
+  memmove (this,pIn,getSize());
+  pIn += getSize();
+  return getSize();
+}
+ZDataBuffer UFloat::_exportURF()
+{
+  ZDataBuffer pOut;
+  unsigned char* wPtr=pOut.extend(getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_Float;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,this,getSize());
+  return pOut;
+}
+ZDataBuffer& UFloat::_exportURF(ZDataBuffer& pOut)
+{
+  unsigned char* wPtr=pOut.extend(getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_Float;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,this,getSize());
+  return pOut;
+}
+
+ZDataBuffer UFloat::_exportURF(float pValue)
+{
+  ZDataBuffer pBuf;
+  UFloat pOut(pValue);
+  unsigned char* wPtr=pBuf.extend(pOut.getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_Float;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,&pOut,pOut.getSize());
+  return pBuf;
+}
+ZDataBuffer& UFloat::_exportURF(float pValue,ZDataBuffer& pBuf)
+{
+  UFloat pOut(pValue);
+  unsigned char* wPtr=pBuf.extend(pOut.getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_Float;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,&pOut,pOut.getSize());
+  return pBuf;
+}
+
+ssize_t UFloat::_importURF(unsigned char* &pIn)
+{
+  ZTypeBase wT;
+  memmove(&wT,pIn,sizeof(ZTypeBase));
+  if (wT!=ZType_Float)
+    return -1;
+  pIn += sizeof(ZTypeBase);
+  memmove (this,pIn,getSize());
+  pIn += getSize();
+  return getSize()+sizeof(ZTypeBase);
+}
+ssize_t UFloat::_importURF(float& pValue,unsigned char* &pIn)
+{
+  ZTypeBase wT;
+  memmove(&wT,pIn,sizeof(ZTypeBase));
+  if (wT!=ZType_Float)
+    return -1;
+  pIn += sizeof(ZTypeBase);
+  memmove (&pValue,pIn,sizeof(US64));
+  pIn += sizeof(US64);
+  return sizeof(US64)+sizeof(ZTypeBase);
+}
+
+/* double */
+
+UDouble& UDouble::_copyFrom(const UDouble& pIn)
+{
+  Sign=pIn.Sign;
+  Value=pIn.Value;
+}
+UDouble& UDouble::fromNatural(double pN)
+{
+  if (pN<0)  // if negative value
+  {
+    Sign=0; // sign byte is set to Zero
+    Value=-pN;
+    Value=_negate (Value); // mandatory otherwise -120 is greater than -110
+    Value = reverseByteOrder_Conditional(Value);
+    return *this;
+  }
+
+  /* positive value */
+  Sign=1;
+  Value=pN;
+  Value = reverseByteOrder_Conditional(Value);
+  return *this;
+}
+double UDouble::toNatural()
+{
+  double wValue = double(reverseByteOrder_Conditional(Value));
+  if (Sign > 0)
+    return wValue;
+
+  wValue=_negate (wValue);
+  return - wValue;
+}
+ZDataBuffer UDouble::_export()
+{
+  return ZDataBuffer(this,getSize());
+}
+size_t UDouble::_import(unsigned char* &pIn)
+{
+  memmove (this,pIn,getSize());
+  pIn += getSize();
+  return getSize();
+}
+ZDataBuffer UDouble::_exportURF()
+{
+  ZDataBuffer pOut;
+  unsigned char* wPtr=pOut.extend(getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_Double;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,this,getSize());
+  return pOut;
+}
+ZDataBuffer& UDouble::_exportURF(ZDataBuffer& pOut)
+{
+  unsigned char* wPtr=pOut.extend(getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_Double;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,this,getSize());
+  return pOut;
+}
+
+ZDataBuffer UDouble::_exportURF(double pValue)
+{
+  ZDataBuffer pBuf;
+  UDouble pOut(pValue);
+  unsigned char* wPtr=pBuf.extend(pOut.getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_Double;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,&pOut,pOut.getSize());
+  return pBuf;
+}
+ZDataBuffer& UDouble::_exportURF(double pValue,ZDataBuffer& pBuf)
+{
+  UDouble pOut(pValue);
+  unsigned char* wPtr=pBuf.extend(pOut.getSize()+sizeof(ZTypeBase));
+  const ZTypeBase wT=ZType_Double;
+  memmove(wPtr,&wT,sizeof(ZTypeBase));
+  wPtr += sizeof(ZTypeBase);
+  memmove (wPtr,&pOut,pOut.getSize());
+  return pBuf;
+}
+
+ssize_t UDouble::_importURF(unsigned char* &pIn)
+{
+  ZTypeBase wT;
+  memmove(&wT,pIn,sizeof(ZTypeBase));
+  if (wT!=ZType_Double)
+    return -1;
+  pIn += sizeof(ZTypeBase);
+  memmove (this,pIn,getSize());
+  pIn += getSize();
+  return getSize()+sizeof(ZTypeBase);
+}
+ssize_t UDouble::_importURF(double& pValue,unsigned char* &pIn)
+{
+  ZTypeBase wT;
+  memmove(&wT,pIn,sizeof(ZTypeBase));
+  if (wT!=ZType_Double)
+    return -1;
+  pIn += sizeof(ZTypeBase);
+  memmove (&pValue,pIn,sizeof(US64));
+  pIn += sizeof(US64);
+  return sizeof(US64)+sizeof(ZTypeBase);
+}
 
 
 

@@ -13,16 +13,16 @@
 #define __ZIF_VERSION__ 3000UL
 
 #include <zindexedfile/zdatatype.h>
-#include <zindexedfile/zrecord.h>
+//#include <zindexedfile/zrecord.h>
 
 /**
-    @addtogroup ZSIndexGroup
-    @{ */
+@addtogroup ZSIndexGroup
+@{ */
 
 //                   ZType_type see <zindexedfile/zdatatype.h>
 
 
-using namespace zbs ;
+namespace zbs {
 
 /** @cond Development */
 /*
@@ -124,6 +124,11 @@ ZStatus wSt;
 //-------- Unitary (Atomic) Key fields definition-------------------------
 class ZSIndexField;
 class ZSKeyDictionary;
+class ZSIndexFile;
+class ZSKey;
+
+}// namespace zbs
+
 
 template <class _Tp>
 ZStatus
@@ -143,23 +148,22 @@ ZStatus _getByteSequenceFromRecord (_Tp pInData,const ssize_t pSize,ZDataBuffer 
 
 //----------Gets a natural value from a key content----------------------------------
 
-ZStatus _getFieldValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSKeyDictionary & pFieldList);
-inline
-ZStatus _getAtomicValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSKeyDictionary & pFieldList);
-inline
-ZStatus _getArrayValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSKeyDictionary & pFieldList);
-inline
-ZStatus _getClassValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSKeyDictionary & pFieldList);
+ZStatus _getFieldValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSIndexFile* pZIF);
+
+ZStatus _getAtomicValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSIndexFile* pZIF);
+
+ZStatus _getArrayValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSIndexFile* pZIF);
+
+ZStatus _getClassValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSIndexFile* pZIF);
 
 
 //-------------Functions----------------------------------
 //!
-bool is_little_endian(void);
 
-ZDataBuffer& _printAtomicValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &pOutValue,const long pRank, ZSKeyDictionary & pFieldList);
-ZDataBuffer& _printArrayValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &pOutValue, const long pRank, ZSKeyDictionary & pKFieldList);
+ZDataBuffer& _printAtomicValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &pOutValue,const long pRank, ZSIndexFile* pZIF);
+ZDataBuffer& _printArrayValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &pOutValue, const long pRank, ZSIndexFile* pZIF);
 
-class ZSKey;
+
 
 template <class _Tp>
 ZStatus
@@ -208,6 +212,7 @@ template <class _Tp>
 ZStatus
 //getAtomicZType(const size_t pTypeHashCode,long& pType,ssize_t& pNaturalSize,ssize_t& pKeyFieldSize);
 getAtomicZType(_Tp pValue, ZTypeBase& pType, uint64_t &pNaturalSize, uint64_t &pUniversalSize);
+
 
 
 
