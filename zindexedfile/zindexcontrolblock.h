@@ -15,31 +15,30 @@ namespace zbs {
  * This infraData is stored in the ZSIndexFile Header AND in the ZSMasterFile index collection within its reserved Header block (ZMasterControlBlock)
  */
 #pragma pack(push)
-#pragma pack(0)
+#pragma pack(1)
 
 class ZSICBOwnData;
-struct ZSICBOwnData_Export{
-  ZSICBOwnData_Export() {}
-  ZSICBOwnData_Export(const ZSICBOwnData_Export& pIn) { _copyFrom(pIn);}
+struct ZSICB_Export{
+  ZSICB_Export() {}
+  ZSICB_Export(const ZSICB_Export& pIn) { _copyFrom(pIn);}
 
 
 
-  ZSICBOwnData_Export& _copyFrom(const ZSICBOwnData_Export& pIn);
-  ZSICBOwnData_Export& _copyFrom(const ZSICBOwnData *pIn);
+  ZSICB_Export& _copyFrom(const ZSICB_Export& pIn);
+  ZSICB_Export& set(const ZSICBOwnData *pIn);
 
-  ZSICBOwnData_Export& operator = (const ZSICBOwnData_Export& pIn) {return  _copyFrom(pIn);}
+  ZSICB_Export& operator = (const ZSICB_Export& pIn) {return  _copyFrom(pIn);}
 
-  ZSICBOwnData_Export& _reverseConditional();
+  ZSICB_Export& _reverseConditional();
 
-  uint32_t      StartSign = cst_ZSTART ;         //!< ZICB block start marker
-  ZBlockID      BlockID   = ZBID_ICB;            //!< must be ZBID_ICB
-  uint32_t      ZMFVersion= __ZMF_VERSION__ ;    //!< Self explainatory
+  uint32_t      StartSign = cst_ZBLOCKSTART ;    // ZICB block start marker
+  ZBlockID      BlockId   = ZBID_ICB;            // must be ZBID_ICB
+  uint32_t      ZMFVersion= __ZMF_VERSION__ ;    // Self explainatory
 
-  uint32_t      ICBTotalSize=0;       //!< ICB total size when written in file header (ZReserved header section size) this field must preceed ICB export content
-  int32_t       ZKDicOffset;       //!< offset to ZDictionary (taking varying sized Index Name into account)
+  uint32_t      ICBTotalSize=0;    // ICB total size when written in file header (ZReserved header section size) this field must preceed ICB export content
+  int32_t       ZKDicOffset;       // offset to ZDictionary (taking varying sized Index Name into account) or -1 if no key dictionary
 
-  uint32_t      KeyUniversalSize=0;   //!< total of key size according universal format (in line with ZKDic when exists)
-//  ZBool                   HasKeyDictionary=false;
+  uint32_t      KeyUniversalSize=0;   // total key size according universal format (in line with ZKDic when exists)
 
 //  ZIFKeyType_type         KeyType;            //!< RFFU
 //  uint8_t                 AutoRebuild=false;  //!< RFFU
@@ -77,7 +76,7 @@ public:
 
   utf8String toXml(int pLevel);
   ZStatus fromXml(zxmlNode* pIndexRankNode,ZaiErrors* pErrorlog);
-  ZDataBuffer& _exportAppend(ZDataBuffer& pZDBExport);
+//  ZDataBuffer& _exportAppend(ZDataBuffer& pICBE);
 
   ZStatus _import(unsigned char *&pPtrIn);
   void clear()

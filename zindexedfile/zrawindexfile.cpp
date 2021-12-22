@@ -43,35 +43,34 @@ ZSIndexControlBlock::_export()
 ZDataBuffer &
 ZSIndexControlBlock::_exportAppend(ZDataBuffer &pICBContent)
 {
-ZSICBOwnData_Export* wICBE;
-int32_t  wDicOffset=0;
+ZSICB_Export* wICBE;
+ZSICB_Export wICB;
 
-  ZSICBOwnData::_exportAppend(pICBContent);// export ICB own data in universal format
 
-  wDicOffset=int32_t(pICBContent.Size);
-/* no dictionary */
-#ifdef __COMMENT__
-  /* if Key dictionary does not exist */
+  wICB.set(this);
 
-  if (ZKDic==nullptr) // update ZDataBuffer with ICB size and dictionary offset to -1 (no dictionary)
-    {
-    wICBE=(ZSICBOwnData_Export*)pICBContent.Data;
-    wICBE->ICBTotalSize = reverseByteOrder_Conditional<uint32_t>(uint32_t(pICBContent.Size)) ;
-    wICBE->ZKDicOffset = reverseByteOrder_Conditional<int32_t>(-1) ;
-    return pICBContent;
-    }
-  /* key dictionary exists */
+    // wICB.ZKDicOffset = wICB.ICBTotalSize = sizeof(ZSICBOwnData_Export) +IndexName._getexportUVFSize();
 
-//  ZDataBuffer     wZDB;
+//    wICB._reverseConditional();
+  pICBContent.appendData(&wICB,sizeof(ZSICB_Export));
 
-  ZKDic->_exportAppend(pICBContent);       // export key dictionary
-#endif // #endif // __COMMENT__
+  IndexName._exportAppendUVF(pICBContent);
 
-  // update ZDataBuffer with ICB size and dictionary offset to effective offset to key dictionary
-  wICBE=(ZSICBOwnData_Export*)pICBContent.Data;
-  wICBE->ICBTotalSize = reverseByteOrder_Conditional<uint32_t>(uint32_t(pICBContent.Size)) ;
-  wICBE->ZKDicOffset = reverseByteOrder_Conditional<int32_t>(int32_t(wDicOffset)) ;
+  _exportAtomic<uint32_t>(cst_ZBLOCKEND,pICBContent);
 
+  wICBE=(ZSICB_Export*)pICBContent.Data;
+
+  if (KeyDic==nullptr)
+      {
+      wICBE->ZKDicOffset = -1;
+      wICBE->_reverseConditional();
+      return pICBContent;
+      }
+
+  wICBE->ZKDicOffset =  pICBContent.Size;
+  wICBE->_reverseConditional();
+
+  KeyDic->_exportAppend(pICBContent);
   return  pICBContent ;
 }// _exportICBAppend
 
@@ -318,7 +317,7 @@ ZRawIndexFile::zcreateIndex(ZSIndexControlBlock &pICB,
                          zsize_type pInitialSize,
                          bool pHighwaterMarking,
                          bool pGrabFreeSpace,
-                         bool pReplace,
+                         bool pBackup,
                          bool pLeaveOpen)
 {
 ZStatus wSt;
@@ -340,7 +339,7 @@ ZStatus wSt;
                              pICB.KeyUniversalSize + sizeof(zaddress_type),
                              pHighwaterMarking,
                              pGrabFreeSpace);
-    wSt= _Base::_create(pInitialSize,ZFT_ZSIndexFile,pReplace,false);             // Do not leave it open after file creation : ZRF_Exclusive | ZRF_All
+    wSt= _Base::_create(pInitialSize,ZFT_ZSIndexFile,pBackup,false);             // Do not leave it open after file creation : ZRF_Exclusive | ZRF_All
 
     if (wSt!=ZS_SUCCESS)
                 {
@@ -386,7 +385,7 @@ ZRawIndexFile::zcreateIndex(ZSIndexControlBlock &pICB,
                           long pBlockTargetSize,
                           bool pHighwaterMarking,
                           bool pGrabFreeSpace,
-                          bool pReplace,
+                          bool pBackup,
                           bool pLeaveOpen)
 {
   ZStatus wSt;
@@ -408,7 +407,7 @@ ZRawIndexFile::zcreateIndex(ZSIndexControlBlock &pICB,
                             pInitialSize,
                             pHighwaterMarking,
                             pGrabFreeSpace);
-  wSt= _Base::_create(pInitialSize,ZFT_ZSIndexFile,pReplace,false);             // Do not leave it open after file creation : ZRF_Exclusive | ZRF_All
+  wSt= _Base::_create(pInitialSize,ZFT_ZSIndexFile,pBackup,false);             // Do not leave it open after file creation : ZRF_Exclusive | ZRF_All
 
   if (wSt!=ZS_SUCCESS)
   {
@@ -486,7 +485,11 @@ ZStatus wSt;
                  ZException.setLastSeverity(Severity_Severe);
                 return  wSt;
                 }
+    if (CheckSum!=nullptr)
+    {
     checkSum* wLocalCheckSum = wRawICB.newcheckSum();// compute checksum on it
+
+
     if ((*CheckSum)!=(*wLocalCheckSum))   // compare with ZMF Father's checkSum
         {
         ZDataBuffer wMasterICBContent;
@@ -538,6 +541,7 @@ ZStatus wSt;
         }// checkSum compared
 // zstatistic intitialization
     delete wLocalCheckSum;
+    }//if (CheckSum!=nullptr)
 
     ZPMSStats = ZPMS ;
     return  ZS_SUCCESS ;
@@ -554,6 +558,8 @@ ZDataBuffer wICBContent;
 //
 // flush ICB to Index file
 //
+  if (getMode()==ZRF_NotOpen)
+    return ZS_SUCCESS;
     wSt=_Base::updateReservedBlock(ZSIndexControlBlock::_exportAppend(wICBContent),true);
     if (wSt!=ZS_SUCCESS)
                 {
@@ -582,7 +588,14 @@ ZDataBuffer wICBContent;
 //
     ZHeader.FileType = ZFT_ZSIndexFile;     // setting ZFile_type
 
-    _Base::setReservedContent(ZSIndexControlBlock::_exportAppend(wICBContent));
+    ZSIndexControlBlock::_exportAppend(wICBContent);
+
+    if (KeyDic!=nullptr)
+    {
+      wICBContent.appendData(KeyDic->_export());
+    }
+
+    ZReserved.setData(wICBContent);
     wSt=_Base::_writeFullFileHeader(true);
  //   wSt=_Base::updateReservedBlock(ZICB->_exportICB());
     if (wSt!=ZS_SUCCESS)
@@ -922,7 +935,7 @@ ZRawIndexFile::_addRawKeyValue_Prepare(ZSIndexItem *&pIndexItem,
                                        const zaddress_type pZMFAddress)
 {
 
-ZStatus wSt;
+ZStatus wSt=ZS_SUCCESS;
 //zaddress_type wZMFAddress;
 //zaddress_type wIndexAddress; // not used but necessary for base ZRandomFile class calls
 ZSIndexResult wZIR;
@@ -1428,7 +1441,7 @@ ZDataBuffer wFieldUValue;
         pRecord.getUniversalbyRank(wFieldUValue,wRDicRank);
         pKeyOut.changeData(wFieldUValue,wKeyOffset);
 
-        wKeyOffset += pRecord.RDic->Tab[wRDicRank].MDicRank->UniversalSize;
+        wKeyOffset += pRecord.RDic->Tab[wRDicRank].MDicField->UniversalSize;
         }//for
 
 
@@ -2676,6 +2689,7 @@ long ZIndexTable::pop (void)
   {
     return  -1;// Beware return  is multiple instructions in debug mode
   }
+  last()->closeIndexFile();
   last()->~ZRawIndexFile();
   if (last()!=nullptr)
   {

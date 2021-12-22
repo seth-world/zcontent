@@ -42,15 +42,20 @@ typedef ZArray<ZSIndexField> _Base;
 
 public:
   ZSKeyDictionary(ZMetaDic*pMDic) ;
+  ZSKeyDictionary(const utf8String& pName,ZMetaDic*pMDic) {setName(pName);MetaDic=pMDic;}
   ZSKeyDictionary(ZSKeyDictionary* pIn);
   ZSKeyDictionary(ZSKeyDictionary& pIn);
   ~ZSKeyDictionary() { } // just to call the base destructor
 
   ZSKeyDictionary& _copyFrom( ZSKeyDictionary& pIn);
 
+  ZSKeyDictionary& operator=( ZSKeyDictionary& pIn) {return _copyFrom(pIn);}
+
+  void setName(const utf8String& pName) {DicKeyName=pName;}
+
   bool hasSameContentAs(ZSKeyDictionary*pKey);
 
-  utf8String  IndexName;        //!< refers to ZICB::IndexName
+  utf8String  DicKeyName;        //!< refers to ZICB::IndexName
   ZMetaDic*   MetaDic=nullptr;  //!< Record Dictionary to which Key Dictionary refers : WARNING : not store in xml <keydictionary>
                                 //!  it is stored apart in dedicated <metadic> xml node
 //    uint32_t KDicSize;          //!< Size of the dictionary when exported (other fields are not exported) this field comes first
@@ -70,8 +75,8 @@ public:
     uint64_t getNaturalSize(const long pKFieldRank);
 
 
-    ZStatus addFieldToZDicByName (const utf8_t *pFieldName);
-    ZStatus addFieldToZDicByRank (const zrank_type pMDicRank);
+    ZStatus addFieldToZKeyByName (const char *pFieldName);
+    ZStatus addFieldToZKeyByRank (const zrank_type pMDicRank);
 
 
 

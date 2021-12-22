@@ -8,17 +8,22 @@ using namespace zbs;
 ZMFDictionary::ZMFDictionary()
 {
 }
-ZMFDictionary::ZMFDictionary(ZMFDictionary& pIn)
+ZMFDictionary::ZMFDictionary(const ZMFDictionary &pIn)
 {
   _copyFrom(pIn);
 }
-ZMFDictionary::ZMFDictionary(ZMFDictionary&& pIn)
+ZMFDictionary::ZMFDictionary(const ZMFDictionary&& pIn)
 {
   _copyFrom(pIn);
 }
 
+ZMFDictionary::ZMFDictionary(const ZMetaDic& pIn)
+{
+  ZMetaDic::_copyFrom(pIn);
+}
+
 ZMFDictionary&
-ZMFDictionary::_copyFrom(ZMFDictionary& pIn)
+ZMFDictionary::_copyFrom(const ZMFDictionary& pIn)
 {
   ZMetaDic::_copyFrom(pIn);
   KeyDic.clear();
@@ -31,13 +36,39 @@ ZMFDictionary::_copyFrom(ZMFDictionary& pIn)
 }
 
 
+
+long
+ZMFDictionary::addKey(ZSKeyDictionary*pIn)
+{
+  long wDI=KeyDic.push(new ZSKeyDictionary(this));
+   for (long wi=0; wi < pIn->size();wi++)
+  {
+    ZSIndexField wF=pIn->Tab[wi];  /* debug */
+    KeyDic[wDI]->push(pIn->Tab[wi]);
+  }
+  return wDI;
+}
+long
+ZMFDictionary::addKey(ZSKeyDictionary*pIn,const utf8String& pKeyName)
+{
+  long wDI=KeyDic.push(new ZSKeyDictionary(this));
+  for (long wi=0; wi < pIn->size();wi++)
+  {
+    ZSIndexField wF=pIn->Tab[wi];  /* debug */
+    KeyDic[wDI]->push(pIn->Tab[wi]);
+  }
+  KeyDic[wDI]->setName(pKeyName);
+  return wDI;
+}
+
+
 ZDataBuffer& ZMFDictionary::_exportAppend(ZDataBuffer& pZDB)
 {
   ZMFDicExportHeader wHead;
   wHead.set(this);
   wHead._exportAppend(pZDB);
 
-  ZMetaDic::_export(pZDB);
+  ZMetaDic::_exportAppend(pZDB);
   for (long wi=0;wi<KeyDic.count();wi++)
     KeyDic[wi]->_exportAppend(pZDB);
   return pZDB;
@@ -201,19 +232,27 @@ void ZMFDicExportHeader::set(const ZMFDictionary* pDic)
 
 ZDataBuffer& ZMFDicExportHeader::_exportAppend(ZDataBuffer& pZDB)
 {
+  StartSign = cst_ZBLOCKSTART;
+  BlockId=ZBID_MDIC;
   IndexCount = reverseByteOrder_Conditional<uint32_t>(IndexCount);
   pZDB.appendData(this,sizeof(ZMFDicExportHeader));
   return pZDB;
 }
 size_t ZMFDicExportHeader::_import(unsigned char* &pPtrIn)
 {
-  size_t wSizeImported=0;
   ZMFDicExportHeader* wHead=(ZMFDicExportHeader*)pPtrIn;
-  if (wHead->BlockId!=ZBID_MDIC)
-    {
-    fprintf(stderr,"ZMFDicExportHeader::_import-W-CORRUPT Dictionary data to import appears to be corrupted.\n");
-    abort();
-    }
+  if ((wHead->BlockId!=ZBID_MDIC)||(wHead->StartSign!=cst_ZBLOCKSTART))
+  {
+    ZException.setMessage("ZMFDicExportHeader::_import",
+        ZS_BADDIC,
+        Severity_Severe,
+        "Invalid Dictionary Header : found Start marker <%X> ZBlockID <%X>. One of these is invalid (or both are).",
+        wHead->StartSign,
+        wHead->BlockId);
+    return  ZS_BADDIC;
+  }
+
+
   IndexCount=reverseByteOrder_Conditional<uint8_t>(wHead->IndexCount);
   pPtrIn += sizeof(ZMFDicExportHeader);
   return sizeof(ZMFDicExportHeader);

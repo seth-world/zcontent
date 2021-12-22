@@ -28,7 +28,7 @@ typedef ZStatus (*extractRawKey_type) (ZDataBuffer &pRawRecord,ZRawIndexFile* pZ
 namespace zbs //========================================================================
 {
 
-class ZRawMasterFile: protected ZRandomFile
+class ZRawMasterFile: protected ZRandomFile, public ZSMasterControlBlock
 {
   typedef ZRandomFile _Base ;
 protected:  ZRawMasterFile(ZFile_type pType);
@@ -81,7 +81,7 @@ public:
   ZStatus setIndexFilesDirectoryPath (uriString &pPath);
   ZStatus setJournalLocalDirectoryPath (uriString &pPath);
 
-  ZRawIndexFile* zgetIndexObject(const zrank_type pIndexRank) {return ZMCB.IndexTable[pIndexRank];}
+  ZRawIndexFile* zgetIndexObject(const zrank_type pIndexRank) {return IndexTable[pIndexRank];}
 
   ZStatus zcreate(const uriString pURI,
                   long pAllocatedBlocks,
@@ -96,12 +96,38 @@ public:
 
   ZStatus zcreate ( const uriString pURI, const zsize_type pInitialSize, bool pBackup=false, bool pLeaveOpen=false);
 
-  ZStatus zcreate (const char* pPathName, const zsize_type pInitialSize, bool pBackup=false, bool pLeaveOpen=false);
-
-  ZStatus zcreateRawIndex  (const utf8String &pIndexName,
+//  ZStatus zcreate (const char* pPathName, const zsize_type pInitialSize, bool pBackup=false, bool pLeaveOpen=false);
+  /**
+ * @brief ZRawMasterFile::zcreateRawIndex Generates a new index from a description (meaning a new ZRandomFile data + header).
+ *
+ * This routine will create a new index with the files structures necessary to hold and manage it : a ZSIndexFile object will be instantiated.
+ * Headerfile of this new ZRF will contain the Index Control Block (ZICB) describing the key.
+ *
+ * - generates a new ZSIndexFile object.
+ * - gives to it the Key description ZICB and appropriate file parameter.
+ * - then calls zcreateIndex of the created object that will
+ *    + creates the appropriate file from a ZRandomFile
+ *    + writes the ZICB into the header
+ *
+ *@note
+ * 1. ZSIndexFile never has journaling nor history function. Everything is managed from Master File.
+ * 2. ZSIndexFile file pathname is not stored but is a computed data from actual ZRawMasterFile file pathname.
+ * 3. Master file must be open in mode <ZRF_Exclusive | ZRF_All>
+ * 4. Master file and created index file are not closed and remain open after this operation
+ *
+ * @param[in] pIndexName        User name of the index key as a utfdescString
+ * @param[in] pKeyUniversalSize Fixed length index key size
+ * @param[in] pDuplicates       Type of key : Allowing duplicates (ZST_DUPLICATES) or not (ZST_NODUPLICATES)
+ * @param[in] pBackup           if set to true (default) then index file with the same name will be backup copied.
+ *                              if set to false, index file with the same name will be replaced during creation operation.
+ * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
+ *  ZS_MODEINVALID ZRawMasterFile must be closed when calling zcreateRawIndex. If not, this status is returned.
+ *
+ */
+  ZStatus zcreateRawIndex  (ZRawIndexFile *&pIndexObjectOut,  /* resulting created index object if successful, nullptr  if not*/
+                            const utf8String &pIndexName,
                             uint32_t pKeyUniversalSize,
                             ZSort_Type pDuplicates,
-                            bool pDoNotClose=false,
                             bool pBackup=true);
 
   ZStatus zcreateRawIndexDetailed ( const utf8String &pIndexName, /*-----ICB------*/
@@ -124,10 +150,13 @@ public:
                               bool pGrabFreeSpace,
                               bool pReplace);
 
-  bool hasDictionary() {return ZMCB.MasterDic!=nullptr;}
-  bool hasIndexTable() {return ZMCB.IndexTable.count()>0;}
+  void setDictionary(const ZMFDictionary& pDictionary);
 
-  ZStatus zopen       (const uriString pURI, const int pMode=ZRF_All); // superseeds ZRandomfile zopen
+
+  bool hasDictionary() {return MasterDic!=nullptr;}
+  bool hasIndexTable() {return IndexTable.count()>0;}
+
+  ZStatus zopen       (const uriString& pURI, const int pMode=ZRF_All); // superseeds ZRandomfile zopen
   ZStatus zopen       (const int pMode=ZRF_All) {return (zopen(getURIContent(),pMode));}
   //    ZStatus zopen       (const int pMode=ZRF_All) {return zopen(ZDescriptor.URIContent,pMode);}
 
@@ -253,7 +282,7 @@ public:
 
 
   //-------------Reports------------------------------------
-  void ZMCBreport(void);
+  void ZMCBreport(FILE *pOutput=stdout);
   //---------------------Utilities-----------------------------------
   static
       ZStatus zrepairIndexes (const char *pZMFPath,
@@ -353,14 +382,12 @@ private:
   ZStatus _removeByRankRaw  (ZRawRecord *pRawRecord, const zrank_type pZMFRank);
 
 
-  static inline
-      ZStatus _remove_RollbackIndexes (ZSMasterControlBlock &pZMCB, ZArray<zrank_type> &pIndexRankProcessed);
-  static inline
-      ZStatus _remove_HardRollbackIndexes (ZSMasterControlBlock& pZMCB,
-          ZArray<ZSIndexItem*> &pIndexItemList,
-          ZArray<zrank_type> &pIndexRankProcessed);
-  static inline
-      ZStatus _remove_CommitIndexes (ZSMasterControlBlock& pZMCB, ZSIndexItemList &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed);
+
+  ZStatus _remove_RollbackIndexes (ZArray<zrank_type> &pIndexRankProcessed);
+
+  ZStatus _remove_HardRollbackIndexes (ZArray<ZSIndexItem*> &pIndexItemList,ZArray<zrank_type> &pIndexRankProcessed);
+
+  ZStatus _remove_CommitIndexes ( ZSIndexItemList &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed);
   /** @endcond */
   //-----------End Remove sequence------------------------------------
 
@@ -398,7 +425,7 @@ public:
 
   bool getJournalingStatus (void)
   {
-    return(ZMCB.ZJCB!=nullptr);
+    return(ZJCB!=nullptr);
   }
 
   ZStatus journalingSetup (uriString &pJournalPath);
@@ -438,7 +465,7 @@ public:
 
   // permanent public data
   //
-  ZSMasterControlBlock  ZMCB;      //< Master Control Block : all data is there
+//  ZSMasterControlBlock  ZMCB;      //< Master Control Block : all data is there
   ZMFStats              ZPMSStats; //< Statistical data
 
   extractRawKey_type    extractRawKey_func=nullptr;

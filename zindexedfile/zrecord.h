@@ -4,7 +4,7 @@
 #include <stdlib.h> //for atexit()
 
 #include <zindexedfile/zmfconfig.h>
-#include <ztoolset/zerror.h>
+//#include <ztoolset/zerror.h>
 #include <zindexedfile/zmetadic.h>
 #include <ztoolset/zbitset.h>
 #include <zindexedfile/zdatatype.h>
@@ -48,21 +48,46 @@ namespace zbs {
  @endverbatim
  *
  */
-struct _RDicFieldBase {ZFieldDescription* MDicRank;} ;//!< Pointer to MDicRank
-struct recordFieldDesc_struct : public _RDicFieldBase
-{
-    uint64_t            URFOffset;              //!< Raw offset from beginning of record
-    uint64_t            DataOffset;             //!< Data offset from beginning of record
-    uint64_t            URFSize;                //!< Universal Record Format size (including field header)
-    ZDataBuffer*        URFData=nullptr;        //!< Pointer to effective current URF data in memory if field has been loaded
-    uint64_t            EffectiveUSize;         //!< Real Universal size for the record (only fixed length data could be anticipated)
-    uint64_t            EffectiveNSize;         //!< Real Natural size for the record (only fixed length data could be anticipated)
-    /* capacity is stored within metadic because is a stable data for the field */
-    URF_Capacity_type   Capacity;               //!< Capacity or Real Array Count for the record (only fixed length data could be anticipated)
 
+class recordFieldDesc
+{
+public:
+  recordFieldDesc()=default;
+  recordFieldDesc(recordFieldDesc& pIn) {_copyFrom(pIn);}
+  ~recordFieldDesc()
+  {
+    clearURFData();
+  }
+  recordFieldDesc&  _copyFrom(const recordFieldDesc& pIn)
+  {
+    URFOffset=pIn.URFOffset;
+    DataOffset=pIn.DataOffset;
+    URFSize=pIn.URFSize;
+    EffectiveUSize=pIn.EffectiveUSize;
+    EffectiveNSize=pIn.EffectiveNSize;
+    Capacity=pIn.Capacity;
+    MDicField=pIn.MDicField;
+    if (pIn.URFData)
+      URFData=new ZDataBuffer(*pIn.URFData);
+    else
+      URFData=nullptr;
+    return *this;
+  }
+  recordFieldDesc& operator =(const recordFieldDesc& pIn) {return _copyFrom(pIn);}
+
+    uint64_t            URFOffset;              // Raw offset from beginning of record
+    uint64_t            DataOffset;             // Data offset from beginning of record
+    uint64_t            URFSize;                // Universal Record Format size (including field header)
+    ZDataBuffer*        URFData=nullptr;        // Pointer to effective current URF data in memory if field has been loaded
+//    unsigned char*        URFData=nullptr;        //!< Pointer to effective current URF data in memory if field has been loaded
+    uint64_t            EffectiveUSize;         // Real Universal size for the record (only fixed length data could be anticipated)
+    uint64_t            EffectiveNSize;         // Real Natural size for the record (only fixed length data could be anticipated)
+    /* capacity is stored within metadic because is a stable data for the field */
+    URF_Capacity_type   Capacity;               // Capacity or Real Array Count for the record (only fixed length data could be anticipated)
+    ZFieldDescription* MDicField=nullptr;       // Pointer to MDicRank table content
     void clear()
     {
-        MDicRank=nullptr;
+        MDicField=nullptr;
         URFOffset=0;
         DataOffset=0;
         URFSize=0;
@@ -72,9 +97,14 @@ struct recordFieldDesc_struct : public _RDicFieldBase
              URFData=nullptr;
             }
 
+        URFData=nullptr;
         EffectiveUSize=0;
         EffectiveNSize=0;
         Capacity=0;
+    }
+    void clearURFData()
+    {
+      zdelete (URFData);
     }
 };
 
@@ -84,18 +114,19 @@ class ZMFDictionary;
  * According the fact that each record may have varying sized field and that fields may be present or not record per record,
  * It is necessary to set up a particular record dictionary.
  */
-class ZRecordDic : public ZArray <recordFieldDesc_struct>
+class ZRecordDic : public ZArray <recordFieldDesc>
 {
 public:
-int64_t TotalRecordSize=0;
+int64_t EffectiveRecordSize=0;
+int64_t TheoricalSize=0;
 
     ZRecordDic(ZMFDictionary* pMasterDic);
     ~ZRecordDic();
 
-    long getFieldByName(const char*pName) const;
+    long getFieldByName(const utf8String& pName) const;
 //    ZType_type getType(const long pRank) {return Tab[pRank].ZType;}
 
-    void reset(void);
+    void clearURFData(void);
     bool testCheckSum(void)
     {
         if (MasterDic==nullptr)
@@ -247,8 +278,8 @@ public:
 */
     unsigned char* getURFFieldFromRawRecord (unsigned char* pDataPtr,ZDataBuffer &pURFData);
 
-    ZStatus getURFbyRank(ZDataBuffer &pValue,const long pRank);
-    ZStatus getUniversalbyRank (ZDataBuffer &pValue, const long pRank, bool pTruncate=false);
+    ZStatus getURFbyRank(ZDataBuffer &pOutValue, const long pRank);
+    ZStatus getUniversalbyRank (ZDataBuffer &pOutValue, const long pRank, bool pTruncate=false);
 #ifdef __COMMENT__
    ZStatus setFieldValuebyName (auto pValue, const char*pName) ;
     ZStatus setFieldPtrValuebyName (auto &pValue, const char*pName, uint32_t pArrayCount) ;
@@ -270,15 +301,47 @@ public:
 /*    template<class _Tp>
     ZStatus setFieldBlobbyRank_T  (_Tp& pBlob,const long pRank);
 */
-    void _setupRecordData(void) ;
 
+    /**
+     * @brief prepareForFeed prepares ZRecord data structures for feeding fields content
+     * @return a ZStatus
+     */
+    ZStatus prepareForFeed();
+
+    bool testFieldPresenceByName(const utf8VaryingString& pName)
+    {
+      return RDic->searchFieldByName(pName);
+    }
+    bool testFieldPresenceByRank(const long pRank)
+    {
+      if (pRank<0)
+        return false;
+      return FieldPresence.test(pRank);
+    }
+
+    /**
+     * @brief _setupRecordData extracts data fields contents from a record just been read from file.
+     *  Raw data is contained within ZRawRecord
+     */
+    void _setupRecordData(void) ;
+    /**
+    * @brief _aggregate  concatenate fields into base ZDataBuffer in order to be written on file
+    */
     ZStatus _aggregate(void);
-    ZStatus _split(void);
+    /**
+       @brief _split Extracts fields from raw record according MetaDic after a ZSMasterFile get operation
+     * @return
+     */
+    ZStatus _split(const ZDataBuffer &pContent);
 
     void _extractAllKeys();
 
     void printRecordData(FILE *pOuput=stdout);
-    void RecordMap(FILE *pOuput=stdout);
+
+    ZStatus RecordCheckAndMap(const ZDataBuffer& pRawContent,FILE *pOuput=stdout);
+
+    utf8String displayRDicField(long pIdx);
+
     ZStatus createXMLRecord(zxmlElementPtr &wRecord);
     void writeXML(FILE* pOutput=stdout);
 
@@ -286,9 +349,11 @@ public:
     ZRecord& setRecordContent(ZDataBuffer& pZDB) { Content.setData(pZDB);  return  *this;}
 
 
+    void checkFields();
+    void verifyFields();
+
 //protected:
     ZRecordDic*             RDic=nullptr;
-    checkSum*               MetaDicCheckSum=nullptr;
 };
 
 ZStatus
@@ -338,8 +403,8 @@ ZDataBuffer* wURFData_Ptr=nullptr;
                               RDic->Tab[pRank].EffectiveNSize,
                               RDic->Tab[pRank].EffectiveUSize,
                               RDic->Tab[pRank].Capacity,
-                              RDic->Tab[pRank].MDicRank->ZType,
-                              RDic->Tab[pRank].MDicRank->Capacity);
+                              RDic->Tab[pRank].MDicField->ZType,
+                              RDic->Tab[pRank].MDicField->Capacity);
     if (wSt!=ZS_SUCCESS)
             {
 
@@ -353,35 +418,46 @@ ZDataBuffer* wURFData_Ptr=nullptr;
                                   Severity_Warning,
                                   "field conversion shows a capacity overflow : source type <%s> target type <%s>.",
                                   decode_ZType(wSourceType),
-                                  decode_ZType(RDic->Tab[pRank].MDicRank->ZType));
+                                  decode_ZType(RDic->Tab[pRank].MDicField->ZType));
 
             }//if (wSt!=ZS_SUCCESS)
     RDic->Tab[pRank].URFData=wURFData_Ptr;
     RDic->Tab[pRank].URFSize = wURFData_Ptr->Size;
-    RDic->Tab[pRank].EffectiveUSize = wURFData_Ptr->Size - RDic->Tab[pRank].MDicRank->HeaderSize;
+    RDic->Tab[pRank].EffectiveUSize = wURFData_Ptr->Size - RDic->Tab[pRank].MDicField->HeaderSize;
+
 
     if (ZVerbose)
-    {
-        if (FieldPresence->test(pRank))
-        {
-        fprintf(stdout,"%s-I Field %ld %s content has been replaced  \n",
-                _GET_FUNCTION_NAME_,
-                pRank,
-              (char*)RDic->Tab[pRank].MDicRank->getName().toUtf());
-        }
-    else
-        {
-            printf ("%s-I Field %ld %s is created and declared present.\n",
-                    _GET_FUNCTION_NAME_,
-                    pRank,
-                    (char*)RDic->Tab[pRank].MDicRank->getName().toUtf());
-        }
-    }//if (ZVerbose)
+      {
+      if (FieldPresence.test(pRank))
+          {
+          fprintf(stdout,"%s-I Field %ld %s content has been replaced  \n",
+                  _GET_FUNCTION_NAME_,
+                  pRank,
+                (char*)RDic->Tab[pRank].MDicField->getName().toUtf());
+          }
+      else
+          {
+              fprintf (stdout,"%s-I Field %ld %s is created and declared present.\n",
+                      _GET_FUNCTION_NAME_,
+                      pRank,
+                      (char*)RDic->Tab[pRank].MDicField->getName().toUtf());
+          }
+      }//if (ZVerbose)
 
-    FieldPresence->set(pRank);
+  FieldPresence.set(pRank);
+
+  fprintf (stdout,"%s-I After presence set Field %ld %s is declared <%s> and <%s>.\n",
+          _GET_FUNCTION_NAME_,
+          pRank,
+          (char*)RDic->Tab[pRank].MDicField->getName().toUtf(),
+          FieldPresence.test(pRank)?"present":"missing",
+          RDic->Tab[pRank].URFData==nullptr?"is nullptr":"has a value");
+
 
     return ZS_SUCCESS;
 }//setFieldValuebyRank
+
+
 
 template<class _Tp>
 ZStatus
@@ -419,8 +495,8 @@ ZDataBuffer* wURFData_Ptr=nullptr;
                               RDic->Tab[pRank].EffectiveNSize,
                               RDic->Tab[pRank].EffectiveUSize,
                               RDic->Tab[pRank].Capacity,
-                              RDic->Tab[pRank].MDicRank->ZType,
-                              RDic->Tab[pRank].MDicRank->Capacity);
+                              RDic->Tab[pRank].MDicField->ZType,
+                              RDic->Tab[pRank].MDicField->Capacity);
     if (wSt!=ZS_SUCCESS)
             {
 
@@ -433,20 +509,20 @@ ZDataBuffer* wURFData_Ptr=nullptr;
                      "%s> Warning: field conversion shows a capacity overflow : source type <%s> target type <%s>\n",
                      _GET_FUNCTION_NAME_,
                      decode_ZType(wSourceType),
-                     decode_ZType(RDic->Tab[pRank].MDicRank->ZType));
+                     decode_ZType(RDic->Tab[pRank].MDicField->ZType));
             }
     RDic->Tab[pRank].URFData=wURFData_Ptr;
     RDic->Tab[pRank].URFSize = wURFData_Ptr->Size;
-    RDic->Tab[pRank].EffectiveUSize = wURFData_Ptr->Size - RDic->Tab[pRank].MDicRank->HeaderSize;
+    RDic->Tab[pRank].EffectiveUSize = wURFData_Ptr->Size - RDic->Tab[pRank].MDicField->HeaderSize;
     if (ZVerbose)
-        if (FieldPresence->test(pRank))
+        if (FieldPresence.test(pRank))
         {
         fprintf(stdout,"%s-W Field content has been replaced : rank %ld \n",
                 _GET_FUNCTION_NAME_,
                 pRank);
         }
 
-    FieldPresence->set(pRank);
+    FieldPresence.set(pRank);
     return ZS_SUCCESS;
 }//setFieldValuebyRank
 
@@ -584,7 +660,7 @@ ZRecord::getFieldValuebyRank_T (_Tp& pTargetNatural, const long pRank)
                                       "trying to access field rank out of record dictionary boundaries");
                 return ZS_OUTBOUND;
                 }
-    if ((pRank>=FieldPresence->EffectiveBitSize)||(!FieldPresence->test(pRank)))
+    if ((pRank>=FieldPresence.EffectiveBitSize)||(!FieldPresence.test(pRank)))
                 {
                 ZException.setMessage(_GET_FUNCTION_NAME_,
                                       ZS_FIELDMISSING,
@@ -603,7 +679,7 @@ ZRecord::getFieldValuebyRank_T (_Tp& pTargetNatural, const long pRank)
     printf("%s>> getting value from record for field rank <%ld> dicitionary name is <%s>\n",
            _GET_FUNCTION_NAME_,
            pRank,
-           (const char*)RDic->Tab[pRank].MDicRank->getName().toCChar());
+           (const char*)RDic->Tab[pRank].MDicField->getName().toCChar());
 
 uint64_t    wTargetNSize, wTargetUSize;
 uint16_t    wTargetUnitsCount;
@@ -615,19 +691,22 @@ uint64_t    wOffset = RDic->Tab[pRank].URFOffset, wDataOffset = RDic->Tab[pRank]
 
     _getZType_T<_Tp>(pTargetNatural,wTargetType,wTargetNSize,wTargetUSize,wTargetUnitsCount);
 
-    wSourceType = RDic->Tab[pRank].MDicRank->ZType;
+    wSourceType = RDic->Tab[pRank].MDicField->ZType;
 
     wTypeStruct=wSourceType&ZType_StructureMask;
     wTypeAtomic=wSourceType&ZType_Atomic;
 
 
+
     return importFieldfURF_T<_Tp>(pTargetNatural,
-                             RDic->Tab[pRank].URFData->Data,
+                             RDic->Tab[pRank].URFData,
                              wTargetType,
                              wTargetNSize,
                              wTargetUSize,
                              wTargetUnitsCount);
 }//getFieldbyRank
+
+
 
 #ifdef __OLD_VERSION__
 template <class _Tp>
@@ -655,7 +734,7 @@ ZRecord::getFieldValuebyRank_T (_Tp& pNatural, const long pRank)
                                       "trying to access field rank out of record dictionary boundaries");
                 return ZS_OUTBOUND;
                 }
-    if ((pRank>=FieldPresence->EffectiveBitSize)||(!FieldPresence->test(pRank)))
+    if ((pRank>=FieldPresence.EffectiveBitSize)||(!FieldPresence.test(pRank)))
                 {
                 ZException.setMessage(_GET_FUNCTION_NAME_,
                                       ZS_FIELDMISSING,

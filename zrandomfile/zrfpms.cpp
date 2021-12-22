@@ -219,7 +219,7 @@ ZRFPMS::reportDetails (FILE*pOutput)
       wAverageFieldWrite,
 
       HighWaterWrites,
-      //             pDescriptor.ZFCB->HighwaterMarking?"<On>":"<Off>",
+      //             pDescriptor.ZFCB.HighwaterMarking?"<On>":"<Off>",
       HighWaterBytesSize,
 
       FreeMatches,

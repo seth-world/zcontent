@@ -150,7 +150,6 @@ ZStatus         wSt = ZS_SUCCESS;
 ZRecord *wRecord = (ZRecord *)ZMFFather->generateRawRecord();
 zrank_type      wZMFRank = 0;
 zaddress_type   wZMFAddress=0;
-long            wIndexRank=0;
 
 long            wIndexCount=0;
 
@@ -347,7 +346,7 @@ ZSIndexFile::_extractKey(ZRecord* pRecord,  ZDataBuffer& pKeyContent)
 
   ZDataBuffer* wKeyValue=nullptr;
 
-  if ((ZMFFather->ZMCB.MasterDic==nullptr)||(ZMFFather->ZMCB.MasterDic->isEmpty()))
+  if ((ZMFFather->MasterDic==nullptr)||(ZMFFather->MasterDic->isEmpty()))
     {
     ZException.setMessage (_GET_FUNCTION_NAME_,
         ZS_BADDIC,
@@ -367,7 +366,7 @@ ZSIndexFile::_extractKey(ZRecord* pRecord,  ZDataBuffer& pKeyContent)
 
   pKeyContent.allocateBZero(KeyUniversalSize+1);
 
-//  ZSKeyDictionary* wKeyDic = ZMFFather->ZMCB.MasterDic->KeyDic[pKeyRank];
+//  ZSKeyDictionary* wKeyDic = ZMFFather->MasterDic->KeyDic[pKeyRank];
   for (long wi=0 ; wi < KeyDic->size() ; wi++)
   {
     // here put extraction rules. RFFU : Extraction could be complex. To be investigated and implemented
@@ -376,7 +375,7 @@ ZSIndexFile::_extractKey(ZRecord* pRecord,  ZDataBuffer& pKeyContent)
     pRecord->getUniversalbyRank(wFieldUValue,wRDicRank);
     pKeyContent.changeData(wFieldUValue,wKeyOffset);
 
-    wKeyOffset += pRecord->RDic->Tab[wRDicRank].MDicRank->UniversalSize;
+    wKeyOffset += pRecord->RDic->Tab[wRDicRank].MDicField->UniversalSize;
   }//for
 
 
@@ -391,7 +390,7 @@ ZSIndexFile::_extractKey(ZRecord* pRecord,  ZDataBuffer& pKeyContent)
     pRecord->getUniversalbyRank(wFieldUValue,wRDicRank);
     pKeyContent.changeData(wFieldUValue,wKeyOffset);
 
-    wKeyOffset += pRecord->RDic->Tab[wRDicRank].MDicRank->UniversalSize;
+    wKeyOffset += pRecord->RDic->Tab[wRDicRank].MDicField->UniversalSize;
   }//for
 
   return ZS_SUCCESS;
@@ -406,7 +405,7 @@ ZSIndexFile::getUniversalbyRank (ZDataBuffer &pOutValue,
                                  bool pTruncate)
 {
 
-  if (ZMFFather->ZMCB.MasterDic==nullptr)
+  if (ZMFFather->MasterDic==nullptr)
     {
     ZException.setMessage(_GET_FUNCTION_NAME_,
                             ZS_BADDIC,
@@ -415,7 +414,7 @@ ZSIndexFile::getUniversalbyRank (ZDataBuffer &pOutValue,
     return ZS_BADDIC;
     }
 
-  ZSKeyDictionary* wKeyDic = ZMFFather->ZMCB.MasterDic->KeyDic[pKeyRank];
+  ZSKeyDictionary* wKeyDic = ZMFFather->MasterDic->KeyDic[pKeyRank];
   if ((pFieldRank<0)||(pFieldRank > wKeyDic->size()))
     {
     ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -427,12 +426,12 @@ ZSIndexFile::getUniversalbyRank (ZDataBuffer &pOutValue,
   /* if presence bit set is nullptr then all fields are reputated present */
   if (pFieldPresence!=nullptr)
     {
-    if ((pFieldRank >= pFieldPresence->EffectiveBitSize)||(!pFieldPresence->test(pFieldRank)))
+    if ((pFieldRank >= pFieldPresence.EffectiveBitSize)||(!pFieldPresence.test(pFieldRank)))
       return ZS_FIELDMISSING;
     }
 
 
-  unsigned char*wDataPtr= ZMFFather->ZMCB.MasterDic->Tab[wKeyDic->Tab[pFieldRank].MDicRank].offset
+  unsigned char*wDataPtr= ZMFFather->MasterDic->Tab[wKeyDic->Tab[pFieldRank].MDicRank].offset
 
   unsigned char*wDataPtr=RDic->Tab[pRank].URFData->Data;
   if (wDataPtr==nullptr)
@@ -469,7 +468,7 @@ ZSIndexFile::getUniversalbyRank (ZDataBuffer &pOutValue,
             "trying to access field rank out of record dictionary boundaries");
         return ZS_OUTBOUND;
       }
-      if ((pRank>=FieldPresence->EffectiveBitSize)||(!FieldPresence->test(pRank)))
+      if ((pRank>=FieldPresence.EffectiveBitSize)||(!FieldPresence.test(pRank)))
         return ZS_FIELDMISSING;
 
       unsigned char*wDataPtr=RDic->Tab[pRank].URFData->Data;
@@ -903,7 +902,7 @@ ZIFCompare wZIFCompare = ZKeyCompareBinary;
   if (KeyDic->size()==1)           // if only one field
       {
         long wMRk=KeyDic->Tab[0].MDicRank;
-        ZTypeBase wType = ZMFFather->ZMCB.MasterDic->Tab[wMRk].ZType;
+        ZTypeBase wType = ZMFFather->MasterDic->Tab[wMRk].ZType;
         if (wType & ZType_Char)  // and this field has type Char (array of char)
           wZIFCompare = ZKeyCompareAlpha; // use string comparison
       } // in all other cases, use binary comparison
@@ -1399,7 +1398,7 @@ ZDataBuffer wFieldUValue;
         pRecord.getUniversalbyRank(wFieldUValue,wRDicRank);
         pKeyOut.changeData(wFieldUValue,wKeyOffset);
 
-        wKeyOffset += pRecord.RDic->Tab[wRDicRank].MDicRank->UniversalSize;
+        wKeyOffset += pRecord.RDic->Tab[wRDicRank].MDicField->UniversalSize;
         }//for
 
 return  ZS_SUCCESS;
@@ -1692,7 +1691,7 @@ zrank_type wIndexFound=0;
     if (pZIF.KeyDic->count()==1)           // if only one field
         {
         long wMRk=pZIF.KeyDic->Tab[0].MDicRank;
-        ZTypeBase wType = pZIF.ZMFFather->ZMCB.MasterDic->Tab[wMRk].ZType;
+        ZTypeBase wType = pZIF.ZMFFather->MasterDic->Tab[wMRk].ZType;
         if (wType & ZType_Char)           // and this field has type Char (array of char)
           wZIFCompare = ZKeyCompareAlpha; // use string comparison
         } // in all other cases, use binary comparison
@@ -2310,7 +2309,7 @@ zrank_type wpivot;
     if (pZIF.KeyDic->count()==1)           // if only one field
         {
         long wMRk=pZIF.KeyDic->Tab[0].MDicRank;
-        ZTypeBase wType = pZIF.ZMFFather->ZMCB.MasterDic->Tab[wMRk].ZType;
+        ZTypeBase wType = pZIF.ZMFFather->MasterDic->Tab[wMRk].ZType;
         if (wType & ZType_Char)           // and this field has type Char (array of char)
           wZIFCompare = ZKeyCompareAlpha; // use string comparison
         } // in all other cases, use binary comparison
@@ -2623,7 +2622,7 @@ ZSIndexFile::getKeyIndexFields(ZDataBuffer &pIndexContent,ZDataBuffer& pKeyValue
 ZStatus wSt=ZS_SUCCESS;
 ZDataBuffer wFieldValue ;
     pIndexContent.clear();
-    if (ZMFFather->ZMCB.MasterDic==nullptr)
+    if (ZMFFather->MasterDic==nullptr)
       {
       ZException.setMessage("ZSIndexFile::getKeyIndexFields",
                             ZS_BADDIC,
@@ -2631,7 +2630,7 @@ ZDataBuffer wFieldValue ;
                             "Master dictionary is missing (nullptr). File appears to be a ZRawMasterFile with no dictionary.\n");
       return ZS_BADDIC;
       }
-    for (long wi=0; (ZMFFather->ZMCB.MasterDic->size())&&(wSt==ZS_SUCCESS);wi++)
+    for (long wi=0; (ZMFFather->MasterDic->size())&&(wSt==ZS_SUCCESS);wi++)
       {
       wSt=_getFieldValueFromKey(pKeyValue,wFieldValue,wi,this);
       if (wSt==ZS_SUCCESS)
@@ -2692,7 +2691,7 @@ _printKeyFieldsValues (ZDataBuffer* wKeyContent,ZSIndexFile* pZIF, bool pHeader,
 zrank_type wMDicRank=0;
 ZDataBuffer wPrintableField;
 
-ZMetaDic* wMetaDic=pZIF-> getMasterFile()->ZMCB.MasterDic;
+ZMetaDic* wMetaDic=pZIF-> getMasterFile()->MasterDic;
 ZSKeyDictionary* wKeyDic=pZIF->KeyDic;
 ZFullIndexField wField ;
 

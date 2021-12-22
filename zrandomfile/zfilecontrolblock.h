@@ -40,20 +40,20 @@ public:
   bool            GrabFreeSpace=false;      /**< attempts to grab free space and holes at each block free operation */
 };
 
-
+class ZFileControlBlock;
 #pragma pack(push)
-#pragma pack(0)
-class ZFileControlBlock_Export
+#pragma pack(1)
+class ZFCB_Export
 {
 public:
-    uint32_t        StartSign=cst_ZSTART ;         /**< StartSign word that mark start of data */
-    ZBlockID        BlockID;            /**< Block id is set to ZBID_FCB */
-    zaddress_type   StartOfData;        /**< offset where Data storage starts : 0L */
-    unsigned long   AllocatedBlocks;            /**< for ZBAT & ZFBT : initial number of available allocated slots in ZBAT and ZFBT */
-    unsigned long   BlockExtentQuota;            /**< for ZBAT & ZFBT : initial extension quota */
+    uint32_t        StartSign=cst_ZBLOCKSTART; /**< StartSign word that mark start of data */
+    ZBlockID        BlockID=ZBID_FCB;     /**< Block id is set to ZBID_FCB */
+    zaddress_type   StartOfData;          /**< offset where Data storage starts : 0L */
+    unsigned long   AllocatedBlocks;      /**< for ZBAT & ZFBT : initial number of available allocated slots in ZBAT and ZFBT */
+    unsigned long   BlockExtentQuota;     /**< for ZBAT & ZFBT : initial extension quota */
 
-    size_t          ZBAT_DataOffset;            /**< Written on file header : Offset to Blocks Access Table array since begining of ZFCB */
-    size_t          ZBAT_ExportSize;            /**<  Written on file header : size in bytes of ZBAT : to be written on file. This size is the global ZArray size in bytes */
+    size_t          ZBAT_DataOffset;      /**< Written on file header : Offset to Blocks Access Table array since begining of ZFCB */
+    size_t          ZBAT_ExportSize;      /**<  Written on file header : size in bytes of ZBAT : to be written on file. This size is the global ZArray size in bytes */
 
     size_t          ZFBT_DataOffset;           /**< offset to Free Blocks Table array since begining of ZFCB */
     size_t          ZFBT_ExportSize;           /**< size in bytes of ZFBT : to be written on file */
@@ -66,22 +66,32 @@ public:
 
 //    void             (*_getReserved) (ZDataBuffer &) ;// routine to load zreserved from derived class
 
-    zsize_type    InitialSize;                  /**< Initial Size allocated to file during creation : file is created to this size then truncated to size 0 to reserve allocation on disk */
-    zsize_type    AllocatedSize;              /**< Total current allocated size in bytes for file */
-    zsize_type    UsedSize;                   /**< Total of currently used size within file in bytes */
+    zsize_type    InitialSize;                /* Initial Size allocated to file during creation : file is created to this size then truncated to size 0 to reserve allocation on disk */
+    zsize_type    AllocatedSize;              /* Total current allocated size in bytes for file */
+    zsize_type    UsedSize;                   /* Total of currently used size within file in bytes */
 //    zsize_type    ExtentSizeQuota;            // extent quota size in bytes for file : no more used
 
-    size_t   MinSize;                    /**< statistical value : minimum length of block record in file  (existing statistic) */
-    size_t   MaxSize;                    /**< statistical value : maximum length of block record in file (existing statistic ) */
-    size_t   BlockTargetSize;           /**< Block target size (user defined value) Foreseen medium size of blocks in a varying block context. */
+    size_t   MinSize;                    /* statistical value : minimum length of block record in file  (existing statistic) */
+    size_t   MaxSize;                    /* statistical value : maximum length of block record in file (existing statistic ) */
+    size_t   BlockTargetSize;           /* Block target size (user defined value) Foreseen medium size of blocks in a varying block context. */
 
 /*    bool            History;
     bool            Autocommit;
     bool            Journaling;*/  // ZRandomFile Does NOT have journaling, history, autocommit : see ZMasterFile instead
 
-    uint8_t         HighwaterMarking;           /**< mark to zero the whole deleted block content when removed */
-    uint8_t         GrabFreeSpace;              /**< attempts to grab free space and holes at each block free operation */
-    uint32_t        EndSign=cst_ZEND;           /**< EndSign word that marks end of data */
+    uint8_t         HighwaterMarking;           /* mark to zero the whole deleted block content when removed */
+    uint8_t         GrabFreeSpace;              /* attempts to grab free space and holes at each block free operation */
+    uint32_t        EndSign=cst_ZBLOCKEND;           /* EndSign word that marks end of data */
+
+    ZFCB_Export()=default;
+    ZFCB_Export(ZFCB_Export&pIn) {_copyFrom(pIn);}
+    ZFCB_Export(ZFCB_Export&&pIn) {_copyFrom(pIn);}
+
+    ZFCB_Export& _copyFrom(const ZFCB_Export& pIn);
+    ZFCB_Export& operator = (const ZFCB_Export& pIn){return _copyFrom(pIn);}
+    ZFCB_Export& operator = (const ZFileControlBlock& pIn);
+
+    void convert();
 
 };
 #pragma pack(pop)
@@ -160,25 +170,25 @@ friend class ZIndexFile;
 public:
 
 /* not copied neither exported to xml */
-    uint32_t       StartSign=cst_ZSTART ; /**< StartSign word that mark start of data */
-    ZBlockID       BlockID;               /**< Block id is set to ZBID_FCB */
-//private:
+//    uint32_t       StartSign=cst_ZSTART ; /**< StartSign word that mark start of data */
+//    ZBlockID       BlockID=ZBID_FCB;               /**< Block id is set to ZBID_FCB */
+
 /* copied and exported to xml */
-    zaddress_type  StartOfData;               /**< offset where Data storage starts : 0L */
+    zaddress_type  StartOfData=0L;               /**< offset where Data storage starts : 0L */
 public:
 
-    unsigned long   AllocatedBlocks;          /**< for ZBAT & ZFBT : initial number of available allocated slots in ZBAT and ZFBT */
-    unsigned long   BlockExtentQuota;         /**< for ZBAT & ZFBT : initial extension quota */
-    zsize_type      InitialSize;              /**< Initial Size allocated to file during creation : file is created to this size then truncated to size 0 to reserve allocation on disk */
-    size_t          BlockTargetSize;          /**< Block target size (user defined value) Foreseen medium size of blocks in a varying block context. */
+    unsigned long   AllocatedBlocks=0;          /**< for ZBAT & ZFBT : initial number of available allocated slots in ZBAT and ZFBT */
+    unsigned long   BlockExtentQuota=0;         /**< for ZBAT & ZFBT : initial extension quota */
+    zsize_type      InitialSize=0;              /**< Initial Size allocated to file during creation : file is created to this size then truncated to size 0 to reserve allocation on disk */
+    size_t          BlockTargetSize=0;          /**< Block target size (user defined value) Foreseen medium size of blocks in a varying block context. */
 
-    uint8_t         HighwaterMarking;         /**< mark to zero the whole deleted block content when removed */
-    uint8_t         GrabFreeSpace;            /**< attempts to grab free space and holes at each block free operation */
+    uint8_t         HighwaterMarking=ZBool(false);         /**< mark to zero the whole deleted block content when removed */
+    uint8_t         GrabFreeSpace=ZBool(false);            /**< attempts to grab free space and holes at each block free operation */
 
 
 /* Following data is not exported to xml */
-    size_t          ZBAT_DataOffset;            /**< Written on file header : Offset to Blocks Access Table array since begining of ZFCB */
-    size_t          ZBAT_ExportSize;            /**<  Written on file header : size in bytes of ZBAT : to be written on file. This size is the global ZArray size in bytes */
+    size_t          ZBAT_DataOffset=0;            /**< Written on file header : Offset to Blocks Access Table array since begining of ZFCB */
+    size_t          ZBAT_ExportSize=0;            /**<  Written on file header : size in bytes of ZBAT : to be written on file. This size is the global ZArray size in bytes */
 
     size_t          ZFBT_DataOffset;           /**< offset to Free Blocks Table array since begining of ZFCB */
     size_t          ZFBT_ExportSize;           /**< size in bytes of ZFBT : to be written on file */
@@ -205,7 +215,7 @@ public:
     bool            Journaling;*/  // ZRandomFile Does NOT have journaling, history, autocommit : see ZMasterFile instead
 
 /* not copied neither exported to xml */
-    uint32_t        EndSign=cst_ZEND;           /**< EndSign word that marks end of data */
+//   uint32_t        EndSign=cst_ZEND;           /**< EndSign word that marks end of data */
 
   ZFileControlBlock (void) ;
   ZFileControlBlock (const ZFileControlBlock& pIn) {_copyFrom(pIn);}
@@ -230,7 +240,7 @@ public:
   int fromXml(zxmlNode* pFCBRootNode, ZaiErrors* pErrorlog);
 
   ZDataBuffer& _export(ZDataBuffer& pZDBExport);
-  ZFileControlBlock& _import(unsigned char *&pZDBImport_Ptr);
+  ZStatus _import(unsigned char *&pZDBImport_Ptr);
 }; // ZFileControlBlock
 
 

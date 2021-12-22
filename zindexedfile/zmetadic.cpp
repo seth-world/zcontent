@@ -18,7 +18,7 @@ using namespace zbs;
  * @return a ZStatus
  */
 ZStatus
-ZMetaDic::addField (const utf8_t*pFieldName,
+ZMetaDic::addField (const utf8String& pFieldName,
                    const ZTypeBase pType,
                    const size_t pNaturalSize,
                    const size_t pUniversalSize,
@@ -207,35 +207,39 @@ ZDataBuffer wDBV1;
  * @return the field position (rank) in dictionary. returns -1 if field name has not been found.
  */
 zrank_type
-ZMetaDic::searchFieldByName(const utf8_t* pFieldName)
+ZMetaDic::searchFieldByName(const utf8String& pFieldName)
 {
-    if (!pFieldName)
+    if (pFieldName.isEmpty())
             return (zrank_type)-1;
-    if (!*pFieldName)
-            return (zrank_type)-1;
+
     for (long wi=0;wi<size();wi++)
-            {
-      if (Tab[wi].getName()==pFieldName)
-//        if (!strcmp((char*)Tab[wi].Name.content,pFieldName))
-                                            return (zrank_type)wi;
-            }
+        {
+        if (Tab[wi].getName()==pFieldName)
+            return (zrank_type)wi;
+        }
     ZException.setMessage(_GET_FUNCTION_NAME_,
                             ZS_INVNAME,
                             Severity_Error,
-                            " Field name <%s> does not exist within Dictionary",
-                            pFieldName);
+                            " Field name <%s> does not exist within Dictionary named <%s>",
+                            pFieldName.toCChar(), DicName.toCChar());
 
     return (zrank_type)-1;
 }//zsearchFieldByName
 
-long ZMetaDic::searchFieldByHash(const md5& pHash)
+zrank_type
+ZMetaDic::searchFieldByHash(const md5& pHash)
 {
   for (long wi=0;wi<size();wi++)
     {
     if (Tab[wi].Hash==pHash)
       return wi;
     }
-  return -1;
+  ZException.setMessage(_GET_FUNCTION_NAME_,
+      ZS_INVNAME,
+      Severity_Error,
+      " Field with hascode <%s> does not exist within Dictionary named <%s>",
+      pHash.toHexa().toChar(), DicName.toCChar());
+  return (zrank_type)-1;
 }
 
 /**
@@ -293,7 +297,7 @@ void ZMetaDic ::print (FILE* pOutput)
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZMetaDic::removeFieldByName (const utf8_t *pFieldName)
+ZMetaDic::removeFieldByName (const utf8String & pFieldName)
 {
 
     long wRank = searchFieldByName(pFieldName);
@@ -324,7 +328,7 @@ ZMetaDic::removeFieldByRank (const long pFieldRank)
  */
 
 ZDataBuffer&
-ZMetaDic::_export(ZDataBuffer& pZDBExport)
+ZMetaDic::_exportAppend(ZDataBuffer& pZDBExport)
 {
   if (isEmpty())
     return pZDBExport;
@@ -334,8 +338,8 @@ ZMetaDic::_export(ZDataBuffer& pZDBExport)
                                                         wBuf,
                                                         wBufSize,
                                                         &ZFieldDescription::_exportConvert);
-    pZDBExport.setData(wBuf,wBufSize);
-    free(wBuf);             // mandatory : release allocated memory
+    pZDBExport.appendData(wBuf,wBufSize);
+    free(wBuf);             // mandatory : release memory allocated by ZAexportCurent()
     return pZDBExport;
 } // ZMetaDic::_export
 /**
@@ -418,7 +422,7 @@ ZMetaDic::_copyFrom( const ZMetaDic& pIn)
     CheckSum = new checkSum(*pIn.CheckSum);
 
   _Base::clear();
-  for (long wi=0;wi<count();wi++)
+  for (long wi=0;wi<pIn.count();wi++)
     push(ZFieldDescription(pIn.Tab[wi]));
 
   return *this;

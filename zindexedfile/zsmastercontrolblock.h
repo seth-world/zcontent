@@ -15,53 +15,62 @@
 
 
 namespace zbs {
-
 /*
-enum ZControlBlockComponents : uint8_t
-{
-  ZCBC_Nothing = 0,
-  ZCBC_HasDictionary = 1,
-  ZCBC_HasJournal = 2,
 
-  ZCBC_Default = ZCBC_HasDictionary | ZCBC_HasJournal
-};
+  Header Reserved components for Master file  (Master Control Block export)
+
+  Master Control Block    ZBID_MCB
+    MCB Own Data : offsets to other "control blocks" and dictionary are here
+    IndexFilePath (UVF format)
+
+  Index Control Blocks ZBID_ICB
+      ICB 0
+      ICB 1
+      ...
+      ICB n
+  Journal Control Block ZBID_JCB
+
+  Master Dictionary   ZBID_MDIC
+      Meta Dictionary
+      Key Dictionaries
 */
-#pragma pack(push)
-#pragma pack(0)
 
+
+#pragma pack(push)
+#pragma pack(1)
 /* if MetaDic does not exist then MDicOffset is -1
 */
 class ZSMCBOwnData;
 class ZSMCBOwnData_Export{                         // will be the first block of data for ZSMCB
 public:
   ZSMCBOwnData_Export() {}
-  ZSMCBOwnData_Export(const ZSMCBOwnData_Export& pIn) { _copyFrom(pIn);}
+  ZSMCBOwnData_Export(const ZSMCBOwnData_Export& pIn) { set(pIn);}
 
-  ZSMCBOwnData_Export& _copyFrom(const ZSMCBOwnData_Export& pIn);
-  ZSMCBOwnData_Export& _copyFrom(const ZSMCBOwnData& pIn);
+  ZSMCBOwnData_Export& set(const ZSMCBOwnData_Export& pIn);
+  ZSMCBOwnData_Export& set(const ZSMCBOwnData& pIn);
 
   ZSMCBOwnData& _toMCBOwnData(ZSMCBOwnData &pOut);
 
 
-  ZSMCBOwnData_Export& operator = (const ZSMCBOwnData_Export& pIn) {return  _copyFrom(pIn);}
-  ZSMCBOwnData_Export& operator = (const ZSMCBOwnData& pIn) {return  _copyFrom(pIn);}
+  ZSMCBOwnData_Export& operator = (const ZSMCBOwnData_Export& pIn) {return  set(pIn);}
+  ZSMCBOwnData_Export& operator = (const ZSMCBOwnData& pIn) {return  set(pIn);}
 
   ZSMCBOwnData_Export& reverseConditional();
 
-  uint32_t    StartSign=  cst_ZSTART ;
-  ZBlockID    BlockID=    ZBID_MCB;
+  uint32_t    StartSign=  cst_ZBLOCKSTART ;
+  ZBlockID    BlockId=    ZBID_MCB;
   uint32_t    ZMFVersion= __ZMF_VERSION__;
 
 //  uint8_t     Components= ZCBC_Default;
   uint32_t    MCBSize;      // contains size of exported - imported  MCB
   //                                includes varying size of index path (varying string)
-  uint32_t    MDicOffset;
-  uint32_t    MDicSize;
   uint32_t    IndexCount;
   uint32_t    ICBOffset;
   uint32_t    ICBSize;
   uint32_t    JCBOffset;
   uint32_t    JCBSize;
+  uint32_t    MDicOffset;
+  uint32_t    MDicSize;
 
   uint8_t     HistoryOn=false;
 
@@ -70,7 +79,6 @@ public:
 };
 #pragma pack(pop)
 
-
 class ZSMCBOwnData{                         // will be the first block of data for ZSMCB
 public:
   //    uint32_t                StartSign=cst_ZSTART ;
@@ -78,13 +86,13 @@ public:
   //    unsigned long           ZMFVersion;
   uint32_t    MCBSize;      // contains size of exported - imported  MCB
   //                                includes varying size of index path (varying string)
-  uint32_t    MDicOffset;     // MDic offset = 0 -> no dictionary
-  int32_t     MDicSize;       // MDic size = 0 -> no dictionary
   uint32_t    IndexCount;
   uint32_t    ICBOffset;
   uint32_t    ICBSize;
   uint32_t    JCBOffset;      // JCBOffset = 0 -> no journalling
   int32_t     JCBSize;        // JCBSize = 0 -> no journalling
+  uint32_t    MDicOffset;     // MDic offset = 0 -> no dictionary
+  int32_t     MDicSize;       // MDic size = 0 -> no dictionary
   uint8_t     HistoryOn=false; /* RFFU: if set, journaling events are historized see if no duplicate role with journaling keep option */
   //    uint8_t                    JournalingOn=false; //  will define wether update or load ZSJournalControlBlock from header while updating/reading ZMasterControlBlock
   uriString   IndexFilePath;  // Directory path for index files. If empty, then directory path of main content file is taken
@@ -96,7 +104,7 @@ public:
   ZDataBuffer& _exportAppend(ZDataBuffer& pZDBExport);
   ZDataBuffer _export();
   /** _import imports from serialized data. Updates pZDBImport_Ptr to first byte after imported data */
-  ZStatus _import(unsigned char *&pZDBImport_Ptr);
+  ZStatus _import(unsigned char *&pPtrIn);
 
 };
 
@@ -156,7 +164,7 @@ public:
    */
   ZStatus _import(unsigned char *&pPtrIn, ZArray<ZPRES> &pIndexPresence);
 
-  ZStatus _import(ZDataBuffer &pDataIn);
+  ZStatus _import(unsigned char *&pPtrIn);
 
   void report(FILE *pOutput=stdout);
 } ;

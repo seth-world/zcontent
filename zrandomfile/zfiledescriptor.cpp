@@ -1,7 +1,11 @@
 #include "zfiledescriptor.h"
 #include <zcontentcommon/zcontentconstants.h>
+#include <zrandomfile/zrandomfiletypes.h>
+#include <zxml/zxmlprimitives.h>
 
 using namespace zbs;
+
+
 
 //=========================== ZFileDescriptor Export import==========================================
 /**
@@ -19,27 +23,27 @@ ZFileDescriptor::_exportFCB(ZDataBuffer& pZDBExport)
   printf ("ZFileDescriptor::_exportFCB>>\n");
   ZFileControlBlock wFileControlBlock;
 
-  wFileControlBlock.ZBAT_DataOffset =  sizeof(ZFileControlBlock_Export);  // ZBAT data Pool is stored first just after ZFCB
+  wFileControlBlock.ZBAT_DataOffset =  sizeof(ZFCB_Export);  // ZBAT data Pool is stored first just after ZFCB
 
-  wFileControlBlock.AllocatedBlocks =ZBAT->getAllocation();
-  wFileControlBlock.BlockExtentQuota = ZBAT->getQuota();
+  wFileControlBlock.AllocatedBlocks =ZBAT.getAllocation();
+  wFileControlBlock.BlockExtentQuota = ZBAT.getQuota();
 
   ZDataBuffer wZBAT_export;
-  ZBAT->_exportPool(wZBAT_export);
+  ZBAT._exportPool(wZBAT_export);
   wFileControlBlock.ZBAT_ExportSize = wZBAT_export.getByteSize();
 
-  wFileControlBlock.ZFBT_DataOffset = (zaddress_type)(ZFCB->ZBAT_DataOffset
-                                                      +ZFCB->ZBAT_ExportSize); // then ZFBT
-  //    wFileControlBlock.ZFBT_ExportSize = ZFBT->_getExportAllocatedSize();
+  wFileControlBlock.ZFBT_DataOffset = (zaddress_type)(ZFCB.ZBAT_DataOffset
+                                                      +ZFCB.ZBAT_ExportSize); // then ZFBT
+  //    wFileControlBlock.ZFBT_ExportSize = ZFBT._getExportAllocatedSize();
   ZDataBuffer wZFBT_export;
-  ZFBT->_exportPool(wZFBT_export);
+  ZFBT._exportPool(wZFBT_export);
   wFileControlBlock.ZFBT_ExportSize = wZFBT_export.getByteSize();
 
-  wFileControlBlock.ZDBT_DataOffset = (zaddress_type)(ZFCB->ZFBT_DataOffset
-                                                      +ZFCB->ZFBT_ExportSize); // then ZDBT
-  //    wFileControlBlock.ZDBT_ExportSize = ZDBT->_getExportAllocatedSize();
+  wFileControlBlock.ZDBT_DataOffset = (zaddress_type)(ZFCB.ZFBT_DataOffset
+                                                      +ZFCB.ZFBT_ExportSize); // then ZDBT
+  //    wFileControlBlock.ZDBT_ExportSize = ZDBT._getExportAllocatedSize();
   ZDataBuffer wZDBT_export;
-  ZFBT->_exportPool(wZDBT_export);
+  ZFBT._exportPool(wZDBT_export);
   wFileControlBlock.ZDBT_ExportSize = wZDBT_export.getByteSize();
 
   wFileControlBlock._export(pZDBExport);
@@ -54,22 +58,21 @@ ZFileDescriptor&
 ZFileDescriptor::_importFCB(unsigned char* pPtrIn)
 {
   printf ("ZFileDescriptor::_importFCB>>\n");
-  ZFileControlBlock* wFileControlBlock=( ZFileControlBlock* )pPtrIn; // for debug
-  setupFCB();
+
   unsigned char* wPtrIn=pPtrIn;
-  ZFCB->_import(wPtrIn);
+  ZFCB._import(wPtrIn);/* wPtrIn is updated by ZFileControlBlock::_import */
 
-  ZBAT->_importPool(wPtrIn);
+  ZBAT._importPool(wPtrIn);  /* wPtrIn is updated by ZBlockPool::_importPool */
 
-  ZFBT->_importPool(wPtrIn);
+  ZFBT._importPool(wPtrIn);
 
-  ZDBT->_importPool(wPtrIn);
+  ZDBT._importPool(wPtrIn);
 
   return *this;
 }// ZFileDescriptor::_importFCB
 
 //=================ZFileDescriptor===============================================
-void
+/*void
 ZFileDescriptor::setupFCB (void)
 {
   if (ZFCB!=nullptr)
@@ -87,6 +90,166 @@ ZFileDescriptor::setupFCB (void)
   return;
   //           ZReserved.clear();  // Reserved header is fully managed by derived classes
 }
+*/
+
+
+ZFDOwnData& ZFDOwnData::_copyFrom(const ZFDOwnData& pIn)
+{
+  FContent=pIn.FContent;
+  ContentFd=pIn.ContentFd;
+  FHeader=pIn.FHeader;
+  HeaderFd=pIn.HeaderFd;
+  Pid=pIn.Pid;
+  Uid=pIn.Uid;
+  _isOpen=pIn._isOpen;
+  Mode=pIn.Mode;
+
+  ZHeader=pIn.ZHeader;
+  ZFCB=pIn.ZFCB;
+  ZBAT=(ZBlockPool&)pIn.ZBAT;
+  ZFBT=(ZBlockPool&)pIn.ZFBT;
+  ZDBT=(ZBlockPool&)pIn.ZDBT;
+  ZReserved=pIn.ZReserved;
+  ZBlockLock=pIn.ZBlockLock;
+  PhysicalPosition=pIn.PhysicalPosition;
+  LogicalPosition=pIn.LogicalPosition;
+  CurrentRank=pIn.CurrentRank;
+
+  return *this;
+}//_copyFrom
+
+utf8String ZFDOwnData::toXml(int pLevel)
+{
+  int wLevel=pLevel;
+  utf8String wReturn;
+  wReturn = fmtXMLnode("zfdowndata",pLevel);
+  wLevel++;
+  /* see if it is really required */
+  wReturn+=fmtXMLint64("physicalposition",  PhysicalPosition,wLevel);  /* uint8_t */
+  wReturn+=fmtXMLint64("logicalposition",LogicalPosition,wLevel);
+  wReturn+=fmtXMLlong("currentrank",CurrentRank,wLevel);
+  /* end see if it is really required */
+  wReturn += fmtXMLendnode("zfdowndata",pLevel);
+  return wReturn;
+}//ZFDOwnData::toXml
+
+
+/**
+ * @brief fromXml loads ZFDOwnData from its xml definition and return 0 when successfull.
+ * When errors returns <>0 and pErrlog contains appropriate error messages.
+ * pHeaderRootNode xml node root for the hcb, typically <headercontrolblock> tag. No validation is made on root node for its name value.
+ */
+int ZFDOwnData::fromXml(zxmlNode* pFDBRootNode,ZaiErrors* pErrorlog)
+{
+  zxmlElement *wRootNode;
+  utfcodeString wXmlHexaId;
+  utf8String wValue;
+  utfcodeString wCValue;
+  bool wBool;
+  unsigned int wInt;
+  ZStatus wSt = pFDBRootNode->getChildByName((zxmlNode *&) wRootNode, "zfdowndata");
+  if (wSt != ZS_SUCCESS) {
+    pErrorlog->logZStatus(
+        ZAIES_Error,
+        wSt,
+        "ZFDOwnData::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
+        "<%s>",
+        "zfdowndata",
+        decode_ZStatus(wSt));
+    return -1;
+  }
+
+  if (ZHeader.fromXml(wRootNode,pErrorlog)!=0)
+    return -1;
+
+  //  if (ZFCB==nullptr)
+  //      ZFCB=new ZFileControlBlock;
+
+  if (ZFCB.fromXml(wRootNode,pErrorlog)!=0)
+    return -1;
+  /* see if it is really required */
+  if (XMLgetChildInt64(wRootNode, "physicalposition", PhysicalPosition, pErrorlog) < 0) {
+    fprintf(stderr,
+        "ZFDOwnData::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+        "default.",
+        "physicalposition");
+  }
+  if (XMLgetChildInt64(wRootNode, "logicalposition", LogicalPosition, pErrorlog) < 0) {
+    fprintf(stderr,
+        "ZFDOwnData::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+        "default.",
+        "logicalposition");
+  }
+  if (XMLgetChildLong(wRootNode, "currentrank", CurrentRank, pErrorlog) < 0) {
+    fprintf(stderr,
+        "ZFDOwnData::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+        "default.",
+        "currentrank");
+  }
+  /* end see if it is really required */
+
+  return (int)pErrorlog->hasError();
+}//ZFDOwnData::fromXml
+
+
+
+ZStatus ZFileDescriptor::fromXml(zxmlNode* pFDRootNode,ZaiErrors* pErrorlog)
+{
+  zxmlElement *wRootNode;
+  utfcodeString wXmlHexaId;
+  utf8String wValue;
+
+  ZStatus wSt = pFDRootNode->getChildByName((zxmlNode *&) wRootNode, "zfiledescriptor");
+  if (wSt != ZS_SUCCESS) {
+    pErrorlog->logZStatus(
+        ZAIES_Error,
+        wSt,
+        "ZFileDescriptor::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
+        "<%s>",
+        "zfiledescriptor",
+        decode_ZStatus(wSt));
+    return wSt;
+  }
+
+  if (ZFDOwnData::fromXml(wRootNode,pErrorlog)!=0)
+    return ZS_XMLERROR;
+
+  if (XMLgetChildText(wRootNode, "uricontent", wValue, pErrorlog) < 0) {
+    fprintf(stderr,
+        "ZFileDescriptor::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+        "default.",
+        "uricontent");
+  }
+  else
+    URIContent=wValue.toCChar();
+
+  if (XMLgetChildText(wRootNode, "uriheader", wValue, pErrorlog) < 0) {
+    fprintf(stderr,
+        "ZFileDescriptor::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+        "default.",
+        "uriheader");
+  }
+  else
+    URIHeader=wValue.toCChar();
+
+  if (XMLgetChildText(wRootNode, "uridirectorypath", wValue, pErrorlog) < 0) {
+    fprintf(stderr,
+        "ZFileDescriptor::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
+        "default.",
+        "uridirectorypath");
+  }
+  else
+    URIDirectoryPath=wValue.toCChar();
+
+  if (ZHeader.fromXml(wRootNode,pErrorlog)!=0)
+    return ZS_XMLERROR;
+
+  if (ZFCB.fromXml(wRootNode,pErrorlog)!=0)
+    return ZS_XMLERROR;
+
+  return pErrorlog->hasError()?ZS_XMLERROR:ZS_SUCCESS;
+}//ZFDOwnData::fromXml
+
 
 
 ZFileDescriptor& ZFileDescriptor::_copyFrom(const ZFileDescriptor& pIn)
@@ -103,20 +266,11 @@ ZFileDescriptor::clearFCB (void)
 {
   ZBlockLock.clear();
   ZReserved.clear();
-  if (ZFCB!=nullptr)
-    delete ZFCB;
-  if (ZBAT!=nullptr)
-    delete ZBAT;
-  if (ZFBT!=nullptr)
-    delete ZFBT;
-  if (ZDBT!=nullptr)
-    delete ZDBT;
-
-
-  ZFCB = nullptr;
-  ZBAT = nullptr;
-  ZFBT = nullptr;
-  ZDBT = nullptr;
+  ZFCB.clear();
+  ZBAT.clear();
+  ZFBT.clear();
+  ZDBT.clear();
+  ZBAT.clear();
 
   return;
 }
@@ -159,9 +313,12 @@ ZFileDescriptor::_close()
     return ZS_FILEERROR;
   }
   _isOpen=false;
-  HeaderAccessed = false;
+  Mode=ZRF_NotOpen;
+  HeaderAccessed = ZHAC_Nothing ;
   ZRFPool->removeFileByFd(ContentFd);
   clearPartial();
+  ContentFd=0;
+  HeaderFd=0;
   return ZS_SUCCESS;
 }
 
@@ -171,7 +328,7 @@ ZFileDescriptor::_forceClose()
   close (ContentFd);
   close (HeaderFd);
   _isOpen=false;
-  HeaderAccessed = false;
+  HeaderAccessed = ZHAC_Nothing;
   ZRFPool->removeFileByFd(ContentFd);
   clearPartial();
 }
@@ -185,6 +342,14 @@ ZFileDescriptor::_forceClose()
 ZStatus
 ZFileDescriptor::setPath (const uriString &pURIPath)
 {
+  if (pURIPath.isEmpty())
+  {
+    ZException.setMessage("ZFileDescriptor::setPath ",
+        ZS_INVNAME,
+        Severity_Error,
+        "Invalid file name <empty>.");
+    return ZS_INVNAME;
+  }
   if (_isOpen)
   {
     ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -197,7 +362,7 @@ ZFileDescriptor::setPath (const uriString &pURIPath)
   }
   Pid = getpid();
   //    utfdescString wDInfo;
-  const utf8_t* wExtension=(const utf8_t*)__HEADER_FILEEXTENSION__;
+/*  const utf8_t* wExtension=(const utf8_t*)__HEADER_FILEEXTENSION__;
   if (wExtension[0]=='.')
     wExtension++;       // +1 because we should miss the '.' char
   //    if (!strcmp(wExtension,(char*)pURIPath.getFileExtension().toString()))
@@ -212,10 +377,10 @@ ZFileDescriptor::setPath (const uriString &pURIPath)
         pURIPath.toCChar());
     return ZS_INVNAME;
   }
-
+*/
   URIContent = pURIPath;
 
-  URIDirectoryPath = URIContent.getDirectoryPath().toString();
+  URIDirectoryPath = URIContent.getDirectoryPath();
 
   if (URIDirectoryPath.isEmpty())  // if directory path is not mentionned : then current working directory is taken
   {
@@ -227,3 +392,42 @@ ZFileDescriptor::setPath (const uriString &pURIPath)
   return generateURIHeader( pURIPath,URIHeader);
 }// ZFileDescriptor::setPath
 
+long
+ZFileDescriptor::getRankFromAddress(const zaddress_type pAddress)
+{
+  for (long wi=0;wi<ZBAT.size();wi++)
+    if (ZBAT.Tab[wi].Address==pAddress)
+      return wi;
+  ZException.setMessage(_GET_FUNCTION_NAME_,
+      ZS_INVADDRESS,
+      Severity_Error,
+      " Address <%lld> does not correspond to a valid block address ",
+      pAddress);
+  return (-1) ;
+}
+
+
+utf8String ZFileDescriptor::toXml(int pLevel,bool pComment)
+{
+  int wLevel=pLevel;
+  utf8String wReturn;
+  wReturn = fmtXMLnode("zfiledescriptor",pLevel);
+  wLevel++;
+
+  /* NB: Lock and LockOwner are not exported to xml */
+
+  wReturn+=fmtXMLchar("uricontent",  URIContent.toCChar(),wLevel);  /* uint8_t */
+  wReturn+=fmtXMLchar("uriheader",URIHeader.toCChar(),wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn,"FYI : not modifiable - generated by ZRandomFile from uricontent");
+  wReturn+=fmtXMLchar("uridirectorypath",URIDirectoryPath.toCChar(),wLevel);
+
+  // wReturn+=ZFDOwnData::toXml(wLevel);  // ZFDOwnData has only volatile data (positionning)
+  if (pComment)
+    wReturn += fmtXMLcomment(" all children fields of zheadercontrolblock are not modifiable ",wLevel);
+  wReturn+=ZHeader.toXml(wLevel);
+  wReturn+=ZFCB.toXml(wLevel,pComment);
+
+  wReturn += fmtXMLendnode("zfiledescriptor",pLevel);
+  return wReturn;
+}//ZFileDescriptor::toXml

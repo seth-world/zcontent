@@ -10,7 +10,7 @@
 
 namespace zbs {
 #pragma pack(push)
-#pragma pack(0)
+#pragma pack(1)
 struct FieldDesc_Export{
   ZTypeBase       ZType;
   uint32_t        ArrayCount; //< if data type is Array then count the rows 0 if not an array

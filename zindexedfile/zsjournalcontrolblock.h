@@ -48,7 +48,7 @@ public:
 
 
 #pragma pack(push)
-#pragma pack(0)
+#pragma pack(1)
 class ZSJCBOwnData;
 class ZSJCBOwnData_Export
 {
@@ -72,8 +72,8 @@ public:
 
 
 
-  uint32_t                StartSign   = cst_ZSTART ;
-  ZBlockID                BlockID     = ZBID_JCB;
+  uint32_t                StartSign   = cst_ZBLOCKSTART ;
+  ZBlockID                BlockId     = ZBID_JCB;
   uint32_t                ZMFVersion  = __ZMF_VERSION__;
   uint32_t                JCBSize;                    //! size of JCBOwndata including exported JournalLocalDirectoryPath
   uint8_t                 JournalingOn=false;         //!< Journaling is started (true) or not (false)
@@ -125,13 +125,11 @@ public:
 
 
   ZDataBuffer& _exportAppend(ZDataBuffer& pZDB);
-  size_t _import(unsigned char* &pPtrIn);
 
   ZDataBuffer& _exportJCB(ZDataBuffer &pJCBContent);
   size_t _getExportSize();
-  ZStatus _importJCB (ZDataBuffer &pJCBContent);
 
-  ZStatus _importJCB(unsigned char* & pPtrIn);
+  ZStatus _import (unsigned char *&pPtrIn);
 
   bool _isSameAs(const ZSJournalControlBlock* pJCB);
 

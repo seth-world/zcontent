@@ -20,7 +20,7 @@ ZRawRecord::ZRawRecord(ZRawMasterFile *pFather)
     else
         FieldPresence=new ZBitset(pMCB->MetaDic->size());
 */
-  for (long wi=0;wi< RawMasterFile->ZMCB.IndexCount;wi++)
+  for (long wi=0;wi< RawMasterFile->IndexCount;wi++)
     KeyValue.push(new ZSIndexItem());
 }
 
@@ -63,15 +63,23 @@ ZRawRecord::setRawKeyContent(long pIdx,const ZDataBuffer& pKeyContent)
  *  ZRawRecord::KeyValue [0..n] -> KeyContent : for each defined key, contains Key content as it will be written to index file.
  *
  * This routine returns a ZDataBuffer, ready to be written to main file, with the following structure :
- *  -------------
- *  FieldPresence (ZType_bitset)  (bitset in URF format)
- * or
- *  ZType_bitsetFull (uint32_t)
+ *
+ *  cst_ZBLOCKSTART  (uint32_t) | Added by ZRandom Block routine :
+ *  ZBID_Data         0x10      |
  *  ----------------
- *  Record content size     (uint64_t)
- *  -------------------
- *  Record raw content (universal values (not URF))
- *  ------------------
+ *  |
+ *  |  ------------------------
+ *  |    FieldPresence (ZType_bitset)  (bitset in URF format)
+ *  |  or
+ *  |    ZType_bitsetFull (uint32_t)
+ *  |  ------------------------
+ *  |  Record raw content size     (uint64_t)
+ *  |  ------------------------
+ *  |  Record raw content (universal values (not URF))
+ *  |  -------------------------
+ *  --------------
+ *  uint32_t number of keys
+ *  --------------
  *  Key 0 content
  *    key canonical size  (uint32_t)
  *    key content (pure universal values (not URF) : values we can sort on )
@@ -81,123 +89,91 @@ ZRawRecord::setRawKeyContent(long pIdx,const ZDataBuffer& pKeyContent)
  *  ...
  *  Key n content
  *  -------------
+ *
+ * cst_ZBLOCKEND  (uint32_t)
+ *
+ *
  * @return
  */
 
 ZDataBuffer
-ZRawRecord::prepareForWrite()
+ZRawRecord::prepareForWrite(ZDataBuffer& pContent)
 {
-  /* FieldPresence bitset is set by ZSMasterFile. Raw master file does not use FieldPresence :
-   * all fields are managed by application and therefore :
-   * FieldPresence is set to nullptr
-   * All fields are reputated to be present within record.
+  /* FieldPresence bitset is set by ZSMasterFile.
+   * Raw master file does not use FieldPresence :
+   *    all fields and FieldPresence have to be managed by application.
    */
-  if (FieldPresence!=nullptr)
-    RawContent.setData(FieldPresence->_exportURF(Content));  // export bitset as first record element
-  else
-    RawContent.setInt(ZType_bitsetFull);  /* if bitset FieldPresence is omitted : all fields are reputated present */
+//  RawContent.clear();
 
-  uint64_t wRecordSize = reverseByteOrder_Conditional<uint64_t> ((uint64_t)Content.Size);
-  RawContent.appendData(&wRecordSize,sizeof(uint64_t));
-  RawContent.appendData(Content);
-  uint32_t wKeySize;
-  /* number of keys to store */
-  wKeySize= reverseByteOrder_Conditional<uint32_t> ((uint32_t)KeyValue.count());
-  RawContent.appendData(&wKeySize,sizeof(uint32_t));
+  RawContent.setData(pContent); // put user record data ( FieldPresence bitset + size uint64_t + record content )
+
+  printf ("ZRawRecord::prepareForWrite put number of keys <%ld> at offset <%ld>\n",KeyValue.count(),RawContent.getByteSize());
+
+  _exportAtomic<uint32_t>((uint32_t)KeyValue.count(),RawContent); /* number of keys to store */
+
   for (long wi=0;wi < KeyValue.count();wi++)
   {
     /* size of next key content */
-    wKeySize= reverseByteOrder_Conditional<uint32_t> ((uint32_t)KeyValue[wi]->KeyContent.Size);
-    RawContent.appendData(&wKeySize,sizeof(uint32_t));
+    _exportAtomic<uint32_t>((uint32_t)KeyValue[wi]->KeyContent.Size,RawContent);
+
     /* key content */
     RawContent.appendData(KeyValue[wi]->KeyContent);
   }
 
-  RawContent.appendData(&cst_ZEND,sizeof(cst_ZEND)); /* no need to indian convert */
+//  RawContent.appendData(&cst_ZBLOCKEND,sizeof(cst_ZBLOCKEND)); /* no need to indian convert */
+
+  if (ZVerbose)
+    {
+    fprintf (stdout,"ZRawRecord::prepareForWrite-I  raw record prepared presence bitset <%s> # keys <%ld> - user record content <%ld> total raw size <%ld>\n",
+        FieldPresence.isNull()?"null":"mentionned",
+        KeyValue.count(),
+        pContent.Size,
+        RawContent.Size);
+    }
 
   return RawContent;
-}
-/**
- * @brief ZRawRecord::getContentFromRaw process raw data (read from file) and extracts record content.
- * Raw data :
- * if first uint_32_t is ZType_bitsetFull, then no bitset, all fields are reputed to be present,
- * no dictionary is available (pure ZRawMasterRecord)
- * else
- * a bitset is present and must be read.
- *
- *
-                      Raw Record bulk structure on file :
+}//prepareForWrite
 
-                  RawMasterFile                   Master File
-                (no dictionary no presence)       with master dictionary
-
-
-  uint32_t        ZType_bitsetFull                  ZType_bitset
-                              \            [...]    Zbitset content
-                               \                   /
-                                \                 /
-  uint64_t                      record content size
-
-  ...                           RECORD EFFECTIVE CONTENT
-
-
-  uint32_t                      Number of key contents
-
-  uint32_t                      Key 0 size
-  ...                           KEY 0 CONTENT
-
-  uint32_t                      Key 1 size
-    ...                         KEY 1 CONTENT
-
-                                    ....
-
-  uint32_t                      Key n size
-    ...                         KEY n CONTENT
-
-
-  uint32_t                      cst_ZEND  : end of record marker
-
-
- */
-
-ZDataBuffer
-ZRawRecord::getContentFromRaw()
+ZStatus
+ZRawRecord::getContentFromRaw(ZDataBuffer& pContent,ZDataBuffer& pRaw )
 {
   /* FieldPresence bitset is set by ZSMasterFile.
    * Raw master file does not use FieldPresence :
-   * all fields are managed by application and therefore :
-   * FieldPresence is set to nullptr
-   * All fields are reputated to be present within record.
-   * This first uint32_t is set to ZType_bitsetFull
+   *    all fields and FieldPresence have to be managed by application.
    */
+  ZStatus wSt=ZS_SUCCESS;
+  ZTypeBase wType=0;
+  unsigned char* wPtrIn=pRaw.Data ;
 
-  uint32_t wType = *(uint32_t*)RawContent.Data;
+/*  if (FieldPresence==nullptr)
+    FieldPresence=new ZBitset;*/
+  wSt=FieldPresence._importURF(wPtrIn);
 
-  unsigned char* wPtrIn=RawContent.Data;
-
-  if (wType == ZType_bitsetFull)
-  {
-    if (FieldPresence!=nullptr)
-      delete FieldPresence;
-    FieldPresence=nullptr;
-    wPtrIn += sizeof(uint32_t);
-  }
-    else
+  if ((wSt!=ZS_OMITTED)&&(wSt!=ZS_SUCCESS))
     {
-    if (FieldPresence==nullptr)
-      FieldPresence=new ZBitset;
-    FieldPresence->_importURF(wPtrIn);
+    ZException.addToLast(" from ZRawRecord::getContentFromRaw");
+    return wSt;
     }
-
     /* getting effective record content */
 
-    uint64_t wRecordContentSize;
+  uint64_t wRecordContentSize;
 
-    _importAtomic<uint64_t>(wRecordContentSize,wPtrIn);
+  _importAtomic<uint64_t>(wRecordContentSize,wPtrIn);
 
-    Content.setData(wPtrIn,wRecordContentSize);
+  if ((wRecordContentSize > __INVALID_SIZE__) ||(ssize_t(wRecordContentSize) < 0))
+      {
+      ZException.setMessage(_GET_FUNCTION_NAME_,
+          ZS_INVSIZE,
+          Severity_Severe,
+          "Raw record has an invalid record content size unsigned <%lld> signed <%lld> hexa <0x%X>.",wRecordContentSize,(ssize_t)wRecordContentSize,wRecordContentSize);
+      return ZS_INVSIZE;
+      }
+  pContent.setData(wPtrIn,wRecordContentSize);
 
     /* getting all keys universal content */
+
+  wPtrIn += wRecordContentSize;
+
 
   RawContent.appendData(Content);
 
@@ -211,7 +187,7 @@ ZRawRecord::getContentFromRaw()
   while (wi < wKeysCount)
     {
     _importAtomic<uint32_t>(wKeySize,wPtrIn);
-    if (wKeySize==cst_ZEND)
+    if (wKeySize==cst_ZBLOCKEND)
       break;
     KeyValue.push(new ZSIndexItem);
     KeyValue.last()->Operation = ZO_Nothing ;
@@ -220,7 +196,7 @@ ZRawRecord::getContentFromRaw()
     wPtrIn += wKeySize;
     wi++;
     }
-  return RawContent;
+  return ZS_SUCCESS;
 }//getContentFromRaw
 
 
@@ -228,8 +204,7 @@ ZRawRecord::getContentFromRaw()
 void
 ZRawRecord::resetAll()
 {
-  if (FieldPresence!=nullptr)
-    FieldPresence->clear();
+//  FieldPresence.clear();
   RawContent.reset();
   Content.reset();
   for (long wi=0;wi<KeyValue.count();wi++ )
@@ -244,7 +219,7 @@ ZRawRecord::setup()
   Content.reset();
   while (KeyValue.count())
     delete KeyValue.popR();
-  for (long wi=0;wi< RawMasterFile->ZMCB.IndexCount;wi++ )
+  for (long wi=0;wi< RawMasterFile->IndexCount;wi++ )
     KeyValue.push(new ZSIndexItem);
 
  }//setup
@@ -256,6 +231,7 @@ ZRawRecord::setup()
  * @param pKeyContent
  * @param pRawRecordContent raw record buffer read from ZSMasterFile
  * @return a ZStatus
+ * ZS_INVTYPE if bitset has not been loaded.
  */
 
 ZStatus
@@ -263,15 +239,15 @@ ZRawRecord::getRawKeyContent(unsigned int pKeyIdx,ZDataBuffer& pKeyContent)
 {
   unsigned char* wPtrIn=RawContent.Data;
   unsigned char* wPtrEnd = wPtrIn + RawContent.Size;
-
-  if(FieldPresence->_importURF(wPtrIn)==nullptr)
-  {
+  ZStatus wSt= FieldPresence._importURF(wPtrIn);
+  if(wSt==ZS_INVTYPE)
+    {
     ZException.setMessage("ZRawRecord::getRawKeyContent",
         ZS_INVVALUE,
         Severity_Severe,
         " Cannot load Field presence bitset ");
-    return ZS_INVVALUE;
-  }
+    return ZS_INVTYPE;
+    }
   uint64_t wRecordSize;
   _importAtomic<uint64_t>(wRecordSize,wPtrIn);
 

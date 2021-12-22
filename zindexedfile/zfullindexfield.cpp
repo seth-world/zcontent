@@ -17,6 +17,6 @@ ZFullIndexField& ZFullIndexField::set(ZSIndexFile* pZIF,long pKeyFieldRank)
 
   ZSMasterFile* wFather = pZIF->getMasterFile();
 
-  ZFieldDescription::_copyFrom(wFather->ZMCB.MasterDic->Tab[MDicRank]);
+  ZFieldDescription::_copyFrom(wFather->MasterDic->Tab[MDicRank]);
   return *this;
 }

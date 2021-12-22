@@ -6,7 +6,7 @@
 #include <zindexedfile/zfielddescription.h>
 
 #pragma pack(push)
-#pragma pack(0)
+#pragma pack(1)
 /* no MDic rank is stored */
 struct ZSIndexField_Out
 {
@@ -53,7 +53,7 @@ struct ZSIndexField_Out
 namespace zbs {
 
 #pragma pack(push)
-#pragma pack(0)
+#pragma pack(1)
 class ZSIndexField_exp
 {
 public:

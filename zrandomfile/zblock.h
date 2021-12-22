@@ -7,15 +7,15 @@ class ZBlock;
 class ZBlockDescriptor;
 
 #pragma pack(push)
-#pragma pack(0)
+#pragma pack(1)
 class ZBlockHeader_Export
 {
 public:
-  uint32_t            StartBlock=cst_ZSTART ;    // Start marker
-  ZBlockID            BlockID=ZBID_Data;         // Block identification : always ZBID_Data here
+  uint32_t            StartBlock=cst_ZBLOCKSTART ;    // Start marker
+  ZBlockID            BlockId=ZBID_Data;         // Block identification : always ZBID_Data here
   zsize_type          BlockSize;      // total size of the physical block, ZBH_Export size+user content size
   ZBlockState_type    State;          // state of the block see @ref ZBlockState_type
-  zlockmask_type          Lock;           // relates to ZLockMask_type (zlockmanager.h)
+  zlockmask_type      Lock;           // relates to ZLockMask_type (zlockmanager.h)
   //    ZLock_Reason        LockReason;     // RFFU (zlockmanager.h)
   pid_t               Pid;            // process identification that locked the block
 };
@@ -38,10 +38,10 @@ public:
 
   //    uint32_t            StartBlock ;    //!< Start sign
   //    ZBlockID            BlockID;        // Block identification
-  zsize_type          BlockSize;      // total size of the physical block on file ,
+  zsize_type          BlockSize;      // total size of the physical block on file  including ZBlockHeader_Export size
   //                                       ZBlockHeader_Export plus user content size
   ZBlockState_type    State;          // state of the block see @ref ZBlockState_type
-  zlockmask_type          Lock;           // relates to ZLockMask_type (zlockmanager.h)
+  zlockmask_type      Lock;           // relates to ZLockMask_type (zlockmanager.h)
   //    ZLock_Reason        LockReason;     // RFFU (zlockmanager.h)
   pid_t               Pid;            // process identification that locked the block
 
@@ -82,46 +82,9 @@ public:
         Pid=_reverseByteOrder_T<pid_t>(pImport->Pid);
         return *this;
     }//_import*/
-  static ZBlockHeader_Export& _exportConvert(ZBlockHeader& pIn,ZBlockHeader_Export* pOut)
-  {
-    pOut->StartBlock = cst_ZSTART;
-    //        pOut->BlockID= pIn.BlockID;   // uint8_t
-    pOut->BlockID= ZBID_Data;   // uint8_t
-    pOut->BlockSize = pIn.BlockSize ;
-    pOut->BlockSize=reverseByteOrder_Conditional<zsize_type>(pIn.BlockSize);
-    pOut->State= pIn.State;   // unsigned char
-    pOut->Lock=reverseByteOrder_Conditional<zlockmask_type>(pIn.Lock);
-    //        pOut->LockReason=pIn.LockReason; // unsigned char
-    pOut->Pid=reverseByteOrder_Conditional<pid_t>(pIn.Pid);
+  static ZBlockHeader_Export& _exportConvert(ZBlockHeader& pIn,ZBlockHeader_Export* pOut);
+  static ZStatus _importConvert(ZBlockHeader& pOut,ZBlockHeader_Export* pIn);
 
-    return *pOut;
-  }//_exportConvert
-
-  static ZStatus _importConvert(ZBlockHeader& pOut,ZBlockHeader_Export* pIn)
-  {
-
-    memset(&pOut,0,sizeof(ZBlockHeader));
-    if ((pIn->StartBlock!=cst_ZSTART)||(pIn->BlockID!=ZBID_Data))
-    {
-      ZException.setMessage(_GET_FUNCTION_NAME_,
-          ZS_INVBLOCKADDR,
-          Severity_Severe,
-          "Invalid block format: invalid marker  Startblock<%X> or BlockId<%X>",
-          pIn->StartBlock,
-          pIn->BlockID);
-      return  ZS_INVBLOCKADDR;
-    }
-    //        pOut.StartBlock = pIn->StartBlock;
-    //        pOut.BlockID= pIn->BlockID;   // unsigned char
-    pOut.BlockSize = pIn->BlockSize ;
-    pOut.BlockSize=reverseByteOrder_Conditional<zsize_type>(pOut.BlockSize);
-    pOut.State= pIn->State;   // unsigned char
-    pOut.Lock=reverseByteOrder_Conditional<zlockmask_type>(pIn->Lock);
-    //        pOut.LockReason=pIn->LockReason; // unsigned char
-    pOut.Pid=reverseByteOrder_Conditional<pid_t>(pIn->Pid);
-
-    return  ZS_SUCCESS;
-  }//_importConvert
 };
 
 /**
@@ -133,75 +96,23 @@ class ZBlockDescriptor : public ZBlockHeader
 public:
   zaddress_type        Address;  //!< Offset from begining of file : Physical Address
 
+  ZBlockDescriptor& _copyFrom(const ZBlockDescriptor& pIn);
+
+
   ZBlockDescriptor(void) {ZBlockHeader::clear(); Address=0; return;}
   ZBlockDescriptor(const ZBlockDescriptor& pIn) {ZBlockHeader::_copyFrom(pIn); Address=pIn.Address;}
   ZBlockDescriptor(const ZBlockDescriptor&& pIn) {ZBlockHeader::_copyFrom(pIn);Address=pIn.Address;}
 
   void clear(void) {memset(this,0,sizeof(ZBlockDescriptor));return;}
 
-  ZBlockDescriptor & operator = (const ZBlockDescriptor &pIn)
-    {
-    ZBlockHeader::_copyFrom(pIn); Address=pIn.Address;
-    return *this;
-    }
-  ZBlockDescriptor& operator = (const ZBlockHeader& pBlockHeader) {memmove(this,&pBlockHeader,sizeof(ZBlockHeader));return *this;}
-  ZBlockDescriptor& operator = (const ZBlock &pBlock) {memmove(this,&pBlock,sizeof(ZBlockHeader)); return *this;}
-  /*    ZDataBuffer& _export(ZDataBuffer& pZDBExport)
-    {
-        ZBlockHeader::_export(pZDBExport);
-        size_t wAddress=_reverseByteOrder_T<zaddress_type>(Address);
-        pZDBExport.appendData(&wAddress,sizeof(wAddress));
-        return pZDBExport;
-    }//_export
-    ZBlockDescriptor& _import(unsigned char* pZDBImport_Ptr)
-    {
-        ZBlockDescriptor* pImport=(ZBlockDescriptor*)(pZDBImport_Ptr);
-        ZBlockHeader::_import(pZDBImport_Ptr);
-        Address=_reverseByteOrder_T<zaddress_type>(pImport->Address);;
-        return *this;
-    }//_import*/
+  ZBlockDescriptor & operator = (const ZBlockDescriptor &pIn) {    return _copyFrom(pIn); }
+  ZBlockDescriptor& operator = (const ZBlockHeader& pBlockHeader) { ZBlockHeader::_copyFrom(pBlockHeader); return *this;}
+  ZBlockDescriptor& operator = (const ZBlock &pBlock) {ZBlockHeader::_copyFrom((const ZBlockHeader&)pBlock); return *this;}
 
-  static ZBlockDescriptor_Export _exportConvert(ZBlockDescriptor& pIn,ZBlockDescriptor_Export* pOut)
-  {
-    memset(pOut,0,sizeof(ZBlockDescriptor_Export));
-    pOut->StartBlock = cst_ZSTART;
-    pOut->BlockID= ZBID_Data ;   // uint8_t
-    pOut->BlockSize=reverseByteOrder_Conditional<zsize_type>(pIn.BlockSize);
-    pOut->State= pIn.State;   // unsigned char
-    pOut->Lock=reverseByteOrder_Conditional<zlockmask_type>(pIn.Lock);
-    //        pOut->LockReason=pIn.LockReason; // unsigned char
-    pOut->Pid=reverseByteOrder_Conditional<pid_t>(pIn.Pid);
-    // specific to ZBlockDescriptor
-    pOut->Address=reverseByteOrder_Conditional<zaddress_type>(pIn.Address);
+  static ZBlockDescriptor_Export _exportConvert(ZBlockDescriptor& pIn,ZBlockDescriptor_Export* pOut);
 
-    return *pOut;
-  }//_exportConvert
+  static ZStatus _importConvert(ZBlockDescriptor& pOut,ZBlockDescriptor_Export* pIn);
 
-  static ZStatus _importConvert(ZBlockDescriptor& pOut,ZBlockDescriptor_Export* pIn)
-  {
-
-    if ((pIn->StartBlock!=cst_ZSTART)||(pIn->BlockID!=ZBID_Data))
-    {
-      ZException.setMessage(_GET_FUNCTION_NAME_,
-          ZS_INVBLOCKADDR,
-          Severity_Severe,
-          "Invalid block format: invalid marker  Startblock<%X> or BlockId<%X>",
-          pIn->StartBlock,
-          pIn->BlockID);
-      return  ZS_INVBLOCKADDR;
-    }
-    memset(&pOut,0,sizeof(ZBlockDescriptor));
-    //        pOut.StartBlock = _reverseByteOrder_T<int32_t>(pIn->StartBlock);
-    //        pOut.BlockID= pIn->BlockID;   // unsigned char
-    pOut.BlockSize=reverseByteOrder_Conditional<zsize_type>(pIn->BlockSize);
-    pOut.State= pIn->State;   // unsigned char
-    pOut.Lock=reverseByteOrder_Conditional<zlockmask_type>(pIn->Lock);
-    //        pOut.LockReason=pIn->LockReason; // unsigned char
-    pOut.Pid=reverseByteOrder_Conditional<pid_t>(pIn->Pid);
-    // specific to ZBlockDescriptor
-    pOut.Address=reverseByteOrder_Conditional<zaddress_type>(pIn->Address);
-    return  ZS_SUCCESS;
-  }//_importConvert
 
 
 };

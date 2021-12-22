@@ -49,8 +49,8 @@ ZSKey::ZSKey(ZSMasterFile *pZMF, const long pKeyRank)
 {
     IndexNumber=pKeyRank;
     ZMF = pZMF;
-    ZIF = pZMF->ZMCB.IndexTable[pKeyRank];
-    if (pKeyRank>ZMF->ZMCB.IndexTable.size())
+    ZIF = pZMF->IndexTable[pKeyRank];
+    if (pKeyRank>ZMF->IndexTable.size())
                 {
                 ZException.setMessage(_GET_FUNCTION_NAME_,
                                         ZS_OUTBOUND,
@@ -71,7 +71,7 @@ ZSKey::ZSKey(ZSMasterFile *pZMF, const long pKeyRank)
             );
         ZException.exit_abort();
       }
-//    ZIF=pZMF->ZMCB.IndexTable[IndexNumber];
+//    ZIF=pZMF->IndexTable[IndexNumber];
 
     if (FieldPresence.allocateCurrentElements(ZIF->KeyDic->count())) // alloc necessary elements and zero it
             {

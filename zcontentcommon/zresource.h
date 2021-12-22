@@ -38,7 +38,7 @@ public:
  * Remark : memset() cannot be used for ZResource object because it has virtual methods and will overwrite VTable content
  */
 #pragma pack(push)
-#pragma pack(0)         // no memory alignment
+#pragma pack(1)         // memory alignment on byte
     ZEntity_type Entity = cst_EntityInvalid; /* entity type : defined by application */
     Resourceid_type id = cst_ResourceInvalid;
 #pragma pack(pop) // end no memory alignment

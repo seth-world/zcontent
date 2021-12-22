@@ -93,29 +93,6 @@ setFieldURFfWChar(void* pNatural,
 
 */
 
-/**
- * @brief setFieldURFfFixedC takes a derived of templateString (descString,...) as source
- *                  and converts it to target structure URF format (target structure given by pTargetType)
- * @param pNatural
- * @param pURFData
- * @param pSourceType
- * @param pSourceSize
- * @param pSourceArrayCount
- * @param pTargetType
- * @param pTargetArrayCount
- * @return
- */
-/*
-ZStatus
-setFieldURFfFixedC(void* pNatural,
-                ZDataBuffer* pURFData,
-                ZTypeBase &pSourceType,
-                   uint64_t &pSourceNSize,
-                   uint64_t &pSourceUSize,
-                uint16_t &pSourceArrayCount,
-                ZTypeBase &pTargetType,
-                uint16_t &pTargetArrayCount);
-*/
 
 
 /**
@@ -424,7 +401,7 @@ ZDataBuffer wValue;
 ZTypeBase wTargetStructType,wTargetAtomicType,wSourceStructType,wSourceAtomicType ;
 size_t wNSize, wUSize;
 uint32_t  wRetainedArrayCount;
-ZDataBuffer wUValue;
+//ZDataBuffer wUValue;
 
     wSt=_getZType_T<_Tp>(pNatural,pSourceType,wNSize,wUSize,pSourceArrayCount);
     if (wSt!=ZS_SUCCESS)
@@ -575,7 +552,7 @@ ZStatus  setFieldURFfN_T (typename std::enable_if_t<std::is_class<_Tp>::value,_T
 {
 
 ZStatus wSt=ZS_SUCCESS;
-
+//ZDataBuffer wTargetURFData;
 /* create URF header :
  *      for atomic data only ZTypeBase data type
  *      arrays & pointer (target type is array) :[ ZTypeBase + uint32_t (array count) reverse byte order if endian]
@@ -584,6 +561,7 @@ ZStatus wSt=ZS_SUCCESS;
  */
 
 // get ZType_type and sizes + arraycount
+
 
     wSt=_getZType_T<_Tp>(pSourceNatural,pSourceType,pSourceNSize,pSourceUSize,pSourceCapacity);
     if (wSt!=ZS_SUCCESS)
@@ -610,13 +588,15 @@ ZStatus wSt=ZS_SUCCESS;
             }//  case ZType_StdString:
         case ZType_StdString:
             {
-            return  (setFieldURFfStdString(&pSourceNatural,
-                                          pTargetURFData,
-                                          pSourceNSize,
-                                          pSourceUSize,
-                                          pSourceCapacity,
-                                          pTargetType,
-                                          pTargetCapacity));
+            wSt=setFieldURFfStdString(&pSourceNatural,
+                                      pTargetURFData,
+                                      pSourceNSize,
+                                      pSourceUSize,
+                                      pSourceCapacity,
+                                      pTargetType,
+                                      pTargetCapacity);
+
+            return  wSt;
             }//  case ZType_StdString:
         case ZType_StdWString:
             {
@@ -644,6 +624,7 @@ ZStatus wSt=ZS_SUCCESS;
         case ZType_Utf8VaryingString:
         case ZType_Utf16VaryingString:
         case ZType_Utf32VaryingString:
+        case ZType_URIString:
             {        
 //            utfStringHeader *wString=static_cast<utfStringHeader*>(wNaturalPtr);
 //            return  wString->_exportURFGeneric(pTargetURFData);

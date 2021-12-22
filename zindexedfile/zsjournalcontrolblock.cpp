@@ -99,7 +99,7 @@ void ZSJournalControlBlock::clear(void)
 ZSJCBOwnData_Export& ZSJCBOwnData_Export::_copyFrom(const ZSJCBOwnData_Export& pIn)
 {
   StartSign=pIn.StartSign;
-  BlockID=pIn.BlockID;
+  BlockId=pIn.BlockId;
   ZMFVersion=pIn.ZMFVersion;
   JCBSize=pIn.JCBSize;
   JournalingOn=pIn.JournalingOn;
@@ -111,8 +111,8 @@ ZSJCBOwnData_Export& ZSJCBOwnData_Export::_copyFrom(const ZSJCBOwnData_Export& p
 ZSJCBOwnData_Export& ZSJCBOwnData_Export::_copyFrom(const ZSJCBOwnData& pIn)
 {
 
-  StartSign=cst_ZSTART;
-  BlockID=ZBID_MCB;
+  StartSign=cst_ZBLOCKSTART;
+  BlockId=ZBID_MCB;
   ZMFVersion=__ZMF_VERSION__;
 
   JournalingOn=pIn.JournalingOn;
@@ -191,52 +191,10 @@ ZSJournalControlBlock::_getExportSize()
  * @brief ZSJournalControlBlock::_importJCB imports (rebuild) a ZSJournalControlBlock from a ZDataBuffer containing flat raw data to import
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
+
 ZStatus
-ZSJournalControlBlock::_importJCB(ZDataBuffer& pJCBContent)
+ZSJournalControlBlock::_import(unsigned char* & pPtrIn)
 {
-
-  //ZStatus wSt;
-  //long wIndexCountsv ;
-
-  ZSJCBOwnData_Export* wJCB =(ZSJCBOwnData_Export*) pJCBContent.Data;
-
-  if (wJCB->BlockID != ZBID_JCB)
-  {
-    ZException.setMessage(_GET_FUNCTION_NAME_,
-        ZS_BADICB,
-        Severity_Error,
-        "Error Journal Control Block identification is bad. Value <%ld>  : File header appears to be corrupted - invalid BlockID",
-        wJCB->BlockID);
-    return (ZS_BADICB);
-  }
-  if (wJCB->StartSign != cst_ZSTART)
-  {
-    ZException.setMessage(_GET_FUNCTION_NAME_,
-        ZS_BADFILEHEADER,
-        Severity_Error,
-        "Error Journal Control Block  : Index header appears to be corrupted - invalid JCB StartBlock mark");
-    return (ZS_BADFILEHEADER);
-  }
-  if (wJCB->ZMFVersion!= __ZMF_VERSION__)
-  {
-    ZException.setMessage(_GET_FUNCTION_NAME_,
-        ZS_BADFILEVERSION,
-        Severity_Error,
-        "Error Journal Control Block   : Found version <%ld> while current ZMF version is <%ld>",
-        wJCB->ZMFVersion,
-        __ZMF_VERSION__);
-    return (ZS_BADFILEVERSION);
-  }
-
-  clear();
-  memmove(this,pJCBContent.Data,sizeof(ZSJCBOwnData));
-
-  return  ZS_SUCCESS;
-}//_importJCB
-ZStatus
-ZSJournalControlBlock::_importJCB(unsigned char* & pPtrIn)
-{
-
   //ZStatus wSt;
   //long wIndexCountsv ;
 
@@ -244,26 +202,20 @@ ZSJournalControlBlock::_importJCB(unsigned char* & pPtrIn)
 
   wJCB->reverseConditional();
 
-  if (wJCB->BlockID != ZBID_JCB)
+  if ((wJCB->BlockId!=ZBID_ICB)||(wJCB->StartSign!=cst_ZBLOCKSTART))
   {
-    ZException.setMessage(_GET_FUNCTION_NAME_,
-        ZS_BADICB,
-        Severity_Error,
-        "Error Journal Control Block identification is bad. Value <%ld>  : File header appears to be corrupted - invalid BlockID",
-        wJCB->BlockID);
-    return (ZS_BADICB);
+    ZException.setMessage("ZSJournalControlBlock::_import",
+        ZS_BADDIC,
+        Severity_Severe,
+        "Invalid Journal Control Block header : found Start marker <%X> ZBlockID <%X>. One of these is invalid (or both are).",
+        wJCB->StartSign,
+        wJCB->BlockId);
+    return  ZS_BADDIC;
   }
-  if (wJCB->StartSign != cst_ZSTART)
-  {
-    ZException.setMessage(_GET_FUNCTION_NAME_,
-        ZS_BADFILEHEADER,
-        Severity_Error,
-        "Error Journal Control Block  : Index header appears to be corrupted - invalid JCB StartBlock mark");
-    return (ZS_BADFILEHEADER);
-  }
+
   if (wJCB->ZMFVersion!= __ZMF_VERSION__)
   {
-    ZException.setMessage(_GET_FUNCTION_NAME_,
+    ZException.setMessage("ZSJournalControlBlock::_import",
         ZS_BADFILEVERSION,
         Severity_Error,
         "Error Journal Control Block   : Found version <%ld> while current ZMF version is <%ld>",
@@ -276,7 +228,7 @@ ZSJournalControlBlock::_importJCB(unsigned char* & pPtrIn)
 
 
   wJCB->_toJCBOwnData(*this);
-
+  pPtrIn += sizeof(ZSJCBOwnData);
 
   return  ZS_SUCCESS;
 }//_importJCB

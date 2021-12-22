@@ -9,11 +9,12 @@
 #include <ztoolset/ztypetype.h>
 #include <ztoolset/zexceptionmin.h>
 #include <zcontentcommon/zlock.h>
-
+#include <ztoolset/zmem.h>
 
 #define __ZRF_VERSION__  2000UL
 #define __ZRF_VERSION_CHAR__  "\"2.00\""
 #define __ZRF_XMLVERSION_CONTROL__  "2.00"
+
 
 
 /** @namespace zbs */
@@ -35,8 +36,8 @@ typedef uint64_t  zsize_type;     //!< ZRandomFile size data type
 typedef uint8_t   zlockmask_type ;    //!< refers to ZLockMask_type
 typedef uint32_t  zmode_type ;        //!< refers to ZRFMode_type
 
-const uint32_t     cst_ZSTART = 0xF5F5F5F5;  //!< Begin marker of a data structure on file
-const uint32_t     cst_ZEND   = 0xF0F0F0F0;  //!< End marker of a data structure on file : does not have to be reversed
+const uint32_t     cst_ZBLOCKSTART = 0xF5F5F5F5;  //!< Begin marker of a data structure on file it is a palyndroma
+const uint32_t     cst_ZBLOCKEND   = 0xFCFCFCFC;  //!< End marker of a data structure on file : it is a palyndroma
 
 const uint8_t      cst_ZSTART_BYTE = 0xF5;
 
@@ -44,9 +45,31 @@ const uint8_t      cst_ZSTART_BYTE = 0xF5;
 const long        cst_ZRF_default_allocation=10;
 const long        cst_ZRF_default_extentquota=5;
 
+const zaddress_type cst_HeaderOffset = 0L;
+
+
+#ifndef __ZOPENZRFPOOL__
+#define __ZOPENZRFPOOL__
+namespace zbs {
+class ZRandomFile; }
+class ZOpenZRFPool: public zbs::ZArray <zbs::ZRandomFile*>
+{
+public:
+  void addOpenFile(zbs::ZRandomFile* pFileData)
+  { push(pFileData);}
+  ZStatus removeFileByObject(zbs::ZRandomFile*pZRF);
+  ZStatus removeFileByFd(int pFd);
+  void closeAll();
+
+}; //ZOpenZRFPool
+
+#ifndef ZRANDOMFILE_CPP
+extern ZOpenZRFPool* ZRFPool;
+#endif //ZRANDOMFILE_CPP*/
+#endif
 
 /** @cond Development
- * @brief The ZPMSCounter_type enum
+ * @brief The ZPMSCounterextern ZOpenZRFPool* ZRFPool;_type enum
  */
 enum ZPMSCounter_type {
     ZPMS_Nothing =          0,
@@ -110,11 +133,11 @@ enum ZFile_type : uint8_t
 {
     ZFT_Nothing     = 0,    //!< nop
     ZFT_ZRandomFile = 1,    //!< file is ZRandomFile
-    ZFT_ZMasterFile = 2,    //!< file is ZMasterFile
+//    ZFT_ZMasterFile = 2,    //!< file is ZMasterFile
     ZFT_ZIndexFile  = 4,    //!< file is ZIndexFile
     ZFT_ZRawMasterFile=2,   //!< file is raw master file (keys are only defined by their universal size)
     ZFT_ZDicMasterFile=8,   //!< this file uses a dictionary
-    ZFT_ZSMasterFile = ZFT_ZDicMasterFile|ZFT_ZRawMasterFile,   //!< file is Structured Master File using a dictionary
+    ZFT_ZMasterFile = ZFT_ZDicMasterFile|ZFT_ZRawMasterFile,   //!< file is Structured Master File using a dictionary
     ZFT_ZSIndexFile = 0x10,  //!< file is Structured index File
 
     ZFT_Any         = 0xFF  //!< all file types allowed
@@ -125,7 +148,7 @@ enum ZFile_type : uint8_t
 /**
  * @brief The ZBlockState_type enum defines the state of the block in file
  */
-enum ZBlockState_type : unsigned char
+enum ZBlockState_type : uint8_t
 {
     ZBS_Nothing         = 0,    //!< NOP
     ZBS_Used            = 1,    //!< block contains a data block

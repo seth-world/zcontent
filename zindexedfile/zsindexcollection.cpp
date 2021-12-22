@@ -39,7 +39,7 @@ ZSIndexCollection::ZSIndexCollection(ZRawIndexFile *pZIFFile)
 ZSIndexCollection::ZSIndexCollection(ZSMasterFile &pZMFFile,const long pIndexRank)
 {
 
-    ZSIndexCollection(pZMFFile.ZMCB.IndexTable[pIndexRank]);
+    ZSIndexCollection(pZMFFile.IndexTable[pIndexRank]);
     return;
 }
 
@@ -872,9 +872,9 @@ ZDataBuffer wFormerFieldValue;
 
 // here check if massive change will affect one of defined key fields for ZSMasterFile
 
-/*    for (zrank_type wi=0;wi<wMasterFile->ZMCB.IndexTable.size();wi++)
+/*    for (zrank_type wi=0;wi<wMasterFile->IndexTable.size();wi++)
         {
-        wZKDic = wMasterFile->ZMCB.IndexTable[wi].ZKDic;
+        wZKDic = wMasterFile->IndexTable[wi].ZKDic;
         for (long wj=0;wi<wZKDic->size();wj++)
                 {
                 if ((pOffset > wZKDic->fieldRecordOffset(wj))&&(pOffset < wZKDic->fieldRecordOffset(wj)))
@@ -895,10 +895,10 @@ ZDataBuffer wFormerFieldValue;
        // check wether data size to change will not bypass the end of the record : if so, truncate it.
        // NB: we are in a record varying context
 
-       if (wMasterFile->ZMCB.ZJCB!=nullptr)
+       if (wMasterFile->ZJCB!=nullptr)
            {
            wFormerFieldValue.setData(wBlock.Content.Data+pOffset,pFieldValue.Size);
-           wMasterFile->ZMCB.ZJCB->Journal->enqueueSetFieldValue(ZJOP_ChgFld,
+           wMasterFile->ZJCB->Journal->enqueueSetFieldValue(ZJOP_ChgFld,
                                                                  wFormerFieldValue,
                                                                  pFieldValue,
                                                                  -1,

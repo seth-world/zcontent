@@ -205,7 +205,7 @@ uriString   wURIJournal;
 
     wURIFather=Father->getURIContent();
 
-    wSt=generateJournalName(wURIFather,Father->ZMCB.ZJCB->JournalLocalDirectoryPath,wURIJournal);
+    wSt=generateJournalName(wURIFather,Father->ZJCB->JournalLocalDirectoryPath,wURIJournal);
     if (wSt!=ZS_SUCCESS)
                     return wSt;
     if ((wSt=_Base::setPath(wURIJournal))!=ZS_SUCCESS)
@@ -399,7 +399,7 @@ ZSJournal::purge(const zrank_type pKeepRanks)
         wEvent.getEventFromRecord(wJournalRecord);
         while (true)
             {
-        if (Father->ZMCB.ZJCB->Remote!=nullptr)     // if a remote mirroring is requested
+        if (Father->ZJCB->Remote!=nullptr)     // if a remote mirroring is requested
                 if (!wEvent.Header.State.is(ZJS_Exported)) // must be exported to remote host before being purged
                                                     break;
 
@@ -590,7 +590,7 @@ generateJournalName(uriString &pZMFName,uriString &pJournalingPath, uriString& p
         else
                 pJournalName = pJournalingPath;
     pJournalName.addConditionalDirectoryDelimiter();
-    pJournalName += pZMFName.getRootBasename().toCChar();
+    pJournalName += pZMFName.getRootname().toCChar();
     pJournalName += "_jnl.";
     pJournalName += __JOURNAL_EXT__;
     return ZS_SUCCESS;

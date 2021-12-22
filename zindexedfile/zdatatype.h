@@ -2846,7 +2846,7 @@ ZTypeBase wSourceType = pSourceType & ZType_AtomicMask;
 
 /* universal signed 16 bits */
 #pragma pack(push)
-#pragma pack(0)
+#pragma pack(1)
 class US8
 {
 public:

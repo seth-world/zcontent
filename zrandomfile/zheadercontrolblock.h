@@ -6,7 +6,7 @@
 
 typedef void  (*ZFCBgetReserved) (ZDataBuffer &) ;
 #pragma pack(push)
-#pragma pack(0)
+#pragma pack(1)
 /**
  * @brief The ZHeaderControlBlock_Export class
  *
@@ -14,22 +14,22 @@ typedef void  (*ZFCBgetReserved) (ZDataBuffer &) ;
  *
  *
  */
+class ZHeaderControlBlock;
 class ZHeaderControlBlock_Export
 {
 public:
-  uint32_t                StartSign   = cst_ZSTART;       /**< check for block start */
-
-  zlockmask_type          Lock    = ZLock_Nolock ;        /**< Lock mask (int32_t) at file header level (Exclusive lock) @see ZLockMask_type one lock at a time is authorized */
-  pid_t                   LockOwner = 0L;                 /**< Owner process for the lock */
-
+  uint32_t                StartSign   = cst_ZBLOCKSTART;  /**< check for block start */
   ZBlockID                BlockID     = ZBID_FileHeader;  /**< identification is file header */
   unsigned long           ZRFVersion  = __ZRF_VERSION__;  /**< software version */
   ZFile_type              FileType    = ZFT_Nothing ;     /**< File type see ref ZFile_type */
+  zlockmask_type          Lock        = ZLock_Nolock ;    /**< Lock mask (int32_t) at file header level (Exclusive lock) @see ZLockMask_type one lock at a time is authorized */
+  pid_t                   LockOwner   = 0L;               /**< Owner process for the lock */
+
   zaddress_type           OffsetFCB;                      /**< offset to ZFileControlBlock when written in file */
   zaddress_type           OffsetReserved;                 /**< offset to ZReserved section when written in file */
   zsize_type              SizeReserved = 0L;              /**< Size of ZReserved section in file */
 
-  uint32_t                EndSign     = cst_ZEND;         /**< check for block end */
+  uint32_t                EndSign     = cst_ZBLOCKEND;         /**< check for block end */
 
   ZHeaderControlBlock_Export()=default;
   ZHeaderControlBlock_Export(ZHeaderControlBlock_Export& pIn) {_copyFrom(pIn);}
@@ -38,10 +38,21 @@ public:
 
   void _convert();
 
+  ZHeaderControlBlock_Export &set(const ZHeaderControlBlock pIn);
   ZHeaderControlBlock_Export& _copyFrom(ZHeaderControlBlock_Export& pIn);
 
 };
+
+class lockPack
+{
+public:
+  zlockmask_type          Lock      = ZLock_Nolock ;  /**< Lock mask (int32_t) at file header level (Exclusive lock) @see ZLockMask_type one lock at a time is authorized */
+  pid_t                   LockOwner = 0L;             /**< Owner process for the lock */
+
+};
+
 #pragma pack(pop)
+
 /**
  * @brief The ZHeaderControlBlock class contains the required information as a header for any ZRandomFile
  *  This block is the first of the file's header.
@@ -76,7 +87,11 @@ public:
   ZHeaderControlBlock& _copyFrom(const ZHeaderControlBlock& pIn);
   ZHeaderControlBlock& operator = (const ZHeaderControlBlock& pIn){_copyFrom(pIn);}
 
+  ZHeaderControlBlock& _fromHCBE(const ZHeaderControlBlock_Export *pIn);
+
   void clear(void) ;
+
+
 
   utf8String toXml(int pLevel);
   /**
@@ -87,6 +102,6 @@ public:
   int fromXml(zxmlNode* pHCBRootNode,ZaiErrors* pErrorlog);
 
   ZDataBuffer& _export(ZDataBuffer& pZDBExport);
-  ZStatus      _import(unsigned char* pZDBImport_Ptr);
+  ZStatus      _import(unsigned char* &pPtrIn);
 };
 #endif // ZHEADERCONTROLBLOCK_H

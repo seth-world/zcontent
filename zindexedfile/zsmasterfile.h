@@ -29,10 +29,6 @@
 //------------------Generic Functions--------------------------
 
 
-utf8String generateIndexRootName(utf8String &pMasterRootName, const long pRank, const utf8String &pIndexName);
-
-ZStatus generateIndexURI(uriString pMasterUri, uriString &pDirectory, uriString &pZIndexFileUri, const long pRank, const utf8String &pIndexName);
-
 
 namespace zbs //========================================================================
 {
@@ -80,7 +76,11 @@ public:
     friend class ZSIndexCollection;
     friend class ZSJournal;
 
+    friend class ZContentVisuMain;
+
 typedef ZRawMasterFile _Base ;
+
+
 
     ZSMasterFile(void) ;
 //    ZSMasterFile(uriString pURI);
@@ -103,8 +103,8 @@ typedef ZRawMasterFile _Base ;
     using ZRandomFile::last;
 
 
-    using _Base::zgetCurrentRank;
-    using _Base::zgetCurrentLogicalPosition ;
+    using _Base::getCurrentRank;
+    using _Base::getLogicalPosition ;
     using _Base::setLogicalFromPhysical ;
     using _Base::zremove;
 
@@ -121,6 +121,8 @@ typedef ZRawMasterFile _Base ;
     using _Base::zgetLastWAddress;
     using _Base::zgetPreviousWAddress;
 
+    using _Base::getFileDescriptor;
+
 
 //----------------Statistical-------------------------------
     using _Base::zfullDump;
@@ -136,7 +138,7 @@ typedef ZRawMasterFile _Base ;
                               const bool pHighwaterMarking,
                               const size_t pBlockTargetSize,
                               const size_t pBlockExtentQuota)
-    { return _Base::_setParameters(ZFT_ZSMasterFile,
+    { return _Base::_setParameters(ZFT_ZMasterFile,
                                    pGrabFreeSpace,
                                    pHighwaterMarking,
                                    pBlockTargetSize,
@@ -145,7 +147,7 @@ typedef ZRawMasterFile _Base ;
     ZStatus setIndexFilesDirectoryPath (uriString &pPath);
     ZStatus setJournalLocalDirectoryPath (uriString &pPath);
 
-//    ZStatus setPath(uriString &pPath) { return _Base::setPath(pPath); }  // defined as virtual in ZRandomFile base class
+//    ZStatus setPath(uriString &pPath) { return _Base::setPath(pPath); }  // defined in ZRandomFile base class
 //----------------End setting parameters--------------------
 // ZSMasterFile creation
 #ifdef __COMMENT__
@@ -166,10 +168,10 @@ typedef ZRawMasterFile _Base ;
      * @param pIndex Index number within ZSMasterFile to return the size for
      * @return
      */
-    ssize_t    zgetIndexCount(const zrank_type pIndexRank) {return ZMCB.IndexTable[pIndexRank]->getRecordCount();}
+    ssize_t    zgetIndexCount(const zrank_type pIndexRank) {return IndexTable[pIndexRank]->getRecordCount();}
  //   ZSKeyDictionary * zgetKeyDictionary(const zrank_type pIndexRank) {return ZMCB.IndexTable[pIndexRank]->ZKDic ;}
 
-    ZRawIndexFile* zgetIndexFile(const zrank_type pIndexRank) {return ZMCB.IndexTable[pIndexRank];}
+    ZRawIndexFile* zgetIndexFile(const zrank_type pIndexRank) {return IndexTable[pIndexRank];}
 
     ZStatus zcreate(ZMetaDic *pMetaDic,
                     const uriString pURI,
@@ -183,24 +185,20 @@ typedef ZRawMasterFile _Base ;
                     bool pBackup=false,
                     bool pLeaveOpen=false);
 
-    ZStatus zcreate (ZMetaDic *pMetaDic, const uriString pURI, const zsize_type pInitialSize, bool pBackup=false, bool pLeaveOpen=false);
+    ZStatus zcreate ( ZMetaDic *pMetaDic,
+                      const uriString pURI,
+                      const zsize_type pInitialSize,
+                      bool pBackup=false,
+                      bool pLeaveOpen=false);
 
-    ZStatus zcreate (ZMetaDic *pMetaDic,const char* pPathName, const zsize_type pInitialSize, bool pBackup=false, bool pLeaveOpen=false);
+ //   ZStatus zcreate (ZMetaDic *pMetaDic,const char* pPathName, const zsize_type pInitialSize, bool pBackup=false, bool pLeaveOpen=false);
 
     ZStatus zcreateIndex (ZSKeyDictionary* pKeyDic,
                           const utf8String &pIndexName,
 // RFFU                   bool pAutorebuild,
                           ZSort_Type pDuplicates,
-                          bool pBackup);
-
-// overload of previous function
-#ifdef __COMMENT__
-    ZStatus zcreateIndex (ZSKeyDictionary &pZKDic,
-                          const utf8_t *pIndexName,
-// RFFU                   bool pAutorebuild,
-                          ZSort_Type pDuplicates,
                           bool pBackup=true);
-#endif // __COMMENT__
+
 
     ZStatus zopen       (const uriString pURI, const int pMode=ZRF_All); // superseeds ZRandomfile zopen
     ZStatus zopen       (const int pMode=ZRF_All) {return (zopen(getURIContent(),pMode));}
@@ -223,7 +221,7 @@ typedef ZRawMasterFile _Base ;
     ZStatus readJCBfromHeader(void);
     ZStatus _getJCBfromReserved(void);
 
-    ZStatus zclose (void);
+//    ZStatus zclose (void);  // zclose is defined within ZRawMasterFile
 
 //---------search and get operations--------------------------------
 //
@@ -347,13 +345,7 @@ typedef ZRawMasterFile _Base ;
                              char &IndexPresence,
                              long &IndexRank,
                              FILE*wOutput);
-/*    static
-    ZStatus zapplyXMLIndexRankDefinition(const char* pXMLPath,
-                                              const char *pContentFilePath,
-                                              bool pRealRun,
-                                              FILE*pOutput);
-*/
-//#endif
+
 
 //-------- Stats-----------------------------------------------
 
@@ -422,15 +414,11 @@ friend ZStatus operator << (ZSMasterFile &pZMF,ZRecord& pInput)
 
     ZStatus _removeByRankRaw  (ZRawRecord *pZMFRecord, const zrank_type pZMFRank);
 
+    ZStatus _remove_RollbackIndexes (ZArray<zrank_type> &pIndexRankProcessed);
 
-    static inline
-    ZStatus _remove_RollbackIndexes (ZSMasterControlBlock &pZMCB, ZArray<zrank_type> &pIndexRankProcessed);
-    static inline
-    ZStatus _remove_HardRollbackIndexes (ZSMasterControlBlock& pZMCB,
-                                         ZArray<ZSIndexItem*> &pIndexItemList,
+    ZStatus _remove_HardRollbackIndexes (ZArray<ZSIndexItem*> &pIndexItemList,
                                          ZArray<zrank_type> &pIndexRankProcessed);
-    static inline
-    ZStatus _remove_CommitIndexes (ZSMasterControlBlock& pZMCB, ZSIndexItemList &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed);
+    ZStatus _remove_CommitIndexes ( ZSIndexItemList &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed);
 /** @endcond */
 //-----------End Remove sequence------------------------------------
 

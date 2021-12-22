@@ -15,6 +15,7 @@
 namespace zbs
 {
 class ZMFDictionary;
+class ZSKeyDictionary;
 }
 
 
@@ -22,16 +23,15 @@ namespace zbs {
 class ZRawMasterFile;
 }
 
-
 utf8String generateIndexRootName(const utf8String &pMasterRootName,
                                  const long pRank,
-                                 utf8String &pIndexName);
+                                 const utf8String &pIndexName);
 ZStatus
-generateIndexURI(uriString pMasterFileUri,
-    uriString &pDirectory,
-    uriString &pZSIndexFileUri,
-    const long pRank,
-    const utf8String& pIndexName);
+generateIndexURI(uriString &pZSIndexFileUri,
+                const uriString pMasterFileUri,
+                const uriString &pDirectory,
+                const long pRank,
+                const utf8String& pIndexName);
 /*
 ZStatus getChildElementValue(QDomNode pNodeWork,const char*pTagName,QString &pContent, bool pMandatory);
 
@@ -196,6 +196,7 @@ ZStatus zmuXMLgetChild(zxmlElement* pRootNode,const char* pName,utf8String& pVal
 
 
 void displayKeyDicElement(ZMFDictionary* pMasterDic,long pIdx,ZaiErrors* pMessageLog);
+void displayKeyDicElement(ZSKeyDictionary* pKeyDic,ZaiErrors* pMessageLog);
 
 const char *decode_ZCOP (uint16_t pZCOP);
 #endif // ZMASTERFILE_UTILITIES_H

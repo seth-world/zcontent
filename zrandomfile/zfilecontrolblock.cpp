@@ -10,17 +10,17 @@ ZFileControlBlock::ZFileControlBlock()
 void ZFileControlBlock::clear(void)
 {
   memset(this,0,sizeof(ZFileControlBlock));
-  StartSign=cst_ZSTART;
+//  StartSign=cst_ZSTART;
   StartOfData = 0L;
-  BlockID = ZBID_FCB;
-  EndSign=cst_ZEND;
+//  BlockID = ZBID_FCB;
+//  EndSign=cst_ZEND;
   return;
 }
 
 ZFileControlBlock& ZFileControlBlock::_copyFrom(const ZFileControlBlock& pIn)
 {
-  StartSign=pIn.StartSign;
-  BlockID=pIn.BlockID;
+//  StartSign=pIn.StartSign;
+//  BlockID=pIn.BlockID;
   StartOfData=pIn.StartOfData;
   AllocatedBlocks=pIn.AllocatedBlocks;
   BlockExtentQuota=pIn.BlockExtentQuota;
@@ -46,7 +46,7 @@ ZFileControlBlock& ZFileControlBlock::_copyFrom(const ZFileControlBlock& pIn)
 
   HighwaterMarking=pIn.HighwaterMarking;
   GrabFreeSpace=pIn.GrabFreeSpace;
-  EndSign=pIn.EndSign;
+//  EndSign=pIn.EndSign;
   return *this;
 }
 
@@ -84,9 +84,9 @@ ZFileControlBlock::setUseableParams(const FCBParams& pIn)
 ZDataBuffer&
 ZFileControlBlock::_export(ZDataBuffer& pZDBExport)
 {
-  ZFileControlBlock_Export wFCB;
-  wFCB.StartSign=StartSign;// don't care reversing start sign or end sign : same as reversed
-  wFCB.BlockID=BlockID;
+  ZFCB_Export wFCB;
+  wFCB.StartSign=cst_ZBLOCKSTART;// don't care reversing start sign or end sign : same as reversed
+  wFCB.BlockID=ZBID_FCB;
 
   wFCB.StartOfData=reverseByteOrder_Conditional<zaddress_type>(StartOfData);
   wFCB.AllocatedBlocks=reverseByteOrder_Conditional<unsigned long>(AllocatedBlocks);
@@ -107,23 +107,43 @@ ZFileControlBlock::_export(ZDataBuffer& pZDBExport)
   wFCB.BlockTargetSize=reverseByteOrder_Conditional<size_t>(BlockTargetSize);
   wFCB.HighwaterMarking=HighwaterMarking;
   wFCB.GrabFreeSpace=GrabFreeSpace;
-  wFCB.EndSign=EndSign;// don't care reversing start sign or end sign : same as reversed
+  wFCB.EndSign=cst_ZBLOCKEND;// don't care reversing start sign or end sign : same as reversed
   pZDBExport.setData(&wFCB,sizeof(wFCB));
 
   return pZDBExport;
 }// ZFileControlBlock::_export
 
-ZFileControlBlock&
+ZStatus
 ZFileControlBlock::_import(unsigned char* &pZDBImport_Ptr)
 {
-  ZFileControlBlock_Export* wFCB=(ZFileControlBlock_Export*) pZDBImport_Ptr;
+  ZFCB_Export* wFCB=(ZFCB_Export*) pZDBImport_Ptr;
 
   //    StartSign=_reverseByteOrder_T<uint32_t>(wFCB->StartSign);
-  StartSign=wFCB->StartSign;
-
-  BlockID=wFCB->BlockID;
-
-  StartOfData=wFCB->StartOfData;// don't care reversing start sign or end sign : same as reversed
+  if (wFCB->StartSign!=cst_ZBLOCKSTART)
+      {
+      ZException.setMessage("ZFileControlBlock::_import",
+          ZS_CORRUPTED,
+          Severity_Severe,
+          "File Control Block appears to be corrupted : invalid start block sign.");
+      return  (ZS_CORRUPTED);
+      }
+  if (wFCB->EndSign!=cst_ZBLOCKEND)
+      {
+        ZException.setMessage("ZFileControlBlock::_import",
+            ZS_CORRUPTED,
+            Severity_Severe,
+            "File Control Block appears to be corrupted : invalid end block sign.");
+        return  (ZS_CORRUPTED);
+      }
+  if (wFCB->BlockID!=ZBID_FCB)
+      {
+        ZException.setMessage("ZFileControlBlock::_import",
+            ZS_INVTYPE,
+            Severity_Error,
+            "File Control Block appears to be corrupted : invalid block id.");
+        return  (ZS_INVTYPE);
+      }
+  AllocatedBlocks=reverseByteOrder_Conditional<zaddress_type>(wFCB->StartOfData);
   AllocatedBlocks=reverseByteOrder_Conditional<unsigned long>(wFCB->AllocatedBlocks);
   BlockExtentQuota=reverseByteOrder_Conditional<unsigned long>(wFCB->BlockExtentQuota);
   ZBAT_DataOffset=reverseByteOrder_Conditional<size_t>(wFCB->ZBAT_DataOffset);
@@ -143,14 +163,99 @@ ZFileControlBlock::_import(unsigned char* &pZDBImport_Ptr)
   HighwaterMarking=wFCB->HighwaterMarking;
   GrabFreeSpace=wFCB->GrabFreeSpace;
   //    EndSign=_reverseByteOrder_T<uint32_t>(wFCB->EndSign);
-  EndSign=wFCB->EndSign;// don't care reversing start sign or end sign : same as reversed
-
-  pZDBImport_Ptr += sizeof(ZFileControlBlock_Export);
-
-  return *this;
+  pZDBImport_Ptr += sizeof(ZFCB_Export);
+  return ZS_SUCCESS;
 }// ZFileControlBlock::_import
 
+ZFCB_Export& ZFCB_Export::_copyFrom(const ZFCB_Export& pIn)
+{
+  StartSign=pIn.StartSign;
+  BlockID=pIn.BlockID;
+  StartOfData=pIn.StartOfData;
+  AllocatedBlocks=pIn.AllocatedBlocks;
+  BlockExtentQuota=pIn.BlockExtentQuota;
+  ZBAT_DataOffset=pIn.ZBAT_DataOffset;
+  ZBAT_ExportSize=pIn.ZBAT_ExportSize;
 
+  ZFBT_DataOffset=pIn.ZFBT_DataOffset;
+  ZFBT_ExportSize=pIn.ZFBT_ExportSize;
+
+  ZDBT_DataOffset=pIn.ZDBT_DataOffset;
+  ZDBT_ExportSize=pIn.ZDBT_ExportSize;
+
+  ZReserved_DataOffset=pIn.ZReserved_DataOffset;
+  ZReserved_ExportSize=pIn.ZReserved_ExportSize;
+
+  InitialSize=pIn.InitialSize;
+  AllocatedSize=pIn.AllocatedSize;
+  UsedSize=pIn.UsedSize;
+
+  MinSize=pIn.MinSize;
+  MaxSize=pIn.MaxSize;
+  BlockTargetSize=pIn.BlockTargetSize;
+
+  HighwaterMarking=pIn.HighwaterMarking;
+  GrabFreeSpace=pIn.GrabFreeSpace;
+  EndSign=pIn.EndSign;
+  return *this;
+}
+
+ZFCB_Export& ZFCB_Export::operator = (const ZFileControlBlock& pIn)
+{
+  StartSign=cst_ZBLOCKSTART;
+  BlockID=ZBID_FCB;
+  StartOfData=pIn.StartOfData;
+  AllocatedBlocks=pIn.AllocatedBlocks;
+  BlockExtentQuota=pIn.BlockExtentQuota;
+  ZBAT_DataOffset=pIn.ZBAT_DataOffset;
+  ZBAT_ExportSize=pIn.ZBAT_ExportSize;
+
+  ZFBT_DataOffset=pIn.ZFBT_DataOffset;
+  ZFBT_ExportSize=pIn.ZFBT_ExportSize;
+
+  ZDBT_DataOffset=pIn.ZDBT_DataOffset;
+  ZDBT_ExportSize=pIn.ZDBT_ExportSize;
+
+  ZReserved_DataOffset=pIn.ZReserved_DataOffset;
+  ZReserved_ExportSize=pIn.ZReserved_ExportSize;
+
+  InitialSize=pIn.InitialSize;
+  AllocatedSize=pIn.AllocatedSize;
+  UsedSize=pIn.UsedSize;
+
+  MinSize=pIn.MinSize;
+  MaxSize=pIn.MaxSize;
+  BlockTargetSize=pIn.BlockTargetSize;
+
+  HighwaterMarking=pIn.HighwaterMarking;
+  GrabFreeSpace=pIn.GrabFreeSpace;
+  EndSign=cst_ZBLOCKEND;
+  return *this;
+}
+
+
+void ZFCB_Export::convert()
+{
+AllocatedBlocks=reverseByteOrder_Conditional<zaddress_type>(StartOfData);
+AllocatedBlocks=reverseByteOrder_Conditional<unsigned long>(AllocatedBlocks);
+BlockExtentQuota=reverseByteOrder_Conditional<unsigned long>(BlockExtentQuota);
+ZBAT_DataOffset=reverseByteOrder_Conditional<size_t>(ZBAT_DataOffset);
+ZBAT_ExportSize=reverseByteOrder_Conditional<size_t>(ZBAT_ExportSize);
+ZFBT_DataOffset=reverseByteOrder_Conditional<size_t>(ZFBT_DataOffset);
+ZFBT_ExportSize=reverseByteOrder_Conditional<size_t>(ZFBT_ExportSize);
+ZDBT_DataOffset=reverseByteOrder_Conditional<size_t>(ZDBT_DataOffset);
+ZDBT_ExportSize=reverseByteOrder_Conditional<size_t>(ZDBT_ExportSize);
+ZReserved_DataOffset=reverseByteOrder_Conditional<size_t>(ZReserved_DataOffset);
+ZReserved_ExportSize=reverseByteOrder_Conditional<size_t>(ZReserved_ExportSize);
+InitialSize=reverseByteOrder_Conditional<zsize_type>(InitialSize);
+AllocatedSize=reverseByteOrder_Conditional<zsize_type>(AllocatedSize);
+UsedSize=reverseByteOrder_Conditional<zsize_type>(UsedSize);
+MinSize=reverseByteOrder_Conditional<size_t>(MinSize);
+MaxSize=reverseByteOrder_Conditional<size_t>(MaxSize);
+BlockTargetSize=reverseByteOrder_Conditional<size_t>(BlockTargetSize);
+//HighwaterMarking=HighwaterMarking;
+//GrabFreeSpace=GrabFreeSpace;
+}
 //-------------xml export import ----------------------------
 
 utf8String ZFileControlBlock::toXml(int pLevel,bool pComment)

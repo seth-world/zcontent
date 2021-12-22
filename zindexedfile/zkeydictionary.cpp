@@ -235,7 +235,7 @@ utf8String ZSKeyDictionary::toXml(int pLevel,int pRank, bool pComment)
 //  wReturn+=fmtXMLuint64("keynaturalsize",KeyNaturalSize,wLevel);
 //  wReturn+=fmtXMLuint64("keyuniversalsize",KeyUniversalSize,wLevel);  // KeyUniversalSize is stored within ICB
 
-  wReturn += fmtXMLchar("indexname",IndexName.toCChar(), wLevel);
+  wReturn += fmtXMLchar("indexname",DicKeyName.toCChar(), wLevel);
   if (pComment)
     fmtXMLaddInlineComment(wReturn," link to index control block indexname field ");
 
@@ -293,7 +293,7 @@ ZStatus ZSKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
     return wSt;
     }
 
-    if (XMLgetChildText(wSingleFieldNode,"indexname",IndexName,pErrorlog,ZAIES_Error)<0)
+    if (XMLgetChildText(wSingleFieldNode,"indexname",DicKeyName,pErrorlog,ZAIES_Error)<0)
       {
       pErrorlog->logZStatus(ZAIES_Error, ZS_XMLMISSREQ,"ZSKeyDictionary::fromXml-E-MISSREQFLD Missing mandatory field <indexname>");
       return ZS_XMLMISSREQ;
@@ -463,7 +463,14 @@ ZSKeyDictionary& ZSKeyDictionary ::_copyFrom( ZSKeyDictionary& pIn)
   Recomputed=pIn.Recomputed;
   Status = pIn.Status;
   MetaDic=pIn.MetaDic;
-  _Base::_copyFrom(pIn);
+//  _Base::_copyFrom(pIn);
+  _Base::setQuota(pIn.ZReallocQuota);
+  _Base::allocate(pIn.ZAllocation);
+  _Base::clear();
+  for (long wi=0; wi<pIn.count();wi++)
+    _Base::push(pIn.Tab[wi]);
+
+  DicKeyName = pIn.DicKeyName;
   return *this;
 } //fieldOffset
 
@@ -506,7 +513,7 @@ uint32_t ZSKeyDictionary::computeKeyOffsets()
 } //computeKeyOffsets
 
 ZStatus
-ZSKeyDictionary::addFieldToZDicByName (const utf8_t* pFieldName)
+ZSKeyDictionary::addFieldToZKeyByName (const char* pFieldName)
 {
 
   ZSIndexField wField;
@@ -518,11 +525,11 @@ ZSKeyDictionary::addFieldToZDicByName (const utf8_t* pFieldName)
   if (wMRank<0)
     return ZS_NOTFOUND;
 
-  return addFieldToZDicByRank (wMRank);
+  return addFieldToZKeyByRank (wMRank);
 }//addFieldToZDicByName
 
 ZStatus
-ZSKeyDictionary::addFieldToZDicByRank (const zrank_type pMDicRank)
+ZSKeyDictionary::addFieldToZKeyByRank (const zrank_type pMDicRank)
 {
   ZSIndexField wField;
   if (MetaDic==nullptr)

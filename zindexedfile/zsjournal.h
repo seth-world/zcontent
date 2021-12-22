@@ -188,7 +188,7 @@ public:
 
 //                                    CMtx.init(false);}
 
-    virtual ~ZSJournal(void);
+    ~ZSJournal(void);
 
     ZStatus setUp(uriString &pJournalPath);
 

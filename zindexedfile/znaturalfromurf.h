@@ -20,21 +20,21 @@ setBlobfURF(_Tp* pNatural,
 
 ZStatus
 setZDateNfURF (void* pNatural,
-                unsigned char *pURFData,
+                ZDataBuffer *pURFData,
                 ZType_type &pSourceType,
                 int32_t &pSourceArrayCount,
                 ZType_type &pTargetType,
                 int32_t &pTargetArrayCount);
 
-ZStatus get_121_BlobNfURF(void* pValue,unsigned char* pURFData);
+ZStatus get_121_BlobNfURF(void* pValue,ZDataBuffer * pURFData);
 
-ZStatus get_121_ZDateFullNfURF(void* pValue, unsigned char* pURFData);
-ZStatus get_121_ZDateNfURF(void* pValue, unsigned char *pURFData);
+ZStatus get_121_ZDateFullNfURF(void* pValue, ZDataBuffer * pURFData);
+ZStatus get_121_ZDateNfURF(void* pValue, ZDataBuffer *pURFData);
 
 
-ZStatus get_121_CheckSumNfURF(void* pValue,unsigned char* pURFData);
+ZStatus get_121_CheckSumNfURF(void* pValue,ZDataBuffer * pURFData);
 
-ZStatus get_ZStringNfURF(void* pValue, ZTypeBase pType, unsigned char *&pURFData);
+ZStatus get_ZStringNfURF(void* pValue, ZTypeBase pType, ZDataBuffer *&pURFData);
 /*ZStatus get_121_utf16FixedStringNfURF(void* pValue, unsigned char* pURFData);
 ZStatus get_121_utf32FixedStringNfURF(void* pValue, unsigned char* pURFData);
 
@@ -96,7 +96,7 @@ template <class _Tp>
  */
 static inline
 ZStatus  importFieldfURF_T (typename std::enable_if_t<std::is_integral<_Tp>::value|std::is_floating_point<_Tp>::value,_Tp> &pValue,
-                          unsigned char* pURFData,        // pointer to input data in URF format
+                          ZDataBuffer* pURFData,        // pointer to input data in URF format
                           ZTypeBase& pTargetType,      // target type (given by RDic)
 
                           uint64_t &pTargetNSize,       // source natural size(out)
@@ -110,9 +110,9 @@ ZStatus wSt;
 uint16_t wCanonical , wEffectiveUSize;
 uint64_t wSourceUSize,wSourceNSize,wHeaderSize;
 ZTypeBase wSourceType;
-unsigned char* wData_Ptr=pURFData;
+unsigned char* wData_Ptr=pURFData->Data;
 
-    if( (wSt=_getURFHeaderData(pURFData,
+    if( (wSt=_getURFHeaderData(wData_Ptr,
                                wSourceType,
                                wSourceUSize,
                                wSourceNSize,
@@ -209,7 +209,7 @@ template <class _Tp>
  */
 static
 ZStatus  importFieldfURF_T (typename std::enable_if_t<std::is_class<_Tp>::value,_Tp> &pValue,
-                          unsigned char* pURFData,     // pointer to input data in URF format
+                          ZDataBuffer* pURFData,      // pointer to input data in URF format
                           ZTypeBase& pTargetType,      // target type (deduced from pValue)
                           uint64_t &pTargetNSize,       // source natural size(out)
                           uint64_t &pTargetUSize,       // source universal size (URF size minus header size)(out)
@@ -226,14 +226,14 @@ ZDataBuffer wUValue;
 
 unsigned char* wData_Ptr;
 
-        if ((wSt= _getURFHeaderData(pURFData,
-                                    wSourceType,
-                                    wSourceUSize,
-                                    wSourceNSize,
-                                    wSourceCapacity,
-                                    wEffectiveUSize,
-                                    wHeaderSize,
-                                    &wData_Ptr))!=ZS_SUCCESS)
+  if ((wSt= _getURFHeaderData(pURFData->Data,
+                             wSourceType,
+                             wSourceUSize,
+                             wSourceNSize,
+                             wSourceCapacity,
+                             wEffectiveUSize,
+                             wHeaderSize,
+                             &wData_Ptr))!=ZS_SUCCESS)
                                                     {return  wSt;}
     // Get the target (natural) data characteristics : type, sizes, array count (NB: Source data infos is given by URF)
 
@@ -267,7 +267,7 @@ unsigned char* wData_Ptr;
              "                  Source  Target\n"
              "   Universal size  %7ld  %ld\n"
              "   Natural   size  %7ld  %ld\n"
-             "   Canonical count %7ld  %ld\n"
+             "   Capacity        %7ld  %ld\n"
              "   URF Effective size %7ld\n"
              "   URF Header    size %7ld\n"
             ,
@@ -275,7 +275,12 @@ unsigned char* wData_Ptr;
             wSourceType,
             decode_ZType(wSourceType),
             pTargetType,
-            decode_ZType(pTargetType));
+            decode_ZType(pTargetType),
+            wSourceUSize,pTargetUSize,
+            wSourceNSize,pTargetNSize,
+            wSourceCapacity,pTargetCapacity,
+            wEffectiveUSize,
+            wHeaderSize);
 
     switch (wSourceType)
     {
@@ -332,7 +337,7 @@ unsigned char* wData_Ptr;
 template <class _Tp>
 static inline
 ZStatus  importFieldfURF_T (typename std::enable_if_t<std::is_array<_Tp>::value,_Tp> &pTargetNatural,
-                          unsigned char* pURFData,      // pointer to input data in URF format
+                          ZDataBuffer* pURFData,      // pointer to input data in URF format
                           ZTypeBase& pTargetType,       // target type (given by RDic)
 
                           uint64_t &pTargetNSize,       // source natural size(out)
@@ -345,8 +350,8 @@ uint16_t wSourceCanonical,wEffectiveUSize;
 uint64_t wSourceUSize,wSourceNSize,wHeaderSize;
 ZTypeBase wSourceType;
 ZDataBuffer wUValue;
-unsigned char* wData_Ptr=pURFData;
-    if ((wSt= _getURFHeaderData(pURFData,
+unsigned char* wData_Ptr=pURFData->Data;
+    if ((wSt= _getURFHeaderData(wData_Ptr,
                                 wSourceType,
                                 wSourceUSize,
                                 wSourceNSize,

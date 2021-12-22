@@ -28,11 +28,24 @@ ZHeaderControlBlock& ZHeaderControlBlock::_copyFrom(const ZHeaderControlBlock& p
   SizeReserved=pIn.SizeReserved;
   return *this;
 }
+ZHeaderControlBlock&
+ZHeaderControlBlock::_fromHCBE(const ZHeaderControlBlock_Export* pIn)
+{
+  FileType = pIn->FileType; /* FileType does not need to be reversed */
+  OffsetFCB = pIn->OffsetFCB;
+  OffsetReserved = pIn->OffsetReserved;
+  SizeReserved = pIn->SizeReserved;
+  Lock = pIn->Lock;
+  LockOwner = pIn->LockOwner;
+}
 
 ZDataBuffer&
 ZHeaderControlBlock::_export(ZDataBuffer& pZDBExport)
 {
   ZHeaderControlBlock_Export wHCB;
+  wHCB.set(*this);
+  wHCB._convert();
+  /*
   wHCB.StartSign = cst_ZSTART;// don't care reversing start sign or end sign : same as reversed
 
   wHCB.Lock = reverseByteOrder_Conditional<zlockmask_type>(Lock);
@@ -47,10 +60,31 @@ ZHeaderControlBlock::_export(ZDataBuffer& pZDBExport)
   wHCB.SizeReserved = reverseByteOrder_Conditional<zsize_type>(SizeReserved);
 
   wHCB.EndSign = cst_ZEND;// don't care reversing start sign or end sign : same as reversed
+*/
   pZDBExport.setData(&wHCB,sizeof(wHCB));
-
   return pZDBExport;
 }
+
+ZHeaderControlBlock_Export&
+ZHeaderControlBlock_Export::set(const ZHeaderControlBlock pIn)
+{
+  StartSign=cst_ZBLOCKSTART;
+  BlockID=ZBID_FileHeader;
+  ZRFVersion=__ZRF_VERSION__;
+
+  FileType = pIn.FileType; /* FileType does not need to be reversed */
+  OffsetFCB = pIn.OffsetFCB;
+  OffsetReserved = pIn.OffsetReserved;
+  SizeReserved = pIn.SizeReserved;
+  Lock = pIn.Lock;
+  LockOwner = pIn.LockOwner;
+
+  EndSign=cst_ZBLOCKEND;
+  return *this;
+}
+
+
+
 
 ZHeaderControlBlock_Export&
 ZHeaderControlBlock_Export::_copyFrom(ZHeaderControlBlock_Export& pIn)
@@ -85,16 +119,16 @@ ZHeaderControlBlock_Export::_convert()
 
 
 ZStatus
-ZHeaderControlBlock::_import(unsigned char* pZDBImport_Ptr)
+ZHeaderControlBlock::_import(unsigned char *&pPtrIn)
 {
 
-  ZHeaderControlBlock_Export* wHCB=(ZHeaderControlBlock_Export*)(pZDBImport_Ptr);
+  ZHeaderControlBlock_Export* wHCB=(ZHeaderControlBlock_Export*)(pPtrIn);
 
   wHCB->_convert();
 
-  if ((wHCB->BlockID!=ZBID_FileHeader)||(wHCB->StartSign!=cst_ZSTART))
+  if ((wHCB->BlockID!=ZBID_FileHeader)||(wHCB->StartSign!=cst_ZBLOCKSTART))
   {
-    ZException.setMessage(_GET_FUNCTION_NAME_,
+    ZException.setMessage("ZHeaderControlBlock::_import",
         ZS_BADFILEHEADER,
         Severity_Severe,
         "invalid header block content found Start marker <%X> ZBlockID <%X>. One of these is invalid (or both are).",
@@ -104,7 +138,7 @@ ZHeaderControlBlock::_import(unsigned char* pZDBImport_Ptr)
   }
   if (wHCB->ZRFVersion!=__ZRF_VERSION__)
   {
-    ZException.setMessage(_GET_FUNCTION_NAME_,
+    ZException.setMessage("ZHeaderControlBlock::_import",
         ZS_BADFILEHEADER,
         Severity_Severe,
         "invalid header block version : found version <%ld> while current version is <%ld>.",
@@ -113,9 +147,11 @@ ZHeaderControlBlock::_import(unsigned char* pZDBImport_Ptr)
     return  ZS_BADFILEHEADER;
   }
 
+  _fromHCBE(wHCB);
 
+  pPtrIn += sizeof(ZHeaderControlBlock_Export);
   return  ZS_SUCCESS;
-}
+}//_import
 
 utf8String ZHeaderControlBlock::toXml(int pLevel)
 {

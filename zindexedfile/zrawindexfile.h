@@ -190,7 +190,7 @@ public:
                          zsize_type pInitialSize,
                          bool pHighwaterMarking=false,
                          bool pGrabFreeSpace=false,
-                         bool pReplace=false,
+                         bool pBackup=false,
                          bool pLeaveOpen=true);
   /**
    * @brief ZSIndexFile::zcreateIndex creates a new index file corresponding to the given specification ICB and ZRF parameters
@@ -204,7 +204,7 @@ public:
                           long pBlockTargetSize,
                           bool pHighwaterMarking=false,
                           bool pGrabFreeSpace=false,
-                          bool pReplace=false,
+                          bool pBackup=false,
                           bool pLeaveOpen=true);
 
 /**
