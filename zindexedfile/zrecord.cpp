@@ -8,12 +8,12 @@
 
 #include <ztoolset/utfstringcommon.h> // for routines setURFxxx getURFxxx
 
-#include <zindexedfile/zsmasterfile.h> // for ZSMasterControlBlock
+#include <zindexedfile/zmasterfile.h> // for ZSMasterControlBlock
 #include <zindexedfile/zmfdictionary.h>
 #include <zxml/zxml.h>
 #include <ztoolset/utfsprintf.h>
 
-/** @addtogroup ZSMASTERFILEGROUP @{ */
+/** @addtogroup ZMASTERFILEGROUP @{ */
 
 
 using namespace  zbs;
@@ -88,7 +88,7 @@ ZRecordDic::clearURFData(void)
 
 }// reset
 
-ZRecord::ZRecord(ZSMasterFile *pZMF) : ZRawRecord(pZMF)
+ZRecord::ZRecord(ZMasterFile *pZMF) : ZRawRecord(pZMF)
 {
   if (pZMF->MasterDic==nullptr)
     {
@@ -226,8 +226,8 @@ ZRecord::_setupRecordData(void)
                 delete FieldPresence;
     FieldPresence=new ZBitset();
 */
-
-    ZStatus wSt=FieldPresence._importURF(Content.Data);
+    const unsigned char* wPtrF=Content.Data;
+    ZStatus wSt=FieldPresence._importURF(wPtrF);
 
     wOffset = FieldPresence.getExportSize();
 // get fields (that are present within the record) and setup record dictionary
@@ -271,7 +271,7 @@ ZRecord::_setupRecordData(void)
             RDic->Tab[wFieldRank].Capacity=wUSize;
             break;
             }
-        if (wType==ZType_FixedWString)
+/*        if (wType==ZType_FixedWString)
             {
             uint16_t wCanonSize;
             uint16_t wUSize;
@@ -306,7 +306,7 @@ ZRecord::_setupRecordData(void)
 
             break;
             }
-
+*/
         // for varying strings see further : switch on structure type
 
         if (wType==ZType_CheckSum)
@@ -472,6 +472,7 @@ getStringNfU (ZDataBuffer&pNatural,ZDataBuffer& pUniversal,ZTypeBase pType)
                         pNatural=pUniversal;
                         return pNatural;
                         }
+/*
     if ((pType&ZType_WChar)||(pType&ZType_WUChar))
                         {
                         if (is_little_endian())
@@ -508,6 +509,8 @@ getStringNfU (ZDataBuffer&pNatural,ZDataBuffer& pUniversal,ZTypeBase pType)
                 pNatural=pUniversal;
             return pNatural;
             }//if (pType&ZType_WUChar)
+*/
+
 }//getStringNfU
 /**
  * @brief ZRecord::getUniversalfromRaw gets universal value
@@ -756,11 +759,11 @@ ZStatus ZRecord::RecordCheckAndMap(const ZDataBuffer& pRawContent, FILE*pOutput)
   uint64_t wRecordContentSize;
   uint16_t wCapacity, wEffectiveUSize;
 
-  unsigned char* wURFDataPtrInitial= pRawContent.Data;
-  unsigned char* wURFDataPtr= pRawContent.Data;
-  unsigned char* wIndexPtr= pRawContent.Data;
+  const unsigned char* wURFDataPtrInitial= pRawContent.Data;
+  const unsigned char* wURFDataPtr= pRawContent.Data;
+  const unsigned char* wIndexPtr= pRawContent.Data;
 
-  unsigned char* wEndPtr ;
+  const unsigned char* wEndPtr ;
 
   uint32_t* wMark=(uint32_t*)wURFDataPtr;
 
@@ -897,7 +900,7 @@ ZStatus ZRecord::RecordCheckAndMap(const ZDataBuffer& pRawContent, FILE*pOutput)
       }
     if (wSt!=ZS_SUCCESS)
     {
-      unsigned char* wPtr= wURFDataPtr;
+      const unsigned char* wPtr= wURFDataPtr;
       size_t wBSt;
       while ((wSt!=ZS_SUCCESS)&&(wPtr < wEndPtr))
       {
@@ -1276,7 +1279,7 @@ size_t wFieldSize;
     if (pContent.isEmpty())
       return ZS_EMPTY;
 
-    unsigned char*wURFDataPtr = pContent.Data;
+    const unsigned char*wURFDataPtr = pContent.Data;
     if (RDic==nullptr)
         {
         ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -1333,7 +1336,7 @@ size_t wFieldSize;
         if (wSt!=ZS_SUCCESS)
                         {return  wSt;}
         wFieldSize = wUniversalSize+wHeaderSize;
-        wFieldURFData=new ZDataBuffer(wURFDataPtr,wFieldSize); // get the whole field header + universal data
+        wFieldURFData=new ZDataBuffer((void*)wURFDataPtr,wFieldSize); // get the whole field header + universal data
 
 
         wFieldURFData->Dump(16,100);
@@ -1569,7 +1572,7 @@ ZRecord::_extractAllKeys(void)
   ZStatus wSt=ZS_SUCCESS;
   long wRDicRank=0;
   size_t wKeyOffset = 0;
-  ZSKeyDictionary* wZKDic;
+  ZKeyDictionary* wZKDic;
   ZDataBuffer wFieldUValue;
 
   printf ("ZRecord::_extractAllKeys-I extracting <%ld> index keys from record.\n",RawMasterFile->IndexCount);
@@ -1624,7 +1627,7 @@ CFUNCTOR void deleteZRecordAll()
 APICEXPORT
 void* createZRecord(void* pZMF)
 {
-    ZSMasterFile* wMasterFile= static_cast <ZSMasterFile*> (pZMF);
+    ZMasterFile* wMasterFile= static_cast <ZMasterFile*> (pZMF);
     ZRecord* wRecord = new ZRecord(wMasterFile);
     if (!isZRecordInit())
                     initZRecord();

@@ -4,7 +4,7 @@
 #include "zrawrecord.h"
 
 #include <zindexedfile/zmetadic.h>
-#include <zindexedfile/zsmastercontrolblock.h>
+#include <zindexedfile/zmastercontrolblock.h>
 #include <ztoolset/zbitset.h>
 #include <zindexedfile/zrawmasterfile.h>
 
@@ -143,7 +143,7 @@ ZRawRecord::getContentFromRaw(ZDataBuffer& pContent,ZDataBuffer& pRaw )
    */
   ZStatus wSt=ZS_SUCCESS;
   ZTypeBase wType=0;
-  unsigned char* wPtrIn=pRaw.Data ;
+  const unsigned char* wPtrIn=pRaw.Data ;
 
 /*  if (FieldPresence==nullptr)
     FieldPresence=new ZBitset;*/
@@ -237,8 +237,8 @@ ZRawRecord::setup()
 ZStatus
 ZRawRecord::getRawKeyContent(unsigned int pKeyIdx,ZDataBuffer& pKeyContent)
 {
-  unsigned char* wPtrIn=RawContent.Data;
-  unsigned char* wPtrEnd = wPtrIn + RawContent.Size;
+  const unsigned char* wPtrIn=RawContent.Data;
+  const unsigned char* wPtrEnd = wPtrIn + RawContent.Size;
   ZStatus wSt= FieldPresence._importURF(wPtrIn);
   if(wSt==ZS_INVTYPE)
     {

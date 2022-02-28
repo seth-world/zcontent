@@ -1,4 +1,4 @@
-#include "zindexcontrolblock.h"
+﻿#include "zindexcontrolblock.h"
 #include <zindexedfile/zmfdictionary.h>
 #include <zxml/zxmlprimitives.h>
 
@@ -64,10 +64,12 @@ ZSICB_Export& ZSICB_Export::set(const ZSICBOwnData* pIn)
 
 
 
-ZSICB_Export& ZSICB_Export::_reverseConditional()
+void ZSICB_Export::_convert()
 {
   if (!is_little_endian())
-    return *this;
+    return ;
+  EndianCheck=reverseByteOrder_Conditional<uint16_t>(EndianCheck);
+
 //  StartSign=reverseByteOrder_Conditional<uint32_t>(StartSign);
   ZMFVersion=reverseByteOrder_Conditional<uint32_t>(ZMFVersion);
   ICBTotalSize=reverseByteOrder_Conditional<uint32_t>(ICBTotalSize);
@@ -75,8 +77,36 @@ ZSICB_Export& ZSICB_Export::_reverseConditional()
   KeyUniversalSize=reverseByteOrder_Conditional<uint32_t>(KeyUniversalSize);
 /* other fields are uint8_t */
 
-  return *this;
+  return ;
 }
+
+
+void
+ZSICB_Export::serialize()
+{
+  if (!is_little_endian())
+    return ;
+  if (isReversed())
+  {
+    fprintf (stderr,"ZSICB_Export::serialize-W-ALRDY File Control Block already serialized.\n");
+    return;
+  }
+  _convert();
+}
+
+void
+ZSICB_Export::deserialize()
+{
+  if (!is_little_endian())
+    return ;
+  if (isNotReversed())
+  {
+    fprintf (stderr,"ZSICB_Export::deserialize-W-ALRDY File Control Block already deserialized. \n");
+    return;
+  }
+  _convert();
+}
+
 
 
 /*
@@ -100,96 +130,94 @@ ZSICBOwnData::_exportAppend(ZDataBuffer& pICBE)
 }// ZSICBOwnData::_exportAppend
 */
 ZStatus
-ZSICBOwnData::_import(unsigned char* &pPtrIn)
+ZSICBOwnData::_import(const unsigned char* &pPtrIn)
 {
-  ZSICB_Export* wICBE=(ZSICB_Export*)( pPtrIn);
+  ZSICB_Export wICBe;
+  wICBe.setFromPtr(pPtrIn);
 
   clear();
 
 
-  if ((wICBE->BlockId!=ZBID_ICB)||(wICBE->StartSign!=cst_ZBLOCKSTART))
+  if ((wICBe.BlockId!=ZBID_ICB)||(wICBe.StartSign!=cst_ZBLOCKSTART))
     {
     ZException.setMessage("ZSICBOwnData::_import",
         ZS_BADICB,
         Severity_Severe,
         "Invalid Index Control Block : found Start marker <%X> ZBlockID <%X>. One of these is invalid (or both are).",
-        wICBE->StartSign,
-        wICBE->BlockId);
+        wICBe.StartSign,
+        wICBe.BlockId);
     return  ZS_BADICB;
     }
-  wICBE->_reverseConditional();
-
-  if (wICBE->ZMFVersion != __ZMF_VERSION__)// HAS to be reversed
+  wICBe.deserialize();
+  if (wICBe.ZMFVersion != __ZMF_VERSION__)// HAS to be reversed
     {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_BADFILEVERSION,
         Severity_Severe,
         "Error Index Control Block   : Found version <%ld> while current ZMF version is <%ld>",
-        wICBE->ZMFVersion,
+        wICBe.ZMFVersion,
         __ZMF_VERSION__);
     return (ZS_BADFILEVERSION);
     }
 
-  uint32_t wICBTotalSize=wICBE->ICBTotalSize;
-  uint32_t wZKDicOffset=wICBE->ZKDicOffset;
+  uint32_t wICBTotalSize=wICBe.ICBTotalSize;
+  uint32_t wZKDicOffset=wICBe.ZKDicOffset;
 
-  KeyUniversalSize=wICBE->KeyUniversalSize;
+  KeyUniversalSize=wICBe.KeyUniversalSize;
 
 //  AutoRebuild=wICBOwn_Import->AutoRebuild;  // uint8_t
-  Duplicates=wICBE->Duplicates; // uint8_t
+  Duplicates=wICBe.Duplicates; // uint8_t
 //  KeyType=wICBOwn_Import->KeyType; // uint8_t
 
   pPtrIn+=sizeof(ZSICB_Export); // index Name is stored just after ZSICBOwnData_Export structure
       // format is Universal format with leading unit size and text size (uint16_t)
 
   IndexName._importUVF(pPtrIn);  // Name is stored after ZSICBOwnData_Export as a varying number of byte (uint16_t is leading string size)
-
+  URIIndex._importUVF(pPtrIn);  // index file name is stored after indexname
   return  ZS_SUCCESS;
 }// ZSICBOwnData::_importICBOwn
 
 ZStatus
-ZSIndexControlBlock::_import(unsigned char* &pPtrIn)
+ZIndexControlBlock::_import(const unsigned char* &pPtrIn)
 {
-  ZSICB_Export* wICBE=(ZSICB_Export*)( pPtrIn);
+  ZSICB_Export wICBe;
+  wICBe.setFromPtr( pPtrIn); /* pPtrIn is updated */
 
-  if (wICBE->BlockId != ZBID_ICB) // uint8_t :not to be reversed
+  if (wICBe.StartSign != cst_ZBLOCKSTART)    // not to be reversed : palyndroma
   {
-    ZException.setMessage(_GET_FUNCTION_NAME_,
-        ZS_BADICB,
-        Severity_Severe,
-        "Error Index Control Block identification is bad. Value <%d>  : File header appears to be corrupted - invalid BlockID",
-        wICBE->BlockId);
-    return (ZS_BADICB);
-  }
-  if (wICBE->StartSign != cst_ZBLOCKSTART)    // not to be reversed : palyndroma
-  {
-    ZException.setMessage(_GET_FUNCTION_NAME_,
+    ZException.setMessage("ZSIndexControlBlock::_import",
         ZS_BADFILEHEADER,
         Severity_Severe,
-        "Error Index Control Block  : Index header appears to be corrupted - invalid ICB StartBlock");
-    return (ZS_BADFILEHEADER);
+        "Invalid Index Control Block header : found Start marker <%X>.",
+        wICBe.StartSign);
+    return  ZS_BADICB;
+  }
+  if (wICBe.BlockId != ZBID_ICB) // uint8_t :not to be reversed
+  {
+    ZException.setMessage("ZSIndexControlBlock::_import",
+        ZS_BADICB,
+        Severity_Severe,
+        "Invalid Index Control Block header : found  ZBlockID <%X>.",
+        wICBe.BlockId);
+    return (ZS_BADICB);
   }
 
-  wICBE->_reverseConditional();
-
-  if (wICBE->ZMFVersion != __ZMF_VERSION__)// HAS to be reversed
+  wICBe.deserialize();
+  if (wICBe.ZMFVersion != __ZMF_VERSION__)// HAS to be reversed
   {
     ZException.setMessage("ZSIndexControlBlock::_import",
         ZS_BADFILEVERSION,
-        Severity_Severe,
+        Severity_Error,
         "Error Index Control Block   : Found version <%ld> while current ZMF version is <%ld>",
-        wICBE->ZMFVersion,
+        wICBe.ZMFVersion,
         __ZMF_VERSION__);
     return (ZS_BADFILEVERSION);
   }
 
-  uint32_t wICBTotalSize=wICBE->ICBTotalSize;
-  unsigned char* wPtrEnd=pPtrIn+wICBTotalSize;
-
-  KeyUniversalSize=wICBE->KeyUniversalSize;
+  KeyUniversalSize=wICBe.KeyUniversalSize;
 
   //  AutoRebuild=wICBOwn_Import->AutoRebuild;  // uint8_t
-  Duplicates=wICBE->Duplicates; // uint8_t
+  Duplicates=wICBe.Duplicates; // uint8_t
   //  KeyType=wICBOwn_Import->KeyType; // uint8_t
 
   pPtrIn+=sizeof(ZSICB_Export); // index Name is stored just after ZSICBOwnData_Export structure
@@ -197,14 +225,26 @@ ZSIndexControlBlock::_import(unsigned char* &pPtrIn)
 
   IndexName._importUVF(pPtrIn);  // Name is stored after ZSICBOwnData_Export as a varying number of byte (uint16_t is leading string size)
                                   // NB: pPtrIn is updated
+  URIIndex._importUVF(pPtrIn);  // index file name is stored after indexname
+
+
+   /* ZIndexControlBlock has no key dictionary definition : key dictionary is stored with MetaDictionary */
 
   /* take care of key dictionary */
 
-  if (wICBE->ZKDicOffset < 0)
-  {
+//  if (wICBe.ZKDicOffset == 0)
+//  {
     /* see the case of a ZKDic is existing while it is declared by import as non existing */
-    return  ZS_SUCCESS;
-  }
+//    return  ZS_SUCCESS;
+//  }
+
+  /* there is a key dictionary */
+/*  unsigned char* wPtrIn= (unsigned char*)wICBE + wICBe.ZKDicOffset ;
+  if (KeyDic)
+    delete KeyDic;
+  KeyDic=new ZSKeyDictionary(pMetaDic);
+  KeyDic->_import(wPtrIn);
+*/
 /*
   if (ZKDic != nullptr)
     delete ZKDic;
@@ -217,6 +257,40 @@ ZSIndexControlBlock::_import(unsigned char* &pPtrIn)
   return  ZS_SUCCESS;
 }// ZSIndexControlBlock::_importICBOwn
 
+
+
+ZDataBuffer
+ZIndexControlBlock::_export()
+{
+  ZDataBuffer     wZDB;
+  return _exportAppend(wZDB);
+}
+
+/**
+ * @brief ZIndexControlBlock::_exportICB exports ZIndexControlBlock content to a flat ZDataBuffer.
+ * @return a ZDataBuffer containing the flat content of ZIndexControlBlock
+ */
+ZDataBuffer &
+ZIndexControlBlock::_exportAppend(ZDataBuffer &pICBContent)
+{
+//  ZSICB_Export* wICBE;
+  ZSICB_Export wICBe;
+
+  wICBe.set(this);
+
+  wICBe.serialize();
+  pICBContent.appendData(&wICBe,sizeof(ZSICB_Export));
+
+  IndexName._exportAppendUVF(pICBContent);  /* export index name */
+  URIIndex._exportAppendUVF(pICBContent);   /* then index file name */
+
+  /* no key dictionary in ZIndexControlBlock */
+
+  return  pICBContent ;
+}// _exportAppend
+
+
+
 /*
  <indexcontrolblock> <!-- no dictionary in index control block -->
     <indexname> </indexname>
@@ -224,7 +298,7 @@ ZSIndexControlBlock::_import(unsigned char* &pPtrIn)
     <duplicates> </duplicates>
   </indexcontrolblock>
 */
-utf8String ZSIndexControlBlock::toXml(int pLevel,bool pComment)
+utf8String ZIndexControlBlock::toXml(int pLevel,bool pComment)
 {
   int wLevel=pLevel;
   utf8String wReturn;
@@ -247,7 +321,7 @@ utf8String ZSIndexControlBlock::toXml(int pLevel,bool pComment)
   return wReturn;
 } // toXml
 
-ZStatus ZSIndexControlBlock::fromXml(zxmlNode* pIndexNode, ZaiErrors* pErrorlog)
+ZStatus ZIndexControlBlock::fromXml(zxmlNode* pIndexNode, ZaiErrors* pErrorlog)
 {
   zxmlElement *wRootNode=nullptr;
   utfcodeString wXmlHexaId;
@@ -290,15 +364,15 @@ ZStatus ZSIndexControlBlock::fromXml(zxmlNode* pIndexNode, ZaiErrors* pErrorlog)
     return pErrorlog->hasError()?ZS_XMLERROR:ZS_SUCCESS;
 }//fromXml
 
-ZSIndexControlBlock&
-ZSIndexControlBlock::_copyFrom( const ZSIndexControlBlock& pIn)
+ZIndexControlBlock&
+ZIndexControlBlock::_copyFrom( const ZIndexControlBlock& pIn)
 {
   ZSICBOwnData::_copyFrom(pIn);
   return *this;
 }//_copyFrom
 
 
-ZSIndexControlBlock::~ZSIndexControlBlock (void)
+ZIndexControlBlock::~ZIndexControlBlock (void)
 {
 
   if (CheckSum!=nullptr)
@@ -306,9 +380,8 @@ ZSIndexControlBlock::~ZSIndexControlBlock (void)
 
   return;
 }
-
-
-void ZSIndexControlBlock::newKeyDic(ZSKeyDictionary *pZKDic,ZMetaDic* pMetaDic)
+/*
+void ZIndexControlBlock::newKeyDic(ZSKeyDictionary *pZKDic,ZMetaDic* pMetaDic)
 {
   if (KeyDic)
     delete KeyDic;
@@ -317,10 +390,10 @@ void ZSIndexControlBlock::newKeyDic(ZSKeyDictionary *pZKDic,ZMetaDic* pMetaDic)
   KeyDic->MetaDic=pMetaDic;
   return;
 }
-
+*/
 // computes and return the effective size of a ZIndex key record
 // variable fields length impose to compute record size at record level
-ssize_t ZSIndexControlBlock::IndexRecordSize (void)
+ssize_t ZIndexControlBlock::IndexRecordSize (void)
 {
   return (KeyUniversalSize + sizeof(zaddress_type));
 }//IndexRecordSize

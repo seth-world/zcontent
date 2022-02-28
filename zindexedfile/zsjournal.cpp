@@ -2,7 +2,7 @@
 #define ZSJOURNAL_CPP
 
 #include <zindexedfile/zsjournal.h>
-#include <zindexedfile/zsmasterfile.h>
+#include <zindexedfile/zmasterfile.h>
 #include <zindexedfile/zsjournalcontrolblock.h>
 
 using namespace zbs;

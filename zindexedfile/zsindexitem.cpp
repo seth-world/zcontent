@@ -28,7 +28,7 @@ ZSIndexItem::toFileKey(void)
  * @brief ZIndexItem_struct::fromFileKey loads a ZIndexItem_struct from an Index file record contained in a ZDataBuffer structure (pFileKey)
  * @note ZOp Operation field is not stored on Index File, and therefore is not subject to be loaded
  *
- * @param[in] pFileKey ZSIndexFile record content to load into current ZIndexItem
+ * @param[in] pFileKey ZIndexFile record content to load into current ZIndexItem
  * @return a reference to current ZIndexItem being processed
  */
 ZSIndexItem&

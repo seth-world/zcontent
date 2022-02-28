@@ -180,11 +180,11 @@ HEADERS_OLD1 += \
     ../zindexedfile/zrecord.h \
     ../zindexedfile/zsifgeneric.h \
     ../zindexedfile/zsindexcollection.h \
-    ../zindexedfile/zsindexfile.h \
+    ../zindexedfile/zindexfile.h \
     ../zindexedfile/zsindextype.h \
     ../zindexedfile/zsjournal.h \
     ../zindexedfile/zskey.h \
-    ../zindexedfile/zsmasterfile.h \
+    ../zindexedfile/zmasterfile.h \
     ../zindexedfile/zurffromnatural.h \
     ../zindexedfile/zurffromnatural_old.h \
     ../zrandomfile/zrandomlockfile.h \
@@ -228,7 +228,10 @@ HEADERS += \
     ../zindexedfile/zindexcontrolblock.h \
     ../zindexedfile/zindexdata.h \
     ../zindexedfile/zindexfield.h \
+    ../zindexedfile/zindexfile.h \
     ../zindexedfile/zkeydictionary.h \
+    ../zindexedfile/zmastercontrolblock.h \
+    ../zindexedfile/zmasterfile.h \
     ../zindexedfile/zmasterfile_utilities.h \
     ../zindexedfile/zmasterfiletype.h \
     ../zindexedfile/zmetadic.h \
@@ -242,14 +245,11 @@ HEADERS += \
     ../zindexedfile/zrecord.h \
 #    ../zindexedfile/zsifgeneric.h \
     ../zindexedfile/zsindexcollection.h \
-    ../zindexedfile/zsindexfile.h \
     ../zindexedfile/zsindexitem.h \
     ../zindexedfile/zsindextype.h \
     ../zindexedfile/zsjournal.h \
     ../zindexedfile/zsjournalcontrolblock.h \
     ../zindexedfile/zskey.h \
-    ../zindexedfile/zsmastercontrolblock.h \
-    ../zindexedfile/zsmasterfile.h \
     ../zindexedfile/zurffromnatural.h \
     ../zrandomfile/zblock.h \
     ../zrandomfile/zfilecontrolblock.h \
@@ -318,7 +318,7 @@ SOURCES_OLD += \
     ../zindexedfile/znaturalfromurf_old.cpp \
     ../zindexedfile/zrecord.cpp \
     ../zindexedfile/zsindexcollection.cpp \
-    ../zindexedfile/zsindexfile.cpp \
+    ../zindexedfile/zindexfile.cpp \
     ../zindexedfile/zsindextype.cpp \
     ../zindexedfile/zsjournal.cpp \
     ../zindexedfile/zskey.cpp \
@@ -347,7 +347,10 @@ SOURCES += \
     ../zindexedfile/zfullindexfield.cpp \
     ../zindexedfile/zindexcontrolblock.cpp \
     ../zindexedfile/zindexfield.cpp \
+    ../zindexedfile/zindexfile.cpp \
     ../zindexedfile/zkeydictionary.cpp \
+    ../zindexedfile/zmastercontrolblock.cpp \
+    ../zindexedfile/zmasterfile.cpp \
     ../zindexedfile/zmasterfile_utilities.cpp \
     ../zindexedfile/zmetadic.cpp \
     ../zindexedfile/zmfdictionary.cpp \
@@ -358,14 +361,11 @@ SOURCES += \
     ../zindexedfile/zrawrecord.cpp \
     ../zindexedfile/zrecord.cpp \
     ../zindexedfile/zsindexcollection.cpp \
-    ../zindexedfile/zsindexfile.cpp \
     ../zindexedfile/zsindexitem.cpp \
     ../zindexedfile/zsindextype.cpp \
     ../zindexedfile/zsjournal.cpp \
     ../zindexedfile/zsjournalcontrolblock.cpp \
     ../zindexedfile/zskey.cpp \
-    ../zindexedfile/zsmastercontrolblock.cpp \
-    ../zindexedfile/zsmasterfile.cpp \
     ../zindexedfile/zurffromnatural.cpp \
     ../zrandomfile/zblock.cpp \
     ../zrandomfile/zfilecontrolblock.cpp \

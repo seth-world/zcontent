@@ -35,7 +35,7 @@ namespace zbs {
 #include <zconfig.h>
 #include <ztoolset/zarray.h>
 #include <ztoolset/zerror.h>
-#include <zindexedfile/zsmasterfile.h>
+#include <zindexedfile/zmasterfile.h>
 
 //------- for data types handling-----
 

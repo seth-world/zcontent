@@ -67,8 +67,9 @@ public:
 
   ZBlockPool& operator = (ZBlockPool& pIn){return (ZBlockPool&)ZArray<ZBlockDescriptor>::_copyFrom(pIn);}
 
-  ZDataBuffer& _exportPool(ZDataBuffer&pZDBExport);
-  size_t _importPool(unsigned char *&pBuffer);
+  ZDataBuffer&  _exportAppendPool(ZDataBuffer&pZDBExport);
+  size_t        getPoolExportSize();
+  size_t        _importPool(const unsigned char *&pPtrIn);
 };
 /*
 typedef ZBlockPool ZBlockAccessTable;     //!< Blocks access table pool : contains references to any used block in file (Primary pool)
@@ -156,8 +157,8 @@ class ZFileDescriptor : public ZFDOwnData
   friend class ZMasterFile;
   friend class ZRawMasterFile;
   friend class ZIndexFile;
-  friend class ZSMasterFile;
-  friend class ZSIndexFile;
+  friend class ZMasterFile;
+  friend class ZIndexFile;
 
   friend void _cleanDeletedBlocks(ZFileDescriptor &pDescriptor,ZBlockDescriptor &pBD);
 protected:
@@ -396,7 +397,7 @@ public:
 
 
   ZDataBuffer& _exportFCB(ZDataBuffer& pZDBExport);
-  ZFileDescriptor& _importFCB(unsigned char *pPtrIn);
+  ZFileDescriptor& _importFCB(const unsigned char *pPtrIn);
 
 
 };//ZFileDescriptor

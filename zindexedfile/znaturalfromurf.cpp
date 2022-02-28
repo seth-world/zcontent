@@ -136,14 +136,14 @@ _getBlobNfURF(void* pNatural,
  * @param[out] pHeaderSize      size in bytes of URF header
  * @return pointer to start of effective field data as unsigned char* (first byte after data header)
  */
-ZStatus _getURFHeaderData(unsigned char* pURF_Ptr,
+ZStatus _getURFHeaderData(const unsigned char* pURF_Ptr,
                                  ZTypeBase &pZType,
                                  uint64_t &pUniversalSize,
                                  uint64_t &pNaturalSize,
                                  uint16_t &pCapacity,       // only for strings and arrays. Otherwise is set to 1
                                  uint16_t &pEffectiveUSize, // only for strings and arrays. Otherwise is set to 1
                                  uint64_t &pHeaderSize,
-                                 unsigned char** pURFdDataPtr)
+                                 const unsigned char** pURFdDataPtr)
 {
 
 
@@ -152,7 +152,7 @@ URF_Varying_Size_type   wVUniversalSize;
 
 ZTypeBase wStructType;
 uint64_t wUSize=0;
-unsigned char* wURFDataPtr;
+const unsigned char* wURFDataPtr;
 
     wURFDataPtr=getURFBufferValue<ZTypeBase>(&pZType,pURF_Ptr);
 
@@ -218,7 +218,7 @@ unsigned char* wURFDataPtr;
         pEffectiveUSize=pUniversalSize=reverseByteOrder_Conditional<uint16_t>(wUSize);
         break;
         }*/
-    case ZType_FixedWString: // fixed Wide strings : ZType + canonical = nb of WChars (uint16_t) + byte size (uint16_t)
+/*    case ZType_FixedWString: // fixed Wide strings : ZType + canonical = nb of WChars (uint16_t) + byte size (uint16_t)
         pHeaderSize=sizeof(ZTypeBase)+sizeof(uint16_t)+sizeof(uint16_t);
 
         wURFDataPtr=getURFBufferValue<URF_Capacity_type>(&pCapacity,wURFDataPtr);
@@ -229,6 +229,7 @@ unsigned char* wURFDataPtr;
                 *pURFdDataPtr=wURFDataPtr;
 
         return  ZS_SUCCESS;
+*/
     case ZType_CharFixedString: // fixed strings
     case ZType_Utf8FixedString:
     case ZType_Utf16FixedString:
@@ -370,7 +371,7 @@ size_t wHeaderSize;
 
 
 ZStatus
-getUniversalFromURF (ZDataBuffer &pValue,unsigned char* pDataPtr,bool pTruncate,unsigned char** pDataPtrOut)
+getUniversalFromURF (ZDataBuffer &pValue,const unsigned char* pDataPtr,bool pTruncate,const unsigned char** pDataPtrOut)
 {
 
   if (pDataPtr==nullptr)
@@ -527,7 +528,8 @@ get_121_ZDateNfURF(void* pValue,ZDataBuffer * pURFData)
 ZStatus
 get_121_CheckSumNfURF(void* pValue, ZDataBuffer *pURFData)
 {
-    return static_cast<checkSum*>(pValue)->_importURF(pURFData->Data);
+  const unsigned char* wPtr=pURFData->Data;
+  return static_cast<checkSum*>(pValue)->_importURF(wPtr);
 }
 
 ZStatus
@@ -536,26 +538,27 @@ get_ZStringNfURF(void* pValue, ZTypeBase pType, ZDataBuffer *&pURFData)
 
     if (pType&ZType_VaryingLength)
     {
+    const unsigned char* wPtr=pURFData->Data;
     switch (pType&ZType_AtomicMask)
     {
         case ZType_Char:
         case ZType_UChar:
-          if (static_cast<utfVaryingString<char>*>(pValue)->_importURF(pURFData->Data)==0)
+          if (static_cast<utfVaryingString<char>*>(pValue)->_importURF(wPtr)==0)
             return ZS_ERROR;
           return ZS_SUCCESS;
         case ZType_U8:
         case ZType_S8:
-          if (static_cast<utfVaryingString<utf8_t>*>(pValue)->_importURF(pURFData->Data)==0)
+          if (static_cast<utfVaryingString<utf8_t>*>(pValue)->_importURF(wPtr)==0)
             return ZS_ERROR;
           return ZS_SUCCESS;
         case ZType_U16:
         case ZType_S16:
-          if (static_cast<utfVaryingString<utf16_t>*>(pValue)->_importURF(pURFData->Data)==0)
+          if (static_cast<utfVaryingString<utf16_t>*>(pValue)->_importURF(wPtr)==0)
             return ZS_ERROR;
           return ZS_SUCCESS;
         case ZType_U32:
         case ZType_S32:
-          if (static_cast<utfVaryingString<utf32_t>*>(pValue)->_importURF(pURFData->Data)==0)
+          if (static_cast<utfVaryingString<utf32_t>*>(pValue)->_importURF(wPtr)==0)
             return ZS_ERROR;
           return ZS_SUCCESS;
     default:
@@ -790,7 +793,7 @@ ZDate wDate;
 }//_getZDateNfU
 
 ZStatus
-_getCheckSumNfURF(void* pValue,unsigned char* pURFData,ZTypeBase pTargetType)
+_getCheckSumNfURF(void* pValue,const unsigned char* pURFData,ZTypeBase pTargetType)
 {
 checkSum wCheckSum;
     if (pTargetType!=ZType_CheckSum)

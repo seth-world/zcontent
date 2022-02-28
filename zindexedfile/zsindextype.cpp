@@ -8,9 +8,9 @@
 #include <zindexedfile/zmfdictionary.h>
 
 #include <zindexedfile/zfullindexfield.h>
-#include <zindexedfile/zsindexfile.h>
+#include <zindexedfile/zindexfile.h>
 
-/** @addtogroup ZSIndexFileGroup
+/** @addtogroup ZIndexFileGroup
 
 @{ */
 
@@ -147,7 +147,7 @@ Data value byte order is reversed according Endian convention IF NECESSARY (syst
  * @param pField        Key Dictionary rank content
  * @return The obtained value with _Tp template parameter type.
  */
-_Tp _getValueAFK (ZDataBuffer &pKeyData,const long pRank,ZSIndexFile* pZIF)
+_Tp _getValueAFK (ZDataBuffer &pKeyData,const long pRank,ZIndexFile* pZIF)
 {
     _Tp wValue;
     ZDataBuffer wDBV;
@@ -234,7 +234,7 @@ Data value byte order is reversed according Endian convention IF NECESSARY (syst
  */
 template <class _Tp>
 static inline
-_Tp _getValueAAFK (ZDataBuffer &pKeyData,const long pIndex,const long pRank,ZSIndexFile* pZIF)
+_Tp _getValueAAFK (ZDataBuffer &pKeyData,const long pIndex,const long pRank,ZIndexFile* pZIF)
 {
     _Tp wValue;
     ZDataBuffer wDBV;
@@ -331,7 +331,7 @@ size_t wOffset=0;
  long wEltOffsetIn=wOffset;
 ZDataBuffer wDBElt;
 //ZDataBuffer wDBIn;
-ZSIndexField wField;
+ZIndexField wField;
 
 //    wDBIn.setData(pInData.Data+pField.Offset,pField.NaturalSize);
 
@@ -575,7 +575,7 @@ case ZType_Float :
  * @param[in] pFieldList Index dictionary as a CZKeyDictionary object. It is necessary to have here the whole dictionary and not only field definition.
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
-ZStatus _getFieldValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSIndexFile* pZIF)
+ZStatus _getFieldValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZIndexFile* pZIF)
 {
   ZFullIndexField wField;
 
@@ -602,7 +602,7 @@ ZStatus _getFieldValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,cons
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSErrorSError
  */
 
-ZStatus _getAtomicValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSIndexFile* pZIF)
+ZStatus _getAtomicValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZIndexFile* pZIF)
 {
 
   ZFullIndexField wField;
@@ -720,7 +720,7 @@ case ZType_Float :
  * @param[in] pFieldList Index dictionary as a CZKeyDictionary object. It is necessary to have here the whole dictionary and not only field definition.
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSErrorSError
  */
-ZStatus _getClassValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZSIndexFile* pZIF)
+ZStatus _getClassValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,const long pRank, ZIndexFile* pZIF)
 {
   ZFullIndexField wField;
   wField.set(pZIF,pRank);
@@ -749,7 +749,7 @@ ZStatus _getClassValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,cons
  * @param[in] pFieldList Index dictionary as a CZKeyDictionary object. It is necessary to have here the whole dictionary and not only field definition.
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSErrorSError
  */
-ZStatus _getArrayValueFromKey(ZDataBuffer &pInData,ZDataBuffer &pOutData,const long pRank,ZSIndexFile* pZIF)
+ZStatus _getArrayValueFromKey(ZDataBuffer &pInData,ZDataBuffer &pOutData,const long pRank,ZIndexFile* pZIF)
 {
 
   ZFullIndexField wField;
@@ -899,7 +899,7 @@ ssize_t KeyDataSize = (ssize_t)((float)wField.UniversalSize / (float)wField.Capa
  * @return          A reference to ZDataBuffer containing the packed data field.
  */
 
-ZDataBuffer& _printAtomicValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &pOutValue,const long pRank, ZSIndexFile* pZIF)
+ZDataBuffer& _printAtomicValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &pOutValue,const long pRank, ZIndexFile* pZIF)
 {
 utfdescString AVFKValue;
 
@@ -1009,7 +1009,7 @@ case ZType_Float :
  * @param[in] pKFieldList Index dictionary as a ZSKeyDictionary object. It is necessary to have here the whole dictionary and not only field definition.
  * @return a reference to pOutValue ZDataBuffer
  */
-ZDataBuffer& _printArrayValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &pOutValue,const long pRank, ZSIndexFile* pZIF)
+ZDataBuffer& _printArrayValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &pOutValue,const long pRank, ZIndexFile* pZIF)
 {
   utfdescString wEltValue;
   ZFullIndexField wField;
@@ -1042,14 +1042,14 @@ ZDataBuffer& _printArrayValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &pOutVal
       snprintf(pOutValue.DataChar,wFieldArrayCount, "<%s>",(pKeyData.DataChar+wFieldOffset));
       return pOutValue;
   }
- if (wZType==ZType_WChar)
+/* if (wZType==ZType_WChar)
    {
        size_t wFieldArrayCount = wField.Capacity ;
 //       size_t wFieldOffset = wField.KeyOffset  ;
        swprintf(pOutValue.WDataChar,wFieldArrayCount,L"<%s>", (pKeyData.DataChar+wField.KeyOffset));
        return pOutValue;
    }
-
+*/
  // then other types
 
 for (long wi=0;wi<wField.Capacity;wi++)
@@ -1185,7 +1185,7 @@ decltype(pValue) wValue = pValue;
 
 template <typename _Tp>
 ZDataBuffer &
-_convert(typename std::enable_if<std::is_integral<_Tp>::value, _Tp>::type &pValue,ZSIndexField pField,ZDataBuffer &pData) {
+_convert(typename std::enable_if<std::is_integral<_Tp>::value, _Tp>::type &pValue,ZIndexField pField,ZDataBuffer &pData) {
   // an implementation for integral types (int, char, unsigned, etc.)
     if (is_little_endian()) // if system uses little endian integral internal representation
             {

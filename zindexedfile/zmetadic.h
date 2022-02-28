@@ -46,17 +46,23 @@ union fieldDef
 
 
 /**
- * @brief The ZMetaDic class this class holds and manage the data definition for a ZSMasterFile.
+ * @brief The ZMetaDic class this class holds and manage the data definition for a ZMasterFile.
  */
 class ZMetaDic : public ZArray <ZFieldDescription>
 {
 public:
     typedef ZArray <ZFieldDescription> _Base ;
 
+    utf8String    DicName;         /* name of the entity described by meta dic */
+    unsigned long Version = 1000000UL;
+    checkSum *    CheckSum=nullptr;/* to check if meta dictionary has changed or not */
+//    long        CurrentRank=0;
+
+
     ZMetaDic() {}
     ~ZMetaDic() { zdelete (CheckSum) ;}
 
-    ZMetaDic(const utf8String& pName) {setName(pName);}
+    ZMetaDic(const utf8String& pDicName) {setDicName(pDicName);}
 
     ZMetaDic& _copyFrom(const ZMetaDic& pIn) ;
 
@@ -65,16 +71,20 @@ public:
     ZMetaDic&  operator = (const ZMetaDic& pIn) { return _copyFrom(pIn);}
 
 
-    void setName(const utf8String& pName) {DicName=pName;}
+    void setDicName(const utf8String& pName) {DicName=pName;}
 
-    checkSum *  CheckSum=nullptr;/* to check if meta dictionary has changed or not */
-    utf8String  DicName;         /* name of the entity described by meta dic */
+    void setVersion(unsigned int pVersion,unsigned int pMajor,unsigned int pMinor)
+      {
+      Version=pVersion*1000000;
+      Version+=pMajor*1000;
+      Version+=pMinor;
+      }
 
     checkSum* getCheckSum(void) {return CheckSum;}
     void generateCheckSum (void)
             {
             ZDataBuffer wMetaDic;
-            _exportAppend(wMetaDic);
+            _exportAppendMetaDicFlat(wMetaDic);
             if (CheckSum!=nullptr)
                     delete CheckSum;
             CheckSum=wMetaDic.newcheckSum();
@@ -83,8 +93,6 @@ public:
 
     void insertField(ZFieldDescription &pFieldDef,const long pRank) {insert(pFieldDef,pRank);}
     void addField(ZFieldDescription &pFieldDef){push(pFieldDef);}
-
-    long CurrentRank=0;
 
     void print (FILE* pOutput=stdout);
 
@@ -115,11 +123,17 @@ public:
 #define getFieldByHash searchFieldByHash
 #define getFieldByName searchFieldByName
 
-    utf8String toXml(int pLevel);
-    ZStatus fromXml(zxmlNode* pDicRootNode, ZaiErrors* pErrorlog, ZaiE_Severity pSeverity);
+    /** @brief XmlSaveToString  saves the meta dictionary alone without defined keys */
+    utf8String XmlSaveToString(bool pComment);
 
-    ZDataBuffer& _exportAppend(ZDataBuffer& pZDBExport) ;
-    size_t _import (unsigned char* &pZDBImport_Ptr);
+    utf8VaryingString toXml(int pLevel, bool pComment=false);
+
+    ZStatus XmlLoadFromString(const utf8String &pXmlString, ZaiErrors* pErrorLog);
+    ZStatus fromXml(zxmlNode* pMetaDicRootNode, ZaiErrors* pErrorlog, ZaiE_Severity pSeverity);
+
+
+    ZDataBuffer& _exportAppendMetaDicFlat(ZDataBuffer& pZDBExport);
+    ZStatus _importMetaDicFlat(const unsigned char *&pPtrIn);
 
     void clear (void) { _Base::clear(); return;}
 

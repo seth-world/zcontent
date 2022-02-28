@@ -39,9 +39,9 @@ ZDataBuffer ZLockid::_export() const
   return wReturn;
 }
 
-size_t     ZLockid::_import(unsigned char *&pUniversalPtr)
+size_t     ZLockid::_import(const unsigned char *&pUniversalPtr)
 {
-  unsigned char* wPtrIn=pUniversalPtr;
+  const unsigned char* wPtrIn=pUniversalPtr;
   ZLockid_type wId;
   memmove(&wId,wPtrIn,sizeof(ZLockid_type));
   id=reverseByteOrder_Conditional<ZLockid_type>(wId);

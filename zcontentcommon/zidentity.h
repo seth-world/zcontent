@@ -97,7 +97,7 @@ public:
 #endif // __COMMENT__
 
     ZDataBuffer _export() const;
-    size_t      _import(unsigned char* &pUniversalPtr);
+    size_t      _import(const unsigned char* &pUniversalPtr);
 
 };
 

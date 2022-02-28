@@ -1,5 +1,5 @@
-#ifndef ZSMASTERCONTROLBLOCK_H
-#define ZSMASTERCONTROLBLOCK_H
+#ifndef ZMASTERCONTROLBLOCK_H
+#define ZMASTERCONTROLBLOCK_H
 
 #include <stdint.h>
 #include <zindexedfile/zmfconfig.h>
@@ -36,30 +36,40 @@ namespace zbs {
 */
 
 
+class ZSMCBOwnData;
 #pragma pack(push)
 #pragma pack(1)
 /* if MetaDic does not exist then MDicOffset is -1
 */
-class ZSMCBOwnData;
 class ZSMCBOwnData_Export{                         // will be the first block of data for ZSMCB
 public:
   ZSMCBOwnData_Export() {}
-  ZSMCBOwnData_Export(const ZSMCBOwnData_Export& pIn) { set(pIn);}
+  ZSMCBOwnData_Export(const ZSMCBOwnData_Export& pIn) { _copyFrom(pIn);}
 
-  ZSMCBOwnData_Export& set(const ZSMCBOwnData_Export& pIn);
+  ZSMCBOwnData_Export& _copyFrom(const ZSMCBOwnData_Export& pIn);
   ZSMCBOwnData_Export& set(const ZSMCBOwnData& pIn);
 
   ZSMCBOwnData& _toMCBOwnData(ZSMCBOwnData &pOut);
 
 
-  ZSMCBOwnData_Export& operator = (const ZSMCBOwnData_Export& pIn) {return  set(pIn);}
+  ZSMCBOwnData_Export& operator = (const ZSMCBOwnData_Export& pIn) {return  _copyFrom(pIn);}
   ZSMCBOwnData_Export& operator = (const ZSMCBOwnData& pIn) {return  set(pIn);}
 
-  ZSMCBOwnData_Export& reverseConditional();
+//  ZSMCBOwnData_Export& reverseConditional();
 
-  uint32_t    StartSign=  cst_ZBLOCKSTART ;
-  ZBlockID    BlockId=    ZBID_MCB;
-  uint32_t    ZMFVersion= __ZMF_VERSION__;
+  ZSMCBOwnData_Export& setFromPtr(const unsigned char*& pPtrIn);
+
+  void _convert();
+  void serialize();
+  void deserialize();
+
+  bool isReversed() {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
+  bool isNotReversed() {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
+
+  uint32_t        StartSign=  cst_ZBLOCKSTART ;
+  ZBlockID        BlockId=    ZBID_MCB;
+  uint16_t        EndianCheck=cst_EndianCheck_Normal;
+  unsigned long   ZMFVersion= __ZMF_VERSION__;
 
 //  uint8_t     Components= ZCBC_Default;
   uint32_t    MCBSize;      // contains size of exported - imported  MCB
@@ -104,14 +114,14 @@ public:
   ZDataBuffer& _exportAppend(ZDataBuffer& pZDBExport);
   ZDataBuffer _export();
   /** _import imports from serialized data. Updates pZDBImport_Ptr to first byte after imported data */
-  ZStatus _import(unsigned char *&pPtrIn);
+  ZStatus _import(const unsigned char *&pPtrIn);
 
 };
 
 //-----------------Master control block-------------------------------------
 
 /**
- * @brief The ZSMasterFileControlBlock class Master File Control Block contains all operational infradata necessary for a master file to operate.
+ * @brief The ZMasterFileControlBlock class Master File Control Block contains all operational infradata necessary for a master file to operate.
  *
  *  ZMCB is stored within reserved block in Master File header.
  *
@@ -119,18 +129,18 @@ public:
  *
  */
 class ZSJournalControlBlock;
-class ZSMasterControlBlock : public ZSMCBOwnData
+class ZMFDictionary;
+class ZMasterControlBlock : public ZSMCBOwnData
 {
 public:
   friend class ZSJournal;
 
-//  ZSIndexControlTable             Index;          // List of Indexes definition content
-  ZIndexTable                     IndexTable;     // List of effective index objects that will manage physical ZSIndexFile
+  ZIndexTable                     IndexTable;     // List of effective index objects that will manage physical ZIndexFile
   ZSJournalControlBlock*          ZJCB=nullptr;   // journaling is defined here. If no journaling, stays to nullptr
   ZMFDictionary*                  MasterDic=nullptr;  // optional master dictionary (raw master file does not have one)
 
-  ZSMasterControlBlock (void) ;
-  ~ZSMasterControlBlock(void) ;
+  ZMasterControlBlock (void) ;
+  ~ZMasterControlBlock(void) ;
 
 //  void pushICBtoIndexTable(ZSIndexControlBlock *pICB);
 //  void removeICBfromIndexTable(const long pRank);
@@ -149,22 +159,15 @@ public:
 
   ZDataBuffer& _exportMCBAppend (ZDataBuffer &pMCBContent);
   ZDataBuffer _exportMCB ();
-
-//  static ZStatus     _importMCB  (ZDataBuffer& pBuffer, ZSMCBOwnData& pMCBOwn, ZArray<ZSIndexControlBlock *> &pICBTable);
-
-//  ZStatus     _importMCB  (ZDataBuffer& pBuffer);
-//  ZStatus     _importMCB  (unsigned char *&wPtrIn);
-
-
   /**
    * @brief _import imports a full MCB to an existing Master control block. Eventually, adds indexes whenever required.
    *  When added, index file remains empty, only Index Control Block is feeded.
    *  IndexPresence returned array shows what indexes have been added.
    *  Pointer to input data pPtrIn is updated by this operation.
    */
-  ZStatus _import(unsigned char *&pPtrIn, ZArray<ZPRES> &pIndexPresence);
+  ZStatus _import(ZRawMasterFile *pMaster, const unsigned char *&pPtrIn, ZArray<ZPRES> &pIndexPresence);
 
-  ZStatus _import(unsigned char *&pPtrIn);
+  ZStatus _import(ZRawMasterFile *pMaster,const unsigned char *&pPtrIn);
 
   void report(FILE *pOutput=stdout);
 } ;

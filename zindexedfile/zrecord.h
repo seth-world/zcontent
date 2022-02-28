@@ -12,15 +12,15 @@
 #include <zindexedfile/znaturalfromurf.h>
 #include <zxml/zxml.h>
 
-#include <zindexedfile/zsindexfile.h>
+#include <zindexedfile/zindexfile.h>
 
 #include <zindexedfile/zrawrecord.h>
 #include <zindexedfile/zmfdictionary.h>
 
 namespace zbs {
-/** @addtogroup ZSMASTERFILEGROUP @{
+/** @addtogroup ZMasterFileGROUP @{
  *
- * @weakgroup ZSMASTERFILERECORD zmasterfile record structure
+ * @weakgroup ZMasterFileRECORD zmasterfile record structure
  *
  * ZRecord structure is the memory representation of current's zmasterfile physical record.<br>
  *
@@ -221,14 +221,14 @@ class  |----|---------->
 
 
 /**
- * @brief The ZRecord Class used to set fields for a ZSMasterFile record.
+ * @brief The ZRecord Class used to set fields for a ZMasterFile record.
  *                   Fields must have been defined within a ZMetaDic.
  *
  * - setting fields value :
  *      + setFieldValuebyRank
  *      + setFieldValuebyName (much longer)
  *
- *  Once the fields value have been set you may write ZSMasterFile record (ZRecord is a ZDataBuffer)
+ *  Once the fields value have been set you may write ZMasterFile record (ZRecord is a ZDataBuffer)
  *
  * - getting fields value :
  *      + getFieldbyName
@@ -238,12 +238,12 @@ class  |----|---------->
  *
  *
  */
-class ZSMasterControlBlock;
+class ZMasterControlBlock;
 
 class ZRecord : public ZRawRecord
 {
 public:
-    ZRecord(ZSMasterFile *pMCB);
+    ZRecord(ZMasterFile *pMCB);
     ZRecord& operator = (const ZDataBuffer &pDataBuffer)
     {
       Content.reset();
@@ -329,7 +329,7 @@ public:
     */
     ZStatus _aggregate(void);
     /**
-       @brief _split Extracts fields from raw record according MetaDic after a ZSMasterFile get operation
+       @brief _split Extracts fields from raw record according MetaDic after a ZMasterFile get operation
      * @return
      */
     ZStatus _split(const ZDataBuffer &pContent);

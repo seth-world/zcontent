@@ -24,7 +24,7 @@ class QAction;
 class QFileDialog;
 namespace zbs {
 //class ZRandomFile;
-class ZSMasterFile;
+class ZMasterFile;
 }
 
 enum VisuMode_type : uint8_t
@@ -37,6 +37,7 @@ enum VisuMode_type : uint8_t
 };
 
 class DisplayMain;
+class DicEdit;
 
 class ZContentVisuMain : public QMainWindow
 {
@@ -69,10 +70,18 @@ public:
   void ZRFUnlock();
   void ZHeaderRawUnlock();
 
-  void displayHeaderControlBlock();
+  void displayHCB();
   void displayFCB();
   void displayMCB();
-  void displayPool();
+
+
+  void displayPool(unsigned char* pPtr,zaddress_type pOffset,const char* pTitle);
+
+  void displayZBAT();
+  void displayZFBT();
+  void displayZDBT();
+
+  void Dictionary();
 
   void surfaceScanZRF();
   void surfaceScanRaw();
@@ -94,10 +103,15 @@ public:
   void removeAllRows();
 
 
+  void textEditMorePressed();
+
   DisplayMain* entityWnd=nullptr;
+  DicEdit* dictionaryWnd=nullptr;
+
+
 
   zbs::ZRandomFile* RandomFile=nullptr;
-  zbs::ZSMasterFile* MasterFile=nullptr;
+  zbs::ZMasterFile* MasterFile=nullptr;
 
   int   Fd=-1;
   long  FileOffset=0;
@@ -126,7 +140,7 @@ public:
 
 private slots:
 
-  void actionEvent(QAction* pAction);
+  void actionMenuEvent(QAction* pAction);
   void actionOpenFileByType(bool pChecked=true);
   void openRaw();
   void actionClose(bool pChecked=true);

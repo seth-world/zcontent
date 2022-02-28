@@ -89,9 +89,9 @@ ZDataBuffer ZIdentity::_export() const
   return wReturn;
 }
 
-size_t     ZIdentity::_import(unsigned char *&pUniversalPtr)
+size_t     ZIdentity::_import(const unsigned char *&pUniversalPtr)
 {
-  unsigned char* wPtrIn=pUniversalPtr;
+  const unsigned char* wPtrIn=pUniversalPtr;
   Identity_type wId;
   memmove(&wId,wPtrIn,sizeof(Identity_type));
   id=reverseByteOrder_Conditional<ZEntity_type>(wId);

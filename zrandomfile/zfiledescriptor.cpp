@@ -29,24 +29,24 @@ ZFileDescriptor::_exportFCB(ZDataBuffer& pZDBExport)
   wFileControlBlock.BlockExtentQuota = ZBAT.getQuota();
 
   ZDataBuffer wZBAT_export;
-  ZBAT._exportPool(wZBAT_export);
+  ZBAT._exportAppendPool(wZBAT_export);
   wFileControlBlock.ZBAT_ExportSize = wZBAT_export.getByteSize();
 
   wFileControlBlock.ZFBT_DataOffset = (zaddress_type)(ZFCB.ZBAT_DataOffset
                                                       +ZFCB.ZBAT_ExportSize); // then ZFBT
   //    wFileControlBlock.ZFBT_ExportSize = ZFBT._getExportAllocatedSize();
   ZDataBuffer wZFBT_export;
-  ZFBT._exportPool(wZFBT_export);
+  ZFBT._exportAppendPool(wZFBT_export);
   wFileControlBlock.ZFBT_ExportSize = wZFBT_export.getByteSize();
 
   wFileControlBlock.ZDBT_DataOffset = (zaddress_type)(ZFCB.ZFBT_DataOffset
                                                       +ZFCB.ZFBT_ExportSize); // then ZDBT
   //    wFileControlBlock.ZDBT_ExportSize = ZDBT._getExportAllocatedSize();
   ZDataBuffer wZDBT_export;
-  ZFBT._exportPool(wZDBT_export);
+  ZFBT._exportAppendPool(wZDBT_export);
   wFileControlBlock.ZDBT_ExportSize = wZDBT_export.getByteSize();
 
-  wFileControlBlock._export(pZDBExport);
+  wFileControlBlock._exportAppend(pZDBExport);
 
   pZDBExport.appendData(wZBAT_export);
   pZDBExport.appendData(wZFBT_export);
@@ -55,11 +55,11 @@ ZFileDescriptor::_exportFCB(ZDataBuffer& pZDBExport)
 }// ZFileDescriptor::_exportFCB
 
 ZFileDescriptor&
-ZFileDescriptor::_importFCB(unsigned char* pPtrIn)
+ZFileDescriptor::_importFCB(const unsigned char* pPtrIn)
 {
   printf ("ZFileDescriptor::_importFCB>>\n");
 
-  unsigned char* wPtrIn=pPtrIn;
+  const unsigned char* wPtrIn=pPtrIn;
   ZFCB._import(wPtrIn);/* wPtrIn is updated by ZFileControlBlock::_import */
 
   ZBAT._importPool(wPtrIn);  /* wPtrIn is updated by ZBlockPool::_importPool */
@@ -294,6 +294,8 @@ void ZFileDescriptor::clearPartial (void)
 ZStatus
 ZFileDescriptor::_close()
 {
+ZStatus wSt=ZS_SUCCESS;
+
   if (close (ContentFd) < 0)
   {
     ZException.getErrno(errno,
@@ -301,7 +303,7 @@ ZFileDescriptor::_close()
         ZS_FILEERROR,
         Severity_Severe,
         "System error closing file <%s>",URIContent.toCChar());
-    return ZS_FILEERROR;
+    wSt= ZS_FILEERROR;
   }
   if (close (HeaderFd) < 0)
   {
@@ -310,7 +312,7 @@ ZFileDescriptor::_close()
         ZS_FILEERROR,
         Severity_Severe,
         "System error closing file <%s>",URIHeader.toCChar());
-    return ZS_FILEERROR;
+    wSt= ZS_FILEERROR;
   }
   _isOpen=false;
   Mode=ZRF_NotOpen;
@@ -319,7 +321,7 @@ ZFileDescriptor::_close()
   clearPartial();
   ContentFd=0;
   HeaderFd=0;
-  return ZS_SUCCESS;
+  return wSt;
 }
 
 void

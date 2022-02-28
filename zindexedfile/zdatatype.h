@@ -107,14 +107,14 @@ namespace zbs
   */
 } // namespace zbs
 // see <zindexedfile/znaturalfromurf.cpp>
-ZStatus _getURFHeaderData(unsigned char* pURF_Ptr,
+ZStatus _getURFHeaderData(const unsigned char* pURF_Ptr,
                                  ZTypeBase &pZType,
                                  uint64_t &pUniversalSize,
                                  uint64_t &pNaturalSize,
                                  uint16_t &pCanonical,
                                  uint16_t &pEffectiveUSize,
                                  uint64_t &pHeaderSize,
-                                 unsigned char **pDataPtr);
+                                 const unsigned char **pDataPtr);
 // see <zindexedfile/znaturalfromurf.cpp>
 size_t  _getURFHeaderSize (ZTypeBase &pZType);
 
@@ -214,10 +214,11 @@ typeDemangler(const char*pName, char **pOutName);
 //-------- Data type constant values-----------------------------
 
 static const size_t CharType = typeid(char).hash_code();
-static const size_t WCharType = typeid(wchar_t).hash_code();
 static const size_t UCharType = typeid(unsigned char).hash_code();
+/* not to be used anymore
+static const size_t WCharType = typeid(wchar_t).hash_code();
 static const size_t WUCharType = typeid(unsigned wchar_t).hash_code();
-
+*/
 static const size_t S8Type = typeid(int8_t).hash_code();
 static const size_t U8Type= typeid(uint8_t).hash_code();
 static const size_t S16Type= typeid(int16_t).hash_code();
@@ -261,6 +262,7 @@ static const size_t utf16varyingStringType= typeid(utf16VaryingString).hash_code
 static const size_t utf32varyingStringType= typeid(utf32VaryingString).hash_code();
 
 static const size_t checksumType= typeid(checkSum).hash_code();
+static const size_t md5Type= typeid(md5).hash_code();
 static const size_t bitsetType= typeid(ZBitset).hash_code();
 
 static const size_t zdatabufferType= typeid(ZDataBuffer).hash_code();
@@ -306,6 +308,7 @@ _getAtomicZType_T(const size_t pTypeHashCode, ZTypeBase &pType, size_t& pNatural
                     pUniversalSize = pNaturalSize;  // array of char is a special case because no sign byte is added
                     break;
                     }
+/* not to be used anymore
     if (pTypeHashCode==WCharType)
                     {
                     pType |= ZType_WChar ;
@@ -320,6 +323,7 @@ _getAtomicZType_T(const size_t pTypeHashCode, ZTypeBase &pType, size_t& pNatural
                     pUniversalSize=pNaturalSize;
                     break;
                     }
+*/
     if (pTypeHashCode==U8Type)
                     {
                     pType |= ZType_U8 ;
@@ -1993,7 +1997,7 @@ long wAtomicUSize = getAtomicUniversalSize(wAtomicType);
             _getAtomicUfN_T<int8_t>((unsigned char*) &pValue[wi],wDBV,wType);
             break;
                    }
-            case ZType_WChar:  // WChar is treated as an unsigned uint16_t but subject to endian conversion
+//            case ZType_WChar:  // WChar is treated as an unsigned uint16_t but subject to endian conversion
             case ZType_U16 :
                      {
             _getAtomicUfN_T<uint16_t>((unsigned char*) &pValue[wi],pUniversal,wType);
@@ -2079,7 +2083,7 @@ Data value byte order is reversed according Endian convention IF NECESSARY (if s
 template <class _Tp>  // type of _Tp must correspond strictly to pSourceType
 static inline
 _Tp _getAtomicNfU_T_Ptr (typename std::enable_if_t<std::is_integral<_Tp>::value|std::is_floating_point<_Tp>::value,_Tp> &pValue,
-                         unsigned char* pUniversal_Ptr,
+                         const unsigned char* pUniversal_Ptr,
                          const ZTypeBase pSourceType)
 {
 //    _Tp pValue;
@@ -2188,8 +2192,8 @@ long wAtomicUSize = getAtomicUniversalSize(wType);
                 int8_t wValue;
            pValue[wi]=_getAtomicNfU_T_Ptr<int8_t>(wValue,pUniversal.Data+wAtomicOffset,(ZType_type)wType);
                    }
-            case ZType_WChar:  // WChar is treated as an unsigned uint16_t but subject to endian conversion
-            case ZType_WUChar:  // WUChar is treated as an unsigned uint16_t but subject to endian conversion
+//            case ZType_WChar:  // WChar is treated as an unsigned uint16_t but subject to endian conversion
+//            case ZType_WUChar:  // WUChar is treated as an unsigned uint16_t but subject to endian conversion
             case ZType_U16 :
                      {
             uint16_t wValue;
@@ -2726,7 +2730,7 @@ template <class _TpTarget>
  */
 ZStatus
 _castAtomicToNfU_T (typename std::enable_if_t<std::is_integral<_TpTarget>::value|std::is_floating_point<_TpTarget>::value,_TpTarget> &pTargetValue,
-                    unsigned char* pUniversal, // Source data
+                    const unsigned char* pUniversal, // Source data
                     ZTypeBase pSourceType)
 {
 size_t wUniversalSize, wNaturalSize;
@@ -3116,7 +3120,5 @@ public:
   static ssize_t _importURF(double& pValue,unsigned char* &pIn);
 };
 #pragma pack(pop)
-
-
 
 #endif // ZDATATYPE_H

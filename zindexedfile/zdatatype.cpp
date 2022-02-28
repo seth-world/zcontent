@@ -2,7 +2,7 @@
 #define ZDATATYPE_CPP
 
 #include <zindexedfile/zsindextype.h>
-#include <zindexedfile/zsindexfile.h>
+#include <zindexedfile/zindexfile.h>
 
 inline
 size_t getAtomicUniversalSize(const ZTypeBase pType)
@@ -170,7 +170,7 @@ std::string*wString=    static_cast<std::string*>(pIndata) ;
 }
 
 template  <class _Tp>
-ZStatus _getByteSequenceFromRecord (typename std::enable_if_t<std::is_pointer<_Tp>::value,_Tp>  pInData, const ssize_t pSize, ZDataBuffer &pOutData, ZSIndexField& pField)
+ZStatus _getByteSequenceFromRecord (typename std::enable_if_t<std::is_pointer<_Tp>::value,_Tp>  pInData, const ssize_t pSize, ZDataBuffer &pOutData, ZIndexField& pField)
 {
     pOutData.setData(pInData,pSize);
     return ZS_SUCCESS;
@@ -706,7 +706,7 @@ ZDataBuffer wDBIn;
                 {
                 return _getArrayUfN_T<int8_t>(pInData,pOutData,pType,pArrayCount);
                 }
-         case ZType_WChar :
+ //        case ZType_WChar :
          case ZType_U16 :
                   {
                   return _getArrayUfN_T<uint16_t>(pInData,pOutData,pType,pArrayCount);

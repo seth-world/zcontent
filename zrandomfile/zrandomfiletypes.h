@@ -1,6 +1,8 @@
 #ifndef ZRANDOMFILETYPES_H
 #define ZRANDOMFILETYPES_H
 
+#include <zindexedfile/zmf_limits.h>  // for __ZRF_VERSION__
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -11,11 +13,6 @@
 #include <zcontentcommon/zlock.h>
 #include <ztoolset/zmem.h>
 
-#define __ZRF_VERSION__  2000UL
-#define __ZRF_VERSION_CHAR__  "\"2.00\""
-#define __ZRF_XMLVERSION_CONTROL__  "2.00"
-
-
 
 /** @namespace zbs */
 
@@ -24,10 +21,14 @@
  * @{
  */
 
-//! @macro  __HEADER_FILEEXTENSION__ preprocessor parameter for ZRF header file extension
+//! @macro  __HEADER_FILEEXTENSION__ preprocessor parameter for standard header file extension
 #define __HEADER_FILEEXTENSION__ ".zrh"
-//! @macro __ZINDEX_FILEEXTENSION__  preprocessor parameter for ZIF file extension
+//! @macro __ZINDEX_FILEEXTENSION__  preprocessor parameter for index content file extension
 #define __ZINDEX_FILEEXTENSION__ ".zix"
+//! @macro __ZINDEX_FILEEXTENSION__  preprocessor parameter for master dictionary content file extension
+#define __ZDICTIONARY_FILEEXTENSION__ ".zdc"
+//! @macro  __MASTER_FILEEXTENSION__ preprocessor parameter for master file content file extension
+#define __MASTER_FILEEXTENSION__ ".zmf"
 
 typedef long      zrank_type;     //!< Block record rank data type NB: could be negative if unknown
 typedef int64_t   zaddress_type;  //!< ZRandomFile address data type : nb : could be negative if unknown
@@ -35,17 +36,6 @@ typedef uint64_t  zsize_type;     //!< ZRandomFile size data type
 
 typedef uint8_t   zlockmask_type ;    //!< refers to ZLockMask_type
 typedef uint32_t  zmode_type ;        //!< refers to ZRFMode_type
-
-const uint32_t     cst_ZBLOCKSTART = 0xF5F5F5F5;  //!< Begin marker of a data structure on file it is a palyndroma
-const uint32_t     cst_ZBLOCKEND   = 0xFCFCFCFC;  //!< End marker of a data structure on file : it is a palyndroma
-
-const uint8_t      cst_ZSTART_BYTE = 0xF5;
-
-
-const long        cst_ZRF_default_allocation=10;
-const long        cst_ZRF_default_extentquota=5;
-
-const zaddress_type cst_HeaderOffset = 0L;
 
 
 #ifndef __ZOPENZRFPOOL__
@@ -97,6 +87,8 @@ enum ZBlockID : uint8_t
 
 };
 
+const char* decode_BlockId(ZBlockID pBID);  /* see zblock.cpp for function instantiation */
+
 /** @endcond */ // Development
 /**
  * @brief The ZRFMode_type enum  open mode for ZRandomFile
@@ -138,7 +130,6 @@ enum ZFile_type : uint8_t
     ZFT_ZRawMasterFile=2,   //!< file is raw master file (keys are only defined by their universal size)
     ZFT_ZDicMasterFile=8,   //!< this file uses a dictionary
     ZFT_ZMasterFile = ZFT_ZDicMasterFile|ZFT_ZRawMasterFile,   //!< file is Structured Master File using a dictionary
-    ZFT_ZSIndexFile = 0x10,  //!< file is Structured index File
 
     ZFT_Any         = 0xFF  //!< all file types allowed
 };
@@ -174,6 +165,10 @@ zmode_type encode_ZRFMode (char* pZRF);
 
 const char * decode_ZFile_type (uint8_t pType);
 ZFile_type encode_ZFile_type (char * pType);
+
+utf8VaryingString getVersionStr (unsigned long pVersion); // defined in zrandomfile.cpp
+unsigned long getVersionNum (const utf8VaryingString& pVersion);// defined in zrandomfile.cpp
+
 
 /** @}  */ //  ZRandomFileGroup
 

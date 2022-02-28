@@ -108,7 +108,7 @@ ZSJCBOwnData_Export& ZSJCBOwnData_Export::_copyFrom(const ZSJCBOwnData_Export& p
   return *this;
 }
 
-ZSJCBOwnData_Export& ZSJCBOwnData_Export::_copyFrom(const ZSJCBOwnData& pIn)
+ZSJCBOwnData_Export& ZSJCBOwnData_Export::set(const ZSJCBOwnData& pIn)
 {
 
   StartSign=cst_ZBLOCKSTART;
@@ -129,21 +129,59 @@ ZSJCBOwnData& ZSJCBOwnData_Export::_toJCBOwnData(ZSJCBOwnData& pOut)
   return pOut;
 }
 
+void ZSJCBOwnData_Export::_convert()
+{
+  if (!is_little_endian())
+    return;
+  EndianCheck=reverseByteOrder_Conditional<uint16_t>(EndianCheck);
+
+  ZMFVersion = reverseByteOrder_Conditional(ZMFVersion);
+  JCBSize = reverseByteOrder_Conditional(JCBSize);
+  Depth = reverseByteOrder_Conditional(Depth);
+}
+
+void ZSJCBOwnData_Export::serialize()
+{
+  if (!is_little_endian())
+    return;
+  if (isReversed())
+  {
+    fprintf (stderr,"ZSJCBOwnData_Export::serialize-W-ALRDY Journal Control block already serialized. \n");
+    return;
+  }
+  _convert();
+}
+
+void
+ZSJCBOwnData_Export::deserialize()
+{
+  if (!is_little_endian())
+    return ;
+  if (isNotReversed())
+  {
+    fprintf (stderr,"ZSJCBOwnData_Export::deserialize-W-ALRDY Journal Control block already deserialized. \n");
+    return;
+  }
+  _convert();
+}
+
+
 
 ZDataBuffer&
 ZSJCBOwnData::_exportAppend(ZDataBuffer& pZDBExport)
 {
-  ZSJCBOwnData_Export wJCBE;
-  ZSJCBOwnData_Export* wJCBEPtr=nullptr ;
+  ZSJCBOwnData_Export wJCBe;
+  ZSJCBOwnData_Export* wJCBePtr=nullptr ;
 
-  wJCBE._copyFrom(*this);
-  wJCBE.reverseConditional();
-  pZDBExport.appendData(&wJCBE,sizeof(ZSJCBOwnData_Export));
+  wJCBe.set(*this);
+  wJCBe.serialize();
+
+  pZDBExport.appendData(&wJCBe,sizeof(ZSJCBOwnData_Export));
   JournalLocalDirectoryPath._exportAppendUVF(pZDBExport);
 /* set size */
-  wJCBEPtr= (ZSJCBOwnData_Export*) pZDBExport.Data ;
-  wJCBEPtr->JCBSize = uint32_t(pZDBExport.Size);
-  wJCBEPtr->reverseConditional();
+  wJCBePtr= (ZSJCBOwnData_Export*) pZDBExport.Data ;
+  wJCBePtr->JCBSize = reverseByteOrder_Conditional<uint32_t> (uint32_t(pZDBExport.Size));
+
   return  pZDBExport;
 }// ZSJCBOwnData::_exportAppend
 
@@ -155,16 +193,17 @@ ZSJCBOwnData::_export()
 }// ZSJCBOwnData::_export
 
 ZSJCBOwnData&
-ZSJCBOwnData::_import(unsigned char* &pPtrIn)
+ZSJCBOwnData::_import(const unsigned char* &pPtrIn)
 {
-  ZSJCBOwnData_Export* wJCB=(ZSJCBOwnData_Export*) pPtrIn;
+  ZSJCBOwnData_Export wJCBe;
+  memmove(&wJCBe, pPtrIn,sizeof(ZSJCBOwnData_Export));
+  pPtrIn += sizeof(ZSJCBOwnData_Export);
 
-  wJCB->reverseConditional();
+  wJCBe.deserialize();
 
-  JournalingOn=wJCB->JournalingOn;
-  Keep=wJCB->Keep;
-  Depth=wJCB->Depth;
-  pPtrIn+=sizeof(ZSJCBOwnData_Export);
+  JournalingOn=wJCBe.JournalingOn;
+  Keep=wJCBe.Keep;
+  Depth=wJCBe.Depth;
 
   JournalLocalDirectoryPath._importUVF(pPtrIn);
 
@@ -193,42 +232,46 @@ ZSJournalControlBlock::_getExportSize()
  */
 
 ZStatus
-ZSJournalControlBlock::_import(unsigned char* & pPtrIn)
+ZSJournalControlBlock::_import(const unsigned char* & pPtrIn)
 {
   //ZStatus wSt;
   //long wIndexCountsv ;
 
-  ZSJCBOwnData_Export* wJCB =(ZSJCBOwnData_Export*) pPtrIn;
+  ZSJCBOwnData_Export wJCB;
+  memmove(&wJCB,pPtrIn,sizeof(ZSJCBOwnData_Export));
+  pPtrIn += sizeof(ZSJCBOwnData_Export);
 
-  wJCB->reverseConditional();
 
-  if ((wJCB->BlockId!=ZBID_ICB)||(wJCB->StartSign!=cst_ZBLOCKSTART))
+  if ((wJCB.BlockId!=ZBID_ICB)||(wJCB.StartSign!=cst_ZBLOCKSTART))
   {
     ZException.setMessage("ZSJournalControlBlock::_import",
         ZS_BADDIC,
         Severity_Severe,
         "Invalid Journal Control Block header : found Start marker <%X> ZBlockID <%X>. One of these is invalid (or both are).",
-        wJCB->StartSign,
-        wJCB->BlockId);
+        wJCB.StartSign,
+        wJCB.BlockId);
     return  ZS_BADDIC;
   }
 
-  if (wJCB->ZMFVersion!= __ZMF_VERSION__)
+  wJCB.deserialize();
+
+  if (wJCB.ZMFVersion!= __ZMF_VERSION__)
   {
     ZException.setMessage("ZSJournalControlBlock::_import",
         ZS_BADFILEVERSION,
         Severity_Error,
         "Error Journal Control Block   : Found version <%ld> while current ZMF version is <%ld>",
-        wJCB->ZMFVersion,
+        wJCB.ZMFVersion,
         __ZMF_VERSION__);
     return (ZS_BADFILEVERSION);
   }
 
+
+
   clear();
 
 
-  wJCB->_toJCBOwnData(*this);
-  pPtrIn += sizeof(ZSJCBOwnData);
+  wJCB._toJCBOwnData(*this);
 
   return  ZS_SUCCESS;
 }//_importJCB

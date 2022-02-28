@@ -328,7 +328,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>110</y>
+       <y>100</y>
        <width>191</width>
        <height>20</height>
       </rect>
@@ -437,6 +437,78 @@
       <string>File has type</string>
      </property>
     </widget>
+    <widget class="QLabel" name="ZRFVersionLBl">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>130</y>
+       <width>101</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="ZMFVersionLBl">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>150</y>
+       <width>101</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>130</y>
+       <width>211</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Random File Software version</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>150</y>
+       <width>211</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Master File Software version</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="ClosedLBl">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>30</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>No Open File</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QTableWidget" name="tableTBw">
     <property name="geometry">
@@ -524,11 +596,20 @@
      <property name="title">
       <string>Header file dump</string>
      </property>
+     <widget class="QMenu" name="displayPoolMEn">
+      <property name="title">
+       <string>display Pool</string>
+      </property>
+      <addaction name="displayZBATQAc"/>
+      <addaction name="displayZDBTQAc"/>
+      <addaction name="displayZFBTQAc"/>
+     </widget>
      <addaction name="displayHCBQAc"/>
      <addaction name="displayFCBQAc"/>
      <addaction name="displayMCBQAc"/>
      <addaction name="HeaderRawUnlockQAc"/>
-     <addaction name="displayPoolQAc"/>
+     <addaction name="displayPoolMEn"/>
+     <addaction name="DictionaryQAc"/>
     </widget>
     <addaction name="rawDumpQAc"/>
     <addaction name="surfaceScanRawQAc"/>
@@ -615,11 +696,6 @@
   <action name="displayMCBQAc">
    <property name="text">
     <string>Master Control Block</string>
-   </property>
-  </action>
-  <action name="displayPoolQAc">
-   <property name="text">
-    <string>display Pool</string>
    </property>
   </action>
   <action name="setfileQAc">
@@ -766,6 +842,26 @@
   <action name="MCBReportQAc">
    <property name="text">
     <string>Master Control Block report</string>
+   </property>
+  </action>
+  <action name="DictionaryQAc">
+   <property name="text">
+    <string>Dictionary</string>
+   </property>
+  </action>
+  <action name="displayZBATQAc">
+   <property name="text">
+    <string>Block Access Table</string>
+   </property>
+  </action>
+  <action name="displayZDBTQAc">
+   <property name="text">
+    <string>Deleted Blocks Table</string>
+   </property>
+  </action>
+  <action name="displayZFBTQAc">
+   <property name="text">
+    <string>Free Blocks Table</string>
    </property>
   </action>
  </widget>

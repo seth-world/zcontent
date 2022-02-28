@@ -206,7 +206,7 @@ offset
 |               + ZMetaDictionary_Export,
 |               + IndexControlBlock_Export (1 per index)
 |
-|          - ZSIndexFile :    ZIndexControlBlock_Export
+|          - ZIndexFile :    ZIndexControlBlock_Export
 |
 |
 |
@@ -305,7 +305,7 @@ namespace zbs {
  * @return
  */
 ZDataBuffer&
-ZBlockPool::_exportPool(ZDataBuffer&pZDBExport)
+ZBlockPool::_exportAppendPool(ZDataBuffer&pZDBExport)
 {
 
 #ifdef __USE_ZTHREAD__
@@ -321,16 +321,10 @@ ZBlockPool::_exportPool(ZDataBuffer&pZDBExport)
     ZAE.ExtentQuota = _Base::getQuota();
     ZAE.NbElements = _Base::ZCurrentNb;
 
-    ZAE.CurrentSize  = ZAE.NbElements*sizeof(ZBlockDescriptor_Export);     // taking the CurrentSize
-    ZAE.AllocatedSize = ZAE.AllocatedElements*sizeof(ZBlockDescriptor_Export); // get the total allocated size
+    ZAE.DataSize = ZAE.NbElements * sizeof(ZBlockDescriptor_Export);
 
-    ZAE.DataSize = ZAE.CurrentSize; // change to allocatedsize if required
+    ZAE.FullSize = getPoolExportSize();
 
-    ZAE.FullSize = ZAE.DataSize+sizeof(ZAExport)+1;
-
-    pZDBExport.allocateBZero(ZAE.FullSize);
-
-    ZAE.DataOffset = sizeof(ZAExport);
 
 #ifdef __REPORT_POOLS__
     fprintf (stdout,
@@ -355,32 +349,48 @@ ZBlockPool::_exportPool(ZDataBuffer&pZDBExport)
          ZAE.DataOffset);
 #endif // __REPORT_POOLS__
 
-    _Base::convertZAExport_I(ZAE);
-    pZDBExport.setData(&ZAE,sizeof(ZAExport));
-    ZBlockDescriptor_Export wBlkExp;
+//    _Base::convertZAExport_I(ZAE);
+
+
+    unsigned char* wPtr=pZDBExport.extendBZero(ZAE.FullSize);
+    ZAE.serialize();
+    memmove(wPtr,&ZAE,sizeof(ZAExport));
+
+
+
+    wPtr += sizeof(ZAExport);
+
+    ZBlockDescriptor_Export* wBlkExp =(ZBlockDescriptor_Export*) wPtr;
     for (long wi=0;wi<_Base::size();wi++)
         {
-        _Base::Tab[wi]._exportConvert(_Base::Tab[wi],&wBlkExp);
-        pZDBExport.appendData(&wBlkExp,sizeof(wBlkExp));
+        _Base::Tab[wi]._exportConvert(_Base::Tab[wi],wBlkExp);
+        wBlkExp++;
         }
-    ZAExport* wZAE=(ZAExport*)pZDBExport.Data;
-    wZAE->FullSize = reverseByteOrder_Conditional<size_t> (pZDBExport.Size);
 
 #ifdef __USE_ZTHREAD__
     _Base::unlock();
 #endif
-
     return pZDBExport;
-
 }// _exportPool
+
+size_t ZBlockPool::getPoolExportSize()
+{
+  return sizeof(ZAExport) + (sizeof(ZBlockDescriptor_Export) * count());
+}
+
+
 /**
  * @brief ZBlockPool::_importPool  DO NOT USE ZArray Standard import/export facilities for Block pools
  * @param pBuffer
  * @return
  */
 size_t
-ZBlockPool::_importPool(unsigned char *& pBuffer)
+ZBlockPool::_importPool(const unsigned char *& pPtrIn)
 {
+
+  ZAExport wZAE;
+  wZAE.setFromPtr(pPtrIn); /* pPtrIn is updated to point after ZAExport */
+  wZAE.deserialize();
 
 //    return _ZAimport((ZArray<ZBlockDescriptor>*)this,pBuffer,&ZBlockDescriptor::_importConvert);
 
@@ -388,7 +398,8 @@ ZBlockPool::_importPool(unsigned char *& pBuffer)
  _Base::lock();
 #endif
 
-ZAExport ZAE = _Base::ZAEimport(pBuffer);
+//ZAExport ZAE = _Base::ZAEimport(pBuffer);
+
 #ifdef __REPORT_POOLS__
 fprintf (stdout,
          " +++++Pool import report :\n"
@@ -401,44 +412,40 @@ fprintf (stdout,
          "    Initial allocation  %ld\n"
          "    Nb elements         %ld\n"
          "    Data offset         %ld\n",
-         ZAE.AllocatedSize,
-         ZAE.CurrentSize,
-         ZAE.DataSize,
-         ZAE.FullSize,
-         ZAE.AllocatedElements,
-         ZAE.ExtentQuota,
-         ZAE.InitialAllocation,
-         ZAE.NbElements,
-         ZAE.DataOffset);
+         wZAE.AllocatedSize,
+         wZAE.CurrentSize,
+         wZAE.DataSize,
+         wZAE.FullSize,
+         wZAE.AllocatedElements,
+         wZAE.ExtentQuota,
+         wZAE.InitialAllocation,
+         wZAE.NbElements,
+         wZAE.DataOffset);
 #endif// __REPORT_POOLS__
 
-_Base::setAllocation(ZAE.AllocatedElements,false);  // no lock
-_Base::bzero(0,-1,false);// no lock
-_Base::setQuota(ZAE.ExtentQuota);
-_Base::setInitialAllocation(ZAE.InitialAllocation,false); // no lock
-_Base::clear(false); // no lock
+_Base::setInitialAllocation(wZAE.InitialAllocation,false);  // no lock
+_Base::setQuota(wZAE.ExtentQuota);                          // set reallocation quota
+if (wZAE.NbElements > (ssize_t)wZAE.AllocatedElements)
+    _Base::setAllocation(wZAE.NbElements,false);           // no lock : allocate space as number of elements
+else
+    _Base::setAllocation(wZAE.AllocatedElements,false);     // no lock : allocate space as allocated elements parameter
+_Base::bzero(0,-1,false);                                   // no lock : set to zero
 
-if (ZAE.NbElements>(ssize_t)ZAE.AllocatedElements)
+if (wZAE.NbElements>0)
     {
-    _Base::setAllocation(ZAE.NbElements,false); // false:no lock
-    }
-if (ZAE.NbElements>0)
-    {
-    _Base::newBlankElement(ZAE.NbElements,false); // no use of pClear : can memset ZBlockDescriptor
-    ZBlockDescriptor_Export* wEltPtr_In=(ZBlockDescriptor_Export*)(pBuffer+ZAE.DataOffset);
-    size_t wSize=sizeof(ZAExport);
-    for (long wi=0;wi<ZAE.NbElements;wi++)
+    _Base::newBlankElement(wZAE.NbElements,false); // no use of pClear : can memset ZBlockDescriptor
+    ZBlockDescriptor_Export* wEltPtr_In=(ZBlockDescriptor_Export*)(pPtrIn);
+    for (long wi=0;wi<wZAE.NbElements;wi++)
         {
         ZBlockDescriptor::_importConvert(Tab[wi],&wEltPtr_In[wi]);
-        wSize += sizeof(ZBlockDescriptor_Export);
         }// for
 
     } //(ZAE.NbElements>0)
 #ifdef __USE_ZTHREAD__
 _Base::unlock();
 #endif
-  pBuffer += ZAE.FullSize;
-return ZAE.FullSize;
+  pPtrIn += wZAE.DataSize;
+return wZAE.FullSize;
 
 }// _importPool
 
@@ -461,7 +468,7 @@ zmode_type wFormerMode=ZRF_Nothing;
     if (!_isOpen)
             {
             wasOpen=false;
-            wSt = _open(ZRF_Exclusive|ZRF_Write,pFileType);
+            wSt = _ZRFopen(ZRF_Exclusive|ZRF_Write,pFileType);
             if (wSt!=ZS_SUCCESS)
                     return wSt;
             }
@@ -471,7 +478,7 @@ zmode_type wFormerMode=ZRF_Nothing;
                     {
                     wFormerMode = getMode();
                     zclose();
-                    wSt = _open(ZRF_Exclusive|ZRF_Write,pFileType);
+                    wSt = _ZRFopen(ZRF_Exclusive|ZRF_Write,pFileType);
                     if (wSt!=ZS_SUCCESS)
                         {
                         ZException.addToLast(" while setHighwaterMarking");
@@ -488,7 +495,7 @@ zmode_type wFormerMode=ZRF_Nothing;
       ZFCB.BlockExtentQuota=pBlockExtentQuota;
 
 
-    wSt=_writeFileDescriptor(true);
+    wSt=_writeFCB(true);
     if (!wasOpen)
                 return zclose();
 
@@ -540,7 +547,7 @@ zmode_type wFormerMode=ZRF_Nothing;
             }// else
 
     ZFCB.HighwaterMarking=pHighwaterMarking;
-    wSt=_writeFileDescriptor(true);
+    wSt=_writeFCB(true);
     if (!wasOpen)
                 return zclose();
 
@@ -591,7 +598,7 @@ zmode_type wFormerMode=ZRF_Nothing;
             }// else
 
         ZFCB.GrabFreeSpace=pGrabFreeSpace;
-        wSt=_writeFileDescriptor(true);
+        wSt=_writeFCB(true);
         if (!wasOpen)
                     return zclose();
 
@@ -635,7 +642,7 @@ zmode_type wFormerMode=ZRF_Nothing;
                     }
             }// else
     ZFCB.BlockTargetSize=pBlockTargetSize;
-    wSt=_writeFileDescriptor(true);
+    wSt=_writeFCB(true);
     if (!wasOpen)
                 return zclose();
 
@@ -679,7 +686,7 @@ ZRandomFile::setBlockExtentQuota (const size_t pBlockExtentQuota)
     }
   }// else
   ZFCB.BlockExtentQuota=pBlockExtentQuota;
-  wSt=_writeFileDescriptor(true);
+  wSt=_writeFCB(true);
   if (!wasOpen)
     return zclose();
 
@@ -1292,10 +1299,10 @@ uriString wFormerHeaderURI;
       goto _createEnd;
       }
 
-    // create entry in ZFreeBlockPool with initial file size as free space
+    /* create one block as entry in ZFreeBlockPool
+      with initial file size as free space           */
 
     wFreeBlock.Address = ZFCB.StartOfData ;
- //   wFreeBlock.BlockID = ZBID_Data;
     wFreeBlock.State   = ZBS_Free;
     wFreeBlock.BlockSize =pInitialSize;
 
@@ -1344,7 +1351,8 @@ uriString wFormerHeaderURI;
 
     ZHeader.FileType = pFileType ;
 
-    wSt=_writeFullFileHeader(true);
+//    wSt=_writeFullFileHeader(true);
+    wSt=_writeAllFileHeader();
 
 _createEnd:
     if (pLeaveOpen)
@@ -1376,11 +1384,12 @@ ZRandomFile::_writeFileHeader( bool pForceWrite)
 {
 
   printf ("ZRandomFile::_writeFileHeader\n");
-  if (Mode & ZRF_Exclusive)
+/*  if (Mode & ZRF_Exclusive)
      {
        if ((!pForceWrite)&&(HeaderAccessed & ZHAC_HCB))
        {  return  ZS_SUCCESS;}
      }
+*/
   ZHeader.OffsetReserved = sizeof(ZHeaderControlBlock_Export) ;
   ZHeader.SizeReserved = ZReserved.Size ;
   ZHeader.OffsetFCB =    ZHeader.OffsetReserved + ZReserved.Size ;
@@ -1404,7 +1413,7 @@ ZRandomFile::_writeFileHeader( bool pForceWrite)
  //ZHeader.BlockID = ZBID_FileHeader ;
 
  ZDataBuffer wZDBHeaderExport;
- ZHeader._export(wZDBHeaderExport);
+ ZHeader._exportAppend(wZDBHeaderExport);
 // ssize_t wSWrite =write(HeaderFd,(char *)&ZHeader,sizeof(ZHeaderControlBlock)); // write file header infos
  ssize_t wSWrite =write(HeaderFd,(char *)wZDBHeaderExport.DataChar,wZDBHeaderExport.Size); // write file header infos
  if (wSWrite<0)
@@ -1602,6 +1611,7 @@ ZRandomFile::_writeFileLockOld(lockPack &pLockPack)
 }//_writeFileLock
 #endif // __COMMENT__
 
+#ifdef __COMMENT__
 
 /**
  * @brief ZRandomFile::_writeReservedHeader  writes the entire file header to disk. This method is the only way to update reserved infradata when its size has changed.
@@ -1611,17 +1621,17 @@ ZRandomFile::_writeFileLockOld(lockPack &pLockPack)
  */
 
 ZStatus
-ZRandomFile::_writeReservedHeader(bool pForceWrite)
+ZRandomFile::_writeAllHeaders(bool pForceWrite)
 {
 ZStatus wSt;
 ssize_t wSWrite;
 
-    if (Mode & ZRF_Exclusive)
+/*    if (Mode & ZRF_Exclusive)
            {
              if ((!pForceWrite)&&(HeaderAccessed & ZHAC_RESERVED))
              {  return  ZS_SUCCESS;}
            }
-
+*/
     //             ZReserved + ZFCB  + ZBAT content + ZFBT content + ZReserved
     //
     if (ZReserved.Size==0)   // if there is a Reserved space
@@ -1644,20 +1654,17 @@ ssize_t wSWrite;
             return  (ZS_WRITEERROR);
             }
 
+
+
+
+
+
     return  _writeFileDescriptor(pForceWrite); //! this is absolutely necessary because size of Reserved block may vary. A future optimization could test if Reserved block size has changed and will save to this occasion this access.
 }// _writeReservedHeader
-
+#endif // __COMMENT__
 /**
- * @brief ZRandomFile::_writeFileDescriptor
+ * @brief ZRandomFile::_writeFCB writes to disk File Control Block and Pool (ZBAT, ZFBT, ZDBT)
  *
- *     writing header. For information :
-
-               ZFileHeader + ZReserved + ZFCB  + ZBAT content + ZFBT content
-
-               This information is written at offset OffsetFCB, in order to skip Reserved block.
-
- *
- * @param[in] pDescriptor   File descriptor for wich Reserved infra data block will be written
  * @param[out] pForceWrite  if true : will write any time. if false and file is opened in exclusive mode : will not write
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  * @errors
@@ -1665,37 +1672,10 @@ ssize_t wSWrite;
  *  - ZS_WRITEERROR error writing FCB + block pools to header file ZException is set
  */
 ZStatus
-ZRandomFile::_writeFileDescriptor(bool pForceWrite)
+ZRandomFile::_writeFCB(bool pForceWrite)
 {
 // Data offsets are computed from Beginning of FCB that may vary is Header size and/or Reserved Data Size Change
 //
-ZFileDescriptor* wFCBExport=nullptr; // added
-ZDataBuffer wZDBZBATExport;
-ZDataBuffer wZDBZFBTExport;
-ZDataBuffer wZDBZDBTExport;
-ssize_t wSWrite;
-
-//    printf("ZRandomFile::_writeFileDescriptor\n");
-    if (Mode & ZRF_Exclusive)
-    {
-      if ((!pForceWrite)&&(HeaderAccessed & ZHAC_FCB))
-      {  return  ZS_SUCCESS;}
-    }
-/*
- *  Export first the pools to ZDataBuffers
- *
- *  Update sizes and offsets within FCB
- *
- *  Export FCB
- *
- *  write FCB to file
- *
- *  write ZBAT , then ZFBT, then ZDBT to file
- *
- */
-    ZBAT._exportPool(wZDBZBATExport);
-    ZFBT._exportPool(wZDBZFBTExport);
-    ZDBT._exportPool(wZDBZDBTExport);
 
 // ==================Update FCB with offsets and sizes then export it===================================================
 
@@ -1704,25 +1684,25 @@ ssize_t wSWrite;
     ZFCB.AllocatedBlocks = ZBAT.getAllocation();
     ZFCB.BlockExtentQuota = ZBAT.getQuota();
 //    ZFCB.ZBAT_ExportSize = ZBAT._getExportAllocatedSize();
-    ZFCB.ZBAT_ExportSize = wZDBZBATExport.Size;
+    ZFCB.ZBAT_ExportSize = ZBAT.getPoolExportSize();
 
 
     ZFCB.ZFBT_DataOffset = (zaddress_type)(ZFCB.ZBAT_DataOffset + ZFCB.ZBAT_ExportSize);// then ZFBT
 //    ZFCB.ZFBT_ExportSize = ZFBT._getExportAllocatedSize();
-    ZFCB.ZFBT_ExportSize = wZDBZFBTExport.Size;
+    ZFCB.ZFBT_ExportSize = ZFBT.getPoolExportSize();
 
     ZFCB.ZDBT_DataOffset = (zaddress_type)(ZFCB.ZFBT_DataOffset + ZFCB.ZFBT_ExportSize); // then ZDBT
 //    ZFCB.ZDBT_ExportSize = ZDBT._getExportAllocatedSize();
-    ZFCB.ZDBT_ExportSize = wZDBZDBTExport.Size;
+    ZFCB.ZDBT_ExportSize = ZDBT.getPoolExportSize();
 
 //====================Export updated FCB and write it to file===============================
 
     ZDataBuffer wZDBFCB;
-    ZFCB._export(wZDBFCB);
+    ZFCB._exportAppend(wZDBFCB);
 
-    wZDBFCB.appendData(wZDBZBATExport);
-    wZDBFCB.appendData(wZDBZFBTExport);
-    wZDBFCB.appendData(wZDBZDBTExport);
+    ZBAT._exportAppendPool(wZDBFCB);
+    ZFBT._exportAppendPool(wZDBFCB);
+    ZDBT._exportAppendPool(wZDBFCB);
 
     if (lseek(HeaderFd,ZHeader.OffsetFCB,SEEK_SET) < 0)
                 {
@@ -1736,8 +1716,8 @@ ssize_t wSWrite;
                 return  (ZS_FILEPOSERR);
                 }
 
-    ZPMS.HFDWrites ++;
-    wSWrite =write(HeaderFd,wZDBFCB.DataChar,wZDBFCB.Size); // write the whole set :ZFCB + block pools
+    ZPMS.HFCBWrites ++;
+    ssize_t wSWrite =write(HeaderFd,wZDBFCB.DataChar,wZDBFCB.Size); // write the whole set :ZFCB + block pools
     if (wSWrite<0)
             {
             ZException.getErrno(errno,
@@ -1749,64 +1729,7 @@ ssize_t wSWrite;
             return  (ZS_WRITEERROR);
             }
 
-//===============================================================================================================
 
-/*    ssize_t wSWrite =write(HeaderFd,(char*)ZFCB,sizeof(ZFileControlBlock)); // write ZFCB
-    if (wSWrite<0)
-            {
-            ZException.getErrno(errno,
-                             _GET_FUNCTION_NAME_,
-                             ZS_WRITEERROR,
-                             Severity_Error,
-                             "Error while writing FCB to file header %s",
-                             URIHeader.toString());
-            return (ZS_WRITEERROR);
-            }
-
-    ssize_t wZASize;
-    unsigned char*wZAContent;
-    wZAContent=ZBAT._exportPool(wZAContent,wZASize);
-    wSWrite = write(HeaderFd,wZAContent,wZASize); // export ZBAT
-    if (wSWrite<0)
-            {
-            ZException.getErrno(errno,
-                             _GET_FUNCTION_NAME_,
-                             ZS_WRITEERROR,
-                             Severity_Error,
-                             "Error while writing Block Access Table to file header %s",
-                             URIHeader.toString());
-            return (ZS_WRITEERROR);
-            }
-    free (wZAContent);
-
-    wZAContent=ZFBT._exportAllocated(wZAContent,wZASize);
-    wSWrite = write(HeaderFd,wZAContent,wZASize); //! export ZFBT
-    if (wSWrite<0)
-            {
-            ZException.getErrno(errno,
-                             _GET_FUNCTION_NAME_,
-                             ZS_WRITEERROR,
-                             Severity_Error,
-                             "Error while writing Free Blocks Pool to file header %s",
-                             URIHeader.toString());
-            return (ZS_WRITEERROR);
-            }
-    free(wZAContent);
-
-    wZAContent=ZDBT._exportAllocated(wZAContent,wZASize);
-    wSWrite = write(HeaderFd,wZAContent,wZASize); //! export ZFBT
-    if (wSWrite<0)
-            {
-            ZException.getErrno(errno,
-                             _GET_FUNCTION_NAME_,
-                             ZS_WRITEERROR,
-                             Severity_Error,
-                             "Error while writing Deleted Blocks Pool to file header %s",
-                             URIHeader.toString());
-            return (ZS_WRITEERROR);
-            }
-    free(wZAContent);
-*/
 //=============================================================================================
 
     fdatasync(HeaderFd);
@@ -1815,6 +1738,325 @@ ssize_t wSWrite;
 
     return  (ZS_SUCCESS);
 }// _writeFileControlBlock
+
+
+
+
+ZStatus
+ZRandomFile::_writeFCB(zaddress_type pOffsetFCB)
+{
+  // Data offsets are computed from Beginning of FCB that may vary is Header size and/or Reserved Data Size Change
+  //
+  ZDataBuffer wZDBZBATExport;
+  ZDataBuffer wZDBZFBTExport;
+  ZDataBuffer wZDBZDBTExport;
+  ssize_t wSWrite;
+
+  //    printf("ZRandomFile::_writeFileDescriptor\n");
+  /*    if (Mode & ZRF_Exclusive)
+    {
+      if ((!pForceWrite)&&(HeaderAccessed & ZHAC_FCB))
+      {  return  ZS_SUCCESS;}
+    }
+*/
+  /*
+ *  Export first the pools to ZDataBuffers
+ *
+ *  Update sizes and offsets within FCB
+ *
+ *  Export FCB
+ *
+ *  write FCB to file
+ *
+ *  write ZBAT , then ZFBT, then ZDBT to file
+ *
+ */
+  ZBAT._exportAppendPool(wZDBZBATExport);
+  ZFBT._exportAppendPool(wZDBZFBTExport);
+  ZDBT._exportAppendPool(wZDBZDBTExport);
+
+  // ==================Update FCB with offsets and sizes then export it===================================================
+
+  ZFCB.ZBAT_DataOffset =  sizeof(ZFileControlBlock);  // ZBAT data Pool is stored first just after ZFCB
+
+  ZFCB.AllocatedBlocks = ZBAT.getAllocation();
+  ZFCB.BlockExtentQuota = ZBAT.getQuota();
+  //    ZFCB.ZBAT_ExportSize = ZBAT._getExportAllocatedSize();
+  ZFCB.ZBAT_ExportSize = wZDBZBATExport.Size;
+
+
+  ZFCB.ZFBT_DataOffset = (zaddress_type)(ZFCB.ZBAT_DataOffset + ZFCB.ZBAT_ExportSize);// then ZFBT
+  //    ZFCB.ZFBT_ExportSize = ZFBT._getExportAllocatedSize();
+  ZFCB.ZFBT_ExportSize = wZDBZFBTExport.Size;
+
+  ZFCB.ZDBT_DataOffset = (zaddress_type)(ZFCB.ZFBT_DataOffset + ZFCB.ZFBT_ExportSize); // then ZDBT
+  //    ZFCB.ZDBT_ExportSize = ZDBT._getExportAllocatedSize();
+  ZFCB.ZDBT_ExportSize = wZDBZDBTExport.Size;
+
+  //====================Export updated FCB and write it to file===============================
+
+  ZDataBuffer wZDBFCB;
+  ZFCB._exportAppend(wZDBFCB);
+
+  wZDBFCB.appendData(wZDBZBATExport);
+  wZDBFCB.appendData(wZDBZFBTExport);
+  wZDBFCB.appendData(wZDBZDBTExport);
+
+  if (lseek(HeaderFd,pOffsetFCB,SEEK_SET) < 0)
+  {
+    ZException.getErrno(errno,
+                      _GET_FUNCTION_NAME_,
+                      ZS_FILEPOSERR,
+                      Severity_Severe,
+                      "Error positionning at FileDescriptor address <%lld> of header file  <%s>",
+                      pOffsetFCB,
+                      URIHeader.toString());
+    return  (ZS_FILEPOSERR);
+  }
+
+  ZPMS.HFCBWrites ++;
+  wSWrite =write(HeaderFd,wZDBFCB.DataChar,wZDBFCB.Size); // write the whole set :ZFCB + block pools
+  if (wSWrite<0)
+  {
+    ZException.getErrno(errno,
+        _GET_FUNCTION_NAME_,
+        ZS_WRITEERROR,
+        Severity_Error,
+        "Error while writing FCB + block pools to file header %s",
+        URIHeader.toString());
+    return  (ZS_WRITEERROR);
+  }
+
+
+  //=============================================================================================
+
+  fdatasync(HeaderFd);
+
+  HeaderAccessed |= ZHAC_FCB;
+
+  return  (ZS_SUCCESS);
+}
+
+
+
+ZStatus
+ZRandomFile::_writeReserved(zaddress_type pOffsetReserved)
+{
+
+  if (lseek(HeaderFd,pOffsetReserved,SEEK_SET) < 0)
+  {
+    ZException.getErrno(errno,
+        _GET_FUNCTION_NAME_,
+        ZS_FILEPOSERR,
+        Severity_Severe,
+        "Error positionning at address <%lld> of header file  <%s>",
+        pOffsetReserved,
+        URIHeader.toString());
+    return  (ZS_FILEPOSERR);
+  }
+
+  ZPMS.HReservedWrites ++;
+  ssize_t wSWrite =write(HeaderFd,ZReserved.DataChar,ZReserved.Size); // write the whole set :ZFCB + block pools
+  if (wSWrite<0)
+  {
+    ZException.getErrno(errno,
+        _GET_FUNCTION_NAME_,
+        ZS_WRITEERROR,
+        Severity_Error,
+        "Error while writing Reserved content to file header %s",
+        URIHeader.toString());
+    return  (ZS_WRITEERROR);
+  }
+
+
+  //=============================================================================================
+
+  fdatasync(HeaderFd);
+
+  HeaderAccessed |= ZHAC_FCB;
+
+  return  (ZS_SUCCESS);
+}
+
+
+
+ZStatus
+ZRandomFile::_writeAllFileHeader()
+{
+  ZDataBuffer wFullHeaderExport;
+
+  printf ("ZRandomFile::_writeAllFileHeader\n");
+
+  ZHeader.OffsetReserved = sizeof(ZHeaderControlBlock_Export) ;
+  ZHeader.SizeReserved = ZReserved.Size ;
+  ZHeader.OffsetFCB =    ZHeader.OffsetReserved + ZReserved.Size ;
+  // NB: ZHeader.Offset is set by clear() method
+
+  ZHeader._exportAppend(wFullHeaderExport);
+
+  /* reserved : As it is */
+
+  wFullHeaderExport.appendData(ZReserved);
+
+  /* FCB and Pool */
+
+  // ==================Update FCB with offsets and sizes then export it===================================================
+
+  ZFCB.ZBAT_DataOffset =  sizeof(ZFCB_Export);  // ZBAT data Pool is stored first just after ZFCB
+
+  ZFCB.AllocatedBlocks = ZBAT.getAllocation();
+  ZFCB.BlockExtentQuota = ZBAT.getQuota();
+  //    ZFCB.ZBAT_ExportSize = ZBAT._getExportAllocatedSize();
+  ZFCB.ZBAT_ExportSize = ZBAT.getPoolExportSize();
+
+
+  ZFCB.ZFBT_DataOffset = (zaddress_type)(ZFCB.ZBAT_DataOffset + ZFCB.ZBAT_ExportSize);// then ZFBT
+  //    ZFCB.ZFBT_ExportSize = ZFBT._getExportAllocatedSize();
+  ZFCB.ZFBT_ExportSize = ZFBT.getPoolExportSize();
+
+  ZFCB.ZDBT_DataOffset = (zaddress_type)(ZFCB.ZFBT_DataOffset + ZFCB.ZFBT_ExportSize); // then ZDBT
+  //    ZFCB.ZDBT_ExportSize = ZDBT._getExportAllocatedSize();
+  ZFCB.ZDBT_ExportSize = ZDBT.getPoolExportSize();
+
+  //====================Export updated FCB and write it to file===============================
+
+
+  ZFCB._exportAppend(wFullHeaderExport);
+
+  ZBAT._exportAppendPool(wFullHeaderExport);  /* first block access table */
+  ZFBT._exportAppendPool(wFullHeaderExport);  /* second free blocks table */
+  ZDBT._exportAppendPool(wFullHeaderExport);  /* third deleted blocks table */
+
+
+
+  if (lseek(HeaderFd,0L,SEEK_SET) < 0)
+  {
+    ZException.getErrno(errno,
+        _GET_FUNCTION_NAME_,
+        ZS_FILEPOSERR,
+        Severity_Severe,
+        "Error positionning at Header address <%lld> of header file  <%s>",
+        0L,
+        URIHeader.toString());
+    return(ZS_FILEPOSERR);
+  }
+  ssize_t wSWrite =write(HeaderFd,wFullHeaderExport.DataChar,wFullHeaderExport.Size);
+  if (wSWrite<0)
+    {
+      ZException.getErrno(errno,
+          _GET_FUNCTION_NAME_,
+          ZS_WRITEERROR,
+          Severity_Error,
+          "Error while writing all content to file header %s",
+          URIHeader.toString());
+      return  (ZS_WRITEERROR);
+    }
+
+  ZPMS.HFHWrites ++;
+  ZPMS.HReservedWrites ++;
+  ZPMS.HFCBWrites ++;
+
+  HeaderAccessed |= ZHAC_HCB | ZHAC_FCB | ZHAC_RESERVED ;
+  return ZS_SUCCESS;
+}
+
+ZStatus
+ZRandomFile::_importAllFileHeader()
+{
+  ZDataBuffer wZDB;
+
+  printf ("ZRandomFile::_importAllFileHeader\n");
+
+  /*
+      Upon successful completion, lseek() returns the resulting offset
+       location as measured in bytes from the beginning of the file.  On
+       error, the value (off_t) -1 is returned and errno is set to
+       indicate the error.
+  */
+  /* get the size of the file */
+  off_t wOff = lseek(HeaderFd,(off_t)0L,SEEK_END);
+  if (wOff<0)
+  {
+    ZException.getErrno(errno,
+        _GET_FUNCTION_NAME_,
+        ZS_FILEPOSERR,
+        Severity_Fatal,
+        "lseek error positionning header file  at end of file file <%s>",
+        URIHeader.toCChar()
+        );
+    return (ZS_FILEPOSERR);
+  }
+
+  wZDB.allocate((size_t)wOff);
+  wOff = lseek(HeaderFd,(off_t)0L,SEEK_SET);
+  if (wOff<0)
+  {
+    ZException.getErrno(errno,
+        _GET_FUNCTION_NAME_,
+        ZS_FILEPOSERR,
+        Severity_Fatal,
+        "Error positionning header at beginning of file <%s>",
+        URIHeader.toCChar()
+        );
+    return (ZS_FILEPOSERR);
+  }
+
+  ZPMS.HFHReads ++;
+
+  //    ssize_t wSRead =read(HeaderFd,(char *)&ZHeader,sizeof(ZHeaderControlBlock));  //! read at first Header control block
+
+  //    ssize_t wSRead =read(HeaderFd,(char *)&wZHeaderExport,sizeof(ZHeaderControlBlock_Export));  // read at first Header control block
+  ssize_t wSRead =read(HeaderFd,wZDB.DataChar,wZDB.Size);  // load the whole file in wZDB
+  if (wSRead<0)
+  {
+    ZException.getErrno(errno,
+        _GET_FUNCTION_NAME_,
+        ZS_BADFILEHEADER,
+        Severity_Fatal,
+        "Error loading  header file  <%s>",
+        URIHeader.toCChar());
+    return  (ZS_BADFILEHEADER);
+  }
+
+  if (wSRead < sizeof(ZHeaderControlBlock_Export))
+  {
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        ZS_BADFILEHEADER,
+        Severity_Fatal,
+        "Invalid/corrupted header file  <%s> size read %ld while expected at least %ld",
+        URIHeader.toCChar(),
+        wSRead, sizeof(ZHeaderControlBlock_Export));
+    return  (ZS_BADFILEHEADER);
+  }
+  const unsigned char* wPtr=wZDB.Data;
+
+  ZHeaderControlBlock_Export wZHCBe;
+  wZHCBe.setFromPtr(wPtr);
+  wZHCBe.deserialize();
+
+  wZHCBe.toHCB(ZHeader);
+
+
+  ZReserved.setData(wPtr,wZHCBe.SizeReserved);
+
+  wPtr += wZHCBe.SizeReserved;
+
+
+  ZFCB_Export wFCBe;
+  wFCBe.setFromPtr(wPtr);
+  wFCBe.deserialize();
+  wFCBe.toFCB(ZFCB);
+
+
+  ZBAT._importPool(wPtr);
+  ZFBT._importPool(wPtr);
+  ZDBT._importPool(wPtr);
+
+  HeaderAccessed |= ZHAC_HCB | ZHAC_FCB | ZHAC_RESERVED ;
+  return ZS_SUCCESS;
+}
+
+
 
 /**
  * @brief ZRandomFile::_writeFullFileHeader  Here only for logical purpose because it de facto an alias of _writeReservedHeader
@@ -1834,11 +2076,12 @@ ZStatus wSt;
 // if ZReserved contains something
     if (ZReserved.Size > 0)
       {
-      if (Mode & ZRF_Exclusive)
+/*      if (Mode & ZRF_Exclusive)
         {
         if ((!pForceWrite)&&(HeaderAccessed & ZHAC_RESERVED))
             {  return  ZS_SUCCESS;}
         }
+*/
         ZPMS.HReservedWrites += 1;
         ssize_t wSWrite =write(HeaderFd,ZReserved.DataChar,ZReserved.Size); // write Reserved infradata
         if (wSWrite<0)
@@ -1852,10 +2095,11 @@ ZStatus wSt;
                 return  (ZS_WRITEERROR);
                 }
         HeaderAccessed |= ZHAC_RESERVED;
+        fdatasync(HeaderFd); // better than flush : writes only data and not metadata to file
       } //if (ZReserved.Size > 0)
 
 
-    return  (_writeFileDescriptor(pForceWrite));
+    return  (_writeFCB(pForceWrite));
 }//_writeFullFileHeader
 
 
@@ -1866,17 +2110,9 @@ ZStatus wSt;
 ZStatus
 ZRandomFile::updateFileDescriptor(bool pForceWrite)
 {
-    return(_writeFileDescriptor(pForceWrite));
+    return(_writeFCB(pForceWrite));
 }
-/**
- * @brief ZRandomFile::updateReservedHeader  updates File Header with the Reserved content already set with setReservedContent and updates the File descriptor in Header zone
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
-ZStatus
-ZRandomFile::updateReservedBlock(bool pForceWrite)
-{
-    return(_writeReservedHeader(pForceWrite));
-}
+
 /**
  * @brief ZRandomFile::updateReservedHeader updates File Header with the give Reserved content given in pReserved, updates this content in memory, and updates the File descriptor in Header zone
  * @param pReserved
@@ -1886,7 +2122,8 @@ ZStatus
 ZRandomFile::updateReservedBlock(const ZDataBuffer &pReserved,bool pForceWrite)
 {
     setReservedContent(pReserved);
-    return(_writeReservedHeader(pForceWrite));
+//    return(_writeAllHeaders(pForceWrite));
+    return _writeAllFileHeader();
 }
 
 
@@ -2014,7 +2251,7 @@ ZDataBuffer wZDB;
         }
 
     // converts and controls about ZHeader integrity
-  unsigned char *wPtrIn=(unsigned char *)&wZHeaderExport;
+  const unsigned char *wPtrIn=(unsigned char *)&wZHeaderExport;
   wSt=ZHeader._import(wPtrIn);
 
    return  wSt;
@@ -2088,7 +2325,7 @@ ZDataBuffer wHeaderContent;
 
 
 
-    unsigned char* wPtr=wHeaderContent.Data;
+    const unsigned char* wPtr=wHeaderContent.Data;
 
     if ((wSt=ZHeader._import(wPtr))!=ZS_SUCCESS)
             {return   wSt;}
@@ -2140,11 +2377,12 @@ ZStatus wSt;
 ZStatus
 ZRandomFile::_getReservedHeader( bool pForceRead)
 {
-    if (getOpenMode() & ZRF_Exclusive)
+/*    if (getOpenMode() & ZRF_Exclusive)
            {
             if (!pForceRead  &&  (HeaderAccessed & ZHAC_RESERVED))
                     { return  ZS_SUCCESS;}
            }
+*/
     off_t wOff = lseek(HeaderFd,(off_t)ZHeader.OffsetReserved,SEEK_SET);
     if (wOff<0)
           {
@@ -2214,7 +2452,7 @@ ZRandomFile::_getFileControlBlock ( bool pForceRead)
 
     ZDataBuffer wZDB;
     wZDB.allocateBZero(sizeof(ZFCB_Export));
-    ZPMS.HFDReads ++;
+    ZPMS.HFCBReads ++;
     ssize_t wSRead =read(HeaderFd,wZDB.DataChar,sizeof(ZFCB_Export));  //! read at first Header control block
     if (wSRead<0)
         {
@@ -2228,7 +2466,7 @@ ZRandomFile::_getFileControlBlock ( bool pForceRead)
         return  (ZS_BADFILEHEADER);
         }
 
-    unsigned char* wPtr=wZDB.Data;
+    const unsigned char* wPtr=wZDB.Data;
     ZFCB._import(wPtr);/* beware wPtr is updated by _import */
 
     size_t wPoolSize = ZFCB.ZBAT_ExportSize + ZFCB.ZFBT_ExportSize + ZFCB.ZDBT_ExportSize;
@@ -2326,129 +2564,6 @@ ZRandomFile::_getFileControlBlock ( bool pForceRead)
 
 
 ZStatus
-ZRandomFile::_getFileControlBlock_old ( bool pForceRead)
-{
-  if (getOpenMode() & ZRF_Exclusive)
-  {
-    if (!pForceRead  &&  (HeaderAccessed & ZHAC_FCB))
-    { return  ZS_SUCCESS;}
-  }
-  off_t wOff = lseek(HeaderFd,ZHeader.OffsetFCB,SEEK_SET);
-  if (wOff<0)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_FILEPOSERR,
-        Severity_Severe,
-        "Error positionning header at offset <%lld> file <%s>",
-        0L,
-        URIHeader.toString()
-        );
-    return (ZS_FILEPOSERR);
-  }
-
-//  setupFCB();
-  // get file control block
-  //
-
-  ZDataBuffer wZDB;
-  wZDB.allocateBZero(sizeof(ZFCB_Export));
-  ZPMS.HFDReads ++;
-  ssize_t wSRead =read(HeaderFd,wZDB.DataChar,sizeof(ZFCB_Export));  //! read at first Header control block
-  if (wSRead<0)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_BADFILEHEADER,
-        Severity_Error,
-        "Error reading  Header control block address <%lld> file  <%s>",
-        0L,
-        URIHeader.toString());
-    return  (ZS_BADFILEHEADER);
-  }
-
-  unsigned char* wPtr=wZDB.Data;
-  ZFCB._import(wPtr);/* beware wPtr is updated by _import */
-
-  size_t wPoolSize = ZFCB.ZBAT_ExportSize + ZFCB.ZFBT_ExportSize + ZFCB.ZDBT_ExportSize;
-
-  ZDataBuffer wBuffer;
-  wBuffer.allocateBZero( ZFCB.ZBAT_ExportSize);
-  wOff = lseek(HeaderFd,(off_t)( ZFCB.ZBAT_DataOffset+ZHeader.OffsetFCB),SEEK_SET);
-  if (wOff<0)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_FILEPOSERR,
-        Severity_Severe,
-        "Error positionning file header at offset <%lld> file <%s>",
-        ZFCB.ZBAT_DataOffset,
-        URIHeader.toString()
-        );
-    return  (ZS_FILEPOSERR);
-  }
-  wSRead =read(HeaderFd,wBuffer.DataChar,ZFCB.ZBAT_ExportSize);
-  //    if ((wSRead<64)||(wSRead !=ZFCB.ZBAT_ExportSize))
-  if (wSRead !=ZFCB.ZBAT_ExportSize)// no export header (64)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_BADFILEHEADER,
-        Severity_Error,
-        "Error reading Block Access Table offset <%lld> file  <%s>. Pool size <%ld> has not been read in totality (<%ld> read).",
-        ZFCB.ZBAT_DataOffset,
-        URIHeader.toString(),
-        ZFCB.ZBAT_ExportSize,
-        wSRead);
-    return  (ZS_BADFILEHEADER);
-  }
-
-  wPtr=wBuffer.Data;
-  ZBAT._importPool(wPtr);  /* beware wPtr is updated by _importPool */
-
-  wBuffer.allocateBZero(ZFCB.ZFBT_ExportSize);
-  wSRead =read(HeaderFd,wBuffer.DataChar,ZFCB.ZFBT_ExportSize);
-  //    if ((wSRead<64)||(wSRead !=ZFCB.ZFBT_ExportSize))
-  if (wSRead !=ZFCB.ZFBT_ExportSize) // no export header (64)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_BADFILEHEADER,
-        Severity_Error,
-        "Error reading free block pool offset <%lld> file  <%s>. Pool size <%ld> has not been read in totality (<%ld> read).",
-        ZFCB.ZFBT_DataOffset,
-        URIHeader.toString(),
-        ZFCB.ZFBT_ExportSize,
-        wSRead);
-    return  (ZS_BADFILEHEADER);
-  }
-  ZFBT._importPool(wBuffer.Data);
-
-  wBuffer.allocateBZero(ZFCB.ZDBT_ExportSize);
-  wSRead =read(HeaderFd,wBuffer.DataChar,ZFCB.ZDBT_ExportSize);
-  //    if ((wSRead<64)||(wSRead !=ZFCB.ZDBT_ExportSize))
-  if (wSRead !=ZFCB.ZDBT_ExportSize) // no export header (64)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_BADFILEHEADER,
-        Severity_Error,
-        "Error reading deleted block pool offset <%lld> file  <%s>. Pool size <%ld> has not been read in totality (<%ld> read).",
-        ZFCB.ZDBT_DataOffset,
-        URIHeader.toString(),
-        ZFCB.ZDBT_ExportSize,
-        wSRead);
-    return  (ZS_BADFILEHEADER);
-  }
-  ZDBT._importPool(wBuffer.Data);
-
-  HeaderAccessed|=ZHAC_FCB;
-
-    return  ZS_SUCCESS;
-}// _getFileControlBlock_old
-
-
-ZStatus
 ZRandomFile::_updateFileControlBlock ( )
 {
   off_t wOff = lseek(HeaderFd,ZHeader.OffsetFCB,SEEK_SET);
@@ -2471,7 +2586,7 @@ ZRandomFile::_updateFileControlBlock ( )
 
   ZDataBuffer wZDB;
   wZDB.allocateBZero(sizeof(ZFCB_Export));
-  ZPMS.HFDReads ++;
+  ZPMS.HFCBReads ++;
   ssize_t wSRead =read(HeaderFd,wZDB.DataChar,sizeof(ZFCB_Export));  //! read at first Header control block
   if (wSRead<0)
   {
@@ -2484,7 +2599,8 @@ ZRandomFile::_updateFileControlBlock ( )
         URIHeader.toString());
     return  (ZS_BADFILEHEADER);
   }
-  ZFCB._import(wZDB.Data);
+  const unsigned char* wPtr=wZDB.getData();
+  ZFCB._import(wPtr);
 
   ZDataBuffer wBuffer;
   wBuffer.allocateBZero( ZFCB.ZBAT_ExportSize);
@@ -2516,8 +2632,8 @@ ZRandomFile::_updateFileControlBlock ( )
         wSRead);
     return  (ZS_BADFILEHEADER);
   }
-
-  ZBAT._importPool(wBuffer.Data);
+  wPtr=wZDB.Data;
+  ZBAT._importPool(wPtr);
 
   wBuffer.allocateBZero(ZFCB.ZFBT_ExportSize);
   wSRead =read(HeaderFd,wBuffer.DataChar,ZFCB.ZFBT_ExportSize);
@@ -2535,7 +2651,8 @@ ZRandomFile::_updateFileControlBlock ( )
         wSRead);
     return  (ZS_BADFILEHEADER);
   }
-  ZFBT._importPool(wBuffer.Data);
+  wPtr=wZDB.getData();
+  ZFBT._importPool(wPtr);
 
   wBuffer.allocateBZero(ZFCB.ZDBT_ExportSize);
   wSRead =read(HeaderFd,wBuffer.DataChar,ZFCB.ZDBT_ExportSize);
@@ -2553,7 +2670,8 @@ ZRandomFile::_updateFileControlBlock ( )
         wSRead);
     return  (ZS_BADFILEHEADER);
   }
-  ZDBT._importPool(wBuffer.Data);
+  wPtr=wZDB.getData();
+  ZDBT._importPool(wPtr);
   /*        ssize_t wSRead =read(HeaderFd,(char *)ZFCB,sizeof(ZFileControlBlock));  //! read at first Header control block
         if (wSRead<0)
                     {
@@ -2731,7 +2849,7 @@ ZBlockHeader_Export wBlockHeadExp;
 ZStatus
 ZRandomFile::zopen(const zmode_type pMode)
 {
-    return  _open(pMode,ZHeader.FileType);
+    return  _ZRFopen(pMode,ZHeader.FileType);
 
 }//zopen
 /**
@@ -3373,7 +3491,7 @@ ZBlockDescriptor wBS;
 
     ZFCB.UsedSize -= wBS.BlockSize ;
 
-    return(_writeFileDescriptor(true));
+    return(_writeFCB(true));
 }//_freeBlock_commit
 
 /**
@@ -3454,7 +3572,7 @@ ZBlockDescriptor_Export wBS_Exp;
                         }
  //           incrementPosition( wSWrite );
 
-            fdatasync(ContentFd); //! better than flush : writes only data and not metadata to file
+            fdatasync(ContentFd); // better than flush : writes only data and not metadata to file
             } // if Highwater
 
     wBS.State = ZBS_Free;
@@ -3469,7 +3587,7 @@ ZBlockDescriptor_Export wBS_Exp;
     LogicalPosition = -1;
     PhysicalPosition = -1;
 
-    return (_writeFileDescriptor(true));
+    return (_writeFCB(true));
 }//_freeBlock
 
 
@@ -3920,7 +4038,7 @@ ZStatus wSt;
                             return wSt;
     ZFBT.erase(pRank);
 
-    return _writeFileDescriptor(true) ;
+    return _writeFCB(true) ;
 }//_recoverFreeBlock
 
 
@@ -4530,7 +4648,7 @@ zrank_type ZRandomFile::swap(const size_t pDest, const size_t pOrig,const size_t
 {
 ZStatus wSt;
     long wi=ZBAT.swap(pDest,pOrig,pNumber);
-    wSt=_writeFileDescriptor(true);
+    wSt=_writeFCB(true);
     if (wSt!=ZS_SUCCESS)
                 return -1;
     return(wi);
@@ -4650,7 +4768,7 @@ ZBlock  wBlock;
 
     pLogicalAddress = setLogicalFromPhysical( ZBAT.Tab[pZBATIndex].Address);
 
-    wSt=_writeFileDescriptor(true);
+    wSt=_writeFCB(true);
     return wSt;
 /*    if (wSt!=ZS_SUCCESS)
         {
@@ -5121,7 +5239,7 @@ ZBlock  wBlock;
     ZFCB.UsedSize += wBlock.BlockSize ;
 //    pAddress = ZBAT.Tab[pIdxCommit].Address;
 
-    return _writeFileDescriptor(true);
+    return _writeFCB(true);
  /*
     wSt=_writeFileDescriptor(true);
     if (wSt!=ZS_SUCCESS)
@@ -5962,7 +6080,7 @@ zaddress_type wAddress;
  *
 */
 ZStatus
-ZRandomFile::_open(const zmode_type pMode, const ZFile_type pFileType, bool pLockRegardless)
+ZRandomFile::_ZRFopen(const zmode_type pMode, const ZFile_type pFileType, bool pLockRegardless)
 {
 ZStatus wSt=ZS_SUCCESS;
     fprintf (stdout,"ZRandomFile::_open-I-OPENNING Openning file <%s>.\n",URIContent.toCChar());
@@ -6023,10 +6141,9 @@ ZStatus wSt=ZS_SUCCESS;
         }
 
 //    setupFCB();  // update pDescriptor
-
-    wSt=_getFullFileHeader(true);  // get header and force read pForceRead = true, whatever the open mode is
-    if (wSt!=ZS_SUCCESS)
-                {return  wSt;}
+  wSt=_importAllFileHeader();  // get header and force read pForceRead = true, whatever the open mode is
+  if (wSt!=ZS_SUCCESS)
+    {return  wSt;}
     if (!pLockRegardless)
       {
         if (ZHeader.Lock & ZRF_Exclusive)
@@ -6057,7 +6174,6 @@ ZStatus wSt=ZS_SUCCESS;
                                 decode_ZFile_type (ZHeader.FileType));
         return  ZS_BADFILETYPE;
         }
-//    fprintf (stdout,"%s>> file type is <%d>  requested file type is <%d>\n",_GET_FUNCTION_NAME_,ZHeader.FileType,pFileType);
 
   if (pFileType == ZFT_Any)
     {
@@ -6263,10 +6379,10 @@ ZStatus wSt=ZS_SUCCESS;
                                 decode_ZFile_type (ZHeader.FileType));
         return  ZS_BADFILETYPE;
         }// ZFT_ZSMasterFile
-*/
-    case ZFT_ZSIndexFile :
+
+    case ZFT_ZIndexFile :
         {
-        if (pFileType==ZFT_ZSIndexFile)
+        if (pFileType==ZFT_ZIndexFile)
                             {
                             wSt=ZS_SUCCESS;
                             break; // everything in line
@@ -6308,7 +6424,8 @@ ZStatus wSt=ZS_SUCCESS;
                                 decode_ZFile_type (pFileType),
                                 decode_ZFile_type (ZHeader.FileType));
         return  ZS_BADFILETYPE;
-        }// ZFT_ZSIndexFile
+        }// ZFT_ZIndexFile
+*/
     default:
         {
         // all other cases are errors
@@ -6347,10 +6464,8 @@ ZStatus wSt=ZS_SUCCESS;
 ZStatus
 ZRandomFile::zclose()
 {
-
 ZStatus wSt;
 
-fprintf (stdout,"ZRandomFile::zclose-I-CLOSING Closing file <%s>.\n",URIContent.toCChar());
   if (!_isOpen)
       {
       ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -6368,9 +6483,12 @@ fprintf (stdout,"ZRandomFile::zclose-I-CLOSING Closing file <%s>.\n",URIContent.
 */
 //    _unlockAll(false);
 
-  wSt=_writeFullFileHeader(true); // write full header and force write pForceWrite=true whatever the open mode is
+
+
+  wSt = _writeAllFileHeader();
   if (wSt!=ZS_SUCCESS)
                 return (wSt);
+
     wSt= ZFileDescriptor::_close();
 /*
     close(ContentFd);
@@ -6877,7 +6995,7 @@ ZStatus wSt;
     if (wSt!=ZS_SUCCESS)
                 return wSt;
 
-    wSt=wZRF._open( ZRF_Read_Only,ZFT_ZRandomFile);
+    wSt=wZRF._ZRFopen( ZRF_Read_Only,ZFT_ZRandomFile);
     if (wSt!=ZS_SUCCESS)
                 return wSt;
 
@@ -7021,7 +7139,7 @@ ZStatus wSt;
 ZRandomFile wZRF;
     wSt=wZRF.setPath(pURIContent);  // generates also Header file structures within ZFileDescriptor
 
-    wSt=wZRF._open(ZRF_Read_Only,ZFT_ZRandomFile);
+    wSt=wZRF._ZRFopen(ZRF_Read_Only,ZFT_ZRandomFile);
     if (wSt!=ZS_SUCCESS)
                 {
                 ZException.exit_abort();
@@ -7080,7 +7198,7 @@ ZRandomFile wZRF;
       {
       return wSt;
       }
-    wSt=wZRF._open(ZRF_Read_Only,ZFT_Any);
+    wSt=wZRF._ZRFopen(ZRF_Read_Only,ZFT_Any);
     if (wSt!=ZS_SUCCESS)
                 {
                 return wSt;
@@ -7234,7 +7352,7 @@ ZRandomFile wDescriptor;
 
     wSt=wDescriptor.setPath(pURIContent);  // generates also Header file structures within ZFileDescriptor
 
-    wSt=wDescriptor._open(ZRF_Read_Only,ZFT_Any);
+    wSt=wDescriptor._ZRFopen(ZRF_Read_Only,ZFT_Any);
     if (wSt!=ZS_SUCCESS)
                 {
                 ZException.printUserMessage(stderr);
@@ -7285,7 +7403,7 @@ ZRandomFile wZRF;
 
     wSt=wZRF.setPath(pURIContent);  //! generates also Header file structures within ZFileDescriptor
 
-    wSt=wZRF._open(ZRF_Read_Only,ZFT_ZRandomFile);
+    wSt=wZRF._ZRFopen(ZRF_Read_Only,ZFT_ZRandomFile);
     if (wSt!=ZS_SUCCESS)
                 {
                 ZException.exit_abort();
@@ -7333,7 +7451,7 @@ ZRandomFile wZRF;
 
     wSt=wZRF.setPath(pURIContent);  // generates also Header file structures within ZFileDescriptor
 
-    wSt=wZRF._open(ZRF_Read_Only,ZFT_Any,false);
+    wSt=wZRF._ZRFopen(ZRF_Read_Only,ZFT_Any,false);
     if (wSt!=ZS_SUCCESS)
                 {
                 ZException.printUserMessage(stderr);
@@ -8122,7 +8240,7 @@ ZStatus wSt;
     wHighBlock.State = ZBS_Free;
     ZFBT.push(wHighBlock);
 
-    return (_writeFileDescriptor(true));
+    return (_writeFCB(true));
 }
 
 /**
@@ -8251,7 +8369,7 @@ zsize_type wFreeSpace = (pFreeSpace < 0)?ZFCB.BlockTargetSize : pFreeSpace ;
     LogicalPosition = -1;
     PhysicalPosition = -1;
 
-    return  (_writeFileDescriptor(true));
+    return  (_writeFCB(true));
 } //ztruncateFile
 
 
@@ -8321,7 +8439,7 @@ bool FOpen = false;
                 else
                     wZFT = ZHeader.FileType;
             }// else
-    if ((wSt=_open(ZRF_Exclusive|ZRF_All,wZFT))!=ZS_SUCCESS)
+    if ((wSt=_ZRFopen(ZRF_Exclusive|ZRF_All,wZFT))!=ZS_SUCCESS)
                                                 return wSt;
     for (wi=0;(wi<ZBAT.size())&&(wSt==ZS_SUCCESS);wi++)
                     {
@@ -8428,7 +8546,7 @@ bool FOpen = false;
     zclose();                           // nb zclose write the whole file header
 
     if (FOpen)     // if file was open re-open in same mode
-            { return  _open(wMode,wZFT);}
+            { return  _ZRFopen(wMode,wZFT);}
     return  ZS_SUCCESS;
 }// zclearFile
 
@@ -8573,12 +8691,12 @@ ZFile_type wFileType = ZFT_ZRandomFile;
              }
             else
             {
-            if ((wSt=_open(ZRF_Read_Only,ZFT_ZRandomFile))!=ZS_SUCCESS) // open to get ZFile_type
+            if ((wSt=_ZRFopen(ZRF_Read_Only,ZFT_ZRandomFile))!=ZS_SUCCESS) // open to get ZFile_type
                              return wSt;
             wFileType = ZHeader.FileType;
             zclose();
             }
-    if ((wSt=_open(ZRF_Exclusive|ZRF_Read_Only,wFileType))!=ZS_SUCCESS) // open with appropriate ZFile_type
+    if ((wSt=_ZRFopen(ZRF_Exclusive|ZRF_Read_Only,wFileType))!=ZS_SUCCESS) // open with appropriate ZFile_type
                                                         return wSt;
     if (!ZFCB.GrabFreeSpace)        // activate grabFreeSpace if it has been set on
                 {
@@ -8596,7 +8714,7 @@ ZFile_type wFileType = ZFT_ZRandomFile;
                  }
     zclose ();
     if (wasOpen)
-            _open(wMode,wFileType);
+            _ZRFopen(wMode,wFileType);
     return  (wSt);
 } // _reorgFile
 
@@ -9020,7 +9138,7 @@ ZRandomFile::putTheMess (void)
     ZBAT.swap(1,3) ;
     ZBAT.swap(0,5) ;
     ZBAT.swap(2,7) ;
-    _writeFileDescriptor(true);
+    _writeFCB(true);
     return;
 }
 //! @endcond
@@ -9569,11 +9687,6 @@ decode_ZFile_type (uint8_t pType)
         case ZFT_ZMasterFile :
             {
                 return ("ZFT_ZMasterFile");
-            }
-
-        case ZFT_ZSIndexFile :
-            {
-                return ("ZFT_ZSIndexFile");
             }
     default :
             {

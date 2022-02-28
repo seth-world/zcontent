@@ -17,7 +17,7 @@ int ZKeyCompareAlpha (const ZDataBuffer &pKey1,ZDataBuffer &pKey2,ssize_t pSize)
 typedef int  (*ZIFCompare) (const ZDataBuffer &pKey1,ZDataBuffer &pKey2,ssize_t pSize);
 
 class ZRawIndexFile;
-class ZSMasterFile;
+class ZMasterFile;
 class ZSIndexCollection;
 
 
@@ -196,15 +196,15 @@ class ZSIndexCollection : public ZArray<ZSIndexResult>  // Ranks of the correspo
     typedef ZArray<ZSIndexResult> _Base;
 
 
-    friend class ZSMasterFile;
-    friend class ZSIndexFile;
+    friend class ZMasterFile;
+    friend class ZIndexFile;
     friend class ZRawMasterFile;
     friend class ZRawIndexFile;
 
 public:
     ZSIndexCollection(void) {ZIFFile=nullptr;}
     ZSIndexCollection(ZRawIndexFile *pZIFFile) ;
-    ZSIndexCollection(ZSMasterFile &pZMFFile, const long pIndexRank) ;
+    ZSIndexCollection(ZMasterFile &pZMFFile, const long pIndexRank) ;
 
     ~ZSIndexCollection(void) { if (InputCollection!=nullptr)
                                                 delete InputCollection;

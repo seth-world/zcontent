@@ -10,7 +10,7 @@
 #include <zindexedfile/zdatatype.h>
 
 
-#include <zindexedfile/zsmasterfile.h>
+#include <zindexedfile/zmasterfile.h>
 #include <zindexedfile/zrecord.h>
 
 #include <zindexedfile/zfullindexfield.h>
@@ -45,7 +45,7 @@ ZSKey::keyValueExtraction( ZRecord* pRecord)
 }//KeyValueExtraction
 */
 
-ZSKey::ZSKey(ZSMasterFile *pZMF, const long pKeyRank)
+ZSKey::ZSKey(ZMasterFile *pZMF, const long pKeyRank)
 {
     IndexNumber=pKeyRank;
     ZMF = pZMF;
@@ -60,7 +60,7 @@ ZSKey::ZSKey(ZSMasterFile *pZMF, const long pKeyRank)
                                         );
                 ZException.exit_abort();
                 }
-  if (ZIF->KeyDic==nullptr)
+  if (ZIF->IdxKeyDic==nullptr)
       {
         ZException.setMessage(_GET_FUNCTION_NAME_,
             ZS_BADDIC,
@@ -73,7 +73,7 @@ ZSKey::ZSKey(ZSMasterFile *pZMF, const long pKeyRank)
       }
 //    ZIF=pZMF->IndexTable[IndexNumber];
 
-    if (FieldPresence.allocateCurrentElements(ZIF->KeyDic->count())) // alloc necessary elements and zero it
+    if (FieldPresence.allocateCurrentElements(ZIF->IdxKeyDic->count())) // alloc necessary elements and zero it
             {
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_INVOP,
@@ -84,7 +84,7 @@ ZSKey::ZSKey(ZSMasterFile *pZMF, const long pKeyRank)
             ZException.exit_abort();
             }
 
-    ZIF->KeyDic->_reComputeKeySize();
+    ZIF->IdxKeyDic->_reComputeKeySize();
 //    ZICB->KeyType=ZIF_Nothing;
     allocate(ZIF->KeyUniversalSize);
     clearData();
@@ -102,7 +102,7 @@ ZSKey::clearFieldSpace (const long pFieldRank)
 {
   ZFullIndexField wField;
 
-  wField.set((ZSIndexFile*)ZIF,pFieldRank);
+  wField.set((ZIndexFile*)ZIF,pFieldRank);
     long wOffset=wField.KeyOffset;
     if ((wField.UniversalSize+wOffset)>Size)
         allocate(wField.UniversalSize+wOffset);
@@ -127,7 +127,7 @@ ZSKey&
 ZSKey::setFieldRawValue (const void* pValue,const ssize_t pSize,const long pFieldRank)
 {
   ZFullIndexField wField;
-  wField.set((ZSIndexFile*)ZIF,pFieldRank);
+  wField.set((ZIndexFile*)ZIF,pFieldRank);
   long wOffset=wField.KeyOffset;
   ssize_t wSize = pSize;
     if (wSize > wField.UniversalSize)
@@ -166,18 +166,18 @@ ZSKey::setFieldRawValue (ZDataBuffer& pValue,const long pFieldRank)
 ZStatus
 ZSKey::setKeyPartial (const ssize_t pFieldRank ,const ssize_t pLength)
 {
-    if ((pFieldRank<0)||(pFieldRank > ZIF->KeyDic->size()))
+    if ((pFieldRank<0)||(pFieldRank > ZIF->IdxKeyDic->size()))
             {
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_OUTBOUND,
                                     Severity_Error,
                                     " Invalid given field rank <%ld> while it must be [0,<%ld>]",
                                     pFieldRank,
-                                    ZIF->KeyDic->lastIdx());
+                                    ZIF->IdxKeyDic->lastIdx());
             return ZS_OUTBOUND;
             }
   ZFullIndexField wField;
-  wField.set ((ZSIndexFile*)ZIF,pFieldRank);
+  wField.set ((ZIndexFile*)ZIF,pFieldRank);
 // compute size up until current field
     PartialLength=0;
     for (long wi=0;wi<pFieldRank;wi++)
@@ -198,7 +198,7 @@ ZSKey::setKeyPartial (const ssize_t pFieldRank ,const ssize_t pLength)
 ZStatus
 ZSKey::setKeyPartial (const utf8_t* pFieldName,ssize_t pLength)
 {
-    long wFieldRank=ZIF->KeyDic->zsearchFieldByName((const utf8_t*)pFieldName);
+    long wFieldRank=ZIF->IdxKeyDic->zsearchFieldByName((const utf8_t*)pFieldName);
     if (wFieldRank<0)
             {
             ZException.addToLast(" While setting partial key length");
@@ -225,7 +225,7 @@ ZSKey::setKeyPartial (const utf8_t* pFieldName,ssize_t pLength)
  ZSKey::zprintKeyFieldsValues (bool pHeader,bool pKeyDump,FILE*pOutput)
  {
   ZDataBuffer* wKeyContent=this;
-  _printKeyFieldsValues (wKeyContent,(ZSIndexFile*) ZIF, pHeader,pKeyDump,pOutput);
+  _printKeyFieldsValues (wKeyContent,(ZIndexFile*) ZIF, pHeader,pKeyDump,pOutput);
      return;
 /*
 ZDataBuffer wPrintableField;
@@ -410,7 +410,7 @@ _setKeyFieldValueStdString (const void* pString,ZSKey & pZKey, const long pField
   const std::string*  wString= static_cast<const std::string*>(pString);
   ssize_t wSize = wString->size() ;
   ZFullIndexField wField;
-  wField.set ((ZSIndexFile*)pZKey.ZIF,pFieldRank);
+  wField.set ((ZIndexFile*)pZKey.ZIF,pFieldRank);
 
 //ssize_t wOffset= pZKey.ZICB->ZKDic->fieldKeyOffset(pFieldRank);
 
@@ -846,19 +846,19 @@ long wType;
 ssize_t wNaturalSize, wUniversalSize,wArrayCount;
 
 
-  if ((pFieldRank<0)||(pFieldRank > pZKey.ZIF->KeyDic->lastIdx()))
+  if ((pFieldRank<0)||(pFieldRank > pZKey.ZIF->IdxKeyDic->lastIdx()))
         {
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                 ZS_OUTBOUND,
                                 Severity_Severe,
                                 " Field rank is out of key dictionary boundaries. given value is <%ld> while dictionary limits are <0> to <%s>",
                                 pFieldRank,
-                                pZKey.ZIF->KeyDic->lastIdx());
+                                pZKey.ZIF->IdxKeyDic->lastIdx());
         return ZS_OUTBOUND;
         }
 
     ZFullIndexField wField;
-    wField.set ((ZSIndexFile*)pZKey.ZIF,pFieldRank);
+    wField.set ((ZIndexFile*)pZKey.ZIF,pFieldRank);
 //first get ZType_type of input data and test its compatibility with target key field
 
     wSt=zgetZType_T<_Tp>(wType,wNaturalSize,wUniversalSize,pArrayCount,false) ; // with tolerance to pointers
@@ -1029,7 +1029,7 @@ template <class _Tp>
 ZStatus
 ZSKey::setFieldValueT (const utf8_t* pFieldName,_Tp pValue, const long pArrayCount)
 {
-    long wFieldRank=ZIF->KeyDic->zsearchFieldByName((const utf8_t*)pFieldName);
+    long wFieldRank=ZIF->IdxKeyDic->zsearchFieldByName((const utf8_t*)pFieldName);
     if (wFieldRank<0)
             return ZException.getLastStatus();
     return zsetKeyFieldValue<_Tp>(pValue,*this,wFieldRank,pArrayCount);

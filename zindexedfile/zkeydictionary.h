@@ -5,7 +5,7 @@
 
 #include <zindexedfile/zsindextype.h>
 #include <zindexedfile/zindexfield.h>
-
+#include <QDataStream> /* for Q_DECLARE_METATYPE */
 
 #ifndef __KEYDICTYPE__
 #define __KEYDIdCTYPE__
@@ -36,28 +36,96 @@ namespace zbs {
  */
 
 class ZMetaDic;
-class ZSKeyDictionary : public ZArray<ZSIndexField>
+class ZMFDictionary;
+
+
+#pragma pack(push)
+#pragma pack(1)
+class ZKeyDictionary_Exp
 {
-typedef ZArray<ZSIndexField> _Base;
+public:
+
+  ZKeyDictionary_Exp()=default;
+
+
+  uint32_t    StartSign=cst_ZMSTART;
+  uint16_t    EndianCheck=cst_EndianCheck_Normal;
+  uint32_t    KeyDicSize=0;   // overall size of exported key dictionary
+  uint32_t    FieldNb=0;      // number of key fields
+  ZAExport    ZAE;            // base ZArray export data
+
+  void setFromPtr(const unsigned char *&pPtrIn);
+
+  void set(const ZKeyDictionary& pIn);
+
+  void _convert();
+  void serialize();
+  void deserialize();
+
+  bool isReversed()
+  {
+    if (EndianCheck==cst_EndianCheck_Reversed) return true;
+    return false;
+  }
+  bool isNotReversed()
+  {
+    if (EndianCheck==cst_EndianCheck_Normal) return true;
+    return false;
+  }
+
+  //  uint64_t    NaturalSize;    //!< Length of the Field to extract from the record : natural size is the canonical data size and not the size of the data once it has been reprocessed for key usage. @note Special case for char and uchar : Sizes are equal to Cstring size (obtained with strlen).
+  //  uint64_t    UniversalSize;  //!< length of the field when stored into Key (Field dictionary internal format size)
+  //  uint32_t    ArrayCount;     //!< in case of ZType is ZType_Array : number of elements in the Array(Atomic size can be computed then using NaturalSize / ArraySize or KeySize / ArraySize ). For other storage type, this field is set to 1.
+  //  ZTypeBase   ZType;          //!< Type mask of the Field @see ZType_type
+};
+
+class KeyDic_Pack
+{
+public:
+  utf8_t  Name[cst_fieldnamelen];
+  long    KeyUniversalSize;
+  uint8_t Duplicates;
+  KeyDic_Pack()=default;
+  KeyDic_Pack(const KeyDic_Pack& pIn) {_copyFrom(pIn);}
+  KeyDic_Pack(const ZKeyDictionary* pIn) {set(*pIn);}
+  KeyDic_Pack& _copyFrom(const KeyDic_Pack& pIn);
+
+  KeyDic_Pack& operator = (const KeyDic_Pack& pIn) {return _copyFrom(pIn);}
+  KeyDic_Pack& operator = (const KeyDic_Pack&& pIn) {return _copyFrom(pIn);}
+
+  KeyDic_Pack& set(const ZKeyDictionary& pIn);
+
+  void setName(const utf8_t* pName);
+  utf8String getName();
+};
+
+#pragma pack(pop)
+
+
+
+class ZKeyDictionary : public ZArray<ZIndexField>
+{
+typedef ZArray<ZIndexField> _Base;
 
 public:
-  ZSKeyDictionary(ZMetaDic*pMDic) ;
-  ZSKeyDictionary(const utf8String& pName,ZMetaDic*pMDic) {setName(pName);MetaDic=pMDic;}
-  ZSKeyDictionary(ZSKeyDictionary* pIn);
-  ZSKeyDictionary(ZSKeyDictionary& pIn);
-  ~ZSKeyDictionary() { } // just to call the base destructor
+  ZKeyDictionary(ZMFDictionary*pMDic) ;
+  ZKeyDictionary(const utf8String& pName,ZMFDictionary*pMDic) {setName(pName);MasterDic=pMDic;}
+  ZKeyDictionary(ZKeyDictionary* pIn);
+  ZKeyDictionary(ZKeyDictionary& pIn);
+  ~ZKeyDictionary() { } // just to call the base destructor
 
-  ZSKeyDictionary& _copyFrom( ZSKeyDictionary& pIn);
+  ZKeyDictionary& _copyFrom( ZKeyDictionary& pIn);
 
-  ZSKeyDictionary& operator=( ZSKeyDictionary& pIn) {return _copyFrom(pIn);}
+  ZKeyDictionary& operator=( ZKeyDictionary& pIn) {return _copyFrom(pIn);}
 
   void setName(const utf8String& pName) {DicKeyName=pName;}
 
-  bool hasSameContentAs(ZSKeyDictionary*pKey);
+  bool hasSameContentAs(ZKeyDictionary*pKey);
 
-  utf8String  DicKeyName;        //!< refers to ZICB::IndexName
-  ZMetaDic*   MetaDic=nullptr;  //!< Record Dictionary to which Key Dictionary refers : WARNING : not store in xml <keydictionary>
-                                //!  it is stored apart in dedicated <metadic> xml node
+  uint8_t           Duplicates=0;
+  utf8String        DicKeyName;       // refers to ZICB::IndexName
+  ZMFDictionary*    MasterDic=nullptr;  // Record Dictionary to which Key Dictionary refers : WARNING : not store in xml <keydictionary>
+                                //  it is stored apart in dedicated <metadic> xml node
 //    uint32_t KDicSize;          //!< Size of the dictionary when exported (other fields are not exported) this field comes first
         // nb: KDicSize is already given by ZAExport structure.
 //    uint32_t KeyNaturalSize ;     //!< overall size of the key (sum of keyfields NATURAL (total) length). not necessary
@@ -68,11 +136,11 @@ public:
     /** @brief computeKeyOffsets (re)compute key fields offset, field by field, and returns the key universal size
      */
     uint32_t computeKeyOffsets();
-    uint32_t computeKeyUniversalSize();
+    uint32_t computeKeyUniversalSize()const;
 
-    ZTypeBase getType(const long pKFieldRank);
-    uint64_t getUniversalSize(const long pKFieldRank);
-    uint64_t getNaturalSize(const long pKFieldRank);
+    ZTypeBase getType(const long pKFieldRank)const ;
+    uint64_t getUniversalSize(const long pKFieldRank) const;
+    uint64_t getNaturalSize(const long pKFieldRank)const ;
 
 
     ZStatus addFieldToZKeyByName (const char *pFieldName);
@@ -80,10 +148,10 @@ public:
 
 
 
-    void print (FILE* pOutput=stdout);
+    void report (FILE* pOutput=stdout);
 
     /* computes the total universal size of the key according its definition and returns this total size */
-    uint32_t _reComputeKeySize(void) ;
+    uint32_t _reComputeKeySize(void) const ;
 
     ZStatus zremoveField (const long pKDicRank);
 
@@ -104,7 +172,7 @@ public:
 //      KeyNaturalSize=0;
 //      KeyUniversalSize=0;
 //      KDicSize=0;
-      Recomputed=false;
+//      Recomputed=false;
       _Base::clear();
       return;
     }
@@ -119,13 +187,21 @@ public:
      * @brief _exportAppend same as previous but appends to pZDBExport ZDataBuffer
      */
     ZDataBuffer& _exportAppend(ZDataBuffer& pZDBExport);
+    ZStatus _import(const unsigned char *&pZDBImport_Ptr);
 
-    size_t _import(unsigned char *&pZDBImport_Ptr);
 
+    /**
+     * @brief _exportAppendFlat This routine does not use ZAExport because of varying elements due to varying string
+     * @param pZDBExport
+     * @return
+     */
+    ZDataBuffer& _exportAppendFlat(ZDataBuffer& pZDBExport);
+    ZStatus _importFlat(const unsigned char *&pPtrIn);
 
 
 } ;
 
 } //namespace zbs
 
+Q_DECLARE_METATYPE(zbs::KeyDic_Pack);   // required for using such structure as variant
 #endif // ZKEYDICTIONARY_H

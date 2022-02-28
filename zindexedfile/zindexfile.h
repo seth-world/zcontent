@@ -1,14 +1,17 @@
-#ifndef ZSINDEXFILE_H
-#define ZSINDEXFILE_H
+#ifndef ZINDEXFILE_H
+#define ZINDEXFILE_H
 
 #include <zindexedfile/zmfconfig.h>
 
 #include <zindexedfile/zrawindexfile.h>
 
 
+/* define functor for key extraction */
+
+typedef ZStatus (*extractRawKey_type) (ZDataBuffer &pRawRecord,ZRawIndexFile* pZIF,ZDataBuffer* pKeyContent);
 
 
-//=================================ZSIndexFile===============================
+//=================================ZIndexFile===============================
 
 namespace zbs {
 
@@ -20,11 +23,11 @@ namespace zbs {
 
 
 /**
- * @brief The ZSIndexFile class This object holds and manages at run-time an index file associated with a ZSMasterFile object ( Father ).
+ * @brief The ZIndexFile class This object holds and manages at run-time an index file associated with a ZMasterFile object ( Father ).
 
-ZSIndexFile does not own the key definitions : Key definitions (dictionary) are local to ZMasterFile for which key has been defined.
-ZSIndexFile index definition is stored in a ZIndexControlBlock (ZICB) that gives all necessary information about how to extract and format key fields from a record coming from its father (ZMasterFile).
-ZSIndexFile manages
+ZIndexFile does not own the key definitions : Key definitions (dictionary) are local to ZMasterFile for which key has been defined.
+ZIndexFile index definition is stored in a ZIndexControlBlock (ZICB) that gives all necessary information about how to extract and format key fields from a record coming from its father (ZMasterFile).
+ZIndexFile manages
  - key values insertion / suppression. For doing this, it extracts and formats appropriate data from its father record using its ZICB.
  - searches on its index data.
 
@@ -39,35 +42,36 @@ class ZRecord;
 class ZRawRecord;
 class ZRawMasterFile;
 
-class ZSIndexFile : public ZRawIndexFile
+class ZIndexFile : public ZRawIndexFile
 {
 friend class ZSIndexCollection;
 friend class ZRawMasterFile;
-friend class ZSMasterFile;
+friend class ZMasterFile;
 
 protected:
         typedef ZRawIndexFile                   _Base   ;
 public:
 
 /**
- * @brief ZSIndexFile first constructor version : the common one.
- *          It sets up the ZSIndexFile parameters AND rebuild the index if pAutoRebuild is set to true (default value is true).
- *          If ZIX rebuild is done, there must not be any ZS_DUPLICATEKEY during the rebuild if ZSIndexFile duplicates option is set to ZST_NODUPLICATES.
+ * @brief ZIndexFile first constructor version : the common one.
+ *          It sets up the ZIndexFile parameters AND rebuild the index if pAutoRebuild is set to true (default value is true).
+ *          If ZIX rebuild is done, there must not be any ZS_DUPLICATEKEY during the rebuild if ZIndexFile duplicates option is set to ZST_NODUPLICATES.
  *          If so, abort() will be called (after having appropriately destroyed objects on father ZAM side).
  *
  * @note if you want to create a ZIX without knowing in advance if there will be duplicates on key or not : you should set pDuplicates to ZST_DUPLICATES.
- *      Do not create ZSIndexFilees with rejected key values : you will have holes into your index tables that will induce an impredictable result as soon as you will update any part of the hierarchy (ZAM and other dependant ZIXs).
+ *      Do not create ZIndexFilees with rejected key values : you will have holes into your index tables that will induce an impredictable result as soon as you will update any part of the hierarchy (ZAM and other dependant ZIXs).
  *
  * @param[in] pFather ZAM to which the ZIX refers
  * @param[in] pDuplicates ZSort_Type defining how duplicates will be managed. (set to ZST_DUPLICATES by default)
  */
-    ZSIndexFile  (ZSMasterFile *pFather);
-    ZSIndexFile  (ZSMasterFile *pFather,ZSIndexControlBlock& pZICB);
-    ZSIndexFile  (ZSMasterFile *pFather,ZSKeyDictionary* pKDic, int pKeyUniversalsize,const utf8String &pIndexName ,ZSort_Type pDuplicates=ZST_NODUPLICATES);
+    ZIndexFile  (ZMasterFile *pFather);
+    ZIndexFile  (ZMasterFile *pFather,ZIndexControlBlock& pZICB);
+    ZIndexFile  (ZMasterFile *pFather,ZKeyDictionary* pKDic, int pKeyUniversalsize,const utf8String &pIndexName ,ZSort_Type pDuplicates=ZST_NODUPLICATES);
 
+    ZIndexFile  (ZRawMasterFile *pFather, int pKeyUniversalsize,const utf8String &pIndexName ,ZSort_Type pDuplicates=ZST_NODUPLICATES);
 
-    ~ZSIndexFile() {}
-    //~ZSIndexFile() {if (ZMFFather!=nullptr)
+    ~ZIndexFile() {}
+    //~ZIndexFile() {if (ZMFFather!=nullptr)
     //                             _deregister();}
 
 
@@ -92,16 +96,15 @@ public:
     using _Base::getFileType;
 
 
-    ZStatus _keyValueExtraction(ZRecord &pRecord, ZDataBuffer& pKeyOut);
 
 
 ZStatus _search( const ZDataBuffer &pKey,
-                ZSIndexFile &pZIF,
+                ZIndexFile &pZIF,
                 ZSIndexResult &pZIR,
                 const zlockmask_type pLock) ;
 
 ZStatus _searchFirst(const ZDataBuffer        &pKey,     // key content to find out in index
-        ZSIndexFile               &pZIF,     // pointer to ZIndexControlBlock containing index description
+        ZIndexFile               &pZIF,     // pointer to ZIndexControlBlock containing index description
         ZSIndexCollection         *pCollection,
         ZSIndexResult             &pZIR,
         const ZMatchSize_type    pZMS);
@@ -111,14 +114,14 @@ ZStatus _searchNext (ZSIndexResult       &pZIR,
 
 
 ZStatus _searchAll(const ZDataBuffer        &pKey,     // key content to find out in index
-                  ZSIndexFile               &pZIF,     // pointer to ZIndexControlBlock containing index description
+                  ZIndexFile               &pZIF,     // pointer to ZIndexControlBlock containing index description
                   ZSIndexCollection &pCollection,
                   const ZMatchSize_type    pZMS);
 
 ZStatus _searchIntervalFirst(const ZDataBuffer      &pKeyLow,  // Lowest key content value to find out in index
                             const ZDataBuffer      &pKeyHigh, // Highest key content value to find out in index
-                            ZSIndexFile             &pZIF,     // pointer to ZIndexControlBlock containing index description
-                            ZSIndexCollection       *pCollection,   // enriched collection of reference (ZSIndexFile rank, ZMasterFile record address)
+                            ZIndexFile             &pZIF,     // pointer to ZIndexControlBlock containing index description
+                            ZSIndexCollection       *pCollection,   // enriched collection of reference (ZIndexFile rank, ZMasterFile record address)
                             ZSIndexResult           &pZIR,
                             const bool             pExclude);
 
@@ -127,8 +130,8 @@ ZStatus _searchIntervalNext (ZSIndexResult       &pZIR,ZSIndexCollection*  pColl
 
 ZStatus _searchIntervalAll (const ZDataBuffer      &pKeyLow,  // Lowest key content value to find out in index
                             const ZDataBuffer      &pKeyHigh, // Highest key content value to find out in index
-                            ZSIndexFile             &pZIF,     // pointer to ZIndexControlBlock containing index description
-                            ZSIndexCollection       *pCollection,   // enriched collection of reference (ZSIndexFile rank, ZMasterFile record address)
+                            ZIndexFile             &pZIF,     // pointer to ZIndexControlBlock containing index description
+                            ZSIndexCollection       *pCollection,   // enriched collection of reference (ZIndexFile rank, ZMasterFile record address)
                             const bool             pExclude); // Exclude KeyLow and KeyHigh value from selection (i. e. > pKeyLow and < pKeyHigh)
 
 
@@ -160,19 +163,31 @@ ZStatus removeIndexValue        (const ZDataBuffer& pKey , zaddress_type &pAddre
 ZStatus zrebuildIndex(bool pStat, FILE*pOutput);
 
 /**
- * @brief ZSIndexFile::_extractKeys extracts all defined keys from pRecordContent using pMasterDic givin pKeysContent as a result.
- * @param pRecordContent
- * @param pMasterDic
- * @param pKeysContent
- * @return
+ * @brief _keyExtraction Extracts the Key value from ZMasterFile record data using dictionnary ZSKeyDictionary fields definition
+ *
+ * return s the concaneted key value in pKey ZDataBuffer.
+ * - Key fields are extracted from the ZMasterFile user record .
+ * - They are converted appropriately whenever required using base internal conversion routines according Dictionary data type ( ZType_type ):
+ *    + atomic fields _getAtomicFromRecord()
+ *    + arrays _getArrayFromRecord()
+ *    + for data type Class (ZType_type) : data is simply mass-moved to key without any conversion
+ *
+ * @note As we are processing variable length records, if a defined key field points outside the record length,
+ *       then its return ing key value is set to binary zero on the corresponding length of the field within returned Key value.
+ *
+ * @note At this stage _recomputeSize should have been done and total key sizes should be OK.
+ *
+ * @param[in] pZKDic  ZIndex dictionary (part of ZIndexControlBlock) for the index to extract key for
+ * @param[in pRecord  ZMasterFile user record to extract key from
+ * @param[out] pKey  Resulting concatenated key content
+ * @return ZStatus
  */
-ZStatus _extractKey(ZRecord *pRecord, ZDataBuffer& pKeyContent);
-
+ZStatus _keyExtraction(ZRecord *pRecord, ZDataBuffer& pKeyOut);
 
 ZStatus getKeyIndexFields(ZDataBuffer &pIndexContent,ZDataBuffer& pKeyValue);
 ZStatus zprintKeyFieldsValues (const zrank_type pRank,bool pHeader,bool pKeyDump,FILE*pOutput);
 
-};// class ZSIndexFile
+};// class ZIndexFile
 
 
 
@@ -182,6 +197,6 @@ ZStatus zprintKeyFieldsValues (const zrank_type pRank,bool pHeader,bool pKeyDump
 
 
 ZStatus
-_printKeyFieldsValues (ZDataBuffer* wKeyContent,ZSIndexFile* pZIF, bool pHeader,bool pKeyDump,FILE*pOutput);
+_printKeyFieldsValues (ZDataBuffer* wKeyContent,ZIndexFile* pZIF, bool pHeader,bool pKeyDump,FILE*pOutput);
 
-#endif  //ZSINDEXFILE_H
+#endif  //ZINDEXFILE_H

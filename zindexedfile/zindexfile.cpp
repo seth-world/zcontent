@@ -1,7 +1,7 @@
-#ifndef ZSIndexFile_CPP
-#define ZSIndexFile_CPP
-#include <zindexedfile/zsindexfile.h>
-#include <zindexedfile/zsmasterfile.h>
+#ifndef ZIndexFile_CPP
+#define ZIndexFile_CPP
+#include <zindexedfile/zindexfile.h>
+#include <zindexedfile/zmasterfile.h>
 #include <zindexedfile/zmfdictionary.h>
 
 #include <zindexedfile/zrecord.h>
@@ -109,29 +109,35 @@ ZSIndexControlBlock::zkeyValueExtraction (ZRecord *pRecord, ZDataBuffer& pKey)
 #endif // __COMMENT__
 
 
-//----------ZSIndexFile-----------------------------------------------
+//----------ZIndexFile-----------------------------------------------
 
 
-ZSIndexFile::ZSIndexFile  (ZSMasterFile *pFather): ZRawIndexFile(pFather)
+ZIndexFile::ZIndexFile  (ZMasterFile *pFather): ZRawIndexFile(pFather)
 {
 }
 
 
-ZSIndexFile::ZSIndexFile  (ZSMasterFile *pFather, ZSIndexControlBlock &pZICB):ZRawIndexFile(pFather,pZICB)
+ZIndexFile::ZIndexFile  (ZMasterFile *pFather, ZIndexControlBlock &pZICB):ZRawIndexFile(pFather,pZICB)
 {
 }// ZIF CTOR 2 w
 
-ZSIndexFile::ZSIndexFile  (ZSMasterFile *pFather, ZSKeyDictionary *pKDic, int pKeyUniversalsize, const utf8String &pIndexName , ZSort_Type pDuplicates):
+ZIndexFile::ZIndexFile  (ZMasterFile *pFather, ZKeyDictionary *pKDic, int pKeyUniversalsize, const utf8String &pIndexName , ZSort_Type pDuplicates):
 ZRawIndexFile(pFather, pKeyUniversalsize, pIndexName , pDuplicates)
 {
-  KeyDic=pKDic;
+  IdxKeyDic=pKDic;
 }
 
+ZIndexFile::ZIndexFile  (ZRawMasterFile *pFather,  int pKeyUniversalsize, const utf8String &pIndexName , ZSort_Type pDuplicates):
+ZRawIndexFile(pFather, pKeyUniversalsize, pIndexName , pDuplicates)
+{
+  IdxKeyDic=nullptr;
+
+}
 
 
 
 /**
- * @brief ZSIndexFile::zrebuildIndex rebuilds the current index
+ * @brief ZIndexFile::zrebuildIndex rebuilds the current index
  *
  * - Clears the file using ZRandomFile::Clear()
  * - Re-create each index rank from father's records content
@@ -142,7 +148,7 @@ ZRawIndexFile(pFather, pKeyUniversalsize, pIndexName , pDuplicates)
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZSIndexFile::zrebuildIndex(bool pStat, FILE*pOutput)
+ZIndexFile::zrebuildIndex(bool pStat, FILE*pOutput)
 {
 
 ZStatus         wSt = ZS_SUCCESS;
@@ -202,7 +208,7 @@ long            wIndexCount=0;
  //           wZMFRank = wFather->zgetCurrentRank();
  //           wZMFAddress=wFather->zgetCurrentLogicalPosition();
             wIndexCount++;
-            wSt=ZSIndexFile::_extractKey(wRecord,wKeyContent);
+            wSt=_keyExtraction(wRecord,wKeyContent);
             if (wSt!= ZS_SUCCESS)
               break;
             wSt=addKeyValue(wRecord,wZMFAddress);
@@ -235,7 +241,7 @@ long            wIndexCount=0;
 
 
 ZStatus
-ZSIndexFile::removeIndexValue        (const ZDataBuffer& pKey , zaddress_type &pAddress)
+ZIndexFile::removeIndexValue        (const ZDataBuffer& pKey , zaddress_type &pAddress)
 {
 
 ZStatus         wSt;
@@ -287,7 +293,7 @@ ZSIndexResult wZIR;
         if (wSt!=ZS_FOUND)
                     {  return  wSt;}
             }
-// At this stage we have one ZIR with the IndexRank to remove within ZSIndexFile
+// At this stage we have one ZIR with the IndexRank to remove within ZIndexFile
 
     return  (_Base::zremove(wZIR.IndexRank));
 }// removeIndexValue
@@ -329,76 +335,10 @@ ZSIndexResult wZIR;
 
 */
 
-/**
- * @brief ZSIndexFile::_extractKeys extracts all defined keys from pRecordContent using pMasterDic givin pKeysContent as a result.
- * @param pRecordContent
- * @param pKeysContent
- * @return
- */
-ZStatus
-ZSIndexFile::_extractKey(ZRecord* pRecord,  ZDataBuffer& pKeyContent)
-{
-  ZStatus wSt;
-  size_t wKeyOffset = 0;
-  size_t wSize =0,wRecordOffset=0;
-  long wRDicRank=0;
-  ZDataBuffer wFieldUValue;
-
-  ZDataBuffer* wKeyValue=nullptr;
-
-  if ((ZMFFather->MasterDic==nullptr)||(ZMFFather->MasterDic->isEmpty()))
-    {
-    ZException.setMessage (_GET_FUNCTION_NAME_,
-        ZS_BADDIC,
-        Severity_Severe,
-        " Dictionary is null or empty");
-    return  ZS_BADDIC;
-    }
-
-  if (pRecord==nullptr)
-      {
-      ZException.setMessage (_GET_FUNCTION_NAME_,
-          ZS_NULLPTR,
-          Severity_Severe,
-          " Record is nullptr");
-      return  ZS_NULLPTR;
-      }
-
-  pKeyContent.allocateBZero(KeyUniversalSize+1);
-
-//  ZSKeyDictionary* wKeyDic = ZMFFather->MasterDic->KeyDic[pKeyRank];
-  for (long wi=0 ; wi < KeyDic->size() ; wi++)
-  {
-    // here put extraction rules. RFFU : Extraction could be complex. To be investigated and implemented
-
-    wRDicRank=KeyDic->Tab[wi].MDicRank;
-    pRecord->getUniversalbyRank(wFieldUValue,wRDicRank);
-    pKeyContent.changeData(wFieldUValue,wKeyOffset);
-
-    wKeyOffset += pRecord->RDic->Tab[wRDicRank].MDicField->UniversalSize;
-  }//for
-
-
-
-  pKeyContent.allocateBZero(KeyUniversalSize+1);
-
-  for (long wi=0;wi<KeyDic->size();wi++)
-  {
-    // here put extraction rules. RFFU : Extraction could be complex. To be investigated and implemented
-
-    wRDicRank=KeyDic->Tab[wi].MDicRank;
-    pRecord->getUniversalbyRank(wFieldUValue,wRDicRank);
-    pKeyContent.changeData(wFieldUValue,wKeyOffset);
-
-    wKeyOffset += pRecord->RDic->Tab[wRDicRank].MDicField->UniversalSize;
-  }//for
-
-  return ZS_SUCCESS;
-}//_extractKey
 
 #ifdef __COMMENT__
 ZStatus
-ZSIndexFile::getUniversalbyRank (ZDataBuffer &pOutValue,
+ZIndexFile::getUniversalbyRank (ZDataBuffer &pOutValue,
                                  ZBitset* pFieldPresence,
                                  const long pKeyRank,
                                  const long pFieldRank,
@@ -697,7 +637,7 @@ ZSIndexFile::getUniversalbyRank (ZDataBuffer &pOutValue,
 #endif //__COMMENT__
 
 /**
- * @brief ZSIndexFile::_addKeyValue Adds a key value from a ZMasterFile record to the current registrated ZSIndexFile instance.
+ * @brief ZIndexFile::_addKeyValue Adds a key value from a ZMasterFile record to the current registrated ZIndexFile instance.
  *
        - Prepare
        - Commit
@@ -712,7 +652,7 @@ ZSIndexFile::getUniversalbyRank (ZDataBuffer &pOutValue,
  * @return
  */
 ZStatus
-ZSIndexFile::addKeyValue(ZRecord* pZMFRecord,   zaddress_type pZMFAddress)
+ZIndexFile::addKeyValue(ZRecord* pZMFRecord,   zaddress_type pZMFAddress)
 {
 
 long ZJoinIndex;
@@ -727,7 +667,7 @@ zrank_type wIndexIdxCommit;
   wIndexItem->Operation=ZO_Push;
   wIndexItem->ZMFaddress=pZMFAddress;
 
-  wSt=_extractKey(pZMFRecord,wIndexItem->KeyContent);
+  wSt=_keyExtraction(pZMFRecord,wIndexItem->KeyContent);
 
     wSt=_addKeyValue_Prepare(wIndexItem,wIndexIdxCommit,pZMFAddress);
     if (wSt!=ZS_SUCCESS)
@@ -743,7 +683,7 @@ zrank_type wIndexIdxCommit;
 
 #ifdef __COMMENT__
 ZStatus
-ZSIndexFile::_addKeyValue(ZDataBuffer &pElement,  long& pIndexRank, zaddress_type pZMFAddress)
+ZIndexFile::_addKeyValue(ZDataBuffer &pElement,  long& pIndexRank, zaddress_type pZMFAddress)
 {
 
 
@@ -755,7 +695,7 @@ ZIndexItem_struct wZI ;
 zaddress_type wAddress;
 
 /**
-  * get with seekGeneric the ZSIndexFile row position to insert
+  * get with seekGeneric the ZIndexFile row position to insert
   *
   *  1-insert accordingly (push_front, push , insert)
   *
@@ -857,14 +797,14 @@ zaddress_type wAddress;
 #endif
     return (ZS_SUCCESS);
 
-}//ZSIndexFile::_addKeyValue
+}//ZIndexFile::_addKeyValue
 #endif //__COMMENT__
 
 //------------------Add sequence-----------------------------------------
 
 
 /**
- * @brief ZSIndexFile::_addKeyValue_Prepare prepare to add an index rank. This will be committed or rolled back later using _addKeyValue_Commit or _Rollback (or HardRollback)
+ * @brief ZIndexFile::_addKeyValue_Prepare prepare to add an index rank. This will be committed or rolled back later using _addKeyValue_Commit or _Rollback (or HardRollback)
 
 @par keyValueExtraction :
    - extracts fields values according their definition in ZKeyFieldList class (ZType, offset, length)
@@ -884,7 +824,7 @@ zaddress_type wAddress;
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZSIndexFile::_addKeyValue_Prepare(ZSIndexItem *&pIndexItem,
+ZIndexFile::_addKeyValue_Prepare(ZSIndexItem *&pIndexItem,
                                  zrank_type &pZBATIndex,
                                  const zaddress_type pZMFAddress)
 {
@@ -899,16 +839,16 @@ ZIFCompare wZIFCompare = ZKeyCompareBinary;
 
 //-----------Comparison routine selection------------------------------------
 
-  if (KeyDic->size()==1)           // if only one field
+  if (IdxKeyDic->size()==1)           // if only one field
       {
-        long wMRk=KeyDic->Tab[0].MDicRank;
+        long wMRk=IdxKeyDic->Tab[0].MDicRank;
         ZTypeBase wType = ZMFFather->MasterDic->Tab[wMRk].ZType;
         if (wType & ZType_Char)  // and this field has type Char (array of char)
           wZIFCompare = ZKeyCompareAlpha; // use string comparison
       } // in all other cases, use binary comparison
 
 
-// get with seekGeneric the ZSIndexFile row position to insert
+// get with seekGeneric the ZIndexFile row position to insert
 
 //  1-insert accordingly (push_front, push , insert)
 
@@ -1030,7 +970,7 @@ _addKeyValuePrepareReturn:
 
 
 ZStatus
-ZSIndexFile::_addKeyValue_Commit(ZSIndexItem *pIndexItem, const zrank_type pZBATIndex)
+ZIndexFile::_addKeyValue_Commit(ZSIndexItem *pIndexItem, const zrank_type pZBATIndex)
 {
 ZStatus wSt;
 zaddress_type wAddress; // local index address : of no use there
@@ -1050,14 +990,14 @@ zaddress_type wAddress; // local index address : of no use there
 
 
 /**
- * @brief ZSIndexFile::_addKeyValue_Rollback used when a problem occurred when
+ * @brief ZIndexFile::_addKeyValue_Rollback used when a problem occurred when
  *    - index file ZBAT has been reserved for index key at pIndexCommit
  *    - it must be released to available pool
  * @param pIndexCommit
  * @return
  */
 ZStatus
-ZSIndexFile::_addKeyValue_Rollback(const zrank_type pIndexCommit)
+ZIndexFile::_addKeyValue_Rollback(const zrank_type pIndexCommit)
 {
 
 ZStatus wSt;
@@ -1076,7 +1016,7 @@ ZStatus wSt;
 } // _addKeyValue_Rollback
 
 /**
- * @brief ZSIndexFile::_addKeyValue_HardRollback routine used when
+ * @brief ZIndexFile::_addKeyValue_HardRollback routine used when
  *        - index key add operation has been fully committed
  *    and
  *        - a problem occurred on Master file
@@ -1088,7 +1028,7 @@ ZStatus wSt;
  */
 
 ZStatus
-ZSIndexFile::_addKeyValue_HardRollback(const zrank_type pIndexCommit)
+ZIndexFile::_addKeyValue_HardRollback(const zrank_type pIndexCommit)
 {
 
   if (ZVerbose)
@@ -1113,10 +1053,10 @@ ZSIndexFile::_addKeyValue_HardRollback(const zrank_type pIndexCommit)
 
 
 /**
- * @brief ZSIndexFile::_removeKeyValue_Prepare  Prepares to remove an index rank corresponding to given pKey (ZDataBuffer)
+ * @brief ZIndexFile::_removeKeyValue_Prepare  Prepares to remove an index rank corresponding to given pKey (ZDataBuffer)
  *
  * Returns
- * - Index key relative position within ZSIndexFile if key content is found
+ * - Index key relative position within ZIndexFile if key content is found
  * - the corresponding Address within Master file if found
  * - a ZIndexItem (pointer to) that is generated inside the module
  *
@@ -1131,13 +1071,13 @@ ZSIndexFile::_addKeyValue_HardRollback(const zrank_type pIndexCommit)
  *
  * @param[in] pKey key content with a ZIndex format. @see _keyValueExtraction()
  * @param[out] pIndexItem a pointer to a ZIndexItem : this object is generated using new ZIndexItem
- * @param[out] pIndexRank logical position within ZSIndexFile for the key content
+ * @param[out] pIndexRank logical position within ZIndexFile for the key content
  * @param[out] pZMFAddress Physical address within ZMasterFile for the block corresponding to key value
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 
 ZStatus
-ZSIndexFile::_removeKeyValue_Prepare(ZDataBuffer & pKey,
+ZIndexFile::_removeKeyValue_Prepare(ZDataBuffer & pKey,
                                     ZSIndexItem* &pIndexItem,
                                     long& pIndexRank,
                                     zaddress_type &pZMFAddress)
@@ -1187,13 +1127,13 @@ ZSIndexResult wZIResult;
 
 
 /**
- * @brief ZSIndexFile::_removeIndexItem_Prepare  ZSIndexItem::KeyContent must content key value to erase in input.
+ * @brief ZIndexFile::_removeIndexItem_Prepare  ZSIndexItem::KeyContent must content key value to erase in input.
  * @param pIndexItem
  * @param pIndexRank
  * @return
  */
 ZStatus
-ZSIndexFile::_removeIndexItem_Prepare(ZSIndexItem &pIndexItem,long & pIndexRank)
+ZIndexFile::_removeIndexItem_Prepare(ZSIndexItem &pIndexItem,long & pIndexRank)
 {
 
   ZStatus wSt;
@@ -1239,7 +1179,7 @@ ZSIndexFile::_removeIndexItem_Prepare(ZSIndexItem &pIndexItem,long & pIndexRank)
 
 
 ZStatus
-ZSIndexFile::_removeKeyValue_Commit(const zrank_type pIndexCommit)
+ZIndexFile::_removeKeyValue_Commit(const zrank_type pIndexCommit)
 {
 
 zrank_type ZJoinIndex;
@@ -1265,14 +1205,14 @@ ZStatus wSt;
 
      return (wSt);
 
-}//ZSIndexFile::_removeKeyValue_Prepare
+}//ZIndexFile::_removeKeyValue_Prepare
 /**
- * @brief ZSIndexFile::_removeKeyValue_Rollback
+ * @brief ZIndexFile::_removeKeyValue_Rollback
  * @param pIndexCommit
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZSIndexFile::_removeKeyValue_Rollback(const zrank_type pIndexCommit)
+ZIndexFile::_removeKeyValue_Rollback(const zrank_type pIndexCommit)
 {
 
 zrank_type ZJoinIndex;
@@ -1300,13 +1240,13 @@ ZStatus wSt;
 }//_removeKeyValue_Rollback
 
 /**
- * @brief ZSIndexFile::_removeKeyValue_HardRollback
+ * @brief ZIndexFile::_removeKeyValue_HardRollback
  * @param pIndexItem
  * @param pIndexCommit
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZSIndexFile::_removeKeyValue_HardRollback(ZSIndexItem* pIndexItem, const zrank_type pIndexCommit)
+ZIndexFile::_removeKeyValue_HardRollback(ZSIndexItem* pIndexItem, const zrank_type pIndexCommit)
 {
 
 
@@ -1344,11 +1284,11 @@ ZStatus wSt;
 
 
 /** @cond Development */
-//#ifdef __COMMENT__
+
 /**
- * @brief _KeyValueExtraction Extracts the Key value from ZMasterFile record data using dictionnary CZKeyDictionary fields definition
+ * @brief _keyExtraction Extracts the Key value from ZMasterFile record data using dictionnary CZKeyDictionary fields definition
  *
- * return s the concaneted key value in pKey ZDataBuffer.
+ * returns the concaneted key fields values in pKey ZDataBuffer.
  * - Key fields are extracted from the ZMasterFile user record .
  * - They are converted appropriately whenever required using base internal conversion routines according Dictionary data type ( ZType_type ):
  *    + atomic fields _getAtomicFromRecord()
@@ -1358,7 +1298,7 @@ ZStatus wSt;
  * @note As we are processing variable length records, if a defined key field points outside the record length,
  *       then its return ing key value is set to binary zero on the corresponding length of the field within returned Key value.
  *
- *
+ * @note At this stage _recomputeSize should have been done and total key sizes should be OK.
  *
  * @param[in] pZKDic  ZIndex dictionary (part of ZIndexControlBlock) for the index to extract key for
  * @param[in pRecord  ZMasterFile user record to extract key from
@@ -1366,45 +1306,64 @@ ZStatus wSt;
  * @return
  */
 
-ZStatus ZSIndexFile::_keyValueExtraction(ZRecord &pRecord, ZDataBuffer& pKeyOut)
+ZStatus ZIndexFile::_keyExtraction(ZRecord *pRecord, ZDataBuffer& pKeyOut)
 {
 ZStatus wSt;
 size_t wKeyOffset = 0;
-size_t wSize =0,wRecordOffset=0;
 long wRDicRank=0;
 ZDataBuffer wFieldUValue;
 
 // at this stage _recomputeSize should have been done and total sizes should be OK.
 
+  if (pRecord==nullptr)
+    {
+      ZException.setMessage (_GET_FUNCTION_NAME_,
+          ZS_NULLPTR,
+          Severity_Severe,
+          "Input record is nullptr for index <%s>.",IndexName.toCChar());
+      return  ZS_NULLPTR;
+    }
 
+  if ((IdxKeyDic==nullptr)||(IdxKeyDic->isEmpty()))
+      {
+      ZException.setMessage (_GET_FUNCTION_NAME_,
+                               ZS_BADDIC,
+                               Severity_Severe,
+                               " Index Control Block appears to be malformed. Key dictionary for index <%s> is nullptr or empty",IndexName.toCChar());
+      return  ZS_BADDIC;
+      }
 
-    if ((KeyDic==nullptr)||(KeyDic->isEmpty()))
-            {
-            ZException.setMessage (_GET_FUNCTION_NAME_,
-                                     ZS_BADDIC,
-                                     Severity_Severe,
-                                     " Index Control Block appears to be malformed. Key dictionary fields list is nullptr or empty");
-            return  ZS_BADDIC;
-            }
+/*
 
+  if ((ZMFFather->MasterDic==nullptr)||(ZMFFather->MasterDic->isEmpty()))
+      {
+        ZException.setMessage (_GET_FUNCTION_NAME_,
+            ZS_BADDIC,
+            Severity_Severe,
+            " Dictionary is null or empty");
+        return  ZS_BADDIC;
+      }
+*/
 
-    pKeyOut.allocateBZero(KeyUniversalSize+1);
+    pKeyOut.allocate(KeyUniversalSize+1);
 
-    for (long wi=0;wi<KeyDic->size();wi++)
+    for (long wi=0;wi<IdxKeyDic->size();wi++)
         {
+        pKeyOut.reset(); /* set space to 0 */
+
 // here put extraction rules. RFFU : Extraction could be complex. To be investigated and implemented
 
-        wRDicRank=KeyDic->Tab[wi].MDicRank;
-        pRecord.getUniversalbyRank(wFieldUValue,wRDicRank);
+        wRDicRank=IdxKeyDic->Tab[wi].MDicRank;
+        pRecord->getUniversalbyRank(wFieldUValue,wRDicRank);
         pKeyOut.changeData(wFieldUValue,wKeyOffset);
 
-        wKeyOffset += pRecord.RDic->Tab[wRDicRank].MDicField->UniversalSize;
+        wKeyOffset += pRecord->RDic->Tab[wRDicRank].MDicField->UniversalSize;
         }//for
 
 return  ZS_SUCCESS;
 }//zKeyValueExtraction
 
-//#endif // __COMMENT__
+
 
 /** @endcond */
 
@@ -1414,7 +1373,7 @@ return  ZS_SUCCESS;
 
 
 /**
- * @brief ZSIndexFile::_search Searches for a FIRST or UNIQUE value for a given index. This search may be EXACT or PARTIAL.
+ * @brief ZIndexFile::_search Searches for a FIRST or UNIQUE value for a given index. This search may be EXACT or PARTIAL.
  *
  * Size of comparison is given by the Size field fo pKey (ZDataBuffer) : if partial key Size will be shorter than Index key size.
  * - Exact is when comparizon size is the whole index key internal size
@@ -1435,9 +1394,9 @@ return  ZS_SUCCESS;
  * see @ref ZSIndexResult.
  *
  * @param[in] pKey key content to find. Key has to be in Key internal format to be compared : formatted using _formatKeyContent() routine
- * @param[in] pZIF ZSIndexFile object to search on
+ * @param[in] pZIF ZIndexFile object to search on
  *
- * @param[out] pZIR a ZSIndexResult object with ZSIndexFile relative key position (rank within index file) corresponding to key content if found
+ * @param[out] pZIR a ZSIndexResult object with ZIndexFile relative key position (rank within index file) corresponding to key content if found
  *                  associated to ZMasterFile corresponding record (block) address.
  * @param[in] pZIFCompare comparizon routine. Either ZKeyCompareAlpha() or ZKeyCompareBinary().
  * @param[in] pLock a zlock_type mask build using ZLockMask_type containing the lock mask to apply onto the found records.
@@ -1451,8 +1410,8 @@ return  ZS_SUCCESS;
 *
  */
 ZStatus
-ZSIndexFile::_search( const ZDataBuffer &pKey,
-                      ZSIndexFile &pZIF,
+ZIndexFile::_search( const ZDataBuffer &pKey,
+                      ZIndexFile &pZIF,
                       ZSIndexResult &pZIR,
                       const zlockmask_type pLock)
 {
@@ -1617,12 +1576,12 @@ _search_Return:
 }// _search
 
 /**
- * @brief ZSIndexFile::_searchAll  Search for ALL index ranks matching EXACTLY a certain key value. Key value cannot be partial.
+ * @brief ZIndexFile::_searchAll  Search for ALL index ranks matching EXACTLY a certain key value. Key value cannot be partial.
  * The size of Index key value defines the length to compare with given key value pKey.
  *
  * @par return s
  * - a ZSIndexCollection gathering a collection of ZSIndexResult_struct i. e. :
- *   + ZSIndexFile ranks of indexes matching key value
+ *   + ZIndexFile ranks of indexes matching key value
  *   + ZMasterFile corresponding address
  *
  * @par Record lock (RFFU-not yet implemented)
@@ -1635,7 +1594,7 @@ _search_Return:
  *  - In case of error (may be already locked), already locked collection items are unlocked before return ing errored ZStatus.
  *
  * @param[in] pKey key content to find. Key has to be formatted using _formatKeyContent() routine
- * @param[in] pZIF ZSIndexFile object to search on
+ * @param[in] pZIF ZIndexFile object to search on
  * @param[out] pCollection  contains the resulting collection of ZSIndexResult objects {Index rank ; ZMF blockaddress} for the matched elements
  *
  * @param[in] pZMS  defines whether comparison is Exact or Partial see @ref ZMatchSize_type. Defaulted to ZMS_MatchKeySize
@@ -1651,8 +1610,8 @@ _search_Return:
 * - ZS_INVSIZE if search is requested on exact key and given key size is not equal to index key size
  */
 ZStatus
-ZSIndexFile::_searchAll(const ZDataBuffer        &pKey,     // key content to find out in index
-                       ZSIndexFile               &pZIF,     // pointer to ZIndexControlBlock containing index description
+ZIndexFile::_searchAll(const ZDataBuffer        &pKey,     // key content to find out in index
+                       ZIndexFile               &pZIF,     // pointer to ZIndexControlBlock containing index description
                        ZSIndexCollection &pCollection,
                        const ZMatchSize_type    pZMS)
 {
@@ -1688,9 +1647,9 @@ zrank_type wIndexFound=0;
 
 
 
-    if (pZIF.KeyDic->count()==1)           // if only one field
+    if (pZIF.IdxKeyDic->count()==1)           // if only one field
         {
-        long wMRk=pZIF.KeyDic->Tab[0].MDicRank;
+        long wMRk=pZIF.IdxKeyDic->Tab[0].MDicRank;
         ZTypeBase wType = pZIF.ZMFFather->MasterDic->Tab[wMRk].ZType;
         if (wType & ZType_Char)           // and this field has type Char (array of char)
           wZIFCompare = ZKeyCompareAlpha; // use string comparison
@@ -1873,18 +1832,18 @@ _searchAllError:
 //            pCollection.zunlockAll();    // lock corresponding Collection with given lock mask if necessary
 
     return  (pCollection.getStatus());
-}// _searchAll using ZSIndexFile
+}// _searchAll using ZIndexFile
 
 
 
 /**
- * @brief ZSIndexFile::_searchFirst search ZSIndexFile pZIF for a first match of pKey (first in key order) and return s a ZSIndexResult
- * - ZSIndexFile rank : index file relative position of key found
+ * @brief ZIndexFile::_searchFirst search ZIndexFile pZIF for a first match of pKey (first in key order) and return s a ZSIndexResult
+ * - ZIndexFile rank : index file relative position of key found
  * - ZMasterFile corresponding record (block) address
  *
  * @par Accessing collection of selected records
  *
- *  ZSIndexFile::_searchFirst() and ZSIndexFile::_searchNext() works using a search context ( ZIndexSearchContext )that maintains a collection of found records (ZSIndexCollection)
+ *  ZIndexFile::_searchFirst() and ZIndexFile::_searchNext() works using a search context ( ZIndexSearchContext )that maintains a collection of found records (ZSIndexCollection)
  *
  *  To get access to this collection, you may use the following syntax  <search context name>->Collection-><function to use>
  *
@@ -1892,13 +1851,13 @@ _searchAllError:
  * - refine the search with sequential adhoc fields matches
  * - use mass operations (lockAll, unlockAll, removeAll)
  *
- * @note sequential adhoc field rules will apply on ZMasterFile's record content and NOT to ZSIndexFile Index key values.
+ * @note sequential adhoc field rules will apply on ZMasterFile's record content and NOT to ZIndexFile Index key values.
  * This means that data to compare is RAW data, and NOT data formatted for index sorting.
- * see @ref ZSIndexFile::_addKeyValue_Prepare() for more on internal key data format vs natural record data format.
+ * see @ref ZIndexFile::_addKeyValue_Prepare() for more on internal key data format vs natural record data format.
  *
  * @param[in] pKey a ZDataBuffer with key value to search for.                                  [stored in collection's context]
  * Key value could be partial or exact, depending on ZDataBuffer Size and pZMS value
- * @param[in] pZIF ZSIndexFile object to search on                                               [stored in collection]
+ * @param[in] pZIF ZIndexFile object to search on                                               [stored in collection]
  * @param[out] pCollection A pointer to the contextual meta-data from the search created by _searchFirst() routine.
  *
  * It contains
@@ -1921,8 +1880,8 @@ _searchAllError:
  * - ZS_INVSIZE if search is requested on exact key and given key size is not equal to index key size
  */
 ZStatus
-ZSIndexFile::_searchFirst(const ZDataBuffer        &pKey,     // key content to find out in index
-                         ZSIndexFile               &pZIF,     // pointer to ZIndexControlBlock containing index description
+ZIndexFile::_searchFirst(const ZDataBuffer        &pKey,     // key content to find out in index
+                         ZIndexFile               &pZIF,     // pointer to ZIndexControlBlock containing index description
                          ZSIndexCollection         *pCollection,
                          ZSIndexResult             &pZIR,
                          const ZMatchSize_type    pZMS)
@@ -1954,7 +1913,7 @@ zrank_type wpivot;
     if (pCollection==nullptr)
     {
 //-----------Comparison routine selection------------------------------------
-    if (pZIF.KeyDic->size()==1)           // if only one field
+    if (pZIF.IdxKeyDic->size()==1)           // if only one field
         {
         wField.set(&pZIF,0);
         if (wField.ZType & ZType_Char)  // and this field has type Char (array of char)
@@ -2124,7 +2083,7 @@ _searchFirstBackProcess:
 
 }// _searchFirst
 /**
- * @brief ZSIndexFile::_searchNext
+ * @brief ZIndexFile::_searchNext
  * @param[in-out] pCollection A pointer to the contextual meta-data from the search created by _searchFirst() routine.
  *
  * It contains
@@ -2141,7 +2100,7 @@ _searchFirstBackProcess:
  * - ZS_NOTFOUND if key value is not found in the middle of index values set
  */
 ZStatus
-ZSIndexFile::_searchNext (ZSIndexResult       &pZIR,
+ZIndexFile::_searchNext (ZSIndexResult       &pZIR,
                          ZSIndexCollection*  pCollection)
 {
 
@@ -2216,12 +2175,12 @@ ZDataBuffer wIndexRecord;
 
 
 /**
- * @brief ZSIndexFile::_searchIntervalAll searches all index key value from ZSIndexFile pZIF corresponding to Interval given by pKeyLow as lowest value for range and pKeyHigh as highest value for range.
+ * @brief ZIndexFile::_searchIntervalAll searches all index key value from ZIndexFile pZIF corresponding to Interval given by pKeyLow as lowest value for range and pKeyHigh as highest value for range.
  *      pKeyLow and pKeyHigh may be included in range if pExclude is false, or exclude from range if pExclude is true.
  * @param[in] pKeyLow   Lowest key content value to find out in index           [stored in collection's context]
  * @param[in] pKeyHigh  Highest key content value to find out in index          [stored in collection's context]
- * @param[in] pZIF      ZSIndexFile object                                       [stored in collection]
- * @param[out] pCollection ZSIndexCollection object created by the routine. It stores the resulting set of reference to found ZSIndexFile-ZMasterFile records.
+ * @param[in] pZIF      ZIndexFile object                                       [stored in collection]
+ * @param[out] pCollection ZSIndexCollection object created by the routine. It stores the resulting set of reference to found ZIndexFile-ZMasterFile records.
  * @param[out] pZIR ZSIndexResult giving the result of the first search if any
  * @param[in] pExclude Exclude KeyLow and KeyHigh value from selection (i. e. > pKeyLow and < pKeyHigh)
  *          this option is stored within Collection context using operation code
@@ -2234,10 +2193,10 @@ ZDataBuffer wIndexRecord;
  * - ZS_NOTFOUND if key value is not found in the middle of index values set
  */
 ZStatus
-ZSIndexFile::_searchIntervalAll  (const ZDataBuffer      &pKeyLow,  // Lowest key content value to find out in index
+ZIndexFile::_searchIntervalAll  (const ZDataBuffer      &pKeyLow,  // Lowest key content value to find out in index
                                  const ZDataBuffer      &pKeyHigh, // Highest key content value to find out in index
-                                 ZSIndexFile             &pZIF,     // pointer to ZIndexControlBlock containing index description
-                                 ZSIndexCollection       *pCollection,   // enriched collection of reference (ZSIndexFile rank, ZMasterFile record address)
+                                 ZIndexFile             &pZIF,     // pointer to ZIndexControlBlock containing index description
+                                 ZSIndexCollection       *pCollection,   // enriched collection of reference (ZIndexFile rank, ZMasterFile record address)
                                  const bool             pExclude) // Exclude KeyLow and KeyHigh value from selection (i. e. > pKeyLow and < pKeyHigh)
 {
 
@@ -2262,10 +2221,10 @@ ZSIndexResult wZIR;
 }// _searchIntervalAll
 
 /**
- * @brief ZSIndexFile::_searchIntervalFirst
+ * @brief ZIndexFile::_searchIntervalFirst
  * @param[in] pKeyLow   Lowest key content value to find out in index           [stored in collection's context]
  * @param[in] pKeyHigh  Highest key content value to find out in index          [stored in collection's context]
- * @param[in] pZIF      ZSIndexFile object                                       [stored in collection]
+ * @param[in] pZIF      ZIndexFile object                                       [stored in collection]
  * @param[out] pCollection ZSIndexCollection object created by the routine.
  * @param[out] pZIR ZSIndexResult giving the result of the first search if any
  * @param[in] pExclude Exclude KeyLow and KeyHigh value from selection (i. e. > pKeyLow and < pKeyHigh)
@@ -2274,10 +2233,10 @@ ZSIndexResult wZIR;
  * @return
  */
 ZStatus
-ZSIndexFile::_searchIntervalFirst(const ZDataBuffer      &pKeyLow,  // Lowest key content value to find out in index
+ZIndexFile::_searchIntervalFirst(const ZDataBuffer      &pKeyLow,  // Lowest key content value to find out in index
                                  const ZDataBuffer      &pKeyHigh, // Highest key content value to find out in index
-                                 ZSIndexFile             &pZIF,     // pointer to ZIndexControlBlock containing index description
-                                 ZSIndexCollection       *pCollection,   // enriched collection of reference (ZSIndexFile rank, ZMasterFile record address)
+                                 ZIndexFile             &pZIF,     // pointer to ZIndexControlBlock containing index description
+                                 ZSIndexCollection       *pCollection,   // enriched collection of reference (ZIndexFile rank, ZMasterFile record address)
                                  ZSIndexResult           &pZIR,
                                  const bool             pExclude)// Exclude KeyLow and KeyHigh value from selection (i. e. > pKeyLow and < pKeyHigh)
 
@@ -2306,9 +2265,9 @@ zrank_type wpivot;
     if (!pCollection->Context.FInitSearch)
     {
 //-----------Comparison routine selection------------------------------------
-    if (pZIF.KeyDic->count()==1)           // if only one field
+    if (pZIF.IdxKeyDic->count()==1)           // if only one field
         {
-        long wMRk=pZIF.KeyDic->Tab[0].MDicRank;
+        long wMRk=pZIF.IdxKeyDic->Tab[0].MDicRank;
         ZTypeBase wType = pZIF.ZMFFather->MasterDic->Tab[wMRk].ZType;
         if (wType & ZType_Char)           // and this field has type Char (array of char)
           wZIFCompare = ZKeyCompareAlpha; // use string comparison
@@ -2511,13 +2470,13 @@ _searchIntervalFirstBackProcess:
 }// _searchIntervalFirst
 
 /**
- * @brief ZSIndexFile::_searchIntervalNext
+ * @brief ZIndexFile::_searchIntervalNext
  * @param[out]    pZIR
  * @param[in-out] pCollection
  * @return
  */
 ZStatus
-ZSIndexFile::_searchIntervalNext (ZSIndexResult       &pZIR,
+ZIndexFile::_searchIntervalNext (ZSIndexResult       &pZIR,
                                  ZSIndexCollection*  pCollection)
 {
 
@@ -2607,7 +2566,7 @@ ZDataBuffer wIndexRecord;
 //--------------------------End Search routines--------------------------------------
 
 /**
- * @brief ZSIndexFile::getKeyIndexFields obtains natural fields values from a given ZIndex key rank content (pKeyValue) according ZKDic fields dictionary definitions
+ * @brief ZIndexFile::getKeyIndexFields obtains natural fields values from a given ZIndex key rank content (pKeyValue) according ZKDic fields dictionary definitions
                      and returns a ZDataBuffer in pIndexContent containing concanetated natural fields values up to be used by computer as their origin data (external natural format).
 
                      @see ZIndexControlBlock::zkeyValueExtraction
@@ -2617,14 +2576,14 @@ ZDataBuffer wIndexRecord;
 * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZSIndexFile::getKeyIndexFields(ZDataBuffer &pIndexContent,ZDataBuffer& pKeyValue)
+ZIndexFile::getKeyIndexFields(ZDataBuffer &pIndexContent,ZDataBuffer& pKeyValue)
 {
 ZStatus wSt=ZS_SUCCESS;
 ZDataBuffer wFieldValue ;
     pIndexContent.clear();
     if (ZMFFather->MasterDic==nullptr)
       {
-      ZException.setMessage("ZSIndexFile::getKeyIndexFields",
+      ZException.setMessage("ZIndexFile::getKeyIndexFields",
                             ZS_BADDIC,
                             Severity_Error,
                             "Master dictionary is missing (nullptr). File appears to be a ZRawMasterFile with no dictionary.\n");
@@ -2640,21 +2599,21 @@ ZDataBuffer wFieldValue ;
 }
 
 /**
-  * @brief ZSIndexFile::zprintKeyFieldsValues     prints the key fields values in a human readable format from a ZSIndexFile
+  * @brief ZIndexFile::zprintKeyFieldsValues     prints the key fields values in a human readable format from a ZIndexFile
   *
-  * Gets a record from a ZSIndexFile corresponding to its relative position pRank.
+  * Gets a record from a ZIndexFile corresponding to its relative position pRank.
   * Prints the index content to pOutput after having converted back all composing field using ZIndex Dictionary.
   *
   * In case of ZType_Class field, then the content of data is dumped using ZDataBuffer::Dump().
   *
-  * @param[in] pRank       logical rank of key record within ZSIndexFile
+  * @param[in] pRank       logical rank of key record within ZIndexFile
   * @param[in] pHeader  if set to true then key fields description is printed. False means only values are printed.
   * @param[in] pKeyDump if set to true then index key record content is dumped after the list of its fields values. False means only fields values are printed.
  * @param[in] pOutput   a FILE* pointer where the reporting will be made. Defaulted to stdout.
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
   */
  ZStatus
- ZSIndexFile::zprintKeyFieldsValues (const zrank_type pRank,bool pHeader,bool pKeyDump,FILE*pOutput)
+ ZIndexFile::zprintKeyFieldsValues (const zrank_type pRank,bool pHeader,bool pKeyDump,FILE*pOutput)
  {
 
 
@@ -2686,13 +2645,13 @@ zaddress_type wIdxAddress;
 
 
 ZStatus
-_printKeyFieldsValues (ZDataBuffer* wKeyContent,ZSIndexFile* pZIF, bool pHeader,bool pKeyDump,FILE*pOutput)
+_printKeyFieldsValues (ZDataBuffer* wKeyContent,ZIndexFile* pZIF, bool pHeader,bool pKeyDump,FILE*pOutput)
 {
 zrank_type wMDicRank=0;
 ZDataBuffer wPrintableField;
 
 ZMetaDic* wMetaDic=pZIF-> getMasterFile()->MasterDic;
-ZSKeyDictionary* wKeyDic=pZIF->KeyDic;
+ZKeyDictionary* wKeyDic=pZIF->IdxKeyDic;
 ZFullIndexField wField ;
 
 // header : index name then fields dictionary definition
@@ -2702,7 +2661,7 @@ ZFullIndexField wField ;
               "------------------------------- Index description ------------------------------------\n"
               " Index name %s\n",
               pZIF->IndexName.toCChar());
-     for (long wi=0;wi<pZIF->KeyDic->size();wi++)
+     for (long wi=0;wi<pZIF->IdxKeyDic->size();wi++)
      {
        wField.set(pZIF,wi);
 //     wMDicRank=    wKeyDic->Tab[wi].MDicRank;
@@ -2803,7 +2762,7 @@ ZFullIndexField wField ;
             fprintf(pOutput,wDate.toFormatted().toCString_Strait());
             }
         case ZType_VaryingCString:  // this cannot be for an index field
-        case ZType_VaryingWString:  // this cannot be for an index field
+//        case ZType_VaryingWString:  // this cannot be for an index field
         case ZType_StdString: // this cannot be for an index field
         default:
             {
@@ -2885,4 +2844,4 @@ ZFullIndexField wField ;
 
 //}// namespace zbs
 
-#endif //ZSIndexFile_CPP
+#endif //ZIndexFile_CPP

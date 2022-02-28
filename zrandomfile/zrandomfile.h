@@ -112,8 +112,8 @@ class ZRandomFile : protected ZFileDescriptor
 // friend class ZFileDescriptor ;
  friend class ZIndexFile;
 
- friend class ZSIndexFile;
- friend class ZSMasterFile;
+ friend class ZIndexFile;
+ friend class ZMasterFile;
 
  friend class ZRawMasterFile;
 
@@ -773,7 +773,7 @@ protected:
       return;
     }
 
-    const ZDataBuffer& getReservedContent (void)
+    ZDataBuffer& getReservedContent (void)
     {
         return ZReserved  ;
     }
@@ -788,7 +788,7 @@ protected:
 
 
 
-    ZStatus _open(const zmode_type pMode,
+    ZStatus _ZRFopen(const zmode_type pMode,
                   const ZFile_type pFileType,
                   bool pLockRegardless=false);
 
@@ -971,7 +971,6 @@ public:
     ZStatus _getReservedHeader(bool pForceRead);
 
     ZStatus _getFileControlBlock(bool pForceRead);
-    ZStatus _getFileControlBlock_old(bool pForceRead);
 
     ZStatus _updateFileControlBlock();
 
@@ -982,7 +981,14 @@ public:
 
     ZStatus _writeFileHeader(bool pForceWrite);
 
-    ZStatus _writeReservedHeader(bool pForceWrite); // corresponds to a full header write because reserved header is positionned before file descriptor
+ //   ZStatus _writeAllHeaders(bool pForceWrite); // corresponds to a full header write because reserved header is positionned before file descriptor
+
+    ZStatus _writeFCB(zaddress_type pOffsetFCB);
+    ZStatus _writeReserved(zaddress_type pOffsetReserved);
+
+    ZStatus _writeAllFileHeader();
+
+     ZStatus _importAllFileHeader();
 
 /**
  * @brief ZRandomFile::_writeFileDescriptor
@@ -1001,7 +1007,7 @@ public:
  *  - ZS_FILEPOSERR bad positionning during lseek operation ZException is set
  *  - ZS_WRITEERROR error writing FCB + block pools to header file ZException is set
  */
-    ZStatus _writeFileDescriptor(bool pForceWrite);
+    ZStatus _writeFCB(bool pForceWrite);
 
 
 
@@ -1047,6 +1053,5 @@ const char *
 decode_ZBID (ZBlockID pZBID);
 
 ZStatus generateURIHeader(uriString pURIPath, uriString &pURIHeader);
-
 
 #endif // ZRANDOMFILE_H

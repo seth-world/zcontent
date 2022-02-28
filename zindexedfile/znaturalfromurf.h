@@ -68,14 +68,14 @@ setCharfURF(void* pNatural,
 
 //==========================Main entry points / data type for setFieldURF_T====================================
 
-ZStatus _getURFHeaderData(unsigned char* pURF_Ptr,
+ZStatus _getURFHeaderData(const unsigned char *pURF_Ptr,
                                  ZTypeBase &pZType,
                                  uint64_t &pUniversalSize,
                                  uint64_t &pNaturalSize,
                                  uint16_t &pCapacity,
                                  uint16_t &pEffectiveUSize,
                                  uint64_t &pHeaderSize,
-                          unsigned char **pURFDataPtr);
+                          const unsigned char **pURFDataPtr);
 
 size_t  _getURFHeaderSize (ZTypeBase &pZType);
 
@@ -110,7 +110,7 @@ ZStatus wSt;
 uint16_t wCanonical , wEffectiveUSize;
 uint64_t wSourceUSize,wSourceNSize,wHeaderSize;
 ZTypeBase wSourceType;
-unsigned char* wData_Ptr=pURFData->Data;
+const unsigned char* wData_Ptr=pURFData->Data;
 
     if( (wSt=_getURFHeaderData(wData_Ptr,
                                wSourceType,
@@ -224,7 +224,7 @@ uint64_t wSourceUSize , wSourceNSize,wHeaderSize;
 ZTypeBase wSourceType;
 ZDataBuffer wUValue;
 
-unsigned char* wData_Ptr;
+const unsigned char* wData_Ptr;
 
   if ((wSt= _getURFHeaderData(pURFData->Data,
                              wSourceType,
@@ -350,7 +350,7 @@ uint16_t wSourceCanonical,wEffectiveUSize;
 uint64_t wSourceUSize,wSourceNSize,wHeaderSize;
 ZTypeBase wSourceType;
 ZDataBuffer wUValue;
-unsigned char* wData_Ptr=pURFData->Data;
+const unsigned char* wData_Ptr=pURFData->Data;
     if ((wSt= _getURFHeaderData(wData_Ptr,
                                 wSourceType,
                                 wSourceUSize,
@@ -612,7 +612,7 @@ unsigned char* wData_Ptr= _getURFHeaderData(pURFData,
 
 
 ZStatus
-getUniversalFromURF (ZDataBuffer &pValue,unsigned char* pDataPtr,bool pTruncate,unsigned char** pDataPtrOut=nullptr);
+getUniversalFromURF (ZDataBuffer &pValue,const unsigned char* pDataPtr, bool pTruncate, const unsigned char **pDataPtrOut=nullptr);
 
 
 #endif // ZNATURALFROMURF_H

@@ -93,7 +93,7 @@ public:
     bool operator!=(const ZLockid &pId) { return !(id == pId.id); }
 
     ZDataBuffer _export() const ;
-    size_t      _import(unsigned char* &pUniversalPtr);
+    size_t      _import(const unsigned char *&pUniversalPtr);
 
 };
 

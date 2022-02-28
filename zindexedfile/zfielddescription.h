@@ -4,23 +4,146 @@
 #include <stdlib.h> //for atexit()
 #include <sys/types.h>
 
+#include <ztoolset/zlimit.h>
+
 #include <ztoolset/ztypetype.h>
 #include <ztoolset/zutfstrings.h>
 #include <ztoolset/zaierrors.h>
+#include <QDataStream> /* for Q_DECLARE_METATYPE */
 
 namespace zbs {
+
+const size_t cst_FieldNameCapacity=cst_fieldnamelen+sizeof(uint8_t)+sizeof(uint16_t);
+class ZFieldDescription;
 #pragma pack(push)
 #pragma pack(1)
-struct FieldDesc_Export{
-  ZTypeBase       ZType;
-  uint32_t        ArrayCount; //< if data type is Array then count the rows 0 if not an array
-  uint64_t        HeaderSize; //< Size of field header
-  uint64_t        UniversalSize;  //< Only if ZType is fixed length. Otherwise set to 0
-  uint64_t        NaturalSize;                    //< idem
-  uint8_t         KeyEligible=false ;             //< could be set as Key field
-  char            Name[cst_fieldnamelen+1+sizeof(uint16_t)];       //< Name of the field aligned to take care of utfdescString export
+/**
+ * @brief The FieldDesc_Export class used to export ZFieldDescription structure.
+ * This structure does not include Name field, which is processed separately.
+ */
+class FieldDesc_Export
+{
+public:
+  uint32_t            StartSign=cst_ZFIELDSTART;
+  uint16_t            EndianCheck=cst_EndianCheck_Normal;
+//  unsigned char   Name[cst_fieldnamelen+sizeof(uint8_t)+sizeof(uint16_t)];       //!< Name of the field with UVF format contained within a fixed Structure
+  ZTypeBase           ZType;
+  URF_Capacity_type   Capacity; //!< if data type is Array then count the rows 0 if not an array
+  uint16_t            HeaderSize; //!< Size of field header
+  uint32_t            UniversalSize;  //!< Only if ZType is fixed length. Otherwise set to 0
+  uint32_t            NaturalSize;                    //!< idem
+  uint8_t             KeyEligible=false ;             //!< could be set as Key field
+  unsigned char       Hash[cst_md5];
+
+    FieldDesc_Export()=default;
+
+    FieldDesc_Export& _copyFrom(FieldDesc_Export& pIn);
+
+    FieldDesc_Export(FieldDesc_Export& pIn) {_copyFrom(pIn);}
+    FieldDesc_Export(FieldDesc_Export&& pIn) {_copyFrom(pIn);}
+
+    FieldDesc_Export& operator = (FieldDesc_Export& pIn) {return _copyFrom(pIn);}
+    FieldDesc_Export& operator = (FieldDesc_Export&& pIn) {return _copyFrom(pIn);}
+
+    FieldDesc_Export& set(ZFieldDescription& pIn);
+    void    setFromPtr(const unsigned char *&pPtrIn);
+    ZFieldDescription toFieldDescription();
+
+    void _convert();
+    void serialize();
+    void deserialize();
+
+    bool isReversed()
+    {
+      if (EndianCheck==cst_EndianCheck_Reversed) return true;
+      return false;
+    }
+    bool isNotReversed()
+    {
+      if (EndianCheck==cst_EndianCheck_Normal) return true;
+      return false;
+    }
 
 };
+/**
+ * @brief The FieldDesc_Check class used to compute md5 hashcode
+ */
+class FieldDesc_Check
+{
+public:
+
+  //       //!< Name of the field with UVF format contained within a fixed Structure
+  ZTypeBase           ZType;
+  URF_Capacity_type   Capacity; //!< if data type is Array then count the rows 0 if not an array
+  uint16_t            HeaderSize; //!< Size of field header
+  uint32_t            UniversalSize;  //!< Only if ZType is fixed length. Otherwise set to 0
+  uint32_t            NaturalSize;                    //!< idem
+  uint8_t             KeyEligible=false ;             //!< could be set as Key field
+  utf8_t              Name[cst_FieldNameCapacity];
+
+  FieldDesc_Check()=default;
+
+  FieldDesc_Check& _copyFrom(FieldDesc_Check& pIn);
+
+  FieldDesc_Check(FieldDesc_Check& pIn) {_copyFrom(pIn);}
+
+  FieldDesc_Check& operator = (FieldDesc_Check& pIn) {return _copyFrom(pIn);}
+  FieldDesc_Check& operator = (FieldDesc_Check&& pIn) {return _copyFrom(pIn);}
+
+  FieldDesc_Check& set(ZFieldDescription& pIn);
+  ZFieldDescription toFieldDescription();
+
+};
+
+/* used to store field description in ZPinboard */
+/**
+ * @brief The FieldDesc_Pack class used to pack ZFieldDescription structure, including Name and Hashcode,
+ * in order to store it in ZPinboard.
+ */
+class KeyField_Pack;
+class FieldDesc_Pack
+{
+public:
+
+  //       //!< Name of the field with UVF format contained within a fixed Structure
+  ZTypeBase           ZType;
+  URF_Capacity_type   Capacity; //!< if data type is Array then count the rows 0 if not an array
+  uint16_t            HeaderSize; //!< Size of field header
+  uint32_t            UniversalSize;  //!< Only if ZType is fixed length. Otherwise set to 0
+  uint32_t            NaturalSize;                    //!< idem
+  uint8_t             KeyEligible=false ;             //!< could be set as Key field
+  utf8_t              Name[cst_FieldNameCapacity];
+  unsigned char       Hash[cst_md5];
+
+  FieldDesc_Pack()=default;
+
+  FieldDesc_Pack& _copyFrom(const FieldDesc_Pack& pIn);
+
+  FieldDesc_Pack(const FieldDesc_Pack& pIn) {_copyFrom(pIn);}
+
+  FieldDesc_Pack& operator = (const FieldDesc_Pack& pIn) {return _copyFrom(pIn);}
+  FieldDesc_Pack& operator = (const FieldDesc_Pack&& pIn) {return _copyFrom(pIn);}
+
+  FieldDesc_Pack& set(ZFieldDescription& pIn);
+  ZFieldDescription toFieldDescription();
+
+  bool hasHash(const unsigned char* pHash) {return memcmp(Hash,pHash,cst_md5)==0;}
+  bool hasSameHash(const FieldDesc_Pack& pIn) {return memcmp(Hash,pIn.Hash,cst_md5)==0;}
+  bool hasSameHash(const KeyField_Pack& pIn) ;
+
+  QDataStream& write(QDataStream &dataStream);
+  QDataStream& read(QDataStream &dataStream);
+
+  friend   QDataStream &operator << (QDataStream &out, const FieldDesc_Pack &myObj)
+  {
+    out.writeBytes((const char *)&myObj,sizeof(FieldDesc_Pack)) ;
+    return(out);
+  }
+  utf8VaryingString getName();
+  void setName(const utf8VaryingString& pName);
+
+};
+
 #pragma pack(pop)
 
 /**
@@ -37,17 +160,18 @@ struct FieldDesc_Export{
  */
 class ZFieldDescription
 {
-
+  friend class zbs::FieldDesc_Export;
+  friend class zbs::FieldDesc_Pack;
 
 public:
   ZFieldDescription() = default;
-  ZFieldDescription (ZFieldDescription& pIn) { _copyFrom(pIn); }
-  ZFieldDescription (ZFieldDescription&& pIn) { _copyFrom(pIn); }
+  ZFieldDescription (const ZFieldDescription& pIn) { _copyFrom(pIn); }
+  ZFieldDescription (const ZFieldDescription&& pIn) { _copyFrom(pIn); }
 
-  ZFieldDescription& _copyFrom(ZFieldDescription& pIn);
+  ZFieldDescription& _copyFrom(const ZFieldDescription &pIn);
 
-  ZFieldDescription& operator = (ZFieldDescription& pIn) { return _copyFrom(pIn); }
-  ZFieldDescription& operator = (ZFieldDescription&& pIn) { return _copyFrom(pIn); }
+  ZFieldDescription& operator = (const ZFieldDescription& pIn) { return _copyFrom(pIn); }
+  ZFieldDescription& operator = (const ZFieldDescription&& pIn) { return _copyFrom(pIn); }
 
   ZTypeBase           ZType;
   URF_Capacity_type   Capacity;           //!< if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if an atomic
@@ -64,6 +188,10 @@ public:  md5                 Hash;        //!< unique hashcode value for the fie
   bool hasName(const char* pName) const { return Name==pName; }
   bool hasName(const utf8String& pName) const { return Name==pName.toCChar(); }
 
+  /* compute md5 hash key with current data from the field */
+  md5& computeMd5();
+
+
   bool isAtomic(void) {return ZType & ZType_Atomic ;}
   bool isArray(void) {return ZType & ZType_Array ;}
   bool isByteSeq(void) {return ZType & ZType_ByteSeq ;}
@@ -76,12 +204,29 @@ public:  md5                 Hash;        //!< unique hashcode value for the fie
   void clear() {ZType=0; Capacity=0;HeaderSize=0;UniversalSize=0;NaturalSize=0; KeyEligible=false;Name.clear(); Hash.clear();}
 
   utf8String toXml(int pLevel, bool pComment=true);
-  ZStatus fromXml(zxmlNode* pRootNode, ZaiErrors* pErrorlog, ZaiE_Severity pSeverity=ZAIES_Error);
+  /**
+   * @brief fromXml  populate Field description's attributes with xml content whose root is given by pFieldRootNode.
+   * @return ZS_SUCCESS if Ok,
+   * ZS_XMLWARNING if a field had some warning(s)  but may be taken as valid
+   * ZS_XMLMISREQ some required node(s) is/are missing
+   * ZS_XMLINVROOTNAME <field> root node is missing in pFieldRootNode
+   */
+  ZStatus fromXml(zxmlNode* pFieldRootNode, ZaiErrors* pErrorlog, ZaiE_Severity pSeverity=ZAIES_Error);
+
+  FieldDesc_Export getFDExp();
+
+  /**
+   * @brief _exportAppendFlat This routine does not use ZAExport because of varying elements due to field name in UVF format
+   * @return
+   */
+  ZDataBuffer& _exportAppendFlat(ZDataBuffer& pZDBExport);
 
   static FieldDesc_Export _exportConvert(ZFieldDescription&pIn,FieldDesc_Export* pOut);
   static ZFieldDescription _importConvert(ZFieldDescription& pOut,FieldDesc_Export* pIn);
 };
 
 } // namespace zbs
-
+using namespace  zbs;
+Q_DECLARE_METATYPE(zbs::ZFieldDescription );   // required for using such structure as variant
+Q_DECLARE_METATYPE(zbs::FieldDesc_Pack);   // required for using such structure as variant
 #endif // ZFIELDDESCRIPTION_H

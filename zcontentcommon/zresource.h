@@ -46,7 +46,7 @@ public:
  //   DataRank_type DataRank = -1; /* reference to data rank (either ZAM rank or MasterFile rank */
 
     ZResource() {clear();}
-    virtual ~ZResource() {} /* mandatory because ZResource has virtual methods */
+    ~ZResource() {} /* mandatory because ZResource has virtual methods */
 
     ZResource(const Resourceid_type pResourceid, const ZEntity_type pEntity)
     {
@@ -146,8 +146,8 @@ public:
         }
 
     /* virtual methods : to be replaced by derived classes own methods */
-    virtual utf8String toXml(int pLevel);
-    virtual int fromXml(zxmlElement *pRootNode, const char *pChildName,ZaiErrors *pErrorlog);
+    utf8String toXml(int pLevel) ;
+    int fromXml(zxmlElement *pRootNode, const char *pChildName,ZaiErrors *pErrorlog);
 
     static int fromXmltoHexa(zxmlElement *pRootNode,
             const char *pChildName,
@@ -165,7 +165,7 @@ public:
     unsigned char* _export(unsigned char*& pBuffer,size_t & pSize) const;
     ZDataBuffer _export() const;
     /** @brief _import imports from serialized data pUniversalPtr. Updates pointer to first byte after imported data*/
-    size_t      _import(unsigned char* &pUniversalPtr);
+    size_t      _import(const unsigned char *&pUniversalPtr);
 
     /**
      * @brief _exportURF
@@ -182,7 +182,7 @@ public:
     unsigned char* _exportURF(unsigned char*& pBuffer,size_t & pSize) const;
     ZDataBuffer *_exportURF(ZDataBuffer *pReturn) const;
     /** @brief _import imports from serialized data pUniversalPtr. Updates pointer to first byte after imported data*/
-    ssize_t      _importURF(unsigned char* &pUniversalPtr);
+    ssize_t      _importURF(const unsigned char *&pUniversalPtr);
 };
 
 #endif // ZRESOURCE_H

@@ -29,9 +29,9 @@ class ZExceptionDLg;
 }
 
 enum ZEDLGReturn : int{
-  ZEDLG_Rejected = 0,
-  ZEDLG_Accepted = 1,
-  ZEDLG_Third    = 2
+  ZEDLG_Rejected = QDialog::Rejected,
+  ZEDLG_Accepted = QDialog::Accepted,
+  ZEDLG_Third    = 0xFF
 };
 
 #include <ztoolset/utfvaryingstring.h>
@@ -41,6 +41,10 @@ typedef utf32VaryingString utf32String;
 #include <ztoolset/uristring.h>
 
 class ZExceptionBase;
+class QWidget;
+class QVBoxLayout;
+class QLabel;
+class QTextEdit;
 
 class ZExceptionDLg : public QDialog
 {
@@ -61,6 +65,24 @@ public:
   void setThirdButton(const utf8String& pButtonText);
 
   static int message(const char *pModule, ZStatus pStatus, Severity_type pSeverity,const char *pFormat,...);
+  static int message2B(const char *pModule, ZStatus pStatus, Severity_type pSeverity, const utf8String& pCancelText, const utf8String& pOkText, const char *pFormat,...);
+  static int message3B(const char *pModule, ZStatus pStatus, Severity_type pSeverity,const utf8String& pButtonText, const char *pFormat,...);
+
+
+  /** @brief messageWAdd one button message with additional information */
+  static int messageWAdd(const char *pModule,
+                        ZStatus pStatus,
+                        Severity_type pSeverity,
+                        const utf8VaryingString& pAdd,
+                        const char *pFormat,...);
+  /** @brief messageWAdd 2 buttons message with additional information */
+  static int message2BWAdd( const char *pModule,
+                            ZStatus pStatus,
+                            Severity_type pSeverity,
+                            const utf8VaryingString& pAdd,
+                            const utf8String& pCancelText,
+                            const utf8String& pOkText,
+                            const char *pFormat,...);
   static int createErrno(const int pErrno,const char *pModule, ZStatus pStatus, Severity_type pSeverity,const char *pFormat,...);
   static int createFileError(FILE *pf,const char *pModule, ZStatus pStatus, Severity_type pSeverity,const char *pFormat,...);
   static int createAddrinfo(int pError, const char *pModule, ZStatus pStatus, Severity_type pSeverity, const char *pFormat,...);
@@ -69,6 +91,8 @@ public:
   static int displayLast( bool pDontShow = false);
 
   static int display(const ZExceptionBase pException, bool pDontShow = false);
+  static int display2B(const ZExceptionBase pException, const char *pCancelText=nullptr, const char *pOKText=nullptr);
+  static int display3B(const ZExceptionBase pException,const utf8String& pButtonText, const char *pCancelText=nullptr, const char *pOKText=nullptr);
 
 
   static int info(ZExceptionBase& pException, QWidget *parent = nullptr);
@@ -77,26 +101,34 @@ public:
   static int severe(ZExceptionBase& pException, QWidget *parent = nullptr);
   static int fatal(ZExceptionBase& pException, QWidget *parent = nullptr);
 
-  static int info3B(ZExceptionBase& pException,const utf8String& pButtonText, QWidget *parent = nullptr);
-  static int warning3B(ZExceptionBase& pException,const utf8String& pButtonText, QWidget *parent = nullptr);
-  static int error3B(ZExceptionBase& pException,const utf8String& pButtonText, QWidget *parent = nullptr);
-  static int severe3B(ZExceptionBase& pException,const utf8String& pButtonText, QWidget *parent = nullptr);
-  static int fatal3B(ZExceptionBase& pException,const utf8String& pButtonText, QWidget *parent = nullptr);
 
 
   static void resetDontShow() ;
 
+  void setAdditionalInfo(const utf8VaryingString& pComp);
+  void removeAdditionalInfo ();
+
 public Q_SLOTS:
 
   void buttonPressed(int pValue);
-
   void DontShowClicked();
+  void MoreClicked();
 
+private Q_SLOTS :
+  void resizeEvent(QResizeEvent* pEvent);
+public:
+  QWidget *VVLWDg=nullptr;
+  QVBoxLayout *VLayout=nullptr;
+  QLabel*   LabLBl=nullptr;
+  QTextEdit * AdditionalTEd=nullptr;
 private:
-  ZStatus currentStatus=ZS_NOTHING;
+  ZStatus currentStatus=ZS_INVALIDSTATUS;
 
+  utf8VaryingString Additional;
+
+  bool FResizeInitial=true;
   bool DoNotShow=false;
-
+  bool FMore=false;
   Ui::ZExceptionDLg *ui;
 };
 

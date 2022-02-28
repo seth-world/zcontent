@@ -57,23 +57,22 @@ public:
   ZSJCBOwnData_Export(const ZSJCBOwnData_Export& pIn) { _copyFrom(pIn);}
 
   ZSJCBOwnData_Export& _copyFrom(const ZSJCBOwnData_Export& pIn);
-  ZSJCBOwnData_Export& _copyFrom(const ZSJCBOwnData& pIn);
+  ZSJCBOwnData_Export& set(const ZSJCBOwnData& pIn);
 
   ZSJCBOwnData& _toJCBOwnData(ZSJCBOwnData &pOut);
 
-  void reverseConditional()
-  {
-    if (!is_little_endian())
-      return;
-    ZMFVersion = reverseByteOrder_Conditional(ZMFVersion);
-    JCBSize = reverseByteOrder_Conditional(JCBSize);
-    Depth = reverseByteOrder_Conditional(Depth);
-  }
+  void _convert();
 
+  void serialize();
+  void deserialize();
+
+  bool isReversed() {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
+  bool isNotReversed() {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
 
 
   uint32_t                StartSign   = cst_ZBLOCKSTART ;
   ZBlockID                BlockId     = ZBID_JCB;
+  uint16_t                EndianCheck=cst_EndianCheck_Normal;
   uint32_t                ZMFVersion  = __ZMF_VERSION__;
   uint32_t                JCBSize;                    //! size of JCBOwndata including exported JournalLocalDirectoryPath
   uint8_t                 JournalingOn=false;         //!< Journaling is started (true) or not (false)
@@ -105,7 +104,7 @@ public:
   ZDataBuffer& _exportAppend(ZDataBuffer& pZDBExport);
   ZDataBuffer _export();
 
-  ZSJCBOwnData& _import(unsigned char *&pPtrIn);
+  ZSJCBOwnData& _import(const unsigned char *&pPtrIn);
 
 };
 class ZSJournal;
@@ -129,7 +128,7 @@ public:
   ZDataBuffer& _exportJCB(ZDataBuffer &pJCBContent);
   size_t _getExportSize();
 
-  ZStatus _import (unsigned char *&pPtrIn);
+  ZStatus _import (const unsigned char *&pPtrIn);
 
   bool _isSameAs(const ZSJournalControlBlock* pJCB);
 

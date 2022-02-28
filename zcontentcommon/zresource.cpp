@@ -167,9 +167,9 @@ unsigned char* ZResource::_export(unsigned char*& pBuffer,size_t & pSize) const
   return pBuffer;
 }
 
-size_t ZResource::_import(unsigned char *&pUniversalPtr)
+size_t ZResource::_import(const unsigned char *&pUniversalPtr)
 {
-  unsigned char* wPtrIn=pUniversalPtr;
+  const unsigned char* wPtrIn=pUniversalPtr;
   ZEntity_type wEntity;
   Resourceid_type wId;
   memmove(&wEntity,wPtrIn,sizeof(ZEntity_type));
@@ -208,7 +208,7 @@ unsigned char* ZResource::_exportURF(unsigned char*& pBuffer,size_t & pSize) con
   return pBuffer;
 }
 
-ssize_t ZResource::_importURF(unsigned char *&pUniversalPtr)
+ssize_t ZResource::_importURF(const unsigned char *&pUniversalPtr)
 {
   ZTypeBase wType;
   _importAtomic<ZTypeBase>(wType, pUniversalPtr);

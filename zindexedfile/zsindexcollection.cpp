@@ -3,7 +3,7 @@
 
 
 #include <zindexedfile/zrawindexfile.h>
-#include <zindexedfile/zsmasterfile.h>
+#include <zindexedfile/zmasterfile.h>
 #include <zindexedfile/zsindexcollection.h>
 #include <zindexedfile/zsjournal.h>
 #include <zindexedfile/zsjournalcontrolblock.h>
@@ -36,7 +36,7 @@ ZSIndexCollection::ZSIndexCollection(ZRawIndexFile *pZIFFile)
     return;
 }
 
-ZSIndexCollection::ZSIndexCollection(ZSMasterFile &pZMFFile,const long pIndexRank)
+ZSIndexCollection::ZSIndexCollection(ZMasterFile &pZMFFile,const long pIndexRank)
 {
 
     ZSIndexCollection(pZMFFile.IndexTable[pIndexRank]);
@@ -389,7 +389,7 @@ ZSIndexCollection::getFirstSelectedRank (ZDataBuffer &pRecordContent,ZSIndexResu
 {
 ZStatus wSt;
 //ZSIndexResult wZIR;
-ZSMasterFile *wMasterFile ;
+ZMasterFile *wMasterFile ;
 
     if (ZIFFile==nullptr)
         {
@@ -410,7 +410,7 @@ ZSMasterFile *wMasterFile ;
             Context.BaseIndex=-1;
             return getStatus();
             }
-    wMasterFile = static_cast<ZSMasterFile*>(ZIFFile->ZMFFather);
+    wMasterFile = static_cast<ZMasterFile*>(ZIFFile->ZMFFather);
     Context.ZSt=ZS_NOTFOUND;
     while (Context.ZSt==ZS_NOTFOUND)
         {
@@ -529,10 +529,10 @@ ZStatus
 ZSIndexCollection::_getRetry(ZDataBuffer &pRecordContent,ZSIndexResult&pZIR)
 {
 ZStatus wSt;
-ZSMasterFile *wMasterFile ;
+ZMasterFile *wMasterFile ;
 
     pZIR=Context.ZIFLast ;// ZIFLast is updated by getFirstRawRank and getNexRawRank
-    wMasterFile = static_cast<ZSMasterFile*>(ZIFFile->ZMFFather);
+    wMasterFile = static_cast<ZMasterFile*>(ZIFFile->ZMFFather);
     setStatus(ZS_NOTFOUND);
     while (getStatus()==ZS_NOTFOUND)
         {
@@ -863,10 +863,10 @@ ZStatus wSt;
  ZSIndexCollection::zsetFieldValue(const ssize_t pOffset,ZDataBuffer &pFieldValue)
  {
 ZStatus wSt;
-ZSMasterFile* wMasterFile =  static_cast<ZSMasterFile*>(ZIFFile->ZMFFather);
+ZMasterFile* wMasterFile =  static_cast<ZMasterFile*>(ZIFFile->ZMFFather);
 ZBlock      wBlock;
 ssize_t     wSize;
-ZSKeyDictionary *wZKDic ;
+ZKeyDictionary *wZKDic ;
 
 ZDataBuffer wFormerFieldValue;
 
@@ -932,7 +932,7 @@ ZSIndexCollection::zremoveAll (void)
 
     for (Context.BaseIndex=0;Context.BaseIndex < size();Context.BaseIndex++)// lock corresponding ZSMasterFile address with given lock mask
         {
-        Context.ZSt=static_cast<ZSMasterFile*>(ZIFFile->ZMFFather)->zremoveByAddress(Tab[Context.BaseIndex].ZMFAddress);
+        Context.ZSt=static_cast<ZMasterFile*>(ZIFFile->ZMFFather)->zremoveByAddress(Tab[Context.BaseIndex].ZMFAddress);
         if (Context.ZSt!=ZS_SUCCESS)
                     {
                     return getStatus();
@@ -948,7 +948,7 @@ ZSIndexCollection::_removeAllRetry (void)
 
     for (long wi=Context.BaseIndex;wi < size();wi++)// lock corresponding ZSMasterFile address with given lock mask
         {
-        setStatus(static_cast<ZSMasterFile*>(ZIFFile->ZMFFather)->zremoveByAddress(Tab[wi].ZMFAddress));
+        setStatus(static_cast<ZMasterFile*>(ZIFFile->ZMFFather)->zremoveByAddress(Tab[wi].ZMFAddress));
         if (Context.ZSt!=ZS_SUCCESS) // if not successfull : unlock what has been done and return status
                     {
                     Context.BaseIndex=wi;

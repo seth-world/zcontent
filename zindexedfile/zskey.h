@@ -2,17 +2,17 @@
 #define ZSKEY_H
 #include <cstdarg>
 #include <zrandomfile/zrandomfile.h>
-#include <zindexedfile/zsindexfile.h>
+#include <zindexedfile/zindexfile.h>
 
 /**
  * @addtogroup ZSKeyGroup
  * @{ */
 //---------------Adhoc key creation : Build Key from Value routines----------------------------------------------------
 /**
-@weakgroup ZSKey class  this object manages one key (given by KeyNumber) for a ZSMasterFile using its ZSIndexControlBlock (ZICB)
+@weakgroup ZSKey class  this object manages one key (given by KeyNumber) for a ZMasterFile using its ZSIndexControlBlock (ZICB)
  *
  *  ZKey class is used to form#include <zindexedfile/zsindexitem.h>at a key content for being used with ZMasterFile in queries.
- *  A key is dedicated to a ZSMasterFile for a dedicated Index
+ *  A key is dedicated to a ZMasterFile for a dedicated Index
  *
  *
  *  The objective is to offer the whole set of functionalities to create a key,
@@ -44,15 +44,15 @@ namespace zbs {
 
 class ZSKey : public ZDataBuffer
 {
-    friend class ZSMasterFile;
-    friend class ZSIndexFile;
+    friend class ZMasterFile;
+    friend class ZIndexFile;
 
     typedef ZDataBuffer _Base;
 public:
 
-    ZSKey(ZSMasterFile  *pZMF, const long pKeyRank) ;
-    ZRawIndexFile       *ZIF=nullptr;          //!<  pointer to ZSMasterFile ZICB element (also stored within ZIndexFile )
-    ZSMasterFile*        ZMF;           //!< pointer to ZSMasterFile
+    ZSKey(ZMasterFile  *pZMF, const long pKeyRank) ;
+    ZRawIndexFile       *ZIF=nullptr;          //!<  pointer to ZMasterFile ZICB element (also stored within ZIndexFile )
+    ZMasterFile*        ZMF;           //!< pointer to ZMasterFile
     long                IndexNumber;    //!<  ZMasterFile Index number (rank)
 
 

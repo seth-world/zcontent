@@ -111,7 +111,7 @@ public:
                   _unlockZBAT(ZBlockLock.last().Address);
                   ZBlockLock.pop();
                     }
-      return (_writeFileDescriptor(pForceWrite));
+      return (_writeFCB(pForceWrite));
   }
 /**
 * @brief _unlock Releases the lock set to block of rank pRank
@@ -143,7 +143,7 @@ public:
     if (wSt!= ZS_SUCCESS)
                 return wSt;
 
-    return (_writeFileDescriptor(pForceWrite));
+    return (_writeFCB(pForceWrite));
 
   }// _unlock
  /**

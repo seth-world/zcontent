@@ -12,27 +12,26 @@ namespace zbs {
 /**
  * @brief The ZIndexControlBlock class  Defines the operational data that describes one index.
  *
- * This infraData is stored in the ZSIndexFile Header AND in the ZSMasterFile index collection within its reserved Header block (ZMasterControlBlock)
+ * This infraData is stored in the ZIndexFile Header AND in the ZMasterFile index collection within its reserved Header block (ZMasterControlBlock)
  */
 #pragma pack(push)
 #pragma pack(1)
 
 class ZSICBOwnData;
-struct ZSICB_Export{
+class ZSICB_Export{
+public:
   ZSICB_Export() {}
   ZSICB_Export(const ZSICB_Export& pIn) { _copyFrom(pIn);}
-
-
 
   ZSICB_Export& _copyFrom(const ZSICB_Export& pIn);
   ZSICB_Export& set(const ZSICBOwnData *pIn);
 
   ZSICB_Export& operator = (const ZSICB_Export& pIn) {return  _copyFrom(pIn);}
 
-  ZSICB_Export& _reverseConditional();
 
   uint32_t      StartSign = cst_ZBLOCKSTART ;    // ZICB block start marker
   ZBlockID      BlockId   = ZBID_ICB;            // must be ZBID_ICB
+  uint16_t      EndianCheck = cst_EndianCheck_Normal;
   uint32_t      ZMFVersion= __ZMF_VERSION__ ;    // Self explainatory
 
   uint32_t      ICBTotalSize=0;    // ICB total size when written in file header (ZReserved header section size) this field must preceed ICB export content
@@ -44,7 +43,19 @@ struct ZSICB_Export{
 //  uint8_t                 AutoRebuild=false;  //!< RFFU
   ZSort_Type    Duplicates;         //!< Index key is allowing duplicates (ZST_DUPLICATES) or is not allowing duplicates (ZST_NODUPLICATES)
 
+  ZSICB_Export& setFromPtr(const unsigned char* &pPtrIn)
+  {
+    memmove (this,pPtrIn,sizeof(ZSICB_Export));
+    pPtrIn += sizeof(ZSICB_Export);
+    return *this;
+  }
 
+  void _convert();
+  void serialize();
+  void deserialize();
+
+  bool isReversed() {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
+  bool isNotReversed() {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
 
   void clear();
 };
@@ -66,19 +77,17 @@ public:
 //  ::ZIFKeyType_type       KeyType;          //!< RFFU
 //  uint8_t                 AutoRebuild=false;  //!< RFFU
 
-  ZSort_Type              Duplicates=ZST_NODUPLICATES;//!< Index key is allowing duplicates (ZST_DUPLICATES) or is not allowing duplicates (ZST_NODUPLICATES)
-  uint32_t                KeyUniversalSize=0;         //!< total of key size with internal format (in line with ZKDic when exists)
-  utf8String              IndexName;                  //!< Index user name
-  long                    IndexRank=0;                //!< self explainatory
-//  bool                    HasKeyDictionary=false;
-
-
+  ZSort_Type              Duplicates=ZST_NODUPLICATES;// Index key is allowing duplicates (ZST_DUPLICATES) or is not allowing duplicates (ZST_NODUPLICATES)
+  uint32_t                KeyUniversalSize=0;         // total of key size with internal format (in line with ZKDic when exists)
+  utf8String              IndexName;                  // Index user name
+  uriString               URIIndex;                   // Index file name
+  long                    IndexRank=0;                // self explainatory
 
   utf8String toXml(int pLevel);
   ZStatus fromXml(zxmlNode* pIndexRankNode,ZaiErrors* pErrorlog);
 //  ZDataBuffer& _exportAppend(ZDataBuffer& pICBE);
 
-  ZStatus _import(unsigned char *&pPtrIn);
+  ZStatus _import(const unsigned char *&pPtrIn);
   void clear()
   {
 //    ICBTotalSize=0;
@@ -89,33 +98,37 @@ public:
     Duplicates= ZST_NODUPLICATES;
     IndexName.clear();}
 };
-class ZMFDictionary;
-class ZMetaDic;
-class ZSIndexControlBlock : public ZSICBOwnData
+//class ZMFDictionary;
+//class ZMetaDic;
+
+ /* ZIndexControlBlock is used to managed raw index.
+  * It has no key dictionary definition : key dictionary is stored with ZMFDictionary when it exists. */
+
+class ZIndexControlBlock : public ZSICBOwnData
 {
 
 public:
-  ZSIndexControlBlock& _copyFrom(const ZSIndexControlBlock& pIn) ;
+  ZIndexControlBlock& _copyFrom(const ZIndexControlBlock& pIn) ;
 //  ZSIndexControlBlock(ZMetaDic *pMetaDic) ;
-  ZSIndexControlBlock() {}
+  ZIndexControlBlock() {}
 
-  ~ZSIndexControlBlock(void);
-  ZSIndexControlBlock(const ZSIndexControlBlock& pIn):ZSICBOwnData(pIn) {_copyFrom(pIn);}
-  ZSIndexControlBlock(const ZSIndexControlBlock&& pIn):ZSICBOwnData(pIn) {_copyFrom(pIn);}
-  ZSIndexControlBlock&  operator = (const ZSIndexControlBlock& pIn) {ZSICBOwnData::_copyFrom(pIn); return _copyFrom(pIn);}
+  ~ZIndexControlBlock(void);
+  ZIndexControlBlock(const ZIndexControlBlock& pIn):ZSICBOwnData(pIn) {_copyFrom(pIn);}
+  ZIndexControlBlock(const ZIndexControlBlock&& pIn):ZSICBOwnData(pIn) {_copyFrom(pIn);}
+  ZIndexControlBlock&  operator = (const ZIndexControlBlock& pIn) {ZSICBOwnData::_copyFrom(pIn); return _copyFrom(pIn);}
 
 //  void setMasterDic (ZMFDictionary* pDic) {MasterDic=pDic;}
-  ZSKeyDictionary         *KeyDic = nullptr ; //< Fields dictionary for the key :                                          // a pointer that is instantiated by new and destroyed when ZICB rank is removed
+  ZKeyDictionary         *IdxKeyDic = nullptr ; // Fields dictionary for the key :                                          // a pointer that is instantiated by new and destroyed when ZICB rank is removed
 //  ZMetaDic*               MetaDic=nullptr;  // reference to meta dictionary for the indexed file
   /* no dictionary in ICB, in MCB */
-//  ZMFDictionary*          MasterDic=nullptr;  // main dictionary if exists : managed at ZSMasterFile level
+//  ZMFDictionary*          MasterDic=nullptr;  // main dictionary if exists : managed at ZMasterFile level
   checkSum*   CheckSum=nullptr;
   md5         MD5;
 //  void clear(ZMetaDic *pMetaDic);
 //  bool hasDictionary() {return ZKDic!=nullptr;}
 //  bool hasDictionary() {return MasterDic!=nullptr;}
 
-  void newKeyDic(ZSKeyDictionary *pZKDic, ZMetaDic *pMetaDic);
+//  void newKeyDic(ZSKeyDictionary *pZKDic, ZMetaDic *pMetaDic);
 
 
   ZDataBuffer&_exportAppend(ZDataBuffer &pICBContent) ;
@@ -125,11 +138,11 @@ public:
   ZStatus     _importICB (ZMFDictionary* pMasterDic,ZDataBuffer &pRawICB, size_t &pImportedSize, size_t pOffset=0) ;
   ZStatus     _import (unsigned char *& pPtrIn, ZMFDictionary *pMetaDic=nullptr);
 */
-  ZStatus     _import (unsigned char *& pPtrIn);
+  ZStatus     _import (const unsigned char *&pPtrIn);
 
  // ZStatus     zkeyValueExtraction (ZRecord *pRecord, ZDataBuffer& pKey);
 
-  // generates checksum for Index Control block on ZSMasterFile side
+  // generates checksum for Index Control block on ZMasterFile side
 
   checkSum* generateCheckSum(void) { CheckSum = _export().newcheckSum(); return CheckSum;}
 

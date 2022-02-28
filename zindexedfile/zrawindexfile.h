@@ -24,7 +24,7 @@ extern ZVerbose_type ZVerbose;
 extern FILE* ZVerboseOutput;
 #endif
 */
-#ifndef ZSMASTERFILE_CPP
+#ifndef ZMasterFile_CPP
     extern bool ZMFStatistics;
 #endif
 
@@ -44,7 +44,7 @@ extern FILE* ZVerboseOutput;
 
 
 
-//=================================ZSIndexFile===============================
+//=================================ZIndexFile===============================
 
 namespace zbs {
 
@@ -56,11 +56,11 @@ namespace zbs {
 
 
 /**
- * @brief The ZSIndexFile class This object holds and manages at run-time an index file associated with a ZSMasterFile object ( Father ).
+ * @brief The ZIndexFile class This object holds and manages at run-time an index file associated with a ZMasterFile object ( Father ).
 
-ZSIndexFile does not own the key definitions : Key definitions (dictionary) are local to ZMasterFile for which key has been defined.
-ZSIndexFile index definition is stored in a ZIndexControlBlock (ZICB) that gives all necessary information about how to extract and format key fields from a record coming from its father (ZMasterFile).
-ZSIndexFile manages
+ZIndexFile does not own the key definitions : Key definitions (dictionary) are local to ZMasterFile for which key has been defined.
+ZIndexFile index definition is stored in a ZIndexControlBlock (ZICB) that gives all necessary information about how to extract and format key fields from a record coming from its father (ZMasterFile).
+ZIndexFile manages
  - key values insertion / suppression. For doing this, it extracts and formats appropriate data from its father record using its ZICB.
  - searches on its index data.
 
@@ -75,7 +75,7 @@ class ZRawRecord;
 //class ZRawRecord;
 class ZRawMasterFile;
 
-class ZRawIndexFile : protected ZRandomFile, public ZSIndexControlBlock
+class ZRawIndexFile : protected ZRandomFile, public ZIndexControlBlock
 {
 friend class ZSIndexCollection;
 friend class ZRawMasterFile;
@@ -83,30 +83,30 @@ friend class ZRawMasterFile;
 protected:
         typedef ZRandomFile                   _Base   ;
 public:
-    friend class ZSMasterFile;
+    friend class ZMasterFile;
 //    ZSIndexControlBlock   *ZICB=nullptr;    //!< ZICB pointer to ZMF father's ZICB content
 //    ZSIndexControlBlock   ZICB ;    //!< ZICB content
 
     ZMFStats              ZPMSStats;        //!< statistical structure
 /**
- * @brief ZSIndexFile first constructor version : the common one.
- *          It sets up the ZSIndexFile parameters AND rebuild the index if pAutoRebuild is set to true (default value is true).
- *          If ZIX rebuild is done, there must not be any ZS_DUPLICATEKEY during the rebuild if ZSIndexFile duplicates option is set to ZST_NODUPLICATES.
+ * @brief ZIndexFile first constructor version : the common one.
+ *          It sets up the ZIndexFile parameters AND rebuild the index if pAutoRebuild is set to true (default value is true).
+ *          If ZIX rebuild is done, there must not be any ZS_DUPLICATEKEY during the rebuild if ZIndexFile duplicates option is set to ZST_NODUPLICATES.
  *          If so, abort() will be called (after having appropriately destroyed objects on father ZAM side).
  *
  * @note if you want to create a ZIX without knowing in advance if there will be duplicates on key or not : you should set pDuplicates to ZST_DUPLICATES.
- *      Do not create ZSIndexFilees with rejected key values : you will have holes into your index tables that will induce an impredictable result as soon as you will update any part of the hierarchy (ZAM and other dependant ZIXs).
+ *      Do not create ZIndexFilees with rejected key values : you will have holes into your index tables that will induce an impredictable result as soon as you will update any part of the hierarchy (ZAM and other dependant ZIXs).
  *
  * @param[in] pFather ZAM to which the ZIX refers
  * @param[in] pDuplicates ZSort_Type defining how duplicates will be managed. (set to ZST_DUPLICATES by default)
  */
     ZRawIndexFile  (ZRawMasterFile *pFather);
-    ZRawIndexFile  (ZRawMasterFile *pFather,ZSIndexControlBlock& pZICB);
+    ZRawIndexFile  (ZRawMasterFile *pFather,ZIndexControlBlock& pZICB);
     ZRawIndexFile  (ZRawMasterFile *pFather,int pKeyUniversalsize,const utf8String &pIndexName ,ZSort_Type pDuplicates=ZST_NODUPLICATES);
 
 
     ~ZRawIndexFile() {}
-    //~ZSIndexFile() {if (ZMFFather!=nullptr)
+    //~ZIndexFile() {if (ZMFFather!=nullptr)
     //                             _deregister();}
 
     using _Base::getSize ;
@@ -167,7 +167,7 @@ public:
 
     zrank_type getCurrentRank (void) {return CurrentRank;}
 /**
-   * @brief ZSIndexFile::zcreateIndex creates a new index file corresponding to the given specification ICB and ZRF parameters
+   * @brief ZIndexFile::zcreateIndex creates a new index file corresponding to the given specification ICB and ZRF parameters
    *
    *  @note This could be NOT a good idea to set GrabFreeSpace option : Indexes are fixed length then search in Free Pool are only made with the same size.
    *
@@ -183,7 +183,7 @@ public:
    * @param[in] pLeaveOpen        Option : true leave the index file open as (ZRF_Exclusive | ZRF_All) false: close index file right after creation
    * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
    */
-    ZStatus zcreateIndex(ZSIndexControlBlock &pICB,
+    ZStatus zcreateIndex(ZIndexControlBlock &pICB,
                          uriString &pIndexUri,
                          long pAllocatedBlocks,
                          long pBlockExtentQuota,
@@ -193,10 +193,10 @@ public:
                          bool pBackup=false,
                          bool pLeaveOpen=true);
   /**
-   * @brief ZSIndexFile::zcreateIndex creates a new index file corresponding to the given specification ICB and ZRF parameters
+   * @brief ZIndexFile::zcreateIndex creates a new index file corresponding to the given specification ICB and ZRF parameters
    *      same as previous but with explicit pBlockTargetSize
    */
-    ZStatus zcreateIndex(ZSIndexControlBlock &pICB,
+    ZStatus zcreateIndex(ZIndexControlBlock &pICB,
                           uriString &pIndexUri,
                           long pAllocatedBlocks,
                           long pBlockExtentQuota,
@@ -208,7 +208,7 @@ public:
                           bool pLeaveOpen=true);
 
 /**
- * @brief ZSIndexFile::zrebuildIndex rebuilds the current index
+ * @brief ZIndexFile::zrebuildIndex rebuilds the current index
  *
  * NB: this routine does not open nor close the files
  *
@@ -220,7 +220,7 @@ public:
  * @param[in] pOutput   a FILE* pointer where the reporting will be made. Defaulted to stdout.
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
-    ZStatus zrebuildIndex (bool pStat=false, FILE *pOutput=stdout) ;
+    ZStatus zrebuildRawIndex (bool pStat=false, FILE *pOutput=stdout) ;
 
     ZStatus openIndexFile (uriString &pIndexUri, long pIndexRank, const int pMode);
     ZStatus closeIndexFile (void);
@@ -264,19 +264,19 @@ public:
   //  ZStatus getKeyIndexFields(ZDataBuffer &pIndexContent,ZDataBuffer& pKeyValue);
   //  ZStatus zprintKeyFieldsValues (const zrank_type pRank, bool pHeader=true, bool pKeyDump=false, FILE*pOutput=stdout) ;
 
-    ZSMasterFile* getMasterFile() {return (ZSMasterFile*)ZMFFather;}
+    ZMasterFile* getMasterFile() {return (ZMasterFile*)ZMFFather;}
     ZRawMasterFile* getRawMasterFile() {return ZMFFather;}
 
     ZStatus
-    _search(const ZDataBuffer &pKey,
-            ZSIndexResult &pZIR,
-            //            ZIFCompare pZIFCompare = ZKeyCompareBinary,
-            const zlockmask_type pLock=ZLock_Nolock);
+    _Rawsearch( const ZDataBuffer &pKey,
+                ZSIndexResult &pZIR,
+                //            ZIFCompare pZIFCompare = ZKeyCompareBinary,
+                const zlockmask_type pLock=ZLock_Nolock);
 
 
     static inline
     ZStatus
-    _search(const ZDataBuffer &pKey,
+    _Rawsearch(const ZDataBuffer &pKey,
               ZRawIndexFile &pZIF,
               ZSIndexResult &pZIR,
   //            ZIFCompare pZIFCompare = ZKeyCompareBinary,
@@ -284,51 +284,51 @@ public:
 
     static
     ZStatus
-    _searchAll(const ZDataBuffer &pKey,
-               ZRawIndexFile &pZIF,
-               ZSIndexCollection &pCollection,
-               const ZMatchSize_type pZMS= ZMS_MatchIndexSize);
+    _RawsearchAll(const ZDataBuffer &pKey,
+                   ZRawIndexFile &pZIF,
+                   ZSIndexCollection &pCollection,
+                   const ZMatchSize_type pZMS= ZMS_MatchIndexSize);
     static
     ZStatus
-    _searchNext(const ZDataBuffer &pKey,
+    _RawsearchNext(const ZDataBuffer &pKey,
                 ZRawIndexFile &pZIF,
                 ZSIndexCollection &pCollection,
                 const ZMatchSize_type pZSC );
 
     static
-    ZStatus _searchFirst (const ZDataBuffer        &pKey,     // key content to find out in index
+    ZStatus _RawsearchFirst (const ZDataBuffer        &pKey,     // key content to find out in index
                           ZRawIndexFile               &pZIF,
                           ZSIndexCollection         *pCollection,
                           ZSIndexResult             &pZIR, const ZMatchSize_type pZMS) ;
     static
-    ZStatus _searchNext (ZSIndexResult             &pZIR,
+    ZStatus _RawsearchNext (ZSIndexResult             &pZIR,
                          ZSIndexCollection *pCollection) ;
 
     static
-    ZStatus _searchIntervalFirst (const ZDataBuffer        &pKeyLow,     // lowest value of key content to find out in index
+    ZStatus _RawsearchIntervalFirst (const ZDataBuffer        &pKeyLow,     // lowest value of key content to find out in index
                                   const ZDataBuffer        &pKeyHigh,    // highest value of key content to find out in index
-                                  ZRawIndexFile               &pZIF,       // ZSIndexFile object to search on
+                                  ZRawIndexFile               &pZIF,       // ZIndexFile object to search on
                                   ZSIndexCollection         *pCollection, // collection and context
                                   ZSIndexResult             &pZIR,       // First (in key order) index rank & ZMF addresses found matching key value
                                   const bool               pExclude); // Exclude KeyLow and KeyHigh value from selection (i. e. > pKeyLow and < pKeyHigh)
 
 
-    static ZStatus _searchIntervalAll  (const ZDataBuffer      &pKeyLow,  // Lowest key content value to find out in index
+    static ZStatus _RawsearchIntervalAll  (const ZDataBuffer      &pKeyLow,  // Lowest key content value to find out in index
                                         const ZDataBuffer      &pKeyHigh, // Highest key content value to find out in index
                                         ZRawIndexFile             &pZIF,     // pointer to ZIndexControlBlock containing index description
-                                        ZSIndexCollection       *pCollection,   // enriched collection of reference (ZSIndexFile rank, ZMasterFile record address)
+                                        ZSIndexCollection       *pCollection,   // enriched collection of reference (ZIndexFile rank, ZMasterFile record address)
                                         const bool             pExclude);
 
 
     static
-    ZStatus _searchIntervalNext (ZSIndexResult       &pZIR,
+    ZStatus _RawsearchIntervalNext (ZSIndexResult       &pZIR,
                                  ZSIndexCollection   *pCollection) ;
 
 
 
 protected:
-   ZRawMasterFile*              ZMFFather=nullptr;   // pointer to ZMasterFile that instantiated the ZSIndexFile object
-   uriString                    IndexUri;    // current Index File uri to be passed to ZRandomFile
+   ZRawMasterFile*              ZMFFather=nullptr;   // pointer to ZMasterFile that instantiated the ZIndexFile object
+//   uriString                    IndexUri;    // current Index File uri to be passed to ZRandomFile
 
 #ifdef __USE_ZTHREAD__
     ZMutex _Mtx;
@@ -339,7 +339,7 @@ protected:
     ZStatus _updateZReverse(ZOp pZAMOp,ZOp pZIXOp, size_t pZAMIdx, size_t pIdx);
     long _lookupZMFIdx (size_t pZMFIdx);
 
-    ZStatus _alignZSIndexFile(ZOp pZAMOp,ZOp pZIXOp, size_t pZAMIdx, size_t pZIXIdx);
+    ZStatus _alignZIndexFile(ZOp pZAMOp,ZOp pZIXOp, size_t pZAMIdx, size_t pZIXIdx);
 
 
 public: utf8String toXml(int pLevel,bool pComment);
@@ -352,13 +352,13 @@ private:
     long                  IndexCommitRank;
     zaddress_type         ZMFAddress;
     ZDataBuffer           CurrentKeyContent;
-};// class ZSIndexFile
+};// class ZIndexFile
 
 
 
-class ZIndexTable :  private ZArray<ZRawIndexFile*>
+class ZIndexTable :  private ZArray<ZIndexFile*>
 {
-  typedef ZArray<ZRawIndexFile*> _Base ;
+  typedef ZArray<ZIndexFile*> _Base ;
 public:
   ZIndexTable() {}
   ~ZIndexTable() {}// just to call the base destructor
@@ -383,9 +383,6 @@ public:
 
   utf8String toXml(int pLevel,bool pComment=true);
   ZStatus fromXml(zxmlNode* pRoot,ZaiErrors*pErrorlog);
-
-
-
 } ;
 
 
@@ -398,6 +395,6 @@ public:
 
 } // namespace zbs
 
-ZStatus _printKeyFieldsValues (ZDataBuffer *wKeyContent,ZSIndexFile* pZIF, bool pHeader,bool pKeyDump,FILE*pOutput);
+ZStatus _printKeyFieldsValues (ZDataBuffer *wKeyContent,ZIndexFile* pZIF, bool pHeader,bool pKeyDump,FILE*pOutput);
 
 #endif  //ZRAWINDEXFILE_H

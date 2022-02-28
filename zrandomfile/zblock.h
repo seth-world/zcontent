@@ -1,18 +1,35 @@
 #ifndef ZBLOCK_H
 #define ZBLOCK_H
 
+#include <ztoolset/zlimit.h>
 #include <zrandomfile/zrandomfiletypes.h>
 
 class ZBlock;
 class ZBlockDescriptor;
-
+class ZBlockHeader;
 #pragma pack(push)
 #pragma pack(1)
 class ZBlockHeader_Export
 {
 public:
-  uint32_t            StartBlock=cst_ZBLOCKSTART ;    // Start marker
+  ZBlockHeader_Export()=default;
+  ZBlockHeader_Export(const ZBlockHeader_Export& pIn) {_copyFrom(pIn);}
+
+  ZBlockHeader_Export& _copyFrom(const ZBlockHeader_Export& pIn);
+
+  ZBlockHeader_Export& set(const ZBlockHeader &pIn);
+  ZBlockHeader_Export& setFromPtr(unsigned char* &pIn);
+
+  void _convert();
+  void serialize();
+  void deserialize();
+
+  bool isReversed() {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
+  bool isNotReversed() {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
+
+  uint32_t            StartSign=cst_ZBLOCKSTART ;    // Start marker
   ZBlockID            BlockId=ZBID_Data;         // Block identification : always ZBID_Data here
+  uint16_t            EndianCheck=cst_EndianCheck_Normal;
   zsize_type          BlockSize;      // total size of the physical block, ZBH_Export size+user content size
   ZBlockState_type    State;          // state of the block see @ref ZBlockState_type
   zlockmask_type      Lock;           // relates to ZLockMask_type (zlockmanager.h)
@@ -22,6 +39,16 @@ public:
 class ZBlockDescriptor_Export: public ZBlockHeader_Export
 {
 public:
+  void set(const ZBlockDescriptor& pIn);
+  void setFromPtr(unsigned char* &pPtrIn);
+
+  void _convert();
+  void serialize();
+  void deserialize();
+
+  bool isReversed() {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
+  bool isNotReversed() {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
+
   zaddress_type        Address;      // Offset from begining of file : Physical Address (starting 0)
 };
 
@@ -57,31 +84,12 @@ public:
   ZBlockHeader& operator = (const ZBlockHeader &pIn) {return _copyFrom(pIn);}
   ZBlockHeader& operator = (const ZBlockDescriptor& pBlockDescriptor) {memmove(this,&pBlockDescriptor,sizeof(ZBlockHeader)); return *this;}
   ZBlockHeader& operator = (const ZBlock& pBlock) {memmove(this,&pBlock,sizeof(ZBlockHeader));  return *this;}
-  /*    ZDataBuffer& _export(ZDataBuffer& pZDBExport)
-    {
-        ZBlockHeader wExport;
-        wExport.StartBlock = _reverseByteOrder_T<int32_t>(StartBlock);
-        wExport.BlockID= BlockID;   // unsigned char
-        wExport.BlockSize=_reverseByteOrder_T<zsize_type>(BlockSize);
-        wExport.State= State;   // unsigned char
-        wExport.Lock=_reverseByteOrder_T<zlock_type>(Lock);
-        wExport.LockReason=LockReason; // unsigned char
-        wExport.Pid=_reverseByteOrder_T<pid_t>(Pid);
-        pZDBExport.setData(&wExport,sizeof(wExport));
-        return pZDBExport;
-    }//_export
-    ZBlockHeader& _import(unsigned char* pZDBImport_Ptr)
-    {
-        ZBlockHeader* pImport=(ZBlockHeader*)(pZDBImport_Ptr);
-        StartBlock = _reverseByteOrder_T<int32_t>(pImport->StartBlock);
-        BlockID= pImport->BlockID;   // unsigned char
-        BlockSize=_reverseByteOrder_T<zsize_type>(pImport->BlockSize);
-        State= pImport->State;   // unsigned char
-        Lock=_reverseByteOrder_T<zlock_type>(pImport->Lock);
-        LockReason=pImport->LockReason; // unsigned char
-        Pid=_reverseByteOrder_T<pid_t>(pImport->Pid);
-        return *this;
-    }//_import*/
+
+
+  ZStatus _import(unsigned char *pPtrIn);
+  ZDataBuffer& _exportAppend(ZDataBuffer &pZDB);
+
+  /* required for exporting Pool with ZArray export facilities */
   static ZBlockHeader_Export& _exportConvert(ZBlockHeader& pIn,ZBlockHeader_Export* pOut);
   static ZStatus _importConvert(ZBlockHeader& pOut,ZBlockHeader_Export* pIn);
 
@@ -109,10 +117,12 @@ public:
   ZBlockDescriptor& operator = (const ZBlockHeader& pBlockHeader) { ZBlockHeader::_copyFrom(pBlockHeader); return *this;}
   ZBlockDescriptor& operator = (const ZBlock &pBlock) {ZBlockHeader::_copyFrom((const ZBlockHeader&)pBlock); return *this;}
 
+  ZStatus _import(unsigned char *pPtrIn);
+  ZDataBuffer& _exportAppend(ZDataBuffer &pZDB);
+
+  /* required for exporting Pool with ZArray export facilities */
   static ZBlockDescriptor_Export _exportConvert(ZBlockDescriptor& pIn,ZBlockDescriptor_Export* pOut);
-
   static ZStatus _importConvert(ZBlockDescriptor& pOut,ZBlockDescriptor_Export* pIn);
-
 
 
 };

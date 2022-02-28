@@ -79,12 +79,14 @@ ZQT_ROOT = $${TOOLSET_ROOT}/zqt
 
 ZQT_WIDGET = $${ZQT_ROOT}/zqtwidget
 
- INCLUDEPATH += $${TOOLSET_INCLUDE}  \
+ INCLUDEPATH += $${TOOLSET_ROOT} \
+                $${TOOLSET_INCLUDE}  \
                 $${TOOLSET_INC_ZBASE} \
                 $${TOOLSET_INC_ZNET} \
                 $${TOOLSET_INC_ZCONTENT} \
                 $${TOOLSET_INC_ZAM} \
                 $${OPENSSL_ROOT} \
+                $${ZQT_ROOT} \
                 $${ZQT_WIDGET} \
                 $${DEVELOPMENT_BASE}/zflow
 
@@ -103,27 +105,67 @@ INCLUDEPATH +=/usr/include/libxml2
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    ../../zqt/zqtwidget/zdatareference.cpp \
+    ../../zqt/zqtwidget/zpinboard.cpp \
     ../../zqt/zqtwidget/zqlabel.cpp \
+    ../../zqt/zqtwidget/zqlineedit.cpp \
+    ../../zqt/zqtwidget/zqstandarditem.cpp \
+    ../../zqt/zqtwidget/zqstandarditemmodel.cpp \
+    ../../zqt/zqtwidget/zqtableview.cpp \
+    ../../zqt/zqtwidget/zqtreeview.cpp \
+    ../../zqt/zqtwidget/zqtwidgettools.cpp \
+    ../../zqt/zqtwidget/zqtwidgettypes.cpp \
+    ../zcontentcommon/zresource.cpp \
+    ../zindexedfile/zfielddescription.cpp \
+    dicedit.cpp \
     displaymain.cpp \
     main.cpp \
     texteditmwn.cpp \
     zcontentvisumain.cpp \
+    zentity.cpp \
     zexceptiondlg.cpp \
+    zfielddlg.cpp \
+    zkeydlg.cpp \
+    zlayout.cpp \
     zscan.cpp
 
 HEADERS += \
+    ../../zconfig_general.h \
+    ../../zqt/zqtwidget/zdatareference.h \
+    ../../zqt/zqtwidget/zpinboard.h \
     ../../zqt/zqtwidget/zqlabel.h \
+    ../../zqt/zqtwidget/zqlineedit.h \
+    ../../zqt/zqtwidget/zqstandarditem.h \
+    ../../zqt/zqtwidget/zqstandarditemmodel.h \
+    ../../zqt/zqtwidget/zqtableview.h \
+    ../../zqt/zqtwidget/zqtreeview.h \
+    ../../zqt/zqtwidget/zqtwidgettools.h \
+    ../../zqt/zqtwidget/zqtwidgettypes.h \
+    ../zcontentcommon/zresource.h \
+    ../zindexedfile/zfielddescription.h \
+    dicedit.h \
     displaymain.h \
     texteditmwn.h \
     zcontentvisumain.h \
+    zentity.h \
     zexceptiondlg.h \
+    zfielddlg.h \
+    zkeydlg.h \
+    zlayout.h \
     zscan.h
 
 FORMS += \
+    dicedit.ui \
+#    dicedit_copy.ui \
+#    dicedit_old.ui \
     displaymain.ui \
     texteditmwn.ui \
+    texteditmwn_copy.ui \
     zcontentvisumain.ui \
     zexceptiondlg.ui \
+    zexceptiondlg_old.ui \
+    zfielddlg.ui \
+    zkeydlg.ui \
     zscan.ui
 
 # Default rules for deployment.

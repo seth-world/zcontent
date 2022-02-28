@@ -16,8 +16,8 @@ ZRFPMS& ZRFPMS::_copyFrom(const ZRFPMS& pIn)
   LockWrites=pIn.LockWrites;
   HReservedReads=pIn.HReservedReads;
   HReservedWrites=pIn.HReservedWrites;
-  HFDReads=pIn.HFDReads;
-  HFDWrites=pIn.HFDWrites;
+  HFCBReads=pIn.HFCBReads;
+  HFCBWrites=pIn.HFCBWrites;
   CBHReads=pIn.CBHReads;
   CBHReadBytesSize=pIn.CBHReadBytesSize;
   CBHWrites=pIn.CBHWrites;
@@ -52,8 +52,8 @@ ZRFPMS::operator - (const ZRFPMS &pPMSIn)
   wZRFPMS1.HFHWrites -= pPMSIn.HFHWrites;
   wZRFPMS1.HReservedReads -= pPMSIn.HReservedReads;
   wZRFPMS1.HReservedWrites -= pPMSIn.HReservedWrites;
-  wZRFPMS1.HFDReads -= pPMSIn.HFDReads;
-  wZRFPMS1.HFDWrites -= pPMSIn.HFDWrites;
+  wZRFPMS1.HFCBReads -= pPMSIn.HFCBReads;
+  wZRFPMS1.HFCBWrites -= pPMSIn.HFCBWrites;
   wZRFPMS1.CBHReads -= pPMSIn.CBHReads;
   wZRFPMS1.CBHReadBytesSize -= pPMSIn.CBHReadBytesSize;
   wZRFPMS1.CBHWrites -= pPMSIn.CBHWrites;
@@ -87,8 +87,8 @@ ZRFPMS::operator + (const ZRFPMS &pPMSIn)
   wZRFPMS1.HFHWrites += pPMSIn.HFHWrites;
   wZRFPMS1.HReservedReads += pPMSIn.HReservedReads;
   wZRFPMS1.HReservedWrites += pPMSIn.HReservedWrites;
-  wZRFPMS1.HFDReads += pPMSIn.HFDReads;
-  wZRFPMS1.HFDWrites += pPMSIn.HFDWrites;
+  wZRFPMS1.HFCBReads += pPMSIn.HFCBReads;
+  wZRFPMS1.HFCBWrites += pPMSIn.HFCBWrites;
   wZRFPMS1.CBHReads += pPMSIn.CBHReads;
   wZRFPMS1.CBHReadBytesSize += pPMSIn.CBHReadBytesSize;
   wZRFPMS1.CBHWrites += pPMSIn.CBHWrites;
@@ -192,8 +192,8 @@ ZRFPMS::reportDetails (FILE*pOutput)
       HFHWrites,
       LockReads,
       LockWrites,
-      HFDReads,
-      HFDWrites,
+      HFCBReads,
+      HFCBWrites,
       HReservedReads,
       HReservedWrites,
 

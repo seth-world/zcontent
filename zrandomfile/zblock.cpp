@@ -1,5 +1,141 @@
 #include "zblock.h"
 
+
+ZBlockHeader_Export& ZBlockHeader_Export::_copyFrom(const ZBlockHeader_Export& pIn)
+{
+  StartSign=pIn.StartSign;
+  BlockId=pIn.BlockId;
+  EndianCheck=pIn.EndianCheck;
+  BlockSize=pIn.BlockSize;
+  State=pIn.State;
+  Lock=pIn.Lock;
+  Pid=pIn.Pid;
+
+  return *this;
+}
+
+ZBlockHeader_Export& ZBlockHeader_Export::set(const ZBlockHeader& pIn)
+{
+
+  BlockSize=pIn.BlockSize;
+  State=pIn.State;
+  Lock=pIn.Lock;
+  Pid=pIn.Pid;
+
+  return *this;
+}
+
+ZBlockHeader_Export& ZBlockHeader_Export::setFromPtr(unsigned char *&pPtrIn)
+{
+  ZBlockHeader_Export* wIne=(ZBlockHeader_Export*)pPtrIn;
+  StartSign=wIne->StartSign;
+  BlockId=wIne->BlockId;
+  EndianCheck=wIne->EndianCheck;
+  BlockSize=wIne->BlockSize;
+  State=wIne->State;
+  Lock=wIne->Lock;
+  Pid=wIne->Pid;
+  pPtrIn += sizeof(ZBlockHeader_Export);
+  return *this;
+}
+
+void ZBlockHeader_Export::_convert()
+{
+  if (!is_little_endian())
+    return ;
+
+  EndianCheck=reverseByteOrder_Conditional(EndianCheck);
+
+  //  StartSign=reverseByteOrder_Conditional<uint32_t>(StartSign);
+  BlockSize=reverseByteOrder_Conditional(BlockSize);
+  Pid=reverseByteOrder_Conditional(Pid);
+  return ;
+}
+
+
+void
+ZBlockHeader_Export::serialize()
+{
+  if (!is_little_endian())
+    return ;
+  if (isReversed())
+  {
+    fprintf (stderr,"ZBlockHeader_Export::serialize-W-ALRDY Master Control Block already serialized. \n");
+    return;
+  }
+  _convert();
+}
+
+void
+ZBlockHeader_Export::deserialize()
+{
+  if (!is_little_endian())
+    return ;
+  if (isNotReversed())
+  {
+    fprintf (stderr,"ZBlockHeader_Export::deserialize-W-ALRDY Master Control Block already deserialized. \n");
+    return;
+  }
+  _convert();
+}
+
+
+
+void ZBlockDescriptor_Export::set(const ZBlockDescriptor &pIn)
+{
+  ZBlockHeader_Export::set((const ZBlockHeader&)pIn);
+  Address = pIn.Address;
+  return ;
+}
+
+void ZBlockDescriptor_Export::setFromPtr(unsigned char *&pPtrIn)
+{
+  ZBlockDescriptor_Export* wIne=(ZBlockDescriptor_Export*)pPtrIn;
+  ZBlockHeader_Export::setFromPtr(pPtrIn);
+  Address = wIne->Address;
+  pPtrIn += sizeof(Address);
+  return ;
+}
+
+void ZBlockDescriptor_Export::_convert()
+{
+  if (!is_little_endian())
+    return ;
+  ZBlockHeader_Export::_convert();
+  Address=reverseByteOrder_Conditional(Address);
+  return ;
+}
+
+void
+ZBlockDescriptor_Export::serialize()
+{
+  if (!is_little_endian())
+    return ;
+  if (isReversed())
+  {
+    fprintf (stderr,"ZBlockDescriptor_Export::serialize-W-ALRDY Master Control Block already serialized. \n");
+    return;
+  }
+  _convert();
+}
+
+void
+ZBlockDescriptor_Export::deserialize()
+{
+  if (!is_little_endian())
+    return ;
+  if (isNotReversed())
+  {
+    fprintf (stderr,"ZBlockDescriptor_Export::deserialize-W-ALRDY Master Control Block already deserialized. \n");
+    return;
+  }
+  _convert();
+}
+
+
+
+
+
 ZBlockHeader& ZBlockHeader::_copyFrom(const ZBlockHeader& pIn)
 {
   BlockSize=pIn.BlockSize;
@@ -8,6 +144,10 @@ ZBlockHeader& ZBlockHeader::_copyFrom(const ZBlockHeader& pIn)
   Pid=pIn.Pid;
   return *this;
 }
+
+
+
+
 ZBlockDescriptor& ZBlockDescriptor::_copyFrom(const ZBlockDescriptor& pIn)
 {
   ZBlockHeader::_copyFrom(pIn);
@@ -15,10 +155,58 @@ ZBlockDescriptor& ZBlockDescriptor::_copyFrom(const ZBlockDescriptor& pIn)
   return *this;
 }
 
+
+ZStatus
+ZBlockHeader::_import(unsigned char *pPtrIn)
+{
+  ZBlockHeader_Export wZBHe;
+  wZBHe.setFromPtr(pPtrIn);
+  wZBHe.deserialize();
+  BlockSize = wZBHe.BlockSize;
+  State=wZBHe.State;
+  Lock=wZBHe.Lock;
+  Pid=wZBHe.Pid;
+}
+
+ZStatus
+ZBlockDescriptor::_import(unsigned char *pPtrIn)
+{
+  ZBlockDescriptor_Export wZBDe;
+  wZBDe.setFromPtr(pPtrIn);
+  wZBDe.deserialize();
+  BlockSize = wZBDe.BlockSize;
+  State=wZBDe.State;
+  Lock=wZBDe.Lock;
+  Pid=wZBDe.Pid;
+  Address = wZBDe.Address;
+}
+
+ZDataBuffer &
+ZBlockHeader::_exportAppend(ZDataBuffer &pZDB)
+{
+  ZBlockHeader_Export wZBHe;
+  wZBHe.set(*this);
+  wZBHe.serialize();
+
+  pZDB.append_T(wZBHe);
+  return pZDB;
+}
+
+ZDataBuffer &
+ZBlockDescriptor::_exportAppend(ZDataBuffer &pZDB)
+{
+  ZBlockDescriptor_Export wZBDe;
+  wZBDe.set(*this);
+  wZBDe.serialize();
+  pZDB.append_T(wZBDe);
+  return pZDB;
+}
+
+
 ZBlockDescriptor_Export ZBlockDescriptor:: _exportConvert(ZBlockDescriptor& pIn,ZBlockDescriptor_Export* pOut)
 {
   memset(pOut,0,sizeof(ZBlockDescriptor_Export));
-  pOut->StartBlock = cst_ZBLOCKSTART;
+  pOut->StartSign = cst_ZBLOCKSTART;
   pOut->BlockId= ZBID_Data ;   // uint8_t
   pOut->BlockSize=reverseByteOrder_Conditional<zsize_type>(pIn.BlockSize);
   pOut->State= pIn.State;   // uint8_t
@@ -31,21 +219,24 @@ ZBlockDescriptor_Export ZBlockDescriptor:: _exportConvert(ZBlockDescriptor& pIn,
   return *pOut;
 }//_exportConvert
 
+
 ZStatus
 ZBlockDescriptor::_importConvert(ZBlockDescriptor& pOut, ZBlockDescriptor_Export *pIn)
 {
-  if ((pIn->StartBlock!=cst_ZBLOCKSTART)||(pIn->BlockId!=ZBID_Data))
+
+  if ((pIn->StartSign!=cst_ZBLOCKSTART)||(pIn->BlockId!=ZBID_Data))
   {
     ZException.setMessage("ZBlockDescriptor::_importConvert",
         ZS_INVBLOCKADDR,
         Severity_Severe,
         "Invalid block format: invalid marker  Startblock<%X> or BlockId<%X>",
-        pIn->StartBlock,
+        pIn->StartSign,
         pIn->BlockId);
     return  ZS_INVBLOCKADDR;
   }
 
   pOut.clear();
+
   //        pOut.StartBlock = _reverseByteOrder_T<int32_t>(pIn->StartBlock);
   //        pOut.BlockID= pIn->BlockID;   // unsigned char
   pOut.BlockSize=reverseByteOrder_Conditional<zsize_type>(pIn->BlockSize);
@@ -58,13 +249,13 @@ ZBlockDescriptor::_importConvert(ZBlockDescriptor& pOut, ZBlockDescriptor_Export
   return  ZS_SUCCESS;
 }//_importConvert
 
-
 ZBlockHeader_Export&
 ZBlockHeader::_exportConvert(ZBlockHeader& pIn,ZBlockHeader_Export* pOut)
 {
-  pOut->StartBlock = cst_ZBLOCKSTART;
-  //        pOut->BlockID= pIn.BlockID;   // uint8_t
+  pOut->StartSign = cst_ZBLOCKSTART;
   pOut->BlockId= ZBID_Data;   // uint8_t
+  pOut->EndianCheck = cst_EndianCheck_Reversed;
+
   pOut->BlockSize=reverseByteOrder_Conditional<zsize_type>(pIn.BlockSize);
   pOut->State= pIn.State;   // unsigned char
   pOut->Lock=reverseByteOrder_Conditional<zlockmask_type>(pIn.Lock);
@@ -78,23 +269,61 @@ ZStatus
 ZBlockHeader::_importConvert(ZBlockHeader& pOut,ZBlockHeader_Export* pIn)
 {
   pOut.clear();
-  if ((pIn->StartBlock!=cst_ZBLOCKSTART)||(pIn->BlockId!=ZBID_Data))
+  if ((pIn->StartSign!=cst_ZBLOCKSTART)||(pIn->BlockId!=ZBID_Data))
   {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_INVBLOCKADDR,
         Severity_Severe,
         "Invalid block format: invalid marker  Startblock<%X> or BlockId<%X>",
-        pIn->StartBlock,
+        pIn->StartSign,
         pIn->BlockId);
     return  ZS_INVBLOCKADDR;
   }
-  //        pOut.StartBlock = pIn->StartBlock;
-  //        pOut.BlockID= pIn->BlockID;   // unsigned char
+  if (pIn->isNotReversed() )
+  {
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        ZS_CORRUPTED,
+        Severity_Severe,
+        "Invalid block format: input is not serialized, EndianChek is not reversed.");
+    return  ZS_CORRUPTED;
+  }
   pOut.BlockSize=reverseByteOrder_Conditional<zsize_type>(pIn->BlockSize);
   pOut.State= pIn->State;   // unsigned char
   pOut.Lock=reverseByteOrder_Conditional<zlockmask_type>(pIn->Lock);
-  //        pOut.LockReason=pIn->LockReason; // unsigned char
+
   pOut.Pid=reverseByteOrder_Conditional<pid_t>(pIn->Pid);
 
   return  ZS_SUCCESS;
 }//_importConvert
+
+
+
+const char*
+decode_BlockId(ZBlockID pBID)
+{
+  switch (pBID)
+  {
+  case ZBID_Nothing:
+    return "ZBID_Nothing";
+  case ZBID_FileHeader:
+    return "ZBID_FileHeader";
+  case ZBID_FCB:
+    return "ZBID_FCB";
+  case ZBID_MCB:
+    return "ZBID_MCB";
+  case ZBID_ICB:
+    return "ZBID_ICB";
+  case ZBID_JCB:
+    return "ZBID_JCB";
+  case ZBID_Data:
+    return "ZBID_Data";
+  case ZBID_Index:
+    return "ZBID_Index";
+  case ZBID_Master:
+    return "ZBID_Master";
+  case ZBID_MDIC:
+    return "ZBID_MDIC";
+  default:
+    return "Unknown Block id";
+  }
+}

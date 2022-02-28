@@ -16,18 +16,24 @@ class QAction;
 class QFileDialog;
 namespace zbs {
 class ZRandomFile;
-class ZSMasterFile;
+class ZMasterFile;
 }
+
+class ZContentVisuMain;
+
 class DisplayMain : public QMainWindow
 {
   Q_OBJECT
 
 public:
-  explicit DisplayMain(QWidget *parent = nullptr);
+  explicit DisplayMain(ZContentVisuMain *parent = nullptr);
   ~DisplayMain();
 
 
   QStandardItemModel* displayItemModel =nullptr;
+
+
+  void setFileClosed(bool pYesNo);
 
   void displayHCB(ZDataBuffer& pData);
   void displayFCB(ZDataBuffer &pData);
@@ -41,10 +47,13 @@ public:
   void displayAll(unsigned char *pPtrIn);
   void load(unsigned char* pPtrIn);
 
+  void getMCB(ZDataBuffer &pData);
+
 
   ZDataBuffer           ContentToDump;
   long                  Offset=0;
   unsigned char*        PtrIn=nullptr;
+  ZContentVisuMain*     VisuMain=nullptr;
 
   enum DisplayWhat {
     ZDW_Nothing = 0,
@@ -58,8 +67,13 @@ public:
 
   void clear();
 
+
+
+
 private slots:
   void sliderChange(int pValue);
+
+
 
 private:
   Ui::DisplayMain *ui;

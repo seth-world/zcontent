@@ -1,8 +1,10 @@
 #ifndef ZHEADERCONTROLBLOCK_H
 #define ZHEADERCONTROLBLOCK_H
 
+#include <ztoolset/zlimit.h>
 #include <zrandomfile/zrandomfiletypes.h>
 #include <ztoolset/zdatabuffer.h>
+
 
 typedef void  (*ZFCBgetReserved) (ZDataBuffer &) ;
 #pragma pack(push)
@@ -14,13 +16,17 @@ typedef void  (*ZFCBgetReserved) (ZDataBuffer &) ;
  *
  *
  */
+
+
 class ZHeaderControlBlock;
 class ZHeaderControlBlock_Export
 {
 public:
   uint32_t                StartSign   = cst_ZBLOCKSTART;  /**< check for block start */
   ZBlockID                BlockID     = ZBID_FileHeader;  /**< identification is file header */
+  uint16_t                EndianCheck = cst_EndianCheck_Normal;
   unsigned long           ZRFVersion  = __ZRF_VERSION__;  /**< software version */
+
   ZFile_type              FileType    = ZFT_Nothing ;     /**< File type see ref ZFile_type */
   zlockmask_type          Lock        = ZLock_Nolock ;    /**< Lock mask (int32_t) at file header level (Exclusive lock) @see ZLockMask_type one lock at a time is authorized */
   pid_t                   LockOwner   = 0L;               /**< Owner process for the lock */
@@ -31,15 +37,32 @@ public:
 
   uint32_t                EndSign     = cst_ZBLOCKEND;         /**< check for block end */
 
+
   ZHeaderControlBlock_Export()=default;
   ZHeaderControlBlock_Export(ZHeaderControlBlock_Export& pIn) {_copyFrom(pIn);}
 
   ZHeaderControlBlock_Export& operator=(ZHeaderControlBlock_Export& pIn) {return _copyFrom(pIn);}
 
-  void _convert();
+  void    set(const ZHeaderControlBlock& pIn);
+  void    setFromPtr(const unsigned char *&pPtrIn);
+  ZHeaderControlBlock&          toHCB(ZHeaderControlBlock& pOut);
 
-  ZHeaderControlBlock_Export &set(const ZHeaderControlBlock pIn);
+  void _convert();
+  void serialize();
+  void deserialize();
+
   ZHeaderControlBlock_Export& _copyFrom(ZHeaderControlBlock_Export& pIn);
+
+  bool isReversed()
+  {
+    if (EndianCheck==cst_EndianCheck_Reversed) return true;
+    return false;
+  }
+  bool isNotReversed()
+  {
+    if (EndianCheck==cst_EndianCheck_Normal) return true;
+    return false;
+  }
 
 };
 
@@ -101,7 +124,7 @@ public:
      */
   int fromXml(zxmlNode* pHCBRootNode,ZaiErrors* pErrorlog);
 
-  ZDataBuffer& _export(ZDataBuffer& pZDBExport);
-  ZStatus      _import(unsigned char* &pPtrIn);
+  ZDataBuffer& _exportAppend(ZDataBuffer& pZDBExport);
+  ZStatus      _import(const unsigned char *&pPtrIn);
 };
 #endif // ZHEADERCONTROLBLOCK_H

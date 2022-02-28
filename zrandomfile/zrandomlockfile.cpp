@@ -130,7 +130,7 @@ ZStatus ZRandomLockFile::_lock(const zaddress_type pAddress,
 //    wlockS.Rank = pRank;
     wlockS.Address = pAddress;
     ZBlockLock.push(wlockS);
-    return (_writeFileDescriptor(pForceWrite));
+    return (_writeFCB(pForceWrite));
 }//_lock
 
 

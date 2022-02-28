@@ -10,7 +10,7 @@ namespace zbs {
 
 /**
  @brief The ZIndexItem class  Main Input/Ouput for indexes. It relates to ZRecord.
-The key effective content as it will be stored using ZSIndexFile object (and not its Fields structure definition).
+The key effective content as it will be stored using ZIndexFile object (and not its Fields structure definition).
 
 */
 class ZSIndexItem : public ZDataBuffer

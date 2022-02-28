@@ -5,7 +5,7 @@
 
 #include <zindexedfile/zindexcollection.h>
 #include <zindexedfile/zrawmasterfile.h>
-#include <zindexedfile/zsmasterfile.h>
+#include <zindexedfile/zmasterfile.h>
 #include <zxml/zxml.h>
 #include <zxml/zxmlprimitives.h>
 #include <ztoolset/zaierrors.h>
@@ -83,9 +83,9 @@ using namespace zbs;
   @{ */
 
 /**
- * @brief generateIndexRootName generates a ZSIndexFile root name from its father ZSMasterFile's root name
+ * @brief generateIndexRootName generates a ZIndexFile root name from its father ZSMasterFile's root name
  *
- * ZSIndexFile name generation rule
+ * ZIndexFile name generation rule
  *@verbatim
  *          <master root name>[<index name>]-<index rank>
  *@endverbatim
@@ -93,7 +93,7 @@ using namespace zbs;
  * @param[in] pMasterRootName   a descString containing the father ZSMasterFile's root name
  * @param[in] pRank             Index rank
  * @param[in] pIndexName        Index user name : could be empty
- * @return an utf8String with the appropriate ZSIndexFile root name
+ * @return an utf8String with the appropriate ZIndexFile root name
  */
 utf8String generateIndexRootName(const utf8String &pMasterRootName,
                                  const long pRank,
@@ -130,15 +130,15 @@ utf8String generateIndexRootName(const utf8String &pMasterRootName,
  *
  *  For base name generation @see generateIndexRootName
  *
- * @param[in]  pMasterFileUri   Base name for ZSMasterFile to create ZSIndexFile name for
- * @param[in]  pPathDir         Directory path to create the ZSIndexFile in
- * @param[out] pZSIndexFileUri   Resulting ZSIndexFile name
+ * @param[out] pZIndexFileUri  Resulting ZIndexFile name
+ * @param[in]  pMasterFileUri   Base name for ZSMasterFile to create ZIndexFile name for
+ * @param[in]  pPathDir         Directory path to create the ZIndexFile in
  * @param [in] pRank            Index rank for the ZSMasterFile
  * @param[in]  pIndexName       Index name (given by user) for the Index
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-generateIndexURI(uriString &pZSIndexFileUri,
+generateIndexURI(uriString &pIndexFileUri,
                  const uriString pMasterFileUri,
                  const uriString &pDirectory,
                  const long pRank,
@@ -155,8 +155,8 @@ utf8String wMasterExt;
             wPath_Uri = pDirectory;
 
     QUrl wUrl(wPath_Uri.toCChar());
-    pZSIndexFileUri.fromQString(wUrl.toString(QUrl::PreferLocalFile));
-    pZSIndexFileUri.addConditionalDirectoryDelimiter() ;
+    pIndexFileUri.fromQString(wUrl.toString(QUrl::PreferLocalFile));
+    pIndexFileUri.addConditionalDirectoryDelimiter() ;
 
     wMasterRoot = pMasterFileUri.getRootname();
     wMasterExt=pMasterFileUri.getFileExtension().toCChar();
@@ -176,7 +176,7 @@ utf8String wMasterExt;
 
     utf8String wM;
     wM=generateIndexRootName(wMasterRoot,pRank,pIndexName);
-    pZSIndexFileUri += wM.toCChar();
+    pIndexFileUri += wM.toCChar();
 
     return(ZS_SUCCESS);
 } //generateIndexURI
@@ -1071,7 +1071,7 @@ loadXMLDictionaryForCreate(zxmlElement* pRoot,ZMFDictionary*& pMasterDic,ZaiErro
 
   /* MCB components :
 
-     *  - IndexTable : array of ZSIndexFile
+     *  - IndexTable : array of ZIndexFile
      *      - ZIndexControlBlock : key size and parameters
      *      - ZRandomFile parameters : target block size is dependent from key size + sizeof address_type
      *
@@ -1161,7 +1161,7 @@ loadXMLDictionaryForCreate(zxmlElement* pRoot,ZMFDictionary*& pMasterDic,ZaiErro
 
         for (long wi=0;wi < wKeyNodes.count() ; wi++)
         {
-          ZSKeyDictionary* wKeyDictionary=new ZSKeyDictionary(pMasterDic);
+          ZKeyDictionary* wKeyDictionary=new ZKeyDictionary(pMasterDic);
           bool wFieldsOK=true;
           zxmlElement* wKeyFields=nullptr;
 
@@ -1192,7 +1192,7 @@ loadXMLDictionaryForCreate(zxmlElement* pRoot,ZMFDictionary*& pMasterDic,ZaiErro
             /* if hash is not found (may be a new field introduced there) :
              * try to get field by name from meta dic
              */
-            ZSIndexField wKeyField;
+            ZIndexField wKeyField;
             utf8String wFieldName;
             wSt=zmuXMLgetChild(wKeyFieldNodes[wj],"mdicrank",wKeyField.MDicRank,pErrorLog,true,ZAIES_Error);
             wSt=zmuXMLgetChild(wKeyFieldNodes[wj],"hash",wKeyField.Hash,pErrorLog,true,ZAIES_Error);
@@ -1302,6 +1302,8 @@ applyXMLDictionaryChange(ZRawMasterFile* pMasterFile, zxmlElement* pRoot, bool p
   int                 wMissingTags=0;
   int                 wErroredKeys=0;
   bool                wCannotProcess=false;
+
+  long                wKeyRank=0;
 
   ZMFDictionary* wMasterDic=nullptr;
 
@@ -1451,7 +1453,7 @@ applyXMLDictionaryChange(ZRawMasterFile* pMasterFile, zxmlElement* pRoot, bool p
 
       for (long wi=0;wi < wKeyNodes.count() ; wi++)
       {
-        ZSKeyDictionary* wKeyDictionary=new ZSKeyDictionary(wMasterDic);
+        ZKeyDictionary* wKeyDictionary=new ZKeyDictionary(wMasterDic);
         bool wFieldsOK=true;
         zxmlElement* wKeyFields=nullptr;
 
@@ -1528,7 +1530,7 @@ applyXMLDictionaryChange(ZRawMasterFile* pMasterFile, zxmlElement* pRoot, bool p
           /* if hash is not found (may be a new field introduced there) :
              * try to get field by name from meta dic
              */
-          ZSIndexField wKeyField;
+          ZIndexField wKeyField;
           utf8String wFieldName;
           wSt=zmuXMLgetChild(wKeyFieldNodes[wj],"mdicrank",wKeyField.MDicRank,pMessageLog,true,ZAIES_Error);
           wSt=zmuXMLgetChild(wKeyFieldNodes[wj],"hash",wKeyField.Hash,pMessageLog,true,ZAIES_Error);
@@ -1586,7 +1588,7 @@ applyXMLDictionaryChange(ZRawMasterFile* pMasterFile, zxmlElement* pRoot, bool p
                 wKeyDictionary->Status=ZPRES_ToCreate;
             else
             {
-            ZSKeyDictionary* wKD=pMasterFile->MasterDic->searchKeyCase(wKeyDictionary->DicKeyName);
+            ZKeyDictionary* wKD=pMasterFile->MasterDic->searchKeyCase(wKeyDictionary->DicKeyName);
             if (!wKD)
                  wKeyDictionary->Status=ZPRES_ToCreate;
             else
@@ -1786,9 +1788,11 @@ applyXMLDictionaryChange(ZRawMasterFile* pMasterFile, zxmlElement* pRoot, bool p
         displayKeyDicElement(wMasterDic,wi,pMessageLog);
         if (pRealRun)
           {
-          pMasterFile->MasterDic->addKey(wMasterDic->KeyDic[wi]);
-          pMasterFile->MasterDic->KeyDic.push(new ZSKeyDictionary(wMasterDic->KeyDic[wi]));
-          pMessageLog->textLog("done.");
+          wSt=pMasterFile->MasterDic->addKey(wMasterDic->KeyDic[wi],wKeyRank);
+          if (wSt==ZS_SUCCESS)
+              pMessageLog->textLog("added key named <%s> to Master dictionary at key rank <%ld>.",wMasterDic->KeyDic[wi]->DicKeyName.toCChar(), wKeyRank);
+          else
+            pMessageLog->logZException();
           }
         break;
 
@@ -1798,7 +1802,7 @@ applyXMLDictionaryChange(ZRawMasterFile* pMasterFile, zxmlElement* pRoot, bool p
       {
         pMessageLog->textLog("About to delete key\n");
         displayKeyDicElement(wMasterDic,wi,pMessageLog);
-        ZSKeyDictionary* wDK=pMasterFile->MasterDic->searchKeyCase(wMasterDic->KeyDic[wi]->DicKeyName);
+        ZKeyDictionary* wDK=pMasterFile->MasterDic->searchKeyCase(wMasterDic->KeyDic[wi]->DicKeyName);
         if (!wDK)
           pMessageLog->errorLog("Strange... dictionary key <%s> not found in file while trying to delete it.",wMasterDic->KeyDic[wi]->DicKeyName.toCChar());
         else
@@ -1814,7 +1818,7 @@ applyXMLDictionaryChange(ZRawMasterFile* pMasterFile, zxmlElement* pRoot, bool p
       case ZPRES_ToChange:
         {
         pMessageLog->textLog("About to change key\n");
-        ZSKeyDictionary* wDK=pMasterFile->MasterDic->searchKeyCase(wMasterDic->KeyDic[wi]->DicKeyName);
+        ZKeyDictionary* wDK=pMasterFile->MasterDic->searchKeyCase(wMasterDic->KeyDic[wi]->DicKeyName);
         if (!wDK)
           {
           pMessageLog->errorLog("Strange... dictionary key <%s> not found in file while trying to change it.",wMasterDic->KeyDic[wi]->DicKeyName.toCChar());
@@ -1830,8 +1834,11 @@ applyXMLDictionaryChange(ZRawMasterFile* pMasterFile, zxmlElement* pRoot, bool p
         pMessageLog->textLog("__________New key values_____________\n");
         displayKeyDicElement(wMasterDic,wi,pMessageLog);
 
-        pMasterFile->MasterDic->addKey(wMasterDic->KeyDic[wi]);
-        pMessageLog->textLog("done.");
+        wSt=pMasterFile->MasterDic->addKey(wMasterDic->KeyDic[wi],wKeyRank);
+        if (wSt==ZS_SUCCESS)
+          pMessageLog->textLog("added key named <%s> to Master dictionary at key rank <%ld>.",wMasterDic->KeyDic[wi]->DicKeyName.toCChar(), wKeyRank);
+        else
+          pMessageLog->logZException();
         break;
         }
       }// switch
@@ -1862,7 +1869,7 @@ displayKeyDicElement(ZMFDictionary* pMasterDic,long pIdx,ZaiErrors* pMessageLog)
 }//displayKeyDicElement
 
 void
-displayKeyDicElement(ZSKeyDictionary* pKeyDic,ZaiErrors* pMessageLog)
+displayKeyDicElement(ZKeyDictionary* pKeyDic,ZaiErrors* pMessageLog)
 {
 
   pMessageLog->textLog("Key <%s> fields count %ld  key universal size %ld\n"
@@ -1877,10 +1884,10 @@ displayKeyDicElement(ZSKeyDictionary* pKeyDic,ZaiErrors* pMessageLog)
     long wMR=pKeyDic->Tab[wh].MDicRank;
     pMessageLog->textLog("%3ld %15s %15s %18s %6ld  %4ld\n",
         wh,
-        pKeyDic->MetaDic->Tab[wMR].getName().toCChar(),
-        decode_ZType( pKeyDic->MetaDic->Tab[wMR].ZType),
+        pKeyDic->MasterDic->Tab[wMR].getName().toCChar(),
+        decode_ZType( pKeyDic->MasterDic->Tab[wMR].ZType),
         pKeyDic->Tab[wh].Hash.toHexa().toChar(),
-        pKeyDic->MetaDic->Tab[wMR].UniversalSize,
+        pKeyDic->MasterDic->Tab[wMR].UniversalSize,
         pKeyDic->Tab[wh].KeyOffset);
   }
   pMessageLog->textLog("   _____________________________________________________________\n");
@@ -2159,7 +2166,7 @@ createMasterFileFromXml(const char* pXMLPath,
      *      - meta dictionary : array of field definitions S
      *      - keyDictionary array
      *            array of keyfields referring to meta dictionary field
-     *  - IndexTable : array of ZSIndexFile
+     *  - IndexTable : array of ZIndexFile
      *      - ZIndexControlBlock : key size and parameters
      *      - ZRandomFile parameters : target block size is dependent from key size + sizeof address_type
      */
@@ -2483,7 +2490,7 @@ createMasterFileFromXml(const char* pXMLPath,
         goto ErrorcreateXMLFile;
       }//if (URIContent.exists())
 
-    wSt=wMasterFile.zcreate(  pContentFilePath,
+    wSt=wMasterFile.zcreateRawMasterFile(  pContentFilePath,
                               wMasterFCB->AllocatedBlocks,
                               wMasterFCB->BlockExtentQuota,
                               wMasterFCB->BlockTargetSize,
@@ -3092,7 +3099,7 @@ applyXmltoFile(const char* pXMLPath,
 
   /* MCB components :
 
-     *  - IndexTable : array of ZSIndexFile
+     *  - IndexTable : array of ZIndexFile
      *      - ZIndexControlBlock : key size and parameters
      *      - ZRandomFile parameters : target block size is dependent from key size + sizeof address_type
      *

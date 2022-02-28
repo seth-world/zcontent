@@ -3,6 +3,8 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <zindexedfile/zmf_limits.h>
+
 #include <ztoolset/zdatabuffer.h>
 #include <zrandomfile/zrandomfiletypes.h>
 class ZFileControlBlock;
@@ -48,6 +50,8 @@ class ZFCB_Export
 public:
     uint32_t        StartSign=cst_ZBLOCKSTART; /**< StartSign word that mark start of data */
     ZBlockID        BlockID=ZBID_FCB;     /**< Block id is set to ZBID_FCB */
+    uint16_t        EndianCheck=cst_EndianCheck_Normal;
+
     zaddress_type   StartOfData;          /**< offset where Data storage starts : 0L */
     unsigned long   AllocatedBlocks;      /**< for ZBAT & ZFBT : initial number of available allocated slots in ZBAT and ZFBT */
     unsigned long   BlockExtentQuota;     /**< for ZBAT & ZFBT : initial extension quota */
@@ -61,8 +65,8 @@ public:
     size_t          ZDBT_DataOffset;           /**< offset to Deleted Blocks Table array since begining of ZFCB */
     size_t          ZDBT_ExportSize;           /**< size in bytes of ZDBT : to be written on file */
 
-    size_t          ZReserved_DataOffset;      /**<  Written on file header : Reserved space address . Must be 0L */
-    size_t          ZReserved_ExportSize;      /**<  given by _getReservedSize */
+//    size_t          ZReserved_DataOffset;      /**<  Written on file header : Reserved space address . Must be 0L */
+//    size_t          ZReserved_ExportSize;      /**<  given by _getReservedSize */
 
 //    void             (*_getReserved) (ZDataBuffer &) ;// routine to load zreserved from derived class
 
@@ -74,10 +78,6 @@ public:
     size_t   MinSize;                    /* statistical value : minimum length of block record in file  (existing statistic) */
     size_t   MaxSize;                    /* statistical value : maximum length of block record in file (existing statistic ) */
     size_t   BlockTargetSize;           /* Block target size (user defined value) Foreseen medium size of blocks in a varying block context. */
-
-/*    bool            History;
-    bool            Autocommit;
-    bool            Journaling;*/  // ZRandomFile Does NOT have journaling, history, autocommit : see ZMasterFile instead
 
     uint8_t         HighwaterMarking;           /* mark to zero the whole deleted block content when removed */
     uint8_t         GrabFreeSpace;              /* attempts to grab free space and holes at each block free operation */
@@ -91,7 +91,17 @@ public:
     ZFCB_Export& operator = (const ZFCB_Export& pIn){return _copyFrom(pIn);}
     ZFCB_Export& operator = (const ZFileControlBlock& pIn);
 
-    void convert();
+
+    ZFCB_Export&        set(const ZFileControlBlock& pIn);
+    void                setFromPtr(const unsigned char *&pPtrIn);
+    ZFileControlBlock&  toFCB(ZFileControlBlock& pOut);
+
+    void _convert();
+    void serialize();
+    void deserialize();
+
+    bool isReversed() {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
+    bool isNotReversed() {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
 
 };
 #pragma pack(pop)
@@ -169,11 +179,7 @@ friend class ZMasterFile;
 friend class ZIndexFile;
 public:
 
-/* not copied neither exported to xml */
-//    uint32_t       StartSign=cst_ZSTART ; /**< StartSign word that mark start of data */
-//    ZBlockID       BlockID=ZBID_FCB;               /**< Block id is set to ZBID_FCB */
 
-/* copied and exported to xml */
     zaddress_type  StartOfData=0L;               /**< offset where Data storage starts : 0L */
 public:
 
@@ -239,8 +245,10 @@ public:
      */
   int fromXml(zxmlNode* pFCBRootNode, ZaiErrors* pErrorlog);
 
-  ZDataBuffer& _export(ZDataBuffer& pZDBExport);
-  ZStatus _import(unsigned char *&pZDBImport_Ptr);
+  ZDataBuffer& _exportAppend(ZDataBuffer& pZDBExport);
+  ZDataBuffer _export();
+
+  ZStatus _import(const unsigned char *&pZDBImport_Ptr);
 }; // ZFileControlBlock
 
 

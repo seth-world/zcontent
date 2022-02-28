@@ -37,8 +37,8 @@ public:
   long        HReservedReads;     /**< reserved block reads */
   long        HReservedWrites;    /**< reverved block writes */
 
-  long        HFDReads;       /**< file descriptor reads */
-  long        HFDWrites;      /**< file descriptor writes */
+  long        HFCBReads;       /**< file control block reads */
+  long        HFCBWrites;      /**< file control block writes */
 
   long        CBHReads;           /**< content block header reads */
   zsize_type  CBHReadBytesSize;   /**< content block header bytes read */

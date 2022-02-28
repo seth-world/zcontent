@@ -29,38 +29,82 @@ ZMFDictionary::_copyFrom(const ZMFDictionary& pIn)
   KeyDic.clear();
   for (long wi = 0; wi < pIn.KeyDic.count(); wi ++)
   {
-    KeyDic.push(new ZSKeyDictionary(pIn.KeyDic[wi]));
-    KeyDic.last()->MetaDic=this;
+    KeyDic.push(new ZKeyDictionary(pIn.KeyDic[wi]));
+    KeyDic.last()->MasterDic=this;
   }
   return *this;
 }
 
 
 
-long
-ZMFDictionary::addKey(ZSKeyDictionary*pIn)
+ZStatus
+ZMFDictionary::addKey(ZKeyDictionary*pIn, long &pOutKeyRank)
 {
-  long wDI=KeyDic.push(new ZSKeyDictionary(this));
-   for (long wi=0; wi < pIn->size();wi++)
-  {
-    ZSIndexField wF=pIn->Tab[wi];  /* debug */
+  pOutKeyRank=-1;
+  for (long wi=0;wi < KeyDic.count();wi++)
+    if (pIn->hasSameContentAs(KeyDic[wi]))
+      {
+      ZException.setMessage("ZMFDictionary::addKey",
+          ZS_DUPLICATEKEY,
+          Severity_Error,
+          "While trying to add Key named <%s> to Master dictionary, a key with same content name <%s> rank <%ld> has been found.",
+          pIn->DicKeyName.toString(),
+          KeyDic[wi]->DicKeyName.toString(),
+          wi);
+      return  ZS_DUPLICATEKEY;
+      }
+
+  long wDI=KeyDic.push(new ZKeyDictionary(pIn->DicKeyName,this));
+  for (long wi=0; wi < pIn->size();wi++)
+    {
+    ZIndexField wF=pIn->Tab[wi];  /* debug */
     KeyDic[wDI]->push(pIn->Tab[wi]);
-  }
-  return wDI;
-}
-long
-ZMFDictionary::addKey(ZSKeyDictionary*pIn,const utf8String& pKeyName)
+    }
+//  KeyDic[wDI]->setName (pIn->DicKeyName);
+  fprintf (stdout,"Key <%s> added within master dictionary at rank <%ld>.\n",KeyDic[wDI]->DicKeyName.toCChar(),wDI);
+  pOutKeyRank=wDI;
+  return ZS_SUCCESS;
+}//addKey
+
+ZStatus
+ZMFDictionary::addKey(ZKeyDictionary*pIn,const utf8String& pKeyName, long &pOutKeyRank)
 {
-  long wDI=KeyDic.push(new ZSKeyDictionary(this));
+  pOutKeyRank=-1;
+  for (long wi=0;wi < KeyDic.count();wi++)
+    {
+    if (pIn->hasSameContentAs(KeyDic[wi]))
+      {
+        ZException.setMessage("ZMFDictionary::addKey",
+            ZS_DUPLICATEKEY,
+            Severity_Error,
+            "While trying to add Key named <%s> to Master dictionary, a key with same content name <%s> rank <%ld> has been found.",
+            pKeyName.toString(),
+            KeyDic[wi]->DicKeyName.toString(),
+            wi);
+        return  ZS_DUPLICATEKEY;
+      }
+    if (pKeyName==KeyDic[wi]->DicKeyName.toCChar())
+      {
+        ZException.setMessage("ZMFDictionary::addKey",
+            ZS_INVNAME,
+            Severity_Error,
+            "While trying to add Key named <%s> to Master dictionary, a key with same content name <%s> rank <%ld> has been found.",
+            pKeyName.toString(),
+            KeyDic[wi]->DicKeyName.toString(),
+            wi);
+        return  ZS_INVNAME;
+      }
+    }
+  long wDI=KeyDic.push(new ZKeyDictionary(this));
   for (long wi=0; wi < pIn->size();wi++)
   {
-    ZSIndexField wF=pIn->Tab[wi];  /* debug */
+    ZIndexField wF=pIn->Tab[wi];  /* debug */
     KeyDic[wDI]->push(pIn->Tab[wi]);
   }
   KeyDic[wDI]->setName(pKeyName);
-  return wDI;
-}
-
+  pOutKeyRank=wDI;
+  return ZS_SUCCESS;
+}//addKey
 
 ZDataBuffer& ZMFDictionary::_exportAppend(ZDataBuffer& pZDB)
 {
@@ -68,28 +112,59 @@ ZDataBuffer& ZMFDictionary::_exportAppend(ZDataBuffer& pZDB)
   wHead.set(this);
   wHead._exportAppend(pZDB);
 
-  ZMetaDic::_exportAppend(pZDB);
+//  ZMetaDic::_exportAppend(pZDB);
+  ZMetaDic::_exportAppendMetaDicFlat(pZDB);
+
+  /* KeyDic is a ZArray of ZArrays */
+  pZDB.append_T<uint32_t>(cst_ZBLOCKSTART);
+  pZDB.append_T<uint16_t>(reverseByteOrder_Conditional<uint16_t>((uint16_t)KeyDic.count()));
+
   for (long wi=0;wi<KeyDic.count();wi++)
-    KeyDic[wi]->_exportAppend(pZDB);
+    KeyDic[wi]->_exportAppendFlat(pZDB);
+
+  pZDB.append_T<uint32_t>(cst_ZBLOCKEND);
   return pZDB;
 }
-size_t ZMFDictionary::_import(unsigned char* &pPtrIn)
+ZStatus ZMFDictionary::_import(const unsigned char* &pPtrIn)
 {
-  size_t wSizeImported=0;
+  ZStatus wSt=ZS_SUCCESS;
+  ssize_t wSize=0;
   ZMFDicExportHeader wHead;
-  wSizeImported += wHead._import(pPtrIn);
+  wSt=wHead._import(pPtrIn);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
 
-  wSizeImported += ZMetaDic::_import(pPtrIn);
+//  wSt=ZMetaDic::_import(pPtrIn,wSize);
+  wSt=ZMetaDic::_importMetaDicFlat(pPtrIn);
 
-  ZSKeyDictionary* wKDic=nullptr;
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+
+
+  ZKeyDictionary* wKDic=nullptr;
   uint32_t wi=0;
-  while(wi++ < wHead.IndexCount)
+  uint32_t wStartSign;
+  _importAtomic<uint32_t>(wStartSign,pPtrIn);
+  uint16_t wKeyCount;
+  _importAtomic<uint16_t>(wKeyCount,pPtrIn);
+
+  KeyDic.clear();
+  while(wi++ < wHead.DicKeyCount)
     {
-    wKDic=new ZSKeyDictionary(this);
-    wSizeImported += wKDic->_import(pPtrIn);
+    wKDic=new ZKeyDictionary(this);
+    wSt= wKDic->_importFlat(pPtrIn);
+//    wSt= wKDic->_importRaw(pPtrIn,wSize);
+    if (wSt!=ZS_SUCCESS)
+      {
+      ZException.addToLast("While importing dictionary key rank <%ld>.",KeyDic.lastIdx()+1);
+          return wSt;
+      }
+
     KeyDic.push(wKDic);
     }
-  return wSizeImported;
+  uint32_t wEndSign;
+  _importAtomic<uint32_t>(wEndSign,pPtrIn);
+  return wSt;
 }//ZMFDictionary::_import
 
 /*
@@ -135,14 +210,21 @@ size_t ZMFDictionary::_import(unsigned char* &pPtrIn)
       </zmasterdictionary>
  */
 
+utf8String ZMFDictionary::XmlSaveToString(bool pComment)
+{
+  utf8String wReturn = fmtXMLdeclaration();
+  wReturn += fmtXMLmainVersion("zmfdictionary",__ZDIC_VERSION__,0);
+  wReturn += toXml(1,pComment);
+  wReturn += fmtXMLendnode("zmfdictionary",0);
+  return wReturn;
+}
 
-
-utf8String ZMFDictionary::toXml(int pLevel)
+utf8String ZMFDictionary::toXml(int pLevel,bool pComment)
 {
   int wLevel=pLevel+1;
   utf8String wReturn;
   ZDataBuffer wB64;
-  wReturn = fmtXMLnode("zmasterdictionary",pLevel);
+  wReturn = fmtXMLnode("masterdictionary",pLevel);
 
   wReturn += fmtXMLuint32("keycount",KeyDic.count(),wLevel);
   /* if (CheckSum!=nullptr)
@@ -154,44 +236,103 @@ utf8String ZMFDictionary::toXml(int pLevel)
       else
       wReturn+=fmtXMLchar("checksum","none",wLevel);
 */
-  wReturn += ZMetaDic::toXml(wLevel);
+  wReturn += ZMetaDic::toXml(wLevel,pComment);
 
 
   wReturn += fmtXMLnode("keydictionary",wLevel);
   for (long wi=0;wi < KeyDic.count();wi++)
   {
-    wReturn += KeyDic[wi]->toXml(wLevel+1,wi);
+    wReturn += KeyDic[wi]->toXml(wLevel+1,wi,pComment);
   }
   wReturn += fmtXMLendnode("keydictionary",wLevel);
-  wReturn += fmtXMLendnode("zmasterdictionary",pLevel);
+  wReturn += fmtXMLendnode("masterdictionary",pLevel);
   return wReturn;
 } // ZMFDictionary::toXml
 
-ZStatus
-ZMFDictionary::fromXml(zxmlNode* pRootNode, ZaiErrors* pErrorlog,ZaiE_Severity pSeverity)
+
+ZStatus ZMFDictionary::XmlLoadFromString(const utf8String &pXmlString,ZaiErrors* pErrorlog)
 {
-  zxmlElement *wRootNode=nullptr;
-  zxmlElement *wFieldsRootNode=nullptr;
-  zxmlElement *wSingleFieldNode=nullptr;
-  zxmlElement *wSwapNode=nullptr;
-  utfcodeString wXmlHexaId;
-  ZFieldDescription wFD;
-  utf8String wValue;
-  utfcodeString wCValue;
-  bool wBool;
-  unsigned int wInt;
-  ZStatus wSt = pRootNode->getChildByName((zxmlNode *&) wRootNode, "zmfdictionary");
+  ZStatus wSt;
+
+  zxmlDoc *wDoc = nullptr;
+  zxmlElement *wRoot = nullptr;
+  zxmlElement *wMetaRootNode=nullptr;
+
+  pErrorlog->setErrorLogContext("ZMFDictionary::XmlLoadFromString");
+
+  wDoc = new zxmlDoc;
+  wSt = wDoc->ParseXMLDocFromMemory(pXmlString.toCChar(), pXmlString.getUnitCount(), nullptr, 0);
   if (wSt != ZS_SUCCESS) {
-    pErrorlog->logZStatus(
-        pSeverity,
-        wSt,
-        "ZMFDictionary::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
-        "zmfdictionary",
-        decode_ZStatus(wSt));
+    pErrorlog->logZException();
+    pErrorlog->errorLog(
+        "ZMFDictionary::XmlloadFromString-E-PARSERR Xml parsing error for string <%s> ",
+        pXmlString.subString(0, 25).toUtf());
     return wSt;
   }
 
-  wSt=wRootNode->getChildByName((zxmlNode*&)wFieldsRootNode,"dicfields");
+  wSt = wDoc->getRootElement(wRoot);
+  if (wSt != ZS_SUCCESS) {
+    pErrorlog->logZException();
+    return wSt;
+  }
+  if (!(wRoot->getName() == "zmfdictionary")) {
+    pErrorlog->errorLog(
+        "ZMFDictionary::XmlLoadFromString-E-INVROOT Invalid root node name <%s> expected <zmfdictionary>",
+        wRoot->getName().toCChar());
+    return ZS_XMLINVROOTNAME;
+  }
+
+
+  wSt=wRoot->getChildByName((zxmlNode*&)wMetaRootNode,"masterdictionary");
+  if (wSt!=ZS_SUCCESS)
+    {
+    pErrorlog->logZStatus(
+        ZAIES_Error,
+        wSt,
+        "ZMFDictionary::XmlLoadFromString-E-CNTFINDND Error cannot find node element with name <%s> status "
+        "<%s>",
+        "masterdictionary",
+        decode_ZStatus(wSt));
+    return wSt;
+    }
+
+  wSt = fromXml(wMetaRootNode, pErrorlog,ZAIES_Error);
+
+  XMLderegister((zxmlNode *&) wMetaRootNode);
+  XMLderegister((zxmlNode *&) wRoot);
+
+  return wSt;
+}//ZMFDictionary::XmlLoadFromString
+
+ZStatus
+ZMFDictionary::fromXml(zxmlNode* pZmfDicNode, ZaiErrors* pErrorlog,ZaiE_Severity pSeverity)
+{
+  zxmlElement *wRootNode=nullptr;
+  zxmlElement *wMDicRootNode=nullptr;
+
+  pErrorlog->setErrorLogContext("ZMFDictionary::fromXml");
+
+  if (pZmfDicNode->getName()!="masterdictionary")
+    {
+    pErrorlog->logZStatus(
+        pSeverity,
+        ZS_INVNAME,
+        "ZMFDictionary::fromXml-E-CNTFINDND Error cannot find required node element with name <%s> status <%s>",
+        "masterdictionary",
+        decode_ZStatus(ZS_XMLMISSREQ));
+    return ZS_XMLMISSREQ;
+    }
+
+  ZStatus wSt;
+  uint32_t wKeyCount;
+  wRootNode=(zxmlElement *)pZmfDicNode;
+
+  if (XMLgetChildUInt32(wRootNode,"keycount",wKeyCount,pErrorlog,ZAIES_Error)<0)
+    {
+      pErrorlog->logZStatus(ZAIES_Warning, ZS_XMLWARNING,"ZMFDictionary::fromXml-W-MISSFLD Missing field <keycount>");
+    }
+
+  wSt=pZmfDicNode->getChildByName((zxmlNode*&)wMDicRootNode,"metadictionary");
   if (wSt!=ZS_SUCCESS)
   {
     pErrorlog->logZStatus(
@@ -199,27 +340,16 @@ ZMFDictionary::fromXml(zxmlNode* pRootNode, ZaiErrors* pErrorlog,ZaiE_Severity p
         wSt,
         "ZMetaDic::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
         "<%s>",
-        "dicfields",
+        "metadictionary",
         decode_ZStatus(wSt));
     return wSt;
   }
 
-  wSt=wFieldsRootNode->getFirstChild((zxmlNode*&)wSingleFieldNode);
-  long wi=0;
-  clear();  /* clear dictionary definitions */
-  while (wSt==ZS_SUCCESS)
-  {
-    wFD.clear();
-    if (wFD.fromXml(wSingleFieldNode,pErrorlog)==0)
-      push(wFD);
-    wSt=wSingleFieldNode->getNextNode((zxmlNode*&)wSwapNode);
-    XMLderegister(wSingleFieldNode);
-    wSingleFieldNode=wSwapNode;
-  }
-  XMLderegister(wRootNode);
-  return pErrorlog->hasError()?ZS_XMLERROR:ZS_SUCCESS;
-}//ZMFDictionary::fromXml
+  wSt=ZMetaDic::fromXml(wMDicRootNode,pErrorlog,pSeverity);
 
+  XMLderegister(wMDicRootNode);
+  return wSt;
+}//ZMFDictionary::fromXml
 
 
 
@@ -227,36 +357,45 @@ ZMFDictionary::fromXml(zxmlNode* pRootNode, ZaiErrors* pErrorlog,ZaiE_Severity p
 
 void ZMFDicExportHeader::set(const ZMFDictionary* pDic)
 {
-  IndexCount=uint32_t(pDic->KeyDic.count());
+  DicKeyCount=uint32_t(pDic->KeyDic.count());
 }
 
 ZDataBuffer& ZMFDicExportHeader::_exportAppend(ZDataBuffer& pZDB)
 {
   StartSign = cst_ZBLOCKSTART;
   BlockId=ZBID_MDIC;
-  IndexCount = reverseByteOrder_Conditional<uint32_t>(IndexCount);
+  DicKeyCount = reverseByteOrder_Conditional<uint32_t>(DicKeyCount);
   pZDB.appendData(this,sizeof(ZMFDicExportHeader));
   return pZDB;
 }
-size_t ZMFDicExportHeader::_import(unsigned char* &pPtrIn)
+
+/**
+ * @brief ZMFDicExportHeader::_import  this routine does not change source data
+ * @param pPtrIn
+ * @param pImportedSize
+ * @return
+ */
+ZStatus ZMFDicExportHeader::_import(const unsigned char* &pPtrIn)
 {
-  ZMFDicExportHeader* wHead=(ZMFDicExportHeader*)pPtrIn;
-  if ((wHead->BlockId!=ZBID_MDIC)||(wHead->StartSign!=cst_ZBLOCKSTART))
+  ZMFDicExportHeader wHead ;
+  memmove (&wHead,pPtrIn,sizeof (ZMFDicExportHeader));
+
+  if ((wHead.BlockId!=ZBID_MDIC)||(wHead.StartSign!=cst_ZBLOCKSTART))
   {
     ZException.setMessage("ZMFDicExportHeader::_import",
         ZS_BADDIC,
         Severity_Severe,
         "Invalid Dictionary Header : found Start marker <%X> ZBlockID <%X>. One of these is invalid (or both are).",
-        wHead->StartSign,
-        wHead->BlockId);
+        wHead.StartSign,
+        wHead.BlockId);
     return  ZS_BADDIC;
   }
 
 
-  IndexCount=reverseByteOrder_Conditional<uint8_t>(wHead->IndexCount);
+  DicKeyCount=reverseByteOrder_Conditional<uint32_t>(wHead.DicKeyCount);
   pPtrIn += sizeof(ZMFDicExportHeader);
-  return sizeof(ZMFDicExportHeader);
-}
+  return ZS_SUCCESS;
+}//_import
 
 
 

@@ -304,7 +304,7 @@ ZDataBuffer wUValue;
                                 pTargetArrayCount);
         }
     else
-    if (pSourceType&ZType_WChar)
+/*    if (pSourceType&ZType_WChar)
         {
         return setFieldURFfWChar(pNatural,
                                  pURFData,
@@ -315,7 +315,7 @@ ZDataBuffer wUValue;
                                  pTargetType,
                                  pTargetArrayCount);
         }
-
+*/
     if (pSourceArrayCount!=pTargetArrayCount)
         {
         fprintf (stderr,"%s>Warning array counts differ from natural input data <%d> to target data <%d>\n",
@@ -422,11 +422,12 @@ uint32_t  wRetainedArrayCount;
         {
         return setFieldURFfChar(pNatural,pURFData,pSourceType,wNSize,pSourceArrayCount,pTargetType,pTargetArrayCount);
         }
-    else
+/*    else
     if (pSourceType&ZType_WChar)
         {
         return setFieldURFfWChar(pNatural,pURFData,pSourceType,wNSize,pSourceArrayCount,pTargetType,pTargetArrayCount);
         }
+        */
 //================Other than char[] or wchar_t[]==========================================
     if (pSourceArrayCount!=pTargetArrayCount)
         {

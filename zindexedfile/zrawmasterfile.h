@@ -13,7 +13,7 @@
 #include <ztoolset/zaierrors.h>
 #include <zxml/zxml.h>
 
-#include <zindexedfile/zsmastercontrolblock.h>
+#include <zindexedfile/zmastercontrolblock.h>
 #include <zindexedfile/zindexcontrolblock.h>
 
 #include <zindexedfile/zsindexitem.h>
@@ -28,7 +28,7 @@ typedef ZStatus (*extractRawKey_type) (ZDataBuffer &pRawRecord,ZRawIndexFile* pZ
 namespace zbs //========================================================================
 {
 
-class ZRawMasterFile: protected ZRandomFile, public ZSMasterControlBlock
+class ZRawMasterFile: protected ZRandomFile, public ZMasterControlBlock
 {
   typedef ZRandomFile _Base ;
 protected:  ZRawMasterFile(ZFile_type pType);
@@ -81,37 +81,40 @@ public:
   ZStatus setIndexFilesDirectoryPath (uriString &pPath);
   ZStatus setJournalLocalDirectoryPath (uriString &pPath);
 
-  ZRawIndexFile* zgetIndexObject(const zrank_type pIndexRank) {return IndexTable[pIndexRank];}
+  ZIndexFile* zgetIndexObject(const zrank_type pIndexRank) {return IndexTable[pIndexRank];}
 
-  ZStatus zcreate(const uriString pURI,
-                  long pAllocatedBlocks,
-                  long pBlockExtentQuota,
-                  long pBlockTargetSize,
-                  const zsize_type pInitialSize,
-                  bool pHighwaterMarking,
-                  bool pGrabFreeSpace,
-                  bool pJournaling,
-                  bool pBackup=false,
-                  bool pLeaveOpen=false);
+  ZStatus zcreateRawMasterFile(const uriString pURI,
+                                long pAllocatedBlocks,
+                                long pBlockExtentQuota,
+                                long pBlockTargetSize,
+                                const zsize_type pInitialSize,
+                                bool pHighwaterMarking,
+                                bool pGrabFreeSpace,
+                                bool pJournaling,
+                                bool pBackup=false,
+                                bool pLeaveOpen=false);
 
-  ZStatus zcreate ( const uriString pURI, const zsize_type pInitialSize, bool pBackup=false, bool pLeaveOpen=false);
+  ZStatus zcreateRawMasterFile (const uriString pURI,
+                                const zsize_type pInitialSize,
+                                bool pBackup=false,
+                                bool pLeaveOpen=false);
 
 //  ZStatus zcreate (const char* pPathName, const zsize_type pInitialSize, bool pBackup=false, bool pLeaveOpen=false);
   /**
  * @brief ZRawMasterFile::zcreateRawIndex Generates a new index from a description (meaning a new ZRandomFile data + header).
  *
- * This routine will create a new index with the files structures necessary to hold and manage it : a ZSIndexFile object will be instantiated.
+ * This routine will create a new index with the files structures necessary to hold and manage it : a ZIndexFile object will be instantiated.
  * Headerfile of this new ZRF will contain the Index Control Block (ZICB) describing the key.
  *
- * - generates a new ZSIndexFile object.
+ * - generates a new ZIndexFile object.
  * - gives to it the Key description ZICB and appropriate file parameter.
  * - then calls zcreateIndex of the created object that will
  *    + creates the appropriate file from a ZRandomFile
  *    + writes the ZICB into the header
  *
  *@note
- * 1. ZSIndexFile never has journaling nor history function. Everything is managed from Master File.
- * 2. ZSIndexFile file pathname is not stored but is a computed data from actual ZRawMasterFile file pathname.
+ * 1. ZIndexFile never has journaling nor history function. Everything is managed from Master File.
+ * 2. ZIndexFile file pathname is not stored but is a computed data from actual ZRawMasterFile file pathname.
  * 3. Master file must be open in mode <ZRF_Exclusive | ZRF_All>
  * 4. Master file and created index file are not closed and remain open after this operation
  *
@@ -124,10 +127,11 @@ public:
  *  ZS_MODEINVALID ZRawMasterFile must be closed when calling zcreateRawIndex. If not, this status is returned.
  *
  */
-  ZStatus zcreateRawIndex  (ZRawIndexFile *&pIndexObjectOut,  /* resulting created index object if successful, nullptr  if not*/
+  ZStatus zcreateRawIndex  (ZIndexFile *&pIndexObjectOut,  /* resulting created index object if successful, nullptr  if not*/
                             const utf8String &pIndexName,
                             uint32_t pKeyUniversalSize,
                             ZSort_Type pDuplicates,
+                            long &pOutIndexRank,
                             bool pBackup=true);
 
   ZStatus zcreateRawIndexDetailed ( const utf8String &pIndexName, /*-----ICB------*/
@@ -150,7 +154,8 @@ public:
                               bool pGrabFreeSpace,
                               bool pReplace);
 
-  void setDictionary(const ZMFDictionary& pDictionary);
+  void _testZReserved();
+
 
 
   bool hasDictionary() {return MasterDic!=nullptr;}
@@ -242,10 +247,37 @@ protected:
   ZStatus _removeByRankR    (ZRawRecord* pZMFRecord, const zrank_type pZMFRank);
 
 
+  /**
+ * @brief ZRawMasterFile::writeMasterControlBlock updates ZMasterControlBlock AND ZSJournalControlBlock (if exists)
+ * for current ZRawMasterFile to ZReserved Header within header file.
+ *
+ * see @ref ZMasterControlBlock::_exportMCB()
+ * see @ref ZSJournalControlBlock::_exportJCB()
+ *
+ * @return
+ */
 public:  ZStatus writeControlBlocks(void);
+  /**
+ * @brief ZRawMasterFile::readControlBlocks reads ZMasterControlBlock AND ZSJournalControlBlock is exists
+ * see @ref ZMasterControlBlock::_import()
+ * see @ref ZSJournalControlBlock::_import()
+ * @return
+ */
 public:  ZStatus readControlBlocks(void);
 
+  /**
+ * @brief ZRawMasterFile::readJCBfromHeader Accesses File header and updates JournalingControlBlock if any.
+ * There is no reverse operation : writting JCB to Header is done using writing whole Control blocks to header file
+ * using ZRawMasterFile::writeControlBlocks()
+ *
+ * @return
+ */
 protected:  ZStatus readJCBfromHeader(void);
+/**
+ * @brief ZRawMasterFile::_getJCBfromReserved updates Journaling control block if any with its content from ZReserved from Filedescriptor.
+ *  ZReserved have to be up to date with an already done getReservedBlock().
+ * @return
+ */
 protected:  ZStatus _getJCBfromReserved(void);
 
 public:
@@ -300,7 +332,7 @@ public:
   ZStatus zremoveIndex (const long pIndexRank, ZaiErrors *pErrorLog=nullptr);
   //------------Surface utilities---------------------------------
 
-  ZStatus zreorgFile(bool pDump=false, FILE *pOutput=stdout); // replaces the ZRandomFile::zreorgFile()
+  ZStatus zreorgRawFile(bool pDump=false, FILE *pOutput=stdout); // replaces the ZRandomFile::zreorgFile()
   ZStatus zindexRebuild (const long pIndexRank,bool pStat=false, FILE *pOutput=stdout);
 
 
@@ -345,7 +377,7 @@ public:
    */
   ZStatus getRawIndex(ZSIndexItem &pIndexItem, const zrank_type pIndexRank, const zrank_type pKeyNumber);
 
-  // -------------------ZSMasterFile operators-------------------------
+  // -------------------ZMasterFile operators-------------------------
 
   /**
   * @brief operator [] Returns a ZDataBuffer containing the record pointed by pIndex rank in ZBlockAccessTable pool,
@@ -393,7 +425,7 @@ private:
 
 
 
-  ZStatus _seek (ZSMasterControlBlock &pMCB, long pIndexNumber, const ZDataBuffer &pKey,ZDataBuffer &pUserRecord);
+  ZStatus _seek (ZMasterControlBlock &pMCB, long pIndexNumber, const ZDataBuffer &pKey,ZDataBuffer &pUserRecord);
 
 
 //-------------Threads Lock management---------------------------
@@ -471,7 +503,7 @@ public:
   extractRawKey_type    extractRawKey_func=nullptr;
 
   ZaiErrors             ErrorLog;
-}; //--------------------end class ZSMasterFile-------------------------------
+}; //--------------------end class ZMasterFile-------------------------------
 
 
 } // namespace zbs

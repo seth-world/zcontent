@@ -40,49 +40,13 @@ ZHeaderControlBlock::_fromHCBE(const ZHeaderControlBlock_Export* pIn)
 }
 
 ZDataBuffer&
-ZHeaderControlBlock::_export(ZDataBuffer& pZDBExport)
+ZHeaderControlBlock::_exportAppend(ZDataBuffer& pZDBExport)
 {
-  ZHeaderControlBlock_Export wHCB;
-  wHCB.set(*this);
-  wHCB._convert();
-  /*
-  wHCB.StartSign = cst_ZSTART;// don't care reversing start sign or end sign : same as reversed
-
-  wHCB.Lock = reverseByteOrder_Conditional<zlockmask_type>(Lock);
-  wHCB.LockOwner = reverseByteOrder_Conditional<pid_t>(LockOwner);
-
-  wHCB.BlockID = ZBID_FileHeader;
-  wHCB.ZRFVersion = reverseByteOrder_Conditional<unsigned long>(__ZRF_VERSION__);
-  wHCB.FileType = FileType;
-  wHCB.OffsetFCB = reverseByteOrder_Conditional<zaddress_type>(OffsetFCB);
-  //    wHCB.OffsetReserved = _reverseByteOrder_T<zaddress_type>(OffsetReserved);
-  wHCB.OffsetReserved = reverseByteOrder_Conditional<zaddress_type>(sizeof(ZHeaderControlBlock_Export));
-  wHCB.SizeReserved = reverseByteOrder_Conditional<zsize_type>(SizeReserved);
-
-  wHCB.EndSign = cst_ZEND;// don't care reversing start sign or end sign : same as reversed
-*/
-  pZDBExport.setData(&wHCB,sizeof(wHCB));
-  return pZDBExport;
+  ZHeaderControlBlock_Export wHCBe;
+  wHCBe.set(*this);
+  wHCBe.serialize();
+  return pZDBExport.appendData(&wHCBe,sizeof(wHCBe));
 }
-
-ZHeaderControlBlock_Export&
-ZHeaderControlBlock_Export::set(const ZHeaderControlBlock pIn)
-{
-  StartSign=cst_ZBLOCKSTART;
-  BlockID=ZBID_FileHeader;
-  ZRFVersion=__ZRF_VERSION__;
-
-  FileType = pIn.FileType; /* FileType does not need to be reversed */
-  OffsetFCB = pIn.OffsetFCB;
-  OffsetReserved = pIn.OffsetReserved;
-  SizeReserved = pIn.SizeReserved;
-  Lock = pIn.Lock;
-  LockOwner = pIn.LockOwner;
-
-  EndSign=cst_ZBLOCKEND;
-  return *this;
-}
-
 
 
 
@@ -91,6 +55,7 @@ ZHeaderControlBlock_Export::_copyFrom(ZHeaderControlBlock_Export& pIn)
 {
   StartSign=pIn.StartSign;
   BlockID=pIn.BlockID;
+  EndianCheck=pIn.EndianCheck;
 
   ZRFVersion=pIn.ZRFVersion;
   FileType = pIn.FileType; /* FileType does not need to be reversed */
@@ -104,10 +69,91 @@ ZHeaderControlBlock_Export::_copyFrom(ZHeaderControlBlock_Export& pIn)
   return *this;
 }
 
+void ZHeaderControlBlock_Export::set(const ZHeaderControlBlock& pIn)
+{
+  StartSign = cst_ZBLOCKSTART;
+  EndSign = cst_ZBLOCKEND;
+  EndianCheck = cst_EndianCheck_Normal;
+
+  ZRFVersion = __ZRF_VERSION__;
+
+  FileType = pIn.FileType; /* FileType does not need to be reversed */
+  OffsetFCB = pIn.OffsetFCB;
+  OffsetReserved = pIn.OffsetReserved;
+  SizeReserved = pIn.SizeReserved;
+  Lock = pIn.Lock;
+  LockOwner = pIn.LockOwner;
+  return ;
+}
+
+void ZHeaderControlBlock_Export::setFromPtr(const unsigned char* &pPtrIn)
+{
+  ZHeaderControlBlock_Export* wHCBe=(ZHeaderControlBlock_Export*)pPtrIn;
+
+  StartSign= wHCBe->StartSign;
+  EndSign= wHCBe->EndSign;
+  EndianCheck= wHCBe->EndianCheck;
+  ZRFVersion = wHCBe->ZRFVersion;
+
+  FileType = wHCBe->FileType; /* FileType does not need to be reversed */
+  OffsetFCB = wHCBe->OffsetFCB;
+  OffsetReserved = wHCBe->OffsetReserved;
+  SizeReserved = wHCBe->SizeReserved;
+  Lock = wHCBe->Lock;
+  LockOwner = wHCBe->LockOwner;
+  pPtrIn += sizeof(ZHeaderControlBlock_Export);
+  return ;
+}
+
+ZHeaderControlBlock&
+ZHeaderControlBlock_Export::toHCB(ZHeaderControlBlock& pOut)
+{
+  if (isReversed())
+    fprintf(stderr,"ZHeaderControlBlock_Export-W-NOTREV Header control block is updated with a reversed(serialized) values.\n");
+
+  pOut.FileType = FileType; /* FileType does not need to be reversed */
+  pOut.OffsetFCB = OffsetFCB;
+  pOut.OffsetReserved = OffsetReserved;
+  pOut.SizeReserved = SizeReserved;
+  pOut.Lock = Lock;
+  pOut.LockOwner = LockOwner;
+
+  return pOut;
+}
+
+
+void
+ZHeaderControlBlock_Export::serialize()
+{
+  if (!is_little_endian())
+    return ;
+  if (isReversed())
+  {
+    fprintf (stderr,"ZHeaderControlBlock_Export::serialize-W-ALRDY ZHeaderControlBlock already serialized. \n");
+    return;
+  }
+  _convert();
+}
+void
+ZHeaderControlBlock_Export::deserialize()
+{
+  if (!is_little_endian())
+    return ;
+  if (isNotReversed())
+  {
+    fprintf (stderr,"ZHeaderControlBlock_Export::deserialize-W-ALRDY ZHeaderControlBlock already deserialized. \n");
+    return;
+  }
+  _convert();
+}
 void
 ZHeaderControlBlock_Export::_convert()
 {
-/* BlockID and  StartSign (palyndroma) do not need to be reversed */
+  if (!is_little_endian())
+    return ;
+/* BlockID (byte), StartSign EndSign(palyndromas) do not need to be reversed */
+
+  EndianCheck=reverseByteOrder_Conditional<uint16_t>(EndianCheck);
   ZRFVersion=reverseByteOrder_Conditional<unsigned long>(ZRFVersion);
 //  FileType = FileType; /* FileType does not need to be reversed */
   OffsetFCB = reverseByteOrder_Conditional<zaddress_type>(OffsetFCB);
@@ -119,37 +165,36 @@ ZHeaderControlBlock_Export::_convert()
 
 
 ZStatus
-ZHeaderControlBlock::_import(unsigned char *&pPtrIn)
+ZHeaderControlBlock::_import(const unsigned char *&pPtrIn)
 {
+  ZHeaderControlBlock_Export wHCBe;
+  wHCBe.setFromPtr(pPtrIn);
+  wHCBe.deserialize();
 
-  ZHeaderControlBlock_Export* wHCB=(ZHeaderControlBlock_Export*)(pPtrIn);
-
-  wHCB->_convert();
-
-  if ((wHCB->BlockID!=ZBID_FileHeader)||(wHCB->StartSign!=cst_ZBLOCKSTART))
+  if ((wHCBe.BlockID!=ZBID_FileHeader)||(wHCBe.StartSign!=cst_ZBLOCKSTART))
   {
     ZException.setMessage("ZHeaderControlBlock::_import",
         ZS_BADFILEHEADER,
         Severity_Severe,
         "invalid header block content found Start marker <%X> ZBlockID <%X>. One of these is invalid (or both are).",
-        wHCB->StartSign,
-        wHCB->BlockID);
+        wHCBe.StartSign,
+        wHCBe.BlockID);
     return  ZS_BADFILEHEADER;
   }
-  if (wHCB->ZRFVersion!=__ZRF_VERSION__)
+  if (wHCBe.ZRFVersion!=__ZRF_VERSION__)
   {
     ZException.setMessage("ZHeaderControlBlock::_import",
         ZS_BADFILEHEADER,
         Severity_Severe,
         "invalid header block version : found version <%ld> while current version is <%ld>.",
-        wHCB->ZRFVersion,
+        wHCBe.ZRFVersion,
         __ZRF_VERSION__);
     return  ZS_BADFILEHEADER;
   }
 
-  _fromHCBE(wHCB);
+  _fromHCBE(&wHCBe);
 
-  pPtrIn += sizeof(ZHeaderControlBlock_Export);
+//  pPtrIn += sizeof(ZHeaderControlBlock_Export);
   return  ZS_SUCCESS;
 }//_import
 

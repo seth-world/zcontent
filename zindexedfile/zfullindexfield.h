@@ -8,7 +8,7 @@ namespace zbs {
 
 class ZSIndexFile;
 
-class ZFullIndexField: public ZSIndexField, public ZFieldDescription
+class ZFullIndexField: public ZIndexField, public ZFieldDescription
 {
 public:
   ZFullIndexField();
@@ -16,14 +16,14 @@ public:
 
   ZFullIndexField & _copyFrom(ZFullIndexField & pIn)
   {
-    ZSIndexField::_copyFrom(pIn);
+    ZIndexField::_copyFrom(pIn);
     ZFieldDescription::_copyFrom(pIn);
     return *this;
   }
 
   ZFullIndexField & operator=(ZFullIndexField & pIn) {return _copyFrom(pIn);}
 
-  ZFullIndexField &set(ZSIndexFile* pZIF, long pKeyFieldRank);
+  ZFullIndexField &set(ZIndexFile* pZIF, long pKeyFieldRank);
 };
 
 } // namespace zbs
