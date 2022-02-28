@@ -1,0 +1,538 @@
+/********************************************************************************
+** Form generated from reading UI file 'zcontentvisumain.ui'
+**
+** Created by: Qt User Interface Compiler version 5.13.2
+**
+** WARNING! All changes made in this file will be lost when recompiling UI file!
+********************************************************************************/
+
+#ifndef UI_ZCONTENTVISUMAIN_H
+#define UI_ZCONTENTVISUMAIN_H
+
+#include <QtCore/QVariant>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QFrame>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QProgressBar>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QStatusBar>
+#include <QtWidgets/QTableWidget>
+#include <QtWidgets/QToolBar>
+#include <QtWidgets/QWidget>
+
+QT_BEGIN_NAMESPACE
+
+class Ui_ZContentVisuMain
+{
+public:
+    QAction *openQAc;
+    QAction *rawQAc;
+    QAction *ZRFRecordsQac;
+    QAction *actionSuface;
+    QAction *surfaceScanRawQAc;
+    QAction *RecoveryQAc;
+    QAction *closeQAc;
+    QAction *rawDumpQAc;
+    QAction *surfaceScanZRFQAc;
+    QAction *displayHCBQAc;
+    QAction *QuitQAc;
+    QAction *displayFCBQAc;
+    QAction *displayMCBQAc;
+    QAction *setfileQAc;
+    QAction *openRawQAc;
+    QAction *openZRFQAc;
+    QAction *openZMFQAc;
+    QAction *actionHeader_file;
+    QAction *unlockZRFQAc;
+    QAction *action;
+    QAction *HeaderRawUnlockQAc;
+    QAction *listIndexesQAc;
+    QAction *clearQAc;
+    QAction *cloneQAc;
+    QAction *truncateQAc;
+    QAction *extendQAc;
+    QAction *rebuildHeaderQAc;
+    QAction *reorganizeQAc;
+    QAction *downgradeZMFtoZRFQAc;
+    QAction *upgradeZRFtoZMFQAc;
+    QAction *reorganizeZMFQAc;
+    QAction *removeIndexQAc;
+    QAction *addIndexQAc;
+    QAction *rebuildIndexQAc;
+    QAction *actionGabu;
+    QAction *extractIndexQAc;
+    QAction *extractAllIndexesQAc;
+    QAction *testRunQAc;
+    QAction *rebuilAllQAc;
+    QAction *runRepairQAc;
+    QAction *MCBReportQAc;
+    QAction *DictionaryQAc;
+    QAction *displayZBATQAc;
+    QAction *displayZDBTQAc;
+    QAction *displayZFBTQAc;
+    QWidget *centralwidget;
+    QFrame *MainFRm;
+    QLabel *OpenModeLbl;
+    QLabel *FileTypeLBl;
+    QLabel *FullPathLbl;
+    QPushButton *BackwardBTn;
+    QPushButton *ForwardBTn;
+    QFrame *RecordFRm;
+    QLabel *RecordNumberLBl;
+    QLabel *label_2;
+    QLabel *AddressLBl;
+    QLabel *label_10;
+    QLabel *BlockSizeLBl;
+    QLabel *label_11;
+    QLabel *UserSizeLBl;
+    QLabel *label_12;
+    QLabel *StateLBl;
+    QLabel *label_13;
+    QLabel *LockMaskLBl;
+    QLabel *RecordTotalLBl;
+    QLabel *label;
+    QLabel *FileSizeLBl;
+    QLabel *label_3;
+    QPushButton *LoadAllBTn;
+    QProgressBar *ProgressPGb;
+    QFrame *SequentialFRm;
+    QLabel *label_6;
+    QLabel *ReadSizeLBl;
+    QLabel *label_7;
+    QLabel *FullSizeLBl;
+    QLabel *label_00;
+    QLabel *label_1;
+    QLabel *ZRFVersionLBl;
+    QLabel *ZMFVersionLBl;
+    QLabel *label_4;
+    QLabel *label_5;
+    QLabel *ClosedLBl;
+    QTableWidget *tableTBw;
+    QMenuBar *menubar;
+    QMenu *fileMEn;
+    QMenu *ZRFMEn;
+    QMenu *ZMFMEn;
+    QMenu *menurepair_all_indexes;
+    QMenu *rawMEn;
+    QMenu *dumpHeaderMEn;
+    QMenu *displayPoolMEn;
+    QStatusBar *statusbar;
+    QToolBar *toolBar;
+
+    void setupUi(QMainWindow *ZContentVisuMain)
+    {
+        if (ZContentVisuMain->objectName().isEmpty())
+            ZContentVisuMain->setObjectName(QString::fromUtf8("ZContentVisuMain"));
+        ZContentVisuMain->resize(864, 640);
+        openQAc = new QAction(ZContentVisuMain);
+        openQAc->setObjectName(QString::fromUtf8("openQAc"));
+        rawQAc = new QAction(ZContentVisuMain);
+        rawQAc->setObjectName(QString::fromUtf8("rawQAc"));
+        ZRFRecordsQac = new QAction(ZContentVisuMain);
+        ZRFRecordsQac->setObjectName(QString::fromUtf8("ZRFRecordsQac"));
+        actionSuface = new QAction(ZContentVisuMain);
+        actionSuface->setObjectName(QString::fromUtf8("actionSuface"));
+        surfaceScanRawQAc = new QAction(ZContentVisuMain);
+        surfaceScanRawQAc->setObjectName(QString::fromUtf8("surfaceScanRawQAc"));
+        RecoveryQAc = new QAction(ZContentVisuMain);
+        RecoveryQAc->setObjectName(QString::fromUtf8("RecoveryQAc"));
+        closeQAc = new QAction(ZContentVisuMain);
+        closeQAc->setObjectName(QString::fromUtf8("closeQAc"));
+        rawDumpQAc = new QAction(ZContentVisuMain);
+        rawDumpQAc->setObjectName(QString::fromUtf8("rawDumpQAc"));
+        surfaceScanZRFQAc = new QAction(ZContentVisuMain);
+        surfaceScanZRFQAc->setObjectName(QString::fromUtf8("surfaceScanZRFQAc"));
+        displayHCBQAc = new QAction(ZContentVisuMain);
+        displayHCBQAc->setObjectName(QString::fromUtf8("displayHCBQAc"));
+        QuitQAc = new QAction(ZContentVisuMain);
+        QuitQAc->setObjectName(QString::fromUtf8("QuitQAc"));
+        displayFCBQAc = new QAction(ZContentVisuMain);
+        displayFCBQAc->setObjectName(QString::fromUtf8("displayFCBQAc"));
+        displayMCBQAc = new QAction(ZContentVisuMain);
+        displayMCBQAc->setObjectName(QString::fromUtf8("displayMCBQAc"));
+        setfileQAc = new QAction(ZContentVisuMain);
+        setfileQAc->setObjectName(QString::fromUtf8("setfileQAc"));
+        openRawQAc = new QAction(ZContentVisuMain);
+        openRawQAc->setObjectName(QString::fromUtf8("openRawQAc"));
+        openZRFQAc = new QAction(ZContentVisuMain);
+        openZRFQAc->setObjectName(QString::fromUtf8("openZRFQAc"));
+        openZMFQAc = new QAction(ZContentVisuMain);
+        openZMFQAc->setObjectName(QString::fromUtf8("openZMFQAc"));
+        actionHeader_file = new QAction(ZContentVisuMain);
+        actionHeader_file->setObjectName(QString::fromUtf8("actionHeader_file"));
+        unlockZRFQAc = new QAction(ZContentVisuMain);
+        unlockZRFQAc->setObjectName(QString::fromUtf8("unlockZRFQAc"));
+        action = new QAction(ZContentVisuMain);
+        action->setObjectName(QString::fromUtf8("action"));
+        HeaderRawUnlockQAc = new QAction(ZContentVisuMain);
+        HeaderRawUnlockQAc->setObjectName(QString::fromUtf8("HeaderRawUnlockQAc"));
+        listIndexesQAc = new QAction(ZContentVisuMain);
+        listIndexesQAc->setObjectName(QString::fromUtf8("listIndexesQAc"));
+        clearQAc = new QAction(ZContentVisuMain);
+        clearQAc->setObjectName(QString::fromUtf8("clearQAc"));
+        cloneQAc = new QAction(ZContentVisuMain);
+        cloneQAc->setObjectName(QString::fromUtf8("cloneQAc"));
+        truncateQAc = new QAction(ZContentVisuMain);
+        truncateQAc->setObjectName(QString::fromUtf8("truncateQAc"));
+        extendQAc = new QAction(ZContentVisuMain);
+        extendQAc->setObjectName(QString::fromUtf8("extendQAc"));
+        rebuildHeaderQAc = new QAction(ZContentVisuMain);
+        rebuildHeaderQAc->setObjectName(QString::fromUtf8("rebuildHeaderQAc"));
+        reorganizeQAc = new QAction(ZContentVisuMain);
+        reorganizeQAc->setObjectName(QString::fromUtf8("reorganizeQAc"));
+        downgradeZMFtoZRFQAc = new QAction(ZContentVisuMain);
+        downgradeZMFtoZRFQAc->setObjectName(QString::fromUtf8("downgradeZMFtoZRFQAc"));
+        upgradeZRFtoZMFQAc = new QAction(ZContentVisuMain);
+        upgradeZRFtoZMFQAc->setObjectName(QString::fromUtf8("upgradeZRFtoZMFQAc"));
+        reorganizeZMFQAc = new QAction(ZContentVisuMain);
+        reorganizeZMFQAc->setObjectName(QString::fromUtf8("reorganizeZMFQAc"));
+        removeIndexQAc = new QAction(ZContentVisuMain);
+        removeIndexQAc->setObjectName(QString::fromUtf8("removeIndexQAc"));
+        addIndexQAc = new QAction(ZContentVisuMain);
+        addIndexQAc->setObjectName(QString::fromUtf8("addIndexQAc"));
+        rebuildIndexQAc = new QAction(ZContentVisuMain);
+        rebuildIndexQAc->setObjectName(QString::fromUtf8("rebuildIndexQAc"));
+        actionGabu = new QAction(ZContentVisuMain);
+        actionGabu->setObjectName(QString::fromUtf8("actionGabu"));
+        extractIndexQAc = new QAction(ZContentVisuMain);
+        extractIndexQAc->setObjectName(QString::fromUtf8("extractIndexQAc"));
+        extractAllIndexesQAc = new QAction(ZContentVisuMain);
+        extractAllIndexesQAc->setObjectName(QString::fromUtf8("extractAllIndexesQAc"));
+        testRunQAc = new QAction(ZContentVisuMain);
+        testRunQAc->setObjectName(QString::fromUtf8("testRunQAc"));
+        testRunQAc->setCheckable(true);
+        rebuilAllQAc = new QAction(ZContentVisuMain);
+        rebuilAllQAc->setObjectName(QString::fromUtf8("rebuilAllQAc"));
+        rebuilAllQAc->setCheckable(true);
+        runRepairQAc = new QAction(ZContentVisuMain);
+        runRepairQAc->setObjectName(QString::fromUtf8("runRepairQAc"));
+        MCBReportQAc = new QAction(ZContentVisuMain);
+        MCBReportQAc->setObjectName(QString::fromUtf8("MCBReportQAc"));
+        DictionaryQAc = new QAction(ZContentVisuMain);
+        DictionaryQAc->setObjectName(QString::fromUtf8("DictionaryQAc"));
+        displayZBATQAc = new QAction(ZContentVisuMain);
+        displayZBATQAc->setObjectName(QString::fromUtf8("displayZBATQAc"));
+        displayZDBTQAc = new QAction(ZContentVisuMain);
+        displayZDBTQAc->setObjectName(QString::fromUtf8("displayZDBTQAc"));
+        displayZFBTQAc = new QAction(ZContentVisuMain);
+        displayZFBTQAc->setObjectName(QString::fromUtf8("displayZFBTQAc"));
+        centralwidget = new QWidget(ZContentVisuMain);
+        centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
+        MainFRm = new QFrame(centralwidget);
+        MainFRm->setObjectName(QString::fromUtf8("MainFRm"));
+        MainFRm->setGeometry(QRect(0, 0, 861, 181));
+        MainFRm->setFrameShape(QFrame::StyledPanel);
+        MainFRm->setFrameShadow(QFrame::Raised);
+        OpenModeLbl = new QLabel(MainFRm);
+        OpenModeLbl->setObjectName(QString::fromUtf8("OpenModeLbl"));
+        OpenModeLbl->setGeometry(QRect(140, 40, 131, 16));
+        FileTypeLBl = new QLabel(MainFRm);
+        FileTypeLBl->setObjectName(QString::fromUtf8("FileTypeLBl"));
+        FileTypeLBl->setGeometry(QRect(140, 80, 131, 16));
+        FullPathLbl = new QLabel(MainFRm);
+        FullPathLbl->setObjectName(QString::fromUtf8("FullPathLbl"));
+        FullPathLbl->setGeometry(QRect(20, 10, 831, 16));
+        FullPathLbl->setFrameShape(QFrame::NoFrame);
+        FullPathLbl->setFrameShadow(QFrame::Plain);
+        BackwardBTn = new QPushButton(MainFRm);
+        BackwardBTn->setObjectName(QString::fromUtf8("BackwardBTn"));
+        BackwardBTn->setGeometry(QRect(320, 47, 41, 41));
+        ForwardBTn = new QPushButton(MainFRm);
+        ForwardBTn->setObjectName(QString::fromUtf8("ForwardBTn"));
+        ForwardBTn->setGeometry(QRect(810, 47, 41, 41));
+        RecordFRm = new QFrame(MainFRm);
+        RecordFRm->setObjectName(QString::fromUtf8("RecordFRm"));
+        RecordFRm->setGeometry(QRect(370, 37, 421, 101));
+        RecordFRm->setFrameShape(QFrame::StyledPanel);
+        RecordFRm->setFrameShadow(QFrame::Raised);
+        RecordNumberLBl = new QLabel(RecordFRm);
+        RecordNumberLBl->setObjectName(QString::fromUtf8("RecordNumberLBl"));
+        RecordNumberLBl->setGeometry(QRect(10, 10, 61, 20));
+        label_2 = new QLabel(RecordFRm);
+        label_2->setObjectName(QString::fromUtf8("label_2"));
+        label_2->setGeometry(QRect(220, 10, 61, 16));
+        AddressLBl = new QLabel(RecordFRm);
+        AddressLBl->setObjectName(QString::fromUtf8("AddressLBl"));
+        AddressLBl->setGeometry(QRect(310, 10, 101, 20));
+        label_10 = new QLabel(RecordFRm);
+        label_10->setObjectName(QString::fromUtf8("label_10"));
+        label_10->setGeometry(QRect(10, 30, 71, 16));
+        BlockSizeLBl = new QLabel(RecordFRm);
+        BlockSizeLBl->setObjectName(QString::fromUtf8("BlockSizeLBl"));
+        BlockSizeLBl->setGeometry(QRect(80, 30, 81, 16));
+        label_11 = new QLabel(RecordFRm);
+        label_11->setObjectName(QString::fromUtf8("label_11"));
+        label_11->setGeometry(QRect(220, 30, 54, 15));
+        UserSizeLBl = new QLabel(RecordFRm);
+        UserSizeLBl->setObjectName(QString::fromUtf8("UserSizeLBl"));
+        UserSizeLBl->setGeometry(QRect(310, 30, 101, 20));
+        label_12 = new QLabel(RecordFRm);
+        label_12->setObjectName(QString::fromUtf8("label_12"));
+        label_12->setGeometry(QRect(10, 50, 54, 15));
+        StateLBl = new QLabel(RecordFRm);
+        StateLBl->setObjectName(QString::fromUtf8("StateLBl"));
+        StateLBl->setGeometry(QRect(80, 50, 81, 16));
+        label_13 = new QLabel(RecordFRm);
+        label_13->setObjectName(QString::fromUtf8("label_13"));
+        label_13->setGeometry(QRect(220, 50, 61, 16));
+        LockMaskLBl = new QLabel(RecordFRm);
+        LockMaskLBl->setObjectName(QString::fromUtf8("LockMaskLBl"));
+        LockMaskLBl->setGeometry(QRect(300, 50, 121, 16));
+        RecordTotalLBl = new QLabel(RecordFRm);
+        RecordTotalLBl->setObjectName(QString::fromUtf8("RecordTotalLBl"));
+        RecordTotalLBl->setGeometry(QRect(140, 10, 61, 20));
+        label = new QLabel(RecordFRm);
+        label->setObjectName(QString::fromUtf8("label"));
+        label->setGeometry(QRect(100, 10, 21, 16));
+        FileSizeLBl = new QLabel(MainFRm);
+        FileSizeLBl->setObjectName(QString::fromUtf8("FileSizeLBl"));
+        FileSizeLBl->setGeometry(QRect(80, 60, 131, 16));
+        label_3 = new QLabel(MainFRm);
+        label_3->setObjectName(QString::fromUtf8("label_3"));
+        label_3->setGeometry(QRect(20, 60, 91, 16));
+        LoadAllBTn = new QPushButton(MainFRm);
+        LoadAllBTn->setObjectName(QString::fromUtf8("LoadAllBTn"));
+        LoadAllBTn->setGeometry(QRect(810, 97, 41, 41));
+        ProgressPGb = new QProgressBar(MainFRm);
+        ProgressPGb->setObjectName(QString::fromUtf8("ProgressPGb"));
+        ProgressPGb->setGeometry(QRect(20, 100, 191, 20));
+        QFont font;
+        font.setPointSize(6);
+        font.setItalic(true);
+        ProgressPGb->setFont(font);
+        ProgressPGb->setValue(24);
+        SequentialFRm = new QFrame(MainFRm);
+        SequentialFRm->setObjectName(QString::fromUtf8("SequentialFRm"));
+        SequentialFRm->setGeometry(QRect(370, 140, 421, 31));
+        SequentialFRm->setFrameShape(QFrame::StyledPanel);
+        SequentialFRm->setFrameShadow(QFrame::Raised);
+        label_6 = new QLabel(SequentialFRm);
+        label_6->setObjectName(QString::fromUtf8("label_6"));
+        label_6->setGeometry(QRect(10, 10, 41, 16));
+        ReadSizeLBl = new QLabel(SequentialFRm);
+        ReadSizeLBl->setObjectName(QString::fromUtf8("ReadSizeLBl"));
+        ReadSizeLBl->setGeometry(QRect(80, 10, 81, 16));
+        label_7 = new QLabel(SequentialFRm);
+        label_7->setObjectName(QString::fromUtf8("label_7"));
+        label_7->setGeometry(QRect(170, 10, 21, 16));
+        FullSizeLBl = new QLabel(SequentialFRm);
+        FullSizeLBl->setObjectName(QString::fromUtf8("FullSizeLBl"));
+        FullSizeLBl->setGeometry(QRect(210, 10, 81, 16));
+        label_00 = new QLabel(MainFRm);
+        label_00->setObjectName(QString::fromUtf8("label_00"));
+        label_00->setGeometry(QRect(20, 40, 91, 16));
+        label_1 = new QLabel(MainFRm);
+        label_1->setObjectName(QString::fromUtf8("label_1"));
+        label_1->setGeometry(QRect(20, 80, 91, 16));
+        ZRFVersionLBl = new QLabel(MainFRm);
+        ZRFVersionLBl->setObjectName(QString::fromUtf8("ZRFVersionLBl"));
+        ZRFVersionLBl->setGeometry(QRect(240, 130, 101, 16));
+        ZMFVersionLBl = new QLabel(MainFRm);
+        ZMFVersionLBl->setObjectName(QString::fromUtf8("ZMFVersionLBl"));
+        ZMFVersionLBl->setGeometry(QRect(240, 150, 101, 16));
+        label_4 = new QLabel(MainFRm);
+        label_4->setObjectName(QString::fromUtf8("label_4"));
+        label_4->setGeometry(QRect(20, 130, 211, 16));
+        label_5 = new QLabel(MainFRm);
+        label_5->setObjectName(QString::fromUtf8("label_5"));
+        label_5->setGeometry(QRect(20, 150, 211, 16));
+        ClosedLBl = new QLabel(MainFRm);
+        ClosedLBl->setObjectName(QString::fromUtf8("ClosedLBl"));
+        ClosedLBl->setGeometry(QRect(130, 30, 151, 31));
+        QFont font1;
+        font1.setPointSize(12);
+        font1.setBold(true);
+        font1.setWeight(75);
+        ClosedLBl->setFont(font1);
+        tableTBw = new QTableWidget(centralwidget);
+        tableTBw->setObjectName(QString::fromUtf8("tableTBw"));
+        tableTBw->setGeometry(QRect(0, 180, 861, 411));
+        QFont font2;
+        font2.setFamily(QString::fromUtf8("Courier"));
+        font2.setPointSize(11);
+        font2.setBold(true);
+        font2.setWeight(75);
+        tableTBw->setFont(font2);
+        ZContentVisuMain->setCentralWidget(centralwidget);
+        menubar = new QMenuBar(ZContentVisuMain);
+        menubar->setObjectName(QString::fromUtf8("menubar"));
+        menubar->setGeometry(QRect(0, 0, 864, 20));
+        fileMEn = new QMenu(menubar);
+        fileMEn->setObjectName(QString::fromUtf8("fileMEn"));
+        ZRFMEn = new QMenu(menubar);
+        ZRFMEn->setObjectName(QString::fromUtf8("ZRFMEn"));
+        ZMFMEn = new QMenu(menubar);
+        ZMFMEn->setObjectName(QString::fromUtf8("ZMFMEn"));
+        menurepair_all_indexes = new QMenu(ZMFMEn);
+        menurepair_all_indexes->setObjectName(QString::fromUtf8("menurepair_all_indexes"));
+        rawMEn = new QMenu(menubar);
+        rawMEn->setObjectName(QString::fromUtf8("rawMEn"));
+        dumpHeaderMEn = new QMenu(rawMEn);
+        dumpHeaderMEn->setObjectName(QString::fromUtf8("dumpHeaderMEn"));
+        displayPoolMEn = new QMenu(dumpHeaderMEn);
+        displayPoolMEn->setObjectName(QString::fromUtf8("displayPoolMEn"));
+        ZContentVisuMain->setMenuBar(menubar);
+        statusbar = new QStatusBar(ZContentVisuMain);
+        statusbar->setObjectName(QString::fromUtf8("statusbar"));
+        ZContentVisuMain->setStatusBar(statusbar);
+        toolBar = new QToolBar(ZContentVisuMain);
+        toolBar->setObjectName(QString::fromUtf8("toolBar"));
+        ZContentVisuMain->addToolBar(Qt::TopToolBarArea, toolBar);
+
+        menubar->addAction(fileMEn->menuAction());
+        menubar->addAction(ZRFMEn->menuAction());
+        menubar->addAction(ZMFMEn->menuAction());
+        menubar->addAction(rawMEn->menuAction());
+        fileMEn->addAction(setfileQAc);
+        fileMEn->addAction(openQAc);
+        fileMEn->addAction(openRawQAc);
+        fileMEn->addAction(openZRFQAc);
+        fileMEn->addAction(openZMFQAc);
+        fileMEn->addAction(unlockZRFQAc);
+        fileMEn->addAction(closeQAc);
+        fileMEn->addAction(QuitQAc);
+        ZRFMEn->addAction(surfaceScanZRFQAc);
+        ZRFMEn->addAction(RecoveryQAc);
+        ZRFMEn->addAction(clearQAc);
+        ZRFMEn->addAction(cloneQAc);
+        ZRFMEn->addAction(truncateQAc);
+        ZRFMEn->addAction(extendQAc);
+        ZRFMEn->addAction(rebuildHeaderQAc);
+        ZRFMEn->addAction(reorganizeQAc);
+        ZRFMEn->addAction(upgradeZRFtoZMFQAc);
+        ZMFMEn->addAction(listIndexesQAc);
+        ZMFMEn->addAction(menurepair_all_indexes->menuAction());
+        ZMFMEn->addAction(downgradeZMFtoZRFQAc);
+        ZMFMEn->addAction(reorganizeZMFQAc);
+        ZMFMEn->addAction(removeIndexQAc);
+        ZMFMEn->addAction(addIndexQAc);
+        ZMFMEn->addAction(rebuildIndexQAc);
+        ZMFMEn->addAction(extractIndexQAc);
+        ZMFMEn->addAction(extractAllIndexesQAc);
+        ZMFMEn->addAction(MCBReportQAc);
+        menurepair_all_indexes->addAction(testRunQAc);
+        menurepair_all_indexes->addAction(rebuilAllQAc);
+        menurepair_all_indexes->addAction(runRepairQAc);
+        rawMEn->addAction(rawDumpQAc);
+        rawMEn->addAction(surfaceScanRawQAc);
+        rawMEn->addAction(action);
+        rawMEn->addAction(dumpHeaderMEn->menuAction());
+        dumpHeaderMEn->addAction(displayHCBQAc);
+        dumpHeaderMEn->addAction(displayFCBQAc);
+        dumpHeaderMEn->addAction(displayMCBQAc);
+        dumpHeaderMEn->addAction(HeaderRawUnlockQAc);
+        dumpHeaderMEn->addAction(displayPoolMEn->menuAction());
+        dumpHeaderMEn->addAction(DictionaryQAc);
+        displayPoolMEn->addAction(displayZBATQAc);
+        displayPoolMEn->addAction(displayZDBTQAc);
+        displayPoolMEn->addAction(displayZFBTQAc);
+
+        retranslateUi(ZContentVisuMain);
+
+        QMetaObject::connectSlotsByName(ZContentVisuMain);
+    } // setupUi
+
+    void retranslateUi(QMainWindow *ZContentVisuMain)
+    {
+        ZContentVisuMain->setWindowTitle(QCoreApplication::translate("ZContentVisuMain", "MainWindow", nullptr));
+        openQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Open file according type", nullptr));
+        rawQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Raw ", nullptr));
+        ZRFRecordsQac->setText(QCoreApplication::translate("ZContentVisuMain", "ZRF Records", nullptr));
+        actionSuface->setText(QCoreApplication::translate("ZContentVisuMain", "Suface", nullptr));
+        surfaceScanRawQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Surface scan", nullptr));
+        RecoveryQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Record recovery", nullptr));
+        closeQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Close current", nullptr));
+        rawDumpQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Raw dump", nullptr));
+        surfaceScanZRFQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Surface dump (ZRF)", nullptr));
+        displayHCBQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Header Control Block", nullptr));
+        QuitQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Quit", nullptr));
+        displayFCBQAc->setText(QCoreApplication::translate("ZContentVisuMain", "File Control Block", nullptr));
+        displayMCBQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Master Control Block", nullptr));
+        setfileQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Set file", nullptr));
+        openRawQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Open file as raw file", nullptr));
+        openZRFQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Open file as Random File", nullptr));
+        openZMFQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Open file as Master File", nullptr));
+        actionHeader_file->setText(QCoreApplication::translate("ZContentVisuMain", "Header file", nullptr));
+        unlockZRFQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Unlock random file", nullptr));
+        action->setText(QCoreApplication::translate("ZContentVisuMain", "Header file unlock", nullptr));
+        HeaderRawUnlockQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Header file unlock", nullptr));
+        listIndexesQAc->setText(QCoreApplication::translate("ZContentVisuMain", "List indexes", nullptr));
+        clearQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Clear file", nullptr));
+        cloneQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Clone file", nullptr));
+        truncateQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Truncate file", nullptr));
+        extendQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Extend File", nullptr));
+        rebuildHeaderQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Rebuild header file", nullptr));
+        reorganizeQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Reorganize file", nullptr));
+        downgradeZMFtoZRFQAc->setText(QCoreApplication::translate("ZContentVisuMain", "dowgrade to ZRF", nullptr));
+        upgradeZRFtoZMFQAc->setText(QCoreApplication::translate("ZContentVisuMain", "upgrade to MasterFile", nullptr));
+        reorganizeZMFQAc->setText(QCoreApplication::translate("ZContentVisuMain", "reorganize", nullptr));
+        removeIndexQAc->setText(QCoreApplication::translate("ZContentVisuMain", "remove Index", nullptr));
+        addIndexQAc->setText(QCoreApplication::translate("ZContentVisuMain", "add Index", nullptr));
+        rebuildIndexQAc->setText(QCoreApplication::translate("ZContentVisuMain", "rebuild single Index", nullptr));
+        actionGabu->setText(QCoreApplication::translate("ZContentVisuMain", "Gabu", nullptr));
+        extractIndexQAc->setText(QCoreApplication::translate("ZContentVisuMain", "extract Index definition", nullptr));
+        extractAllIndexesQAc->setText(QCoreApplication::translate("ZContentVisuMain", "extract all Indexes definitions", nullptr));
+        testRunQAc->setText(QCoreApplication::translate("ZContentVisuMain", "test run", nullptr));
+        rebuilAllQAc->setText(QCoreApplication::translate("ZContentVisuMain", "rebuild all", nullptr));
+        runRepairQAc->setText(QCoreApplication::translate("ZContentVisuMain", "run repair", nullptr));
+        MCBReportQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Master Control Block report", nullptr));
+        DictionaryQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Dictionary", nullptr));
+        displayZBATQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Block Access Table", nullptr));
+        displayZDBTQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Deleted Blocks Table", nullptr));
+        displayZFBTQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Free Blocks Table", nullptr));
+        OpenModeLbl->setText(QCoreApplication::translate("ZContentVisuMain", "not open", nullptr));
+        FileTypeLBl->setText(QCoreApplication::translate("ZContentVisuMain", "Unknown type", nullptr));
+        FullPathLbl->setText(QCoreApplication::translate("ZContentVisuMain", "no file selected", nullptr));
+        BackwardBTn->setText(QCoreApplication::translate("ZContentVisuMain", "<", nullptr));
+        ForwardBTn->setText(QCoreApplication::translate("ZContentVisuMain", ">", nullptr));
+        RecordNumberLBl->setText(QCoreApplication::translate("ZContentVisuMain", "Record", nullptr));
+        label_2->setText(QCoreApplication::translate("ZContentVisuMain", "Address", nullptr));
+        AddressLBl->setText(QCoreApplication::translate("ZContentVisuMain", "Address", nullptr));
+        label_10->setText(QCoreApplication::translate("ZContentVisuMain", "Block Size", nullptr));
+        BlockSizeLBl->setText(QCoreApplication::translate("ZContentVisuMain", "Block Size", nullptr));
+        label_11->setText(QCoreApplication::translate("ZContentVisuMain", "User Size", nullptr));
+        UserSizeLBl->setText(QCoreApplication::translate("ZContentVisuMain", "User Size", nullptr));
+        label_12->setText(QCoreApplication::translate("ZContentVisuMain", "State", nullptr));
+        StateLBl->setText(QCoreApplication::translate("ZContentVisuMain", "Block Size", nullptr));
+        label_13->setText(QCoreApplication::translate("ZContentVisuMain", "Lock mask", nullptr));
+        LockMaskLBl->setText(QCoreApplication::translate("ZContentVisuMain", "lock", nullptr));
+        RecordTotalLBl->setText(QCoreApplication::translate("ZContentVisuMain", "Record", nullptr));
+        label->setText(QCoreApplication::translate("ZContentVisuMain", "of", nullptr));
+        FileSizeLBl->setText(QCoreApplication::translate("ZContentVisuMain", "0", nullptr));
+        label_3->setText(QCoreApplication::translate("ZContentVisuMain", "File size", nullptr));
+        LoadAllBTn->setText(QCoreApplication::translate("ZContentVisuMain", "All", nullptr));
+        label_6->setText(QCoreApplication::translate("ZContentVisuMain", "Read", nullptr));
+        ReadSizeLBl->setText(QCoreApplication::translate("ZContentVisuMain", "Size", nullptr));
+        label_7->setText(QCoreApplication::translate("ZContentVisuMain", "of", nullptr));
+        FullSizeLBl->setText(QCoreApplication::translate("ZContentVisuMain", "Size", nullptr));
+        label_00->setText(QCoreApplication::translate("ZContentVisuMain", "File is open as", nullptr));
+        label_1->setText(QCoreApplication::translate("ZContentVisuMain", "File has type", nullptr));
+        ZRFVersionLBl->setText(QCoreApplication::translate("ZContentVisuMain", "TextLabel", nullptr));
+        ZMFVersionLBl->setText(QCoreApplication::translate("ZContentVisuMain", "TextLabel", nullptr));
+        label_4->setText(QCoreApplication::translate("ZContentVisuMain", "Random File Software version", nullptr));
+        label_5->setText(QCoreApplication::translate("ZContentVisuMain", "Master File Software version", nullptr));
+        ClosedLBl->setText(QCoreApplication::translate("ZContentVisuMain", "No Open File", nullptr));
+        fileMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "File", nullptr));
+        ZRFMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "ZRF", nullptr));
+        ZMFMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "ZMF", nullptr));
+        menurepair_all_indexes->setTitle(QCoreApplication::translate("ZContentVisuMain", "repair all indexes", nullptr));
+        rawMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "Raw file", nullptr));
+        dumpHeaderMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "Header file dump", nullptr));
+        displayPoolMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "display Pool", nullptr));
+        toolBar->setWindowTitle(QCoreApplication::translate("ZContentVisuMain", "toolBar", nullptr));
+    } // retranslateUi
+
+};
+
+namespace Ui {
+    class ZContentVisuMain: public Ui_ZContentVisuMain {};
+} // namespace Ui
+
+QT_END_NAMESPACE
+
+#endif // UI_ZCONTENTVISUMAIN_H
