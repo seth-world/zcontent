@@ -103,7 +103,7 @@ utf8String ZFieldDescription::toXml(int pLevel, bool pComment)
   return wReturn;
 }//toXml
 
-ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode,ZaiErrors* pErrorlog,ZaiE_Severity pSeverity)
+ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, ZaiErrors* pErrorlog)
 {
   bool        wErrored=false;
   bool        wHashismissing=false;
@@ -116,11 +116,10 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode,ZaiErrors* pErrorlog
 
   if (pFieldRootNode->getName()!="field")
     {
-    pErrorlog->logZStatus(
-        pSeverity,
-        ZS_XMLINVROOTNAME,
-        "FieldDescription::fromXml-E-CNTFINDPAR Cannot find root node <%s>. Stopping xml parsing.",
-        "field");
+    pErrorlog->logZStatus(ZAIES_Error,
+                          ZS_XMLINVROOTNAME,
+                          "FieldDescription::fromXml-E-CNTFINDPAR Cannot find root node <%s>. Stopping xml parsing.",
+                          "field");
     return ZS_XMLINVROOTNAME;
     }
 
@@ -137,13 +136,9 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode,ZaiErrors* pErrorlog
 
   if (XMLgetChildMd5(wRootNode, "hash", Hash, pErrorlog) < 0)
     {
-    if (wName.isEmpty())
-    {
-      pErrorlog->logZStatus(ZAIES_Error,ZS_XMLMISSREQ,
-          "FieldDescription::fromXml-E-CNTFINDPAR Cannot find node <hash> while node <name> is missing.");
-      return ZS_XMLMISSREQ;
-    }
-    else
+      pErrorlog->warningLog(
+        "FieldDescription::fromXml-W-CNTFINDHASH Cannot find node <hash> for field named <%s>. Hashcode will be recomputed.",
+        Name.toCChar());
       wHashismissing=true;
     }
 
@@ -197,12 +192,24 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode,ZaiErrors* pErrorlog
   if ((!wErrored) && wHashismissing)
     {
     computeMd5();
-    pErrorlog->warningLog(
-        "FieldDescription::fromXml-W-CNTFINDNOD Cannot find node <hash> for field named <%s>. Recomputing field's hash : value is <%s>.",
+    pErrorlog->infoLog(
+        "FieldDescription::fromXml-I-RECOMPHASH Field <%s> : recomputing field's hashcode : value is <%s>.",
         Name.toCChar(),
         Hash.toHexa().toChar());
     }
-
+    else if ((!wErrored) && pCheckHash)
+    {
+      ZFieldDescription wFComp(*this);
+      wFComp.computeMd5();
+      if (wFComp.Hash != Hash)
+      {
+        pErrorlog->warningLog(
+            "FieldDescription::fromXml-W-CHECKHASH Field <%s> : recomputed field's hashcode <%s> is not what has been loaded <%s>.",
+            Name.toCChar(),
+            wFComp.Hash.toHexa().toChar(),
+            Hash.toHexa().toChar());
+      }
+    }//else if
   if (wErrored)
     return ZS_XMLMISSREQ;
   if (wHashismissing)

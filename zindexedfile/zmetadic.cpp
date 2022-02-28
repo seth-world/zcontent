@@ -540,7 +540,7 @@ utf8VaryingString ZMetaDic::toXml(int pLevel,bool pComment)
 } // ZMetaDic::toXml
 
 
-ZStatus ZMetaDic::XmlLoadFromString(const utf8String &pXmlString,ZaiErrors* pErrorLog)
+ZStatus ZMetaDic::XmlLoadFromString(const utf8String &pXmlString,bool pCheckHash, ZaiErrors* pErrorLog)
 {
   ZStatus wSt;
 
@@ -569,14 +569,14 @@ ZStatus ZMetaDic::XmlLoadFromString(const utf8String &pXmlString,ZaiErrors* pErr
     return ZS_XMLINVROOTNAME;
   }
 
-  wSt = fromXml(wRoot, pErrorLog,ZAIES_Error);
+  wSt = fromXml(wRoot, pCheckHash, pErrorLog);
 
   XMLderegister((zxmlNode *&) wRoot);
 
   return wSt;
 }//ZMetaDic::XmlLoadFromString
 
-ZStatus ZMetaDic::fromXml(zxmlNode* pMetaDicRootNode, ZaiErrors* pErrorlog,ZaiE_Severity pSeverity)
+ZStatus ZMetaDic::fromXml(zxmlNode* pMetaDicRootNode, bool pCheckHash,ZaiErrors* pErrorlog)
 {
   zxmlElement *wMetaDicNode=nullptr;
   zxmlElement *wFieldsRootNode=nullptr;
@@ -594,9 +594,9 @@ ZStatus ZMetaDic::fromXml(zxmlNode* pMetaDicRootNode, ZaiErrors* pErrorlog,ZaiE_
   wMetaDicNode=( zxmlElement *)pMetaDicRootNode;
   if( wMetaDicNode->getName() != "metadictionary")
     {
-    pErrorlog->logZStatus(pSeverity,
+    pErrorlog->logZStatus(ZAIES_Fatal,
                           ZS_XMLINVROOTNAME,
-                          "ZMetaDic::fromXml-E-INVROOTNAME Wrong name for given metadic root node. Expected <metadic> ");
+                          "ZMetaDic::fromXml-F-INVROOTNAME Wrong name <%s> for given root node. Expected <metadictionary> ",wMetaDicNode->getName().toCChar());
     return ZS_XMLINVROOTNAME;
     }
 
@@ -618,7 +618,7 @@ ZStatus ZMetaDic::fromXml(zxmlNode* pMetaDicRootNode, ZaiErrors* pErrorlog,ZaiE_
   ZStatus wSt=wMetaDicNode->getChildByName((zxmlNode*&)wFieldsRootNode,"dicfields");
   if (wSt!=ZS_SUCCESS)
   {
-    pErrorlog->logZStatus(pSeverity,
+    pErrorlog->logZStatus(ZAIES_Error,
                           ZS_XMLMISSREQ,
                           "ZMetaDic::fromXml-E-CNTFINDND Error cannot find required node element with name <%s> status <%s>",
                           "dicfields",
@@ -632,7 +632,7 @@ ZStatus ZMetaDic::fromXml(zxmlNode* pMetaDicRootNode, ZaiErrors* pErrorlog,ZaiE_
   while (wSt==ZS_SUCCESS)
     {
     wFD.clear();
-    wSt=wFD.fromXml(wSingleFieldNode,pErrorlog);
+    wSt=wFD.fromXml(wSingleFieldNode,pCheckHash,pErrorlog);
     if (wSt > 0) /* ZS_SUCCESS or ZS_WARNING  -> field is oK */
       push(wFD);
     else

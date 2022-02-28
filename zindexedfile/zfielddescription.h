@@ -206,12 +206,17 @@ public:  md5                 Hash;        //!< unique hashcode value for the fie
   utf8String toXml(int pLevel, bool pComment=true);
   /**
    * @brief fromXml  populate Field description's attributes with xml content whose root is given by pFieldRootNode.
+   * @param pFieldRootNode root node for field to load : must point to <field>
+   * @param pCheckHash    if set, this option will induce a computation of hashcode and a comparizon with the existing one.
+   *                      if comparizon do not match, a warning message is logged
+   * @param pErrorlog     Pointer to message logging object
+   * @param pSeverity     Severity level to
    * @return ZS_SUCCESS if Ok,
    * ZS_XMLWARNING if a field had some warning(s)  but may be taken as valid
    * ZS_XMLMISREQ some required node(s) is/are missing
    * ZS_XMLINVROOTNAME <field> root node is missing in pFieldRootNode
    */
-  ZStatus fromXml(zxmlNode* pFieldRootNode, ZaiErrors* pErrorlog, ZaiE_Severity pSeverity=ZAIES_Error);
+  ZStatus fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, ZaiErrors* pErrorlog);
 
   FieldDesc_Export getFDExp();
 

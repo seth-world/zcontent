@@ -101,8 +101,8 @@ public:
   utf8VaryingString toXml(int pLevel,bool pComment);
 
   /** @brief XmlSaveToString  loads the whole master dictionary (ZMFDictionary) including its defined keys */
-  ZStatus XmlLoadFromString(const utf8String &pXmlString, ZaiErrors* pErrorlog);
-  ZStatus fromXml(zxmlNode* pZmfDicNode, ZaiErrors* pErrorlog, ZaiE_Severity pSeverity=ZAIES_Error);
+  ZStatus XmlLoadFromString(const utf8String &pXmlString,bool pCheckHash, ZaiErrors* pErrorlog);
+  ZStatus fromXml(zxmlNode* pZmfDicNode, bool pCheckHash,ZaiErrors* pErrorlog);
 
 };
 

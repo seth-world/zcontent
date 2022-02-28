@@ -128,8 +128,9 @@ public:
 
     utf8VaryingString toXml(int pLevel, bool pComment=false);
 
-    ZStatus XmlLoadFromString(const utf8String &pXmlString, ZaiErrors* pErrorLog);
-    ZStatus fromXml(zxmlNode* pMetaDicRootNode, ZaiErrors* pErrorlog, ZaiE_Severity pSeverity);
+    ZStatus XmlLoadFromString(const utf8String &pXmlString, bool pCheckHash, ZaiErrors* pErrorLog);
+
+    ZStatus fromXml(zxmlNode* pMetaDicRootNode, bool pCheckHash, ZaiErrors* pErrorlog);
 
 
     ZDataBuffer& _exportAppendMetaDicFlat(ZDataBuffer& pZDBExport);

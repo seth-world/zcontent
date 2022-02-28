@@ -250,7 +250,7 @@ utf8String ZMFDictionary::toXml(int pLevel,bool pComment)
 } // ZMFDictionary::toXml
 
 
-ZStatus ZMFDictionary::XmlLoadFromString(const utf8String &pXmlString,ZaiErrors* pErrorlog)
+ZStatus ZMFDictionary::XmlLoadFromString(const utf8String &pXmlString,bool pCheckHash,ZaiErrors* pErrorlog)
 {
   ZStatus wSt;
 
@@ -296,7 +296,7 @@ ZStatus ZMFDictionary::XmlLoadFromString(const utf8String &pXmlString,ZaiErrors*
     return wSt;
     }
 
-  wSt = fromXml(wMetaRootNode, pErrorlog,ZAIES_Error);
+  wSt = fromXml(wMetaRootNode, pCheckHash,pErrorlog);
 
   XMLderegister((zxmlNode *&) wMetaRootNode);
   XMLderegister((zxmlNode *&) wRoot);
@@ -305,7 +305,7 @@ ZStatus ZMFDictionary::XmlLoadFromString(const utf8String &pXmlString,ZaiErrors*
 }//ZMFDictionary::XmlLoadFromString
 
 ZStatus
-ZMFDictionary::fromXml(zxmlNode* pZmfDicNode, ZaiErrors* pErrorlog,ZaiE_Severity pSeverity)
+ZMFDictionary::fromXml(zxmlNode* pZmfDicNode, bool pCheckHash, ZaiErrors* pErrorlog)
 {
   zxmlElement *wRootNode=nullptr;
   zxmlElement *wMDicRootNode=nullptr;
@@ -315,12 +315,12 @@ ZMFDictionary::fromXml(zxmlNode* pZmfDicNode, ZaiErrors* pErrorlog,ZaiE_Severity
   if (pZmfDicNode->getName()!="masterdictionary")
     {
     pErrorlog->logZStatus(
-        pSeverity,
+        ZAIES_Error,
         ZS_INVNAME,
-        "ZMFDictionary::fromXml-E-CNTFINDND Error cannot find required node element with name <%s> status <%s>",
+        "ZMFDictionary::fromXml-E-CNTFINDND Error cannot find master dictionary root node element with name <%s> status <%s>",
         "masterdictionary",
-        decode_ZStatus(ZS_XMLMISSREQ));
-    return ZS_XMLMISSREQ;
+        decode_ZStatus(ZS_XMLINVROOTNAME));
+    return ZS_XMLINVROOTNAME;
     }
 
   ZStatus wSt;
@@ -336,16 +336,16 @@ ZMFDictionary::fromXml(zxmlNode* pZmfDicNode, ZaiErrors* pErrorlog,ZaiE_Severity
   if (wSt!=ZS_SUCCESS)
   {
     pErrorlog->logZStatus(
-        pSeverity,
+        ZAIES_Error,
         wSt,
-        "ZMetaDic::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
+        "ZMetaDic::fromXml-E-CNTFINDND Error cannot find meta dictionary root node element with name <%s> status "
         "<%s>",
         "metadictionary",
         decode_ZStatus(wSt));
     return wSt;
   }
 
-  wSt=ZMetaDic::fromXml(wMDicRootNode,pErrorlog,pSeverity);
+  wSt=ZMetaDic::fromXml(wMDicRootNode,pCheckHash,pErrorlog);
 
   XMLderegister(wMDicRootNode);
   return wSt;

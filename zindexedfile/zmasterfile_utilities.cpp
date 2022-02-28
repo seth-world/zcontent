@@ -1052,7 +1052,7 @@ validateXmlDicDefinition(ZMFDictionary* pMasterDic,ZArray<IndexData_st>* pIndexD
 
 
 ZStatus
-loadXMLDictionaryForCreate(zxmlElement* pRoot,ZMFDictionary*& pMasterDic,ZaiErrors* pErrorLog)
+loadXMLDictionaryForCreate(zxmlElement* pRoot,ZMFDictionary*& pMasterDic,bool pCheckHash, ZaiErrors* pErrorLog)
 {
   ZStatus wSt=ZS_SUCCESS;
   zxmlElement* wMasterDicNode=nullptr;
@@ -1119,7 +1119,7 @@ loadXMLDictionaryForCreate(zxmlElement* pRoot,ZMFDictionary*& pMasterDic,ZaiErro
       XMLderegister(wMetaDicNode);
       pErrorLog->textLog("loadXMLDictionary: found node <metadic>. Loading meta dictionary.");
 
-      wSt=pMasterDic->ZMetaDic::fromXml(wMasterDicNode,pErrorLog,ZAIES_Warning);
+      wSt=pMasterDic->ZMetaDic::fromXml(wMasterDicNode,pCheckHash,pErrorLog);
       if (wSt!=ZS_SUCCESS)
         {
         pErrorLog->errorLog("loadXMLDictionary: Meta dictionary (field dictionary) cannot be loaded or appears to be corrupted.\n "
@@ -1291,7 +1291,7 @@ EndloadXMLDictionary:
  *
  */
 ZStatus
-applyXMLDictionaryChange(ZRawMasterFile* pMasterFile, zxmlElement* pRoot, bool pRealRun, ZaiErrors* pMessageLog)
+applyXMLDictionaryChange(ZRawMasterFile* pMasterFile, zxmlElement* pRoot, bool pRealRun,bool pCheckHash,ZaiErrors* pMessageLog)
 {
   ZStatus wSt=ZS_SUCCESS;
   zxmlElement* wMasterDicNode=nullptr;
@@ -1382,7 +1382,7 @@ applyXMLDictionaryChange(ZRawMasterFile* pMasterFile, zxmlElement* pRoot, bool p
     XMLderegister(wMetaDicNode);
 
     pMessageLog->textLog("found node <metadic>. Loading meta dictionary.");
-    wSt=wMasterDic->ZMetaDic::fromXml(wMasterDicNode,pMessageLog,ZAIES_Error);
+    wSt=wMasterDic->ZMetaDic::fromXml(wMasterDicNode,pCheckHash,pMessageLog);
     if (wSt!=ZS_SUCCESS)
       {
       pMessageLog->errorLog("loadXMLDictionary: Meta dictionary (field dictionary) cannot be loaded or appears to be corrupted.\n "
@@ -1952,6 +1952,7 @@ createMasterFileFromXml(const char* pXMLPath,
                         const char *pContentFilePath,
                         bool pRealRun,
                         bool pReplace,
+                        bool pCheckHash,
                         const char* pLogfile)
 {
   ZStatus     wSt;
@@ -2173,7 +2174,7 @@ createMasterFileFromXml(const char* pXMLPath,
 
     /* getting Master dictionary : for master dictionary rootnode is mcb node */
 
-    wSt = loadXMLDictionaryForCreate(wMCBNode, wMasterDic, &wErrorLog);
+    wSt = loadXMLDictionaryForCreate(wMCBNode, wMasterDic, pCheckHash, &wErrorLog);
 
 
     if (XMLgetChildText(wMCBNode,"indexfilepath",wMCB.IndexFilePath,&wErrorLog,ZAIES_Warning)<0)

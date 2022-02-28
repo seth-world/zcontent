@@ -87,7 +87,7 @@ ZStatus
 createMasterFileFromXml(const char* pXMLPath,
     const char *pContentFilePath,
     bool pRealRun,
-    bool pReplace,
+    bool pReplace, bool pCheckHash,
     const char* pLogfile);
 
 
@@ -182,7 +182,7 @@ ZStatus validateXmlDicDefinition(ZMFDictionary* wMasterDic, ZArray<IndexData_st>
  *  When KeyDictionary is errored or does not exist, pMasterDic->KeyDic.count() returns zero
  *
  */
-ZStatus loadXMLDictionaryForCreate(zxmlElement* pRoot, ZMFDictionary *& pMasterDic, ZaiErrors* pErrorLog);
+ZStatus loadXMLDictionaryForCreate(zxmlElement* pRoot, ZMFDictionary *& pMasterDic, bool pCheckHash, ZaiErrors* pErrorLog);
 
 ZStatus zmuXMLgetChild(zxmlElement* pRootNode, const char* pName, bool& pValue,  ZaiErrors* pErrorlog, bool pMandatory,ZaiE_Severity pSeverity=ZAIES_Error);
 ZStatus zmuXMLgetChild(zxmlElement* pRootNode,const char* pName,int& pValue,ZaiErrors* pErrorlog,bool pMandatory,ZaiE_Severity pSeverity=ZAIES_Error);
