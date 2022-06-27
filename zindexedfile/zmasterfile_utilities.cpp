@@ -395,7 +395,7 @@ utf8String wTagName;
 //--------------ZFileControlBlock modifiable fields----------------
 
     pErrorLog->setErrorLogContext("_testXMLZFileControlBlock");
-    pErrorLog->setAutoPrintOn(true);
+    pErrorLog->setAutoPrintOn(ZAIES_Text);
 /*
     wSt=pFileNode->getChildByName(wFileDescNode,"ZFileDescriptor");
     if (wSt!=ZS_SUCCESS)
@@ -507,7 +507,7 @@ zxmlNode * wHCBNode=nullptr;
 
 ZFileDescriptor wFileDescriptor;
 
-pErrorLog->setAutoPrintOn(true);
+pErrorLog->setAutoPrintOn(ZAIES_Text);
 pErrorLog->setErrorLogContext("_testXMLZFileDescriptor");
 
     if (pFileNode->getName()!="file")
@@ -2046,7 +2046,7 @@ createMasterFileFromXml(const char* pXMLPath,
       wBase=pLogfile;
 
   wErrorLog.setErrorLogContext("createFromXml");
-  wErrorLog.setAutoPrintOn(true);
+  wErrorLog.setAutoPrintOn(ZAIES_Text);
   if (!wBase.isEmpty())
     wErrorLog.setOutput(wBase.toCChar());
   else
@@ -2937,7 +2937,7 @@ applyXmltoFile(const char* pXMLPath,
     wBase=pLogfile;
 
   wMessageLog.setErrorLogContext("applyXmltoFile");
-  wMessageLog.setAutoPrintOn(true);
+  wMessageLog.setAutoPrintOn(ZAIES_Text);
   if (!wBase.isEmpty())
     wMessageLog.setOutput(wBase.toCChar());
   else
@@ -3894,7 +3894,7 @@ createZRandomFileFromXml(const char* pXMLPath,
     wBase=pLogfile;
 
   wErrorLog.setErrorLogContext("createZRandomFileFromXml");
-  wErrorLog.setAutoPrintOn(true);
+  wErrorLog.setAutoPrintOn(ZAIES_Text);
   if (!wBase.isEmpty())
     wErrorLog.setOutput(wBase.toCChar());
   else

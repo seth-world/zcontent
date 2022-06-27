@@ -510,7 +510,7 @@ getStringNfU (ZDataBuffer&pNatural,ZDataBuffer& pUniversal,ZTypeBase pType)
             return pNatural;
             }//if (pType&ZType_WUChar)
 */
-
+  return pNatural;
 }//getStringNfU
 /**
  * @brief ZRecord::getUniversalfromRaw gets universal value
@@ -1662,7 +1662,7 @@ void deleteZRecord(void* pZRecord)
  */
 APICEXPORT ZStatus setFieldValueByRank(void* pRecordCTX,void* pValue,const long pRank,ZTypeBase pType)
 {
-
+  return ZS_SUCCESS;
 }
 
 /*APICEXPORT ZStatus setFieldValueByRank_Array(void* pRecordCTX,void* pValue,const long pRank,const size_t pCapacity,ZTypeBase pType)
@@ -1672,12 +1672,12 @@ APICEXPORT ZStatus setFieldValueByRank(void* pRecordCTX,void* pValue,const long 
 */
 APICEXPORT ZStatus getFieldValueByRank(void* pRecordCTX,void* pValue,const long pRank,ZTypeBase pType)
 {
-
+  return ZS_SUCCESS;
 }
 
 APICEXPORT ZStatus getFieldValueByRank_Array(void* pRecordCTX,void* pValue,const long pRank,const size_t pCapacity,ZTypeBase pType)
 {
-
+  return ZS_SUCCESS;
 }
 
 APICEXPORT ZStatus  setFieldURFfN (void* &pSourceNatural,

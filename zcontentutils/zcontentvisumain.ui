@@ -616,10 +616,19 @@
     <addaction name="action"/>
     <addaction name="dumpHeaderMEn"/>
    </widget>
+   <widget class="QMenu" name="menuDictionary">
+    <property name="title">
+     <string>Dictionary</string>
+    </property>
+    <addaction name="dicNewQAc"/>
+    <addaction name="dicLoadXmlQAc"/>
+    <addaction name="cppparserQAc"/>
+   </widget>
    <addaction name="fileMEn"/>
    <addaction name="ZRFMEn"/>
    <addaction name="ZMFMEn"/>
    <addaction name="rawMEn"/>
+   <addaction name="menuDictionary"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -862,6 +871,21 @@
   <action name="displayZFBTQAc">
    <property name="text">
     <string>Free Blocks Table</string>
+   </property>
+  </action>
+  <action name="dicNewQAc">
+   <property name="text">
+    <string>Create new</string>
+   </property>
+  </action>
+  <action name="dicLoadXmlQAc">
+   <property name="text">
+    <string>Load from Xml file</string>
+   </property>
+  </action>
+  <action name="cppparserQAc">
+   <property name="text">
+    <string>c++ parser</string>
    </property>
   </action>
  </widget>

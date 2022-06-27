@@ -25,7 +25,7 @@ public:
   ZLock_struct(const ZLock_struct& pIn) {_copyFrom(pIn);}
   ZLock_struct(const ZLock_struct&& pIn) {_copyFrom(pIn);}
 
-  ZLock_struct& operator = (const ZLock_struct& pIn) {_copyFrom(pIn);}
+  ZLock_struct& operator = (const ZLock_struct& pIn) {return _copyFrom(pIn);}
 
   ZLock_struct& _copyFrom(const ZLock_struct& pIn)
   {
@@ -44,7 +44,7 @@ public:
   ZLockPool(const ZLockPool& pIn) {_copyFrom(pIn);}
   ZLockPool(const ZLockPool&& pIn) {_copyFrom(pIn);}
 
-  ZLockPool& operator = (const ZLockPool& pIn) {_copyFrom(pIn);}
+  ZLockPool& operator = (const ZLockPool& pIn) {return _copyFrom(pIn);}
 
   ZLockPool& _copyFrom(const ZLockPool& pIn)
   {

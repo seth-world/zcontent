@@ -12,7 +12,8 @@
 
 #include <zcontent/zrandomfile/zrandomfile.h>
 
-
+#define __DISPLAYCALLBACK__(__NAME__)  std::function<void (const utf8VaryingString&)> __NAME__
+#define __PROGRESSCALLBACK__(__NAME__)  std::function<void (int)> __NAME__
 
 
 namespace Ui {
@@ -27,6 +28,8 @@ namespace zbs {
 class ZMasterFile;
 }
 
+
+//class textEditMWn;
 enum VisuMode_type : uint8_t
 {
   VMD_Nothing = 0,
@@ -38,6 +41,7 @@ enum VisuMode_type : uint8_t
 
 class DisplayMain;
 class DicEdit;
+class textEditMWn;
 
 class ZContentVisuMain : public QMainWindow
 {
@@ -104,10 +108,21 @@ public:
 
 
   void textEditMorePressed();
+  void closeMCBCB(const QEvent *pEvent);
+  void closeGenlogCB(const QEvent *pEvent);
 
+  textEditMWn* openGenLogWin();
+/*
+  void _print(const utf8VaryingString& pOut);
+  void _print(const char* pFormat,...);
+
+  __DISPLAYCALLBACK__(_displayCallBack)=nullptr;
+*/
   DisplayMain* entityWnd=nullptr;
   DicEdit* dictionaryWnd=nullptr;
 
+  textEditMWn* MCBWin=nullptr;
+  textEditMWn* GenlogWin=nullptr;
 
 
   zbs::ZRandomFile* RandomFile=nullptr;

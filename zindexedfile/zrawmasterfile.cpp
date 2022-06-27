@@ -695,7 +695,7 @@ ZArray<ZPRES>    wIndexPresence;
 
     wPtrIn=ZReserved.Data+JCBOffset;
     ZJCB->_import(wPtrIn);
-
+    return wSt;
 }// readControlBlocks
 
 
@@ -2718,6 +2718,7 @@ ZRawMasterFile::zremoveByRankR     (ZDataBuffer& pRecordContent,const zrank_type
     if (wSt!=ZS_SUCCESS)
       return wSt;
     pRecordContent=RawRecord->Content;
+    return wSt;
 } // zremoveByRankR
 
 

@@ -108,7 +108,7 @@ public:
   ZHeaderControlBlock(const ZHeaderControlBlock&& pIn) {_copyFrom(pIn);}
 
   ZHeaderControlBlock& _copyFrom(const ZHeaderControlBlock& pIn);
-  ZHeaderControlBlock& operator = (const ZHeaderControlBlock& pIn){_copyFrom(pIn);}
+  ZHeaderControlBlock& operator = (const ZHeaderControlBlock& pIn){return _copyFrom(pIn);}
 
   ZHeaderControlBlock& _fromHCBE(const ZHeaderControlBlock_Export *pIn);
 

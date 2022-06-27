@@ -55,9 +55,8 @@ public:
 #pragma pack(pop)
 
 /**
- * @brief The ZBlockHeader class  : ZBlockHeader is heading any user data and stored in file before user record content as a header for each data block
+ * @brief The ZBlockHeader class  : ZBlockHeader is heading any user data and written in file before user record content as a header for each data block
  *  This header is effectively what is written on file before any user data record.
- *
  */
 class ZBlockHeader
 {
@@ -96,7 +95,7 @@ public:
 };
 
 /**
- * @brief The ZBlockDescriptor class This class enhance ZBlockHeader with other fields (Address).
+ * @brief The ZBlockDescriptor class This class enhance ZBlockHeader with Address.
  * This is the main entry for describing file blocks within pools (ZBlockAccessTable, ZFreeBlockPool,...).
  */
 class ZBlockDescriptor : public ZBlockHeader
@@ -124,19 +123,24 @@ public:
   static ZBlockDescriptor_Export _exportConvert(ZBlockDescriptor& pIn,ZBlockDescriptor_Export* pOut);
   static ZStatus _importConvert(ZBlockDescriptor& pOut,ZBlockDescriptor_Export* pIn);
 
-
 };
 
 /**
- * @brief The ZBlockMin_struct struct Intermediate simplified structure to manage addresses and content size.
+ * @brief The ZBlockMin class Intermediate simplified structure to manage addresses and content size.
  */
-struct ZBlockMin_struct
+class ZBlockMin
 {
-  zaddress_type Address;
-  zsize_type   BlockSize;
+public:
+  ZBlockMin()=default;
+  ZBlockMin(zaddress_type pAddr,zsize_type pSize) {Address=pAddr; BlockSize=pSize;}
+  ZBlockMin(const ZBlockMin& pIn) {_copyFrom(pIn);}
+  zaddress_type Address=0L;
+  zsize_type   BlockSize=0uL;
 
-  ZBlockMin_struct& operator = (ZBlockDescriptor &pBlock)
+  ZBlockMin& operator = (ZBlockDescriptor &pBlock)
   {Address=pBlock.Address; BlockSize=pBlock.BlockSize; return *this;}
+  ZBlockMin& operator = (const ZBlockMin& pIn) {return _copyFrom(pIn);}
+  ZBlockMin& _copyFrom (const ZBlockMin& pIn) {Address=pIn.Address; BlockSize=pIn.BlockSize; return *this;}
 };
 
 

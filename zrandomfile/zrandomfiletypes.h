@@ -131,6 +131,7 @@ enum ZFile_type : uint8_t
     ZFT_ZDicMasterFile=8,   //!< this file uses a dictionary
     ZFT_ZMasterFile = ZFT_ZDicMasterFile|ZFT_ZRawMasterFile,   //!< file is Structured Master File using a dictionary
 
+    ZFT_DictionaryFile = 0x10,
     ZFT_Any         = 0xFF  //!< all file types allowed
 };
 

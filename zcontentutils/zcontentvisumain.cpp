@@ -1,5 +1,6 @@
 #include "zcontentvisumain.h"
 #include "ui_zcontentvisumain.h"
+
 #include <QStandardItemModel>
 #include <qaction.h>
 #include <qactiongroup.h>
@@ -15,17 +16,20 @@
 
 #include "displaymain.h"
 #include "zscan.h"
-#include "texteditmwn.h"
 
-#include "zexceptiondlg.h"
+
+#include <zexceptiondlg.h>
 
 #include <zcontent/zindexedfile/zmfdictionary.h>
 
 #include <dicedit.h>
+#include <qfiledialog.h>
 
+#include <texteditmwn.h>
 
 #define __FIXED_FONT__ "courrier"
 
+using namespace std;
 using namespace zbs;
 
 ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
@@ -67,15 +71,18 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
   actionGroup->addAction(ui->displayFCBQAc);
   actionGroup->addAction(ui->displayMCBQAc);
 
+  /* dictionary sub-choice */
   actionGroup->addAction(ui->DictionaryQAc);
+
+  /* dictionary menu */
+  actionGroup->addAction(ui->dicNewQAc);
+  actionGroup->addAction(ui->dicLoadXmlQAc);
 
   /* display pool choices */
 
   actionGroup->addAction(ui->displayZBATQAc);
   actionGroup->addAction(ui->displayZDBTQAc);
   actionGroup->addAction(ui->displayZFBTQAc);
-
-
 
   actionGroup->addAction(ui->HeaderRawUnlockQAc);
 
@@ -99,7 +106,6 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
   actionGroup->addAction(ui->extractAllIndexesQAc); /* extract all xml index definitions */
   actionGroup->addAction(ui->reorganizeZMFQAc);
   actionGroup->addAction(ui->MCBReportQAc);         /* list Master Control Block */
-
 
   ui->openQAc->setVisible(false);
   ui->openRawQAc->setVisible(false);
@@ -166,8 +172,8 @@ ZContentVisuMain::~ZContentVisuMain()
 void
 ZContentVisuMain::actionMenuEvent(QAction* pAction)
 {
+  utf8VaryingString wStr;
   ZStatus wSt=ZS_SUCCESS;
-
 
   if (pAction==ui->openQAc)
   {
@@ -270,9 +276,56 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
     displayZFBT();
     return;
   }
+
   if (pAction==ui->DictionaryQAc)
   {
     Dictionary();
+    return;
+  }
+
+  if (pAction==ui->dicNewQAc)
+  {
+    if (!dictionaryWnd)
+      dictionaryWnd=new DicEdit(this);
+    dictionaryWnd->clear();
+
+    dictionaryWnd->setNewDictionary();
+
+    dictionaryWnd->show();
+    return;
+  }
+
+  if (pAction==ui->dicLoadXmlQAc)
+  {
+    QFileDialog wFd;
+    wFd.setWindowTitle(QObject::tr("Xml file","DicEdit"));
+    wFd.setLabelText(QFileDialog::Accept,  QObject::tr("Select","ZContentVisuMain"));
+    wFd.setLabelText(QFileDialog::Reject ,  QObject::tr("Cancel","ZContentVisuMain"));
+    wFd.setFileMode(QFileDialog::ExistingFile);
+    while (true)
+      {
+      int wRet=wFd.exec();
+      if (wRet==QDialog::Rejected)
+        return;
+
+      if (wFd.selectedFiles().isEmpty())
+        ZExceptionDLg::message("dicLoadXmlQAc",ZS_EMPTY,Severity_Error,QObject::tr("No file selected.Please select a valid file.","ZContentVisuMain").toUtf8().data());
+      else
+        break;
+      }//while (true)
+
+    uriString wXmlFile= wFd.selectedFiles()[0].toUtf8().data();
+
+    if (!dictionaryWnd)
+      dictionaryWnd=new DicEdit(this);
+
+    wSt=dictionaryWnd->loadXmlDictionary(wXmlFile);
+    if (wSt==ZS_SUCCESS)
+      {
+      wStr.sprintf("Xml file %s has been successfully loaded.",wXmlFile.toCChar());
+      statusBar()->showMessage(QObject::tr(wStr.toCChar(),"DicEdit"),cst_MessageDuration);
+      }
+    dictionaryWnd->show();
     return;
   }
 
@@ -313,6 +366,7 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
 
 }//actionMenuEvent
 
+
 void ZContentVisuMain::reportMCB()
 {
   FILE* wReportLog = fopen("reportMCB.log","w");
@@ -320,10 +374,17 @@ void ZContentVisuMain::reportMCB()
   fflush(wReportLog);
   fclose(wReportLog);
 
-  textEditMWn* wTextWin=new textEditMWn(this);
+  if (MCBWin==nullptr)
+    MCBWin=new textEditMWn(this,false,nullptr);
+//    MCBWin=new textEditMWn(this,nullptr);
+  else
+    MCBWin->clear();
 
-  wTextWin->setTextFromFile("reportMCB.log");
-  wTextWin->show();
+  MCBWin->registerCloseCallback(std::bind(&ZContentVisuMain::closeMCBCB, this,std::placeholders::_1));
+  MCBWin->registerMoreCallback(std::bind(&ZContentVisuMain::textEditMorePressed, this));
+
+  MCBWin->setTextFromFile("reportMCB.log");
+  MCBWin->show();
 }
 
 
@@ -339,10 +400,9 @@ void ZContentVisuMain::repairIndexes(bool pTestRun,bool pRebuildAll)
   fflush(wRepairLog);
   fclose(wRepairLog);
 
-  textEditMWn* wTextWin=new textEditMWn;
-
-  wTextWin->setTextFromFile("repairindex.log");
-  wTextWin->show();
+  openGenLogWin();
+  GenlogWin->setTextFromFile("repairindex.log");
+  GenlogWin->show();
 
   if (wSt==ZS_SUCCESS)
     return;
@@ -394,7 +454,8 @@ ZContentVisuMain::ZRFUnlock()
   ZStatus wSt=ZRandomFile::zutilityUnlockZRF(URICurrent);
   if (wSt!=ZS_SUCCESS)
   {
-    ZExceptionDLg::display(*ZException.popR());
+    ZExceptionDLg::displayLast(false);
+    ZException.pop();
   }
 }
 void
@@ -408,7 +469,8 @@ ZContentVisuMain::ZHeaderRawUnlock()
   ZStatus wSt=ZRandomFile::zutilityUnlockHeaderFile(URICurrent);
   if (wSt!=ZS_SUCCESS)
   {
-  ZExceptionDLg::display(*ZException.popR());
+    ZExceptionDLg::displayLast(false);
+    ZException.pop();
   }
 }
 
@@ -455,7 +517,8 @@ ZContentVisuMain::actionOpenFileByType(bool pChecked)
       return;
     }
 
-  ZExceptionDLg::display(*ZException.popR());
+    ZExceptionDLg::displayLast(false);
+    ZException.pop();
 
   return;
 } // actionOpenFileByType
@@ -784,8 +847,10 @@ ZContentVisuMain::unlockZRFZMF(const char* pFilePath)
 
   ZStatus wSt=  ZRandomFile::zutilityUnlockZRF(pFilePath);
 
-  if (wSt!=ZS_SUCCESS)
-    ZExceptionDLg::display(*ZException.popR());
+  if (wSt!=ZS_SUCCESS) {
+    ZExceptionDLg::displayLast(false);
+    ZException.pop();
+  }
   else
     ZExceptionDLg::message("ZContentVisuMain::unlockZRFZMF",ZS_SUCCESS,Severity_Information,"File <%s> has been successfully unlocked.",pFilePath);
   return wSt;
@@ -899,7 +964,7 @@ ZContentVisuMain::openOther(const char* pFileName)
 
   if (entityWnd)
     entityWnd->setFileClosed(false);
-  if (entityWnd)
+  if (dictionaryWnd)
     dictionaryWnd->setFileClosed(false);
 
   return ZS_SUCCESS;
@@ -916,7 +981,7 @@ ZContentVisuMain::displayHCB()
         "Load / reload file content <Reload>\n"
         "Quit <Quit>",sizeof(ZHeaderControlBlock_Export),RawData.Size);
 
-    int wRet=ZExceptionDLg::display2B(wE,"Quit","Reload");
+    int wRet=ZExceptionDLg::display2B("HCB Exception",wE,"Quit","Reload");
     if (wRet==ZEDLG_Rejected)
       return;
     //      case ZEDLG_Accepted:
@@ -956,7 +1021,7 @@ ZContentVisuMain::displayFCB()
         "Load / reload file content <Reload>\n"
         "Quit <Quit>",sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export),RawData.Size);
 
-    int wRet=ZExceptionDLg::display2B(wE,"Quit","Reload");
+    int wRet=ZExceptionDLg::display2B("FCB Exception",wE,"Quit","Reload");
     if (wRet==ZEDLG_Rejected)
       return;
     //      case ZEDLG_Accepted:
@@ -993,7 +1058,7 @@ ZContentVisuMain::displayMCB()
         "Load / reload file content <Reload>\n"
         "Quit <Quit>",sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export),RawData.Size);
 
-    int wRet=ZExceptionDLg::display2B(wE,"Quit","Reload");
+    int wRet=ZExceptionDLg::display2B("MCB Exception",wE,"Quit","Reload");
     if (wRet==ZEDLG_Rejected)
       return;
     //      case ZEDLG_Accepted:
@@ -1031,7 +1096,7 @@ ZContentVisuMain::displayZBAT()
         "Load / reload file content <Reload>\n"
         "Quit <Quit>",sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export),RawData.Size);
 
-    int wRet=ZExceptionDLg::display2B(wE,"Quit","Reload");
+    int wRet=ZExceptionDLg::display2B("ZBAT Exception",wE,"Quit","Reload");
     if (wRet==ZEDLG_Rejected)
       return;
     //      case ZEDLG_Accepted:
@@ -1107,7 +1172,8 @@ ZContentVisuMain::displayPool(unsigned char* pPtr,zaddress_type pOffset,const ch
       wZAEe->InitialAllocation,reverseByteOrder_Conditional (wZAEe->InitialAllocation),
       wZAEe->NbElements,reverseByteOrder_Conditional (wZAEe->NbElements));
 
-  textEditMWn* wTEx=new textEditMWn(this);
+
+  textEditMWn* wTEx=openGenLogWin();
   wTEx->setText(wOut,pTitle);
 
   int wNbElt = int(reverseByteOrder_Conditional<ssize_t> (wZAEe->NbElements));
@@ -1165,7 +1231,7 @@ ZContentVisuMain::displayZDBT()
         "Load / reload file content <Reload>\n"
         "Quit <Quit>",sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export),RawData.Size);
 
-    int wRet=ZExceptionDLg::display2B(wE,"Quit","Reload");
+    int wRet=ZExceptionDLg::display2B("ZDBT Exception",wE,"Quit","Reload");
     if (wRet==ZEDLG_Rejected)
       return;
     //      case ZEDLG_Accepted:
@@ -1218,7 +1284,7 @@ ZContentVisuMain::displayZFBT()
         "Load / reload file content <Reload>\n"
         "Quit <Quit>",sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export),RawData.Size);
 
-    int wRet=ZExceptionDLg::display2B(wE,"Quit","Reload");
+    int wRet=ZExceptionDLg::display2B("HCB_Export Exception",wE,"Quit","Reload");
     if (wRet==ZEDLG_Rejected)
       return;
     //      case ZEDLG_Accepted:
@@ -1267,7 +1333,7 @@ ZContentVisuMain::Dictionary()
 
   if (wSt!=ZS_SUCCESS)
     {
-    ZExceptionDLg::display(ZException.last());
+    ZExceptionDLg::displayLast(false);
     return;
     }
 
@@ -1696,10 +1762,10 @@ ZContentVisuMain::surfaceScanZRF()
   }
 
 
-  textEditMWn* wTextWin=new textEditMWn;
+  openGenLogWin();
 
-  wTextWin->setTextFromFile("surfacescanzrf.txt");
-  wTextWin->show();
+  GenlogWin->setTextFromFile("surfacescanzrf.txt");
+  GenlogWin->show();
 
   return;
 }
@@ -1715,8 +1781,54 @@ ZContentVisuMain::surfaceScanRaw()
   return;
 }
 
+void ZContentVisuMain::closeMCBCB(const QEvent *pEvent)
+{
+  MCBWin=nullptr;
+}
 void
 ZContentVisuMain::textEditMorePressed()
 {
 
 }
+void ZContentVisuMain::closeGenlogCB(const QEvent* pEvent)
+{
+  GenlogWin=nullptr;
+}
+textEditMWn*  ZContentVisuMain::openGenLogWin()
+{
+  if (GenlogWin==nullptr) {
+      GenlogWin = new textEditMWn(this);
+      GenlogWin->registerCloseCallback(std::bind(&ZContentVisuMain::closeGenlogCB, this,std::placeholders::_1));
+  }
+  else
+    GenlogWin->clear();
+  return GenlogWin;
+}
+/*
+void ZContentVisuMain::_print(const char* pFormat,...)
+{
+  utf8VaryingString wOut;
+  va_list ap;
+  va_start(ap, pFormat);
+  wOut.vsnprintf(500,pFormat,ap);
+  va_end(ap);
+  if (_displayCallback==nullptr) {
+    fprintf(Output,wOut.toCChar());
+    fprintf(Output,"\n");
+    std::cout.flush();
+  }
+  else
+    _displayCallback(wOut);
+}
+
+void ZContentVisuMain::_print(const utf8VaryingString& pOut)
+{
+  if (_displayCallback==nullptr) {
+    fprintf(Output,pOut.toCChar());
+    fprintf(Output,"\n");
+    std::cout.flush();
+  }
+  else
+    _displayCallback(pOut);
+}
+*/

@@ -112,9 +112,19 @@ decode_ZEntity (ZEntity_type pEntity)
       return "ZEntity_Group";
     case ZEntity_SystemUser:
       return "ZEntity_SystemUser";
-    default:
-        return "Unknown Entity";
 
+    case ZEntity_CppField:
+      return "ZEntity_CppField";
+    case ZEntity_CppClass:
+      return "ZEntity_CppClass";
+    case ZEntity_CppParsingSelection:
+      return "ZEntity_CppParsingSelection";
+
+    default: {
+      utf8VaryingString wStr;
+      wStr.sprintf("Unknown Entity code %lX",pEntity);
+        return wStr.toCChar();
+    }
     }// switch
 }//decode_ZEntity
 

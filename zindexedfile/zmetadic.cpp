@@ -8,6 +8,8 @@
 
 using namespace zbs;
 
+ZMetaDic::ZMetaDic() :  ZArray<ZFieldDescription>(cst_ZRF_default_allocation,cst_ZRF_default_extentquota) ,
+                        DicName("no name") { }
 /**
  * @brief ZMetaDic::addField Main routine for adding dictionary field. All parameters are input.
  * @param[in] pFieldName
@@ -338,6 +340,7 @@ ZMetaDic::_exportAppendMetaDicFlat(ZDataBuffer& pZDBExport)
     wKDExp.serialize();
     pZDBExport.append_T(wKDExp);
     Tab[wi].getName()._exportAppendUVF(pZDBExport);  /* then append field name */
+    Tab[wi].ToolTip._exportAppendUVF(pZDBExport);  /* then append Tooltip (if exists) */
   }
 
   pZDBExport.append_T(cst_ZBUFFEREND);
@@ -369,7 +372,8 @@ ZMetaDic::_importMetaDicFlat(const unsigned char* &pPtrIn)
       wKDExp.setFromPtr(pPtrIn);
       wKDExp.deserialize();
       ZFieldDescription wFD= wKDExp.toFieldDescription();
-      wFD.getName()._importUVF(pPtrIn);
+      wFD.getName()._importUVF(pPtrIn);  /* import field name */
+      wFD.ToolTip._importUVF(pPtrIn); /* then import tooltip */
       push(wFD);
       memmove(&wCheckEnd,pPtrIn,sizeof(uint32_t));
       }
@@ -436,7 +440,7 @@ ZMetaDic::_copyFrom( const ZMetaDic& pIn)
   _Base::clear();
   for (long wi=0;wi<pIn.count();wi++)
     push(ZFieldDescription(pIn.Tab[wi]));
-
+  DicName = pIn.DicName;
   return *this;
 }//_copyFrom
 

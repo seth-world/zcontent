@@ -9,6 +9,7 @@ ZIndexField& ZIndexField::_copyFrom(const ZIndexField &pIn)
   MDicRank=pIn.MDicRank;
   Hash=pIn.Hash;
   KeyOffset=pIn.KeyOffset;
+  KeyDic=pIn.KeyDic;
   return *this;
 }
 void ZIndexField::clear()

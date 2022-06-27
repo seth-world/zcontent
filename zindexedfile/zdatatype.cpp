@@ -71,7 +71,7 @@ ZTypeBase wZType = pType&ZType_AtomicMask;
                     }
 
        }//switch
-
+  return 0;
 }//getUniversalSize
 /**
  * @brief getAtomicNaturalSize returns the Atomic natural size of the type.
@@ -146,7 +146,7 @@ ZTypeBase wZType = pType;
                     }
 
        }//switch
-
+return 0;
 }//getNaturalSize
 
 
@@ -1338,6 +1338,7 @@ US16& US16::_copyFrom(const US16& pIn)
 {
   Sign=pIn.Sign;
   Value=pIn.Value;
+  return *this;
 }
 US16& US16::fromNatural(int16_t pN)
 {
@@ -1446,6 +1447,7 @@ ssize_t US16::_importURF(int16_t& pValue,unsigned char* &pIn)
 UU16& UU16::_copyFrom(const UU16& pIn)
 {
   Value=pIn.Value;
+  return *this;
 }
 UU16& UU16::fromNatural(uint16_t pN)
 {
@@ -1536,6 +1538,7 @@ US32& US32::_copyFrom(const US32& pIn)
 {
   Sign=pIn.Sign;
   Value=pIn.Value;
+  return *this;
 }
 US32& US32::fromNatural(int32_t pN)
 {
@@ -1644,6 +1647,7 @@ ssize_t US32::_importURF(int32_t& pValue,unsigned char* &pIn)
 UU32& UU32::_copyFrom(const UU32& pIn)
 {
   Value=pIn.Value;
+  return *this;
 }
 UU32& UU32::fromNatural(uint32_t pN)
 {
@@ -1736,6 +1740,7 @@ US64& US64::_copyFrom(const US64& pIn)
 {
   Sign=pIn.Sign;
   Value=pIn.Value;
+  return *this;
 }
 US64& US64::fromNatural(int64_t pN)
 {
@@ -1844,6 +1849,7 @@ ssize_t US64::_importURF(int64_t& pValue,unsigned char* &pIn)
 UU64& UU64::_copyFrom(const UU64& pIn)
 {
   Value=pIn.Value;
+  return *this;
 }
 UU64& UU64::fromNatural(uint64_t pN)
 {
@@ -1936,6 +1942,7 @@ UFloat& UFloat::_copyFrom(const UFloat& pIn)
 {
   Sign=pIn.Sign;
   Value=pIn.Value;
+  return *this;
 }
 UFloat& UFloat::fromNatural(float pN)
 {
@@ -2044,6 +2051,7 @@ UDouble& UDouble::_copyFrom(const UDouble& pIn)
 {
   Sign=pIn.Sign;
   Value=pIn.Value;
+  return *this;
 }
 UDouble& UDouble::fromNatural(double pN)
 {

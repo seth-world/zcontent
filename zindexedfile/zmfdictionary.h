@@ -10,6 +10,7 @@ namespace  zbs {
 
 class ZMFDictionary : public ZMetaDic
 {
+protected:
   ZMFDictionary& _copyFrom(const ZMFDictionary &pIn);
 public:
   ZMFDictionary();
@@ -24,6 +25,11 @@ public:
     while (KeyDic.count()>0)
       delete KeyDic.popR();
     }
+
+  bool Active=false;
+
+  ZMFDictionary& operator = (const ZMFDictionary& pIn) {return _copyFrom(pIn);}
+
 
   ZArray<ZKeyDictionary*> KeyDic;
 
@@ -54,6 +60,16 @@ public:
       if (KeyDic[wi]->DicKeyName.isEqualCase(pKeyName))
         return wi;
     return -1;
+  }
+
+  ZIndexField* searchKeyFieldCase(const utf8String& pKeyFieldName)
+  {
+    long wR=-1;
+    for (long wi=0;wi<KeyDic.count();wi++)
+      if ((wR=KeyDic[wi]->hasFieldNameCase(pKeyFieldName)) > -1 ) {
+        return &KeyDic[wi]->Tab[wR];
+      }
+    return nullptr;
   }
 
   /**
@@ -96,6 +112,7 @@ public:
   ZDataBuffer& _exportAppend(ZDataBuffer& pZDB);
   ZStatus _import(const unsigned char *&pPtrIn);
 
+
   /** @brief XmlSaveToString  saves the whole master dictionary (ZMFDictionary) including its defined keys */
   utf8VaryingString XmlSaveToString(bool pComment);
   utf8VaryingString toXml(int pLevel,bool pComment);
@@ -106,6 +123,8 @@ public:
 
 };
 
+
+
 #pragma pack(push)
 #pragma pack(1)
 class ZMFDicExportHeader
@@ -113,9 +132,17 @@ class ZMFDicExportHeader
 public:
   ZMFDicExportHeader() {}
   void set(const ZMFDictionary *pDic);
-  uint32_t  StartSign=cst_ZBLOCKSTART; /* StartSign word that mark start of data */
-  uint8_t   BlockId=ZBID_MDIC;
-  uint32_t  DicKeyCount=0;
+
+  /** updates pDic with header data */
+  void get(ZMFDictionary& pDic);
+
+  uint8_t       Active=0;
+  uint32_t      DicKeyCount=0;
+  unsigned long Version=0UL;
+  ZDateFull     CreationDate;
+  ZDateFull     ModificationDate;
+  utf8VaryingString DicName;
+
   ZDataBuffer& _exportAppend(ZDataBuffer& pZDB);
   ZStatus _import(const unsigned char *&pPtrIn);
 };

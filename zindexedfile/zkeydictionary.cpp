@@ -12,12 +12,14 @@ KeyDic_Pack& KeyDic_Pack::_copyFrom(const KeyDic_Pack& pIn)
   memmove(Name,pIn.Name,cst_fieldnamelen);
   KeyUniversalSize=pIn.KeyUniversalSize;
   Duplicates=pIn.Duplicates;
+  return *this;
 }
 
 KeyDic_Pack& KeyDic_Pack::set(const ZKeyDictionary &pIn)
 {
   pIn.DicKeyName._exportUVFPtr(Name,cst_fieldnamelen);
   KeyUniversalSize=pIn._reComputeKeySize();
+  return *this;
 }
 
 void
@@ -41,11 +43,11 @@ ZKeyDictionary::ZKeyDictionary(ZMFDictionary*pMDic)
 {
 MasterDic=pMDic;
 }
-ZKeyDictionary::ZKeyDictionary(ZKeyDictionary* pIn)
+ZKeyDictionary::ZKeyDictionary(const ZKeyDictionary *pIn)
 {
   _copyFrom(*pIn);
 }
-ZKeyDictionary::ZKeyDictionary(ZKeyDictionary& pIn)
+ZKeyDictionary::ZKeyDictionary(const ZKeyDictionary& pIn)
 {
   _copyFrom(pIn);
 }
@@ -644,7 +646,7 @@ void ZKeyDictionary::report (FILE* pOutput)
 }
 
 
-ZKeyDictionary& ZKeyDictionary ::_copyFrom( ZKeyDictionary& pIn)
+ZKeyDictionary& ZKeyDictionary ::_copyFrom(const ZKeyDictionary &pIn)
 {
  // KDicSize=pIn.KDicSize;
 //  KeyNaturalSize=pIn.KeyNaturalSize;
@@ -658,10 +660,19 @@ ZKeyDictionary& ZKeyDictionary ::_copyFrom( ZKeyDictionary& pIn)
   _Base::clear();
   for (long wi=0; wi<pIn.count();wi++)
     _Base::push(pIn.Tab[wi]);
-
+  ToolTip = pIn.ToolTip;
   DicKeyName = pIn.DicKeyName;
   return *this;
 } //fieldOffset
+
+long ZKeyDictionary ::hasFieldNameCase(const utf8VaryingString& pName) {
+  for (long wi=0;wi < count();wi++) {
+    if (MasterDic->Tab[Tab[wi].MDicRank].getName().isEqualCase(pName))
+      return wi;
+  }
+  return -1;
+}
+
 
 bool ZKeyDictionary ::hasSameContentAs(ZKeyDictionary*pKey)
 {
@@ -760,5 +771,42 @@ ZKeyDictionary::addFieldToZKeyByRank (const zrank_type pMDicRank)
 }// addFieldToZDicByRank
 
 
-/** @endcond */
 
+void ZKeyHeaderRow::set(const ZKeyDictionary& pKeyDic) {
+  ZKeyDictionary::_copyFrom(pKeyDic);
+  KeyUniversalSize=pKeyDic._reComputeKeySize();
+}
+void ZKeyHeaderRow::set(const ZKeyDictionary* pKeyDic) {
+  ZKeyDictionary::_copyFrom(pKeyDic);
+  KeyUniversalSize=pKeyDic->_reComputeKeySize();
+}
+ZKeyDictionary ZKeyHeaderRow::get() {
+  return new ZKeyDictionary(this);
+}
+/*
+void ZKeyFieldRow::set(const ZMetaDic& pMetaDic, const ZIndexField& pKeyField) {
+  MDicRank=pKeyField.MDicRank;
+  KeyOffset=pKeyField.KeyOffset;
+  Hash=pKeyField.Hash;
+  UniversalSize=pMetaDic.Tab[MDicRank].UniversalSize;
+  Name =pMetaDic.Tab[MDicRank].getName();
+  ZType = pMetaDic.Tab[MDicRank].ZType;
+}*/
+void ZKeyFieldRow::set( const ZIndexField& pKeyField) {
+  ZIndexField::_copyFrom(pKeyField);
+//  MDicRank=pKeyField.MDicRank;
+//  KeyOffset=pKeyField.KeyOffset;
+//  Hash=pKeyField.Hash;
+  assert(pKeyField.KeyDic->MasterDic!=nullptr);
+  ZMetaDic* wMetaDic=pKeyField.KeyDic->MasterDic;
+  UniversalSize=wMetaDic->Tab[MDicRank].UniversalSize;
+  Name =wMetaDic->Tab[MDicRank].getName();
+  ZType = wMetaDic->Tab[MDicRank].ZType;
+}
+ZIndexField ZKeyFieldRow::get() {
+  return ZIndexField (*this);
+}
+
+
+
+/** @endcond */

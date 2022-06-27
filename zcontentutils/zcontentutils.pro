@@ -10,7 +10,7 @@ CONFIG += c++17
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 
-TARGET = zcontentvisu
+TARGET = zcontentutils
 
 
 
@@ -26,7 +26,7 @@ TOOLSET_ROOT = $$DEVELOPMENT_BASE/zbasetools
 
 # name of the root include directory
 
-MODULE = ztestindexfile
+MODULE = zcontentutils
 
 #defines DEVELOPMENT_BASE, TOOLSET symbols and ICU symbols
 
@@ -60,7 +60,7 @@ QMAKE_LFLAGS += -lcrypto -lcrypto
 LIBS += -ldl -lstdc++
 
 unix:{
-LIBS += -L$${LIBRARY_REPOSITORY} -lzbase -lzcontent
+LIBS += -L$${LIBRARY_REPOSITORY} -lzbase -lzcontent -lzcppparser
 
 # if using libxml++  (version 2.6)
 #LIBS +=/usr/lib/libxml++-2.6.a
@@ -85,6 +85,7 @@ ZQT_WIDGET = $${ZQT_ROOT}/zqtwidget
                 $${TOOLSET_INC_ZNET} \
                 $${TOOLSET_INC_ZCONTENT} \
                 $${TOOLSET_INC_ZAM} \
+                $${TOOLSET_INC_ZCPPPARSER} \
                 $${OPENSSL_ROOT} \
                 $${ZQT_ROOT} \
                 $${ZQT_WIDGET} \
@@ -122,12 +123,14 @@ SOURCES += \
     main.cpp \
     texteditmwn.cpp \
     zcontentvisumain.cpp \
+    zcu_common.cpp \
     zentity.cpp \
     zexceptiondlg.cpp \
     zfielddlg.cpp \
     zkeydlg.cpp \
     zlayout.cpp \
-    zscan.cpp
+    zscan.cpp \
+    ztypezqtrv.cpp
 
 HEADERS += \
     ../../zconfig_general.h \
@@ -147,12 +150,14 @@ HEADERS += \
     displaymain.h \
     texteditmwn.h \
     zcontentvisumain.h \
+    zcu_common.h \
     zentity.h \
     zexceptiondlg.h \
     zfielddlg.h \
     zkeydlg.h \
     zlayout.h \
-    zscan.h
+    zscan.h \
+    ztypezqtrv.h
 
 FORMS += \
     dicedit.ui \
@@ -165,6 +170,7 @@ FORMS += \
     zexceptiondlg.ui \
     zexceptiondlg_old.ui \
     zfielddlg.ui \
+    zfielddlg_copy.ui \
     zkeydlg.ui \
     zscan.ui
 

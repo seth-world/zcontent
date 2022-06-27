@@ -141,6 +141,7 @@ class ZLock
 //        Owner = pIn.Owner;
 //        Reason = pIn.Reason;
         DataRank = pIn.DataRank;
+        return *this;
     }
 public:
     ZResource       Resourceid;

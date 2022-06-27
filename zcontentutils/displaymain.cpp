@@ -109,12 +109,12 @@ DisplayMain::displayFCB(ZDataBuffer &pData)
   if (pData.Size < sizeof(ZHeaderControlBlock_Export))
   {
     ZExceptionBase wE= ZExceptionBase::create("DisplayMain::displayFCB",ZS_INVSIZE,Severity_Error,
-        "Cannot view Header Control Block requested minimum size <%ld> Bytes \n"
+        "Cannot view File Control Block requested minimum size <%ld> Bytes \n"
         "Only <%ld> Bytes have been loaded.\n\n"
         "Load / reload file content <Reload>\n"
         "Quit <Quit>",sizeof(ZHeaderControlBlock_Export),pData.Size);
 
-    int wRet=ZExceptionDLg::display2B(wE,"Quit","Reload");
+    int wRet=ZExceptionDLg::display2B("FCB Exception",wE,"Quit","Reload");
     if (wRet==ZEDLG_Rejected)
         return;
 //      case ZEDLG_Accepted:

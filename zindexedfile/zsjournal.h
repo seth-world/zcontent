@@ -21,7 +21,7 @@ enum ZJOperation:long {
     ZJOP_Close              =0x0000ffff
 };
 
-char * decode_ZJOP (const ZJOperation pOperation);
+const char *decode_ZJOP(const ZJOperation pOperation);
 
 typedef uint8_t ZJState_base;
 

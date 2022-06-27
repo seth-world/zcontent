@@ -43,6 +43,10 @@ enum ZLayout_type : uint32_t
    ZLayout_KeyTRv        =   0x02,
    ZLayout_TypeDLg       =   0x04,
 
+   ZLayout_ParsingResultTRv   =   0x08,
+   ZLayout_ParsingFieldTBv   =   0x10,
+
+
   //--------Admin layouts---------------------------------------
   //
   ZLayout_VaultList       = 0x00010000, // Administrator Vault list

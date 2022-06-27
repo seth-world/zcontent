@@ -16,7 +16,7 @@
 
 #include <zqt/zqtwidget/zqtreeview.h>
 #include <zqt/zqtwidget/zqtableview.h>
-//#include <zqt/zqtwidget/ZQStandardItemModel.h>
+
 #include <zqt/zqtwidget/zqstandarditem.h>
 
 #include <zqt/zqtwidget/zdatareference.h>
@@ -29,6 +29,8 @@
 
 #include <zcontent/zindexedfile/zfielddescription.h>
 
+#include <zcontent/zindexedfile/zdictionaryfile.h>
+
 #include <qclipboard.h>
 #include <qmimedata.h>
 #include <qfiledialog.h>
@@ -38,7 +40,9 @@
 #include <qaction.h>
 #include <qactiongroup.h>
 #include <zindexedfile/zfielddescription.h>
+#include <zindexedfile/zkeydictionary.h>
 #include <zindexedfile/zindexfield.h>
+
 
 #include <texteditmwn.h>
 
@@ -46,60 +50,73 @@
 #include <QLineEdit>
 #include <QPushButton>
 
-ZPinboard   Pinboard;
-bool        UseMimeData=false;
-bool        DragEngaged=false;
+#include <rawfields.h>
+
+#include <zindexedfile/zdictionaryfile.h>
+
+#include <zstdlistdlg.h>
+
+using namespace zbs;
+
+const int cst_MessageDuration = 20000;  /* milliseconds */
+int cst_KeyOffsetColumn = 2 ;
+int cst_KeyUSizeColumn = 1 ;
 
 
-class ZKeyFieldExtended: ZIndexField
+extern ZPinboard   Pinboard;
+extern bool        UseMimeData;
+extern bool        DragEngaged;
+
+DicEdit::~DicEdit()
 {
-  ZTypeBase     ZType;
-  utf8_t        Name[cst_fieldnamelen];
-  unsigned char HashCode[cst_md5];
-};
+  if (FieldDLg)
+    delete FieldDLg;
+  if (MasterDic)
+    delete MasterDic;
 
-
-/************************************************/
-/* simulates resource allocation manager */
-int ResourceCounter=0;
-
-ZResource getNewResource(ZEntity_type pEntity)
-{
-  return ZResource (++ResourceCounter,pEntity)  ;
+  delete ui;
 }
-void releaseResource(ZResource pResource)
-{
-  return  ;
+void
+DicEdit::displayErrorCallBack(const utf8VaryingString& pMessage) {
+    statusBar()->showMessage(QObject::tr(pMessage.toCChar()),cst_MessageDuration);
 }
-/***********************************************/
 
-
-DicEdit::DicEdit(QWidget *parent) :
-                                            QMainWindow(parent),
-                                            ui(new Ui::DicEdit)
+DicEdit::DicEdit(QWidget *parent) : QMainWindow(parent),ui(new Ui::DicEdit)
 {
   ui->setupUi(this);
 
   setWindowTitle("Master Dictionary");
+
+  Errorlog.setAutoPrintOn(ZAIES_Text);
+  Errorlog.setDisplayCallback(std::bind(&DicEdit::displayErrorCallBack, this,_1));
+
+
+  ui->DicNameLBl->setText ("No dictionary name");
+  ui->VersionLBl->setText ("0.0-0");
+  ui->KeysNbLBl ->setText ("0");
+  ui->FieldsNbLBl->setText("0");
+
 
 /*  ui->displayTBv->setStyleSheet(QString::fromUtf8("QTableView::item{border-left : 1px solid black;\n"
                                                 "border-right  : 1px solid black;\n"
                                                 "font: 75 12pt \"Courier\";\n"
                                                 " }"));
 */
+  fieldTBv = setupFieldTBv( ui->displayDicTBv,true,10);/* 10 columns */
 
-  fieldTBv = setupFieldTBv( ui->displayDicTBv,true,9);/* 9 columns */
+  FieldSM=fieldTBv->selectionModel();
 
   int wCol=0;
   fieldTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("Name")));
-  fieldTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("ZType")));
-  fieldTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("expanded")));
+  fieldTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("ZType code")));
+  fieldTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("ZType symbols")));
   fieldTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("Capacity")));
   fieldTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("HeaderSize")));
   fieldTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("UniversalSize")));
   fieldTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("NaturalSize")));
   fieldTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("KeyEligible")));
   fieldTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("Hash")));
+  fieldTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("Tooltip")));
 
   fieldTBv->setShowGrid(true);
 
@@ -107,7 +124,6 @@ DicEdit::DicEdit(QWidget *parent) :
   fieldTBv->setWordWrap(false);
 
   fieldTBv->setSupportedDropActions(Qt::CopyAction);
-
 
   fieldTBv->addFilterMask(ZEF_DoubleClick);
 
@@ -117,16 +133,18 @@ DicEdit::DicEdit(QWidget *parent) :
 
   /* for key fields */
 
-  keyTRv = setupKeyTRv(ui->displayKeyTRv,true,6); /* 6 columns */
 
+
+  keyTRv = setupKeyTRv(ui->displayKeyTRv,true,5); /* 5 columns */
+  KeySM=keyTRv->selectionModel();
 
   wCol=0;
   keyTRv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("Name")));
-  keyTRv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("ZType")));
-//  keyTRv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("MDicRank")));
+  keyTRv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("ZType code")));
   keyTRv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("KeyOffset")));
   keyTRv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("UniversalSize")));
   keyTRv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("Hash")));
+  keyTRv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem(tr("Tooltip")));
 
 
 //  ui->displayKeyTRv->setShowGrid(true);
@@ -140,10 +158,86 @@ DicEdit::DicEdit(QWidget *parent) :
 
   keyTRv->setAlternatingRowColors(true);
 
+  keyTRv->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+
   keyTRv->show();
 
   ui->ClosedLBl->setVisible(false);
+
+
+  generalMEn=new QMenu(QObject::tr("general","DicEdit"),ui->menubar);
+  ui->menubar->addMenu(generalMEn);
+
+  generalGroup = new QActionGroup(generalMEn);
+
+  parserQAc= new QAction(QObject::tr("c++ parser","DicEdit"),generalMEn);
+  parserQAc->setObjectName("parserQAc");
+  generalGroup->addAction(parserQAc);
+  generalMEn->addAction(parserQAc);
+
+  setupReadWriteMenu();
+
+  generalGroup->addAction(FwritetoclipQAc);
+  generalGroup->addAction(FwriteXmltofileQAc);
+  generalGroup->addAction(FviewXmlQAc);
+  generalGroup->addAction(FwritetoDicQAc);
+
+  generalGroup->addAction(FloadfromclipQAc);
+  generalGroup->addAction(FloadfromXmlFileQAc);
+  generalGroup->addAction(FloadfromDicQAc);
+
+
+  generalMEn->addMenu(FloadMEn);
+  generalMEn->addMenu(FwritetoMEn);
+
+  quitQAc= new QAction(QObject::tr("quit","DicEdit"),generalMEn);
+  quitQAc->setObjectName("quitQAc");
+  generalGroup->addAction(quitQAc);
+  generalMEn->addAction(quitQAc);
+
+  QObject::connect(generalGroup, SIGNAL(triggered(QAction*)), this, SLOT(generalActionEvent(QAction*)));
+
 }
+void
+DicEdit::generalActionEvent(QAction* pAction) {
+
+  if (pAction == parserQAc) {
+    if (rawFields==nullptr) {
+      rawFields = new RawFields( "/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata/zcppparserparameters.xml", this);
+    }
+  rawFields->showAll();
+  rawFields->setFocus();
+  } // parserQAc
+  if (pAction == quitQAc) {
+    Quit();
+  } // parserQAc
+
+  readWriteActionEvent(pAction);
+}
+
+void
+DicEdit::Quit() {
+
+  int wRet=ZExceptionDLg::message2B("DicEdit::Quit",ZS_EXCEPTION,Severity_Information,"Continue","Quit",
+      "Are you sure you want to quit ?");
+  if (wRet==QDialog::Rejected)
+    return;
+  QApplication::quit();
+}
+
+void
+DicEdit::clear()
+{
+//  fieldTBv->ItemModel->clear();
+//  keyTRv->I
+  clearAllRows();
+
+  ui->VersionLBl->clear();
+  ui->FieldsNbLBl->clear();
+  ui->KeysNbLBl->clear();
+  ui->DicNameLBl->clear();
+}
+
 
 void DicEdit::setFileClosed(bool pYesNo)
 {
@@ -218,12 +312,16 @@ DicEdit::setupFieldFlexMenu()
   QObject::connect(fieldActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(fieldActionEvent(QAction*)));
 
   FInsertBeforeQAc= new QAction(fieldFlexMEn);
-  FInsertBeforeQAc->setText(QCoreApplication::translate("DicEdit", "New before", nullptr));
+  FInsertBeforeQAc->setText(QCoreApplication::translate("DicEdit", "Insert new before", nullptr));
   FInsertBeforeQAc->setObjectName("FInsertBeforeQAc");
 
   FInsertAfterQAc= new QAction(fieldFlexMEn);
-  FInsertAfterQAc->setText(QCoreApplication::translate("DicEdit", "New after", nullptr));
+  FInsertAfterQAc->setText(QCoreApplication::translate("DicEdit", "Insert new after", nullptr));
   FInsertAfterQAc->setObjectName("FInsertAfterQAc");
+
+  FAppendQAc= new QAction(fieldFlexMEn);
+  FAppendQAc->setText(QCoreApplication::translate("DicEdit", "Append new", nullptr));
+  FAppendQAc->setObjectName("FAppendQAc");
 
   FChangeQAc= new QAction(fieldFlexMEn);
   FChangeQAc->setText(QCoreApplication::translate("DicEdit", "Change", nullptr));
@@ -241,14 +339,27 @@ DicEdit::setupFieldFlexMenu()
   FcopyQAc->setText(QCoreApplication::translate("DicEdit", "Copy", nullptr));
   FcopyQAc->setObjectName("FcopyQAc");
 
-  FpasteQAc= new QAction(fieldFlexMEn);
-  FpasteQAc->setText(QCoreApplication::translate("DicEdit", "Paste", nullptr));
-  FpasteQAc->setObjectName("FpasteQAc");
+  FpasteInsertBeforeQAc= new QAction(fieldFlexMEn);
+  FpasteInsertBeforeQAc->setText(QCoreApplication::translate("DicEdit", "Paste before", nullptr));
+  FpasteInsertBeforeQAc->setObjectName("FpasteInsertBeforeQAc");
+
+  FpasteInsertAfterQAc= new QAction(fieldFlexMEn);
+  FpasteInsertAfterQAc->setText(QCoreApplication::translate("DicEdit", "Paste after", nullptr));
+  FpasteInsertAfterQAc->setObjectName("FpasteInsertAfterQAc");
+
+
+  FpasteAppendQAc= new QAction(fieldFlexMEn);
+  FpasteAppendQAc->setText(QCoreApplication::translate("DicEdit", "Paste append", nullptr));
+  FpasteAppendQAc->setObjectName("FpasteAppendQAc");
 
   fieldFlexMEn->addAction(FInsertBeforeQAc);
   fieldActionGroup->addAction(FInsertBeforeQAc);
   fieldFlexMEn->addAction(FInsertAfterQAc);
   fieldActionGroup->addAction(FInsertAfterQAc);
+
+  fieldFlexMEn->addAction(FAppendQAc);
+  fieldActionGroup->addAction(FAppendQAc);
+
   fieldFlexMEn->addAction(FDeleteQAc);
   fieldActionGroup->addAction(FDeleteQAc);
 
@@ -259,8 +370,13 @@ DicEdit::setupFieldFlexMenu()
   fieldFlexMEn->addAction(FcopyQAc);
   fieldActionGroup->addAction(FcopyQAc);
 
-  fieldFlexMEn->addAction(FpasteQAc);
-  fieldActionGroup->addAction(FpasteQAc);
+  fieldFlexMEn->addAction(FpasteInsertBeforeQAc);
+  fieldActionGroup->addAction(FpasteInsertBeforeQAc);
+  fieldFlexMEn->addAction(FpasteInsertAfterQAc);
+  fieldActionGroup->addAction(FpasteInsertAfterQAc);
+
+  fieldFlexMEn->addAction(FpasteAppendQAc);
+  fieldActionGroup->addAction(FpasteAppendQAc);
 
   if (FwritetoMEn==nullptr)
     setupReadWriteMenu();
@@ -280,6 +396,90 @@ DicEdit::setupFieldFlexMenu()
 
   return fieldFlexMEn;
 }//setupFieldFlexMenu
+
+void DicEdit::fieldActionEvent(QAction* pAction)
+{
+  utf8String wMsg;
+  if (pAction->objectName()=="FInsertBeforeQAc")
+  {
+    QModelIndex wIdx=fieldTBv->currentIndex();
+    fieldInsertNewBefore(wIdx);
+    return;
+  }
+  if (pAction->objectName()=="FInsertAfterQAc")
+  {
+    QModelIndex wIdx=fieldTBv->currentIndex();
+    fieldInsertNewAfter(wIdx);
+    return;
+  }
+
+  if (pAction->objectName()=="FAppendQAc")
+  {
+    if (fieldAppend()) {
+      ui->statusBar->showMessage(QObject::tr("1 field created and appended","DicEdit"),cst_MessageDuration);
+    }
+    return;
+  }
+
+  if (pAction->objectName()=="FChangeQAc")
+  {
+    QModelIndex wIdx=fieldTBv->currentIndex();
+    if (!wIdx.isValid())
+    {
+      statusBar()->showMessage(QObject::tr("No field row selected","DicEdit"),cst_MessageDuration);
+      return ;
+    }
+    fieldChange(wIdx);
+    return;
+  }
+
+  if (pAction->objectName()=="FDeleteQAc")
+  {
+    if (_fieldDelete(fieldTBv->currentIndex())) {
+      ui->statusBar->showMessage(QObject::tr("1 field deleted","DicEdit"),cst_MessageDuration);
+    }
+    return;
+  }
+
+  if (pAction->objectName()=="FcopyQAc") {
+
+    if (fieldCopyToPinboard(fieldTBv->currentIndex()))
+        ui->statusBar->showMessage(QObject::tr("1 field copied","DicEdit"),cst_MessageDuration);
+    return;
+  } // FcopyQAc
+
+  if (pAction->objectName()=="FCutQAc") {
+    if (!fieldCopyToPinboard(fieldTBv->currentIndex()))
+      return;
+    if (_fieldDelete(fieldTBv->currentIndex()))
+      ui->statusBar->showMessage(QObject::tr("1 field cut","DicEdit"),cst_MessageDuration);
+    return;
+  } // FCutQAc
+
+  if (pAction==FpasteInsertBeforeQAc)
+  {
+    if (fieldInsertBeforeFromPinboard(fieldTBv->currentIndex())) {
+        ui->statusBar->showMessage(QObject::tr("1 field inserted","DicEdit"),cst_MessageDuration);
+    }
+    return;
+  }
+  if (pAction==FpasteInsertAfterQAc) {
+    if (fieldInsertAfterFromPinboard(fieldTBv->currentIndex())) {
+      ui->statusBar->showMessage(QObject::tr("1 field inserted","DicEdit"),cst_MessageDuration);
+    }
+    return;
+  }
+  if (pAction==FpasteAppendQAc) {
+    if (fieldAppendFromPinboard()) {
+      ui->statusBar->showMessage(QObject::tr("1 field pasted","DicEdit"),cst_MessageDuration);
+    }
+    return;
+  }
+
+  readWriteActionEvent(pAction);  /* call the common menu actions */
+
+  return;
+}//fieldActionEvent
 
 
 QMenu *
@@ -356,106 +556,35 @@ void DicEdit::keyActionEvent(QAction* pAction)
   utf8String wMsg;
   if (pAction->objectName()=="KInsertKeyQAc")
   {
-    QVariant wV;
-    ZDataReference wDRef;
-    KeyDic_Pack wKD_Pack;
-    wKD_Pack.setName((const utf8_t*)"New key");
-    wKD_Pack.KeyUniversalSize  = -1;
-    wKD_Pack.Duplicates  = false;
-
-    ZKeyDLg* wKeyDLg=new ZKeyDLg;
-    wKeyDLg->setWindowTitle("Key");
-
-    wKeyDLg->set(&wKD_Pack);
-
-    int wRet=wKeyDLg->exec();
-
-    wKeyDLg->deleteLater();
-
-    if (wRet==QDialog::Rejected)
-      return;
-
-    wDRef.set(ZLayout_KeyTRv,getNewResource(ZEntity_KeyDic),-1);
-
-    QList<QStandardItem *> wKeyRow;
-
-    wKeyRow << createItem(wKD_Pack.getName().toCChar());
-    wKeyRow << createItem (wKD_Pack.KeyUniversalSize ,"size: %ld");
-    wKeyRow << createItem (wKD_Pack.Duplicates?"Yes":"No" ,"dup: %s");
-
-    keyTRv->ItemModel->appendRow(wKeyRow);
-
-    wDRef.setIndex(wKeyRow[0]->index());
-    wV.setValue<ZDataReference>(wDRef);
-    wKeyRow[0]->setData(wV,ZFlowRole);
-
-    wV.setValue<KeyDic_Pack>(wKD_Pack);
-    wKeyRow[0]->setData(wV,ZQtValueRole);
-
+    keyInsert(keyTRv->currentIndex());
     return;
   }
 
   if (pAction->objectName()=="KDeleteQAc")
   {
     QModelIndex wIdx= keyTRv->currentIndex();
+
     if(!wIdx.isValid())
       return;
+
     if (wIdx.column()!=0)           /* because all data is stored at column 0 */
       wIdx=wIdx.siblingAtColumn(0);
 
     /* extract data from item */
-    long wi=wIdx.row();
-    QVariant wV=wIdx.data(ZFlowRole);
+    QVariant wV=wIdx.data(ZQtDataReference);
     ZDataReference wDRef=wV.value<ZDataReference>();
 
-    if (wDRef.getZEntity()==ZEntity_KeyField) /* delete a key field */
-      {
-      /* search for treeview parent row which is key description for getting current index */
-      QModelIndex wPIdx=wIdx.parent();
-      if (!wPIdx.isValid())
-        return;
-      wV=wPIdx.data(ZFlowRole);
-      if (!wV.isValid())
-        return;
-      ZDataReference wDRefKey= wV.value<ZDataReference>();
-      if (wDRefKey.isInvalid())
-        return;
-      ZKeyDictionary* wKDic= (ZKeyDictionary*)wDRefKey.getPtr();
-      long wDicRank=MasterDic->KeyDic[wDRef.getDataRank()]->Tab[wDRef.DataRank].MDicRank;
-
-      wMsg.sprintf("Deleting key field <%s>",MasterDic->Tab[wDicRank].getName().toCChar());
-      statusBar()->showMessage(QObject::tr(wMsg.toCChar()),cst_MessageDuration);
-      /* suppress key field within key dictionary */
-      wKDic->erase(wDRef.DataRank);
-      /* then remove */
-      keyTRv->ItemModel->removeRow(wIdx.row());
-      /* recompute key size */
-      int KeySize=0;
-      if (wKDic->count())
-          KeySize=wKDic->_reComputeKeySize();
+    if (wDRef.getZEntity()==ZEntity_KeyDic) {
+      keyDelete(wIdx);
       return;
-      }
+    }
+    if (wDRef.getZEntity()!=ZEntity_KeyField) {
+      Errorlog.errorLog("KDeleteQAc-E-INVTYP Invalid infradata type <%s> for row.",wDRef.getZEntity());
+    }
 
-    if (wDRef.getZEntity()!=ZEntity_KeyDic)  /* if not key dictionary : wrong data */
-      {
-      fprintf(stderr,"KDeleteQAc- wrong ZDataReference entity <%s>\n",decode_ZEntity(wDRef.getZEntity()).toChar());
-      return ;
-      }
-    /* Key dictionary : here we have a whole key to delete */
-
-    ZKeyDictionary* wKDic= (ZKeyDictionary*)wDRef.getPtr();
-    wMsg.sprintf("Deleting whole key number <%ld> name <%s>",wDRef.getDataRank(), wKDic->DicKeyName.toCChar());
-    statusBar()->showMessage(QObject::tr(wMsg.toCChar()),cst_MessageDuration);
-    /* suppress whole key within master dictionary */
-    MasterDic->KeyDic.erase(wDRef.getDataRank());
-    /* then remove */
-
-    int wRowNb=keyTRv->ItemModel->rowCount(wIdx);  /* get number of children */
-
-    keyTRv->ItemModel->removeRows(0,wRowNb,wIdx);  /* remove all child rows */
-    keyTRv->ItemModel->removeRow(wIdx.row(),wIdx.parent()); /* remove key dictionary row */
+    _keyfieldDelete(wIdx);
     return;
-  }//KDeleteQAc
+  }// KDeleteQAc
 
   if (pAction->objectName()=="KcutQAc")
     {
@@ -468,147 +597,62 @@ void DicEdit::keyActionEvent(QAction* pAction)
       }
 
     /* extract data from item */
-    QVariant wV=wIdx.data(ZFlowRole);
+    QVariant wV=wIdx.data(ZQtDataReference);
     ZDataReference wDRef=wV.value<ZDataReference>();
 
     if (wDRef.getZEntity()==ZEntity_KeyDic)
       {
-      wV=wIdx.data(ZQtValueRole);
-      KeyDic_Pack wKDPack = wV.value<KeyDic_Pack>();
-      QList<QList<QStandardItem*>>* wKeyRows = new QList<QList<QStandardItem*>>(cutAllKeyRows(wIdx));
-
-      ZDataReference wKeyDRef;
-      wKeyDRef.ZLayout=keyTRv->Layout;
-//      wKeyDRef.setIndex(wIdx);
-      wKeyDRef.setResource(getNewResource(ZEntity_KeyDicRowsSet));
-      wKeyDRef.setPtr(wKeyRows);
-
-      ZPinboardElement wPBElt;
-      wPBElt.DRef = wKeyDRef;
-      Pinboard.push(wPBElt);
-
-      wMsg.sprintf("Key name <%s> full rows copied.",wKDPack.getName().toCChar());
-      statusBar()->showMessage(QObject::tr(wMsg.toCChar()),cst_MessageDuration);
+      keyCutToPinboard(wIdx);
       return;
       }
 
-    if (wDRef.getZEntity()!=ZEntity_KeyField)
-      {
-      wMsg.sprintf("Bad source row for cut operation.");
-      statusBar()->showMessage(QObject::tr(wMsg.toCChar()),cst_MessageDuration);
-      return;
-      }
+    if (wDRef.getZEntity()!=ZEntity_KeyField) {
 
-    wV=wIdx.data(ZQtValueRole);
-    KeyField_Pack wKFPack = wV.value<KeyField_Pack>();
-
-    ZDataReference wKeyFieldDRef;
-    wKeyFieldDRef.ZLayout=keyTRv->Layout;
-    wKeyFieldDRef.setResource(getNewResource(ZEntity_KeyFieldRow));
-//    wKeyFieldDRef.setIndex(wIdx);
-
-    QList<QStandardItem*>* wKeyFieldRow = new QList<QStandardItem*>(cutRow(keyTRv->ItemModel, wIdx));
-    wKeyFieldDRef.setPtr(wKeyFieldRow);
-
-    ZPinboardElement wPBElt;
-    wPBElt.DRef = wKeyFieldDRef;
-    Pinboard.push(wPBElt);
-
-    wMsg.sprintf("Key field <%ld> cut.",wKFPack.getName().toCChar());
-    statusBar()->showMessage(QObject::tr(wMsg.toCChar()),cst_MessageDuration);
+    }
+    if (!keyFieldCopyToPinboard(wIdx))
+        return;
+    _keyfieldDelete(wIdx);
     return;
     }// KcutQAc
 
 
-  if (pAction->objectName()=="KpasteQAc") /* paste from pinboard */
-    {
-    QModelIndex wIdx= keyTRv->currentIndex(); /* destination index for paste */
-    if(!wIdx.isValid())
-    {
-      wMsg.sprintf("no row selected");
-      ui->statusBar->showMessage(wMsg.toCChar(),cst_MessageDuration);
-      return;
-    }
-    if (Pinboard.isEmpty())
-      {
-      wMsg.sprintf("nothing selected.");
-      ui->statusBar->showMessage(wMsg.toCChar(),cst_MessageDuration);
-      return;
-      }
-    if (Pinboard.last().getZEntity()==ZEntity_KeyDicRowsSet)
-      {
-       pinboardPasteKeyRowSet(wIdx);
-       return ;
-      }
-    if (Pinboard.last().getZEntity()==ZEntity_KeyFieldRow)
-      {
-        pinboardPasteKeyFieldRow(wIdx);
-        return ;
-      }
-    /* extract data from item */
-
-    if (Pinboard.last().getZEntity()==ZEntity_DicField)
-    {
-      pinboardPasteFieldToKey(wIdx);
-      return;
-    }
+  if (pAction->objectName()=="KpasteQAc") { /* paste from pinboard */
+    keyTRvInsertFromPinboard(keyTRv->currentIndex());
     return;
-    }//if (pAction->objectName()=="KpasteQAc")
+    }//KpasteQAc
 
-    if (pAction->objectName()=="KappendQAc") /* append from pinboard */
-    {
-      QModelIndex wIdx= keyTRv->currentIndex(); /* destination index for paste */
-      if(!wIdx.isValid())
-      {
-        wMsg.sprintf("no row selected");
-        ui->statusBar->showMessage(wMsg.toCChar(),cst_MessageDuration);
-        return;
-      }
-      if (Pinboard.isEmpty())
-      {
-        wMsg.sprintf("nothing selected.");
-        ui->statusBar->showMessage(wMsg.toCChar(),cst_MessageDuration);
-        return;
-      }
-      if (Pinboard.last().getZEntity()==ZEntity_KeyDicRowsSet)
-      {
-        pinboardPasteKeyRowSet(wIdx,true);
-        return ;
-      }
-      if (Pinboard.last().getZEntity()==ZEntity_KeyFieldRow)
-      {
-        pinboardPasteKeyFieldRow(wIdx,true);
-        return ;
-      }
-      /* extract data from item */
+    if (pAction->objectName()=="KappendQAc") { /* append from pinboard */
 
-      if (Pinboard.last().getZEntity()==ZEntity_DicField)
-      {
-        pinboardPasteFieldToKey(wIdx);
-        return;
-      }
-      return;
-    }// KpasteQAc
+      keyTRvAppendFromPinboard(keyTRv->currentIndex());
+
+    }// KappendQAc
 
     readWriteActionEvent(pAction);  /* call the common menu actions */
 
   return;
 }
 
-utf8VaryingString
-DicEdit::getDicName()
+bool
+DicEdit::getDicName(unsigned long &pVersion,utf8VaryingString& pDicName)
 {
-  utf8String wDicName=MasterDic->DicName;
+  utf8VaryingString wDicName;
+  if (pDicName.isEmpty())
+    wDicName="<no name>";
+  else
+    wDicName=pDicName;
+  utf8VaryingString wVersion=getVersionStr(pVersion);
 
   QDialog wDicNameDLg;
   wDicNameDLg.setObjectName("wDicNameDLg");
   wDicNameDLg.setWindowTitle(QObject::tr("Dictionary name","DicEdit"));
   wDicNameDLg.resize(400,150);
+
   QVBoxLayout* QVL=new QVBoxLayout(&wDicNameDLg);
+  wDicNameDLg.setLayout(QVL);
+
   QVL->setObjectName("QVL");
   QHBoxLayout* QHL=new QHBoxLayout;
   QHL->setObjectName("QHL");
-  wDicNameDLg.setLayout(QVL);
   QVL->insertLayout(0,QHL);
   QLabel* wLb=new QLabel(QObject::tr("Dictionary name","DicEdit"),&wDicNameDLg);
   wLb->setObjectName("wLb");
@@ -617,28 +661,46 @@ DicEdit::getDicName()
   wDicNameLEd->setObjectName("wDicNameLEd");
   QHL->addWidget(wDicNameLEd);
 
+  QHBoxLayout* QHL1=new QHBoxLayout;
+  QHL1->setObjectName("QHL1");
+  QVL->insertLayout(1,QHL1);
+  QLabel* wLb1=new QLabel(QObject::tr("Version number","DicEdit"),&wDicNameDLg);
+  wLb->setObjectName("wLb1");
+  QHL1->addWidget(wLb1);
+  QLineEdit* wVersionLEd=new QLineEdit(wVersion.toCChar());
+  wVersionLEd->setObjectName("wVersionLEd");
+  QHL1->addWidget(wVersionLEd);
+
   QHBoxLayout* QHLBtn=new QHBoxLayout;
   QHLBtn->setObjectName("QHLBtn");
-  QVL->insertLayout(1,QHLBtn);
+  QVL->insertLayout(2,QHLBtn);
 
   QPushButton* wOk=new QPushButton(QObject::tr("Ok","DicEdit"),&wDicNameDLg);
   wOk->setObjectName("wOk");
   QPushButton* wCancel=new QPushButton(QObject::tr("Cancel","DicEdit"),&wDicNameDLg);
   wCancel->setObjectName("wCancel");
+  QSpacerItem* wSpacer= new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+  QHLBtn->addItem(wSpacer);
+
   QHLBtn->addWidget(wCancel);
   QHLBtn->addWidget(wOk);
 
   wDicNameLEd->setText(wDicName.toCChar());
+  wDicNameLEd->setSelection(0,wDicName.UnitCount);
+
+  wDicNameDLg.setWindowTitle(QObject::tr("Dictionary identification","DicEdit"));
 
   QObject::connect(wOk, &QPushButton::clicked, &wDicNameDLg, &QDialog::accept);
   QObject::connect(wCancel, &QPushButton::clicked, &wDicNameDLg, &QDialog::reject);
 
   int wRet=wDicNameDLg.exec();
   if (wRet==QDialog::Accepted)
-  {
-    wDicName=wDicNameLEd->text().toUtf8().data();
-  }
-  return wDicName;
+    {
+    pDicName=wDicNameLEd->text().toUtf8().data();
+    pVersion = getVersionNum(wVersionLEd->text().toUtf8().data());
+    return true;
+    }
+  return false;
 }//getDicName
 
 void
@@ -655,8 +717,9 @@ DicEdit::readWriteActionEvent(QAction*pAction)
     /* generate xml from current views content */
 
     ZMFDictionary* wMasterDic = screenToDic();  /* get Master dictionary content from views */
-
-    wMasterDic->DicName = getDicName();         /* name meta dictionary */
+    if (wMasterDic==nullptr)
+      return;
+    getDicName(wMasterDic->Version,wMasterDic->DicName);         /* name meta dictionary */
 
     utf8String wXmlDic=wMasterDic->XmlSaveToString(true); /* generate full xml definition */
 
@@ -676,7 +739,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
   }// FwritetoclipQAc
 
   if  (pAction->objectName()=="FloadfromclipQAc")
-  {
+    {
     ZStatus wSt;
     ZMFDictionary wMasterDic;
     utf8String wXmlContent;
@@ -685,13 +748,13 @@ DicEdit::readWriteActionEvent(QAction*pAction)
     QClipboard *wClipboard = QGuiApplication::clipboard();
     const QMimeData * wMData=wClipboard->mimeData(QClipboard::Clipboard);
     if (wMData==nullptr)
-    {
+      {
       statusBar()->showMessage(QObject::tr("Clipboard is empty","DicEdit"),cst_MessageDuration);
-    }
+      }
     if (!wMData->hasFormat("text/plain"))
-    {
+      {
       statusBar()->showMessage(QObject::tr("Clipboard has no text data.","DicEdit"),cst_MessageDuration);
-    }
+      }
     wXmlContent = wMData->data("text/plain").data();  /* load mime data as utf8 string */
 
     Errorlog.setErrorLogContext("FloadfromclipQAc");
@@ -707,17 +770,17 @@ DicEdit::readWriteActionEvent(QAction*pAction)
       return;
     }
     /* here we may only have warnings, infos or text messages */
-    if (Errorlog.count()>0)
+    if (Errorlog.hasMessages())
     {
       Severity_type wS = Errorlog.getSeverity();
 
       int wRet = ZExceptionDLg::message2BWAdd("FloadfromXmlFileQAc",
-          wS > Severity_Warning?ZS_ERROR:ZS_NOTHING,
+          wS > Severity_Warning?ZS_ERROR:ZS_WARNING,
           wS,
           Errorlog.allLoggedToString(),
           "Stop","Continue",
           "Some warning messages have been issued during load of xml definition from clipboard");
-      if (wRet==ZEDLG_Rejected)
+      if (wRet==QDialog::Rejected)
         return;
     }
 
@@ -726,21 +789,23 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
     wMsg.sprintf("Xml dictionary definition has been successfully loaded from clipboard.");
     statusBar()->showMessage(QObject::tr(wMsg.toCChar(),"DicEdit"),cst_MessageDuration);
-  } //  FloadfromclipQAc
+    } //  FloadfromclipQAc
 
 
   if  (pAction->objectName()=="FviewXmlQAc") /* generate xml from current content and view it */
   {
     /* generate xml from current views content */
     ZMFDictionary* wMasterDic = screenToDic();
-    wMasterDic->DicName = getDicName();
+    getDicName(wMasterDic->Version,wMasterDic->DicName);
 
     utf8String wXmlDic=wMasterDic->XmlSaveToString(true);
 
     delete wMasterDic;
 
     /* display xml content */
-    textEditMWn* wTEx=new textEditMWn((QWidget*)this);
+    textEditMWn* wTEx=new textEditMWn((QWidget*)this,
+                                        TEOP_Nothing, /*no line numbers and close button is really closing and destroying dialog */
+                                        nullptr);   /* no close callback */
     wTEx->setText(wXmlDic,wMasterDic->DicName);
     wTEx->show();
     return;
@@ -774,7 +839,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
     /* generate xml from current views content */
     ZMFDictionary* wMasterDic = screenToDic();
-    wMasterDic->DicName = getDicName();
+    getDicName(wMasterDic->Version,wMasterDic->DicName);
 
     utf8String wXmlDic=wMasterDic->XmlSaveToString(true);
 
@@ -832,7 +897,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
       return;
       }
   /* here we may only have warnings, infos or text messages */
-    if (Errorlog.count()>0)
+    if (Errorlog.hasMessages())
       {
       Severity_type wS = Errorlog.getSeverity();
 
@@ -872,288 +937,1087 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
 }//readWriteActionEvent
 
+bool
+DicEdit::keyInsert(const QModelIndex &pIdx) {
+  QVariant wV;
+  ZDataReference wDRef;
+  ZKeyHeaderRow wKHR(MasterDic);
+
+  ZKeyDLg* wKeyDLg=new ZKeyDLg(MasterDic);
+  wKeyDLg->setWindowTitle("Key");
+
+  wKeyDLg->setCreate();
+
+  int wRet=wKeyDLg->exec();
+  if (wRet==QDialog::Rejected) {
+    wKeyDLg->deleteLater();
+    return false;
+  }
+
+  wKHR.set(wKeyDLg->get());
+  wKeyDLg->deleteLater();
+  ZKeyDictionary* wKDic=new ZKeyDictionary(wKeyDLg->get());
+  return _keyInsert(pIdx,wKDic);
+}
 
 bool
-DicEdit::pinboardPasteFieldToKey(const QModelIndex& pKeyIdx,bool pAppend)
-{
+DicEdit::_keyInsert (const QModelIndex& pIdx,ZKeyDictionary* pKey) {
+  QVariant wV;
+  ZDataReference  wDRef;
+  ZKeyHeaderRow*  wKHR=nullptr;
+  ZKeyFieldRow*   wKFR=nullptr;
+  /* define key index (row and array rank are same) to insert before */
+
+  if ((keyTRv->ItemModel->rowCount()==0)||(!pIdx.isValid())) {
+    return _keyAppend(pKey);
+  }
+
+  /* find key item to insert before */
+  QStandardItem* wKeyItem=keyTRv->ItemModel->item(pIdx.row(),0);
+  wV=wKeyItem->data(ZQtDataReference);
+  wDRef = wV.value<ZDataReference>();
+
+  if (wDRef.getZEntity()==ZEntity_KeyField) {
+    wKeyItem=wKeyItem->parent();  /* jump to key item */
+  } else if (wDRef.getZEntity()!=ZEntity_KeyDic) {
+    Errorlog.errorLog("DicEdit::_keyInsert-E-INVTYP Invalid infradata entity type <%s> ",decode_ZEntity(wDRef.getZEntity()).toChar());
+    return false;
+  }
+  /* create and insert key row */
+  wKHR=new ZKeyHeaderRow(pKey);
+  QList<QStandardItem*> wKeyRow = createKeyDicRow(wKHR);
+  keyTRv->ItemModel->insertRow(wKeyItem->row(),wKeyRow);
+
+  /* insert whole key data within dictionary */
+  long wKeyRank=MasterDic->KeyDic.insert(pKey,wKeyItem->row());
+
+  /* create and link infradata to key item */
+  wDRef.set(ZLayout_KeyTRv,getNewResource(ZEntity_KeyDic),wKeyRank);
+  wV.setValue<ZDataReference>(wDRef);
+  wKeyRow[0]->setData(wV,ZQtDataReference);
+
+  /* create and insert key field rows individually */
+  QList<QStandardItem*> wKeyFieldRow;
+  for (long wi=0; wi < wKHR->count();wi++) {
+    wKeyFieldRow.clear();
+    /* create data to stick to field row */
+    wKFR = new ZKeyFieldRow(pKey->Tab[wi]);
+//    wKFR->set(pKey->Tab[wi]);
+    /* create row from this data */
+    wKeyFieldRow=createKeyFieldRow(*wKFR);
+    /* stick this data as infradata to field row */
+    wDRef.set(ZLayout_KeyTRv,getNewResource(ZEntity_KeyField),wi);
+    wDRef.setPtr(wKFR );
+    wV.setValue<ZDataReference>(wDRef);
+    wKeyFieldRow[0]->setData(wV,ZQtDataReference);
+    /* append row to mother key row */
+    wKeyRow[0]->appendRow(wKeyFieldRow);
+  }// for
+
+
+  return true; /* done */
+
+} // _keyInsert
+
+bool
+DicEdit::keyChange(QModelIndex pIdx) {
+
+  if (!pIdx.isValid()) {
+    return false;
+  }
+  QVariant wV;
+  ZDataReference wDRef;
+  ZKeyHeaderRow*  wKHR=nullptr;
+
+  if (pIdx.row()!=0) {
+    pIdx=pIdx.siblingAtColumn(0);
+  }
+
+  QStandardItem* wKeyItem=keyTRv->ItemModel->itemFromIndex(pIdx);
+  wV=wKeyItem->data(ZQtDataReference);
+  wDRef = wV.value<ZDataReference>();
+
+  if (wDRef.getZEntity()==ZEntity_KeyField) {
+    wKeyItem=wKeyItem->parent();  /* if field, jump to key item */
+  } else if (wDRef.getZEntity()!=ZEntity_KeyDic) {
+    Errorlog.errorLog("DicEdit::_keyCopy-E-INVTYP Invalid infradata entity type <%s> ",decode_ZEntity(wDRef.getZEntity()).toChar());
+    return false;
+  }
+  /* extract infradata again - now it has been validated keyItem points to the correct item */
+  wV=wKeyItem->data(ZQtDataReference);
+  wDRef = wV.value<ZDataReference>();
+
+  wKHR=wDRef.getPtr<ZKeyHeaderRow*>();
+
+  ZKeyDLg* wKeyDLg=new ZKeyDLg(MasterDic);
+  wKeyDLg->setWindowTitle("Key");
+
+  wKeyDLg->set(wKHR);
+
+  int wRet=wKeyDLg->exec();
+  if (wRet==QDialog::Rejected) {
+    wKeyDLg->deleteLater();
+    return false;
+  }
+
+  wKHR->set(wKeyDLg->get()); /* get back modified data and by the way update infradata */
+
+  wKeyDLg->deleteLater();
+
+  QModelIndex wIdx= wKeyItem->index(); /* get the correct index from key item */
+
+  /* update dictionary data */
+
+  MasterDic->KeyDic[wIdx.row()]->DicKeyName = wKHR->DicKeyName;
+  MasterDic->KeyDic[wIdx.row()]->ToolTip = wKHR->ToolTip;
+  MasterDic->KeyDic[wIdx.row()]->Duplicates = wKHR->Duplicates;
+  /* infradata has been modified previously */
+
+  /* change rows content */
+
+  QList<QStandardItem*> wRow = itemRow(fieldTBv->ItemModel,wIdx, &Errorlog);
+  utf8VaryingString wStr;
+  int Col=0;
+  wRow[Col]->setText(wKHR->DicKeyName.toCChar());
+  Col++;
+  Col++;
+  wStr.sprintf("total size: %ld",wKHR->KeyUniversalSize);
+  wRow[Col]->setText(wStr.toCChar());
+  Col++;
+//  wStr.sprintf("%s",wKHR->Duplicates?"Duplicates":"No duplicates");
+  wRow[Col]->setText(wKHR->Duplicates?"Duplicates":"No duplicates");
+  Col++;
+  wRow[Col]->setText(wKHR->ToolTip.toCChar());
+  Col++;
+
+  return true;
+}
+
+
+bool
+DicEdit::keyAppend () {
+
+  ZKeyDLg* wKeyDLg=new ZKeyDLg(MasterDic);
+  wKeyDLg->setWindowTitle("Key");
+
+  wKeyDLg->setCreate();
+
+  int wRet=wKeyDLg->exec();
+  if (wRet==QDialog::Rejected) {
+    wKeyDLg->deleteLater();
+    return false;
+  }
+
+  return _keyAppend(wKeyDLg->get());
+}
+
+bool
+DicEdit::keyAppendFromPinboard() {
   if (Pinboard.isEmpty())
-    {
-    statusBar()->showMessage(QObject::tr("Pinboard is empty-","DicEdit"),cst_MessageDuration);
     return false;
-    }
 
-  utf8String wStr;
-  if (!pKeyIdx.isValid())
-    {
-    statusBar()->showMessage(QObject::tr("No target element selected","DicEdit"),cst_MessageDuration);
+  ZKeyFieldRow* wKFR=nullptr;
+  ZDataReference wDRef ;
+  QVariant wV;
+  QList<QStandardItem *>  wKeyFieldRow ;
+  QStandardItem* wKeyItem=nullptr;
+  wDRef=Pinboard.last().DRef;
+
+  if (wDRef.getZEntity()!=ZEntity_KeyDic) {
     return false;
-    }
+  }
+  ZKeyDictionary* wKeyDic= wDRef.getPtr<ZKeyDictionary*>();
+  if (_keyAppend(wKeyDic)) {
+    Pinboard.pop();
+    return true;
+  }
+  return false;
+} //keyAppendFromPinboard
 
-  FieldDesc_Pack* wFDPack= Pinboard.last().getDRefPtr<FieldDesc_Pack*>();
 
+bool
+DicEdit::_keyAppend (ZKeyDictionary* pKey) {
+  QVariant wV;
+  ZDataReference wDRef;
+  ZKeyHeaderRow* wKHR = new ZKeyHeaderRow(pKey);
+  ZKeyFieldRow* wKFR=nullptr;
 
-  QVariant wV = pKeyIdx.data(ZFlowRole);
-  if (!wV.isValid())
-    {
-    ui->statusBar->showMessage("Invalid data from insert row.",cst_MessageDuration);
-    return false;
-    }
-  ZDataReference wDRef =wV.value<ZDataReference>();
+  ZKeyDictionary* wKey = pKey ;
+  long wKeyRank=MasterDic->KeyDic.push(wKey);
+
+  wDRef.set(ZLayout_KeyTRv,getNewResource(ZEntity_KeyDic),wKeyRank);
+  wDRef.setPtr(wKHR);
+  wV.setValue<ZDataReference>(wDRef);
+
+  QList<QStandardItem *> wKeyRow = createKeyDicRow(wKHR);
+  keyTRv->ItemModel->appendRow(wKeyRow);
+  wKeyRow[0]->setData(wV,ZQtDataReference);
+
+  /* now create and append all children rows if any */
 
   QList<QStandardItem *> wKeyFieldRow;
-  if (!pinboardGetKeyField(pKeyIdx.row(),wKeyFieldRow))  /* wIdx.row() gives the key number-could be given by wDRef.DataRank */
+
+  for (long wi=0;wi < wKey->count(); wi++) {
+    wKFR=new ZKeyFieldRow(wKey->Tab[wi]);
+    wDRef.set(ZLayout_KeyTRv,getNewResource(ZEntity_KeyField),wi);
+    wDRef.setPtr(wKFR);
+    wV.setValue<ZDataReference>(wDRef);
+
+    wKeyFieldRow=createKeyFieldRow(*wKFR);
+    wKeyFieldRow[0]->setData(wV,ZQtDataReference);
+    wKeyRow.append(wKeyFieldRow);
+  }
+
+  return true;
+}
+
+
+
+bool
+DicEdit::keyCutToPinboard(const QModelIndex &pIdx) {
+  if (!keyCopyToPinboard(pIdx))
     return false;
-
-  if (wDRef.getZEntity()==ZEntity_KeyDic) /* target is key dictionary : append field to key */
-    {
-    /* append to key Item */
-    QStandardItem* wKeyItem=keyTRv->ItemModel->itemFromIndex( pKeyIdx );
-    wKeyItem->appendRow(wKeyFieldRow);
-
-    keyTRv->resizeColumns();
-
-    /* update model index in Row[0] */
-    ZDataReference wDRef1;
-    QModelIndex wNewIdx = wKeyFieldRow[0]->index();
-    wV=wKeyFieldRow[0]->data(ZFlowRole);
-    wDRef1=wV.value<ZDataReference>();
-    wDRef1.setIndex(wNewIdx);
-    wV.setValue<ZDataReference>(wDRef1);
-    wKeyFieldRow[0]->setData(wV,ZFlowRole);
-
-
-
-    updateKeyValues(pKeyIdx);/* update values for the key */
-    wStr.sprintf("field <%s> appended to key <%s>.",wFDPack->getName().toCChar(),wKeyItem->text().toUtf8().data());
-    ui->statusBar->showMessage(wStr.toCChar(),cst_MessageDuration);
-    return true;
-    }
-
-  if (wDRef.getZEntity()==ZEntity_KeyField) /* target is key field : insert key field before this key field */
-    {
-    /* search key item father and append before current idx row */
-    QModelIndex wKeyParentIdx = pKeyIdx.parent();
-    QStandardItem* wItem=keyTRv->ItemModel->itemFromIndex(wKeyParentIdx);
-    const char* wAppCh;
-    if (pAppend)
-      {
-      wItem->appendRow(wKeyFieldRow);
-      wAppCh="appended";
-      }
-    else
-      {
-      wItem->insertRow(pKeyIdx.row(),wKeyFieldRow);
-      wAppCh="inserted";
-      }
-    /* update model index in Row[0] */
-    ZDataReference wDRef1;
-    QModelIndex wNewIdx = wKeyFieldRow[0]->index();
-    wV=wKeyFieldRow[0]->data(ZFlowRole);
-    wDRef1=wV.value<ZDataReference>();
-    wDRef1.setIndex(wNewIdx);
-    wV.setValue<ZDataReference>(wDRef1);
-    wKeyFieldRow[0]->setData(wV,ZFlowRole);
-
-    updateKeyValues(pKeyIdx.parent()); /* update values for the whole key */
-    wStr.sprintf("field <%s> %s to key <%s>.",wFDPack->getName().toCChar(),wAppCh,wItem->text().toUtf8().data());
-    ui->statusBar->showMessage(wStr.toCChar(),cst_MessageDuration);
-    return true;
-    }
-
-  ui->statusBar->showMessage("Invalid type of row.",cst_MessageDuration);
-  return false;
+  return _keyDelete(pIdx);
 }
 
 bool
-DicEdit::pinboardPasteKeyRowSet(const QModelIndex& pKeyIdx,bool pAppend) /* if pKeyIdx is invalid, then append key row set */
-{
-  utf8String wStr;
-  if (Pinboard.isEmpty())
-    {
-    wStr = "No previous element in Pinboard.";
-    statusBar()->showMessage(QObject::tr("No previous element in Pinboard.","DicEdit"),cst_MessageDuration);
+DicEdit::keyCopyToPinboard (QModelIndex pIdx) {
+  QVariant wV;
+  ZDataReference  wDRef;
+  ZKeyHeaderRow* pKHR=nullptr;
+
+  /* define key index (row and array rank are same) to insert before */
+
+  if (!pIdx.isValid()) {
+    Errorlog.errorLog("DicEdit::_keyCopy-E-INVIDX Invalid row index.");
     return false;
-    }
-  if (Pinboard.last().getZEntity()!=ZEntity_KeyDicRowsSet)
-    {
-    wStr.sprintf("Expecting ZEntity_KeyDicRowsSet in Pinboard while got <%s>\n",decode_ZEntity( Pinboard.last().getZEntity()).toChar());
-    statusBar()->showMessage(QObject::tr(wStr.toCChar(),"DicEdit"),cst_MessageDuration);
-    fprintf(stderr,"DicEdit::pinboardPasteKeyRowSet-E-INVENT expecting ZEntity_KeyDicRowsSet in Pinboard.\n"
-                    "while got <%s>\n",decode_ZEntity( Pinboard.last().getZEntity()).toChar());
-
+  }
+  if (pIdx.row()!=0) {
+    pIdx=pIdx.siblingAtColumn(0);
+  }
+  wV=pIdx.data(ZQtDataReference);
+  wDRef=wV.value<ZDataReference>();
+  if (wDRef.getZEntity()!=ZEntity_KeyDic) {
+    Errorlog.errorLog("DicEdit::keyfieldInsertFromTemporary-E-INVTYP Invalid infradata entity type <%s> while expected <ZEntity_KeyDic>.",
+        decode_ZEntity(wDRef.getZEntity()).toChar());
     return false;
-    }
-  QModelIndex wKeyIdx=pKeyIdx;
-  ZDataReference wDRef;
-  if (!pKeyIdx.isValid())/* if invalid then append to end - if not insert before index */
-  {
-    statusBar()->showMessage(QObject::tr("No target element selected- Appending.","DicEdit"),cst_MessageDuration);
-    wDRef.setInvalid();
   }
-  else
-    {
-    QVariant wV = pKeyIdx.data(ZFlowRole);
-    if (!wV.isValid())
-      { /* if data is not valid - append */
-        statusBar()->showMessage(QObject::tr("Current index data is invalid - Appending.","DicEdit"),cst_MessageDuration);
-        wDRef.setInvalid();     /* to append */
-        wKeyIdx=QModelIndex();  /* set target model index to invalid */
-      }
-    else
-      {
-      wDRef = wV.value<ZDataReference>();
-      if (wDRef.getZEntity()==ZEntity_KeyField)
-        {/* if key field get parent key to insert before */
+  pKHR=wDRef.getPtr<ZKeyHeaderRow*>();
 
-          wKeyIdx = pKeyIdx.parent();
-        }
-        else if (wDRef.getZEntity()!=ZEntity_KeyDic)
-          {
-          statusBar()->showMessage(QObject::tr("Trying to insert key rows in non appropriate row.","DicEdit"),cst_MessageDuration);
-          return false;
-          }
-      }// else
-    }//else
+  wDRef.set(ZLayout_KeyTRv,getNewResource(ZEntity_KeyDic),-1);
+  wDRef.setPtr(new ZKeyHeaderRow(pKHR));
 
-/* insert or append key rows set */
-
-  QList<QList<QStandardItem *>>* wKeyRows = Pinboard.getLast()->DRef.getPtr<QList<QList<QStandardItem *>>*>();
-
-  QList<QStandardItem *> wKeyDicRow = (*wKeyRows)[0]; /* first is key dictionary row */
-
-  if (pAppend ||(!wKeyIdx.isValid()))
-  {
-    /* append key dictionary row */
-    keyTRv->ItemModel->appendRow((*wKeyRows)[0]);
-
-    /* append each key field rows to qstandarditem */
-
-    for (int wi=1;wi < wKeyRows->count();wi++)
-      (*wKeyRows)[0][0]->appendRow((*wKeyRows)[wi]);
-
-    wStr.sprintf("1 key dictionary and %d key fields added.",wKeyRows->count()-1);
-    ui->statusBar->showMessage(QObject::tr(wStr.toCChar()),cst_MessageDuration);
-
-    Pinboard.pop();
-
-    return true;
-  }
+  ZPinboardElement wPElt;
+  wPElt.setDataReference(wDRef);
+  Pinboard.push(wPElt);
+  utf8VaryingString wMsg;
+  wMsg.sprintf("Key <%s> copied. %ld rows copied.",
+      pKHR->DicKeyName.toCChar(),
+      pKHR->count() );
+  statusBar()->showMessage(QObject::tr(wMsg.toCChar()),cst_MessageDuration);
+  return true;
+} // _keyCopy
 
 
-// wKeyIdx.isValid()
-
-    int wKeyRow=wKeyIdx.row();
-    /* insert key dictionary row (rank 0) to root index */
-    keyTRv->ItemModel->insertRows(wKeyRow,1,wKeyIdx.parent());
-    /* for this key dictionary row, insert each item in its appropriate column */
-    for (int wCol=0;wCol < wKeyDicRow.count();wCol++)
-      keyTRv->ItemModel->setItem(wKeyRow,wCol,wKeyDicRow[wCol]);
-
-    /* then append each child row to parent item */
-    for (int wi=1;wi<wKeyRows->count();wi++)
-      wKeyDicRow[0]->appendRow((*wKeyRows)[wi]);
-
-    /* delete Pinboard element, and rows */
-
-    wStr.sprintf("1 key dictionary and %d key fields inserted.",wKeyRows->count()-1);
-    ui->statusBar->showMessage(QObject::tr(wStr.toCChar()),cst_MessageDuration);
-
-    delete wKeyRows;
-
-    Pinboard.pop();
-
-    wStr.sprintf("1 key dictionary and %d key fields added.",wKeyRows->count()-1);
-    ui->statusBar->showMessage(QObject::tr(wStr.toCChar()),cst_MessageDuration);
-    return true;
-  /* wKeyIdx is not valid : append */
-
-
-} //pinboardInsertKeyRowSet
-
-/* pinboardPasteKeyFieldRow paste a QList<QStandardItem*> row representing a key field row.
- * This comes from keyTRv to be pasted to keyTRv (move).
- *
- * if pIdx points to
- * - a Key dictionary row, then field row is append at the end of existing key field rows
- * - a key field row, then field row is inserted before pIdx or appended if pAppend is true
- *
- *  key values are recomputed
+/**
+ * @brief DicEdit::_keyDelete deletes key pointed by pIdx :
+ *  - delete key row and deletes infradata associated to it
+ *  - deletes all children field rows and infradata associated with QStandardItem at column 0 for children fields
+ *  - deletes Key dictionary Key element and all dependent fields.
  */
 bool
-DicEdit::pinboardPasteKeyFieldRow(const QModelIndex& pIdx,bool pAppend) /* if pKeyIdx is invalid, then append key row set */
-{
-  utf8String wStr;
-  if (Pinboard.isEmpty())
-  {
-    wStr = "No previous element in Pinboard.";
-    statusBar()->showMessage(QObject::tr("No previous element in Pinboard.","DicEdit"),cst_MessageDuration);
+DicEdit::_keyDelete (const QModelIndex& pIdx) {
+  QVariant wV;
+  ZDataReference  wDRef , wFDRef;
+  ZKeyHeaderRow*  wKHR=nullptr;
+  ZKeyFieldRow*   wKFR=nullptr;
+
+  /* define key index (row and array rank are same) to insert before */
+
+  if (!pIdx.isValid()) {
+    Errorlog.errorLog("DicEdit::_keyDelete-E-INVIDX Invalid row index.");
     return false;
   }
-  if (Pinboard.last().getZEntity()!=ZEntity_KeyFieldRow)
-    {
-    wStr.sprintf("Expecting ZEntity_KeyFieldRow in Pinboard while got <%s>\n",decode_ZEntity( Pinboard.last().getZEntity()).toChar());
-    statusBar()->showMessage(QObject::tr(wStr.toCChar(),"DicEdit"),cst_MessageDuration);
-    fprintf(stderr,"DicEdit::pinboardPasteKeyFieldRow-E-INVENT expecting ZEntity_KeyFieldRow in Pinboard.\n"
-                    "while got <%s>\n",decode_ZEntity( Pinboard.last().getZEntity()).toChar());
 
+  QStandardItem* wKeyItem=keyTRv->ItemModel->item(pIdx.row(),0);
+  wV=wKeyItem->data(ZQtDataReference);
+  wDRef = wV.value<ZDataReference>();
+  if (wDRef.getZEntity()!=ZEntity_KeyDic)
+    abort();
+  wKHR=wDRef.getPtr<ZKeyHeaderRow*>();
+
+
+
+  if (wDRef.getZEntity()==ZEntity_KeyField) {
+    wKeyItem=wKeyItem->parent();  /* if field, jump to key item */
+  } else if (wDRef.getZEntity()!=ZEntity_KeyDic) {
+    Errorlog.errorLog("DicEdit::_keyDelete-E-INVTYP Invalid infradata entity type <%s> ",decode_ZEntity(wDRef.getZEntity()).toChar());
     return false;
-    }
+  }
 
-  if (!pIdx.isValid())
-    {
-    statusBar()->showMessage(QObject::tr("No target element selected","DicEdit"),cst_MessageDuration);
+  delete wKHR; /* delete infradata for key row */
+
+  /* delete infradata for each field */
+  QStandardItem* wFieldItem=nullptr;
+  for (int wi=0;wi < wKeyItem->rowCount();wi++)  {
+    wFieldItem=wKeyItem->child(wi,0);
+    wV=wFieldItem->data(ZQtDataReference);
+    if (!wV.isValid())
+      abort();
+    wDRef = wV.value<ZDataReference>();
+    if (wDRef.getZEntity()==ZEntity_KeyField)
+      wKFR=wDRef.getPtr<ZKeyFieldRow*>();
+    else
+      abort();
+    delete wKFR;
+  }
+  wKeyItem->removeRows(0,wKeyItem->rowCount());
+
+  /* delete dictionary data */
+  MasterDic->KeyDic.erase(wKeyItem->row());
+
+  /* remove key row (key is the first child of root element) */
+
+  keyTRv->ItemModel->removeRow(pIdx.row());
+  return true;
+} // _keyDelete
+
+/** @brief DicEdit::_keyDelete deletes key field pointed by pIdx :
+ *  - delete key field row and deletes infradata associated to it
+ *  - recomputes and displays key universal size value and each key field offset within the mother key.
+ */
+bool
+DicEdit::_keyfieldDelete (QModelIndex pIdx) {
+  QVariant wV;
+  ZDataReference  wDRef , wFDRef;
+  ZKeyHeaderRow*  wKHR=nullptr;
+  ZKeyFieldRow*   wKFR=nullptr;
+
+  /* define key index (row and array rank are same) to insert before */
+
+  if (!pIdx.isValid()) {
+    Errorlog.errorLog("DicEdit::_keyDelete-E-INVIDX Invalid row index.");
     return false;
-    }
+  }
+  if (pIdx.column()!=0) {
+    pIdx = pIdx.siblingAtColumn(0);
+  }
 
-  QVariant wV = pIdx.data(ZFlowRole);
-  if (!wV.isValid())
-    {
-    ui->statusBar->showMessage("Invalid data for target row.",cst_MessageDuration);
-    fprintf(stderr,"DicEdit::pinboardPasteKeyFieldRow-E-INVDATA invalid data for target row.\n");
+  wV=pIdx.data(ZQtDataReference);
+  wDRef = wV.value<ZDataReference>();
+  wKFR=wDRef.getPtr<ZKeyFieldRow*>();
+
+  if (wDRef.getZEntity()!=ZEntity_KeyField) {
+    Errorlog.errorLog("DicEdit::_keyDelete-E-INVTYPE Invalid row type. Expected <ZEntity_KeyField> while got <%s>",wDRef.getZEntity());
     return false;
+  }
+  /* get to item at column 0 (contains infradata) */
+  QStandardItem* wKeyFieldItem=keyTRv->ItemModel->itemFromIndex(pIdx);
+
+  /* delete infradata */
+  delete wKFR;
+
+  /* get mother key item infradata */
+  QStandardItem* wKeyItem=wKeyFieldItem->parent();
+  wV=wKeyItem->data(ZQtDataReference);
+  wDRef = wV.value<ZDataReference>();
+  wKHR=wDRef.getPtr<ZKeyHeaderRow*>();
+
+  /* delete key dictionary key field element */
+  MasterDic->KeyDic[wKeyItem->row()]->erase(wKeyFieldItem->row());
+
+  /* delete key field row */
+  wKeyItem->removeRow(wKeyItem->row());
+
+  /* recompute values for key Universal Size and key field offsets */
+
+  _recomputeKeyValues(wKeyItem);
+
+  return true;  /* done */
+} // _keyDelete
+
+
+/** @brief DicEdit::_recomputeKeyValues  recomputes and displays for each field key offset and key Universal Size for the key  */
+void DicEdit::_recomputeKeyValues(QStandardItem* wKeyItem) {
+
+  QVariant wV;
+  ZDataReference  wDRef , wFDRef;
+  ZKeyHeaderRow*  wKHR=nullptr;
+  ZKeyFieldRow*   wKFR=nullptr;
+
+  int wUniversalSize=0, wOffset=0 ;
+  QStandardItem* wKField=nullptr;
+  QStandardItem* wKFOffset=nullptr;
+  QStandardItem* wKUSize=nullptr;
+  utf8VaryingString wStr;
+
+  /* get mother key item infradata */
+  wV=wKeyItem->data(ZQtDataReference);
+  wDRef = wV.value<ZDataReference>();
+  wKHR=wDRef.getPtr<ZKeyHeaderRow*>();
+
+  for (int wi = 0 ; wi < wKeyItem->rowCount() ; wi ++ ) {
+    wKField=wKeyItem->child(wi,0);
+    wV=wKField->data(ZQtDataReference);
+    wDRef = wV.value<ZDataReference>();
+    wKFR=wDRef.getPtr<ZKeyFieldRow*>();
+    /* compute values and change infradata offset value */
+    wKFR->KeyOffset = wOffset ;
+    wOffset += wKFR->UniversalSize;
+    wUniversalSize += wKFR->UniversalSize;
+    /* display field offset new value */
+    wKFOffset=wKeyItem->child(wi,cst_KeyOffsetColumn);  /* get offset item */
+    wStr.sprintf("%ld", wKFR->KeyOffset);
+    wKFOffset->setText(wStr.toCChar());   /* update displayed value */
+  } // for
+
+  /* update infradata */
+  wKHR->KeyUniversalSize = wUniversalSize;
+
+  /* update key displayed value */
+  /* 'keyTRv->ItemModel->' because key is the uppermost element */
+  int wRNb=wKeyItem->row();
+  wKUSize = keyTRv->ItemModel->item(wKeyItem->row(),cst_KeyUSizeColumn);
+  if (wKUSize==nullptr) {
+    abort();
+  }
+
+  wStr.sprintf("total size: %d", wUniversalSize);
+  wKUSize->setText(wStr.toCChar());   /* update displayed value */
+
+  /* recompute key dictionary values */
+
+  MasterDic->KeyDic[wKeyItem->row()]->computeKeyOffsets();
+  MasterDic->KeyDic[wKeyItem->row()]->computeKeyUniversalSize();
+
+  return ;  /* done */
+}// _recomputeKeyValues
+
+bool
+DicEdit::keyFieldCopyToPinboard (QModelIndex pIdx) {
+  if (!pIdx.isValid()) {
+    Errorlog.errorLog("DicEdit::keyFieldCopyToPinboard-E-INVIDX Invalid row index.");
+    return false;
+  }
+  if (pIdx.row()!=0) {
+    pIdx=pIdx.siblingAtColumn(0);
+  }
+  QVariant wV;
+  ZDataReference  wDRef;
+  ZKeyFieldRow*   wKFR=nullptr;
+  wV=pIdx.data(ZQtDataReference);
+  wDRef=wV.value<ZDataReference>();
+  if (wDRef.getZEntity()!=ZEntity_KeyField) {
+    Errorlog.errorLog("DicEdit::keyfieldInsertFromTemporary-E-INVTYP Invalid infradata entity type <%s> while expected <ZEntity_KeyField>.",
+        decode_ZEntity(wDRef.getZEntity()).toChar());
+    return false;
+  }
+  wKFR=wDRef.getPtr<ZKeyFieldRow*>();
+
+  wDRef.set(ZLayout_KeyTRv,getNewResource(ZEntity_KeyField),-1);
+  wDRef.setPtr(new ZKeyFieldRow(*wKFR));
+
+  ZPinboardElement wPElt;
+  wPElt.setDataReference(wDRef);
+  Pinboard.push(wPElt);
+  utf8VaryingString wMsg;
+  wMsg.sprintf("Key field <%ld> copied to pinboard.",wKFR->Name.toCChar());
+  statusBar()->showMessage(QObject::tr(wMsg.toCChar()),cst_MessageDuration);
+  return true;
+} // _keyFieldCopy
+
+bool
+DicEdit::fieldAppendToKey(const QModelIndex &pIdx,ZFieldDescription& pField) {
+
+  if (!pField.KeyEligible) {
+    int wRet=ZExceptionDLg::message2B("DicEdit::fieldAppendToKey",ZS_INVTYPE,Severity_Error,
+        "Discard","Force",
+        "Field %s cannot be part of a key.\n"
+        "Using such a field without conversion may induce problems."
+        "Do you wish to continue anyway or discard ?",pField.getName().toCChar());
+    if (wRet==QDialog::Rejected)
+      return false;
+  }
+
+
+  ZKeyHeaderRow wKHR(MasterDic);
+  ZKeyFieldRow wKFR;
+  ZDataReference wDRefKey , wDRefKeyField;
+  QVariant wV;
+  QList<QStandardItem *> wKeyRow, wKeyFieldRow ;
+
+  wKFR.Name = pField.getName();
+  wKFR.ZType = pField.ZType;
+  wKFR.MDicRank = MasterDic->searchFieldByName(wKFR.Name);
+
+  wKFR.UniversalSize = pField.UniversalSize;
+  wKFR.Hash = pField.Hash;
+  wKFR.KeyOffset = 0; /* to be recomputed */
+
+
+/* if there is nothing yet in tree view (no key defined) then
+ *  - create a key with name __NEW_KEYNAME__
+ *  - display this key
+ *  - create a key field from given field description (done before)
+ *  - append key field to created key
+ */
+  if (keyTRv->ItemModel->rowCount()==0) {
+
+    /* create a key with name __NEW_KEYNAME__ */
+    ZKeyDictionary* wKeyDic=new ZKeyDictionary(__NEW_KEYNAME__,MasterDic);
+    long wKeyFieldRank=MasterDic->KeyDic.push(wKeyDic);
+    wKHR.set(wKeyDic);
+
+    wKeyRow=createKeyDicRow(wKHR);
+
+    wDRefKey.setZLayout(ZLayout_KeyTRv);
+    wDRefKey.setResource(getNewResource(ZEntity_KeyDic));
+    wDRefKey.setDataRank(wKeyFieldRank);
+    wDRefKey.setPtr(new ZKeyHeaderRow(wKHR)); /* store key dictionary Data (to be deleted) */
+    wV.setValue<ZDataReference>(wDRefKey);
+
+    wKeyRow[0]->setData(wV,ZQtDataReference);
+
+    keyTRv->ItemModel->appendRow(wKeyRow); /* display this key */
+
+    wKeyFieldRow=createKeyFieldRow(wKFR);
+    /* if there is nothing yet in tree view (no key defined) then
+ *  - create a key with name __NEW_KEYNAME__
+ *  - display this key
+ *  - create a key field from given field description (done before)
+ *  - append key field to created key
+ */
+    ZIndexField wKField = wKFR.get();
+    long wKFRank=MasterDic->KeyDic.last()->push( wKField);
+
+    wDRefKeyField.setZLayout(ZLayout_KeyTRv);
+    wDRefKeyField.setResource(getNewResource(ZEntity_KeyField));
+    wDRefKeyField.setDataRank(wKFRank);
+    wDRefKeyField.setPtr(new ZKeyFieldRow(wKFR)); /* store key dictionary Data (to be deleted) */
+    wV.setValue<ZDataReference>(wDRefKey);
+    wKeyFieldRow[0]->setData(wV,ZQtDataReference);
+
+    wKeyRow[0]->appendRow(wKeyFieldRow); /* append key field to created key */
+
+    _recomputeKeyValues(wKeyRow[0]);
+
+    return true;
+  } // if (keyTRv->ItemModel->rowCount()==0)
+
+  /* append to current key :
+   * from current model index : if type is ZEntity_KeyField get father
+   * create row
+   */
+
+  QModelIndex wIdxFather , wIdx = pIdx;
+  QStandardItem* wKeyItem=nullptr;
+
+  if (wIdx.column()!=0)
+    wIdx=wIdx.siblingAtColumn(0);
+
+  /* get type */
+  wV=wIdx.data(ZQtDataReference);
+  wDRefKey=wV.value<ZDataReference>();
+
+  if (wDRefKey.getZEntity()==ZEntity_KeyDic) {
+    wIdxFather = wIdx;
+  }
+  else if (wDRefKey.getZEntity()==ZEntity_KeyField) {
+    wIdxFather = wIdx.parent();
+    wV=wIdxFather.data(ZQtDataReference);
+    wDRefKey=wV.value<ZDataReference>();
+  } else {
+    Errorlog.errorLog("DicEdit::keyfieldAppend-E-INVTYP Invalid infradata entity type <%s> while expected <ZEntity_KeyField>.",decode_ZEntity(wDRefKey.getZEntity()).toChar());
+    return false;
+  }
+
+  wKeyItem = keyTRv->ItemModel->itemFromIndex(wIdxFather);
+
+  wKeyFieldRow=createKeyFieldRow(wKFR);
+
+  wDRefKeyField.setZLayout(ZLayout_KeyTRv);
+  wDRefKeyField.setResource(getNewResource(ZEntity_KeyField));
+  wDRefKeyField.setDataRank(wKeyItem->rowCount());
+  wDRefKeyField.setPtr(new ZKeyFieldRow(wKFR)); /* store key dictionary Data (to be deleted) */
+  wV.setValue<ZDataReference>(wDRefKey);
+  wKeyFieldRow[0]->setData(wV,ZQtDataReference);
+
+  wKeyItem->appendRow(wKeyFieldRow);
+
+  _recomputeKeyValues(wKeyItem);
+
+  return true;
+} //keyfieldAppend
+
+bool
+DicEdit::keyTRvInsertFromPinboard(QModelIndex pIdx) {
+  if (Pinboard.isEmpty())
+    return false;
+  if (!pIdx.isValid()) {
+    ui->statusBar->showMessage(QObject::tr("nothing selected."),cst_MessageDuration);
+    return false;
+  }
+  ZDataReference wDRef ;
+  QVariant wV;
+
+  wDRef=Pinboard.last().DRef;
+
+  switch (Pinboard.last().getZEntity()) {
+    /* key field move */
+    case ZEntity_KeyField: {
+      ZKeyFieldRow* wKFR=Pinboard.last().DRef.getPtr<ZKeyFieldRow*>();
+      return _keyFieldInsertToKey(pIdx,wKFR);
     }
-  ZDataReference wDRef =wV.value<ZDataReference>();
+    /* a whole key must be inserted here */
+    case ZEntity_KeyDic: {
+      ZKeyHeaderRow* wKHR = Pinboard.last().DRef.getPtr<ZKeyHeaderRow*>();
+      return _keyInsert(pIdx,wKHR);
+    }
+    /* a dictionary field must be converted to key field and inserted here */
+    case ZEntity_DicField:{
+      ZFieldDescription* wField = Pinboard.last().DRef.getPtr<ZFieldDescription*>();
+      return _fieldInsertToKey(pIdx,wField);
+    }
+    default:
+      Errorlog.errorLog("DicEdit::keyfieldInsertFromTemporary-E-INVTYP Invalid infradata entity type <%s> while expected <ZEntity_KeyField>.",decode_ZEntity(wDRef.getZEntity()).toChar());
+      return false;
+  }//switch
 
-  QList<QStandardItem *>* wKeyFieldRow = Pinboard.last().DRef.getPtr<QList<QStandardItem *>*>();
+}// keyTRvInsertFromPinboard
 
-  if (wDRef.getZEntity()==ZEntity_KeyDic) /* target is key dictionary : append field to key */
-    {
-    /* append to key Item */
-    QStandardItem* wKeyItem=keyTRv->ItemModel->itemFromIndex( pIdx );
-    wKeyItem->appendRow(*wKeyFieldRow);
+
+
+
+bool
+DicEdit::_keyFieldInsertToKey(QModelIndex pIdx, ZKeyFieldRow* pKFR) {
+  QVariant        wV;
+  ZDataReference  wDRef ;
+  QStandardItem*  wKeyItem=nullptr;
+
+  /* append to current key :
+   * from current model index : if type is ZEntity_KeyField get father
+   * create row
+   */
+  QModelIndex wIdx = pIdx;
+  if (wIdx.column()!=0) {
+    wIdx=pIdx.siblingAtColumn(0);
+  }
+
+  wV=wIdx.data(ZQtDataReference);
+  if (wV.isNull()) {
+    Errorlog.errorLog("DicEdit::_keyFieldInsertToKey-E-VARNULL Cannot get infradata.");
+    return false;
+  }
+  wDRef=wV.value<ZDataReference>();
+
+  /* if target row is a Key dictionary, simply append inside this key */
+  if (wDRef.getZEntity()==ZEntity_KeyDic) {
+    wKeyItem=keyTRv->ItemModel->itemFromIndex(wIdx);
+    return keyTRvAppendFromPinboard(wIdx);
+  }
+  else if (wDRef.getZEntity()!=ZEntity_KeyField) {
+    Errorlog.errorLog("DicEdit::keyfieldInsertFromTemporary-E-INVTYP Invalid infradata entity type <%s> while expected <ZEntity_KeyField>.",decode_ZEntity(wDRef.getZEntity()).toChar());
+    return false;
+  }
+  /* here this is a key field row */
+
+  pKFR = wDRef.getPtr<ZKeyFieldRow*>();
+
+  QModelIndex wKeyIdx=wIdx.parent();
+  wKeyItem=keyTRv->ItemModel->item(wKeyIdx.row(),0);
+
+  /* insert row in tree view */
+  QList<QStandardItem*> wRow= createKeyFieldRow(*pKFR);
+
+  /* insert key field in key dictionary */
+  ZIndexField wIFld(MasterDic->KeyDic[wKeyItem->row()]);
+
+  wIFld.KeyOffset=0; /* to be recomputed */
+  wIFld.Hash = pKFR->Hash;
+  wIFld.MDicRank = pKFR->MDicRank;
+  //  wIFld.MDicRank=MasterDic->searchFieldByName(pTemp->KFR.Name);
+  //  wIFld.KeyDic = MasterDic->KeyDic[wKeyItem->row()]; // already done with ZIndexField CTOR
+
+  long wFldDicRank=MasterDic->KeyDic[wKeyItem->row()]->insert(wIFld,wIdx.row());
+
+  /* update row infradata */
+
+  wDRef.set(ZLayout_KeyTRv,getNewResource(ZEntity_KeyField),wFldDicRank);
+  pKFR->MDicRank=wFldDicRank;
+  wDRef.setPtr(pKFR);
+
+  wV.setValue<ZDataReference>(wDRef);
+  wRow[0]->setData(wV,ZQtDataReference);
+
+  wKeyItem->insertRow(pIdx.row(),wRow);
+
+  /* update and display key values */
+
+  _recomputeKeyValues(wKeyItem);
+
+  /* delete Temporary */
+
+  //  delete wKFR;
+
+  return true;  /* done */
+} // DicEdit::_keyFieldInsertToKey
+
+bool
+DicEdit::_keyFieldAppendToKey(QModelIndex pIdx, ZKeyFieldRow* pKFR) {
+  QVariant        wV;
+  ZDataReference  wDRef ;
+  QStandardItem*  wKeyItem=nullptr;
+
+  /* append to current key :
+   * from current model index : if type is ZEntity_KeyField get father
+   * create row
+   */
+  QModelIndex wIdx = pIdx;
+  if (wIdx.column()!=0) {
+    wIdx=pIdx.siblingAtColumn(0);
+  }
+
+  wV=wIdx.data(ZQtDataReference);
+  if (wV.isNull()) {
+    Errorlog.errorLog("DicEdit::_keyFieldInsertToKey-E-VARNULL Cannot get infradata.");
+    return false;
+  }
+  wDRef=wV.value<ZDataReference>();
+
+  /* if target row is a Key dictionary, simply append inside this key */
+  if (wDRef.getZEntity()==ZEntity_KeyDic) {
+    wKeyItem=keyTRv->ItemModel->itemFromIndex(wIdx);
+    return keyTRvAppendFromPinboard(wIdx);
+  }
+  else if (wDRef.getZEntity()!=ZEntity_KeyField) {
+    Errorlog.errorLog("DicEdit::keyfieldInsertFromTemporary-E-INVTYP Invalid infradata entity type <%s> while expected <ZEntity_KeyField>.",decode_ZEntity(wDRef.getZEntity()).toChar());
+    return false;
+  }
+  /* here this is a key field row */
+
+  pKFR = wDRef.getPtr<ZKeyFieldRow*>();
+
+  QModelIndex wKeyIdx=wIdx.parent();
+  wKeyItem=keyTRv->ItemModel->item(wKeyIdx.row(),0);
+
+
+  QList<QStandardItem*> wRow= createKeyFieldRow(*pKFR);
+
+  /* append key field to key in key dictionary */
+
+  ZIndexField wIFld(MasterDic->KeyDic[wKeyItem->row()]); /* initialize a new key field with key dictionary */
+
+  wIFld.KeyOffset=0; /* to be recomputed */
+  wIFld.Hash = pKFR->Hash;
+  wIFld.MDicRank = pKFR->MDicRank;
+  //  wIFld.MDicRank=MasterDic->searchFieldByName(pTemp->KFR.Name);
+  //  wIFld.KeyDic = MasterDic->KeyDic[wKeyItem->row()]; // already done with ZIndexField CTOR
+  /* append key field */
+  long wFldDicRank=MasterDic->KeyDic[wKeyItem->row()]->push(wIFld);
+
+  /* set row infradata */
+
+  wDRef.set(ZLayout_KeyTRv,getNewResource(ZEntity_KeyField),wFldDicRank);
+  pKFR->MDicRank=wFldDicRank;
+  wDRef.setPtr(pKFR);
+
+  wV.setValue<ZDataReference>(wDRef);
+  wRow[0]->setData(wV,ZQtDataReference);
+
+  /* append row in tree view */
+  wKeyItem->appendRow(wRow);
+  keyTRv->resizeColumns();
+
+  /* update and display key values */
+
+  _recomputeKeyValues(wKeyItem);
+
+  /* delete Temporary */
+
+  //  delete wKFR;
+
+  return true;  /* done */
+} // DicEdit::_keyFieldAppendToKey
+
+
+bool
+DicEdit::_fieldInsertToKey(QModelIndex pIdx,ZFieldDescription* pField) {
+  if (!pField->KeyEligible) {
+    int wRet=ZExceptionDLg::message2B("DicEdit::fieldAppendToKey",ZS_INVTYPE,Severity_Error,
+        "Discard","Force",
+        "Field %s cannot be part of a key.\n"
+        "Using such a field without conversion may induce problems."
+        "Do you wish to continue anyway or discard ?",pField->getName().toCChar());
+    if (wRet==QDialog::Rejected)
+      return false;
+  }
+  ZKeyHeaderRow   wKHR(MasterDic);
+  ZKeyFieldRow    wKFR;
+  ZDataReference  wDRefKey;
+  ZDataReference  wDRefKeyField;
+  QVariant        wV;
+  QList<QStandardItem *> wKeyRow, wKeyFieldRow ;
+
+  wKFR.Name = pField->getName();
+  wKFR.ZType = pField->ZType;
+  wKFR.MDicRank = MasterDic->searchFieldByName(wKFR.Name);
+
+  wKFR.UniversalSize = pField->UniversalSize;
+  wKFR.Hash = pField->Hash;
+  wKFR.KeyOffset = 0; /* to be recomputed */
+
+
+  /* if there is nothing yet in tree view (no key defined) then
+ *  - create a key with name __NEW_KEYNAME__
+ *  - display this key
+ *  - create a key field from given field description (done before)
+ *  - append key field to created key
+ */
+  if (keyTRv->ItemModel->rowCount()==0) {
+    return _fieldAppendToKey(pIdx,pField);
+  } // if (keyTRv->ItemModel->rowCount()==0)
+
+  /* append to current key :
+   * from current model index : if type is ZEntity_KeyField get father
+   * create row
+   */
+
+  QModelIndex wIdxFather , wIdx = pIdx;
+  QStandardItem* wKeyItem=nullptr;
+
+  if (wIdx.column()!=0)
+    wIdx=wIdx.siblingAtColumn(0);
+
+  /* get type */
+  wV=wIdx.data(ZQtDataReference);
+  wDRefKey=wV.value<ZDataReference>();
+
+  if (wDRefKey.getZEntity()==ZEntity_KeyDic) {
+    wIdxFather = wIdx;
+  }
+  else if (wDRefKey.getZEntity()==ZEntity_KeyField) {
+    wIdxFather = wIdx.parent();
+    wV=wIdxFather.data(ZQtDataReference);
+    wDRefKey=wV.value<ZDataReference>();
+  } else {
+    Errorlog.errorLog("DicEdit::keyfieldAppend-E-INVTYP Invalid infradata entity type <%s> while expected <ZEntity_KeyField>.",decode_ZEntity(wDRefKey.getZEntity()).toChar());
+    return false;
+  }
+
+  wKeyItem = keyTRv->ItemModel->itemFromIndex(wIdxFather);
+
+  wKeyFieldRow=createKeyFieldRow(wKFR);
+
+  wDRefKeyField.setZLayout(ZLayout_KeyTRv);
+  wDRefKeyField.setResource(getNewResource(ZEntity_KeyField));
+  wDRefKeyField.setDataRank(wKeyItem->rowCount());
+  wDRefKeyField.setPtr(new ZKeyFieldRow(wKFR)); /* store key dictionary Data (to be deleted) */
+  wV.setValue<ZDataReference>(wDRefKeyField);
+  wKeyFieldRow[0]->setData(wV,ZQtDataReference);
+  if (wKeyItem->rowCount()==0) {  /* key has no associated fields yet -> append */
+    wKeyItem->appendRow(wKeyFieldRow);
+  }
+  else
+    wKeyItem->insertRow(pIdx.row(),wKeyFieldRow);
+
+  keyTRv->expandItem(wIdxFather);
+//  keyTRv->resizeColumns();
+
+  _recomputeKeyValues(wKeyItem);
+
+  return true;
+} //_fieldInsertToKey
+bool
+DicEdit::_fieldAppendToKey(QModelIndex pIdx,ZFieldDescription* pField) {
+  if (!pField->KeyEligible) {
+    int wRet=ZExceptionDLg::message2B("DicEdit::fieldAppendToKey",ZS_INVTYPE,Severity_Error,
+        "Discard","Force",
+        "Field %s cannot be part of a key.\n"
+        "Using such a field without conversion may induce problems."
+        "Do you wish to continue anyway or discard ?",pField->getName().toCChar());
+    if (wRet==QDialog::Rejected)
+      return false;
+  }
+  ZKeyHeaderRow wKHR(MasterDic);
+  ZKeyFieldRow wKFR;
+  ZDataReference wDRefKey , wDRefKeyField;
+  QVariant wV;
+  QList<QStandardItem *> wKeyRow, wKeyFieldRow ;
+
+  wKFR.Name = pField->getName();
+  wKFR.ZType = pField->ZType;
+  wKFR.MDicRank = MasterDic->searchFieldByName(wKFR.Name);
+
+  wKFR.UniversalSize = pField->UniversalSize;
+  wKFR.Hash = pField->Hash;
+  wKFR.KeyOffset = 0; /* to be recomputed */
+
+
+  /* if there is nothing yet in tree view (no key defined) then
+ *  - create a key with name __NEW_KEYNAME__
+ *  - display this key
+ *  - create a key field from given field description (done before)
+ *  - append key field to created key
+ */
+  if (keyTRv->ItemModel->rowCount()==0) {
+
+    /* create a key with name __NEW_KEYNAME__ */
+    ZKeyDictionary* wKeyDic=new ZKeyDictionary(__NEW_KEYNAME__,MasterDic);
+    long wKeyFieldRank=MasterDic->KeyDic.push(wKeyDic);
+    wKHR.set(wKeyDic);
+
+    wKeyRow=createKeyDicRow(wKHR);
+
+    wDRefKey.setZLayout(ZLayout_KeyTRv);
+    wDRefKey.setResource(getNewResource(ZEntity_KeyDic));
+    wDRefKey.setDataRank(wKeyFieldRank);
+    wDRefKey.setPtr(new ZKeyHeaderRow(wKHR)); /* store key dictionary Data (to be deleted) */
+    wV.setValue<ZDataReference>(wDRefKey);
+
+    wKeyRow[0]->setData(wV,ZQtDataReference);
+
+    keyTRv->ItemModel->appendRow(wKeyRow); /* append this key to treeview - level 0 */
+
+
+    wKeyFieldRow=createKeyFieldRow(wKFR);
+  } // if (keyTRv->ItemModel->rowCount()==0)
+
+    /* if there is nothing yet in tree view (no key defined) then
+ *  - create a key with name __NEW_KEYNAME__
+ *  - display this key
+ *  - create a key field from given field description (done before)
+ *  - append key field to created key
+ */
+    ZIndexField wKField = wKFR.get();
+    long wKFRank=MasterDic->KeyDic.last()->push( wKField);
+
+
+    wDRefKeyField.setZLayout(ZLayout_KeyTRv);
+    wDRefKeyField.setResource(getNewResource(ZEntity_KeyField));
+    wDRefKeyField.setDataRank(wKFRank);
+    wDRefKeyField.setPtr(new ZKeyFieldRow(wKFR)); /* store key dictionary Data (to be deleted) */
+    wV.setValue<ZDataReference>(wDRefKey);
+    wKeyFieldRow[0]->setData(wV,ZQtDataReference);
+
+    wKeyRow[0]->appendRow(wKeyFieldRow); /* append key field to created key */
 
     keyTRv->resizeColumns();
-
-    /* update model index in Row[0] */
-    updateKeyValues(pIdx);/* update values for the key */
-
-    wStr.sprintf("1 field added to key.");
-    ui->statusBar->showMessage(QObject::tr(wStr.toCChar()),cst_MessageDuration);
-
-    Pinboard.pop();
+    _recomputeKeyValues(wKeyRow[0]);
 
     return true;
-    }
+} //_fieldAppendToKey
 
-  if (wDRef.getZEntity()==ZEntity_KeyField) /* target is key field : insert key field before this key field  or append it */
-    {
-    /* search key item father and append before current idx row */
-    QModelIndex wKeyParentIdx = pIdx.parent();
-    QStandardItem* wItem=keyTRv->ItemModel->itemFromIndex(wKeyParentIdx);
-    if (pAppend)
-      wItem->appendRow(*wKeyFieldRow);
-    else
-      wItem->insertRow(pIdx.row(),*wKeyFieldRow);
+bool
+DicEdit::_fieldInsertToKey1(QModelIndex pIdx, ZFieldDescription* pField) {
+  QVariant        wV;
+  ZDataReference  wDRef ;
+  QStandardItem*  wKeyItem=nullptr;
+  ZKeyFieldRow*    wKFR=nullptr;
+  /* append to current key :
+   * from current model index : if type is ZEntity_KeyField get father
+   * create row
+   */
+  QModelIndex wIdx = pIdx;
+  if (wIdx.column()!=0) {
+    wIdx=pIdx.siblingAtColumn(0);
+  }
 
-    /* update model index in Row[0] */
-    updateKeyValues(pIdx.parent()); /* update values for the whole key */
-    return true;
-    }
+  wV=wIdx.data(ZQtDataReference);
+  if (wV.isNull()) {
+    Errorlog.errorLog("DicEdit::_fieldInsertToKey-E-VARNULL Cannot get infradata.");
+    return false;
+  }
+  wDRef=wV.value<ZDataReference>();
 
-  ui->statusBar->showMessage("Invalid type of row.",cst_MessageDuration);
-  return false;
-}
 
+
+  /* if target row is a Key dictionary, simply append inside this key */
+  if (wDRef.getZEntity()==ZEntity_KeyDic) {
+    wKeyItem=keyTRv->ItemModel->itemFromIndex(wIdx);
+    return keyTRvAppendFromPinboard(wIdx);
+  }
+  else if (wDRef.getZEntity()!=ZEntity_KeyField) {
+    Errorlog.errorLog("DicEdit::keyfieldInsertFromTemporary-E-INVTYP Invalid infradata entity type <%s> while expected <ZEntity_KeyField>.",decode_ZEntity(wDRef.getZEntity()).toChar());
+    return false;
+  }
+  /* here this is a key field row */
+
+  wKFR = wDRef.getPtr<ZKeyFieldRow*>();
+
+  QModelIndex wKeyIdx=wIdx.parent();
+  wKeyItem=keyTRv->ItemModel->item(wKeyIdx.row(),0);
+
+  /* insert row in tree view */
+  QList<QStandardItem*> wRow= createKeyFieldRow(*wKFR);
+
+  /* insert key field in key dictionary */
+  ZIndexField wIFld(MasterDic->KeyDic[wKeyItem->row()]);
+
+  wIFld.KeyOffset=0; /* to be recomputed */
+  wIFld.Hash = wKFR->Hash;
+  wIFld.MDicRank = wKFR->MDicRank;
+  //  wIFld.MDicRank=MasterDic->searchFieldByName(pTemp->KFR.Name);
+  //  wIFld.KeyDic = MasterDic->KeyDic[wKeyItem->row()]; // already done with ZIndexField CTOR
+
+  long wFldDicRank=MasterDic->KeyDic[wKeyItem->row()]->insert(wIFld,wIdx.row());
+
+  /* update row infradata */
+
+  wDRef.set(ZLayout_KeyTRv,getNewResource(ZEntity_KeyField),wFldDicRank);
+  wKFR->MDicRank=wFldDicRank;
+  wDRef.setPtr(wKFR);
+
+  wV.setValue<ZDataReference>(wDRef);
+  wRow[0]->setData(wV,ZQtDataReference);
+
+  wKeyItem->insertRow(pIdx.row(),wRow);
+
+  /* update and display key values */
+
+  _recomputeKeyValues(wKeyItem);
+
+  /* delete Temporary */
+
+  //  delete wKFR;
+
+  return true;  /* done */
+} // DicEdit::_fieldInsertToKey
+
+bool
+DicEdit::keyTRvAppendFromPinboard(const QModelIndex &pIdx) {
+  if (Pinboard.isEmpty())
+    return false;
+  if (!pIdx.isValid()) {
+    ui->statusBar->showMessage(QObject::tr("nothing selected."),cst_MessageDuration);
+    return false;
+  }
+  ZKeyFieldRow* wKFR=nullptr;
+  ZDataReference wDRef ;
+  QVariant wV;
+  QStandardItem* wKeyItem=nullptr;
+
+  wDRef=Pinboard.last().DRef;
+
+  switch (Pinboard.last().getZEntity()) {
+  case ZEntity_KeyField: {
+    ZKeyFieldRow* wKFR=Pinboard.last().DRef.getPtr<ZKeyFieldRow*>();
+    return _keyFieldAppendToKey(pIdx,wKFR);
+  }
+  case ZEntity_KeyDic: { /* a whole key must be appended */
+    ZKeyHeaderRow* wKHR = Pinboard.last().DRef.getPtr<ZKeyHeaderRow*>();
+    return _keyAppend(wKHR);
+  }
+  case ZEntity_DicField:{ /* a dictionary field must be converted to key field and inserted here */
+    ZFieldDescription* wField = Pinboard.last().DRef.getPtr<ZFieldDescription*>();
+    return _fieldAppendToKey(pIdx,wField);
+  }
+  default:
+    Errorlog.errorLog("DicEdit::keyTRvAppendFromPinboard-E-INVTYP Invalid infradata entity type <%s>.",decode_ZEntity(wDRef.getZEntity()).toChar());
+    return false;
+  }//switch
+
+
+}//keyTRvAppendFromPinboard
 
 bool
 DicEdit::updateKeyValues(const QModelIndex& pKeyIdx)
@@ -1169,7 +2033,7 @@ DicEdit::updateKeyValues(const QModelIndex& pKeyIdx)
   if (pKeyIdx.column()!=0)
     wKeyIdx=pKeyIdx.siblingAtColumn(0);
 
-  QVariant wV = wKeyIdx.data(ZFlowRole);
+  QVariant wV = wKeyIdx.data(ZQtDataReference);
   if (!wV.isValid())
     {
     fprintf(stderr,"DicEdit::updateKeyValues-E-INVDATA Index data is not valid.\n");
@@ -1237,281 +2101,24 @@ DicEdit::updateKeyValues(const QModelIndex& pKeyIdx)
 
   wItemIdx = wKeyIdx.siblingAtColumn(1);
   wItem= keyTRv->ItemModel->itemFromIndex(wItemIdx);
-  wStr.sprintf("size : %ld",wKDPack.KeyUniversalSize);
+  wStr.sprintf("total size: %ld",wKDPack.KeyUniversalSize);
   wItem->setText(wStr.toCChar());
 
   return true;
-}//recomputeKeyValues
+}//updateKeyValues
 
-
-bool DicEdit::getIndexFieldData (QModelIndex& wIdx,ZDataReference &wDRef,ZFieldDescription &wFDesc)
-{
-  if (!wIdx.isValid())
-    {
-      ui->statusBar->showMessage("No current row selected.",cst_MessageDuration);
-      return false;
-    }
-  QVariant wV=wIdx.data(ZFlowRole);
-  if (!wV.isValid())
-    return false;
-  wDRef=wV.value<ZDataReference>();
-  if (wDRef.getZEntity()!=ZEntity_DicField)
-    return false;
-  wV=wIdx.data(ZQtValueRole);
-  if (!wV.isValid())
-    return false;
-  FieldDesc_Pack wFDescPack = wV.value<FieldDesc_Pack>();
-  wFDesc = wFDescPack.toFieldDescription();
-  return true;
-}
-bool DicEdit::pinboardPushField (QModelIndex& wIdx)
-{
-  if (!wIdx.isValid())
-  {
-    ui->statusBar->showMessage("No current row selected.",cst_MessageDuration);
-    return false;
-  }
-  QVariant wV=wIdx.data(ZFlowRole);
-  if (!wV.isValid())
-  {
-    ui->statusBar->showMessage("Cannot find data in row element.",cst_MessageDuration);
-    return false;
-  }
-  ZDataReference wDRef=wV.value<ZDataReference>();
-  wV=wIdx.data(ZQtValueRole);
-  if (!wV.isValid())
-  {
-    ui->statusBar->showMessage("Cannot find data in row element.",cst_MessageDuration);
-    return false;
-  }
-  FieldDesc_Pack wFDPack = wV.value<FieldDesc_Pack>();
-
-  ZPinboardElement wPElt;
-  wPElt.setDataReference(wDRef);
-
-  wPElt.setData(&wFDPack,sizeof(FieldDesc_Pack));
-  Pinboard.push(wPElt);
-  return true;
-}
-bool DicEdit::pinboardGetField (ZFieldDescription& pField)
-{
-  if (Pinboard.isEmpty())
-  {
-    ui->statusBar->showMessage("No previous data in clipboard.",cst_MessageDuration);
-    return false;
-  }
-
-  if (Pinboard.last().DRef.getZEntity()!=ZEntity_DicField)
-  {
-    ui->statusBar->showMessage("Data in clipboard is not appropriate to paste there.",cst_MessageDuration);
-    return false;
-  }
-
-  FieldDesc_Pack* wFDPackPtr = Pinboard.last().getDataPtr<FieldDesc_Pack>();
-
-  pField=wFDPackPtr->toFieldDescription();
-
-  return true;
-}
-
-void DicEdit::fieldActionEvent(QAction* pAction)
-{
-  utf8String wMsg;
-  if (pAction->objectName()=="FInsertBeforeQAc")
-  {
-    QModelIndex wIdx=fieldTBv->currentIndex();
-    if (!wIdx.isValid())
-    {
-      statusBar()->showMessage(QObject::tr("No field row selected","DicEdit"),cst_MessageDuration);
-      return ;
-    }
-    fieldCreateBefore(wIdx);
-    return;
-  }
-  if (pAction->objectName()=="FInsertAfterQAc")
-  {
-    statusBar()->showMessage(QObject::tr("Not implemented","DicEdit"),cst_MessageDuration);
-    return;
-  }
-  if (pAction->objectName()=="FChangeQAc")
-  {
-    QModelIndex wIdx=fieldTBv->currentIndex();
-    if (!wIdx.isValid())
-    {
-      statusBar()->showMessage(QObject::tr("No field row selected","DicEdit"),cst_MessageDuration);
-      return ;
-    }
-    fieldChange(wIdx);
-    return;
-  }
-
-  if (pAction->objectName()=="FDeleteQAc")
-  {
-    utf8String wMsg;
-    QModelIndex wIdx= fieldTBv->currentIndex();
-    if(!wIdx.isValid())
-      {
-      ui->statusBar->showMessage("No current row selected.",cst_MessageDuration);
-      return;
-      }
-
-    ZDataReference    wDRef;
-    ZFieldDescription wFDesc;
-
-    if (!getIndexFieldData(wIdx,wDRef,wFDesc))
-      return;
-
-    /* search for keys with that field involved */
-    int wKField=0;
-    for (long wi=0;wi < MasterDic->KeyDic.count();wi++)
-      {
-      for (long wj=0;wi < MasterDic->KeyDic[wi]->count();wi++)
-            if (wDRef.getDataRank()==MasterDic->KeyDic[wi]->Tab[wj].MDicRank)
-              {
-              wKField++;
-              MasterDic->KeyDic[wi]->erase(wj); /* remove key with this field as key field */
-              wj--;
-              }
-      }
-      if (wKField==0)
-          wMsg.sprintf("Deleting dictionary field <%s>",wFDesc.getName().toCChar());
-      else
-      {
-        displayKeyDictionaries(*MasterDic);  /* if some key(s) have been changed, display all key again */
-        wMsg.sprintf("Deleting dictionary field <%s>. Changing <%d> key(s)",
-            wFDesc.getName().toCChar(),wKField);
-      }
-    /* then remove */
-    MasterDic->erase(wDRef.getDataRank());
-    fieldTBv->ItemModel->QStandardItemModel::removeRow(wIdx.row(),wIdx.parent());
-    ui->statusBar->showMessage(wMsg.toCChar(),cst_MessageDuration);
-    return;
-  }
-
-  if (pAction->objectName()=="FcopyQAc")
-    {
-    utf8String wMsg;
-    QModelIndex wIdx= fieldTBv->currentIndex();
-    if(!wIdx.isValid())
-    {
-      ui->statusBar->showMessage("No current row selected.",cst_MessageDuration);
-      return;
-    }
-    ZDataReference    wDRef;
-    ZFieldDescription wFDesc;
-
-/*    if (!getIndexFieldData(wIdx,wDRef,wFDesc))
-      return;
-*/
-
-    pinboardPushField(wIdx);
-
-    wMsg.sprintf("1 field copied");
-    ui->statusBar->showMessage(wMsg.toCChar(),cst_MessageDuration);
-    return;
-    }
-
-
-  if (pAction->objectName()=="FCutQAc")
-    {
-      QModelIndex wIdx= fieldTBv->currentIndex();
-      if(!wIdx.isValid())
-        {
-        wMsg.sprintf("no row selected");
-        ui->statusBar->showMessage(wMsg.toCChar(),cst_MessageDuration);
-        return;
-        }
-
-      QVariant wV=wIdx.data(ZFlowRole);
-      ZDataReference wDRef=wV.value<ZDataReference>();
-      wV=wIdx.data(ZQtValueRole);
-      FieldDesc_Pack wFDPack = wV.value<FieldDesc_Pack>();
-
-      ZPinboardElement wPElt;
-      wPElt.setDataReference(wDRef);
-
-      wPElt.setData(&wFDPack,sizeof(FieldDesc_Pack));
-      Pinboard.push(wPElt);
-
-      fieldTBv->ItemModel->removeRow(wIdx.row(),wIdx.parent());
-      wMsg.sprintf("1 field cut");
-      ui->statusBar->showMessage(wMsg.toCChar(),cst_MessageDuration);
-      return;
-    }
-
-  if (pAction->objectName()=="FpasteQAc")
-  {
-    utf8String wMsg;
-    QModelIndex wIdx= fieldTBv->currentIndex();
-    if(!wIdx.isValid())
-      {
-      ui->statusBar->showMessage("No current row selected.",cst_MessageDuration);
-      return;
-      }
-    pinboardInsertField(wIdx);
-    return;
-  }
-
-  readWriteActionEvent(pAction);  /* call the common menu actions */
-
-  return;
-}//fieldActionEvent
-
-bool
-DicEdit::pinboardInsertField(QModelIndex wIdx)
-{
-  if (Pinboard.isEmpty())
-    return false;
-  if (Pinboard.getLast()->DRef.getZEntity()!=ZEntity_DicField) /* only dictionary field is allowed */
-    return false;
-  ZPinboard* wPB=&Pinboard;
-  utf8String wMsg;
-  if(!wIdx.isValid())
-  {
-    ui->statusBar->showMessage("No current row selected.",cst_MessageDuration);
-    return false;
-  }
-
-  ZFieldDescription wFDesc;
-  FieldDesc_Pack* wFDPackPtr = Pinboard.last().getDataPtr<FieldDesc_Pack>();
-  wFDesc=wFDPackPtr->toFieldDescription();
-
-  QList<QStandardItem*> wRow=createRowFromField(wFDesc);
-
-  QVariant wV;
-  wV.setValue<ZDataReference>(Pinboard.last().DRef);
-  wRow[0]->setData(wV,ZFlowRole);
-
-  FieldDesc_Pack* wFDPack=Pinboard.last().getDataPtr<FieldDesc_Pack>();
-  if (wFDPack==nullptr)
-  {
-    fprintf(stderr,"Pinboard-E-INVFDP: invalid FieldDesc_Pack - nullptr.\n");
-    return false;
-  }
-  wV.setValue<FieldDesc_Pack>(*wFDPack);
-  wRow[0]->setData(wV,ZQtValueRole);
-
-  fieldTBv->ItemModel->insertRow(wIdx.row(), wRow);
-
-  fieldTBv->resizeRowsToContents();
-
-  return true;
-}
 
 void
-DicEdit::KeyTRvKeyFiltered(int pKey,int pMouse)
+DicEdit::KeyTRvKeyFiltered(int pKey,QKeyEvent* pEvent)
 {
 
-  if(pKey == Qt::Key_Escape)
-  {
+  if(pKey == Qt::Key_Escape) {
     if( QMessageBox::question (this,tr("You pressed <Esc> key"), tr("Do you really want to quit without saving anything ?"),QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
     {
       QApplication::quit();
       return;
     }
   }
-  if (pMouse!=0)
-    goto KKFMouseClickTrapped ;
 
   if(pKey == Qt::Key_Insert)
   {
@@ -1527,39 +2134,84 @@ DicEdit::KeyTRvKeyFiltered(int pKey,int pMouse)
 //    deleteGeneric();
     return;
   }
-
-
   return;
-
-KKFMouseClickTrapped:
-
-  return;
-
 }//KeyTReKeyFiltered
 
-bool DicEdit::fieldDelete(QModelIndex &pIdx)
+void
+DicEdit::KeyTRvMouseFiltered(int pKey,QMouseEvent* pEvent)
 {
-  if (!pIdx.isValid())
-    return false;
 
-  ZFieldDescription wF;
+}
+
+bool DicEdit::_fieldDelete(QModelIndex pIdx, bool pForceDelete)
+{
+  utf8VaryingString wStr;
+  if (!pIdx.isValid()) {
+    ui->statusBar->showMessage(QObject::tr("No valid field row selected.","DicEdit"),cst_MessageDuration);
+    return false;
+  }
+  if (pIdx.column()!=0) {
+    pIdx=pIdx.siblingAtColumn(0);
+  }
+//  QStandardItem* wItem = fieldTBv->ItemModel->itemFromIndex(pIdx);
+//  QStandardItem* wFather = wItem->parent();  /* for a table view this is not really necessary */
+
   QVariant wV;
-  wV = pIdx.data(ZQtValueRole);
-  if (!wV.isValid())
+  wV = pIdx.data(ZQtDataReference);
+  if (!wV.isValid()){
+    Errorlog.errorLog("DicEdit::_fieldDelete-E-INVENT Cannot get row infra data <ZQtDataReference>.\n");
     return false;
+  }
 
+  ZDataReference wDRef=wV.value<ZDataReference>();
+  ZFieldDescription* wF=wDRef.getPtr<ZFieldDescription*>();
+
+  long wR=-1;
+  int wKRank=0;
+  int wKNb=0;
+  /* look for all keys that involve this field */
+  for (long wi=0;wi < MasterDic->KeyDic.count();wi++) {
+    if ((wR=MasterDic->KeyDic.Tab[wi]->hasFieldNameCase(wF->getName()))>=0) {
+      wKRank=wi;
+      wKNb++;
+    }
+  }
+  if (wKNb>0) {
+  if (pForceDelete) {
+      Errorlog.errorLog("field named <%s> is used by %ld key(s). Last key name is <%s>. Cannot be deleted."
+          ,wKNb,MasterDic->KeyDic[wKRank]->DicKeyName.toCChar());
+      return false;
+    }
+    else
+      Errorlog.warningLog("field named <%s> is used by %ld key(s). Last key name is <%s>."
+          ,wKNb,MasterDic->KeyDic[wKRank]->DicKeyName.toCChar());
+  }//if (wKNb>0)
+
+
+//  wFather->removeRow(pIdx.row());
   fieldTBv->ItemModel->removeRow(pIdx.row());
 
+  long wRank=MasterDic->searchFieldByName(wF->getName());
+
+  MasterDic->erase(wRank);
+
+  wStr.sprintf("Field <%s> has been deleted.",wF->getName().toCChar());
+  delete wF;
+
+  statusBar()->showMessage(QObject::tr(wStr.toCChar()),cst_MessageDuration);
   return true;
 }
 
-bool DicEdit::fieldChange(QModelIndex& pIdx)
+bool DicEdit::fieldChange(QModelIndex pIdx)
 {
   utf8String wStr;
   if (!pIdx.isValid())
     return false;
-  long wi=pIdx.row(); 
-  QVariant wV=fieldTBv->ItemModel->item(wi,0)->data(ZFlowRole);
+  if (pIdx.column()!=0) {
+    pIdx=pIdx.siblingAtColumn(0);
+  }
+  int wItemRow=pIdx.row();
+  QVariant wV=fieldTBv->ItemModel->item(wItemRow,0)->data(ZQtDataReference); /* we can do that because simple table view */
   if (!wV.isValid())
     return false;
   ZDataReference wDRef=wV.value<ZDataReference>();
@@ -1568,36 +2220,32 @@ bool DicEdit::fieldChange(QModelIndex& pIdx)
     fprintf(stderr,"DicEdit::fieldChange-E-INVENT Invalid entity : expected ZEntity_DicField.");
     return false;
   }
-  if (FieldDLg==nullptr)
+  if (FieldDLg==nullptr) {
     FieldDLg=new ZFieldDLg(this);
-
-  ZFieldDescription wFDesc = MasterDic->Tab[wDRef.DataRank];  /* temporary structure for storing changes */
+  }
+  ZFieldDescription* wFDescPtr= wDRef.getPtr<ZFieldDescription*>();
+  ZFieldDescription wFDesc(*wFDescPtr);
   bool wB=false;
-  while (!wB)
-  {
-    FieldDLg->setup(&wFDesc);
+  while (!wB) {
+    FieldDLg->setup(wFDesc);
     int wRet=FieldDLg->exec();
     if (wRet==QDialog::Rejected)
       return false;
     wB=controlField(wFDesc);
   }
 
-  /* accept changes */
-  MasterDic->Tab[wDRef.DataRank]=wFDesc;
-  wV.setValue<ZFieldDescription>(wFDesc);
-  fieldTBv->ItemModel->item(wi,0)->setData(wV,ZQtValueRole);
+/* displayFieldChange manages the changes in table view and in dictionary */
 
-  if (!displayFieldChange(wFDesc,pIdx))
-    {
-    wStr.sprintf("unable to change field <%s>. Something went wrong.",
+  if (!displayFieldChange(wFDesc,pIdx)) {
+    Errorlog.errorLog("unable to change field <%s>. Something went wrong.",
         MasterDic->Tab[wDRef.DataRank].getName().toCChar());
-    statusBar()->showMessage(QObject::tr(wStr.toCChar()),cst_MessageDuration);
     return false;
-    }
-  wStr.sprintf("Changed field <%s>",MasterDic->Tab[wDRef.DataRank].getName().toCChar());
+  }
+  wStr.sprintf("field <%s> changed",MasterDic->Tab[wDRef.DataRank].getName().toCChar());
   statusBar()->showMessage(QObject::tr(wStr.toCChar()),cst_MessageDuration);
   return true;
 }//DicEdit::fieldChange
+
 
 bool controlField(ZFieldDescription& pField)
 {
@@ -1634,14 +2282,14 @@ void processItem(QStandardItem* pItem, long pDataRank)
   if (pItem==nullptr)
     return ;
 
-  wV=pItem->data(ZFlowRole);
+  wV=pItem->data(ZQtDataReference);
   wDRef = wV.value<ZDataReference>();
 
   if (wDRef.DataRank >= pDataRank)
   {
     wDRef.DataRank++;
     wV.setValue<ZDataReference>(wDRef);
-    pItem->setData(wV,ZFlowRole);
+    pItem->setData(wV,ZQtDataReference);
   }
 }
 
@@ -1668,6 +2316,7 @@ void _updateDataRank(QStandardItemModel* pItemModel,QStandardItem* pItem,long pD
   }
   return ;
 }// _updateDataRank
+
 void updateDataRank(QStandardItemModel* pItemModel,long pDataRank)
 {
   QModelIndex wIdx ;
@@ -1687,203 +2336,306 @@ void updateDataRank(QStandardItemModel* pItemModel,long pDataRank)
 }//updateDataRank
 
 
-bool DicEdit::fieldCreateBefore(QModelIndex &wIdx)
-{
-  if (!wIdx.isValid())
-  {
-    ui->statusBar->showMessage("No current row selected.",cst_MessageDuration);
-    return false;
-  }
-
-  /* get data to access dictionary */
-  QVariant wV = wIdx.data(ZFlowRole);
-  ZDataReference wDRef = wV.value<ZDataReference>();
+bool DicEdit::fieldAppend() {
+  QVariant wV;
+  ZDataReference wDRef;
 
   if (FieldDLg==nullptr)
     FieldDLg=new ZFieldDLg(this);
 
-  ZFieldDescription wFDesc;
-  wFDesc.setFieldName(__NEW_FIELDNAME__);
-  wFDesc.ZType=ZType_Unknown;
-  wFDesc.HeaderSize=0;
-  wFDesc.Capacity=0;
-  wFDesc.UniversalSize=0;
-  wFDesc.NaturalSize=0;
-  wFDesc.KeyEligible=false;
-  wFDesc.Hash.clear();
+  FieldDLg->setCreate();
+  int wRet=FieldDLg->exec();
+  if (wRet==QDialog::Rejected)
+    return false;
+  ZFieldDescription wFDesc=FieldDLg->getFieldDescription();
+  return _fieldAppend(wFDesc);
 
-  bool wB=false;
-  while (!wB)
-    {
-    FieldDLg->setup(&wFDesc);
-    int wRet=FieldDLg->exec();
-    if (wRet==QDialog::Rejected)
+}//fieldAppend
+
+bool DicEdit::fieldInsertNewBefore(QModelIndex pIdx) {
+  QVariant wV;
+  ZDataReference wDRef;
+
+  if (FieldDLg==nullptr)
+    FieldDLg=new ZFieldDLg(this);
+
+  FieldDLg->setCreate();
+  int wRet=FieldDLg->exec();
+  if (wRet==QDialog::Rejected)
       return false;
-    wB=controlField(wFDesc);
-    }
+  ZFieldDescription wFDesc=FieldDLg->getFieldDescription();
+  return _fieldInsertBefore(pIdx,wFDesc);
 
-  MasterDic->insertField(wFDesc,wDRef.DataRank);
-  wDRef.setPtr(&MasterDic->Tab[wDRef.DataRank]);
+}//fieldInsertNewBefore
 
-  /* update (shift) data ranks */
-  updateDataRank(fieldTBv->ItemModel,wDRef.DataRank);
 
-  QList<QStandardItem*> wRow = createRowFromField(wFDesc);
+bool DicEdit::fieldInsertNewAfter(QModelIndex pIdx) {
+  QVariant wV;
+  ZDataReference wDRef;
 
+  if (FieldDLg==nullptr)
+    FieldDLg=new ZFieldDLg(this);
+
+  FieldDLg->setCreate();
+  int wRet=FieldDLg->exec();
+  if (wRet==QDialog::Rejected)
+    return false;
+  ZFieldDescription wFDesc=FieldDLg->getFieldDescription();
+  return _fieldInsertAfter(pIdx,wFDesc);
+
+}//fieldInsertNewAfter
+
+bool DicEdit::_fieldAppend(ZFieldDescription &wFDesc) {
+  QVariant wV;
+  ZDataReference wDRef;
+  QList<QStandardItem*> wRow = createFieldRowFromField(&wFDesc);
+
+  long wRIdx=0;
+  wRIdx=MasterDic->push(wFDesc);
+
+  wDRef.set(ZLayout_FieldTBv,getNewResource(ZEntity_DicField),wRIdx);
+  wDRef.setPtr(new ZFieldDescription(MasterDic->Tab[wRIdx]));
+  wDRef.setDataRank(wRIdx);
   wV.setValue<ZDataReference>(wDRef);
-  wRow[0]->setData(wV,ZFlowRole);
 
-  fieldTBv->ItemModel->insertRow(wIdx.row(),wRow);
+  wRow[0]->setData(wV,ZQtDataReference);
 
+  fieldTBv->ItemModel->appendRow(wRow);
 
-
+  fieldTBv->resizeRowsToContents();
+  fieldTBv->resizeColumnsToContents();
   return true;
-}
-bool DicEdit::fieldMoveBefore(QModelIndex &wIdxSource,QModelIndex &wIdxTarget)
+}//_fieldAppend
+
+
+bool DicEdit::fieldCopyToPinboard(QModelIndex pIdx)
 {
-  if (!wIdxSource.isValid())
-  {
-    ui->statusBar->showMessage("No valid source row selected.",cst_MessageDuration);
+  if (!pIdx.isValid()) {
+    ui->statusBar->showMessage(QObject::tr("No valid field row selected.","DicEdit"),cst_MessageDuration);
     return false;
   }
-  if (!wIdxTarget.isValid())
-  {
-    ui->statusBar->showMessage("No target source row selected.",cst_MessageDuration);
-    return false;
+  if (pIdx.column()!=0) {
+    pIdx=pIdx.siblingAtColumn(0);
   }
+  ZDataReference wDRef ;
 
   /* get data to access dictionary */
-  QVariant wV = wIdxSource.data(ZFlowRole);
-  ZDataReference wDRef = wV.value<ZDataReference>();
+  QVariant wV=pIdx.data(ZQtDataReference);
+  wDRef = wV.value<ZDataReference>();
+//  wDRef.setDataRank(pIdx.row());        /* store row as DataRank */
+//  wDRef.setDataRankInvalid();
 
+  wDRef.setIndex ( pIdx); /* store row  */
 
-  ZFieldDescription wFDesc;
-  wFDesc._copyFrom(*(ZFieldDescription*)wDRef.getPtr());
+  ZPinboardElement wPBElt;
+  wPBElt.DRef = wDRef;
 
-  fieldDelete(wIdxSource);
+  ZFieldDescription* wFD=wDRef.getPtr<ZFieldDescription*>();
+  wPBElt.DRef.setPtr(new ZFieldDescription(*wFD));
 
+  Pinboard.push(wPBElt);
   return true;
-}
+}//_fieldCopyToPinboard
 
-
-/**
- * @brief createRowFromFieldDescription creates an item list describing field desciption.
- *                                      data is not set and must be set by callee.
- * @param pField
- * @return
- */
-
-QList<QStandardItem*> createRowFromField(ZFieldDescription& pField)
+bool DicEdit::fieldInsertBeforeFromPinboard(QModelIndex pIdx)
 {
-  utf8String wStr;
-  QList<QStandardItem*> wFieldRow;
-
-  wFieldRow << new QStandardItem(pField.getName().toCChar());
-  wFieldRow.last()->setEditable(false);
-
-  wStr.sprintf("0x%08X",pField.ZType);
-  wFieldRow << new QStandardItem( wStr.toCChar());
-  wFieldRow.last()->setEditable(false);
-
-  wFieldRow << new QStandardItem( decode_ZType(pField.ZType));
-  wFieldRow.last()->setEditable(false);
-
-  wStr.sprintf("%d",pField.Capacity);
-  wFieldRow << new QStandardItem( wStr.toCChar());
-  wFieldRow.last()->setEditable(false);
-
-  wStr.sprintf("%ld",pField.HeaderSize);
-    wFieldRow <<  new QStandardItem( wStr.toCChar());
-  wFieldRow.last()->setEditable(false);
-
-  wStr.sprintf("%ld",pField.UniversalSize);
-  wFieldRow <<  new QStandardItem( wStr.toCChar());
-  wFieldRow.last()->setEditable(false);
-
-  wStr.sprintf("%ld",pField.NaturalSize);
-  wFieldRow <<  new QStandardItem( wStr.toCChar());
-  wFieldRow.last()->setEditable(false);
-
-  wFieldRow <<  new QStandardItem( pField.KeyEligible?"Yes":"No");
-  wFieldRow.last()->setEditable(false);
-
-  wFieldRow <<  new QStandardItem( pField.Hash.toHexa().toChar());
-  wFieldRow.last()->setEditable(false);
-
-  return wFieldRow;
-}
-
-bool setRowFromField(QList<QStandardItem*> &wRow,ZFieldDescription& pField)
-{
-  utf8String wStr;
-  if (wRow.count()<10)
-  {
-    fprintf(stderr,"setRowFromField-E-IVCNT  Invalid number of QStandardItem within list to update.\n");
+  if (Pinboard.isEmpty()) {
+    ui->statusBar->showMessage(QObject::tr("Nothing in pinboard.","DicEdit"),cst_MessageDuration);
+    return false;
+  }
+  if (!pIdx.isValid()) {
+    ui->statusBar->showMessage(QObject::tr("No valid field row selected.","DicEdit"),cst_MessageDuration);
     return false;
   }
 
-  wRow[0]->setText(pField.getName().toCChar());
-  wRow[0]->setEditable(false);
+  if (Pinboard.getLast()->DRef.getZEntity()!=ZEntity_DicField ) {
+    Errorlog.errorLog("DicEdit::fieldInsertFromPinboard-E-INVENT Invalid entity from pinboard <%s> while expecting ZEntity_DicField.",
+                      decode_ZEntity (Pinboard.getLast()->DRef.getZEntity()).toChar());
+    return false;
+  }
+  ZFieldDescription* wFD= Pinboard.getLast()->DRef.getPtr<ZFieldDescription*>(); /* will be linked to created field row*/
 
-  wStr.sprintf("0x%08X",pField.ZType);
-  wRow[1]->setText(wStr.toCChar());
-  wRow[0]->setEditable(false);
+  bool wRet=_fieldInsertBefore(pIdx, *wFD);
 
-  wRow[2]->setText(decode_ZType(pField.ZType));
-  wRow[0]->setEditable(false);
+  delete wFD;
+  Pinboard.pop();
 
-  wStr.sprintf("%d",pField.Capacity);
-  wRow[3]->setText(wStr.toCChar());
-  wRow[0]->setEditable(false);
+  fieldTBv->resizeColumnsToContents();
+  fieldTBv->resizeRowsToContents();
 
-  wStr.sprintf("%d",pField.Capacity);
-  wRow[4]->setText(wStr.toCChar());
-  wRow[0]->setEditable(false);
+  return wRet;
+}//fieldInsertBeforeFromPinboard
 
-  wStr.sprintf("%ld",pField.HeaderSize);
-  wRow[5]->setText(wStr.toCChar());
-  wRow[0]->setEditable(false);
+bool DicEdit::fieldInsertAfterFromPinboard(QModelIndex pIdx)
+{
+  if (Pinboard.isEmpty()) {
+    ui->statusBar->showMessage(QObject::tr("Nothing in pinboard.","DicEdit"),cst_MessageDuration);
+    return false;
+  }
+  if (!pIdx.isValid())
+  {
+    ui->statusBar->showMessage(QObject::tr("No valid field row selected.","DicEdit"),cst_MessageDuration);
+    return false;
+  }
 
-  wStr.sprintf("%ld",pField.UniversalSize);
-  wRow[6]->setText(wStr.toCChar());
-  wRow[0]->setEditable(false);
+  if (Pinboard.getLast()->DRef.getZEntity()!=ZEntity_DicField ) {
+    Errorlog.errorLog("DicEdit::fieldInsertFromPinboard-E-INVENT Invalid entity from pinboard <%s> while expecting ZEntity_DicField.",
+        decode_ZEntity (Pinboard.getLast()->DRef.getZEntity()).toChar());
+    return false;
+  }
+  ZFieldDescription* wFD= Pinboard.getLast()->DRef.getPtr<ZFieldDescription*>(); /* will be linked to created field row*/
 
-  wStr.sprintf("%ld",pField.NaturalSize);
-  wRow[7]->setText(wStr.toCChar());
-  wRow[0]->setEditable(false);
+  bool wRet=_fieldInsertAfter(pIdx, *wFD);
 
-  wRow[8]->setText(pField.KeyEligible?"Yes":"No");
-  wRow[0]->setEditable(false);
+  delete wFD;
+  Pinboard.pop();
 
-  wRow[9]->setText(pField.Hash.toHexa().toChar());
-  wRow[0]->setEditable(false);
+  fieldTBv->resizeColumnsToContents();
+  fieldTBv->resizeRowsToContents();
+
+  return wRet;
+}//fieldInsertAfterFromPinboard
+
+bool DicEdit::_fieldInsertAfter(QModelIndex pIdx, ZFieldDescription &pFDesc)
+{
+  if (!pIdx.isValid()) {
+    ui->statusBar->showMessage(QObject::tr("No valid field row selected.","DicEdit"),cst_MessageDuration);
+    return false;
+  }
+
+  QVariant wV;
+  ZDataReference wDRef (ZLayout_FieldTBv,getNewResource(ZEntity_DicField));
+  QList<QStandardItem*> wRow ;
+
+  if (pIdx.column()!=0) {
+    pIdx=pIdx.siblingAtColumn(0);
+  }
+//  QStandardItem* wItem = fieldTBv->ItemModel->itemFromIndex(pIdx);
+//  QStandardItem* wFather = wItem->parent();  /* for a table view this is not really necessary */
+
+  int wRank= pIdx.row() + 1;
+
+  long wFieldRank;
+
+  wRow = createFieldRowFromField(&pFDesc);
+
+  if (fieldTBv->ItemModel->rowCount() < wRank) {   /* if last row : append */
+    fieldTBv->ItemModel->appendRow(wRow);
+    wFieldRank=MasterDic->push(pFDesc);
+  }
+  else {
+
+    fieldTBv->ItemModel->insertRow(wRank,wRow);
+    wFieldRank=MasterDic->insert(pFDesc,wRank);
+  }
+  wDRef.setDataRank(wFieldRank);
+  wDRef.setPtr(new ZFieldDescription(pFDesc));
+  wV.setValue<ZDataReference>(wDRef);
+  wRow[0]->setData(wV,ZQtDataReference);
 
   return true;
+}//_fieldInsertAfter
+
+bool DicEdit::_fieldInsertBefore(QModelIndex pIdx, ZFieldDescription &pFDesc)
+{
+  if (!pIdx.isValid()) {
+    ui->statusBar->showMessage(QObject::tr("No valid field row selected.","DicEdit"),cst_MessageDuration);
+    return false;
+  }
+
+  QVariant wV;
+  ZDataReference wDRef (ZLayout_FieldTBv,getNewResource(ZEntity_DicField));
+  QList<QStandardItem*> wRow ;
+
+  if (pIdx.column()!=0) {
+    pIdx=pIdx.siblingAtColumn(0);
+  }
+
+  int wRank= pIdx.row();
+
+  long wFieldRank = MasterDic->insert(pFDesc,wRank);
+
+  wRow = createFieldRowFromField(&pFDesc);
+  wDRef.setDataRank(wFieldRank);
+  wDRef.setPtr(new ZFieldDescription(pFDesc));
+  wV.setValue<ZDataReference>(wDRef);
+  wRow[0]->setData(wV,ZQtDataReference);
+
+  fieldTBv->ItemModel->insertRow(wRank,wRow);
+
+  return true;
+}//_fieldInsertAfter
+
+bool DicEdit::fieldAppendFromPinboard()
+{
+  if (Pinboard.isEmpty())
+    return false;
+
+  if (Pinboard.getLast()->DRef.getZEntity()!=ZEntity_DicField ) {
+    Errorlog.errorLog("DicEdit::fieldInsertFromPinboard-E-INVENT Invalid entity from pinboard <%s> while expecting ZEntity_DicField.",
+        decode_ZEntity (Pinboard.getLast()->DRef.getZEntity()).toChar());
+    return false;
+  }
+  QVariant wV;
+  ZDataReference wDRef= Pinboard.getLast()->DRef;
+  QList<QStandardItem*> wRow ;
+
+  ZFieldDescription* wFD= Pinboard.getLast()->DRef.getPtr<ZFieldDescription*>();
+
+  bool wRet = _fieldAppend(*wFD);
+
+  delete wFD;
+  Pinboard.pop() ;
+
+  fieldTBv->resizeColumnsToContents();
+  fieldTBv->resizeRowsToContents();
+
+  return wRet;
+}//_fieldAppendFromPinboard
+
+bool DicEdit::fieldCutToPinboard(const QModelIndex &pIdx)
+{
+  if (!fieldCopyToPinboard(pIdx))
+      return false;
+
+  return _fieldDelete(pIdx);
 }
 
 
-
-bool DicEdit::displayFieldChange(ZFieldDescription& pField,QModelIndex& pIdx)
+bool DicEdit::displayFieldChange(ZFieldDescription& pField,QModelIndex pIdx)
 {
-  if (!pIdx.isValid())
-  {
+  if (!pIdx.isValid()) {
     ui->statusBar->showMessage("No current row selected.",cst_MessageDuration);
     return false;
   }
-  utf8String wStr;
-  QList<QStandardItem*> wRow = itemRow(fieldTBv->ItemModel,pIdx);
-
-  QVariant wV=wRow[0]->data(ZFlowRole);
-  if (!wV.isValid())
-    return false;
-  ZDataReference wDRef=wV.value<ZDataReference>();
-  if (wDRef.getZEntity()!=ZEntity_DicField)
-  {
-    fprintf(stderr,"DicEdit::displayFieldChange-E-INVENT Invalid entity : expected ZEntity_DicField.");
-    return false;
+  if (pIdx.column()!=0) {
+    pIdx.siblingAtColumn(0);
   }
 
-  return setRowFromField(wRow,pField);
+  utf8VaryingString wStr;
+  QList<QStandardItem*> wRow = itemRow(fieldTBv->ItemModel,pIdx);
+
+  QVariant wV=wRow[0]->data(ZQtDataReference);
+  if (!wV.isValid()) {
+    fprintf(stderr,"DicEdit::displayFieldChange-E-INVDAT Invalid data .\n");
+    return false;
+  }
+  ZDataReference wDRef=wV.value<ZDataReference>();
+  if (wDRef.getZEntity()!=ZEntity_DicField) {
+    fprintf(stderr,"DicEdit::displayFieldChange-E-INVENT Invalid entity : expected ZEntity_DicField.\n");
+    return false;
+  }
+  ZFieldDescription* wField= wDRef.getPtr<ZFieldDescription*>();
+
+  /*search dictionary for former field name (could be changed) */
+
+  long wRank= MasterDic->searchFieldByName(wField->getName());
+  /* update data (possibly field name) */
+  wField->_copyFrom(pField);
+  /* update dictionary */
+  MasterDic->Tab[wRank]._copyFrom(pField);
+  /* display change */
+  return setFieldRowFromField(wRow,pField);
 }//displayFieldChange
 
 /* replaces the values (displayed value and dictionary value) of a field at model index wIdx */
@@ -1891,14 +2643,13 @@ void DicEdit::acceptFieldChange(ZFieldDescription& pField,QModelIndex &wIdx)
 {
   utf8String wStr;
 //  QModelIndex wIdx=fieldTBv->currentIndex();
-  if (!wIdx.isValid())
-  {
+  if (!wIdx.isValid()) {
     ui->statusBar->showMessage("No current row selected.",cst_MessageDuration);
     return;
   }
 
   QStandardItem* wItem=fieldTBv->ItemModel->item(wIdx.row(),0);
-  QVariant wV=wItem->data(ZFlowRole);
+  QVariant wV=wItem->data(ZQtDataReference);
   if (!wV.isValid())
     return;
   ZDataReference wDRef=wV.value<ZDataReference>();
@@ -1908,20 +2659,22 @@ void DicEdit::acceptFieldChange(ZFieldDescription& pField,QModelIndex &wIdx)
     return;
   }
 
+  ZFieldDescription* wField= wDRef.getPtr<ZFieldDescription*>();
+  wField->_copyFrom(pField);
+
+/* displayFieldChange manages the changes in table view and in dictionary */
   if (!displayFieldChange(pField,wIdx))
     return;
 
-  MasterDic->Tab[wDRef.DataRank] = pField;
-
   wDRef.setPtr(&MasterDic->Tab[wDRef.DataRank]);  /* store pointer to dictionary field */
   wV.setValue<ZDataReference>(wDRef);
-  wItem->setData(wV,ZFlowRole);
+  wItem->setData(wV,ZQtDataReference);
 
 } //acceptFieldChange
 
 
 void
-DicEdit::FieldTBvKeyFiltered(int pKey,int pMouseFlag)
+DicEdit::FieldTBvKeyFiltered(int pKey, QKeyEvent *pEvent)
 {
 
   if(pKey == Qt::Key_Escape)
@@ -1929,8 +2682,6 @@ DicEdit::FieldTBvKeyFiltered(int pKey,int pMouseFlag)
     this->hide();
     return;
   }
-  if (pMouseFlag!=0)
-    goto KKFMouseClickTrapped ;
 
   if(pKey == Qt::Key_Insert)
   {
@@ -1940,7 +2691,7 @@ DicEdit::FieldTBvKeyFiltered(int pKey,int pMouseFlag)
     WR.DataRank=-1;
     QModelIndex wIdx = fieldTBv->currentIndex();
     if (wIdx.isValid())
-      fieldCreateBefore(wIdx);
+      fieldInsertNewBefore(wIdx);
 //    createEvent(WR);
     return;
   }
@@ -1952,8 +2703,12 @@ DicEdit::FieldTBvKeyFiltered(int pKey,int pMouseFlag)
 
   return;
 
-KKFMouseClickTrapped:
-  switch (pMouseFlag)
+}//KeyTReKeyFiltered
+
+void
+DicEdit::FieldTBvMouseFiltered(int pKey, QMouseEvent *pEvent)
+{
+  switch (pKey)
   {
   case ZEF_DoubleClickLeft:
   {
@@ -1966,12 +2721,13 @@ KKFMouseClickTrapped:
     fieldChange(wIdx);
     break;
   }
-//  case ZEF_SingleClickLeft:
+    //  case ZEF_SingleClickLeft:
   }
 
   return;
+}
 
-}//KeyTReKeyFiltered
+
 
 ZQTableView* DicEdit::setupFieldTBv(ZQTableView* pFieldTBv, bool pColumnAutoAdjust, int pColumns)
 {
@@ -1987,7 +2743,7 @@ ZQTableView* DicEdit::setupFieldTBv(ZQTableView* pFieldTBv, bool pColumnAutoAdju
 
   //  ui->centralwidget->addWidget(GenericTRv);
 
-  pFieldTBv->setSizePolicy(QSizePolicy ::Preferred , QSizePolicy ::Preferred );
+  pFieldTBv->setSizePolicy(QSizePolicy ::Expanding , QSizePolicy ::Expanding );
 
   pFieldTBv->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   pFieldTBv->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -2004,36 +2760,52 @@ ZQTableView* DicEdit::setupFieldTBv(ZQTableView* pFieldTBv, bool pColumnAutoAdju
 
   // registering callback function : this notation allows to be readable
   //
-  std::function<void(int,int)>                                wKeyFilterCBF;
+  std::function<void(int,QKeyEvent *)>                        wKeyFilterCBF;
   std::function<void(QContextMenuEvent *)>                    wContextMenuCBF;
   std::function<bool (int,ZDataReference *,ZDataReference *)> wDropEventCBF=nullptr;
   std::function<void ()>                                      wRawStartDrag;
   std::function<bool (QDropEvent *)>                          wRawDropEventCBF;
-
+/*
   wKeyFilterCBF     = std::bind(&DicEdit::FieldTBvKeyFiltered, this,_1,_2);
   wContextMenuCBF   = std::bind(&DicEdit::FieldTBvFlexMenu, this,_1);     // for context menu callback for ZQTreeView
 //  wDropEventCBF     = std::bind(&DicEdit::FieldTBvDropEvent, this,_1,_2,_3);     // for drag and drop
   wRawStartDrag     = std::bind(&DicEdit::FieldTBvRawStartDrag, this);
   wRawDropEventCBF  = std::bind(&DicEdit::FieldTBvRawDropEvent, this,_1);
+*/
+  pFieldTBv->_registerCallBacks(std::bind(&DicEdit::FieldTBvKeyFiltered, this,_1,_2),
+                      std::bind(&DicEdit::FieldTBvMouseFiltered, this,_1,_2),
+                      std::bind(&DicEdit::FieldTBvFlexMenu, this,_1),
+                      nullptr);
 
-  pFieldTBv->_register(wKeyFilterCBF,wContextMenuCBF,wDropEventCBF);
+  pFieldTBv->setDestructorCallback(std::bind(&DicEdit::DestructorCallback, this));
 
   pFieldTBv->setEditTriggers(QAbstractItemView::NoEditTriggers);  /* it is not editable */
   pFieldTBv->setSelectionBehavior(QAbstractItemView::SelectRows); /* select line per line */
   pFieldTBv->setSelectionMode(QAbstractItemView::SingleSelection); /* only one line */
 
-
   pFieldTBv->setSupportedDropActions(Qt::CopyAction|Qt::MoveAction);
 
-  pFieldTBv->setRawStartDragCallback(wRawStartDrag);
-  pFieldTBv->setRawDropEventCallback(wRawDropEventCBF);
+  pFieldTBv->setRawStartDragCallback(std::bind(&DicEdit::FieldTBvRawStartDrag, this));
+  pFieldTBv->setRawDropEventCallback(std::bind(&DicEdit::FieldTBvRawDropEvent, this,_1));
 
   return pFieldTBv;
-
-  //    PerDomainTRe->expandAll();
 }//setupFieldTBv
 
-
+void DicEdit::DestructorCallback() {
+  int wFieldRows=fieldTBv->ItemModel->rowCount();
+  QStandardItem* wItem;
+  QVariant wV;
+  for (int wi=0;wi< wFieldRows;wi++) {
+    wItem=fieldTBv->ItemModel->item(wi,0);
+    if (wItem==nullptr)
+      continue;
+    wV = wItem->data(ZQtDataReference);
+    if (!wV.isValid())
+      continue;
+    ZFieldDescription* wFD =(ZFieldDescription*) wV.value<void*>();
+    delete wFD;
+  }
+} // DestructorCallback
 
 ZQTreeView *DicEdit::setupKeyTRv(ZQTreeView* pKeyTRv, bool pColumnAutoAdjust, int pColumns)
 {
@@ -2050,7 +2822,7 @@ ZQTreeView *DicEdit::setupKeyTRv(ZQTreeView* pKeyTRv, bool pColumnAutoAdjust, in
 
 //  ui->centralwidget->addWidget(GenericTRv);
 
-  pKeyTRv->setSizePolicy(QSizePolicy ::Preferred , QSizePolicy ::Preferred );
+  pKeyTRv->setSizePolicy(QSizePolicy ::Expanding , QSizePolicy ::Expanding );
 
   pKeyTRv->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   pKeyTRv->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -2067,7 +2839,7 @@ ZQTreeView *DicEdit::setupKeyTRv(ZQTreeView* pKeyTRv, bool pColumnAutoAdjust, in
 
   // registering callback function : this notation allows to be readable
   //
-  std::function<void(int,int)>                                wKeyFilterCBF;
+  std::function<void(int,QKeyEvent*)>                         wKeyFilterCBF;
   std::function<void(QContextMenuEvent *)>                    wContextMenuCBF;
   std::function<bool (int,ZDataReference *,ZDataReference *)> wDropEventCBF=nullptr;
   std::function<void ()>                                      wRawStartDragCBF;
@@ -2075,12 +2847,14 @@ ZQTreeView *DicEdit::setupKeyTRv(ZQTreeView* pKeyTRv, bool pColumnAutoAdjust, in
 
   wKeyFilterCBF     = std::bind(&DicEdit::KeyTRvKeyFiltered, this,_1,_2);
   wContextMenuCBF   = std::bind(&DicEdit::KeyTRvFlexMenu, this,_1);         // for context menu callback for ZQTreeView
- // wDropEventCBF     = std::bind(&DicEdit::KeyTRvDropEvent, this,_1,_2,_3);  // for drag and drop
 
   wRawStartDragCBF  = std::bind(&DicEdit::KeyTRvRawStartDrag, this);     // for raw drag and drop
-  wRawDropEventCBF  = std::bind(&DicEdit::KeyTRvRawDropEvent, this,_1);     // for raw drag and drop
+  wRawDropEventCBF  = std::bind(&DicEdit::KeyTRvRawDropEvent, this,_1);  // for raw drag and drop
 
-  pKeyTRv->_register(wKeyFilterCBF,wContextMenuCBF,wDropEventCBF);
+  pKeyTRv->_register( std::bind(&DicEdit::KeyTRvKeyFiltered, this,_1,_2),
+                      nullptr,
+                      std::bind(&DicEdit::KeyTRvFlexMenu, this,_1),
+                      nullptr);
 
   pKeyTRv->setSortingEnabled(false);  // will be set to true in the end of setup_effective
 
@@ -2088,8 +2862,8 @@ ZQTreeView *DicEdit::setupKeyTRv(ZQTreeView* pKeyTRv, bool pColumnAutoAdjust, in
   pKeyTRv->setSelectionBehavior(QAbstractItemView::SelectRows); /* select line per line */
   pKeyTRv->setSelectionMode(QAbstractItemView::SingleSelection); /* only one line */
 
-  pKeyTRv->setRawStartDragCallback(wRawStartDragCBF);
-  pKeyTRv->setRawDropEventCallback(wRawDropEventCBF);
+  pKeyTRv->setRawStartDragCallback(std::bind(&DicEdit::KeyTRvRawStartDrag, this));
+  pKeyTRv->setRawDropEventCallback(std::bind(&DicEdit::KeyTRvRawDropEvent,this,_1));
 
   pKeyTRv->setSupportedDropActions(Qt::CopyAction|Qt::MoveAction);
 
@@ -2097,13 +2871,6 @@ ZQTreeView *DicEdit::setupKeyTRv(ZQTreeView* pKeyTRv, bool pColumnAutoAdjust, in
   //    PerDomainTRe->expandAll();
 }//setupKeyTRv
 
-/*
-bool DicEdit::KeyTRvDropEvent(int pDropType, ZDataReference *pSource, ZDataReference * pTarget)
-{
-  ZPinboardElement* wDropElement= Pinboard.getLast();
-  return true;
-}
-*/
 
 
 void DicEdit::KeyTRvRawStartDrag()
@@ -2111,113 +2878,158 @@ void DicEdit::KeyTRvRawStartDrag()
   QModelIndex wIdx=fieldTBv->currentIndex();
   if (!wIdx.isValid())
     return;
-  QVariant wV=wIdx.data(ZFlowRole);
-  if (!wV.isValid())
+  keyCopyToPinboard(wIdx);
+  return;
+
+  if(wIdx.column()!=0)
+    wIdx=wIdx.siblingAtColumn(0);
+
+  QVariant wV=wIdx.data(ZQtDataReference);
+  if (!wV.isValid()) {
+    ui->statusBar->showMessage(QObject::tr("Invalid data for current row","DicEdit"),cst_MessageDuration);
     return;
+  }
   ZDataReference wDRef=wV.value<ZDataReference>();
-  if (wDRef.getZEntity()!=ZEntity_KeyField)  /* only key field (not key dic) is been allowed to be dragged */
+  switch (wDRef.getZEntity()) {
+  case ZEntity_KeyDic:
+    keyCopyToPinboard(wIdx);
     return;
-  wV=wIdx.data(ZQtValueRole);
-  if (!wV.isValid())
+  case ZEntity_KeyField:
+    keyFieldCopyToPinboard(wIdx);
     return;
-  KeyField_Pack wFDPack = wV.value<KeyField_Pack>();
+
+  }
+
+  if (wDRef.getZEntity()!=ZEntity_KeyField) { /* only key field (not key dic) is been allowed to be dragged */
+    ui->statusBar->showMessage(QObject::tr("Only key field (not dictionary key) is allowed to be dragged","DicEdit"),cst_MessageDuration);
+    return;
+  }
+
   ZPinboardElement wPBE;
   wPBE.setDataReference(wDRef);
-  wPBE.setData(&wFDPack,sizeof(KeyField_Pack));
+
+//  wPBE.setData(&wFDPack,sizeof(KeyField_Pack));
   Pinboard.push(wPBE,true);
   return;
 }
 
 bool DicEdit::KeyTRvRawDropEvent(QDropEvent *pEvent)
 {
-  ZPinboard* wPinboard=&Pinboard;
+  ZPinboard* wPinboard=&Pinboard; /* debug */
 
-  if (Pinboard.isEmpty())
-    {
+  if (Pinboard.isEmpty()) {
       statusBar()->showMessage(QObject::tr("No drag source element selected","DicEdit"),cst_MessageDuration);
       return false;
-    }
-  //
-  // determines the destination for the drop operation
-  //
-  QModelIndex wIdx = keyTRv->indexAt (pEvent->pos());
-  if (!wIdx.isValid())
-    {
-      statusBar()->showMessage(QObject::tr("No target element selected","DicEdit"),cst_MessageDuration);
-      return false;
-    }
+  }
 
-  QVariant wV = wIdx.data(ZFlowRole);
-  if (!wV.isValid())
+  QModelIndex wIdx;
+  if (keyTRv->ItemModel->rowCount()==0) {
+    /* no key yet defined : define one */
+
+    if (!keyAppend())
+      return false; /* if not defined or error : return */
+
+    wIdx = keyTRv->ItemModel->index(0,0); /* set index to newly created key */
+  }
+  else {
+    wIdx = keyTRv->indexAt (pEvent->pos());
+  }
+  if (!wIdx.isValid()) {
+    statusBar()->showMessage(QObject::tr("No target element selected","DicEdit"),cst_MessageDuration);
     return false;
-
+  }
+  return keyTRvInsertFromPinboard(wIdx);
 
   /* get the origin of the dragndrop operation */
+  switch (Pinboard.getLast()->DRef.getZEntity()) {
+  case ZEntity_DicField: {
+//    ZFieldDescription * wFD= Pinboard.getLast()->DRef.getPtr<ZFieldDescription*>();
+    return keyTRvInsertFromPinboard(wIdx);
+  }
+  case ZEntity_KeyDic: {
+    ZKeyDictionary *wKey= Pinboard.getLast()->DRef.getPtr<ZKeyDictionary*>();
+    _keyInsert(wIdx,wKey);
+    Pinboard.pop();
+    return true;
+  }
+  case ZEntity_KeyField:
+    keyTRvInsertFromPinboard(wIdx);
+    return true;
+  default:
+    Errorlog.errorLog("DicEdit::_keyCopy-E-INVTYP Invalid infradata entity type <%s> ",
+        decode_ZEntity(Pinboard.getLast()->DRef.getZEntity()).toChar());
+    return false;
+  }
 
-  if (Pinboard.getLast()->DRef.ZLayout==fieldTBv->Layout ) /* coming from field list */
-    {
-    return pinboardPasteFieldToKey(wIdx);
-    }//if (Pinboard.getLast()->DRef.Layout==ZLayout_KeyTRv )
-
-    if (Pinboard.getLast()->DRef.ZLayout!=keyTRv->Layout ) /* not coming from same widget -> not admitted */
-      return false;
-
-    /* same widget : this is a move */
 
   ui->statusBar->showMessage("Move for key field is not yet implemented.",cst_MessageDuration);
   return false;
 }// KeyTRvRawDropEvent
-/*
-bool DicEdit::FieldTBvDropEvent(int pDropType,ZDataReference *pSource,ZDataReference *pTarget)
-{
-  return true;
-}
-*/
+
 void DicEdit::FieldTBvRawStartDrag()
 {
-  QModelIndex wIdx=fieldTBv->currentIndex();
-  if (!wIdx.isValid())
-    return;
-  if (wIdx.column()!=0)
-    wIdx=wIdx.siblingAtColumn(0);
+  if (fieldCopyToPinboard(fieldTBv->currentIndex()))
+    OriginIndex=fieldTBv->currentIndex();
 
-  QVariant wV=wIdx.data(ZFlowRole);
-  if (!wV.isValid())
-    return;
-  ZDataReference wDRef=wV.value<ZDataReference>();
-  wDRef.setIndex(wIdx);
-
-  wV=wIdx.data(ZQtValueRole);
-  if (!wV.isValid())
-    return;
-  FieldDesc_Pack wFDPack = wV.value<FieldDesc_Pack>();
-  ZPinboardElement wPBE;
-  wPBE.setDataReference(wDRef);
-  wPBE.setData<FieldDesc_Pack>(wFDPack);
-  ZPinboard* wPB=&Pinboard;
-  Pinboard.push(wPBE,true);
   return;
 }
 
 bool DicEdit::FieldTBvRawDropEvent(QDropEvent *pEvent)
 {
-  //
-  // determines the destination for the drop operation
-  //
+  const QMimeData *wMimeData = pEvent->mimeData();
+
+  if (wMimeData->hasUrls()) {
+    if (wMimeData->urls().isEmpty()){
+      pEvent->ignore(); // error no url while one was expected : meaning external to Qt application
+      return false;
+    }
+    uriString wURI ;
+    wURI = wMimeData->urls()[0].toString();
+    wURI = wURI.getLocal();
+    /* eliminate <file://>   */
+
+    if (rawFields==nullptr) {
+      rawFields = new RawFields( wURI,
+          "/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata/zcppparserparameters.xml", this);
+    }
+
+    rawFields->showAll();
+    rawFields->parse();
+    return true;
+  }//if (wMimeData->hasUrls())
+
+  QList<QString>FormatList = wMimeData->formats();
+
+  QVariant wV;
+  ZDataReference wDRef;
+
   QModelIndex wIdx = fieldTBv->indexAt (pEvent->pos());
-  if (!wIdx.isValid())
-    return false;
 
-  QModelIndex wSIdx = Pinboard.getLast()->DRef.getIndex();
-  if (!wSIdx.isValid())
-    return false;
+  if (Pinboard.isEmpty()) {
+      ui->statusBar->showMessage(QObject::tr("Nothing in pinboard.","DicEdit"),cst_MessageDuration);
+      return false;
+  }
 
-  if (!pinboardInsertField(wIdx))
-    return false;
-  fieldTBv->ItemModel->removeRow(wSIdx.row(),wSIdx.parent());
+  wDRef=Pinboard.last().DRef;
 
-  Pinboard.pop();
-  return true;
+//  QList<QStandardItem*> wRowToDelete= fieldTBv->ItemModel->takeRow( wDRef.getIndex().row());
+
+  bool wRet= fieldInsertBeforeFromPinboard(wIdx);
+  if (wRet) {
+    /* if successful : delete associated data */
+    if (OriginIndex.isValid()) {
+      wV=OriginIndex.data(ZQtDataReference);
+      if (wV.isValid()) {
+        wDRef=wV.value<ZDataReference>();
+        ZFieldDescription* wFD=wDRef.getPtr<ZFieldDescription*>();
+        delete wFD;
+      }
+      /* then delete displayed row */
+      fieldTBv->ItemModel->removeRow( OriginIndex.row()); /* origin row is set to ZDataReference::Index in startdrag routine */
+    }
+  }
+
+  return wRet;
 }
 
 void
@@ -2244,7 +3056,7 @@ DicEdit::importDic(const unsigned char* pPtrIn)
     return ;
   }
 
-  displayZMFDictionary(*MasterDic);
+  displayZMFDictionary(MasterDic);
 }
 
 void
@@ -2313,89 +3125,295 @@ DicEdit::importDicFromFullHeader(ZDataBuffer& pHeaderContent)
   importDicFromReserved(pHeaderContent.Data+wOffset);
 }
 
+
 ZMFDictionary*
 DicEdit::screenToDic()
 {
   ZMFDictionary* wMetaDic=new ZMFDictionary;
   ZKeyDictionary* wKeyDic=nullptr;
 
+  ZKeyHeaderRow*  wKHR=nullptr;
+  ZKeyFieldRow*   wKFR=nullptr;
+
+  ZDataReference wDRef, wDRefKh, wDRefKf;
+
   int wFieldRows=fieldTBv->ItemModel->rowCount();
   QStandardItem* wItem;
   QVariant wV;
-  for (int wi=0;wi< wFieldRows;wi++)
-    {
+  for (int wi=0;wi< wFieldRows;wi++) {
     wItem=fieldTBv->ItemModel->item(wi,0);
-    wV = wItem->data(ZQtValueRole);
-    FieldDesc_Pack wFDPack = wV.value<FieldDesc_Pack>();
-    ZFieldDescription wFD = wFDPack.toFieldDescription();
-    wMetaDic->push(wFD);
-    }
+    wV = wItem->data(ZQtDataReference);
+    wDRef=wV.value<ZDataReference>();
+
+    ZFieldDescription* wFD =wDRef.getPtr<ZFieldDescription*>();
+    wMetaDic->push(*wFD);
+    } // for
+
   int wKeyRows=keyTRv->ItemModel->rowCount();
   QStandardItem* wKeyItem;
-  for (int wi=0;wi< wKeyRows;wi++)
-    {
+  for (int wi=0;wi < wKeyRows;wi++) {
     wKeyItem=keyTRv->ItemModel->item(wi,0);
-    wV = wKeyItem->data(ZQtValueRole);
-    KeyDic_Pack wKDPack = wV.value<KeyDic_Pack>();
+    wV = wKeyItem->data(ZQtDataReference);
+    wDRefKh=wV.value<ZDataReference>();
+    wKHR = wDRefKh.getPtr<ZKeyHeaderRow*>();
 
-    wKeyDic = new ZKeyDictionary(wKDPack.getName(),wMetaDic);
-    wKeyDic->Duplicates = wKDPack.Duplicates;
-
+    wKeyDic = new ZKeyDictionary(wKHR->get());
+/*
+    wKeyDic->DicKeyName = wKHR->DicKeyName;
+    wKeyDic->Duplicates = wKHR->Duplicates;
+    wKeyDic->ToolTip = wKHR->ToolTip;
+*/
+    int wKeyFieldCount = wKeyItem->rowCount() ;
     /* key fields */
     for (int wj=0;wj < wKeyItem->rowCount();wj++)
       {
       wItem=wKeyItem->child(wj,0);
-      wV = wItem->data(ZQtValueRole);
-      KeyField_Pack wKFPack = wV.value<KeyField_Pack>();
+      wV = wItem->data(ZQtDataReference);
+      wDRefKf=wV.value<ZDataReference>();
+      wKFR = wDRefKf.getPtr<ZKeyFieldRow*>();
 
-      ZIndexField wIxFld;
+      ZIndexField wIxFld = wKFR->get();
       wIxFld.MDicRank=-1;
-      for (long wF=0;wF< wMetaDic->count();wF++)
-        if (wKFPack.hasHash(wMetaDic->Tab[wF].Hash.content))
-            {
+      long wF=0;
+      for (;wF< wMetaDic->count();wF++)
+        if (wKFR->Name == wMetaDic->Tab[wF].getName()){
             wIxFld.MDicRank=wF;
             break;
-            }
+        }
       if (wIxFld.MDicRank<0)
         {
-        fprintf(stderr,"DicEdit::screenToDic-E-KFNTFND Key field <%s> not found in master dictionary (hascode not found). Key field disguarded.\n",wKFPack.getName().toCChar());
+        fprintf(stderr,"DicEdit::screenToDic-E-KFNTFND Key field <%s> not found in master dictionary (field name not found). Key field discarded.\n",
+            wKFR->Name.toCChar());
         continue;
         }
-      wIxFld.KeyOffset = wKFPack.KeyOffset;
-      for (int wh=0;wh<cst_md5;wh++)
-        wIxFld.Hash.content[wh] = wKFPack.Hash[wh];
-      wKeyDic->push(wIxFld);
 
+        wIxFld.KeyOffset = wKFR->KeyOffset;
+      for (int wh=0;wh<cst_md5;wh++)
+        wIxFld.Hash.content[wh] = wKFR->Hash.content[wh];
+
+      wKeyDic->push(wIxFld);
       }//for (int wj=0;wj < wKeyItem->rowCount();wj++)
 
     wMetaDic->KeyDic.push(wKeyDic);  /* then push the whole Key dictionary */
     }//for (int wi=0;wi< wKeyRows;wi++)
 
 
+  if (MasterDic==nullptr) {
+    ZExceptionDLg::message("DicEdit::screenToDic",ZS_NULLPTR,Severity_Error,
+        "No dictionary defined.");
+    return nullptr;
+  }
+
   wMetaDic->DicName = MasterDic->DicName;
   return wMetaDic;
 }//screenToDic
 
+ZStatus
+DicEdit::loadDictionaryFile(const uriString& pDicPath,long pRank){
+
+  ZDataBuffer wRecord;
+  if (DictionaryFile==nullptr) {
+    DictionaryFile=new ZDictionaryFile;
+  }
+
+  if (DictionaryFile->isOpen())
+    DictionaryFile->zclose();
+
+  ZStatus wSt=DictionaryFile->zopen(pDicPath,ZMode_Edit);
+
+  ZDicHeaderList wDicHeaderList;
+  wDicHeaderList=DictionaryFile->getAllDicHeaders();
+
+  ZStdListHeaders wHeaders;
+  ZStdListDLgContent wContent;
+
+  wHeaders.add ("Dictionary name");
+  wHeaders.add ("Active");
+  wHeaders.add ("Version");
+  wHeaders.add ("Keys");
+  wHeaders.add ("Created");
+  wHeaders.add ("Modified");
+
+  for (long wi=0;wi < wDicHeaderList.count();wi++) {
+    ZStdListDLgLine wContentLine;
+    utf8VaryingString wStr;
+
+    wContentLine.add (wDicHeaderList[wi]->DicName) ;
+    wContentLine.add (wDicHeaderList[wi]->Active?"Active":"") ;
+    wContentLine.add (getVersionStr( wDicHeaderList[wi]->Version)) ;
+    wStr.sprintf("%ld",wDicHeaderList[wi]->DicKeyCount) ;
+    wContentLine.add (wStr) ;
+    wContentLine.add (wDicHeaderList[wi]->CreationDate.toDateTimeFormatted().toCChar()) ;
+    wContentLine.add (wDicHeaderList[wi]->ModificationDate.toDateTimeFormatted().toCChar()) ;
+    wContent.push(wContentLine);
+  }
+
+  ZStdListDLg wListDlg(this);
+
+  wListDlg.setWindowTitle("Available dictionaries");
+
+  wListDlg.dataSetup(wHeaders,wContent);
+
+  int wRet=wListDlg.exec();
+
+  if (wRet==QDialog::Rejected)
+    return ZS_REJECTED;
+
+  long wRank = wListDlg.get().row();
+
+  return DictionaryFile->loadDictionaryByRank(wRank);
+}
+
+bool
+DicEdit::saveOrCreateDictionaryFile(){
+
+  QFileDialog wFD(this,"Dictionary file ","",__DICTIONARY_EXTENSION__);
+
+  int wRet=wFD.exec();
+
+  if (wRet==QDialog::Rejected)
+    return false;
+  uriString wSelected = wFD.selectedFiles()[0].toUtf8().data();
+
+  if (wSelected.exists()) {
+    DictionaryFile->saveDictionary();
+    if (saveDictionaryFile(wSelected)==ZS_SUCCESS)
+      return true;
+    return false;
+  }
+
+  return true;
+}
+
+bool
+DicEdit::loadDictionaryFile(){
+  QFileDialog wFD(this,"Dictionary file","",__DICTIONARY_EXTENSION__);
+
+  while (true) {
+    int wRet=wFD.exec();
+
+    if (wRet==QDialog::Rejected)
+      return false;
+    uriString wSelected = wFD.selectedFiles()[0].toUtf8().data();
+
+    if (wSelected.exists()){
+      break;
+    }
+    if (ZExceptionDLg::adhocMessage2B("Dictionary file",Severity_Error,"Abort","Retry",nullptr,"File %s does not exist ",wSelected.toCChar())==QDialog::Rejected)
+      return false;
+
+  } // while true
+
+
+
+
+  return true;
+}
+
+ZStatus
+DicEdit::saveDictionaryFile(const uriString& pDicPath, unsigned long pVersion){
+
+
+  if (DictionaryFile->CreationDate.isInvalid())
+    DictionaryFile->CreationDate = ZDateFull::currentDateTime();
+  DictionaryFile->ModificationDate = ZDateFull::currentDateTime();
+
+  if (!pDicPath.exists()) {
+    return createDictionaryFile(pDicPath,pVersion);
+  }
+
+  return DictionaryFile->saveDictionary(pVersion);
+}
+
+ZStatus
+DicEdit::createDictionaryFile(const uriString& pDicPath, unsigned long pVersion){
+  DictionaryFile->CreationDate = ZDateFull::currentDateTime();
+  DictionaryFile->ModificationDate = ZDateFull::currentDateTime();
+}
 
 void
-DicEdit::displayZMFDictionary(ZMFDictionary &pDic)
+DicEdit::setDictionary (const ZMFDictionary& pZMFDic)
 {
+  if (MasterDic!=nullptr)
+    delete MasterDic;
+  MasterDic = new ZMFDictionary(pZMFDic);
+}
+void
+DicEdit::setNewDictionary ()
+{
+  if (MasterDic!=nullptr)
+    delete MasterDic;
+  MasterDic = new ZMFDictionary;
+}
 
+ZStatus
+DicEdit::loadXmlDictionary (const uriString& pXmlDic)
+{
+  ZMFDictionary wMasterDic;
+  utf8VaryingString wXmlContent,wStr;
+
+  ZaiErrors Errorlog;
+
+  clear();
+
+  ZStatus wSt = pXmlDic.loadUtf8(wXmlContent);
+  if (wSt!=ZS_SUCCESS)
+  {
+    ZExceptionDLg::displayLast();  /* loadUtf8 uses ZException */
+    return wSt;
+  }
+  /* here load master dictionary */
+  wSt =wMasterDic.XmlLoadFromString(wXmlContent,true,&Errorlog);
+  if (wSt!=ZS_SUCCESS)   /* XmlLoadFromString uses returns a ZStatus but uses errorlog to log messages */
+  {
+    ZExceptionDLg::messageWAdd("FloadfromXmlFileQAc",
+        wSt,
+        Errorlog.getSeverity(),
+        Errorlog.allLoggedToString(),
+        "Status is %s : Cannot load xml string definition from file %s",decode_ZStatus(wSt), pXmlDic.toCChar());
+    return wSt;
+  }
+  /* here we may only have warnings, infos or text messages */
+  if (Errorlog.hasMessages()) {
+    Severity_type wS = Errorlog.getSeverity();
+
+    int wRet = ZExceptionDLg::message2BWAdd("FloadfromXmlFileQAc",
+        wS > Severity_Warning?ZS_ERROR:ZS_WARNING,
+        wS,
+        Errorlog.allLoggedToString(),
+        "Stop","Continue",
+        "Some warning messages have been issued during load of xml definition from file %s",pXmlDic.toCChar());
+    if (wRet==QDialog::Rejected)
+      return ZS_CANCEL;
+  }
+
+  wStr.sprintf("Xml file %s has been successfully loaded.",pXmlDic.toCChar());
+  statusBar()->showMessage(QObject::tr(wStr.toCChar(),"DicEdit"),cst_MessageDuration);
+  if (MasterDic!=nullptr)
+    delete MasterDic;
+  MasterDic = new ZMFDictionary(wMasterDic);
+  displayZMFDictionary(MasterDic);
+  return ZS_SUCCESS;
+}// loadXmlDictionary
+
+void
+DicEdit::displayZMFDictionary(ZMFDictionary *pDic)
+{
   utf8String wStr;
   QVariant   wV;
   ZDataReference wDRef;
 
-  if (pDic.DicName.isEmpty())
+  if (pDic->DicName.isEmpty())
     ui->DicNameLBl->setText("<no name>");
   else
-    ui->DicNameLBl->setText(pDic.DicName.toCChar());
+    ui->DicNameLBl->setText(pDic->DicName.toCChar());
 
-  ui->VersionLBl->setText(getVersionStr(pDic.Version).toCChar());
+  ui->VersionLBl->setText(getVersionStr(pDic->Version).toCChar());
 
-  wStr.sprintf("%ld",pDic.count());
+  wStr.sprintf("%ld",pDic->count());
   ui->FieldsNbLBl->setText(wStr.toCChar());
 
-  wStr.sprintf("%ld",pDic.KeyDic.count());
+  wStr.sprintf("%ld",pDic->KeyDic.count());
   ui->KeysNbLBl->setText(wStr.toCChar());
 
   if (fieldTBv->ItemModel)
@@ -2406,22 +3424,19 @@ DicEdit::displayZMFDictionary(ZMFDictionary &pDic)
   int wRow=0;
   QList<QStandardItem *> wFieldRow ;
 
+  ZFieldDescription* wFD=nullptr;
 
-  for (long wi=0;wi < pDic.count();wi++)
+  for (long wi=0;wi < pDic->count();wi++)
     {
-    wFieldRow = createRowFromField(pDic[wi]);  /* create item list from field description */
+    wFieldRow = createFieldRowFromField(&pDic->Tab[wi]);  /* create item list from field description */
     /* set up data to item 0 */
+    wFD=new ZFieldDescription(pDic->Tab[wi]);
     wDRef.setZLayout(ZLayout_FieldTBv);
     wDRef.setResource(getNewResource(ZEntity_DicField));
-    wDRef.setRank((long)wi);          /* store rank within meta dictionary */
-    wDRef.setPtr(&pDic[wi]);          /* store pointer to dictionary field */
+    wDRef.setDataRank((long)wi);    /* store rank within meta dictionary (for information) */
+    wDRef.setPtr(wFD);              /* store pointer to effective field data */
     wV.setValue<ZDataReference>(wDRef);
-    wFieldRow[0]->setData(wV,ZFlowRole);
-
-    FieldDesc_Pack wFDPack;
-    wFDPack.set(pDic[wi]);
-    wV.setValue<FieldDesc_Pack>(wFDPack);
-    wFieldRow[0]->setData(wV,ZQtValueRole);
+    wFieldRow[0]->setData(wV,ZQtDataReference);
 
     fieldTBv->ItemModel->appendRow(wFieldRow);
 
@@ -2432,10 +3447,14 @@ DicEdit::displayZMFDictionary(ZMFDictionary &pDic)
 
   displayKeyDictionaries(pDic);
 
-}
+}//DicEdit::displayZMFDictionary
+
 void
-DicEdit::displayKeyDictionaries(ZMFDictionary &pDic)
+DicEdit::displayKeyDictionaries(ZMFDictionary *pDic)
 {
+  ZKeyHeaderRow* wKHR;
+  ZKeyFieldRow wKFR;
+
   utf8String wStr;
   QVariant   wV;
   ZDataReference wDRefKey , wDRefKeyField;
@@ -2445,78 +3464,41 @@ DicEdit::displayKeyDictionaries(ZMFDictionary &pDic)
     if (keyTRv->ItemModel->rowCount()>0)
       keyTRv->ItemModel->removeRows(0,keyTRv->ItemModel->rowCount());
 
-  long wMDicRank=0;
+  for (long wi=0;wi < pDic->KeyDic.count();wi++) {
+    wKHR->set(pDic->KeyDic[wi]);
 
-  for (long wi=0;wi < pDic.KeyDic.count();wi++)
-  {
-  wKeyRow.clear();
-  wKeyRow << createItem( pDic.KeyDic[wi]->DicKeyName.toCChar());
+    wKeyRow=createKeyDicRow(wKHR);
 
-  wDRefKey.setZLayout(ZLayout_KeyTRv);
-  wDRefKey.setResource(getNewResource(ZEntity_KeyDic));
-  wDRefKey.setRank((long)wi);
-  wDRefKey.setPtr(&pDic.KeyDic[wi]); /* store pointer to key dictionary  */
+    wDRefKey.setZLayout(ZLayout_KeyTRv);
+    wDRefKey.setResource(getNewResource(ZEntity_KeyDic));
+    wDRefKey.setDataRank((long)wi);
+    wDRefKey.setPtr(new ZKeyHeaderRow(wKHR)); /* store key dictionary Data (to be deleted) */
+    wV.setValue<ZDataReference>(wDRefKey);
 
-  wV.setValue<ZDataReference>(wDRefKey);
-  wKeyRow[0]->setData(wV,ZFlowRole);
+    wKeyRow[0]->setData(wV,ZQtDataReference);
 
-  KeyDic_Pack wKDPack(pDic.KeyDic[wi]);
-  wV.setValue<KeyDic_Pack>(wKDPack);
-  wKeyRow[0]->setData(wV,ZQtValueRole);
+    for (long wj=0;wj < pDic->KeyDic[wi]->count(); wj++) {
+      wKFR.set(pDic->KeyDic[wi]->Tab[wj]);
 
-  wKeyRow[0]->setEditable(false);
+        wKeyFieldRow = createKeyFieldRow(wKFR);
 
-  /* other characteristics of the key */
-  wKeyRow << createItem( wKDPack.KeyUniversalSize,"size: %ld");
-  wKeyRow.last()->setEditable(false);
-  wKeyRow << createItem( wKDPack.Duplicates?"Yes":"No","dup: %s");
-  wKeyRow.last()->setEditable(false);
+        wDRefKeyField.clear();
 
-  for (long wj=0;wj < pDic.KeyDic[wi]->count(); wj++)
-    {
-    wKeyFieldRow.clear();
-    wMDicRank = pDic.KeyDic[wi]->Tab[wj].MDicRank;
+        wDRefKeyField.setResource(getNewResource(ZEntity_KeyField));
+        wDRefKeyField.setDataRank((long)wj);
+        wDRefKeyField.setPtr(new ZKeyFieldRow(wKFR)); /* store key field Data (to be deleted) */
+        wV.setValue<ZDataReference>(wDRefKeyField);
+        wKeyFieldRow[0]->setData(wV,ZQtDataReference);
 
-    wKeyFieldRow << createItem(pDic[wMDicRank].getName().toCChar());
-
-    wDRefKeyField.clear();
-
-    wDRefKeyField.setResource(getNewResource(ZEntity_KeyField));
-    wDRefKeyField.setRank((long)wj);
-    wDRefKeyField.setPtr(&pDic.KeyDic[wi]->Tab[wj]); /* store pointer to key field  */
-
-    wV.setValue<ZDataReference>(wDRefKeyField);
-    wKeyFieldRow[0]->setData(wV,ZFlowRole);
-
-    KeyField_Pack wKFPack;
-    wKFPack.set(*MasterDic,wi,wj);
-    wV.setValue<KeyField_Pack>(wKFPack);
-    wKeyFieldRow[0]->setData(wV,ZQtValueRole);
-
-    wKeyFieldRow << createItem( wKFPack.ZType,"0x%08X");
-//    wKeyFieldRow << createItem( wMDicRank,"%ld");
-    wKeyFieldRow << createItem( wKFPack.KeyOffset,"%d");
-    wKeyFieldRow << createItem( wKFPack.UniversalSize,"%ld");
-    wKeyFieldRow << createItemMd5( wKFPack.Hash);
-
-    wKeyRow[0]->appendRow(wKeyFieldRow);
-  /* update index after child row has been appended */
-    wDRefKeyField.setIndex( wKeyFieldRow[0]->index());
-    wV.setValue<ZDataReference>(wDRefKeyField);
-    if (!wV.isValid())
-    {
-      fprintf(stderr,"DicEdit::displayKeyDictionaries-E-INVVALUE cannot set value to QVariant with ZDataReference.\n");
-      abort();
-    }
-    wKeyFieldRow[0]->setData(wV,ZFlowRole);
-    }// for wj
+        wKeyRow[0]->appendRow(wKeyFieldRow);
+      }// for wj
 
     keyTRv->ItemModel->appendRow(wKeyRow);
 
     /* update index after child row has been created */
     wDRefKey.setIndex(wKeyRow[0]->index());
     wV.setValue<ZDataReference>(wDRefKey);
-    wKeyRow[0]->setData(wV,ZFlowRole);
+    wKeyRow[0]->setData(wV,ZQtDataReference);
 
   }// for wi
 
@@ -2525,10 +3507,36 @@ DicEdit::displayKeyDictionaries(ZMFDictionary &pDic)
   keyTRv->resizeColumns();
 }
 
+QList<QStandardItem *>
+DicEdit::createKeyDicRow(const ZKeyHeaderRow& pKHR) {
+  QList<QStandardItem *>  wKeyRow;
+
+  wKeyRow << createItem( pKHR.DicKeyName.toCChar());
+  wKeyRow[0]->setEditable(false);
+
+  wKeyRow << createItem( "Dictionary key");
+
+  wKeyRow << createItem( " ");
+
+  /* other characteristics of the key */
+  wKeyRow << createItem( pKHR.KeyUniversalSize,"size %ld");
+  cst_KeyUSizeColumn = 3 ;
+  wKeyRow.last()->setEditable(false);
+  wKeyRow << createItem( pKHR.Duplicates?"Duplicates":"No duplicate","%s");
+  wKeyRow.last()->setEditable(false);
+
+  if (pKHR.ToolTip.isEmpty())
+    wKeyRow << createItem( " ");
+  else
+    wKeyRow << createItemAligned( pKHR.ToolTip.toCChar(),"%s",Qt::AlignLeft);
+  wKeyRow.last()->setEditable(false);
+  return wKeyRow;
+}
+
 
 
 void
-DicEdit::clear()
+DicEdit::clearAllRows()
 {
   if (fieldTBv->ItemModel)
     if (fieldTBv->ItemModel->rowCount()>0)
@@ -2539,300 +3547,154 @@ DicEdit::clear()
       keyTRv->ItemModel->removeRows(0,keyTRv->ItemModel->rowCount());
 }
 
-DicEdit::~DicEdit()
+void
+DicEdit::resizeEvent(QResizeEvent* pEvent)
 {
-  if (FieldDLg)
-    delete FieldDLg;
-  if (MasterDic)
-    delete MasterDic;
+  QSize wRDlg = pEvent->oldSize();
+  QWidget::resize(pEvent->size().width(),pEvent->size().height());
 
-  delete ui;
+  if (_FResizeInitial) {
+    _FResizeInitial=false;
+    return;
+  }
+  QRect wR1 = ui->layoutWidget->geometry();
+
+  int wWMargin = (wRDlg.width()-wR1.width());
+  int wVW=pEvent->size().width() - wWMargin;
+  int wHMargin = wRDlg.height() - wR1.height();
+  int wVH=pEvent->size().height() - wHMargin ;
+
+  ui->layoutWidget->resize(wVW,wVH);  /* expands in width and height */
+
+}//DicEdit::resizeEvent
+
+QList<QStandardItem*> createKeyRowFromKey(ZKeyHeaderRow &wKHR)
+{
+  QList<QStandardItem *> wKeyRow;
+
+  wKeyRow << createItem(wKHR.DicKeyName.toCChar());
+  wKeyRow << createItem (" ");
+  wKeyRow << createItem (wKHR.KeyUniversalSize ,"total size: %ld");
+  cst_KeyUSizeColumn = 2;
+  wKeyRow << createItem (wKHR.Duplicates?"Duplicates":"No duplicates");
+  wKeyRow << createItem (wKHR.ToolTip.toCChar());
+  return wKeyRow;
 }
+QList<QStandardItem *>
+DicEdit::createKeyFieldRow(const ZKeyFieldRow& wKFR) {
+  QList<QStandardItem *>  wKeyFieldRow;
+  ZDataReference          wDRef;
+  QVariant                wV;
 
-bool
-DicEdit::pinboardGetKeyField(int pKeyRank, QList<QStandardItem *> &pKeyFieldRow)
-{
-  if (Pinboard.isEmpty())
-    {
-    ui->statusBar->showMessage("No previous data in clipboard.",cst_MessageDuration);
-    return false;
-    }
-  if (Pinboard.last().DRef.getZEntity()!=ZEntity_DicField)
-    {
-      ui->statusBar->showMessage("Data in clipboard is not appropriate to paste there.",cst_MessageDuration);
-      return false;
-    }
-
-    ZFieldDescription wFDesc;
-    pinboardGetField(wFDesc);
-    /* create key field data */
-    /* search field within fieldTBv rows */
-
-    QModelIndex wFieldRootIndex = Pinboard.last().DRef.getIndex().parent();
-    QModelIndex wFieldIdx ;
-
-    int wRowCount= fieldTBv->ItemModel->rowCount(wFieldRootIndex);
-
-    QVariant wV;
-    FieldDesc_Pack wFD_Pack;
-    FieldDesc_Pack* wFDPackPtr = Pinboard.last().getDataPtr<FieldDesc_Pack>();
-    long wDicFieldRank=-1;
-    int wRow=0;
-    for (;wRow < wRowCount;wRow++)
-      {
-        wFieldIdx = fieldTBv->ItemModel->index(wRow,0,wFieldRootIndex);
-        if (!wFieldIdx.isValid())
-          continue;
-
-        wV=wFieldIdx.data(ZQtValueRole);
-        wFD_Pack=wV.value<FieldDesc_Pack>();
-
-        if (wFDPackPtr->hasSameHash(wFD_Pack))
-          {
-          wDicFieldRank = wRow;
-          break;
-          }
-      }//for (;wRow < wRowCount;wRow++)
-#ifdef __COMMENT__
-    long wf=0,wMDicFieldRank=-1;
-    for (;wf<MasterDic->count();wf++) /* search field within MasterDic : must search within rows */
-    {
-      if (MasterDic->Tab[wf].Hash==wFDesc.Hash)
-      {
-        wMDicFieldRank=wf;
-        break;
-      }
-    }//for
-#endif//__COMMENT__
-    if (wDicFieldRank<0)
-      {
-      ui->statusBar->showMessage("Cannot find field.",cst_MessageDuration);
-      return false;
-      }
-    KeyField_Pack wKFPack;
-
-    wKFPack.set(wFD_Pack,pKeyRank);
-    ZDataReference wDRef;
-
-    /* append row */
-    pKeyFieldRow << createItem(wFDesc.getName().toCChar());
-    wV.setValue<KeyField_Pack>(wKFPack);
-    pKeyFieldRow.last()->setData(wV,ZQtValueRole);
-
-    wDRef.setRank(pKeyRank);
-    wDRef.setZLayout(ZLayout_KeyTRv);
-    wDRef.setResource(getNewResource(ZEntity_KeyField));
-/* item index must be set */
-    wV.setValue<ZDataReference>(wDRef);
-    pKeyFieldRow.last()->setData(wV,ZFlowRole);
-
-    pKeyFieldRow << createItem(wFDesc.ZType,"0x%08X");
-//    pKeyFieldRow << createItem(wFieldRank,"%ld");
-    pKeyFieldRow << createItem(wKFPack.KeyOffset,"%d");
-    pKeyFieldRow << createItem(wFDesc.UniversalSize,"%ld");
-    pKeyFieldRow << createItem(wFDesc.Hash.toHexa().toChar());
-
-    Pinboard.pop();
-
-    return true;
-}//pinboardGetKeyField
-
-
-
-ZDataReference
-getZDataReference(QStandardItemModel *pModel, int pRow)
-{
-  QStandardItem* wItem= pModel->item(pRow,0);
-  QVariant wV=wItem->data(ZFlowRole);
-  if (!wV.isValid())
-    return ZDataReference(); /* return invalid DRef */
-  ZDataReference wDRef=wV.value<ZDataReference>();
-  return wDRef;
-}
-
-/* creates a list pointing to effective items */
-QList<QStandardItem*> itemRow (QStandardItemModel*pModel,QModelIndex& pIdx)
-{
-  QList<QStandardItem*> wRow;
-  if (!pIdx.isValid())
-    {
-    fprintf(stderr,"getAllKeyRows-E-INVIDX Index is not valid.\n");
-    return wRow;
-    }
-
-  /* get the number of columns for this kind of tree lines */
-  int wColumns = pModel->columnCount(pIdx.parent());
-
-  QStandardItem* wFatherItem= pModel->itemFromIndex(pIdx.parent()); /* general case get parent item */
-
-  int wi=0;
-  if (wFatherItem==nullptr) /* if top level */
-    while (wi < wColumns)
-      {
-      QStandardItem* wItem=pModel->item(pIdx.row(),wi++);
-      wRow << wItem;
-      }
-  else
-    while (wi < wColumns)
-      {
-      QStandardItem* wItem=wFatherItem->child(pIdx.row(),wi++);
-      wRow << wItem;
-      }
-
-  return wRow;
-}//itemRow
-
-/* creates a list pointing to cloned items */
-QList<QStandardItem*> cloneRow (QStandardItemModel*pModel,QModelIndex& pIdx)
-{
-  QList<QStandardItem*> wRow;
-  if (!pIdx.isValid())
-  {
-    fprintf(stderr,"getAllKeyRows-E-INVIDX Index is not valid.\n");
-    return wRow;
-  }
-
-  /* get the number of columns for this kind of tree lines */
-  int wColumns = pModel->columnCount(pIdx.parent());
-
-  QStandardItem* wFatherItem= pModel->itemFromIndex(pIdx.parent()); /* general case get parent item */
-
-  int wi=0;
-  if (wFatherItem==nullptr) /* if top level */
-    while (wi < wColumns)
-      {
-      QStandardItem* wItem=pModel->item(pIdx.row(),wi++)->clone();
-      wRow << wItem;
-      }
-  else
-    while (wi < wColumns)
-      {
-      QStandardItem* wItem=wFatherItem->child(pIdx.row(),wi++)->clone();
-      wRow << wItem;
-      }
-
-  return wRow;
-}//cloneRow
-#ifdef __COMMENT__
-/* creates a list pointing to effective items after having cut them */
-QList<QStandardItem*> cutRow(QStandardItemModel*pModel,QModelIndex& pIdx)
-{
-  QList<QStandardItem*> wRow;
-  if (!pIdx.isValid())
-    return wRow;
-
-  /* get the number of columns for this kind of tree lines */
-  int wColumns = pModel->columnCount(pIdx.parent());
-
-  int wi=0;
-  while (wi < wColumns)
-  {
-    QStandardItem* wItem=pModel->takeItem(pIdx.row(),wi++);
-    wRow << wItem;
-  }
-  return wRow;
-}//cutRow
-#endif // __COMMENT__
-
-/* creates a list pointing to effective items after having cut them */
-QList<QStandardItem*> cutRow (QStandardItemModel*pModel,QModelIndex& pIdx)
-{
-  QList<QStandardItem*> wRow;
-  if (!pIdx.isValid())
-  {
-    fprintf(stderr,"getAllKeyRows-E-INVIDX Index is not valid.\n");
-    return wRow;
-  }
-
-  /* get the number of columns for this kind of tree lines */
-  int wColumns = pModel->columnCount(pIdx.parent());
-
-  QStandardItem* wFatherItem= pModel->itemFromIndex(pIdx.parent()); /* general case get parent item */
-
-  int wi=0;
-  if (wFatherItem==nullptr) /* if top level */
-    return pModel->takeRow(pIdx.row());
-  else
-    return wFatherItem->takeRow(pIdx.row());
-}//cutRow
-
-
-
-QList<QList<QStandardItem*>> DicEdit::cutAllKeyRows(const QModelIndex& pKeyIdx)
-{
-  QList<QList<QStandardItem*>> wKeyRows;
-
-  if (!pKeyIdx.isValid())
-    {
-    fprintf(stderr,"getAllKeyRows-E-INVIDX Index is not valid.\n");
-    return wKeyRows;
-    }
-  QModelIndex wKeyIdx=pKeyIdx;
-  if (pKeyIdx.column()!=0)
-    wKeyIdx=pKeyIdx.siblingAtColumn(0);
-
-  QVariant wV=wKeyIdx.data(ZFlowRole);
-  if (!wV.isValid())
-    {
-    fprintf(stderr,"getAllKeyRows-E-INVDATA Index data is not valid.\n");
-    return wKeyRows;
-    }
-
-  ZDataReference wDRef=wV.value<ZDataReference>();
-  if (wDRef.getZEntity()!=ZEntity_KeyDic)
-    {
-    fprintf(stderr,"getAllKeyRows-E-INVROW Index is not a Key Dictionary.\n");
-    return wKeyRows;
-    }
-
-  QStandardItem* wItem = keyTRv->ItemModel->itemFromIndex(wKeyIdx);
-
-  int wRNb=wItem->rowCount();
-  int wRow=0;
-  while (wRow < wRNb)
-    {
-    wKeyRows << wItem->takeRow(wRow);
-    wRow++;
-    }//while (wRow < wRNb)
-
-//  wItem->removeRows(0,wRNb);
-
-  int wCRow=wKeyIdx.row();
-  /* then insert key dictionary row at rank 0 */
-  wKeyRows.insert(0,keyTRv->ItemModel->takeRow(wCRow));
-  /* remove key dictionary empty row */
-//  keyTRv->ItemModel->removeRows(wCRow,1);
-  return wKeyRows;
+  wKeyFieldRow << createItem(wKFR.Name.toCChar());
+  wKeyFieldRow << createItem( wKFR.ZType,"0x%08X");
+  wKeyFieldRow << createItem( wKFR.KeyOffset,"%d");
+  cst_KeyOffsetColumn = 2;
+  wKeyFieldRow << createItem( wKFR.UniversalSize,"%ld");
+  wKeyFieldRow << createItem( wKFR.Hash);
+  return wKeyFieldRow;
 }
 
 
-bool DicEdit::pasteAllKeyRows(const QModelIndex& pKeyIdx,QList<QList<QStandardItem*>>& pKeyRows)
+/**
+ * @brief createRowFromFieldDescription creates an item list describing field desciption.
+ *                                      data is not set and must be set by callee.
+ * @param pField
+ * @return
+ */
+
+QList<QStandardItem*> createFieldRowFromField(ZFieldDescription* pField)
 {
-  if (!pKeyIdx.isValid())
-    {
-    fprintf(stderr,"pasteAllKeyRows-E-INVIDX Index is not valid.\n");
+  utf8String wStr;
+  QList<QStandardItem*> wFieldRow;
+
+  wFieldRow << new QStandardItem(pField->getName().toCChar());
+  wFieldRow.last()->setEditable(false);
+
+  wStr.sprintf("0x%08X",pField->ZType);
+  wFieldRow << new QStandardItem( wStr.toCChar());
+  wFieldRow.last()->setEditable(false);
+
+  wFieldRow << new QStandardItem( decode_ZType(pField->ZType));
+  wFieldRow.last()->setEditable(false);
+
+  wStr.sprintf("%d",pField->Capacity);
+  wFieldRow << new QStandardItem( wStr.toCChar());
+  wFieldRow.last()->setEditable(false);
+
+  wStr.sprintf("%ld",pField->HeaderSize);
+  wFieldRow <<  new QStandardItem( wStr.toCChar());
+  wFieldRow.last()->setEditable(false);
+
+  wStr.sprintf("%ld",pField->UniversalSize);
+  wFieldRow <<  new QStandardItem( wStr.toCChar());
+  wFieldRow.last()->setEditable(false);
+
+  wStr.sprintf("%ld",pField->NaturalSize);
+  wFieldRow <<  new QStandardItem( wStr.toCChar());
+  wFieldRow.last()->setEditable(false);
+
+  wFieldRow <<  new QStandardItem( pField->KeyEligible?"Yes":"No");
+  wFieldRow.last()->setEditable(false);
+
+  wFieldRow <<  new QStandardItem( pField->Hash.toHexa().toChar());
+  wFieldRow.last()->setEditable(false);
+
+  if (pField->ToolTip.isEmpty())
+    wFieldRow <<  new QStandardItem( "" );
+  else
+    wFieldRow <<  new QStandardItem( pField->ToolTip.toCChar());
+  wFieldRow.last()->setEditable(false);
+
+
+  return wFieldRow;
+}
+
+bool setFieldRowFromField(QList<QStandardItem*> &wRow,ZFieldDescription& pField)
+{
+  utf8String wStr;
+  if (wRow.count() < 10) {
+    fprintf(stderr,"setRowFromField-E-IVCNT  Invalid number of QStandardItem within list to update.\n");
     return false;
-    }
-  QModelIndex wKeyIdx=pKeyIdx;
-  if (pKeyIdx.column()!=0)
-    wKeyIdx=pKeyIdx.siblingAtColumn(0);
+  }
+  int Col=0;
+  wRow[Col]->setText(pField.getName().toCChar());
+  wRow[Col++]->setEditable(false);
 
-  QVariant wV=wKeyIdx.data(ZFlowRole);
-  if (!wV.isValid())
-    {
-    fprintf(stderr,"pasteAllKeyRows-E-INVDATA Index data is not valid.\n");
-    return false;
-    }
+  wStr.sprintf("0x%08X",pField.ZType);
+  wRow[Col]->setText(wStr.toCChar());
+  wRow[Col++]->setEditable(false);
 
-  ZDataReference wDRef=wV.value<ZDataReference>();
-  if (wDRef.getZEntity()!=ZEntity_KeyDic)
-    {
-    fprintf(stderr,"pasteAllKeyRows-E-INVROW Index is not a Key Dictionary.\n");
-    return false;
-    }
+  wRow[Col]->setText(decode_ZType(pField.ZType));
+  wRow[Col++]->setEditable(false);
 
+  wStr.sprintf("%d",pField.Capacity);
+  wRow[Col]->setText(wStr.toCChar());
+  wRow[Col++]->setEditable(false);
 
+  wStr.sprintf("%ld",pField.HeaderSize);
+  wRow[Col]->setText(wStr.toCChar());
+  wRow[Col++]->setEditable(false);
 
+  wStr.sprintf("%ld",pField.UniversalSize);
+  wRow[Col]->setText(wStr.toCChar());
+  wRow[Col++]->setEditable(false);
+
+  wStr.sprintf("%ld",pField.NaturalSize);
+  wRow[Col]->setText(wStr.toCChar());
+  wRow[Col++]->setEditable(false);
+
+  wRow[Col]->setText(pField.KeyEligible?"Yes":"No");
+  wRow[Col++]->setEditable(false);
+
+  wRow[Col]->setText(pField.Hash.toHexa().toChar());
+  wRow[Col++]->setEditable(false);
+
+  if (pField.ToolTip.isEmpty())
+    wRow[Col]->setText("");
+  else
+    wRow[Col]->setText(pField.ToolTip.toCChar());
+  wRow[Col++]->setEditable(false);
 
   return true;
 }

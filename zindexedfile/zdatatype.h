@@ -2862,6 +2862,7 @@ public:
   {
     Sign=pIn.Sign;
     Value=pIn.Value;
+    return *this;
   }
   US8& operator = (const US8& pIn) {return _copyFrom(pIn);}
   US8& operator = (const int8_t& pIn) {return fromNatural(pIn);}

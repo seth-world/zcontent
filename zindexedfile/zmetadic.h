@@ -53,22 +53,24 @@ class ZMetaDic : public ZArray <ZFieldDescription>
 public:
     typedef ZArray <ZFieldDescription> _Base ;
 
-    utf8String    DicName;         /* name of the entity described by meta dic */
-    unsigned long Version = 1000000UL;
-    checkSum *    CheckSum=nullptr;/* to check if meta dictionary has changed or not */
+    utf8VaryingString DicName;         /* name of the entity described by meta dic */
+    unsigned long     Version = 1000000UL;
+    ZDateFull         CreationDate;
+    ZDateFull         ModificationDate;
+    checkSum *        CheckSum=nullptr;/* to check if meta dictionary has changed or not */
 //    long        CurrentRank=0;
 
 
-    ZMetaDic() {}
+    ZMetaDic() ;
     ~ZMetaDic() { zdelete (CheckSum) ;}
 
-    ZMetaDic(const utf8String& pDicName) {setDicName(pDicName);}
+    ZMetaDic(const utf8VaryingString& pDicName) {setDicName(pDicName);}
 
     ZMetaDic& _copyFrom(const ZMetaDic& pIn) ;
 
     ZMetaDic(const ZMetaDic& pIn) {_copyFrom(pIn);}
     ZMetaDic(const ZMetaDic&& pIn) {_copyFrom(pIn);}
-    ZMetaDic&  operator = (const ZMetaDic& pIn) { return _copyFrom(pIn);}
+    ZMetaDic&  operator = (const ZMetaDic& pIn) { return _copyFrom(pIn); }
 
 
     void setDicName(const utf8String& pName) {DicName=pName;}
@@ -103,12 +105,6 @@ public:
                      const URF_Array_Count_type pArrayCount);
     template <class _Tp>
     ZStatus addField_T (const utf8String &pFieldName);
-/*    template<class _Tp>
-    ZStatus addField_T(const char *pFieldName)
-    {
-        return addField_T<_Tp>((const utf8String &) pFieldName);
-    }*/
-//    ZStatus addField_A (auto pValue,const utf8_t *pFieldName);
     ZStatus removeFieldByName (const utf8String &pFieldName);
 /*    ZStatus removeFieldByName(const utf8_t *pFieldName)
     {

@@ -33,16 +33,21 @@ enum ZEntity : ZEntity_type  /* application defined ZEntity */
     ZEntity_KeyDicRow   =          0x0000041, /* QList with key field items row  */
     ZEntity_KeyDicRowsSet =        0x0000051, /* QList of Qlist with key field rows - with row[0] as key dictionary row */
     ZEntity_KeyFieldRow =          0x0000061, /* QList with key field items row  */
+
+    ZEntity_CppField    =          0x0000101,   /* ZCppParser field */
+    ZEntity_CppClass    =          0x0000201,   /* ZCppParser class */
+    ZEntity_CppParsingSelection =  0x0000401,   /* multiline selection with either ZEntity_CppClass and/or ZEntity_CppField */
+
     // -----------Document entities  ---------------------
     //
-    ZEntity_MasterDoc  =          0x0000091,
+    ZEntity_MasterDoc  =           0x0000091,
     ZEntity_Version     =          0x00000A1,
     //    ZEntity_Master      =   ZEntity_MasterDesc | ZEntity_Version ,     // generic should be suppressed
 
     ZEntity_MasterLink  =          0x00000B1,
     ZEntity_ObjectLink  =          0x00000C1,
     ZEntity_Memo        =          0x00100D1,
-    ZEntity_Tag         =         0x000000E1,
+    ZEntity_Tag         =          0x000000E1,
 
     ZEntity_MimeClass   =         0x000000F1,  // Entity class that contains Mime definition (viewer, editor etc.)
 

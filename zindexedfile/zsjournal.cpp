@@ -596,7 +596,7 @@ generateJournalName(uriString &pZMFName,uriString &pJournalingPath, uriString& p
     return ZS_SUCCESS;
 }
 
-char * decode_ZJOP (const ZJOperation pOperation)
+const char * decode_ZJOP (const ZJOperation pOperation)
 {
     switch (pOperation)
     {

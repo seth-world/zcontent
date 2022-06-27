@@ -4,6 +4,19 @@
 
 #include <zindexedfile/zindexfield.h> // for hash comparizon (KeyField_Pack)
 
+void ZFieldDescription::clear()
+{
+  Name.clear();
+  ZType=ZType_Unknown;
+  HeaderSize=0;
+  Capacity=0;
+  UniversalSize=0;
+  NaturalSize=0;
+  KeyEligible=false;
+  Hash.clear();
+  ToolTip.clear();
+}
+
 ZFieldDescription&
 ZFieldDescription::_copyFrom(const ZFieldDescription& pIn)
 {
@@ -15,6 +28,7 @@ ZFieldDescription::_copyFrom(const ZFieldDescription& pIn)
   KeyEligible=pIn.KeyEligible;
   Name=pIn.Name;
   Hash = pIn.Hash;
+  ToolTip=pIn.ToolTip;
   return *this;
 }
 
@@ -34,16 +48,45 @@ void ZFieldDescription::setFieldName(const utf8String& pName)
     Name= pName;
 } // setFieldName
 
+bool ZFieldDescription::hasName(const utf8VaryingString& pName) const { return Name==pName.toCChar(); }
+
+bool ZFieldDescription::hasHashCode (const md5& pHashcode) const {return (Hash==pHashcode);}
+
+bool ZFieldDescription::checkHashcode()
+{
+  if (Hash.isInvalid())
+    return false;
+
+  md5 wNewHash = _computeMd5();
+
+  for (int wi=0;wi < cst_md5 ; wi++)
+    if (wNewHash.content[wi]!=Hash.content[wi])
+      return false;
+  return true;
+}//checkHashcode
+
 md5& ZFieldDescription::computeMd5()
 {
   FieldDesc_Check wFDCheck;
-
+  fprintf (stderr,"ZFieldDescription::computeMd5-I-  name <%s>\n"
+                  "ZType <%08X>  header <%ld> Natural <%ld> Universal <%ld>.\n",
+                  getName().toCChar(),ZType,HeaderSize,NaturalSize,UniversalSize);
   wFDCheck.set(*this);
-
   Hash.clear();
   Hash.compute((unsigned char*)&wFDCheck,sizeof(FieldDesc_Check));
+  fprintf (stderr,"ZFieldDescription::computeMd5-I-  md5 <%s>\n",Hash.toHexa().toChar());
+  std::cerr.flush();
   return Hash;
 } // computeMd5
+
+md5 ZFieldDescription::_computeMd5()
+{
+  FieldDesc_Check wFDCheck;
+  wFDCheck.set(*this);
+  md5 wHash;
+  wHash.compute((unsigned char*)&wFDCheck,sizeof(FieldDesc_Check));
+  return wHash;
+} // _computeMd5
 
 /*
       <field>
@@ -62,10 +105,10 @@ md5& ZFieldDescription::computeMd5()
 
 */
 
-utf8String ZFieldDescription::toXml(int pLevel, bool pComment)
+utf8VaryingString ZFieldDescription::toXml(int pLevel, bool pComment)
 {
   int wLevel=pLevel;
-  utf8String wReturn;
+  utf8VaryingString wReturn;
 
   wReturn = fmtXMLnode("field",pLevel);
   wLevel++;
@@ -98,6 +141,9 @@ utf8String ZFieldDescription::toXml(int pLevel, bool pComment)
   wReturn+=fmtXMLmd5("hash",Hash,wLevel);
   if (pComment)
     fmtXMLaddInlineComment(wReturn," unique hashcode value for the field.");
+  wReturn+=fmtXMLchar("tooltip",ToolTip.toCChar(),wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn,"Custom help");
 
   wReturn += fmtXMLendnode("field",pLevel);
   return wReturn;
@@ -133,6 +179,14 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, Za
     }
   else
     Name=wName.toCChar();
+
+    if (XMLgetChildText(wRootNode, "tooltip", wName, pErrorlog) < 0) {
+      pErrorlog->logZStatus(ZAIES_Warning,ZS_XMLEMPTY,
+          "FieldDescription::fromXml-W-MISSTOOLTIP node <Tooltip> is missing for field named %s.",
+          Name.toCChar());
+    }
+    else
+      ToolTip=wName.toCChar();
 
   if (XMLgetChildMd5(wRootNode, "hash", Hash, pErrorlog) < 0)
     {
@@ -397,30 +451,30 @@ FieldDesc_Export::deserialize()
 
 FieldDesc_Check& FieldDesc_Check::set(ZFieldDescription& pIn)
 {
+  memset(this,0,sizeof(FieldDesc_Check));
   ZType=pIn.ZType;
   Capacity=pIn.Capacity;
   HeaderSize=uint16_t(pIn.HeaderSize);
   UniversalSize=uint32_t(pIn.UniversalSize);
   NaturalSize=uint32_t(pIn.NaturalSize);
   KeyEligible=pIn.KeyEligible;
-  pIn.getName()._exportUVFPtr(Name,cst_FieldNameCapacity);
+//  memset(Name,0,cst_FieldNameCapacity);
+  pIn.Name._exportUVFPtr(Name,cst_FieldNameCapacity);
   return *this;
 }
 
 FieldDesc_Check&
 FieldDesc_Check::_copyFrom(FieldDesc_Check& pIn)
 {
-  /*  for (int wi=0; wi < cst_FieldNameCapacity;wi++)
+  for (int wi=0; wi < cst_FieldNameCapacity;wi++)
     Name[wi]=pIn.Name[wi];
-*/
-
   ZType=pIn.ZType;
   Capacity=pIn.Capacity;
   HeaderSize=pIn.HeaderSize;
   UniversalSize=pIn.UniversalSize;
   NaturalSize=pIn.NaturalSize;
   KeyEligible=pIn.KeyEligible;
-  memmove(Name,pIn.Name,cst_FieldNameCapacity);
+//  memmove(Name,pIn.Name,cst_FieldNameCapacity);
   return *this;
 }
 
@@ -447,7 +501,7 @@ FieldDesc_Pack& FieldDesc_Pack::set(ZFieldDescription& pIn)
   UniversalSize=uint32_t(pIn.UniversalSize);
   NaturalSize=uint32_t(pIn.NaturalSize);
   KeyEligible=pIn.KeyEligible;
-  pIn.getName()._exportUVFPtr(Name,cst_FieldNameCapacity);
+  pIn.Name._exportUVFPtr(Name,cst_FieldNameCapacity);
   memmove(Hash,pIn.Hash.content,cst_md5);
   return *this;
 }

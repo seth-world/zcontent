@@ -75,6 +75,9 @@ public:
     QAction *displayZBATQAc;
     QAction *displayZDBTQAc;
     QAction *displayZFBTQAc;
+    QAction *dicNewQAc;
+    QAction *dicLoadXmlQAc;
+    QAction *cppparserQAc;
     QWidget *centralwidget;
     QFrame *MainFRm;
     QLabel *OpenModeLbl;
@@ -121,6 +124,7 @@ public:
     QMenu *rawMEn;
     QMenu *dumpHeaderMEn;
     QMenu *displayPoolMEn;
+    QMenu *menuDictionary;
     QStatusBar *statusbar;
     QToolBar *toolBar;
 
@@ -221,6 +225,12 @@ public:
         displayZDBTQAc->setObjectName(QString::fromUtf8("displayZDBTQAc"));
         displayZFBTQAc = new QAction(ZContentVisuMain);
         displayZFBTQAc->setObjectName(QString::fromUtf8("displayZFBTQAc"));
+        dicNewQAc = new QAction(ZContentVisuMain);
+        dicNewQAc->setObjectName(QString::fromUtf8("dicNewQAc"));
+        dicLoadXmlQAc = new QAction(ZContentVisuMain);
+        dicLoadXmlQAc->setObjectName(QString::fromUtf8("dicLoadXmlQAc"));
+        cppparserQAc = new QAction(ZContentVisuMain);
+        cppparserQAc->setObjectName(QString::fromUtf8("cppparserQAc"));
         centralwidget = new QWidget(ZContentVisuMain);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         MainFRm = new QFrame(centralwidget);
@@ -376,6 +386,8 @@ public:
         dumpHeaderMEn->setObjectName(QString::fromUtf8("dumpHeaderMEn"));
         displayPoolMEn = new QMenu(dumpHeaderMEn);
         displayPoolMEn->setObjectName(QString::fromUtf8("displayPoolMEn"));
+        menuDictionary = new QMenu(menubar);
+        menuDictionary->setObjectName(QString::fromUtf8("menuDictionary"));
         ZContentVisuMain->setMenuBar(menubar);
         statusbar = new QStatusBar(ZContentVisuMain);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
@@ -388,6 +400,7 @@ public:
         menubar->addAction(ZRFMEn->menuAction());
         menubar->addAction(ZMFMEn->menuAction());
         menubar->addAction(rawMEn->menuAction());
+        menubar->addAction(menuDictionary->menuAction());
         fileMEn->addAction(setfileQAc);
         fileMEn->addAction(openQAc);
         fileMEn->addAction(openRawQAc);
@@ -431,6 +444,9 @@ public:
         displayPoolMEn->addAction(displayZBATQAc);
         displayPoolMEn->addAction(displayZDBTQAc);
         displayPoolMEn->addAction(displayZFBTQAc);
+        menuDictionary->addAction(dicNewQAc);
+        menuDictionary->addAction(dicLoadXmlQAc);
+        menuDictionary->addAction(cppparserQAc);
 
         retranslateUi(ZContentVisuMain);
 
@@ -485,6 +501,9 @@ public:
         displayZBATQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Block Access Table", nullptr));
         displayZDBTQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Deleted Blocks Table", nullptr));
         displayZFBTQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Free Blocks Table", nullptr));
+        dicNewQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Create new", nullptr));
+        dicLoadXmlQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Load from Xml file", nullptr));
+        cppparserQAc->setText(QCoreApplication::translate("ZContentVisuMain", "c++ parser", nullptr));
         OpenModeLbl->setText(QCoreApplication::translate("ZContentVisuMain", "not open", nullptr));
         FileTypeLBl->setText(QCoreApplication::translate("ZContentVisuMain", "Unknown type", nullptr));
         FullPathLbl->setText(QCoreApplication::translate("ZContentVisuMain", "no file selected", nullptr));
@@ -524,6 +543,7 @@ public:
         rawMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "Raw file", nullptr));
         dumpHeaderMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "Header file dump", nullptr));
         displayPoolMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "display Pool", nullptr));
+        menuDictionary->setTitle(QCoreApplication::translate("ZContentVisuMain", "Dictionary", nullptr));
         toolBar->setWindowTitle(QCoreApplication::translate("ZContentVisuMain", "toolBar", nullptr));
     } // retranslateUi
 

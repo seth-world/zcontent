@@ -51,8 +51,16 @@ class ZExceptionDLg : public QDialog
   Q_OBJECT
 
 public:
-  explicit ZExceptionDLg(const ZExceptionBase &pException, bool pDontShow=false);
+  explicit ZExceptionDLg(const utf8VaryingString& pTitle,const ZExceptionBase &pException, bool pDontShow=false);
+  explicit ZExceptionDLg(const utf8VaryingString& pTitle, Severity_type pSeverity,
+      const utf8VaryingString& pMessage,
+      const utf8VaryingString *pComplement=nullptr,
+      bool pDontShow=false);
   ~ZExceptionDLg();
+
+  void init(const utf8VaryingString& pTitle,Severity_type pSeverity,ZStatus pStatus,const utf8VaryingString& pMessage, const utf8VaryingString& pComplement,bool pDontShow)  ;
+
+  void applySeverity(Severity_type pSeverity);
 
   void setInfo();
   void setWarning();
@@ -63,6 +71,27 @@ public:
 
   void setButtonText(int pOrder,const utf8String& pButtonText);
   void setThirdButton(const utf8String& pButtonText);
+  /**
+   * @brief adhocMessage  displays an adhoc message(not dependant from ZException) with one button <close>
+   * @param pTitle        displayed dialog title
+   * @param pSeverity     induces the severity logo (one of info,warning, error, fatal) in the top right corner of dialog
+   * @param pComplement   a string with potential complement to be displayed
+   * @param pFormat       the main message with variadic content
+   * @return  a return type corresponding to the button pressed
+   */
+  static int adhocMessage(const utf8VaryingString &pTitle, Severity_type pSeverity, const utf8VaryingString *pComplement, const char *pFormat,...);
+  /**
+   * @brief adhocMessage2B displays an adhoc message(not dependant from ZException) with two buttons, cancel and ok button.
+   * @param pTitle        displayed dialog title
+   * @param pSeverity     induces the severity logo (one of severity levels info,warning, error, fatal,highest) in the top right corner of dialog
+   * @param pCancelText   a string with cancel button displayed text
+   * @param pOkText       a string with OK button displayed text
+   * @param pComplement   a string with potential complement to be displayed
+   * @param pFormat       the main message with variadic content
+   * @return  a return type corresponding to the button pressed (Dialog::Rejected or Dialog::Accepted)
+   */
+  static int adhocMessage2B(const utf8String&pTitle, Severity_type pSeverity,const utf8String& pCancelText, const utf8String& pOkText,const utf8VaryingString *pComplement, const char *pFormat,...);
+  static int adhocMessage3B(const utf8String&pTitle, Severity_type pSeverity,const utf8String& pOtherText,const utf8String& pCancelText, const utf8String& pOkText,const utf8VaryingString *pComplement, const char *pFormat,...);
 
   static int message(const char *pModule, ZStatus pStatus, Severity_type pSeverity,const char *pFormat,...);
   static int message2B(const char *pModule, ZStatus pStatus, Severity_type pSeverity, const utf8String& pCancelText, const utf8String& pOkText, const char *pFormat,...);
@@ -90,9 +119,9 @@ public:
 
   static int displayLast( bool pDontShow = false);
 
-  static int display(const ZExceptionBase pException, bool pDontShow = false);
-  static int display2B(const ZExceptionBase pException, const char *pCancelText=nullptr, const char *pOKText=nullptr);
-  static int display3B(const ZExceptionBase pException,const utf8String& pButtonText, const char *pCancelText=nullptr, const char *pOKText=nullptr);
+  static int display(const utf8VaryingString& pTitle,const ZExceptionBase pException, bool pDontShow = false);
+  static int display2B(const utf8VaryingString& pTitle,const ZExceptionBase pException, const char *pCancelText=nullptr, const char *pOKText=nullptr);
+  static int display3B(const utf8VaryingString &pTitle, const ZExceptionBase pException, const utf8String& pButtonText, const char *pCancelText=nullptr, const char *pOKText=nullptr);
 
 
   static int info(ZExceptionBase& pException, QWidget *parent = nullptr);

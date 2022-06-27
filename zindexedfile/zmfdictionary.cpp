@@ -106,6 +106,7 @@ ZMFDictionary::addKey(ZKeyDictionary*pIn,const utf8String& pKeyName, long &pOutK
   return ZS_SUCCESS;
 }//addKey
 
+
 ZDataBuffer& ZMFDictionary::_exportAppend(ZDataBuffer& pZDB)
 {
   ZMFDicExportHeader wHead;
@@ -117,6 +118,8 @@ ZDataBuffer& ZMFDictionary::_exportAppend(ZDataBuffer& pZDB)
 
   /* KeyDic is a ZArray of ZArrays */
   pZDB.append_T<uint32_t>(cst_ZBLOCKSTART);
+  pZDB.append_T<uint8_t>((uint8_t)Active);
+  pZDB.append_T<unsigned long>(reverseByteOrder_Conditional<unsigned long>(Version));
   pZDB.append_T<uint16_t>(reverseByteOrder_Conditional<uint16_t>((uint16_t)KeyDic.count()));
 
   for (long wi=0;wi<KeyDic.count();wi++)
@@ -125,10 +128,12 @@ ZDataBuffer& ZMFDictionary::_exportAppend(ZDataBuffer& pZDB)
   pZDB.append_T<uint32_t>(cst_ZBLOCKEND);
   return pZDB;
 }
+
+
+
 ZStatus ZMFDictionary::_import(const unsigned char* &pPtrIn)
 {
   ZStatus wSt=ZS_SUCCESS;
-  ssize_t wSize=0;
   ZMFDicExportHeader wHead;
   wSt=wHead._import(pPtrIn);
   if (wSt!=ZS_SUCCESS)
@@ -140,6 +145,9 @@ ZStatus ZMFDictionary::_import(const unsigned char* &pPtrIn)
   if (wSt!=ZS_SUCCESS)
     return wSt;
 
+
+  CreationDate = wHead.CreationDate;
+  ModificationDate = wHead.ModificationDate;
 
   ZKeyDictionary* wKDic=nullptr;
   uint32_t wi=0;
@@ -357,15 +365,44 @@ ZMFDictionary::fromXml(zxmlNode* pZmfDicNode, bool pCheckHash, ZaiErrors* pError
 
 void ZMFDicExportHeader::set(const ZMFDictionary* pDic)
 {
+  Active = pDic->Active ;
+  Version = pDic->Version ;
+  CreationDate = pDic->CreationDate;
+  ModificationDate = pDic->ModificationDate;
   DicKeyCount=uint32_t(pDic->KeyDic.count());
+  DicName = pDic->DicName;
 }
+
+void ZMFDicExportHeader::get(ZMFDictionary& pDic)
+{
+  pDic.CreationDate = CreationDate;
+  pDic.ModificationDate = ModificationDate;
+  pDic.DicName = DicName;
+  pDic.Active = Active;
+  pDic.Version = Version;
+
+  /* key count is calculated from ZKeyDictionary array */
+
+  return;
+}
+
 
 ZDataBuffer& ZMFDicExportHeader::_exportAppend(ZDataBuffer& pZDB)
 {
-  StartSign = cst_ZBLOCKSTART;
-  BlockId=ZBID_MDIC;
-  DicKeyCount = reverseByteOrder_Conditional<uint32_t>(DicKeyCount);
-  pZDB.appendData(this,sizeof(ZMFDicExportHeader));
+  pZDB.allocateBZero(sizeof(uint32_t)+2+sizeof(uint32_t)+sizeof(unsigned long)+sizeof(uint64_t)+sizeof(uint64_t));
+
+  unsigned char* wPtr= pZDB.Data;
+  _exportAtomicPtr(cst_ZBLOCKSTART,wPtr);   /* uint32_t */
+  *wPtr++=ZBID_MDIC;                        /* uint8_t */
+  *wPtr++= Active;                          /* uint8_t */
+  _exportAtomicPtr(DicKeyCount,wPtr);       /* uint32_t */
+  _exportAtomicPtr(Version,wPtr);           /* unsigned long */
+
+  CreationDate._exportPtr(wPtr);            /* ZDateFull exported to uint64_t */
+  ModificationDate._exportPtr(wPtr);        /* ZDateFull exported to uint64_t */
+
+  DicName._exportAppendUVF(pZDB);           /* utf8VaryingString exported with UVF format */
+
   return pZDB;
 }
 
@@ -377,23 +414,29 @@ ZDataBuffer& ZMFDicExportHeader::_exportAppend(ZDataBuffer& pZDB)
  */
 ZStatus ZMFDicExportHeader::_import(const unsigned char* &pPtrIn)
 {
-  ZMFDicExportHeader wHead ;
-  memmove (&wHead,pPtrIn,sizeof (ZMFDicExportHeader));
+  uint32_t wStartSign ;
+  _importAtomic(wStartSign,pPtrIn);
+  uint8_t wBlockId = *pPtrIn++;
 
-  if ((wHead.BlockId!=ZBID_MDIC)||(wHead.StartSign!=cst_ZBLOCKSTART))
+  if ((wBlockId!=ZBID_MDIC)||(wStartSign!=cst_ZBLOCKSTART))
   {
     ZException.setMessage("ZMFDicExportHeader::_import",
         ZS_BADDIC,
         Severity_Severe,
         "Invalid Dictionary Header : found Start marker <%X> ZBlockID <%X>. One of these is invalid (or both are).",
-        wHead.StartSign,
-        wHead.BlockId);
+        wStartSign,
+        wBlockId);
     return  ZS_BADDIC;
   }
+  Active = *pPtrIn++;
+  _importAtomic(DicKeyCount,pPtrIn);
+  _importAtomic(Version,pPtrIn);
 
+  CreationDate._import(pPtrIn);
+  ModificationDate._import(pPtrIn);
 
-  DicKeyCount=reverseByteOrder_Conditional<uint32_t>(wHead.DicKeyCount);
-  pPtrIn += sizeof(ZMFDicExportHeader);
+  DicName._importUVF(pPtrIn);
+
   return ZS_SUCCESS;
 }//_import
 

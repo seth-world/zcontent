@@ -39,6 +39,11 @@ typedef long zrank_type;
 namespace zbs {
 
 
+enum ZBATAllocate_type: int {
+  ZBATA_Create=0,
+  ZBATA_Insert=1,
+  ZBATA_Replace=2
+};
 
 /** @cond Development */
 
@@ -787,10 +792,14 @@ protected:
     ZStatus updateReservedBlock(const ZDataBuffer &pReserved, bool pForceWrite);
 
 
-
     ZStatus _ZRFopen(const zmode_type pMode,
                   const ZFile_type pFileType,
                   bool pLockRegardless=false);
+
+protected:
+    ZStatus _baseOpen(const zmode_type pMode,
+                      const ZFile_type pFileType,
+                      bool pLockRegardless=false);
 
 
 public:
@@ -836,8 +845,10 @@ public:
     ZStatus _insert2PhasesCommit_Commit(const ZDataBuffer &pUserBuffer,
                                        const zrank_type pZBATIndex);
 
-
+  /** see _deleteZBAT */
     ZStatus _insert2PhasesCommit_Rollback(const zrank_type pZBATIndex);
+
+
 
 
 /*     inline
@@ -879,24 +890,48 @@ public:
 // obtains a free block of pSize  (within ZFBT) and moves it to ZBAT
 
     long _getFreeBlock(const size_t pSize,
-                       ZBlockMin_struct &pBlock,
+                       ZBlockMin &pBlock,
+                        int pFlag,
                        zrank_type pZBATRank=-1,
                        const zaddress_type pBaseAddress=-1);
+    long _getFreeBlockOld(const size_t pSize,
+                      ZBlockMin &pBlock,
+                      int pFlag,
+                      zrank_type pZBATRank=-1,
+                      const zaddress_type pBaseAddress=-1);
 
-    ZStatus _getExtent(ZBlockDescriptor &pBlockMin,
-                       const size_t pSize);     //! get a free block extension with size greater or equal to pSize (according ExtentQuotaSize)
+    long checkSplitFreeBlock (long pRank, size_t pRequestedSize);
+
+    /** @brief ZRandomFile::_getFreeBlockEngine core free block engine search
+      *  Obtains a free block of size pSize searching at minimum pBaseAddress,
+      *  Extends file whenever required, creates an entry in free blocks pool
+      *  Returns corresponding block rank in free blocks pool or -1 if error */
+    long _getFreeBlockEngine(const size_t pSize, const zaddress_type pBaseAddress=-1);
+
+    /* somehow same as _insert2PhasesCommit_Rollback */
+    long _deleteZBAT (const size_t pRank);
+
+    ZStatus _getExtent(ZBlockDescriptor &pBlockDesc,
+                       const size_t pExtentSize);     //! get a free block extension with size greater or equal to pSize (according ExtentQuotaSize)
 
     long _allocateFreeBlock (zrank_type pZFBTRank,
                              zsize_type pSize,
+                             int pFlag=0,
                              long pZBATRank=-1);// allocates a free block to used block (from ZFBT to ZBAT) at rank pZBABRank, or by push (pZBABRank=-1)
+
+
 
     void _cleanDeletedBlocks(ZBlockDescriptor &pBD);
 
     void _freeBlock_Prepare (zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
 
     void _freeBlock_Rollback(zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
+    ZStatus _freeBlock_Commit  (zrank_type pRank, bool pReplace=false); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
 
-    ZStatus _freeBlock_Commit  (zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
+
+    ZStatus _replace( const ZDataBuffer &pUserBuffer,
+                      const zrank_type pRank,
+                      zaddress_type &pLogicalAddress);
 
     ZStatus _freeBlock(zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
 

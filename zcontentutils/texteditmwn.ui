@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>813</width>
-    <height>628</height>
+    <height>623</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -72,9 +72,52 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="moreBTn">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QPushButton" name="searchBTn">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../../zqt/icons/magnifyingglass.png</normaloff>../../zqt/icons/magnifyingglass.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="searchLEd"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="searchMainBTn">
+         <property name="toolTip">
+          <string notr="true">set search on/off</string>
+         </property>
          <property name="text">
-          <string>More</string>
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../../zqt/icons/strigi.png</normaloff>../../zqt/icons/strigi.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="filterBTn">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../../zqt/icons/funel.png</normaloff>../../zqt/icons/funel.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="lineNumbersBTn">
+         <property name="text">
+          <string>Line numbers On</string>
          </property>
         </widget>
        </item>
@@ -95,7 +138,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QPlainTextEdit" name="textPTe">
+      <widget class="ZQPlainTextEdit" name="textPTe">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -115,6 +158,9 @@
          <weight>75</weight>
          <bold>true</bold>
         </font>
+       </property>
+       <property name="toolTip">
+        <string>Filter content</string>
        </property>
        <property name="sizeAdjustPolicy">
         <enum>QAbstractScrollArea::AdjustToContents</enum>
@@ -139,6 +185,13 @@
    </property>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ZQPlainTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header location="global">zqplaintextedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -26,7 +26,7 @@ public:
     BlockExtentQuota=pIn.BlockExtentQuota;
     BlockTargetSize=pIn.BlockTargetSize;
     HighwaterMarking=pIn.HighwaterMarking;
-    GrabFreeSpace=pIn.HighwaterMarking;
+    GrabFreeSpace=pIn.GrabFreeSpace;
     return *this;
   }
 
@@ -41,6 +41,7 @@ public:
   bool            HighwaterMarking=false;   /**< mark to zero the whole deleted block content when removed */
   bool            GrabFreeSpace=false;      /**< attempts to grab free space and holes at each block free operation */
 };
+
 
 class ZFileControlBlock;
 #pragma pack(push)
@@ -228,7 +229,7 @@ public:
   ZFileControlBlock (const ZFileControlBlock&& pIn) {_copyFrom(pIn);}
 
   ZFileControlBlock& _copyFrom(const ZFileControlBlock& pIn);
-  ZFileControlBlock& operator = (const ZFileControlBlock& pIn){_copyFrom(pIn);}
+  ZFileControlBlock& operator = (const ZFileControlBlock& pIn){return _copyFrom(pIn);}
 
   void clear(void) ;
 

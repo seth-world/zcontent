@@ -589,6 +589,8 @@ ZStatus _getFieldValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &AVFKValue,cons
     if (wZType & ZType_Class)
             return _getClassValueFromKey(pKeyData,AVFKValue,pRank,pZIF);
 
+    return ZS_INVPARAMS;
+
 }//_getValueFromKey
 
 

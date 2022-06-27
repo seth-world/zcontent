@@ -162,11 +162,13 @@ class ZFieldDescription
 {
   friend class zbs::FieldDesc_Export;
   friend class zbs::FieldDesc_Pack;
-
+  friend class FieldDesc_Check;
 public:
   ZFieldDescription() = default;
   ZFieldDescription (const ZFieldDescription& pIn) { _copyFrom(pIn); }
   ZFieldDescription (const ZFieldDescription&& pIn) { _copyFrom(pIn); }
+
+ ~ZFieldDescription () {  }
 
   ZFieldDescription& _copyFrom(const ZFieldDescription &pIn);
 
@@ -180,17 +182,26 @@ public:
   uint64_t            NaturalSize;        //!< Only if ZType is fixed length. Otherwise set to 0
   ZBool               KeyEligible=false ; //!< May be used as Key field (true) or not (false)
 
-private: utf8String          Name;        //!< Name of the field
-public:  md5                 Hash;        //!< unique hashcode value for the field.
+  utf8VaryingString   ToolTip;           //!< Help for the field
 
-  void setFieldName(const utf8String& pName);
+private: utf8VaryingString  Name;        //!< Name of the field
+public:  md5                Hash;        //!< unique hashcode value for the field.
+
+  void clear() ;
+
+  void setFieldName(const utf8VaryingString& pName);
   utf8String& getName() {return Name;}
-  bool hasName(const char* pName) const { return Name==pName; }
-  bool hasName(const utf8String& pName) const { return Name==pName.toCChar(); }
 
-  /* compute md5 hash key with current data from the field */
+  bool hasName(const utf8VaryingString& pName) const;
+  bool hasHashCode (const md5& pHashcode) const ;
+
+  /** @brief checkHashcode check if existing hashcode value is still in line with field description content */
+  bool checkHashcode() ;
+
+  /** @brief computeMd5() compute md5 hash key with all current data from the field and store it within Hash field. returns computed value */
   md5& computeMd5();
-
+  /** @brief _computeMd5() compute md5 hash key with all current data from the field, WITHOUT storeing it within Hash field and returns computed value */
+  md5 _computeMd5();
 
   bool isAtomic(void) {return ZType & ZType_Atomic ;}
   bool isArray(void) {return ZType & ZType_Array ;}
@@ -201,9 +212,7 @@ public:  md5                 Hash;        //!< unique hashcode value for the fie
   bool isSigned(void) {return ZType & ZType_Signed ;}
   bool isEndian(void) {return ZType & ZType_Endian ;}
 
-  void clear() {ZType=0; Capacity=0;HeaderSize=0;UniversalSize=0;NaturalSize=0; KeyEligible=false;Name.clear(); Hash.clear();}
-
-  utf8String toXml(int pLevel, bool pComment=true);
+  utf8VaryingString toXml(int pLevel, bool pComment=true);
   /**
    * @brief fromXml  populate Field description's attributes with xml content whose root is given by pFieldRootNode.
    * @param pFieldRootNode root node for field to load : must point to <field>

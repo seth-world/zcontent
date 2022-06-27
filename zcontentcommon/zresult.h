@@ -28,8 +28,8 @@ public:
     ZResult(const ZResult&& pIn) {_copyFrom(pIn);}
 
     ZResult& _copyFrom(const ZResult& pIn);
-    ZResult& operator = (const ZResult& pIn) {_copyFrom(pIn);}
-    ZResult& operator = (const ZResult&& pIn) {_copyFrom(pIn);}
+    ZResult& operator = (const ZResult& pIn) {return _copyFrom(pIn);}
+    ZResult& operator = (const ZResult&& pIn) {return _copyFrom(pIn);}
 
     void clear();
 

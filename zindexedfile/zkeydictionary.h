@@ -102,7 +102,6 @@ public:
 #pragma pack(pop)
 
 
-
 class ZKeyDictionary : public ZArray<ZIndexField>
 {
 typedef ZArray<ZIndexField> _Base;
@@ -110,11 +109,11 @@ typedef ZArray<ZIndexField> _Base;
 public:
   ZKeyDictionary(ZMFDictionary*pMDic) ;
   ZKeyDictionary(const utf8String& pName,ZMFDictionary*pMDic) {setName(pName);MasterDic=pMDic;}
-  ZKeyDictionary(ZKeyDictionary* pIn);
-  ZKeyDictionary(ZKeyDictionary& pIn);
+  ZKeyDictionary(const ZKeyDictionary* pIn);
+  ZKeyDictionary(const ZKeyDictionary& pIn);
   ~ZKeyDictionary() { } // just to call the base destructor
 
-  ZKeyDictionary& _copyFrom( ZKeyDictionary& pIn);
+  ZKeyDictionary& _copyFrom( const ZKeyDictionary& pIn);
 
   ZKeyDictionary& operator=( ZKeyDictionary& pIn) {return _copyFrom(pIn);}
 
@@ -122,8 +121,27 @@ public:
 
   bool hasSameContentAs(ZKeyDictionary*pKey);
 
+  long  hasFieldNameCase(const utf8VaryingString& pName);
+
+  long push(ZIndexField& pField) {
+    pField.KeyDic = this;
+    return _Base::push(pField);
+  }
+  long insert(ZIndexField& pField, long pIdx) {
+    pField.KeyDic = this;
+    return _Base::insert(pField, pIdx);
+  }
+
+  long insert(ZIndexField* pFieldArray, long pIdx,long pNb) {
+    for (long wi = 0; wi < pNb; wi++)
+      pFieldArray[wi].KeyDic = this;
+    return _Base::insert(pFieldArray, pIdx,pNb);
+  }
+
+
   uint8_t           Duplicates=0;
   utf8String        DicKeyName;       // refers to ZICB::IndexName
+  utf8VaryingString ToolTip;         //!< help describing the key
   ZMFDictionary*    MasterDic=nullptr;  // Record Dictionary to which Key Dictionary refers : WARNING : not store in xml <keydictionary>
                                 //  it is stored apart in dedicated <metadic> xml node
 //    uint32_t KDicSize;          //!< Size of the dictionary when exported (other fields are not exported) this field comes first
@@ -200,6 +218,67 @@ public:
 
 
 } ;
+
+
+
+/* reference of that to be stored within QStandardItem[0] */
+class ZKeyHeaderRow : public ZKeyDictionary
+{
+public:
+  ZKeyHeaderRow(ZMFDictionary*pMDic) : ZKeyDictionary(pMDic) {}
+  ZKeyHeaderRow(ZKeyDictionary* pKeyDic) : ZKeyDictionary(pKeyDic) {set(pKeyDic);}
+
+  ZKeyHeaderRow(const ZKeyHeaderRow& pIn) : ZKeyDictionary(pIn) {ZKeyHeaderRow::_copyFrom(pIn);}
+  ZKeyHeaderRow(const ZKeyHeaderRow* pIn) : ZKeyDictionary(pIn) {ZKeyHeaderRow::_copyFrom(*pIn);}
+
+  uint32_t          KeyUniversalSize=0;
+
+  ZKeyHeaderRow& _copyFrom(const ZKeyHeaderRow& pIn) {
+    ZKeyDictionary::_copyFrom(pIn);
+    KeyUniversalSize=pIn.KeyUniversalSize;
+    return *this;
+  }
+
+  ZKeyHeaderRow& operator = (const ZKeyHeaderRow& pIn) {return _copyFrom(pIn); }
+
+  void set(const ZKeyDictionary& pKeyDic) ;
+  void set(const ZKeyDictionary* pKeyDic) ;
+  ZKeyDictionary get() ;
+};
+
+class ZKeyFieldRow : public ZIndexField
+{
+public:
+  ZKeyFieldRow()=default;
+  ZKeyFieldRow(const ZIndexField& pKeyField):ZIndexField(pKeyField) {set(pKeyField);}
+  ZKeyFieldRow(const ZKeyFieldRow& pIn) {_copyFrom(pIn);}
+  ZTypeBase         ZType=ZType_Nothing;
+  utf8VaryingString Name;
+  uint32_t          UniversalSize=0;
+//  uint32_t      MDicRank=0;       // reference to Metadictionary row : not stored in XML
+//  uint32_t      KeyOffset=0;      // Offset of the Field from the beginning of Key record computed using universal formats
+//  md5           Hash;             // unique reference to meta dictionary field definition (stored in XML)
+
+  ZKeyFieldRow& _copyFrom(const ZKeyFieldRow& pIn) {
+    ZIndexField::_copyFrom(pIn);
+//    MDicRank=pIn.MDicRank;
+//    KeyOffset=pIn.KeyOffset;
+//    Hash=pIn.Hash;
+    UniversalSize=pIn.UniversalSize;
+    Name =pIn.Name;
+    ZType = pIn.ZType;
+    return *this;
+  }
+
+  ZKeyFieldRow& operator = (const ZKeyFieldRow& pIn) {return _copyFrom(pIn); }
+
+  //  void set(const ZMetaDic& pMetaDic, const ZIndexField& pKeyField) ;
+  void set(const ZIndexField& pKeyField) ;
+  ZIndexField get() ;
+};
+
+
+
 
 } //namespace zbs
 

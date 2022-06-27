@@ -135,6 +135,7 @@ class ZIndexField
 public:
   ZIndexField& _copyFrom(const ZIndexField& pIn);
   ZIndexField()=default;
+  ZIndexField(ZKeyDictionary* pParent) {KeyDic=pParent;}
   ZIndexField(const ZIndexField& pIn) {_copyFrom(pIn);}
   ZIndexField(const ZIndexField&& pIn) {_copyFrom(pIn);}
 
@@ -156,11 +157,10 @@ public:
     /* this routine does not change input data - but updates pPtrIn*/
     void _import(const unsigned char *&pPtrIn);
 
-
-
-    uint32_t    MDicRank=0;       // reference to Metadictionary row : not stored in XML
-    uint32_t    KeyOffset=0;      // Offset of the Field from the beginning of Key record computed using universal formats
-    md5         Hash;             // unique reference to meta dictionary field definition (stored in XML)
+    uint32_t          MDicRank=0;       // reference to Metadictionary row : not stored in XML
+    uint32_t          KeyOffset=0;      // Offset of the Field from the beginning of Key record computed using universal formats
+    md5               Hash;             // unique reference to meta dictionary field definition (stored in XML)
+    ZKeyDictionary*   KeyDic=nullptr;  // reverse to parent key dictionary
 //    uint64_t    NaturalSize=0;    //!< Length of the Field to extract from the record : natural size is the canonical data size and not the size of the data once it has been reprocessed for key usage. @note Special case for char and uchar : Sizes are equal to Cstring size (obtained with strlen).
 //    uint64_t    UniversalSize=0;  //!< length of the field when stored into Key (Field dictionary internal format size)
 //    ZTypeBase   ZType=0;          //!< Type mask of the Field @see ZType_type
