@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#define __DICTIONARY_EXTENSION__ ".dic"
+#define __DICTIONARY_EXTENSION__ "dic"
 
 const unsigned long cst_DictionaryVersionAny = 0xFFFFFFFFFF;
 
@@ -62,13 +62,36 @@ class ZDictionaryFile : public ZRandomFile , public ZMFDictionary
 public:
   ZDictionaryFile();
 
+  using ZMFDictionary::push;
+
+  ZStatus zcreate(const uriString &pFilename, size_t pInitialSize, bool pBackup=true, bool pLeaveOpen=false);
+  ZStatus zcreate(const uriString &pFilename, size_t pInitialSize,
+                  const long pAllocatedBlocks,
+                  const long pBlockExtentQuota,
+                  const long pBlockTargetSize,
+                  const bool pHighwaterMarking,
+                  const bool pGrabFreeSpace, bool pBackup, bool pLeaveOpen);
+
+  ZStatus zinitalize(const uriString &pFilename, bool pBackup=true);
+
   ZStatus zopen(const uriString &pFilename,const zmode_type pMode);
+  ZStatus zopen(const zmode_type pMode);
 
   ZStatus loadDictionaryByVersion(unsigned long pVersion );
   ZStatus loadDictionaryByRank(long pRank );
   ZStatus loadActiveDictionary();
-  ZStatus saveDictionary(unsigned long pVersion);
 
+  
+  ZStatus getDictionaryHeader(ZMFDicExportHeader& wHeader,long pRank );
+
+  ZStatus searchActiveDictionary(long &pRank);
+
+  ZStatus searchDictionary(long &pRank,const utf8VaryingString& pDicName ,unsigned long pVersion);
+
+  ZStatus searchAndWrite();
+
+  ZStatus save();
+//  ZStatus saveDictionary();
 
   void setDictionary(ZMFDictionary& pMasterDic) {ZMFDictionary::_copyFrom( pMasterDic);}
   ZMFDictionary& getDictionary() {return *this;}
@@ -77,14 +100,15 @@ public:
   long findDictionaryByName(const utf8VaryingString& pName );
 
 
+
+
   utf8VaryingString exportToXmlString(bool pComment);
   ZStatus exportToXmlFile(const uriString &pXmlFile,bool pComment);
 
   ZStatus importFromXmlString(const utf8VaryingString& pXmlContent);
   ZStatus importFromXmlFile(const uriString &pXmlFile);
 
-  ZDicList getAllDictionaries();
-  ZDicHeaderList getAllDicHeaders();
+  ZStatus getAllDicHeaders(ZDicHeaderList& wDicHeaderList);
 
 //  ZMFDictionary MasterDic ;
 };

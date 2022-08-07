@@ -1,5 +1,9 @@
 #include "zfielddlg.h"
 #include "ui_zfielddlg.h"
+#include "ztypedlg.h"
+
+#include <zcontent/zcontentutils/ztypelistbutton.h>
+#include <zexceptiondlg.h>
 
 #include <qevent.h>
 #include <zqt/zqtwidget/zqstandarditemmodel.h>
@@ -9,16 +13,11 @@
 #include <ztoolset/ztypetype.h>
 #include <zcontent/zindexedfile/zdatatype.h>
 
-#include <zexceptiondlg.h>
-
-#include "ztypedlg.h"
 
 
 #define __ICON_PATH__ "/home/gerard/Development/zbasetools/zqt/icons/"
 #define __HASH_OK_ICON__      "HashcodeOk.png"
 #define __HASH_WRONG_ICON__   "HashcodeWrong.png"
-
-
 
 ZFieldDLg::ZFieldDLg(QWidget *parent) : QDialog(parent), ui(new Ui::ZFieldDLg)
 {
@@ -50,7 +49,7 @@ ZFieldDLg::ZFieldDLg(QWidget *parent) : QDialog(parent), ui(new Ui::ZFieldDLg)
 //  QObject::connect(ui->ZTypeLEd,SIGNAL(sigFocusIn(QFocusEvent*)),this,SLOT(ZTypeFocusIn(QFocusEvent*)));
   QObject::connect(TypeListBtn,SIGNAL(clicked()),this,SLOT(ZTypeListClicked()));
 
-  QObject::connect(ui->DisguardBTn,SIGNAL(clicked()),this,SLOT(DisguardClicked()));
+  QObject::connect(ui->DiscardBTn,SIGNAL(clicked()),this,SLOT(DiscardClicked()));
   QObject::connect(ui->AcceptBTn,SIGNAL(clicked()),this,SLOT(AcceptClicked()));
 
   QObject::connect(ui->ComputeBTn,SIGNAL(clicked()),this,SLOT(ComputeClicked()));
@@ -64,9 +63,6 @@ ZFieldDLg::ZFieldDLg(QWidget *parent) : QDialog(parent), ui(new Ui::ZFieldDLg)
 
 ZFieldDLg::~ZFieldDLg()
 {
-//  if (ZTypeTRv)
-//    ZTypeTRv->deleteLater();
-
   delete ui;
 }
 
@@ -117,11 +113,9 @@ ZFieldDLg::ZTypeListClicked()
 
   TypeListBtn->ZType = Field.ZType = ZTypeTRv->get();
 
-
-
-
   wStr.sprintf("0x%08X",Field.ZType);
   ui->ZTypeLEd->setText(wStr.toCChar());
+  ui->ZTypeLEd->setReadOnly(true);
 
   ui->ZTypeStrLEd->setText(decode_ZType(Field.ZType));
   ui->ZTypeStrLEd->setReadOnly(true);
@@ -165,7 +159,7 @@ ZFieldDLg::AcceptClicked()
 }
 
 void
-ZFieldDLg::DisguardClicked()
+ZFieldDLg::DiscardClicked()
 {
   reject();
 }

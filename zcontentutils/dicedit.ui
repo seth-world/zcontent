@@ -29,30 +29,10 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QLabel" name="ClosedLBl">
-     <property name="geometry">
-      <rect>
-       <x>942</x>
-       <y>10</y>
-       <width>180</width>
-       <height>19</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>No Open File</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="KeysNbLBl">
      <property name="geometry">
       <rect>
-       <x>880</x>
+       <x>1060</x>
        <y>10</y>
        <width>41</width>
        <height>20</height>
@@ -65,7 +45,7 @@
     <widget class="QLabel" name="label_4">
      <property name="geometry">
       <rect>
-       <x>720</x>
+       <x>900</x>
        <y>10</y>
        <width>71</width>
        <height>19</height>
@@ -75,7 +55,7 @@
       <string>Fields</string>
      </property>
     </widget>
-    <widget class="QLabel" name="DicNameLBl">
+    <widget class="ZQLabel" name="DicNameLBl">
      <property name="geometry">
       <rect>
        <x>12</x>
@@ -91,7 +71,7 @@
     <widget class="QLabel" name="FieldsNbLBl">
      <property name="geometry">
       <rect>
-       <x>770</x>
+       <x>950</x>
        <y>10</y>
        <width>51</width>
        <height>19</height>
@@ -104,7 +84,7 @@
     <widget class="QLabel" name="label_3">
      <property name="geometry">
       <rect>
-       <x>830</x>
+       <x>1010</x>
        <y>10</y>
        <width>51</width>
        <height>19</height>
@@ -117,7 +97,7 @@
     <widget class="QLabel" name="label_6">
      <property name="geometry">
       <rect>
-       <x>520</x>
+       <x>540</x>
        <y>10</y>
        <width>71</width>
        <height>19</height>
@@ -127,10 +107,10 @@
       <string>Version</string>
      </property>
     </widget>
-    <widget class="QLabel" name="VersionLBl">
+    <widget class="ZQLabel" name="VersionLBl">
      <property name="geometry">
       <rect>
-       <x>580</x>
+       <x>610</x>
        <y>10</y>
        <width>111</width>
        <height>19</height>
@@ -138,6 +118,16 @@
      </property>
      <property name="text">
       <string>##.##-##</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="ActiveCBx">
+     <property name="geometry">
+      <rect>
+       <x>740</x>
+       <y>10</y>
+       <width>121</width>
+       <height>23</height>
+      </rect>
      </property>
     </widget>
    </widget>
@@ -213,6 +203,11 @@
    <class>ZQTableView</class>
    <extends>QTableView</extends>
    <header>zqtableview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ZQLabel</class>
+   <extends>QLabel</extends>
+   <header>zqlabel.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

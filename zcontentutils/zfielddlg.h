@@ -57,7 +57,7 @@ public slots:
 //  void ZTypeFocusIn(QFocusEvent* pEvent);
   void ZTypeListClicked();
   void AcceptClicked();
-  void DisguardClicked();
+  void DiscardClicked();
   void ComputeClicked();
   void ArrayClicked();
 

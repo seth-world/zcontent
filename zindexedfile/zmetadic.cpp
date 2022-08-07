@@ -428,7 +428,6 @@ ZMetaDic::writeXML(FILE* pOutput)
 ZMetaDic&
 ZMetaDic::_copyFrom( const ZMetaDic& pIn)
 {
-
   if (CheckSum!=nullptr)
     {
     delete CheckSum;
@@ -441,6 +440,7 @@ ZMetaDic::_copyFrom( const ZMetaDic& pIn)
   for (long wi=0;wi<pIn.count();wi++)
     push(ZFieldDescription(pIn.Tab[wi]));
   DicName = pIn.DicName;
+  Version = pIn.Version;
   return *this;
 }//_copyFrom
 

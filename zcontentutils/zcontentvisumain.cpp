@@ -289,7 +289,7 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
       dictionaryWnd=new DicEdit(this);
     dictionaryWnd->clear();
 
-    dictionaryWnd->setNewDictionary();
+//    dictionaryWnd->setNewDictionary();
 
     dictionaryWnd->show();
     return;
@@ -961,12 +961,6 @@ ZContentVisuMain::openOther(const char* pFileName)
   ui->ZRFMEn->setEnabled(false);
   ui->ZMFMEn->setEnabled(false);
 
-
-  if (entityWnd)
-    entityWnd->setFileClosed(false);
-  if (dictionaryWnd)
-    dictionaryWnd->setFileClosed(false);
-
   return ZS_SUCCESS;
 }//openOther
 
@@ -1396,10 +1390,6 @@ void
 ZContentVisuMain::actionClose(bool pChecked)
 {
 
-  if (entityWnd)
-    entityWnd->setFileClosed(true);
-  if (dictionaryWnd)
-    dictionaryWnd->setFileClosed(true);
 
   displayWidgetBlockOnce=false;
   if (RandomFile)

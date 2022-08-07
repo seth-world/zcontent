@@ -52,10 +52,11 @@ class ZExceptionDLg : public QDialog
 
 public:
   explicit ZExceptionDLg(const utf8VaryingString& pTitle,const ZExceptionBase &pException, bool pDontShow=false);
-  explicit ZExceptionDLg(const utf8VaryingString& pTitle, Severity_type pSeverity,
-      const utf8VaryingString& pMessage,
-      const utf8VaryingString *pComplement=nullptr,
-      bool pDontShow=false);
+  /* CTOR For adhoc message */
+  explicit ZExceptionDLg( const utf8VaryingString& pTitle, Severity_type pSeverity,
+                          const utf8VaryingString& pMessage,
+                          const utf8VaryingString *pComplement=nullptr,
+                          bool pDontShow=false);
   ~ZExceptionDLg();
 
   void init(const utf8VaryingString& pTitle,Severity_type pSeverity,ZStatus pStatus,const utf8VaryingString& pMessage, const utf8VaryingString& pComplement,bool pDontShow)  ;

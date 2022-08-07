@@ -33,6 +33,10 @@
 /** @} */
 
 
+#define __DISPLAYCALLBACK__(__NAME__)  std::function<void (const utf8VaryingString&)> __NAME__
+#define __PROGRESSCALLBACK__(__NAME__)  std::function<void (int)> __NAME__
+
+
 typedef long zrank_type;
 
 
@@ -433,6 +437,10 @@ public:
     ZStatus zremoveR(long pRank,ZDataBuffer& pRecord);
     ZStatus zremoveByAddress (zaddress_type pAddress);
 
+    ZStatus zreplace(const ZDataBuffer &pRecord,zrank_type pRank);
+
+
+
 
     // ----------File space management------------------------------
 
@@ -470,6 +478,9 @@ protected:
     ZStatus _reorgFile (bool pDump=false, FILE *pOutput=stdout) ;
 
     ZStatus _reorgFileInternals(bool pDump, FILE*pOutput);
+#ifdef __DEPRECATED__
+    ZStatus _reorgFileInternalsOld(bool pDump, FILE*pOutput);
+#endif
 public:
     //-----------------get routines-----------------------------------
     /**
@@ -650,9 +661,9 @@ public:
 //--------------------- statistical  functions----------------------------------
 
 
-    void    ZRFPMSReport( FILE *pOutput=stdout);
+    void    ZRFPMSReport( FILE *pOutput=nullptr);
 
-    static ZStatus ZRFstat(const uriString &pFilename, FILE* pOutput=stdout);
+    static ZStatus ZRFstat(const uriString &pFilename, FILE* pOutput=nullptr);
 /*    ZStatus ZRFstat (const char *pFilePath, FILE* pOutput=stdout)
         {
         uriString wFilePath;
@@ -660,6 +671,9 @@ public:
         return ZRFstat(wFilePath,pOutput);
         }
 */
+    /** @brief getFileSize  returns effective current raw size in byte of current content file
+     */
+    ssize_t getFileSize();
 
     ZStatus zgetBlockDescriptor (const zrank_type pRank, ZBlockDescriptor &pBlockDescriptor);
     ZStatus zgetFreeBlockDescriptor (const zrank_type pRank, ZBlockDescriptor &pBlockDescriptor);
@@ -675,7 +689,12 @@ public:
  */
     void zfullDump(const int pColumn=16,FILE* pOutput=stdout);
     void zheaderDump(FILE* pOutput=stdout);
-    void zcontentDump(const int pColumn=16,FILE* pOutput=stdout);
+/**
+ * @brief ZRandomFile::zcontentDump reports the whole content of the current ZRandomFile using defined output media
+ * @param pColumn   the number of bytes used to present ascii and hexa dump @see ZDataBuffer::Dump
+ * @return ZStatus
+ */
+    ZStatus _contentDump(const int pColumn=16);
 /**
  * @brief zsurfaceScan  Scans the physical file surface for a whole ZRandomFile corresponding to pURIContent
 
@@ -701,13 +720,16 @@ public:
     }
 */
 
-    ZStatus _surfaceScan(FILE *pOutput=stdout);
+    ZStatus _surfaceScan();
 
 public:
 //--------------Dump any ZRF given by its uriString pathname - static methods -------------------------
 //
 
     static void zblockDump (const uriString& pURIContent, const long pRank, const int pColumn=16, FILE* pOutput=stdout);
+
+    void _blockDump(const long pRank, const int pColumn=16);
+
 /*    void zblockDump (const char *pFilePath,const long pBlockNum,const int pColumn=16, FILE* pOutput=stdout)
         {
         uriString wFilePath;
@@ -731,38 +753,30 @@ public:
   * @param pColumn   Number of bytes displayed both in ascii and hexadecimal per row
   * @param pOutput   a FILE* pointer where the reporting will be made. By default, set to stdout.
 */
-    static void zfullDump(const uriString &pURIContent, const int pColumn=16, FILE* pOutput=stdout);
-/*    void zfullDump (const char *pFilePath, const int pColumn=16, FILE* pOutput=stdout)
-        {
-        uriString wFilePath;
-        wFilePath=(const utf8_t*)pFilePath;
-        zfullDump(wFilePath,pColumn,pOutput);
-        return;
-        }
-*/
+  static void zfullDump(const uriString &pURIContent, const int pColumn=16, FILE* pOutput=stdout);
 
-    static void zheaderDump(uriString &pURIContent, FILE* pOutput=stdout);
-    static void zheaderDump (const char *pFilePath, FILE* pOutput=stdout)
+  ZStatus _fullDump(const int pColumn=16);
+
+  static void zheaderDumpS(const uriString &pURIContent, FILE* pOutput=stdout);
+
+static    void zcontentDumpS(uriString pURIContent, int pColumn=16, FILE* pOutput=stdout);
+static    void zcontentDumpS (const char *pFilePath, int pColumn=16, FILE* pOutput=stdout)
         {
         uriString wFilePath;
         wFilePath=(const utf8_t*)pFilePath;
-        zheaderDump(wFilePath,pOutput);
+        zcontentDumpS(wFilePath,pColumn,pOutput);
         return;
         }
-static    void zcontentDump(uriString pURIContent, int pColumn=16, FILE* pOutput=stdout);
-    void zcontentDump (const char *pFilePath, int pColumn=16, FILE* pOutput=stdout)
-        {
-        uriString wFilePath;
-        wFilePath=(const utf8_t*)pFilePath;
-        zcontentDump(wFilePath,pColumn,pOutput);
-        return;
-        }
+
+
 protected:
-
-    void _headerDump( FILE* pOutput=stdout);
-    void _fullcontentDump(const int pWidth=16, FILE* pOutput=stdout);
+  /**
+ * @brief ZRandomFile::_headerDump reports the header data of the currently opened ZRandomFile using registrated display facilities
+ */
+    void _headerDump();
+    ZStatus _fullcontentDump(const int pWidth=16);
     void _dumpOneDataBlock(ZBlock &pBlock, utf8String &pRulerHexa, utf8String &pRulerAscii,
-                          const int pWidth=16, FILE *pOutput=stdout);
+                          const int pWidth=16);
 
 //-----------End Dump---------------------------------------------
 //
@@ -821,11 +835,15 @@ public:
 
 //-----------Internal routines-------------------------------
 
-    ZStatus _add2PhasesCommit_Prepare  (const ZDataBuffer &pUserBuffer,
+    ZStatus _add2PhasesCommit_Prepare  (const ZDataBuffer &pUserContent,
                                         zrank_type &pZBATIndex,
                                         zaddress_type &pLogicalAddress);
-
-    ZStatus _add2PhasesCommit_Commit(const ZDataBuffer &pUserBuffer,
+#ifdef __DEPRECATED__
+    ZStatus _add2PhasesCommit_PrepareOld  (const ZDataBuffer &pUserContent,
+        zrank_type &pZBATIndex,
+        zaddress_type &pLogicalAddress);
+#endif
+    ZStatus _add2PhasesCommit_Commit(const ZDataBuffer &pUserContent,
                                       const zrank_type pZBATIndex,
                                       zaddress_type &pLogicalAddress);
 
@@ -841,6 +859,12 @@ public:
                                         const zrank_type pRank,
                                         zrank_type &pZBATIndex,
                                         zaddress_type &pLogicalAddress);
+#ifdef __DEPRECATED__
+    ZStatus _insert2PhasesCommit_PrepareOld(const ZDataBuffer &pUserBuffer,
+        const zrank_type pRank,
+        zrank_type &pZBATIndex,
+        zaddress_type &pLogicalAddress);
+#endif //__DEPRECATED__
 
     ZStatus _insert2PhasesCommit_Commit(const ZDataBuffer &pUserBuffer,
                                        const zrank_type pZBATIndex);
@@ -929,9 +953,7 @@ public:
     ZStatus _freeBlock_Commit  (zrank_type pRank, bool pReplace=false); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
 
 
-    ZStatus _replace( const ZDataBuffer &pUserBuffer,
-                      const zrank_type pRank,
-                      zaddress_type &pLogicalAddress);
+    ZStatus _replace(const ZDataBuffer &pUserBuffer, const zrank_type pRank, zaddress_type &pAddress);
 
     ZStatus _freeBlock(zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
 
@@ -1075,6 +1097,18 @@ public:
                          const zaddress_type pAddress);
 
 
+    void set_displayCallBack(__DISPLAYCALLBACK__(pDCB)) {_displayCallback=pDCB;}
+    void set_progressCallBack(__PROGRESSCALLBACK__(pPCB)) {_progressCallBack=pPCB;}
+    void set_Output(FILE* pOutput) {Output=pOutput;}
+
+
+    void _print(const char* pFormat,...);
+    void _print(const utf8VaryingString& pOut);
+
+
+    __DISPLAYCALLBACK__(_displayCallback)=nullptr;
+    __PROGRESSCALLBACK__(_progressCallBack)=nullptr;
+    FILE* Output=nullptr;
 
 
 }; // ZRandomFile

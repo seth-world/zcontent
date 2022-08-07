@@ -71,8 +71,15 @@ DicEdit::~DicEdit()
 {
   if (FieldDLg)
     delete FieldDLg;
-  if (MasterDic)
-    delete MasterDic;
+//  if (MasterDic)
+//    delete MasterDic;
+
+  if (DictionaryFile) {
+    if (DictionaryFile->isOpen())
+      DictionaryFile->zclose();
+
+    delete DictionaryFile;
+  }
 
   delete ui;
 }
@@ -90,12 +97,14 @@ DicEdit::DicEdit(QWidget *parent) : QMainWindow(parent),ui(new Ui::DicEdit)
   Errorlog.setAutoPrintOn(ZAIES_Text);
   Errorlog.setDisplayCallback(std::bind(&DicEdit::displayErrorCallBack, this,_1));
 
+  ui->ActiveCBx->addItem("Not active");
+  ui->ActiveCBx->addItem("Active");
+  ui->ActiveCBx->setCurrentIndex(0);
 
   ui->DicNameLBl->setText ("No dictionary name");
   ui->VersionLBl->setText ("0.0-0");
   ui->KeysNbLBl ->setText ("0");
   ui->FieldsNbLBl->setText("0");
-
 
 /*  ui->displayTBv->setStyleSheet(QString::fromUtf8("QTableView::item{border-left : 1px solid black;\n"
                                                 "border-right  : 1px solid black;\n"
@@ -132,9 +141,6 @@ DicEdit::DicEdit(QWidget *parent) : QMainWindow(parent),ui(new Ui::DicEdit)
   fieldTBv->show();
 
   /* for key fields */
-
-
-
   keyTRv = setupKeyTRv(ui->displayKeyTRv,true,5); /* 5 columns */
   KeySM=keyTRv->selectionModel();
 
@@ -162,9 +168,6 @@ DicEdit::DicEdit(QWidget *parent) : QMainWindow(parent),ui(new Ui::DicEdit)
 
   keyTRv->show();
 
-  ui->ClosedLBl->setVisible(false);
-
-
   generalMEn=new QMenu(QObject::tr("general","DicEdit"),ui->menubar);
   ui->menubar->addMenu(generalMEn);
 
@@ -177,15 +180,14 @@ DicEdit::DicEdit(QWidget *parent) : QMainWindow(parent),ui(new Ui::DicEdit)
 
   setupReadWriteMenu();
 
+  generalGroup->addAction(FwritetoDicQAc);
   generalGroup->addAction(FwritetoclipQAc);
   generalGroup->addAction(FwriteXmltofileQAc);
   generalGroup->addAction(FviewXmlQAc);
-  generalGroup->addAction(FwritetoDicQAc);
 
+  generalGroup->addAction(FloadfromDicQAc);
   generalGroup->addAction(FloadfromclipQAc);
   generalGroup->addAction(FloadfromXmlFileQAc);
-  generalGroup->addAction(FloadfromDicQAc);
-
 
   generalMEn->addMenu(FloadMEn);
   generalMEn->addMenu(FwritetoMEn);
@@ -197,13 +199,34 @@ DicEdit::DicEdit(QWidget *parent) : QMainWindow(parent),ui(new Ui::DicEdit)
 
   QObject::connect(generalGroup, SIGNAL(triggered(QAction*)), this, SLOT(generalActionEvent(QAction*)));
 
+//  QObject::connect(ui->ActiveCBx, SIGNAL(currentIndexChanged(int)), this, SLOT(activeChanged(int)));
+
+  /* here after ZQLabel fields with doubleClicked signal */
+  QObject::connect(ui->DicNameLBl, SIGNAL(doubleClicked()), this, SLOT(dicDescriptionClicked()));
+  QObject::connect(ui->VersionLBl, SIGNAL(doubleClicked()), this, SLOT(dicDescriptionClicked()));
+
+  DictionaryFile = new ZDictionaryFile;
 }
+void
+DicEdit::dicDescriptionClicked() {
+  utf8VaryingString wDicName = ui->DicNameLBl->text().toUtf8().data();
+  unsigned long wVersion = getVersionNum(ui->VersionLBl->text().toUtf8().data());
+
+  if (!getDicName(wVersion,wDicName))
+    return ;
+
+  ui->DicNameLBl->setText(wDicName.toCChar());
+  ui->VersionLBl->setText(getVersionStr(wVersion).toCChar());
+}
+
 void
 DicEdit::generalActionEvent(QAction* pAction) {
 
   if (pAction == parserQAc) {
+
     if (rawFields==nullptr) {
-      rawFields = new RawFields( "/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata/zcppparserparameters.xml", this);
+//      rawFields = new RawFields( "/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata/zcppparserparameters.xml", this);
+      rawFields = new RawFields( this);
     }
   rawFields->showAll();
   rawFields->setFocus();
@@ -218,8 +241,7 @@ DicEdit::generalActionEvent(QAction* pAction) {
 void
 DicEdit::Quit() {
 
-  int wRet=ZExceptionDLg::message2B("DicEdit::Quit",ZS_EXCEPTION,Severity_Information,"Continue","Quit",
-      "Are you sure you want to quit ?");
+  int wRet=ZExceptionDLg::adhocMessage2B("",Severity_Information,"Continue","Quit",nullptr,"Are you sure you want to quit ?");
   if (wRet==QDialog::Rejected)
     return;
   QApplication::quit();
@@ -238,14 +260,7 @@ DicEdit::clear()
   ui->DicNameLBl->clear();
 }
 
-
-void DicEdit::setFileClosed(bool pYesNo)
-{
-  ui->ClosedLBl->setVisible(pYesNo);
-}
-
-void DicEdit::KeyTRvFlexMenu(QContextMenuEvent *event)
-{
+void DicEdit::KeyTRvFlexMenu(QContextMenuEvent *event) {
   if (keyFlexMEn==nullptr)
             setupKeyFlexMenu();
   keyFlexMEn->exec(event->globalPos());
@@ -269,6 +284,10 @@ DicEdit::setupReadWriteMenu()
 {
   FwritetoMEn=new QMenu(QObject::tr("write to","DicEdit"),this);
 
+  FwritetoDicQAc = new QAction(QObject::tr("dictionary file","DicEdit"),this);
+  FwritetoDicQAc->setObjectName("FwritetoDicQAc");
+  FwritetoMEn->addAction(FwritetoDicQAc);
+
   FwritetoclipQAc = new QAction(QObject::tr("clipboard as xml","DicEdit"),this);
   FwritetoclipQAc->setObjectName("FwritetoclipQAc");
   FwritetoMEn->addAction(FwritetoclipQAc);
@@ -281,11 +300,11 @@ DicEdit::setupReadWriteMenu()
   FviewXmlQAc->setObjectName("FviewXmlQAc");
   FwritetoMEn->addAction(FviewXmlQAc);
 
-  FwritetoDicQAc = new QAction(QObject::tr("dictionary","DicEdit"),this);
-  FwritetoDicQAc->setObjectName("FwritetoDicQAc");
-  FwritetoMEn->addAction(FwritetoDicQAc);
-
   FloadMEn=new QMenu(QObject::tr("load from","DicEdit"),this);
+
+  FloadfromDicQAc = new QAction(QObject::tr("dictionary file","DicEdit"),this);
+  FloadfromDicQAc->setObjectName("FloadfromDicQAc");
+  FloadMEn->addAction(FloadfromDicQAc);
 
   FloadfromclipQAc = new QAction(QObject::tr("clipboard","DicEdit"),this);
   FloadfromclipQAc->setObjectName("FloadfromclipQAc");
@@ -295,9 +314,7 @@ DicEdit::setupReadWriteMenu()
   FloadfromXmlFileQAc->setObjectName("FloadfromXmlFileQAc");
   FloadMEn->addAction(FloadfromXmlFileQAc);
 
-  FloadfromDicQAc = new QAction(QObject::tr("dictionary","DicEdit"),this);
-  FloadfromDicQAc->setObjectName("FloadfromDicQAc");
-  FloadMEn->addAction(FloadfromDicQAc);
+
 
 }//setupReadWriteMenu
 
@@ -492,8 +509,16 @@ DicEdit::setupKeyFlexMenu()
   QObject::connect(keyActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(keyActionEvent(QAction*)));
 
   KInsertKeyQAc= new QAction(keyFlexMEn);
-  KInsertKeyQAc->setText(QCoreApplication::translate("DicEdit", "New key", nullptr));
+  KInsertKeyQAc->setText(QCoreApplication::translate("DicEdit", "Insert key", nullptr));
   KInsertKeyQAc->setObjectName("KInsertKeyQAc");
+
+  KAppendKeyQAc= new QAction(keyFlexMEn);
+  KAppendKeyQAc->setText(QCoreApplication::translate("DicEdit", "Add key", nullptr));
+  KAppendKeyQAc->setObjectName("KAppendKeyQAc");
+
+  KChangeKeyQAc= new QAction(keyFlexMEn);
+  KChangeKeyQAc->setText(QCoreApplication::translate("DicEdit", "Change key", nullptr));
+  KChangeKeyQAc->setObjectName("KChangeKeyQAc");
 
   KDeleteKeyQAc= new QAction(keyFlexMEn);
   KDeleteKeyQAc->setText(QCoreApplication::translate("DicEdit", "Delete key", nullptr));
@@ -515,12 +540,43 @@ DicEdit::setupKeyFlexMenu()
   KappendQAc->setText(QCoreApplication::translate("DicEdit", "Append", nullptr));
   KappendQAc->setObjectName("KappendQAc");
 
+  KKeyMoveupQAc= new QAction(keyFlexMEn);
+  KKeyMoveupQAc->setText(QCoreApplication::translate("DicEdit", "Move key up", nullptr));
+  KKeyMoveupQAc->setObjectName("KKeyMoveupQAc");
+
+  KKeyMovedownQAc= new QAction(keyFlexMEn);
+  KKeyMovedownQAc->setText(QCoreApplication::translate("DicEdit", "Move key down", nullptr));
+  KKeyMovedownQAc->setObjectName("KKeyMovedownQAc");
+
+  KKeyfieldMoveupQAc= new QAction(keyFlexMEn);
+  KKeyfieldMoveupQAc->setText(QCoreApplication::translate("DicEdit", "Move key field up", nullptr));
+  KKeyfieldMoveupQAc->setObjectName("KKeyfieldMoveupQAc");
+
+  KKeyfieldMovedownQAc= new QAction(keyFlexMEn);
+  KKeyfieldMovedownQAc->setText(QCoreApplication::translate("DicEdit", "Move key field down", nullptr));
+  KKeyfieldMovedownQAc->setObjectName("KKeyfieldMovedownQAc");
+
+
   keyFlexMEn->addAction(KDeleteQAc);
   keyActionGroup->addAction(KDeleteQAc);
 
   keyFlexMEn->addSeparator();
+  keyFlexMEn->addAction(KKeyMoveupQAc);
+  keyActionGroup->addAction(KKeyMoveupQAc);
+  keyFlexMEn->addAction(KKeyMovedownQAc);
+  keyActionGroup->addAction(KKeyMovedownQAc);
+  keyFlexMEn->addAction(KKeyfieldMoveupQAc);
+  keyActionGroup->addAction(KKeyfieldMoveupQAc);
+  keyFlexMEn->addAction(KKeyfieldMovedownQAc);
+  keyActionGroup->addAction(KKeyfieldMovedownQAc);
+
+  keyFlexMEn->addSeparator();
   keyFlexMEn->addAction(KInsertKeyQAc);
   keyActionGroup->addAction(KInsertKeyQAc);
+  keyFlexMEn->addAction(KAppendKeyQAc);
+  keyActionGroup->addAction(KAppendKeyQAc);
+  keyFlexMEn->addAction(KChangeKeyQAc);
+  keyActionGroup->addAction(KChangeKeyQAc);
   keyFlexMEn->addAction(KDeleteKeyQAc);
   keyActionGroup->addAction(KDeleteKeyQAc);
 
@@ -554,13 +610,37 @@ DicEdit::setupKeyFlexMenu()
 void DicEdit::keyActionEvent(QAction* pAction)
 {
   utf8String wMsg;
-  if (pAction->objectName()=="KInsertKeyQAc")
-  {
+  if (pAction==KInsertKeyQAc) {
     keyInsert(keyTRv->currentIndex());
     return;
   }
+  if (pAction==KKeyMoveupQAc) {
+    keyMoveup();
+    return;
+  }
+  if (pAction==KKeyMovedownQAc) {
+    keyMovedown();
+    return;
+  }
+  if (pAction==KKeyfieldMoveupQAc) {
+    keyfieldMoveup();
+    return;
+  }
+  if (pAction==KKeyfieldMovedownQAc) {
+    keyfieldMovedown();
+    return;
+  }
 
-  if (pAction->objectName()=="KDeleteQAc")
+
+  if (pAction==KAppendKeyQAc) {
+    keyAppend();
+    return;
+  }
+  if (pAction==KChangeKeyQAc) {
+    keyChange(keyTRv->currentIndex());
+    return;
+  }
+  if (pAction==KDeleteQAc)
   {
     QModelIndex wIdx= keyTRv->currentIndex();
 
@@ -586,7 +666,7 @@ void DicEdit::keyActionEvent(QAction* pAction)
     return;
   }// KDeleteQAc
 
-  if (pAction->objectName()=="KcutQAc")
+  if (pAction==KcutQAc)
     {
     QModelIndex wIdx= keyTRv->currentIndex();
     if(!wIdx.isValid())
@@ -616,12 +696,12 @@ void DicEdit::keyActionEvent(QAction* pAction)
     }// KcutQAc
 
 
-  if (pAction->objectName()=="KpasteQAc") { /* paste from pinboard */
+  if (pAction==KpasteQAc) { /* paste from pinboard */
     keyTRvInsertFromPinboard(keyTRv->currentIndex());
     return;
     }//KpasteQAc
 
-    if (pAction->objectName()=="KappendQAc") { /* append from pinboard */
+    if (pAction==KappendQAc) { /* append from pinboard */
 
       keyTRvAppendFromPinboard(keyTRv->currentIndex());
 
@@ -630,7 +710,7 @@ void DicEdit::keyActionEvent(QAction* pAction)
     readWriteActionEvent(pAction);  /* call the common menu actions */
 
   return;
-}
+}//keyActionEvent
 
 bool
 DicEdit::getDicName(unsigned long &pVersion,utf8VaryingString& pDicName)
@@ -703,6 +783,17 @@ DicEdit::getDicName(unsigned long &pVersion,utf8VaryingString& pDicName)
   return false;
 }//getDicName
 
+
+void
+DicEdit:: renewDicFile(ZMFDictionary& pDic){
+  if (DictionaryFile==nullptr)
+    DictionaryFile = new ZDictionaryFile;
+
+  if (DictionaryFile->isOpen())
+    DictionaryFile->zclose();
+  DictionaryFile->setDictionary(pDic);
+}
+
 void
 DicEdit::readWriteActionEvent(QAction*pAction)
 {
@@ -712,7 +803,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
   /* https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types */
 
-  if  (pAction->objectName()=="FwritetoclipQAc") /* generate xml from current content and write xml to clipboard */
+  if  (pAction==FwritetoclipQAc) /* generate xml from current content and write xml to clipboard */
   {
     /* generate xml from current views content */
 
@@ -738,7 +829,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
     return;
   }// FwritetoclipQAc
 
-  if  (pAction->objectName()=="FloadfromclipQAc")
+  if  (pAction==FloadfromclipQAc)
     {
     ZStatus wSt;
     ZMFDictionary wMasterDic;
@@ -784,15 +875,17 @@ DicEdit::readWriteActionEvent(QAction*pAction)
         return;
     }
 
-    delete MasterDic;
-    MasterDic = new ZMFDictionary(wMasterDic) ;
+//    delete MasterDic;
+//    MasterDic = new ZMFDictionary(wMasterDic) ;
+
+    renewDicFile(wMasterDic);
 
     wMsg.sprintf("Xml dictionary definition has been successfully loaded from clipboard.");
     statusBar()->showMessage(QObject::tr(wMsg.toCChar(),"DicEdit"),cst_MessageDuration);
     } //  FloadfromclipQAc
 
 
-  if  (pAction->objectName()=="FviewXmlQAc") /* generate xml from current content and view it */
+  if  (pAction==FviewXmlQAc) /* generate xml from current content and view it */
   {
     /* generate xml from current views content */
     ZMFDictionary* wMasterDic = screenToDic();
@@ -800,18 +893,20 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
     utf8String wXmlDic=wMasterDic->XmlSaveToString(true);
 
-    delete wMasterDic;
-
     /* display xml content */
     textEditMWn* wTEx=new textEditMWn((QWidget*)this,
                                         TEOP_Nothing, /*no line numbers and close button is really closing and destroying dialog */
                                         nullptr);   /* no close callback */
     wTEx->setText(wXmlDic,wMasterDic->DicName);
+
+
+
+    delete wMasterDic;
     wTEx->show();
     return;
   }//  FviewXmlQAc
 
-  if  (pAction->objectName()=="FwriteXmltofileQAc")
+  if  (pAction==FwriteXmltofileQAc)
   {
     QFileDialog wFd;
 
@@ -853,7 +948,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
   } // FwriteXmltofileQAc
 
 
-  if  (pAction->objectName()=="FloadfromXmlFileQAc")
+  if  (pAction==FloadfromXmlFileQAc)
   {
     QFileDialog wFd;
     wFd.setWindowTitle(QObject::tr("Xml file","DicEdit"));
@@ -911,8 +1006,9 @@ DicEdit::readWriteActionEvent(QAction*pAction)
               return;
       }
 
-  delete MasterDic;
-  MasterDic = new ZMFDictionary(wMasterDic) ;
+//  delete MasterDic;
+//  MasterDic = new ZMFDictionary(wMasterDic) ;
+  renewDicFile(wMasterDic);
 
   wMsg.sprintf("Xml file %s has been successfully loaded.",wXmlFile.toCChar());
   statusBar()->showMessage(QObject::tr(wMsg.toCChar(),"DicEdit"),cst_MessageDuration);
@@ -920,30 +1016,45 @@ DicEdit::readWriteActionEvent(QAction*pAction)
   } // FloadfromXmlFileQAc
 
 
-  if  (pAction->objectName()=="FwritetoDicQAc")
+  if  (pAction==FwritetoDicQAc)
     {
-      statusBar()->showMessage(QObject::tr("Sorry not yet implemented.","DicEdit"),cst_MessageDuration);
-      return;
+    if (saveOrCreateDictionaryFile()!=ZS_SUCCESS)
+      ZExceptionDLg::displayLast();
+
+    return;
     } // FwritetoDicQAc
 
 
-  if  (pAction->objectName()=="FloadfromDicQAc")
+  if  (pAction==FloadfromDicQAc)
     {
-      statusBar()->showMessage(QObject::tr("Sorry not yet implemented.","DicEdit"),cst_MessageDuration);
-      return;
+    loadDictionaryFile();
+    return;
     } // FloadfromDicQAc
 
   return;
 
 }//readWriteActionEvent
+void
+DicEdit::statusBarMessage(const char* pFormat,...) {
+  if (pFormat==nullptr)
+    ui->statusBar->showMessage("<nullptr>");
+  utf8VaryingString wStr;
+  va_list ap;
+  va_start(ap, pFormat);
+
+  wStr.vsnprintf(250,pFormat,ap);
+  va_end(ap);
+
+  ui->statusBar->showMessage(wStr.toCChar(),cst_MessageDuration);
+}
 
 bool
 DicEdit::keyInsert(const QModelIndex &pIdx) {
   QVariant wV;
   ZDataReference wDRef;
-  ZKeyHeaderRow wKHR(MasterDic);
+  ZKeyHeaderRow wKHR(DictionaryFile);
 
-  ZKeyDLg* wKeyDLg=new ZKeyDLg(MasterDic);
+  ZKeyDLg* wKeyDLg=new ZKeyDLg(DictionaryFile,this);
   wKeyDLg->setWindowTitle("Key");
 
   wKeyDLg->setCreate();
@@ -980,7 +1091,7 @@ DicEdit::_keyInsert (const QModelIndex& pIdx,ZKeyDictionary* pKey) {
   if (wDRef.getZEntity()==ZEntity_KeyField) {
     wKeyItem=wKeyItem->parent();  /* jump to key item */
   } else if (wDRef.getZEntity()!=ZEntity_KeyDic) {
-    Errorlog.errorLog("DicEdit::_keyInsert-E-INVTYP Invalid infradata entity type <%s> ",decode_ZEntity(wDRef.getZEntity()).toChar());
+    statusBarMessage("DicEdit::_keyInsert-E-INVTYP Invalid infradata entity type <%s> ",decode_ZEntity(wDRef.getZEntity()).toChar());
     return false;
   }
   /* create and insert key row */
@@ -989,7 +1100,7 @@ DicEdit::_keyInsert (const QModelIndex& pIdx,ZKeyDictionary* pKey) {
   keyTRv->ItemModel->insertRow(wKeyItem->row(),wKeyRow);
 
   /* insert whole key data within dictionary */
-  long wKeyRank=MasterDic->KeyDic.insert(pKey,wKeyItem->row());
+  long wKeyRank=DictionaryFile->KeyDic.insert(pKey,wKeyItem->row());
 
   /* create and link infradata to key item */
   wDRef.set(ZLayout_KeyTRv,getNewResource(ZEntity_KeyDic),wKeyRank);
@@ -1040,7 +1151,7 @@ DicEdit::keyChange(QModelIndex pIdx) {
   if (wDRef.getZEntity()==ZEntity_KeyField) {
     wKeyItem=wKeyItem->parent();  /* if field, jump to key item */
   } else if (wDRef.getZEntity()!=ZEntity_KeyDic) {
-    Errorlog.errorLog("DicEdit::_keyCopy-E-INVTYP Invalid infradata entity type <%s> ",decode_ZEntity(wDRef.getZEntity()).toChar());
+    statusBarMessage("DicEdit::_keyCopy-E-INVTYP Invalid infradata entity type <%s> ",decode_ZEntity(wDRef.getZEntity()).toChar());
     return false;
   }
   /* extract infradata again - now it has been validated keyItem points to the correct item */
@@ -1049,7 +1160,7 @@ DicEdit::keyChange(QModelIndex pIdx) {
 
   wKHR=wDRef.getPtr<ZKeyHeaderRow*>();
 
-  ZKeyDLg* wKeyDLg=new ZKeyDLg(MasterDic);
+  ZKeyDLg* wKeyDLg=new ZKeyDLg(DictionaryFile,this);
   wKeyDLg->setWindowTitle("Key");
 
   wKeyDLg->set(wKHR);
@@ -1068,9 +1179,9 @@ DicEdit::keyChange(QModelIndex pIdx) {
 
   /* update dictionary data */
 
-  MasterDic->KeyDic[wIdx.row()]->DicKeyName = wKHR->DicKeyName;
-  MasterDic->KeyDic[wIdx.row()]->ToolTip = wKHR->ToolTip;
-  MasterDic->KeyDic[wIdx.row()]->Duplicates = wKHR->Duplicates;
+  DictionaryFile->KeyDic[wIdx.row()]->DicKeyName = wKHR->DicKeyName;
+  DictionaryFile->KeyDic[wIdx.row()]->ToolTip = wKHR->ToolTip;
+  DictionaryFile->KeyDic[wIdx.row()]->Duplicates = wKHR->Duplicates;
   /* infradata has been modified previously */
 
   /* change rows content */
@@ -1097,7 +1208,7 @@ DicEdit::keyChange(QModelIndex pIdx) {
 bool
 DicEdit::keyAppend () {
 
-  ZKeyDLg* wKeyDLg=new ZKeyDLg(MasterDic);
+  ZKeyDLg* wKeyDLg=new ZKeyDLg(DictionaryFile);
   wKeyDLg->setWindowTitle("Key");
 
   wKeyDLg->setCreate();
@@ -1143,7 +1254,7 @@ DicEdit::_keyAppend (ZKeyDictionary* pKey) {
   ZKeyFieldRow* wKFR=nullptr;
 
   ZKeyDictionary* wKey = pKey ;
-  long wKeyRank=MasterDic->KeyDic.push(wKey);
+  long wKeyRank=DictionaryFile->KeyDic.push(wKey);
 
   wDRef.set(ZLayout_KeyTRv,getNewResource(ZEntity_KeyDic),wKeyRank);
   wDRef.setPtr(wKHR);
@@ -1189,7 +1300,7 @@ DicEdit::keyCopyToPinboard (QModelIndex pIdx) {
   /* define key index (row and array rank are same) to insert before */
 
   if (!pIdx.isValid()) {
-    Errorlog.errorLog("DicEdit::_keyCopy-E-INVIDX Invalid row index.");
+    statusBarMessage("DicEdit::_keyCopy-E-INVIDX Invalid row index.");
     return false;
   }
   if (pIdx.row()!=0) {
@@ -1198,7 +1309,7 @@ DicEdit::keyCopyToPinboard (QModelIndex pIdx) {
   wV=pIdx.data(ZQtDataReference);
   wDRef=wV.value<ZDataReference>();
   if (wDRef.getZEntity()!=ZEntity_KeyDic) {
-    Errorlog.errorLog("DicEdit::keyfieldInsertFromTemporary-E-INVTYP Invalid infradata entity type <%s> while expected <ZEntity_KeyDic>.",
+    statusBarMessage("DicEdit::keyfieldInsertFromTemporary-E-INVTYP Invalid infradata entity type <%s> while expected <ZEntity_KeyDic>.",
         decode_ZEntity(wDRef.getZEntity()).toChar());
     return false;
   }
@@ -1211,10 +1322,9 @@ DicEdit::keyCopyToPinboard (QModelIndex pIdx) {
   wPElt.setDataReference(wDRef);
   Pinboard.push(wPElt);
   utf8VaryingString wMsg;
-  wMsg.sprintf("Key <%s> copied. %ld rows copied.",
+  statusBarMessage("Key <%s> copied. %ld rows copied.",
       pKHR->DicKeyName.toCChar(),
       pKHR->count() );
-  statusBar()->showMessage(QObject::tr(wMsg.toCChar()),cst_MessageDuration);
   return true;
 } // _keyCopy
 
@@ -1235,7 +1345,7 @@ DicEdit::_keyDelete (const QModelIndex& pIdx) {
   /* define key index (row and array rank are same) to insert before */
 
   if (!pIdx.isValid()) {
-    Errorlog.errorLog("DicEdit::_keyDelete-E-INVIDX Invalid row index.");
+    statusBarMessage("DicEdit::_keyDelete-E-INVIDX Invalid row index.");
     return false;
   }
 
@@ -1251,7 +1361,7 @@ DicEdit::_keyDelete (const QModelIndex& pIdx) {
   if (wDRef.getZEntity()==ZEntity_KeyField) {
     wKeyItem=wKeyItem->parent();  /* if field, jump to key item */
   } else if (wDRef.getZEntity()!=ZEntity_KeyDic) {
-    Errorlog.errorLog("DicEdit::_keyDelete-E-INVTYP Invalid infradata entity type <%s> ",decode_ZEntity(wDRef.getZEntity()).toChar());
+    statusBarMessage("DicEdit::_keyDelete-E-INVTYP Invalid infradata entity type <%s> ",decode_ZEntity(wDRef.getZEntity()).toChar());
     return false;
   }
 
@@ -1274,7 +1384,7 @@ DicEdit::_keyDelete (const QModelIndex& pIdx) {
   wKeyItem->removeRows(0,wKeyItem->rowCount());
 
   /* delete dictionary data */
-  MasterDic->KeyDic.erase(wKeyItem->row());
+  DictionaryFile->KeyDic.erase(wKeyItem->row());
 
   /* remove key row (key is the first child of root element) */
 
@@ -1296,7 +1406,7 @@ DicEdit::_keyfieldDelete (QModelIndex pIdx) {
   /* define key index (row and array rank are same) to insert before */
 
   if (!pIdx.isValid()) {
-    Errorlog.errorLog("DicEdit::_keyDelete-E-INVIDX Invalid row index.");
+    statusBarMessage("DicEdit::_keyDelete-E-INVIDX Invalid row index.");
     return false;
   }
   if (pIdx.column()!=0) {
@@ -1308,7 +1418,7 @@ DicEdit::_keyfieldDelete (QModelIndex pIdx) {
   wKFR=wDRef.getPtr<ZKeyFieldRow*>();
 
   if (wDRef.getZEntity()!=ZEntity_KeyField) {
-    Errorlog.errorLog("DicEdit::_keyDelete-E-INVTYPE Invalid row type. Expected <ZEntity_KeyField> while got <%s>",wDRef.getZEntity());
+    statusBarMessage("DicEdit::_keyDelete-E-INVTYPE Invalid row type. Expected <ZEntity_KeyField> while got <%s>",wDRef.getZEntity());
     return false;
   }
   /* get to item at column 0 (contains infradata) */
@@ -1324,7 +1434,7 @@ DicEdit::_keyfieldDelete (QModelIndex pIdx) {
   wKHR=wDRef.getPtr<ZKeyHeaderRow*>();
 
   /* delete key dictionary key field element */
-  MasterDic->KeyDic[wKeyItem->row()]->erase(wKeyFieldItem->row());
+  DictionaryFile->KeyDic[wKeyItem->row()]->erase(wKeyFieldItem->row());
 
   /* delete key field row */
   wKeyItem->removeRow(wKeyItem->row());
@@ -1387,8 +1497,8 @@ void DicEdit::_recomputeKeyValues(QStandardItem* wKeyItem) {
 
   /* recompute key dictionary values */
 
-  MasterDic->KeyDic[wKeyItem->row()]->computeKeyOffsets();
-  MasterDic->KeyDic[wKeyItem->row()]->computeKeyUniversalSize();
+  DictionaryFile->KeyDic[wKeyItem->row()]->computeKeyOffsets();
+  DictionaryFile->KeyDic[wKeyItem->row()]->computeKeyUniversalSize();
 
   return ;  /* done */
 }// _recomputeKeyValues
@@ -1440,7 +1550,7 @@ DicEdit::fieldAppendToKey(const QModelIndex &pIdx,ZFieldDescription& pField) {
   }
 
 
-  ZKeyHeaderRow wKHR(MasterDic);
+  ZKeyHeaderRow wKHR(DictionaryFile);
   ZKeyFieldRow wKFR;
   ZDataReference wDRefKey , wDRefKeyField;
   QVariant wV;
@@ -1448,7 +1558,7 @@ DicEdit::fieldAppendToKey(const QModelIndex &pIdx,ZFieldDescription& pField) {
 
   wKFR.Name = pField.getName();
   wKFR.ZType = pField.ZType;
-  wKFR.MDicRank = MasterDic->searchFieldByName(wKFR.Name);
+  wKFR.MDicRank = DictionaryFile->searchFieldByName(wKFR.Name);
 
   wKFR.UniversalSize = pField.UniversalSize;
   wKFR.Hash = pField.Hash;
@@ -1464,8 +1574,8 @@ DicEdit::fieldAppendToKey(const QModelIndex &pIdx,ZFieldDescription& pField) {
   if (keyTRv->ItemModel->rowCount()==0) {
 
     /* create a key with name __NEW_KEYNAME__ */
-    ZKeyDictionary* wKeyDic=new ZKeyDictionary(__NEW_KEYNAME__,MasterDic);
-    long wKeyFieldRank=MasterDic->KeyDic.push(wKeyDic);
+    ZKeyDictionary* wKeyDic=new ZKeyDictionary(__NEW_KEYNAME__,DictionaryFile);
+    long wKeyFieldRank=DictionaryFile->KeyDic.push(wKeyDic);
     wKHR.set(wKeyDic);
 
     wKeyRow=createKeyDicRow(wKHR);
@@ -1488,7 +1598,7 @@ DicEdit::fieldAppendToKey(const QModelIndex &pIdx,ZFieldDescription& pField) {
  *  - append key field to created key
  */
     ZIndexField wKField = wKFR.get();
-    long wKFRank=MasterDic->KeyDic.last()->push( wKField);
+    long wKFRank=DictionaryFile->KeyDic.last()->push( wKField);
 
     wDRefKeyField.setZLayout(ZLayout_KeyTRv);
     wDRefKeyField.setResource(getNewResource(ZEntity_KeyField));
@@ -1579,12 +1689,171 @@ DicEdit::keyTRvInsertFromPinboard(QModelIndex pIdx) {
       return _fieldInsertToKey(pIdx,wField);
     }
     default:
-      Errorlog.errorLog("DicEdit::keyfieldInsertFromTemporary-E-INVTYP Invalid infradata entity type <%s> while expected <ZEntity_KeyField>.",decode_ZEntity(wDRef.getZEntity()).toChar());
+      statusBarMessage("DicEdit::keyfieldInsertFromTemporary-E-INVTYP Invalid infradata entity type <%s> while expected <ZEntity_KeyField>.",decode_ZEntity(wDRef.getZEntity()).toChar());
       return false;
   }//switch
 
 }// keyTRvInsertFromPinboard
 
+
+
+
+bool
+DicEdit::keyMoveup() {
+
+  QModelIndex  wIdx= keyTRv->currentIndex();
+  if (!wIdx.isValid()) {
+    return false;
+  }
+  QVariant wV;
+  ZDataReference wDRef;
+  ZKeyHeaderRow*  wKHR=nullptr;
+
+  if (wIdx.column()!=0) {
+    wIdx=wIdx.siblingAtColumn(0);
+  }
+
+  QStandardItem* wKeyItem=keyTRv->ItemModel->itemFromIndex(wIdx);
+  wV=wKeyItem->data(ZQtDataReference);
+  wDRef = wV.value<ZDataReference>();
+
+  if (wDRef.getZEntity()==ZEntity_KeyField) {
+    wKeyItem=wKeyItem->parent();  /* if field, jump to key item */
+  } else if (wDRef.getZEntity()!=ZEntity_KeyDic) {
+    statusBarMessage("DicEdit::_keyCopy-E-INVTYP Invalid infradata entity type <%s> ",decode_ZEntity(wDRef.getZEntity()).toChar());
+    return false;
+  }
+
+  int wRow = wKeyItem->row();
+  if (wRow==0) {
+    statusBarMessage("Already at first position ");
+    return false;
+  }
+
+  QList<QStandardItem*> wKeyRow = keyTRv->ItemModel->takeRow(wRow);
+  if (wKeyRow.count()==0)
+    return false;
+  wRow--;
+  keyTRv->ItemModel->insertRow(wRow,wKeyRow);
+  return true;
+}//keyMoveup
+
+bool
+DicEdit::keyMovedown() {
+
+  QModelIndex  wIdx= keyTRv->currentIndex();
+  if (!wIdx.isValid()) {
+    return false;
+  }
+  QVariant wV;
+  ZDataReference wDRef;
+  ZKeyHeaderRow*  wKHR=nullptr;
+
+  if (wIdx.column()!=0) {
+    wIdx=wIdx.siblingAtColumn(0);
+  }
+
+  QStandardItem* wKeyItem=keyTRv->ItemModel->itemFromIndex(wIdx);
+  wV=wKeyItem->data(ZQtDataReference);
+  wDRef = wV.value<ZDataReference>();
+
+  if (wDRef.getZEntity()==ZEntity_KeyField) {
+    wKeyItem=wKeyItem->parent();  /* if field, jump to key item */
+  } else if (wDRef.getZEntity()!=ZEntity_KeyDic) {
+    statusBarMessage("DicEdit::_keyCopy-E-INVTYP Invalid infradata entity type <%s> ",decode_ZEntity(wDRef.getZEntity()).toChar());
+    return false;
+  }
+
+  int wRow = wKeyItem->row();
+  if (wRow==keyTRv->ItemModel->rowCount()-1) {
+    statusBarMessage("Already at last position ");
+    return false;
+  }
+
+  QList<QStandardItem*> wKeyRow = keyTRv->ItemModel->takeRow(wRow);
+  if (wKeyRow.count()==0)
+    return false;
+  wRow++;
+  keyTRv->ItemModel->insertRow(wRow,wKeyRow);
+  return true;
+}//keyMovedown
+bool
+DicEdit::keyfieldMoveup() {
+
+  QModelIndex  wIdx= keyTRv->currentIndex();
+  if (!wIdx.isValid()) {
+    return false;
+  }
+  QVariant wV;
+  ZDataReference wDRef;
+
+  if (wIdx.column()!=0) {
+    wIdx=wIdx.siblingAtColumn(0);
+  }
+
+  QStandardItem* wKeyfieldItem=keyTRv->ItemModel->itemFromIndex(wIdx);
+  wV=wKeyfieldItem->data(ZQtDataReference);
+  wDRef = wV.value<ZDataReference>();
+
+  if (wDRef.getZEntity()!=ZEntity_KeyField) {
+    statusBarMessage("DicEdit::_keyCopy-E-INVTYP Invalid infradata entity type <%s> ",decode_ZEntity(wDRef.getZEntity()).toChar());
+    return false;
+  }
+
+  QStandardItem* wKeyItem=wKeyfieldItem->parent();
+
+  int wRow = wKeyfieldItem->row();
+  if (wRow==0) {
+    statusBarMessage("Already at first key field position ");
+    return false;
+  }
+
+  QList<QStandardItem*> wKeyfieldRow = wKeyItem->takeRow(wRow);
+  if (wKeyfieldRow.count()==0)
+    return false;
+  wRow--;
+  wKeyItem->insertRow(wRow,wKeyfieldRow);
+  return true;
+}//keyfieldMoveup
+
+bool
+DicEdit::keyfieldMovedown() {
+
+  QModelIndex  wIdx= keyTRv->currentIndex();
+  if (!wIdx.isValid()) {
+    return false;
+  }
+  QVariant wV;
+  ZDataReference wDRef;
+
+  if (wIdx.column()!=0) {
+    wIdx=wIdx.siblingAtColumn(0);
+  }
+
+  QStandardItem* wKeyfieldItem=keyTRv->ItemModel->itemFromIndex(wIdx);
+  wV=wKeyfieldItem->data(ZQtDataReference);
+  wDRef = wV.value<ZDataReference>();
+
+  if (wDRef.getZEntity()!=ZEntity_KeyField) {
+    statusBarMessage("DicEdit::_keyCopy-E-INVTYP Invalid infradata entity type <%s> ",decode_ZEntity(wDRef.getZEntity()).toChar());
+    return false;
+  }
+
+  QStandardItem* wKeyItem=wKeyfieldItem->parent();
+
+  int wRow = wKeyfieldItem->row();
+  if (wRow==wKeyItem->rowCount()-1) {
+    statusBarMessage("Already at last key field position ");
+    return false;
+  }
+
+  QList<QStandardItem*> wKeyfieldRow = wKeyItem->takeRow(wRow);
+  if (wKeyfieldRow.count()==0)
+    return false;
+  wRow++;
+  wKeyItem->insertRow(wRow,wKeyfieldRow);
+  return true;
+}//keyfieldMovedown
 
 
 
@@ -1630,15 +1899,15 @@ DicEdit::_keyFieldInsertToKey(QModelIndex pIdx, ZKeyFieldRow* pKFR) {
   QList<QStandardItem*> wRow= createKeyFieldRow(*pKFR);
 
   /* insert key field in key dictionary */
-  ZIndexField wIFld(MasterDic->KeyDic[wKeyItem->row()]);
+  ZIndexField wIFld(DictionaryFile->KeyDic[wKeyItem->row()]);
 
   wIFld.KeyOffset=0; /* to be recomputed */
   wIFld.Hash = pKFR->Hash;
   wIFld.MDicRank = pKFR->MDicRank;
-  //  wIFld.MDicRank=MasterDic->searchFieldByName(pTemp->KFR.Name);
-  //  wIFld.KeyDic = MasterDic->KeyDic[wKeyItem->row()]; // already done with ZIndexField CTOR
+  //  wIFld.MDicRank=DictionaryFile->searchFieldByName(pTemp->KFR.Name);
+  //  wIFld.KeyDic = DictionaryFile->KeyDic[wKeyItem->row()]; // already done with ZIndexField CTOR
 
-  long wFldDicRank=MasterDic->KeyDic[wKeyItem->row()]->insert(wIFld,wIdx.row());
+  long wFldDicRank=DictionaryFile->KeyDic[wKeyItem->row()]->insert(wIFld,wIdx.row());
 
   /* update row infradata */
 
@@ -1705,15 +1974,15 @@ DicEdit::_keyFieldAppendToKey(QModelIndex pIdx, ZKeyFieldRow* pKFR) {
 
   /* append key field to key in key dictionary */
 
-  ZIndexField wIFld(MasterDic->KeyDic[wKeyItem->row()]); /* initialize a new key field with key dictionary */
+  ZIndexField wIFld(DictionaryFile->KeyDic[wKeyItem->row()]); /* initialize a new key field with key dictionary */
 
   wIFld.KeyOffset=0; /* to be recomputed */
   wIFld.Hash = pKFR->Hash;
   wIFld.MDicRank = pKFR->MDicRank;
-  //  wIFld.MDicRank=MasterDic->searchFieldByName(pTemp->KFR.Name);
-  //  wIFld.KeyDic = MasterDic->KeyDic[wKeyItem->row()]; // already done with ZIndexField CTOR
+  //  wIFld.MDicRank=DictionaryFile->searchFieldByName(pTemp->KFR.Name);
+  //  wIFld.KeyDic = DictionaryFile->KeyDic[wKeyItem->row()]; // already done with ZIndexField CTOR
   /* append key field */
-  long wFldDicRank=MasterDic->KeyDic[wKeyItem->row()]->push(wIFld);
+  long wFldDicRank=DictionaryFile->KeyDic[wKeyItem->row()]->push(wIFld);
 
   /* set row infradata */
 
@@ -1751,7 +2020,7 @@ DicEdit::_fieldInsertToKey(QModelIndex pIdx,ZFieldDescription* pField) {
     if (wRet==QDialog::Rejected)
       return false;
   }
-  ZKeyHeaderRow   wKHR(MasterDic);
+  ZKeyHeaderRow   wKHR(DictionaryFile);
   ZKeyFieldRow    wKFR;
   ZDataReference  wDRefKey;
   ZDataReference  wDRefKeyField;
@@ -1760,7 +2029,7 @@ DicEdit::_fieldInsertToKey(QModelIndex pIdx,ZFieldDescription* pField) {
 
   wKFR.Name = pField->getName();
   wKFR.ZType = pField->ZType;
-  wKFR.MDicRank = MasterDic->searchFieldByName(wKFR.Name);
+  wKFR.MDicRank = DictionaryFile->searchFieldByName(wKFR.Name);
 
   wKFR.UniversalSize = pField->UniversalSize;
   wKFR.Hash = pField->Hash;
@@ -1800,7 +2069,7 @@ DicEdit::_fieldInsertToKey(QModelIndex pIdx,ZFieldDescription* pField) {
     wV=wIdxFather.data(ZQtDataReference);
     wDRefKey=wV.value<ZDataReference>();
   } else {
-    Errorlog.errorLog("DicEdit::keyfieldAppend-E-INVTYP Invalid infradata entity type <%s> while expected <ZEntity_KeyField>.",decode_ZEntity(wDRefKey.getZEntity()).toChar());
+    statusBarMessage("DicEdit::keyfieldAppend-E-INVTYP Invalid infradata entity type <%s> while expected <ZEntity_KeyField>.",decode_ZEntity(wDRefKey.getZEntity()).toChar());
     return false;
   }
 
@@ -1825,6 +2094,9 @@ DicEdit::_fieldInsertToKey(QModelIndex pIdx,ZFieldDescription* pField) {
 
   _recomputeKeyValues(wKeyItem);
 
+  for (long wi=0;wi < keyTRv->ItemModel->columnCount();wi++)
+    keyTRv->resizeColumnToContents(wi);
+
   return true;
 } //_fieldInsertToKey
 bool
@@ -1838,15 +2110,17 @@ DicEdit::_fieldAppendToKey(QModelIndex pIdx,ZFieldDescription* pField) {
     if (wRet==QDialog::Rejected)
       return false;
   }
-  ZKeyHeaderRow wKHR(MasterDic);
+  ZKeyHeaderRow wKHR(DictionaryFile);
   ZKeyFieldRow wKFR;
   ZDataReference wDRefKey , wDRefKeyField;
   QVariant wV;
   QList<QStandardItem *> wKeyRow, wKeyFieldRow ;
+  QStandardItem* wKeyItem=nullptr;
+  QStandardItem* wCurrentItem=nullptr;
 
   wKFR.Name = pField->getName();
   wKFR.ZType = pField->ZType;
-  wKFR.MDicRank = MasterDic->searchFieldByName(wKFR.Name);
+  wKFR.MDicRank = DictionaryFile->searchFieldByName(wKFR.Name);
 
   wKFR.UniversalSize = pField->UniversalSize;
   wKFR.Hash = pField->Hash;
@@ -1859,28 +2133,61 @@ DicEdit::_fieldAppendToKey(QModelIndex pIdx,ZFieldDescription* pField) {
  *  - create a key field from given field description (done before)
  *  - append key field to created key
  */
-  if (keyTRv->ItemModel->rowCount()==0) {
+  if ((keyTRv->ItemModel->rowCount()==0)||(!keyTRv->CurrentIndex.isValid())) {
+
+    ZKeyDLg* wKeyDLg=new ZKeyDLg(DictionaryFile,this);
+    wKeyDLg->setWindowTitle("Key");
+
+    wKeyDLg->setCreate();
+
+    int wRet=wKeyDLg->exec();
+    if (wRet==QDialog::Rejected) {
+      wKeyDLg->deleteLater();
+      return false;
+    }
+
+    wKHR.set(wKeyDLg->get());
+    wKeyDLg->deleteLater();
+    ZKeyDictionary* wKeyDic=new ZKeyDictionary(wKeyDLg->get());
 
     /* create a key with name __NEW_KEYNAME__ */
-    ZKeyDictionary* wKeyDic=new ZKeyDictionary(__NEW_KEYNAME__,MasterDic);
-    long wKeyFieldRank=MasterDic->KeyDic.push(wKeyDic);
+/*    ZKeyDictionary* wKeyDic=new ZKeyDictionary(__NEW_KEYNAME__,DictionaryFile);
+    long wKeyFieldRank=DictionaryFile->KeyDic.push(wKeyDic);
     wKHR.set(wKeyDic);
-
+*/
     wKeyRow=createKeyDicRow(wKHR);
 
     wDRefKey.setZLayout(ZLayout_KeyTRv);
     wDRefKey.setResource(getNewResource(ZEntity_KeyDic));
-    wDRefKey.setDataRank(wKeyFieldRank);
+    wDRefKey.setDataRank(0);
+//    wDRefKey.setDataRank(wKeyFieldRank);
     wDRefKey.setPtr(new ZKeyHeaderRow(wKHR)); /* store key dictionary Data (to be deleted) */
     wV.setValue<ZDataReference>(wDRefKey);
 
     wKeyRow[0]->setData(wV,ZQtDataReference);
 
+    wKeyItem = wKeyRow[0];
+
     keyTRv->ItemModel->appendRow(wKeyRow); /* append this key to treeview - level 0 */
-
-
-    wKeyFieldRow=createKeyFieldRow(wKFR);
   } // if (keyTRv->ItemModel->rowCount()==0)
+  else {
+    QModelIndex wIdx =   keyTRv->currentIndex();
+    if (wIdx.column()!=0)
+      wIdx=wIdx.siblingAtColumn(0);
+
+    wCurrentItem = keyTRv->ItemModel->itemFromIndex(wIdx);
+    QVariant wV=wCurrentItem->data(ZQtDataReference);
+    ZDataReference wDRef = wV.value<ZDataReference>();
+    if (wDRef.getZEntity()==ZEntity_KeyDic) {
+      wKeyItem = wCurrentItem;
+    }
+    else {
+      wKeyItem = wCurrentItem->parent();
+    }
+
+  }// else if (keyTRv->ItemModel->rowCount()==0)
+
+  wKeyFieldRow=createKeyFieldRow(wKFR);
 
     /* if there is nothing yet in tree view (no key defined) then
  *  - create a key with name __NEW_KEYNAME__
@@ -1889,108 +2196,34 @@ DicEdit::_fieldAppendToKey(QModelIndex pIdx,ZFieldDescription* pField) {
  *  - append key field to created key
  */
     ZIndexField wKField = wKFR.get();
-    long wKFRank=MasterDic->KeyDic.last()->push( wKField);
-
+//    long wKFRank=DictionaryFile->KeyDic.last()->push( wKField); // dictionary in memory is not in line with display
 
     wDRefKeyField.setZLayout(ZLayout_KeyTRv);
     wDRefKeyField.setResource(getNewResource(ZEntity_KeyField));
-    wDRefKeyField.setDataRank(wKFRank);
+    wDRefKeyField.setDataRank(0);
+//    wDRefKeyField.setDataRank(wKFRank);
     wDRefKeyField.setPtr(new ZKeyFieldRow(wKFR)); /* store key dictionary Data (to be deleted) */
     wV.setValue<ZDataReference>(wDRefKey);
     wKeyFieldRow[0]->setData(wV,ZQtDataReference);
 
-    wKeyRow[0]->appendRow(wKeyFieldRow); /* append key field to created key */
-
-    keyTRv->resizeColumns();
+    wKeyItem->appendRow(wKeyFieldRow); /* append key field to created key */
     _recomputeKeyValues(wKeyRow[0]);
 
+//    keyTRv->resizeColumns();
+    for (long wi=0;wi < keyTRv->ItemModel->columnCount();wi++)
+      keyTRv->resizeColumnToContents(wi);
     return true;
 } //_fieldAppendToKey
-
-bool
-DicEdit::_fieldInsertToKey1(QModelIndex pIdx, ZFieldDescription* pField) {
-  QVariant        wV;
-  ZDataReference  wDRef ;
-  QStandardItem*  wKeyItem=nullptr;
-  ZKeyFieldRow*    wKFR=nullptr;
-  /* append to current key :
-   * from current model index : if type is ZEntity_KeyField get father
-   * create row
-   */
-  QModelIndex wIdx = pIdx;
-  if (wIdx.column()!=0) {
-    wIdx=pIdx.siblingAtColumn(0);
-  }
-
-  wV=wIdx.data(ZQtDataReference);
-  if (wV.isNull()) {
-    Errorlog.errorLog("DicEdit::_fieldInsertToKey-E-VARNULL Cannot get infradata.");
-    return false;
-  }
-  wDRef=wV.value<ZDataReference>();
-
-
-
-  /* if target row is a Key dictionary, simply append inside this key */
-  if (wDRef.getZEntity()==ZEntity_KeyDic) {
-    wKeyItem=keyTRv->ItemModel->itemFromIndex(wIdx);
-    return keyTRvAppendFromPinboard(wIdx);
-  }
-  else if (wDRef.getZEntity()!=ZEntity_KeyField) {
-    Errorlog.errorLog("DicEdit::keyfieldInsertFromTemporary-E-INVTYP Invalid infradata entity type <%s> while expected <ZEntity_KeyField>.",decode_ZEntity(wDRef.getZEntity()).toChar());
-    return false;
-  }
-  /* here this is a key field row */
-
-  wKFR = wDRef.getPtr<ZKeyFieldRow*>();
-
-  QModelIndex wKeyIdx=wIdx.parent();
-  wKeyItem=keyTRv->ItemModel->item(wKeyIdx.row(),0);
-
-  /* insert row in tree view */
-  QList<QStandardItem*> wRow= createKeyFieldRow(*wKFR);
-
-  /* insert key field in key dictionary */
-  ZIndexField wIFld(MasterDic->KeyDic[wKeyItem->row()]);
-
-  wIFld.KeyOffset=0; /* to be recomputed */
-  wIFld.Hash = wKFR->Hash;
-  wIFld.MDicRank = wKFR->MDicRank;
-  //  wIFld.MDicRank=MasterDic->searchFieldByName(pTemp->KFR.Name);
-  //  wIFld.KeyDic = MasterDic->KeyDic[wKeyItem->row()]; // already done with ZIndexField CTOR
-
-  long wFldDicRank=MasterDic->KeyDic[wKeyItem->row()]->insert(wIFld,wIdx.row());
-
-  /* update row infradata */
-
-  wDRef.set(ZLayout_KeyTRv,getNewResource(ZEntity_KeyField),wFldDicRank);
-  wKFR->MDicRank=wFldDicRank;
-  wDRef.setPtr(wKFR);
-
-  wV.setValue<ZDataReference>(wDRef);
-  wRow[0]->setData(wV,ZQtDataReference);
-
-  wKeyItem->insertRow(pIdx.row(),wRow);
-
-  /* update and display key values */
-
-  _recomputeKeyValues(wKeyItem);
-
-  /* delete Temporary */
-
-  //  delete wKFR;
-
-  return true;  /* done */
-} // DicEdit::_fieldInsertToKey
 
 bool
 DicEdit::keyTRvAppendFromPinboard(const QModelIndex &pIdx) {
   if (Pinboard.isEmpty())
     return false;
-  if (!pIdx.isValid()) {
+/*  if (!pIdx.isValid()) {
     ui->statusBar->showMessage(QObject::tr("nothing selected."),cst_MessageDuration);
     return false;
   }
+*/
   ZKeyFieldRow* wKFR=nullptr;
   ZDataReference wDRef ;
   QVariant wV;
@@ -2012,7 +2245,7 @@ DicEdit::keyTRvAppendFromPinboard(const QModelIndex &pIdx) {
     return _fieldAppendToKey(pIdx,wField);
   }
   default:
-    Errorlog.errorLog("DicEdit::keyTRvAppendFromPinboard-E-INVTYP Invalid infradata entity type <%s>.",decode_ZEntity(wDRef.getZEntity()).toChar());
+    statusBarMessage("DicEdit::keyTRvAppendFromPinboard-E-INVTYP Invalid infradata entity type <%s>.",decode_ZEntity(wDRef.getZEntity()).toChar());
     return false;
   }//switch
 
@@ -2170,8 +2403,8 @@ bool DicEdit::_fieldDelete(QModelIndex pIdx, bool pForceDelete)
   int wKRank=0;
   int wKNb=0;
   /* look for all keys that involve this field */
-  for (long wi=0;wi < MasterDic->KeyDic.count();wi++) {
-    if ((wR=MasterDic->KeyDic.Tab[wi]->hasFieldNameCase(wF->getName()))>=0) {
+  for (long wi=0;wi < DictionaryFile->KeyDic.count();wi++) {
+    if ((wR=DictionaryFile->KeyDic.Tab[wi]->hasFieldNameCase(wF->getName()))>=0) {
       wKRank=wi;
       wKNb++;
     }
@@ -2179,21 +2412,21 @@ bool DicEdit::_fieldDelete(QModelIndex pIdx, bool pForceDelete)
   if (wKNb>0) {
   if (pForceDelete) {
       Errorlog.errorLog("field named <%s> is used by %ld key(s). Last key name is <%s>. Cannot be deleted."
-          ,wKNb,MasterDic->KeyDic[wKRank]->DicKeyName.toCChar());
+          ,wKNb,DictionaryFile->KeyDic[wKRank]->DicKeyName.toCChar());
       return false;
     }
     else
       Errorlog.warningLog("field named <%s> is used by %ld key(s). Last key name is <%s>."
-          ,wKNb,MasterDic->KeyDic[wKRank]->DicKeyName.toCChar());
+          ,wKNb,DictionaryFile->KeyDic[wKRank]->DicKeyName.toCChar());
   }//if (wKNb>0)
 
 
 //  wFather->removeRow(pIdx.row());
   fieldTBv->ItemModel->removeRow(pIdx.row());
 
-  long wRank=MasterDic->searchFieldByName(wF->getName());
+  long wRank=DictionaryFile->searchFieldByName(wF->getName());
 
-  MasterDic->erase(wRank);
+  DictionaryFile->erase(wRank);
 
   wStr.sprintf("Field <%s> has been deleted.",wF->getName().toCChar());
   delete wF;
@@ -2238,13 +2471,14 @@ bool DicEdit::fieldChange(QModelIndex pIdx)
 
   if (!displayFieldChange(wFDesc,pIdx)) {
     Errorlog.errorLog("unable to change field <%s>. Something went wrong.",
-        MasterDic->Tab[wDRef.DataRank].getName().toCChar());
+        DictionaryFile->Tab[wDRef.DataRank].getName().toCChar());
     return false;
   }
-  wStr.sprintf("field <%s> changed",MasterDic->Tab[wDRef.DataRank].getName().toCChar());
+  wStr.sprintf("field <%s> changed",DictionaryFile->Tab[wDRef.DataRank].getName().toCChar());
   statusBar()->showMessage(QObject::tr(wStr.toCChar()),cst_MessageDuration);
   return true;
 }//DicEdit::fieldChange
+
 
 
 bool controlField(ZFieldDescription& pField)
@@ -2391,10 +2625,10 @@ bool DicEdit::_fieldAppend(ZFieldDescription &wFDesc) {
   QList<QStandardItem*> wRow = createFieldRowFromField(&wFDesc);
 
   long wRIdx=0;
-  wRIdx=MasterDic->push(wFDesc);
+  wRIdx=DictionaryFile->push(wFDesc);
 
   wDRef.set(ZLayout_FieldTBv,getNewResource(ZEntity_DicField),wRIdx);
-  wDRef.setPtr(new ZFieldDescription(MasterDic->Tab[wRIdx]));
+  wDRef.setPtr(new ZFieldDescription(DictionaryFile->Tab[wRIdx]));
   wDRef.setDataRank(wRIdx);
   wV.setValue<ZDataReference>(wDRef);
 
@@ -2521,12 +2755,12 @@ bool DicEdit::_fieldInsertAfter(QModelIndex pIdx, ZFieldDescription &pFDesc)
 
   if (fieldTBv->ItemModel->rowCount() < wRank) {   /* if last row : append */
     fieldTBv->ItemModel->appendRow(wRow);
-    wFieldRank=MasterDic->push(pFDesc);
+    wFieldRank=DictionaryFile->push(pFDesc);
   }
   else {
 
     fieldTBv->ItemModel->insertRow(wRank,wRow);
-    wFieldRank=MasterDic->insert(pFDesc,wRank);
+    wFieldRank=DictionaryFile->insert(pFDesc,wRank);
   }
   wDRef.setDataRank(wFieldRank);
   wDRef.setPtr(new ZFieldDescription(pFDesc));
@@ -2553,7 +2787,7 @@ bool DicEdit::_fieldInsertBefore(QModelIndex pIdx, ZFieldDescription &pFDesc)
 
   int wRank= pIdx.row();
 
-  long wFieldRank = MasterDic->insert(pFDesc,wRank);
+  long wFieldRank = DictionaryFile->insert(pFDesc,wRank);
 
   wRow = createFieldRowFromField(&pFDesc);
   wDRef.setDataRank(wFieldRank);
@@ -2629,11 +2863,11 @@ bool DicEdit::displayFieldChange(ZFieldDescription& pField,QModelIndex pIdx)
 
   /*search dictionary for former field name (could be changed) */
 
-  long wRank= MasterDic->searchFieldByName(wField->getName());
+  long wRank= DictionaryFile->searchFieldByName(wField->getName());
   /* update data (possibly field name) */
   wField->_copyFrom(pField);
   /* update dictionary */
-  MasterDic->Tab[wRank]._copyFrom(pField);
+  DictionaryFile->Tab[wRank]._copyFrom(pField);
   /* display change */
   return setFieldRowFromField(wRow,pField);
 }//displayFieldChange
@@ -2666,7 +2900,7 @@ void DicEdit::acceptFieldChange(ZFieldDescription& pField,QModelIndex &wIdx)
   if (!displayFieldChange(pField,wIdx))
     return;
 
-  wDRef.setPtr(&MasterDic->Tab[wDRef.DataRank]);  /* store pointer to dictionary field */
+  wDRef.setPtr(&DictionaryFile->Tab[wDRef.DataRank]);  /* store pointer to dictionary field */
   wV.setValue<ZDataReference>(wDRef);
   wItem->setData(wV,ZQtDataReference);
 
@@ -2936,7 +3170,7 @@ bool DicEdit::KeyTRvRawDropEvent(QDropEvent *pEvent)
   }
   if (!wIdx.isValid()) {
     statusBar()->showMessage(QObject::tr("No target element selected","DicEdit"),cst_MessageDuration);
-    return false;
+    return keyTRvAppendFromPinboard(wIdx);
   }
   return keyTRvInsertFromPinboard(wIdx);
 
@@ -2989,12 +3223,10 @@ bool DicEdit::FieldTBvRawDropEvent(QDropEvent *pEvent)
     /* eliminate <file://>   */
 
     if (rawFields==nullptr) {
-      rawFields = new RawFields( wURI,
-          "/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata/zcppparserparameters.xml", this);
-    }
+      rawFields = new RawFields(this); }
 
     rawFields->showAll();
-    rawFields->parse();
+    rawFields->parse(false);
     return true;
   }//if (wMimeData->hasUrls())
 
@@ -3040,23 +3272,18 @@ DicEdit::importDic(const unsigned char* pPtrIn)
 
   utf8String wStr;
 
-//  ZMFDictionary wDic;
-
-  if (MasterDic!=nullptr)
-    delete MasterDic;
-
-  MasterDic = new ZMFDictionary;
+  ZMFDictionary wDic;
 
 //  ssize_t wSize;
-  ZStatus wSt= MasterDic->_import(pPtrIn);
+  ZStatus wSt= wDic._import(pPtrIn);
   if (wSt!=ZS_SUCCESS)
   {
     ZExceptionDLg::message("DicEdit::displayZMFDictionaryValues",wSt,Severity_Error,
         "Cannot load successfully dictionary.");
     return ;
   }
-
-  displayZMFDictionary(MasterDic);
+  renewDicFile(wDic);
+  displayZMFDictionary(wDic);
 }
 
 void
@@ -3198,19 +3425,15 @@ DicEdit::screenToDic()
     }//for (int wi=0;wi< wKeyRows;wi++)
 
 
-  if (MasterDic==nullptr) {
-    ZExceptionDLg::message("DicEdit::screenToDic",ZS_NULLPTR,Severity_Error,
-        "No dictionary defined.");
-    return nullptr;
-  }
+  wMetaDic->DicName = ui->DicNameLBl->text().toUtf8().data();
+  wMetaDic->Version = getVersionNum(ui->VersionLBl->text().toUtf8().data());
 
-  wMetaDic->DicName = MasterDic->DicName;
+  wMetaDic->Active = ui->ActiveCBx->currentIndex()==1 ;
   return wMetaDic;
 }//screenToDic
 
 ZStatus
-DicEdit::loadDictionaryFile(const uriString& pDicPath,long pRank){
-
+DicEdit::loadDictionaryFile(const uriString& pDicPath){
   ZDataBuffer wRecord;
   if (DictionaryFile==nullptr) {
     DictionaryFile=new ZDictionaryFile;
@@ -3221,8 +3444,13 @@ DicEdit::loadDictionaryFile(const uriString& pDicPath,long pRank){
 
   ZStatus wSt=DictionaryFile->zopen(pDicPath,ZMode_Edit);
 
+  /* if only one record, no need of choosing between dictionary versions */
+
+  if (DictionaryFile->count()==1)
+      return DictionaryFile->loadDictionaryByRank(0);
+
   ZDicHeaderList wDicHeaderList;
-  wDicHeaderList=DictionaryFile->getAllDicHeaders();
+  wSt =DictionaryFile->getAllDicHeaders(wDicHeaderList);
 
   ZStdListHeaders wHeaders;
   ZStdListDLgContent wContent;
@@ -3243,8 +3471,8 @@ DicEdit::loadDictionaryFile(const uriString& pDicPath,long pRank){
     wContentLine.add (getVersionStr( wDicHeaderList[wi]->Version)) ;
     wStr.sprintf("%ld",wDicHeaderList[wi]->DicKeyCount) ;
     wContentLine.add (wStr) ;
-    wContentLine.add (wDicHeaderList[wi]->CreationDate.toDateTimeFormatted().toCChar()) ;
-    wContentLine.add (wDicHeaderList[wi]->ModificationDate.toDateTimeFormatted().toCChar()) ;
+    wContentLine.add (wDicHeaderList[wi]->CreationDate.toFormatted().toCChar()) ;
+    wContentLine.add (wDicHeaderList[wi]->ModificationDate.toFormatted().toCChar()) ;
     wContent.push(wContentLine);
   }
 
@@ -3265,8 +3493,9 @@ DicEdit::loadDictionaryFile(const uriString& pDicPath,long pRank){
 }
 
 bool
-DicEdit::saveOrCreateDictionaryFile(){
+DicEdit::saveOrCreateDictionaryFile() {
 
+  ZStatus wSt;
   QFileDialog wFD(this,"Dictionary file ","",__DICTIONARY_EXTENSION__);
 
   int wRet=wFD.exec();
@@ -3275,19 +3504,121 @@ DicEdit::saveOrCreateDictionaryFile(){
     return false;
   uriString wSelected = wFD.selectedFiles()[0].toUtf8().data();
 
-  if (wSelected.exists()) {
-    DictionaryFile->saveDictionary();
-    if (saveDictionaryFile(wSelected)==ZS_SUCCESS)
+  if (wSelected.getFileExtension().isEmpty()) {
+    wSelected += ".";
+    wSelected += __DICTIONARY_EXTENSION__;
+  }
+
+
+  utf8VaryingString wDicName = ui->DicNameLBl->text().toUtf8().data();
+  unsigned long     wVersion = getVersionNum(ui->VersionLBl->text().toUtf8().data());
+
+//  ZMFDictionary* wMasterDic = screenToDic();  /* get Master dictionary content from views */
+//  if (wMasterDic==nullptr)
+//    return false;
+  if (!getDicName(wVersion,wDicName))/* name meta dictionary and version */
+    return false;
+
+  /* update appropriately name and version */
+
+  ui->DicNameLBl->setText(wDicName.toCChar());
+  ui->VersionLBl->setText( getVersionStr( wVersion).toCChar());
+
+  /*
+  ---------------------------------------------------------------------------------
+  dictionary file does not exist         create and don't care active (zinitialize)
+  ---------------------------------------------------------------------------------
+
+  dictionary file exits
+
+  open it
+
+  ------saving rules-----------
+
+  Dic content to write is not active :
+      [searchAndWrite] search for (DicName , Version) in file :
+        not exists -> append
+        exists -> replace
+
+  Dic content to write is active :
+      search for active in file :
+      active not exists :
+        [searchAndWrite] search for (DicName , Version) in file :
+          not exists -> append
+          exists -> replace
+      active exists :
+        (DicName , Version) are the same : replace.
+        (DicName , Version) are not the same :
+          found in Dictionary set to not Active, and replace
+          [searchAndWrite] search for (DicName , Version) in file :
+            not exists -> append
+            exists -> replace
+*/
+
+  if (!wSelected.exists()) {
+    if (DictionaryFile==nullptr)
+      DictionaryFile = new ZDictionaryFile;
+    ZMFDictionary* wDic= screenToDic();
+    DictionaryFile->setDictionary(*wDic);
+    delete wDic;
+    wSt= DictionaryFile->zinitalize(wSelected,true);
+    if (wSt > 0) {
+      ZExceptionDLg::adhocMessage("Dictionary saved",Severity_Information,nullptr,
+          "Dictionary file %s created dic <%s> version <%s> status <%s>",
+          wSelected.getBasename().toCChar(),
+          DictionaryFile->DicName.toCChar(),
+          getVersionStr( DictionaryFile->Version).toCChar(),
+          DictionaryFile->Active?"Active":"Not active");
       return true;
+    }
+    ZExceptionDLg::display("Dictionary save",ZException.last(),false);
+    return false;
+  } //if (!wSelected.exists())
+
+  if (DictionaryFile==nullptr)
+    DictionaryFile = new ZDictionaryFile;
+  else {
+    if (DictionaryFile->isOpen())
+      DictionaryFile->zclose();
+  }
+
+  ZMFDictionary* wDic= screenToDic();
+  DictionaryFile->setDictionary(*wDic);
+  delete wDic;
+
+  wSt=DictionaryFile->zopen(wSelected,ZRF_Modify);
+  if (wSt!=ZS_SUCCESS) {
+    ZExceptionDLg::display("Dictionary save",ZException.last(),false);
+    return false;
+  }
+  wSt=DictionaryFile->save(); /* save using defined rules (Active etc.) */
+
+  if (wSt<0) {
+    ZExceptionDLg::display("Dictionary save",ZException.last(),false);
     return false;
   }
 
+  ZExceptionDLg::adhocMessage("Dictionary saved",Severity_Information,nullptr,
+      "Dictionary file %s created dic <%s> version <%s> status <%s>",
+      wSelected.getBasename().toCChar(),
+      DictionaryFile->DicName.toCChar(),
+      getVersionStr( DictionaryFile->Version).toCChar(),
+      DictionaryFile->Active?"Active":"Not active");
   return true;
-}
+}//saveOrCreateDictionaryFile
 
 bool
 DicEdit::loadDictionaryFile(){
-  QFileDialog wFD(this,"Dictionary file","",__DICTIONARY_EXTENSION__);
+  ZStatus wSt;
+  uriString wEnvDir;
+  ZDicHeaderList wDicHList;
+
+  const char* wWD=getenv(__PARSER_WORK_DIRECTORY__);
+  if (!wWD)
+    wWD="";
+
+
+  QFileDialog wFD(this,"Dictionary file",wWD);
 
   while (true) {
     int wRet=wFD.exec();
@@ -3296,55 +3627,117 @@ DicEdit::loadDictionaryFile(){
       return false;
     uriString wSelected = wFD.selectedFiles()[0].toUtf8().data();
 
-    if (wSelected.exists()){
-      break;
+    if (!wSelected.exists()){
+      if (ZExceptionDLg::adhocMessage2B("Dictionary file",Severity_Error,"Give up","Retry",nullptr,"File %s does not exist ",wSelected.toCChar())==QDialog::Rejected)
+        return false;
+      continue;
     }
-    if (ZExceptionDLg::adhocMessage2B("Dictionary file",Severity_Error,"Abort","Retry",nullptr,"File %s does not exist ",wSelected.toCChar())==QDialog::Rejected)
-      return false;
 
+
+
+    /* load all dictionary versions */
+    if (DictionaryFile==nullptr)
+      DictionaryFile= new ZDictionaryFile;
+    else {
+      if (DictionaryFile->isOpen())
+        DictionaryFile->zclose();
+    }
+    wSt=DictionaryFile->zopen(wSelected,ZRF_Modify);
+    if (wSt!=ZS_SUCCESS) {
+      utf8VaryingString* wXMes=new utf8VaryingString(ZException.last().formatFullUserMessage());
+      if (ZExceptionDLg::adhocMessage2B("Dictionary file",Severity_Error,"Give up","Try another",
+              wXMes,"File %s has been errored while trying to open it.",wSelected.toCChar())==QDialog::Rejected)
+        return false;
+      continue;
+    }
+    /* if only one dictionary version stored, no need of choosing */
+    if (DictionaryFile->getRecordCount()==1) {
+      utf8VaryingString wStr;
+      wSt= DictionaryFile->loadDictionaryByRank(0);
+      if (wSt!=ZS_SUCCESS) {
+        ZExceptionDLg::displayLast(false);
+        return false;
+      }
+      wStr.sprintf("Dictionary %s version %s status %s has been loaded",DictionaryFile->DicName.toCChar(),getVersionStr(DictionaryFile->Version).toCChar(),
+          DictionaryFile->Active?"Active":"Not active");
+      ui->statusBar->showMessage(wStr.toCChar(),cst_MessageDuration);
+
+      displayZMFDictionary(*DictionaryFile);
+
+      return true;
+    }
+
+    /* if multiple versions are stored, then choose one of these to load */
+
+    wSt= DictionaryFile->getAllDicHeaders(wDicHList);
+
+    if (wDicHList.count()==0) {
+      if (wSt!=ZS_EOF) {
+        utf8VaryingString* wXMes=new utf8VaryingString(ZException.last().formatFullUserMessage());
+        if (ZExceptionDLg::adhocMessage2B("Dictionary file",Severity_Error,"Give up","Try another",
+                wXMes,"File %s has been errored while being read.",wSelected.toCChar())==QDialog::Rejected)
+          return false;
+      }
+      else{
+        if (ZExceptionDLg::adhocMessage2B("Dictionary file",Severity_Error,"Give up","Try another",nullptr,"File %s does not contain any valid dictionary version.",wSelected.toCChar())==QDialog::Rejected)
+            return false;
+      }
+      continue;
+    }// count==0
+    break;   /* everything normal */
   } // while true
 
 
+  ZStdListDLg wListDlg(this);
 
+  ZStdListDLgLine     wTitle;
+  ZStdListDLgLine     wLine;
+  ZStdListDLgContent  wContent;
+  utf8VaryingString   wStr;
+
+  wTitle.add("Dictionary Name");
+  wTitle.add("Version");
+  wTitle.add("Active");
+  wTitle.add("Keys");
+  wTitle.add("Creation date");
+  wTitle.add("Modification date");
+
+  for (long wi=0;wi<wDicHList.count();wi++) {
+    wLine.clear();
+    wLine.add(wDicHList[wi]->DicName);
+    wLine.add( getVersionStr( wDicHList[wi]->Version) );
+    wLine.add(wDicHList[wi]->Active?"Active":"");
+    wStr.sprintf("%ld",wDicHList[wi]->DicKeyCount);
+    wLine.add(wStr);
+    wLine.add(wDicHList[wi]->CreationDate.toFormatted().toCChar());
+    wLine.add(wDicHList[wi]->ModificationDate.toFormatted().toCChar());
+    wContent.push(wLine);
+  }
+
+  wListDlg.dataSetup(wTitle,wContent);
+
+  if (wListDlg.exec()==QDialog::Rejected)
+    return false;
+
+
+  ZRowCol wRC=wListDlg.get();
+
+  wSt= DictionaryFile->loadDictionaryByRank(wRC.row());
+  if (wSt!=ZS_SUCCESS) {
+    ZExceptionDLg::displayLast(false);
+    return false;
+  }
+  wStr.sprintf("Dictionary %s version %s status %s has been loaded",DictionaryFile->DicName.toCChar(),getVersionStr(DictionaryFile->Version).toCChar(),
+      DictionaryFile->Active?"Active":"Not active");
+  ui->statusBar->showMessage(wStr.toCChar(),cst_MessageDuration);
+
+  displayZMFDictionary(*DictionaryFile);
 
   return true;
 }
 
-ZStatus
-DicEdit::saveDictionaryFile(const uriString& pDicPath, unsigned long pVersion){
 
 
-  if (DictionaryFile->CreationDate.isInvalid())
-    DictionaryFile->CreationDate = ZDateFull::currentDateTime();
-  DictionaryFile->ModificationDate = ZDateFull::currentDateTime();
-
-  if (!pDicPath.exists()) {
-    return createDictionaryFile(pDicPath,pVersion);
-  }
-
-  return DictionaryFile->saveDictionary(pVersion);
-}
-
-ZStatus
-DicEdit::createDictionaryFile(const uriString& pDicPath, unsigned long pVersion){
-  DictionaryFile->CreationDate = ZDateFull::currentDateTime();
-  DictionaryFile->ModificationDate = ZDateFull::currentDateTime();
-}
-
-void
-DicEdit::setDictionary (const ZMFDictionary& pZMFDic)
-{
-  if (MasterDic!=nullptr)
-    delete MasterDic;
-  MasterDic = new ZMFDictionary(pZMFDic);
-}
-void
-DicEdit::setNewDictionary ()
-{
-  if (MasterDic!=nullptr)
-    delete MasterDic;
-  MasterDic = new ZMFDictionary;
-}
 
 ZStatus
 DicEdit::loadXmlDictionary (const uriString& pXmlDic)
@@ -3387,50 +3780,50 @@ DicEdit::loadXmlDictionary (const uriString& pXmlDic)
       return ZS_CANCEL;
   }
 
-  wStr.sprintf("Xml file %s has been successfully loaded.",pXmlDic.toCChar());
+  wStr.sprintf("Xml dictionary file %s has been successfully loaded.",pXmlDic.toCChar());
   statusBar()->showMessage(QObject::tr(wStr.toCChar(),"DicEdit"),cst_MessageDuration);
-  if (MasterDic!=nullptr)
-    delete MasterDic;
-  MasterDic = new ZMFDictionary(wMasterDic);
-  displayZMFDictionary(MasterDic);
+
+  DictionaryFile->setDictionary(wMasterDic);
+  displayZMFDictionary(wMasterDic);
   return ZS_SUCCESS;
 }// loadXmlDictionary
 
 void
-DicEdit::displayZMFDictionary(ZMFDictionary *pDic)
+DicEdit::displayZMFDictionary(ZMFDictionary &pDic)
 {
   utf8String wStr;
   QVariant   wV;
   ZDataReference wDRef;
 
-  if (pDic->DicName.isEmpty())
+  if (pDic.DicName.isEmpty())
     ui->DicNameLBl->setText("<no name>");
   else
-    ui->DicNameLBl->setText(pDic->DicName.toCChar());
+    ui->DicNameLBl->setText(pDic.DicName.toCChar());
 
-  ui->VersionLBl->setText(getVersionStr(pDic->Version).toCChar());
+  ui->VersionLBl->setText(getVersionStr(pDic.Version).toCChar());
 
-  wStr.sprintf("%ld",pDic->count());
+  ui->ActiveCBx->setCurrentIndex(pDic.Active?1:0);
+
+  wStr.sprintf("%ld",pDic.count());
   ui->FieldsNbLBl->setText(wStr.toCChar());
 
-  wStr.sprintf("%ld",pDic->KeyDic.count());
+  wStr.sprintf("%ld",pDic.KeyDic.count());
   ui->KeysNbLBl->setText(wStr.toCChar());
 
   if (fieldTBv->ItemModel)
     if (fieldTBv->ItemModel->rowCount()>0)
       fieldTBv->ItemModel->removeRows(0,fieldTBv->ItemModel->rowCount());
 
-
   int wRow=0;
   QList<QStandardItem *> wFieldRow ;
 
   ZFieldDescription* wFD=nullptr;
 
-  for (long wi=0;wi < pDic->count();wi++)
+  for (long wi=0;wi < pDic.count();wi++)
     {
-    wFieldRow = createFieldRowFromField(&pDic->Tab[wi]);  /* create item list from field description */
+    wFieldRow = createFieldRowFromField(&pDic.Tab[wi]);  /* create item list from field description */
     /* set up data to item 0 */
-    wFD=new ZFieldDescription(pDic->Tab[wi]);
+    wFD=new ZFieldDescription(pDic.Tab[wi]);
     wDRef.setZLayout(ZLayout_FieldTBv);
     wDRef.setResource(getNewResource(ZEntity_DicField));
     wDRef.setDataRank((long)wi);    /* store rank within meta dictionary (for information) */
@@ -3450,7 +3843,7 @@ DicEdit::displayZMFDictionary(ZMFDictionary *pDic)
 }//DicEdit::displayZMFDictionary
 
 void
-DicEdit::displayKeyDictionaries(ZMFDictionary *pDic)
+DicEdit::displayKeyDictionaries(ZMFDictionary &pDic)
 {
   ZKeyHeaderRow* wKHR;
   ZKeyFieldRow wKFR;
@@ -3464,8 +3857,8 @@ DicEdit::displayKeyDictionaries(ZMFDictionary *pDic)
     if (keyTRv->ItemModel->rowCount()>0)
       keyTRv->ItemModel->removeRows(0,keyTRv->ItemModel->rowCount());
 
-  for (long wi=0;wi < pDic->KeyDic.count();wi++) {
-    wKHR->set(pDic->KeyDic[wi]);
+  for (long wi=0;wi < pDic.KeyDic.count();wi++) {
+    wKHR->set(pDic.KeyDic[wi]);
 
     wKeyRow=createKeyDicRow(wKHR);
 
@@ -3477,8 +3870,8 @@ DicEdit::displayKeyDictionaries(ZMFDictionary *pDic)
 
     wKeyRow[0]->setData(wV,ZQtDataReference);
 
-    for (long wj=0;wj < pDic->KeyDic[wi]->count(); wj++) {
-      wKFR.set(pDic->KeyDic[wi]->Tab[wj]);
+    for (long wj=0;wj < pDic.KeyDic[wi]->count(); wj++) {
+      wKFR.set(pDic.KeyDic[wi]->Tab[wj]);
 
         wKeyFieldRow = createKeyFieldRow(wKFR);
 
@@ -3587,7 +3980,7 @@ DicEdit::createKeyFieldRow(const ZKeyFieldRow& wKFR) {
   QVariant                wV;
 
   wKeyFieldRow << createItem(wKFR.Name.toCChar());
-  wKeyFieldRow << createItem( wKFR.ZType,"0x%08X");
+  wKeyFieldRow << createItem( decode_ZType (wKFR.ZType));
   wKeyFieldRow << createItem( wKFR.KeyOffset,"%d");
   cst_KeyOffsetColumn = 2;
   wKeyFieldRow << createItem( wKFR.UniversalSize,"%ld");
@@ -3645,7 +4038,6 @@ QList<QStandardItem*> createFieldRowFromField(ZFieldDescription* pField)
   else
     wFieldRow <<  new QStandardItem( pField->ToolTip.toCChar());
   wFieldRow.last()->setEditable(false);
-
 
   return wFieldRow;
 }

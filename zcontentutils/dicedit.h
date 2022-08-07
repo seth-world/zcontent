@@ -11,12 +11,8 @@
 
 #include <zcu_common.h>
 #include <zcontent/zindexedfile/zindexfield.h>
-//#include <zcontent/zindexedfile/zkeydictionary.h>
 
-
-extern const int cst_MessageDuration ;
-
-
+#include <zcontentutilsparams.h>
 
 class ZDataReference;
 namespace  zbs {
@@ -80,6 +76,8 @@ public:
 class DicEdit : public QMainWindow
 {
   Q_OBJECT
+
+  friend class RawFields;
 
 public:
   explicit DicEdit(QWidget *parent = nullptr);
@@ -185,6 +183,7 @@ fieldTBv
   /** @brief _keyInsert inserts a new key as pkey - and all its key fields - before key pointed by pIdx  within tree view and within key dictionary :
    * if tree view is empty or if pIdx is invalid then key is appended */
   inline bool _keyInsert (const QModelIndex& pIdx, ZKeyDictionary *pKey);
+
   /** @brief keyInsert creates by dialog (ZKeyDLg) a new empty key (no key fields) and appends it to tree view as well as key dictionary.   */
   bool keyAppend();
   /** @brief _keyAppend appends a key as pkey - and all its key fields -  within tree view and within key dictionary  */
@@ -228,7 +227,6 @@ fieldTBv
 //  bool _keyInsertToKey(QModelIndex pIdx,ZKeyHeaderRow* pKHR);
   bool _keyFieldInsertToKey(QModelIndex pIdx,ZKeyFieldRow* pKFR);
   bool _fieldInsertToKey(QModelIndex pIdx,ZFieldDescription* pField);
-  bool _fieldInsertToKey1(QModelIndex pIdx,ZFieldDescription* pField);
 
 //  bool _keyAppendToKey(QModelIndex pIdx,ZKeyHeaderRow* pKHR);
   bool _keyFieldAppendToKey(QModelIndex pIdx,ZKeyFieldRow* pKFR);
@@ -256,6 +254,12 @@ fieldTBv
 
   inline void _recomputeKeyValues(QStandardItem* wKF);
 
+  /** @brief keyInsert creates by dialog (ZKeyDLg) a new empty key (no key fields) and appends it to tree view as well as key dictionary.   */
+  bool keyMoveup();
+  bool keyMovedown();
+  bool keyfieldMoveup();
+  bool keyfieldMovedown();
+
 /** @brief acceptFieldChange replaces the values (displayed value and dictionary value) of a field at model index wIdx */
   void acceptFieldChange(ZFieldDescription& pField, QModelIndex &wIdx);
 
@@ -269,11 +273,9 @@ fieldTBv
 
   /* Set-up MetaDic and KeyDictionary display views */
 
-  void setDictionary (const ZMFDictionary& pZMFDic);
-  void setNewDictionary();
   ZStatus loadXmlDictionary (const uriString& pXmlDic);
-  void displayZMFDictionary(ZMFDictionary *pDic);
-  void displayKeyDictionaries(ZMFDictionary *pDic);
+  void displayZMFDictionary(ZMFDictionary &pDic);
+  void displayKeyDictionaries(ZMFDictionary &pDic);
   QList<QStandardItem *> createKeyDicRow(const ZKeyHeaderRow& pKHR);
   QList<QStandardItem *> createKeyFieldRow(const ZKeyFieldRow& wKFR);
 
@@ -281,10 +283,7 @@ fieldTBv
   bool saveOrCreateDictionaryFile();
   bool loadDictionaryFile();
 
-  ZStatus loadDictionaryFile(const uriString& pDicPath, long pRank=0);
-  ZStatus saveDictionaryFile(const uriString& pDicPath, unsigned long pVersion);
-  ZStatus createDictionaryFile(const uriString& pDicPath, unsigned long pVersion);
-
+  ZStatus loadDictionaryFile(const uriString& pDicPath);
 
   /** @brief recomputeKeyValues recomputes and updates all key values for key whose model index is pKeyIdx.
    *  These values are Key universal size, and for each field, key offset, depending on field row position
@@ -293,12 +292,9 @@ fieldTBv
 
   ZMFDictionary* screenToDic();
 
-  void setFileClosed(bool pYesNo);
-
   void closeEvent(QCloseEvent *event) override {
     Quit();
   }
-
 
   ZDataBuffer           ContentToDump;
   long                  Offset=0;
@@ -338,10 +334,17 @@ fieldTBv
   void resizeEvent(QResizeEvent* pEvent) override;
   bool _FResizeInitial=true;
 
+  void renewDicFile(ZMFDictionary& pDic);
+
+  void statusBarMessage(const char* pFormat,...);
+
 public slots:
   void keyActionEvent(QAction*pAction);
   void fieldActionEvent(QAction*pAction);
   void generalActionEvent(QAction* pAction);
+  void dicDescriptionClicked();
+
+
 
 private:
 
@@ -356,11 +359,17 @@ private:
   QMenu *keyFlexMEn=nullptr;
   QActionGroup* keyActionGroup=nullptr;
   QAction* KInsertKeyQAc=nullptr;
+  QAction* KAppendKeyQAc=nullptr;
+  QAction* KChangeKeyQAc=nullptr;
   QAction* KDeleteKeyQAc=nullptr;
   QAction* KDeleteQAc=nullptr;
   QAction* KcutQAc=nullptr;
   QAction* KpasteQAc=nullptr;
   QAction* KappendQAc=nullptr;
+  QAction* KKeyMoveupQAc=nullptr;
+  QAction* KKeyMovedownQAc=nullptr;
+  QAction* KKeyfieldMoveupQAc=nullptr;
+  QAction* KKeyfieldMovedownQAc=nullptr;
 
   QMenu *fieldFlexMEn=nullptr;
   QActionGroup* fieldActionGroup=nullptr;
@@ -389,7 +398,7 @@ private:
   QItemSelectionModel* FieldSM=nullptr;
   QItemSelectionModel* KeySM=nullptr;
 
-  ZMFDictionary* MasterDic=nullptr;
+//  ZMFDictionary* MasterDic=nullptr;
 
   ZaiErrors Errorlog;
 

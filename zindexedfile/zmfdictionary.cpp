@@ -25,6 +25,8 @@ ZMFDictionary::ZMFDictionary(const ZMetaDic& pIn)
 ZMFDictionary&
 ZMFDictionary::_copyFrom(const ZMFDictionary& pIn)
 {
+  Active = pIn.Active;
+
   ZMetaDic::_copyFrom(pIn);
   KeyDic.clear();
   for (long wi = 0; wi < pIn.KeyDic.count(); wi ++)
@@ -139,15 +141,13 @@ ZStatus ZMFDictionary::_import(const unsigned char* &pPtrIn)
   if (wSt!=ZS_SUCCESS)
     return wSt;
 
+  wHead.get(*this);
+
 //  wSt=ZMetaDic::_import(pPtrIn,wSize);
   wSt=ZMetaDic::_importMetaDicFlat(pPtrIn);
 
   if (wSt!=ZS_SUCCESS)
     return wSt;
-
-
-  CreationDate = wHead.CreationDate;
-  ModificationDate = wHead.ModificationDate;
 
   ZKeyDictionary* wKDic=nullptr;
   uint32_t wi=0;
@@ -218,7 +218,7 @@ ZStatus ZMFDictionary::_import(const unsigned char* &pPtrIn)
       </zmasterdictionary>
  */
 
-utf8String ZMFDictionary::XmlSaveToString(bool pComment)
+utf8VaryingString ZMFDictionary::XmlSaveToString(bool pComment)
 {
   utf8String wReturn = fmtXMLdeclaration();
   wReturn += fmtXMLmainVersion("zmfdictionary",__ZDIC_VERSION__,0);
@@ -227,13 +227,15 @@ utf8String ZMFDictionary::XmlSaveToString(bool pComment)
   return wReturn;
 }
 
-utf8String ZMFDictionary::toXml(int pLevel,bool pComment)
+utf8VaryingString ZMFDictionary::toXml(int pLevel,bool pComment)
 {
   int wLevel=pLevel+1;
   utf8String wReturn;
   ZDataBuffer wB64;
   wReturn = fmtXMLnode("masterdictionary",pLevel);
 
+
+  wReturn += fmtXMLbool("active",Active,wLevel);
   wReturn += fmtXMLuint32("keycount",KeyDic.count(),wLevel);
   /* if (CheckSum!=nullptr)
       {
@@ -333,7 +335,13 @@ ZMFDictionary::fromXml(zxmlNode* pZmfDicNode, bool pCheckHash, ZaiErrors* pError
 
   ZStatus wSt;
   uint32_t wKeyCount;
+  Active=false;
   wRootNode=(zxmlElement *)pZmfDicNode;
+
+  if (XMLgetChildBool(wRootNode,"active",Active,pErrorlog,ZAIES_Error)<0)
+  {
+    pErrorlog->logZStatus(ZAIES_Warning, ZS_XMLWARNING,"ZMFDictionary::fromXml-W-MISSFLD Missing field <active>");
+  }
 
   if (XMLgetChildUInt32(wRootNode,"keycount",wKeyCount,pErrorlog,ZAIES_Error)<0)
     {

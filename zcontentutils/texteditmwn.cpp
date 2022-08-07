@@ -105,7 +105,7 @@ void textEditMWn::closeEvent(QCloseEvent *event)
   if (CloseCallBack!=nullptr) {
     CloseCallBack(event);
   }
-  QWidget::closeEvent(event);
+  QMainWindow::closeEvent(event);
   return;
 }
 
@@ -315,16 +315,17 @@ textEditMWn::filtrate() {
   QTextDocument* wTDoc=Text->document();
   QTextBlock wTBloc= wTDoc->firstBlock();
   while (true) {
-  utf8VaryingString wBC=wTBloc.text().toUtf8().data();
-  if (FiltrateCallBack(wBC))
-    wTBloc.setVisible(true);
-  else
-    wTBloc.setVisible(false);
-
-  if (wEndText)
-    break;
-  wTBloc=wTBloc.next();
-  wEndText=(wTBloc == wTDoc->lastBlock());
+    utf8VaryingString wBC=wTBloc.text().toUtf8().data();
+    if (!wBC.isEmpty()) {
+      if ( FiltrateCallBack(wBC))
+        wTBloc.setVisible(true);
+      else
+        wTBloc.setVisible(false);
+    }
+    if (wEndText)
+      break;
+    wTBloc=wTBloc.next();
+    wEndText=(wTBloc == wTDoc->lastBlock());
   }// while true
 
   Text->update();

@@ -20,7 +20,8 @@ ZStatus DontShowStatus=ZS_NOTHING;
 ZExceptionDLg::ZExceptionDLg(const utf8VaryingString& pTitle,Severity_type pSeverity,
                             const utf8VaryingString& pMessage,
                             const utf8VaryingString* pComplement,
-                            bool pDontShow) {
+                            bool pDontShow) : QDialog(nullptr), ui(new Ui::ZExceptionDLg)
+{
   DoNotShow=false;
   ui->setupUi(this);
 
@@ -61,8 +62,7 @@ ZExceptionDLg::ZExceptionDLg(const utf8VaryingString& pTitle,Severity_type pSeve
 
 ZExceptionDLg::ZExceptionDLg(const utf8VaryingString& pTitle,const ZExceptionBase& pException, bool pDontShow) :
                                                 QDialog(nullptr),
-                                                ui(new Ui::ZExceptionDLg)
-{
+                                                ui(new Ui::ZExceptionDLg) {
   DoNotShow=false;
   ui->setupUi(this);
   currentStatus=pException.Status;
@@ -569,7 +569,7 @@ ZExceptionDLg::adhocMessage(const utf8VaryingString& pTitle, Severity_type pSeve
   wMessage.vsnprintf(2000,pFormat,arglist);
   va_end(arglist);
 
-  ZExceptionDLg* wDlg=new ZExceptionDLg(pTitle,pSeverity,wMessage,pComplement);
+  ZExceptionDLg* wDlg=new ZExceptionDLg(pTitle,pSeverity,wMessage,pComplement,false);
 
   wDlg->ui->OKBTn->setVisible(true);
   wDlg->ui->OKBTn->setText("Close");
@@ -582,7 +582,12 @@ ZExceptionDLg::adhocMessage(const utf8VaryingString& pTitle, Severity_type pSeve
 }
 
 int
-ZExceptionDLg::adhocMessage2B(const utf8String&pTitle, Severity_type pSeverity,const utf8String& pCancelText, const utf8String& pOkText,const utf8VaryingString *pComplement, const char *pFormat,...) {
+ZExceptionDLg::adhocMessage2B(const utf8String&pTitle, Severity_type pSeverity,
+    const utf8String& pCancelText,
+    const utf8String& pOkText,
+    const utf8VaryingString *pComplement,
+    const char *pFormat,...) {
+
   utf8VaryingString wMessage;
   va_list arglist;
   va_start (arglist, pFormat);
@@ -738,6 +743,7 @@ ZExceptionDLg::display2B(const utf8VaryingString &pTitle,const ZExceptionBase pE
   wDlg->deleteLater();
   return wRet;
 }//display2B
+
 
 
 int

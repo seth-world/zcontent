@@ -125,11 +125,11 @@ typedef ZRawMasterFile _Base ;
 
 
 //----------------Statistical-------------------------------
-    using _Base::zfullDump;
-    using _Base::zheaderDump;
-    using _Base::zcontentDump;
+    using _Base::_fullDump;
+    using _Base::_headerDump;
+    using _Base::_contentDump;
 
-    using _Base::zsurfaceScan;
+    using _Base::_surfaceScan;
 
 //    using _Base::zclearFile;  // for tests only : must be suppressed imperatively
 

@@ -75,7 +75,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="DisguardBTn">
+  <widget class="QPushButton" name="DiscardBTn">
    <property name="geometry">
     <rect>
      <x>320</x>
@@ -385,7 +385,7 @@
  <tabstops>
   <tabstop>FieldNameLEd</tabstop>
   <tabstop>AcceptBTn</tabstop>
-  <tabstop>DisguardBTn</tabstop>
+  <tabstop>DiscardBTn</tabstop>
   <tabstop>ZTypeStrLEd</tabstop>
   <tabstop>ZTypeLEd</tabstop>
  </tabstops>
