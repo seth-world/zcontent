@@ -22,6 +22,8 @@
 
 #include <zindexedfile/zrawmasterfile.h>
 
+#include <zindexedfile/zdictionaryfile.h>
+
 /*#ifdef QT_CORE_LIB
 //#include <zxml/qxmlutilities.h>
 #endif // QT_CORE_LIB
@@ -79,8 +81,6 @@ public:
     friend class ZContentVisuMain;
 
 typedef ZRawMasterFile _Base ;
-
-
 
     ZMasterFile(void) ;
 //    ZMasterFile(uriString pURI);
@@ -163,7 +163,7 @@ typedef ZRawMasterFile _Base ;
                                   ZSort_Type pDuplicates);
 #endif // __COMMENT__
 
-    void setDictionary (const ZMFDictionary& pDictionary);
+//    void setDictionary (const ZMFDictionary& pDictionary);
     ZStatus addKeyToDic(ZKeyDictionary* pKeyDic, long &pOutKeyRank);
 
     ZStatus zprintIndexFieldValues (const zrank_type pIndex, const zrank_type pIdxRank, bool pHeader=true, bool pKeyDump=false,FILE *pOutput=stdout);
@@ -178,7 +178,7 @@ typedef ZRawMasterFile _Base ;
     ZRawIndexFile* zgetIndexFile(const zrank_type pIndexRank) {return IndexTable[pIndexRank];}
 
 
-    ZStatus zcreateMasterFile(ZMFDictionary *pMasterDic,
+    ZStatus zcreateMasterFile(uriString *pDictionary,
                     const uriString pURI,
                     long pAllocatedBlocks,
                     long pBlockExtentQuota,
@@ -190,7 +190,7 @@ typedef ZRawMasterFile _Base ;
                     bool pBackup=false,
                     bool pLeaveOpen=false);
 
-    ZStatus zcreateMasterFile ( ZMFDictionary *pMasterDic,
+    ZStatus zcreateMasterFile ( uriString *pDictionary,
                       const uriString pURI,
                       const zsize_type pInitialSize,
                       bool pBackup=false,
@@ -499,12 +499,12 @@ friend ZStatus operator << (ZMasterFile &pZMF,ZRecord& pInput)
 
 //    ZDataBuffer &popR(void)                  _METHOD_NOT_ALLOWED__
 //    ZDataBuffer &popR_front(void)            _METHOD_NOT_ALLOWED__
-    ZDataBuffer &popRP(ZDataBuffer &pReturn) ;
+  ZDataBuffer &popRP(ZDataBuffer &pReturn) ;
 
-    ZStatus _seek (ZMasterControlBlock &pMCB, long pIndexNumber, const ZDataBuffer &pKey,ZDataBuffer &pUserRecord);
+  ZStatus _seek (ZMasterControlBlock &pMCB, long pIndexNumber, const ZDataBuffer &pKey,ZDataBuffer &pUserRecord);
 
 
-    ZRecord* generateRecord();
+  ZRecord* generateRecord();
 
 
 }; //--------------------end class ZMasterFile-------------------------------

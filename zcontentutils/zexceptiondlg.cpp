@@ -576,6 +576,8 @@ ZExceptionDLg::adhocMessage(const utf8VaryingString& pTitle, Severity_type pSeve
   wDlg->ui->CancelBTn->setVisible(false);
   wDlg->ui->OtherBTn->setVisible(false);
 
+  wDlg->ui->TitleLBl->setText(pTitle.toCChar());
+
   int wRet= wDlg->exec();
   wDlg->deleteLater();
   return wRet;
@@ -608,6 +610,8 @@ ZExceptionDLg::adhocMessage2B(const utf8String&pTitle, Severity_type pSeverity,
     wDlg->ui->CancelBTn->setText(pCancelText.toCChar());
 
   wDlg->ui->OtherBTn->setVisible(false);
+
+  wDlg->ui->TitleLBl->setText(pTitle.toCChar());
 
   int wRet= wDlg->exec();
   wDlg->deleteLater();
@@ -642,6 +646,8 @@ ZExceptionDLg::adhocMessage3B(const utf8String&pTitle, Severity_type pSeverity,c
     wDlg->ui->OtherBTn->setText(pOtherText.toCChar());
 
   wDlg->ui->OtherBTn->setVisible(true);
+
+  wDlg->ui->TitleLBl->setText(pTitle.toCChar());
 
   int wRet= wDlg->exec();
   wDlg->deleteLater();

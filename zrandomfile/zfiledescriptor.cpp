@@ -285,7 +285,7 @@ void ZFileDescriptor::clearPartial (void)
   PhysicalPosition = -1;
   LogicalPosition = -1;
   _isOpen = false ;
-  HeaderAccessed = false;
+  HeaderAccessed = ZHAC_Nothing;
 
   Pid= getpid();  // get current pid for ZFileDescriptor
 }

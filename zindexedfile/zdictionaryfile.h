@@ -81,7 +81,7 @@ public:
   ZStatus loadDictionaryByRank(long pRank );
   ZStatus loadActiveDictionary();
 
-  
+
   ZStatus getDictionaryHeader(ZMFDicExportHeader& wHeader,long pRank );
 
   ZStatus searchActiveDictionary(long &pRank);
@@ -93,14 +93,11 @@ public:
   ZStatus save();
 //  ZStatus saveDictionary();
 
-  void setDictionary(ZMFDictionary& pMasterDic) {ZMFDictionary::_copyFrom( pMasterDic);}
+  void setDictionary(const ZMFDictionary& pDictionary) {ZMFDictionary::_copyFrom( pDictionary);}
   ZMFDictionary& getDictionary() {return *this;}
 
   long findDictionaryByVersion(unsigned long pVersion );
   long findDictionaryByName(const utf8VaryingString& pName );
-
-
-
 
   utf8VaryingString exportToXmlString(bool pComment);
   ZStatus exportToXmlFile(const uriString &pXmlFile,bool pComment);
@@ -109,8 +106,11 @@ public:
   ZStatus importFromXmlFile(const uriString &pXmlFile);
 
   ZStatus getAllDicHeaders(ZDicHeaderList& wDicHeaderList);
+  ZStatus getAllDictionaries(ZDicList& pDiclist);
 
-//  ZMFDictionary MasterDic ;
+  ZStatus generateAndSetFileName(const uriString& pURIContent);
+  static utf8VaryingString generateFileName(const uriString& pURIContent);
+//  ZMFDictionary Dictionary ;
 };
 } // namespace zbs
 #endif // ZDICTIONARYFILE_H

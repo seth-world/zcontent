@@ -135,54 +135,54 @@ createZRandomFileFromXml(const char* pXMLPath,
 
 ZStatus
 createDicFromXmlDefinition( ZRawMasterFile& pMasterFile,
-                            ZMFDictionary* wMasterDic,
+                            ZMFDictionary* wDictionary,
                             ZArray<IndexData_st>* wIndexData,
                             bool pRealRun,
                             ZaiErrors* pErrorLog);
 
 /**
  * @brief validateXmlDicDefinition checks wether ICB indexes are aligned with key dictionary
- * @param[in] pMasterDic the whole master dictionary structure to check
+ * @param[in] pDictionary the whole master dictionary structure to check
  * @param[in] pIndexData  ICB Index table
  * @param pErrorLog
  * @return a ZStatus
  * ZS_SUCCESS       : Key dictionary is aligned with ICB indexes.
  *                    This routine returns only a ZStatus, and does not change or allocate data structures.
  *
- * ZS_NULLPTR       : pMasterDic is nullptr-> no master dictionary defined
+ * ZS_NULLPTR       : pDictionary is nullptr-> no master dictionary defined
  * ZS_BADDIC        : Number of indexes does not match nubmer of defined dictionary keys
  * ZS_DUPLICATEKEY  : Two dictionary keys match the same ICB index name. Corrupted key dictionary.
  * ZS_INVSIZE       : Dictionary key universal size does not match index size. Key dictionary is malformed or ICB index is malformed.
  * ZS_NOTFOUND      : ICB index name not found within key dictionary. Key dictionary is incomplete.
  *
  */
-ZStatus validateXmlDicDefinition(ZMFDictionary* wMasterDic, ZArray<IndexData_st> *wIndexData, ZaiErrors* pErrorLog);
+ZStatus validateXmlDicDefinition(ZMFDictionary* wDictionary, ZArray<IndexData_st> *wIndexData, ZaiErrors* pErrorLog);
 /**
  * @brief loadXMLDictionary reads all element from a DOM element root
  * @param wMCBNode
- * @param pMasterDic
+ * @param pDictionary
  * @param pErrorLog
  * @return a ZStatus
- * ZS_SUCCESS   : Meta dictionary (fields definition) and Key dictionary has been correctly loaded into pMasterDic.
- *                in this case, pMasterDic is returned as a structure allocated by new, and MUST BE DEALLOCATED by callee.
+ * ZS_SUCCESS   : Meta dictionary (fields definition) and Key dictionary has been correctly loaded into pDictionary.
+ *                in this case, pDictionary is returned as a structure allocated by new, and MUST BE DEALLOCATED by callee.
  *
- * ZS_INVVALUE  : pMasterDic has not be initialized to nullptr and may cause a memory problem. Nothing is done.
- * ZS_NOTFOUND  : No Master Dictionary has been found under given xml root node. pMasterDic is set to nullptr.
+ * ZS_INVVALUE  : pDictionary has not be initialized to nullptr and may cause a memory problem. Nothing is done.
+ * ZS_NOTFOUND  : No Master Dictionary has been found under given xml root node. pDictionary is set to nullptr.
  * ZS_BADDIC    : No Meta dictionary node has been found under Master Dictionary node. XML structure is corrupted.
  * ZS_XMLERROR  : Meta dictionary has been found but an xml problem occurred during loading of fields definition.
  *
- * ZS_NOTFOUND  : No key dictionary found. pMasterDic exists with a valid fields definition
+ * ZS_NOTFOUND  : No key dictionary found. pDictionary exists with a valid fields definition
  *                but KeyDic has count() set to zero (no key).
- * ZS_XMLEMPTY  : Key dictionary is malformed. No key definition found.pMasterDic exists with a valid fields definition
+ * ZS_XMLEMPTY  : Key dictionary is malformed. No key definition found.pDictionary exists with a valid fields definition
  *                but KeyDic has count() set to zero (no key).
  *
  * In addition to returned ZStatus :
  *
- *  When Meta Dictionary is errored or does not exist, pMasterDic is set to nullptr
- *  When KeyDictionary is errored or does not exist, pMasterDic->KeyDic.count() returns zero
+ *  When Meta Dictionary is errored or does not exist, pDictionary is set to nullptr
+ *  When KeyDictionary is errored or does not exist, pDictionary->KeyDic.count() returns zero
  *
  */
-ZStatus loadXMLDictionaryForCreate(zxmlElement* pRoot, ZMFDictionary *& pMasterDic, bool pCheckHash, ZaiErrors* pErrorLog);
+ZStatus loadXMLDictionaryForCreate(zxmlElement* pRoot, ZMFDictionary *& pDictionary, bool pCheckHash, ZaiErrors* pErrorLog);
 
 ZStatus zmuXMLgetChild(zxmlElement* pRootNode, const char* pName, bool& pValue,  ZaiErrors* pErrorlog, bool pMandatory,ZaiE_Severity pSeverity=ZAIES_Error);
 ZStatus zmuXMLgetChild(zxmlElement* pRootNode,const char* pName,int& pValue,ZaiErrors* pErrorlog,bool pMandatory,ZaiE_Severity pSeverity=ZAIES_Error);
@@ -195,7 +195,7 @@ ZStatus zmuXMLgetChild(zxmlElement* pRootNode,const char* pName,md5& pValue,ZaiE
 ZStatus zmuXMLgetChild(zxmlElement* pRootNode,const char* pName,utf8String& pValue,ZaiErrors* pErrorlog,bool pMandatory,ZaiE_Severity pSeverity=ZAIES_Error);
 
 
-void displayKeyDicElement(ZMFDictionary* pMasterDic,long pIdx,ZaiErrors* pMessageLog);
+void displayKeyDicElement(ZMFDictionary* pDictionary,long pIdx,ZaiErrors* pMessageLog);
 void displayKeyDicElement(ZKeyDictionary* pKeyDic,ZaiErrors* pMessageLog);
 
 const char *decode_ZCOP (uint16_t pZCOP);

@@ -441,6 +441,8 @@ ZMetaDic::_copyFrom( const ZMetaDic& pIn)
     push(ZFieldDescription(pIn.Tab[wi]));
   DicName = pIn.DicName;
   Version = pIn.Version;
+  CreationDate=pIn.CreationDate;
+  ModificationDate=pIn.ModificationDate;
   return *this;
 }//_copyFrom
 

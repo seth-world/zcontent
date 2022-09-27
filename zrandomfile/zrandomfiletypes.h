@@ -26,7 +26,7 @@
 //! @macro __ZINDEX_FILEEXTENSION__  preprocessor parameter for index content file extension
 #define __ZINDEX_FILEEXTENSION__ ".zix"
 //! @macro __ZINDEX_FILEEXTENSION__  preprocessor parameter for master dictionary content file extension
-#define __ZDICTIONARY_FILEEXTENSION__ ".zdc"
+#define __ZDICTIONARY_FILEEXTENSION__ ".dic"
 //! @macro  __MASTER_FILEEXTENSION__ preprocessor parameter for master file content file extension
 #define __MASTER_FILEEXTENSION__ ".zmf"
 
@@ -56,7 +56,7 @@ public:
 #ifndef ZRANDOMFILE_CPP
 extern ZOpenZRFPool* ZRFPool;
 #endif //ZRANDOMFILE_CPP*/
-#endif
+#endif  // __ZOPENZRFPOOL__
 
 /** @cond Development
  * @brief The ZPMSCounterextern ZOpenZRFPool* ZRFPool;_type enum
@@ -142,13 +142,19 @@ enum ZFile_type : uint8_t
  */
 enum ZBlockState_type : uint8_t
 {
-    ZBS_Nothing         = 0,    //!< NOP
-    ZBS_Used            = 1,    //!< block contains a data block
-    ZBS_Free            = 2,    //!< block is free
-    ZBS_Deleted         = 0xFF, //!< block has been deleted
-    ZBS_BeingDeleted    = 0x1F, //!< block has been marked for deletion but is still not deleted yet : it could be restored using a rollback operation
-    ZBS_Control         = 4,    //!< control block reserved for future use
-    ZBS_Allocated       = 8     //!< block in allocated from free blocks pool - an entry has been created in ZBAT . But still not allocated. It still could be freed if create operation is not committed
+    ZBS_Nothing         = 0,    // NOP
+    ZBS_Used            = 0x01, // block contains a data block
+    ZBS_Free            = 0x02, // block is free
+    ZBS_Deleted         = 0x10, // block has been deleted
+    ZBS_BeingDeleted    = 0x12, // block has been marked for deletion but is still not deleted yet : it could be restored using a rollback operation
+    ZBS_Allocated       = 0x04, // block in allocated from free blocks pool - an entry has been created in ZBAT . But still not allocated. It still could be freed if create operation is not committed
+    ZBS_AllocFromDelete = 0x14, // block is allocated from a deleted block in free block pool
+
+    ZBS_Control         = 0x20,  //  used for file reorganization
+
+    ZBS_Split           = 0x40, //  checksplit has splitted this block with previous or next block
+
+    ZBS_Invalid         = 0x80  // block has been declared invalid by ZRandomFile scanning function
 } ;
 
 
@@ -158,7 +164,7 @@ ZStatus generateURIHeader(uriString pURIPath, uriString &pURIHeader);
 //-----------Functions-----------------------
 //
 //const char * decode_ZStatus (ZStatus ZS);
-const char * decode_ZBS (ZBlockState_type pZBS);
+const char * decode_ZBS (uint8_t pZBS);
 
 const char * decode_ZRFMode (zmode_type pZRF);
 zmode_type encode_ZRFMode (char* pZRF);

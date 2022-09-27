@@ -11,13 +11,16 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QStatusBar>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include "zqlabel.h"
 #include "zqtableview.h"
 #include "zqtreeview.h"
 
@@ -27,19 +30,21 @@ class Ui_DicEdit
 {
 public:
     QWidget *centralwidget;
-    ZQTableView *displayDicTBv;
-    QLabel *label_2;
-    QLabel *label_5;
-    ZQTreeView *displayKeyTRv;
     QFrame *frame_2;
-    QLabel *ClosedLBl;
     QLabel *KeysNbLBl;
     QLabel *label_4;
-    QLabel *DicNameLBl;
+    ZQLabel *DicNameLBl;
     QLabel *FieldsNbLBl;
     QLabel *label_3;
     QLabel *label_6;
-    QLabel *VersionLBl;
+    ZQLabel *VersionLBl;
+    QComboBox *ActiveCBx;
+    QWidget *layoutWidget;
+    QVBoxLayout *verticalLayout;
+    QLabel *label_2;
+    ZQTableView *displayDicTBv;
+    QLabel *label_5;
+    ZQTreeView *displayKeyTRv;
     QMenuBar *menubar;
     QStatusBar *statusBar;
 
@@ -47,69 +52,73 @@ public:
     {
         if (DicEdit->objectName().isEmpty())
             DicEdit->setObjectName(QString::fromUtf8("DicEdit"));
-        DicEdit->resize(1153, 685);
+        DicEdit->resize(1137, 685);
         centralwidget = new QWidget(DicEdit);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
-        displayDicTBv = new ZQTableView(centralwidget);
-        displayDicTBv->setObjectName(QString::fromUtf8("displayDicTBv"));
-        displayDicTBv->setGeometry(QRect(10, 80, 1130, 331));
-        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(displayDicTBv->sizePolicy().hasHeightForWidth());
-        displayDicTBv->setSizePolicy(sizePolicy);
-        displayDicTBv->setAcceptDrops(true);
-        displayDicTBv->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        label_2 = new QLabel(centralwidget);
-        label_2->setObjectName(QString::fromUtf8("label_2"));
-        label_2->setGeometry(QRect(470, 60, 211, 16));
-        label_5 = new QLabel(centralwidget);
-        label_5->setObjectName(QString::fromUtf8("label_5"));
-        label_5->setGeometry(QRect(500, 420, 71, 16));
-        displayKeyTRv = new ZQTreeView(centralwidget);
-        displayKeyTRv->setObjectName(QString::fromUtf8("displayKeyTRv"));
-        displayKeyTRv->setGeometry(QRect(10, 440, 1130, 199));
-        sizePolicy.setHeightForWidth(displayKeyTRv->sizePolicy().hasHeightForWidth());
-        displayKeyTRv->setSizePolicy(sizePolicy);
-        displayKeyTRv->setEditTriggers(QAbstractItemView::NoEditTriggers);
         frame_2 = new QFrame(centralwidget);
         frame_2->setObjectName(QString::fromUtf8("frame_2"));
         frame_2->setGeometry(QRect(0, 10, 1131, 41));
         frame_2->setFrameShape(QFrame::StyledPanel);
         frame_2->setFrameShadow(QFrame::Raised);
-        ClosedLBl = new QLabel(frame_2);
-        ClosedLBl->setObjectName(QString::fromUtf8("ClosedLBl"));
-        ClosedLBl->setGeometry(QRect(942, 10, 180, 19));
-        QFont font;
-        font.setPointSize(12);
-        font.setBold(true);
-        font.setWeight(75);
-        ClosedLBl->setFont(font);
         KeysNbLBl = new QLabel(frame_2);
         KeysNbLBl->setObjectName(QString::fromUtf8("KeysNbLBl"));
-        KeysNbLBl->setGeometry(QRect(880, 10, 41, 20));
+        KeysNbLBl->setGeometry(QRect(1060, 10, 41, 20));
         label_4 = new QLabel(frame_2);
         label_4->setObjectName(QString::fromUtf8("label_4"));
-        label_4->setGeometry(QRect(720, 10, 71, 19));
-        DicNameLBl = new QLabel(frame_2);
+        label_4->setGeometry(QRect(900, 10, 71, 19));
+        DicNameLBl = new ZQLabel(frame_2);
         DicNameLBl->setObjectName(QString::fromUtf8("DicNameLBl"));
         DicNameLBl->setGeometry(QRect(12, 10, 491, 19));
         FieldsNbLBl = new QLabel(frame_2);
         FieldsNbLBl->setObjectName(QString::fromUtf8("FieldsNbLBl"));
-        FieldsNbLBl->setGeometry(QRect(770, 10, 51, 19));
+        FieldsNbLBl->setGeometry(QRect(950, 10, 51, 19));
         label_3 = new QLabel(frame_2);
         label_3->setObjectName(QString::fromUtf8("label_3"));
-        label_3->setGeometry(QRect(830, 10, 51, 19));
+        label_3->setGeometry(QRect(1010, 10, 51, 19));
         label_6 = new QLabel(frame_2);
         label_6->setObjectName(QString::fromUtf8("label_6"));
-        label_6->setGeometry(QRect(520, 10, 71, 19));
-        VersionLBl = new QLabel(frame_2);
+        label_6->setGeometry(QRect(540, 10, 71, 19));
+        VersionLBl = new ZQLabel(frame_2);
         VersionLBl->setObjectName(QString::fromUtf8("VersionLBl"));
-        VersionLBl->setGeometry(QRect(580, 10, 111, 19));
+        VersionLBl->setGeometry(QRect(610, 10, 111, 19));
+        ActiveCBx = new QComboBox(frame_2);
+        ActiveCBx->setObjectName(QString::fromUtf8("ActiveCBx"));
+        ActiveCBx->setGeometry(QRect(740, 10, 121, 23));
+        layoutWidget = new QWidget(centralwidget);
+        layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
+        layoutWidget->setGeometry(QRect(20, 70, 1101, 561));
+        verticalLayout = new QVBoxLayout(layoutWidget);
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
+        label_2 = new QLabel(layoutWidget);
+        label_2->setObjectName(QString::fromUtf8("label_2"));
+        label_2->setAlignment(Qt::AlignCenter);
+
+        verticalLayout->addWidget(label_2);
+
+        displayDicTBv = new ZQTableView(layoutWidget);
+        displayDicTBv->setObjectName(QString::fromUtf8("displayDicTBv"));
+        displayDicTBv->setAcceptDrops(true);
+        displayDicTBv->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+        verticalLayout->addWidget(displayDicTBv);
+
+        label_5 = new QLabel(layoutWidget);
+        label_5->setObjectName(QString::fromUtf8("label_5"));
+        label_5->setAlignment(Qt::AlignCenter);
+
+        verticalLayout->addWidget(label_5);
+
+        displayKeyTRv = new ZQTreeView(layoutWidget);
+        displayKeyTRv->setObjectName(QString::fromUtf8("displayKeyTRv"));
+        displayKeyTRv->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+        verticalLayout->addWidget(displayKeyTRv);
+
         DicEdit->setCentralWidget(centralwidget);
         menubar = new QMenuBar(DicEdit);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 1153, 20));
+        menubar->setGeometry(QRect(0, 0, 1137, 20));
         DicEdit->setMenuBar(menubar);
         statusBar = new QStatusBar(DicEdit);
         statusBar->setObjectName(QString::fromUtf8("statusBar"));
@@ -123,9 +132,6 @@ public:
     void retranslateUi(QMainWindow *DicEdit)
     {
         DicEdit->setWindowTitle(QCoreApplication::translate("DicEdit", "MainWindow", nullptr));
-        label_2->setText(QCoreApplication::translate("DicEdit", "Meta dictionary", nullptr));
-        label_5->setText(QCoreApplication::translate("DicEdit", "Keys", nullptr));
-        ClosedLBl->setText(QCoreApplication::translate("DicEdit", "No Open File", nullptr));
         KeysNbLBl->setText(QCoreApplication::translate("DicEdit", "###", nullptr));
         label_4->setText(QCoreApplication::translate("DicEdit", "Fields", nullptr));
         DicNameLBl->setText(QCoreApplication::translate("DicEdit", "DicName", nullptr));
@@ -133,6 +139,8 @@ public:
         label_3->setText(QCoreApplication::translate("DicEdit", "Keys", nullptr));
         label_6->setText(QCoreApplication::translate("DicEdit", "Version", nullptr));
         VersionLBl->setText(QCoreApplication::translate("DicEdit", "##.##-##", nullptr));
+        label_2->setText(QCoreApplication::translate("DicEdit", "Meta dictionary", nullptr));
+        label_5->setText(QCoreApplication::translate("DicEdit", "Keys", nullptr));
     } // retranslateUi
 
 };

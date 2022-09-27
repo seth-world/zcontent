@@ -10,17 +10,19 @@
 #define UI_TEXTEDITMWN_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
-#include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include <zqplaintextedit.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -33,10 +35,15 @@ public:
     QHBoxLayout *horizontalLayout;
     QLabel *ClosedLBl;
     QSpacerItem *horizontalSpacer;
-    QPushButton *moreBTn;
+    QHBoxLayout *horizontalLayout_2;
+    QPushButton *searchBTn;
+    QLineEdit *searchLEd;
+    QPushButton *searchMainBTn;
+    QPushButton *filterBTn;
+    QPushButton *lineNumbersBTn;
     QPushButton *wrapBTn;
     QPushButton *closeBTn;
-    QPlainTextEdit *textPTe;
+    ZQPlainTextEdit *textPTe;
     QStatusBar *statusbar;
     QMenuBar *menubar;
 
@@ -44,7 +51,7 @@ public:
     {
         if (textEditMWn->objectName().isEmpty())
             textEditMWn->setObjectName(QString::fromUtf8("textEditMWn"));
-        textEditMWn->resize(813, 628);
+        textEditMWn->resize(813, 623);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -80,10 +87,47 @@ public:
 
         horizontalLayout->addItem(horizontalSpacer);
 
-        moreBTn = new QPushButton(verticalLayoutWidget);
-        moreBTn->setObjectName(QString::fromUtf8("moreBTn"));
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        searchBTn = new QPushButton(verticalLayoutWidget);
+        searchBTn->setObjectName(QString::fromUtf8("searchBTn"));
+        QIcon icon;
+        icon.addFile(QString::fromUtf8("../../zqt/icons/magnifyingglass.png"), QSize(), QIcon::Normal, QIcon::Off);
+        searchBTn->setIcon(icon);
 
-        horizontalLayout->addWidget(moreBTn);
+        horizontalLayout_2->addWidget(searchBTn);
+
+        searchLEd = new QLineEdit(verticalLayoutWidget);
+        searchLEd->setObjectName(QString::fromUtf8("searchLEd"));
+
+        horizontalLayout_2->addWidget(searchLEd);
+
+
+        horizontalLayout->addLayout(horizontalLayout_2);
+
+        searchMainBTn = new QPushButton(verticalLayoutWidget);
+        searchMainBTn->setObjectName(QString::fromUtf8("searchMainBTn"));
+#if QT_CONFIG(tooltip)
+        searchMainBTn->setToolTip(QString::fromUtf8("set search on/off"));
+#endif // QT_CONFIG(tooltip)
+        QIcon icon1;
+        icon1.addFile(QString::fromUtf8("../../zqt/icons/strigi.png"), QSize(), QIcon::Normal, QIcon::Off);
+        searchMainBTn->setIcon(icon1);
+
+        horizontalLayout->addWidget(searchMainBTn);
+
+        filterBTn = new QPushButton(verticalLayoutWidget);
+        filterBTn->setObjectName(QString::fromUtf8("filterBTn"));
+        QIcon icon2;
+        icon2.addFile(QString::fromUtf8("../../zqt/icons/funel.png"), QSize(), QIcon::Normal, QIcon::Off);
+        filterBTn->setIcon(icon2);
+
+        horizontalLayout->addWidget(filterBTn);
+
+        lineNumbersBTn = new QPushButton(verticalLayoutWidget);
+        lineNumbersBTn->setObjectName(QString::fromUtf8("lineNumbersBTn"));
+
+        horizontalLayout->addWidget(lineNumbersBTn);
 
         wrapBTn = new QPushButton(verticalLayoutWidget);
         wrapBTn->setObjectName(QString::fromUtf8("wrapBTn"));
@@ -98,7 +142,7 @@ public:
 
         verticalLayout->addLayout(horizontalLayout);
 
-        textPTe = new QPlainTextEdit(verticalLayoutWidget);
+        textPTe = new ZQPlainTextEdit(verticalLayoutWidget);
         textPTe->setObjectName(QString::fromUtf8("textPTe"));
         sizePolicy1.setHeightForWidth(textPTe->sizePolicy().hasHeightForWidth());
         textPTe->setSizePolicy(sizePolicy1);
@@ -132,9 +176,15 @@ public:
     {
         textEditMWn->setWindowTitle(QCoreApplication::translate("textEditMWn", "MainWindow", nullptr));
         ClosedLBl->setText(QCoreApplication::translate("textEditMWn", "No Open File", nullptr));
-        moreBTn->setText(QCoreApplication::translate("textEditMWn", "More", nullptr));
+        searchBTn->setText(QString());
+        searchMainBTn->setText(QString());
+        filterBTn->setText(QString());
+        lineNumbersBTn->setText(QCoreApplication::translate("textEditMWn", "Line numbers On", nullptr));
         wrapBTn->setText(QCoreApplication::translate("textEditMWn", "No wrap", nullptr));
         closeBTn->setText(QCoreApplication::translate("textEditMWn", "Close", nullptr));
+#if QT_CONFIG(tooltip)
+        textPTe->setToolTip(QCoreApplication::translate("textEditMWn", "Filter content", nullptr));
+#endif // QT_CONFIG(tooltip)
     } // retranslateUi
 
 };

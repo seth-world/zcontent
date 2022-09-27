@@ -19,10 +19,23 @@ TARGET = zcontentutils
 
 HOME = /home/gerard
 
+
 # --------ztoolset common definitions------------
 
 DEVELOPMENT_BASE = $${HOME}/Development
-TOOLSET_ROOT = $$DEVELOPMENT_BASE/zbasetools
+TOOLSET_ROOT = $${DEVELOPMENT_BASE}/zbasetools
+TOOLSET_INCLUDE = ${TOOLSET_ROOT}/include
+TOOLSET_INC_ZBASE = ${TOOLSET_INCLUDE}/zbase
+TOOLSET_INC_ZNET = ${TOOLSET_INCLUDE}/znet
+TOOLSET_INC_ZCONTENT = ${TOOLSET_INCLUDE}/zcontent
+TOOLSET_INC_ZAM = ${TOOLSET_INCLUDE}/zam
+TOOLSET_INC_ZCPPPARSER = ${TOOLSET_INCLUDE}/zcppparser/zcppparser
+
+TOOLSET_INC_ZCPPPARSER = ${TOOLSET_INCLUDE}/zcppparser/zcppparser
+
+ZQT_ROOT = $${TOOLSET_ROOT}/zqt
+ZCONTENT_ROOT = $${TOOLSET_ROOT}/zcontent
+ZQT_WIDGET = $${ZQT_ROOT}/zqtwidget
 
 # name of the root include directory
 
@@ -75,11 +88,9 @@ LIBS +=  -licuuc -licudata -licui18n -licuio -licutu -licutest
 #LIBS += $$ICU_BASE/lib/libicutu.a
 #LIBS += $$ICU_BASE/lib/libicutest.a
 
-ZQT_ROOT = $${TOOLSET_ROOT}/zqt
 
-ZQT_WIDGET = $${ZQT_ROOT}/zqtwidget
 
- INCLUDEPATH += $${TOOLSET_ROOT} \
+INCLUDEPATH += $${TOOLSET_ROOT} \
                 $${TOOLSET_INCLUDE}  \
                 $${TOOLSET_INC_ZBASE} \
                 $${TOOLSET_INC_ZNET} \
@@ -89,7 +100,9 @@ ZQT_WIDGET = $${ZQT_ROOT}/zqtwidget
                 $${OPENSSL_ROOT} \
                 $${ZQT_ROOT} \
                 $${ZQT_WIDGET} \
+                $${ZCONTENT_ROOT}/zcontentutils \
                 $${DEVELOPMENT_BASE}/zflow
+
 
 #if using ICU
 INCLUDEPATH +=  $${ICU_COMMON} \
@@ -106,73 +119,144 @@ INCLUDEPATH +=/usr/include/libxml2
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    ../../zqt/zqtwidget/zdatareference.cpp \
-    ../../zqt/zqtwidget/zpinboard.cpp \
-    ../../zqt/zqtwidget/zqlabel.cpp \
-    ../../zqt/zqtwidget/zqlineedit.cpp \
-    ../../zqt/zqtwidget/zqstandarditem.cpp \
-    ../../zqt/zqtwidget/zqstandarditemmodel.cpp \
-    ../../zqt/zqtwidget/zqtableview.cpp \
-    ../../zqt/zqtwidget/zqtreeview.cpp \
-    ../../zqt/zqtwidget/zqtwidgettools.cpp \
-    ../../zqt/zqtwidget/zqtwidgettypes.cpp \
-    ../zcontentcommon/zresource.cpp \
-    ../zindexedfile/zfielddescription.cpp \
-    dicedit.cpp \
-    displaymain.cpp \
+    $${ZQT_WIDGET}/zdatareference.cpp \
+    $${ZQT_WIDGET}/zpinboard.cpp \
+    $${ZQT_WIDGET}/zqlabel.cpp \
+    $${ZQT_WIDGET}/zqlineedit.cpp \
+    $${ZQT_WIDGET}/zqstandarditem.cpp \
+    $${ZQT_WIDGET}/zqstandarditemmodel.cpp \
+    $${ZQT_WIDGET}/zqtableview.cpp \
+    $${ZQT_WIDGET}/zqtreeview.cpp \
+    $${ZQT_WIDGET}/zqtwidgettools.cpp \
+    $${ZQT_WIDGET}/zqtwidgettypes.cpp \
+    $${ZQT_WIDGET}/zqplaintextedit.cpp \
+#    $${ZQT_WIDGET}/zqpixlabelchecked.cpp \
+\
+    $${ZCONTENT_ROOT}/zcontentcommon/zresource.cpp \
+    $${ZCONTENT_ROOT}/zindexedfile/zfielddescription.cpp \
+\
+    $${ZCONTENT_ROOT}/zcontentutils/dicedit.cpp \
+    $${ZCONTENT_ROOT}/zcontentutils/displaymain.cpp \
+    $${ZCONTENT_ROOT}/zcontentutils/zcu_common.cpp \
+    $${ZCONTENT_ROOT}/zcontentutils/zdisplayedfield.cpp \
+    $${ZCONTENT_ROOT}/zcontentutils/zparsingrules.cpp \
+    $${ZCONTENT_ROOT}/zcontentutils/zparsingrulesdlg.cpp \
+    $${ZCONTENT_ROOT}/zcontentutils/zstdlistdlg.cpp \
+    $${ZCONTENT_ROOT}/zcontentutils/ztypedlg.cpp \
+\
+    $${TOOLSET_ROOT}/zcppparser/zcppparserutils/rawfields.cpp \
+#    ../../zcppparser/zcppparserutils/rawfields.cpp \
+#/home/gerard/Development/zbasetools/zcppparser/zcppparserutils/rawfields.h
+    $${ZCONTENT_ROOT}/zcontentutils/texteditmwn.cpp \
+    $${ZCONTENT_ROOT}/zcontentutils/zcontentvisumain.cpp \
+    $${ZCONTENT_ROOT}/zcontentutils/zentity.cpp \
+    $${ZCONTENT_ROOT}/zcontentutils/zexceptiondlg.cpp \
+    $${ZCONTENT_ROOT}/zcontentutils/zfielddlg.cpp \
+    $${ZCONTENT_ROOT}/zcontentutils/zkeydlg.cpp \
+    $${ZCONTENT_ROOT}/zcontentutils/zlayout.cpp \
+    $${ZCONTENT_ROOT}/zcontentutils/zscan.cpp \
     main.cpp \
-    texteditmwn.cpp \
-    zcontentvisumain.cpp \
-    zcu_common.cpp \
-    zentity.cpp \
-    zexceptiondlg.cpp \
-    zfielddlg.cpp \
-    zkeydlg.cpp \
-    zlayout.cpp \
-    zscan.cpp \
-    ztypezqtrv.cpp
+    zdicdlg.cpp
+
+
 
 HEADERS += \
     ../../zconfig_general.h \
-    ../../zqt/zqtwidget/zdatareference.h \
-    ../../zqt/zqtwidget/zpinboard.h \
-    ../../zqt/zqtwidget/zqlabel.h \
-    ../../zqt/zqtwidget/zqlineedit.h \
-    ../../zqt/zqtwidget/zqstandarditem.h \
-    ../../zqt/zqtwidget/zqstandarditemmodel.h \
-    ../../zqt/zqtwidget/zqtableview.h \
-    ../../zqt/zqtwidget/zqtreeview.h \
-    ../../zqt/zqtwidget/zqtwidgettools.h \
-    ../../zqt/zqtwidget/zqtwidgettypes.h \
-    ../zcontentcommon/zresource.h \
-    ../zindexedfile/zfielddescription.h \
-    dicedit.h \
-    displaymain.h \
-    texteditmwn.h \
-    zcontentvisumain.h \
-    zcu_common.h \
-    zentity.h \
-    zexceptiondlg.h \
-    zfielddlg.h \
-    zkeydlg.h \
-    zlayout.h \
-    zscan.h \
-    ztypezqtrv.h
+    $${ZQT_WIDGET}/zdatareference.h \
+    $${ZQT_WIDGET}/zpinboard.h \
+    $${ZQT_WIDGET}/zqlabel.h \
+    $${ZQT_WIDGET}/zqlineedit.h \
+    $${ZQT_WIDGET}/zqstandarditem.h \
+    $${ZQT_WIDGET}/zqstandarditemmodel.h \
+    $${ZQT_WIDGET}/zqtableview.h \
+    $${ZQT_WIDGET}/zqtreeview.h \
+    $${ZQT_WIDGET}/zqtwidgettools.h \
+    $${ZQT_WIDGET}/zqtwidgettypes.h \
+    $${ZQT_WIDGET}/zqplaintextedit.h \
+#    $${ZQT_WIDGET}/zqpixlabelchecked.h \
+\
+    $${ZCONTENT_ROOT}/zcontentcommon/zresource.h \
+    $${ZCONTENT_ROOT}/zindexedfile/zfielddescription.h \
+\
+    $${ZCONTENT_ROOT}/zcontentutils/dicedit.h \
+    $${ZCONTENT_ROOT}/zcontentutils/displaymain.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zcu_common.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zcontentutilsparams.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zdisplayedfield.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zparsingrules.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zparsingrulesdlg.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zstdlistdlg.h \
+    $${ZCONTENT_ROOT}/zcontentutils/ztypedlg.h \
+    $${ZCONTENT_ROOT}/zcontentutils/texteditmwn.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zcontentvisumain.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zentity.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zexceptiondlg.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zfielddlg.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zkeydlg.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zlayout.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zscan.h \
+\
+    $${TOOLSET_ROOT}/zcppparser/zcppparserutils/rawfields.h \
+    zdicdlg.h
+
+
+#    ztypelistbutton.h \
+#    ztypezqtrv.h
+
+
 
 FORMS += \
-    dicedit.ui \
-#    dicedit_copy.ui \
-#    dicedit_old.ui \
-    displaymain.ui \
-    texteditmwn.ui \
-    texteditmwn_copy.ui \
-    zcontentvisumain.ui \
-    zexceptiondlg.ui \
-    zexceptiondlg_old.ui \
-    zfielddlg.ui \
-    zfielddlg_copy.ui \
-    zkeydlg.ui \
-    zscan.ui
+#    ../../zcppparser/zcppparserutils/rawfields.ui \
+    $${ZCONTENT_ROOT}/zcontentutils/displaymain.ui \
+    $${ZCONTENT_ROOT}/zcontentutils/dicedit.ui \
+    $${ZCONTENT_ROOT}/zcontentutils/displaymain.ui \
+    $${ZCONTENT_ROOT}/zcontentutils/zparsingrules.ui \
+    $${ZCONTENT_ROOT}/zcontentutils/zparsingrulesdlg.ui \
+    $${ZCONTENT_ROOT}/zcontentutils/texteditmwn.ui \
+    $${ZCONTENT_ROOT}/zcontentutils/zcontentvisumain.ui \
+    $${ZCONTENT_ROOT}/zcontentutils/zexceptiondlg.ui \
+    $${ZCONTENT_ROOT}/zcontentutils/zfielddlg.ui \
+    $${ZCONTENT_ROOT}/zcontentutils/zkeydlg.ui \
+    $${ZCONTENT_ROOT}/zcontentutils/zscan.ui
+    $${TOOLSET_ROOT}/zcppparser/zcppparserutils/rawfields.ui
+
+
+OLDHEADERS += \
+    ../../zconfig_general.h \
+    $${ZQT_WIDGET}/zdatareference.h \
+    $${ZQT_WIDGET}/zpinboard.h \
+    $${ZQT_WIDGET}/zqlabel.h \
+    $${ZQT_WIDGET}/zqlineedit.h \
+    $${ZQT_WIDGET}/zqstandarditem.h \
+    $${ZQT_WIDGET}/zqstandarditemmodel.h \
+    $${ZQT_WIDGET}/zqtableview.h \
+    $${ZQT_WIDGET}/zqtreeview.h \
+    $${ZQT_WIDGET}/zqtwidgettools.h \
+    $${ZQT_WIDGET}/zqtwidgettypes.h \
+    $${ZQT_WIDGET}/zqplaintextedit.h \
+    $${ZCONTENT_ROOT}/zcontentcommon/zresource.h \
+    $${ZCONTENT_ROOT}/zindexedfile/zfielddescription.h \
+    $${ZCONTENT_ROOT}/zcontentutils/dicedit.h \
+    $${ZCONTENT_ROOT}/zcontentutils/displaymain.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zcu_common.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zcontentutilsparams.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zdisplayedfield.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zparsingrules.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zparsingrulesdlg.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zstdlistdlg.h \
+    $${ZCONTENT_ROOT}/zcontentutils/ztypedlg.h \
+    rawfields.h \
+    $${ZCONTENT_ROOT}/zcontentutils/texteditmwn.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zcontentvisumain.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zentity.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zexceptiondlg.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zfielddlg.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zkeydlg.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zlayout.h \
+    $${ZCONTENT_ROOT}/zcontentutils/zscan.h
+
+
+
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -266,9 +266,9 @@ ZMasterFile::addKeyToDic(ZKeyDictionary* pKeyDic,long &pOutKeyRank)
   pOutKeyRank=-1;
   if (pKeyDic==nullptr)
     return ZS_NULLPTR;
-  if ( MasterDic->searchKey(pKeyDic->DicKeyName)!=nullptr)
+  if ( Dictionary->searchKey(pKeyDic->DicKeyName)!=nullptr)
     return ZS_DUPLICATEKEY;
- return MasterDic->addKey(pKeyDic,pOutKeyRank);
+ return Dictionary->addKey(pKeyDic,pOutKeyRank);
 }
 
 /**
@@ -313,7 +313,7 @@ uriString wIndexFileDirectoryPath;
           getURIContent().toString());
       return  ZS_NULLPTR;
     }
-    if (MasterDic==nullptr)
+    if (Dictionary==nullptr)
       {
       ZException.setMessage (_GET_FUNCTION_NAME_,
           ZS_NULLPTR,
@@ -344,7 +344,7 @@ uriString wIndexFileDirectoryPath;
           return  ZS_ERROPEN;
         }
 
-    wSt=MasterDic->addKey(pKeyDic,pOutKeyRank);
+    wSt=Dictionary->addKey(pKeyDic,pOutKeyRank);
     if (wSt!=ZS_SUCCESS)
       return wSt;
 
@@ -354,7 +354,7 @@ uriString wIndexFileDirectoryPath;
     if (wSt==ZS_SUCCESS)
       {
 
-//      wIndexObject->newKeyDic(pKeyDic,MasterDic);  // no key dictionary within ZIndexControlBlock
+//      wIndexObject->newKeyDic(pKeyDic,Dictionary);  // no key dictionary within ZIndexControlBlock
       wSt=wIndexObject->writeIndexControlBlock();
       }
 
@@ -371,7 +371,7 @@ ZMasterFile::zcreateIndexFromDictionary (const utf8String &pDicKeyName,
   uriString wIndexURI;
   uriString wIndexFileDirectoryPath;
   pOutKeyRank=-1;
-  if (MasterDic==nullptr)
+  if (Dictionary==nullptr)
     {
     ZException.setMessage (_GET_FUNCTION_NAME_,
         ZS_NULLPTR,
@@ -403,7 +403,7 @@ ZMasterFile::zcreateIndexFromDictionary (const utf8String &pDicKeyName,
   }
 
   /* key name must exist within master dictionary */
-  ZKeyDictionary* wKeyDic= MasterDic->searchKeyCase(pDicKeyName);
+  ZKeyDictionary* wKeyDic= Dictionary->searchKeyCase(pDicKeyName);
 
   if (wKeyDic==nullptr)
     {
@@ -495,8 +495,8 @@ ZMasterFile::zremoveIndex (const long pIndexRank)
   ZStatus wSt=  ZRawMasterFile::zremoveIndex(pIndexRank);
   if (wSt==ZS_SUCCESS)
     {
-    delete MasterDic->KeyDic[pIndexRank];
-    MasterDic->KeyDic.erase(pIndexRank);
+    delete Dictionary->KeyDic[pIndexRank];
+    Dictionary->KeyDic.erase(pIndexRank);
     }
   return wSt;
 }//zremoveIndex
@@ -1323,7 +1323,7 @@ ErrorRepairIndexes:
  */
 
 ZStatus
-ZMasterFile::zcreateMasterFile(ZMFDictionary *pMasterDic,
+ZMasterFile::zcreateMasterFile(uriString *pDictionary,
                                 const uriString pURI,
                                 long pAllocatedBlocks,
                                 long pBlockExtentQuota,
@@ -1335,9 +1335,6 @@ ZMasterFile::zcreateMasterFile(ZMFDictionary *pMasterDic,
                                 bool pBackup,
                                 bool pLeaveOpen)
 {
-  ZMasterFile::setDictionary(*pMasterDic);
-//  MasterDic->generateCheckSum();
-
   ZStatus wSt=ZRawMasterFile::zcreateRawMasterFile( pURI,
                                                     pAllocatedBlocks,
                                                     pBlockExtentQuota,
@@ -1351,29 +1348,26 @@ ZMasterFile::zcreateMasterFile(ZMFDictionary *pMasterDic,
 
 
   ZHeader.FileType = ZFT_ZMasterFile;
-
   return wSt;
 }
-
+/*
 void ZMasterFile::setDictionary (const ZMFDictionary& pDictionary)
 {
-  if (MasterDic)
-    delete MasterDic;
-  MasterDic = new ZMFDictionary(pDictionary);
+  Dictionary->setDictionary(pDictionary);
   ZHeader.FileType = ZFile_type (ZHeader.FileType | ZFT_ZDicMasterFile) ;
 }
-
+*/
 ZStatus
-ZMasterFile::zcreateMasterFile(ZMFDictionary* pMasterDic,const uriString pURI, const zsize_type pInitialSize, bool pBackup, bool pLeaveOpen)
+ZMasterFile::zcreateMasterFile(uriString *pDictionary, const uriString pURI, const zsize_type pInitialSize, bool pBackup, bool pLeaveOpen)
 {
   ZStatus wSt;
   printf ("ZSMasterFile::zcreate \n");
-  if (pMasterDic==nullptr)
+  if (pDictionary==nullptr)
     {
     ZException.setMessage("ZSMasterFile::zcreate",ZS_NULLPTR,Severity_Severe,"Meta dictionary is nullptr while trying to create Master File <%s>.",URIContent.toCChar());
     return (ZS_NULLPTR);
     }
-  if (pMasterDic->isEmpty())
+  if (pDictionary->isEmpty())
     {
       ZException.setMessage("ZSMasterFile::zcreate",ZS_EMPTY,Severity_Error,"Meta dictionary is empty while trying to create Master File <%s>.",URIContent.toCChar());
       return (ZS_NULLPTR);
@@ -1391,8 +1385,8 @@ ZMasterFile::zcreateMasterFile(ZMFDictionary* pMasterDic,const uriString pURI, c
           getURIContent().toString());
       return (wSt);
     }
-  ZMasterFile::setDictionary(*pMasterDic);
-//  MasterDic->generateCheckSum();
+  ZMasterFile::setDictionary(*pDictionary);
+//  Dictionary->generateCheckSum();
 
 
   ZHeader.FileType = ZFT_ZMasterFile;     // setting ZFile_type (Already done in _create routine but as ZRandomFiles)
@@ -1465,13 +1459,13 @@ ZDataBuffer wMCBContent;
             return  wSt;
             }
 
-    if (MasterDic)
-      MasterDic->clear();
+    if (Dictionary)
+      Dictionary->clear();
     else
-      MasterDic=new ZMFDictionary;
+      Dictionary=new ZMFDictionary;
     for (long wi=0;wi<pMetaDic->size();wi++)
-                MasterDic->push(pMetaDic->Tab[wi]);
-    MasterDic->generateCheckSum();
+                Dictionary->push(pMetaDic->Tab[wi]);
+    Dictionary->generateCheckSum();
 
     ZHeader.FileType = ZFT_ZSMasterFile;     // setting ZFile_type
 
@@ -1549,13 +1543,13 @@ ZDataBuffer wMCBContent;
             }
 */
 
-    if (MasterDic)
-      delete MasterDic;
-    MasterDic=new ZMFDictionary;
+    if (Dictionary)
+      delete Dictionary;
+    Dictionary=new ZMFDictionary;
     for (long wi=0;wi<pMetaDic->size();wi++)
-                MasterDic->push(pMetaDic->Tab[wi]);
+                Dictionary->push(pMetaDic->Tab[wi]);
 
-    MasterDic->generateCheckSum();
+    Dictionary->generateCheckSum();
 
     ZHeader.FileType = ZFT_ZSMasterFile;     // setting ZFile_type (Already done in _create routine)
     if (pLeaveOpen)
@@ -1644,7 +1638,6 @@ ZMasterFile::createZKeyByName (const char* pKeyName)
 ZSKey*
 ZMasterFile::createZKey (const long pKeyNumber)
 {
-
 
     if (!isOpen())
         {
@@ -1740,6 +1733,30 @@ ZMasterFile::zopen  (const uriString pURI, const int pMode)
   if (wSt!=ZS_SUCCESS)
       {return  wSt;}
 
+/* get dictionary */
+
+  if (Dictionary)
+    delete Dictionary ;
+
+  Dictionary = new ZDictionaryFile;
+
+  wSt = Dictionary->generateAndSetFileName(URIContent); /* compute dictionary file name from master file content file name */
+  if (wSt==ZS_FILENOTEXIST) {
+    ZException.setMessage("ZMasterFile::zopen",wSt,Severity_Error,"Dictionary file <%s> has not been found.",
+        Dictionary->getURIContent().toCChar());
+    return ZS_FILENOTEXIST;
+  }
+  wSt=Dictionary->zopen(ZRF_Read_Only);
+  if (wSt!=ZS_SUCCESS) {
+    ZException.setMessage("ZMasterFile::zopen",wSt,Severity_Error,"Dictionary file <%s> cannot be openned.",
+        Dictionary->getURIContent().toCChar());
+    return ZS_FILENOTEXIST;
+  }
+  wSt=Dictionary->loadActiveDictionary();
+  if (wSt!=ZS_SUCCESS) {
+    ZException.addToLast(" while openning file <%s>",URIContent.toCChar());
+    return wSt;
+  }
   // MCB is loaded
   //----------Journaling----------------------
 
@@ -1922,8 +1939,8 @@ long wi = 0;
 
 //    ZExceptionStack.clear();
 //    ZException.getLastStatus() = ZS_SUCCESS;
-
-    wSt=_Base::_insert2PhasesCommit_Prepare(pRecord->Content,pZMFRank,wZMFIdxCommit,wZMFAddress);  // prepare the add on Master File, reserve appropriate space, get entry in pool
+    wZMFIdxCommit=pZMFRank;
+    wSt=_Base::_insert2Phases_Prepare(pRecord->Content,wZMFIdxCommit,wZMFAddress);  // prepare the add on Master File, reserve appropriate space, get entry in pool
     if (wSt!=ZS_SUCCESS)
             {
             goto zinsert_error;
@@ -1948,7 +1965,7 @@ long wi = 0;
           // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
           _add_RollbackIndexes ( IndexRankProcessed); // An additional error during index rollback will pushed on exception stack
           // on error reset ZMF in its original state
-          _Base::_add2PhasesCommit_Rollback(wZMFIdxCommit); // do not accept update on Master File and free resources
+          _Base::_add2Phases_Rollback(wZMFIdxCommit); // do not accept update on Master File and free resources
           goto zinsert_error;
         }
         wSt=IndexTable[wi]->_addRawKeyValue_Prepare(wIndexItem,wIndex_Rank, wZMFAddress);// for indexes don't care about insert, this is an add key value
@@ -1959,7 +1976,7 @@ long wi = 0;
 // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
                 _add_RollbackIndexes ( IndexRankProcessed); // An additional error during index rollback will pushed on exception stack
 // on error reset ZMF in its original state
-                _Base::_add2PhasesCommit_Rollback(wZMFIdxCommit); // do not accept update on Master File and free resources
+                _Base::_add2Phases_Rollback(wZMFIdxCommit); // do not accept update on Master File and free resources
                 goto zinsert_error;
                 }
 
@@ -1979,7 +1996,7 @@ long wi = 0;
         {
         // Soft rollback master update regardless returned ZStatus
         // Nb: Exception is pushed on stack. ZException keeps the last status.
-        _Base::_add2PhasesCommit_Rollback(wZMFIdxCommit);
+        _Base::_add2Phases_Rollback(wZMFIdxCommit);
 
         goto zinsert_error;
         }
@@ -1987,7 +2004,7 @@ long wi = 0;
 // at this stage all indexes have been committed
 //         commit for Master file data must be done now
 //
-    wSt = _Base::_insert2PhasesCommit_Commit(pRecord->Content,wZMFIdxCommit);//! accept insert update on Master File
+    wSt = _Base::_insert2Phases_Commit(pRecord->Content,wZMFIdxCommit, wZMFAddress);//! accept insert update on Master File
     if (wSt!=ZS_SUCCESS)    //! and if then an error occur : hard rollback all indexes and signal exception
             {
             _add_HardRollbackIndexes ( IndexRankProcessed); // indexes are already committed so use hardRollback to counter pass
@@ -2084,7 +2101,7 @@ ZMasterFile::_add(ZRecord* pRecord)
 
   // prepare the add on Master File, reserve appropriate space, get entry in pool, lock it
 
-  wSt=_Base::_add2PhasesCommit_Prepare( pRecord->RawContent,
+  wSt=_Base::_add2Phases_Prepare( pRecord->RawContent,
       wZMFZBATIndex,     // get internal ZBAT pool allocated index
       wZMFAddress);
   if (wSt!=ZS_SUCCESS)
@@ -2112,7 +2129,7 @@ ZMasterFile::_add(ZRecord* pRecord)
       // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
       _add_RollbackIndexes (IndexRankProcessed); // An additional error during index rollback will pushed on exception stack
       // on error reset ZMF in its original state
-      _Base::_add2PhasesCommit_Rollback(wZMFZBATIndex); // do not accept update on Master File and free resources
+      _Base::_add2Phases_Rollback(wZMFZBATIndex); // do not accept update on Master File and free resources
       goto zaddRaw_error;
     }
 
@@ -2124,7 +2141,7 @@ ZMasterFile::_add(ZRecord* pRecord)
       // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
       _add_RollbackIndexes ( IndexRankProcessed); // An additional error during index rollback will pushed on exception stack
       // on error reset ZMF in its original state
-      _Base::_add2PhasesCommit_Rollback(wZMFZBATIndex); // do not accept update on Master File and free resources
+      _Base::_add2Phases_Rollback(wZMFZBATIndex); // do not accept update on Master File and free resources
       goto zaddRaw_error;
     }
 
@@ -2146,7 +2163,7 @@ ZMasterFile::_add(ZRecord* pRecord)
   {
     // Soft rollback master update regardless returned ZStatus
     // Nb: Exception is pushed on stack. ZException keeps the last status.
-    _Base::_add2PhasesCommit_Rollback(wZMFZBATIndex);
+    _Base::_add2Phases_Rollback(wZMFZBATIndex);
 
     goto zaddRaw_error;
   }
@@ -2155,7 +2172,7 @@ ZMasterFile::_add(ZRecord* pRecord)
   //         commit for Master file data must be done now
   //
   //  wSt = _Base::_add2PhasesCommit_Commit(_Base::pRecord->RawContent,wZMFZBATIndex,wZMFAddress);// accept update on Master File
-  wSt = _Base::_add2PhasesCommit_Commit(pRecord->RawContent,pRecord->Rank,pRecord->Address);// accept update on Master File
+  wSt = _Base::_add2Phases_Commit(pRecord->RawContent,pRecord->Rank,pRecord->Address);// accept update on Master File
 
   if (wSt!=ZS_SUCCESS)    // and if then an error occur : hard rollback all indexes
   {
@@ -2319,28 +2336,29 @@ bool wasOpen=false;
 bool wgrabFreeSpaceSet = false;
 
 zmode_type wMode = ZRF_Nothing ;
-    if (_isOpen)
-             {
-             wMode=getMode();
-             zclose();
-             wasOpen=true;
-             }
-     if ((wSt=zopen(URIContent,ZRF_Exclusive|ZRF_Write))!=ZS_SUCCESS)
-                                                         {  return  wSt;}
+  if (_isOpen)
+           {
+           wMode=getMode();
+           zclose();
+           wasOpen=true;
+           }
 
 
-     if (!ZFCB.GrabFreeSpace)        // activate grabFreeSpace if it has been set on
-                 {
-     ZFCB.GrabFreeSpace=true;
-                 wgrabFreeSpaceSet = true;
-                 }
 
-    zstartPMSMonitoring();
+  if ((wSt=zopen(URIContent,ZRF_Exclusive|ZRF_Write))!=ZS_SUCCESS)
+           {  return  wSt;}
 
-    wSt = ZRandomFile::_reorgFileInternals(pDump,pOutput);
 
-   while (wi < IndexTable.size())
-    {
+  if (!ZFCB.GrabFreeSpace)    {    // activate grabFreeSpace if it has been set on
+    ZFCB.GrabFreeSpace=true;
+    wgrabFreeSpaceSet = true;
+  }
+
+  zstartPMSMonitoring();
+
+  wSt = ZRandomFile::_reorgFileInternals(pDump,pOutput);
+
+  while (wi < IndexTable.size()) {
 //            wSt=IndexTableObjects[wj]->_addRollBackIndex(pIndexRankProcessed.popR()); // rollback update on each index concerned
 //       wSt=IndexTable[wi]->zrebuildRawIndex(false,pOutput); // hard rollback update on each already committed index
 

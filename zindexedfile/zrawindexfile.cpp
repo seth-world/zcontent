@@ -676,9 +676,9 @@ ZSIndexResult wZIR;
 
 */
 /**
- * @brief ZRawIndexFile::_extractKeys extracts all defined keys from pRecordContent using pMasterDic givin pKeysContent as a result.
+ * @brief ZRawIndexFile::_extractKeys extracts all defined keys from pRecordContent using pDictionary givin pKeysContent as a result.
  * @param pRecordContent
- * @param pMasterDic
+ * @param pDictionary
  * @param pKeysContent
  * @return
  */
@@ -937,7 +937,8 @@ ZIFCompare wZIFCompare = ZKeyCompareBinary;
                 {
                 pIndexItem->Operation=ZO_Push_front ;
 //                ZJoinIndex=0;
-                wSt=_insert2PhasesCommit_Prepare (pIndexItem->toFileKey(),0L,pZBATIndex,wZIR.ZMFAddress);// equivalent to push_front
+                pZBATIndex=0L;
+                wSt=_insert2Phases_Prepare (pIndexItem->toFileKey(),pZBATIndex,wZIR.ZMFAddress);// equivalent to push_front
                 if (ZVerbose)
                         _DBGPRINT ("Index Push_Front  (index rank 0L )\n");
 
@@ -947,7 +948,7 @@ ZIFCompare wZIFCompare = ZKeyCompareBinary;
                 {
                 pIndexItem->Operation=ZO_Push ;
 //                ZJoinIndex=this->size();
-                wSt=_Base::_add2PhasesCommit_Prepare(pIndexItem->toFileKey(),pZBATIndex,wZIR.ZMFAddress);// equivalent to push
+                wSt=_Base::_add2Phases_Prepare(pIndexItem->toFileKey(),pZBATIndex,wZIR.ZMFAddress);// equivalent to push
                 if (ZVerbose)
                         _DBGPRINT ("Index Push\n");
                 break;
@@ -955,10 +956,11 @@ ZIFCompare wZIFCompare = ZKeyCompareBinary;
             case (ZS_NOTFOUND):
                 {
                 pIndexItem->Operation=ZO_Insert ;
-                wSt=_Base::_insert2PhasesCommit_Prepare(pIndexItem->toFileKey(),wZIR.IndexRank,pZBATIndex,wZIR.ZMFAddress);// insert at position returned by seekGeneric
+                pZBATIndex=wZIR.IndexRank;
+                wSt=_Base::_insert2Phases_Prepare(pIndexItem->toFileKey(),pZBATIndex,wZIR.ZMFAddress);// insert at position returned by seekGeneric
 //                ZJoinIndex=wRes.ZIdx;
                 if (ZVerbose)
-                        _DBGPRINT ("Index insert at rank <%ld>\n", wZIR.IndexRank);
+                  _DBGPRINT ("Index insert at rank <%ld>\n", wZIR.IndexRank)
                 break;
                 }
             case (ZS_FOUND):
@@ -977,9 +979,9 @@ ZIFCompare wZIFCompare = ZKeyCompareBinary;
                 pIndexItem->Operation=ZO_Insert ;
 
                 if (ZVerbose)
-                        _DBGPRINT ("Index Duplicate key insert at rank <%ld>\n", wZIR.IndexRank);
-
-                wSt=_Base::_insert2PhasesCommit_Prepare(pIndexItem->toFileKey(),wZIR.IndexRank,pZBATIndex,wZIR.ZMFAddress); // insert at position returned by seekGeneric
+                        _DBGPRINT ("Index Duplicate key insert at rank <%ld>\n", wZIR.IndexRank)
+                pZBATIndex=wZIR.IndexRank;
+                wSt=_Base::_insert2Phases_Prepare(pIndexItem->toFileKey(),pZBATIndex,wZIR.ZMFAddress); // insert at position returned by seekGeneric
 
 //                ZJoinIndex=wRes.ZIdx;
                 break;
@@ -1032,7 +1034,7 @@ ZRawIndexFile::_addRawKeyValue_Commit(ZSIndexItem *pIndexItem, const zrank_type 
 ZStatus wSt;
 zaddress_type wAddress; // local index address : of no use there
 
-    wSt=_Base::_add2PhasesCommit_Commit(pIndexItem->toFileKey(),pZBATIndex,wAddress);
+    wSt=_Base::_add2Phases_Commit(pIndexItem->toFileKey(),pZBATIndex,wAddress);
     if (wSt!=ZS_SUCCESS)
             {
             ZException.addToLast(" during Index _addKeyValue_Commit on index <%s> rank <%02ld> ",
@@ -1058,7 +1060,7 @@ ZRawIndexFile::_addRawKeyValue_Rollback(const zrank_type pIndexCommit)
 {
 
 ZStatus wSt;
-    wSt=_Base::_add2PhasesCommit_Rollback (pIndexCommit);
+    wSt=_Base::_add2Phases_Rollback (pIndexCommit);
     if (wSt!=ZS_SUCCESS)
             {
             ZException.addToLast(" during Index _addKeyValue_Rollback (Soft rollback) on index <%s> rank <%02ld> ",

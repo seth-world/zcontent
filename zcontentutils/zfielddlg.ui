@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>491</width>
-    <height>402</height>
+    <height>440</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -79,7 +79,7 @@
    <property name="geometry">
     <rect>
      <x>320</x>
-     <y>370</y>
+     <y>400</y>
      <width>71</width>
      <height>23</height>
     </rect>
@@ -92,7 +92,7 @@
    <property name="geometry">
     <rect>
      <x>400</x>
-     <y>370</y>
+     <y>400</y>
      <width>71</width>
      <height>23</height>
     </rect>
@@ -140,7 +140,7 @@
      <x>10</x>
      <y>150</y>
      <width>461</width>
-     <height>121</height>
+     <height>141</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -250,11 +250,14 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>130</x>
       <y>90</y>
       <width>16</width>
       <height>16</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string extracomment="defines wether field may be part of a key or not"/>
     </property>
     <property name="text">
      <string/>
@@ -269,6 +272,9 @@
       <height>16</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string extracomment="defines wether field may be part of a key or not"/>
+    </property>
     <property name="text">
      <string>Key eligible</string>
     </property>
@@ -276,14 +282,30 @@
    <widget class="QPushButton" name="CreateArrayBTn">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>90</y>
+      <x>10</x>
+      <y>110</y>
       <width>181</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>Create array from capacity</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="KeyEligibleLBl">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>90</y>
+      <width>281</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string extracomment="defines wether field may be part of a key or not"/>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>
@@ -304,7 +326,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>280</y>
+     <y>310</y>
      <width>461</width>
      <height>81</height>
     </rect>
@@ -352,19 +374,6 @@
     </property>
     <property name="text">
      <string>Compute hashcode</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="HashIconLBl">
-    <property name="geometry">
-     <rect>
-      <x>380</x>
-      <y>10</y>
-      <width>32</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>dteea</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_6">

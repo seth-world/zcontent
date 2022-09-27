@@ -18,12 +18,12 @@
 
 using namespace  zbs;
 
-ZRecordDic::ZRecordDic(ZMFDictionary *pMasterDic)
+ZRecordDic::ZRecordDic(ZMFDictionary *pDictionary)
 {
 recordFieldDesc wField;
-  MasterDic=pMasterDic;
+  Dictionary=pDictionary;
 
-  if (pMasterDic==nullptr)
+  if (pDictionary==nullptr)
       {
         ZException.setMessage(_GET_FUNCTION_NAME_,
                               ZS_BADCHECKSUM,
@@ -31,7 +31,7 @@ recordFieldDesc wField;
                               "Given Meta Dictionary is nullptr while initializing a ZRecord Dictionary.");
         ZException.exit_abort();
       }
-  if (pMasterDic->CheckSum==nullptr)
+  if (pDictionary->CheckSum==nullptr)
     {
       ZException.setMessage(_GET_FUNCTION_NAME_,
                             ZS_BADCHECKSUM,
@@ -40,12 +40,12 @@ recordFieldDesc wField;
       ZException.exit_abort();
     }
   CheckSum=new checkSum;
-  memmove (CheckSum->content ,pMasterDic->CheckSum->content,sizeof(CheckSum->content));
+  memmove (CheckSum->content ,pDictionary->CheckSum->content,sizeof(CheckSum->content));
   TheoricalSize=0;
-  for (long wi=0;wi < pMasterDic->size();wi++)
+  for (long wi=0;wi < pDictionary->size();wi++)
         {
         wField.clear();
-        wField.MDicField=&pMasterDic->Tab[wi];
+        wField.MDicField=&pDictionary->Tab[wi];
         push(wField);
         TheoricalSize += wField.MDicField->UniversalSize;
         }
@@ -90,7 +90,7 @@ ZRecordDic::clearURFData(void)
 
 ZRecord::ZRecord(ZMasterFile *pZMF) : ZRawRecord(pZMF)
 {
-  if (pZMF->MasterDic==nullptr)
+  if (pZMF->Dictionary==nullptr)
     {
     ZException.setMessage("ZRecord::ZRecord",
           ZS_BADDIC,
@@ -99,7 +99,7 @@ ZRecord::ZRecord(ZMasterFile *pZMF) : ZRawRecord(pZMF)
     ZException.exit_abort();
     }
   ZRawRecord::setup();
-  RDic=new ZRecordDic(pZMF->MasterDic);
+  RDic=new ZRecordDic(pZMF->Dictionary);
   RDic->clearURFData();
 }
 
@@ -115,7 +115,7 @@ ZRecord::~ZRecord()
 ZStatus
 ZRecord::prepareForFeed()
 {
-  if (RawMasterFile->MasterDic==nullptr)    /* ZRecord usage implies that meta dictionary has been defined */
+  if (RawMasterFile->Dictionary==nullptr)    /* ZRecord usage implies that meta dictionary has been defined */
     {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_INVOP,
@@ -127,7 +127,7 @@ ZRecord::prepareForFeed()
   ZRawRecord::resetAll();
   if (RDic==nullptr)
     {
-    RDic=new ZRecordDic(RawMasterFile->MasterDic);
+    RDic=new ZRecordDic(RawMasterFile->Dictionary);
     }
     else
       RDic->clearURFData();
@@ -196,7 +196,7 @@ ZRecord::prepareForFeed()
 void
 ZRecord::_setupRecordData(void)
 {
-  if (RawMasterFile->MasterDic==nullptr)    /* ZRecord usage implies that meta dictionary has been defined */
+  if (RawMasterFile->Dictionary==nullptr)    /* ZRecord usage implies that meta dictionary has been defined */
     {
       ZException.setMessage(_GET_FUNCTION_NAME_,
           ZS_INVOP,
@@ -207,7 +207,7 @@ ZRecord::_setupRecordData(void)
 
   if (RDic==nullptr)
         {
-        RDic=new ZRecordDic(RawMasterFile->MasterDic);
+        RDic=new ZRecordDic(RawMasterFile->Dictionary);
         }
     Rank=0;
     
@@ -1582,7 +1582,7 @@ ZRecord::_extractAllKeys(void)
   {
 //   wZKDic=MCB->Index[wi]->ZKDic;
 
-    wZKDic =  RawMasterFile->MasterDic->KeyDic[wi];
+    wZKDic =  RawMasterFile->Dictionary->KeyDic[wi];
 
     KeyValue[wi]->KeyContent.reset();
 //    KeyValue[wi]->KeyContent.allocateBZero(MCB->Index[wi]->KeyUniversalSize+1);

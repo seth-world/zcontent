@@ -13,10 +13,10 @@ ZDictionaryFile::ZDictionaryFile() : ZRandomFile(ZFT_DictionaryFile)
 ZStatus ZDictionaryFile::zinitalize(const uriString &pFilename, bool pBackup)
 {
   ZDataBuffer wDicExport;
-  _exportAppend(wDicExport);
-
   CreationDate = ZDateFull::currentDateTime();
   ModificationDate = ZDateFull::currentDateTime();
+
+  _exportAppend(wDicExport);
 
   ZStatus wSt=zcreate(pFilename,wDicExport.Size,pBackup,true);
   if (wSt!=ZS_SUCCESS)
@@ -211,25 +211,63 @@ ZStatus ZDictionaryFile::searchDictionary(long &pRank,const utf8VaryingString& p
  *          search for (DicName , Version) in file :
             not exists -> append
             exists -> replace
+
+      if dictionary to write is active, then reset all other active dictionaries to not active.
  * @param pDicName
  * @param pVersion
  * @return
  */
 ZStatus
 ZDictionaryFile::searchAndWrite() {
-  long wRank;
   ZDataBuffer wDicExport;
-  _exportAppend(wDicExport);
 
-  ZStatus wSt=searchDictionary(wRank,DicName,Version);
-  if (wSt==ZS_FOUND) {
-    wSt=zreplace(wDicExport,wRank);
-    if (wSt==ZS_SUCCESS) {
-      return ZS_REPLACED;
+  ZDataBuffer         wDicRecord;
+  ZMFDicExportHeader  wHeader;
+  bool  wDicReplace=false;
+  long wRank=0;
+  ZStatus wSt=zget(wDicRecord,wRank);
+
+  while (wSt==ZS_SUCCESS){
+    const unsigned char* wPtrIn=wDicRecord.getData();
+    wSt= wHeader._import(wPtrIn);
+    if (wSt != ZS_SUCCESS){
+      break;
     }
-    return wSt;
-  }
+    if ((wSt==ZS_SUCCESS)&&(wHeader.DicName==DicName)&&(wHeader.Version==Version)) {
+      wDicReplace=true;
+      wSt=zreplace(wDicRecord,wRank);
+      if (wSt!=ZS_SUCCESS)
+        break;
+    }
+    else {
+      if (Active && wHeader.Active) { /* if current is active and another is active, set this another to inactive */
+        ZMFDictionary       wAnotherDic;
+        const unsigned char* wPtrIn=wDicRecord.getData();
+        wSt= wAnotherDic._import(wPtrIn);
+        if (wSt != ZS_SUCCESS) {
+          break;
+        }
+        wAnotherDic.Active=false;
+        wAnotherDic.ModificationDate = ZDateFull::currentDateTime();
+        wDicRecord.clear();
+        wAnotherDic._exportAppend(wDicRecord);
+        wSt=zreplace(wDicRecord,wRank);
+        if (wSt!=ZS_SUCCESS)
+          break;
+      } // if (Active && wHeader.Active)
+      /* NB: if dictionary to save is not active, we do not care about changing active status of other dics */
+    }//else
+    wRank++;
+    wSt=zget(wDicRecord,wRank);
+  }// while
 
+  if (wSt!=ZS_OUTBOUNDHIGH)
+    return wSt;
+  if (wDicReplace)
+    return ZS_REPLACED;
+
+  ModificationDate = ZDateFull::currentDateTime();
+  _exportAppend(wDicExport);
   wSt=zadd(wDicExport);
   if (wSt==ZS_SUCCESS) {
     return ZS_CREATED;
@@ -282,36 +320,9 @@ ZDictionaryFile::save(){
   if (CreationDate.isInvalid())
     CreationDate = ZDateFull::currentDateTime();
 
-  ModificationDate = ZDateFull::currentDateTime();
+//  ModificationDate = ZDateFull::currentDateTime();
 
-
-  if (!Active) {
-      return searchAndWrite();
-    }
-
-  long wRank=-1;
-
-  wSt=searchActiveDictionary(wRank);
-  if (wRank<0) {
-    return searchAndWrite();
-  }
-
-  /* Active dictionary exists in file */
-
-  /* get Active from file */
-  ZMFDicExportHeader wHeader;
-  ZDataBuffer wDicExport;
-  _exportAppend(wDicExport);
-
-  wSt=getDictionaryHeader(wHeader,wRank);
-
-  if ((wHeader.DicName==DicName)&&(wHeader.Version==Version)) {
-    return zreplace(wDicExport,wRank);
-  }
-
-  wSt = searchAndWrite();
-  if (wSt < 0)
-    return wSt;
+  wSt= searchAndWrite();
   if (wSvMode == ZRF_NotOpen)
     zclose();
   return wSt;
@@ -323,8 +334,10 @@ ZDictionaryFile::getAllDicHeaders(ZDicHeaderList& wDicHeaderList)
   ZMFDicExportHeader* wDicHeader=nullptr;
   const unsigned char* wPtrIn=nullptr;
   ZDataBuffer wRecord;
-  ZStatus wSt=zget(wRecord,0);
-
+  zrank_type wRank=0;
+  ZStatus wSt=zget(wRecord,wRank++);
+  if (wSt==ZS_OUTBOUNDHIGH)
+    return ZS_EMPTY;
 
   while (wSt==ZS_SUCCESS) {
     wPtrIn=wRecord.getData();
@@ -332,13 +345,35 @@ ZDictionaryFile::getAllDicHeaders(ZDicHeaderList& wDicHeaderList)
     wSt=wDicHeader->_import(wPtrIn);
     if (wSt==ZS_SUCCESS) {
       wDicHeaderList.push(wDicHeader);
-      wSt=zgetNext(wRecord);
+      wSt=zget(wRecord,wRank++);
     }
   }
 
   return wSt;
 }
 
+ZStatus
+ZDictionaryFile::getAllDictionaries(ZDicList& pDiclist)
+{
+  ZMFDictionary* wDic=nullptr;
+  const unsigned char* wPtrIn=nullptr;
+  ZDataBuffer wRecord;
+  zrank_type wRank=0;
+  ZStatus wSt=zget(wRecord,0L);
+  if (wSt==ZS_OUTBOUNDHIGH)
+    return ZS_EMPTY;
+
+  while (wSt==ZS_SUCCESS) {
+    wPtrIn=wRecord.getData();
+    wDic = new ZMFDictionary;
+    wSt=wDic->_import(wPtrIn);
+    if (wSt==ZS_SUCCESS) {
+      pDiclist.push(wDic);
+      wSt=zgetNext(wRecord);
+    }
+  }
+  return wSt;
+}
 long ZDictionaryFile::findDictionaryByVersion(unsigned long pVersion )
 {
   ZMFDicExportHeader wHeader;
@@ -469,3 +504,24 @@ ZStatus ZDictionaryFile::exportToXmlFile(const uriString &pXmlFile,bool pComment
   utf8VaryingString wContent = ((ZMFDictionary*)this)->XmlSaveToString(pComment);
   return pXmlFile.writeContent(wContent);
 }
+
+ZStatus
+ZDictionaryFile::generateAndSetFileName(const uriString& pURIContent){
+  URIContent = generateFileName(pURIContent);
+  if (!URIContent.exists())
+    return ZS_FILENOTEXIST;
+  return ZS_SUCCESS;
+}
+
+utf8VaryingString
+ZDictionaryFile::generateFileName(const uriString& pURIContent){
+  uriString wDicPath;
+  wDicPath = pURIContent.getDirectoryPath();
+  wDicPath.addConditionalDirectoryDelimiter();
+  wDicPath += pURIContent.getBasename();
+  wDicPath += ".";
+  wDicPath += __DICTIONARY_EXTENSION__;
+
+  return (utf8VaryingString)wDicPath;
+}
+

@@ -26,7 +26,6 @@
 #include <zrandomfile/zfiledescriptor.h>
 
 #ifndef ZRANDOMFILE_CPP
-
     extern bool ZRFStatistics;
 #endif
     void setZRFStatistics (bool pStatistics) ;
@@ -232,12 +231,12 @@ public:
     static ZStatus zutilityUnlockHeaderFile (const uriString& pHeaderFile);
 
     bool _isFileLocked ( bool pForceRead=true);
-
+#ifdef __COMMENT__
     ZStatus _writeFileLock(lockPack &pLockPack);
     ZStatus _readFileLock(lockPack &pLockPack);
     ZStatus _writeFileLockOld(lockPack &pLockPack);
     ZStatus _readFileLockOld(lockPack &pLockPack);
-
+#endif // __COMMENT__
 
 
  void setCreateMinimum(const zsize_type pInitialSize);
@@ -369,6 +368,12 @@ public:
 
     ZStatus zget(void* pRecord, size_t &pSize, const zrank_type pRank);
     ZStatus zget(ZDataBuffer &pRecordContent, const zrank_type pRank);
+
+    ZStatus zgetFirst(ZDataBuffer &pRecordContent) {
+      if (getRecordCount()<1)
+        return ZS_EOF;
+      return zget(pRecordContent,0L);
+    }
 
     ZStatus zgetNext (void* pUserRecord, size_t& pSize);
     ZStatus zgetNext (ZDataBuffer &pUserRecord);
@@ -622,7 +627,6 @@ public:
         return *this;
       }
 
-
 //----------------------------XML Routines-------------------------------------
 
 
@@ -639,11 +643,6 @@ public:
 
 /** @remark :   fromXml() means nothing for a ZRandomFile or a ZMasterFile :
  *              see creation from xml or modification from xml */
-/*  These routines does not exist
-    ZStatus fromXml(zxmlElement *pRootNode, ZaiErrors *pErrorlog);
-    ZStatus XmlLoadFromString(const utf8String &pXmlString, ZaiErrors *pErrorLog);
-    ZStatus XmlLoadFromFile(uriString &pXmlFile, ZaiErrors* pErrorLog );
-*/
 
 
 /**
@@ -664,13 +663,6 @@ public:
     void    ZRFPMSReport( FILE *pOutput=nullptr);
 
     static ZStatus ZRFstat(const uriString &pFilename, FILE* pOutput=nullptr);
-/*    ZStatus ZRFstat (const char *pFilePath, FILE* pOutput=stdout)
-        {
-        uriString wFilePath;
-        wFilePath=(const utf8_t*)pFilePath;
-        return ZRFstat(wFilePath,pOutput);
-        }
-*/
     /** @brief getFileSize  returns effective current raw size in byte of current content file
      */
     ssize_t getFileSize();
@@ -712,13 +704,6 @@ public:
  * @param pOutput   a FILE* pointer where the reporting will be made. By default, set to stdout.
  */
     static ZStatus zsurfaceScan(const uriString pURIContent, FILE *pOutput=stdout);
-/*    void zsurfaceScan(const char* pFilename, FILE *pOutput=stdout)
-    {
-        uriString wFilename;
-        wFilename = (const utf8_t*)pFilename;
-        zsurfaceScan(wFilename,pOutput);
-    }
-*/
 
     ZStatus _surfaceScan();
 
@@ -730,14 +715,6 @@ public:
 
     void _blockDump(const long pRank, const int pColumn=16);
 
-/*    void zblockDump (const char *pFilePath,const long pBlockNum,const int pColumn=16, FILE* pOutput=stdout)
-        {
-        uriString wFilePath;
-        wFilePath=(const utf8_t*)pFilePath;
-        zblockDump(wFilePath,pBlockNum,pColumn,pOutput);
-        return;
-        }
-*/
 
 /**
   * @brief ZRandomFile::zfullDump     logical full dump of a whole ZRandomFile given by its uri (pURIContent).
@@ -827,15 +804,11 @@ public:
   protected:
     ZStatus _getByAddress (ZBlock &pBlock, const zaddress_type pAddress);
 
-    ZStatus _add( ZDataBuffer &pUserBuffer, zaddress_type &pAddress);
-
-
-
-
+    ZStatus _add(const ZDataBuffer &pUserBuffer, zaddress_type &pAddress);
 
 //-----------Internal routines-------------------------------
 
-    ZStatus _add2PhasesCommit_Prepare  (const ZDataBuffer &pUserContent,
+    ZStatus _add2Phases_Prepare  (const ZDataBuffer &pUserContent,
                                         zrank_type &pZBATIndex,
                                         zaddress_type &pLogicalAddress);
 #ifdef __DEPRECATED__
@@ -843,22 +816,21 @@ public:
         zrank_type &pZBATIndex,
         zaddress_type &pLogicalAddress);
 #endif
-    ZStatus _add2PhasesCommit_Commit(const ZDataBuffer &pUserContent,
+
+
+    ZStatus _add2Phases_Commit(const ZDataBuffer &pUserContent,
                                       const zrank_type pZBATIndex,
                                       zaddress_type &pLogicalAddress);
 
-    ZStatus _add2PhasesCommit_Rollback(const zrank_type pZBATIndex);
+    ZStatus _add2Phases_Rollback(const zrank_type pZBATIndex);
 
 
     ZStatus _insert(const ZDataBuffer &pUserBuffer,
-                    const zrank_type pRank,
+                    zrank_type pRank,
                     zaddress_type &pLogicalAddress);
 
 
-    ZStatus _insert2PhasesCommit_Prepare(const ZDataBuffer &pUserBuffer,
-                                        const zrank_type pRank,
-                                        zrank_type &pZBATIndex,
-                                        zaddress_type &pLogicalAddress);
+
 #ifdef __DEPRECATED__
     ZStatus _insert2PhasesCommit_PrepareOld(const ZDataBuffer &pUserBuffer,
         const zrank_type pRank,
@@ -866,13 +838,16 @@ public:
         zaddress_type &pLogicalAddress);
 #endif //__DEPRECATED__
 
-    ZStatus _insert2PhasesCommit_Commit(const ZDataBuffer &pUserBuffer,
-                                       const zrank_type pZBATIndex);
+    ZStatus _insert2Phases_Prepare(const ZDataBuffer &pUserBuffer,
+                                  zrank_type &pZBATIndex,
+                                  zaddress_type &pLogicalAddress);
+
+    ZStatus _insert2Phases_Commit(const ZDataBuffer &pUserBuffer,
+                                  const zrank_type  pZBATIndex,
+                                  zaddress_type &pLogicalAddress);
 
   /** see _deleteZBAT */
-    ZStatus _insert2PhasesCommit_Rollback(const zrank_type pZBATIndex);
-
-
+    ZStatus _insert2Phases_Rollback(const zrank_type pZBATIndex);
 
 
 /*     inline
@@ -913,11 +888,6 @@ public:
 
 // obtains a free block of pSize  (within ZFBT) and moves it to ZBAT
 
-    long _getFreeBlock(const size_t pSize,
-                       ZBlockMin &pBlock,
-                        int pFlag,
-                       zrank_type pZBATRank=-1,
-                       const zaddress_type pBaseAddress=-1);
     long _getFreeBlockOld(const size_t pSize,
                       ZBlockMin &pBlock,
                       int pFlag,
@@ -931,29 +901,38 @@ public:
       *  Extends file whenever required, creates an entry in free blocks pool
       *  Returns corresponding block rank in free blocks pool or -1 if error */
     long _getFreeBlockEngine(const size_t pSize, const zaddress_type pBaseAddress=-1);
+    /* deprecated version */
+    long _getFreeBlock(const size_t pSize,
+        ZBlockMin &pBlock,
+        int pFlag,
+        zrank_type pZBATRank=-1,
+        const zaddress_type pBaseAddress=-1);
 
     /* somehow same as _insert2PhasesCommit_Rollback */
     long _deleteZBAT (const size_t pRank);
 
     ZStatus _getExtent(ZBlockDescriptor &pBlockDesc,
                        const size_t pExtentSize);     //! get a free block extension with size greater or equal to pSize (according ExtentQuotaSize)
-
+// allocates a free block to used block (from ZFBT to ZBAT) at rank pZBABRank, or by push (pZBABRank=-1)
     long _allocateFreeBlock (zrank_type pZFBTRank,
                              zsize_type pSize,
                              int pFlag=0,
-                             long pZBATRank=-1);// allocates a free block to used block (from ZFBT to ZBAT) at rank pZBABRank, or by push (pZBABRank=-1)
+                             long pZBATRank=-1);
 
 
 
     void _cleanDeletedBlocks(ZBlockDescriptor &pBD);
 
+    /** @brief _freeBlock_Prepare Prepares to delete an entry of ZBAT pool. */
     void _freeBlock_Prepare (zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
-
+    /** @brief _freeBlock_Rollback Invalidate freeBlock operation and sets the ZBAT block again to ZBS_Used */
     void _freeBlock_Rollback(zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
-    ZStatus _freeBlock_Commit  (zrank_type pRank, bool pReplace=false); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
+    /** @brief _freeBlock_Commit Deletes (Frees) definitively an entry of ZBlockAccessTable pool - updates file */
+    ZStatus _freeBlock_Commit  (zrank_type pRank, bool pKeepZBATElement=false); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
 
 
     ZStatus _replace(const ZDataBuffer &pUserBuffer, const zrank_type pRank, zaddress_type &pAddress);
+    ZStatus _replaceErrored(const ZDataBuffer &pUserBuffer, const zrank_type pRank, zaddress_type &pAddress);
 
     ZStatus _freeBlock(zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
 
@@ -1109,7 +1088,6 @@ public:
     __DISPLAYCALLBACK__(_displayCallback)=nullptr;
     __PROGRESSCALLBACK__(_progressCallBack)=nullptr;
     FILE* Output=nullptr;
-
 
 }; // ZRandomFile
 

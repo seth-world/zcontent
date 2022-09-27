@@ -41,7 +41,7 @@ KeyDic_Pack::getName()
 
 ZKeyDictionary::ZKeyDictionary(ZMFDictionary*pMDic)
 {
-MasterDic=pMDic;
+Dictionary=pMDic;
 }
 ZKeyDictionary::ZKeyDictionary(const ZKeyDictionary *pIn)
 {
@@ -55,17 +55,17 @@ ZKeyDictionary::ZKeyDictionary(const ZKeyDictionary& pIn)
 ZTypeBase ZKeyDictionary::getType(const long pKFieldRank) const
 {
   long wRank =Tab[pKFieldRank].MDicRank;
-  return (MasterDic->Tab[wRank].ZType);
+  return (Dictionary->Tab[wRank].ZType);
 }
 uint64_t ZKeyDictionary::getUniversalSize(const long pKFieldRank) const
 {
   long wRank =Tab[pKFieldRank].MDicRank;
-  return (MasterDic->Tab[wRank].UniversalSize);
+  return (Dictionary->Tab[wRank].UniversalSize);
 }
 uint64_t ZKeyDictionary::getNaturalSize(const long pKFieldRank) const
 {
   long wRank =Tab[pKFieldRank].MDicRank;
-  return (MasterDic->Tab[wRank].NaturalSize);
+  return (Dictionary->Tab[wRank].NaturalSize);
 }
 uint32_t ZKeyDictionary::computeKeyUniversalSize() const
 {
@@ -445,12 +445,12 @@ utf8String ZKeyDictionary::toXml(int pLevel,int pRank, bool pComment)
     if (pComment)
       wReturn += fmtXMLcomment(" hereafter optional fields from MetaDic describing key field ",wLevel+2);
     long wI = Tab[wi].MDicRank;
-    wReturn +=fmtXMLchar("name",MasterDic->Tab[wI].getName().toCChar(),wLevel+2);
-    wReturn +=fmtXMLuint32("ztype",MasterDic->Tab[wI].ZType,wLevel+2);    /* ZTypeBase = uint32_t*/
+    wReturn +=fmtXMLchar("name",Dictionary->Tab[wI].getName().toCChar(),wLevel+2);
+    wReturn +=fmtXMLuint32("ztype",Dictionary->Tab[wI].ZType,wLevel+2);    /* ZTypeBase = uint32_t*/
     utf8String wZTStr;
-    wZTStr.sprintf(" ZType_type <%s> converted to its value number",decode_ZType(MasterDic->Tab[wI].ZType));
+    wZTStr.sprintf(" ZType_type <%s> converted to its value number",decode_ZType(Dictionary->Tab[wI].ZType));
     fmtXMLaddInlineComment(wReturn,wZTStr.toCChar());
-    wReturn +=fmtXMLuint64("universalsize",MasterDic->Tab[wI].UniversalSize,wLevel+2);
+    wReturn +=fmtXMLuint64("universalsize",Dictionary->Tab[wI].UniversalSize,wLevel+2);
 
     wReturn += fmtXMLendnode("field",wLevel+1);
     }
@@ -524,9 +524,9 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
         XMLgetChildUInt(wSingleFieldNode,"keyoffset",wIFld.KeyOffset,pErrorlog,ZAIES_Error);
         /* search within Meta Dic for hash code */
         bool wF=false;
-        for (long wi=0;wi < MasterDic->count();wi++)
+        for (long wi=0;wi < Dictionary->count();wi++)
           {
-          if (MasterDic->Tab[wi].Hash==wIFld.Hash)
+          if (Dictionary->Tab[wi].Hash==wIFld.Hash)
             {
             wF=true;
             wIFld.MDicRank=uint32_t(wi);
@@ -537,9 +537,9 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
           if (!wF) /* hash not successfull :try by name */
           {
             XMLgetChildText(wSingleFieldNode,"name",wName,pErrorlog,ZAIES_Error);
-            for (long wi=0;wi < MasterDic->count();wi++)
+            for (long wi=0;wi < Dictionary->count();wi++)
             {
-              if (MasterDic->Tab[wi].getName()==wName)
+              if (Dictionary->Tab[wi].getName()==wName)
               {
                 wF=true;
                 wIFld.MDicRank=uint32_t(wi);
@@ -586,7 +586,7 @@ ZKeyDictionary::zsearchFieldByName(const utf8_t *pFieldName) const
   for (long wi=0;wi<size();wi++)
   {
     wMDicRank= Tab[wi].MDicRank;
-    if (MasterDic->Tab[wMDicRank].getName()==pFieldName)
+    if (Dictionary->Tab[wMDicRank].getName()==pFieldName)
       return wi;
   }
   return -1;
@@ -604,7 +604,7 @@ ZKeyDictionary::zsearchFieldByName(const utf8String &pFieldName) const
   for (long wi=0;wi<size();wi++)
   {
     wMDicRank= Tab[wi].MDicRank;
-    if (MasterDic->Tab[wMDicRank].getName()==pFieldName)
+    if (Dictionary->Tab[wMDicRank].getName()==pFieldName)
       return wi;
   }
   return -1;
@@ -628,7 +628,7 @@ void ZKeyDictionary::report (FILE* pOutput)
       "ZType");
   for (long wi=0;wi<size();wi++)
   {
-    ZFieldDescription& wFD = MasterDic->Tab[Tab[wi].MDicRank];
+    ZFieldDescription& wFD = Dictionary->Tab[Tab[wi].MDicRank];
 
     fprintf (pOutput,
         " <%2ld> %8d %8ld %8ld %8d <%15s> <%s>\n",
@@ -653,7 +653,7 @@ ZKeyDictionary& ZKeyDictionary ::_copyFrom(const ZKeyDictionary &pIn)
 //  KeyUniversalSize=pIn.KeyUniversalSize;
   Recomputed=pIn.Recomputed;
   Status = pIn.Status;
-  MasterDic=pIn.MasterDic;
+  Dictionary=pIn.Dictionary;
 //  _Base::_copyFrom(pIn);
   _Base::setQuota(pIn.ZReallocQuota);
   _Base::allocate(pIn.ZAllocation);
@@ -667,7 +667,7 @@ ZKeyDictionary& ZKeyDictionary ::_copyFrom(const ZKeyDictionary &pIn)
 
 long ZKeyDictionary ::hasFieldNameCase(const utf8VaryingString& pName) {
   for (long wi=0;wi < count();wi++) {
-    if (MasterDic->Tab[Tab[wi].MDicRank].getName().isEqualCase(pName))
+    if (Dictionary->Tab[Tab[wi].MDicRank].getName().isEqualCase(pName))
       return wi;
   }
   return -1;
@@ -683,11 +683,11 @@ bool ZKeyDictionary ::hasSameContentAs(ZKeyDictionary*pKey)
     {
     long wMDicRank= Tab[wi].MDicRank;
     long wMDicRankIn= pKey->Tab[wi].MDicRank;
-    if (MasterDic->Tab[wMDicRank].ZType!=pKey->MasterDic->Tab[wMDicRankIn].ZType)
+    if (Dictionary->Tab[wMDicRank].ZType!=pKey->Dictionary->Tab[wMDicRankIn].ZType)
       return false;
-    if (MasterDic->Tab[wMDicRank].UniversalSize!=pKey->MasterDic->Tab[wMDicRankIn].UniversalSize)
+    if (Dictionary->Tab[wMDicRank].UniversalSize!=pKey->Dictionary->Tab[wMDicRankIn].UniversalSize)
       return false;
-    if (MasterDic->Tab[wMDicRank].Capacity!=pKey->MasterDic->Tab[wMDicRankIn].Capacity)
+    if (Dictionary->Tab[wMDicRank].Capacity!=pKey->Dictionary->Tab[wMDicRankIn].Capacity)
       return false;
     if (Tab[wi].KeyOffset!=pKey->Tab[wi].KeyOffset)
       return false;
@@ -706,7 +706,7 @@ uint32_t ZKeyDictionary::computeKeyOffsets()
   while (wi < count())
     {
     Tab[wi].KeyOffset=wKeyOffset;
-    wKeyOffset += MasterDic->Tab[Tab[wi].MDicRank].UniversalSize;
+    wKeyOffset += Dictionary->Tab[Tab[wi].MDicRank].UniversalSize;
     wi++;
     }
   return wKeyOffset;  // computed key size
@@ -717,11 +717,11 @@ ZKeyDictionary::addFieldToZKeyByName (const char* pFieldName)
 {
 
   ZIndexField wField;
-  if (MasterDic==nullptr)
+  if (Dictionary==nullptr)
   {
     return ZS_INVVALUE;
   }
-  zrank_type wMRank=MasterDic->searchFieldByName(pFieldName);
+  zrank_type wMRank=Dictionary->searchFieldByName(pFieldName);
   if (wMRank<0)
     return ZS_NOTFOUND;
 
@@ -732,11 +732,11 @@ ZStatus
 ZKeyDictionary::addFieldToZKeyByRank (const zrank_type pMDicRank)
 {
   ZIndexField wField;
-  if (MasterDic==nullptr)
+  if (Dictionary==nullptr)
   {
     return ZS_NULLPTR;
   }
-  if ((pMDicRank>=MasterDic->size())||(pMDicRank<0))
+  if ((pMDicRank>=Dictionary->size())||(pMDicRank<0))
   {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_OUTBOUND,
@@ -746,15 +746,15 @@ ZKeyDictionary::addFieldToZKeyByRank (const zrank_type pMDicRank)
     return ZS_OUTBOUND;
   }
 
-  if (!MasterDic->Tab[pMDicRank].KeyEligible)
-    if (!isKeyEligible( MasterDic->Tab[pMDicRank].ZType))
+  if (!Dictionary->Tab[pMDicRank].KeyEligible)
+    if (!isKeyEligible( Dictionary->Tab[pMDicRank].ZType))
     {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_INVINDEX,
         Severity_Error,
         "Field rank <%ld> <%s> is not eligible to be a key field",
         pMDicRank,
-        MasterDic->Tab[pMDicRank].getName().toCChar());
+        Dictionary->Tab[pMDicRank].getName().toCChar());
     return ZS_INVTYPE;
     }
 /*  wField.ZType=MetaDic->Tab[pMDicRank].ZType;
@@ -762,7 +762,7 @@ ZKeyDictionary::addFieldToZKeyByRank (const zrank_type pMDicRank)
   wField.NaturalSize=MetaDic->Tab[pMDicRank].NaturalSize;
   wField.ArrayCount=MetaDic->Tab[pMDicRank].Capacity;*/
   wField.MDicRank = pMDicRank;
-  wField.Hash = MasterDic->Tab[pMDicRank].Hash ;
+  wField.Hash = Dictionary->Tab[pMDicRank].Hash ;
   /* KeyOffset is left to Zero */
   push(wField);
   computeKeyOffsets();
@@ -770,7 +770,7 @@ ZKeyDictionary::addFieldToZKeyByRank (const zrank_type pMDicRank)
   return ZS_SUCCESS;
 }// addFieldToZDicByRank
 
-
+#ifdef __COMMENT__
 
 void ZKeyHeaderRow::set(const ZKeyDictionary& pKeyDic) {
   ZKeyDictionary::_copyFrom(pKeyDic);
@@ -797,8 +797,8 @@ void ZKeyFieldRow::set( const ZIndexField& pKeyField) {
 //  MDicRank=pKeyField.MDicRank;
 //  KeyOffset=pKeyField.KeyOffset;
 //  Hash=pKeyField.Hash;
-  assert(pKeyField.KeyDic->MasterDic!=nullptr);
-  ZMetaDic* wMetaDic=pKeyField.KeyDic->MasterDic;
+  assert(pKeyField.KeyDic->Dictionary!=nullptr);
+  ZMetaDic* wMetaDic=pKeyField.KeyDic->Dictionary;
   UniversalSize=wMetaDic->Tab[MDicRank].UniversalSize;
   Name =wMetaDic->Tab[MDicRank].getName();
   ZType = wMetaDic->Tab[MDicRank].ZType;
@@ -807,6 +807,6 @@ ZIndexField ZKeyFieldRow::get() {
   return ZIndexField (*this);
 }
 
-
+#endif //__COMMENT__
 
 /** @endcond */

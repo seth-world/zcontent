@@ -28,17 +28,9 @@ void releaseResource(ZResource pResource)
 
 
 /* creates a list pointing to effective items */
-QList<QStandardItem*> itemRow (QStandardItemModel*pModel,QModelIndex& pIdx, ZaiErrors* pErrorlog)
+QList<QStandardItem*> itemRow (QStandardItemModel*pModel,QModelIndex pIdx)
 {
   QList<QStandardItem*> wRow;
-  if (!pIdx.isValid())
-  {
-    if (pErrorlog)
-      pErrorlog->errorLog("itemRow-E-INVIDX Index is not valid.\n");
-    else
-      fprintf(stderr,"itemRow-E-INVIDX Index is not valid.\n");
-    return wRow;
-  }
 
   /* get the number of columns for this kind of tree lines */
   int wColumns = pModel->columnCount(pIdx.parent());

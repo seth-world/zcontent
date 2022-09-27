@@ -28,8 +28,12 @@ enum ZEntity : ZEntity_type  /* application defined ZEntity */
     ZEntity_Class       =                   1,  // mask to say 'this is an application data structure'
 
     ZEntity_KeyDic      =          0x0000011,
+    ZEntity_KeyDicItem  =          0x0000012, /* a pointer to key dictionary QStandardItem  */
     ZEntity_KeyField    =          0x0000021,
+    ZEntity_KeyFieldItem =         0x0000022, /* only QStandardItem* is transmitted */
     ZEntity_DicField    =          0x0000031,
+    ZEntity_DicFieldItem=          0x0000032,
+    ZEntity_DicFieldRow=           0x0000034,
     ZEntity_KeyDicRow   =          0x0000041, /* QList with key field items row  */
     ZEntity_KeyDicRowsSet =        0x0000051, /* QList of Qlist with key field rows - with row[0] as key dictionary row */
     ZEntity_KeyFieldRow =          0x0000061, /* QList with key field items row  */

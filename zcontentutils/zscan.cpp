@@ -90,9 +90,6 @@ ZScan::scanMain()
   zaddress_type wOldAddress=0;
   long          wOldSize=0;
 
-
-
-  int wMaxRows=0;
   int wTick=0;
   utf8String wStr;
   int wRow=0;
@@ -213,10 +210,12 @@ ZScan::scanMain()
   if (wRow < cst_MaxRows)
     ui->tableTBw->setRowCount(wRow);
 
-  ui->tableTBw->resizeRowsToContents();
-  ui->tableTBw->resizeColumnsToContents();
+  for (long wi=0;wi < ui->tableTBw->model()->columnCount();wi++)
+    ui->tableTBw->resizeColumnToContents(wi);
+  for (long wi=0;wi < ui->tableTBw->model()->rowCount();wi++)
+    ui->tableTBw->resizeRowsToContents();
 
-}
+}//ZScan::scanMain
 
 
 void

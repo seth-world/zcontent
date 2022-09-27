@@ -26,8 +26,8 @@ ZMasterControlBlock::~ZMasterControlBlock(void)
                 delete MDicCheckSum;*/
   if (ZJCB!=nullptr)
     delete ZJCB;
-  if (MasterDic!=nullptr)
-    delete MasterDic;
+  if (Dictionary!=nullptr)
+    delete Dictionary;
   while (IndexTable.size()>0)
   {
     IndexTable.pop();
@@ -70,8 +70,8 @@ ZSMCBOwnData_Export& ZSMCBOwnData_Export::_copyFrom(const ZSMCBOwnData_Export& p
   BlockId=pIn.BlockId;
   ZMFVersion=pIn.ZMFVersion;
   MCBSize=pIn.MCBSize;
-  MDicOffset=pIn.MDicOffset;
-  MDicSize=pIn.MDicSize;
+//  MDicOffset=pIn.MDicOffset;
+//  MDicSize=pIn.MDicSize;
   IndexCount=pIn.IndexCount;
   ICBOffset=pIn.ICBOffset;
   ICBOffset=pIn.ICBOffset;
@@ -90,8 +90,8 @@ ZSMCBOwnData_Export& ZSMCBOwnData_Export::set(const ZSMCBOwnData& pIn)
   ZMFVersion=__ZMF_VERSION__;
 
   MCBSize=pIn.MCBSize;
-  MDicOffset=pIn.MDicOffset;
-  MDicSize=pIn.MDicSize;
+//  MDicOffset=pIn.MDicOffset;
+//  MDicSize=pIn.MDicSize;
   IndexCount=pIn.IndexCount;
   ICBOffset=pIn.ICBOffset;
   ICBSize=pIn.ICBSize;
@@ -109,8 +109,8 @@ ZSMCBOwnData_Export& ZSMCBOwnData_Export::setFromPtr(const unsigned char*& pPtrI
 ZSMCBOwnData& ZSMCBOwnData_Export::_toMCBOwnData(ZSMCBOwnData& pOut)
 {
   pOut.MCBSize=MCBSize;
-  pOut.MDicOffset=MDicOffset;
-  pOut.MDicSize=MDicSize;
+//  pOut.MDicOffset=MDicOffset;
+//  pOut.MDicSize=MDicSize;
   pOut.IndexCount=IndexCount;
   pOut.ICBOffset=ICBOffset;
   pOut.ICBSize=ICBSize;
@@ -132,8 +132,8 @@ void ZSMCBOwnData_Export::_convert()
 //  StartSign=reverseByteOrder_Conditional<uint32_t>(StartSign);
   ZMFVersion=reverseByteOrder_Conditional<unsigned long>(ZMFVersion);
   MCBSize=reverseByteOrder_Conditional<uint32_t>(MCBSize);
-  MDicOffset=reverseByteOrder_Conditional<uint32_t>(MDicOffset);
-  MDicSize=reverseByteOrder_Conditional<int32_t>(MDicSize);
+//  MDicOffset=reverseByteOrder_Conditional<uint32_t>(MDicOffset);
+//  MDicSize=reverseByteOrder_Conditional<int32_t>(MDicSize);
   ICBOffset=reverseByteOrder_Conditional<uint32_t>(ICBOffset);
   ICBSize=reverseByteOrder_Conditional<uint32_t>(ICBSize);
   JCBOffset=reverseByteOrder_Conditional<uint32_t>(JCBOffset);
@@ -313,8 +313,8 @@ ZMasterControlBlock::toXml(int pLevel,bool pComment)
     wReturn += ZJCB->toXml(wLevel);
 
   /*--------dictionary ------------*/
-  if (MasterDic!=nullptr)
-    wReturn += MasterDic->toXml(wLevel,pComment);
+  if (Dictionary!=nullptr)
+    wReturn += static_cast<ZMFDictionary*>(Dictionary)->toXml(wLevel,pComment);
 
   wReturn += fmtXMLendnode("zmastercontrolblock",pLevel);
   return wReturn;
@@ -451,7 +451,6 @@ ZDataBuffer ZMasterControlBlock::_exportMCB()
 
 ZDataBuffer& ZMasterControlBlock::_exportMCBAppend(ZDataBuffer &pMCBContent)
 {
-
   ZDataBuffer wJCB;
   ZDataBuffer wICB;
   ZDataBuffer wMDic;
@@ -472,12 +471,13 @@ ZDataBuffer& ZMasterControlBlock::_exportMCBAppend(ZDataBuffer &pMCBContent)
       ZJCB->_exportJCB(wJCB);
 
   /* third export master dic : if master dic exists */
+/*
   wMDic.clear();
-  if (MasterDic != nullptr)
+  if (Dictionary != nullptr)
     {
-    MasterDic->_exportAppend(wMDic);
+    Dictionary->_exportAppend(wMDic);
     }
-
+*/
 
   /* then start filling MCB owndata */
 
@@ -511,8 +511,8 @@ ZDataBuffer& ZMasterControlBlock::_exportMCBAppend(ZDataBuffer &pMCBContent)
     wOffset += wJCB.Size;
     }
   wOffset += wJCB.Size;
-
-  if (MasterDic == nullptr)
+/*
+  if (Dictionary == nullptr)
     {
       wMCBe.MDicSize = 0;
       wMCBe.MDicOffset = 0;
@@ -523,9 +523,12 @@ ZDataBuffer& ZMasterControlBlock::_exportMCBAppend(ZDataBuffer &pMCBContent)
       wMCBe.MDicOffset = wOffset;
       }
   wOffset += wMDic.Size;
+*/
 //  wMCBe.MCBSize = wOffset ; /* updated offset gives the total size for MCB */
 
-  wMCBe.MCBSize = sizeof(ZSMCBOwnData_Export)+IndexFilePath._getexportUVFSize() + wMCBe.MDicSize + wMCBe.JCBSize + wMCBe.ICBSize;
+//  wMCBe.MCBSize = sizeof(ZSMCBOwnData_Export)+IndexFilePath._getexportUVFSize() + wMCBe.MDicSize + wMCBe.JCBSize + wMCBe.ICBSize;
+  wMCBe.MCBSize = sizeof(ZSMCBOwnData_Export)+IndexFilePath._getexportUVFSize()  + wMCBe.JCBSize + wMCBe.ICBSize;
+
   wMCBe.serialize();
 
 /* first MCB & MCBOwnData + IndexFilePath */
@@ -616,13 +619,13 @@ ZSMasterControlBlock::_importMCB(ZDataBuffer& pBuffer)
 
 
 
-  if (MasterDic!=nullptr)
-    delete MasterDic;
-  MasterDic=nullptr;
+  if (Dictionary!=nullptr)
+    delete Dictionary;
+  Dictionary=nullptr;
   if (MDicSize > 0)
     {
-    MasterDic = new ZMFDictionary;
-    wInSize = MasterDic->_import(wPtrIn);
+    Dictionary = new ZMFDictionary;
+    wInSize = Dictionary->_import(wPtrIn);
     }
 
 
@@ -697,23 +700,25 @@ ZMasterControlBlock::_import(ZRawMasterFile*pMaster,const unsigned char*& pPtrIn
     }
 
   ssize_t wInSize=0;
-  if (MasterDic!=nullptr)
-          delete MasterDic;
-  MasterDic=nullptr;
+
+#ifdef __COMEMENT__
+  if (Dictionary!=nullptr)
+          delete Dictionary;
+  Dictionary=nullptr;
   if ((MDicSize > 0) && (MDicOffset > 0))
     {
-    MasterDic = new ZMFDictionary;
+    Dictionary = new ZMFDictionary;
     wPtrDic=wPtrIn + MDicOffset ;
-    wSt = MasterDic->_import(wPtrDic);
+    wSt = Dictionary->_import(wPtrDic);
     if (wSt!=ZS_SUCCESS)
       return wSt;
-
+*/
     /* Match Index rank with key dictionary rank and update KeyDic within index file
      * NB: if no dictionary present (RawMasterFile) then KeyDic will remain nullptr
      */
     for (long wi=0;wi < IndexTable.count();wi++ )
     {
-      ZKeyDictionary* wKD=MasterDic->searchKeyCase(IndexTable[wi]->IndexName);
+      ZKeyDictionary* wKD=Dictionary->searchKeyCase(IndexTable[wi]->IndexName);
       if (!wKD)
       {
         ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -726,8 +731,7 @@ ZMasterControlBlock::_import(ZRawMasterFile*pMaster,const unsigned char*& pPtrIn
     }// for
 
     }//if (MDicSize > 0)
-
-
+#endif // __COMMENT__
 
 
   if (ZJCB!=nullptr)
@@ -762,7 +766,7 @@ ZMasterControlBlock::report(FILE*pOutput)
   fprintf(pOutput,
       "Master Dictionary\n"
       "-----------------\n");
-  if (MasterDic==nullptr)
+  if (Dictionary==nullptr)
     fprintf(pOutput,"---------No master dictionary (file might be of type ZRawMasterFile)-----------\n");
   else
     {
@@ -774,16 +778,16 @@ ZMasterControlBlock::report(FILE*pOutput)
         "Eligible",
         "ZType");
 
-    for (long wi=0;wi < MasterDic->size();wi++)
+    for (long wi=0;wi < Dictionary->size();wi++)
     {
       fprintf (pOutput,
           "    <%2ld> <%15s> %10ld %10ld %8s %s\n",
           wi,
-          MasterDic->Tab[wi].getName().toCChar(),
-          MasterDic->Tab[wi].NaturalSize,
-          MasterDic->Tab[wi].UniversalSize,
-          MasterDic->Tab[wi].KeyEligible?"Yes":"No",
-          decode_ZType(MasterDic->Tab[wi].ZType));
+          Dictionary->Tab[wi].getName().toCChar(),
+          Dictionary->Tab[wi].NaturalSize,
+          Dictionary->Tab[wi].UniversalSize,
+          Dictionary->Tab[wi].KeyEligible?"Yes":"No",
+          decode_ZType(Dictionary->Tab[wi].ZType));
     }
     fprintf (pOutput,
         "___________________________________________________________________________\n");
@@ -802,7 +806,7 @@ ZMasterControlBlock::report(FILE*pOutput)
             IndexTable[wi]->IndexName.toCChar(),
             IndexTable[wi]->KeyUniversalSize,
             IndexTable[wi]->Duplicates==ZST_DUPLICATES?"Duplicates":"No Duplicates");
-    if (MasterDic!=nullptr)
+    if (Dictionary!=nullptr)
     {
     fprintf (pOutput,
         "   Fields %17s  %15s  %5s %12s %s\n",
@@ -811,18 +815,18 @@ ZMasterControlBlock::report(FILE*pOutput)
         "Internal",
         "Key Offset",
         "ZType");
-    for (long wj=0; wj < MasterDic->KeyDic[wi]->size();wj++)
+    for (long wj=0; wj < Dictionary->KeyDic[wi]->size();wj++)
     {
       fprintf (pOutput,
           "    <%ld> <%15s> %5ld %5ld %12d %s\n",
           wj,
-          MasterDic->Tab[MasterDic->KeyDic[wi]->Tab[wj].MDicRank].getName().toCChar(),
-          MasterDic->Tab[MasterDic->KeyDic[wi]->Tab[wj].MDicRank].NaturalSize,
-          MasterDic->Tab[MasterDic->KeyDic[wi]->Tab[wj].MDicRank].UniversalSize,
-          MasterDic->KeyDic[wi]->Tab[wj].KeyOffset,
-          decode_ZType(MasterDic->Tab[MasterDic->KeyDic[wi]->Tab[wj].MDicRank].ZType));
+          Dictionary->Tab[Dictionary->KeyDic[wi]->Tab[wj].MDicRank].getName().toCChar(),
+          Dictionary->Tab[Dictionary->KeyDic[wi]->Tab[wj].MDicRank].NaturalSize,
+          Dictionary->Tab[Dictionary->KeyDic[wi]->Tab[wj].MDicRank].UniversalSize,
+          Dictionary->KeyDic[wi]->Tab[wj].KeyOffset,
+          decode_ZType(Dictionary->Tab[Dictionary->KeyDic[wi]->Tab[wj].MDicRank].ZType));
     }// for
-    }// if (MasterDic!=nullptr)
+    }// if (Dictionary!=nullptr)
   }// for (long wi=0;wi < IndexTable.size();wi++)
 
   fprintf (pOutput,

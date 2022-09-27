@@ -79,6 +79,8 @@ public:
   //  ZTypeBase   ZType;          //!< Type mask of the Field @see ZType_type
 };
 
+
+
 class KeyDic_Pack
 {
 public:
@@ -108,7 +110,7 @@ typedef ZArray<ZIndexField> _Base;
 
 public:
   ZKeyDictionary(ZMFDictionary*pMDic) ;
-  ZKeyDictionary(const utf8String& pName,ZMFDictionary*pMDic) {setName(pName);MasterDic=pMDic;}
+  ZKeyDictionary(const utf8String& pName,ZMFDictionary*pMDic) {setName(pName);Dictionary=pMDic;}
   ZKeyDictionary(const ZKeyDictionary* pIn);
   ZKeyDictionary(const ZKeyDictionary& pIn);
   ~ZKeyDictionary() { } // just to call the base destructor
@@ -142,7 +144,7 @@ public:
   uint8_t           Duplicates=0;
   utf8String        DicKeyName;       // refers to ZICB::IndexName
   utf8VaryingString ToolTip;         //!< help describing the key
-  ZMFDictionary*    MasterDic=nullptr;  // Record Dictionary to which Key Dictionary refers : WARNING : not store in xml <keydictionary>
+  ZMFDictionary*    Dictionary=nullptr;  // Record Dictionary to which Key Dictionary refers : WARNING : not store in xml <keydictionary>
                                 //  it is stored apart in dedicated <metadic> xml node
 //    uint32_t KDicSize;          //!< Size of the dictionary when exported (other fields are not exported) this field comes first
         // nb: KDicSize is already given by ZAExport structure.
@@ -220,7 +222,7 @@ public:
 } ;
 
 
-
+#ifdef __COMMENT__
 /* reference of that to be stored within QStandardItem[0] */
 class ZKeyHeaderRow : public ZKeyDictionary
 {
@@ -277,7 +279,7 @@ public:
   ZIndexField get() ;
 };
 
-
+#endif// __COMMENT__
 
 
 } //namespace zbs

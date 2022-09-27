@@ -12,7 +12,9 @@
 
 #include <ztoolset/ztypetype.h>
 #include <zcontent/zindexedfile/zdatatype.h>
-
+#include <QStatusBar>
+#include <qtooltip.h>
+#include <qevent.h>
 
 
 #define __ICON_PATH__ "/home/gerard/Development/zbasetools/zqt/icons/"
@@ -33,8 +35,8 @@ ZFieldDLg::ZFieldDLg(QWidget *parent) : QDialog(parent), ui(new Ui::ZFieldDLg)
   wImgFile += __HASH_WRONG_ICON__;
   HashWrongPXm.load(wImgFile.toCChar());
 
-  ui->HashIconLBl->setScaledContents(true);
-  ui->HashIconLBl->setPixmap(HashWrongPXm);
+//  ui->HashIconLBl->setScaledContents(true);
+//  ui->HashIconLBl->setPixmap(HashWrongPXm);
 
   setWindowTitle(QObject::tr("Dictionary field","DicEdit"));
 
@@ -55,6 +57,9 @@ ZFieldDLg::ZFieldDLg(QWidget *parent) : QDialog(parent), ui(new Ui::ZFieldDLg)
   QObject::connect(ui->ComputeBTn,SIGNAL(clicked()),this,SLOT(ComputeClicked()));
 
   QObject::connect(ui->CreateArrayBTn,SIGNAL(clicked()),this,SLOT(ArrayClicked()));
+
+  QObject::connect(ui->KeyEligibleCHk,SIGNAL(stateChanged(int)),this,SLOT(setKeyEligibleToolTip(int)));
+
   ui->CreateArrayBTn->setVisible(false);
 
   ui->AcceptBTn->setDefault(true);
@@ -150,6 +155,9 @@ void
 ZFieldDLg::AcceptClicked()
 {
   refresh();
+  if (FCreate)
+    ComputeClicked();/* if creation then compute hashcode for first time and set up indicators */
+
   if (RawField) {
     accept();
     return;
@@ -219,8 +227,8 @@ ZFieldDLg::ComputeClicked()
   refresh();
   Field.computeMd5();
   ui->HashcodeLEd->setText(Field.Hash.toHexa().toChar());
-  ui->HashIconLBl->setScaledContents(true);
-  ui->HashIconLBl->setPixmap(HashOKPXm);
+//  ui->HashIconLBl->setScaledContents(true);
+//  ui->HashIconLBl->setPixmap(HashOKPXm);
 }
 
 bool
@@ -229,16 +237,17 @@ ZFieldDLg::HashCodeCompare()
   refresh();
   if (Field.checkHashcode())
     {
-      ui->HashIconLBl->setPixmap(HashOKPXm);
+//      ui->HashIconLBl->setPixmap(HashOKPXm);
       return true;
     }
 
-  ui->HashIconLBl->setPixmap(HashWrongPXm);
+//  ui->HashIconLBl->setPixmap(HashWrongPXm);
   return false;
 }//HashCodeCompare
 
 void ZFieldDLg::setup(ZFieldDescription &pField, bool pRawFields)
 {
+  FCreate=false;
   Field=pField;
   utf8String wStr;
 
@@ -316,6 +325,9 @@ void ZFieldDLg::setup(ZFieldDescription &pField, bool pRawFields)
 
 void ZFieldDLg::setCreate( )
 {
+  FCreate=true;
+//  ui->HashIconLBl->setPixmap(HashWrongPXm);
+
   Field.clear();
   Field.setFieldName(__NEW_FIELDNAME__);
 
@@ -360,6 +372,7 @@ void ZFieldDLg::setCreate( )
 
 ZFieldDescription ZFieldDLg::getFieldDescription()
 {
+  refresh();
   Field.computeMd5();
   return Field;
 }
@@ -397,8 +410,15 @@ ZFieldDLg::setComment(const utf8VaryingString& pComment) {
 }
 
 
-bool ZFieldDLg::controlField()
-{
+void
+ZFieldDLg::setKeyEligibleToolTip(int pState) {
+  if (ui->KeyEligibleCHk->isChecked())
+    ui->KeyEligibleLBl->setText(QObject::tr("Field may be part of a key.","ZFieldDLg"));
+  else
+    ui->KeyEligibleLBl->setText(QObject::tr("Field cannot be part of a key.","ZFieldDLg"));
+}
+
+bool ZFieldDLg::controlField() {
   if (Field.getName()==__NEW_FIELDNAME__)
   {
     ZExceptionDLg::message("ZFieldDLg::controlField",ZS_INVNAME,Severity_Error,
@@ -421,10 +441,15 @@ bool ZFieldDLg::controlField()
       return false;
     return true;
     }
-  if (HashCodeCompare())
+/*
+  if (FCreate || HashCodeCompare())
     return true;
   ZExceptionDLg::message("ZFieldDLg::controlField",ZS_INVVALUE,Severity_Error,
       "Hashcode control does not match between computed hashcode and current hashcode.\n"
       "May be you changed some data into this field (even slight thing like a space) that makes it different.");
   return false;
+*/
+  return true;
 } //controlField
+
+

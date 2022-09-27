@@ -117,16 +117,16 @@ public:
   ZIndexControlBlock(const ZIndexControlBlock&& pIn):ZSICBOwnData(pIn) {_copyFrom(pIn);}
   ZIndexControlBlock&  operator = (const ZIndexControlBlock& pIn) {ZSICBOwnData::_copyFrom(pIn); return _copyFrom(pIn);}
 
-//  void setMasterDic (ZMFDictionary* pDic) {MasterDic=pDic;}
+//  void setDictionary (ZMFDictionary* pDic) {Dictionary=pDic;}
   ZKeyDictionary         *IdxKeyDic = nullptr ; // Fields dictionary for the key :                                          // a pointer that is instantiated by new and destroyed when ZICB rank is removed
 //  ZMetaDic*               MetaDic=nullptr;  // reference to meta dictionary for the indexed file
   /* no dictionary in ICB, in MCB */
-//  ZMFDictionary*          MasterDic=nullptr;  // main dictionary if exists : managed at ZMasterFile level
+//  ZMFDictionary*          Dictionary=nullptr;  // main dictionary if exists : managed at ZMasterFile level
   checkSum*   CheckSum=nullptr;
   md5         MD5;
 //  void clear(ZMetaDic *pMetaDic);
 //  bool hasDictionary() {return ZKDic!=nullptr;}
-//  bool hasDictionary() {return MasterDic!=nullptr;}
+//  bool hasDictionary() {return Dictionary!=nullptr;}
 
 //  void newKeyDic(ZSKeyDictionary *pZKDic, ZMetaDic *pMetaDic);
 
@@ -135,7 +135,7 @@ public:
   ZDataBuffer _export() ;
 /*  no dictionary in icb
  *
-  ZStatus     _importICB (ZMFDictionary* pMasterDic,ZDataBuffer &pRawICB, size_t &pImportedSize, size_t pOffset=0) ;
+  ZStatus     _importICB (ZMFDictionary* pDictionary,ZDataBuffer &pRawICB, size_t &pImportedSize, size_t pOffset=0) ;
   ZStatus     _import (unsigned char *& pPtrIn, ZMFDictionary *pMetaDic=nullptr);
 */
   ZStatus     _import (const unsigned char *&pPtrIn);

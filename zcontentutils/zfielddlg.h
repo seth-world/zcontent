@@ -17,7 +17,7 @@ namespace Ui {
 class ZFieldDLg;
 }
 
-
+class QStatusBar;
 class ZTypeDLg;
 class ZTypeListButton;
 
@@ -44,6 +44,7 @@ public:
 
   void setComment(const utf8VaryingString& pComment);
 
+  utf8VaryingString   FormerFieldName;
   ZFieldDescription   Field;
 //  QDialog*            ZTypeDLg=nullptr;
   ZTypeDLg*           ZTypeTRv=nullptr;
@@ -61,9 +62,12 @@ public slots:
   void ComputeClicked();
   void ArrayClicked();
 
+  void setKeyEligibleToolTip(int pState);
+
   int exec() override;
 
 private:
+  bool FCreate=false;
   bool RawField=false;
   Ui::ZFieldDLg *ui;
 };

@@ -345,7 +345,7 @@ ZIndexFile::getUniversalbyRank (ZDataBuffer &pOutValue,
                                  bool pTruncate)
 {
 
-  if (ZMFFather->MasterDic==nullptr)
+  if (ZMFFather->Dictionary==nullptr)
     {
     ZException.setMessage(_GET_FUNCTION_NAME_,
                             ZS_BADDIC,
@@ -354,7 +354,7 @@ ZIndexFile::getUniversalbyRank (ZDataBuffer &pOutValue,
     return ZS_BADDIC;
     }
 
-  ZSKeyDictionary* wKeyDic = ZMFFather->MasterDic->KeyDic[pKeyRank];
+  ZSKeyDictionary* wKeyDic = ZMFFather->Dictionary->KeyDic[pKeyRank];
   if ((pFieldRank<0)||(pFieldRank > wKeyDic->size()))
     {
     ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -371,7 +371,7 @@ ZIndexFile::getUniversalbyRank (ZDataBuffer &pOutValue,
     }
 
 
-  unsigned char*wDataPtr= ZMFFather->MasterDic->Tab[wKeyDic->Tab[pFieldRank].MDicRank].offset
+  unsigned char*wDataPtr= ZMFFather->Dictionary->Tab[wKeyDic->Tab[pFieldRank].MDicRank].offset
 
   unsigned char*wDataPtr=RDic->Tab[pRank].URFData->Data;
   if (wDataPtr==nullptr)
@@ -842,7 +842,7 @@ ZIFCompare wZIFCompare = ZKeyCompareBinary;
   if (IdxKeyDic->size()==1)           // if only one field
       {
         long wMRk=IdxKeyDic->Tab[0].MDicRank;
-        ZTypeBase wType = ZMFFather->MasterDic->Tab[wMRk].ZType;
+        ZTypeBase wType = ZMFFather->Dictionary->Tab[wMRk].ZType;
         if (wType & ZType_Char)  // and this field has type Char (array of char)
           wZIFCompare = ZKeyCompareAlpha; // use string comparison
       } // in all other cases, use binary comparison
@@ -880,7 +880,8 @@ ZIFCompare wZIFCompare = ZKeyCompareBinary;
                 {
                 pIndexItem->Operation=ZO_Push_front ;
 //                ZJoinIndex=0;
-                wSt=_insert2PhasesCommit_Prepare (pIndexItem->toFileKey(),0L,pZBATIndex,wZIR.ZMFAddress);// equivalent to push_front
+                pZBATIndex=0L;
+                wSt=_insert2Phases_Prepare (pIndexItem->toFileKey(),pZBATIndex,wZIR.ZMFAddress);// equivalent to push_front
                 if (ZVerbose)
                         _DBGPRINT ("Index Push_Front  (index rank 0L )\n");
 
@@ -890,7 +891,7 @@ ZIFCompare wZIFCompare = ZKeyCompareBinary;
                 {
                 pIndexItem->Operation=ZO_Push ;
 //                ZJoinIndex=this->size();
-                wSt=_Base::_add2PhasesCommit_Prepare(pIndexItem->toFileKey(),pZBATIndex,wZIR.ZMFAddress);// equivalent to push
+                wSt=_Base::_add2Phases_Prepare(pIndexItem->toFileKey(),pZBATIndex,wZIR.ZMFAddress);// equivalent to push
                 if (ZVerbose)
                         _DBGPRINT ("Index Push\n");
                 break;
@@ -898,7 +899,8 @@ ZIFCompare wZIFCompare = ZKeyCompareBinary;
             case (ZS_NOTFOUND):
                 {
                 pIndexItem->Operation=ZO_Insert ;
-                wSt=_Base::_insert2PhasesCommit_Prepare(pIndexItem->toFileKey(),wZIR.IndexRank,pZBATIndex,wZIR.ZMFAddress);// insert at position returned by seekGeneric
+                pZBATIndex=wZIR.IndexRank;
+                wSt=_Base::_insert2Phases_Prepare(pIndexItem->toFileKey(),pZBATIndex,wZIR.ZMFAddress);// insert at position returned by seekGeneric
 //                ZJoinIndex=wRes.ZIdx;
                 if (ZVerbose)
                         _DBGPRINT ("Index insert at rank <%ld>\n", wZIR.IndexRank);
@@ -922,7 +924,8 @@ ZIFCompare wZIFCompare = ZKeyCompareBinary;
                 if (ZVerbose)
                         _DBGPRINT ("Index Duplicate key insert at rank <%ld>\n", wZIR.IndexRank);
 
-                wSt=_Base::_insert2PhasesCommit_Prepare(pIndexItem->toFileKey(),wZIR.IndexRank,pZBATIndex,wZIR.ZMFAddress); // insert at position returned by seekGeneric
+                pZBATIndex=wZIR.IndexRank;
+                wSt=_Base::_insert2Phases_Prepare(pIndexItem->toFileKey(),pZBATIndex,wZIR.ZMFAddress); // insert at position returned by seekGeneric
 
 //                ZJoinIndex=wRes.ZIdx;
                 break;
@@ -975,7 +978,7 @@ ZIndexFile::_addKeyValue_Commit(ZSIndexItem *pIndexItem, const zrank_type pZBATI
 ZStatus wSt;
 zaddress_type wAddress; // local index address : of no use there
 
-    wSt=_Base::_add2PhasesCommit_Commit(pIndexItem->toFileKey(),pZBATIndex,wAddress);
+    wSt=_Base::_add2Phases_Commit(pIndexItem->toFileKey(),pZBATIndex,wAddress);
     if (wSt!=ZS_SUCCESS)
             {
             ZException.addToLast(" during Index _addKeyValue_Commit on index <%s> rank <%02ld> ",
@@ -1001,7 +1004,7 @@ ZIndexFile::_addKeyValue_Rollback(const zrank_type pIndexCommit)
 {
 
 ZStatus wSt;
-    wSt=_Base::_add2PhasesCommit_Rollback (pIndexCommit);
+    wSt=_Base::_add2Phases_Rollback (pIndexCommit);
     if (wSt!=ZS_SUCCESS)
             {
             ZException.addToLast(" during Index _addKeyValue_Rollback (Soft rollback) on index <%s> rank <%02ld> ",
@@ -1335,7 +1338,7 @@ ZDataBuffer wFieldUValue;
 
 /*
 
-  if ((ZMFFather->MasterDic==nullptr)||(ZMFFather->MasterDic->isEmpty()))
+  if ((ZMFFather->Dictionary==nullptr)||(ZMFFather->Dictionary->isEmpty()))
       {
         ZException.setMessage (_GET_FUNCTION_NAME_,
             ZS_BADDIC,
@@ -1650,7 +1653,7 @@ zrank_type wIndexFound=0;
     if (pZIF.IdxKeyDic->count()==1)           // if only one field
         {
         long wMRk=pZIF.IdxKeyDic->Tab[0].MDicRank;
-        ZTypeBase wType = pZIF.ZMFFather->MasterDic->Tab[wMRk].ZType;
+        ZTypeBase wType = pZIF.ZMFFather->Dictionary->Tab[wMRk].ZType;
         if (wType & ZType_Char)           // and this field has type Char (array of char)
           wZIFCompare = ZKeyCompareAlpha; // use string comparison
         } // in all other cases, use binary comparison
@@ -2268,7 +2271,7 @@ zrank_type wpivot;
     if (pZIF.IdxKeyDic->count()==1)           // if only one field
         {
         long wMRk=pZIF.IdxKeyDic->Tab[0].MDicRank;
-        ZTypeBase wType = pZIF.ZMFFather->MasterDic->Tab[wMRk].ZType;
+        ZTypeBase wType = pZIF.ZMFFather->Dictionary->Tab[wMRk].ZType;
         if (wType & ZType_Char)           // and this field has type Char (array of char)
           wZIFCompare = ZKeyCompareAlpha; // use string comparison
         } // in all other cases, use binary comparison
@@ -2581,7 +2584,7 @@ ZIndexFile::getKeyIndexFields(ZDataBuffer &pIndexContent,ZDataBuffer& pKeyValue)
 ZStatus wSt=ZS_SUCCESS;
 ZDataBuffer wFieldValue ;
     pIndexContent.clear();
-    if (ZMFFather->MasterDic==nullptr)
+    if (ZMFFather->Dictionary==nullptr)
       {
       ZException.setMessage("ZIndexFile::getKeyIndexFields",
                             ZS_BADDIC,
@@ -2589,7 +2592,7 @@ ZDataBuffer wFieldValue ;
                             "Master dictionary is missing (nullptr). File appears to be a ZRawMasterFile with no dictionary.\n");
       return ZS_BADDIC;
       }
-    for (long wi=0; (ZMFFather->MasterDic->size())&&(wSt==ZS_SUCCESS);wi++)
+    for (long wi=0; (ZMFFather->Dictionary->size())&&(wSt==ZS_SUCCESS);wi++)
       {
       wSt=_getFieldValueFromKey(pKeyValue,wFieldValue,wi,this);
       if (wSt==ZS_SUCCESS)
@@ -2650,7 +2653,7 @@ _printKeyFieldsValues (ZDataBuffer* wKeyContent,ZIndexFile* pZIF, bool pHeader,b
 zrank_type wMDicRank=0;
 ZDataBuffer wPrintableField;
 
-ZMetaDic* wMetaDic=pZIF-> getMasterFile()->MasterDic;
+ZMetaDic* wMetaDic=static_cast<ZMetaDic*>(pZIF-> getMasterFile()->Dictionary);
 ZKeyDictionary* wKeyDic=pZIF->IdxKeyDic;
 ZFullIndexField wField ;
 

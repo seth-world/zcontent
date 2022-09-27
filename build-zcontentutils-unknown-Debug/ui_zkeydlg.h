@@ -28,12 +28,14 @@ public:
     QLabel *label_2;
     QPushButton *OKBTn;
     QPushButton *DisguardBTn;
+    QLineEdit *TooltipLEd;
+    QLabel *label_3;
 
     void setupUi(QDialog *ZKeyDLg)
     {
         if (ZKeyDLg->objectName().isEmpty())
             ZKeyDLg->setObjectName(QString::fromUtf8("ZKeyDLg"));
-        ZKeyDLg->resize(400, 139);
+        ZKeyDLg->resize(510, 139);
         KeyNameLEd = new QLineEdit(ZKeyDLg);
         KeyNameLEd->setObjectName(QString::fromUtf8("KeyNameLEd"));
         KeyNameLEd->setGeometry(QRect(120, 10, 211, 23));
@@ -48,10 +50,20 @@ public:
         label_2->setGeometry(QRect(20, 50, 141, 16));
         OKBTn = new QPushButton(ZKeyDLg);
         OKBTn->setObjectName(QString::fromUtf8("OKBTn"));
-        OKBTn->setGeometry(QRect(310, 110, 80, 23));
+        OKBTn->setGeometry(QRect(420, 110, 80, 23));
         DisguardBTn = new QPushButton(ZKeyDLg);
         DisguardBTn->setObjectName(QString::fromUtf8("DisguardBTn"));
-        DisguardBTn->setGeometry(QRect(200, 110, 80, 23));
+        DisguardBTn->setGeometry(QRect(310, 110, 80, 23));
+        TooltipLEd = new QLineEdit(ZKeyDLg);
+        TooltipLEd->setObjectName(QString::fromUtf8("TooltipLEd"));
+        TooltipLEd->setGeometry(QRect(120, 80, 381, 23));
+        label_3 = new QLabel(ZKeyDLg);
+        label_3->setObjectName(QString::fromUtf8("label_3"));
+        label_3->setGeometry(QRect(20, 80, 91, 16));
+        QWidget::setTabOrder(KeyNameLEd, DuplicatesCHk);
+        QWidget::setTabOrder(DuplicatesCHk, TooltipLEd);
+        QWidget::setTabOrder(TooltipLEd, OKBTn);
+        QWidget::setTabOrder(OKBTn, DisguardBTn);
 
         retranslateUi(ZKeyDLg);
 
@@ -65,7 +77,8 @@ public:
         DuplicatesCHk->setText(QString());
         label_2->setText(QCoreApplication::translate("ZKeyDLg", "Allow Duplicates", nullptr));
         OKBTn->setText(QCoreApplication::translate("ZKeyDLg", "OK", nullptr));
-        DisguardBTn->setText(QCoreApplication::translate("ZKeyDLg", "Disguard", nullptr));
+        DisguardBTn->setText(QCoreApplication::translate("ZKeyDLg", "Discard", nullptr));
+        label_3->setText(QCoreApplication::translate("ZKeyDLg", "Tooltip", nullptr));
     } // retranslateUi
 
 };

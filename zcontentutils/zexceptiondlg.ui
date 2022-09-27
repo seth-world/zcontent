@@ -55,7 +55,7 @@
    </property>
    <layout class="QVBoxLayout" name="VertLayoutMsgVLy">
     <item>
-     <widget class="QLabel" name="label">
+     <widget class="QLabel" name="TitleLBl">
       <property name="text">
        <string>Main message</string>
       </property>

@@ -13,6 +13,8 @@
 #include <zindexedfile/zrawindexfile.h>
 #include <zindexedfile/zindexdata.h>
 
+#include <zindexedfile/zdictionaryfile.h>
+
 
 namespace zbs {
 /*
@@ -79,8 +81,8 @@ public:
   uint32_t    ICBSize;
   uint32_t    JCBOffset;
   uint32_t    JCBSize;
-  uint32_t    MDicOffset;
-  uint32_t    MDicSize;
+//  uint32_t    MDicOffset;
+//  uint32_t    MDicSize;
 
   uint8_t     HistoryOn=false;
 
@@ -101,14 +103,19 @@ public:
   uint32_t    ICBSize;
   uint32_t    JCBOffset;      // JCBOffset = 0 -> no journalling
   int32_t     JCBSize;        // JCBSize = 0 -> no journalling
-  uint32_t    MDicOffset;     // MDic offset = 0 -> no dictionary
-  int32_t     MDicSize;       // MDic size = 0 -> no dictionary
+//  uint32_t    MDicOffset;     // MDic offset = 0 -> no dictionary
+//  int32_t     MDicSize;       // MDic size = 0 -> no dictionary
   uint8_t     HistoryOn=false; /* RFFU: if set, journaling events are historized see if no duplicate role with journaling keep option */
   //    uint8_t                    JournalingOn=false; //  will define wether update or load ZSJournalControlBlock from header while updating/reading ZMasterControlBlock
   uriString   IndexFilePath;  // Directory path for index files. If empty, then directory path of main content file is taken
   //    uriString               JournalPath;        // see ZJCB - Directory path for journal file. If empty, then directory path of main content file is taken
   //    uint32_t                EndSign=cst_ZEND ;
-  bool hasDictionary() {return MDicOffset > 0;}
+  utf8VaryingString DictionaryName; /* name of the dictionary to search for within dictionary file. If empty, then first active dictionary is taken */
+  uriString         DictionaryPath; /* Directory path for dictionary If empty, then directory path of main content file is taken */
+
+  ZDictionaryFile* Dictionary=nullptr;
+
+  bool hasDictionary() {return Dictionary != nullptr;}
   bool hasJournal() {return JCBOffset > 0;}
 
   ZDataBuffer& _exportAppend(ZDataBuffer& pZDBExport);
@@ -137,7 +144,8 @@ public:
 
   ZIndexTable                     IndexTable;     // List of effective index objects that will manage physical ZIndexFile
   ZSJournalControlBlock*          ZJCB=nullptr;   // journaling is defined here. If no journaling, stays to nullptr
-  ZMFDictionary*                  MasterDic=nullptr;  // optional master dictionary (raw master file does not have one)
+//  ZMFDictionary*                  Dictionary=nullptr;  // optional master dictionary (raw master file does not have one)
+
 
   ZMasterControlBlock (void) ;
   ~ZMasterControlBlock(void) ;

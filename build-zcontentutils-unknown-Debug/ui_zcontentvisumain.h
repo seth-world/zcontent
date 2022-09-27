@@ -12,17 +12,18 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QFrame>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
-#include <QtWidgets/QTableWidget>
 #include <QtWidgets/QToolBar>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -30,7 +31,7 @@ QT_BEGIN_NAMESPACE
 class Ui_ZContentVisuMain
 {
 public:
-    QAction *openQAc;
+    QAction *openByTypeQAc;
     QAction *rawQAc;
     QAction *ZRFRecordsQac;
     QAction *actionSuface;
@@ -49,7 +50,7 @@ public:
     QAction *openZMFQAc;
     QAction *actionHeader_file;
     QAction *unlockZRFQAc;
-    QAction *action;
+    QAction *headerFileUnlockQAc;
     QAction *HeaderRawUnlockQAc;
     QAction *listIndexesQAc;
     QAction *clearQAc;
@@ -75,9 +76,12 @@ public:
     QAction *displayZBATQAc;
     QAction *displayZDBTQAc;
     QAction *displayZFBTQAc;
-    QAction *dicNewQAc;
+    QAction *dictionaryQAc;
     QAction *dicLoadXmlQAc;
     QAction *cppparserQAc;
+    QAction *openZRHQAc;
+    QAction *actiongabu;
+    QAction *actionbagu;
     QWidget *centralwidget;
     QFrame *MainFRm;
     QLabel *OpenModeLbl;
@@ -115,16 +119,22 @@ public:
     QLabel *label_4;
     QLabel *label_5;
     QLabel *ClosedLBl;
-    QTableWidget *tableTBw;
+    QLineEdit *searchLEd;
+    QComboBox *searchTypeCBx;
+    QPushButton *searchFwdBTn;
+    QLabel *label_8;
+    QLabel *CurAddressLBl;
+    QPushButton *searchBckBTn;
+    QWidget *verticalLayoutWidget;
+    QVBoxLayout *verticalLayout;
     QMenuBar *menubar;
     QMenu *fileMEn;
     QMenu *ZRFMEn;
     QMenu *ZMFMEn;
     QMenu *menurepair_all_indexes;
     QMenu *rawMEn;
-    QMenu *dumpHeaderMEn;
-    QMenu *displayPoolMEn;
-    QMenu *menuDictionary;
+    QMenu *headerMEn;
+    QMenu *menuView_pool;
     QStatusBar *statusbar;
     QToolBar *toolBar;
 
@@ -132,9 +142,9 @@ public:
     {
         if (ZContentVisuMain->objectName().isEmpty())
             ZContentVisuMain->setObjectName(QString::fromUtf8("ZContentVisuMain"));
-        ZContentVisuMain->resize(864, 640);
-        openQAc = new QAction(ZContentVisuMain);
-        openQAc->setObjectName(QString::fromUtf8("openQAc"));
+        ZContentVisuMain->resize(868, 676);
+        openByTypeQAc = new QAction(ZContentVisuMain);
+        openByTypeQAc->setObjectName(QString::fromUtf8("openByTypeQAc"));
         rawQAc = new QAction(ZContentVisuMain);
         rawQAc->setObjectName(QString::fromUtf8("rawQAc"));
         ZRFRecordsQac = new QAction(ZContentVisuMain);
@@ -171,8 +181,8 @@ public:
         actionHeader_file->setObjectName(QString::fromUtf8("actionHeader_file"));
         unlockZRFQAc = new QAction(ZContentVisuMain);
         unlockZRFQAc->setObjectName(QString::fromUtf8("unlockZRFQAc"));
-        action = new QAction(ZContentVisuMain);
-        action->setObjectName(QString::fromUtf8("action"));
+        headerFileUnlockQAc = new QAction(ZContentVisuMain);
+        headerFileUnlockQAc->setObjectName(QString::fromUtf8("headerFileUnlockQAc"));
         HeaderRawUnlockQAc = new QAction(ZContentVisuMain);
         HeaderRawUnlockQAc->setObjectName(QString::fromUtf8("HeaderRawUnlockQAc"));
         listIndexesQAc = new QAction(ZContentVisuMain);
@@ -225,17 +235,23 @@ public:
         displayZDBTQAc->setObjectName(QString::fromUtf8("displayZDBTQAc"));
         displayZFBTQAc = new QAction(ZContentVisuMain);
         displayZFBTQAc->setObjectName(QString::fromUtf8("displayZFBTQAc"));
-        dicNewQAc = new QAction(ZContentVisuMain);
-        dicNewQAc->setObjectName(QString::fromUtf8("dicNewQAc"));
+        dictionaryQAc = new QAction(ZContentVisuMain);
+        dictionaryQAc->setObjectName(QString::fromUtf8("dictionaryQAc"));
         dicLoadXmlQAc = new QAction(ZContentVisuMain);
         dicLoadXmlQAc->setObjectName(QString::fromUtf8("dicLoadXmlQAc"));
         cppparserQAc = new QAction(ZContentVisuMain);
         cppparserQAc->setObjectName(QString::fromUtf8("cppparserQAc"));
+        openZRHQAc = new QAction(ZContentVisuMain);
+        openZRHQAc->setObjectName(QString::fromUtf8("openZRHQAc"));
+        actiongabu = new QAction(ZContentVisuMain);
+        actiongabu->setObjectName(QString::fromUtf8("actiongabu"));
+        actionbagu = new QAction(ZContentVisuMain);
+        actionbagu->setObjectName(QString::fromUtf8("actionbagu"));
         centralwidget = new QWidget(ZContentVisuMain);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         MainFRm = new QFrame(centralwidget);
         MainFRm->setObjectName(QString::fromUtf8("MainFRm"));
-        MainFRm->setGeometry(QRect(0, 0, 861, 181));
+        MainFRm->setGeometry(QRect(0, 0, 861, 211));
         MainFRm->setFrameShape(QFrame::StyledPanel);
         MainFRm->setFrameShadow(QFrame::Raised);
         OpenModeLbl = new QLabel(MainFRm);
@@ -257,7 +273,7 @@ public:
         ForwardBTn->setGeometry(QRect(810, 47, 41, 41));
         RecordFRm = new QFrame(MainFRm);
         RecordFRm->setObjectName(QString::fromUtf8("RecordFRm"));
-        RecordFRm->setGeometry(QRect(370, 37, 421, 101));
+        RecordFRm->setGeometry(QRect(370, 37, 421, 71));
         RecordFRm->setFrameShape(QFrame::StyledPanel);
         RecordFRm->setFrameShadow(QFrame::Raised);
         RecordNumberLBl = new QLabel(RecordFRm);
@@ -318,7 +334,7 @@ public:
         ProgressPGb->setValue(24);
         SequentialFRm = new QFrame(MainFRm);
         SequentialFRm->setObjectName(QString::fromUtf8("SequentialFRm"));
-        SequentialFRm->setGeometry(QRect(370, 140, 421, 31));
+        SequentialFRm->setGeometry(QRect(370, 170, 421, 31));
         SequentialFRm->setFrameShape(QFrame::StyledPanel);
         SequentialFRm->setFrameShadow(QFrame::Raised);
         label_6 = new QLabel(SequentialFRm);
@@ -341,16 +357,16 @@ public:
         label_1->setGeometry(QRect(20, 80, 91, 16));
         ZRFVersionLBl = new QLabel(MainFRm);
         ZRFVersionLBl->setObjectName(QString::fromUtf8("ZRFVersionLBl"));
-        ZRFVersionLBl->setGeometry(QRect(240, 130, 101, 16));
+        ZRFVersionLBl->setGeometry(QRect(240, 170, 101, 16));
         ZMFVersionLBl = new QLabel(MainFRm);
         ZMFVersionLBl->setObjectName(QString::fromUtf8("ZMFVersionLBl"));
-        ZMFVersionLBl->setGeometry(QRect(240, 150, 101, 16));
+        ZMFVersionLBl->setGeometry(QRect(240, 190, 101, 16));
         label_4 = new QLabel(MainFRm);
         label_4->setObjectName(QString::fromUtf8("label_4"));
-        label_4->setGeometry(QRect(20, 130, 211, 16));
+        label_4->setGeometry(QRect(20, 170, 211, 16));
         label_5 = new QLabel(MainFRm);
         label_5->setObjectName(QString::fromUtf8("label_5"));
-        label_5->setGeometry(QRect(20, 150, 211, 16));
+        label_5->setGeometry(QRect(20, 190, 211, 16));
         ClosedLBl = new QLabel(MainFRm);
         ClosedLBl->setObjectName(QString::fromUtf8("ClosedLBl"));
         ClosedLBl->setGeometry(QRect(130, 30, 151, 31));
@@ -359,19 +375,35 @@ public:
         font1.setBold(true);
         font1.setWeight(75);
         ClosedLBl->setFont(font1);
-        tableTBw = new QTableWidget(centralwidget);
-        tableTBw->setObjectName(QString::fromUtf8("tableTBw"));
-        tableTBw->setGeometry(QRect(0, 180, 861, 411));
-        QFont font2;
-        font2.setFamily(QString::fromUtf8("Courier"));
-        font2.setPointSize(11);
-        font2.setBold(true);
-        font2.setWeight(75);
-        tableTBw->setFont(font2);
+        searchLEd = new QLineEdit(MainFRm);
+        searchLEd->setObjectName(QString::fromUtf8("searchLEd"));
+        searchLEd->setGeometry(QRect(530, 110, 261, 23));
+        searchTypeCBx = new QComboBox(MainFRm);
+        searchTypeCBx->setObjectName(QString::fromUtf8("searchTypeCBx"));
+        searchTypeCBx->setGeometry(QRect(380, 110, 141, 23));
+        searchTypeCBx->setMinimumContentsLength(0);
+        searchFwdBTn = new QPushButton(MainFRm);
+        searchFwdBTn->setObjectName(QString::fromUtf8("searchFwdBTn"));
+        searchFwdBTn->setGeometry(QRect(240, 110, 121, 23));
+        label_8 = new QLabel(MainFRm);
+        label_8->setObjectName(QString::fromUtf8("label_8"));
+        label_8->setGeometry(QRect(390, 140, 61, 16));
+        CurAddressLBl = new QLabel(MainFRm);
+        CurAddressLBl->setObjectName(QString::fromUtf8("CurAddressLBl"));
+        CurAddressLBl->setGeometry(QRect(480, 140, 101, 20));
+        searchBckBTn = new QPushButton(MainFRm);
+        searchBckBTn->setObjectName(QString::fromUtf8("searchBckBTn"));
+        searchBckBTn->setGeometry(QRect(240, 140, 121, 23));
+        verticalLayoutWidget = new QWidget(centralwidget);
+        verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
+        verticalLayoutWidget->setGeometry(QRect(0, 220, 861, 381));
+        verticalLayout = new QVBoxLayout(verticalLayoutWidget);
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
         ZContentVisuMain->setCentralWidget(centralwidget);
         menubar = new QMenuBar(ZContentVisuMain);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 864, 20));
+        menubar->setGeometry(QRect(0, 0, 868, 20));
         fileMEn = new QMenu(menubar);
         fileMEn->setObjectName(QString::fromUtf8("fileMEn"));
         ZRFMEn = new QMenu(menubar);
@@ -382,12 +414,10 @@ public:
         menurepair_all_indexes->setObjectName(QString::fromUtf8("menurepair_all_indexes"));
         rawMEn = new QMenu(menubar);
         rawMEn->setObjectName(QString::fromUtf8("rawMEn"));
-        dumpHeaderMEn = new QMenu(rawMEn);
-        dumpHeaderMEn->setObjectName(QString::fromUtf8("dumpHeaderMEn"));
-        displayPoolMEn = new QMenu(dumpHeaderMEn);
-        displayPoolMEn->setObjectName(QString::fromUtf8("displayPoolMEn"));
-        menuDictionary = new QMenu(menubar);
-        menuDictionary->setObjectName(QString::fromUtf8("menuDictionary"));
+        headerMEn = new QMenu(menubar);
+        headerMEn->setObjectName(QString::fromUtf8("headerMEn"));
+        menuView_pool = new QMenu(headerMEn);
+        menuView_pool->setObjectName(QString::fromUtf8("menuView_pool"));
         ZContentVisuMain->setMenuBar(menubar);
         statusbar = new QStatusBar(ZContentVisuMain);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
@@ -400,12 +430,13 @@ public:
         menubar->addAction(ZRFMEn->menuAction());
         menubar->addAction(ZMFMEn->menuAction());
         menubar->addAction(rawMEn->menuAction());
-        menubar->addAction(menuDictionary->menuAction());
+        menubar->addAction(headerMEn->menuAction());
         fileMEn->addAction(setfileQAc);
-        fileMEn->addAction(openQAc);
+        fileMEn->addAction(openByTypeQAc);
         fileMEn->addAction(openRawQAc);
         fileMEn->addAction(openZRFQAc);
         fileMEn->addAction(openZMFQAc);
+        fileMEn->addAction(openZRHQAc);
         fileMEn->addAction(unlockZRFQAc);
         fileMEn->addAction(closeQAc);
         fileMEn->addAction(QuitQAc);
@@ -433,20 +464,15 @@ public:
         menurepair_all_indexes->addAction(runRepairQAc);
         rawMEn->addAction(rawDumpQAc);
         rawMEn->addAction(surfaceScanRawQAc);
-        rawMEn->addAction(action);
-        rawMEn->addAction(dumpHeaderMEn->menuAction());
-        dumpHeaderMEn->addAction(displayHCBQAc);
-        dumpHeaderMEn->addAction(displayFCBQAc);
-        dumpHeaderMEn->addAction(displayMCBQAc);
-        dumpHeaderMEn->addAction(HeaderRawUnlockQAc);
-        dumpHeaderMEn->addAction(displayPoolMEn->menuAction());
-        dumpHeaderMEn->addAction(DictionaryQAc);
-        displayPoolMEn->addAction(displayZBATQAc);
-        displayPoolMEn->addAction(displayZDBTQAc);
-        displayPoolMEn->addAction(displayZFBTQAc);
-        menuDictionary->addAction(dicNewQAc);
-        menuDictionary->addAction(dicLoadXmlQAc);
-        menuDictionary->addAction(cppparserQAc);
+        headerMEn->addAction(headerFileUnlockQAc);
+        headerMEn->addAction(displayFCBQAc);
+        headerMEn->addAction(displayHCBQAc);
+        headerMEn->addAction(displayMCBQAc);
+        headerMEn->addAction(menuView_pool->menuAction());
+        menuView_pool->addAction(displayZBATQAc);
+        menuView_pool->addAction(displayZFBTQAc);
+        menuView_pool->addAction(displayZDBTQAc);
+        toolBar->addAction(HeaderRawUnlockQAc);
 
         retranslateUi(ZContentVisuMain);
 
@@ -456,7 +482,7 @@ public:
     void retranslateUi(QMainWindow *ZContentVisuMain)
     {
         ZContentVisuMain->setWindowTitle(QCoreApplication::translate("ZContentVisuMain", "MainWindow", nullptr));
-        openQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Open file according type", nullptr));
+        openByTypeQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Open file according type", nullptr));
         rawQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Raw ", nullptr));
         ZRFRecordsQac->setText(QCoreApplication::translate("ZContentVisuMain", "ZRF Records", nullptr));
         actionSuface->setText(QCoreApplication::translate("ZContentVisuMain", "Suface", nullptr));
@@ -475,7 +501,7 @@ public:
         openZMFQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Open file as Master File", nullptr));
         actionHeader_file->setText(QCoreApplication::translate("ZContentVisuMain", "Header file", nullptr));
         unlockZRFQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Unlock random file", nullptr));
-        action->setText(QCoreApplication::translate("ZContentVisuMain", "Header file unlock", nullptr));
+        headerFileUnlockQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Header file unlock", nullptr));
         HeaderRawUnlockQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Header file unlock", nullptr));
         listIndexesQAc->setText(QCoreApplication::translate("ZContentVisuMain", "List indexes", nullptr));
         clearQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Clear file", nullptr));
@@ -501,9 +527,12 @@ public:
         displayZBATQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Block Access Table", nullptr));
         displayZDBTQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Deleted Blocks Table", nullptr));
         displayZFBTQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Free Blocks Table", nullptr));
-        dicNewQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Create new", nullptr));
+        dictionaryQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Dictionary facilities", nullptr));
         dicLoadXmlQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Load from Xml file", nullptr));
         cppparserQAc->setText(QCoreApplication::translate("ZContentVisuMain", "c++ parser", nullptr));
+        openZRHQAc->setText(QCoreApplication::translate("ZContentVisuMain", "Open file as header file", nullptr));
+        actiongabu->setText(QCoreApplication::translate("ZContentVisuMain", "gabu", nullptr));
+        actionbagu->setText(QCoreApplication::translate("ZContentVisuMain", "bagu", nullptr));
         OpenModeLbl->setText(QCoreApplication::translate("ZContentVisuMain", "not open", nullptr));
         FileTypeLBl->setText(QCoreApplication::translate("ZContentVisuMain", "Unknown type", nullptr));
         FullPathLbl->setText(QCoreApplication::translate("ZContentVisuMain", "no file selected", nullptr));
@@ -536,14 +565,18 @@ public:
         label_4->setText(QCoreApplication::translate("ZContentVisuMain", "Random File Software version", nullptr));
         label_5->setText(QCoreApplication::translate("ZContentVisuMain", "Master File Software version", nullptr));
         ClosedLBl->setText(QCoreApplication::translate("ZContentVisuMain", "No Open File", nullptr));
+        searchTypeCBx->setCurrentText(QString());
+        searchFwdBTn->setText(QCoreApplication::translate("ZContentVisuMain", "search forward", nullptr));
+        label_8->setText(QCoreApplication::translate("ZContentVisuMain", "Address", nullptr));
+        CurAddressLBl->setText(QCoreApplication::translate("ZContentVisuMain", "Address", nullptr));
+        searchBckBTn->setText(QCoreApplication::translate("ZContentVisuMain", "search backward", nullptr));
         fileMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "File", nullptr));
         ZRFMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "ZRF", nullptr));
         ZMFMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "ZMF", nullptr));
         menurepair_all_indexes->setTitle(QCoreApplication::translate("ZContentVisuMain", "repair all indexes", nullptr));
         rawMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "Raw file", nullptr));
-        dumpHeaderMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "Header file dump", nullptr));
-        displayPoolMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "display Pool", nullptr));
-        menuDictionary->setTitle(QCoreApplication::translate("ZContentVisuMain", "Dictionary", nullptr));
+        headerMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "Header file", nullptr));
+        menuView_pool->setTitle(QCoreApplication::translate("ZContentVisuMain", "View pool", nullptr));
         toolBar->setWindowTitle(QCoreApplication::translate("ZContentVisuMain", "toolBar", nullptr));
     } // retranslateUi
 

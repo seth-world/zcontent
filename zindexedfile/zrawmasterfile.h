@@ -158,7 +158,7 @@ public:
 
 
 
-  bool hasDictionary() {return MasterDic!=nullptr;}
+  bool hasDictionary() {return Dictionary!=nullptr;}
   bool hasIndexTable() {return IndexTable.count()>0;}
 
   ZStatus zopen       (const uriString& pURI, const int pMode=ZRF_All); // superseeds ZRandomfile zopen

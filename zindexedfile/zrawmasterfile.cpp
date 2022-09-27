@@ -27,7 +27,7 @@ ZRawMasterFile::ZRawMasterFile(ZFile_type pType) : ZRandomFile(pType)
   RawRecord=new ZRawRecord(this);
   ZJCB=nullptr;
   // MetaDic = nullptr;
-  MasterDic = nullptr;
+  Dictionary = nullptr;
 
   setFileType(pType);
   return ;
@@ -38,7 +38,7 @@ ZRawMasterFile::ZRawMasterFile() : ZRandomFile(ZFT_ZRawMasterFile)
   RawRecord=new ZRawRecord(this);
   ZJCB=nullptr;
 // MetaDic = nullptr;
-  MasterDic = nullptr;
+  Dictionary = nullptr;
   return ;
 }
 
@@ -49,7 +49,7 @@ ZRawMasterFile::ZRawMasterFile(uriString pURI) : ZRandomFile(pURI)
     if (wSt!=ZS_SUCCESS)
             ZException.exit_abort();
     ZJCB=nullptr;
-    MasterDic = nullptr;
+    Dictionary = nullptr;
     setFileType(ZFT_ZRawMasterFile);
     return;
 }
@@ -2227,8 +2227,8 @@ ZRawMasterFile::_insertRaw       (ZRawRecord *pRecord, const zrank_type pZMFRank
    */
 
   pRecord->Rank = pZMFRank;
-
-  wSt=_Base::_insert2PhasesCommit_Prepare(pRecord->RawContent,pRecord->Rank,wZMFIdxCommit,pRecord->Address);
+  wZMFIdxCommit=pRecord->Rank ;
+  wSt=_Base::_insert2Phases_Prepare(pRecord->RawContent,wZMFIdxCommit,pRecord->Address);
   if (wSt!=ZS_SUCCESS)
     goto _insertRaw_error;
 
@@ -2249,7 +2249,7 @@ ZRawMasterFile::_insertRaw       (ZRawRecord *pRecord, const zrank_type pZMFRank
       // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
       _add_RollbackIndexes (IndexRankProcessed); // An additional error during index rollback will pushed on exception stack
       // on error reset ZMF in its original state
-      _Base::_add2PhasesCommit_Rollback(wZMFIdxCommit); // do not accept update on Master File and free resources
+      _Base::_add2Phases_Rollback(wZMFIdxCommit); // do not accept update on Master File and free resources
       goto _insertRaw_error;
     }
 
@@ -2261,7 +2261,7 @@ ZRawMasterFile::_insertRaw       (ZRawRecord *pRecord, const zrank_type pZMFRank
       // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
       _add_RollbackIndexes ( IndexRankProcessed); // An additional error during index rollback will pushed on exception stack
       // on error reset ZMF in its original state
-      _Base::_add2PhasesCommit_Rollback(wZMFIdxCommit); // do not accept update on Master File and free resources
+      _Base::_add2Phases_Rollback(wZMFIdxCommit); // do not accept update on Master File and free resources
       goto _insertRaw_error;
     }
 
@@ -2281,7 +2281,7 @@ ZRawMasterFile::_insertRaw       (ZRawRecord *pRecord, const zrank_type pZMFRank
     {
     // Soft rollback master update regardless returned ZStatus
     // Nb: Exception is pushed on stack. ZException keeps the last status.
-    _Base::_add2PhasesCommit_Rollback(wZMFIdxCommit);
+    _Base::_add2Phases_Rollback(wZMFIdxCommit);
 
     goto _insertRaw_error;
     }
@@ -2289,7 +2289,7 @@ ZRawMasterFile::_insertRaw       (ZRawRecord *pRecord, const zrank_type pZMFRank
   // at this stage all indexes have been committed
   //         commit for Master file data must be done now
   //
-  wSt = _Base::_insert2PhasesCommit_Commit(pRecord->RawContent,wZMFIdxCommit);// accept insert update on Master File
+  wSt = _Base::_insert2Phases_Commit(pRecord->RawContent,wZMFIdxCommit,wZMFAddress);// accept insert update on Master File
   if (wSt!=ZS_SUCCESS)    //! and if then an error occur : hard rollback all indexes and signal exception
     {
     _add_HardRollbackIndexes (IndexRankProcessed); // indexes are already committed so use hardRollback to counter pass
@@ -2373,7 +2373,7 @@ ZRawMasterFile::_addRaw(ZRawRecord* pRecord)
 
 // prepare the add on Master File, reserve appropriate space, get entry in pool, lock it
 
-  wSt=_Base::_add2PhasesCommit_Prepare( pRecord->RawContent,
+  wSt=_Base::_add2Phases_Prepare( pRecord->RawContent,
                                         wZMFZBATIndex,     // get internal ZBAT pool allocated index
                                         wZMFAddress);
   if (wSt!=ZS_SUCCESS)
@@ -2401,7 +2401,7 @@ ZRawMasterFile::_addRaw(ZRawRecord* pRecord)
       // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
       _add_RollbackIndexes (IndexRankProcessed); // An additional error during index rollback will pushed on exception stack
       // on error reset ZMF in its original state
-      _Base::_add2PhasesCommit_Rollback(wZMFZBATIndex); // do not accept update on Master File and free resources
+      _Base::_add2Phases_Rollback(wZMFZBATIndex); // do not accept update on Master File and free resources
       goto zaddRaw_error;
     }
 
@@ -2413,7 +2413,7 @@ ZRawMasterFile::_addRaw(ZRawRecord* pRecord)
       // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
       _add_RollbackIndexes ( IndexRankProcessed); // An additional error during index rollback will pushed on exception stack
       // on error reset ZMF in its original state
-      _Base::_add2PhasesCommit_Rollback(wZMFZBATIndex); // do not accept update on Master File and free resources
+      _Base::_add2Phases_Rollback(wZMFZBATIndex); // do not accept update on Master File and free resources
       goto zaddRaw_error;
       }
 
@@ -2435,7 +2435,7 @@ ZRawMasterFile::_addRaw(ZRawRecord* pRecord)
   {
     // Soft rollback master update regardless returned ZStatus
     // Nb: Exception is pushed on stack. ZException keeps the last status.
-    _Base::_add2PhasesCommit_Rollback(wZMFZBATIndex);
+    _Base::_add2Phases_Rollback(wZMFZBATIndex);
 
     goto zaddRaw_error;
   }
@@ -2444,7 +2444,7 @@ ZRawMasterFile::_addRaw(ZRawRecord* pRecord)
   //         commit for Master file data must be done now
   //
 //  wSt = _Base::_add2PhasesCommit_Commit(_Base::pRecord->RawContent,wZMFZBATIndex,wZMFAddress);// accept update on Master File
-  wSt = _Base::_add2PhasesCommit_Commit(pRecord->RawContent,pRecord->Rank,pRecord->Address);// accept update on Master File
+  wSt = _Base::_add2Phases_Commit(pRecord->RawContent,pRecord->Rank,pRecord->Address);// accept update on Master File
 
   if (wSt!=ZS_SUCCESS)    // and if then an error occur : hard rollback all indexes
     {

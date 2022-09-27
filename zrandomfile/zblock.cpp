@@ -3,6 +3,7 @@
 
 ZBlockHeader_Export& ZBlockHeader_Export::_copyFrom(const ZBlockHeader_Export& pIn)
 {
+  memset(this,0,sizeof(ZBlockHeader_Export));
   StartSign=pIn.StartSign;
   BlockId=pIn.BlockId;
   EndianCheck=pIn.EndianCheck;
@@ -138,6 +139,7 @@ ZBlockDescriptor_Export::deserialize()
 
 ZBlockHeader& ZBlockHeader::_copyFrom(const ZBlockHeader& pIn)
 {
+  memset(this,0,sizeof(ZBlockHeader));
   BlockSize=pIn.BlockSize;
   State=pIn.State;
   Lock=pIn.Lock;
@@ -145,7 +147,24 @@ ZBlockHeader& ZBlockHeader::_copyFrom(const ZBlockHeader& pIn)
   return *this;
 }
 
-
+ZBlockHeader& ZBlockHeader::_FromZBlock(const ZBlock& pIn)
+{
+  memset(this,0,sizeof(ZBlockHeader));
+  BlockSize=pIn.BlockSize;
+  State=pIn.State;
+  Lock=pIn.Lock;
+  Pid=pIn.Pid;
+  return *this;
+}
+ZBlockHeader& ZBlockHeader::_FromZBlockDescriptor(const ZBlockDescriptor& pIn)
+{
+  memset(this,0,sizeof(ZBlockHeader));
+  BlockSize=pIn.BlockSize;
+  State=pIn.State;
+  Lock=pIn.Lock;
+  Pid=pIn.Pid;
+  return *this;
+}
 
 
 ZBlockDescriptor& ZBlockDescriptor::_copyFrom(const ZBlockDescriptor& pIn)
@@ -206,7 +225,7 @@ ZBlockDescriptor::_exportAppend(ZDataBuffer &pZDB)
 ZBlockDescriptor_Export ZBlockDescriptor:: _exportConvert(ZBlockDescriptor& pIn,ZBlockDescriptor_Export* pOut)
 {
   memset(pOut,0,sizeof(ZBlockDescriptor_Export));
-  pOut->StartSign = cst_ZBLOCKSTART;
+  pOut->StartSign = cst_ZFILEBLOCKSTART;
   pOut->BlockId= ZBID_Data ;   // uint8_t
   pOut->BlockSize=reverseByteOrder_Conditional<zsize_type>(pIn.BlockSize);
   pOut->State= pIn.State;   // uint8_t
@@ -224,12 +243,19 @@ ZStatus
 ZBlockDescriptor::_importConvert(ZBlockDescriptor& pOut, ZBlockDescriptor_Export *pIn)
 {
 
-  if ((pIn->StartSign!=cst_ZBLOCKSTART)||(pIn->BlockId!=ZBID_Data))
-  {
+  if (pIn->StartSign!=cst_ZFILEBLOCKSTART) {
     ZException.setMessage("ZBlockDescriptor::_importConvert",
         ZS_INVBLOCKADDR,
         Severity_Severe,
-        "Invalid block format: invalid marker  Startblock<%X> or BlockId<%X>",
+        "Invalid block format: invalid marker  Startblock<0x%X>" ,
+        pIn->StartSign);
+    return  ZS_INVBLOCKADDR;
+  }
+  if (pIn->BlockId!=ZBID_Data) {
+    ZException.setMessage("ZBlockDescriptor::_importConvert",
+        ZS_INVBLOCKADDR,
+        Severity_Severe,
+        "Invalid block format: invalid block id <0x%X>",
         pIn->StartSign,
         pIn->BlockId);
     return  ZS_INVBLOCKADDR;
@@ -252,7 +278,7 @@ ZBlockDescriptor::_importConvert(ZBlockDescriptor& pOut, ZBlockDescriptor_Export
 ZBlockHeader_Export&
 ZBlockHeader::_exportConvert(ZBlockHeader& pIn,ZBlockHeader_Export* pOut)
 {
-  pOut->StartSign = cst_ZBLOCKSTART;
+  pOut->StartSign = cst_ZFILEBLOCKSTART;
   pOut->BlockId= ZBID_Data;   // uint8_t
   pOut->EndianCheck = cst_EndianCheck_Reversed;
 
@@ -269,18 +295,24 @@ ZStatus
 ZBlockHeader::_importConvert(ZBlockHeader& pOut,ZBlockHeader_Export* pIn)
 {
   pOut.clear();
-  if ((pIn->StartSign!=cst_ZBLOCKSTART)||(pIn->BlockId!=ZBID_Data))
-  {
-    ZException.setMessage(_GET_FUNCTION_NAME_,
+  if (pIn->StartSign!=cst_ZFILEBLOCKSTART) {
+    ZException.setMessage("ZBlockHeader::_importConvert",
         ZS_INVBLOCKADDR,
         Severity_Severe,
-        "Invalid block format: invalid marker  Startblock<%X> or BlockId<%X>",
+        "Invalid block format: invalid marker  Startblock<0x%X>" ,
+        pIn->StartSign);
+    return  ZS_INVBLOCKADDR;
+  }
+  if (pIn->BlockId!=ZBID_Data){
+    ZException.setMessage("ZBlockHeader::_importConvert",
+        ZS_INVBLOCKADDR,
+        Severity_Severe,
+        "Invalid block format: invalid block id <0x%X>",
         pIn->StartSign,
         pIn->BlockId);
     return  ZS_INVBLOCKADDR;
   }
-  if (pIn->isNotReversed() )
-  {
+  if (pIn->isNotReversed() ) {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_CORRUPTED,
         Severity_Severe,

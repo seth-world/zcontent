@@ -134,6 +134,8 @@ public:
   zaddress_type LogicalPosition=0;   /**< current offset since beginning of data : updated by any read / write operation done on ZRandomFile. Not updated by remove operation (set to -1) */
   long          CurrentRank=0;        /**< current ZBAT rank. set to -1 if no current rank */
 
+  bool          Changed=false;
+
   ZFDOwnData() =default;
   ZFDOwnData(const ZFDOwnData& pIn) {_copyFrom(pIn);}
   ZFDOwnData(const ZFDOwnData&& pIn) {_copyFrom(pIn);}

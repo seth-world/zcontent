@@ -50,9 +50,9 @@ QStandardItem* createItem(long pValue,const char*pFormat);
 //ZDataReference getZDataReference(QStandardItemModel* pModel, int pRow);
 ZDataReference getParent( QStandardItemModel* pItemModel,QModelIndex &wIdx);
 /* creates a list pointing to effective items */
-QList<QStandardItem*> itemRow (QStandardItemModel*pModel,QModelIndex& pIdx, ZaiErrors* pErrorlog=nullptr);
+//QList<QStandardItem*> itemRow (QStandardItemModel*pModel,QModelIndex pIdx);
 /* creates a list pointing to duplicated items */
-QList<QStandardItem*> itemRowDuplicate (QStandardItemModel*pModel,const QModelIndex&  pIdx);
+QList<QStandardItem*> itemRowDuplicate (QStandardItemModel*pModel,const QModelIndex  pIdx);
 
 /* creates a list pointing to effective items after having cut them */
 QList<QStandardItem*> cutRow (QStandardItemModel*pModel,QModelIndex& pIdx, ZaiErrors* pErrorlog=nullptr);

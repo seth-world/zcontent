@@ -4,6 +4,8 @@
 
 int main(int argc, char *argv[])
 {
+  ZVerbose |= ZVB_ZRF;
+
   QApplication a(argc, argv);
 
   utf8VaryingString wStr;

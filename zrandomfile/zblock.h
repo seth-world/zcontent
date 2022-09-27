@@ -27,11 +27,11 @@ public:
   bool isReversed() {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
   bool isNotReversed() {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
 
-  uint32_t            StartSign=cst_ZBLOCKSTART ;    // Start marker
+  uint32_t            StartSign=cst_ZFILEBLOCKSTART ;    // Start marker
   ZBlockID            BlockId=ZBID_Data;         // Block identification : always ZBID_Data here
   uint16_t            EndianCheck=cst_EndianCheck_Normal;
   zsize_type          BlockSize;      // total size of the physical block, ZBH_Export size+user content size
-  ZBlockState_type    State;          // state of the block see @ref ZBlockState_type
+  uint8_t             State;          // state of the block see @ref ZBlockState_type
   zlockmask_type      Lock;           // relates to ZLockMask_type (zlockmanager.h)
   //    ZLock_Reason        LockReason;     // RFFU (zlockmanager.h)
   pid_t               Pid;            // process identification that locked the block
@@ -66,7 +66,7 @@ public:
   //    ZBlockID            BlockID;        // Block identification
   zsize_type          BlockSize;      // total size of the physical block on file  including ZBlockHeader_Export size
   //                                       ZBlockHeader_Export plus user content size
-  ZBlockState_type    State;          // state of the block see @ref ZBlockState_type
+  uint8_t             State=0;          // state of the block see @ref ZBlockState_type
   zlockmask_type      Lock;           // relates to ZLockMask_type (zlockmanager.h)
   //    ZLock_Reason        LockReason;     // RFFU (zlockmanager.h)
   pid_t               Pid;            // process identification that locked the block
@@ -80,9 +80,13 @@ public:
 
   ZBlockHeader& _copyFrom(const ZBlockHeader& pIn);
 
+  ZBlockHeader& _FromZBlock(const ZBlock& pIn);
+  ZBlockHeader& _FromZBlockDescriptor(const ZBlockDescriptor& pIn);
+
+
   ZBlockHeader& operator = (const ZBlockHeader &pIn) {return _copyFrom(pIn);}
-  ZBlockHeader& operator = (const ZBlockDescriptor& pBlockDescriptor) {memmove(this,&pBlockDescriptor,sizeof(ZBlockHeader)); return *this;}
-  ZBlockHeader& operator = (const ZBlock& pBlock) {memmove(this,&pBlock,sizeof(ZBlockHeader));  return *this;}
+  ZBlockHeader& operator = (const ZBlockDescriptor& pBlockDescriptor) {return _FromZBlockDescriptor(pBlockDescriptor);}
+  ZBlockHeader& operator = (const ZBlock& pBlock) {return _FromZBlock(pBlock);}
 
 
   ZStatus _import(unsigned char *pPtrIn);

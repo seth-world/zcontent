@@ -120,7 +120,7 @@ public:
 int64_t EffectiveRecordSize=0;
 int64_t TheoricalSize=0;
 
-    ZRecordDic(ZMFDictionary* pMasterDic);
+    ZRecordDic(ZMFDictionary* pDictionary);
     ~ZRecordDic();
 
     long getFieldByName(const utf8String& pName) const;
@@ -129,14 +129,14 @@ int64_t TheoricalSize=0;
     void clearURFData(void);
     bool testCheckSum(void)
     {
-        if (MasterDic==nullptr)
+        if (Dictionary==nullptr)
                 return false;
-        if (memcmp(CheckSum->content,MasterDic->CheckSum->content,sizeof(CheckSum->content)))
+        if (memcmp(CheckSum->content,Dictionary->CheckSum->content,sizeof(CheckSum->content)))
                         return false;
         return true;
     }
 
-    ZMFDictionary   *MasterDic=nullptr;
+    ZMFDictionary   *Dictionary=nullptr;
     checkSum        *CheckSum=nullptr;
 };
 

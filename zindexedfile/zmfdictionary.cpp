@@ -32,7 +32,7 @@ ZMFDictionary::_copyFrom(const ZMFDictionary& pIn)
   for (long wi = 0; wi < pIn.KeyDic.count(); wi ++)
   {
     KeyDic.push(new ZKeyDictionary(pIn.KeyDic[wi]));
-    KeyDic.last()->MasterDic=this;
+    KeyDic.last()->Dictionary=this;
   }
   return *this;
 }
@@ -131,8 +131,6 @@ ZDataBuffer& ZMFDictionary::_exportAppend(ZDataBuffer& pZDB)
   return pZDB;
 }
 
-
-
 ZStatus ZMFDictionary::_import(const unsigned char* &pPtrIn)
 {
   ZStatus wSt=ZS_SUCCESS;
@@ -176,7 +174,7 @@ ZStatus ZMFDictionary::_import(const unsigned char* &pPtrIn)
 }//ZMFDictionary::_import
 
 /*
-      <zmasterdictionary>
+      <zDictionarytionary>
         <metadic>
           <dicfields>
             <field>
@@ -215,7 +213,7 @@ ZStatus ZMFDictionary::_import(const unsigned char* &pPtrIn)
           </key>
         </keydictionary>
 
-      </zmasterdictionary>
+      </zDictionarytionary>
  */
 
 utf8VaryingString ZMFDictionary::XmlSaveToString(bool pComment)
@@ -232,7 +230,7 @@ utf8VaryingString ZMFDictionary::toXml(int pLevel,bool pComment)
   int wLevel=pLevel+1;
   utf8String wReturn;
   ZDataBuffer wB64;
-  wReturn = fmtXMLnode("masterdictionary",pLevel);
+  wReturn = fmtXMLnode("Dictionarytionary",pLevel);
 
 
   wReturn += fmtXMLbool("active",Active,wLevel);
@@ -255,7 +253,7 @@ utf8VaryingString ZMFDictionary::toXml(int pLevel,bool pComment)
     wReturn += KeyDic[wi]->toXml(wLevel+1,wi,pComment);
   }
   wReturn += fmtXMLendnode("keydictionary",wLevel);
-  wReturn += fmtXMLendnode("masterdictionary",pLevel);
+  wReturn += fmtXMLendnode("Dictionarytionary",pLevel);
   return wReturn;
 } // ZMFDictionary::toXml
 
@@ -293,7 +291,7 @@ ZStatus ZMFDictionary::XmlLoadFromString(const utf8String &pXmlString,bool pChec
   }
 
 
-  wSt=wRoot->getChildByName((zxmlNode*&)wMetaRootNode,"masterdictionary");
+  wSt=wRoot->getChildByName((zxmlNode*&)wMetaRootNode,"Dictionarytionary");
   if (wSt!=ZS_SUCCESS)
     {
     pErrorlog->logZStatus(
@@ -301,7 +299,7 @@ ZStatus ZMFDictionary::XmlLoadFromString(const utf8String &pXmlString,bool pChec
         wSt,
         "ZMFDictionary::XmlLoadFromString-E-CNTFINDND Error cannot find node element with name <%s> status "
         "<%s>",
-        "masterdictionary",
+        "Dictionarytionary",
         decode_ZStatus(wSt));
     return wSt;
     }
@@ -322,13 +320,13 @@ ZMFDictionary::fromXml(zxmlNode* pZmfDicNode, bool pCheckHash, ZaiErrors* pError
 
   pErrorlog->setErrorLogContext("ZMFDictionary::fromXml");
 
-  if (pZmfDicNode->getName()!="masterdictionary")
+  if (pZmfDicNode->getName()!="Dictionarytionary")
     {
     pErrorlog->logZStatus(
         ZAIES_Error,
         ZS_INVNAME,
         "ZMFDictionary::fromXml-E-CNTFINDND Error cannot find master dictionary root node element with name <%s> status <%s>",
-        "masterdictionary",
+        "Dictionarytionary",
         decode_ZStatus(ZS_XMLINVROOTNAME));
     return ZS_XMLINVROOTNAME;
     }
