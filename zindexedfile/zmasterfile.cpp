@@ -371,8 +371,7 @@ ZMasterFile::zcreateIndexFromDictionary (const utf8String &pDicKeyName,
   uriString wIndexURI;
   uriString wIndexFileDirectoryPath;
   pOutKeyRank=-1;
-  if (Dictionary==nullptr)
-    {
+  if (Dictionary==nullptr) {
     ZException.setMessage (_GET_FUNCTION_NAME_,
         ZS_NULLPTR,
         Severity_Severe,
@@ -492,9 +491,8 @@ ZStatus
 ZMasterFile::zremoveIndex (const long pIndexRank)
 {
 //  utf8String wIndexName=IndexTable[pIndexRank]->IndexName;
-  ZStatus wSt=  ZRawMasterFile::zremoveIndex(pIndexRank);
-  if (wSt==ZS_SUCCESS)
-    {
+  ZStatus wSt=  ZRawMasterFile::zremoveIndex(pIndexRank,&ErrorLog);
+  if (wSt==ZS_SUCCESS) {
     delete Dictionary->KeyDic[pIndexRank];
     Dictionary->KeyDic.erase(pIndexRank);
     }
@@ -1008,7 +1006,7 @@ const unsigned char* wPtrIn=nullptr;
                         if (wMasterZRF.getAllocatedBlocks()>0)
                             wIndexAllocatedSize =  wMasterZRF.getAllocatedBlocks() * wMasterFile.IndexTable[wi]->IndexRecordSize();
 
-            wSt =  wIndexFile.zcreateIndex((ZIndexControlBlock&)*wMasterFile.IndexTable[IndexRank],  // pointer to index control block because ZIndexFile stores pointer to Father's ICB
+            wSt =  wIndexFile.zcreateIndexFile((ZIndexControlBlock&)*wMasterFile.IndexTable[IndexRank],  // pointer to index control block because ZIndexFile stores pointer to Father's ICB
                                               wIndexUri,
                                               wMasterZRF.getAllocatedBlocks(),
                                               wMasterZRF.getBlockExtentQuota(),
@@ -1093,7 +1091,7 @@ const unsigned char* wPtrIn=nullptr;
                         "                  Repare option has been chosen "
                         "                  Trying to delete file and reprocess it as missing file.\n");
 
-                        wIndexZRF._removeFile(); // may be not necessary : to be checked
+                        wIndexZRF._removeFile(true,&wMasterFile.ErrorLog); // may be not necessary : to be checked
 
                         IndexRank--;
                         continue;
@@ -1124,7 +1122,7 @@ const unsigned char* wPtrIn=nullptr;
                         "                  Repare option has been chosen \n"
                         "                  Trying to delete file and reprocess it as missing file.\n");
 
-                        wIndexZRF._removeFile(); // may be not necessary : to be checked
+                        wIndexZRF._removeFile(true,&wMasterFile.ErrorLog); // may be not necessary : to be checked
 
                         IndexRank--;
                         continue;
@@ -1156,7 +1154,7 @@ const unsigned char* wPtrIn=nullptr;
                         "                  Repare option has been chosen \n"
                         "                  Trying to delete file and reprocess it as missing file.\n");
 
-                        wIndexZRF._removeFile(); // may be not necessary : to be checked
+                        wIndexZRF._removeFile(true,&wMasterFile.ErrorLog); // may be not necessary : to be checked
 
                         IndexRank--;
                         continue;
@@ -1205,7 +1203,7 @@ const unsigned char* wPtrIn=nullptr;
                          "%s>> removing corrupted index file\n",
                          _GET_FUNCTION_NAME_);
 
-                 wIndexZRF._removeFile();
+                 wIndexZRF._removeFile(true,&wMasterFile.ErrorLog);
                  fprintf (wOutput,
                           "%s>> reprocessing index as missing index file\n",
                           _GET_FUNCTION_NAME_);
@@ -1299,31 +1297,10 @@ ErrorRepairIndexes:
 /** @ */ // ZMFUtilities
 
 
-/**
- * @brief ZSMasterFile::zcreate  ZSMasterFile creation with a full definition with a file path that will name main content file.
- * Other file names will be deduced from this name.
- * @note At this stage, no indexes are created for ZSMasterFile.
- *
- * Main file content and file header are created with appropriate parameters as given in parameters.
- * ZSMasterFile infradata structure is created within header file.
- *
- * @param[in] pURI  uriString containing the path of the future ZSMasterFile main content file.
- *          Other file names will be deduced from this main name.
- * @param[in] pAllocatedBlocks  number of initial elements in ZBAT pool and other pools(pInitialAlloc) see: @ref ZArrayParameters
- * @param[in] pBlockExtentQuota extension quota for pools (pReallocQuota) see: @ref ZArrayParameters
- * @param[in] pBlockTargetSize  approximation of best record size. see: @ref ZRFBlockTargetSize
- * @param[in] pInitialSize      Initial file space in byte that is allocated at creation time. This space is placed in Free block pool as one block.
- * @param[in] pHistory          RFFU History option true : on ; false : off
- * @param[in] pAutocommit       RFFU Autocommit option true : on ; false : off
- * @param[in] pJournaling       RFFU Journaling option true : on ; false : off
- * @param[in] pHighwaterMarking HighWaterMarking option true : on ; false : off see: @ref ZRFHighWaterMarking
- * @param[in] pGrabFreeSpace    GrabFreespace option true : on ; false : off see: @ref ZRFGrabFreeSpace
- * @param[in] pLeaveOpen   if set to true file is left open after its creation with open mode mask (ZRF_Exclusive | ZRF_All ). If false, file is closed.
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
+
 
 ZStatus
-ZMasterFile::zcreateMasterFile(uriString *pDictionary,
+ZMasterFile::zcreateMasterFile(
                                 const uriString pURI,
                                 long pAllocatedBlocks,
                                 long pBlockExtentQuota,
@@ -1358,11 +1335,11 @@ void ZMasterFile::setDictionary (const ZMFDictionary& pDictionary)
 }
 */
 ZStatus
-ZMasterFile::zcreateMasterFile(uriString *pDictionary, const uriString pURI, const zsize_type pInitialSize, bool pBackup, bool pLeaveOpen)
+ZMasterFile::zcreateMasterFile( const uriString pURI, const zsize_type pInitialSize, bool pBackup, bool pLeaveOpen)
 {
   ZStatus wSt;
   printf ("ZSMasterFile::zcreate \n");
-  if (pDictionary==nullptr)
+ /* if (pDictionary==nullptr)
     {
     ZException.setMessage("ZSMasterFile::zcreate",ZS_NULLPTR,Severity_Severe,"Meta dictionary is nullptr while trying to create Master File <%s>.",URIContent.toCChar());
     return (ZS_NULLPTR);
@@ -1373,7 +1350,7 @@ ZMasterFile::zcreateMasterFile(uriString *pDictionary, const uriString pURI, con
       return (ZS_NULLPTR);
     }
 
-
+*/
   wSt=ZRandomFile::setPath (pURI);
   if (wSt!=ZS_SUCCESS)
   {return (wSt);}
@@ -1385,7 +1362,7 @@ ZMasterFile::zcreateMasterFile(uriString *pDictionary, const uriString pURI, con
           getURIContent().toString());
       return (wSt);
     }
-  ZMasterFile::setDictionary(*pDictionary);
+//  ZMasterFile::setDictionary(*pDictionary);
 //  Dictionary->generateCheckSum();
 
 
@@ -1412,188 +1389,422 @@ ZMasterFile::zcreateMasterFile(uriString *pDictionary, const uriString pURI, con
 
 }
 
-#ifdef __OLDVERSION__
+
 ZStatus
-ZSMasterFile::zcreate(ZMetaDic* pMetaDic,
-                    const uriString pURI,
-                     long pAllocatedBlocks,
-                     long pBlockExtentQuota,
-                     long pBlockTargetSize,
-                     const zsize_type pInitialSize,
-                     bool pHighwaterMarking,
-                     bool pGrabFreeSpace,
-                     bool pJournaling,
-                     bool pBackup,
-                     bool pLeaveOpen)
-{
+ZMasterFile::initDictionary(const uriString& pDictionary, bool pKeepFileAsReference) {
+  ZStatus wSt;
 
-
-ZStatus wSt;
-ZDataBuffer wMCBContent;
-//    ZMFURI=pURI;
-    wSt=_Base::setPath(pURI);
-    if (wSt!=ZS_SUCCESS)
-            {
-            ZException.addToLast(" While creating Master file %s",
-                                     getURIContent().toString());
-            return  wSt;
-            }
-
-    _Base::setCreateMaximum (pAllocatedBlocks,
-                             pBlockExtentQuota,
-                             pBlockTargetSize,
-                             pInitialSize,
-                             pHighwaterMarking,
-                             pGrabFreeSpace);
-    if (wSt!=ZS_SUCCESS)
-            {
-            ZException.addToLast(" While creating Master file %s",
-                                     getURIContent().toString());
-            return  wSt;
-            }
-    wSt=_Base::_create(pInitialSize,ZFT_ZSMasterFile,pBackup,true); // calling ZRF base creation routine and it leave open
-    if (wSt!=ZS_SUCCESS)
-            {
-            ZException.addToLast(" While creating Master file %s",
-                                     getURIContent().toString());
-            return  wSt;
-            }
-
-    if (Dictionary)
-      Dictionary->clear();
-    else
-      Dictionary=new ZMFDictionary;
-    for (long wi=0;wi<pMetaDic->size();wi++)
-                Dictionary->push(pMetaDic->Tab[wi]);
-    Dictionary->generateCheckSum();
-
-    ZHeader.FileType = ZFT_ZSMasterFile;     // setting ZFile_type
-
-    ZRandomFile::setReservedContent(_exportMCBAppend(wMCBContent));
-//    wSt=_Base::updateReservedBlock(_exportMCB());
-    wSt=_Base::_writeFullFileHeader(true);
-    if (wSt!=ZS_SUCCESS)
-      {
-      _Base::zclose();
-      ZException.addToLast(" While creating Master file %s",
-                               getURIContent().toString());
-      return  wSt;
+  if (isOpen()){
+    if (getOpenMode()!=(ZRF_Exclusive | ZRF_Modify)) {
+      wSt = changeOpenMode(ZRF_Exclusive | ZRF_Modify);
+      if (wSt!=ZS_SUCCESS) {
+        ZException.setMessage("ZMasterFile::initDictionary",wSt,Severity_Severe,
+            "File <%s> cannot be changed its open mode from <%s> to <%s>.",
+            URIContent.toCChar(),
+            decode_ZRFMode(getOpenMode()),
+            decode_ZRFMode(ZRF_Exclusive | ZRF_Modify));
+        return wSt;
       }
-
-// Manage journaling for the being created file
-// - set option to MCB
-// - if journaling enabled : create journaling file
-
-//    JournalingOn = pJournaling; // update journaling MCB option for the file
-    if (pJournaling)
-        {
-        ZJCB->Journal=new ZSJournal(this);
-        wSt=ZJCB->Journal->createFile();
-        if (wSt!=ZS_SUCCESS)
-                {
-                ZException.addToLast(" while creating ZSMasterFile %s",
-                                       getURIContent().toString());
-                return  wSt;
-                }
-        }
-
-    if (pLeaveOpen)
-            { return  wSt;}
-
-
-    return   zclose();
-}// zcreate
-
-/**
- * @brief ZSMasterFile::zcreate Creates the raw content file and its header as a ZRandomFile with a structure capable of creating indexes.
- * @param[in] pURI  uriString containing the path of the future ZSMasterFile main content file. Other file names will be deduced from this main name.
- * @param[in] pInitialSize Initial file space in byte that is allocated at creation time. This space is placed in Free block pool as one block.
- * @param[in] pBackup    If set to true file will be replaced if it already exists. If false (default value), existing file will be renamed according renaming rules.
- * @param[in] pLeaveOpen   If set to true file is left open after its creation with open mode mask (ZRF_Exclusive | ZRF_All ). If false, file is closed.
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
-ZStatus
-ZSMasterFile::zcreate (ZMetaDic* pMetaDic,const uriString pURI, const zsize_type pInitialSize, bool pBackup, bool pLeaveOpen)
-{
-
-
-ZStatus wSt;
-ZDataBuffer wMCBContent;
-//    ZMFURI=pURI;
-
-
-    wSt=_Base::setPath (pURI);
+    }
+  }
+  else {
+    wSt=zopen(ZRF_Exclusive | ZRF_Modify);
     if (wSt!=ZS_SUCCESS)
-                {return (wSt);}
-    _Base::setCreateMinimum(pInitialSize);
-    wSt=_Base::_create(pInitialSize,ZFT_ZSMasterFile,pBackup,true); // calling ZRF base creation routine and it leave open
-    if (wSt!=ZS_SUCCESS)
-            {
-            ZException.addToLast(" While creating Master file %s",
-                                     getURIContent().toString());
-            return (wSt);
-            }
-    /* ----------File is left open : so no necessity to open again
-    wSt=_Base::_open(ZRF_Exclusive | ZRF_Write,ZFT_ZSMasterFile);
-    if (wSt!=ZS_SUCCESS)
-            {
-            ZException.addToLast(" While creating Master file %s",
-                                     ZMFURI.toString());
-            return  wSt;
-            }
-*/
+      return wSt;
+  }
 
-    if (Dictionary)
-      delete Dictionary;
-    Dictionary=new ZMFDictionary;
-    for (long wi=0;wi<pMetaDic->size();wi++)
-                Dictionary->push(pMetaDic->Tab[wi]);
+  if (ZRawMasterFile::IndexCount > 0) {
+    ZException.setMessage("ZMasterFile::initDictionary",ZS_INVOP,Severity_Severe,
+        "File <%s> has already %ld defined %s.",
+        URIContent.toCChar(),
+        ZRawMasterFile::IndexCount,
+        (ZRawMasterFile::IndexCount > 1) ?"indexes":"index");
+    return ZS_INVOP;
+  }
 
-    Dictionary->generateCheckSum();
+  if (!pDictionary.exists()){
+    ZException.setMessage("ZMasterFile::initDictionary",ZS_NULLPTR,Severity_Severe,"Dictionary file <%s> does not exist.",pDictionary.toCChar());
+    return ZS_NULLPTR;
+  }
+  if (Dictionary!=nullptr) {
+    ZException.setMessage("ZMasterFile::initDictionary",ZS_BADDIC,Severity_Severe,
+        "Dictionary file <%s> already exist. Cannot override dictionary.",pDictionary.toCChar());
+    return ZS_BADDIC;
+  }
+  Dictionary = new ZDictionaryFile;
+  if (pKeepFileAsReference) {
+    URIDirectoryPath =pDictionary;
+    wSt=Dictionary->zopen(pDictionary,ZRF_Read_Only);
+    wSt=Dictionary->loadActiveDictionary();
+    DictionaryName = Dictionary->DicName;
+    return wSt;
+  }
+  ZDictionaryFile wDic;
+  wSt=wDic.zopen(pDictionary,ZRF_Read_Only);
+  wSt=wDic.loadActiveDictionary();
+  Dictionary->setDictionary(wDic);
+  Dictionary->setPath( Dictionary->generateFileName(URIContent).toCChar());
+  return Dictionary->save();
 
-    ZHeader.FileType = ZFT_ZSMasterFile;     // setting ZFile_type (Already done in _create routine)
-    if (pLeaveOpen)
-            {
-            _exportMCBAppend(wMCBContent);
-            _Base::setReservedContent(wMCBContent);
-        //    wSt=_Base::updateReservedBlock(_exportMCB());
-            wSt=_Base::_writeFullFileHeader(true);
-            if (wSt!=ZS_SUCCESS)
-                    {
-                    ZException.addToLast(" While creating Master file %s",
-                                             getURIContent().toString());
-                    return  wSt;
-                    }
+  /* create all indexes */
+  long wOutIndexRank;
+  ZIndexFile* wIdxFile;
+  for (long wi=0 ; wi < Dictionary->KeyDic.count();wi++) {
+    Dictionary->KeyDic[wi]->computeKeyUniversalSize();
+    Dictionary->KeyDic[wi]->computeKeyOffsets();
 
-             return  wSt;
-            }
+    wSt = zcreateRawIndex(wIdxFile,
+                          Dictionary->KeyDic[wi]->DicKeyName,
+                          Dictionary->KeyDic[wi]->computeKeyUniversalSize(),
+                          ZSort_Type(Dictionary->KeyDic[wi]->Duplicates),
+                          wOutIndexRank,
+                          false);
+    if (wSt!=ZS_SUCCESS) {
+      return wSt;
+    }
+  }// for
 
-/* only close header & content files : header has been updated */
+}//ZMasterFile::initDictionary
 
-
-    return  zclose(); // updates headers including reserved block
-}//zcreate
-
-/**
- * @brief ZSMasterFile::zcreate Creates the raw content file and its header as a ZRandomFile with a structure capable of creating indexes.
- *  @note if a file of the same name already exists (either content file or header file)
- *        then content and header file will be renamed to  <base file name>.<extension>_bck<nn>
- *        where <nn> is a version number
+/*   metadic :
  *
- * @param[in] pPathHame  a C string (const char*) containing the path of the future ZSMasterFile main content file. Other file names will be deduced from this main name.
- * @param[in] pInitialSize      Initial file space in byte that is allocated at creation time. This space is placed in Free block pool as one block.
- * @param[in] pLeaveOpen   if set to true file is left open after its creation with open mode mask (ZRF_Exclusive | ZRF_All ). If false, file is closed.
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
+ *    if (no change)  reconduct
+ *
+ *    field inserted  or deleted (wherever they are positionned) each record is modified for the whole file
+ *    appended        no change
+ *
+ *
+ *  key  :
+ *
+ *  reconduct all unchanged index/key (skip)
+ *
+ *  modified : suppress index and create new
+ *  appended : create new
+ *  inserted : insert new
+ *  deleted : delete
+ *
+ *
+ *  first - process indexes :
+ *
+ *  second - process content :
+ *
+ *  if no metadic change : rebuild newly created indexes (if any)
+ *
+ *  if metadic change :
+ *  clear all existing indexes
+ *  convert meta file content record per record :
+ *    - delete former record
+ *    - move former record to new record
+ *    - insert new record
+ *
+ *
  */
+std::function<ZStatus (ZRecord*,ZRecord*)> applyDictionaryConvert;
 ZStatus
-ZSMasterFile::zcreate (ZMetaDic *pMetaDic,const char* pPathName, const zsize_type pInitialSize, bool pBackup, bool pLeaveOpen)
-{
-uriString wURI(pPathName);
-//    ZMFURI=pPathName;
-    return (zcreate(pMetaDic,wURI,pInitialSize,pBackup,pLeaveOpen));
-}//zcreate
+ZMasterFile::applyDictionary( const uriString& pURIDictionary,
+                              const uriString& pURIMasterFile,
+                              std::function<ZStatus (ZRecord*,ZRecord*)> pApplyDictionaryConvert,
+                              bool pKeepFileAsReference,
+                              FILE* pOutput) {
+  ZStatus wSt;
 
-#endif // __OLDVERSION__
+  ZMasterFile wMasterFile;
+  wMasterFile.ErrorLog.setAutoPrintOn(ZAIES_Text);
+
+  wMasterFile.ErrorLog.textLog( "Opening master file <%s>",pURIMasterFile.toString());
+
+  wSt=wMasterFile.zopen(pURIMasterFile,ZRF_Exclusive | ZRF_Modify);
+  if (wSt!=ZS_SUCCESS) {
+    wMasterFile.ErrorLog.logZStatus(ZAIES_Fatal,wSt, "Opening master file <%s>",pURIMasterFile.toString());
+    return wSt;
+  }
+
+  if (wMasterFile.Dictionary==nullptr)
+    return wMasterFile.initDictionary(pURIDictionary,pKeepFileAsReference);
+
+  if (!pURIDictionary.exists()){
+    wMasterFile.ErrorLog.errorLog("Dictionary file <%s> does not exist.",pURIDictionary.toCChar());
+    return ZS_NULLPTR;
+  }
+
+  ZDictionaryFile wInputDic;
+
+  wSt=wInputDic.zopen(pURIDictionary,ZRF_Read_Only);
+  if (wSt!=ZS_SUCCESS) {
+    wMasterFile.ErrorLog.logZStatus(ZAIES_Fatal,wSt,
+        "Cannot open input dictionary file <%s>.",
+        pURIDictionary.toCChar());
+/*    ZException.setMessage("ZMasterFile::applyDictionary",wSt,Severity_Severe,
+        "Cannot open input dictionary file <%s>.",
+        pURIDictionary.toCChar());
+*/
+    return wSt;
+  }
+  wSt=wInputDic.loadActiveDictionary();
+  if (wSt!=ZS_SUCCESS) {
+    wMasterFile.ErrorLog.logZStatus(ZAIES_Fatal,wSt,
+        "Cannot load active dictionary from input dictionary file <%s>.",
+        pURIDictionary.toCChar());
+/*    ZException.setMessage("ZMasterFile::applyDictionary",wSt,Severity_Severe,
+        "Cannot load active dictionary from input dictionary file <%s>.",
+        pURIDictionary.toCChar());
+*/
+    wMasterFile.zclose();
+    wInputDic.zclose();
+    return wSt;
+  }// if (wSt!=ZS_SUCCESS)
+
+
+/*
+
+Prepare
+    for each new key dictionary
+        find key dictionary with same name
+          if found : check if keydictionary is the same in new dictionary and in existing dictionary
+                     if yes, tag new key as found - tag former key as found
+                     if not, tag new key as changed - tag former key as found
+          if not found, tag new key as new
+
+Process
+  index processing
+    first pass :
+    for each former key, if not tagged as found, suppress index.
+
+    second pass:
+    for each new key found : create new index
+    for each changed key found : remove index , create new index
+
+  record processing
+
+    third pass:
+    if meta dictionary is same as new meta dictionary : if no new index end processing. if new indexes : rebuild new indexes
+
+    deconnect indexes : no index update.
+
+    clone masterfile.
+
+    for each record :
+        get former record using former record structure (former dictionary)
+        move to new record structure (new dictionary)
+        delete current record.
+        write new record.
+
+
+    rebuild all indexes.
+
+  */
+
+
+  wMasterFile.ErrorLog.textLog("Process indexes.");
+
+  int* wNewKeyTag,*wFormerKeyTag=nullptr;
+#define __TO_BE_DELETED__ 0
+#define __UNCHANGED__ 1
+#define __CHANGED__ 2
+#define __REMOVE__ 3
+#define __CREATE__ 4
+
+
+  wNewKeyTag = zmalloc<int>(wInputDic.KeyDic.count());
+  memset(wNewKeyTag,0,wInputDic.KeyDic.count()*sizeof(int));
+
+  wFormerKeyTag = zmalloc<int>(wMasterFile.Dictionary->KeyDic.count());
+  memset(wFormerKeyTag,__REMOVE__,wMasterFile.Dictionary->KeyDic.count()*sizeof(int));
+
+  int wCreate=0,wUnchanged=0, wChanged=0,wRemove=0;
+
+  /* scroll new dictionary key & compare to existing one */
+
+  wMasterFile.ErrorLog.textLog("First pass : Scroll new dictionary keys and compare to existing.");
+
+  for (long wINew=0; wINew < wInputDic.KeyDic.count(); wINew++) {
+    wNewKeyTag[wINew] = __CREATE__;
+    for (long wi = 0; wi < wMasterFile.Dictionary->KeyDic.count() ; wi ++) {
+      if (wMasterFile.Dictionary->KeyDic[wi]->DicKeyName==wInputDic.KeyDic[wINew]->DicKeyName) {
+        /* check if the same */
+        KeyDic_Pack wNewKDPack, wFormerKDPack;
+        wNewKDPack.set(wInputDic.KeyDic[wINew]);
+        wFormerKDPack.set(wMasterFile.Dictionary->KeyDic[wi]);
+        if (memcmp(&wNewKDPack,&wFormerKDPack,sizeof(KeyDic_Pack))==0){
+          wNewKeyTag[wINew] = wFormerKeyTag[wi] = __UNCHANGED__;
+          wUnchanged ++;
+          break;
+        }
+        wNewKeyTag[wINew] = wFormerKeyTag[wi] = __CHANGED__;
+        break;
+      }// key is found
+    }// for  wi
+    if (wNewKeyTag[wINew] == __CREATE__)
+      wCreate++;
+  } // for wINew
+
+  wMasterFile.ErrorLog.textLog("Second pass.");
+
+  /* check existing indexes to remove */
+
+  wMasterFile.ErrorLog.textLog("Check and remove existing index.");
+  for (long wi = 0; wi < wMasterFile.Dictionary->KeyDic.count() ; wi ++) {
+    if (wFormerKeyTag[wi] == __REMOVE__) {
+       wMasterFile.ErrorLog.textLog("Removing existing index <%s>.",wMasterFile.Dictionary->KeyDic[wi]->DicKeyName.toString());
+       wSt = wMasterFile.zremoveIndex(wi);
+       if (wSt!=ZS_SUCCESS)
+         return wSt;
+       wRemove++;
+       wMasterFile.ErrorLog.textLog("Removed.");
+    }
+
+  }// for
+
+  wMasterFile.ErrorLog.textLog("Create new indexes -  Change indexes.");
+
+  ZIndexFile* wIFile=nullptr;
+
+  for (long wi = 0; wi < wInputDic.KeyDic.count() ; wi ++) {
+
+    switch(wNewKeyTag[wi]) {
+    case __CREATE__:
+
+/*      wSt=wMasterFile.zcreateRawIndex(wIFile,
+          wInputDic.KeyDic[wi]->DicKeyName,
+          wInputDic.KeyDic[wi]->computeKeyUniversalSize(),
+          ZSort_Type (wInputDic.KeyDic[wi]->Duplicates),
+          wi,
+          false);
+*/
+long wIndexRank;
+      wMasterFile.ErrorLog.textLog("Creating index <%s>.",wInputDic.KeyDic[wi]->DicKeyName.toString());
+
+      wSt=wMasterFile._createRawIndexDet(wIndexRank,
+                                        wInputDic.KeyDic[wi]->DicKeyName,
+                                        wInputDic.KeyDic[wi]->computeKeyUniversalSize(),
+                                        ZSort_Type (wInputDic.KeyDic[wi]->Duplicates),
+                                        wMasterFile.ZFCB.AllocatedBlocks,
+                                        wMasterFile.ZFCB.BlockExtentQuota,
+                                        wMasterFile.ZFCB.InitialSize,
+                                        wMasterFile.ZFCB.HighwaterMarking,
+                                        wMasterFile.ZFCB.GrabFreeSpace,
+                                        false,
+                                        &wMasterFile.ErrorLog);
+      if (wSt!=ZS_SUCCESS)
+        return wSt;
+
+      wMasterFile.ErrorLog.textLog("Index created.");
+      wCreate ++;
+      break;
+
+    case __CHANGED__:
+      wMasterFile.ErrorLog.textLog("Changing index <%s>.",wMasterFile.Dictionary->KeyDic[wi]->DicKeyName.toString());
+
+      wSt = wMasterFile.zremoveIndex(wi); /* suppress index */
+      if (wSt!=ZS_SUCCESS)
+        return wSt;
+      wSt = wMasterFile._insertRawIndexDet(wi,
+                                          wInputDic.KeyDic[wi]->DicKeyName,
+                                          wInputDic.KeyDic[wi]->computeKeyUniversalSize(),
+                                          ZSort_Type (wInputDic.KeyDic[wi]->Duplicates),
+                                          wMasterFile.ZFCB.AllocatedBlocks,
+                                          wMasterFile.ZFCB.BlockExtentQuota,
+                                          wMasterFile.ZFCB.InitialSize,
+                                          wMasterFile.ZFCB.HighwaterMarking,
+                                          wMasterFile.ZFCB.GrabFreeSpace,
+                                          false,
+                                          &wMasterFile.ErrorLog);
+      if (wSt!=ZS_SUCCESS)
+        return wSt;
+      wMasterFile.ErrorLog.textLog("Changed.");
+
+      wChanged ++;
+      break;
+    case __UNCHANGED__:
+      wUnchanged++;
+      break;
+    }
+
+    if (wFormerKeyTag[wi] == __REMOVE__) {
+      wMasterFile.ErrorLog.textLog("Removing existing index <%s>.",wMasterFile.Dictionary->KeyDic[wi]->DicKeyName.toString());
+      wSt = wMasterFile.zremoveIndex(wi);
+      if (wSt!=ZS_SUCCESS)
+        return wSt;
+      wRemove++;
+      wMasterFile.ErrorLog.textLog("Removed.");
+    }
+  }// for
+
+  bool  wDictionariesEqual=false;
+  ZDataBuffer wInputDicFlat;
+  ZDataBuffer wFormerDicFlat;
+
+  wInputDic._exportAppendMetaDicFlat(wInputDicFlat);
+  wMasterFile.Dictionary->_exportAppendMetaDicFlat(wFormerDicFlat);
+
+  if (wInputDicFlat.Size==wFormerDicFlat.Size) {
+    if (memcmp(wFormerDicFlat.Data,wInputDicFlat.Data,wInputDicFlat.Size)) {
+      wDictionariesEqual=true;
+      wMasterFile.ErrorLog.textLog("Meta dictionaries are the same.");
+      wMasterFile.ErrorLog.textLog("Indexes\n"
+          "  removed   %d\n"
+          "  created   %d\n"
+          "  changed   %d\n"
+          "  unchanged %d"
+          ,
+          wRemove,wCreate,wChanged,wUnchanged );
+      wMasterFile.ErrorLog.textLog("Meta dictionary remain unchanged.");
+
+      wMasterFile.ErrorLog.textLog("End processing.");
+      return ZS_SUCCESS;
+    }
+  }
+
+  if (pApplyDictionaryConvert==nullptr) {
+    wMasterFile.ErrorLog.textLog("No record conversion routine has been specified. Aborting processing.");
+    wMasterFile.ErrorLog.textLog("Indexes\n"
+                                 "  removed   %d\n"
+                                 "  created   %d\n"
+                                 "  changed   %d\n"
+                                 "  unchanged %d"
+        ,
+        wRemove,wCreate,wChanged,wUnchanged );
+    return ZS_INVPARAMS;
+  }
+
+  ZMasterFile wNewMasterFile;
+  wNewMasterFile.initDictionary (pURIDictionary);
+
+  ZRecord wFormerRecord(&wMasterFile);
+  ZRecord wNewRecord(&wNewMasterFile);
+  int wRecordChanged=0,wRecordProcessed=0;
+  long wRecordRank=0;
+  wSt=wMasterFile.zget(&wFormerRecord,wRecordRank);
+  while (wSt==ZS_SUCCESS) {
+    wSt=pApplyDictionaryConvert(&wNewRecord,&wFormerRecord);
+    if (wSt==ZS_REPLACED) {
+      wRecordChanged++;
+      wRecordProcessed++;
+      wSt=wMasterFile.zget(&wFormerRecord,++wRecordRank);
+    }
+    else if (wSt==ZS_SUCCESS) {
+      wRecordProcessed++;
+    }
+    else {
+      wMasterFile.ErrorLog.logZException();
+      return wSt;
+    }
+  }// while
+  wMasterFile.ErrorLog.textLog("Indexes\n"
+                               "  removed   %d\n"
+                               "  created   %d\n"
+                               "  changed   %d\n"
+                               "  unchanged %d"
+      ,
+      wRemove,wCreate,wChanged,wUnchanged );
+  wMasterFile.ErrorLog.textLog("Meta dictionary has been changed\n"
+      "Record processed %ld\n"
+      ,
+      wRecordChanged );
+  wMasterFile.ErrorLog.textLog("End processing.");
+  return ZS_SUCCESS;
+}//ZMasterFile::applyDictionary
+
 //----------------End zcreate--------------------
 
 
@@ -1855,8 +2066,6 @@ ZMasterFile::zopen  (const uriString pURI, const int pMode)
 ZStatus
 ZMasterFile::zget(ZRecord *pRecord, const zrank_type pZMFRank)
 {
-
-
 ZStatus wSt;
 //    wSt=_Base::zaddWithAddress (pRecord,wAddress);      // record must stay locked until successfull commit for indexes
 
@@ -2091,7 +2300,7 @@ ZMasterFile::_add(ZRecord* pRecord)
 
   if (!isOpen())
   {
-    ZException.setMessage("ZRawMasterFile::zaddRaw",
+    ZException.setMessage("ZMasterFile::_add",
         ZS_FILENOTOPEN,
         Severity_Severe,
         " File <%s> is not open while trying to access it",

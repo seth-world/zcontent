@@ -556,9 +556,11 @@ ZExceptionDLg::createAddrinfo(int pError,const char *pModule, ZStatus pStatus, S
 }
 
 int
-ZExceptionDLg::displayLast(bool pDontShow)
+ZExceptionDLg::displayLast(const utf8VaryingString& pTitle,bool pDontShow)
 {
-  return display("Last exception",ZException.last(),pDontShow);
+  if (pTitle.isEmpty())
+    return display("Last exception",ZException.last(),pDontShow);
+  return display(pTitle,ZException.last(),pDontShow);
 }
 
 int

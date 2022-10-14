@@ -68,7 +68,7 @@ void ZKeyFieldRow::setFromKeyDic(ZIndexField *pField) {
 
   KeyOffset=pField->KeyOffset;
   Hash=pField->Hash;
-  Name = pField->KeyDic->MasterDic->Tab[pField->MDicRank].getName().toCChar();
+  Name = pField->KeyDic->Dictionary->Tab[pField->MDicRank].getName().toCChar();
 
   return;
 }

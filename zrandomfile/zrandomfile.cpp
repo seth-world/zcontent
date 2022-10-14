@@ -700,17 +700,18 @@ ZRandomFile::setBlockExtentQuota (const size_t pBlockExtentQuota)
 #include <cstdio>
 
 ZStatus
-ZRandomFile::_removeFile(const char* pContentPath, ZaiErrors *pErrorLog)
+ZRandomFile::_removeFile(const char* pContentPath,bool pBackup, ZaiErrors *pErrorLog)
 {
 
   ZStatus wSt=zopen(pContentPath,ZRF_All);
   if (wSt!=ZS_SUCCESS)
     return wSt;
-  return _removeFile();
+  return _removeFile(pBackup,pErrorLog);
 }
 
 /**
- * @brief ZRandomFile::_removeFile definitively remove ZRandomFile structure (content and header files).
+ * @brief ZRandomFile::_removeFile if pBackup not set to true definitively remove ZRandomFile structure (content and header files).
+ *                                  if set , files (content and header) are renamed to
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  * @errors :
  *    ZS_INVOP :        file is already open when trying to open it
@@ -723,7 +724,7 @@ ZRandomFile::_removeFile(const char* pContentPath, ZaiErrors *pErrorLog)
  *    ZS_FILEERROR  : cannot physically remove file (either content or header) ZException is loaded with errno and appropriate error explainations.
  */
 ZStatus
-ZRandomFile::_removeFile(ZaiErrors *pErrorLog)
+ZRandomFile::_removeFile(bool pBackup,ZaiErrors *pErrorLog)
 {
   ZStatus wSt;
   /* if not open : must open exclusive to load header data and to insure no user is using it */
@@ -735,36 +736,42 @@ ZRandomFile::_removeFile(ZaiErrors *pErrorLog)
         return wSt;
       }
   zclose();
-  if (remove(URIHeader.toCChar())!=0)
-        {
-        ZException.getErrno(errno,
-                         _GET_FUNCTION_NAME_,
-                         ZS_FILEERROR,
-                         Severity_Severe,
-                         " Cannot remove file <%s>",
-                         URIHeader.toCChar());
+
+  if (pBackup) {
+    wSt=URIHeader.renameBck("bck");
+    if (wSt!=ZS_SUCCESS) {
+      if (pErrorLog!=nullptr)
+        pErrorLog->logZException();
+      return wSt;
+    }
+
+  } else
+      if ((wSt=URIHeader.remove())!=ZS_SUCCESS) {
         if (pErrorLog!=nullptr)
           pErrorLog->logZException();
-        return ZS_FILEERROR;
-        }
+      return wSt;
+  }
 
   if (pErrorLog!=nullptr)
-      pErrorLog->textLog("%s>> removed file <%s>",URIHeader.toCChar());
+      pErrorLog->infoLog("removed file <%s>",URIHeader.toCChar());
 
-    if (remove(URIContent.toCChar())!=0)
-        {
-        ZException.getErrno(errno,
-                         _GET_FUNCTION_NAME_,
-                         ZS_FILEERROR,
-                         Severity_Severe,
-                         " Cannot remove file <%s>",
-                         URIContent.toString());
+
+  if (pBackup) {
+    wSt=URIContent.renameBck("bck");
+    if (wSt!=ZS_SUCCESS) {
+      if (pErrorLog!=nullptr)
+        pErrorLog->logZException();
+      return wSt;
+    }
+
+  } else
+      if ((wSt=URIContent.remove())!=ZS_SUCCESS) {
         if (pErrorLog!=nullptr)
-          pErrorLog->logZException();
-        return ZS_FILEERROR;
-        }
+            pErrorLog->logZException();
+        return wSt;
+      }
   if (pErrorLog!=nullptr)
-          pErrorLog->textLog("%s>> removed file <%s>",URIContent.toCChar());
+          pErrorLog->infoLog("removed file <%s>",URIContent.toCChar());
   return ZS_SUCCESS;
 } //_removeFile
 

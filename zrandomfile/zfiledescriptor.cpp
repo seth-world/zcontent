@@ -290,6 +290,34 @@ void ZFileDescriptor::clearPartial (void)
   Pid= getpid();  // get current pid for ZFileDescriptor
 }
 
+bool
+testOpenModeValue (zmode_type pMode) {
+  bool wValidMode=false;
+  if (pMode & ZRF_Exclusive)
+    wValidMode = true;
+  if (pMode & ZRF_Delete_Only)
+    wValidMode = true;
+  if (pMode & ZRF_Write_Only)
+    wValidMode = true;
+  if (pMode & ZRF_Read_Only)
+    wValidMode = true;
+  return wValidMode;
+}
+
+
+ZStatus
+ZFileDescriptor::_changeOpenMode (zmode_type pNewMode) {
+  if (!_isOpen)
+    return ZS_INVOP;
+  if (!testOpenModeValue(pNewMode)) {
+    return ZS_INVVALUE;
+  }
+
+  /* TODO test if new mode is compatible with file situation (lock etc.) */
+
+  Mode=pNewMode;
+  return ZS_SUCCESS;
+}
 
 ZStatus
 ZFileDescriptor::_close()

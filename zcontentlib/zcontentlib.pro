@@ -222,6 +222,7 @@ HEADERS += \
     ../zcontentcommon/zresource.h \
     ../zcontentcommon/zresult.h \
     ../zcontentcommon/zresult.h \
+    ../zindexedfile/zdataconversion.h \
     ../zindexedfile/zdatatype.h \
     ../zindexedfile/zdictionaryfile.h \
     ../zindexedfile/zfielddescription.h \
@@ -343,6 +344,7 @@ SOURCES += \
     ../zcontentcommon/zoperation.cpp \
     ../zcontentcommon/zresource.cpp \
     ../zcontentcommon/zresult.cpp \
+    ../zindexedfile/zdataconversion.cpp \
     ../zindexedfile/zdatatype.cpp \
     ../zindexedfile/zdictionaryfile.cpp \
     ../zindexedfile/zfielddescription.cpp \

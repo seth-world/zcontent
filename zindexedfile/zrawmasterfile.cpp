@@ -19,6 +19,7 @@
 #include <zxml/zxmlprimitives.h>
 
 #include <zindexedfile/zmfdictionary.h>  // for addDictionary()
+#include <stdio.h>
 
 using namespace  zbs;
 
@@ -716,10 +717,10 @@ ZRawMasterFile::zcreateRawIndex ( ZIndexFile *&pIndexObjectOut,
 //  ZRawIndexFile *wIndexObject=nullptr;
   long w1=0,w2=0;
 
+
   pIndexObjectOut=nullptr;
   pOutIndexRank=-1;
-  if  (getMode()!=(ZRF_Exclusive | ZRF_All))
-      {
+  if  (getOpenMode()!=(ZRF_Exclusive | ZRF_All)) {
       ZException.setMessage("ZRawMasterFile::zcreateRawIndex",
           ZS_MODEINVALID,
           Severity_Error,
@@ -727,6 +728,7 @@ ZRawMasterFile::zcreateRawIndex ( ZIndexFile *&pIndexObjectOut,
           pIndexName.toCChar(),
           URIContent.toCChar(),
           decode_ZRFMode(getMode()));
+      ErrorLog.logZException();
       return ZS_MODEINVALID;
       }
 
@@ -786,7 +788,7 @@ ZRawMasterFile::zcreateRawIndex ( ZIndexFile *&pIndexObjectOut,
   //
   // Nota Bene : there is no History and Journaling processing for Index Files
   //
-  wSt =  pIndexObjectOut->zcreateIndex(*IndexTable.last(),      // pointer to index control block because ZIndexFile stores pointer to Father's ICB
+  wSt =  pIndexObjectOut->zcreateIndexFile(*IndexTable.last(),      // pointer to index control block because ZIndexFile stores pointer to Father's ICB
       wIndexURI,
       _Base::getAllocatedBlocks(),
       _Base::getBlockExtentQuota(),
@@ -840,6 +842,151 @@ zcreateRawIndexError:
 
 }//zcreateRawIndex
 
+
+ZStatus
+ZRawMasterFile::zinsertRawIndex ( long pIndexRank,
+                                  ZIndexFile *&pIndexObjectOut,
+                                  const utf8String &pIndexName,
+                                  uint32_t pKeyUniversalSize,
+                                  ZSort_Type pDuplicates,
+                                  long & pOutIndexRank,
+                                  bool pBackup)
+{
+  ZStatus wSt;
+  //  bool wasOpen=false;
+  long wi;
+  zsize_type wIndexAllocatedSize=0;
+  uriString wIndexURI;
+  uriString wIndexFileDirectoryPath;
+  //  ZRawIndexFile *wIndexObject=nullptr;
+  long w1=0,w2=0;
+
+
+
+  pIndexObjectOut=nullptr;
+  pOutIndexRank=-1;
+  if  (getOpenMode()!=(ZRF_Exclusive | ZRF_All)) {
+    ZException.setMessage("ZRawMasterFile::zcreateRawIndex",
+        ZS_MODEINVALID,
+        Severity_Error,
+        " Trying to create index <%s> while file <%s> has invalid open mode  <%s> while required <ZRF_Exclusive|ZRF_All>.\n",
+        pIndexName.toCChar(),
+        URIContent.toCChar(),
+        decode_ZRFMode(getMode()));
+    ErrorLog.logZException();
+    return ZS_MODEINVALID;
+  }
+
+  // check index name ambiguity
+
+  if ((wi=IndexTable.searchCaseIndexByName(pIndexName.toCChar()))>-1)
+  {
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        ZS_INVNAME,
+        Severity_Error,
+        " Ambiguous index name <%s>. Index name already exist at Index rank <%ld>. Please use zremoveIndex first.\n",
+        pIndexName.toCChar(),
+        wi);
+    wSt= ZS_INVNAME;
+    goto zcreateRawIndexEnd ;
+  }
+
+
+  // instantiation of the ZIndexFile new structure :
+  // it gives a pointer to the actual ICB stored in Index vector
+  //
+  pIndexObjectOut = new ZIndexFile(this,pKeyUniversalSize,pIndexName,pDuplicates);
+
+  pOutIndexRank=IndexTable.push(pIndexObjectOut); // since here any creation error will induce a desctruction of IndexTableObjects.lastIdx()
+
+  // ---------compute index file name-------------------
+
+  // Define IndexFileDirectoryPath
+  //     if mentionned then take it
+  //     if not then take the directory from Master File URI
+
+  if (IndexFilePath.isEmpty())
+  {
+    //        utfdescString wDInfo;
+    wIndexFileDirectoryPath=getURIContent().getDirectoryPath();
+  }
+  else
+  {
+    wIndexFileDirectoryPath=IndexFilePath;
+  }
+
+  wSt=generateIndexURI( wIndexURI,
+      getURIContent(),
+      wIndexFileDirectoryPath,
+      IndexTable.lastIdx(),
+      pIndexName);
+  if (wSt!=ZS_SUCCESS)
+  {return  wSt;} // Beware return  is multiple instructions in debug mode
+
+  // compute the allocated size
+  w1 = wIndexAllocatedSize =  _Base::getAllocatedBlocks();
+  w2 = IndexTable[pOutIndexRank]->IndexRecordSize();
+
+  if (_Base::getBlockTargetSize()>0)
+    if (_Base::getAllocatedBlocks()>0)
+      wIndexAllocatedSize =  _Base::getAllocatedBlocks() * IndexTable[pOutIndexRank]->IndexRecordSize();
+  //
+  // Nota Bene : there is no History and Journaling processing for Index Files
+  //
+  wSt =  pIndexObjectOut->zcreateIndexFile(*IndexTable.last(),      // pointer to index control block because ZIndexFile stores pointer to Father's ICB
+      wIndexURI,
+      _Base::getAllocatedBlocks(),
+      _Base::getBlockExtentQuota(),
+      wIndexAllocatedSize,
+      _Base::getHighwaterMarking(),
+      //                                      _Base::getGrabFreeSpace(),
+      false,        // grabfreespace is set to false
+      pBackup,
+      true          // leave it open
+      );
+  if (wSt!=ZS_SUCCESS)
+    goto zcreateRawIndexError;
+
+  //    IndexTable.last()->generateCheckSum();
+
+  // update MCB to Reserved block in RandomFile header (_Base)
+  // then write updated Master Control Block to Master Header
+  //
+  /*  wSt= pIndexObjectOut->openIndexFile(wIndexURI,wIndexRank, (ZRF_Exclusive | ZRF_All));
+  if (wSt!=ZS_SUCCESS)
+    goto zcreateRawIndexError;
+*/
+  wSt=pIndexObjectOut->zrebuildRawIndex(ZMFStatistics ,stderr);
+  if (wSt!=ZS_SUCCESS)
+    goto zcreateRawIndexError;
+
+
+zcreateRawIndexEnd:
+  IndexCount = (uint32_t)IndexTable.count();
+  /*  zclose();  // close everything and therefore update MCB in file
+  if (wasOpen)
+    {
+    return  zopen(wMode);
+    }
+*/
+  return  wSt;
+zcreateRawIndexError:
+
+
+  if (pIndexObjectOut)
+  {
+    pIndexObjectOut->zclose();
+    IndexTable.pop() ; // destroy the ZIndexFile object
+    popIndex(); // destroy created ICB
+  }
+  pIndexObjectOut=nullptr;
+  ZException.addToLast(" While creating new raw index <%s> for raw master file <%s>",
+      pIndexName.toCChar(),
+      URIContent.toCChar());
+  goto zcreateRawIndexEnd;
+
+}//zcreateRawIndex
+#ifdef __COMMENT__
 ZStatus
 ZRawMasterFile::zcreateRawIndexDetailed (const utf8String &pIndexName, /*-----ICB------*/
                                           uint32_t pKeyUniversalSize,
@@ -911,7 +1058,7 @@ ZRawMasterFile::zcreateRawIndexDetailed (const utf8String &pIndexName, /*-----IC
   return  wSt;
 
 } //zcreateRawIndexDetailed
-
+#endif // __COMMENT__
 
 #ifdef __COMMENT__
 ZStatus
@@ -1084,15 +1231,17 @@ void ZRawMasterFile::_testZReserved()
 }
 
 ZStatus
-ZRawMasterFile::_createRawIndexDet (const utf8String &pIndexName,/*-----ICB------*/
+ZRawMasterFile::_createRawIndexDet (long &pOutRank,
+                                    const utf8String &pIndexName,
                                     uint32_t pKeyUniversalSize,
                                     ZSort_Type pDuplicates,
-                                    long pAllocatedBlocks,      /* ---FCB (for index ZRandomFile)---- */
+                                    long pAllocatedBlocks,      /* ---FCB parameters (for index ZRandomFile)---- */
                                     long pBlockExtentQuota,
                                     zsize_type pInitialSize,
                                     bool pHighwaterMarking,
                                     bool pGrabFreeSpace,
-                                    bool pReplace)
+                                    bool pReplace,
+                                    ZaiErrors* pErrorLog)
 {
   ZStatus wSt;
 //  bool wIsOpen = isOpen();
@@ -1102,7 +1251,6 @@ ZRawMasterFile::_createRawIndexDet (const utf8String &pIndexName,/*-----ICB-----
   uriString wIndexFileDirectoryPath;
   ZIndexFile *wIndexObject=nullptr;
   long w1=0,w2=0;
-  long wIndexRank;
 
   if (!isOpen())
     {
@@ -1111,6 +1259,7 @@ ZRawMasterFile::_createRawIndexDet (const utf8String &pIndexName,/*-----ICB-----
         Severity_Error,
         " ZRawMasterFile <%s> must be open.",
         getURIContent().toCChar());
+    pErrorLog->logZException();
     return  ZS_MODEINVALID;
     }
 
@@ -1121,6 +1270,7 @@ ZRawMasterFile::_createRawIndexDet (const utf8String &pIndexName,/*-----ICB-----
           Severity_Error,
           " ZRawMasterFile <%s> must be open with mode <ZRF_Exclusive|ZRF_All>.",
           getURIContent().toCChar());
+      pErrorLog->logZException();
       return  ZS_MODEINVALID;
       }
 
@@ -1134,25 +1284,26 @@ ZRawMasterFile::_createRawIndexDet (const utf8String &pIndexName,/*-----ICB-----
           " Ambiguous index name <%s>. Index name already exist at Index rank <%ld>. Please use zremoveIndex first.\n",
           pIndexName.toCChar(),
           wi);
+      pErrorLog->logZException();
       wSt= ZS_INVNAME;
       goto createRawIndexDet1End ;
     }
-
 
   // instantiation of the ZIndexFile new structure :
   // it gives a pointer to the actual ICB stored in Index vector
   //
   wIndexObject = new ZIndexFile(this,pKeyUniversalSize,pIndexName,pDuplicates);
 
-  wIndexRank=IndexTable.push(wIndexObject); // since here any creation error will induce a desctruction of IndexTableObjects.lastIdx()
+  pOutRank=IndexTable.push(wIndexObject); // since here any creation error will induce a desctruction of IndexTableObjects.lastIdx()
 
-  if (wIndexRank < 0)
+  if (pOutRank < 0)
     {
       ZException.setMessage(_GET_FUNCTION_NAME_,
           ZS_ERROR,
           Severity_Error,
           "Index name <%s> : Cannot push index object to index table.\n",
           pIndexName.toCChar());
+      pErrorLog->logZException();
       delete wIndexObject;
       return ZS_ERROR;
     }
@@ -1176,7 +1327,7 @@ ZRawMasterFile::_createRawIndexDet (const utf8String &pIndexName,/*-----ICB-----
   wSt=generateIndexURI( getURIContent(),
                         wIndexFileDirectoryPath,
                         wIndexURI,
-                        wIndexRank,
+                        pOutRank,
                         pIndexName);
   if (wSt!=ZS_SUCCESS)
   {goto createRawIndexDet1End;}
@@ -1187,11 +1338,11 @@ ZRawMasterFile::_createRawIndexDet (const utf8String &pIndexName,/*-----ICB-----
 
   if (_Base::getBlockTargetSize()>0)
     if (_Base::getAllocatedBlocks()>0)
-      wIndexAllocatedSize =  _Base::getAllocatedBlocks() * IndexTable[wIndexRank]->IndexRecordSize();
+      wIndexAllocatedSize =  _Base::getAllocatedBlocks() * IndexTable[pOutRank]->IndexRecordSize();
   //
   // Nota Bene : there is no History and Journaling processing for Index Files
   //
-  wSt =  wIndexObject->zcreateIndex(*IndexTable[wIndexRank],      // pointer to index control block because ZIndexFile stores pointer to Father's ICB
+  wSt =  wIndexObject->zcreateIndexFile(*IndexTable[pOutRank],      // pointer to index control block because ZIndexFile stores pointer to Father's ICB
                                     wIndexURI,
                                     pAllocatedBlocks,
                                     pBlockExtentQuota,
@@ -1209,28 +1360,187 @@ ZRawMasterFile::_createRawIndexDet (const utf8String &pIndexName,/*-----ICB-----
   // update MCB to Reserved block in RandomFile header (_Base)
   // then write updated Master Control Block to Master Header
   //
-  wSt= wIndexObject->openIndexFile(wIndexURI,wIndexRank,(ZRF_Exclusive | ZRF_All));
+  wSt= wIndexObject->openIndexFile(wIndexURI,pOutRank,(ZRF_Exclusive | ZRF_All));
   if (wSt!=ZS_SUCCESS)
     goto createRawIndexDet1Error;
-
+/*
   wSt=wIndexObject->zrebuildRawIndex(ZMFStatistics ,stderr);
   if (wSt!=ZS_SUCCESS)
     goto createRawIndexDet1Error;
-
+*/
 createRawIndexDet1End:
   return  wSt;
 
 createRawIndexDet1Error:
-  IndexTable[wIndexRank]->zclose();
-  IndexTable[wIndexRank]->_removeFile();
-  IndexTable.erase(wIndexRank) ; // destroy the ZIndexFile object
+  IndexTable[pOutRank]->zclose();
+  IndexTable[pOutRank]->_removeFile(true,&ErrorLog);
+  IndexTable.erase(pOutRank) ; // destroy the ZIndexFile object
   ZException.addToLast(" While creating new raw index <%s> for raw master file <%s>. Index has not been created.",
                         pIndexName.toCChar(),
                         URIContent.toCChar());
+  pErrorLog->logZException();
+  pOutRank=-1;
   goto createRawIndexDet1End;
 }//_createRawIndexDetailed
 
-#include <stdio.h>
+
+ZStatus
+ZRawMasterFile::_insertRawIndexDet (long pInputIndexRank,
+                                    const utf8String &pIndexName,/*-----ICB------*/
+                                    uint32_t pKeyUniversalSize,
+                                    ZSort_Type pDuplicates,
+                                    long pAllocatedBlocks,      /* ---FCB (for index ZRandomFile)---- */
+                                    long pBlockExtentQuota,
+                                    zsize_type pInitialSize,
+                                    bool pHighwaterMarking,
+                                    bool pGrabFreeSpace,
+                                    bool pReplace,
+                                    ZaiErrors* pErrorLog)
+{
+  ZStatus wSt;
+  //  bool wIsOpen = isOpen();
+  long wi;
+  zsize_type wIndexAllocatedSize=0;
+  uriString wIndexURI;
+  uriString wIndexFileDirectoryPath;
+  ZIndexFile *wIndexObject=nullptr;
+  long w1=0,w2=0;
+
+  if (!isOpen())
+  {
+    ZException.setMessage (_GET_FUNCTION_NAME_,
+        ZS_MODEINVALID,
+        Severity_Error,
+        " ZRawMasterFile <%s> must be open.",
+        getURIContent().toCChar());
+    pErrorLog->logZException();
+    return  ZS_MODEINVALID;
+  }
+
+  if (!(getOpenMode()&(ZRF_Exclusive|ZRF_All)))
+  {
+    ZException.setMessage (_GET_FUNCTION_NAME_,
+        ZS_MODEINVALID,
+        Severity_Error,
+        " ZRawMasterFile <%s> must be open with mode <ZRF_Exclusive|ZRF_All>.",
+        getURIContent().toCChar());
+
+    pErrorLog->logZException();
+    return  ZS_MODEINVALID;
+  }
+
+  // check index name ambiguity
+
+  if ((wi=IndexTable.searchCaseIndexByName(pIndexName.toCChar()))>-1)
+  {
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        ZS_INVNAME,
+        Severity_Error,
+        " Ambiguous index name <%s>. Index name already exist at Index rank <%ld>. Please use zremoveIndex first.\n",
+        pIndexName.toCChar(),
+        wi);
+    pErrorLog->logZException();
+    wSt= ZS_INVNAME;
+    goto insertRawIndexDet1Error ;
+  }
+
+
+  // instantiation of the ZIndexFile new structure :
+
+  // it gives a pointer to the actual ICB stored in Index vector
+  //
+  wIndexObject = new ZIndexFile(this,pKeyUniversalSize,pIndexName,pDuplicates);
+
+  if(IndexTable.insert(wIndexObject,pInputIndexRank)<0) {// since here any creation error will induce a desctruction of IndexTableObjects.lastIdx()
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        ZS_ERROR,
+        Severity_Error,
+        "Index name <%s> : Cannot insert index object to index table at rank %ld.\n",
+        pIndexName.toCChar(),
+        pInputIndexRank);
+    pErrorLog->logZException();
+    delete wIndexObject;
+    return ZS_ERROR;
+  }
+
+  // ---------compute index file name-------------------
+
+  // Define IndexFileDirectoryPath
+  //     if mentionned then take it
+  //     if not then take the directory from Master File URI
+
+  if (IndexFilePath.isEmpty())
+  {
+    //        utfdescString wDInfo;
+    wIndexFileDirectoryPath=getURIContent().getDirectoryPath().toCChar();
+  }
+  else
+  {
+    wIndexFileDirectoryPath=IndexFilePath;
+  }
+
+  wSt=generateIndexURI( getURIContent(),
+                        wIndexFileDirectoryPath,
+                        wIndexURI,
+                        pInputIndexRank,
+                        pIndexName);
+  if (wSt!=ZS_SUCCESS)
+  {goto insertRawIndexDet1Error;}
+
+  // compute the allocated size
+  w1 = wIndexAllocatedSize =  _Base::getAllocatedBlocks();
+  w2 = IndexTable.last()->IndexRecordSize();
+
+  if (_Base::getBlockTargetSize()>0)
+    if (_Base::getAllocatedBlocks()>0)
+      wIndexAllocatedSize =  _Base::getAllocatedBlocks() * IndexTable[pInputIndexRank]->IndexRecordSize();
+  //
+  // Nota Bene : there is no History and Journaling processing for Index Files
+  //
+
+  /* effective creation of ZRandomFile containing the index- enrich wIndexObject with file's parameters */
+
+  wSt =  wIndexObject->zcreateIndexFile(*IndexTable[pInputIndexRank], // ZIndexFile inherits from ZRawIndexFile then from ZIndexControlBlock )
+                                      wIndexURI,
+                                      pAllocatedBlocks,
+                                      pBlockExtentQuota,
+                                      pInitialSize,
+                                      pHighwaterMarking,
+                                      pGrabFreeSpace,        // grabfreespace is set to false
+                                      pReplace,
+                                      false          // do not leave it open
+                                      );
+  if (wSt!=ZS_SUCCESS)
+    goto insertRawIndexDet1Error;
+
+  //    IndexTable.last()->generateCheckSum();
+
+  // update MCB to Reserved block in RandomFile header (_Base)
+  // then write updated Master Control Block to Master Header
+  //
+  wSt= wIndexObject->openIndexFile(wIndexURI,pInputIndexRank,(ZRF_Exclusive | ZRF_All));
+  if (wSt!=ZS_SUCCESS)
+    goto insertRawIndexDet1End;
+/*
+  wSt=wIndexObject->zrebuildRawIndex(ZMFStatistics ,stderr);
+  if (wSt!=ZS_SUCCESS)
+    goto insertRawIndexDet1Error;
+*/
+insertRawIndexDet1End:
+  return  wSt;
+
+insertRawIndexDet1Error:
+  IndexTable[pInputIndexRank]->zclose();
+  IndexTable[pInputIndexRank]->_removeFile(true,&ErrorLog);
+  IndexTable.erase(pInputIndexRank) ; // destroy the ZIndexFile object
+  ZException.addToLast(" While creating new raw index <%s> for raw master file <%s>. Index has not been created.",
+      pIndexName.toCChar(),
+      URIContent.toCChar());
+  goto insertRawIndexDet1End;
+}//_insertRawIndexDetailed
+
+
+
 /**
  * @brief ZRawMasterFile::zremoveIndex Destroys an Index definition and its files' content on storage
  *
@@ -1243,7 +1553,7 @@ createRawIndexDet1Error:
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZRawMasterFile::zremoveIndex (const long pIndexRank,ZaiErrors* pErrorLog)
+ZRawMasterFile::zremoveIndex (const long pIndexRank,bool pBackup,ZaiErrors* pErrorLog)
 {
 
 ZStatus wSt;
@@ -1283,7 +1593,9 @@ int wRet;
     if (wSt!=ZS_SUCCESS)
                 { return  wSt;} // Beware return  is multiple instructions in debug mode
 
-    wSt=IndexTable[pIndexRank]->_removeFile();  // remove the files
+
+
+    wSt=IndexTable[pIndexRank]->_removeFile(&ErrorLog);  // remove the files
     if (wSt!=ZS_SUCCESS)
                 { return  wSt;} // Beware return  is multiple instructions in debug mode
 
@@ -1292,9 +1604,12 @@ int wRet;
     IndexTable.erase(pIndexRank);
     IndexCount= IndexTable.size();
 
+    if ((wSt=shiftIndexNameDown(pIndexRank,pErrorLog))!=ZS_SUCCESS) {
+      return wSt;
+    }
+/*
     for (long wi = pIndexRank;wi<IndexTable.size();wi++)
         {
-
         FormerIndexContent = IndexTable[wi]->URIContent;
         FormerIndexHeader = IndexTable[wi]->URIHeader;
 
@@ -1313,7 +1628,7 @@ int wRet;
         IndexTable[wi]->URIContent = NewIndexContent;
         IndexTable[wi]->URIHeader = NewIndexHeader;
 
-        wRet=rename(FormerIndexContent.toCString_Strait(),NewIndexContent.toCString_Strait());
+        wRet=rename(FormerIndexContent.toCChar(),NewIndexContent.toCChar());
         if (wRet)
         {
             ZException.getErrno(errno,
@@ -1328,14 +1643,11 @@ int wRet;
         }
         else
         {
-            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                    ZS_SUCCESS,
-                                    Severity_Information,
-                                    "Index content file <%s> has been renamed to <%s>",
-                                    FormerIndexContent.toString(),
-                                    NewIndexContent.toString());
-            if (pErrorLog)
-              pErrorLog->logZException();
+            if (pErrorLog) {
+              pErrorLog->infoLog("Index content file <%s> has been renamed to <%s>",
+                  FormerIndexContent.toString(),
+                  NewIndexContent.toString());
+            }
         }
 
         wRet=rename(FormerIndexHeader.toCChar(),NewIndexHeader.toCChar());
@@ -1353,22 +1665,175 @@ int wRet;
           }
         else
         {
-            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                    ZS_SUCCESS,
-                                    Severity_Information,
-                                    "Index content file <%s> has been renamed to <%s>",
-                                    FormerIndexHeader.toString(),
-                                    NewIndexHeader.toString());
-            if (pErrorLog)
-              pErrorLog->logZException();
+            if (pErrorLog) {
+              pErrorLog->infoLog("Index header file <%s> has been renamed to <%s>",
+                  FormerIndexHeader.toString(),
+                  NewIndexHeader.toString());
+            }
         }
         IndexTable[wi]->openIndexFile( NewIndexContent,wi,wMode);
         }// for
-
+*/
     ZDataBuffer wMCBContent;
     return   _Base::updateReservedBlock(_exportMCBAppend(wMCBContent),true);
 }//zremoveIndex
 
+ZStatus
+ZRawMasterFile::shiftIndexNameDown(long pStartRank,ZaiErrors* pErrorLog) {
+  ZStatus wSt=ZS_SUCCESS;
+  uriString FormerIndexContent;
+  uriString FormerIndexHeader;
+  uriString NewIndexContent;
+  uriString NewIndexHeader;
+  zmode_type wMode = getOpenMode();
+
+
+  for (long wi = pStartRank;wi<IndexTable.size();wi++)
+  {
+    FormerIndexContent = IndexTable[wi]->URIContent;
+    FormerIndexHeader = IndexTable[wi]->URIHeader;
+
+    IndexTable[wi]->zclose();// close index files before renaming its files
+
+    wSt=generateIndexURI(getURIContent(),IndexFilePath,NewIndexContent,wi,IndexTable[wi]->IndexName);
+    if (wSt!=ZS_SUCCESS)
+    {
+      return  wSt;// Beware return  is multiple instructions in debug mode
+    }
+    wSt=generateURIHeader(NewIndexContent,NewIndexHeader);
+    if (wSt!=ZS_SUCCESS)
+    {
+      return  wSt;// Beware return  is multiple instructions in debug mode
+    }
+    IndexTable[wi]->URIContent = NewIndexContent;
+    IndexTable[wi]->URIHeader = NewIndexHeader;
+
+    int wRet=rename(FormerIndexContent.toCChar(),NewIndexContent.toCChar());
+    if (wRet)
+    {
+      ZException.getErrno(errno,
+          _GET_FUNCTION_NAME_,
+          ZS_FILEERROR,
+          Severity_Severe,
+          "Cannot rename index content file <%s> to <%s>",
+          FormerIndexContent.toString(),
+          NewIndexContent.toString());
+      if (pErrorLog)
+        pErrorLog->logZException();
+    }
+    else
+    {
+      if (pErrorLog) {
+        pErrorLog->infoLog("Index content file <%s> has been renamed to <%s>",
+            FormerIndexContent.toString(),
+            NewIndexContent.toString());
+      }
+    }
+
+    wRet=rename(FormerIndexHeader.toCChar(),NewIndexHeader.toCChar());
+    if (wRet)
+    {
+      ZException.getErrno(errno,
+          _GET_FUNCTION_NAME_,
+          ZS_FILEERROR,
+          Severity_Severe,
+          "Cannot rename index header file <%s> to <%s>",
+          FormerIndexHeader.toString(),
+          NewIndexHeader.toString());
+      if (pErrorLog)
+        pErrorLog->logZException();
+    }
+    else
+    {
+      if (pErrorLog) {
+        pErrorLog->infoLog("Index header file <%s> has been renamed to <%s>",
+            FormerIndexHeader.toString(),
+            NewIndexHeader.toString());
+      }
+    }
+    IndexTable[wi]->openIndexFile( NewIndexContent,wi,wMode);
+  }// for
+  return ZS_SUCCESS;
+}
+
+/* must be launched before new index insertion */
+ZStatus
+ZRawMasterFile::shiftIndexNameUp(long pStartRank,ZaiErrors* pErrorLog) {
+  ZStatus wSt=ZS_SUCCESS;
+  uriString FormerIndexContent;
+  uriString FormerIndexHeader;
+  uriString NewIndexContent;
+  uriString NewIndexHeader;
+  zmode_type wMode = getOpenMode();
+
+
+  for (long wi = pStartRank; wi<IndexTable.size() ;wi++)
+  {
+    FormerIndexContent = IndexTable[wi]->URIContent;
+    FormerIndexHeader = IndexTable[wi]->URIHeader;
+
+    IndexTable[wi]->zclose();// close index files before renaming its files
+
+    wSt=generateIndexURI(getURIContent(),IndexFilePath,NewIndexContent,wi+1,IndexTable[wi]->IndexName);
+    if (wSt!=ZS_SUCCESS)
+    {
+      return  wSt;// Beware return  is multiple instructions in debug mode
+    }
+    wSt=generateURIHeader(NewIndexContent,NewIndexHeader);
+    if (wSt!=ZS_SUCCESS)
+    {
+      return  wSt;// Beware return  is multiple instructions in debug mode
+    }
+    IndexTable[wi]->URIContent = NewIndexContent;
+    IndexTable[wi]->URIHeader = NewIndexHeader;
+
+    int wRet=rename(FormerIndexContent.toCChar(),NewIndexContent.toCChar());
+    if (wRet)
+    {
+      ZException.getErrno(errno,
+          _GET_FUNCTION_NAME_,
+          ZS_FILEERROR,
+          Severity_Severe,
+          "Cannot rename index content file <%s> to <%s>",
+          FormerIndexContent.toString(),
+          NewIndexContent.toString());
+      if (pErrorLog)
+        pErrorLog->logZException();
+    }
+    else
+    {
+      if (pErrorLog) {
+        pErrorLog->infoLog("Index content file <%s> has been renamed to <%s>",
+            FormerIndexContent.toString(),
+            NewIndexContent.toString());
+      }
+    }
+
+    wRet=rename(FormerIndexHeader.toCChar(),NewIndexHeader.toCChar());
+    if (wRet)
+    {
+      ZException.getErrno(errno,
+          _GET_FUNCTION_NAME_,
+          ZS_FILEERROR,
+          Severity_Severe,
+          "Cannot rename index header file <%s> to <%s>",
+          FormerIndexHeader.toString(),
+          NewIndexHeader.toString());
+      if (pErrorLog)
+        pErrorLog->logZException();
+    }
+    else
+    {
+      if (pErrorLog) {
+        pErrorLog->infoLog("Index header file <%s> has been renamed to <%s>",
+            FormerIndexHeader.toString(),
+            NewIndexHeader.toString());
+      }
+    }
+    IndexTable[wi]->openIndexFile( NewIndexContent,wi,wMode);
+  }// for
+  return ZS_SUCCESS;
+}
 //---------------------------------Utilities-----------------------------------------------------
 
 /**  * @addtogroup ZMFUtilities

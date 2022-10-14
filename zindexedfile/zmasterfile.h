@@ -1,5 +1,20 @@
 #ifndef ZMASTERFILE_H
 #define ZMASTERFILE_H
+/**
+    Dictionary is externalized
+
+
+  master file creation :
+
+  create dictionary file using content utilities
+
+  create Masterfile as a Raw master file
+
+  apply dictionary to master file -> will create all indexes.
+
+*/
+
+
 #include <zindexedfile/zmfconfig.h>
 #include <cstdarg>
 #include <zindexedfile/zmf_limits.h>
@@ -177,8 +192,29 @@ typedef ZRawMasterFile _Base ;
 
     ZRawIndexFile* zgetIndexFile(const zrank_type pIndexRank) {return IndexTable[pIndexRank];}
 
-
-    ZStatus zcreateMasterFile(uriString *pDictionary,
+ /**
+ * @brief ZSMasterFile::zcreateMasterFile  ZSMasterFile creation with a full definition with a file path that will name main content file.
+ * Other file names will be deduced from this name.
+ * @note At this stage, no indexes are created for ZSMasterFile.
+ *
+ * Main file content and file header are created with appropriate parameters as given in parameters.
+ * ZSMasterFile infradata structure is created within header file.
+ *
+ * @param[in] pURI  uriString containing the path of the future ZSMasterFile main content file.
+ *          Other file names will be deduced from this main name.
+ * @param[in] pAllocatedBlocks  number of initial elements in ZBAT pool and other pools(pInitialAlloc) see: @ref ZArrayParameters
+ * @param[in] pBlockExtentQuota extension quota for pools (pReallocQuota) see: @ref ZArrayParameters
+ * @param[in] pBlockTargetSize  approximation of best record size. see: @ref ZRFBlockTargetSize
+ * @param[in] pInitialSize      Initial file space in byte that is allocated at creation time. This space is placed in Free block pool as one block.
+ * @param[in] pHistory          RFFU History option true : on ; false : off
+ * @param[in] pAutocommit       RFFU Autocommit option true : on ; false : off
+ * @param[in] pJournaling       RFFU Journaling option true : on ; false : off
+ * @param[in] pHighwaterMarking HighWaterMarking option true : on ; false : off see: @ref ZRFHighWaterMarking
+ * @param[in] pGrabFreeSpace    GrabFreespace option true : on ; false : off see: @ref ZRFGrabFreeSpace
+ * @param[in] pLeaveOpen   if set to true file is left open after its creation with open mode mask (ZRF_Exclusive | ZRF_All ). If false, file is closed.
+ * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
+ */
+    ZStatus zcreateMasterFile(
                     const uriString pURI,
                     long pAllocatedBlocks,
                     long pBlockExtentQuota,
@@ -190,13 +226,34 @@ typedef ZRawMasterFile _Base ;
                     bool pBackup=false,
                     bool pLeaveOpen=false);
 
-    ZStatus zcreateMasterFile ( uriString *pDictionary,
+    ZStatus zcreateMasterFile (
                       const uriString pURI,
                       const zsize_type pInitialSize,
                       bool pBackup=false,
                       bool pLeaveOpen=false);
 
  //   ZStatus zcreate (ZMetaDic *pMetaDic,const char* pPathName, const zsize_type pInitialSize, bool pBackup=false, bool pLeaveOpen=false);
+
+    /**
+     * @brief initDictionary  Just after Master file raw creation,
+     *                        uses pDictionary to use as master dictionary and create all indexes.
+     * @param pDictionary           A well formed dictionary file that could be obtained using zcontent utilitaries.
+     * @param pKeepFileAsReference  When set to false, a new dictionary is created with dictionary naming standards.
+     *                              When set to true, given dictionary file is kept as is.
+     * @return a ZStatus set to ZS_SUCCESS when OK.
+     */
+    ZStatus initDictionary(const uriString& pDictionary, bool pKeepFileAsReference=false);
+    /**
+     * @brief applyDictionary A utility function that applies a dictionary definition to an existing master file with its own already existing dictionary.
+     * @param pDictionary
+     * @param pKeepFileAsReference
+     * @return  a ZStatus set to ZS_SUCCESS when OK.
+     */
+    static ZStatus applyDictionary(const uriString& pURIDictionary,
+        const uriString& pURIMasterFile,
+        std::function<ZStatus (ZRecord*,ZRecord*)> pApplyDictionaryConvert=nullptr,
+        bool pKeepFileAsReference=false,
+        FILE *pOutput=stdout);
 /**
  * @brief ZMasterFile::zcreateIndexWithDefinition Generates a new raw index (meaning a new ZRandomFile data + header) from a given key definition.
  *

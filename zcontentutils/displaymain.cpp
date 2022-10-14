@@ -707,7 +707,7 @@ DisplayMain::displayMCBValues(unsigned char* pPtrIn)
   wStr.sprintf("%4ld 0x%4X",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
 
-
+#ifdef __COMMENT__
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wMCBExport->MDicOffset),"%ld");
   wDumpRow << createItem( "MDicOffset");
@@ -735,7 +735,7 @@ DisplayMain::displayMCBValues(unsigned char* pPtrIn)
   wOffset=int(Offset+offsetof(ZSMCBOwnData_Export,MDicSize));
   wStr.sprintf("%4ld 0x%4X",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
-
+#endif // __COMMENT__
 
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wMCBExport->HistoryOn),"%ld");

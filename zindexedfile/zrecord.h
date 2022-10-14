@@ -689,7 +689,7 @@ ZTypeBase   wTargetType,wSourceType,wTypeStruct,wTypeAtomic;
 uint64_t    wOffset = RDic->Tab[pRank].URFOffset, wDataOffset = RDic->Tab[pRank].DataOffset;
 
 
-    _getZType_T<_Tp>(pTargetNatural,wTargetType,wTargetNSize,wTargetUSize,wTargetUnitsCount);
+    _getZTypeFull_T<_Tp>(pTargetNatural,wTargetType,wTargetNSize,wTargetUSize,wTargetUnitsCount);
 
     wSourceType = RDic->Tab[pRank].MDicField->ZType;
 

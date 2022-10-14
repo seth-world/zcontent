@@ -265,7 +265,7 @@ return  _Base::_removeFile(pErrorLog);
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZRawIndexFile::zcreateIndex(ZIndexControlBlock &pICB,
+ZRawIndexFile::zcreateIndexFile(ZIndexControlBlock &pICB,
                          uriString &pIndexUri,
                          long pAllocatedBlocks,
                          long pBlockExtentQuota,
@@ -332,16 +332,16 @@ return  ZS_SUCCESS;
 
 
 ZStatus
-ZRawIndexFile::zcreateIndex(ZIndexControlBlock &pICB,
-                          uriString &pIndexUri,
-                          long pAllocatedBlocks,
-                          long pBlockExtentQuota,
-                          zsize_type pInitialSize,
-                          long pBlockTargetSize,
-                          bool pHighwaterMarking,
-                          bool pGrabFreeSpace,
-                          bool pBackup,
-                          bool pLeaveOpen)
+ZRawIndexFile::zcreateIndexFile(ZIndexControlBlock &pICB,
+                                uriString &pIndexUri,
+                                long pAllocatedBlocks,
+                                long pBlockExtentQuota,
+                                zsize_type pInitialSize,
+                                long pBlockTargetSize,
+                                bool pHighwaterMarking,
+                                bool pGrabFreeSpace,
+                                bool pBackup,
+                                bool pLeaveOpen)
 {
   ZStatus wSt;
 
@@ -960,7 +960,7 @@ ZIFCompare wZIFCompare = ZKeyCompareBinary;
                 wSt=_Base::_insert2Phases_Prepare(pIndexItem->toFileKey(),pZBATIndex,wZIR.ZMFAddress);// insert at position returned by seekGeneric
 //                ZJoinIndex=wRes.ZIdx;
                 if (ZVerbose)
-                  _DBGPRINT ("Index insert at rank <%ld>\n", wZIR.IndexRank)
+                  _DBGPRINT ("Index insert at rank <%ld>\n", wZIR.IndexRank);
                 break;
                 }
             case (ZS_FOUND):
@@ -2640,7 +2640,6 @@ ZDataBuffer wIndexRecord;
 
 long ZIndexTable::pop (void)
 {
-
   if (size()<0)
   {
     return  -1;// Beware return  is multiple instructions in debug mode
@@ -2657,8 +2656,7 @@ long ZIndexTable::pop (void)
 
 long ZIndexTable::erase (long pRank)
 {
-  if (pRank>lastIdx())
-  {
+  if (pRank>lastIdx()) {
     return  -1;
   }
   Tab[pRank]->~ZIndexFile();
@@ -2669,13 +2667,21 @@ long ZIndexTable::erase (long pRank)
   return  _Base::erase(pRank);
 } // erase
 
+long ZIndexTable::insert (ZIndexFile* pIndexFile,long pRank)
+{
+  if (pRank > lastIdx()) {
+    return  -1;
+  }
+
+  return _Base::insert(pIndexFile,pRank);
+} // erase
+
 void ZIndexTable::clear(void)
 {
   while (size()>0)
     pop();
   _Base::clear();
 }// clear
-
 
 
 long ZIndexTable::searchIndexByName (const char* pName)

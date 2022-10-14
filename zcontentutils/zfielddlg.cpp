@@ -16,6 +16,8 @@
 #include <qtooltip.h>
 #include <qevent.h>
 
+#include <zindexedfile/zdataconversion.h>// for _getURFHeaderSize
+
 
 #define __ICON_PATH__ "/home/gerard/Development/zbasetools/zqt/icons/"
 #define __HASH_OK_ICON__      "HashcodeOk.png"

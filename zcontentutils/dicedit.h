@@ -22,8 +22,24 @@ class KeyField_Pack;
 class ZIndexField;
 class ZDictionaryFile;
 }
+/*
+#define __GENERATE_PARAMETER_FILE__ "zcppgenerateparameters.xml"
+class GenObj {
+public:
+  GenObj()=default;
+  GenObj(ZTypeBase pZType,long pIncludeRank) {ZType=pZType; IncludeRank=pIncludeRank;}
+  ZTypeBase   ZType=ZType_Nothing;
+  long        IncludeRank=-1;
+};
 
-
+class GenInclude {
+public:
+  GenInclude()=default;
+  GenInclude(const utf8VaryingString& pInclude) {Include=pInclude; Used=false;}
+  utf8VaryingString Include;
+  bool              Used = false;
+};
+*/
 namespace Ui {
 class DicEdit;
 }
@@ -52,27 +68,7 @@ class ZKeyHeaderRow;
 class ZKeyFieldRow;
 }
 
-/*
-class ZKeyRowTemporary {
-public:
-  ZKeyRowTemporary()=default;
-  ZKeyRowTemporary(const ZKeyRowTemporary& pIn);
 
-  ZKeyRowTemporary& _copyFrom(const ZKeyRowTemporary& pIn) {
-    KeyData=pIn.KeyData;
-    KeyRows=pIn.KeyRows;
-    return *this;
-  }
-  ZKeyDictionary*               KeyData = nullptr;
-  QList<QList<QStandardItem*>>  KeyRows ;
-};
-
-class ZKeyFieldRowTemporary {
-public:
-  ZKeyFieldRow          KFR;
-  QList<QStandardItem*> Row ;
-};
-*/
 class DicEdit : public QMainWindow
 {
   Q_OBJECT
@@ -325,7 +321,6 @@ fieldTBv
    */
   bool updateKeyValues(const QModelIndex &pKeyIdx);
 
-
   ZMFDictionary* screenToDic();
 
   void closeEvent(QCloseEvent *event) override {
@@ -374,6 +369,13 @@ fieldTBv
 
   bool getDicName(unsigned long &pVersion, bool &pActive, utf8VaryingString &pDicName);
 
+  /** @brief getGenNames  gets two names while generating code : the class name to be generated and the output file base name.
+   * if output file base name is empty, class name is chosen.
+   * Output file base name will be used to create two files a header file and a cpp source file.
+   * @return a boolean : true -> OK, false -> quit or error
+   */
+  bool getGenerationNames(utf8VaryingString &pOutFileBaseName, utf8VaryingString &pClass, utf8VaryingString &pBrief, utf8VaryingString &pGenPath);
+
   void readWriteActionEvent(QAction*pAction);
 
   void displayErrorCallBack(const utf8VaryingString &pMessage) ;
@@ -399,6 +401,8 @@ private:
   QActionGroup *generalGroup=nullptr;
   QAction* parserQAc=nullptr;
   QAction* quitQAc=nullptr;
+
+  QAction* generateQAc=nullptr;
 
 
   QMenu *keyFlexMEn=nullptr;

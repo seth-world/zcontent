@@ -1957,7 +1957,7 @@ createDicFromXmlDefinition( ZRawMasterFile& pMasterFile,
           pMasterFile.Dictionary->getURIContent().toCChar());
       return ZS_SUCCESS;
     }
-
+  } // if (pRealRun)
   return ZS_SUCCESS;
 }//createDicFromXmlDefinition
 
@@ -2585,15 +2585,18 @@ createMasterFileFromXml(const char* pXMLPath,
 
     if (pRealRun)
       {
-      wSt=wMasterFile.zcreateRawIndexDetailed(  wIndexData->Tab[wi].IndexName,
-                                                wIndexData->Tab[wi].KeyUniversalSize,
-                                                wIndexData->Tab[wi].Duplicates,
-                                                wIndexData->Tab[wi].FCB.AllocatedBlocks,
-                                                wIndexData->Tab[wi].FCB.BlockExtentQuota,
-                                                wIndexData->Tab[wi].FCB.InitialSize,
-                                                wIndexData->Tab[wi].FCB.HighwaterMarking,
-                                                wIndexData->Tab[wi].FCB.GrabFreeSpace,
-                                                false);
+      long wIndexRank;
+      wSt=wMasterFile._createRawIndexDet(wIndexRank,
+                                          wIndexData->Tab[wi].IndexName,
+                                          wIndexData->Tab[wi].KeyUniversalSize,
+                                          wIndexData->Tab[wi].Duplicates,
+                                          wIndexData->Tab[wi].FCB.AllocatedBlocks,
+                                          wIndexData->Tab[wi].FCB.BlockExtentQuota,
+                                          wIndexData->Tab[wi].FCB.InitialSize,
+                                          wIndexData->Tab[wi].FCB.HighwaterMarking,
+                                          wIndexData->Tab[wi].FCB.GrabFreeSpace,
+                                          false,
+                                          &wMasterFile.ErrorLog);
       if (wSt==ZS_SUCCESS)
         wErrorLog.infoLog(" Index structure and files created.");
       else
@@ -2639,8 +2642,8 @@ createMasterFileFromXml(const char* pXMLPath,
 
     if (pRealRun && (wDictionary != nullptr))
       {
-      wMasterFile.Dictionary = new ZMFDictionary(*wDictionary);
-      wErrorLog.textLog("Master dictionary created.");
+      wMasterFile.Dictionary->setDictionary( *wDictionary);
+      wErrorLog.textLog("Master dictionary integrated.");
       }
 
   }//if (wMayCreateDictionary)
@@ -3561,15 +3564,18 @@ PostMCBapplyXMLtoFile:
 
         if ((pRealRun)&&!wCannotProcess)
           {
-            wSt=wMasterFile.zcreateRawIndexDetailed(  wIndexData->Tab[wi].IndexName,
-                wIndexData->Tab[wi].KeyUniversalSize,
-                wIndexData->Tab[wi].Duplicates,
-                wIndexData->Tab[wi].FCB.AllocatedBlocks,
-                wIndexData->Tab[wi].FCB.BlockExtentQuota,
-                wIndexData->Tab[wi].FCB.InitialSize,
-                wIndexData->Tab[wi].FCB.HighwaterMarking,
-                wIndexData->Tab[wi].FCB.GrabFreeSpace,
-                false);
+          long wIndexRank;
+          wSt=wMasterFile._createRawIndexDet(wIndexRank,
+                                              wIndexData->Tab[wi].IndexName,
+                                              wIndexData->Tab[wi].KeyUniversalSize,
+                                              wIndexData->Tab[wi].Duplicates,
+                                              wIndexData->Tab[wi].FCB.AllocatedBlocks,
+                                              wIndexData->Tab[wi].FCB.BlockExtentQuota,
+                                              wIndexData->Tab[wi].FCB.InitialSize,
+                                              wIndexData->Tab[wi].FCB.HighwaterMarking,
+                                              wIndexData->Tab[wi].FCB.GrabFreeSpace,
+                                              false,
+                                              &wMasterFile.ErrorLog);
             if (wSt==ZS_SUCCESS)
               wMessageLog.infoLog(" Index structure and files created. Index built.");
             else
@@ -3635,9 +3641,9 @@ PostMCBapplyXMLtoFile:
         wMasterFile.IndexTable[wh]->KeyUniversalSize=wIndexData->Tab[wi].KeyUniversalSize;
         wMasterFile.IndexTable[wh]->Duplicates=wIndexData->Tab[wi].Duplicates;
         wMasterFile.IndexTable[wh]->setParameters(wIndexData->Tab[wi].FCB.GrabFreeSpace,
-                                                        wIndexData->Tab[wi].FCB.HighwaterMarking,
-                                                        wIndexData->Tab[wi].FCB.BlockTargetSize,
-                                                        wIndexData->Tab[wi].FCB.BlockExtentQuota);
+                                                  wIndexData->Tab[wi].FCB.HighwaterMarking,
+                                                  wIndexData->Tab[wi].FCB.BlockTargetSize,
+                                                  wIndexData->Tab[wi].FCB.BlockExtentQuota);
         wMasterFile.writeControlBlocks();
         wSt=wMasterFile.zindexRebuild(wh,true);
         if (wSt==ZS_SUCCESS)

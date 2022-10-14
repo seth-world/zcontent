@@ -892,7 +892,7 @@ ZContentVisuMain::ZRFUnlock()
   ZStatus wSt=ZRandomFile::zutilityUnlockZRF(URICurrent);
   if (wSt!=ZS_SUCCESS)
   {
-    ZExceptionDLg::displayLast(false);
+    ZExceptionDLg::displayLast("Unlock file",false);
     ZException.pop();
   }
 }
@@ -907,7 +907,7 @@ ZContentVisuMain::ZHeaderRawUnlock()
   ZStatus wSt=ZRandomFile::zutilityUnlockHeaderFile(URICurrent);
   if (wSt!=ZS_SUCCESS)
   {
-    ZExceptionDLg::displayLast(false);
+    ZExceptionDLg::displayLast("Unlock header file",false);
     ZException.pop();
   }
 }
@@ -958,7 +958,7 @@ ZContentVisuMain::actionOpenFileByType(bool pChecked)
       return;
     }
 
-    ZExceptionDLg::displayLast(false);
+    ZExceptionDLg::displayLast("Open file",false);
     ZException.pop();
 
   return;
@@ -1183,12 +1183,12 @@ ZStatus wSt=ZS_SUCCESS;
   if (wSt!=ZS_SUCCESS)
     {
     if (wSt==ZS_FILETYPEWARN)
-      ZExceptionDLg::displayLast(true);
+      ZExceptionDLg::displayLast("Open file",true);
     else
       {
       delete RandomFile;
       RandomFile=nullptr;
-      ZExceptionDLg::displayLast(false);
+      ZExceptionDLg::displayLast("Open file",false);
       return wSt;
       }
     }
@@ -1261,12 +1261,12 @@ ZStatus wSt=ZS_SUCCESS;
   if (wSt!=ZS_SUCCESS)
   {
     if (wSt==ZS_FILETYPEWARN)
-      ZExceptionDLg::displayLast(true);
+      ZExceptionDLg::displayLast("Open file",true);
     else
     {
       delete MasterFile;
       MasterFile=nullptr;
-      ZExceptionDLg::displayLast(false);
+      ZExceptionDLg::displayLast("Open file",false);
       return wSt;
     }
   }
@@ -1341,7 +1341,7 @@ ZContentVisuMain::unlockZRFZMF(const char* pFilePath)
   ZStatus wSt=  ZRandomFile::zutilityUnlockZRF(pFilePath);
 
   if (wSt!=ZS_SUCCESS) {
-    ZExceptionDLg::displayLast(false);
+    ZExceptionDLg::displayLast("Unlock file",false);
     ZException.pop();
   }
   else
@@ -2250,7 +2250,7 @@ ZContentVisuMain::displayListZRFNextRecord(size_t pWidth)
   ui->ForwardBTn->setVisible(true);
   if (wSt!=ZS_SUCCESS)
   {
-    ZExceptionDLg::displayLast(false);
+    ZExceptionDLg::displayLast("Read file",false);
 //    QMessageBox::critical(this,tr("Random File error"),ZException.formatFullUserMessage().toCChar());
     return wSt;
   }

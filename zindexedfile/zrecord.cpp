@@ -229,7 +229,7 @@ ZRecord::_setupRecordData(void)
     const unsigned char* wPtrF=Content.Data;
     ZStatus wSt=FieldPresence._importURF(wPtrF);
 
-    wOffset = FieldPresence.getExportSize();
+    wOffset = FieldPresence.getURFSize();
 // get fields (that are present within the record) and setup record dictionary
     ZTypeBase wType;
 

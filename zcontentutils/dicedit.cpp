@@ -2,7 +2,9 @@
 #include "ui_dicedit.h"
 #include <QStandardItemModel>
 
-#include <qmessagebox.h>
+#include <unistd.h>
+
+//#include <qmessagebox.h>
 
 #include <zrandomfile/zheadercontrolblock.h>
 #include <zrandomfile/zfilecontrolblock.h>
@@ -43,6 +45,7 @@
 #include <zindexedfile/zkeydictionary.h>
 #include <zindexedfile/zindexfield.h>
 
+#include <zindexedfile/zdataconversion.h>// for _getURFHeaderSize
 
 #include <texteditmwn.h>
 
@@ -53,6 +56,8 @@
 
 #include <zcppparser/zcppparserutils/rawfields.h>
 
+#include <zcppgenerate.h>
+
 
 #include <zindexedfile/zdictionaryfile.h>
 
@@ -61,7 +66,14 @@
 
 #include <zcontent/zcontentutils/zdicdlg.h>
 
+#ifdef __USE_WINDOWS__
+#include <io.h>
+#else
+#include <fcntl.h>  // for open()
+#endif
 
+
+#include <zxml/zxmlprimitives.h>
 
 using namespace zbs;
 
@@ -197,6 +209,12 @@ DicEdit::init() {
   generalGroup->addAction(parserQAc);
   generalMEn->addAction(parserQAc);
 
+
+  generateQAc= new QAction(QObject::tr("generate","DicEdit"),generalMEn);
+  generateQAc->setObjectName("generateQAc");
+  generalGroup->addAction(generateQAc);
+  generalMEn->addAction(generateQAc);
+
   setupReadWriteMenu();
 
   generalMEn->addAction(SaveQAc);
@@ -254,6 +272,30 @@ DicEdit::generalActionEvent(QAction* pAction) {
   rawFields->showAll();
   rawFields->setFocus();
   } // parserQAc
+
+  if (pAction == quitQAc) {
+    Quit();
+  } // parserQAc
+
+  if (pAction == generateQAc) {
+
+    ZCppGenerate* wGen=new ZCppGenerate(DictionaryFile);
+
+    ZStatus wSt=wGen->loadGenerateParameters("",&Errorlog);
+    if (wSt!=ZS_SUCCESS) {
+      ZExceptionDLg::displayLast("Generation parameters",false);
+    }
+    utf8VaryingString wGenPath = wGen->getGenPath();
+
+    utf8VaryingString wOutFileBaseName, wClass , wBrief = DictionaryFile->DicName.toString();
+    if (!getGenerationNames(wOutFileBaseName,wClass,wBrief,wGenPath))
+      return;
+
+    wSt=wGen->generateInterface(wOutFileBaseName,wClass,wBrief);
+
+    delete wGen;
+    return;
+  } // generateQAc
   if (pAction == quitQAc) {
     Quit();
   } // parserQAc
@@ -836,6 +878,7 @@ DicEdit::getDicName(unsigned long &pVersion,bool &pActive,utf8VaryingString& pDi
     wDicName="<no name>";
   else
     wDicName=pDicName;
+
   utf8VaryingString wVersion=getVersionStr(pVersion);
 
   QDialog wDicNameDLg;
@@ -894,14 +937,131 @@ DicEdit::getDicName(unsigned long &pVersion,bool &pActive,utf8VaryingString& pDi
 
   int wRet=wDicNameDLg.exec();
   if (wRet==QDialog::Accepted)
-    {
+  {
     pDicName=wDicNameLEd->text().toUtf8().data();
     pVersion = getVersionNum(wVersionLEd->text().toUtf8().data());
     pActive = wActiveCHk->isChecked();
     return true;
-    }
+  }
   return false;
+
 }//getDicName
+
+bool
+DicEdit::getGenerationNames(utf8VaryingString& pOutFileBaseName,utf8VaryingString& pClass,utf8VaryingString& pBrief,utf8VaryingString& pGenPath)
+{
+
+  utf8VaryingString wClass=pClass,wOutFileName;
+  if (pOutFileBaseName.isEmpty())
+    wOutFileName=wClass;
+  else
+    wOutFileName=pOutFileBaseName;
+
+  QDialog wGenNamesDLg;
+  wGenNamesDLg.setObjectName("wGenNamesDLg");
+  wGenNamesDLg.setWindowTitle(QObject::tr("Generation names","DicEdit"));
+  wGenNamesDLg.resize(400,150);
+
+  QVBoxLayout* QVL=new QVBoxLayout(&wGenNamesDLg);
+  wGenNamesDLg.setLayout(QVL);
+
+  QVL->setObjectName("QVL");
+  QHBoxLayout* QHL=new QHBoxLayout;
+  QHL->setObjectName("QHL");
+  QVL->insertLayout(0,QHL);
+  QLabel* wLb=new QLabel(QObject::tr("Class name","DicEdit"),&wGenNamesDLg);
+  wLb->setObjectName("wLb");
+  QHL->addWidget(wLb);
+  QLineEdit* wClassLEd=new QLineEdit(pClass.toCChar(),&wGenNamesDLg);
+  wClassLEd->setObjectName("wClassLEd");
+  QHL->addWidget(wClassLEd);
+
+  QHBoxLayout* QHL1=new QHBoxLayout;
+  QHL1->setObjectName("QHL1");
+  QVL->insertLayout(1,QHL1);
+
+  QLabel* wLb1=new QLabel(QObject::tr("Output base name","DicEdit"),&wGenNamesDLg);
+  wLb1->setObjectName("wLb1");
+  QHL1->addWidget(wLb1);
+  QLineEdit* wOutNameLEd=new QLineEdit(pOutFileBaseName.toCChar());
+  wOutNameLEd->setObjectName("wVersionLEd");
+  QHL1->addWidget(wOutNameLEd);
+
+  QHBoxLayout* QHL2=new QHBoxLayout;
+  QHL2->setObjectName("QHL2");
+  QVL->insertLayout(2,QHL2);
+
+  QLabel* wLb2=new QLabel(QObject::tr("Class description","DicEdit"),&wGenNamesDLg);
+  wLb2->setObjectName("wLb2");
+  QHL2->addWidget(wLb2);
+  QLineEdit* wBriefLEd=new QLineEdit(pBrief.toCChar());
+  wBriefLEd->setObjectName("wBriefLEd");
+  QHL2->addWidget(wBriefLEd);
+
+  QHBoxLayout* QHL3=new QHBoxLayout;
+  QHL3->setObjectName("QHL3");
+  QVL->insertLayout(3,QHL3);
+
+  QLabel* wLb3=new QLabel(QObject::tr("Class description","DicEdit"),&wGenNamesDLg);
+  wLb3->setObjectName("wLb3");
+  QHL3->addWidget(wLb3);
+  QLineEdit* wGenPathLEd=new QLineEdit(pGenPath.toCChar());
+  wGenPathLEd->setObjectName("wGenPathLEd");
+  QHL3->addWidget(wGenPathLEd);
+
+
+  QHBoxLayout* QHLBtn=new QHBoxLayout;
+  QHLBtn->setObjectName("QHLBtn");
+  QVL->insertLayout(4,QHLBtn);
+
+  QPushButton* wOk=new QPushButton(QObject::tr("Ok","DicEdit"),&wGenNamesDLg);
+  wOk->setObjectName("wOk");
+  QPushButton* wCancel=new QPushButton(QObject::tr("Cancel","DicEdit"),&wGenNamesDLg);
+  wCancel->setObjectName("wCancel");
+  QSpacerItem* wSpacer= new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+  QHLBtn->addItem(wSpacer);
+
+  QHLBtn->addWidget(wCancel);
+  QHLBtn->addWidget(wOk);
+
+  wClassLEd->setText(wClass.toCChar());
+
+
+  wBriefLEd->setText(pBrief.toCChar());
+
+  wGenNamesDLg.setWindowTitle(QObject::tr("Dictionary identification","DicEdit"));
+
+  QObject::connect(wOk, &QPushButton::clicked, &wGenNamesDLg, &QDialog::accept);
+  QObject::connect(wCancel, &QPushButton::clicked, &wGenNamesDLg, &QDialog::reject);
+
+  while (true) {
+    wClassLEd->setSelection(0,wClass.UnitCount);
+    wClassLEd->setFocus();
+    int wRet=wGenNamesDLg.exec();
+    if (wRet==QDialog::Accepted) {
+
+      wClass=wClassLEd->text().toUtf8().data();
+      wOutFileName = wOutNameLEd->text().toUtf8().data();
+      pBrief = wBriefLEd->text().toUtf8().data();
+      pGenPath = wGenPathLEd->text().toUtf8().data();
+
+      if (wClass.contains((utf8_t*)" ")) {
+        ZExceptionDLg::adhocMessage("Invalid name",Severity_Error,nullptr,"Class name <%s> must not contain space(s)",wClass.toString());
+        continue;
+      }
+      uriString wGenPath=wGenPathLEd->text().toUtf8().data();
+      if (!wGenPath.exists())
+      if (wOutFileName.contains((utf8_t*)" ")) {
+        ZExceptionDLg::adhocMessage("Generation directory",Severity_Error,nullptr,"Generation directory <%s> does not exist.",wGenPath.toString());
+        continue;
+      }
+      pClass = wClass;
+      pOutFileBaseName = wOutFileName;
+      return true;
+    } // if (wRet==QDialog::Accepted)
+    return false;
+  }// while true
+}//getGenNames
 
 
 void
@@ -1103,7 +1263,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
       if (wFd.selectedFiles().isEmpty())
         {
-        QMessageBox::critical(this,tr("No file selected"),"Please select a valid file");
+        ZExceptionDLg::adhocMessage("No file selected",Severity_Error,nullptr,"Please select a valid file");
         }
       else
         break;
@@ -4015,11 +4175,12 @@ DicEdit::importDicFromReserved(const unsigned char* pPtrReserved)
     return;
     }
 
-
+/*
     uint32_t wMDicOffset = reverseByteOrder_Conditional<uint32_t>(wMCBExport->MDicOffset);
     uint32_t wMDicSize = reverseByteOrder_Conditional<uint32_t>(wMCBExport->MDicSize);
 
     importDic(pPtrReserved+wMDicOffset);
+*/
 
 }//importDicFromReserved
 
@@ -4435,7 +4596,7 @@ DicEdit::loadDictionaryFile(){
       utf8VaryingString wStr;
       wSt= DictionaryFile->loadDictionaryByRank(0);
       if (wSt!=ZS_SUCCESS) {
-        ZExceptionDLg::displayLast(false);
+        ZExceptionDLg::displayLast("Dictionary load",false);
         return false;
       }
       wStr.sprintf("Dictionary %s version %s status %s has been loaded",DictionaryFile->DicName.toCChar(),getVersionStr(DictionaryFile->Version).toCChar(),
@@ -4504,7 +4665,7 @@ DicEdit::loadDictionaryFile(){
 
   wSt= DictionaryFile->loadDictionaryByRank(wRC.row());
   if (wSt!=ZS_SUCCESS) {
-    ZExceptionDLg::displayLast(false);
+    ZExceptionDLg::displayLast("Dictionary load",false);
     return false;
   }
   wStr.sprintf("Dictionary %s version %s status %s has been loaded",DictionaryFile->DicName.toCChar(),getVersionStr(DictionaryFile->Version).toCChar(),
@@ -4602,7 +4763,7 @@ DicEdit::manageDictionaryFiles(){
       utf8VaryingString wStr;
       wSt= DictionaryFile->loadDictionaryByRank(0);
       if (wSt!=ZS_SUCCESS) {
-        ZExceptionDLg::displayLast(false);
+        ZExceptionDLg::displayLast("Dictionary load",false);
         return ;
       }
       wStr.sprintf("Dictionary %s version %s status %s has been loaded",DictionaryFile->DicName.toCChar(),getVersionStr(DictionaryFile->Version).toCChar(),
@@ -4996,7 +5157,7 @@ QStandardItem* setFieldRowFromField(QStandardItemModel *pModel, int pRow, ZField
   wStr.sprintf("%ld",pField.NaturalSize);
   pModel->item(pRow,wCol++)->setText(wStr.toCChar());
 
-  pModel->item(pRow,wCol++)->setText(pField.KeyEligible?"Yes":"No");
+  pModel->item(pRow,wCol++)->setText(pField.KeyEligible ? "Yes":"No");
 
   pModel->item(pRow,wCol++)->setText(pField.Hash.toHexa().toChar());
 
@@ -5055,3 +5216,4 @@ QStandardItem* DicEdit::changeFieldRowFromField(int pRow,ZFieldDescription& pFie
 
   return wItem;
 } // changeFieldRowFromField
+

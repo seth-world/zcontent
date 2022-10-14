@@ -79,6 +79,7 @@ class ZRawIndexFile : protected ZRandomFile, public ZIndexControlBlock
 {
 friend class ZSIndexCollection;
 friend class ZRawMasterFile;
+friend class ZIndexTable;
 
 protected:
         typedef ZRandomFile                   _Base   ;
@@ -183,7 +184,7 @@ public:
    * @param[in] pLeaveOpen        Option : true leave the index file open as (ZRF_Exclusive | ZRF_All) false: close index file right after creation
    * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
    */
-    ZStatus zcreateIndex(ZIndexControlBlock &pICB,
+    ZStatus zcreateIndexFile(ZIndexControlBlock &pICB,
                          uriString &pIndexUri,
                          long pAllocatedBlocks,
                          long pBlockExtentQuota,
@@ -196,7 +197,7 @@ public:
    * @brief ZIndexFile::zcreateIndex creates a new index file corresponding to the given specification ICB and ZRF parameters
    *      same as previous but with explicit pBlockTargetSize
    */
-    ZStatus zcreateIndex(ZIndexControlBlock &pICB,
+    ZStatus zcreateIndexFile(ZIndexControlBlock &pICB,
                           uriString &pIndexUri,
                           long pAllocatedBlocks,
                           long pBlockExtentQuota,
@@ -372,9 +373,9 @@ public:
 
   long pop (void);
   long erase (long pRank);
+  long insert(ZIndexFile* pIndexFile, long pRank);
   void clear(void);
 
-  ZStatus removeIndex(const long pIdx);
 
   long searchIndexByName (const char* pName);
   long searchCaseIndexByName (const char* pName);

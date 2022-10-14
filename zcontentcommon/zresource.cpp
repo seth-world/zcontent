@@ -117,13 +117,14 @@ utf8String ZResource::toHexa() const
     wContent.sprintf("%l08Xu#%l08Xd", Entity, id);
     return wContent;
 }
-
+#ifdef __DEPRECATED__   // casting is deprecated
 ZDataBuffer ZResource::toKey()
 {
     ZDataBuffer wOutValue;
     _castAtomicValue_T<ZEntity_type>(Entity, ZType_U64, wOutValue);
     return wOutValue;
 }
+
 
 ZDataBuffer ZResource::toFullKey()
 {
@@ -135,7 +136,7 @@ ZDataBuffer ZResource::toFullKey()
 //    wOutValue += wZDB;
     return wOutValue;
 }
-
+#endif // __DEPRECATED__
 
 ZDataBuffer ZResource::_export() const
 {
@@ -191,21 +192,16 @@ ZDataBuffer* ZResource::_exportURF(ZDataBuffer* pReturn) const
   return pReturn;
 }
 
-unsigned char* ZResource::_exportURF(unsigned char*& pBuffer,size_t & pSize) const
+size_t ZResource::_exportURF_Ptr(unsigned char* &pURF) const
 {
-  errno=0;
-  pSize = sizeof(ZTypeBase)+sizeof(ZEntity_type)+sizeof(Resourceid_type);
-  unsigned char* wPtrOut=pBuffer =(unsigned char*) malloc(pSize);
-  if (pBuffer==nullptr)
-  {
-    pSize=0;
-    errno=ENOMEM;
-    return pBuffer;
-  }
-  _exportAtomicPtr<ZTypeBase>(ZType_Resource, wPtrOut);
-  _exportAtomicPtr<ZEntity_type>(Entity, wPtrOut);
-  _exportAtomicPtr<Resourceid_type>(id, wPtrOut);
-  return pBuffer;
+  _exportAtomicPtr<ZTypeBase>(ZType_Resource, pURF);
+  _exportAtomicPtr<ZEntity_type>(Entity, pURF);
+  _exportAtomicPtr<Resourceid_type>(id, pURF);
+  return sizeof(ZTypeBase)+sizeof(ZEntity_type)+sizeof(Resourceid_type);
+}
+size_t ZResource::getURFSize() const
+{
+  return sizeof(ZTypeBase)+sizeof(ZEntity_type)+sizeof(Resourceid_type);
 }
 
 ssize_t ZResource::_importURF(const unsigned char *&pUniversalPtr)

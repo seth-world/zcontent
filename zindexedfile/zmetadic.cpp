@@ -2,6 +2,7 @@
 #define ZMETADIC_CPP
 
 #include <zindexedfile/zmetadic.h>
+#include <zindexedfile/zdataconversion.h> // for _getURFHeaderSize
 
 #include <ztoolset/zutfstrings.h>
 #include <zxml/zxmlprimitives.h>

@@ -519,6 +519,8 @@ ZDictionaryFile::generateFileName(const uriString& pURIContent){
   wDicPath = pURIContent.getDirectoryPath();
   wDicPath.addConditionalDirectoryDelimiter();
   wDicPath += pURIContent.getBasename();
+  wDicPath += "-";
+  wDicPath += "dictionary";
   wDicPath += ".";
   wDicPath += __DICTIONARY_EXTENSION__;
 

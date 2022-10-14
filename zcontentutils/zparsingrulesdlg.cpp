@@ -4,6 +4,8 @@
 #include <zexceptiondlg.h>
 #include <zcontent/zindexedfile/zdatatype.h>
 
+#include <zindexedfile/zdataconversion.h> // for _getURFHeaderSize
+
 #include <qmenu.h>
 #include <qaction.h>
 #include <qactiongroup.h>

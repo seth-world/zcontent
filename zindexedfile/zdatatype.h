@@ -2,6 +2,7 @@
 #define ZDATATYPE_H
 
 #include <zconfig.h>
+#include <cstdint>
 #include <type_traits>
 #include <ztoolset/zerror.h>
 #include <ztoolset/ztypetype.h>
@@ -107,18 +108,11 @@ namespace zbs
   */
 } // namespace zbs
 // see <zindexedfile/znaturalfromurf.cpp>
-ZStatus _getURFHeaderData(const unsigned char* pURF_Ptr,
-                                 ZTypeBase &pZType,
-                                 uint64_t &pUniversalSize,
-                                 uint64_t &pNaturalSize,
-                                 uint16_t &pCanonical,
-                                 uint16_t &pEffectiveUSize,
-                                 uint64_t &pHeaderSize,
-                                 const unsigned char **pDataPtr);
-// see <zindexedfile/znaturalfromurf.cpp>
-size_t  _getURFHeaderSize (ZTypeBase &pZType);
 
-ZStatus checkFieldsTypes (const ZTypeBase pTypeIn, const ZTypeBase pTargetType);
+// see <zindexedfile/znaturalfromurf.cpp>
+
+
+
 
 ZStatus getAtomicZType_Sizes(ZTypeBase pType, uint64_t& pNaturalSize, uint64_t& pUniversalSize);
 
@@ -127,57 +121,21 @@ size_t getAtomicUniversalSize(const ZTypeBase pType);
 
 //ZStatus _castAtomicValue_A (auto pValue,const ZType_type pTargetType,ZDataBuffer &pOutValue);
 
+template <class _Tp>
+ZTypeBase
+_getAtomicZTypeFull(const size_t pTypeHashCode, uint64_t& pNaturalSize, uint64_t& pUniversalSize);
 
-ZStatus _getAtomicUfN(ZDataBuffer &pInData,ZDataBuffer &pOutData,const ZType_type pType);
-
-struct ZType_struct{
-    ZType_type Type;
-};
-
-class CType : public ZType_struct
-{
-public:
-    typedef ZType_struct _Base;
-    CType() {}
-    CType(ZType_type pType) {_Base::Type=pType;}
-
-    bool isAtomic() {return (Type&ZType_Atomic);}
-    bool isByteSeq() {return (Type&ZType_ByteSeq);}
-    bool isString() {return (Type&ZType_String);}
-    bool isVarying() {return (Type&ZType_VaryingLength);}
-    bool isEndian() {return (Type&ZType_Endian);}
+template <class _Tp>
+ZTypeBase
+_getClassZTypeFull( _Tp*  pValue,               /* value is required to get much info on it when it is class */
+                    const size_t wTypeHashCode,
+                    size_t &pNaturalSize,
+                    size_t &pUniversalSize,
+                    URF_Array_Count_type &pUnitCount);
 
 
-    int32_t getStructure() {return Type&ZType_StructureMask; }
-    int32_t getAtomicType() {return Type&ZType_AtomicMask;}
-
-    uint64_t getAtomicUniversalSize()
-    {
-        uint64_t wNaturalSize,wUniversalSize;
-
-        if (getAtomicZType_Sizes(getAtomicType(),wNaturalSize,wUniversalSize)!=ZS_SUCCESS)
-                                                                ZException.exit_abort();
-        return wUniversalSize;
-    }
-    uint64_t getAtomicNaturalSize()
-    {
-        uint64_t wNaturalSize,wUniversalSize;
-
-        if (getAtomicZType_Sizes(getAtomicType(),wNaturalSize,wUniversalSize)!=ZS_SUCCESS)
-                                                                ZException.exit_abort();
-        return wNaturalSize;
-    }
-
-    CType* extract (unsigned char* pPtr)
-    {
-        memmove (&Type,pPtr,sizeof(ZTypeBase));
-        return this;
-    }
-};
 
 /** @} */
-
-
 
 using namespace zbs ;
 
@@ -208,8 +166,8 @@ typeDemangler(const char*pName,utfdescString &pOutName);
 void
 typeDemangler(const char*pName, char **pOutName);
 #endif // __COMMENT__
+
 #include <ztoolset/zbitset.h>
-//#include <ztoolset/zwstrings.h>
 
 //-------- Data type constant values-----------------------------
 
@@ -276,11 +234,23 @@ static const size_t zdateFullType= typeid(ZDateFull).hash_code();
 //---------- Data type acquisition ----------------------------
 //
 
+template <class _Tp>
+ZTypeBase _getAtomicZType(const size_t pTypeHashCode);
+template <class _Tp>
+ZTypeBase _getClassZType(size_t pTypeHashCode);
 
 
-template <class _Tp> // must be template because called by conditional templates
+ZStatus _getFixedStringType(void*pValue, ZTypeBase &pType,size_t &pNaturalSize ,size_t &pUniversalSize ,URF_Array_Count_type &pArrayCount);
+//ZStatus _getFixedWStringType(void*pValue, ZTypeBase &pType, size_t &pNaturalSize , size_t &pUniversalSize , URF_Array_Count_type &pArrayCount);
+
+ZStatus _getBlobType(void*pValue,ZTypeBase &pType,size_t &pNaturalSize , size_t &pUniversalSize ,URF_Array_Count_type &pArrayCount);
+
+ZStatus _getBitsetTypeFull(void*pValue, ZTypeBase &pType, uint64_t &pNaturalSize , uint64_t&pUniversalSize , URF_Array_Count_type &pArrayCount);
+
+
+template <class _Tp> // IMPORTANT: must be template because called by conditional templates
 /**
- * @brief _getAtomicZTypeT template to analyze a type hashcode and deduce ZType_Type and natural and internal sizes for an atomic data
+ * @brief _getAtomicZTypeFull template to analyze a type hashcode and deduce ZType_Type and natural and internal sizes for an atomic data
  * This function must be a template because called by template routines
  *
  * @param[in] pTypeHashCode  type hashcode obtained using typeid(VAR).hash_code(). VAR must be atomic.
@@ -289,21 +259,21 @@ template <class _Tp> // must be template because called by conditional templates
  * @param[out] pKeyFieldSize Resulting internal size of the variable
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
-ZStatus
-_getAtomicZType_T(const size_t pTypeHashCode, ZTypeBase &pType, size_t& pNaturalSize, size_t& pUniversalSize)
+ZTypeBase
+_getAtomicZTypeFull(const size_t pTypeHashCode,  size_t& pNaturalSize, size_t& pUniversalSize)
 {
-
+  ZTypeBase wType=0;
     while (true)
     {
     if (pTypeHashCode==UCharType)
                     {
-                    pType |= ZType_UChar ;
+                    wType |= ZType_UChar ;
                     pNaturalSize=sizeof(unsigned char);
                     break;
                     }
     if (pTypeHashCode==CharType)
                     {
-                    pType |= ZType_Char ;
+                    wType |= ZType_Char ;
                     pNaturalSize=sizeof(char);
                     pUniversalSize = pNaturalSize;  // array of char is a special case because no sign byte is added
                     break;
@@ -326,49 +296,49 @@ _getAtomicZType_T(const size_t pTypeHashCode, ZTypeBase &pType, size_t& pNatural
 */
     if (pTypeHashCode==U8Type)
                     {
-                    pType |= ZType_U8 ;
+                    wType |= ZType_U8 ;
                     pNaturalSize=sizeof(uint8_t);
                     break;
                     }
     if (pTypeHashCode==S8Type)
                     {
-                    pType |= ZType_S8 ;
+                    wType |= ZType_S8 ;
                     pNaturalSize=sizeof(int8_t);
                     break;
                     }
     if (pTypeHashCode==S16Type)
                     {
-                    pType |= ZType_S16 ;
+                    wType |= ZType_S16 ;
                     pNaturalSize=sizeof(int16_t);
                     break;
                     }
     if (pTypeHashCode==U16Type)
                     {
-                    pType |= ZType_U16 ;
+                    wType |= ZType_U16 ;
                     pNaturalSize=sizeof(uint16_t);
                     break;
                     }
     if (pTypeHashCode==S32Type)
                     {
-                    pType |= ZType_S32 ;
+                    wType |= ZType_S32 ;
                     pNaturalSize=sizeof(int32_t);
                     break;
                     }
     if (pTypeHashCode==U32Type)
                     {
-                    pType |= ZType_U32 ;
+                    wType |= ZType_U32 ;
                     pNaturalSize=sizeof(uint32_t);
                     break;
                     }
     if (pTypeHashCode==S64Type)
                     {
-                    pType |= ZType_S64 ;
+                    wType |= ZType_S64 ;
                     pNaturalSize=sizeof(int64_t);
                     break;
                     }
     if (pTypeHashCode==U64Type)
                     {
-                    pType |= ZType_U64 ;
+                    wType |= ZType_U64 ;
                     pNaturalSize=sizeof(uint64_t);
                     break;
                     }
@@ -377,49 +347,108 @@ _getAtomicZType_T(const size_t pTypeHashCode, ZTypeBase &pType, size_t& pNatural
 //
     if (pTypeHashCode==FloatType)
                     {
-                    pType |= ZType_Float ;
+                    wType |= ZType_Float ;
                     pNaturalSize=sizeof(float);
                     break;
                     }
     if (pTypeHashCode==DoubleType)
                     {
-                    pType |= ZType_Double ;
+                    wType |= ZType_Double ;
                     pNaturalSize=sizeof(double);
                     break;
                     }
     if (pTypeHashCode==LDoubleType)
                     {
-                    pType |= ZType_LDouble ;
+                    wType |= ZType_LDouble ;
                     pNaturalSize=sizeof(long double);
                     break;
                     }
 
 
-    pType = ZType_Unknown;
+    wType = ZType_Unknown;
     pNaturalSize = -1;
     pUniversalSize = -1;
     ZException.setMessage(_GET_FUNCTION_NAME_,
                           ZS_INVTYPE,
                           Severity_Severe,
                           "Atomic type of data hashcode <%lX> cannot not be recognized",pTypeHashCode);
-    return (ZS_INVTYPE);
+    return (wType);
 
     }// while
     pUniversalSize = pNaturalSize;
-    if (pType & ZType_Signed)
+    if (wType & ZType_Signed)
                 pUniversalSize = pUniversalSize+ 1; // take care of sign byte
 
-    return(ZS_SUCCESS);
-}// _getAtomicZTypeT generic - template
+    return(wType);
+}// _getAtomicZTypeFull_T generic - template
+
+template <class _Tp>
+ZTypeBase
+_getAtomicZType(const size_t pTypeHashCode)
+{
+
+    if (pTypeHashCode==UCharType)
+    {
+      return ZType_UChar ;
+    }
+    if (pTypeHashCode==CharType)
+    {
+      return ZType_Char ;
+    }
+    /* not to be used anymore
+    if (pTypeHashCode==WCharType)
+                    {
+                    return ZType_WChar ;
+                    }
+    if (pTypeHashCode==WUCharType)
+                    {
+                    return ZType_WUChar ;
+                    }
+*/
+    if (pTypeHashCode==U8Type)
+    {
+      return ZType_U8 ;
+    }
+    if (pTypeHashCode==S8Type)
+    {
+      return ZType_S8 ;
+    }
+    if (pTypeHashCode==S16Type)
+    {
+      return ZType_S16 ;
+    }
+    if (pTypeHashCode==U16Type)
+    {
+      return ZType_U16 ;
+    }
+    if (pTypeHashCode==S32Type)
+    {
+      return ZType_S32 ;
+    }
+    if (pTypeHashCode==U32Type)
+      return ZType_U32 ;
+
+    if (pTypeHashCode==S64Type)
+      return ZType_S64 ;
+
+    if (pTypeHashCode==U64Type)
+      return ZType_U64 ;
 
 
-//-----------------Key Dictionary definition--------------------------------
-// --------------- Key field type ------------------------------------------
+    //-------Floating point----------------------------
+    //
+    if (pTypeHashCode==FloatType)
+      return ZType_Float ;
 
-// following is no more used see conditional template _getZTypeT function
-//static inline
-//ZStatus _getZType(auto pValue, ZType_type &pType, ssize_t &pNaturalSize, ssize_t pKeySize,bool pFromRecord=true);
+    if (pTypeHashCode==DoubleType)
+      return ZType_Double ;
 
+    if (pTypeHashCode==LDoubleType)
+      return ZType_LDouble ;
+
+
+    return (ZType_Unknown);
+}// _getAtomicZType_T generic - template
 
 
 template <typename _Tp>
@@ -510,30 +539,198 @@ utfStringDescriptor* wString = static_cast<utfStringDescriptor*>(pValue);
   pUniversalSize= wString->getByteSize();
   return ZS_SUCCESS;
 }
-/*
-template <typename _Tp>
-ZStatus
-_getZTypeVaryingWString (void *pValue,
-                      ZTypeBase &pType,
-                      size_t &pNaturalSize,
-                      size_t &pUniversalSize,
-                      uint16_t &pArrayCount)
-{
 
-varyingWString* wString = static_cast<varyingWString*>(pValue);
-
-//size_t wSize=wString->capacity();
-  pType = ZType_VaryingWString ;
-
-  pArrayCount = wString->Size/sizeof(wchar_t);
-  pNaturalSize = wString->Size;
-  pUniversalSize= wString->Size;
-  return ZS_SUCCESS;
-}
-*/
 /**================================_getZType templates===========================================================
- *
+ *    Warning : Enum is not allowed
  */
+template <typename _Tp>
+/**
+ * @brief _getZTypeFull_T template function : from a given value (pValue) with template type _Tp analyzes the type of data and :
+   -  generates a ZType_type mask returned in pType (long),
+   - returns
+      + a Natural size (roughly sizeof(_Tp))
+      + Key size for the data (depending on Sign byte etc.)
+      + Array size (number of elements in array or 1 if atomic data or Class)
+
+There is one function (conditional overloads) for
+  - atomic data : integral and floating point
+  - array : for array, analyzed type is done additionally for the atomic data type of contained elements
+  - pointer: for pointer, analyzed type contains additionally the atomic data type to which the pointer points to.
+  - class (non polymorphic class & struct)
+
+ * @param[in]  pValue the value of the data field to be analyzed
+ * @param[out] pType
+ * @param[out] pNaturalSize resulting natural total size of the array
+ * @param[out] pUniversalSize  resulting (Key) internal total size of the data field
+ * @param[out] pCapacity   Number of occurrences withing the array if data type is an array or 1 if atomic data or Class
+ * @return  a ZTypeBase : resulting ZType_type data type mask. If not recognized, set to ZType_Unknown and ZException is set appropriately.
+ */
+ZTypeBase
+_getZTypeFull_T(typename std::enable_if_t<std::is_integral<_Tp>::value|std::is_floating_point<_Tp>::value,_Tp> &pValue,
+           size_t &pNaturalSize,
+           size_t &pUniversalSize,
+           URF_Array_Count_type &pCapacity)
+{
+    ZTypeBase wType  ; // set pType (ZType_type mask) to zero (ZType_Nothing)
+    pCapacity = 1;
+    const size_t wTypeHashCode = typeid(pValue).hash_code();
+    if (wTypeHashCode==typeid(void).hash_code())
+                {
+                ZException.setMessage  (_GET_FUNCTION_NAME_,
+                                          ZS_INVTYPE,
+                                          Severity_Severe,
+                                          "Invalid data type requested <void> ");
+
+                return ZS_INVTYPE ;
+                }
+
+    wType = _getAtomicZTypeFull<_Tp>(wTypeHashCode,pNaturalSize,pUniversalSize);
+    if (wType!=ZType_Unknown )
+      return wType | ZType_Atomic;
+
+    char wOutName[50];
+    char*wOutNamePtr= (char*)wOutName;
+    memset(wOutName,0,50);
+    typeDemangler(typeid(_Tp).name(),wOutNamePtr,50);
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        ZS_INVTYPE,
+        Severity_Severe,
+        " Unrecognized field data type  <%s> (before demangling <%s>) hascode <%lX.",
+        wOutName,
+        typeid(_Tp).name(),
+        typeid(pValue).hash_code());
+    return(wType);
+
+}// _getZType_T integral + floating point (fundamental excepted std::nullptr_t and void data types)
+
+/** @brief _getZTypeFull_T get ZType template for Class type ( class or struct ).
+ */
+template <typename _Tp>
+ZTypeBase
+_getZTypeFull_T(typename std::enable_if_t<std::is_class<_Tp>::value,_Tp> &pValue,
+    size_t &pNaturalSize,
+    size_t &pUniversalSize,
+    URF_Array_Count_type &pUnitCount)
+{
+  ZTypeBase pType ;
+  const size_t wTypeHashCode=typeid(pValue).hash_code();
+  pUnitCount = 1;
+
+  pType = _getClassZTypeFull<_Tp>(&pValue,wTypeHashCode,pNaturalSize,pUniversalSize,pUnitCount);
+
+  if (pType != ZType_Unknown)
+    return ZS_SUCCESS;
+
+  pNaturalSize = pUniversalSize =pUnitCount=0;
+
+  char wOutName[50];
+  char*wOutNamePtr= (char*)wOutName;
+  memset(wOutName,0,50);
+  typeDemangler(typeid(_Tp).name(),wOutNamePtr,50);
+  ZException.setMessage(_GET_FUNCTION_NAME_,
+      ZS_INVTYPE,
+      Severity_Severe,
+      " Unrecognized field data type  <%s> (before demangling <%s>) hascode <%lX.",
+      wOutName,
+      typeid(_Tp).name(),
+      typeid(pValue).hash_code());
+  return(ZS_INVTYPE);
+}// _getZTypeT for class (class & struct)
+
+template <typename _Tp>
+ZTypeBase
+_getZTypeFull_T(typename std::enable_if_t<std::is_pointer<_Tp>::value,_Tp> &pValue,
+           size_t &pNaturalSize,
+           size_t &pUniversalSize,
+           URF_Array_Count_type &pCapacity)
+{
+ZStatus wSt;
+ZTypeBase wType;
+
+    const size_t wTypeHash = typeid(*pValue).hash_code();
+
+    wType=_getAtomicZTypeFull<_Tp>(wTypeHash,pNaturalSize,pUniversalSize); // analyze first array element's Atomic data type
+    if (wType!=ZType_Unknown){
+      return wType | ZType_Pointer;
+    }
+    /* not found, try classes */
+    wType=_getClassZTypeFull<_Tp>(wTypeHash,pNaturalSize,pUniversalSize,pCapacity); // analyze first array element's Atomic data type
+    if (wType!=ZType_Unknown)
+      return wType | ZType_Pointer;
+
+
+    char wOutName[50];
+    char*wOutNamePtr= (char*)wOutName;
+    memset(wOutName,0,50);
+    typeDemangler(typeid(_Tp).name(),wOutNamePtr,50);
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        ZS_INVTYPE,
+        Severity_Severe,
+        " Unrecognized field data type  <%s> (before demangling <%s>) hascode <%lX.",
+        wOutName,
+        typeid(_Tp).name(),
+        typeid(pValue).hash_code());
+    fprintf (stderr,ZException.last().formatFullUserMessage().toCChar());
+    return wType | ZType_Pointer;
+
+} // _getZTypeFull_T for Pointer
+
+
+
+template <typename _Tp>
+/**
+ * @brief _getZType_T get ZType template for Array. That far we are processing an Array.
+ *    So we will get of what is made this array.
+ *    Length of the field will be length of array * unitary size*
+ * @param[in]  pValue the value of the data field to be analyzed
+ * @param[out] pType resulting ZType_type data type mask
+ * @param[out] pNaturalSize resulting natural total size of the array
+ * @param[out] pKeyFieldSize  resulting (Key) internal total size of the array
+ * @param[out] pArraySize   Number of occurrences withing the array
+ * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.@see ZBSError
+ */
+ZTypeBase
+_getZTypeFull_T(typename std::enable_if_t<std::is_array<_Tp>::value,_Tp> &pValue,
+                size_t &pNaturalSize,
+                size_t &pUniversalSize,
+                URF_Array_Count_type &pCapacity)
+{
+  ZTypeBase wType;
+  const size_t wTypeHash = typeid(pValue[0]).hash_code();
+
+  wType=_getAtomicZTypeFull<_Tp>(wTypeHash,pNaturalSize,pUniversalSize); // analyze first array element's Atomic data type
+  if (wType!=ZType_Unknown){
+    return wType | ZType_Pointer;
+  }
+  /* not found, try classes */
+  wType=_getClassZTypeFull<_Tp>(wTypeHash,pNaturalSize,pUniversalSize,pCapacity); // analyze first array element's Atomic data type
+  if (wType!=ZType_Unknown)
+    return wType | ZType_Array;
+
+
+  char wOutName[50];
+  char*wOutNamePtr= (char*)wOutName;
+  memset(wOutName,0,50);
+  typeDemangler(typeid(_Tp).name(),wOutNamePtr,50);
+  ZException.setMessage(_GET_FUNCTION_NAME_,
+      ZS_INVTYPE,
+      Severity_Severe,
+      " Unrecognized field data type  <%s> (before demangling <%s>) hascode <%lX.",
+      wOutName,
+      typeid(_Tp).name(),
+      typeid(pValue).hash_code());
+  fprintf (stderr,ZException.last().formatFullUserMessage().toCChar());
+  return wType | ZType_Array;;
+
+}// _getZTypeT for Array
+
+//--------------Enum will not be allowed anymore : deprecated and not useful----------------
+
+//#include <ztoolset/zutfstrings.h>
+
+/*============== simple get data type =================*/
+
+
 template <typename _Tp>
 /**
  * @brief _getZTypeT template function : from a given value (pValue) with template type _Tp analyzes the type of data and :
@@ -550,69 +747,76 @@ There is one function (conditional overloads) for
   - class (non polymorphic class & struct)
 
  * @param[in]  pValue the value of the data field to be analyzed
- * @param[out] pType resulting ZType_type data type mask
- * @param[out] pNaturalSize resulting natural total size of the array
- * @param[out] pKeyFieldSize  resulting (Key) internal total size of the data field
- * @param[out] pArraySize   Number of occurrences withing the array if data type is an array or 1 if atomic data or Class
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.@see ZBSError
+ * @return  resulting ZType_type data type mask.
+ * If type has not been found, then ZType_Unknown is returned and ZException is set with appropriate message.
  */
-ZStatus
-_getZType_T(typename std::enable_if_t<std::is_integral<_Tp>::value|std::is_floating_point<_Tp>::value,_Tp> &pValue,
-           ZTypeBase &pType,
-           size_t &pNaturalSize,
-           size_t &pKeyFieldSize,
-           URF_Array_Count_type &pArraySize)
+ZTypeBase
+_getZType_T(typename std::enable_if_t<std::is_integral<_Tp>::value|std::is_floating_point<_Tp>::value,_Tp> &pValue)
 {
-    pType = ZType_Atomic ; // set pType (ZType_type mask) to zero (ZType_Nothing)
-    pArraySize = 1;
+
     const size_t wTypeHashCode = typeid(pValue).hash_code();
-    if (wTypeHashCode==typeid(void).hash_code())
-                {
-                ZException.setMessage  (_GET_FUNCTION_NAME_,
+    if (wTypeHashCode==typeid(void).hash_code()) {
+        ZException.setMessage  (_GET_FUNCTION_NAME_,
                                           ZS_INVTYPE,
                                           Severity_Severe,
                                           "Invalid data type requested <void> ");
 
-                return ZS_INVTYPE ;
-                }
+        fprintf (stderr,ZException.last().formatFullUserMessage().toCChar());
+        return ZType_Unknown ;
+    }
 
-    return _getAtomicZType_T<_Tp>(wTypeHashCode,pType,pNaturalSize,pKeyFieldSize);
+    ZTypeBase wType = _getAtomicZType<_Tp>(wTypeHashCode);
 
+    if (wType!=ZType_Unknown){
+      return wType | ZType_Atomic;
+    }
+    /* well, this is an unknown type */
+    char wOutName[50];
+    char*wOutNamePtr= (char*)wOutName;
+    memset(wOutName,0,50);
+    typeDemangler(typeid(_Tp).name(),wOutNamePtr,50);
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        ZS_INVTYPE,
+        Severity_Severe,
+        " Unrecognized data type  <%s> (before demangling <%s>) hascode <%lX.",
+        wOutName,
+        typeid(_Tp).name(),
+        typeid(pValue).hash_code());
+    fprintf (stderr,ZException.last().formatFullUserMessage().toCChar());
+    return wType;
 }// _getZType_T integral + floating point (fundamental excepted std::nullptr_t and void data types)
 
+
 template <typename _Tp>
-ZStatus
-_getZType_T(typename std::enable_if_t<std::is_pointer<_Tp>::value,_Tp> &pValue,
-           ZTypeBase &pType,
-           size_t &pNaturalSize,
-           size_t &pUniversalSize,
-           URF_Array_Count_type &pArrayCount)
+ZTypeBase
+_getZType_T(typename std::enable_if_t<std::is_pointer<_Tp>::value,_Tp> &pValue)
 {
-ZStatus wSt;
-ZTypeBase wType;
+  ZTypeBase wType;
+  const size_t wTypeHash = typeid(*pValue).hash_code();
 
-    pType = ZType_Pointer;
-    if (typeid(std::string).hash_code()==typeid(*pValue).hash_code())  // address pointer to std::string
-    {
-    return _getZTypeStdString<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pArrayCount) ;
-    }
-    size_t wAtomicNaturalSize;
-    size_t wAtomicUniversalSize;
-    wSt=_getAtomicZType_T<_Tp>(typeid(*pValue).hash_code(),wType,wAtomicNaturalSize,wAtomicUniversalSize); // analyze first array element's Atomic data type
-    if (wSt!=ZS_SUCCESS)
-                return wSt;
-    pType |= wType;
-
-    if (wType & ZType_Char)
-                {
-                return _getZTypeCString<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pArrayCount);
-//                return ZS_SUCCESS;
-                }
-    pNaturalSize = wAtomicNaturalSize;
-//    pArraySize = 1 ;
-    pUniversalSize =  wAtomicUniversalSize ;
-
-    return ZS_SUCCESS;
+  wType=_getAtomicZType<_Tp>(wTypeHash); // analyze first array element's Atomic data type
+  if (wType!=ZType_Unknown){
+    return wType | ZType_Pointer;
+  }
+  /* not found, try classes */
+  wType=_getClassZType<_Tp>(wTypeHash); // analyze first array element's Atomic data type
+  if (wType!=ZType_Unknown){
+    return wType | ZType_Pointer;
+  }
+  /* well, this is an unknown type */
+  char wOutName[50];
+  char*wOutNamePtr= (char*)wOutName;
+  memset(wOutName,0,50);
+  typeDemangler(typeid(_Tp).name(),wOutNamePtr,50);
+  ZException.setMessage(_GET_FUNCTION_NAME_,
+      ZS_INVTYPE,
+      Severity_Severe,
+      " Unrecognized field data type  <%s> (before demangling <%s>) hascode <%lX.",
+      wOutName,
+      typeid(_Tp).name(),
+      typeid(pValue).hash_code());
+  fprintf (stderr,ZException.last().formatFullUserMessage().toCChar());
+  return wType;
 
 } // _getZType_T for Pointer
 
@@ -630,107 +834,44 @@ template <typename _Tp>
  * @param[out] pArraySize   Number of occurrences withing the array
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.@see ZBSError
  */
-ZStatus
-_getZType_T(typename std::enable_if_t<std::is_array<_Tp>::value,_Tp> &pValue,
-           ZTypeBase &pType,        //!< Field type mask using ZType_type
-           size_t &pNaturalSize,    //!< total field natural size (External size)
-           size_t &pUniversalSize,  //!< total field internal format size ( may differ from natural size according sign byte )
-           URF_Array_Count_type &pArrayCount)   //!< Number or array elementsbool pRecordUse)
+ZTypeBase
+_getZType_T(typename std::enable_if_t<std::is_array<_Tp>::value,_Tp> &pValue)   //!< Number or array elementsbool pRecordUse)
 {
 ZStatus wSt;
  //   long wNaturalSize = 0;  //! total field natural size
  //   long wKeySize = 0;      //! unary element size within Key ( may differ according sign byte )
 ZTypeBase wType;
-    pType = ZType_Array ; // set pType (ZType_type mask) to zero (ZType_Nothing)
-    size_t wAtomicNaturalSize;
-    size_t wAtomicUniversalSize;
-    wSt=_getAtomicZType_T<_Tp>(typeid(pValue[0]).hash_code(),wType,wAtomicNaturalSize,wAtomicUniversalSize); // analyze first array element's Atomic data type
-    if (wSt!=ZS_SUCCESS)
-                return wSt;
-    pNaturalSize = sizeof (_Tp);
-    pArrayCount = (uint16_t ) ((float)pNaturalSize / (float)wAtomicNaturalSize );
-    pUniversalSize = ((size_t)pArrayCount) * wAtomicUniversalSize ;
-    pType |= wType ;
-    return(ZS_SUCCESS);
+const size_t wTypeHash = typeid(pValue[0]).hash_code();
 
+    wType=_getAtomicZType<_Tp>(wTypeHash); // analyze first array element's Atomic data type
+    if (wType!=ZType_Unknown){
+      return wType | ZType_Array;
+    }
+    /* not found, try classes */
+    wType=_getClassZType<_Tp>(wTypeHash); // analyze first array element's Atomic data type
+    if (wType!=ZType_Unknown){
+      return wType | ZType_Array;
+    }
+    /* well, this is an unknown type */
+    char wOutName[50];
+    char*wOutNamePtr= (char*)wOutName;
+    memset(wOutName,0,50);
+    typeDemangler(typeid(_Tp).name(),wOutNamePtr,50);
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        ZS_INVTYPE,
+        Severity_Severe,
+        " Unrecognized field data type  <%s> (before demangling <%s>) hascode <%lX.",
+        wOutName,
+        typeid(_Tp).name(),
+        typeid(pValue).hash_code());
+    fprintf (stderr,ZException.last().formatFullUserMessage().toCChar());
+    return wType;
 }// _getZTypeT for Array
+
+
 
 //--------------Enum will not be allowed anymore : deprecated and not useful----------------
 
-#ifdef __COMMENT__
-template <typename _Tp>
-/**
- * @brief _getZTypeT get ZType template for Enum.
- *
- *  Enums are encoded in a long
- *
- * @param[in]  pValue the value of the data field to be analyzed
- * @param[out] pType resulting ZType_type data type mask
- * @param[out] pNaturalSize resulting natural total size of the array
- * @param[out] pKeyFieldSize  resulting (Key) internal total size of the array
- * @param[out] pArraySize   Number of occurrences withing the array
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.@see ZBSError
- */
-ZStatus
-//_getZTypeT(typename std::enable_if_t<std::is_integral<_Tp>::value,_Tp> &pValue,long &pType_mask,ssize_t& pLength,bool pFromRecord)
-_getZTypeT(typename std::enable_if_t<std::is_enum<_Tp>::value,_Tp> &pValue,
-           ZTypeBase pType,             //!< Field type mask using ZType_type
-           ssize_t &pNaturalSize,   //!< total field natural size (External size)
-           ssize_t &pKeyFieldSize,  //!< total field internal format size ( may differ from natural size according sign byte )
-           long &pArraySize)        //!< Number or array elements
-{
-ZStatus wSt;
-    long wNaturalSize = 0;  // total field natural size
-    long wKeyFieldSize = 0;      // unary element size within Key ( may differ according sign byte )
-    pType = ZType_Enum ; // set pType (ZType_type mask) to zero (ZType_Nothing)
-
-
-    ssize_t wSize = sizeof(pValue);
-
-    while(true)
-    {
-    if (wSize== sizeof(int8_t))
-                {
-                pType |= ZType_S8&(~ZType_NegateStructure)  ;
-                break ;
-                }
-    if (wSize== sizeof(int16_t))
-                {
-                pType |= ZType_S16&(~ZType_NegateStructure)  ;
-                break ; ;
-                }
-    if (wSize== sizeof(int32_t))
-                {
-                pType |= ZType_S32 & (~ZType_NegateStructure)  ;  // ZType_EnumLong
-                break ;
-                }
-    if (wSize== sizeof(int64_t))
-                {
-                pType |= ZType_S64 & (~ZType_NegateStructure)  ;
-                break ;
-                }
-
-    pType = ZType_Enum|ZType_Unknown ;
-    break;
-    }//while true
-
-    pNaturalSize = wSize;
-    pKeyFieldSize = wSize + 1;
-
-    pArraySize=1;
-    return(ZS_SUCCESS);
-
-/*
-    long wValue=0;    // this is a long
-
-    wSt=_getAtomicZTypeT<_Tp>(typeid(wValue).hash_code(),pType,pNaturalSize,pKeyFieldSize); // analyze first array element's Atomic data type
-    if (wSt!=ZS_SUCCESS)
-                return wSt;
-
-*/
-}// _getZTypeT for Enum
-
-#endif // __COMMENT__
 //#include <ztoolset/zutfstrings.h>
 ZStatus _getFixedStringType(void*pValue,
                             ZTypeBase &pType,
@@ -741,122 +882,25 @@ ZStatus _getFixedStringType(void*pValue,
 
 ZStatus _getBlobType(void*pValue,ZTypeBase &pType,size_t &pNaturalSize , size_t &pUniversalSize ,URF_Array_Count_type &pArrayCount);
 
-ZStatus _getBitsetType(void*pValue, ZTypeBase &pType, uint64_t &pNaturalSize , uint64_t&pUniversalSize , URF_Array_Count_type &pArrayCount);
+ZStatus _getBitsetTypeFull(void*pValue, ZTypeBase &pType, uint64_t &pNaturalSize , uint64_t&pUniversalSize , URF_Array_Count_type &pArrayCount);
+
+
+/* single get for ztype (no other values) */
+
+
 /** @brief _getZTypeT get ZType template for Class type ( class or struct ).
  *  It does nothing : it is there to insure std::enable_if <> coherence while compiling
  */
 template <typename _Tp>
-ZStatus
-_getZType_T(typename std::enable_if_t<std::is_class<_Tp>::value,_Tp> &pValue,
-            ZTypeBase &pType,
-            size_t &pNaturalSize,
-            size_t &pUniversalSize,
-            URF_Array_Count_type &pUnitCount)
+ZTypeBase
+_getZTypeT(typename std::enable_if_t<std::is_class<_Tp>::value,_Tp> &pValue)
 {
-
-    pType = ZType_Class ;
     size_t wTypeHashCode=typeid(pValue).hash_code();
-    pUnitCount = 1;
-    if (wTypeHashCode==stdStringType)
-        {
-        return _getZTypeStdString<_Tp>(&pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
-        }
-    if (typeid(pValue).hash_code()==stdWStringType)
-        {
-        return _getZTypeStdWString<_Tp>(&pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
-        }
-//===============Fixed utf strings=================================
 
-    if (wTypeHashCode==descStringType)
-        {
-        return _getUtfStringData<_Tp>(&pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
-/*        pType=ZType_Utf8FixedString;
-        pNaturalSize = pUniversalSize =pUnitCount = cst_desclen+1;
-        return ZS_SUCCESS ;*/
-        }
-    if (wTypeHashCode==codeStringType)
-        {
-        return _getUtfStringData<_Tp>(&pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
-/*        pType=ZType_Utf8FixedString;
-        pNaturalSize = pUniversalSize =pUnitCount = cst_codelen+1;
-        return ZS_SUCCESS ;*/
-        }
-    if (wTypeHashCode==uriStringType)
-        {
-        return _getUtfStringData<_Tp>(&pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
-/*        pType=ZType_Utf8FixedString;
-        pNaturalSize = pUniversalSize =pUnitCount = cst_urilen+1;
-        return ZS_SUCCESS ;*/
-        }
-    if (wTypeHashCode==messageStringType)
-        {
-        return _getUtfStringData<_Tp>(&pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
-/*        pType=ZType_Utf8FixedString;
-        pNaturalSize = pUniversalSize =pUnitCount = cst_messagelen+1;
-        return ZS_SUCCESS ;*/
-        }
-    if (wTypeHashCode==keywordStringType)
-        {
-        return _getUtfStringData<_Tp>(&pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
-/*        pType=ZType_Utf8FixedString;
-        pNaturalSize = pUniversalSize =pUnitCount = cst_keywordlen+1;
-        return ZS_SUCCESS ;*/
-        }
-    if (wTypeHashCode==identityStringType)
-        {
-        return _getUtfStringData<_Tp>(&pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
-/*        pType=ZType_Utf8FixedString;
-        pNaturalSize = pUniversalSize =pUnitCount = cst_identitylen+1;
-        return ZS_SUCCESS ;*/
-        }
-     //===============Varying utf strings=================================
-    if (wTypeHashCode==utf8varyingStringType)
-        {
-        return _getUtfStringData<_Tp>(&pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
-        }
-    if (wTypeHashCode==utf16varyingStringType)
-        {
-        return _getUtfStringData<_Tp>(&pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
-        }
-    if (wTypeHashCode==utf32varyingStringType)
-        {
-        return _getUtfStringData<_Tp>(&pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
-        }
-    if (wTypeHashCode==checksumType)
-        {
-        pType=ZType_CheckSum;
-        pNaturalSize = pUniversalSize =pUnitCount = cst_checksum;
-        return ZS_SUCCESS ;
-        }
-    if (wTypeHashCode==bitsetType)
-        {
-        pType=ZType_bitset;
-        return _getBitsetType(&pValue,pType,pNaturalSize , pUniversalSize ,pUnitCount);
-        return ZS_SUCCESS ;
-        }
-    if (wTypeHashCode==zdatabufferType)
-        {
-        pType=ZType_Blob;
-        return _getBlobType(&pValue,pType,pNaturalSize , pUniversalSize ,pUnitCount);
-        }
+    ZTypeBase wType = _getClassZType<_Tp>(wTypeHashCode);
 
-    if (wTypeHashCode==zdateType)
-        {
-        pType=ZType_ZDate;
-        pNaturalSize = pUniversalSize = sizeof(uint32_t);
-        pUnitCount =1;
-        return ZS_SUCCESS ;
-        }
-    if (wTypeHashCode==zdateFullType)
-        {
-        pType=ZType_ZDateFull;
-        pNaturalSize = pUniversalSize = sizeof(uint64_t);
-        pUnitCount = 1;
-        return ZS_SUCCESS ;
-        }
-
-    pType=ZType_Unknown;
-    pNaturalSize = pUniversalSize =pUnitCount=0;
+    if (wType!=ZType_Unknown)
+      return wType;
 
     char wOutName[50];
     char*wOutNamePtr= (char*)wOutName;
@@ -869,8 +913,203 @@ _getZType_T(typename std::enable_if_t<std::is_class<_Tp>::value,_Tp> &pValue,
                           wOutName,
                           typeid(_Tp).name(),
                           typeid(pValue).hash_code());
-    return(ZS_INVTYPE);
+    fprintf(stderr,ZException.formatFullUserMessage().toCChar());
+    return(wType);
 }// _getZTypeT for class (class & struct)
+
+
+template <class _Tp>
+ZTypeBase
+_getClassZType(size_t pTypeHashCode)
+{
+  if (pTypeHashCode==stdStringType)
+    return ZType_StdString;
+  if (pTypeHashCode==stdWStringType)
+    return ZType_StdWString;
+
+  //===============Fixed utf strings=================================
+
+  if (pTypeHashCode==descStringType)
+    return ZType_Utf8FixedString;
+  if (pTypeHashCode==codeStringType)
+    return ZType_Utf8FixedString;
+  if (pTypeHashCode==messageStringType)
+    return ZType_Utf8FixedString;
+  if (pTypeHashCode==keywordStringType)
+    return ZType_Utf8FixedString;
+  if (pTypeHashCode==identityStringType)
+    return ZType_Utf8FixedString;
+
+  if (pTypeHashCode==uriStringType)
+    return ZType_URIString;
+
+  //===============Varying utf strings=================================
+
+  if (pTypeHashCode==utf8varyingStringType)
+    return ZType_Utf8VaryingString;
+  if (pTypeHashCode==utf16varyingStringType)
+    return ZType_Utf16VaryingString;
+  if (pTypeHashCode==utf32varyingStringType)
+    return ZType_Utf32VaryingString;
+
+  if (pTypeHashCode==checksumType)
+    return ZType_CheckSum;
+  if (pTypeHashCode==md5Type)
+    return ZType_MD5;
+
+  if (pTypeHashCode==bitsetType)
+    return ZType_bitset;
+
+  if (pTypeHashCode==zdatabufferType)
+    return ZType_Blob;
+
+  if (pTypeHashCode==zdateType)
+    return ZType_ZDate;
+  if (pTypeHashCode==zdateFullType)
+    return ZType_ZDateFull;
+
+
+  return(ZType_Unknown);
+}// _getClassZType for class (class & struct)
+
+
+template <class _Tp>
+ZTypeBase
+_getClassZTypeFull( _Tp*  pValue,               /* value is required to get much info on it when it is class */
+                    const size_t wTypeHashCode,
+                    size_t &pNaturalSize,
+                    size_t &pUniversalSize,
+                    URF_Array_Count_type &pUnitCount)
+{
+  ZTypeBase pType = ZType_Class ;
+  pUnitCount = 1;
+
+  //===============Varying utf strings=================================
+
+  if (wTypeHashCode==utf8varyingStringType)
+  {
+    _getUtfStringData<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
+    return pType;
+  }
+  if (wTypeHashCode==utf16varyingStringType)
+  {
+    _getUtfStringData<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
+    return pType;
+  }
+  if (wTypeHashCode==utf32varyingStringType)
+  {
+    _getUtfStringData<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
+    return pType;
+  }
+
+  //=============Crypting classes =======================
+
+  if (wTypeHashCode==checksumType)
+  {
+    pType=ZType_CheckSum;
+    pNaturalSize = pUniversalSize =pUnitCount = cst_checksum;
+    return pType;
+  }
+  if (wTypeHashCode==md5Type)
+  {
+    pType=ZType_MD5;
+    pNaturalSize = pUniversalSize =pUnitCount = cst_md5 ;
+    return pType;
+  }
+  //============= bitset =======================
+
+  if (wTypeHashCode==bitsetType)
+  {
+    pType=ZType_bitset;
+    return _getBitsetTypeFull(pValue,pType,pNaturalSize , pUniversalSize ,pUnitCount);
+    return pType;
+  }
+
+  //============= blob (ZDataBuffer) =======================
+
+  if (wTypeHashCode==zdatabufferType)
+  {
+    pType=ZType_Blob;
+    _getBlobType(pValue,pType,pNaturalSize , pUniversalSize ,pUnitCount);
+    return pType;
+  }
+
+  //============= dates =======================
+
+  if (wTypeHashCode==zdateType)
+  {
+    pType=ZType_ZDate;
+    pNaturalSize = pUniversalSize = sizeof(uint32_t);
+    pUnitCount =1;
+    return pType;
+  }
+  if (wTypeHashCode==zdateFullType)
+  {
+    pType=ZType_ZDateFull;
+    pNaturalSize = pUniversalSize = sizeof(uint64_t);
+    pUnitCount = 1;
+    return pType;
+  }
+
+  if (wTypeHashCode==stdStringType)
+  {
+    _getZTypeStdString<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
+    return pType;
+  }
+  if (wTypeHashCode==stdWStringType)
+  {
+    _getZTypeStdWString<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
+    return pType;
+  }
+  //===============Fixed size strings=================================
+
+  if (wTypeHashCode==descStringType)
+  {
+    _getUtfStringData<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
+    return pType;
+    /*        pType=ZType_Utf8FixedString;
+        pNaturalSize = pUniversalSize =pUnitCount = cst_desclen+1;
+        return ZS_SUCCESS ;*/
+  }
+  if (wTypeHashCode==codeStringType)
+  {
+    _getUtfStringData<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
+    return pType;
+    /*        pType=ZType_Utf8FixedString;
+        pNaturalSize = pUniversalSize =pUnitCount = cst_codelen+1;
+        return ZS_SUCCESS ;*/
+  }
+  if (wTypeHashCode==uriStringType)
+  {
+    _getUtfStringData<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
+    return pType;
+  }
+  if (wTypeHashCode==messageStringType)
+  {
+    _getUtfStringData<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
+    return pType;
+    /*        pType=ZType_Utf8FixedString;
+        pNaturalSize = pUniversalSize =pUnitCount = cst_messagelen+1;
+        return ZS_SUCCESS ;*/
+  }
+  if (wTypeHashCode==keywordStringType)
+  {
+    _getUtfStringData<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
+    return pType;
+  }
+  if (wTypeHashCode==identityStringType)
+  {
+    _getUtfStringData<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
+    return pType;
+  }
+
+
+  pType=ZType_Unknown;
+  pNaturalSize = pUniversalSize = pUnitCount=0;
+
+
+  return pType;
+}// _getClassZType for class (class & struct)
 
 
 /** @endcond */ // Development
@@ -911,8 +1150,8 @@ _getZType_T(typename std::enable_if_t<std::is_class<_Tp>::value,_Tp> &pValue,
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.@see ZBSError
  */
 template <class _Tp>
-ZStatus
-zgetZType_T(ZTypeBase &pType,
+ZTypeBase
+zgetZType_T(
             size_t &pNaturalSize,
             size_t &pUniversalSize,
             URF_Array_Count_type &pArrayCount,
@@ -923,18 +1162,18 @@ ZStatus wSt;
     _Tp wValue;
     if (pArrayCount<1)
                 pArrayCount=1;
-    pType = ZType_Nothing ; // set pType (ZType_type mask) to zero (ZType_Nothing)
+    ZTypeBase pType = ZType_Nothing ; // set pType (ZType_type mask) to zero (ZType_Nothing)
 
 
     //-----First data structure analysis-----------
     //
 
-    wSt=  _getZType_T<_Tp>(wValue,pType,pNaturalSize,pUniversalSize,pArrayCount);
-    if (wSt!=ZS_SUCCESS)
-                    return wSt;
+    pType=  _getZTypeFull_T<_Tp>(wValue,pNaturalSize,pUniversalSize,pArrayCount);
+    if (pType==ZType_Unknown)
+                    return pType;
     if (pRecordUse)
             {
-            if (pType&ZType_Pointer)
+            if (pType & ZType_Pointer)
                 {
                  utfdescString wOutName;
                  typeDemangler(typeid(_Tp).name(),(char*)wOutName.content,wOutName.getByteSize());
@@ -948,21 +1187,10 @@ ZStatus wSt;
                 }
             }
 
-    return wSt;
+    return pType;
 
 }// zgetZType
-/*
-ZStatus
-zgetZType(auto &pValue,
-          ZTypeBase& pType,
-          size_t &pNaturalSize,
-          size_t &pUniversalSize,
-          URF_Array_Count_type &pArrayCount,
-          bool pRecordUse=true)
-{
-    return zgetZType_T<typeof(pValue)>(pValue,pType,pNaturalSize,pUniversalSize,pArrayCount);
-}
-*/
+
 //-----------------------End Get Type of data --------------------------------------------------
 
 
@@ -970,7 +1198,7 @@ zgetZType(auto &pValue,
 
 template <class _Tp>
 ZStatus
-_getAtomicZType_T(const size_t pTypeHashCode,ZTypeBase& pType,size_t& pNaturalSize,size_t& pUniversalSize);
+_getAtomicZTypeFull_T(const size_t pTypeHashCode,size_t& pNaturalSize,size_t& pUniversalSize);
 
 /** to be changed to templates */
 
@@ -1041,1402 +1269,8 @@ If atomic data types are not the same (value to set and key field type) then a c
 
 
 
-/** @cond Development */
 
 
-/**
- * @brief _castAtomicValue template function that converts any atomic value type to Universal atomic value
- *                                  according pDesiredType
- *          This routine is used to change atomic datatype from one to another before converting it
- *
- * @param[in] pValue        Data to convert
- * @param[in] pDesiredType  ZType_Type of Data to convert
- *
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.@see ZBSError
- */
-template <class _Tp>
-ZStatus
-_castAtomicValue_T (typename std::enable_if_t<std::is_integral<_Tp>::value|std::is_floating_point<_Tp>::value,_Tp> &pValue,
-                  const ZType_type pDesiredType,
-                  ZDataBuffer &pOutValue)
-{
-
-    if (sizeof(_Tp)>getAtomicNaturalSize(pDesiredType))
-                {
-                ZException.setMessage(_GET_FUNCTION_NAME_,
-                                      ZS_FIELDLOOSEPREC,
-                                      Severity_Error,
-                                      "asked to convert to <%s>. Field may loose precision: Conversion rejected.",
-                                      decode_ZType(pDesiredType));
-                return ZS_FIELDLOOSEPREC;
-                }
-ZTypeBase wType = pDesiredType & ZType_AtomicMask;
-
-    switch (wType)
-    {
-    case ZType_U8 :
-             {
-              uint8_t wValue= static_cast<uint8_t>(pValue);
-              pOutValue.setData(&wValue,sizeof(wValue));
-              return ZS_SUCCESS;
-             }
-    case ZType_S8 :
-            {
-            int8_t wValue= static_cast<int8_t>(pValue);
-            pOutValue.setData(&wValue,sizeof(wValue));
-            return ZS_SUCCESS;
-            }
-
-     case ZType_U16 :
-              {
-                uint16_t wValue= static_cast<uint16_t>(pValue);
-                pOutValue.setData(&wValue,sizeof(wValue));
-                return ZS_SUCCESS;
-              }
-     case ZType_S16 :
-             {
-                int16_t wValue= static_cast<int16_t>(pValue);
-                pOutValue.setData(&wValue,sizeof(wValue));
-                return ZS_SUCCESS;
-             }
-     case ZType_U32 :
-              {
-            uint32_t wValue= static_cast<uint32_t>(pValue);
-            pOutValue.setData(&wValue,sizeof(wValue));
-               return ZS_SUCCESS;
-              }
-     case ZType_S32 :
-             {
-            int32_t wValue= static_cast<int32_t>(pValue);
-            pOutValue.setData(&wValue,sizeof(wValue));
-             return ZS_SUCCESS;
-             }
-     case ZType_U64 :
-              {
-            uint64_t wValue= static_cast<uint64_t>(pValue);
-            pOutValue.setData(&wValue,sizeof(wValue));
-              return ZS_SUCCESS;
-              }
-     case ZType_S64 :
-             {
-            int64_t wValue= static_cast<int64_t>(pValue);
-            pOutValue.setData(&wValue,sizeof(wValue));
-             return ZS_SUCCESS;
-             }
-    case ZType_Float :
-                 {
-                float wValue= static_cast<float>(pValue);
-                pOutValue.setData(&wValue,sizeof(wValue));
-                 return ZS_SUCCESS;
-                 }
-     case ZType_Double :
-                  {
-        double wValue= static_cast<double>(pValue);
-        pOutValue.setData(&wValue,sizeof(wValue));
-                  return ZS_SUCCESS;
-                  }
-     case ZType_LDouble :
-                  {
-                long double wValue= static_cast<long double>(pValue);
-                pOutValue.setData(&wValue,sizeof(wValue));
-                    return ZS_SUCCESS;
-                  }
-
-        default:
-                 {
-                     ZException.setMessage(_GET_FUNCTION_NAME_,
-                                             ZS_INVTYPE,
-                                             Severity_Fatal,
-                                             "Invalid Type for key field to convert data to <%ld> <%s> encountered while processing data conversion",
-                                             pDesiredType,
-                                             decode_ZType(pDesiredType));
-                     return ZS_INVTYPE;
-                 }
-    }// switch
-}// _castAtomicValue
-
-
-/*
-ZStatus
-_castAtomicValue_A (auto pValue,
-                  const ZType_type pTargetType,
-                  ZDataBuffer &pOutValue)
-{
-    return _castAtomicValue_T<typeof(pValue)>(pValue,pTargetType,pOutValue);
-}
-*/
-#ifdef __COMMENT__
-/**
- * @brief _castAtomicToNfU_T template function that converts any Universal atomic value of pSourceType
- *          to Natural atomic value of type _Tp
- *          This routine is used to convert to natural value and to change atomic datatype from source type to the requested one
- *
- * @param[in] pInValue      Data to convert in Universal format
- * @param[in] pSourceType   ZType_Type of Data to convert
- * @param[out] pOutValue    Value converted and eventually casted to appropriate type
- *
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.@see ZBSError
- */
-template <class _Tp>
-ZStatus
-_castAtomicToNfU_T (ZDataBuffer &pInValue,
-                    const ZType_type pSourceType,
-                    typename std::enable_if_t<std::is_integral<_Tp>::value|std::is_floating_point<_Tp>::value,_Tp> &pOutValue)
-{
-size_t wSize=getAtomicNaturalSize(pSourceType);
-    if (sizeof(_Tp) < wSize)
-                {
-                ZException.setMessage(_GET_FUNCTION_NAME_,
-                                      ZS_FIELDLOOSEPREC,
-                                      Severity_Error,
-                                      "asked to convert from <%s>. Field may loose precision: Conversion rejected.",
-                                      decode_ZType(pSourceType));
-                return ZS_FIELDLOOSEPREC;
-                }
-ZTypeBase wType =  pSourceType & ZType_AtomicMask;
-
-    switch (wType)
-    {
-    case ZType_U8 :
-             {
-              uint8_t wValue;
-              memmove(&wValue,pInValue.Data,sizeof(wValue));
-//              wValue=_reverseByteOrder_T<uint8_t>(wValue);
-              pOutValue= static_cast<_Tp>(wValue);
-              return ZS_SUCCESS;
-             }
-    case ZType_S8 :
-            {
-            int8_t wValue ;
-            memmove(&wValue,pInValue.Data+1,sizeof(wValue));
-//            wValue=_reverseByteOrder_T<int8_t>(wValue);
-            if (pInValue.Data[0]!=1) // if negative
-                {
-                _negate(wValue);
-                wValue=-wValue;
-                }
-            pOutValue= static_cast<_Tp>(wValue);
-            return ZS_SUCCESS;
-            }
-
-     case ZType_U16 :
-              {
-            uint16_t wValue;
-            memmove(&wValue,pInValue.Data,sizeof(wValue));
-            wValue=_reverseByteOrder_T<uint16_t>(wValue);
-            pOutValue= static_cast<_Tp>(wValue);
-            return ZS_SUCCESS;
-              }
-     case ZType_S16 :
-             {
-            int16_t wValue ;
-            memmove(&wValue,pInValue.Data+1,sizeof(wValue));
-            wValue=_reverseByteOrder_T<int16_t>(wValue);
-            if (pInValue.Data[0]!=1) // if negative
-                {
-                _negate(wValue);
-                wValue=-wValue;
-                }
-            pOutValue= static_cast<_Tp>(wValue);
-            return ZS_SUCCESS;
-             }
-     case ZType_U32 :
-            {
-          uint32_t wValue;
-          memmove(&wValue,pInValue.Data,sizeof(wValue));
-          wValue=_reverseByteOrder_T<uint32_t>(wValue);
-          pOutValue= static_cast<_Tp>(wValue);
-          return ZS_SUCCESS;
-            }
-     case ZType_S32 :
-            {
-           int32_t wValue ;
-           memmove(&wValue,pInValue.Data+1,sizeof(int32_t));
-           wValue=_reverseByteOrder_T<int32_t>(wValue);
-           if (pInValue.Data[0]!=1) // if negative
-               {
-               _negate(wValue);
-               wValue=-wValue;
-               }
-           pOutValue= static_cast<_Tp>(wValue);
-           return ZS_SUCCESS;
-            }
-     case ZType_U64 :
-            {
-          uint64_t wValue;
-          memmove(&wValue,pInValue.Data,sizeof(wValue));
-          wValue=_reverseByteOrder_T<uint64_t>(wValue);
-          pOutValue= static_cast<_Tp>(wValue);
-          return ZS_SUCCESS;
-            }
-     case ZType_S64 :
-            {
-           int64_t wValue ;
-           memmove(&wValue,pInValue.Data+1,sizeof(wValue));
-           wValue=_reverseByteOrder_T<int64_t>(wValue);
-           if (pInValue.Data[0]!=1) // if negative
-               {
-               _negate(wValue);
-               wValue=-wValue;
-               }
-           pOutValue= static_cast<_Tp>(wValue);
-           return ZS_SUCCESS;
-            }
-    case ZType_Float :
-            {
-           float wValue ;
-           memmove(&wValue,pInValue.Data+1,sizeof(wValue));
-           wValue=_reverseByteOrder_T<float>(wValue);
-           if (pInValue.Data[0]!=1) // if negative
-               {
-               _negate(wValue);
-               wValue=-wValue;
-               }
-           pOutValue= static_cast<_Tp>(wValue);
-           return ZS_SUCCESS;
-            }
-     case ZType_Double :
-            {
-           double wValue ;
-           memmove(&wValue,pInValue.Data+1,sizeof(wValue));
-           wValue=_reverseByteOrder_T<double>(wValue);
-           if (pInValue.Data[0]!=1) // if negative
-               {
-               _negate(wValue);
-               wValue=-wValue;
-               }
-           pOutValue= static_cast<_Tp>(wValue);
-           return ZS_SUCCESS;
-            }
-     case ZType_LDouble :
-            {
-           long double wValue ;
-           memmove(&wValue,pInValue.Data+1,sizeof(wValue));
-           wValue=_reverseByteOrder_T<long double>(wValue);
-           if (pInValue.Data[0]!=1) // if negative
-               {
-               _negate(wValue);
-               wValue=-wValue;
-               }
-           pOutValue= static_cast<_Tp>(wValue);
-           return ZS_SUCCESS;
-            }
-
-        default:
-                 {
-                     ZException.setMessage(_GET_FUNCTION_NAME_,
-                                             ZS_INVTYPE,
-                                             Severity_Fatal,
-                                             "Invalid Type for key field to convert data to <%ld> <%s> encountered while processing data conversion",
-                                             wType,
-                                             decode_ZType(wType));
-                     return ZS_INVTYPE;
-                 }
-    }// switch
-}// _castAtomicValue
-#endif // __COMMENT__
-
-// for atomic
-//ZStatus zgetUfN_A(auto &pNatural,ZDataBuffer &pUniversal,ZType_type& pType,long &pArrayCount);
-
-#ifdef __COMMENT__
-/**
- * @brief _getUniversalValue converts pValue from its Natural format to its Universal format
- * @param pValue        value to convert (here template for Pointers)
- * @param pUniversal
- * @param pTargetType
- * @param pSourceType
- * @param pArrayCount
- * @return
- */
-template <class _Tp>
-ZStatus
-_getUniversalValue (typename std::enable_if_t<std::is_pointer<_Tp>::value,_Tp> &pValue,
-                          ZDataBuffer &pUniversal,
-                          const ZType_type pDesiredType,
-                          const long pDesiredArraySize,
-                          const ZType_type pZType,
-                          const long pArraySize)
-{
-ZStatus wSt;
-ssize_t wArrayCount = pArraySize;
-    ZDataBuffer wNaturalValue;
-    ZDataBuffer wANaturalValue;
-    ZDataBuffer wKeyValue;
-
-    if (pArraySize<1)
-            {
-            wArrayCount= sizeof(pValue)/sizeof(pValue[0]);
-            }
-    if (wArrayCount>pDesiredArraySize)  // if array has more elements than key field : truncate to key field
-        {
-            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                    ZS_INVSIZE,
-                                    Severity_Warning,
-                                    " given array size for pointer <%ld>  exceeds size of universal array size<%ld>. Array size truncated",
-                                    wArrayCount,
-                                    pDesiredArraySize);
-            ZException.printUserMessage(stderr);
-            wArrayCount = pDesiredArraySize;
-        }
-    wNaturalValue.clear();
-
-    if (pZType != pDesiredType )
-            {
-            for (long wi=0;wi<wArrayCount;wi++)
-            {
-            wSt=_castAtomicValue_T<typeof(*pValue)>(pValue[wi],pDesiredType,wANaturalValue);
-            wNaturalValue.appendData(wANaturalValue);
-             }
-            }
-        else
-            wNaturalValue.appendData(&pValue[0],sizeof(pValue));
-
-    wField.RecordOffset = 0;                  // we are cheating key extraction mechanism saying its a record and field is at offset 0
-    wField.ArraySize = wArrayCount;      // cheating also for number of array occurence
-    _getArrayUfN(wNaturalValue,wKeyValue);  // Extract & pack Array of Atomic Fields ready for Key usage
-    if (wSt!=ZS_SUCCESS)
-            return wSt;
-
-    pUniversal.setData(wKeyValue); // set the key value
-
-    return wSt;
-} // _setKeyFieldValue for array data type
-/**
- * @brief _getUniversalValue converts pValue from its Natural format to its Universal format
- * @param pValue        value to convert (here template for Arrays)
- * @param pUniversal
- * @param pTargetType
- * @param pSourceType
- * @param pArrayCount
- * @return
- */
-template <class _Tp>
-ZStatus
-_getUniversalFromNatural (typename std::enable_if_t<std::is_array<_Tp>::value,_Tp> &pValue,
-                        ZDataBuffer &pUniversal,
-                        const ZType_type pTargetType,
-                        const long pTargetArrayCount,
-                        const ZType_type pZType,
-                        const long pArraySize)
-{
-ZStatus wSt;
-ssize_t wArrayCount;
-    ZDataBuffer wNaturalValue;
-    ZDataBuffer wANaturalValue;
-    ZDataBuffer wKeyValue;
-
-    if (pArraySize<1)
-            {
-            wArrayCount= sizeof(pValue)/sizeof(pValue[0]);
-            }
-    if (wArrayCount>pTargetArrayCount)  // if array has more elements than key field : truncate to key field
-        {
-            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                    ZS_INVSIZE,
-                                    Severity_Warning,
-                                    " given array size <%ld>  exceeds size of universal desired array size<%ld>. Array size truncated.",
-                                    wArrayCount,
-                                    pTargetArrayCount);
-            ZException.printUserMessage(stderr);
-            wArrayCount = pTargetArrayCount;
-        }
-    wNaturalValue.clear();
-
-    if (pZType != pTargetType )
-            {
-            for (long wi=0;wi<wArrayCount;wi++)
-            {
-            _castAtomicValue<_Tp>(pValue[wi],pTargetType,wANaturalValue);
-            wNaturalValue.appendData(wANaturalValue);
-             }
-            }
-        else
-            wNaturalValue.appendData(&pValue[0],sizeof(pValue));
-
-    ZIndexField_struct wField;
-    wField = pUniversal.ZICB->ZKDic->Tab[pFieldRank] ;
-    wField.RecordOffset = 0;                  // we are cheating key extraction mechanism saying its a record and field is at offset 0
-    wField.ArraySize = wArrayCount;      // cheating also for number of array occurence
-    wSt=_getArrayUfN<>(wNaturalValue,wKeyValue,wField);  // Extract & pack Array of Atomic Fields ready for Key usage
-    if (wSt!=ZS_SUCCESS)
-            return wSt;
-
-    pUniversal.setFieldRawValue(wKeyValue,pFieldRank); // set the key value
-
-    return wSt;
-} // _setKeyFieldValue for array data type
-
-
-
-template <class _Tp>
-ZStatus
-_getUniversalFromNatural (typename std::enable_if_t<std::is_pointer<_Tp>::value,_Tp> &pValue,
-                   ZDataBuffer & pUniversal,
-                   const long pZType,
-                   const long pArrayCount) // array count represents the number of value occurrences the pointer points to
-{
-ZStatus wSt;
-long wType=pZType;
-ssize_t wArrayCount=pArrayCount<1?1:pArrayCount;
-/*
-ZDataBuffer wKeyValue;
-
-
-    if (wArrayCount>pUniversal.ZICB->ZKDic->Tab[pFieldRank].ArraySize)
-    {
-        ZException.setMessage(_GET_FUNCTION_NAME_,
-                                ZS_INVSIZE,
-                                Severity_Warning,
-                                " given array size <%ld> for pointer exceeds size of key field array size<%ld> (field rank <%ld>). Array size truncated to key field array size",
-                                wArrayCount,
-                                pUniversal.ZICB->ZKDic->Tab[pFieldRank].ArraySize,
-                                pFieldRank);
-        ZException.printUserMessage(stderr);
-        wArrayCount = pUniversal.ZICB->ZKDic->Tab[pFieldRank].ArraySize;
-    }
-*/
-    if (wType == ZType_ByteSeq)
-        {
-        pUniversal.setData(pValue,wArrayCount,pFieldRank); // set the key value using pArraySize as Length
-        return ZS_SUCCESS;
-        }
-
-    if (wType == ZType_PointerChar)
-                        {
-                        return _setKeyFieldValueCString<_Tp>(pValue,pUniversal,pFieldRank);
-//                        pZKey.appendValue(pValue,pZKey.ZICB->ZKDic->Tab[pFieldRank].KeyFieldSize);  // Extract & pack pointer to String Fields ready for Key usage
-//                        return ZS_SUCCESS;
-                        }
-
-    wType = wType & ~(ZType_Pointer);
-
-
-
-    if ((pZType&ZType_StdString)==ZType_StdString) // pointer to std::string : use appropriate routine
-            {
-            return _getValueFromStdString<_Tp>(pValue,pUniversal,pFieldRank);
-            }
-
-
-//    wNaturalValue.setData(pValue,sizeof(pArraySize));  // pValue is a pointer and pArraySize the number of elements
-
-    ZIndexField_struct wField;
-    wField = pUniversal.ZICB->ZKDic->Tab[pFieldRank] ;
-    wField.RecordOffset = 0;                  // we are cheating key extraction mechanism saying its a record and field is at offset 0
-
-    wSt=_getValueFromPointer<_Tp>(pValue,pUniversal,pZType,pFieldRank,wArrayCount);  // Extract & pack values pointed by pValue to get Fields ready for Key usage
-
-//    pZKey.setFieldRawValue(wKeyValue,pFieldRank); // set the key value
-    return wSt;
-} // _setKeyFieldValue for pointers
-
-
-template <class _Tp>
-ZStatus
-_getUniversalFromNatural (typename std::enable_if_t<std::is_class<_Tp>::value,_Tp> &pValue,
-                   ZKey & pZKey,
-                   const long pZType,
-                   const long pFieldRank,
-                   const long  &pArrayNumber)
-{
-ssize_t wSize = sizeof(pValue);
-// now extracting without conversion
-    if ((pZType&ZType_StdString)==ZType_StdString)
-            {
-            return _setKeyFieldValueStdString<_Tp>(&pValue,pZKey,pFieldRank);
-            }
-
-    if (sizeof(pValue)>pZKey.ZICB->ZKDic->Tab[pFieldRank].InternalSize)
-    {
-        ZException.setMessage(_GET_FUNCTION_NAME_,
-                                ZS_INVSIZE,
-                                Severity_Warning,
-                                " given class size <%ld> exceeds size of key field size<%ld> (field rank <%ld>). Array size truncated to key field array size",
-                                wSize,
-                                pZKey.ZICB->ZKDic->Tab[pFieldRank].InternalSize,
-                                pFieldRank);
-        ZException.printUserMessage(stderr);
-        wSize = pZKey.ZICB->ZKDic->Tab[pFieldRank].InternalSize;
-    }
-
-//    pZKey.appendValue(&pValue,wSize,pZKey.ZICB->ZKDic->fieldKeyOffset(pFieldRank)); // set the key value
-    pZKey.setFieldRawValue(&pValue,wSize,pFieldRank);// set the key raw value
-    return ZS_SUCCESS;
-}
-
-template <class _Tp>
-/**
- * @brief zsetKeyFieldValue sets the Key field with pValue. Does all controls and calls specialised routines according ZType_type and size of input data
- * @param[in] pValue    input data value of type (_Tp) defined by template parameter
- * @param[in] pZKey     ZKey object owning the key dictionary that will get the key fields values converted to internal key format.
- * @param[in] pFieldRank    Key dictionary field rank. Could be obtained by field name @see CZKeyDictionary::zgetFieldRank()
- * @param[in] pArraySize    For a field with type pointer : number of atomic data elements pointer points to. For an array, pArraySize is deduced.
- *                          Defaulted to -1. For all other data types, and if pArraySize value is < 1, this value is set to 1.
-* @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.@see ZBSError
- */
-ZStatus
-zgetUniversalFromNatural_T (_Tp pValue, ZDataBuffer & pUniversal,const long pFieldRank,ssize_t pArraySize)
-{
-ZStatus wSt;
-
-long wType;
-ssize_t wNaturalSize, wUniversalSize,wArraySize;
-
-/*    if ((pFieldRank<0)||(pFieldRank> pZKey.ZICB->ZKDic->lastIdx()))
-        {
-        ZException.setMessage(_GET_FUNCTION_NAME_,
-                                ZS_OUTBOUND,
-                                Severity_Severe,
-                                " Field rank is out of key dictionary boundaries. given value is <%ld> while dictionary limits are <0> to <%s>",
-                                pFieldRank,
-                                pZKey.ZICB->ZKDic->lastIdx());
-        return ZS_OUTBOUND;
-        }
-*/
-//first get ZType_type of input data and test its compatibility with target key field
-
-    wSt=zgetZType_T<_Tp>(wType,wNaturalSize,wUniversalSize,pArraySize,false) ; // with tolerance to pointers
-    if (wSt!=ZS_SUCCESS)
-                return wSt;
-    /*
-    wSt=testUniversalTypes(wType, pZKey.ZICB->ZKDic->Tab[pFieldRank].ZType);
-    if (wSt!=ZS_SUCCESS)
-        {
-        return wSt;
-        }
-    */
-
-    pUniversal.allocate(wUniversalSize);
-
-
-// now extracting and converting
-
-    if ((wType & ZType_StdString)==ZType_StdString)
-            {
-            wSt= _setKeyFieldValueStdString<_Tp>(&pValue,pZKey,pFieldRank); // addresses the direct reference and the pointer to std::string
-            }
-        else
-            wSt=_getUniversalFromNatural<_Tp>(pValue,pUniversal,wType,pFieldRank,pArraySize);
-
-    if (wSt!=ZS_SUCCESS)
-                    return wSt;
-
-} //zsetKeyFieldValue
-
-/** @endcond */
-
-/**
- * @brief ZKey::setFieldValue loads the value (auto) pValue to the key field (defined in key dictionary) of rank pFieldRank
- *
- * @note GNU C++ compiler converts arrays to pointers when using 'auto' clause.
- * In case of arrays, use template ZKey::setFieldValueT
- * @note
- * pArraySize is not necessary in case of data type that is anything excepted a pointer.
- * In case of pointer of chars 'char*' (C string), pArraysize is not necessary because deduced from size of string.
- * In case of pointer to std::string, pArraysize is not necessary because deduced from size of string.
- *
- *@bug the default value of -1 for pArraySize does not work with GNU compiler because of the use of 'auto' clause.
- * so that, pArraySize should systematically be mentionned
- *
- * This routine controls the coherence of given data.
- * - It makes the data conversion whenever required to have a dictionary defined data (natural data).
- * - It makes the conversion from natural field to internal key field value format.
- * - It addresses pointers vs arrays.
- * - It pads the key if the size of input data (specifically for arrays) is not large enough.
- * - It truncates the data if given value exceeds defined key field boundaries.
- *
- * @param[in] pFieldRank field order (rank) in key dictionary
- * @param[in] pValue  Value of undertermined type to set the field with
- * @param[in] pArraySize Usefull value for pointers only, and for
- * It gives the corresponding number of atomic values the pointer points to.
- * If data type is other than pointer, array size value is deduced from data type.
- * A negative value means 'omitted'. Defaulted to -1.
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.@see ZBSError
- */
-ZStatus
-zgetUniversalFromNatural (auto pValue,ZDataBuffer& pUniversal ,long &pArraySize)
-{
-    return zgetUniversalFromNatural_T<typeof(pValue)>(pValue,pUniversal,pArraySize);
-}
-/**
- * @brief ZKey::setFieldValue loads the value (auto) pValue to the key field (defined in key dictionary)
- * with a name that matches given string.
- *
- *@bug the default value of -1 for pArraySize does not work with GNU compiler because of the use of 'auto' clause.
- * so that, pArraySize should systematically be mentionned
- *
- * @note GNU C++ compiler converts arrays to pointers when using 'auto' clause.
- * In case of arrays, use template ZKey::setFieldValueT
- * @note
- * pArraySize is not necessary in case of data type that is anything excepted a pointer.
- * In case of pointer of chars 'char*' (C string), pArraysize is not necessary because deduced from size of string.
- * In case of pointer to std::string, pArraysize is not necessary because deduced from size of string.
- *
- * This routine controls the coherence of given data.
- * - It makes the data conversion whenever required to have a dictionary defined data (natural data).
- * - It makes the conversion from natural field to internal key field value format.
- * - It addresses pointers vs arrays.
- * - It pads the key if the size of input data (specifically for arrays) is not large enough.
- * - It truncates the data if given value exceeds defined key field boundaries.
- *
- * @param[in] pFieldRank field order (rank) in key dictionary
- * @param[in] pValue  Value of undertermined type to set the field with
- * @param[in] pArraySize Usefull value for pointers only, and for
- * It gives the corresponding number of atomic values the pointer points to.
- * If data type is other than pointer, array size value is deduced from data type.
- * A negative value means 'omitted'. Defaulted to -1.
-* @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.@see ZBSError
- */
-ZStatus
-ZKey::setFieldValue (const char* pFieldName,auto pValue, const long pArraySize)
-{
-    long wFieldRank=ZICB->ZKDic->zsearchFieldByName(pFieldName);
-    if (wFieldRank<0)
-            return ZException.getLastStatus();
-    return zsetKeyFieldValue<typeof(pValue)>(pValue,*this,wFieldRank,pArraySize);
-}
-
-
-
-
-template <class _Tp>
-/**
- * @brief ZKey::setFieldValueT Template routine that loads the value (of type _Tp) pValue to the key field (defined in key dictionary) of rank pFieldRank
- * @note
- * Template is necessary in case of an array to keep the native data type.
- * @note
- * pArraySize is not necessary in case of data type that is anything excepted a pointer.
- * In case of pointer of chars 'char*' (C string), pArraysize is not necessary because deduced from size of string.
- * In case of pointer to std::string, pArraysize is not necessary because deduced from size of string.
- *
- * This routine controls the coherence of given data.
- * - It makes the data conversion whenever required to have a dictionary defined data (natural data).
- * - It makes the conversion from natural field to internal key field value format.
- * - It addresses pointers vs arrays.
- * - It pads the key if the size of input data (specifically for arrays) is not large enough.
- * - It truncates the data if given value exceeds defined key field boundaries.
- *
- * @param[in] pFieldRank field order (rank) in key dictionary
- * @param[in] pValue  Value of undertermined type to set the field with
- * @param[in] pArraySize Usefull value for pointers only, and for
- * It gives the corresponding number of atomic values the pointer points to.
- * If data type is other than pointer, array size value is deduced from data type.
- * A negative value means 'omitted'. Defaulted to -1.
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.@see ZBSError
- * @return
- */
-ZStatus
-ZKey::setFieldValueT (const long pFieldRank,_Tp pValue, const long pArraySize)
-{
-    return zsetKeyFieldValue<_Tp>(pValue,*this,pFieldRank,pArraySize);
-}
-template <class _Tp>
-/**
- * @brief ZKey::setFieldValueT Template routine that loads the value (of type _Tp) pValue to the key field (defined in key dictionary)
- *  with a name that matches given string.
- * @note
- * Template is necessary in case of an array to keep the native data type.
- * @note
- * pArraySize is not necessary in case of data type that is anything excepted a pointer.
- * In case of pointer of chars 'char*' (C string), pArraysize is not necessary because deduced from size of string.
- * In case of pointer to std::string, pArraysize is not necessary because deduced from size of string.
- *
- * This routine controls the coherence of given data.
- * - It makes the data conversion whenever required to have a dictionary defined data (natural data).
- * - It makes the conversion from natural field to internal key field value format.
- * - It addresses pointers vs arrays.
- * - It pads the key if the size of input data (specifically for arrays) is not large enough.
- * - It truncates the data if given value exceeds defined key field boundaries.
- *
- * @param[in] pFieldRank field order (rank) in key dictionary
- * @param[in] pValue  Value of undertermined type to set the field with
- * @param[in] pArraySize Usefull value for pointers only, and for
- * It gives the corresponding number of atomic values the pointer points to.
- * If data type is other than pointer, array size value is deduced from data type.
- * A negative value means 'omitted'. Defaulted to -1.
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.@see ZBSError
- * @return
- */
-ZStatus
-ZKey::setFieldValueT (const char* pFieldName,_Tp pValue, const long pArraySize)
-{
-    long wFieldRank=ZICB->ZKDic->zsearchFieldByName(pFieldName);
-    if (wFieldRank<0)
-            return ZException.getLastStatus();
-    return zsetKeyFieldValue<_Tp>(pValue,*this,wFieldRank,pArraySize);
-}
-
-
-
-//-------------------End Build Key from Value routines-----------------------------------
-
-#endif // __COMMENT__
-/** @} */ // end ZKeyGroup
-
-//------------Functions-----------------------------------------
-
-//ZStatus
-//getAtomicZType(auto pValue, ZTypeBase& pType, uint64_t &pNaturalSize, uint64_t &pUniversalSize);
-
-template <class _Tp>
-ZStatus
-_setUniversalFromStdString (const void* pString,ZDataBuffer & pUniversal, const ZType_type pDesiredType, const ssize_t pDesiredArraySize)
-{
-const std::string*  wString= static_cast<const std::string*>(pString);
-ssize_t wSize = wString->size()+1 ;
-//ssize_t wOffset= pZKey.ZICB->ZKDic->fieldKeyOffset(pFieldRank);
-
-    if (pDesiredType!=ZType_ArrayChar)
-        {
-        ZException.setMessage(_GET_FUNCTION_NAME_,
-                                ZS_INVTYPE,
-                                Severity_Error,
-                                " While trying to set up a Key field value : destination field->expecting array of char - having %s ",
-                                decode_ZType(pDesiredType));
-        return ZS_INVTYPE;
-        }
-
-    if (wSize>= pDesiredArraySize)
-                                wSize = pDesiredArraySize-1;
-
-    pUniversal.setData((void*)wString->c_str(),wSize);
-    pUniversal.Data[wSize]='\0';
-    return ZS_SUCCESS;
-}// _setKeyFieldValueStdString
-
-
-template <class _Tp>
-/**
- * @brief _setUniversalValueCString Converts a CString (char*) to an array of char of pDesiredSize maximum length
- * @param pString
- * @param pUniversal
- * @param pDesiredType
- * @param pDesiredSize
- * @return
- */
-ZStatus
-_setUniversalFromCString (const void* pString,ZDataBuffer & pUniversal, const ZType_type pDesiredType, const ssize_t pDesiredSize)
-{
-const char*  wString= static_cast<const char*>(pString);
-ssize_t wSize = strlen(wString)+1 ;
-//ssize_t wOffset= pZKey.ZICB->ZKDic->fieldKeyOffset(pFieldRank);
-
-    if (pDesiredType!=ZType_ArrayChar)
-        {
-        ZException.setMessage(_GET_FUNCTION_NAME_,
-                                ZS_INVTYPE,
-                                Severity_Error,
-                                " While trying to set up a universal field value : destination field->expecting array of char - having %s ",
-                                pDesiredType);
-        return ZS_INVTYPE;
-        }
-
-    if (wSize> pDesiredSize)
-                                wSize = pDesiredSize-1;
-
-    pUniversal.setData((void*)wString,wSize);
-    pUniversal.DataChar[wSize]='\0';
-    return ZS_SUCCESS;
-}
-
-template <class _Tp>
-/**
- * @brief _setUniversalValueWString Converts a WString (wchar_t*) to an array of wchar_t of pDesiredSize maximum length
- * @param pString
- * @param pUniversal
- * @param pDesiredType
- * @param pDesiredSize
- * @return
- */
-ZStatus
-_setUniversalFromWString (const void* pString,ZDataBuffer & pUniversal, const ZType_type pDesiredType, const ssize_t pDesiredSize)
-{
-const char*  wString= static_cast<const char*>(pString);
-ssize_t wSize = strlen(wString)+1 ;
-//ssize_t wOffset= pZKey.ZICB->ZKDic->fieldKeyOffset(pFieldRank);
-
-    if (pDesiredType!=ZType_ArrayChar)
-        {
-        ZException.setMessage(_GET_FUNCTION_NAME_,
-                                ZS_INVTYPE,
-                                Severity_Error,
-                                " While trying to set up a universal field value : destination field->expecting array of char - having %s ",
-                                pDesiredType);
-        return ZS_INVTYPE;
-        }
-
-    if (wSize> pDesiredSize)
-                                wSize = pDesiredSize-1;
-
-    pUniversal.setData((void*)wString,wSize);
-    pUniversal.DataChar[wSize]='\0';
-    return ZS_SUCCESS;
-}
-
-
-
-
-
-
-
-//===================== Natural to Universal format data conversion ============================
-
-/** @addtogroup DATAFORMATGROUP
- *
- * @weakgroup LLRTC Low level routines : templates for conversion to and from Universal format ========================
-
- @par Standards
-
- - by data types
-    . _getAtomicxxx : concerns atomic data conversion
-    . _getArrayxxx : concerns arrays conversion
- - suffixes :
-    . UfN  Universal from Natural converts a natural data to its universal format
-    . NfU  Natural from Universal converts a universal format to natural format
-
- When routine is a template, then suffix <_T> is added to routine name
- When routine is NOT a template but uses 'auto' clause, then suffix <_A> is added to routine name
-
-*/
-/**
- * @brief _getAtomicUfN_T  Template: get Atomic Universal From Natural value according its data type (ZType_type) given by pZType
- *
-Converts a Atomic Natural field to an Universal format value
-reverse byte order if necessary (Endian)
-and returns
-  - a ZDataBuffer with the formatted field content ready to be used as a natural data type in the given ZDataBuffer pOutData
-  - the atomic value data field as well as a return value
-
-Size of the resulting field is the size of natural data type (ex : int8_t is 1 ), and Size field of ZDataBuffer pOutData is set to correct length.
-
- *
- * @param[in] pInData       Record buffer to extract field from
- * @param[out] pOutData     Field content extracted from key and formatted back to Natural (computer) data type
- * @param[in] pZType        Type mask of data ( ZType_type )
- * @return              The pure natural value of the field converted from Key field content (a reference to pOutData ).
- */
-template <class _Tp>
-static inline
-_Tp _getAtomicUfN_T(unsigned char* pInData, ZDataBuffer &pUniversalData,const ZTypeBase pType )
-{
-    _Tp wValue , wValue2;
-
-    memmove(&wValue,pInData,sizeof(wValue));
-
-    if (wValue < 0)
-                wValue2 = -wValue;
-            else
-                wValue2 = wValue;
-
-    if ((pType & ZType_Endian)&&is_little_endian())    // only if system is little endian and data type is subject to endian reverse byte conversion
-                        wValue2= reverseByteOrder_Conditional<_Tp>(wValue2);
-
-    if (pType & ZType_Signed)
-            {
-
-            pUniversalData.allocate(sizeof(_Tp)+1);   // unsigned means size + sign byte
-            if (wValue<0)  // if negative value
-                    {
-                    pUniversalData.Data[0]=0; // sign byte is set to Zero
-                    wValue2=_negate (wValue2); // mandatory otherwise -120 is greater than -110
-                    }
-                else
-                    pUniversalData.Data[0]=1;
-
-            memmove(pUniversalData.Data+1,&wValue2,sizeof(_Tp)); // skip the sign byte and store value (absolute value)
-            return wValue;
-            }
-// up to here : unsigned data type
-
-//    pOutData->setData(&wValue,sizeof(_Tp));// not deduced for sizeof(_Tp) because of Arrays
-    pUniversalData.setData(&wValue,getAtomicUniversalSize(pType));// unsigned means same size as input data type
-    return wValue;
-} // _getAtomicUfN_T
-
-
-/**
- * @brief _getArrayUfN_T  Template: gets an Array of Universal values from an array of Natural values
- *
- *
- * @param pKeyData      Key buffer to extract field from
- * @param pType         Full ZType_type for the array
- * @return The obtained value with _Tp template parameter type : Field content extracted and formatted up to be used as key field
- */
-template <class _Tp>
-static
-ZStatus _getArrayUfN_T (_Tp &pValue,
-                   ZDataBuffer &pUniversal,
-                   const ZType_type pType,
-                   URF_Array_Count_type &pArrayCount)
-{
-ZStatus wSt;
-ZDataBuffer wDBV;
-
-ZTypeBase wType = pType & ZType_AtomicMask;  // get the atomic data type
-// Compute array ranks
-long wAtomicType = pType & ZType_AtomicMask;
-long wAtomicUSize = getAtomicUniversalSize(wAtomicType);
-
-    pArrayCount = (uint16_t)(sizeof(pValue)/wAtomicUSize);
-
-// following data formats MUST not be converted with leading sign byte : just move them.
-
-    if ((wType == ZType_Char)||(wType == ZType_UChar)||(wType == ZType_U8))
-            {
-             pUniversal.setData(&pValue,sizeof(pValue));
-             return ZS_SUCCESS;
-             }
-
-    for (long wi=0;wi<pArrayCount;wi++)
-        {
-        switch (wType)
-        {
-           case ZType_S8 :
-                   {
-            _getAtomicUfN_T<int8_t>((unsigned char*) &pValue[wi],wDBV,wType);
-            break;
-                   }
-//            case ZType_WChar:  // WChar is treated as an unsigned uint16_t but subject to endian conversion
-            case ZType_U16 :
-                     {
-            _getAtomicUfN_T<uint16_t>((unsigned char*) &pValue[wi],pUniversal,wType);
-            break;
-                     }
-            case ZType_S16 :
-                    {
-            _getAtomicUfN_T<int16_t>((unsigned char*) &pValue[wi],pUniversal,wType);
-            break;
-                    }
-            case ZType_U32 :
-                     {
-            _getAtomicUfN_T<uint32_t>((unsigned char*) &pValue[wi],pUniversal,wType);
-            break;
-                     }
-            case ZType_S32 :
-                    {
-            _getAtomicUfN_T<int32_t>((unsigned char*) &pValue[wi],pUniversal,wType);
-            break;
-                    }
-            case ZType_U64 :
-                     {
-            _getAtomicUfN_T<uint64_t>((unsigned char*) &pValue[wi],pUniversal,wType);
-            break;
-                     }
-            case ZType_S64 :
-                    {
-            _getAtomicUfN_T<int64_t>((unsigned char*) &pValue[wi],pUniversal,wType);
-            break;
-                    }
-           case ZType_Float :
-                        {
-            _getAtomicUfN_T<float>((unsigned char*) &pValue[wi],pUniversal,wType);
-            break;
-                        }
-            case ZType_Double :
-                         {
-            _getAtomicUfN_T<double>((unsigned char*) &pValue[wi],pUniversal,wType);
-            break;
-                         }
-            case ZType_LDouble :
-                         {
-            _getAtomicUfN_T<long double>((unsigned char*) &pValue[wi],pUniversal,wType);
-            break;
-                         }
-
-               default:
-                        {
-                            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                                    ZS_INVTYPE,
-                                                    Severity_Fatal,
-                                                    "Invalid atomic ZType <%ld> <%s> encountered while processing record data",
-                                                   pType,
-                                                    decode_ZType(pType));
-                            return ZS_INVTYPE;
-                        }
-
-           }//switch
-        if (wSt!=ZS_SUCCESS)
-                    return wSt;
-        pUniversal.appendData(wDBV);
-        }// for
-    return ZS_SUCCESS;
-} // _getArrayUfN_T
-
-//========== Conversion from Universal to Natural data format======================================
-
-/**
- * @brief _getAtomicNfU_T  Template: get Atomic Natural value From  Universal format
- *
-Extracts an ZType_Atomic field from a ZDataBuffer (Universal format according ZType_type) :
-
-- using the length deduced from its originary type.
-
-Data value byte order is reversed according Endian convention IF NECESSARY (if system is little Endian).
-
- *
- * @param pUniversal ZDataBuffer containing Atomic data in universal format
- * @param pType      ZType_type of data to be converted
- * @return The obtained value with _Tp template parameter type.
- */
-
-template <class _Tp>  // type of _Tp must correspond strictly to pSourceType
-static inline
-_Tp _getAtomicNfU_T_Ptr (typename std::enable_if_t<std::is_integral<_Tp>::value|std::is_floating_point<_Tp>::value,_Tp> &pValue,
-                         const unsigned char* pUniversal_Ptr,
-                         const ZTypeBase pSourceType)
-{
-//    _Tp pValue;
-
-    size_t wUniversalSize = getAtomicUniversalSize(pSourceType);
-    size_t wNaturalSize = getAtomicNaturalSize(pSourceType);
-
-
-    if (pSourceType & ZType_Signed)
-            {
-            while (true)
-                {
-                if (is_little_endian()) // only if system is little endian
-                    if (pSourceType & ZType_Endian)   // and data type is subject to endian reverse byte conversion
-                                {
-                                pValue=reverseByteOrder_Ptr<_Tp>(pUniversal_Ptr+1);
-                                break;
-                                }
-                memmove(&pValue,(pUniversal_Ptr+1),wUniversalSize);
-                break;
-                }// while
-            if (pUniversal_Ptr[0]==0)  // signed negative value
-                    {
-                    pValue=_negate(pValue); // mandatory otherwise -120 is greater than -110
-                    return -pValue;
-                    }
-                else // it is a positive value
-                    {
-                    return pValue;
-                    }
-            }
- // not signed : means no byte sign
-    while (true)
-    {
-    if (is_little_endian()) // only if system is little endian
-            {
-            if (pSourceType & ZType_Endian)   // and data type is subject to endian reverse byte conversion
-                {
-                pValue=reverseByteOrder_Ptr<_Tp>(pUniversal_Ptr);
-                break;
-                }
-            }
-    memmove(&pValue,pUniversal_Ptr,wNaturalSize);
-    break;
-    }// while
-    return pValue;
-} // _getAtomicNfU_T_Ptr
-
-
-
-
-
-/*template <class _Tp>
-static inline
-_Tp _getAtomicNfU_T (_Tp &pValue,
-                     ZDataBuffer &pUniversal,const ZTypeBase pType)
-{
-    return _getAtomicNfU_T_Ptr<_Tp>(pUniversal.Data,pType);
-}*/
-
-/**
- * @brief _getArrayNfU_T  Template: gets an Array of Natural values from an array of Universal values
- *
- *
- * @param pKeyData      Key buffer to extract field from
- * @param pType         Full ZType_type for the array
- * @return The obtained value with _Tp template parameter type : Field content extracted and formatted up to be used as key field
- */
-template <class _Tp>
-static inline
-_Tp _getArrayNfU_T (typename std::enable_if_t<std::is_array<_Tp>::value,_Tp> &pValue,
-                     ZDataBuffer &pUniversal,
-                     const ZType_type pType)
-{
-size_t wAtomicOffset =0 ;
-int32_t wType = pType & ZType_AtomicMask;  // get the atomic data type
-// Compute array ranks
-long wAtomicUSize = getAtomicUniversalSize(wType);
-
-
-    size_t wArrayCount = pUniversal.Size / wAtomicUSize;
-    size_t wTargetArrayCount = sizeof(pValue)/wAtomicUSize;  // must be equal to wArrayCount
-
-    if (wArrayCount!=wTargetArrayCount)
-            {
-             fprintf(stderr,"%s-W Warning target array count <%ld> is not equal to source <%ld>\n",
-                     _GET_FUNCTION_NAME_,
-                     wTargetArrayCount,
-                     wArrayCount);
-            }
-// following data formats MUST not be converted with leading sign byte : just move them.
-
-    if ((wType == ZType_Char)||(wType == ZType_UChar)||(wType == ZType_U8))
-            {
-             memmove(pValue,pUniversal.Data,pUniversal.Size);
-             return pValue;
-             }
-
-    for (long wi=0;wi<wArrayCount;wi++)
-        {
-//        wDBV.setData(pUniversal.Data+wAtomicOffset,wAtomicUSize);
-        switch (wType)
-        {
-           case ZType_S8 :
-                   {
-                int8_t wValue;
-           pValue[wi]=_getAtomicNfU_T_Ptr<int8_t>(wValue,pUniversal.Data+wAtomicOffset,(ZType_type)wType);
-                   }
-//            case ZType_WChar:  // WChar is treated as an unsigned uint16_t but subject to endian conversion
-//            case ZType_WUChar:  // WUChar is treated as an unsigned uint16_t but subject to endian conversion
-            case ZType_U16 :
-                     {
-            uint16_t wValue;
-            pValue[wi]=_getAtomicNfU_T_Ptr<uint16_t>(wValue,pUniversal.Data+wAtomicOffset,(ZType_type)wType);
-            break;
-                     }
-            case ZType_S16 :
-                    {
-            int16_t wValue;
-            pValue[wi]=_getAtomicNfU_T_Ptr<int16_t>(wValue,pUniversal.Data+wAtomicOffset,(ZType_type)wType);
-            break;
-                    }
-            case ZType_U32 :
-                     {
-            uint32_t wValue;
-            pValue[wi]=_getAtomicNfU_T_Ptr<uint32_t>(wValue,pUniversal.Data+wAtomicOffset,(ZType_type)wType);
-            break;
-                     }
-            case ZType_S32 :
-                    {
-            int32_t wValue;
-            pValue[wi]=_getAtomicNfU_T_Ptr<int32_t>(wValue,pUniversal.Data+wAtomicOffset,(ZType_type)wType);
-             break;
-                    }
-            case ZType_U64 :
-                     {
-            uint64_t wValue;
-            pValue[wi]=_getAtomicNfU_T_Ptr<uint64_t>(wValue,pUniversal.Data+wAtomicOffset,(ZType_type)wType);
-            break;
-                     }
-            case ZType_S64 :
-                    {
-            int64_t wValue;
-            pValue[wi]=_getAtomicNfU_T_Ptr<int64_t>(wValue,pUniversal.Data+wAtomicOffset,(ZType_type)wType);
-            break;
-                    }
-           case ZType_Float :
-                        {
-            float wValue;
-            pValue[wi]=_getAtomicNfU_T_Ptr<float>(wValue,pUniversal.Data+wAtomicOffset,(ZType_type)wType);
-            break;
-                        }
-            case ZType_Double :
-                         {
-            double wValue;
-            pValue[wi]=_getAtomicNfU_T_Ptr<double>(wValue,pUniversal.Data+wAtomicOffset,(ZType_type)wType);
-            break;
-                         }
-            case ZType_LDouble :
-                         {
-            long double wValue;
-            pValue[wi]=_getAtomicNfU_T_Ptr<long double>(wValue,pUniversal.Data+wAtomicOffset,(ZType_type)wType);
-            break;
-                         }
-
-               default:
-                        {
-                            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                                    ZS_INVTYPE,
-                                                    Severity_Fatal,
-                                                    "Invalid atomic ZType <%ld> <%s> encountered while processing record data",
-                                                   pType,
-                                                    decode_ZType(pType));
-                            ZException.exit_abort();
-                        }
-
-           }//switch
-
-        wAtomicOffset += wAtomicUSize;
-        }
-    return pValue;
-} // _getArrayNfU_T_Ptr
-
-#ifdef __COMMENT__
-
-template <class _Tp>
-/**
- * @brief _getClassNfU_T Only those class types are allowed :
- *      templateString and derived,
- *      wtemplateString and derived (same as templateString but with wchar_t)
- *      std::string
- *      ZDataBuffer
- *
- * @param pValue
- * @param pUniversal
- * @param pType
- * @return
- */
-static inline
-_Tp* _getClassNfU_T (typename std::enable_if_t<std::is_class<_Tp>::value,_Tp> &pValue,
-                     ZDataBuffer &pUniversal,
-                     const ZType_type pType)
-{
-size_t wAtomicOffset =0 ;
-int32_t wType = pType & ZType_AtomicMask;  // get the atomic data type
-
-
-    if (pType==ZType_Blob)
-        {
-        ZDataBuffer* wValue=static_cast<ZDataBuffer*>(&pValue);
-        wValue->setData(pUniversal);
-        return wValue;
-        }
-    if (pType==ZType_FixedCString)
-        {
-        templatePString* wValue=static_cast<templatePString*>(&pValue);
-        size_t wCapacity=wValue->_capacity;
-        }
-    if (pType==ZType_FixedWString)
-        {
-        templatePWString* wValue=static_cast<templatePWString*>(&pValue);
-        size_t wCapacity=wValue->_capacity;
-        }
-
-}
-#endif // __COMMENT__
-template <class _Tp>
-/**
- * @brief _castAtomicToUfN_T template routine that delivers a ZDataBuffer with casted data from an input type to another
- *      Types must be compatible
- * @param pValue
- * @param pUniversal
- * @param pDesiredType
- * @return
- */
-ZStatus
-_castAtomicToUfN_T (typename std::enable_if_t<std::is_integral<_Tp>::value|std::is_floating_point<_Tp>::value,_Tp> &pValue,
-                    ZDataBuffer &pUniversal,
-                    ZTypeBase pDesiredType)
-{
-size_t wUniversalSize, wNaturalSize;
-uint16_t wArrayCount;
-ZTypeBase wType2;
-_Tp wValue = pValue;
-ZTypeBase wType = pDesiredType & ZType_AtomicMask;
-
-    if (sizeof(_Tp) > getAtomicNaturalSize(pDesiredType))
-                {
-                ZException.setMessage(_GET_FUNCTION_NAME_,
-                                      ZS_FIELDLOOSEPREC,
-                                      Severity_Error,
-                                      "asked to convert to <%s>. Field may loose precision: Conversion rejected.",
-                                      decode_ZType(pDesiredType));
-                return ZS_FIELDLOOSEPREC;
-                }
-
-
-    if ((pValue<0)&&!(wType&ZType_Signed))
-            {
-            _getZType_T<_Tp>(pValue,wType2,wNaturalSize,wUniversalSize,wArrayCount);
-             ZException.setMessage(_GET_FUNCTION_NAME_,
-                                   ZS_FIELDCAPAOVFLW,
-                                   Severity_Error,
-                                   " request to cast a negative number of type <%s> to unsigned type <%s>",
-                                   decode_ZType(wType2),
-                                   decode_ZType(wType));
-             return ZS_FIELDCAPAOVFLW;
-            }
-
-    switch (wType)
-    {
-    case ZType_U8 :
-             {
-              uint8_t wValue= static_cast<uint8_t>(pValue); // no endian no sign
-              _getAtomicUfN_T<uint8_t>((unsigned char*)&wValue,pUniversal,wType);
-              return ZS_SUCCESS;
-             }
-    case ZType_S8 : // no endian - sign byte
-            {
-            int8_t wValue= static_cast<int8_t>(pValue);
-             _getAtomicUfN_T<int8_t>((unsigned char*)&wValue,pUniversal,wType);
-            return ZS_SUCCESS;
-            }
-
-     case ZType_U16 :
-              {
-                uint16_t wValue= static_cast<uint16_t>(pValue);
-                _getAtomicUfN_T<uint16_t>((unsigned char*)&wValue,pUniversal,wType);
-                return ZS_SUCCESS;
-              }
-     case ZType_S16 :
-             {
-                int16_t wValue= static_cast<int16_t>(pValue);
-                _getAtomicUfN_T<int16_t>((unsigned char*)&wValue,pUniversal,wType);
-                return ZS_SUCCESS;
-             }
-     case ZType_U32 :
-              {
-
-            uint32_t wValue= static_cast<uint32_t>(pValue);
-            _getAtomicUfN_T<uint32_t>((unsigned char*)&wValue,pUniversal,wType);
-               return ZS_SUCCESS;
-              }
-     case ZType_S32 :
-             {
-            int32_t wValue= static_cast<int32_t>(pValue);
-            _getAtomicUfN_T<int32_t>((unsigned char*)&wValue,pUniversal,wType);
-             return ZS_SUCCESS;
-             }
-     case ZType_U64 :
-              {
-            uint64_t wValue= static_cast<uint64_t>(pValue);
-            _getAtomicUfN_T<uint64_t>((unsigned char*)&wValue,pUniversal,wType);
-              return ZS_SUCCESS;
-              }
-     case ZType_S64 :
-             {
-            int64_t wValue= static_cast<int64_t>(pValue);
-            _getAtomicUfN_T<int64_t>((unsigned char*)&wValue,pUniversal,wType);
-             return ZS_SUCCESS;
-             }
-    case ZType_Float :
-                 {
-                float wValue= static_cast<float>(pValue);
-                _getAtomicUfN_T<float>((unsigned char*)&wValue,pUniversal,wType);
-                 return ZS_SUCCESS;
-                 }
-     case ZType_Double :
-                  {
-                double wValue= static_cast<double>(pValue);
-                _getAtomicUfN_T<double>((unsigned char*)&wValue,pUniversal,wType);
-                  return ZS_SUCCESS;
-                  }
-     case ZType_LDouble :
-                  {
-                long double wValue= static_cast<long double>(pValue);
-                _getAtomicUfN_T<long double>((unsigned char*)&wValue,pUniversal,wType);;
-                    return ZS_SUCCESS;
-                  }
-
-        default:
-                 {
-                     ZException.setMessage(_GET_FUNCTION_NAME_,
-                                             ZS_INVTYPE,
-                                             Severity_Fatal,
-                                             "Invalid Type for key field to convert data to <%ld> <%s> encountered while processing data conversion",
-                                             pDesiredType,
-                                             decode_ZType(pDesiredType));
-                     return ZS_INVTYPE;
-                 }
-    }// switch
-}// _castAtomicValue
-#include <cstdint>
 template<class _TpCheck>
 ZStatus checkMaxAtomicValue_T(ZTypeBase pAtomicType,_TpCheck pValueCheck)
 {
@@ -2459,8 +1293,8 @@ ZTypeBase wCheckType;
             }
         if (pValueCheck<0)
             {
-            _getZType_T<_TpCheck>(pValueCheck,wCheckType,wNaturalSize,wUniversalSize,wArrayCount);
-             ZException.setMessage(_GET_FUNCTION_NAME_,
+            wCheckType = _getZTypeFull_T<_TpCheck>(pValueCheck,wNaturalSize,wUniversalSize,wArrayCount);
+            ZException.setMessage(_GET_FUNCTION_NAME_,
                                    ZS_INVVALUE,
                                    Severity_Severe,
                                    " request to cast a negative number of type <%s> to unsigned type <%s>",
@@ -2497,7 +1331,7 @@ ZTypeBase wCheckType;
             }
         if (pValueCheck<0)
             {
-            _getZType_T<_TpCheck>(pValueCheck,wCheckType,wNaturalSize,wUniversalSize,wArrayCount);
+            wCheckType=_getZTypeFull_T<_TpCheck>(pValueCheck,wNaturalSize,wUniversalSize,wArrayCount);
              ZException.setMessage(_GET_FUNCTION_NAME_,
                                    ZS_INVVALUE,
                                    Severity_Severe,
@@ -2534,7 +1368,7 @@ ZTypeBase wCheckType;
             }
         if (pValueCheck<0)
             {
-            _getZType_T<_TpCheck>(pValueCheck,wCheckType,wNaturalSize,wUniversalSize,wArrayCount);
+            wCheckType=_getZTypeFull_T<_TpCheck>(pValueCheck,wNaturalSize,wUniversalSize,wArrayCount);
              ZException.setMessage(_GET_FUNCTION_NAME_,
                                    ZS_INVVALUE,
                                    Severity_Severe,
@@ -2571,7 +1405,7 @@ ZTypeBase wCheckType;
             }
         if (pValueCheck<0)
             {
-            _getZType_T<_TpCheck>(pValueCheck,wCheckType,wNaturalSize,wUniversalSize,wArrayCount);
+            wCheckType=_getZTypeFull_T<_TpCheck>(pValueCheck,wNaturalSize,wUniversalSize,wArrayCount);
              ZException.setMessage(_GET_FUNCTION_NAME_,
                                    ZS_INVVALUE,
                                    Severity_Severe,
@@ -2615,94 +1449,94 @@ ZTypeBase wCheckType;
 template <class _Tp>
 ZStatus
 //getAtomicZType(const size_t pTypeHashCode,long& pType,ssize_t& pNaturalSize,ssize_t& pKeyFieldSize)
-getAtomicZType(_Tp pValue, ZTypeBase& pType, uint64_t& pNaturalSize, uint64_t& pUniversalSize)
+getAtomicZTypeFull(_Tp pValue, ZTypeBase& pType, uint64_t& pNaturalSize, uint64_t& pUniversalSize)
 {
-const size_t pTypeHashCode = typeid(pValue).hash_code();
-    pType=ZType_Nothing;
-    while (true)
+  const size_t wTypeHashCode = typeid(pValue).hash_code();
+  pType=ZType_Nothing;
+  while (true)
+  {
+    if (wTypeHashCode==UCharType)
     {
-    if (pTypeHashCode==UCharType)
-                    {
-                    pType |= ZType_UChar ;
-                    pNaturalSize=sizeof(unsigned char);
-                    break;
-                    }
-    if (pTypeHashCode==CharType)
-                    {
-                    pType |= ZType_Char ;
-                    pNaturalSize=sizeof(char);
-                    pUniversalSize = pNaturalSize;  // array of char is a special case because no sign byte is added
-                    break;
-                    }
-    if (pTypeHashCode==U8Type)
-                    {
-                    pType |= ZType_U8 ;
-                    pNaturalSize=sizeof(uint8_t);
-                    break;
-                    }
-    if (pTypeHashCode==S8Type)
-                    {
-                    pType |= ZType_S8 ;
-                    pNaturalSize=sizeof(int8_t);
-                    break;
-                    }
-    if (pTypeHashCode==S16Type)
-                    {
-                    pType |= ZType_S16 ;
-                    pNaturalSize=sizeof(int16_t);
-                    break;
-                    }
-    if (pTypeHashCode==U16Type)
-                    {
-                    pType |= ZType_U16 ;
-                    pNaturalSize=sizeof(uint16_t);
-                    break;
-                    }
-    if (pTypeHashCode==S32Type)
-                    {
-                    pType |= ZType_S32 ;
-                    pNaturalSize=sizeof(int32_t);
-                    break;
-                    }
-    if (pTypeHashCode==U32Type)
-                    {
-                    pType |= ZType_U32 ;
-                    pNaturalSize=sizeof(uint32_t);
-                    break;
-                    }
-    if (pTypeHashCode==S64Type)
-                    {
-                    pType |= ZType_S64 ;
-                    pNaturalSize=sizeof(int64_t);
-                    break;
-                    }
-    if (pTypeHashCode==U64Type)
-                    {
-                    pType |= ZType_U64 ;
-                    pNaturalSize=sizeof(uint64_t);
-                    break;
-                    }
+      pType |= ZType_UChar ;
+      pNaturalSize=sizeof(unsigned char);
+      break;
+    }
+    if (wTypeHashCode==CharType)
+    {
+      pType |= ZType_Char ;
+      pNaturalSize=sizeof(char);
+      pUniversalSize = pNaturalSize;  // array of char is a special case because no sign byte is added
+      break;
+    }
+    if (wTypeHashCode==U8Type)
+    {
+      pType |= ZType_U8 ;
+      pNaturalSize=sizeof(uint8_t);
+      break;
+    }
+    if (wTypeHashCode==S8Type)
+    {
+      pType |= ZType_S8 ;
+      pNaturalSize=sizeof(int8_t);
+      break;
+    }
+    if (wTypeHashCode==S16Type)
+    {
+      pType |= ZType_S16 ;
+      pNaturalSize=sizeof(int16_t);
+      break;
+    }
+    if (wTypeHashCode==U16Type)
+    {
+      pType |= ZType_U16 ;
+      pNaturalSize=sizeof(uint16_t);
+      break;
+    }
+    if (wTypeHashCode==S32Type)
+    {
+      pType |= ZType_S32 ;
+      pNaturalSize=sizeof(int32_t);
+      break;
+    }
+    if (wTypeHashCode==U32Type)
+    {
+      pType |= ZType_U32 ;
+      pNaturalSize=sizeof(uint32_t);
+      break;
+    }
+    if (wTypeHashCode==S64Type)
+    {
+      pType |= ZType_S64 ;
+      pNaturalSize=sizeof(int64_t);
+      break;
+    }
+    if (wTypeHashCode==U64Type)
+    {
+      pType |= ZType_U64 ;
+      pNaturalSize=sizeof(uint64_t);
+      break;
+    }
 
-//-------Floating point----------------------------
-//
-    if (pTypeHashCode==FloatType)
-                    {
-                    pType |= ZType_Float ;
-                    pNaturalSize=sizeof(float);
-                    break;
-                    }
-    if (pTypeHashCode==DoubleType)
-                    {
-                    pType |= ZType_Double ;
-                    pNaturalSize=sizeof(double);
-                    break;
-                    }
-    if (pTypeHashCode==LDoubleType)
-                    {
-                    pType |= ZType_LDouble ;
-                    pNaturalSize=sizeof(long double);
-                    break;
-                    }
+    //-------Floating point----------------------------
+    //
+    if (wTypeHashCode==FloatType)
+    {
+      pType |= ZType_Float ;
+      pNaturalSize=sizeof(float);
+      break;
+    }
+    if (wTypeHashCode==DoubleType)
+    {
+      pType |= ZType_Double ;
+      pNaturalSize=sizeof(double);
+      break;
+    }
+    if (wTypeHashCode==LDoubleType)
+    {
+      pType |= ZType_LDouble ;
+      pNaturalSize=sizeof(long double);
+      break;
+    }
 
 
     pType = ZType_Unknown;
@@ -2711,415 +1545,13 @@ const size_t pTypeHashCode = typeid(pValue).hash_code();
 
     return (ZS_INVTYPE);
 
-    }// while
-    pUniversalSize = pNaturalSize;
-    if (pType & ZType_Signed)
-                pUniversalSize = pUniversalSize+ 1; //! take care of sign byte
+  }// while
+  pUniversalSize = pNaturalSize;
+  if (pType & ZType_Signed)
+    pUniversalSize = pUniversalSize+ 1; //! take care of sign byte
 
-    return(ZS_SUCCESS);
+  return(ZS_SUCCESS);
 }// getAtomicZType generic - not template
 
-template <class _TpTarget>
-/**
- * @brief _castAtomicToNfU_T template routine that delivers a natural value with casted data from an input type to another
- *      Types must be compatible
- * @param pValue Ouput data
- * @param pUniversal
- * @param pDesiredType
- * @return
- */
-ZStatus
-_castAtomicToNfU_T (typename std::enable_if_t<std::is_integral<_TpTarget>::value|std::is_floating_point<_TpTarget>::value,_TpTarget> &pTargetValue,
-                    const unsigned char* pUniversal, // Source data
-                    ZTypeBase pSourceType)
-{
-size_t wUniversalSize, wNaturalSize;
-uint16_t wArrayCount;
-ZTypeBase wTargetType;
-ZStatus wSt=ZS_SUCCESS;
-
-ZTypeBase wSourceType = pSourceType & ZType_AtomicMask;
-
-    wSt=getAtomicZType(pTargetValue,wTargetType,wNaturalSize,wUniversalSize);
-    if (wSt!=ZS_SUCCESS)
-                return wSt;
-// @todo : check type by type with max value
-
-    switch (wSourceType)
-    {
-    case ZType_U8 :
-             {
-
-              uint8_t wValue= _getAtomicNfU_T_Ptr<uint8_t>(wValue,pUniversal,wSourceType); // no endian no sign
-
-              _getAtomicNfU_T_Ptr<uint8_t>(wValue,pUniversal,wTargetType);
-              return ZS_SUCCESS;
-              }
-    case ZType_S8 : // no endian - sign byte
-            {
-            int8_t wValue= _getAtomicNfU_T_Ptr<int8_t>(wValue,pUniversal,wSourceType);
-            if ((wSt=checkMaxAtomicValue_T<int8_t>(wTargetType,wValue))!=ZS_SUCCESS)
-                                                        return wSt;
-            pTargetValue=static_cast<_TpTarget>(wValue);
-            return ZS_SUCCESS;
-            }
-
-     case ZType_U16 :
-            {
-            uint16_t wValue= _getAtomicNfU_T_Ptr<uint16_t>(wValue,pUniversal,wSourceType);
-            if ((wSt=checkMaxAtomicValue_T<uint16_t>(wTargetType,wValue))!=ZS_SUCCESS)
-                                                        return wSt;
-            pTargetValue=static_cast<_TpTarget>(wValue);
-            return ZS_SUCCESS;
-            }
-     case ZType_S16 :
-            {
-            int16_t wValue= _getAtomicNfU_T_Ptr<int16_t>(wValue,pUniversal,wSourceType);
-            if ((wSt=checkMaxAtomicValue_T<int16_t>(wTargetType,wValue))!=ZS_SUCCESS)
-                                                        return wSt;
-            pTargetValue=static_cast<_TpTarget>(wValue);
-            return ZS_SUCCESS;
-            }
-     case ZType_U32 :
-        {
-        uint32_t wValue= _getAtomicNfU_T_Ptr<uint32_t>(wValue,pUniversal,wSourceType);
-        if ((wSt=checkMaxAtomicValue_T<uint32_t>(wTargetType,wValue))!=ZS_SUCCESS)
-                                                    return wSt;
-        pTargetValue=static_cast<_TpTarget>(wValue);
-        return ZS_SUCCESS;
-        }
-     case ZType_S32 :
-        {
-        int32_t wValue= _getAtomicNfU_T_Ptr<int32_t>(wValue,pUniversal,wSourceType);
-        if ((wSt=checkMaxAtomicValue_T<int32_t>(wTargetType,wValue))!=ZS_SUCCESS)
-                                                    return wSt;
-        pTargetValue=static_cast<_TpTarget>(wValue);
-        return ZS_SUCCESS;
-        }
-     case ZType_U64 :
-        {
-        uint64_t wValue= _getAtomicNfU_T_Ptr<uint64_t>(wValue,pUniversal,wSourceType);
-        if ((wSt=checkMaxAtomicValue_T<uint64_t>(wTargetType,wValue))!=ZS_SUCCESS)
-                                                    return wSt;
-        pTargetValue=static_cast<_TpTarget>(wValue);
-        return ZS_SUCCESS;
-        }
-     case ZType_S64 :
-        {
-        int64_t wValue= _getAtomicNfU_T_Ptr<int64_t>(wValue,pUniversal,wSourceType);
-        if ((wSt=checkMaxAtomicValue_T<int64_t>(wTargetType,wValue))!=ZS_SUCCESS)
-                                                    return wSt;
-        pTargetValue=static_cast<_TpTarget>(wValue);
-        return ZS_SUCCESS;
-        }
-    case ZType_Float :
-        {
-        float wValue= _getAtomicNfU_T_Ptr<float>(wValue,pUniversal,wSourceType);
-        pTargetValue=static_cast<_TpTarget>(wValue);
-        return ZS_SUCCESS;
-        }
-     case ZType_Double :
-        {
-        double wValue= _getAtomicNfU_T_Ptr<double>(wValue,pUniversal,wSourceType);
-        pTargetValue=static_cast<_TpTarget>(wValue);
-        return ZS_SUCCESS;
-        }
-     case ZType_LDouble :
-        {
-        long double wValue= _getAtomicNfU_T_Ptr<long double>(wValue,pUniversal,wSourceType);
-        pTargetValue=static_cast<_TpTarget>(wValue);
-        return ZS_SUCCESS;
-        }
-
-        default:
-         {
-         _getZType_T<_TpTarget>(pTargetValue,wTargetType,wNaturalSize,wUniversalSize,wArrayCount);
-         ZException.setMessage(_GET_FUNCTION_NAME_,
-                                 ZS_INVTYPE,
-                                 Severity_Severe,
-                                 "Invalid Type code <%lX> [type <%s>] encountered while processing data conversion",
-                                 wTargetType,
-                                 decode_ZType(wTargetType));
-         return ZS_INVTYPE;
-         }
-    }// switch*/
-}// _castAtomicValue
-
-
-
-
-/* universal signed 16 bits */
-#pragma pack(push)
-#pragma pack(1)
-class US8
-{
-public:
-  uint8_t   Sign;
-  uint8_t  Value;
-  US8() {}
-  US8(const US8& pIn) {_copyFrom(pIn);}
-  US8& _copyFrom(const US8& pIn)
-  {
-    Sign=pIn.Sign;
-    Value=pIn.Value;
-    return *this;
-  }
-  US8& operator = (const US8& pIn) {return _copyFrom(pIn);}
-  US8& operator = (const int8_t& pIn) {return fromNatural(pIn);}
-
-  US8& fromNatural(int8_t pN)
-  {
-    if (pN<0)  // if negative value
-    {
-      Sign=0; // sign byte is set to Zero
-      Value=-pN;
-      Value=_negate (Value); // mandatory otherwise -120 is greater than -110
-      return *this;
-    }
-
-    /* positive value */
-    Sign=1;
-    Value=pN;
-    return *this;
-  }
-  int8_t toNatural()
-  {
-    if (Sign>0)
-      return int8_t(Value);
-
-    Value=_negate (Value);
-    return - int8_t(Value);
-  }
-};
-
-class US16
-{
-public:
-  uint8_t   Sign;
-  uint16_t  Value;
-  US16() {}
-  US16(const US16& pIn) {_copyFrom(pIn);}
-  US16(int16_t pIn) {fromNatural(pIn);}
-  US16& _copyFrom(const US16& pIn);
-  US16& operator = (const US16& pIn) {return _copyFrom(pIn);}
-  US16& operator = (const int16_t& pIn) {return fromNatural(pIn);}
-
-  size_t getSize() {return sizeof(uint16_t)+1;}
-
-  US16& fromNatural(int16_t pN);
-  int16_t toNatural();
-
-  ZDataBuffer _export();
-  size_t _import(unsigned char* &pIn);
-
-  static ZDataBuffer _exportURF(int16_t pValue);
-  static ZDataBuffer& _exportURF(int16_t pValue,ZDataBuffer& pBuf);
-
-  ZDataBuffer _exportURF();
-  ZDataBuffer& _exportURF(ZDataBuffer& pOut);
-  ssize_t _importURF(unsigned char* &pIn);
-  static ssize_t _importURF(int16_t& pValue,unsigned char* &pIn);
-};
-
-class UU16
-{
-public:
-  uint16_t  Value;
-  UU16() {}
-  UU16(const UU16& pIn) {_copyFrom(pIn);}
-  UU16(uint16_t pIn) {fromNatural(pIn);}
-  UU16& _copyFrom(const UU16& pIn);
-  UU16& operator = (const UU16& pIn) {return _copyFrom(pIn);}
-  UU16& operator = (const uint16_t& pIn) {return fromNatural(pIn);}
-
-  size_t getSize() {return sizeof(uint16_t);}
-
-  UU16& fromNatural(uint16_t pN);
-  uint16_t toNatural();
-
-  ZDataBuffer _export();
-  size_t _import(unsigned char* &pIn);
-
-  static ZDataBuffer _exportURF(uint16_t pValue);
-  static ZDataBuffer& _exportURF(uint16_t pValue,ZDataBuffer& pBuf);
-
-  ZDataBuffer _exportURF();
-  ZDataBuffer& _exportURF(ZDataBuffer& pOut);
-  ssize_t _importURF(unsigned char* &pIn);
-  static ssize_t _importURF(uint16_t& pValue,unsigned char* &pIn);
-
-};
-class US32
-{
-public:
-  uint8_t   Sign;
-  uint32_t  Value;
-  US32() {}
-  US32(const US32& pIn) {_copyFrom(pIn);}
-  US32(int32_t pIn) {fromNatural(pIn);}
-  US32& _copyFrom(const US32& pIn);
-  US32& operator = (const US32& pIn) {return _copyFrom(pIn);}
-  US32& operator = (const int32_t& pIn) {return fromNatural(pIn);}
-
-  size_t getSize() {return sizeof(uint32_t)+1;}
-
-  US32& fromNatural(int32_t pN);
-  int32_t toNatural();
-
-  ZDataBuffer _export();
-  size_t _import(unsigned char* &pIn);
-
-  static ZDataBuffer _exportURF(int32_t pValue);
-  static ZDataBuffer& _exportURF(int32_t pValue,ZDataBuffer& pBuf);
-
-  ZDataBuffer _exportURF();
-  ZDataBuffer& _exportURF(ZDataBuffer& pOut);
-  ssize_t _importURF(unsigned char* &pIn);
-  static ssize_t _importURF(int32_t& pValue,unsigned char* &pIn);
-};
-class UU32
-{
-public:
-  uint32_t  Value;
-  UU32() {}
-  UU32(const UU32& pIn) {_copyFrom(pIn);}
-  UU32(float pIn) {fromNatural(pIn);}
-  UU32& _copyFrom(const UU32& pIn);
-  UU32& operator = (const UU32& pIn) {return _copyFrom(pIn);}
-  UU32& operator = (const uint32_t& pIn) {return fromNatural(pIn);}
-
-  size_t getSize() {return sizeof(uint32_t);}
-
-  UU32& fromNatural(uint32_t pN);
-  uint32_t toNatural();
-
-  ZDataBuffer _export();
-  size_t _import(unsigned char* &pIn);
-
-  static ZDataBuffer _exportURF(uint32_t pValue);
-  static ZDataBuffer& _exportURF(uint32_t pValue,ZDataBuffer& pBuf);
-
-  ZDataBuffer _exportURF();
-  ZDataBuffer& _exportURF(ZDataBuffer& pOut);
-  ssize_t _importURF(unsigned char* &pIn);
-  static ssize_t _importURF(uint32_t& pValue,unsigned char* &pIn);
-};
-
-class US64
-{
-public:
-  uint8_t   Sign;
-  uint64_t  Value;
-  US64() {}
-  US64(const US64& pIn) {_copyFrom(pIn);}
-  US64(int64_t pIn) {fromNatural(pIn);}
-
-  US64& _copyFrom(const US64& pIn);
-  US64& operator = (const US64& pIn) {return _copyFrom(pIn);}
-  US64& operator = (const int64_t& pIn) {return fromNatural(pIn);}
-
-  size_t getSize() {return sizeof(uint64_t)+1;}
-
-  US64& fromNatural(int64_t pN);
-  int64_t toNatural();
-
-  ZDataBuffer _export();
-  size_t _import(unsigned char* &pIn);
-
-  static ZDataBuffer _exportURF(int64_t pValue);
-  static ZDataBuffer& _exportURF(int64_t pValue,ZDataBuffer& pBuf);
-
-  ZDataBuffer _exportURF();
-  ZDataBuffer& _exportURF(ZDataBuffer& pOut);
-  ssize_t _importURF(unsigned char* &pIn);
-  static ssize_t _importURF(int64_t& pValue,unsigned char* &pIn);
-
-};
-class UU64
-{
-public:
-  uint64_t  Value;
-  UU64() {}
-  UU64(const US64& pIn) {_copyFrom(pIn);}
-  UU64& _copyFrom(const UU64& pIn);
-  UU64& operator = (const UU64& pIn) {return _copyFrom(pIn);}
-  UU64& operator = (const uint64_t& pIn) {return fromNatural(pIn);}
-
-  size_t getSize() {return sizeof(uint64_t);}
-
-  UU64& fromNatural(uint64_t pN);
-  uint64_t toNatural() { return reverseByteOrder_Conditional(Value);}
-
-  ZDataBuffer _export();
-  size_t _import(unsigned char* &pIn);
-
-  static ZDataBuffer _exportURF(uint64_t pValue);
-  static ZDataBuffer& _exportURF(uint64_t pValue,ZDataBuffer& pBuf);
-
-  ZDataBuffer _exportURF();
-  ZDataBuffer& _exportURF(ZDataBuffer& pOut);
-  ssize_t _importURF(unsigned char* &pIn);
-  static ssize_t _importURF(uint64_t& pValue,unsigned char* &pIn);
-
-};
-
-
-class UFloat
-{
-public:
-  uint8_t   Sign;
-  float     Value;
-  UFloat() {}
-  UFloat(const UFloat& pIn) {_copyFrom(pIn);}
-  UFloat(float pIn) {fromNatural(pIn);}
-  UFloat& _copyFrom(const UFloat& pIn);
-  UFloat& operator = (const UFloat& pIn) {return _copyFrom(pIn);}
-  UFloat& operator = (const float& pIn) {return fromNatural(pIn);}
-
-  size_t getSize() {return sizeof(float)+1;}
-
-  UFloat& fromNatural(float pN);
-  float toNatural();
-
-  ZDataBuffer _export();
-  size_t _import(unsigned char* &pIn);
-
-  static ZDataBuffer _exportURF(float pValue);
-  static ZDataBuffer& _exportURF(float pValue,ZDataBuffer& pBuf);
-
-  ZDataBuffer _exportURF();
-  ZDataBuffer& _exportURF(ZDataBuffer& pOut);
-  ssize_t _importURF(unsigned char* &pIn);
-  static ssize_t _importURF(float& pValue,unsigned char* &pIn);
-};
-class UDouble
-{
-public:
-  uint8_t   Sign;
-  double    Value;
-  UDouble() {}
-  UDouble(const UDouble& pIn) {_copyFrom(pIn);}
-  UDouble(double pIn) {fromNatural(pIn);}
-  UDouble& _copyFrom(const UDouble& pIn);
-  UDouble& operator = (const UDouble& pIn) {return _copyFrom(pIn);}
-  UDouble& operator = (const double& pIn) {return fromNatural(pIn);}
-
-  size_t getSize() {return sizeof(double)+1;}
-
-  UDouble& fromNatural(double pN);
-  double toNatural();
-
-  ZDataBuffer _export();
-  size_t _import(unsigned char* &pIn);
-
-  static ZDataBuffer _exportURF(double pValue);
-  static ZDataBuffer& _exportURF(double pValue,ZDataBuffer& pBuf);
-
-  ZDataBuffer _exportURF();
-  ZDataBuffer& _exportURF(ZDataBuffer& pOut);
-  ssize_t _importURF(unsigned char* &pIn);
-  static ssize_t _importURF(double& pValue,unsigned char* &pIn);
-};
-#pragma pack(pop)
 
 #endif // ZDATATYPE_H

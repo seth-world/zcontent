@@ -150,7 +150,7 @@ URF_Array_Count_type wArrayCount=0;
 ZTypeBase wType;
 
 
-    wSt=zgetZType_T<_Tp>(wType,wNaturalSize,wUniversalSize,wArrayCount);
+    wSt=_getZTypeFull_T<_Tp>(wType,wNaturalSize,wUniversalSize,wArrayCount);
     if (wSt!=ZS_SUCCESS)
             return wSt;
 

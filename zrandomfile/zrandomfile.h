@@ -127,6 +127,8 @@ class ZRandomFile : protected ZFileDescriptor
 
  friend class ZOpenZRFPool;
 
+ friend class zZIndexTable;
+
 // friend class ZContentVisuMain;
 
 public:
@@ -294,7 +296,7 @@ public:
                      bool pLeaveOpen=false) ;
 
     /** @brief zremoveFile removes files (content file and header file) for currently openned ZRandomFile  */
-    ZStatus _removeFile (ZaiErrors *pErrorLog=nullptr) ;
+    ZStatus _removeFile (bool pBackup,ZaiErrors *pErrorLog=nullptr) ;
     /**
      * @brief ZRandomFile::_removeFile definitively remove ZRandomFile structure (content and header files) whose content is pContentPath.
      * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
@@ -308,15 +310,15 @@ public:
      *
      *    ZS_FILEERROR  : cannot physically remove file (either content or header) ZException is loaded with errno and appropriate error explainations.
      */
-    ZStatus _removeFile (const char* pContentPath, ZaiErrors *pErrorLog=nullptr) ;
+    ZStatus _removeFile (const char* pContentPath,bool pBackup, ZaiErrors *pErrorLog=nullptr) ;
 
     /** @brief removeFile static method that definitively removes ZRandomFile structure (content and header files) whose content is pContentPath.
      *  @see _removeFile
      */
-    static ZStatus removeFile (const char* pContentPath, ZaiErrors *pErrorLog=nullptr)
+    static ZStatus removeFile (const char* pContentPath, bool pBackup,ZaiErrors *pErrorLog=nullptr)
     {
       ZRandomFile wZRF;
-      return wZRF._removeFile(pContentPath,pErrorLog);
+      return wZRF._removeFile(pContentPath,pBackup, pErrorLog);
     }
 
     /**
@@ -359,6 +361,11 @@ public:
         return ZRF_NotOpen;
       return (zmode_type)Mode;
     }
+
+   ZStatus    changeOpenMode(zmode_type pOpenMode) {
+     return _changeOpenMode(pOpenMode);
+   }
+
     ZStatus zopen(const zmode_type pMode);
 //    ZStatus zopen(const char *pFilename,const zmode_type pMode);
     ZStatus zopen(const uriString &pFilename,const zmode_type pMode);

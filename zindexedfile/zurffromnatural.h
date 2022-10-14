@@ -16,6 +16,7 @@
 #include <ztoolset/ztypetype.h>
 #include <zindexedfile/zdatatype.h>
 #include <ztoolset/zatomicconvert.h>
+#include <zindexedfile/zdataconversion.h>
 
 ZStatus
 setFieldURFfBlob(void* pSourceNatural,
@@ -159,7 +160,7 @@ uint16_t wArrayCount;
 ZDataBuffer wUValue;
 
     // create URF header : for atomic data only ZTypeBase data type
-    wSt=_getZType_T<_Tp>(pValue,pSourceType,pSourceNSize,pSourceUSize,wArrayCount);
+    wSt=_getZTypeFull_T<_Tp>(pValue,pSourceType,pSourceNSize,pSourceUSize,wArrayCount);
     if (wSt!=ZS_SUCCESS)
             return wSt;
 
@@ -172,7 +173,7 @@ ZDataBuffer wUValue;
 
 //    wTargetType=reverseByteOrder_Conditional<ZTypeBase>(pTargetType);
 //    pURFData->setData(&wTargetType,sizeof(wTargetType));
-
+/*
     if (pSourceType!=pTargetType)
         {
         wSt=_castAtomicToUfN_T<_Tp>(pValue,wUValue,pTargetType);
@@ -181,7 +182,7 @@ ZDataBuffer wUValue;
         _getAtomicUfN_T<_Tp>((unsigned char*) &pValue,wUValue,pTargetType);
     if (wSt!=ZS_SUCCESS)
                 return wSt;
-
+*/
     unsigned char* wURFPtr=pURFData->allocateBZero(wUValue.Size+sizeof(pTargetType));
 
     wURFPtr=setURFBufferValue<ZTypeBase>(wURFPtr,pTargetType);
@@ -243,6 +244,7 @@ ZDataBuffer wUValue;
  *  Other Atomic                   x        --          --          --              --           --      --      conv(*)
  *  Data
  *
+ * DEPRECATED
  * (*) cast to new format if necessary using  <_castAtomicToUfN_T>
  *
  *
@@ -274,9 +276,9 @@ ZDataBuffer wUValue;
         return ZS_INVVALUE;
         }
     // create URF header : for atomic data only ZTypeBase data type
-    wSt=_getZType_T<_Tp>(pNatural,pSourceType,pSourceNSize,pSourceUSize,pSourceArrayCount);
-    if (wSt!=ZS_SUCCESS)
-                    return wSt;
+    pSourceType=_getZTypeFull_T<_Tp>(pNatural,pSourceNSize,pSourceUSize,pSourceArrayCount);
+    if (pSourceType==ZType_Unknown)
+                    return ZS_INVTYPE;
     printf ("%s-Pointer> assigning field value from source type <%X> <%s> to target type <%X><%s>\n",
             _GET_FUNCTION_NAME_,
             pSourceType,
@@ -333,7 +335,7 @@ ZDataBuffer wUValue;
             }
         }
     pURFData->clear();
-
+/*    casting is deprecated
     if (pSourceType!=pTargetType)
         {
         for (long wi=0;(wi<wRetainedArrayCount)&&(wSt==ZS_SUCCESS);wi++)
@@ -346,19 +348,20 @@ ZDataBuffer wUValue;
         }//if (pOriginType!=pTargetType)
         else
         {
+*/
         for (long wi=0;(wi<pTargetArrayCount)&&(wSt==ZS_SUCCESS);wi++)
             {
-            wSt= _getAtomicUfN_T<typeof(pNatural[0])>((unsigned char*) &pNatural[wi],wValue,pTargetType);
+            wSt= _getAtomicUfN<typeof(pNatural[0])>(pNatural[wi],wValue,pTargetType);
              if (wSt==ZS_SUCCESS)
                     pURFData->appendData(wValue);
             }// for
-        }
+//        }
 // padding to 0 wether necessary
 
 decltype(pNatural[0]) wZeroValue=0;
     for (long wi=wRetainedArrayCount;(wi<pTargetArrayCount)&&(wSt==ZS_SUCCESS);wi++)
             {
-            wSt= _getAtomicUfN_T<typeof(pNatural[0])>((unsigned char*) &wZeroValue,wValue,pTargetType);
+            wSt= _getAtomicUfN<typeof(pNatural[0])>( &wZeroValue,wValue,pTargetType);
             if (wSt==ZS_SUCCESS)
                        pURFData->appendData(wValue);
             }
@@ -403,7 +406,7 @@ size_t wNSize, wUSize;
 uint32_t  wRetainedArrayCount;
 //ZDataBuffer wUValue;
 
-    wSt=_getZType_T<_Tp>(pNatural,pSourceType,wNSize,wUSize,pSourceArrayCount);
+    wSt=_getZTypeFull_T<_Tp>(pNatural,pSourceType,wNSize,wUSize,pSourceArrayCount);
     if (wSt!=ZS_SUCCESS)
                     return wSt;
     printf ("%s-Array>> assigning field value from source type <%X> <%s> to target type <%X><%s>\n",
@@ -447,7 +450,7 @@ uint32_t  wRetainedArrayCount;
         }
     pURFData->clear();
 
-    if (pSourceType!=pTargetType)
+/*    if (pSourceType!=pTargetType)
         {
         for (long wi=0;(wi<wRetainedArrayCount)&&(wSt==ZS_SUCCESS);wi++)
             {
@@ -458,20 +461,20 @@ uint32_t  wRetainedArrayCount;
 
         }//if (pOriginType!=pTargetType)
         else
-        {
+        {*/
         for (long wi=0;(wi<pTargetArrayCount)&&(wSt==ZS_SUCCESS);wi++)
             {
-            wSt= _getAtomicUfN_T<decltype(pNatural[0])>((unsigned char*) &pNatural[wi],wValue,pTargetType);
+            wSt= _getAtomicUfN<decltype(pNatural[0])>(pNatural[wi],wValue,pTargetType);
              if (wSt==ZS_SUCCESS)
                     pURFData->appendData(wValue);
             }// for
-        }
+//        }
 // padding to 0 wether necessary
 
 decltype(pNatural[0]) wZeroValue=0;
     for (long wi=wRetainedArrayCount;(wi<pTargetArrayCount)&&(wSt==ZS_SUCCESS);wi++)
             {
-            wSt= _getAtomicUfN_T<decltype(pNatural[0])>((unsigned char*) &wZeroValue,wValue,pTargetType);
+            wSt= _getAtomicUfN<decltype(pNatural[0])>(wZeroValue,wValue,pTargetType);
             if (wSt==ZS_SUCCESS)
                        pURFData->appendData(wValue);
             }
@@ -564,7 +567,7 @@ ZStatus wSt=ZS_SUCCESS;
 // get ZType_type and sizes + arraycount
 
 
-    wSt=_getZType_T<_Tp>(pSourceNatural,pSourceType,pSourceNSize,pSourceUSize,pSourceCapacity);
+    wSt=_getZTypeFull_T<_Tp>(pSourceNatural,pSourceType,pSourceNSize,pSourceUSize,pSourceCapacity);
     if (wSt!=ZS_SUCCESS)
                    { return  wSt;}
 
@@ -961,7 +964,7 @@ ZDataBuffer& _atomictoURF (typename std::enable_if_t<std::is_integral<_Tp>::valu
   ZTypeBase wType;
   bool wIsSigned=false;
 
-  _getZType_T<_Tp>(pIn,wType,wNaturalSize,wUniversalSize,wArrayCount);
+  _getZTypeFull_T<_Tp>(pIn,wType,wNaturalSize,wUniversalSize,wArrayCount);
 
   wIsSigned = wType & ZType_Signed ;
 

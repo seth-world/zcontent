@@ -114,11 +114,11 @@ public:
   int     ContentFd=0;
   FILE*   FHeader=nullptr;
   int     HeaderFd=0;
-  pid_t   Pid;                      /* pid of current process owning ZFileDescriptor instance (set at object instantiation )  : other processes are collaborative processes sharing info with it */
-  ZSystemUser     Uid;              /* uid of current process owning ZFileDescriptor instance (set at object instantiation ) */
-  bool            _isOpen = false;  /* True when file is open , false if closed */
-  uint8_t HeaderAccessed=ZHAC_Nothing;  /*  has not been accessed : set to false by close operation - set to true at first access to header data */
-  zmode_type   Mode  = ZRF_Nothing; /* Mode mask (int32_t) the file has been openned for see: @ref ZRFMode_type */
+  pid_t   Pid=0;                    /* pid of current process owning ZFileDescriptor instance (set at object instantiation )  : other processes are collaborative processes sharing info with it */
+  ZSystemUser       Uid;              /* uid of current process owning ZFileDescriptor instance (set at object instantiation ) */
+  bool              _isOpen = false;  /* True when file is open , false if closed */
+  uint8_t           HeaderAccessed=ZHAC_Nothing;  /*  has not been accessed : set to false by close operation - set to true at first access to header data */
+  zmode_type        Mode  = ZRF_Nothing; /* Mode mask (int32_t) the file has been openned for see: @ref ZRFMode_type */
   ZHeaderControlBlock ZHeader;
   //    zaddress_type       OffsetFCB=0L;  /**< offset to ZFCB : OL if no derived class infradata space allocation. Else gives the size of reserved space.
   ZFileControlBlock ZFCB;
@@ -186,6 +186,8 @@ public:
     clear();
     return _copyFrom(pIn);
   }
+
+  ZStatus _changeOpenMode (zmode_type pNewMode);
 
   ZStatus _close();
   void _forceClose();

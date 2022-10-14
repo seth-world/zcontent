@@ -131,6 +131,7 @@ SOURCES += \
     $${ZQT_WIDGET}/zqtwidgettypes.cpp \
     $${ZQT_WIDGET}/zqplaintextedit.cpp \
 #    $${ZQT_WIDGET}/zqpixlabelchecked.cpp \
+    ../../../zmftest/zdoctest.cpp \
 \
     $${ZCONTENT_ROOT}/zcontentcommon/zresource.cpp \
     $${ZCONTENT_ROOT}/zindexedfile/zfielddescription.cpp \
@@ -156,11 +157,15 @@ SOURCES += \
     $${ZCONTENT_ROOT}/zcontentutils/zlayout.cpp \
     $${ZCONTENT_ROOT}/zcontentutils/zscan.cpp \
     main.cpp \
+    zcppgenerate.cpp \
     zdicdlg.cpp
 
 
 
 HEADERS += \
+    ../../../zmftest/header.h \
+    ../../../zmftest/zdocphy.h \
+    ../../../zmftest/zdoctest.h \
     ../../zconfig_general.h \
     $${ZQT_WIDGET}/zdatareference.h \
     $${ZQT_WIDGET}/zpinboard.h \
@@ -197,6 +202,7 @@ HEADERS += \
     $${ZCONTENT_ROOT}/zcontentutils/zscan.h \
 \
     $${TOOLSET_ROOT}/zcppparser/zcppparserutils/rawfields.h \
+    zcppgenerate.h \
     zdicdlg.h
 
 

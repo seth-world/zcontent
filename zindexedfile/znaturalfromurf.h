@@ -9,6 +9,8 @@
 #include <ztoolset/ztypetype.h>
 #include <zindexedfile/zdatatype.h>
 #include <ztoolset/zatomicconvert.h>
+#include <zindexedfile/zdataconversion.h>
+
 template <class _Tp>
 ZStatus
 setBlobfURF(_Tp* pNatural,
@@ -123,7 +125,7 @@ const unsigned char* wData_Ptr=pURFData->Data;
                                                 {return  wSt;}
     // Get the target (natural) data characteristics : type, sizes, array count (NB: Source data infos is given by URF)
 
-    wSt=_getZType_T<_Tp>(pValue,pTargetType,pTargetNSize,pTargetUSize,pTargetArrayCount); //
+    wSt=_getZTypeFull_T<_Tp>(pValue,pTargetType,pTargetNSize,pTargetUSize,pTargetArrayCount); //
     if (wSt!=ZS_SUCCESS)
             return wSt;
 
@@ -135,7 +137,7 @@ const unsigned char* wData_Ptr=pURFData->Data;
             pTargetType,
             decode_ZType(pTargetType));
 
-
+#ifdef __DEPRECATED__
     if (wSourceType!=pTargetType)
         {
         if (!(wSourceType&ZType_Atomic)) // target type must be atomic
@@ -157,8 +159,23 @@ const unsigned char* wData_Ptr=pURFData->Data;
         }
         else
         _getAtomicNfU_T_Ptr<_Tp>(pValue,wData_Ptr,wSourceType); // if not, simply depack
-    if (wSt!=ZS_SUCCESS)
-                return  wSt;
+#endif // __DEPRECATED__ \
+
+  if (wSourceType!=pTargetType) {
+        ZException.setMessage(_GET_FUNCTION_NAME_,
+            ZS_INVTYPE,
+            Severity_Severe,
+            "Incompatible source and target data type : cannot convert from <%x> <%s> to <%x> <%s>.",
+            wSourceType,
+            decode_ZType(wSourceType),
+            pTargetType,
+            decode_ZType(pTargetType));
+        return  ZS_INVTYPE;
+  }
+  _getAtomicNfU_T_Ptr<typeof(pValue)>(pValue,wData_Ptr,wSourceType);
+
+  if (wSt!=ZS_SUCCESS)
+    return  wSt;
 
     pTargetArrayCount=1;
     return  ZS_SUCCESS;
@@ -191,7 +208,7 @@ _getBlobNfURF(void* pValue, unsigned char* pURFData, ZTypeBase pTargetType);
 
 template <class _Tp>
 /**
- * @brief setFieldNfURF_T set field natural value from urf towards class objects : conversion is made strictly 1 to 1.
+ * @brief importFieldfURF_T set field natural value from urf towards class objects : conversion is made strictly 1 to 1.
  *
  * An errored ZStatus is issued if data type does not correspond strictly to the defined one in URF data.
  *
@@ -258,7 +275,7 @@ const unsigned char* wData_Ptr;
         return  ZS_INVTYPE;
         }
 
-    wSt=_getZType_T<_Tp>(pValue,pTargetType,pTargetNSize,pTargetUSize,pTargetCapacity); //
+    wSt=_getZTypeFull_T<_Tp>(pValue,pTargetType,pTargetNSize,pTargetUSize,pTargetCapacity); //
     if (wSt!=ZS_SUCCESS)
             return wSt;
 
@@ -362,7 +379,7 @@ const unsigned char* wData_Ptr=pURFData->Data;
                                                 {return  wSt;}
     // Get the target (natural) data characteristics : type, sizes, array count (NB: Source data infos is given by URF)
 
-    wSt=_getZType_T<_Tp>(pTargetNatural,pTargetType,pTargetNSize,pTargetUSize,pTargetArrayCount); //
+    wSt=_getZTypeFull_T<_Tp>(pTargetNatural,pTargetType,pTargetNSize,pTargetUSize,pTargetArrayCount); //
     if (wSt!=ZS_SUCCESS)
             return wSt;
     printf ("%s-Array>> getting field value from URF source type <%x> <%s> to Natural target type <%x><%s>\n",

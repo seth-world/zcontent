@@ -118,7 +118,7 @@ public:
   static int createAddrinfo(int pError, const char *pModule, ZStatus pStatus, Severity_type pSeverity, const char *pFormat,...);
 
 
-  static int displayLast( bool pDontShow = false);
+  static int displayLast(const utf8VaryingString &pTitle="", bool pDontShow = false);
 
   static int display(const utf8VaryingString& pTitle,const ZExceptionBase pException, bool pDontShow = false);
   static int display2B(const utf8VaryingString& pTitle,const ZExceptionBase pException, const char *pCancelText=nullptr, const char *pOKText=nullptr);

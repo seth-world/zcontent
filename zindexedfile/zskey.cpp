@@ -842,7 +842,7 @@ zsetKeyFieldValue (_Tp pValue, ZSKey & pZKey,const long pFieldRank,ssize_t pArra
 {
 ZStatus wSt;
 
-long wType;
+ZTypeBase wType;
 ssize_t wNaturalSize, wUniversalSize,wArrayCount;
 
 
@@ -861,9 +861,9 @@ ssize_t wNaturalSize, wUniversalSize,wArrayCount;
     wField.set ((ZIndexFile*)pZKey.ZIF,pFieldRank);
 //first get ZType_type of input data and test its compatibility with target key field
 
-    wSt=zgetZType_T<_Tp>(wType,wNaturalSize,wUniversalSize,pArrayCount,false) ; // with tolerance to pointers
-    if (wSt!=ZS_SUCCESS)
-                return wSt;
+    wType =_getZTypeFull_T<_Tp>(wNaturalSize,wUniversalSize,pArrayCount,false) ; // with tolerance to pointers
+    if (wType==ZType_Unknown)
+                return ZS_INVTYPE;
     wSt=testKeyTypes(wType, wField.ZType);
     if (wSt!=ZS_SUCCESS)
         {

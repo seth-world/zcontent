@@ -103,7 +103,8 @@ public:
   /**
  * @brief ZRawMasterFile::zcreateRawIndex Generates a new index from a description (meaning a new ZRandomFile data + header).
  *
- * This routine will create a new index with the files structures necessary to hold and manage it : a ZIndexFile object will be instantiated.
+ * This routine will create a new index with the files structures necessary to hold and manage it :
+ *  a ZIndexFile object will be instantiated.
  * Headerfile of this new ZRF will contain the Index Control Block (ZICB) describing the key.
  *
  * - generates a new ZIndexFile object.
@@ -134,6 +135,14 @@ public:
                             long &pOutIndexRank,
                             bool pBackup=true);
 
+  ZStatus zinsertRawIndex  (long pIndexRank,
+                            ZIndexFile *&pIndexObjectOut,  /* resulting created index object if successful, nullptr  if not*/
+                            const utf8String &pIndexName,
+                            uint32_t pKeyUniversalSize,
+                            ZSort_Type pDuplicates,
+                            long &pOutIndexRank,
+                            bool pBackup=true);
+#ifdef __COMMENT__
   ZStatus zcreateRawIndexDetailed ( const utf8String &pIndexName, /*-----ICB------*/
                                     uint32_t pKeyUniversalSize,
                                     ZSort_Type pDuplicates,
@@ -143,8 +152,23 @@ public:
                                     bool pHighwaterMarking,
                                     bool pGrabFreeSpace,
                                     bool pReplace);
-
-  ZStatus _createRawIndexDet (const utf8String &pIndexName, /*-----ICB------*/
+#endif // __COMMENT__
+  /**
+   * @brief _createRawIndexDet
+   *  @warning it is necessary to run zrebuildRawIndex() afterwards
+   * @param pIndexName
+   * @param pKeyUniversalSize
+   * @param pDuplicates
+   * @param pAllocatedBlocks
+   * @param pBlockExtentQuota
+   * @param pInitialSize
+   * @param pHighwaterMarking
+   * @param pGrabFreeSpace
+   * @param pReplace
+   * @return
+   */
+  ZStatus _createRawIndexDet (long &pOutRank,
+                              const utf8String &pIndexName, /*-----ICB------*/
                               uint32_t pKeyUniversalSize,
                               ZSort_Type pDuplicates,
                               long pAllocatedBlocks,      /* ---FCB (for index ZRandomFile)---- */
@@ -152,11 +176,37 @@ public:
                               zsize_type pInitialSize,
                               bool pHighwaterMarking,
                               bool pGrabFreeSpace,
-                              bool pReplace);
+                              bool pReplace,
+                              ZaiErrors* pErrorLog);
+  /**
+   * @brief _insertRawIndexDet
+   *  @warning it is necessary to run zrebuildRawIndex() afterwards
+   * @param pIndexRank
+   * @param pIndexName
+   * @param pKeyUniversalSize
+   * @param pDuplicates
+   * @param pAllocatedBlocks
+   * @param pBlockExtentQuota
+   * @param pInitialSize
+   * @param pHighwaterMarking
+   * @param pGrabFreeSpace
+   * @param pReplace
+   * @param pErrorLog
+   * @return
+   */
+  ZStatus _insertRawIndexDet (long pInputIndexRank,
+                              const utf8String &pIndexName, /*-----ICB------*/
+                              uint32_t pKeyUniversalSize,
+                              ZSort_Type pDuplicates,
+                              long pAllocatedBlocks,      /* ---FCB (for index ZRandomFile)---- */
+                              long pBlockExtentQuota,
+                              zsize_type pInitialSize,
+                              bool pHighwaterMarking,
+                              bool pGrabFreeSpace,
+                              bool pReplace,
+                              ZaiErrors* pErrorLog);
 
   void _testZReserved();
-
-
 
   bool hasDictionary() {return Dictionary!=nullptr;}
   bool hasIndexTable() {return IndexTable.count()>0;}
@@ -329,7 +379,11 @@ public:
   static
       void    zupgradeZRFtoZMF (const char* pZRFPath, FILE* pOutput=nullptr);
 
-  ZStatus zremoveIndex (const long pIndexRank, ZaiErrors *pErrorLog=nullptr);
+  ZStatus zremoveIndex (const long pIndexRank, bool pBackup=false, ZaiErrors *pErrorLog=nullptr);
+
+  ZStatus shiftIndexNameDown(long pStartRank,ZaiErrors* pErrorLog);
+  ZStatus shiftIndexNameUp(long pStartRank,ZaiErrors* pErrorLog);
+
   //------------Surface utilities---------------------------------
 
   ZStatus zreorgRawFile(bool pDump=false, FILE *pOutput=stdout); // replaces the ZRandomFile::zreorgFile()

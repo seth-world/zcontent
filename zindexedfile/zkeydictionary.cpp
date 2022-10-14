@@ -9,6 +9,7 @@ using namespace zbs;
 
 KeyDic_Pack& KeyDic_Pack::_copyFrom(const KeyDic_Pack& pIn)
 {
+  memset(this,0,sizeof(KeyDic_Pack));
   memmove(Name,pIn.Name,cst_fieldnamelen);
   KeyUniversalSize=pIn.KeyUniversalSize;
   Duplicates=pIn.Duplicates;
@@ -17,6 +18,7 @@ KeyDic_Pack& KeyDic_Pack::_copyFrom(const KeyDic_Pack& pIn)
 
 KeyDic_Pack& KeyDic_Pack::set(const ZKeyDictionary &pIn)
 {
+  memset(this,0,sizeof(KeyDic_Pack));
   pIn.DicKeyName._exportUVFPtr(Name,cst_fieldnamelen);
   KeyUniversalSize=pIn._reComputeKeySize();
   return *this;
