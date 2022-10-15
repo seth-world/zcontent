@@ -333,18 +333,18 @@ ZMetaDic::_exportAppendMetaDicFlat(ZDataBuffer& pZDBExport)
   ZAExport wZAE;
   wZAE = getZAExport();
   wZAE.serialize();
-  pZDBExport.append_T(wZAE);
+  pZDBExport.append_T<ZAExport>(wZAE);
 
   for (long wi=0;wi < count(); wi++)
   {
     wKDExp.set(Tab[wi]);            /* export field data  */
     wKDExp.serialize();
-    pZDBExport.append_T(wKDExp);
+    pZDBExport.append_T<FieldDesc_Export>(wKDExp);
     Tab[wi].getName()._exportAppendUVF(pZDBExport);  /* then append field name */
     Tab[wi].ToolTip._exportAppendUVF(pZDBExport);  /* then append Tooltip (if exists) */
   }
 
-  pZDBExport.append_T(cst_ZBUFFEREND);
+  pZDBExport.append_T<uint32_t>(cst_ZBUFFEREND);
   return pZDBExport;
 }//_exportAppendFlat
 
@@ -355,6 +355,13 @@ ZMetaDic::_importMetaDicFlat(const unsigned char* &pPtrIn)
   ZAExport wZAE;
   wZAE.setFromPtr(pPtrIn);
   wZAE.deserialize();
+  if (wZAE.StartSign!=cst_ZMSTART) {
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        ZS_CORRUPTED,
+        Severity_Error,
+        "ZMetaDic::_importMetaDicFlat Meta dictionary <%s> : start block mark 0xF6F6F6F6 has not been found.",DicName.toCChar());
+    return ZS_CORRUPTED;
+  }
 
   clear();
   uint32_t wCheckEnd=0;
@@ -367,9 +374,8 @@ ZMetaDic::_importMetaDicFlat(const unsigned char* &pPtrIn)
     setAllocation(wZAE.NbElements,false);
     }
 //  newBlankElement(wZAE.NbElements);
-    int wCount=wZAE.NbElements;
-    while ( wCount-- && (wCheckEnd!=cst_ZBUFFEREND))
-      {
+  int wCount=wZAE.NbElements;
+  while ( wCount-- && (wCheckEnd!=cst_ZBUFFEREND)) {
       wKDExp.setFromPtr(pPtrIn);
       wKDExp.deserialize();
       ZFieldDescription wFD= wKDExp.toFieldDescription();
@@ -377,10 +383,16 @@ ZMetaDic::_importMetaDicFlat(const unsigned char* &pPtrIn)
       wFD.ToolTip._importUVF(pPtrIn); /* then import tooltip */
       push(wFD);
       memmove(&wCheckEnd,pPtrIn,sizeof(uint32_t));
-      }
+  }
   memmove(&wCheckEnd,pPtrIn,sizeof(uint32_t));
-  if (wCheckEnd==cst_ZBUFFEREND)
-        pPtrIn += sizeof(uint32_t);
+  if (wCheckEnd!=cst_ZBUFFEREND) {
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        ZS_CORRUPTED,
+        Severity_Error,
+        " Meta dictionary <%s> : end block mark 0xFBFBFBFB has not been found.",DicName.toCChar());
+    return ZS_CORRUPTED;
+  }
+  pPtrIn += sizeof(uint32_t);
   return ZS_SUCCESS;
 }//_importFlat
 
@@ -532,7 +544,10 @@ utf8VaryingString ZMetaDic::toXml(int pLevel,bool pComment)
   if (pComment)
     fmtXMLaddInlineComment(wReturn," <version> field is the local version to the dictionary data (not to be confused with software version).");
 
-  wReturn += fmtXMLchar("dicname",DicName.toCChar(),wLevel);
+  if (DicName.isEmpty())
+    wReturn += fmtXMLcomment("/dicname/ is missing",wLevel);
+  else
+    wReturn += fmtXMLchar("dicname",DicName.toCChar(),wLevel);
 
   wReturn += fmtXMLnode("dicfields",wLevel);
   /* key fields */
@@ -655,7 +670,7 @@ ZStatus ZMetaDic::fromXml(zxmlNode* pMetaDicRootNode, bool pCheckHash,ZaiErrors*
   pErrorlog->textLog("ZMetaDic::fromXml___________Field definitions load report____________________\n"
                      " Dictionary name <%s>.\n"
                      " %ld loaded.\n"
-                     " %ld fields warned.\n"
+                     " %d fields warned.\n"
                      " %d errored and not loaded.",
                       DicName.isEmpty()?"<no name>":DicName.toCChar(),
                       count(), wWarnedFields,

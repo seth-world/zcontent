@@ -28,6 +28,9 @@
 #include <texteditmwn.h>
 #include <zqt/zqtwidget/zqtableview.h>
 
+#include <functional> // for std::function and placeholders
+
+#include <QGroupBox>
 
 #define __FIXED_FONT__ "courrier"
 
@@ -66,20 +69,16 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
   VisuTBv = new ZQTableView(this);
 
   VisuTBv->newModel(21);
-/*
-  VisuTBv->setModel(new QStandardItemModel(this));
-  VisuTBv->model()->setColumnCount(21);
-  VisuTBv->setShowGrid(true);
-  VisuTBv->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  VisuTBv->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
-//  VisuTBv->setHorizontalHeaderItem(0,new QTableWidgetItem(tr("Hexadecimal")));
+  VisuTBv->setContextMenuCallback(std::bind(&ZContentVisuMain::VisuBvFlexMenuCallback, this,placeholders::_1));
 
-//  VisuTBv->setSpan();
-*/
+//  VisuTBv->setMouseClickCallback(std::bind(&ZContentVisuMain::VisuMouseCallback, this,placeholders::_1,placeholders::_2)  );
+
+  QFont wVisuFont ("Monospace");
+
+  VisuTBv->setFont(wVisuFont);
+
   ui->verticalLayout->addWidget(VisuTBv);
-
-//  QHeaderView* wVisuHead=new QHeaderView(Qt::Horizontal,VisuTBv);
 
 
   for (int wi=0;wi < 20;wi++)
@@ -182,15 +181,22 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
   ui->OpenModeLbl->setVisible(false);
   ui->ClosedLBl->setVisible(true);
 
+/* mem.h
+const uint32_t     cst_ZMSTART = 0xF6F6F6F6;  //!< Begin marker of a data structure on file it is a palyndroma
+const uint32_t     cst_ZSTRINGEND   = 0xFAFAFAFA;  //!< End marker of a string data memory zone
+const uint32_t     cst_ZBUFFEREND   = 0xFBFBFBFB;  //!< End marker of a ZDataBuffer data structure in memory
+*/
 
   ui->searchTypeCBx->addItem("Ascii case sensitive");       /* 0 */
   ui->searchTypeCBx->addItem("Ascii no case");              /* 1 */
   ui->searchTypeCBx->addItem("Hexa free sequence");         /* 2 */
-  ui->searchTypeCBx->addItem("File block start F9F9F9F9");  /* 3 */
-  ui->searchTypeCBx->addItem("Data block start F5F5F5F5");  /* 4 */
-  ui->searchTypeCBx->addItem("Field start      F4F4F4F4");  /* 5 */
-  ui->searchTypeCBx->addItem("Data block end   FCFCFCFC");  /* 6 */
-
+  ui->searchTypeCBx->addItem("F9F9F9F9 File block start");  /* 3 */
+  ui->searchTypeCBx->addItem("F5F5F5F5 Data block start");  /* 4 */
+  ui->searchTypeCBx->addItem("F4F4F4F4 Dictionary field start (file)");  /* 5 */
+  ui->searchTypeCBx->addItem("FCFCFCFC Data block end");  /* 6 */
+  ui->searchTypeCBx->addItem("F6F6F6F6 Dictionary structure begin(file)");  /* 7 */
+  ui->searchTypeCBx->addItem("FAFAFAFA String data begin (memory)");  /* 8 */
+  ui->searchTypeCBx->addItem("FBFBFBFB Buffer end");  /* 9 */
 
   QObject::connect(ui->BackwardBTn, SIGNAL(pressed()), this, SLOT(backward()));
   QObject::connect(ui->ForwardBTn, SIGNAL(pressed()), this, SLOT(forward()));
@@ -200,7 +206,8 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
   QObject::connect(ui->searchFwdBTn, SIGNAL(pressed()), this, SLOT(searchFwd()));
   QObject::connect(ui->searchBckBTn, SIGNAL(pressed()), this, SLOT(searchBck()));
   QObject::connect(ui->searchTypeCBx, SIGNAL(currentIndexChanged(int)), this, SLOT(searchCBxChanged(int)));
-  QObject::connect(VisuTBv, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(VisuDoubleClicked(QModelIndex)));
+  QObject::connect(VisuTBv, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(VisuClicked(QModelIndex)));
+  QObject::connect(VisuTBv, SIGNAL(clicked(QModelIndex)), this, SLOT(VisuClicked(QModelIndex)));
 
 }
 
@@ -226,28 +233,300 @@ ZContentVisuMain::~ZContentVisuMain()
 
   delete ui;
 }
+void ZContentVisuMain::VisuMouseCallback(int pZEF, QMouseEvent *pEvent)
+{
+  /* update offset */
+  QModelIndex wIdx;
+  if (!wIdx.isValid())
+    return;
+  ssize_t wOffset=computeOffsetFromCoord(wIdx.row(),wIdx.column());
+  SearchOffset=wOffset;
+  utf8VaryingString wStr;
+  wStr.sprintf("%ld",wOffset);
+  ui->CurAddressLBl->setText(wStr.toCChar());
+}//VisuMouseCallback
+
+void ZContentVisuMain::VisuBvFlexMenuCallback(QContextMenuEvent *event)
+{
+  QMenu* visuFlexMEn=new QMenu(this);
+  visuFlexMEn->setTitle(QCoreApplication::translate("ZContentVisuMain", "Evaluate", nullptr));
+
+  QActionGroup* visuActionGroup=new QActionGroup(visuFlexMEn) ;
+  QObject::connect(visuActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(visuActionEvent(QAction*)));
+
+  uint16QAc= new QAction("uint16",visuFlexMEn);
+  visuFlexMEn->addAction(uint16QAc);
+  visuActionGroup->addAction(uint16QAc);
+
+  int16QAc= new QAction("int16",visuFlexMEn);
+  visuFlexMEn->addAction(int16QAc);
+  visuActionGroup->addAction(int16QAc);
+
+  uint32QAc= new QAction("uint32",visuFlexMEn);
+  visuFlexMEn->addAction(uint32QAc);
+  visuActionGroup->addAction(uint32QAc);
+
+  int32QAc= new QAction("int32",visuFlexMEn);
+  visuFlexMEn->addAction(int32QAc);
+  visuActionGroup->addAction(int32QAc);
+
+  uint64QAc= new QAction("uint64",visuFlexMEn);
+  visuFlexMEn->addAction(uint64QAc);
+  visuActionGroup->addAction(uint64QAc);
+
+  int64QAc= new QAction("int64",visuFlexMEn);
+  visuFlexMEn->addAction(int64QAc);
+  visuActionGroup->addAction(int64QAc);
+
+  sizetQAc= new QAction("size_t",visuFlexMEn);
+  visuFlexMEn->addAction(sizetQAc);
+  visuActionGroup->addAction(sizetQAc);
+
+  visuFlexMEn->exec(event->globalPos());
+  visuFlexMEn->deleteLater();
+}//VisuBvFlexMenu
+
+void ZContentVisuMain::visuActionEvent(QAction* pAction) {
+  QDialog wVisuDLg (this);
+  wVisuDLg.setWindowTitle(QObject::tr("Evaluate values","ZContentVisuMain"));
+
+  wVisuDLg.resize(450,150);
+
+  QVBoxLayout* QVL=new QVBoxLayout(&wVisuDLg);
+  wVisuDLg.setLayout(QVL);
+
+  QGridLayout* QGLyt=new QGridLayout(this);
+  QVL->insertLayout(0,QGLyt);
+
+  QHBoxLayout* QHL=new QHBoxLayout;
+  QGLyt->addLayout(QHL,0,4);
+  QHL->setAlignment(Qt::AlignCenter);
+
+  QLabel* LBlType=new QLabel("Type",this);
+  QHL->addWidget(LBlType);
+  QLabel* wTypeLBl=new QLabel(this);
+  QHL->addWidget(wTypeLBl);
 
 
-ssize_t computeOffsetFromCoord(int pRow, int pCol) {
-  int wD=0;
-  ssize_t wOffset =0;
-  for (int wi=0;wi < pCol ; wi++) {
+  QLabel* wLbDec=new QLabel(QObject::tr("Decimal","ZContentVisuMain"),&wVisuDLg);
+  QGLyt->addWidget(wLbDec,1,1);
+  QLabel* wLbHexa=new QLabel(QObject::tr("Hexa","ZContentVisuMain"),&wVisuDLg);
+  QGLyt->addWidget(wLbHexa,1,4);
 
-    if (wD==4) {
-      wD=0;
-      continue;
-    }
-    else
-      wD++;
-    wOffset ++ ;
+  QLabel* wLb=new QLabel(QObject::tr("Raw","ZContentVisuMain"),&wVisuDLg);
+  wLb->setAlignment(Qt::AlignCenter);
+  QGLyt->addWidget(wLb,2,0);
+
+  QLineEdit* wRawValueLEd=new QLineEdit(&wVisuDLg);
+  wRawValueLEd->setAlignment(Qt::AlignRight);
+  QGLyt->addWidget(wRawValueLEd,2,1);
+
+  QLineEdit* wRawHexaLEd=new QLineEdit(&wVisuDLg);
+  wRawHexaLEd->setAlignment(Qt::AlignRight);
+  QGLyt->addWidget(wRawHexaLEd,2,4);
+
+  QLabel* wLb1=new QLabel(QObject::tr("Deserialized","ZContentVisuMain"),&wVisuDLg);
+  QGLyt->addWidget(wLb1,3,0);
+  wLb1->setAlignment(Qt::AlignCenter);
+  QLineEdit* wDeserializedLEd=new QLineEdit(&wVisuDLg);
+  wDeserializedLEd->setAlignment(Qt::AlignRight);
+  QGLyt->addWidget(wDeserializedLEd,3,1);
+
+  QLineEdit* wDeserializedHexaLEd=new QLineEdit(&wVisuDLg);
+  wDeserializedHexaLEd->setAlignment(Qt::AlignRight);
+  QGLyt->addWidget(wDeserializedHexaLEd,3,4);
+
+  QHBoxLayout* QHLBtn=new QHBoxLayout;
+  QHLBtn->setObjectName("QHLBtn");
+  QVL->insertLayout(1,QHLBtn);
+
+  QPushButton* wNext=new QPushButton(QObject::tr("Next","ZContentVisuMain"),&wVisuDLg);
+  QPushButton* wClose=new QPushButton(QObject::tr("Close","ZContentVisuMain"),&wVisuDLg);
+  QSpacerItem* wSpacer= new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+  QHLBtn->addItem(wSpacer);
+
+  QHLBtn->addWidget(wNext);
+  QHLBtn->addWidget(wClose);
+
+
+
+  QObject::connect(wNext, &QPushButton::clicked, &wVisuDLg, &QDialog::accept);
+  QObject::connect(wClose, &QPushButton::clicked, &wVisuDLg, &QDialog::reject);
+
+  size_t wValueSize=0;
+  QModelIndex wIdx=VisuTBv->currentIndex();
+  if (!wIdx.isValid())
+    return;
+  ssize_t wOffset=computeOffsetFromCoord(wIdx.row(),wIdx.column());
+  SearchOffset=wOffset;
+
+  utf8VaryingString wStr;
+  wStr.sprintf("%ld",wOffset);
+  ui->CurAddressLBl->setText(wStr.toCChar());
+
+  if (pAction==uint16QAc) {
+    wValueSize=sizeof(uint16_t);
+    if (wOffset+sizeof(uint16_t) > RawData.Size )
+      return;
+    wTypeLBl->setText("uint16");
+    uint16_t * wValuePtr = (uint16_t *)(RawData.Data + wOffset);
+    uint16_t wValue = *wValuePtr;
+    uint16_t wDeSerialized = reverseByteOrder_Conditional<uint16_t>(wValue);
+    wStr.sprintf("%u",wValue);
+    wRawValueLEd->setText(wStr.toCChar());
+    wStr.sprintf("%04X",wValue);
+    wRawHexaLEd->setText(wStr.toCChar());
+    wStr.sprintf("%d",wDeSerialized);
+    wDeserializedLEd->setText(wStr.toCChar());
+    wStr.sprintf("%04X",wDeSerialized);
+    wDeserializedHexaLEd->setText(wStr.toCChar());
   }
-  for (int wi=0;wi < pRow ; wi++)
-    wOffset += 16 ;
-  return wOffset;
+  if (pAction==int16QAc) {
+    wValueSize=sizeof(int16_t);
+    if (wOffset+sizeof(int16_t) > RawData.Size )
+      return;
+    wTypeLBl->setText("int16");
+    int16_t * wValuePtr = (int16_t *)(RawData.Data + wOffset);
+    int16_t wValue = *wValuePtr;
+    int16_t wDeSerialized = reverseByteOrder_Conditional<int16_t>(wValue);
+    wStr.sprintf("%|d",wValue);
+    wRawValueLEd->setText(wStr.toCChar());
+    wStr.sprintf("%04X",wValue);
+    wRawHexaLEd->setText(wStr.toCChar());
+    wStr.sprintf("%|d",wDeSerialized);
+    wDeserializedLEd->setText(wStr.toCChar());
+    wStr.sprintf("%04X",wDeSerialized);
+    wDeserializedHexaLEd->setText(wStr.toCChar());
+  }
+  if (pAction==uint32QAc) {
+    wValueSize=sizeof(uint32_t);
+    if (wOffset+sizeof(uint32_t) > RawData.Size )
+      return;
+    wTypeLBl->setText("uint32");
+    uint32_t * wValuePtr = (uint32_t *)(RawData.Data + wOffset);
+    uint32_t wValue = *wValuePtr;
+    uint32_t wDeSerialized = reverseByteOrder_Conditional<uint32_t>(wValue);
+    wStr.sprintf("%|u",wValue);
+    wRawValueLEd->setText(wStr.toCChar());
+    wStr.sprintf("%08X",wValue);
+    wRawHexaLEd->setText(wStr.toCChar());
+    wStr.sprintf("%|u",wDeSerialized);
+    wDeserializedLEd->setText(wStr.toCChar());
+    wStr.sprintf("%08X",wDeSerialized);
+    wDeserializedHexaLEd->setText(wStr.toCChar());
+  }
+  if (pAction==int32QAc) {
+    wValueSize=sizeof(int32_t);
+    if (wOffset+sizeof(int32_t) > RawData.Size )
+      return;
+    wTypeLBl->setText("int32");
+    int32_t * wValuePtr = (int32_t *)(RawData.Data + wOffset);
+    int32_t wValue = *wValuePtr;
+    int32_t wDeSerialized = reverseByteOrder_Conditional<int32_t>(wValue);
+    wStr.sprintf("%|d",wValue);
+    wRawValueLEd->setText(wStr.toCChar());
+    wStr.sprintf("%08X",wValue);
+    wRawHexaLEd->setText(wStr.toCChar());
+    wStr.sprintf("%|d",wDeSerialized);
+    wDeserializedLEd->setText(wStr.toCChar());
+    wStr.sprintf("%08X",wDeSerialized);
+    wDeserializedHexaLEd->setText(wStr.toCChar());
+  }
+  if (pAction==uint64QAc) {
+    wValueSize=sizeof(uint64_t);
+    if (wOffset+sizeof(uint64_t) > RawData.Size )
+      return;
+    wTypeLBl->setText("uint64");
+    uint64_t * wValuePtr = (uint64_t *)(RawData.Data + wOffset);
+    uint64_t wValue = *wValuePtr;
+    uint64_t wDeSerialized = reverseByteOrder_Conditional<uint64_t>(wValue);
+    wStr.sprintf("%|lu",wValue);
+    wRawValueLEd->setText(wStr.toCChar());
+    wStr.sprintf("%016lX",wValue);
+    wRawHexaLEd->setText(wStr.toCChar());
+    wStr.sprintf("%|lu",wDeSerialized);
+    wDeserializedLEd->setText(wStr.toCChar());
+    wStr.sprintf("%016lX",wDeSerialized);
+    wDeserializedHexaLEd->setText(wStr.toCChar());
+  }
+  if (pAction==int64QAc) {
+    wValueSize=sizeof(int64_t);
+    if (wOffset+sizeof(int64_t) > RawData.Size )
+      return;
+    wTypeLBl->setText("int64");
+    int64_t * wValuePtr = (int64_t *)(RawData.Data + wOffset);
+    int64_t wValue = *wValuePtr;
+    int64_t wDeSerialized = reverseByteOrder_Conditional<int64_t>(wValue);
+    wStr.sprintf("%|ld",wValue);
+    wRawValueLEd->setText(wStr.toCChar());
+    wStr.sprintf("%016lX",wValue);
+    wRawHexaLEd->setText(wStr.toCChar());
+    wStr.sprintf("%|ld",wDeSerialized);
+    wDeserializedLEd->setText(wStr.toCChar());
+    wStr.sprintf("%016lX",wDeSerialized);
+    wDeserializedHexaLEd->setText(wStr.toCChar());
+  }
+  if (pAction==sizetQAc) {
+    wValueSize=sizeof(size_t);
+    if (wOffset+sizeof(size_t) > RawData.Size )
+      return;
+    wTypeLBl->setText("size_t");
+    size_t * wValuePtr = (size_t *)(RawData.Data + wOffset);
+    size_t wValue = *wValuePtr;
+    size_t wDeSerialized = reverseByteOrder_Conditional<size_t>(wValue);
+    wStr.sprintf("%|lu",wValue);
+    wRawValueLEd->setText(wStr.toCChar());
+    if (sizeof(size_t) > 4) {
+      wStr.sprintf("%|lu",wValue);
+      wRawValueLEd->setText(wStr.toCChar());
+      wStr.sprintf("%016lX",wValue);
+      wRawHexaLEd->setText(wStr.toCChar());
+      wStr.sprintf("%|lu",wDeSerialized);
+      wDeserializedLEd->setText(wStr.toCChar());
+      wStr.sprintf("%016lX",wDeSerialized);
+      wDeserializedHexaLEd->setText(wStr.toCChar());
+    }
+    else {
+      wStr.sprintf("%u",wValue);
+      wRawValueLEd->setText(wStr.toCChar());
+      wStr.sprintf("%08X",wValue);
+      wRawHexaLEd->setText(wStr.toCChar());
+      wStr.sprintf("%u",wDeSerialized);
+      wDeserializedLEd->setText(wStr.toCChar());
+      wStr.sprintf("%08X",wDeSerialized);
+      wDeserializedHexaLEd->setText(wStr.toCChar());
+    }
+  }
+  int wRet=wVisuDLg.exec();
+
+  if (wRet==QDialog::Rejected)
+    return;
+  /* skip value in offset */
+
+  if ( (wOffset + wValueSize) > RawData.Size )
+    return;
+//  setSearchOffset(wOffset+wValueSize);
+  VisuLineCol wNewPosition;
+  wOffset+=wValueSize;
+  wNewPosition.compute (wOffset);
+  QModelIndex wNewIdx = wIdx.sibling(wNewPosition.line,wNewPosition.col);
+  if (!wNewIdx.isValid())
+    abort();
+  wStr.sprintf("%ld",wOffset);
+  ui->CurAddressLBl->setText(wStr.toCChar());
+  VisuTBv->setFocus();
+  VisuTBv->setCurrentIndex(wNewIdx);
+//  VisuTBv->QTableView::clicked(wNewIdx);
+//  VisuTBv->scrollTo(wNewIdx);
+
+  return;
 }
 
-void ZContentVisuMain::VisuDoubleClicked(QModelIndex pIdx) {
+
+
+void ZContentVisuMain::VisuClicked(QModelIndex pIdx) {
   setSearchOffset(computeOffsetFromCoord(pIdx.row(),pIdx.column()));
+
 }
 
 void ZContentVisuMain::setSearchOffset(ssize_t pOffset) {
@@ -282,6 +561,22 @@ void ZContentVisuMain::searchCBxChanged(int pIndex){
   case 6:
     ui->searchLEd->clear();
     ui->searchLEd->setText("FCFCFCFC");
+    SearchOffset=-1;
+    return;
+  case 7:
+    ui->searchLEd->clear();
+    ui->searchLEd->setText("F6F6F6F6");
+    SearchOffset=-1;
+    return;
+  case 8:
+    ui->searchLEd->clear();
+    ui->searchLEd->setText("FAFAFAFA");
+    SearchOffset=-1;
+    return;
+
+  case 9:
+    ui->searchLEd->clear();
+    ui->searchLEd->setText("FBFBFBFB");
     SearchOffset=-1;
     return;
   }
@@ -391,29 +686,6 @@ int getHexaDigits(uint8_t* &pChar,uint8_t & pHexaValue) {
   return 0;
 }// getHexaDigits
 
-class VisuLineCol {
-public:
-  int line=0;
-  int col=0;
-  VisuLineCol& compute(ssize_t wOffset) {
-    /* highlight searched result in table view
-   * start block :
-     offset / 16 -> gives the line
-
-    offset - (offset / 16) gives the column
-                     */
-
-    double wOf = wOffset;
-    line = int(wOf / 16.0);
-
-    col = int(wOf - (double (line)* 16.0));
-
-    col = col + (col / 4);
-
-    return *this;
-  }
-
-};
 
 /* highlight searched result in table view
    * start block :
@@ -2947,4 +3219,23 @@ textEditMWn*  ZContentVisuMain::openGenLogWin()
 void ZContentVisuMain::DicEditQuitCallback(){
 //  delete dictionaryWnd;
   dictionaryWnd = nullptr;
+}
+
+
+ssize_t computeOffsetFromCoord(int pRow, int pCol) {
+  int wD=0;
+  ssize_t wOffset =0;
+  for (int wi=0;wi < pCol ; wi++) {
+
+    if (wD==4) {
+      wD=0;
+      continue;
+    }
+    else
+      wD++;
+    wOffset ++ ;
+  }
+  for (int wi=0;wi < pRow ; wi++)
+    wOffset += 16 ;
+  return wOffset;
 }

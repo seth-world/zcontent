@@ -119,10 +119,6 @@ ZDataBuffer& ZMFDictionary::_exportAppend(ZDataBuffer& pZDB)
   ZMetaDic::_exportAppendMetaDicFlat(pZDB);
 
   /* KeyDic is a ZArray of ZArrays */
-  pZDB.append_T<uint32_t>(cst_ZBLOCKSTART);
-  pZDB.append_T<uint8_t>((uint8_t)Active);
-  pZDB.append_T<unsigned long>(reverseByteOrder_Conditional<unsigned long>(Version));
-  pZDB.append_T<uint16_t>(reverseByteOrder_Conditional<uint16_t>((uint16_t)KeyDic.count()));
 
   for (long wi=0;wi<KeyDic.count();wi++)
     KeyDic[wi]->_exportAppendFlat(pZDB);
@@ -148,12 +144,9 @@ ZStatus ZMFDictionary::_import(const unsigned char* &pPtrIn)
     return wSt;
 
   ZKeyDictionary* wKDic=nullptr;
-  uint32_t wi=0;
-  uint32_t wStartSign;
-  _importAtomic<uint32_t>(wStartSign,pPtrIn);
-  uint16_t wKeyCount;
-  _importAtomic<uint16_t>(wKeyCount,pPtrIn);
 
+
+  uint32_t wi=0;
   KeyDic.clear();
   while(wi++ < wHead.DicKeyCount)
     {
@@ -174,7 +167,9 @@ ZStatus ZMFDictionary::_import(const unsigned char* &pPtrIn)
 }//ZMFDictionary::_import
 
 /*
-      <zDictionarytionary>
+      <dictionary>
+        <active>true</active>
+        <keycount>1</keycount>
         <metadic>
           <dicfields>
             <field>
@@ -230,7 +225,7 @@ utf8VaryingString ZMFDictionary::toXml(int pLevel,bool pComment)
   int wLevel=pLevel+1;
   utf8String wReturn;
   ZDataBuffer wB64;
-  wReturn = fmtXMLnode("Dictionarytionary",pLevel);
+  wReturn = fmtXMLnode("dictionary",pLevel);
 
 
   wReturn += fmtXMLbool("active",Active,wLevel);
@@ -253,7 +248,7 @@ utf8VaryingString ZMFDictionary::toXml(int pLevel,bool pComment)
     wReturn += KeyDic[wi]->toXml(wLevel+1,wi,pComment);
   }
   wReturn += fmtXMLendnode("keydictionary",wLevel);
-  wReturn += fmtXMLendnode("Dictionarytionary",pLevel);
+  wReturn += fmtXMLendnode("dictionary",pLevel);
   return wReturn;
 } // ZMFDictionary::toXml
 
@@ -273,7 +268,7 @@ ZStatus ZMFDictionary::XmlLoadFromString(const utf8String &pXmlString,bool pChec
   if (wSt != ZS_SUCCESS) {
     pErrorlog->logZException();
     pErrorlog->errorLog(
-        "ZMFDictionary::XmlloadFromString-E-PARSERR Xml parsing error for string <%s> ",
+        "ZMFDictionary::XmlloadFromString-E-PARSERR Xml parsing error for string <%s>",
         pXmlString.subString(0, 25).toUtf());
     return wSt;
   }
@@ -291,15 +286,14 @@ ZStatus ZMFDictionary::XmlLoadFromString(const utf8String &pXmlString,bool pChec
   }
 
 
-  wSt=wRoot->getChildByName((zxmlNode*&)wMetaRootNode,"Dictionarytionary");
+  wSt=wRoot->getChildByName((zxmlNode*&)wMetaRootNode,"dictionary");
   if (wSt!=ZS_SUCCESS)
     {
     pErrorlog->logZStatus(
         ZAIES_Error,
         wSt,
-        "ZMFDictionary::XmlLoadFromString-E-CNTFINDND Error cannot find node element with name <%s> status "
-        "<%s>",
-        "Dictionarytionary",
+        "ZMFDictionary::XmlLoadFromString-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
+        "dictionary",
         decode_ZStatus(wSt));
     return wSt;
     }
@@ -312,21 +306,36 @@ ZStatus ZMFDictionary::XmlLoadFromString(const utf8String &pXmlString,bool pChec
   return wSt;
 }//ZMFDictionary::XmlLoadFromString
 
+/*
+<?xml version='1.0' encoding='UTF-8'?>
+ <zmfdictionary version = "'0.30-0'">
+   <Dictionary>
+      <active>true</active>
+      <keycount>1</keycount>
+      <metadictionary>
+         <version>'1.0-0'</version><!--  <version> field is the local version to the dictionary data (not to be confused with software version). -->
+         <dicname>zdoc physical</dicname>
+*/
+
+
 ZStatus
-ZMFDictionary::fromXml(zxmlNode* pZmfDicNode, bool pCheckHash, ZaiErrors* pErrorlog)
+ZMFDictionary::fromXml(zxmlNode* pDicNode, bool pCheckHash, ZaiErrors* pErrorlog)
 {
   zxmlElement *wRootNode=nullptr;
   zxmlElement *wMDicRootNode=nullptr;
+  zxmlElement *wKeyRootNode=nullptr;
+  zxmlElement *wKeyDicNode=nullptr;
+  zxmlElement *wSwapNode=nullptr;
 
   pErrorlog->setErrorLogContext("ZMFDictionary::fromXml");
 
-  if (pZmfDicNode->getName()!="Dictionarytionary")
+  if (pDicNode->getName()!="dictionary")
     {
     pErrorlog->logZStatus(
         ZAIES_Error,
         ZS_INVNAME,
         "ZMFDictionary::fromXml-E-CNTFINDND Error cannot find master dictionary root node element with name <%s> status <%s>",
-        "Dictionarytionary",
+        "Dictionary",
         decode_ZStatus(ZS_XMLINVROOTNAME));
     return ZS_XMLINVROOTNAME;
     }
@@ -334,26 +343,23 @@ ZMFDictionary::fromXml(zxmlNode* pZmfDicNode, bool pCheckHash, ZaiErrors* pError
   ZStatus wSt;
   uint32_t wKeyCount;
   Active=false;
-  wRootNode=(zxmlElement *)pZmfDicNode;
+  wRootNode=(zxmlElement *)pDicNode;
 
-  if (XMLgetChildBool(wRootNode,"active",Active,pErrorlog,ZAIES_Error)<0)
-  {
+  if (XMLgetChildBool(wRootNode,"active",Active,pErrorlog,ZAIES_Error)<0) {
     pErrorlog->logZStatus(ZAIES_Warning, ZS_XMLWARNING,"ZMFDictionary::fromXml-W-MISSFLD Missing field <active>");
   }
 
-  if (XMLgetChildUInt32(wRootNode,"keycount",wKeyCount,pErrorlog,ZAIES_Error)<0)
-    {
+  if (XMLgetChildUInt32(wRootNode,"keycount",wKeyCount,pErrorlog,ZAIES_Error)<0) {
       pErrorlog->logZStatus(ZAIES_Warning, ZS_XMLWARNING,"ZMFDictionary::fromXml-W-MISSFLD Missing field <keycount>");
     }
 
-  wSt=pZmfDicNode->getChildByName((zxmlNode*&)wMDicRootNode,"metadictionary");
+  wSt=wRootNode->getChildByName((zxmlNode*&)wMDicRootNode,"metadictionary");
   if (wSt!=ZS_SUCCESS)
   {
     pErrorlog->logZStatus(
         ZAIES_Error,
         wSt,
-        "ZMetaDic::fromXml-E-CNTFINDND Error cannot find meta dictionary root node element with name <%s> status "
-        "<%s>",
+        "ZMFDictionary::fromXml-E-CNTFINDND Error cannot find meta dictionary root node element with name <%s> status <%s>",
         "metadictionary",
         decode_ZStatus(wSt));
     return wSt;
@@ -361,8 +367,69 @@ ZMFDictionary::fromXml(zxmlNode* pZmfDicNode, bool pCheckHash, ZaiErrors* pError
 
   wSt=ZMetaDic::fromXml(wMDicRootNode,pCheckHash,pErrorlog);
 
-  XMLderegister(wMDicRootNode);
-  return wSt;
+
+/*
+<keydictionary>
+         <key>
+            <keyname>Primary key</keyname><!--  linked to index control block indexname field  -->
+            <duplicates>false</duplicates><!--  If set, key allows duplicates. if not - key must be unique  -->
+            <keyfields>
+               <field>
+                  <mdicrank>0</mdicrank>
+                  <hash>
+                     <md5>412D1A55DB1580BF7B79177786B50693</md5>
+                  </hash>
+                  <keyoffset>0</keyoffset>
+                  <!--  hereafter optional fields from MetaDic describing key field  -->
+                  <name>Documentid</name>
+                  <ztype>536870913</ztype><!--  ZType_type <ZType_Resource > converted to its value number -->
+                  <universalsize>0</universalsize>
+               </field>
+            </keyfields>
+         </key>
+      </keydictionary>
+*/
+
+
+  wSt=wRootNode->getChildByName((zxmlNode*&)wKeyRootNode,"keydictionary");
+  if (wSt!=ZS_SUCCESS)
+  {
+    pErrorlog->logZStatus(
+        ZAIES_Error,
+        wSt,
+        "ZMFDictionary::fromXml-W-CNTFINDND Warning. cannot find key dictionary root node element with name <%s> status <%s>.\n"
+        "                                       No key will be defined for dictionary <%s>.",
+        "keydictionary",
+        decode_ZStatus(wSt),
+        DicName.toString()
+        );
+    return wSt;
+  }
+  wSt=wKeyRootNode->getFirstChild((zxmlNode*&)wKeyDicNode);
+  ZKeyDictionary* wKeyDic=nullptr;
+  while (wSt==ZS_SUCCESS) {
+    if (wKeyDicNode->getName()=="key") {
+      ZKeyDictionary* wKeyDic = new ZKeyDictionary(this);
+      wSt=wKeyDic->fromXml(wKeyDicNode,pErrorlog);
+      if (wSt==ZS_SUCCESS) {
+          KeyDic.push(wKeyDic);
+      }
+      else {
+        delete wKeyDic;
+        wKeyDic=nullptr;
+      }
+      wKeyDic = new ZKeyDictionary(this);
+    }// if (wKeyDicNode->getName()=="key")
+    wSt=wKeyDicNode->getNextElementSibling(wSwapNode);
+    XMLderegister(wKeyDicNode);
+    wKeyDicNode=wSwapNode;
+  }// while
+  delete wKeyDic;
+  pErrorlog->textLog(" %ld keys loaded.\n"
+                     "___________________________________________________\n", KeyDic.count());
+
+  XMLderegister(wKeyDicNode);
+  return ZS_SUCCESS;
 }//ZMFDictionary::fromXml
 
 

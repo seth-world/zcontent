@@ -17,9 +17,16 @@
 
 //#include <ztoolset/zwstrings.h>
 
+size_t getAtomicNaturalSize(const ZTypeBase pType);
+size_t getAtomicUniversalSize(const ZTypeBase pType);
+
 template <class _Tp>
 size_t getAtomicURFSize(ZTypeBase pType) ;
 size_t  _getURFHeaderSize (ZTypeBase &pZType);
+template <class _Tp>
+size_t getAtomicNaturalSize_T(_Tp pValue);
+template <class _Tp>
+size_t getAtomicUniversalSize_T(_Tp pValue);
 
 ZStatus _getURFHeaderData(const unsigned char* pURF_Ptr,
     ZTypeBase &pZType,
@@ -74,11 +81,11 @@ and returns
 
 
 template <class _Tp>
-void _getAtomicUfN(_Tp pInData, ZDataBuffer &pUniversalData,const ZTypeBase pType ) {
+void _getAtomicUfN(_Tp pInData, ZDataBuffer &pUniversalData) {
 
   _Tp wValue=pInData , wValue2;
 
-  if (pType & ZType_Signed) {
+  if (std::is_signed<_Tp> ()) {
 
     unsigned char* wPtr=pUniversalData.allocate(sizeof(_Tp)+1);   // unsigned means size + sign byte
     if (wValue < 0)  {
@@ -103,13 +110,43 @@ void _getAtomicUfN(_Tp pInData, ZDataBuffer &pUniversalData,const ZTypeBase pTyp
   return ;
 } // _getAtomicUfN
 
+
 template <class _Tp>
-static inline
-    void _getAtomicUfN_Append(_Tp pInData, ZDataBuffer &pUniversalOut,const ZTypeBase pType ) {
+size_t _getAtomicUfN_Ptr(_Tp pInData, unsigned char* &pUniversalPtr ) {
 
   _Tp wValue=pInData , wValue2;
 
-  if (pType & ZType_Signed) {
+  if (std::is_signed<_Tp> ()) {
+
+      if (wValue < 0)  {
+      wValue2 = -wValue;
+      wValue2= reverseByteOrder_Conditional<_Tp>(wValue2);
+      wValue2 = _negate (wValue2); // mandatory otherwise -120 is greater than -110
+      pUniversalPtr[0] = 0; // sign byte is set to Zero meaning negative value in URF
+    }
+    else {
+      wValue2 = wValue;
+      wValue2= reverseByteOrder_Conditional<_Tp>(wValue2);
+      pUniversalPtr[0] = 1; // sign byte is set to 1 meaning positive value in URF
+    }
+    memmove(pUniversalPtr+1,&wValue2,sizeof(_Tp)); // skip the sign byte and store value (absolute value)
+    return sizeof(_Tp)+1;
+  } // if (pType & ZType_Signed)
+
+  // up to here : unsigned data type
+  wValue2= reverseByteOrder_Conditional<_Tp>(wValue2);
+  memmove(pUniversalPtr,&wValue2,sizeof(_Tp));
+  return sizeof(_Tp) ;
+} // _getAtomicUfN_Ptr
+
+
+template <class _Tp>
+static inline
+    void _getAtomicUfN_Append(_Tp pInData, ZDataBuffer &pUniversalOut ) {
+
+  _Tp wValue=pInData , wValue2;
+
+  if (std::is_signed<_Tp> ()) {
 
     unsigned char* wPtr=pUniversalOut.extend(sizeof(_Tp)+1);   // unsigned means size + sign byte
     if (wValue < 0)  {
@@ -790,7 +827,16 @@ _setUniversalFromWString (const void* pString,ZDataBuffer & pUniversal, const ZT
   return ZS_SUCCESS;
 }
 
-
+template <class _Tp>
+size_t getAtomicNaturalSize_T(_Tp pValue) {
+  ZTypeBase wType=  _getZType_T<_Tp>(pValue);
+  return getAtomicNaturalSize(wType);
+}
+template <class _Tp>
+size_t getAtomicUniversalSize_T(_Tp pValue) {
+  ZTypeBase wType=  _getZType_T<_Tp>(pValue);
+  return getAtomicUniversalSize(wType);
+}
 
 
 

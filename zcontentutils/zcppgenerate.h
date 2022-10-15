@@ -32,6 +32,29 @@ public:
   bool              Used = false;
 };
 
+
+class genReport {
+public:
+  genReport()=default;
+
+  genReport(const genReport& pIn) {_copyFrom(pIn);}
+
+  genReport& operator = (const genReport& pIn) {return _copyFrom(pIn);}
+
+  genReport& _copyFrom(const genReport& pIn) {
+    Fields = pIn.Fields;
+    ErrFields = pIn.ErrFields;
+    ErrInstructions = pIn.ErrInstructions;
+    return *this;
+  }
+
+  int Fields=0;
+  int ErrFields=0;
+  int ErrInstructions=0;
+};
+
+
+
 class ZDictionaryFile;
 /*
 <?xml version='1.0' encoding='UTF-8'?>
@@ -57,24 +80,53 @@ public:
                                 ZaiErrors *pErrorLog);
 
 
-  utf8VaryingString genIncludes(ZTypeBase pField,
-      ZArray<GenObj> &pGenObjList,
-      ZArray<GenInclude> &pGenIncludeList);
+  utf8VaryingString genIncludes(ZTypeBase pField);
 
-  utf8VaryingString genHeaderFields(utf8VaryingString& pFileIncludeList,ZArray<GenObj> &pGenObjList,ZArray<GenInclude> &pGenIncludeList);
+  utf8VaryingString genHeaderFields(utf8VaryingString& pFileIncludeList);
+
   utf8VaryingString genCopyFrom(utf8VaryingString& pClassName);
-  ZStatus generateInterface(const utf8VaryingString &pOutName, const utf8VaryingString &pClassName, const utf8VaryingString &pBrief);
+
+  ZStatus genHeader(const utf8VaryingString& pClassName,
+                              const uriString &pHeaderFile,
+                              const utf8VaryingString &pBrief);
+  utf8VaryingString genHeaderKeys() ;
+  utf8VaryingString genCppKeys(const utf8VaryingString& pClassName);
+
+  ZStatus genCpp(const utf8VaryingString& pClassName, const uriString &pHeaderFile, const uriString& pCppFile);
+
+  ZStatus generateInterface(const utf8VaryingString &pOutBase,
+                            const utf8VaryingString &pClassName,
+                            const utf8VaryingString &pBrief,
+                            const uriString &pGenPath);
 
   uriString getGenPath() {return GenPath;}
 
+  uriString getGenCppFile() {return GenCppFile;}
+  uriString getGenHeaderFile() {return GenHeaderFile;}
+
+  bool testErrored(long pRank);
+
 private:
   ZDictionaryFile* DictionaryFile=nullptr;
-  ZArray<GenObj>      wGenObjList;
-  ZArray<GenInclude>  wGenIncludeList;
+  ZArray<GenObj>      GenObjList;
+  ZArray<GenInclude>  GenIncludeList;
+
+  ZArray<long> ErroredFields;
+
+  uriString           GenCppFile;
+  uriString           GenHeaderFile;
 
   uriString           GenPath;
+  ZaiErrors           ErrorLog;
 };
 
 } // namespace zbs
+
+
+ZStatus ZTypeToCTypeDefinition(ZTypeBase pType,
+                                long pCapacity,
+                                const utf8VaryingString& pName,
+                                utf8VaryingString &pDeclaration,
+                                ZaiErrors* pErrorLog);
 
 #endif // ZCPPGENERATE_H

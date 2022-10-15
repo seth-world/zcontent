@@ -14,6 +14,9 @@
 
 #include <zcontentutilsparams.h>
 
+class textEditMWn;
+
+
 class ZDataReference;
 namespace  zbs {
 class ZKeyDictionary;
@@ -21,6 +24,8 @@ class ZFieldDescription;
 class KeyField_Pack;
 class ZIndexField;
 class ZDictionaryFile;
+
+class ZCppGenerate;
 }
 /*
 #define __GENERATE_PARAMETER_FILE__ "zcppgenerateparameters.xml"
@@ -91,6 +96,9 @@ public:
 
   void clear();
   void clearAllRows();
+
+  void clearFieldRows();
+  void clearKeyRows();
 
 
 /**
@@ -376,6 +384,8 @@ fieldTBv
    */
   bool getGenerationNames(utf8VaryingString &pOutFileBaseName, utf8VaryingString &pClass, utf8VaryingString &pBrief, utf8VaryingString &pGenPath);
 
+  void searchDirectory();
+
   void readWriteActionEvent(QAction*pAction);
 
   void displayErrorCallBack(const utf8VaryingString &pMessage) ;
@@ -387,6 +397,9 @@ fieldTBv
 
   void statusBarMessage(const char* pFormat,...);
 
+  void closeGenShowCppCB(QEvent *pEvent);
+  void closeGenShowHeaderCB(QEvent *pEvent);
+
 public slots:
   void keyActionEvent(QAction*pAction);
   void fieldActionEvent(QAction*pAction);
@@ -397,13 +410,23 @@ private:
 
   RawFields* rawFields=nullptr;
 
+  zbs::ZCppGenerate* GenerateEngine=nullptr;
+
+  textEditMWn*  GenCppFileWin=nullptr;
+  textEditMWn*  GenHeaderFileWin=nullptr;
+
   QMenu *generalMEn=nullptr;
   QActionGroup *generalGroup=nullptr;
   QAction* parserQAc=nullptr;
   QAction* quitQAc=nullptr;
 
-  QAction* generateQAc=nullptr;
+  QMenu*    generateMainMEn=nullptr;
+  QAction*  generateQAc=nullptr;
 
+  QMenu*    genShowHideMEn=nullptr;
+  QAction*  genShowLogQAc=nullptr;
+  QAction*  genShowHeaderQAc=nullptr;
+  QAction*  genShowCppQAc=nullptr;
 
   QMenu *keyFlexMEn=nullptr;
   QActionGroup* keyActionGroup=nullptr;
@@ -452,6 +475,8 @@ private:
 //  ZMFDictionary* MasterDic=nullptr;
 
   ZaiErrors Errorlog;
+
+  uriString SelectedDirectory;
 
   QPersistentModelIndex OriginIndex;
 

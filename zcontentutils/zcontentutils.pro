@@ -131,7 +131,6 @@ SOURCES += \
     $${ZQT_WIDGET}/zqtwidgettypes.cpp \
     $${ZQT_WIDGET}/zqplaintextedit.cpp \
 #    $${ZQT_WIDGET}/zqpixlabelchecked.cpp \
-    ../../../zmftest/zdoctest.cpp \
 \
     $${ZCONTENT_ROOT}/zcontentcommon/zresource.cpp \
     $${ZCONTENT_ROOT}/zindexedfile/zfielddescription.cpp \
@@ -163,9 +162,6 @@ SOURCES += \
 
 
 HEADERS += \
-    ../../../zmftest/header.h \
-    ../../../zmftest/zdocphy.h \
-    ../../../zmftest/zdoctest.h \
     ../../zconfig_general.h \
     $${ZQT_WIDGET}/zdatareference.h \
     $${ZQT_WIDGET}/zpinboard.h \
@@ -215,7 +211,6 @@ FORMS += \
 #    ../../zcppparser/zcppparserutils/rawfields.ui \
     $${ZCONTENT_ROOT}/zcontentutils/displaymain.ui \
     $${ZCONTENT_ROOT}/zcontentutils/dicedit.ui \
-    $${ZCONTENT_ROOT}/zcontentutils/displaymain.ui \
     $${ZCONTENT_ROOT}/zcontentutils/zparsingrules.ui \
     $${ZCONTENT_ROOT}/zcontentutils/zparsingrulesdlg.ui \
     $${ZCONTENT_ROOT}/zcontentutils/texteditmwn.ui \

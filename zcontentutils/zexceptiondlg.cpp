@@ -39,7 +39,7 @@ ZExceptionDLg::ZExceptionDLg(const utf8VaryingString& pTitle,Severity_type pSeve
 
   ui->ExceptionFRm->setVisible(false);
 
-  applySeverity(pSeverity);
+  applySeverity(pSeverity,pTitle);
 
   ui->MessageTEd->setText(pMessage.toCChar());
 
@@ -303,34 +303,34 @@ ZExceptionDLg::~ZExceptionDLg()
 {
   delete ui;
 }
-void ZExceptionDLg::applySeverity(Severity_type pSeverity) {
+void ZExceptionDLg::applySeverity(Severity_type pSeverity,const utf8VaryingString& pTitle) {
   switch(pSeverity)
   {
   case Severity_Information:
-    setInfo();
+    setInfo(pTitle);
     break;
   case Severity_Warning:
-    setWarning();
+    setWarning(pTitle);
     break;
   case Severity_Error:
-    setError();
+    setError(pTitle);
     break;
   case Severity_Severe:
-    setSevere();
+    setSevere(pTitle);
     break;
   case Severity_Fatal:
-    setFatal();
+    setFatal(pTitle);
     break;
   case Severity_Highest:
-    setHighest();
+    setHighest(pTitle);
     break;
   default:
-    setError();
+    setError(pTitle);
     break;
   }
 }
 
-void ZExceptionDLg::setInfo()
+void ZExceptionDLg::setInfo(const utf8VaryingString& pTitle)
 {
   uriString wImgFile = __ICON_PATH__;
   wImgFile += __INFO_ICON__;
@@ -339,10 +339,12 @@ void ZExceptionDLg::setInfo()
   wPxMp.load(wImgFile.toCChar());
   ui->LogoLBl->setScaledContents(true);
   ui->LogoLBl->setPixmap(wPxMp);
-
-  setWindowTitle("Information");
+  if (pTitle.isEmpty())
+    setWindowTitle("Information");
+  else
+    setWindowTitle(pTitle.toCChar());
 }
-void ZExceptionDLg::setWarning()
+void ZExceptionDLg::setWarning(const utf8VaryingString &pTitle)
 {
   uriString wImgFile = __ICON_PATH__;
   wImgFile += __WARNING_ICON__;
@@ -351,10 +353,12 @@ void ZExceptionDLg::setWarning()
   wPxMp.load(wImgFile.toCChar());
   ui->LogoLBl->setScaledContents(true);
   ui->LogoLBl->setPixmap(wPxMp);
-
-  setWindowTitle("Warning");
+  if (pTitle.isEmpty())
+    setWindowTitle("Warning");
+  else
+    setWindowTitle(pTitle.toCChar());
 }
-void ZExceptionDLg::setError()
+void ZExceptionDLg::setError(const utf8VaryingString &pTitle)
 {
   uriString wImgFile = __ICON_PATH__;
   wImgFile += __ERROR_ICON__;
@@ -363,11 +367,12 @@ void ZExceptionDLg::setError()
   wPxMp.load(wImgFile.toCChar());
   ui->LogoLBl->setScaledContents(true);
   ui->LogoLBl->setPixmap(wPxMp);
-
-  setWindowTitle("Error");
-
+  if (pTitle.isEmpty())
+    setWindowTitle("Error");
+  else
+    setWindowTitle(pTitle.toCChar());
 }
-void ZExceptionDLg::setSevere()
+void ZExceptionDLg::setSevere(const utf8VaryingString &pTitle)
 {
   uriString wImgFile = __ICON_PATH__;
   wImgFile += __SEVERE_ICON__;
@@ -376,8 +381,13 @@ void ZExceptionDLg::setSevere()
   wPxMp.load(wImgFile.toCChar());
   ui->LogoLBl->setScaledContents(true);
   ui->LogoLBl->setPixmap(wPxMp);
+  if (pTitle.isEmpty())
+    setWindowTitle("Severe error");
+  else
+    setWindowTitle(pTitle.toCChar());
+
 }
-void ZExceptionDLg::setFatal()
+void ZExceptionDLg::setFatal(const utf8VaryingString &pTitle)
 {
   uriString wImgFile = __ICON_PATH__;
   wImgFile += __FATAL_ICON__;
@@ -386,11 +396,13 @@ void ZExceptionDLg::setFatal()
   wPxMp.load(wImgFile.toCChar());
   ui->LogoLBl->setScaledContents(true);
   ui->LogoLBl->setPixmap(wPxMp);
-
-  setWindowTitle("Fatal error");
+  if (pTitle.isEmpty())
+    setWindowTitle("Fatal error");
+  else
+    setWindowTitle(pTitle.toCChar());
 
 }
-void ZExceptionDLg::setHighest()
+void ZExceptionDLg::setHighest(const utf8VaryingString &pTitle)
 {
   uriString wImgFile = __ICON_PATH__;
   wImgFile += __HIGHEST_ICON__;
@@ -399,8 +411,10 @@ void ZExceptionDLg::setHighest()
   wPxMp.load(wImgFile.toCChar());
   ui->LogoLBl->setScaledContents(true);
   ui->LogoLBl->setPixmap(wPxMp);
-
-  setWindowTitle("Highest Error");
+  if (pTitle.isEmpty())
+    setWindowTitle("Highest Error");
+  else
+    setWindowTitle(pTitle.toCChar());
 
 }
 
@@ -436,7 +450,7 @@ ZExceptionDLg::info(ZExceptionBase& pException, QWidget *parent)
 {
   ZExceptionDLg* wDlg=new ZExceptionDLg("Information",pException,false);
   wDlg->ui->CancelBTn->setVisible(false);
-  wDlg->setInfo();
+  wDlg->setInfo("Information");
 
   int wRet= wDlg->exec();
   wDlg->deleteLater();
@@ -447,7 +461,7 @@ ZExceptionDLg::warning(ZExceptionBase& pException, QWidget *parent)
 {
   ZExceptionDLg* wDlg=new ZExceptionDLg("Warning",pException,false);
   wDlg->ui->CancelBTn->setVisible(false);
-  wDlg->setWarning();
+  wDlg->setWarning("Warning");
 
   int wRet= wDlg->exec();
   wDlg->deleteLater();
@@ -666,6 +680,9 @@ ZExceptionDLg::display(const utf8VaryingString &pTitle, const ZExceptionBase pEx
     return 0;
     }
 
+  if (!pException.Complement.isEmpty())
+    wDlg->setAdditionalInfo(pException.Complement);
+
   wDlg->ui->OKBTn->setVisible(true);
   wDlg->ui->OKBTn->setText("Close");
   wDlg->ui->CancelBTn->setVisible(false);
@@ -674,25 +691,25 @@ ZExceptionDLg::display(const utf8VaryingString &pTitle, const ZExceptionBase pEx
   switch(pException.Severity)
   {
   case Severity_Information:
-    wDlg->setInfo();
+    wDlg->setInfo(pTitle);
     break;
   case Severity_Warning:
-    wDlg->setWarning();
+    wDlg->setWarning(pTitle);
     break;
   case Severity_Error:
-    wDlg->setError();
+    wDlg->setError(pTitle);
     break;
   case Severity_Severe:
-    wDlg->setSevere();
+    wDlg->setSevere(pTitle);
     break;
   case Severity_Fatal:
-    wDlg->setFatal();
+    wDlg->setFatal(pTitle);
     break;
   case Severity_Highest:
-    wDlg->setHighest();
+    wDlg->setHighest(pTitle);
     break;
   default:
-    wDlg->setError();
+    wDlg->setError(pTitle);
     break;
   }
 
@@ -725,25 +742,25 @@ ZExceptionDLg::display2B(const utf8VaryingString &pTitle,const ZExceptionBase pE
   switch(pException.Severity)
   {
   case Severity_Information:
-    wDlg->setInfo();
+    wDlg->setInfo(pTitle);
     break;
   case Severity_Warning:
-    wDlg->setWarning();
+    wDlg->setWarning(pTitle);
     break;
   case Severity_Error:
-    wDlg->setError();
+    wDlg->setError(pTitle);
     break;
   case Severity_Severe:
-    wDlg->setSevere();
+    wDlg->setSevere(pTitle);
     break;
   case Severity_Fatal:
-    wDlg->setFatal();
+    wDlg->setFatal(pTitle);
     break;
   case Severity_Highest:
-    wDlg->setHighest();
+    wDlg->setHighest(pTitle);
     break;
   default:
-    wDlg->setError();
+    wDlg->setError(pTitle);
     break;
   }
 
@@ -777,25 +794,25 @@ ZExceptionDLg::display3B(const utf8VaryingString& pTitle,const ZExceptionBase pE
   switch(pException.Severity)
   {
   case Severity_Information:
-    wDlg->setInfo();
+    wDlg->setInfo(pTitle);
     break;
   case Severity_Warning:
-    wDlg->setWarning();
+    wDlg->setWarning(pTitle);
     break;
   case Severity_Error:
-    wDlg->setError();
+    wDlg->setError(pTitle);
     break;
   case Severity_Severe:
-    wDlg->setSevere();
+    wDlg->setSevere(pTitle);
     break;
   case Severity_Fatal:
-    wDlg->setFatal();
+    wDlg->setFatal(pTitle);
     break;
   case Severity_Highest:
-    wDlg->setHighest();
+    wDlg->setHighest(pTitle);
     break;
   default:
-    wDlg->setError();
+    wDlg->setError(pTitle);
     break;
   }
 

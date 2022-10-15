@@ -128,18 +128,22 @@ ZDicDLg::setDicFile(const uriString& pDicFile) {
   if (wSt!=ZS_SUCCESS)
     return wSt;
   wSt= DicFile->getAllDictionaries(DicList);
+  DicFile->zclose();
   if (wSt!=ZS_EOF) {
     if (wSt==ZS_EMPTY){
       ZExceptionDLg::adhocMessage("Dictionaries load",Severity_Warning,nullptr,
           "Dictionary file <%s> is empty.",pDicFile.getBasename().toCChar());
+      return wSt;
     }
     else{
     ZExceptionDLg::messageWAdd("Dictionaries load",ZException.last().Status,ZException.last().Severity,
         ZException.last().formatUtf8(),"Cannot load dictionaries from file <%s>.",pDicFile.getBasename().toCChar());
+    return wSt;
     }
   }
+
   DataChanged=false;
-  return wSt;
+  return ZS_SUCCESS;
 }// setDicFile
 
 

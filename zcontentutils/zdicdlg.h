@@ -81,7 +81,7 @@ public:
   explicit ZDicDLg(const uriString& pDicFile, QWidget *pParent=nullptr) ;
 
   ~ZDicDLg() override ;
-
+  /** loads dictionaries from pDicFile. Return ZS_SUCCESS when done */
   ZStatus setDicFile(const uriString& pDicFile);
 
   void init();

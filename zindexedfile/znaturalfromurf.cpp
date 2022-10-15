@@ -518,12 +518,14 @@ get_121_BlobNfURF(void* pValue, ZDataBuffer *pURFData)
 ZStatus
 get_121_ZDateFullNfURF(void* pValue, ZDataBuffer *pURFData)
 {
-  return static_cast<ZDateFull*>(pValue)->_importURF(pURFData->Data);
+  const unsigned char* wPtr=pURFData->Data;
+  return static_cast<ZDateFull*>(pValue)->_importURF(wPtr);
 }
 ZStatus
 get_121_ZDateNfURF(void* pValue,ZDataBuffer * pURFData)
 {
-    return static_cast<ZDate*>(pValue)->_importURF(pURFData->Data);
+  const unsigned char* wPtr=pURFData->Data;
+  return static_cast<ZDate*>(pValue)->_importURF(wPtr);
 }
 ZStatus
 get_121_CheckSumNfURF(void* pValue, ZDataBuffer *pURFData)
@@ -626,13 +628,13 @@ get_121_utf32VaryingStringNfURF(void* pValue, unsigned char* pURFData)
  * @return     a ZStatus
  */
 ZStatus
-_getZDateFullNfURF(void* pValue,unsigned char* pURFData,ZTypeBase pTargetType,uint64_t pTargetNSize,uint32_t pTargetArrayCount)
+_getZDateFullNfURF(void* pValue,const unsigned char* pURFData,ZTypeBase pTargetType,uint64_t pTargetNSize,uint32_t pTargetArrayCount)
 {
 
-
 ZDateFull wDate;
-    wDate._importURF(pURFData);
-    switch(pTargetType)
+  pTargetArrayCount=1;
+  wDate._importURF(pURFData);
+  switch(pTargetType)
     {
     case ZType_ZDateFull:
     {
@@ -704,15 +706,14 @@ ZDateFull wDate;
 
 
 ZStatus
-_getZDateNfURF(void* pValue,unsigned char* pURFData,ZTypeBase pTargetType,uint64_t pTargetNSize,uint32_t pTargetArrayCount)
+_getZDateNfURF(void* pValue,const unsigned char* pURFData,ZTypeBase pTargetType,uint64_t pTargetNSize,uint32_t pTargetArrayCount)
 {
-
-
 ZDate wDate;
-    wDate._importURF(pURFData);
+  pTargetArrayCount = 1;
+  wDate._importURF(pURFData);
 
 
-    switch(pTargetType)
+  switch(pTargetType)
     {
     case ZType_ZDate:
     {

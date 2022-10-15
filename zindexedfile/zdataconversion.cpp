@@ -48,68 +48,68 @@ ZStatus _getAtomicUfN(ZDataBuffer &pInData,ZDataBuffer &pOutData,const ZType_typ
 case ZType_U8 :
          {
           uint8_t wData = *((uint8_t*)pInData.Data);
-          _getAtomicUfN<uint8_t>(wData,pOutData,pType);
+          _getAtomicUfN<uint8_t>(wData,pOutData);
           return ZS_SUCCESS;
          }
   case ZType_S8 :
     {
     int8_t wData = *((int8_t*)pInData.Data);
-    _getAtomicUfN<int8_t>(wData,pOutData,pType);
+    _getAtomicUfN<int8_t>(wData,pOutData);
     return ZS_SUCCESS;
     }
 
   case ZType_U16 :
       {
       uint16_t wData = *((uint16_t*)pInData.Data);
-      _getAtomicUfN<uint16_t>(wData,pOutData,pType);
+      _getAtomicUfN<uint16_t>(wData,pOutData);
       return ZS_SUCCESS;
       }
   case ZType_S16 :
      {
       int16_t wData = *((int16_t*)pInData.Data);
-     _getAtomicUfN<int16_t>(wData,pOutData,pType);;
+     _getAtomicUfN<int16_t>(wData,pOutData);
      return ZS_SUCCESS;
      }
   case ZType_U32 :
       {
       uint32_t wData = *((uint32_t*)pInData.Data);
-       _getAtomicUfN<uint32_t>(wData,pOutData,pType);
+       _getAtomicUfN<uint32_t>(wData,pOutData);
        return ZS_SUCCESS;
       }
   case ZType_S32 :
        {
         int32_t wData = *((int32_t*)pInData.Data);
-       _getAtomicUfN<int32_t>(wData,pOutData,pType);
+       _getAtomicUfN<int32_t>(wData,pOutData);
        return ZS_SUCCESS;
        }
   case ZType_U64 :
       {
       uint64_t wData = *((uint64_t*)pInData.Data);
-      _getAtomicUfN<uint64_t>(wData,pOutData,pType);
+      _getAtomicUfN<uint64_t>(wData,pOutData);
       return ZS_SUCCESS;
       }
  case ZType_S64 :
      {
     int64_t wData = *((int64_t*)pInData.Data);
-     _getAtomicUfN<int64_t>(wData,pOutData,pType);
+     _getAtomicUfN<int64_t>(wData,pOutData);
      return ZS_SUCCESS;
      }
   case ZType_Float :
     {
     float wData = *((float*)pInData.Data);
-    _getAtomicUfN<float>(wData,pOutData,pType);
+    _getAtomicUfN<float>(wData,pOutData);
     return ZS_SUCCESS;
     }
   case ZType_Double :
     {
     double wData = *((double*)pInData.Data);
-    _getAtomicUfN<double>(wData,pOutData,pType);
+    _getAtomicUfN<double>(wData,pOutData);
     return ZS_SUCCESS;
     }
   case ZType_LDouble :
     {
     long double wData = *((long double*)pInData.Data);
-    _getAtomicUfN<long double>(wData,pOutData,pType);
+    _getAtomicUfN<long double>(wData,pOutData);
     return ZS_SUCCESS;
     }
 

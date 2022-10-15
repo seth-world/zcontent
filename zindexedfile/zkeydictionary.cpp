@@ -247,7 +247,6 @@ void ZKeyDictionary_Exp::_convert()
   EndianCheck = reverseByteOrder_Conditional<uint16_t>(EndianCheck);
   FieldNb=reverseByteOrder_Conditional<uint32_t>(FieldNb);
   KeyDicSize=reverseByteOrder_Conditional<uint32_t>(KeyDicSize);
-  ZAE._convert();
 }
 void
 ZKeyDictionary_Exp::serialize()
@@ -260,6 +259,7 @@ ZKeyDictionary_Exp::serialize()
     return;
   }
   _convert();
+  ZAE.serialize();
 
 }
 void
@@ -273,6 +273,7 @@ ZKeyDictionary_Exp::deserialize()
     return;
   }
   _convert();
+  ZAE.deserialize();
 
 }
 
@@ -312,13 +313,12 @@ ZStatus
 ZKeyDictionary::_importFlat(const unsigned char* &pPtrIn)
 {
 
-  ZKeyDictionary_Exp wKDExp;
+  ZKeyDictionary_Exp wKDExp ;
   wKDExp.setFromPtr(pPtrIn);
 
-  if (wKDExp.StartSign!=cst_ZMSTART)
-  {
+  if (wKDExp.StartSign!=cst_ZMSTART) {
     ZException.setMessage(_GET_FUNCTION_NAME_,ZS_CORRUPTED,Severity_Error,
-        "While importing Key Dictionary found start sign <%X> expected <%s>. Import data is corrupted.",wKDExp.StartSign,cst_ZMSTART);
+        "While importing Key Dictionary found start sign <%X> expected <%X>. Import data is corrupted.",wKDExp.StartSign,cst_ZMSTART);
     return ZS_CORRUPTED;
   }
 
@@ -338,11 +338,12 @@ ZKeyDictionary::_importFlat(const unsigned char* &pPtrIn)
     return ZS_CORRUPTED;
   }
 
-  /* Note : DicKeyName export data is between ZAExport and ZArray flat content */
+  /* set parameters for current ZKeyDictionary ZArray with ZAE params */
+  wKDExp.ZAE.setZArray(this);
+
+  /* Note : DicKeyName export data is between ZAExport and ZArray flat content (key fields descriptions) */
 
   DicKeyName._importUVF(pPtrIn); /* pPtrIn is updated */
-
-  wKDExp.ZAE.setZArray(this); /* set parameters */
 
   /* now import key field by key field */
   //  ZSIndexField_exp* wIFExp=(ZSIndexField_exp*)pPtrIn;
@@ -425,10 +426,13 @@ utf8String ZKeyDictionary::toXml(int pLevel,int pRank, bool pComment)
 //  wReturn+=fmtXMLuint64("keynaturalsize",KeyNaturalSize,wLevel);
 //  wReturn+=fmtXMLuint64("keyuniversalsize",KeyUniversalSize,wLevel);  // KeyUniversalSize is stored within ICB
 
+  if (DicKeyName.isEmpty())
+    fmtXMLcomment("/keyname/ is missing",wLevel);
+  else {
   wReturn += fmtXMLchar("keyname",DicKeyName.toCChar(), wLevel);
   if (pComment)
-    fmtXMLaddInlineComment(wReturn," link to index control block indexname field ");
-
+    fmtXMLaddInlineComment(wReturn," linked to index control block indexname field ");
+  }
   wReturn+=fmtXMLbool("duplicates",(bool)Duplicates,wLevel);
   if (pComment)
     fmtXMLaddInlineComment(wReturn," If set, key allows duplicates. if not - key must be unique ");
@@ -475,17 +479,18 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
   ZIndexField wIFld;
   bool wBool;
   unsigned int wInt;
+  ZStatus   wSt;
 
-  ZStatus wSt = pKeyDicNode->getChildByName((zxmlNode *&) wKeyRootNode, "keydictionary");
-  if (wSt != ZS_SUCCESS) {
-    pErrorlog->logZStatus(
-        ZAIES_Error,
-        wSt,
-        "ZSKeyDictionary::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
-        "keydictionary",
-        decode_ZStatus(wSt));
-    return wSt;
-    }
+  int wErroredFields=0,wWarnedFields=0;
+
+  if( pKeyDicNode->getName() != "key") {
+    pErrorlog->logZStatus(ZAIES_Fatal,
+        ZS_XMLINVROOTNAME,
+        "ZMetaDic::fromXml-F-INVROOTNAME Wrong name <%s> for given root node. Expected <metadictionary> ",pKeyDicNode->getName().toCChar());
+    return ZS_XMLINVROOTNAME;
+  }
+
+  wKeyRootNode=(zxmlElement *)pKeyDicNode;
 
   if (XMLgetChildText(wKeyRootNode,"keyname",DicKeyName,pErrorlog,ZAIES_Error)<0)
       {
@@ -497,6 +502,7 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
       {
         pErrorlog->logZStatus(ZAIES_Error, ZS_XMLMISSREQ,"ZSKeyDictionary::fromXml-E-MISSREQFLD Missing mandatory field <keyname>");
         return ZS_XMLMISSREQ;
+        wErroredFields ++;
       }
       else
         Duplicates=(uint8_t)wBool;
@@ -507,8 +513,7 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
       pErrorlog->logZStatus(
           ZAIES_Error,
           wSt,
-          "ZSKeyDictionary::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status "
-          "<%s>",
+          "ZSKeyDictionary::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
           "keyfields",
           decode_ZStatus(wSt));
       return wSt;
@@ -522,8 +527,10 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
       if (wSingleFieldNode->getName()=="field")
         {
         wIFld.clear();
-        XMLgetChildMd5(wSingleFieldNode,"hash",wIFld.Hash,pErrorlog,ZAIES_Error);
-        XMLgetChildUInt(wSingleFieldNode,"keyoffset",wIFld.KeyOffset,pErrorlog,ZAIES_Error);
+        if (XMLgetChildMd5(wSingleFieldNode,"hash",wIFld.Hash,pErrorlog,ZAIES_Error) != ZS_SUCCESS)
+          wErroredFields ++;
+        if (XMLgetChildUInt(wSingleFieldNode,"keyoffset",wIFld.KeyOffset,pErrorlog,ZAIES_Error) != ZS_SUCCESS)
+          wErroredFields ++;
         /* search within Meta Dic for hash code */
         bool wF=false;
         for (long wi=0;wi < Dictionary->count();wi++)
@@ -538,7 +545,8 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
 
           if (!wF) /* hash not successfull :try by name */
           {
-            XMLgetChildText(wSingleFieldNode,"name",wName,pErrorlog,ZAIES_Error);
+            if (XMLgetChildText(wSingleFieldNode,"name",wName,pErrorlog,ZAIES_Error) != ZS_SUCCESS)
+              wErroredFields ++;
             for (long wi=0;wi < Dictionary->count();wi++)
             {
               if (Dictionary->Tab[wi].getName()==wName)
@@ -552,7 +560,8 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
 
           if (!wF) /* name not successfull : error */
           {
-            XMLgetChildUInt(wSingleFieldNode,"mdicrank",wIFld.MDicRank,pErrorlog,ZAIES_Error);
+            if (XMLgetChildUInt(wSingleFieldNode,"mdicrank",wIFld.MDicRank,pErrorlog,ZAIES_Error) != ZS_SUCCESS)
+              wErroredFields ++;
             pErrorlog->logZStatus(ZAIES_Error,ZS_NOTFOUND,
                 "ZSKeyDictionary::fromXml-E-NTFND Key field name <%s> hash <%s> declared meta dic rank <%s> has not been found within meta dictionary",
                 wName.toCChar(),
@@ -569,6 +578,17 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
       XMLderegister(wSingleFieldNode);
       wSingleFieldNode=wSwapNode;
       }//while (wSt==ZS_SUCCESS)
+
+    pErrorlog->textLog("ZKeyDictionary::fromXml___________Field definitions load report____________________\n"
+                       " Key name <%s>.\n"
+                       " %ld key fields loaded.\n"
+                       " %d xml fields warned.\n"
+                       " %d xml fields errored and not loaded.",
+        DicKeyName.isEmpty()?"<no name>":DicKeyName.toCChar(),
+        count(), wWarnedFields,
+        wErroredFields);
+
+
 
   XMLderegister(wKeyRootNode);
   return pErrorlog->hasError()?ZS_XMLERROR:ZS_SUCCESS;

@@ -122,9 +122,71 @@ public:
   ZStatus fromXml(zxmlNode* pZmfDicNode, bool pCheckHash,ZaiErrors* pErrorlog);
 
 };
+/*                ----------------------------
+                    Dictionary export schema
+                  ----------------------------
 
+_________________________Beginning of export data _________________________
 
+  ZMFDicExportHeader structure (no start block)
+  ...
+  DicName (UVF format)
+  _________Meta dictionary _exportAppendMetaDicFlat()______________________
 
+                    |   cst_ZMSTART (0xF6F6F6F6)
+                    |
+  ZAExport          |   header data for fields ZArray
+                    |
+
+                          |   cst_ZFIELDSTART (0xF4F4F4F4)
+                          |
+        FieldDesc_Export  |
+                          |
+        Name (field name) UVF format
+        ToolTip           UVF format
+
+                          |   cst_ZFIELDSTART (0xF4F4F4F4)
+                          |
+        FieldDesc_Export  |
+                          |
+        Name (field name) UVF format
+        ToolTip           UVF format
+          ...
+
+  cst_ZBUFFEREND (0xFBFBFBFB)
+  _______________End of meta dictionary_____________
+
+  ___________KeyDictionary _exportAppendFlat()_______
+        -- Key 0 --
+                      | cst_ZMSTART (0xF6F6F6F6)
+                      | uint16_t endian check
+  ZKeyDictionary_Exp  | uint32_t KeyDicSize
+                      | uint32_t fieldNb
+                      |
+                      |               | cst_ZMSTART (0xF6F6F6F6)
+                      | ZAExport      | uint16_t endian check
+                      |               | size_t    FullSize
+                      |               | size_t    AllocatedSize
+                      |               | size_t    CurrentSize
+                      |               | size_t    AllocatedElements
+                      |               | size_t    FullSize
+                      |               | size_t    FullSize
+                      |               | ... see ZAExport
+                      |               | ssize_t   NbElements
+     DicKeyName (UVF)
+                   | uint8_t char unit size
+                   | uint16_t (UVF_Size_type) unit count
+                   | ... string content...
+
+     ZIndexField_Exp - key field content
+     ...
+
+-- Key 1 --
+    ...
+cst_ZBUFFEREND (0xFBFBFBFB)
+______________________End of export__________________________________
+
+*/
 #pragma pack(push)
 #pragma pack(1)
 class ZMFDicExportHeader

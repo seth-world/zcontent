@@ -157,6 +157,9 @@ public:
     virtual utf8String toStr() const;
     virtual utf8String toHexa() const;
 
+    size_t getUniversalSize();
+    size_t getUniversal_Ptr(unsigned char*& pPtr);
+
     /** @brief toKey() gets only ZResource::id (int this order) converted to universal format (Nota Bene : resource id is unique)*/
     ZDataBuffer toKey();
     /** @brief  toFullKey() gets ZResource::Entity+ZResource::id (int this order) converted to universal format */

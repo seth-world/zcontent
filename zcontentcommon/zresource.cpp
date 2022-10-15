@@ -4,6 +4,7 @@
 #include <zcontentcommon/zresource.h>
 #include <zxml/zxmlprimitives.h>
 #include <zindexedfile/zdatatype.h>
+#include <zindexedfile/zdataconversion.h>
 #include <zxml/zxml.h>
 
 
@@ -148,23 +149,23 @@ ZDataBuffer ZResource::_export() const
   return wReturn;
 }
 
-unsigned char* ZResource::_export(unsigned char*& pBuffer,size_t & pSize) const
+unsigned char* ZResource::_export(unsigned char*& pBuffer,size_t& pSize) const
 {
   errno=0;
   pSize = sizeof(ZEntity_type)+sizeof(Resourceid_type);
-  unsigned char* wBuffer=pBuffer =(unsigned char*) malloc(pSize);
+  pBuffer =(unsigned char*) malloc(pSize);
   if (pBuffer==nullptr)
     {
     pSize=0;
     errno=ENOMEM;
-    return pBuffer;
+    return nullptr;
     }
   ZEntity_type wEntity=reverseByteOrder_Conditional<ZEntity_type>(Entity);
   Resourceid_type wId=reverseByteOrder_Conditional<Resourceid_type>(id);
-  memmove(wBuffer,&wEntity,sizeof(wEntity));
-  wBuffer += sizeof(wEntity);
-  memmove(wBuffer,&wId,sizeof(Resourceid_type));
-  wBuffer += sizeof(Resourceid_type);
+  memmove(pBuffer,&wEntity,sizeof(wEntity));
+  pBuffer += sizeof(wEntity);
+  memmove(pBuffer,&wId,sizeof(Resourceid_type));
+  pBuffer += sizeof(Resourceid_type);
   return pBuffer;
 }
 
@@ -219,5 +220,14 @@ ssize_t ZResource::_importURF(const unsigned char *&pUniversalPtr)
   return sizeof(ZTypeBase)+sizeof(ZEntity_type)+sizeof(Resourceid_type);
 }
 
+
+size_t ZResource::getUniversalSize() {
+  return sizeof(ZEntity_type)+sizeof(Resourceid_type)+1; /* NB: Resourceid_type is signed */
+}
+size_t ZResource::getUniversal_Ptr(unsigned char*& pPtr) {
+  _exportAtomicPtr<ZEntity_type>(Entity,pPtr);
+  _getAtomicUfN_Ptr<Resourceid_type>(id,pPtr);
+  return sizeof(ZEntity_type)+sizeof(Resourceid_type)+1;
+}
 
 #endif // ZRESOURCE_CPP

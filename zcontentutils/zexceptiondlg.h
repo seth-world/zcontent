@@ -61,14 +61,14 @@ public:
 
   void init(const utf8VaryingString& pTitle,Severity_type pSeverity,ZStatus pStatus,const utf8VaryingString& pMessage, const utf8VaryingString& pComplement,bool pDontShow)  ;
 
-  void applySeverity(Severity_type pSeverity);
+  void applySeverity(Severity_type pSeverity, const utf8VaryingString &pTitle);
 
-  void setInfo();
-  void setWarning();
-  void setError();
-  void setSevere();
-  void setFatal();
-  void setHighest();
+  void setInfo(const utf8VaryingString &pTitle);
+  void setWarning(const utf8VaryingString &pTitle);
+  void setError(const utf8VaryingString &pTitle);
+  void setSevere(const utf8VaryingString &pTitle);
+  void setFatal(const utf8VaryingString &pTitle);
+  void setHighest(const utf8VaryingString &pTitle);
 
   void setButtonText(int pOrder,const utf8String& pButtonText);
   void setThirdButton(const utf8String& pButtonText);

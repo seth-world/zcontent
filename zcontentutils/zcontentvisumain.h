@@ -229,14 +229,30 @@ private slots:
 
   bool chooseFile(bool pChecked);
 
-  void VisuDoubleClicked(QModelIndex pIdx);
+  void VisuClicked(QModelIndex pIdx);
+
+  void visuActionEvent(QAction* pAction);
 
 
   void backward();
   void forward();
   void loadAll();
 
+  void VisuBvFlexMenuCallback(QContextMenuEvent *event);
+  void VisuMouseCallback(int pZEF, QMouseEvent *pEvent);
+
 private:
+
+  QAction* uint16QAc = nullptr;
+
+
+  QAction* int16QAc = nullptr;
+  QAction* uint32QAc = nullptr;
+  QAction* int32QAc = nullptr;
+  QAction* uint64QAc = nullptr;
+  QAction* int64QAc = nullptr;
+  QAction* sizetQAc = nullptr;
+
 
   ZDataBuffer       SearchContent;
   ssize_t           SearchOffset=-1;
@@ -292,5 +308,37 @@ _searchBlockStart (int pContentFd,
                     uint32_t *pBeginContent=nullptr);
 
 void setLoadMax (ssize_t pLoadMax);
+
+ssize_t computeOffsetFromCoord(int pRow, int pCol);
+
+class VisuLineCol {
+public:
+  int line=0;
+  int col=0;
+  VisuLineCol& compute(ssize_t wOffset) {
+    /* highlight searched result in table view
+   * start block :
+     offset / 16 -> gives the line
+
+    offset - (offset / 16) gives the column
+                     */
+
+                 double wOf = wOffset;
+    line = int(wOf / 16.0);
+
+    col = int(wOf - (double (line)* 16.0));
+
+    col = col + (col / 4);
+
+    return *this;
+  }
+  QModelIndex getIndex() {
+    QModelIndex wReturn;
+    wReturn.sibling(line,col);
+    return wReturn;
+  }
+};
+
+
 
 #endif // ZCONTENTVISUMAIN_H

@@ -116,8 +116,6 @@ namespace zbs
 
 ZStatus getAtomicZType_Sizes(ZTypeBase pType, uint64_t& pNaturalSize, uint64_t& pUniversalSize);
 
-size_t getAtomicNaturalSize(const ZTypeBase pType);
-size_t getAtomicUniversalSize(const ZTypeBase pType);
 
 //ZStatus _castAtomicValue_A (auto pValue,const ZType_type pTargetType,ZDataBuffer &pOutValue);
 
@@ -635,7 +633,7 @@ _getZTypeFull_T(typename std::enable_if_t<std::is_class<_Tp>::value,_Tp> &pValue
       typeid(_Tp).name(),
       typeid(pValue).hash_code());
   return(ZS_INVTYPE);
-}// _getZTypeT for class (class & struct)
+}// _getZType_T for class (class & struct)
 
 template <typename _Tp>
 ZTypeBase
@@ -722,7 +720,7 @@ _getZTypeFull_T(typename std::enable_if_t<std::is_array<_Tp>::value,_Tp> &pValue
   fprintf (stderr,ZException.last().formatFullUserMessage().toCChar());
   return wType | ZType_Array;;
 
-}// _getZTypeT for Array
+}// _getZType_T for Array
 
 //--------------Enum will not be allowed anymore : deprecated and not useful----------------
 
@@ -733,7 +731,7 @@ _getZTypeFull_T(typename std::enable_if_t<std::is_array<_Tp>::value,_Tp> &pValue
 
 template <typename _Tp>
 /**
- * @brief _getZTypeT template function : from a given value (pValue) with template type _Tp analyzes the type of data and :
+ * @brief _getZType_T template function : from a given value (pValue) with template type _Tp analyzes the type of data and :
    -  generates a ZType_type mask returned in pType (long),
    - returns
       + a Natural size (roughly sizeof(_Tp))
@@ -888,12 +886,12 @@ ZStatus _getBitsetTypeFull(void*pValue, ZTypeBase &pType, uint64_t &pNaturalSize
 /* single get for ztype (no other values) */
 
 
-/** @brief _getZTypeT get ZType template for Class type ( class or struct ).
+/** @brief _getZType_T get ZType template for Class type ( class or struct ).
  *  It does nothing : it is there to insure std::enable_if <> coherence while compiling
  */
 template <typename _Tp>
 ZTypeBase
-_getZTypeT(typename std::enable_if_t<std::is_class<_Tp>::value,_Tp> &pValue)
+_getZType_T(typename std::enable_if_t<std::is_class<_Tp>::value,_Tp> &pValue)
 {
     size_t wTypeHashCode=typeid(pValue).hash_code();
 
@@ -915,7 +913,7 @@ _getZTypeT(typename std::enable_if_t<std::is_class<_Tp>::value,_Tp> &pValue)
                           typeid(pValue).hash_code());
     fprintf(stderr,ZException.formatFullUserMessage().toCChar());
     return(wType);
-}// _getZTypeT for class (class & struct)
+}// _getZType_T for class (class & struct)
 
 
 template <class _Tp>

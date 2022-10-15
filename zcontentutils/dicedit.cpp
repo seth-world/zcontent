@@ -75,6 +75,8 @@
 
 #include <zxml/zxmlprimitives.h>
 
+#include <texteditmwn.h>
+
 using namespace zbs;
 
 const int cst_MessageDuration = 20000;  /* milliseconds */
@@ -92,6 +94,9 @@ DicEdit::~DicEdit()
     delete FieldDLg;
     FieldDLg=nullptr;
   }
+  if (GenerateEngine)
+    delete GenerateEngine;
+  GenerateEngine=nullptr;
 //  if (MasterDic)
 //    delete MasterDic;
 
@@ -203,17 +208,49 @@ DicEdit::init() {
   ui->menubar->addMenu(generalMEn);
 
   generalGroup = new QActionGroup(generalMEn);
+  generalGroup->setExclusive(false);
 
-  parserQAc= new QAction(QObject::tr("c++ parser","DicEdit"),generalMEn);
+  parserQAc= new QAction(QObject::tr("parse a C++ header","DicEdit"),generalMEn);
   parserQAc->setObjectName("parserQAc");
   generalGroup->addAction(parserQAc);
   generalMEn->addAction(parserQAc);
 
+  generateMainMEn=new QMenu(QObject::tr("code generation","DicEdit"),this);
 
-  generateQAc= new QAction(QObject::tr("generate","DicEdit"),generalMEn);
+  generalMEn->addMenu(generateMainMEn);
+
+  generateQAc= new QAction(QObject::tr("generate","DicEdit"),generateMainMEn);
   generateQAc->setObjectName("generateQAc");
   generalGroup->addAction(generateQAc);
-  generalMEn->addAction(generateQAc);
+  generateMainMEn->addAction(generateQAc);
+
+  genShowHideMEn = new QMenu(QObject::tr("Show / hide","DicEdit"),generateMainMEn);
+
+//  generateMainMEn->addMenu(genShowHideMEn);
+
+  genShowLogQAc= new QAction(QObject::tr("show generation log","DicEdit"),genShowHideMEn);
+  genShowLogQAc->setObjectName("genShowLogQAc");
+  genShowLogQAc->setCheckable(true);
+  genShowLogQAc->setChecked(false);
+  generalGroup->addAction(genShowLogQAc);
+//  genShowHideMEn->addAction(genShowLogQAc);
+//  generateMainMEn->addAction(genShowLogQAc);
+
+  genShowCppQAc= new QAction(QObject::tr("show cpp code","DicEdit"),genShowHideMEn);
+  genShowCppQAc->setObjectName("genShowCppQAc");
+  genShowCppQAc->setCheckable(true);
+  genShowCppQAc->setChecked(false);
+  generalGroup->addAction(genShowCppQAc);
+//  genShowHideMEn->addAction(genShowCppQAc);
+  generateMainMEn->addAction(genShowCppQAc);
+
+  genShowHeaderQAc= new QAction(QObject::tr("show header code","DicEdit"),genShowHideMEn);
+  genShowHeaderQAc->setObjectName("genShowHeaderQAc");
+  genShowHeaderQAc->setCheckable(true);
+  genShowHeaderQAc->setChecked(false);
+  generalGroup->addAction(genShowHeaderQAc);
+//  genShowHideMEn->addAction(genShowHeaderQAc);
+  generateMainMEn->addAction(genShowHeaderQAc);
 
   setupReadWriteMenu();
 
@@ -279,29 +316,139 @@ DicEdit::generalActionEvent(QAction* pAction) {
 
   if (pAction == generateQAc) {
 
-    ZCppGenerate* wGen=new ZCppGenerate(DictionaryFile);
+    ZMFDictionary* wMasterDic = screenToDic();  /* get Master dictionary content from views */
+    DictionaryFile->setDictionary(*wMasterDic);
+    if (GenerateEngine==nullptr)
+      GenerateEngine=new ZCppGenerate(DictionaryFile);
 
-    ZStatus wSt=wGen->loadGenerateParameters("",&Errorlog);
+    ZStatus wSt=GenerateEngine->loadGenerateParameters(uriString(),&Errorlog);
     if (wSt!=ZS_SUCCESS) {
       ZExceptionDLg::displayLast("Generation parameters",false);
     }
-    utf8VaryingString wGenPath = wGen->getGenPath();
+    utf8VaryingString wGenPath = GenerateEngine->getGenPath();
 
     utf8VaryingString wOutFileBaseName, wClass , wBrief = DictionaryFile->DicName.toString();
     if (!getGenerationNames(wOutFileBaseName,wClass,wBrief,wGenPath))
       return;
 
-    wSt=wGen->generateInterface(wOutFileBaseName,wClass,wBrief);
+    wSt=GenerateEngine->generateInterface(wOutFileBaseName,wClass,wBrief,wGenPath);
 
-    delete wGen;
+    if (GenCppFileWin==nullptr) {
+      GenCppFileWin = new textEditMWn(this,
+          TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
+          std::bind(&DicEdit::closeGenShowCppCB, this,std::placeholders::_1));
+      if (genShowCppQAc->isChecked())
+        GenCppFileWin->show();
+    }
+    if (GenHeaderFileWin==nullptr) {
+      GenHeaderFileWin = new textEditMWn(this,
+          TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
+          std::bind(&DicEdit::closeGenShowHeaderCB, this,std::placeholders::_1));
+      if (genShowHeaderQAc->isChecked())
+        GenHeaderFileWin->show();
+    }
+    if (GenerateEngine && GenerateEngine->getGenCppFile().exists())
+      GenCppFileWin->setTextFromFile(GenerateEngine->getGenCppFile());
+    if (GenerateEngine && GenerateEngine->getGenCppFile().exists())
+      GenHeaderFileWin->setTextFromFile(GenerateEngine->getGenHeaderFile());
+//    delete wGen;
     return;
   } // generateQAc
+
+  if (pAction == genShowCppQAc) {
+    if (GenCppFileWin==nullptr) {
+      GenCppFileWin = new textEditMWn(this,
+          TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
+          std::bind(&DicEdit::closeGenShowCppCB, this,std::placeholders::_1));
+
+      if (GenerateEngine && GenerateEngine->getGenCppFile().exists())
+        GenCppFileWin->setTextFromFile(GenerateEngine->getGenCppFile());
+    }
+    if (genShowCppQAc->isChecked())
+      GenCppFileWin->show();
+    else
+      GenCppFileWin->hide();
+    return;
+  } // genShowCppQAc
+
+  if (pAction == genShowHeaderQAc) {
+    if (GenHeaderFileWin==nullptr) {
+      GenHeaderFileWin = new textEditMWn(this,
+          TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
+          std::bind(&DicEdit::closeGenShowHeaderCB, this,std::placeholders::_1));
+
+      if (GenerateEngine && GenerateEngine->getGenHeaderFile().exists())
+        GenHeaderFileWin->setTextFromFile(GenerateEngine->getGenHeaderFile());
+    }
+    if (genShowHeaderQAc->isChecked())
+      GenHeaderFileWin->show();
+    else
+      GenHeaderFileWin->hide();
+    return;
+  } // genShowCppQAc
+
   if (pAction == quitQAc) {
     Quit();
   } // parserQAc
 
   readWriteActionEvent(pAction);
 }
+
+void DicEdit::closeGenShowCppCB(QEvent *pEvent)
+{
+  if (pEvent->type()==QEvent::Destroy) {
+    genShowCppQAc->setEnabled(false);
+    genShowCppQAc->setChecked(false);
+ //   genShowCppQAc->setText(QCoreApplication::translate("DicEdit", "Show token list", nullptr));
+    GenCppFileWin->QWidget::close();
+    GenCppFileWin->deleteLater();
+    GenCppFileWin=nullptr;
+    return;
+  }
+  if (pEvent->type()==QEvent::Hide) {
+    genShowCppQAc->setChecked(false);
+//    genShowCppQAc->setText(QCoreApplication::translate("RawFields", "Show token list", nullptr));
+    GenCppFileWin->QWidget::hide();
+    return;
+  }
+  if (pEvent->type()==QEvent::Close) {
+    genShowCppQAc->setEnabled(false);
+    genShowCppQAc->setChecked(false);
+//    genShowCppQAc->setText(QCoreApplication::translate("RawFields", "Show token list", nullptr));
+    GenCppFileWin->QWidget::close();
+    GenCppFileWin->deleteLater();
+    GenCppFileWin=nullptr;
+    return;
+  }
+}//DicEdit::closeGenShowCppCB
+
+void DicEdit::closeGenShowHeaderCB(QEvent *pEvent)
+{
+  if (pEvent->type()==QEvent::Destroy) {
+    genShowHeaderQAc->setEnabled(false);
+    genShowHeaderQAc->setChecked(false);
+    //   genShowCppQAc->setText(QCoreApplication::translate("DicEdit", "Show token list", nullptr));
+    GenHeaderFileWin->QWidget::close();
+    GenHeaderFileWin->deleteLater();
+    GenHeaderFileWin=nullptr;
+    return;
+  }
+  if (pEvent->type()==QEvent::Hide) {
+    genShowHeaderQAc->setChecked(false);
+    //    genShowCppQAc->setText(QCoreApplication::translate("RawFields", "Show token list", nullptr));
+    GenHeaderFileWin->QWidget::hide();
+    return;
+  }
+  if (pEvent->type()==QEvent::Close) {
+    genShowHeaderQAc->setEnabled(false);
+    genShowHeaderQAc->setChecked(false);
+    //    genShowCppQAc->setText(QCoreApplication::translate("RawFields", "Show token list", nullptr));
+    GenHeaderFileWin->QWidget::close();
+    GenHeaderFileWin->deleteLater();
+    GenHeaderFileWin=nullptr;
+    return;
+  }
+}//DicEdit::closeGenShowCppCB
 
 void
 DicEdit::Quit() {
@@ -357,10 +504,8 @@ void DicEdit::FieldTBvFlexMenu(QContextMenuEvent *event)
 void
 DicEdit::setupReadWriteMenu()
 {
-
   SaveQAc = new QAction(QObject::tr("Save","DicEdit"),this);
   SaveQAc->setObjectName("SaveQAc");
-//  generalMEn->addAction(SaveQAc);
 
   FwritetoMEn=new QMenu(QObject::tr("Save as","DicEdit"),this);
 
@@ -957,6 +1102,8 @@ DicEdit::getGenerationNames(utf8VaryingString& pOutFileBaseName,utf8VaryingStrin
   else
     wOutFileName=pOutFileBaseName;
 
+  SelectedDirectory=pGenPath;
+
   QDialog wGenNamesDLg;
   wGenNamesDLg.setObjectName("wGenNamesDLg");
   wGenNamesDLg.setWindowTitle(QObject::tr("Generation names","DicEdit"));
@@ -1002,13 +1149,14 @@ DicEdit::getGenerationNames(utf8VaryingString& pOutFileBaseName,utf8VaryingStrin
   QHL3->setObjectName("QHL3");
   QVL->insertLayout(3,QHL3);
 
-  QLabel* wLb3=new QLabel(QObject::tr("Class description","DicEdit"),&wGenNamesDLg);
+  QLabel* wLb3=new QLabel(QObject::tr("Target directory","DicEdit"),&wGenNamesDLg);
   wLb3->setObjectName("wLb3");
   QHL3->addWidget(wLb3);
   QLineEdit* wGenPathLEd=new QLineEdit(pGenPath.toCChar());
   wGenPathLEd->setObjectName("wGenPathLEd");
   QHL3->addWidget(wGenPathLEd);
-
+  QPushButton* wDirBTn=new QPushButton(QObject::tr("Search","DicEdit"),&wGenNamesDLg);
+  QHL3->addWidget(wDirBTn);
 
   QHBoxLayout* QHLBtn=new QHBoxLayout;
   QHLBtn->setObjectName("QHLBtn");
@@ -1034,6 +1182,9 @@ DicEdit::getGenerationNames(utf8VaryingString& pOutFileBaseName,utf8VaryingStrin
   QObject::connect(wOk, &QPushButton::clicked, &wGenNamesDLg, &QDialog::accept);
   QObject::connect(wCancel, &QPushButton::clicked, &wGenNamesDLg, &QDialog::reject);
 
+  QObject::connect(wDirBTn, &QPushButton::clicked, this, &DicEdit::searchDirectory);
+
+
   while (true) {
     wClassLEd->setSelection(0,wClass.UnitCount);
     wClassLEd->setFocus();
@@ -1050,8 +1201,7 @@ DicEdit::getGenerationNames(utf8VaryingString& pOutFileBaseName,utf8VaryingStrin
         continue;
       }
       uriString wGenPath=wGenPathLEd->text().toUtf8().data();
-      if (!wGenPath.exists())
-      if (wOutFileName.contains((utf8_t*)" ")) {
+      if (!wGenPath.exists()) {
         ZExceptionDLg::adhocMessage("Generation directory",Severity_Error,nullptr,"Generation directory <%s> does not exist.",wGenPath.toString());
         continue;
       }
@@ -1063,6 +1213,31 @@ DicEdit::getGenerationNames(utf8VaryingString& pOutFileBaseName,utf8VaryingStrin
   }// while true
 }//getGenNames
 
+void
+DicEdit::searchDirectory() {
+  QFileDialog wFd;
+
+  wFd.setWindowTitle(QObject::tr("Source directory","DicEdit"));
+  wFd.setLabelText(QFileDialog::Accept,  "Select");
+  wFd.setLabelText(QFileDialog::Reject ,  "Cancel");
+
+  wFd.setOption(QFileDialog::ShowDirsOnly,true);
+  wFd.setDirectory(SelectedDirectory.toCChar());
+
+  while (true)
+  {
+    int wRet=wFd.exec();
+    if (wRet==QDialog::Rejected)
+      return;
+
+    if (wFd.selectedFiles().isEmpty()) {
+      ZExceptionDLg::adhocMessage("Source directory",Severity_Warning,nullptr,"No directory has been selected.\nPlease select a valid directory.");
+      continue;
+    }
+    SelectedDirectory = wFd.selectedFiles()[0].toUtf8().data();
+    break;
+  }//while (true)
+}
 
 void
 DicEdit:: renewDicFile(ZMFDictionary& pDic){
@@ -1084,6 +1259,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
   if  (pAction==SaveQAc) /* save to dictionary file if exists otherwise recursive call with */
   {
+
     if (DictionaryFile==nullptr) {
       if (saveOrCreateDictionaryFile()!=ZS_SUCCESS)
         ZExceptionDLg::displayLast();
@@ -1154,7 +1330,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
     wSt =wMasterDic.XmlLoadFromString(wXmlContent,true,&Errorlog);
     if (wSt!=ZS_SUCCESS)   /* XmlLoadFromString uses returns a ZStatus but uses errorlog to log messages */
     {
-      ZExceptionDLg::messageWAdd("FloadfromXmlFileQAc",
+      ZExceptionDLg::messageWAdd("FloadfromclipQAc",
           wSt,
           Errorlog.getSeverity(),
           Errorlog.allLoggedToString(),
@@ -1166,7 +1342,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
     {
       Severity_type wS = Errorlog.getSeverity();
 
-      int wRet = ZExceptionDLg::message2BWAdd("FloadfromXmlFileQAc",
+      int wRet = ZExceptionDLg::message2BWAdd("FloadfromclipQAc",
           wS > Severity_Warning?ZS_ERROR:ZS_WARNING,
           wS,
           Errorlog.allLoggedToString(),
@@ -1209,9 +1385,12 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
   if  (pAction==FwriteXmltofileQAc)
   {
-    QFileDialog wFd;
+    const char* wWD=getenv(__PARSER_WORK_DIRECTORY__);
+    if (!wWD)
+      wWD="";
+    QFileDialog wFd(this,QObject::tr("Xml file","DicEdit"),wWD);
 
-    wFd.setWindowTitle(QObject::tr("Xml file","DicEdit"));
+//    wFd.setWindowTitle(QObject::tr("Xml file","DicEdit"));
     wFd.setLabelText(QFileDialog::Accept,  "Select");
     wFd.setLabelText(QFileDialog::Reject ,  "Cancel");
     while (true)
@@ -1230,7 +1409,9 @@ DicEdit::readWriteActionEvent(QAction*pAction)
     }//while (true)
 
     uriString wOutFile= wFd.selectedFiles()[0].toUtf8().data();
-
+    if (wOutFile.getFileExtension().isEmpty()) {
+      wOutFile.changeFileExtension(".xml");
+    }
     bool Fexists=wOutFile.exists();
 
     /* generate xml from current views content */
@@ -1249,14 +1430,15 @@ DicEdit::readWriteActionEvent(QAction*pAction)
   } // FwriteXmltofileQAc
 
 
-  if  (pAction==FloadfromXmlFileQAc)
-  {
-    QFileDialog wFd;
-    wFd.setWindowTitle(QObject::tr("Xml file","DicEdit"));
+  if  (pAction==FloadfromXmlFileQAc) {
+
+    const char* wWD=getenv(__PARSER_WORK_DIRECTORY__);
+    if (!wWD)
+      wWD="";
+    QFileDialog wFd(this,QObject::tr("Xml file","DicEdit"),wWD);
     wFd.setLabelText(QFileDialog::Accept,  "Select");
     wFd.setLabelText(QFileDialog::Reject ,  "Cancel");
-    while (true)
-      {
+    while (true) {
       int wRet=wFd.exec();
       if (wRet==QDialog::Rejected)
         return;
@@ -1283,8 +1465,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
       }
     /* here load master dictionary */
     wSt =wMasterDic.XmlLoadFromString(wXmlContent,true,&Errorlog);
-    if (wSt!=ZS_SUCCESS)   /* XmlLoadFromString uses returns a ZStatus but uses errorlog to log messages */
-      {
+    if (wSt!=ZS_SUCCESS)  { /* XmlLoadFromString uses returns a ZStatus but uses errorlog to log messages */
       ZExceptionDLg::messageWAdd("FloadfromXmlFileQAc",
           wSt,
           Errorlog.getSeverity(),
@@ -1293,8 +1474,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
       return;
       }
   /* here we may only have warnings, infos or text messages */
-    if (Errorlog.hasMessages())
-      {
+    if (Errorlog.hasMessages()) {
       Severity_type wS = Errorlog.getSeverity();
 
       int wRet = ZExceptionDLg::message2BWAdd("FloadfromXmlFileQAc",
@@ -1313,6 +1493,9 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
   wMsg.sprintf("Xml file %s has been successfully loaded.",wXmlFile.toCChar());
   statusBar()->showMessage(QObject::tr(wMsg.toCChar(),"DicEdit"),cst_MessageDuration);
+
+  displayZMFDictionary(*DictionaryFile);
+
   return;
   } // FloadfromXmlFileQAc
 
@@ -4259,7 +4442,6 @@ DicEdit::screenToDic()
     wKeyDic->Duplicates = wKHR->Duplicates;
     wKeyDic->ToolTip = wKHR->ToolTip;
 */
-    int wKeyFieldCount = wKeyItem->rowCount() ;
     /* key fields */
     for (int wj=0;wj < wKeyItem->rowCount();wj++)
       {
@@ -4366,8 +4548,11 @@ DicEdit::loadDictionaryFile(const uriString& pDicPath){
 bool
 DicEdit::saveOrCreateDictionaryFile() {
 
+  const char* wWD=getenv(__PARSER_WORK_DIRECTORY__);
+  if (!wWD)
+    wWD="";
   ZStatus wSt;
-  QFileDialog wFD(this,"Dictionary file ","","Dictionary (*." __DICTIONARY_EXTENSION__");; All files (*.*)");
+  QFileDialog wFD(this,"Dictionary file ",wWD,"Dictionary (*." __DICTIONARY_EXTENSION__");; All files (*.*)");
 
   wFD.setLabelText(QFileDialog::Accept,"Choose or new");
   wFD.setLabelText(QFileDialog::Reject,"Give up");
@@ -4536,8 +4721,11 @@ DicEdit::loadDictionaryFile(){
       continue;
     }
 
-    ZDicDLg* wDicDLg=new ZDicDLg (wSelected,this);
-
+    ZDicDLg* wDicDLg=new ZDicDLg (this);
+    wSt=wDicDLg->setDicFile( wSelected);
+    if (wSt!=ZS_SUCCESS)
+      return false;
+    wDicDLg->dataSetup() ;
     wRet=wDicDLg->exec();
     if (wRet==QDialog::Rejected)
       return false;
@@ -4851,10 +5039,12 @@ DicEdit::displayZMFDictionary(ZMFDictionary &pDic)
 
   wStr.sprintf("%ld",pDic.KeyDic.count());
   ui->KeysNbLBl->setText(wStr.toCChar());
-
+/*
   if (fieldTBv->ItemModel)
     if (fieldTBv->ItemModel->rowCount()>0)
       fieldTBv->ItemModel->removeRows(0,fieldTBv->ItemModel->rowCount());
+*/
+  clearAllRows();
 
   int wRow=0;
   QList<QStandardItem *> wFieldRow ;
@@ -4888,29 +5078,33 @@ void
 DicEdit::displayKeyDictionaries(ZMFDictionary &pDic)
 {
   ZKeyHeaderRow* wKHR=nullptr;
-  ZKeyFieldRow wKFR;
+  ZKeyFieldRow* wKFR=nullptr;
 
   utf8String wStr;
   QVariant   wV;
   ZDataReference wDRefKey , wDRefKeyField;
   QList<QStandardItem *> wKeyRow, wKeyFieldRow ;
 
+  clearKeyRows();
+
+/*
   if (keyTRv->ItemModel)
     if (keyTRv->ItemModel->rowCount()>0)
       keyTRv->ItemModel->removeRows(0,keyTRv->ItemModel->rowCount());
-
+*/
 /*  for (int wi=0;wi < fieldTBv->ItemModel->rowCount();wi++) {
 
   }
 */
   for (long wi=0;wi < pDic.KeyDic.count();wi++) {
+    ZKeyHeaderRow wKHR ;
+    wKHR.set(pDic.KeyDic[wi]);
 
-    wKHR->set(pDic.KeyDic[wi]);
 
     wKeyRow=createKeyDicRow(wKHR); /* create item row with appropriate infra data linked to it */
 
     for (long wj=0;wj < pDic.KeyDic[wi]->count(); wj++) {
-
+      ZKeyFieldRow wKFR ;
       wKFR.Hash = pDic.KeyDic[wi]->Tab[wj].Hash;
       wKFR.KeyOffset = pDic.KeyDic[wi]->Tab[wj].KeyOffset;
       wKFR.Name = pDic[pDic.KeyDic[wi]->Tab[wj].MDicRank].getName();
@@ -4920,20 +5114,19 @@ DicEdit::displayKeyDictionaries(ZMFDictionary &pDic)
       if (wFieldRow < 0){
         abort();
       }
-      wKFR.FieldItem = fieldTBv->ItemModel->item(wFieldRow,0);
 
       wKeyFieldRow = createKeyFieldRow(wKFR);
+      wKFR.FieldItem = fieldTBv->ItemModel->item(wFieldRow,0);
 
       wKeyRow[0]->appendRow(wKeyFieldRow);
+
+      /* update index after child row has been created */
+      wDRefKeyField.set(ZLayout_KeyTRv, getNewResource(ZEntity_KeyField),0);
+      wDRefKeyField.setIndex(wKeyRow[0]->index());
+
     }// for wj
 
     keyTRv->ItemModel->appendRow(wKeyRow);
-
-    /* update index after child row has been created */
-    wDRefKey.setIndex(wKeyRow[0]->index());
-    wV.setValue<ZDataReference>(wDRefKey);
-    wKeyRow[0]->setData(wV,ZQtDataReference);
-
   }// for wi
 
 //  ui->displayKeyTRv->resizeRowsToContents();
@@ -4981,16 +5174,59 @@ createKeyDicRow(const ZKeyHeaderRow& pKHR) {
 void
 DicEdit::clearAllRows()
 {
+  clearKeyRows();
+  clearFieldRows();
+} // clearAllRows
+
+void
+DicEdit::clearFieldRows() {
+  ZDataReference wDRef;
+  QVariant wV;
+
   if (fieldTBv) {
-  if (fieldTBv->ItemModel)
-    if (fieldTBv->ItemModel->rowCount()>0)
+    if (fieldTBv->ItemModel) {
+      if (fieldTBv->ItemModel->rowCount()>0) {
+        for (int wi=0;wi < fieldTBv->ItemModel->rowCount();wi++) {
+          wV = fieldTBv->ItemModel->item(wi,0)->data(ZQtDataReference);
+          wDRef = wV.value<ZDataReference>();
+          ZFieldDescription* wFDesc = wDRef.getPtr<ZFieldDescription*>();
+          delete wFDesc;
+        } // for
+      } // rowCount()
       fieldTBv->ItemModel->removeRows(0,fieldTBv->ItemModel->rowCount());
-  }
+    } // fieldTBv->ItemModel
+  }// fieldTBv
+}
+
+void
+DicEdit::clearKeyRows() {
+  ZDataReference wDRef;
+  QVariant wV;
   if (keyTRv) {
-  if (keyTRv->ItemModel)
-    if (keyTRv->ItemModel->rowCount()>0)
-      keyTRv->ItemModel->removeRows(0,keyTRv->ItemModel->rowCount());
-  }
+    if (keyTRv->ItemModel) {
+      if (keyTRv->ItemModel->rowCount()>0) {
+
+        for (int wi=0;wi < keyTRv->ItemModel->rowCount();wi++) {
+          /* delete all data for key fields in the key */
+          QStandardItem* wKeyItem = fieldTBv->ItemModel->item(wi,0);
+          for (int wj=0;wj < wKeyItem->rowCount();wj++) {
+            wV = wKeyItem->child(wj,0)->data(ZQtDataReference);
+            wDRef = wV.value<ZDataReference>();
+            ZKeyFieldRow* wKFR = wDRef.getPtr<ZKeyFieldRow*>();
+            delete wKFR;
+          }
+          /* delete data for the key itself */
+          wV = keyTRv->ItemModel->item(wi,0)->data(ZQtDataReference);
+          wDRef = wV.value<ZDataReference>();
+          ZKeyHeaderRow* wKHR = wDRef.getPtr<ZKeyHeaderRow*>();
+          delete wKHR;
+        } // for
+
+        /* clean display */
+        keyTRv->ItemModel->removeRows(0,keyTRv->ItemModel->rowCount());
+      }// rowCount
+    } // ItemModel
+  } // keyTRv
 }
 
 void

@@ -16,7 +16,6 @@
 
 
 
-inline
 size_t getAtomicUniversalSize(const ZTypeBase pType)
 {
 ZTypeBase wZType = pType & ZType_AtomicMask;

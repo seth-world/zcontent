@@ -156,28 +156,6 @@ ZTypeBase wType;
 
     return addField(pFieldName,wType,wNaturalSize,wUniversalSize,wArrayCount);
 }//_addField
-/*
-ZStatus
-ZMetaDic::addField_A (auto pValue, const utf8_t *pFieldName)
-{
-ZStatus wSt;
-size_t wNaturalSize=0, wUniversalSize=0;
-uint16_t wArrayCount=0;
-ZTypeBase wType;
-
-// beware typeof() may be not portable  : decltype keeps the reference and its not usable for templateStrings
-
-    wSt=  _getZType_T<decltype(pValue)>(pValue,wType,wNaturalSize,wUniversalSize,wArrayCount);
-    if (wSt!=ZS_SUCCESS)
-            {
-            ZException.addToLast(" while getting type of field <%s>",pFieldName);
-            return wSt;
-            }
-    return addField(pFieldName,wType,wNaturalSize,wUniversalSize,wArrayCount);
-}
-*/
-
-
 
 /* ------------- C interfaces to ZMetadic -----------------------_*/
 

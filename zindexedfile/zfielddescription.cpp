@@ -112,7 +112,10 @@ utf8VaryingString ZFieldDescription::toXml(int pLevel, bool pComment)
 
   wReturn = fmtXMLnode("field",pLevel);
   wLevel++;
-  wReturn+=fmtXMLchar("name",Name.toCChar(),wLevel);
+  if (Name.isEmpty())
+    wReturn += fmtXMLcomment("/name/ is missing",wLevel);
+  else
+    wReturn += fmtXMLchar("name",Name.toCChar(),wLevel);
   if (pComment)
     fmtXMLaddInlineComment(wReturn," Name of the dictionary field : it must be unique.");
 
@@ -141,10 +144,13 @@ utf8VaryingString ZFieldDescription::toXml(int pLevel, bool pComment)
   wReturn+=fmtXMLmd5("hash",Hash,wLevel);
   if (pComment)
     fmtXMLaddInlineComment(wReturn," unique hashcode value for the field.");
-  wReturn+=fmtXMLchar("tooltip",ToolTip.toCChar(),wLevel);
-  if (pComment)
-    fmtXMLaddInlineComment(wReturn,"Custom help");
-
+  if (ToolTip.isEmpty())
+    wReturn += fmtXMLcomment("/tooltip/ is missing",wLevel);
+  else {
+    wReturn += fmtXMLchar("tooltip",ToolTip.toCChar(),wLevel);
+    if (pComment)
+      fmtXMLaddInlineComment(wReturn,"Custom help");
+  }
   wReturn += fmtXMLendnode("field",pLevel);
   return wReturn;
 }//toXml

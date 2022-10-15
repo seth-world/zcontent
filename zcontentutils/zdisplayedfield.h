@@ -36,7 +36,7 @@ public:
 
   uint32_t          KeyUniversalSize=0;
   uint8_t           Duplicates=0;
-  utf8String        DicKeyName;       // refers to ZICB::IndexName
+  utf8VaryingString DicKeyName;       // refers to ZICB::IndexName
   utf8VaryingString ToolTip;         //!< help describing the key
 };
 /**
@@ -59,7 +59,7 @@ public:
   //  uint32_t      KeyOffset=0;      // Offset of the Field from the beginning of Key record computed using universal formats
   //  md5           Hash;             // unique reference to meta dictionary field definition (stored in XML)
 
-  QStandardItem*    FieldItem=nullptr;
+  QStandardItem*    FieldItem=nullptr; // corresponding field item in field view
 
   ZKeyFieldRow& _copyFrom(const ZKeyFieldRow& pIn) {
  //   ZIndexField::_copyFrom(pIn);
