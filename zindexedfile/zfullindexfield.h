@@ -3,6 +3,7 @@
 
 #include <zindexedfile/zfielddescription.h>
 #include <zindexedfile/zindexfield.h>
+#include <zindexedfile/zrawindexfile.h>
 
 namespace zbs {
 
@@ -23,7 +24,7 @@ public:
 
   ZFullIndexField & operator=(ZFullIndexField & pIn) {return _copyFrom(pIn);}
 
-  ZFullIndexField &set(ZIndexFile* pZIF, long pKeyFieldRank);
+  ZFullIndexField &set(ZRawIndexFile *pZIF, long pKeyFieldRank);
 };
 
 } // namespace zbs

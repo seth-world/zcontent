@@ -37,7 +37,7 @@ ZMetaDic::addField (const utf8String& pFieldName,
   wField.setFieldName(pFieldName);
 
   wField.ZType=pType;
-  wField.HeaderSize = _getURFHeaderSize(wField.ZType);
+  wField.HeaderSize = getURFHeaderSize(wField.ZType);
   if (wField.ZType&ZType_VaryingLength)
         {
         wField.NaturalSize=0;
@@ -543,6 +543,13 @@ utf8VaryingString ZMetaDic::toXml(int pLevel,bool pComment)
   wReturn += fmtXMLversion("version",Version,wLevel);
   if (pComment)
     fmtXMLaddInlineComment(wReturn," <version> field is the local version to the dictionary data (not to be confused with software version).");
+  wReturn += fmtXMLdatefull("creationdate",CreationDate,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn," <creationdate>  when dictionary has been firstly created.");
+
+  wReturn += fmtXMLdatefull("modificationdate",ModificationDate,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn," <modificationdate>  when dictionary has lastly being saved.");
 
   if (DicName.isEmpty())
     wReturn += fmtXMLcomment("/dicname/ is missing",wLevel);
@@ -636,7 +643,18 @@ ZStatus ZMetaDic::fromXml(zxmlNode* pMetaDicRootNode, bool pCheckHash,ZaiErrors*
           "ZMetaDic::fromXml-W-CNTFINDND Warning: cannot find node element with name <version>. Dictionary version set to <1.0.0>.");
       Version=1000000UL;
     }
-
+  if (XMLgetChildZDateFull(wMetaDicNode,"creationdate",CreationDate,pErrorlog,ZAIES_Warning) <0)
+    {
+      pErrorlog->logZStatus(ZAIES_Warning,
+          ZS_XMLWARNING,
+          "ZMetaDic::fromXml-W-CNTFINDND Warning: cannot find node element with name <creationdate>. Dictionary version set to <1.0.0>.");
+    }
+  if (XMLgetChildZDateFull(wMetaDicNode,"modificationdate",ModificationDate,pErrorlog,ZAIES_Warning) <0)
+    {
+      pErrorlog->logZStatus(ZAIES_Warning,
+          ZS_XMLWARNING,
+          "ZMetaDic::fromXml-W-CNTFINDND Warning: cannot find node element with name <modificationdate>. Dictionary version set to <1.0.0>.");
+    }
   ZStatus wSt=wMetaDicNode->getChildByName((zxmlNode*&)wFieldsRootNode,"dicfields");
   if (wSt!=ZS_SUCCESS)
   {

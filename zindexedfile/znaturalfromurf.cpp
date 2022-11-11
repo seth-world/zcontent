@@ -12,7 +12,7 @@
 
 ZStatus
 _getBlobNfURF(void* pNatural,
-             unsigned char* pURFInData,
+             const unsigned char* pURFInData,
              ZTypeBase pTargetType)
 {
     if (pTargetType!=ZType_Blob)
@@ -25,7 +25,7 @@ _getBlobNfURF(void* pNatural,
                               decode_ZType(ZType_Blob));
         return ZS_INVTYPE;
         }
-    ZBlob* wZDB=static_cast<ZBlob*>(pNatural);
+    ZDataBuffer* wZDB=static_cast<ZDataBuffer*>(pNatural);
     wZDB->_importURF(pURFInData);
     return ZS_SUCCESS;
 
@@ -303,73 +303,6 @@ const unsigned char* wURFDataPtr;
     return  ZS_INVOP; // not understood - by the way not possible too.
 }//_getURFHeaderData
 
-size_t  _getURFHeaderSize (ZTypeBase &pZType)
-{
-ZTypeBase wType,wStructType;
-size_t wHeaderSize;
-    wType=pZType;
-    while (true)
-    {
-    if (wType==ZType_Blob)
-        {
-        wHeaderSize=sizeof(ZTypeBase)+sizeof(uint64_t);
-        break;
-        }
-    if (wType==ZType_ZDate)
-        {
-        wHeaderSize= sizeof(ZTypeBase);
-        break;
-        }
-    if (wType==ZType_ZDateFull)
-        {
-        wHeaderSize= sizeof(ZTypeBase);
-        break;
-        }
-    if (wType==ZType_CheckSum)
-        {
-        wHeaderSize= sizeof(ZTypeBase);
-        break;
-        }
-    if (wType&ZType_VaryingMask) // varying strings & blobs
-        {
-        wHeaderSize=sizeof(ZTypeBase)+sizeof(uint64_t);
-        break;
-        }
-    if (wType&ZType_String) // Fixed strings
-        {
-        wHeaderSize=sizeof(ZTypeBase)+sizeof(URF_Capacity_type)+sizeof(URF_Fixed_Size_type);
-        break;
-        }
-    wStructType= wType & ZType_StructureMask;
-    switch (wStructType)
-    {
-    case ZType_Atomic:
-        {
-        wHeaderSize= sizeof(ZTypeBase);
-        break;
-        }
-    case ZType_Array:
-        {
-        wHeaderSize=sizeof(ZTypeBase)+sizeof(uint32_t);
-        break;
-        }
-    case ZType_String: // can only be a fixed string : checkSum has been processed before (checkSum is both a ZType_String & a ZType_Class)
-        {
-        wHeaderSize=sizeof(ZTypeBase)+(sizeof(uint16_t)*2);
-        break;
-        }
-    default:    // Other types : data length is on uint32_t, canonical (array) count is systematically set to 1
-        {
-        wHeaderSize=sizeof(ZTypeBase)+sizeof(uint32_t);
-        break;
-        }
-    }// switch
-    break;
-    }// while true
-    return wHeaderSize;
-}//_getURFHeaderSize
-
-
 ZStatus
 getUniversalFromURF (ZDataBuffer &pValue,const unsigned char* pDataPtr,bool pTruncate,const unsigned char** pDataPtrOut)
 {
@@ -460,7 +393,8 @@ getUniversalFromURF (ZDataBuffer &pValue,const unsigned char* pDataPtr,bool pTru
 
   case ZType_Blob:
   {
-    return ZBlob::getUniversalFromURF(pDataPtr,pValue,pDataPtrOut);
+    abort();
+//    return ZBlob::getUniversalFromURF(pDataPtr,pValue,pDataPtrOut);
   }
 
   }// switch (wType)
@@ -510,34 +444,33 @@ getUniversalFromURF (ZDataBuffer &pValue,const unsigned char* pDataPtr,bool pTru
  *  Remark: Necessary to have a separate routine witn void* value statically casted to appropriate class to avoid compilation issues
  *
 */
-ZStatus
-get_121_BlobNfURF(void* pValue, ZDataBuffer *pURFData)
+ssize_t
+get_121_BlobNfURF(void* pValue, const unsigned char *pURFData)
 {
-  return static_cast<ZBlob*>(pValue)->_importURF(pURFData->Data);
+  static_cast<ZDataBuffer*>(pValue)->_importURF(pURFData);
+  return ZS_SUCCESS;
 }
-ZStatus
-get_121_ZDateFullNfURF(void* pValue, ZDataBuffer *pURFData)
+ssize_t get_121_ZDateFullNfURF(void* pValue, ZDataBuffer *pURFData)
 {
   const unsigned char* wPtr=pURFData->Data;
-  return static_cast<ZDateFull*>(pValue)->_importURF(wPtr);
+  return static_cast<ZDateFull*>(pValue)->_importURF(wPtr) ;
+
 }
-ZStatus
+ssize_t
 get_121_ZDateNfURF(void* pValue,ZDataBuffer * pURFData)
 {
   const unsigned char* wPtr=pURFData->Data;
   return static_cast<ZDate*>(pValue)->_importURF(wPtr);
 }
-ZStatus
-get_121_CheckSumNfURF(void* pValue, ZDataBuffer *pURFData)
+ssize_t get_121_CheckSumNfURF(void* pValue, ZDataBuffer *pURFData)
 {
   const unsigned char* wPtr=pURFData->Data;
   return static_cast<checkSum*>(pValue)->_importURF(wPtr);
 }
 
-ZStatus
+ssize_t
 get_ZStringNfURF(void* pValue, ZTypeBase pType, ZDataBuffer *&pURFData)
 {
-
     if (pType&ZType_VaryingLength)
     {
     const unsigned char* wPtr=pURFData->Data;
@@ -545,29 +478,24 @@ get_ZStringNfURF(void* pValue, ZTypeBase pType, ZDataBuffer *&pURFData)
     {
         case ZType_Char:
         case ZType_UChar:
-          if (static_cast<utfVaryingString<char>*>(pValue)->_importURF(wPtr)==0)
-            return ZS_ERROR;
-          return ZS_SUCCESS;
+          return (static_cast<utfVaryingString<char>*>(pValue)->_importURF(wPtr));
         case ZType_U8:
         case ZType_S8:
-          if (static_cast<utfVaryingString<utf8_t>*>(pValue)->_importURF(wPtr)==0)
-            return ZS_ERROR;
-          return ZS_SUCCESS;
+              return static_cast<utfVaryingString<utf8_t>*>(pValue)->_importURF(wPtr);
         case ZType_U16:
         case ZType_S16:
-          if (static_cast<utfVaryingString<utf16_t>*>(pValue)->_importURF(wPtr)==0)
-            return ZS_ERROR;
+              return static_cast<utfVaryingString<utf16_t>*>(pValue)->_importURF(wPtr);
           return ZS_SUCCESS;
         case ZType_U32:
         case ZType_S32:
-          if (static_cast<utfVaryingString<utf32_t>*>(pValue)->_importURF(wPtr)==0)
-            return ZS_ERROR;
-          return ZS_SUCCESS;
+          return static_cast<utfVaryingString<utf32_t>*>(pValue)->_importURF(wPtr);
+
     default:
-        break;
+        return -1;
         }
     }
-    return  static_cast<utfStringHeader*>(pValue)->_importURFGeneric(pURFData->Data);
+  return -1;
+//    return  static_cast<utfStringHeader*>(pValue)->_importURFGeneric(pURFData->Data);
 }// get_ZStringNfURF
 /*
 ZStatus

@@ -87,7 +87,6 @@ public:
     //    ZResource(Entity_type pEntity, utfcodeString &pCode) { pEntity = pCode.toLong(); }
 
 
-protected:
     static ZResource getNew(const ZEntity_type pEntity)
     {
         ZResource wR;
@@ -183,9 +182,10 @@ public:
      * @return
      */
     unsigned char*  _exportURF(unsigned char*& pBuffer,size_t & pSize) const;
-    ZDataBuffer*    _exportURF(ZDataBuffer *pReturn) const;
+    size_t          _exportURF(ZDataBuffer &pReturn) const;
     size_t          _exportURF_Ptr(unsigned char* &pURF) const;
     size_t          getURFSize() const;
+    size_t          getUniversalSize() const ;
     /** @brief _import imports from serialized data pUniversalPtr. Updates pointer to first byte after imported data*/
     ssize_t         _importURF(const unsigned char *&pUniversalPtr);
 };

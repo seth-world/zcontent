@@ -261,7 +261,7 @@ ZStatus ZMFDictionary::XmlLoadFromString(const utf8String &pXmlString,bool pChec
   zxmlElement *wRoot = nullptr;
   zxmlElement *wMetaRootNode=nullptr;
 
-  pErrorlog->setErrorLogContext("ZMFDictionary::XmlLoadFromString");
+  pErrorlog->setContext("ZMFDictionary::XmlLoadFromString");
 
   wDoc = new zxmlDoc;
   wSt = wDoc->ParseXMLDocFromMemory(pXmlString.toCChar(), pXmlString.getUnitCount(), nullptr, 0);
@@ -324,10 +324,10 @@ ZMFDictionary::fromXml(zxmlNode* pDicNode, bool pCheckHash, ZaiErrors* pErrorlog
   zxmlElement *wRootNode=nullptr;
   zxmlElement *wMDicRootNode=nullptr;
   zxmlElement *wKeyRootNode=nullptr;
-  zxmlElement *wKeyDicNode=nullptr;
+//  zxmlElement *wKeyDicNode=nullptr;
   zxmlElement *wSwapNode=nullptr;
 
-  pErrorlog->setErrorLogContext("ZMFDictionary::fromXml");
+  pErrorlog->setContext("ZMFDictionary::fromXml");
 
   if (pDicNode->getName()!="dictionary")
     {
@@ -405,30 +405,24 @@ ZMFDictionary::fromXml(zxmlNode* pDicNode, bool pCheckHash, ZaiErrors* pErrorlog
         );
     return wSt;
   }
-  wSt=wKeyRootNode->getFirstChild((zxmlNode*&)wKeyDicNode);
+  ZNodeCollection wNodes = wKeyRootNode->getAllChildren("key");
+//  wSt=wKeyRootNode->getFirstChild((zxmlNode*&)wKeyDicNode);
   ZKeyDictionary* wKeyDic=nullptr;
-  while (wSt==ZS_SUCCESS) {
-    if (wKeyDicNode->getName()=="key") {
-      ZKeyDictionary* wKeyDic = new ZKeyDictionary(this);
-      wSt=wKeyDic->fromXml(wKeyDicNode,pErrorlog);
-      if (wSt==ZS_SUCCESS) {
-          KeyDic.push(wKeyDic);
-      }
-      else {
-        delete wKeyDic;
-        wKeyDic=nullptr;
-      }
-      wKeyDic = new ZKeyDictionary(this);
-    }// if (wKeyDicNode->getName()=="key")
-    wSt=wKeyDicNode->getNextElementSibling(wSwapNode);
-    XMLderegister(wKeyDicNode);
-    wKeyDicNode=wSwapNode;
-  }// while
-  delete wKeyDic;
+  for (long wi=0; wi < wNodes.count(); wi++ ) {
+    ZKeyDictionary* wKeyDic = new ZKeyDictionary(this);
+    wSt=wKeyDic->fromXml(wNodes[wi],pErrorlog);
+    if (wSt==ZS_SUCCESS) {
+      KeyDic.push(wKeyDic);
+    }
+    else {
+      delete wKeyDic;
+      wKeyDic=nullptr;
+    }
+  }// for
   pErrorlog->textLog(" %ld keys loaded.\n"
                      "___________________________________________________\n", KeyDic.count());
 
-  XMLderegister(wKeyDicNode);
+//  XMLderegister(wKeyDicNode);
   return ZS_SUCCESS;
 }//ZMFDictionary::fromXml
 
@@ -496,7 +490,7 @@ ZStatus ZMFDicExportHeader::_import(const unsigned char* &pPtrIn)
     ZException.setMessage("ZMFDicExportHeader::_import",
         ZS_BADDIC,
         Severity_Severe,
-        "Invalid Dictionary Header : found Start marker <%X> ZBlockID <%X>. One of these is invalid (or both are).",
+        "Invalid Dictionary Header : found Start marker <%X> ZBlockId <%X>. One of these is invalid (or both are).",
         wStartSign,
         wBlockId);
     return  ZS_BADDIC;

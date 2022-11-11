@@ -105,8 +105,6 @@ ZExceptionDLg::ZExceptionDLg(const utf8VaryingString& pTitle,const ZExceptionBas
   QObject::connect (ui->OtherBTn,&QAbstractButton::pressed,this,[this]{ done(ZEDLG_Third); });
   QObject::connect (ui->MoreBTn,&QAbstractButton::pressed,this,[this]{ MoreClicked(); });
 
-//  QObject::connect(this, SIGNAL(QDialog::resizeEvent(QResizeEvent*)), this, SLOT(resizeWindow(QResizeEvent*)));
-
 }
 
 void
@@ -167,6 +165,7 @@ ZExceptionDLg::init(const utf8VaryingString& pTitle,Severity_type pSeverity,ZSta
  *  - second : width and height -> keep in width and height the initial distance from edges of dialog
  *  Overrides base widget resizeEvent()
  */
+
 void ZExceptionDLg::resizeEvent(QResizeEvent* pEvent)
 {
   QSize wRDlg = pEvent->oldSize();
@@ -180,6 +179,9 @@ void ZExceptionDLg::resizeEvent(QResizeEvent* pEvent)
 
   QRect wR1 = ui->verticalLayoutWidget->geometry();
 
+
+//  int wHMargin = (wRDlg.height()-wR1.height());  /* keep the same height margin */
+//  int wVH=pEvent->size().height() - wHMargin;
   int wVH=wR1.height();
   int wWMargin = (wRDlg.width()-wR1.width());  /* keep the same width margin */
   int wVW=pEvent->size().width() - wWMargin;

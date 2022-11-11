@@ -1,9 +1,9 @@
-#ifndef ZJOURNAL_CPP
-#define ZJOURNAL_CPP
+#ifndef ZSJOURNAL_CPP
+#define ZSJOURNAL_CPP
 
 #include <zindexedfile/zjournal.h>
-#include <zindexedfile/zsmasterfile.h>
 #include <zindexedfile/zmasterfile.h>
+#include <zindexedfile/zsjournalcontrolblock.h>
 
 using namespace zbs;
 
@@ -78,14 +78,13 @@ ZJEventQueue::erase (const zrank_type pRank)
 void
 ZJEventQueue::enqueue (const ZJOperation &pZJOP,
                        pid_t pPid,
-                       ZUserId pUid,
-                       descString &pUsername,
-                       ZDataBuffer &pRecord,
+                       const ZSystemUserId &pUid,
+                       const ZDataBuffer &pRecord,
                        const zrank_type pRank,
                        const zaddress_type pAddress,
                        const ssize_t pOffset)
 {
-    ZJEvent *wEvent = new ZJEvent (pZJOP,pPid,pUid,pUsername,pRecord,pRank,pAddress,pOffset);
+    ZJEvent *wEvent = new ZJEvent (pZJOP,pPid,pUid,pRecord,pRank,pAddress,pOffset);
 /*    wEvent->setData(pRecord);
     wEvent->Username = pUsername;
     wEvent->Pid = pPid;
@@ -107,7 +106,7 @@ ZJEventQueue::dequeue(ZJEvent &pEvent)
     pEvent.Header.Pid = Tab[0]->Header.Pid;
     pEvent.Header.DateTime = Tab[0]->Header.DateTime;
     pEvent.Header.Uid = Tab[0]->Header.Uid;
-    pEvent.Header.Username = Tab[0]->Header.Username;
+//    pEvent.Header.Username = Tab[0]->Header.Username;
     pEvent.Header.Rank= Tab[0]->Header.Rank;
     pEvent.Header.Address= Tab[0]->Header.Address;
 
@@ -119,7 +118,7 @@ ZJEventQueue::dequeue(ZJEvent &pEvent)
 
 
 //-----------------ZJournal--------------------
-ZJournal::~ZJournal(void)
+ZSJournal::~ZSJournal(void)
 {
 ZStatus wSt;
     if (isOpen())
@@ -143,7 +142,7 @@ ZStatus wSt;
  * @return  a ZStatus
  */
 ZStatus
-ZJournal::init(const bool pmustExist)
+ZSJournal::init(const bool pmustExist)
 {
 uriString   wURIJournal;
 ZStatus     wSt;
@@ -162,7 +161,7 @@ ZStatus     wSt;
         ZException.exit_abort();
         }
     Username = wUserDesc->pw_name ;*/
-    Username = ZUser().setToCurrentUser().getName().toString();
+    Username = ZSystemUser().setToCurrentUser().getSystemName();
 
     if ((wSt=setJournalLocalDirectoryPath())!=ZS_SUCCESS)
                             {
@@ -198,7 +197,7 @@ ZStatus     wSt;
 
 
 ZStatus
-ZJournal::setJournalLocalDirectoryPath(void)
+ZSJournal::setJournalLocalDirectoryPath(void)
 {
 ZStatus wSt;
 uriString   wURIFather;
@@ -206,7 +205,7 @@ uriString   wURIJournal;
 
     wURIFather=Father->getURIContent();
 
-    wSt=generateJournalName(wURIFather,Father->ZMCB.ZJCB->JournalLocalDirectoryPath,wURIJournal);
+    wSt=generateJournalName(wURIFather,Father->ZJCB->JournalLocalDirectoryPath,wURIJournal);
     if (wSt!=ZS_SUCCESS)
                     return wSt;
     if ((wSt=_Base::setPath(wURIJournal))!=ZS_SUCCESS)
@@ -223,7 +222,7 @@ uriString   wURIJournal;
  * @return a ZStatus. in case of error ZException is set with appropriate message.
  */
 ZStatus
-ZJournal::createFile(void)
+ZSJournal::createFile(void)
 {
 ZStatus wSt;
 uriString   wURIFather;
@@ -265,7 +264,7 @@ long wInitialSize;
 
     if (wSt!=ZS_SUCCESS)
             {
-            ZException.addToLast(" while creating journal file for ZMasterFile %s",
+            ZException.addToLast(" while creating journal file for ZSMasterFile %s",
                                    wURIFather.toString());
 
             }
@@ -274,16 +273,16 @@ long wInitialSize;
 
 
 ZStatus
-ZJournal::start(void)
+ZSJournal::start(void)
 {
-        if (!JThread._start(&ZJournal::process,this))
+        if (!JThread._start(&ZSJournal::process,this))
                     return ZException.getLastStatus();
         return ZS_SUCCESS;
 }
 
 
 ZStatus
-ZJournal::reset(ZMasterFile* pFather)
+ZSJournal::reset(ZRawMasterFile *pFather)
 {
 //uriString   wURIFather;
 uriString   wURIJournal;
@@ -307,7 +306,7 @@ ZStatus     wSt;
     fprintf(stderr,
             "ZJournal::reset-I-REMOVE removing journal file %s\n",
             wURIJournal.toString());
-    int wRet=remove(wURIJournal.toString());
+    int wRet=remove(wURIJournal.toCString_Strait());
     if (wRet!=0)
         {
         ZException.getErrno(wRet,
@@ -315,7 +314,7 @@ ZStatus     wSt;
                          ZS_FILEERROR,
                          Severity_Severe,
                          " while trying to remove journal file %s",
-                         wURIJournal.toString());
+                         wURIJournal.toCString_Strait());
         return ZS_FILEERROR;
         }
     return ZS_SUCCESS;
@@ -323,12 +322,12 @@ ZStatus     wSt;
 
 
 void
-ZJournal::end(void)
+ZSJournal::end(void)
 {
-    if (JThread.Created)    // if journaling thread active
+  if (JThread.isCreated())    // if journaling thread active
         {
         ZDataBuffer wRecord;
-        EvtQueue.enqueue(ZJOP_Close,Pid,Uid,Username,wRecord);  // enqueue termination message
+        EvtQueue.enqueue(ZJOP_Close,Pid,Uid,wRecord);  // enqueue termination message
         }
         else
         {
@@ -349,13 +348,13 @@ ZJournal::end(void)
  * @param[in] pAddress address for record operation. Significant for remove by address (ZJOP_RemoveByAddress). defaulted to -1 if omitted.
  */
 void
-ZJournal::enqueue (const ZJOperation pOperation,
-                   ZDataBuffer &pRecord,
+ZSJournal::enqueue (const ZJOperation pOperation,
+                   const ZDataBuffer &pRecord,
                    const zrank_type pRank,
                    const zaddress_type pAddress,
                    const ssize_t pOffset)
 {
-    EvtQueue.enqueue(pOperation,Pid,Uid,Username,pRecord,pRank,pAddress,pOffset);
+    EvtQueue.enqueue(pOperation,Pid,Uid,pRecord,pRank,pAddress,pOffset);
     CMtx.signal();
 }
 
@@ -369,7 +368,7 @@ ZJournal::enqueue (const ZJOperation pOperation,
  * @param pOffset
  */
 void
-ZJournal::enqueueSetFieldValue (const ZJOperation pOperation,
+ZSJournal::enqueueSetFieldValue (const ZJOperation pOperation,
                                 ZDataBuffer &pFieldBefore,
                                 ZDataBuffer &pFieldAfter,
                                 const zrank_type pRank,
@@ -378,12 +377,12 @@ ZJournal::enqueueSetFieldValue (const ZJOperation pOperation,
 {
 ZDataBuffer pBuffer;
     packFieldValues(pBuffer,pFieldBefore,pFieldAfter);
-    EvtQueue.enqueue(pOperation,Pid,Uid,Username,pBuffer,pRank,pAddress,pOffset);
+    EvtQueue.enqueue(pOperation,Pid,Uid,pBuffer,pRank,pAddress,pOffset);
     CMtx.signal();
 }
 
 ZStatus
-ZJournal::purge(const zrank_type pKeepRanks)
+ZSJournal::purge(const zrank_type pKeepRanks)
 {
     ZDataBuffer wJournalRecord;
     ZJEvent wEvent;
@@ -394,13 +393,13 @@ ZJournal::purge(const zrank_type pKeepRanks)
                                 ZException.addToLast(" while purging journal file");
                                 return wSt;
                                 }
-        while (size()>pKeepRanks)
+        while (getSize()>pKeepRanks)
         {
 
         wEvent.getEventFromRecord(wJournalRecord);
         while (true)
             {
-        if (Father->ZMCB.ZJCB->Remote!=nullptr)     // if a remote mirroring is requested
+        if (Father->ZJCB->Remote!=nullptr)     // if a remote mirroring is requested
                 if (!wEvent.Header.State.is(ZJS_Exported)) // must be exported to remote host before being purged
                                                     break;
 
@@ -434,12 +433,12 @@ return ZS_SUCCESS;
  * @return
  */
 void*
-ZJournal::process(void* pJournal) // client thread
+ZSJournal::process(void* pJournal) // client thread
 {
 ZStatus wSt;
 ZJEvent wEvent;
 ZDataBuffer wJournalRecord;
-    ZJournal* wJournal = static_cast<ZJournal*> (pJournal);
+    ZSJournal* wJournal = static_cast<ZSJournal*> (pJournal);
     fprintf (stderr,
              " ZJournal::process-I- Starting journal processing. File is %s\n",
              wJournal->getURIContent().toString());
@@ -449,7 +448,7 @@ ZDataBuffer wJournalRecord;
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                 wSt,
                                 Severity_Fatal,
-                                " while opening journaling file for ZMasterFile %s",
+                                " while opening journaling file for ZSMasterFile %s",
                                 wJournal->Father->getURIContent().toString());
         ZException.Thread_exit_abort();
         }
@@ -488,7 +487,7 @@ ZDataBuffer wJournalRecord;
 }// process
 
 ZStatus
-ZJournal::getEvent(zrank_type pRank,ZJEvent pEvent)
+ZSJournal::getEvent(zrank_type pRank,ZJEvent pEvent)
 {
 ZDataBuffer wBuffer;
 ZStatus wSt;
@@ -497,7 +496,7 @@ ZStatus wSt;
 }
 
 ZStatus
-ZJournal::report (FILE* pOutput)
+ZSJournal::report (FILE* pOutput)
 {
 long wRank;
 ZJEvent wEvent;
@@ -521,7 +520,7 @@ ZDataBuffer wFieldAfter;
 
     fprintf (pOutput,
              "Rank| %60s |  Content dump |\n"
-             "    |   Pid   |   Uid  |  Username  |  Date and time | \n",
+             "    |   Pid   |   Uid  | Operation |  Date and time | rank    | address   |\n"
              "Header data");
 
     while (zgetNext(wRecord)==ZS_SUCCESS)
@@ -533,14 +532,13 @@ ZDataBuffer wFieldAfter;
             wFieldBefore.dumpHexa(0,30,wLineHexa,wLineChar);
             wFieldAfter.dumpHexa(0,30,wLineHexa2,wLineChar2);
             fprintf (pOutput,
-                     "%3ld|%6ld|%6ld|%20s|%17s|%10s|%3ld|%6lld|%6ld|%s %s\n",
+                     "%3ld|%6ld|%6s|%20s|%10s|%3ld|%6lld|%6ld|%s %s\n",
                      wRank,
                      wEvent.Header.Pid,
-                     wEvent.Header.Uid,
-                     wEvent.Header.Username,
-                     wEvent.Header.DateTime.toLocaleFormatted(),
-                     wEvent.Header.DateTime,
+                     wEvent.Header.Uid.toString().toCChar(),
+//                     wEvent.Header.Username.toCChar(),
                      decode_ZJOP(wEvent.Header.Operation),
+                     wEvent.Header.DateTime.toLocale().toCChar(),
                      wEvent.Header.Rank,
                      wEvent.Header.Address,
                      wEvent.Header.Offset,
@@ -553,14 +551,13 @@ ZDataBuffer wFieldAfter;
 
     wEvent.dumpHexa(0,30,wLineHexa,wLineChar);
     fprintf (pOutput,
-             "%3ld|%6ld|%6ld|%20s|%17s|%10s|%3ld|%6lld|%6ld|%s %s\n",
+             "%3ld|%6ld|%6s|%20s|%10s|%3ld|%6lld|%6ld|%s %s\n",
              wRank,
              wEvent.Header.Pid,
-             wEvent.Header.Uid,
-             wEvent.Header.Username,
-             wEvent.Header.DateTime.toLocaleFormatted(),
-             wEvent.Header.DateTime,
+             wEvent.Header.Uid.toString().toCChar(),
+//             wEvent.Header.Username.toCChar(),
              decode_ZJOP(wEvent.Header.Operation),
+             wEvent.Header.DateTime.toLocale().toCChar(),
              wEvent.Header.Rank,
              wEvent.Header.Address,
              wEvent.Header.Offset,
@@ -574,7 +571,7 @@ ZDataBuffer wFieldAfter;
 ZStatus
 generateJournalName(uriString &pZMFName,uriString &pJournalingPath, uriString& pJournalName)
 {
-//descString wBase;
+//utfdescString wBase;
 //uriString wJournalName;
     if (!pJournalingPath.isEmpty())
         if (!pJournalingPath.isDirectory())
@@ -587,18 +584,19 @@ generateJournalName(uriString &pZMFName,uriString &pJournalingPath, uriString& p
              return ZS_NOTDIRECTORY;
             }
 //    wBase=pZMFName.getRootBasename();
+//    utfdescString wDInfo;
     if (pJournalingPath.isEmpty())
-                pJournalName = pZMFName.getDirectoryPath();
+                pJournalName = pZMFName.getDirectoryPath().toCChar();
         else
                 pJournalName = pJournalingPath;
     pJournalName.addConditionalDirectoryDelimiter();
-    pJournalName += pZMFName.getRootBasename();
+    pJournalName += pZMFName.getRootname().toCChar();
     pJournalName += "_jnl.";
     pJournalName += __JOURNAL_EXT__;
     return ZS_SUCCESS;
 }
 
-char * decode_ZJOP (const ZJOperation pOperation)
+const char * decode_ZJOP (const ZJOperation pOperation)
 {
     switch (pOperation)
     {
@@ -643,39 +641,34 @@ char * decode_ZJOP (const ZJOperation pOperation)
 }// decode_ZJOP
 
 
-char*
+const char*
 ZJState::decode (void)
 {
 
     if (State==ZJS_Nothing)
-                return (Buf="ZJS_Nothing").content;
+                return "ZJS_Nothing";
+
 
     if (State&ZJS_Created)
             {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZJS_Created";
+            Buf.addConditionalOR((const utf8_t*) "ZJS_Created");
             }
     if (State&ZJS_Exported)
             {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZJS_Exported";
+            Buf.addConditionalOR((const utf8_t*) "ZJS_Exported");
             }
     if (State&ZJS_RolledBack)
             {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZJS_RolledBack";
+            Buf.addConditionalOR((const utf8_t*) "ZJS_RolledBack");
             }
 
     if (Buf.isEmpty())
                 {
                 return "Unknown ZJState";
                 }
-    return Buf.content;
-
+    return Buf.toCString_Strait();
 }// decode
+
 ZJState &
 ZJState::encode (char *pString)
 {
@@ -688,19 +681,19 @@ ZJState::encode (char *pString)
                 {
                     return *this;
                 }
-descString wBuf;
+utfdescString wBuf;
     wBuf.clear();
-    wBuf = pString;
+    wBuf = (const utf8_t*)pString;
     wBuf.toUpper();
     if (wBuf=="ZJS_NOTHING")
             {
                 return *this;
             }
-    if (Buf.contains("ZJS_CREATED"))
+    if (Buf.contains((utf8_t*)"ZJS_CREATED"))
                      State |= ZJS_Created;
-    if (Buf.contains("ZJS_ROLLEDBACK"))
+    if (Buf.contains((utf8_t*)"ZJS_ROLLEDBACK"))
                      State |= ZJS_RolledBack;
-    if (Buf.contains("ZJS_EXPORTED"))
+    if (Buf.contains((utf8_t*)"ZJS_EXPORTED"))
                      State |= ZJS_Exported;
 
     return *this;
@@ -708,12 +701,12 @@ descString wBuf;
 }// encode
 
 
-char*
+const char*
 ZProtocol::decode (void)
 {
 
     if (Protocol==ZP_Nothing)
-                return (Buf="ZP_Nothing").content;
+                return "ZP_Nothing";
 
     if ((Protocol&ZP_Base)==ZP_Base)
             {
@@ -767,7 +760,7 @@ ZProtocol::decode (void)
                 {
                 return "Unknown ZJProtocol";
                 }
-    return Buf.content;
+    return Buf.toCString_Strait();
 
 }// decode
 
@@ -784,26 +777,26 @@ ZProtocol::encode (const char *pString)
                     return *this;
                 }
     Buf.clear();
-    Buf = pString;
+    Buf = (const utf8_t*)pString;
     Buf.toUpper();
     Buf.Trim();
-    if (Buf=="ZJS_NOTHING")
+    if (Buf==(const utf8_t*)"ZJS_NOTHING")
             {
                 return *this;
             }
-    if (Buf.containsCase("ZP_Base"))
+    if (Buf.containsCase((utf8_t*)"ZP_Base"))
                      Protocol |= ZP_Base;
-    if (Buf.containsCase("ZP_RPC"))
+    if (Buf.containsCase((utf8_t*)"ZP_RPC"))
                      Protocol |= ZP_RPC;
-    if (Buf.containsCase("ZP_Corba"))
+    if (Buf.containsCase((utf8_t*)"ZP_Corba"))
                      Protocol |= ZP_Corba;
-    if (Buf.containsCase("ZP_DBus"))
+    if (Buf.containsCase((utf8_t*)"ZP_DBus"))
                      Protocol |= ZP_DBus;
-    if (Buf.containsCase("ZP_XML-RPC"))
+    if (Buf.containsCase((utf8_t*)"ZP_XML-RPC"))
                      Protocol |= ZP_XMLRPC;
-    if (Buf.containsCase("ZP_SSLV5"))
+    if (Buf.containsCase((utf8_t*)"ZP_SSLV5"))
                      Protocol |= ZP_SSLV5;
-    if (Buf.containsCase("ZP_B64"))
+    if (Buf.containsCase((utf8_t*)"ZP_B64"))
                      Protocol |= ZP_B64;
 
     return *this;
@@ -812,68 +805,5 @@ ZProtocol::encode (const char *pString)
  
 
 
-char*
-ZHAT::decode (void)
-{
-    Buf.clear();
-    if (Type==ZHAT_Nothing)
-                return (Buf="ZHAT_Nothing").content;
-
-    if (Type&ZHAT_IPV6)
-            {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZHAT_IPV6";
-            }
-    if (Type&ZHAT_IPV4)
-            {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZHAT_IPV4";
-            }
-    if (Type&ZHAT_Default)
-            {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZHAT_Default";
-            }
-
-    if (Buf.isEmpty())
-                {
-                return "Unknown ZJState";
-                }
-    return Buf.content;
-
-}// decode
-ZHAT &
-ZHAT::encode (char *pString)
-{
-    Type = ZHAT_Nothing;
-    if (pString==nullptr)
-                {
-                    return *this;
-                }
-    if (strlen(pString)==0)
-                {
-                    return *this;
-                }
-descString wBuf;
-    wBuf.clear();
-    wBuf = pString;
-    wBuf.toUpper();
-    if (wBuf=="ZHAT_Nothing")
-            {
-                return *this;
-            }
-    if (Buf.contains("ZHAT_IPV4"))
-                     Type |= ZHAT_IPV4;
-    if (Buf.contains("ZHAT_IPV6"))
-                     Type |= ZHAT_IPV6;
-    if (Buf.contains("ZHAT_Default"))
-                     Type |= ZHAT_Default;
-
-    return *this;
-
-}// encode
 //! @} JournalingGroup
-#endif // ZJOURNAL_CPP
+#endif // ZSJOURNAL_CPP

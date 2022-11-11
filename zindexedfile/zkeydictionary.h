@@ -3,7 +3,7 @@
 
 #include <ztoolset/zarray.h>
 
-#include <zindexedfile/zsindextype.h>
+#include <zindexedfile/zindextype.h>
 #include <zindexedfile/zindexfield.h>
 #include <QDataStream> /* for Q_DECLARE_METATYPE */
 
@@ -62,12 +62,12 @@ public:
   void serialize();
   void deserialize();
 
-  bool isReversed()
+  bool isReversed() const
   {
     if (EndianCheck==cst_EndianCheck_Reversed) return true;
     return false;
   }
-  bool isNotReversed()
+  bool isNotReversed() const
   {
     if (EndianCheck==cst_EndianCheck_Normal) return true;
     return false;
@@ -197,7 +197,7 @@ public:
       return;
     }
 
-    utf8String toXml(int pLevel, int pRank, bool pComment=false);
+    utf8VaryingString toXml(int pLevel, int pRank, bool pComment=false);
     ZStatus fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog);
 
     /** @brief _export exports current key dictionary in a ZAExport normalized format into a new ZDataBuffer as result

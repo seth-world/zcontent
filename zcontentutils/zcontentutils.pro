@@ -155,9 +155,12 @@ SOURCES += \
     $${ZCONTENT_ROOT}/zcontentutils/zkeydlg.cpp \
     $${ZCONTENT_ROOT}/zcontentutils/zlayout.cpp \
     $${ZCONTENT_ROOT}/zcontentutils/zscan.cpp \
+    filegeneratedlg.cpp \
     main.cpp \
     zcppgenerate.cpp \
-    zdicdlg.cpp
+    zdicdlg.cpp \
+    zfilegenerate.cpp \
+    zrawmasterfilevisu.cpp
 
 
 
@@ -198,8 +201,11 @@ HEADERS += \
     $${ZCONTENT_ROOT}/zcontentutils/zscan.h \
 \
     $${TOOLSET_ROOT}/zcppparser/zcppparserutils/rawfields.h \
+    filegeneratedlg.h \
     zcppgenerate.h \
-    zdicdlg.h
+    zdicdlg.h \
+    zfilegenerate.h \
+    zrawmasterfilevisu.h
 
 
 #    ztypelistbutton.h \
@@ -218,7 +224,10 @@ FORMS += \
     $${ZCONTENT_ROOT}/zcontentutils/zexceptiondlg.ui \
     $${ZCONTENT_ROOT}/zcontentutils/zfielddlg.ui \
     $${ZCONTENT_ROOT}/zcontentutils/zkeydlg.ui \
-    $${ZCONTENT_ROOT}/zcontentutils/zscan.ui
+    $${ZCONTENT_ROOT}/zcontentutils/zscan.ui \
+    ../../zcppparser/zcppparserutils/rawfields.ui \
+    filegeneratedlg.ui \
+    zrawmasterfilevisu.ui
     $${TOOLSET_ROOT}/zcppparser/zcppparserutils/rawfields.ui
 
 
@@ -263,3 +272,9 @@ OLDHEADERS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    ../../zqt/icons/backward.gif \
+    ../../zqt/icons/forward.gif \
+    ../../zqt/icons/tobegin.gif \
+    ../../zqt/icons/toend.gif

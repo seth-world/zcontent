@@ -314,9 +314,9 @@
     <widget class="QPushButton" name="LoadAllBTn">
      <property name="geometry">
       <rect>
-       <x>810</x>
+       <x>800</x>
        <y>97</y>
-       <width>41</width>
+       <width>51</width>
        <height>41</height>
       </rect>
      </property>

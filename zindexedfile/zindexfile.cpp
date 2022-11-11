@@ -112,16 +112,16 @@ ZSIndexControlBlock::zkeyValueExtraction (ZRecord *pRecord, ZDataBuffer& pKey)
 //----------ZIndexFile-----------------------------------------------
 
 
-ZIndexFile::ZIndexFile  (ZMasterFile *pFather): ZRawIndexFile(pFather)
+ZIndexFile::ZIndexFile  (ZRawMasterFile *pFather): ZRawIndexFile(pFather)
 {
 }
 
 
-ZIndexFile::ZIndexFile  (ZMasterFile *pFather, ZIndexControlBlock &pZICB):ZRawIndexFile(pFather,pZICB)
+ZIndexFile::ZIndexFile  (ZRawMasterFile *pFather, ZIndexControlBlock &pZICB):ZRawIndexFile(pFather,pZICB)
 {
 }// ZIF CTOR 2 w
 
-ZIndexFile::ZIndexFile  (ZMasterFile *pFather, ZKeyDictionary *pKDic, int pKeyUniversalsize, const utf8String &pIndexName , ZSort_Type pDuplicates):
+ZIndexFile::ZIndexFile  (ZRawMasterFile *pFather, ZKeyDictionary *pKDic, int pKeyUniversalsize, const utf8String &pIndexName , ZSort_Type pDuplicates):
 ZRawIndexFile(pFather, pKeyUniversalsize, pIndexName , pDuplicates)
 {
   IdxKeyDic=pKDic;
@@ -246,10 +246,10 @@ ZIndexFile::removeIndexValue        (const ZDataBuffer& pKey , zaddress_type &pA
 
 ZStatus         wSt;
 
-ZSIndexCollection wZIRList(this);
+ZIndexCollection wZIRList(this);
 //zaddress_type   wZMFAddress;
 //long            wIndexRank;
-ZSIndexResult wZIR;
+ZIndexResult wZIR;
 
     if (Duplicates == ZST_DUPLICATES)
             {
@@ -660,7 +660,7 @@ ZStatus wSt;
 
 ZOp wZIndexOp;  // for journaling & history purpose
 
-ZSIndexItem* wIndexItem = new ZSIndexItem ;
+ZIndexItem* wIndexItem = new ZIndexItem ;
 
 zrank_type wIndexIdxCommit;
 
@@ -824,7 +824,7 @@ zaddress_type wAddress;
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZIndexFile::_addKeyValue_Prepare(ZSIndexItem *&pIndexItem,
+ZIndexFile::_addKeyValue_Prepare(ZIndexItem *&pIndexItem,
                                  zrank_type &pZBATIndex,
                                  const zaddress_type pZMFAddress)
 {
@@ -832,7 +832,7 @@ ZIndexFile::_addKeyValue_Prepare(ZSIndexItem *&pIndexItem,
 ZStatus wSt;
 //zaddress_type wZMFAddress;
 //zaddress_type wIndexAddress; // not used but necessary for base ZRandomFile class calls
-ZSIndexResult wZIR;
+ZIndexResult wZIR;
 
 ZIFCompare wZIFCompare = ZKeyCompareBinary;
 
@@ -869,10 +869,9 @@ ZIFCompare wZIFCompare = ZKeyCompareBinary;
 #if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
         _Mtx.lock();
 #endif
-    if (ZVerbose)
-            {
-            _DBGPRINT ("_addKeyValue_Prepare : _search return status <%s> rank <%ld>\n", decode_ZStatus(wSt),wZIR.IndexRank);
-            }
+    if (__ZRFVERBOSE__) {
+      _DBGPRINT ("_addKeyValue_Prepare : _search return status <%s> rank <%ld>\n", decode_ZStatus(wSt),wZIR.IndexRank)
+    }
 
     switch (wSt)
             {
@@ -973,7 +972,7 @@ _addKeyValuePrepareReturn:
 
 
 ZStatus
-ZIndexFile::_addKeyValue_Commit(ZSIndexItem *pIndexItem, const zrank_type pZBATIndex)
+ZIndexFile::_addKeyValue_Commit(ZIndexItem *pIndexItem, const zrank_type pZBATIndex)
 {
 ZStatus wSt;
 zaddress_type wAddress; // local index address : of no use there
@@ -1081,7 +1080,7 @@ ZIndexFile::_addKeyValue_HardRollback(const zrank_type pIndexCommit)
 
 ZStatus
 ZIndexFile::_removeKeyValue_Prepare(ZDataBuffer & pKey,
-                                    ZSIndexItem* &pIndexItem,
+                                    ZIndexItem* &pIndexItem,
                                     long& pIndexRank,
                                     zaddress_type &pZMFAddress)
 {
@@ -1089,7 +1088,7 @@ ZIndexFile::_removeKeyValue_Prepare(ZDataBuffer & pKey,
 ZStatus wSt;
 ZResult wRes;
 //zaddress_type wIndexAddress;
-ZSIndexResult wZIResult;
+ZIndexResult wZIResult;
 
 //ZIFCompare         wZIFCompare = ZKeyCompareBinary;
 
@@ -1115,7 +1114,7 @@ ZSIndexResult wZIResult;
 
     pIndexRank=wZIResult.IndexRank ;
 
-    pIndexItem = new ZSIndexItem ;
+    pIndexItem = new ZIndexItem ;
     pIndexItem->Operation=ZO_Erase ;
     pIndexItem->KeyContent = pKey;
     pIndexItem->ZMFaddress = 0 ; // dont know yet
@@ -1136,13 +1135,13 @@ ZSIndexResult wZIResult;
  * @return
  */
 ZStatus
-ZIndexFile::_removeIndexItem_Prepare(ZSIndexItem &pIndexItem,long & pIndexRank)
+ZIndexFile::_removeIndexItem_Prepare(ZIndexItem &pIndexItem,long & pIndexRank)
 {
 
   ZStatus wSt;
   ZResult wRes;
   //zaddress_type wIndexAddress;
-  ZSIndexResult wZIResult;
+  ZIndexResult wZIResult;
 
   //ZIFCompare         wZIFCompare = ZKeyCompareBinary;
 
@@ -1249,7 +1248,7 @@ ZStatus wSt;
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZIndexFile::_removeKeyValue_HardRollback(ZSIndexItem* pIndexItem, const zrank_type pIndexCommit)
+ZIndexFile::_removeKeyValue_HardRollback(ZIndexItem* pIndexItem, const zrank_type pIndexCommit)
 {
 
 
@@ -1415,14 +1414,14 @@ return  ZS_SUCCESS;
 ZStatus
 ZIndexFile::_search( const ZDataBuffer &pKey,
                       ZIndexFile &pZIF,
-                      ZSIndexResult &pZIR,
+                      ZIndexResult &pZIR,
                       const zlockmask_type pLock)
 {
 ZStatus     wSt= ZS_NOTFOUND;
 
 pZIR.IndexRank = 0;
 ZDataBuffer wIndexRecord;
-ZSIndexItem wIndexItem ;
+ZIndexItem wIndexItem ;
 
 ssize_t wCompareSize=0;
 
@@ -1614,16 +1613,16 @@ _search_Return:
  */
 ZStatus
 ZIndexFile::_searchAll(const ZDataBuffer        &pKey,     // key content to find out in index
-                       ZIndexFile               &pZIF,     // pointer to ZIndexControlBlock containing index description
-                       ZSIndexCollection &pCollection,
+                       ZRawIndexFile               &pZIF,     // pointer to ZIndexControlBlock containing index description
+                       ZIndexCollection &pCollection,
                        const ZMatchSize_type    pZMS)
 {
 
 
 ZStatus     wSt=ZS_NOTFOUND;
 //long        wIndexRank;
-ZSIndexResult wZIR;
-ZSIndexItem wIndexItem ;
+ZIndexResult wZIR;
+ZIndexItem wIndexItem ;
 ZDataBuffer wIndexRecord;
 
 ZIFCompare wZIFCompare=ZKeyCompareBinary;
@@ -1884,9 +1883,9 @@ _searchAllError:
  */
 ZStatus
 ZIndexFile::_searchFirst(const ZDataBuffer        &pKey,     // key content to find out in index
-                         ZIndexFile               &pZIF,     // pointer to ZIndexControlBlock containing index description
-                         ZSIndexCollection         *pCollection,
-                         ZSIndexResult             &pZIR,
+                         ZRawIndexFile            &pZIF,     // pointer to ZIndexControlBlock containing index description
+                         ZIndexCollection        *pCollection,
+                         ZIndexResult            &pZIR,
                          const ZMatchSize_type    pZMS)
 
 {
@@ -1894,7 +1893,7 @@ ZIndexFile::_searchFirst(const ZDataBuffer        &pKey,     // key content to f
 
 ZStatus     wSt=ZS_NOTFOUND;
 //long        wIndexRank;
-ZSIndexItem wIndexItem ;
+ZIndexItem wIndexItem ;
 ZDataBuffer wIndexRecord;
 
 ZIFCompare wZIFCompare=ZKeyCompareBinary; // comparison routine is deduced from Dictionary Key field type
@@ -1933,7 +1932,7 @@ zrank_type wpivot;
 
 
 
-    pCollection=new ZSIndexCollection (&pZIF); // initialize all and create ZSIndexCollection instance
+    pCollection=new ZIndexCollection (&pZIF); // initialize all and create ZSIndexCollection instance
     pCollection->Context.setup (pKey,
                                 nullptr,
                                 wZIFCompare,
@@ -2103,11 +2102,11 @@ _searchFirstBackProcess:
  * - ZS_NOTFOUND if key value is not found in the middle of index values set
  */
 ZStatus
-ZIndexFile::_searchNext (ZSIndexResult       &pZIR,
-                         ZSIndexCollection*  pCollection)
+ZIndexFile::_searchNext (ZIndexResult       &pZIR,
+                         ZIndexCollection*  pCollection)
 {
 
-ZSIndexItem wIndexItem ;
+ZIndexItem wIndexItem ;
 ZDataBuffer wIndexRecord;
 
 //
@@ -2199,13 +2198,13 @@ ZStatus
 ZIndexFile::_searchIntervalAll  (const ZDataBuffer      &pKeyLow,  // Lowest key content value to find out in index
                                  const ZDataBuffer      &pKeyHigh, // Highest key content value to find out in index
                                  ZIndexFile             &pZIF,     // pointer to ZIndexControlBlock containing index description
-                                 ZSIndexCollection       *pCollection,   // enriched collection of reference (ZIndexFile rank, ZMasterFile record address)
+                                 ZIndexCollection       *pCollection,   // enriched collection of reference (ZIndexFile rank, ZMasterFile record address)
                                  const bool             pExclude) // Exclude KeyLow and KeyHigh value from selection (i. e. > pKeyLow and < pKeyHigh)
 {
 
 
 ZStatus      wSt;
-ZSIndexResult wZIR;
+ZIndexResult wZIR;
 
     wSt=_searchIntervalFirst(pKeyLow,
                              pKeyHigh,
@@ -2239,14 +2238,14 @@ ZStatus
 ZIndexFile::_searchIntervalFirst(const ZDataBuffer      &pKeyLow,  // Lowest key content value to find out in index
                                  const ZDataBuffer      &pKeyHigh, // Highest key content value to find out in index
                                  ZIndexFile             &pZIF,     // pointer to ZIndexControlBlock containing index description
-                                 ZSIndexCollection       *pCollection,   // enriched collection of reference (ZIndexFile rank, ZMasterFile record address)
-                                 ZSIndexResult           &pZIR,
+                                 ZIndexCollection       *pCollection,   // enriched collection of reference (ZIndexFile rank, ZMasterFile record address)
+                                 ZIndexResult           &pZIR,
                                  const bool             pExclude)// Exclude KeyLow and KeyHigh value from selection (i. e. > pKeyLow and < pKeyHigh)
 
 {
 
 
-ZSIndexItem wIndexItem ;
+ZIndexItem wIndexItem ;
 ZDataBuffer wIndexRecord;
 
 ZIFCompare wZIFCompare=ZKeyCompareBinary; // comparison routine is deduced from Dictionary Key field type
@@ -2283,7 +2282,7 @@ zrank_type wpivot;
     if (wCompareSize> pZIF.KeyUniversalSize)
                 wCompareSize=pZIF.KeyUniversalSize;
 
-    pCollection=new ZSIndexCollection (&pZIF);
+    pCollection=new ZIndexCollection (&pZIF);
 
     pCollection->Context.setup (pKeyLow,&pKeyHigh,wZIFCompare,wCompareSize); // initialize all and create ZSIndexCollection instance
     pCollection->setStatus(ZS_NOTFOUND) ;
@@ -2479,12 +2478,12 @@ _searchIntervalFirstBackProcess:
  * @return
  */
 ZStatus
-ZIndexFile::_searchIntervalNext (ZSIndexResult       &pZIR,
-                                 ZSIndexCollection*  pCollection)
+ZIndexFile::_searchIntervalNext (ZIndexResult       &pZIR,
+                                 ZIndexCollection*  pCollection)
 {
 
 
-ZSIndexItem wIndexItem ;
+ZIndexItem wIndexItem ;
 ZDataBuffer wIndexRecord;
 
 //

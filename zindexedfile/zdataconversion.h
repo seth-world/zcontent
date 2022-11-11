@@ -19,14 +19,17 @@
 
 size_t getAtomicNaturalSize(const ZTypeBase pType);
 size_t getAtomicUniversalSize(const ZTypeBase pType);
+/* Arrays and Pointers are not managed here */
+size_t getURFHeaderSize(ZTypeBase pZType);
 
+#ifdef __COMMENT__
 template <class _Tp>
 size_t getAtomicURFSize(ZTypeBase pType) ;
-size_t  _getURFHeaderSize (ZTypeBase &pZType);
 template <class _Tp>
 size_t getAtomicNaturalSize_T(_Tp pValue);
 template <class _Tp>
 size_t getAtomicUniversalSize_T(_Tp pValue);
+#endif // __COMMENT__
 
 ZStatus _getURFHeaderData(const unsigned char* pURF_Ptr,
     ZTypeBase &pZType,

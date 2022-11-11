@@ -90,7 +90,7 @@ createMasterFileFromXml(const char* pXMLPath,
     bool pReplace, bool pCheckHash,
     const char* pLogfile);
 
-
+#ifdef __DEPRECATED__
 /**
  * @brief ZRawMasterFile::zapplyXMLFileDefinition Tests or applies an xml file give by pFilePath to change parameters of an <b>existing</b> file
  * @param[in] pXMLPath         a valid file path pointing to an xml file full definition
@@ -116,7 +116,7 @@ applyXmltoFile(const char* pXMLPath,
 
 ZStatus
 applyXMLDictionaryChange(ZRawMasterFile* pMasterFile, zxmlElement* pRoot,bool pRealRun,ZaiErrors* pMessageLog);
-
+#endif //__DEPRECATED__
 /**
  * @brief createZRandomFileFromXml loads an Xml definition, checks it, and if valid, creates or replaces(depending on pReplace) a ZRandomFile with loaded parameters.
  * @param pXMLPath

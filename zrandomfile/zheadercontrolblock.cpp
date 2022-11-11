@@ -11,7 +11,7 @@ void ZHeaderControlBlock::clear(void)
 {
   memset(this,0,sizeof(ZHeaderControlBlock));
   //    StartSign=cst_ZSTART;
-  //    BlockID = ZBID_FileHeader ;
+  //    BlockId = ZBID_FileHeader ;
   //    ZRFVersion=__ZRF_VERSION__;
   //    EndSign=cst_ZEND;
   OffsetReserved = sizeof(ZHeaderControlBlock_Export); // because Reserved block just starts after ZHeaderControlBlock
@@ -37,15 +37,17 @@ ZHeaderControlBlock::_fromHCBE(const ZHeaderControlBlock_Export* pIn)
   SizeReserved = pIn->SizeReserved;
   Lock = pIn->Lock;
   LockOwner = pIn->LockOwner;
+  return *this;
 }
 
-ZDataBuffer&
+size_t
 ZHeaderControlBlock::_exportAppend(ZDataBuffer& pZDBExport)
 {
   ZHeaderControlBlock_Export wHCBe;
   wHCBe.set(*this);
   wHCBe.serialize();
-  return pZDBExport.appendData(&wHCBe,sizeof(wHCBe));
+  pZDBExport.appendData(&wHCBe,sizeof(wHCBe));
+  return sizeof(wHCBe);
 }
 
 
@@ -54,7 +56,7 @@ ZHeaderControlBlock_Export&
 ZHeaderControlBlock_Export::_copyFrom(ZHeaderControlBlock_Export& pIn)
 {
   StartSign=pIn.StartSign;
-  BlockID=pIn.BlockID;
+  BlockId=pIn.BlockId;
   EndianCheck=pIn.EndianCheck;
 
   ZRFVersion=pIn.ZRFVersion;
@@ -151,7 +153,7 @@ ZHeaderControlBlock_Export::_convert()
 {
   if (!is_little_endian())
     return ;
-/* BlockID (byte), StartSign EndSign(palyndromas) do not need to be reversed */
+/* BlockId (byte), StartSign EndSign(palyndromas) do not need to be reversed */
 
   EndianCheck=reverseByteOrder_Conditional<uint16_t>(EndianCheck);
   ZRFVersion=reverseByteOrder_Conditional<unsigned long>(ZRFVersion);
@@ -171,14 +173,14 @@ ZHeaderControlBlock::_import(const unsigned char *&pPtrIn)
   wHCBe.setFromPtr(pPtrIn);
   wHCBe.deserialize();
 
-  if ((wHCBe.BlockID!=ZBID_FileHeader)||(wHCBe.StartSign!=cst_ZBLOCKSTART))
+  if ((wHCBe.BlockId!=ZBID_HCB)||(wHCBe.StartSign!=cst_ZBLOCKSTART))
   {
     ZException.setMessage("ZHeaderControlBlock::_import",
         ZS_BADFILEHEADER,
         Severity_Severe,
-        "invalid header block content found Start marker <%X> ZBlockID <%X>. One of these is invalid (or both are).",
+        "invalid header block content found Start marker <%X> ZBlockId <%X>. One of these is invalid (or both are).",
         wHCBe.StartSign,
-        wHCBe.BlockID);
+        wHCBe.BlockId);
     return  ZS_BADFILEHEADER;
   }
   if (wHCBe.ZRFVersion!=__ZRF_VERSION__)

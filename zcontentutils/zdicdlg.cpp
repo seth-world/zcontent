@@ -232,7 +232,6 @@ ZDicDLg::getDicActive(long pRank) {
   wActiveCHk->setChecked(DicList[pRank]->Active);
 
   QHBoxLayout* QHLBtn=new QHBoxLayout;
-  QHLBtn->setObjectName("QHLBtn");
   QVL->insertLayout(2,QHLBtn);
 
   QPushButton* wOk=new QPushButton(QObject::tr("Ok","DicEdit"),&wDicNameDLg);

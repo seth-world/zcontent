@@ -4,14 +4,64 @@
 #include <ztoolset/zstatus.h>
 #include <ztoolset/zarray.h>
 #include <ztoolset/zbitset.h>
-#include <zindexedfile/zsindexitem.h>
+#include <zindexedfile/zindexitem.h>
 
-
+/*
+ *  Content : must hold the genuine record content
+ *
+ *  KeyValue[0..n]->KeyContent  Array that must hold the genuine key value (0 for primary key up to n )
+ *
+ *
+ * FieldPresence bitset is set by ZSMasterFile.
+ * Raw master file does not use FieldPresence :
+ *  all fields are managed by application and therefore :
+ *  - fieldPresence is set to nullptr
+ *  - all fields are reputated to be present within record.
+ *
+ *
+ * This setup is done using :
+ *  ZRawRecord::Content : this ZDataBuffer contains record data in universal format
+ *
+ *  ZRawRecord::KeyValue [0..n] -> KeyContent : for each defined key, contains Key content as it will be written to index file.
+ *
+ * This routine returns a ZDataBuffer, ready to be written to main file, with the following structure :
+ *
+ *  cst_ZBLOCKSTART  (uint32_t) | Added by ZRandom Block routine :
+ *  ZBID_Data         0x10      |
+ *  ----------------
+ *  |
+ *  |  ------------------------
+ *  |    FieldPresence (ZType_bitset)  (bitset in URF format)
+ *  |  or
+ *  |    ZType_bitsetFull (uint32_t)
+ *  |  ------------------------
+ *  |  Record raw content size     (uint64_t)
+ *  |  ------------------------
+ *  |  Record raw content (universal values (not URF))
+ *  |  -------------------------
+ *  --------------
+ *  uint32_t number of keys
+ *  --------------
+ *  Key 0 content
+ *    key canonical size  (uint32_t)
+ *    key content (pure universal values (not URF) : values we can sort on )
+ *  -------------
+ *  Key 1 content
+ *  -------------
+ *  ...
+ *  Key n content
+ *  -------------
+ *
+ * cst_ZBLOCKEND  (uint32_t)
+ *
+ */
 
 
 namespace zbs {
 
 class ZRawMasterFile;
+
+
 
 class ZRawRecord
 {
@@ -45,14 +95,14 @@ public:
       (no dictionary no presence)       with master dictionary
 
 
-      uint32_t        ZType_bitsetFull                  ZType_bitset
-                              \            [...]    Zbitset content
-                               \                   /
+      uint32_t        ZType_bitsetFull               ZType_bitset
+                        All fields present [...]    Zbitset content
+                               \                    /
                                 \                 /
       uint64_t                  record content size
 
       ...                       RECORD EFFECTIVE CONTENT
-
+                                    URF format
 
       uint32_t                    Number of key contents
 
@@ -94,7 +144,7 @@ public:
   ZBitset                   FieldPresence;
   ZDataBuffer               RawContent;  /* what is written on the file : bitset, content, keys */
   ZDataBuffer               Content;     /* the record content */
-  ZSIndexItemList           KeyValue;   /* key values to be written in RawContent and in index files */
+  ZIndexItemList           KeyValue;   /* key values to be written in RawContent and in index files */
 
   long                    Rank=0L;      /* ZBAT rank */
   zaddress_type           Address=0L;   /* logical address (used with ZRandomFile::zget) */

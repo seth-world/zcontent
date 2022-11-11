@@ -4,7 +4,7 @@
 
 //#include <zindexedfile/zkeydictionary.h>  // no dic in index control block
 //#include <zindexedfile/zrecord.h>
-#include <zindexedfile/zsindextype.h>
+#include <zindexedfile/zindextype.h>
 #include <zindexedfile/zindexdata.h>
 
 namespace zbs {
@@ -17,22 +17,25 @@ namespace zbs {
 #pragma pack(push)
 #pragma pack(1)
 
-class ZSICBOwnData;
-class ZSICB_Export{
+class ZICBOwnData;
+class ZICB_Export{
 public:
-  ZSICB_Export() {}
-  ZSICB_Export(const ZSICB_Export& pIn) { _copyFrom(pIn);}
+  ZICB_Export() {}
+  ZICB_Export(const ZICB_Export& pIn) { _copyFrom(pIn);}
 
-  ZSICB_Export& _copyFrom(const ZSICB_Export& pIn);
-  ZSICB_Export& set(const ZSICBOwnData *pIn);
+  ZICB_Export& _copyFrom(const ZICB_Export& pIn);
+  ZICB_Export& set(const ZICBOwnData *pIn);
 
-  ZSICB_Export& operator = (const ZSICB_Export& pIn) {return  _copyFrom(pIn);}
+  ZICB_Export& operator = (const ZICB_Export& pIn) {return  _copyFrom(pIn);}
 
+  bool isValid() const {
+    return (StartSign==cst_ZBLOCKSTART) && (BlockId==ZBID_ICB) && (EndianCheck==cst_EndianCheck_Normal);
+  }
 
   uint32_t      StartSign = cst_ZBLOCKSTART ;    // ZICB block start marker
-  ZBlockID      BlockId   = ZBID_ICB;            // must be ZBID_ICB
+  ZBlockId      BlockId   = ZBID_ICB;            // must be ZBID_ICB
   uint16_t      EndianCheck = cst_EndianCheck_Normal;
-  uint32_t      ZMFVersion= __ZMF_VERSION__ ;    // Self explainatory
+  unsigned long ZMFVersion= __ZMF_VERSION__ ;    // Self explainatory
 
   uint32_t      ICBTotalSize=0;    // ICB total size when written in file header (ZReserved header section size) this field must preceed ICB export content
   int32_t       ZKDicOffset;       // offset to ZDictionary (taking varying sized Index Name into account) or -1 if no key dictionary
@@ -43,10 +46,10 @@ public:
 //  uint8_t                 AutoRebuild=false;  //!< RFFU
   ZSort_Type    Duplicates;         //!< Index key is allowing duplicates (ZST_DUPLICATES) or is not allowing duplicates (ZST_NODUPLICATES)
 
-  ZSICB_Export& setFromPtr(const unsigned char* &pPtrIn)
+  ZICB_Export& setFromPtr(const unsigned char* &pPtrIn)
   {
-    memmove (this,pPtrIn,sizeof(ZSICB_Export));
-    pPtrIn += sizeof(ZSICB_Export);
+    memmove (this,pPtrIn,sizeof(ZICB_Export));
+    pPtrIn += sizeof(ZICB_Export);
     return *this;
   }
 
@@ -54,21 +57,21 @@ public:
   void serialize();
   void deserialize();
 
-  bool isReversed() {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
-  bool isNotReversed() {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
+  bool isReversed() const  {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
+  bool isNotReversed() const {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
 
   void clear();
 };
 #pragma pack(pop)
 
-class ZSICBOwnData{
+class ZICBOwnData{
 public:
-  ZSICBOwnData& _copyFrom(const ZSICBOwnData& pIn) ;
-  ZSICBOwnData() {}
-  ZSICBOwnData(const ZSICBOwnData& pIn) {_copyFrom(pIn);}
-  ZSICBOwnData(const ZSICBOwnData&& pIn) {_copyFrom(pIn);}
+  ZICBOwnData& _copyFrom(const ZICBOwnData& pIn) ;
+  ZICBOwnData() {}
+  ZICBOwnData(const ZICBOwnData& pIn) {_copyFrom(pIn);}
+  ZICBOwnData(const ZICBOwnData&& pIn) {_copyFrom(pIn);}
 
-  ZSICBOwnData&  operator = (const ZSICBOwnData& pIn) {return _copyFrom(pIn);}
+  ZICBOwnData&  operator = (const ZICBOwnData& pIn) {return _copyFrom(pIn);}
 
 // the values below are only exported and not stored
 //  uint32_t            ICBTotalSize;      //!< ICB (ZSICBOwnData_Export+ Name varying string length + ZKDic export size) size when written in file header (ZReserved header field)
@@ -79,9 +82,12 @@ public:
 
   ZSort_Type              Duplicates=ZST_NODUPLICATES;// Index key is allowing duplicates (ZST_DUPLICATES) or is not allowing duplicates (ZST_NODUPLICATES)
   uint32_t                KeyUniversalSize=0;         // total of key size with internal format (in line with ZKDic when exists)
-  utf8String              IndexName;                  // Index user name
+  utf8VaryingString       IndexName;                  // Index user name
   uriString               URIIndex;                   // Index file name
   long                    IndexRank=0;                // self explainatory
+
+
+  utf8VaryingString getURIIndex() {return URIIndex;}
 
   utf8String toXml(int pLevel);
   ZStatus fromXml(zxmlNode* pIndexRankNode,ZaiErrors* pErrorlog);
@@ -104,7 +110,7 @@ public:
  /* ZIndexControlBlock is used to managed raw index.
   * It has no key dictionary definition : key dictionary is stored with ZMFDictionary when it exists. */
 
-class ZIndexControlBlock : public ZSICBOwnData
+class ZIndexControlBlock : public ZICBOwnData
 {
 
 public:
@@ -113,9 +119,9 @@ public:
   ZIndexControlBlock() {}
 
   ~ZIndexControlBlock(void);
-  ZIndexControlBlock(const ZIndexControlBlock& pIn):ZSICBOwnData(pIn) {_copyFrom(pIn);}
-  ZIndexControlBlock(const ZIndexControlBlock&& pIn):ZSICBOwnData(pIn) {_copyFrom(pIn);}
-  ZIndexControlBlock&  operator = (const ZIndexControlBlock& pIn) {ZSICBOwnData::_copyFrom(pIn); return _copyFrom(pIn);}
+  ZIndexControlBlock(const ZIndexControlBlock& pIn):ZICBOwnData(pIn) {_copyFrom(pIn);}
+  ZIndexControlBlock(const ZIndexControlBlock&& pIn):ZICBOwnData(pIn) {_copyFrom(pIn);}
+  ZIndexControlBlock&  operator = (const ZIndexControlBlock& pIn) {ZICBOwnData::_copyFrom(pIn); return _copyFrom(pIn);}
 
 //  void setDictionary (ZMFDictionary* pDic) {Dictionary=pDic;}
   ZKeyDictionary         *IdxKeyDic = nullptr ; // Fields dictionary for the key :                                          // a pointer that is instantiated by new and destroyed when ZICB rank is removed
@@ -130,8 +136,7 @@ public:
 
 //  void newKeyDic(ZSKeyDictionary *pZKDic, ZMetaDic *pMetaDic);
 
-
-  ZDataBuffer&_exportAppend(ZDataBuffer &pICBContent) ;
+  size_t _exportAppend(ZDataBuffer &pICBContent) ;
   ZDataBuffer _export() ;
 /*  no dictionary in icb
  *

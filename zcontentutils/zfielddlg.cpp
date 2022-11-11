@@ -127,7 +127,7 @@ ZFieldDLg::ZTypeListClicked()
   ui->ZTypeStrLEd->setText(decode_ZType(Field.ZType));
   ui->ZTypeStrLEd->setReadOnly(true);
 
-  Field.HeaderSize = _getURFHeaderSize(Field.ZType);
+  Field.HeaderSize = getURFHeaderSize(Field.ZType);
   wStr.sprintf("%ld",Field.HeaderSize);
   ui->HeaderSizeLEd->setText(wStr.toCChar());
 
@@ -228,7 +228,7 @@ ZFieldDLg::ComputeClicked()
 {
   refresh();
   Field.computeMd5();
-  ui->HashcodeLEd->setText(Field.Hash.toHexa().toChar());
+  ui->HashcodeLEd->setText(Field.Hash.toHexa().toCChar());
 //  ui->HashIconLBl->setScaledContents(true);
 //  ui->HashIconLBl->setPixmap(HashOKPXm);
 }
@@ -312,7 +312,7 @@ void ZFieldDLg::setup(ZFieldDescription &pField, bool pRawFields)
 
   ui->HashcodeFRm->setVisible(!RawField);
 
-  ui->HashcodeLEd->setText(pField.Hash.toHexa().toChar());
+  ui->HashcodeLEd->setText(pField.Hash.toHexa().toCChar());
   ui->HashcodeLEd->setReadOnly(true);
 
   ui->FieldNameLEd->setText(pField.getName().toCChar());
@@ -360,7 +360,7 @@ void ZFieldDLg::setCreate( )
   wStr.sprintf("%ld",Field.Capacity);
   ui->CapacityLEd->setText(wStr.toCChar());
 
-  ui->HashcodeLEd->setText(Field.Hash.toHexa().toChar());
+  ui->HashcodeLEd->setText(Field.Hash.toHexa().toCChar());
   ui->HashcodeLEd->setReadOnly(true);
 
   ui->FieldNameLEd->setText(Field.getName().toCChar());
@@ -433,14 +433,20 @@ bool ZFieldDLg::controlField() {
         "Field type 0x%08X <%s> is invalid. Please enter a valid field type.",Field.ZType,decode_ZType(Field.ZType));
     return false;
   }
-  if (Field.HeaderSize!=_getURFHeaderSize(Field.ZType))
+  if (Field.HeaderSize!=getURFHeaderSize(Field.ZType))
     {
     int wRet=ZExceptionDLg::message2B("ZFieldDLg::controlField",ZS_INVVALUE,Severity_Warning, "Force","Modify",
-        "Field type 0x%08X <%s> has a specified header size of <%ld> while you entered <%ld>. Please confirm.",
+        "Field type 0x%08X <%s> has a specified header size of <%ld> while you entered <%ld>.\n"
+        " Please confirm <Force> or set to standard value <Modify>.",
         Field.ZType,decode_ZType(Field.ZType),
-        _getURFHeaderSize(Field.ZType),Field.HeaderSize);
-    if (wRet==QDialog::Rejected)
-      return false;
+        getURFHeaderSize(Field.ZType),Field.HeaderSize);
+      if (wRet==QDialog::Accepted) {
+        Field.HeaderSize = getURFHeaderSize(Field.ZType);
+        utf8VaryingString wStr;
+        wStr.sprintf("%ld",Field.HeaderSize);
+        ui->HeaderSizeLEd->setText(wStr.toCChar());
+        return true;
+      }
     return true;
     }
 /*

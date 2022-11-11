@@ -109,6 +109,7 @@ public:
 };
 
 class ZMFDictionary;
+
 /**
  * @brief The ZRecordDic class Record dictionary
  * According the fact that each record may have varying sized field and that fields may be present or not record per record,
@@ -243,7 +244,7 @@ class ZMasterControlBlock;
 class ZRecord : public ZRawRecord
 {
 public:
-    ZRecord(ZMasterFile *pMCB);
+    ZRecord(ZRawMasterFile *pMCB);
     ZRecord& operator = (const ZDataBuffer &pDataBuffer)
     {
       Content.reset();

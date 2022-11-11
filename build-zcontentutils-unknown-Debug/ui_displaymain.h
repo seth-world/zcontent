@@ -75,7 +75,7 @@ public:
         ClosedLBl->setFont(font);
         displayTBv = new QTableView(centralwidget);
         displayTBv->setObjectName(QString::fromUtf8("displayTBv"));
-        displayTBv->setGeometry(QRect(0, 110, 621, 461));
+        displayTBv->setGeometry(QRect(0, 110, 621, 431));
         DisplayMain->setCentralWidget(centralwidget);
         statusbar = new QStatusBar(DisplayMain);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
@@ -91,8 +91,8 @@ public:
         DisplayMain->setWindowTitle(QCoreApplication::translate("DisplayMain", "MainWindow", nullptr));
         label->setText(QCoreApplication::translate("DisplayMain", "Offset", nullptr));
         OffsetLBl->setText(QCoreApplication::translate("DisplayMain", "Offset value", nullptr));
-        label_2->setText(QCoreApplication::translate("DisplayMain", "Entity", nullptr));
-        ZEntityLBl->setText(QCoreApplication::translate("DisplayMain", "ZEntity", nullptr));
+        label_2->setText(QString());
+        ZEntityLBl->setText(QString());
         ClosedLBl->setText(QCoreApplication::translate("DisplayMain", "No Open File", nullptr));
     } // retranslateUi
 

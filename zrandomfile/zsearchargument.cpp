@@ -1,14 +1,17 @@
-#ifndef ZSEARCHARGUMENT_CPP
-#define ZSEARCHARGUMENT_CPP
+#ifndef ZSSEARCHARGUMENT_CPP
+#define ZSSEARCHARGUMENT_CPP
 #include <zrandomfile/zsearchargument.h>
 #include <ztoolset/zexceptionmin.h>
+
 #include <ztoolset/zutfstrings.h> // for utfmessageString
+
+#include <ztoolset/zmem.h>
 
 using namespace zbs;
 
-//---------------ZSearchArgument---------------------------------------------------
+//---------------ZSSearchArgument---------------------------------------------------
 /**
- * @brief ZSearchArgument::add Adds a new search rule
+ * @brief ZSSearchArgument::add Adds a new search rule
  *
  *  @note it is possible to have multiple rules.
  * Rules are stored in the definition order.
@@ -30,71 +33,82 @@ ZSearchArgument::add(const ssize_t pFieldOffset,
                              const uint16_t pSearchType,
                              const bool pOR)
 {
-     newBlankElement();
-     last().OR = pOR;
+  FreeFieldSearch wNewFFS;
+  wNewFFS.SearchSequence=pSequence;
+  wNewFFS.FieldLength=pFieldLength;
+  wNewFFS.FieldOffset=pFieldOffset;
+  wNewFFS.SequenceSize = wNewFFS.SearchSequence.Size;
+  wNewFFS.SequenceOffset = 0;
+  wNewFFS.SearchType = pSearchType;
 
-     last().FieldLength=pFieldLength;
-     last().FieldOffset=pFieldOffset;
-     last().SequenceSize = pSequence.Size;
-     last().SequenceOffset = 0;
 
-     last().SearchType = pSearchType;
+  wNewFFS.FFS |= FFS_OR;
+  if (wNewFFS.SearchType & ZRFCaseRegardless) {
+    wNewFFS.FFS |= FFS_CaseRegardless;
+    wNewFFS.SearchType =(uint16_t) (wNewFFS.SearchType &  ~ZRFCaseRegardless) ;  // wipe out ZCaseRegardless
+  }
+  if (wNewFFS.SearchType & ZRFString) {
+    wNewFFS.FFS |= FFS_String;
+    wNewFFS.SearchType =(uint16_t)( wNewFFS.SearchType &  ~ZRFString) ;  // wipe out ZRFString
 
-     if (last().SearchType & ZRFCaseRegardless)
-              {
-              last().FCaseRegardless = true;
-              last().SearchType =(ZRFSearch_type) (last().SearchType &  ~ZRFCaseRegardless) ;  // wipe out ZCaseRegardless
-              }
-      if (last().SearchType & ZRFString)
-          {
-          last().FString = true;
-          last().SearchType =(ZRFSearch_type)( last().SearchType &  ~ZRFString) ;  // wipe out ZRFString
+    while ((wNewFFS.SearchSequence.DataChar[wNewFFS.SequenceSize-1]=='\0')&&(wNewFFS.SequenceSize > 0))
+      wNewFFS.SequenceSize--;
+  }
+  if (wNewFFS.SearchType & ZRFTrimspace) {
+    wNewFFS.FFS |= FFS_TrimSpace;
+    wNewFFS.SearchType =(uint16_t)( wNewFFS.SearchType &  ~ZRFTrimspace) ;  // wipe out ZRFTrimspace
 
-          while (pSequence.DataChar[last().SequenceSize-1]=='\0')
-                                                 last().SequenceSize--;
-          }
-    if (last().SearchType & ZRFTrimspace)
-      {
-      last().FTrimSpace = true;
-      last().SearchType =(ZRFSearch_type)( last().SearchType &  ~ZRFTrimspace) ;  // wipe out ZRFTrimspace
+    /* eliminate leading and trailing blank characters */
 
-      while (pSequence.DataChar[last().SequenceSize-1]==' ')
-                                                 last().SequenceSize--;
-      last().SequenceOffset = 0;
-      while (pSequence.DataChar[last().SequenceOffset]==' ')
-                                                 last().SequenceOffset++;
-      }
-    // setting up Size to scan
-    //
-     last().SearchSequence.setData(pSequence.Data+last().SequenceOffset,(last().SequenceSize-last().SequenceOffset));
+    utf8_t* wPtr =  wNewFFS.SearchSequence.Data ;
 
-     if (last().FieldLength<1)  // if pLength is ommitted (either 0 or less)
-         {
-         last().FieldLength = last().SequenceSize ;
-         }
+    utf8_t* wPtrEnd = (wPtr + wNewFFS.SequenceSize - 1);
+    while ((*wPtr == ' ') && (wPtr < wPtrEnd))
+      wPtr++;
+    utf8_t* wPtrBegin = wPtr;
+    wPtr=wPtrEnd;
+    while ((*wPtr == '\0') && (*wPtr == ' ') && (wPtr > wPtrBegin))
+      wPtr--;
+    *wPtr = '\0';
+    wPtrEnd = wPtr;
+
+    size_t wSize = wPtrEnd - wPtrBegin + 1;
+
+    utf8_t* wDup = zmalloc<utf8_t>(wSize);  /* duplicate string to copy */
+    wPtr=wPtrBegin;
+
+    while (wPtr < wPtrEnd) {
+      *wDup++ = *wPtr++;
+    }
+    wNewFFS.SearchSequence.setData(wDup,wSize); /* replace sequence to search */
+    zfree(wDup);
+  } // if (wNewFFS.SearchType & ZRFTrimspace)
+
+  if (wNewFFS.FieldLength < 1) { // if pLength is ommitted (either 0 or less)
+    wNewFFS.FieldLength = wNewFFS.SequenceSize ;
+  }
 
     // optimizing size and compare :
     // if sequence size equals field length, then use ZEqualsTo whatever pSearchType is
 //     if (last().SequenceSize==last().FieldLength)
 //                     last().SearchType = ZRFEqualsTo ;
 
-     if ((last().SearchType==ZRFEqualsTo)&&(last().FieldLength!=last().SequenceSize))
-         {
-         pop();
-         ZException.setMessage(_GET_FUNCTION_NAME_,
+  if ((wNewFFS.SearchType==ZRFEqualsTo)&&(last().FieldLength!=wNewFFS.SequenceSize)) {
+ //        pop();
+    ZException.setMessage(_GET_FUNCTION_NAME_,
                                  ZS_INVSIZE,
                                  Severity_Severe,
                                  "Invalid size of sequence to search <%ld> must be equal to field length <%ld>. Use ZRFStartsWith in place.",
                                  last().SequenceSize,
                                  last().FieldLength
                                  );
-         return ZS_INVSIZE;
-         }
-     return ZS_SUCCESS;
+    return ZS_INVSIZE;
+  }
+  return ZS_SUCCESS;
 }// AddArgument
 
 /**
- * @brief ZSearchArgument::evaluate Evaluates all search condition matching a single give record pRecord
+ * @brief ZSSearchArgument::evaluate Evaluates all search condition matching a single give record pRecord
  *
  * Evaluation is made in the rule storage order (ZArray rank order) from the first stored to the last stored rule.
  *
@@ -130,11 +144,9 @@ ZDataBuffer wFieldContent;
                           Tab[wRank].SearchSequence,
                           Tab[wRank].SequenceSize,
                           Tab[wRank].SearchType,
-                          Tab[wRank].FString,
-                          Tab[wRank].FTrimSpace,
-                          Tab[wRank].FCaseRegardless);
+                          Tab[wRank].FFS);
 
-        if (Tab[wRank].OR)
+        if (Tab[wRank].FFS & FFS_OR)
                 FGlobal = FGlobal | FCurrent ;
             else
                 FGlobal = FGlobal & FCurrent ;
@@ -145,7 +157,7 @@ ZDataBuffer wFieldContent;
 }//evaluate
 
 /**
- * @brief ZSearchArgument::report Dumps the set of rules contained in ZSearchArgument
+ * @brief ZSSearchArgument::report Dumps the set of rules contained in ZSSearchArgument
  * @param[in] pOutput Output to which rules will be reported. Defaulted to stdout->
  */
 void
@@ -161,9 +173,9 @@ ZSearchArgument::report(FILE*pOutput)
     {
     utfmessageString wFlag;
     wFlag.clear();
-    wFlag += Tab[wi].FString?"ZRFString":"Binary";
-    wFlag += Tab[wi].FCaseRegardless?"|ZRFCaseRegardless":"";
-    wFlag += Tab[wi].FTrimSpace?"|ZRFTrimSpaces":"";
+    wFlag += Tab[wi].FFS & FFS_String?"ZRFString":"Binary";
+    wFlag += Tab[wi].FFS & FFS_CaseRegardless?"|ZRFCaseRegardless":"";
+    wFlag += Tab[wi].FFS & FFS_TrimSpace?"|ZRFTrimSpaces":"";
     wFlag += "|";
     wFlag += decode_ZSearchType(Tab[wi].SearchType);
     fprintf(pOutput,
@@ -172,7 +184,7 @@ ZSearchArgument::report(FILE*pOutput)
             Tab[wi].FieldOffset,
             Tab[wi].FieldLength,
             wFlag.toString(),
-            Tab[wi].OR?"OR":"AND");
+            Tab[wi].FFS & FFS_OR?"OR":"AND");
             Tab[wi].SearchSequence.Dump(16,-1,pOutput);
     }// for
 
@@ -180,8 +192,148 @@ ZSearchArgument::report(FILE*pOutput)
 
 
 
-//---------------End ZSearchArgument-------------------------------
+//---------------End ZSSearchArgument-------------------------------
 
 
 
-#endif // ZSEARCHARGUMENT_H
+/**
+ * @brief ZRandomFile::_testSequence test wether a Field content is selected (ZS_FOUND) or not (ZS_NOTFOUND) according the given selection criterias.
+ * @param[in] wFieldContent     Field  (Record segment) to explore
+ * @param[in] pSequence         Sequence to find
+ * @param[in] wSequenceSize     real sequence size according ZRFString conditions or not
+ * @param[in] FString           Are we looking for a string (true) or binary sequence (false)
+ * @param[in] FTrimSpace        Request to trim leading and trailing spaces (true)
+ * @param[in] FCaseregardless   Should we disregard case (true) or not (false)
+ * @param [in]wSearchType       Expurged ZSearch_type  (no ZRFString , no ZRFCaseregardless, no ZRFTrimspace)
+ * @return true if the wFieldContent matches the rule condition - false if not
+ */
+bool
+_testSequence(ZDataBuffer &wFieldContent,           // Field  (Record segment) to explore
+    ZDataBuffer &pSequence,  // Sequence to find
+    ssize_t wSequenceSize,   // real sequence size according ZRFString conditions or not
+    uint16_t wSearchType,    // Expurged ZSearch_type  (no ZRFString , ZRFCaseregardles
+    uint8_t pFFS)
+
+/*                           bool FString,            // Are we looking for a string (true) or binary sequence (false)
+                           bool FTrimSpace,         // Request to trim leading and trailing spaces
+                           bool FCaseregardless)    // should we disregard case (true) or not (false)
+*/
+{
+  ssize_t wLength=wFieldContent.Size;
+  ssize_t wOffset = 0;
+
+  if ((pFFS & FFS_String)&&(wSearchType==ZRFEndsWith))
+  {
+    wLength=wFieldContent.Size;
+    while ((wFieldContent.DataChar[wLength-1]==0)&&(wLength>0))
+      wLength--;
+    if(wLength<wSequenceSize)
+      return false;  // not a match next record
+  }
+
+  if (pFFS & FFS_TrimSpace)
+  {
+    wOffset=0;
+    while (((wFieldContent.DataChar[wOffset])==cst_spaceChar)&&(wOffset < wLength))
+      wOffset++;
+    if (wOffset==wLength)
+      return false;
+  }
+
+  switch (wSearchType)
+  {
+  case ZRFEqualsTo :
+  {
+    if (pFFS & FFS_CaseRegardless)
+    {
+      if (wFieldContent.bstartwithCaseRegardless(pSequence.Data,wSequenceSize,0)==0)
+      {
+        return true;
+      }
+    }// FCaseregardless
+    else
+        if (memcmp(pSequence.Data,wFieldContent.Data,wSequenceSize)==0) // here put analysis of field content
+    {
+      return true;
+      //                            pMRes.ZTabAddress.push (getAddressFromRank(wi));
+    }
+    break;
+  }// ZRFEqualsTo
+  case ZRFStartsWith :
+  {
+    if (pFFS & FFS_CaseRegardless)
+    {
+      if (wFieldContent.bstartwithCaseRegardless(pSequence.Data,wSequenceSize,wOffset)==0)
+      {
+        return true;
+      }
+    }// FCaseregardless
+    else
+        if (memcmp(pSequence.Data,wFieldContent.Data,wSequenceSize)==0) //
+    {
+      return true;
+    }
+    break;
+  }//ZRFStartsWith
+
+  case ZRFEndsWith :
+  {
+    size_t wOffset = wLength + 1 - wSequenceSize;
+    if (pFFS & FFS_CaseRegardless)
+    {
+      if (wFieldContent.bstartwithCaseRegardless(pSequence.Data,wSequenceSize,wOffset)==0)
+      {
+        return true;
+      }
+    }// FCaseregardless
+    else
+        if (memcmp(pSequence.Data,wFieldContent.Data+wOffset,wSequenceSize)==0) //
+    {
+      return true;
+    }
+    break;
+  }//ZRFEndsWith
+
+  case ZRFContains :
+  {
+    if (pFFS & FFS_CaseRegardless)
+    {
+      if (wFieldContent.bsearchCaseRegardless(pSequence.Data,wSequenceSize,0)>=0)
+      {
+        return true;
+      }
+    }
+    else
+        if (wFieldContent.bsearch(pSequence.Data, wSequenceSize,0)>=0)
+    {
+      return true;
+    }
+    break;
+  }//ZRFContains
+
+
+  case ZRFGreaterThan :
+  {
+    if (pFFS & FFS_CaseRegardless)
+    {
+      wFieldContent.toUpper();
+      pSequence.toUpper();
+    }
+    return (memcmp(wFieldContent.Data,pSequence.Data,pSequence.Size)>0);
+  }//ZRFContains
+  case ZRFLessThan :
+  {
+    if (pFFS & FFS_CaseRegardless)
+    {
+      wFieldContent.toUpper();
+      pSequence.toUpper();
+    }
+    return (memcmp(wFieldContent.Data,pSequence.Data,pSequence.Size)<0);
+  }//ZRFContains
+  }//switch
+
+  return false;
+} //_testSequence
+
+
+#endif // ZSSearchArgument_H

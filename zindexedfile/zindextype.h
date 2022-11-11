@@ -1,12 +1,12 @@
 #ifndef ZSINDEXTYPE_H
 #define ZSINDEXTYPE_H
 #include <zconfig.h>
+#include <cstdint>
 
 #include <ztoolset/zerror.h>
 #include <ztoolset/zbasedatatypes.h>
 #include <ztoolset/zexceptionmin.h>
 #include <zrandomfile/zrandomfiletypes.h>
-#include <cstdint>
 
 
 #include <zindexedfile/zmf_limits.h>
@@ -124,7 +124,7 @@ ZStatus wSt;
 class ZIndexField;
 class ZKeyDictionary;
 class ZIndexFile;
-class ZSKey;
+class ZKey;
 
 }// namespace zbs
 
@@ -166,12 +166,12 @@ ZDataBuffer& _printArrayValueFromKey(ZDataBuffer &pKeyData, ZDataBuffer &pOutVal
 
 template <class _Tp>
 ZStatus
-zsetKeyFieldValue (_Tp pValue, ZSKey & pZKey,const long pFieldRank,ssize_t pArraySize);
+zsetKeyFieldValue (_Tp pValue, ZKey & pZKey,const long pFieldRank,ssize_t pArraySize);
 
 template <class _Tp>
 static inline
 ZStatus
-_setKeyFieldValue ( ZSKey &pZKey,const long pFieldRank,_Tp pValue,const long pArrayNumber);
+_setKeyFieldValue ( ZKey &pZKey,const long pFieldRank,_Tp pValue,const long pArrayNumber);
 
 //
 //  Key fields description

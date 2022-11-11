@@ -90,130 +90,6 @@ unix:{
 #                    /usr/local/include/c++/5.3.0  \
 #                $$TOOLSET_ROOT
 
-
-OLDHEADERS += \
-    zconfig.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zarray.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zsortedarray.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/ztoolset_common.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zerror.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zsaatomic.h \
-    $$ZBASESYSTEM_ROOT/zio/zdir.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zsastring.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zsacommon.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zsafiltered.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zfilter.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zfind.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zsahelpers.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zsageneric.h\
-    $$ZBASESYSTEM_ROOT/ztoolset/zjoin.h \
-    $$ZBASESYSTEM_ROOT/zthread/zthread.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zam.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zjoindyn.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zjoinstatic.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zam_include.h \
-    $$ZBASESYSTEM_ROOT/zcrypt/zcrypt.h \
-    $$ZBASESYSTEM_ROOT/zmail/zmailcommon.h \
-    $$ZBASESYSTEM_ROOT/zxml/qxmlutilities.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/ztypes.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zflowutility.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zlockmanager.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zexceptionmin.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zbasedatatypes.h \
-#    $$ZBASESYSTEM_ROOT/treedialog.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zauthorization.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zstrings.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/ztemplatestring.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zdatabuffer.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/uristring.h \
-    $$ZBASESYSTEM_ROOT/zthread/zarglist.h \
-    $$ZBASESYSTEM_ROOT/zthread/zmutex.h \
-    $$ZBASESYSTEM_ROOT/zthread/zmutex_pthread.h \
-    $$ZBASESYSTEM_ROOT/zthread/zmutex_std.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zdate.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/cescapedstring.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zmodulestack.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zlimit.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/ZSystemUser.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/checksum.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/ztime.h \
-    $$ZBASESYSTEM_ROOT/zthread/zthreadexithandler.h \
-    $$ZBASESYSTEM_ROOT/ztoolset/zfunctions.h \
-    ../zrandomfile/zrandomfile.h \
-    ../zrandomfile/zrandomfile_doc.h \
-    ../zrandomfile/zrandomfile_quickstart_doc.h \
-    ../zrandomfile/zrandomfiletypes.h \
-    ../zrandomfile/zrecordaccesstable.h \
-    ../zrandomfile/zrfcollection.h \
-    ../zrandomfile/zrfconfig.h \
-    ../zrandomfile/zsearchargument.h \
-    ../zindexedfile/zicm_todo_test.h \
-    ../zindexedfile/zicmmain_doc.h \
-    ../zindexedfile/zifgeneric.h \
-    ../zindexedfile/zindexcollection.h \
-    ../zindexedfile/zindexfile.h \
-    ../zindexedfile/zindexfile_doc.h \
-    ../zindexedfile/zindextype.h \
-    ../zindexedfile/zjournal.h \
-    ../zindexedfile/zjournal_doc.h \
-    ../zindexedfile/zkey.h \
-    ../zindexedfile/zmasterfile.h \
-    ../zindexedfile/zmasterfile_doc.h \
-    ../zindexedfile/zmasterfile_old.h \
-    ../zindexedfile/zmasterfile_quickstart_doc.h \
-    ../zindexedfile/zmfconfig.h \
-    zconfig.h
-
-HEADERS_OLD1 += \
-    ../common/zcontentconstants.h \
-    ../common/zidentity.h \
-    ../common/zidentity.h \
-    ../common/zlock.h \
-    ../common/zlock.h \
-    ../common/zresult.h \
-    ../zindexedfile/zdatatype.h \
-    ../zindexedfile/zmasterfile_utilities.h \
-    ../zindexedfile/zmetadic.h \
-    ../zindexedfile/zmf_limits.h \
-    ../zindexedfile/znaturalfromurf.h \
-    ../zindexedfile/znaturalfromurf_old.h \
-    ../zindexedfile/zrecord.h \
-    ../zindexedfile/zsifgeneric.h \
-    ../zindexedfile/zsindexcollection.h \
-    ../zindexedfile/zindexfile.h \
-    ../zindexedfile/zsindextype.h \
-    ../zindexedfile/zsjournal.h \
-    ../zindexedfile/zskey.h \
-    ../zindexedfile/zmasterfile.h \
-    ../zindexedfile/zurffromnatural.h \
-    ../zindexedfile/zurffromnatural_old.h \
-    ../zrandomfile/zrandomlockfile.h \
-    ../zrandomfile/zsrfcollection.h \
-    ../zrandomfile/zssearchargument.h \
-    ../zrandomfile/zrandomfile.h \
-    ../zrandomfile/zrandomfile_doc.h \
-    ../zrandomfile/zrandomfile_quickstart_doc.h \
-    ../zrandomfile/zrandomfiletypes.h \
-    ../zrandomfile/zrecordaccesstable.h \
-    ../zrandomfile/zrfcollection.h \
-    ../zrandomfile/zrfconfig.h \
-    ../zrandomfile/zsearchargument.h \
-    ../zindexedfile/zicm_todo_test.h \
-    ../zindexedfile/zicmmain_doc.h \
-#    ../zindexedfile/zifgeneric.h \
-#    ../zindexedfile/zindexcollection.h \
-#    ../zindexedfile/zindexfile.h \
-#    ../zindexedfile/zindextype.h \
-#    ../zindexedfile/zjournal.h \
-#    ../zindexedfile/zkey.h \
-#    ../zindexedfile/zmasterfile.h \
-    ../zindexedfile/zindexfile_doc.h \
-    ../zindexedfile/zmasterfile_doc.h \
-    ../zindexedfile/zjournal_doc.h \
-    ../zindexedfile/zmasterfile_quickstart_doc.h \
-    zconfig.h \
-    ../zindexedfile/zmfconfig.h
-
 HEADERS += \
     ../zcontentcommon/zcontentconstants.h \
     ../zcontentcommon/zidentity.h \
@@ -227,10 +103,16 @@ HEADERS += \
     ../zindexedfile/zdictionaryfile.h \
     ../zindexedfile/zfielddescription.h \
     ../zindexedfile/zfullindexfield.h \
+    ../zindexedfile/zindexcollection.h \
     ../zindexedfile/zindexcontrolblock.h \
     ../zindexedfile/zindexdata.h \
     ../zindexedfile/zindexfield.h \
     ../zindexedfile/zindexfile.h \
+    ../zindexedfile/zindexitem.h \
+    ../zindexedfile/zindextable.h \
+    ../zindexedfile/zindextype.h \
+    ../zindexedfile/zjournal.h \
+    ../zindexedfile/zkey.h \
     ../zindexedfile/zkeydictionary.h \
     ../zindexedfile/zmastercontrolblock.h \
     ../zindexedfile/zmasterfile.h \
@@ -243,30 +125,25 @@ HEADERS += \
     ../zindexedfile/znaturalfromurf.h \
     ../zindexedfile/zrawindexfile.h \
     ../zindexedfile/zrawmasterfile.h \
+    ../zindexedfile/zrawmasterfileutils.h \
     ../zindexedfile/zrawrecord.h \
     ../zindexedfile/zrecord.h \
 #    ../zindexedfile/zsifgeneric.h \
-    ../zindexedfile/zsindexcollection.h \
-    ../zindexedfile/zsindexitem.h \
-    ../zindexedfile/zsindextype.h \
-    ../zindexedfile/zsjournal.h \
     ../zindexedfile/zsjournalcontrolblock.h \
-    ../zindexedfile/zskey.h \
     ../zindexedfile/zurffromnatural.h \
     ../zrandomfile/zblock.h \
     ../zrandomfile/zfilecontrolblock.h \
     ../zrandomfile/zfiledescriptor.h \
     ../zrandomfile/zheadercontrolblock.h \
     ../zrandomfile/zrandomlockfile.h \
+    ../zrandomfile/zrfcollection.h \
     ../zrandomfile/zrfpms.h \
-    ../zrandomfile/zsrfcollection.h \
-    ../zrandomfile/zssearchargument.h \
+    ../zrandomfile/zsearchargument.h \
     ../zrandomfile/zrandomfile.h \
     ../zrandomfile/zrandomfiletypes.h \
     ../zrandomfile/zrecordaccesstable.h \
     ../zrandomfile/zrfcollection.h \
     ../zrandomfile/zrfconfig.h \
-    ../zrandomfile/zsearchargument.h \
     ../zindexedfile/zicm_todo_test.h \
 # documentation
 # Random file documentation
@@ -284,60 +161,6 @@ HEADERS += \
 
 FURTHER_H =     ../zrandomfile/zrandomlockfile.h
 
-OLDSOURCE +=  \
-    $$ZBASESYSTEM_ROOT/ztoolset/zfunctions.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/zam.cpp \
-    $$ZBASESYSTEM_ROOT/zcrypt/zcrypt.cpp \
-    $$ZBASESYSTEM_ROOT/zmail/zmailcommon.cpp \
-    $$ZBASESYSTEM_ROOT/zxml/qxmlutilities.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/ztypes.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/zlockmanager.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/zexceptionmin.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/zbasedatatypes.cpp \
-#    $$ZBASESYSTEM_ROOT/treedialog.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/zstrings.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/ztemplatestring.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/zdatabuffer.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/uristring.cpp \
-    $$ZBASESYSTEM_ROOT/zthread/zmutex.cpp \
-    $$ZBASESYSTEM_ROOT/zthread/zthread.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/zdate.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/cescapedstring.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/zmodulestack.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/ZSystemUser.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/zerror.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/checksum.cpp \
-    $$ZBASESYSTEM_ROOT/zio/zdir.cpp \
-    $$ZBASESYSTEM_ROOT/ztoolset/ztime.cpp \
-    $$ZBASESYSTEM_ROOT/zthread/zthreadexithandler.cpp
-
-SOURCES_OLD += \
-    ../zcontentcommon/zlock.cpp \
-    ../zindexedfile/zdatatype.cpp \
-    ../zindexedfile/zmasterfile_utilities.cpp \
-    ../zindexedfile/zmetadic.cpp \
-    ../zindexedfile/znaturalfromurf.cpp \
-    ../zindexedfile/znaturalfromurf_old.cpp \
-    ../zindexedfile/zrecord.cpp \
-    ../zindexedfile/zsindexcollection.cpp \
-    ../zindexedfile/zindexfile.cpp \
-    ../zindexedfile/zsindextype.cpp \
-    ../zindexedfile/zsjournal.cpp \
-    ../zindexedfile/zskey.cpp \
-    ../zindexedfile/zsmasterfile.cpp \
-    ../zindexedfile/zurffromnatural.cpp \
-    ../zindexedfile/zurffromnatural_old.cpp \
-    ../zrandomfile/zrandomfile.cpp \
-    ../zrandomfile/zrandomlockfile.cpp \
-    ../zrandomfile/zrfcollection.cpp \
-    ../zrandomfile/zsearchargument.cpp \
-    ../zindexedfile/zindexcollection.cpp \
-    ../zindexedfile/zindexfile.cpp \
-    ../zindexedfile/zindextype.cpp \
-    ../zindexedfile/zjournal.cpp \
-    ../zindexedfile/zkey.cpp \
-    ../zindexedfile/zmasterfile.cpp \
-    ../zrandomfile/zssearchargument.cpp
 SOURCES += \
     ../zcontentcommon/zidentity.cpp \
     ../zcontentcommon/zlock.cpp \
@@ -349,9 +172,15 @@ SOURCES += \
     ../zindexedfile/zdictionaryfile.cpp \
     ../zindexedfile/zfielddescription.cpp \
     ../zindexedfile/zfullindexfield.cpp \
+    ../zindexedfile/zindexcollection.cpp \
     ../zindexedfile/zindexcontrolblock.cpp \
     ../zindexedfile/zindexfield.cpp \
     ../zindexedfile/zindexfile.cpp \
+    ../zindexedfile/zindexitem.cpp \
+    ../zindexedfile/zindextable.cpp \
+    ../zindexedfile/zindextype.cpp \
+    ../zindexedfile/zjournal.cpp \
+    ../zindexedfile/zkey.cpp \
     ../zindexedfile/zkeydictionary.cpp \
     ../zindexedfile/zmastercontrolblock.cpp \
     ../zindexedfile/zmasterfile.cpp \
@@ -364,12 +193,7 @@ SOURCES += \
     ../zindexedfile/zrawmasterfile.cpp \
     ../zindexedfile/zrawrecord.cpp \
     ../zindexedfile/zrecord.cpp \
-    ../zindexedfile/zsindexcollection.cpp \
-    ../zindexedfile/zsindexitem.cpp \
-    ../zindexedfile/zsindextype.cpp \
-    ../zindexedfile/zsjournal.cpp \
     ../zindexedfile/zsjournalcontrolblock.cpp \
-    ../zindexedfile/zskey.cpp \
     ../zindexedfile/zurffromnatural.cpp \
     ../zrandomfile/zblock.cpp \
     ../zrandomfile/zfilecontrolblock.cpp \
@@ -379,7 +203,7 @@ SOURCES += \
     ../zrandomfile/zrandomlockfile.cpp \
     ../zrandomfile/zrfcollection.cpp \
     ../zrandomfile/zrfpms.cpp \
-    ../zrandomfile/zssearchargument.cpp
+    ../zrandomfile/zsearchargument.cpp
 
 FURTHER_CPP=         ../zrandomfile/zrandomlockfile.cpp
 

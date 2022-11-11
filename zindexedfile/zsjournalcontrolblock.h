@@ -66,15 +66,15 @@ public:
   void serialize();
   void deserialize();
 
-  bool isReversed() {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
-  bool isNotReversed() {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
+  bool isReversed() const {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
+  bool isNotReversed() const {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
 
 
   uint32_t                StartSign   = cst_ZBLOCKSTART ;
-  ZBlockID                BlockId     = ZBID_JCB;
+  ZBlockId                BlockId     = ZBID_JCB;
   uint16_t                EndianCheck=cst_EndianCheck_Normal;
   uint32_t                ZMFVersion  = __ZMF_VERSION__;
-  uint32_t                JCBSize;                    //! size of JCBOwndata including exported JournalLocalDirectoryPath
+  uint32_t                JCBSize =0;                 //! size of JCBOwndata including exported JournalLocalDirectoryPath
   uint8_t                 JournalingOn=false;         //!< Journaling is started (true) or not (false)
   uint8_t                 Keep=false;                 // uint8_t used as bool
   uint32_t                Depth=-1;
@@ -109,16 +109,16 @@ public:
 };
 class ZSJournal;
 class ZRemoteMirroring;
-class ZSJournalControlBlock : public ZSJCBOwnData
+class ZJournalControlBlock : public ZSJCBOwnData
 {
 public:
   friend class ZSJournal;
-  ZSJournalControlBlock ();
-  ~ZSJournalControlBlock(void) ;
+  ZJournalControlBlock ();
+  ~ZJournalControlBlock(void) ;
 
-  ZSJournalControlBlock (const ZSJournalControlBlock& pIn) {_copyFrom(pIn);}
+  ZJournalControlBlock (const ZJournalControlBlock& pIn) {_copyFrom(pIn);}
 
-  ZSJournalControlBlock& _copyFrom(const ZSJournalControlBlock& pIn);
+  ZJournalControlBlock& _copyFrom(const ZJournalControlBlock& pIn);
 
   void clear(void);
 
@@ -130,7 +130,7 @@ public:
 
   ZStatus _import (const unsigned char *&pPtrIn);
 
-  bool _isSameAs(const ZSJournalControlBlock* pJCB);
+  bool _isSameAs(const ZJournalControlBlock* pJCB);
 
   void report(FILE *pOutput=stdout);
 

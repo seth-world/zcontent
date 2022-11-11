@@ -119,18 +119,21 @@ public:
   bool displayWidgetBlockOnce=false;
   ZStatus displayWidgetBlock(ZDataBuffer& pData);
   void displayOneLine(int pRow,unsigned char* &wPtr,unsigned char* wPtrEnd);
-  ZStatus displayWidgetBlock_old(ZDataBuffer& pData,int pWidth);
+
   void displayBlockData();
 
   void ZRFUnlock();
   void ZHeaderRawUnlock();
 
+  bool testRequestedSize(size_t pRequestedSize);
+
   void displayHCB();
   void displayFCB();
   void displayMCB();
+  void displayICBs();
 
 
-  void displayPool(unsigned char* pPtr,zaddress_type pOffset,const char* pTitle);
+  void displayPool(const unsigned char* pPtr,zaddress_type pOffset,const char* pTitle);
 
   void displayZBAT();
   void displayZFBT();
@@ -243,6 +246,10 @@ private slots:
 
 private:
 
+  QAction* displayICBQAc = nullptr;
+
+  /* evaluate actions */
+
   QAction* uint16QAc = nullptr;
 
 
@@ -252,6 +259,8 @@ private:
   QAction* uint64QAc = nullptr;
   QAction* int64QAc = nullptr;
   QAction* sizetQAc = nullptr;
+
+
 
 
   ZDataBuffer       SearchContent;

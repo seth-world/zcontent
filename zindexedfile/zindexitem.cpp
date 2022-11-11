@@ -1,13 +1,18 @@
-#include "zsindexitem.h"
+#include "zindexitem.h"
 
 using namespace zbs;
 
-ZSIndexItem::ZSIndexItem()
+ZIndexItem::ZIndexItem()
 {
 
 }
 //---------ZIndexItem_struct routines-------------------------------------------------------
 //
+void
+ZIndexItem::set(const ZDataBuffer& pKeyContent) {
+  setData(pKeyContent);
+}
+
 /**
  * @brief ZIndexItem_struct::toFileKey converts the memory content of the ZIndexItem Key to a flat stream of bytes to write on Index File
  * @note ZOp Operation field is not stored on Index File
@@ -15,7 +20,7 @@ ZSIndexItem::ZSIndexItem()
  * @return a reference to a ZDataBuffer containing the flat content of ZIndexItem being processed
  */
 ZDataBuffer&
-ZSIndexItem::toFileKey(void)
+ZIndexItem::toFileKey(void)
 {
   zaddress_type wAddress;
   wAddress = reverseByteOrder_Conditional<zaddress_type>(ZMFaddress);
@@ -31,8 +36,8 @@ ZSIndexItem::toFileKey(void)
  * @param[in] pFileKey ZIndexFile record content to load into current ZIndexItem
  * @return a reference to current ZIndexItem being processed
  */
-ZSIndexItem&
-ZSIndexItem::fromFileKey (ZDataBuffer &pFileKey)
+ZIndexItem&
+ZIndexItem::fromFileKey (ZDataBuffer &pFileKey)
 {
   size_t wOffset =0;
   size_t wSize;

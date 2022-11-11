@@ -655,4 +655,82 @@ size_t getOtherURF(const ZTypeBase pType,_Tp &pData)
   }//switch
   return 0;
 }//getOtherURF
+/* Arrays and Pointers are not managed here */
+size_t getURFHeaderSize(ZTypeBase pZType)
+{
+  ZTypeBase wType,wStructType;
+  size_t wHeaderSize;
+  wType=pZType;
+  wType &= ~ (ZType_Array|ZType_Pointer);
 
+  if (wType & ZType_Atomic)
+    return  sizeof(ZTypeBase);
+
+  switch (wType) {
+    case ZType_Resource:
+      return sizeof(ZTypeBase);
+    case ZType_ZDate:
+      return sizeof(ZTypeBase);
+    case ZType_ZDateFull:
+      return sizeof(ZTypeBase);
+    case ZType_CheckSum:
+      return sizeof(ZTypeBase);
+    case ZType_MD5:
+      return sizeof(ZTypeBase);
+    case ZType_URIString:
+    case ZType_URI:
+      return sizeof(ZTypeBase) + sizeof(URF_Varying_Size_type);
+    case ZType_Utf8VaryingString:
+      return sizeof(ZTypeBase) + sizeof(URF_Varying_Size_type);
+    case ZType_Utf16VaryingString:
+      return sizeof(ZTypeBase) + sizeof(URF_Varying_Size_type);
+    case ZType_Utf32VaryingString:
+      return sizeof(ZTypeBase) + sizeof(URF_Varying_Size_type) ;
+
+    case ZType_Utf8FixedString:
+      return sizeof(URF_Fixed_Size_type) + sizeof(URF_Capacity_type) + sizeof(ZTypeBase);
+    case ZType_Utf16FixedString:
+      return sizeof(URF_Fixed_Size_type) + sizeof(URF_Capacity_type) + sizeof(ZTypeBase);
+    case ZType_Utf32FixedString:
+      return sizeof(URF_Fixed_Size_type) + sizeof(URF_Capacity_type) + sizeof(ZTypeBase);
+
+    case ZType_Blob:
+      return sizeof(ZTypeBase)+sizeof(uint64_t);
+
+    default:
+      break;
+    }
+
+  if (wType & ZType_VaryingMask) // varying strings & blobs
+    return sizeof(ZTypeBase)+sizeof(uint64_t);
+
+  if (wType & ZType_String) // Fixed strings
+    return sizeof(ZTypeBase)+sizeof(URF_Capacity_type)+sizeof(URF_Fixed_Size_type);
+
+   // Other types : data length is on uint32_t, canonical (array) count is systematically set to 1
+  return sizeof(ZTypeBase)+sizeof(uint32_t);
+
+  wStructType= wType & ZType_StructureMask;
+  switch (wStructType)
+  {
+    /*    case ZType_Atomic:
+      {
+      wHeaderSize= sizeof(ZTypeBase);
+      break;
+      }
+*/
+  case ZType_Array:
+  {
+    wHeaderSize=sizeof(ZTypeBase)+sizeof(uint32_t);
+    break;
+  }
+
+  default:    // Other types : data length is on uint32_t, canonical (array) count is systematically set to 1
+  {
+    wHeaderSize=sizeof(ZTypeBase)+sizeof(uint32_t);
+    break;
+  }
+  }// switch
+
+  return wHeaderSize;
+}// getURFHeaderSize

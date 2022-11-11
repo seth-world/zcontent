@@ -300,7 +300,7 @@ namespace zbs {
  * @param pZDBExport
  * @return
  */
-ZDataBuffer&
+size_t
 ZBlockPool::_exportAppendPool(ZDataBuffer&pZDBExport)
 {
 
@@ -366,7 +366,7 @@ ZBlockPool::_exportAppendPool(ZDataBuffer&pZDBExport)
 #ifdef __USE_ZTHREAD__
     _Base::unlock();
 #endif
-    return pZDBExport;
+    return ZAE.FullSize ;
 }// _exportPool
 
 size_t ZBlockPool::getPoolExportSize()
@@ -1076,7 +1076,7 @@ ZRandomFile::zcreate(const char* pFilename,
                      bool pLeaveOpen)
 {
 uriString wFilename;
-    wFilename=(const utf8_t*)pFilename;
+    wFilename=pFilename;
     return (zcreate(wFilename,
                     pInitialSize,
                     pAllocatedBlocks,
@@ -1387,6 +1387,7 @@ ZRandomFile::_writeFileHeader( bool pForceWrite)
 {
 
   printf ("ZRandomFile::_writeFileHeader\n");
+  std::cout.flush();
 /*  if (Mode & ZRF_Exclusive)
      {
        if ((!pForceWrite)&&(HeaderAccessed & ZHAC_HCB))
@@ -1405,7 +1406,7 @@ ZRandomFile::_writeFileHeader( bool pForceWrite)
                               _GET_FUNCTION_NAME_,
                               ZS_FILEPOSERR,
                               Severity_Severe,
-                              "Error positionning at Header address <%lld> of header file  <%s>",
+                              "Error positionning at Header address <%ld> of header file  <%s>",
                               0L,
                               URIHeader.toString());
              return(ZS_FILEPOSERR);
@@ -1413,7 +1414,7 @@ ZRandomFile::_writeFileHeader( bool pForceWrite)
  // write ZFileHeader block
  //
  ZPMS.HFHWrites ++;
- //ZHeader.BlockID = ZBID_FileHeader ;
+ //ZHeader.BlockId = ZBID_FileHeader ;
 
  ZDataBuffer wZDBHeaderExport;
  ZHeader._exportAppend(wZDBHeaderExport);
@@ -1886,20 +1887,22 @@ ZRandomFile::_writeReserved(zaddress_type pOffsetReserved)
 ZStatus
 ZRandomFile::_writeAllFileHeader()
 {
-  ZDataBuffer wFullHeaderExport;
+  ZDataBuffer wZDB;
+  if (__ZRFVERBOSE__)
+    _DBGPRINT("ZRandomFile::_writeAllFileHeader \n") // debug
 
-  printf ("ZRandomFile::_writeAllFileHeader\n");
+  std::cout.flush();
 
   ZHeader.OffsetReserved = sizeof(ZHeaderControlBlock_Export) ;
   ZHeader.SizeReserved = ZReserved.Size ;
   ZHeader.OffsetFCB =    ZHeader.OffsetReserved + ZReserved.Size ;
   // NB: ZHeader.Offset is set by clear() method
 
-  ZHeader._exportAppend(wFullHeaderExport);
+  size_t wRet=ZHeader._exportAppend(wZDB);
 
   /* reserved : As it is */
 
-  wFullHeaderExport.appendData(ZReserved);
+  wZDB.appendData(ZReserved);
 
   /* FCB and Pool */
 
@@ -1924,12 +1927,11 @@ ZRandomFile::_writeAllFileHeader()
   //====================Export updated FCB and write it to file===============================
 
 
-  ZFCB._exportAppend(wFullHeaderExport);
+  wRet=ZFCB._exportAppend(wZDB);
 
-  ZBAT._exportAppendPool(wFullHeaderExport);  /* first block access table */
-  ZFBT._exportAppendPool(wFullHeaderExport);  /* second free blocks table */
-  ZDBT._exportAppendPool(wFullHeaderExport);  /* third deleted blocks table */
-
+  ZBAT._exportAppendPool(wZDB);  /* first block access table */
+  ZFBT._exportAppendPool(wZDB);  /* second free blocks table */
+  ZDBT._exportAppendPool(wZDB);  /* third deleted blocks table */
 
 
   if (lseek(HeaderFd,0L,SEEK_SET) < 0)
@@ -1943,7 +1945,7 @@ ZRandomFile::_writeAllFileHeader()
         URIHeader.toString());
     return(ZS_FILEPOSERR);
   }
-  ssize_t wSWrite =write(HeaderFd,wFullHeaderExport.DataChar,wFullHeaderExport.Size);
+  ssize_t wSWrite =write(HeaderFd,wZDB.DataChar,wZDB.Size);
   if (wSWrite<0)
     {
       ZException.getErrno(errno,
@@ -1968,7 +1970,9 @@ ZRandomFile::_importAllFileHeader()
 {
   ZDataBuffer wZDB;
 
-  printf ("ZRandomFile::_importAllFileHeader\n");
+  if (__ZRFVERBOSE__)
+    _DBGPRINT("ZRandomFile::_importAllFileHeader \n") // debug
+
 
   /*
       Upon successful completion, lseek() returns the resulting offset
@@ -2067,12 +2071,14 @@ ZRandomFile::_importAllFileHeader()
  * @param[out] pForceWrite  if true : will write any time. if false and file is opened in exclusive mode : will not write
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSErrorr
  */
+#ifdef __DEPRECATED__
 ZStatus
 ZRandomFile::_writeFullFileHeader( bool pForceWrite)
 {
 ZStatus wSt;
 
-    printf ("ZRandomFile::_writeFullFileHeader\n");
+    if (__ZRFVERBOSE__)
+      _DBGPRINT("ZRandomFile::_writeFullFileHeader \n") // debug
 
     if ((wSt=_writeFileHeader(pForceWrite))!=ZS_SUCCESS)
                             { return  wSt;}
@@ -2104,7 +2110,7 @@ ZStatus wSt;
 
     return  (_writeFCB(pForceWrite));
 }//_writeFullFileHeader
-
+#endif // __DEPRECATED__
 
 /**
  * @brief ZRandomFile::updateFileDescriptor  updates only the File descriptor zone in file header (without updating Reserved data)
@@ -2315,7 +2321,9 @@ ZRandomFile::_getFullFileHeader(bool pForceRead)
 {
 ZStatus wSt;
 ZDataBuffer wHeaderContent;
-    printf("ZRandomFile::_getFullFileHeader\n");
+
+    if (__ZRFVERBOSE__)
+      _DBGPRINT("ZRandomFile::_getFullFileHeader \n") // debug
 
     if (getOpenMode() & ZRF_Exclusive)
            {
@@ -2780,23 +2788,20 @@ ZRandomFile::_cleanDeletedBlocks(ZBlockDescriptor &pBD)
     zaddress_type wAddMax = pBD.Address+pBD.BlockSize;
 
     long wi = 0;
-    while (wi<ZDBT.size())
-            {
-                if ((ZDBT.Tab[wi].Address >= wAddMin)&&(ZDBT.Tab[wi].Address < wAddMax))
-                            {
-                            if (__ZRFVERBOSE__)
-                               _DBGPRINT(
-                                     " Removing deleted block index %ld from recoverable block pool address %lld is included in field of allocated block address %lld size %lld\n",
-                                     wi,
-                                     ZDBT.Tab[wi].Address,
-                                     pBD.Address,
-                                     pBD.BlockSize
-                                     );
-                              ZDBT.erase(wi);
-                              continue;
-                            }
-                wi++;
-            }
+    while (wi<ZDBT.size()) {
+      if ((ZDBT.Tab[wi].Address >= wAddMin)&&(ZDBT.Tab[wi].Address < wAddMax)) {
+        if (__ZRFVERBOSE__)
+          _DBGPRINT( " Removing deleted block index %ld from recoverable block pool address %lld is included in field of allocated block address %lld size %lld\n",
+                     wi,
+                     ZDBT.Tab[wi].Address,
+                     pBD.Address,
+                     pBD.BlockSize
+                     )
+        ZDBT.erase(wi);
+        continue;
+      }
+      wi++;
+    } // while
     return;
 } // _cleanDeletedBlocks
 
@@ -2836,9 +2841,8 @@ zrank_type wZBATRank=pZBATRank;
 
     ZPMS.FreeMatches ++;
 
-// debug
     if (__ZRFVERBOSE__)
-        _DBGPRINT(" allocateFreeBlock ; allocate size is %lld \n",pSize); // debug
+        _DBGPRINT(" allocateFreeBlock ; allocate size is %ld \n",pSize) // debug
 
     if ((pZFBTRank<0 )||(pZFBTRank > ZFBT.lastIdx()))
                     {
@@ -3426,7 +3430,7 @@ ZBlockDescriptor_Export wBS_Exp;
     wBlock.resetData();
     wBlock.State=ZBS_Deleted;
     wBlock.BlockSize = wBS.BlockSize;
-//    wBlock.BlockID =ZBID_Nothing;
+//    wBlock.BlockId =ZBID_Nothing;
 
     wSt=_writeBlockHeader((ZBlockHeader&)wBlock,wBS.Address);
     if (wSt!=ZS_SUCCESS)
@@ -4603,11 +4607,13 @@ ZRandomFile::_getFreeBlockEngine (const size_t pRequestedSize, const zaddress_ty
 
     if (pRequestedSize <= ZFBT.Tab[wi].BlockSize)  {               // Sizes match
       if(__ZRFVERBOSE__)
-        _DBGPRINT("ZRandomFile::_getFreeBlockEngine found block in pool index %ld state %s size %ld - requested size %ld \n",
+        _DBGPRINT("ZRandomFile::_getFreeBlockEngine found block in pool index %ld address %ld state %s size %ld - requested size %ld \n",
             wi,
+            ZFBT.Tab[wi].Address,
             decode_ZBS(ZFBT.Tab[wi].State),
             ZFBT.Tab[wi].BlockSize,
-            pRequestedSize)
+            pRequestedSize
+            )
       ZPMS.FreeMatches ++;
       return checkSplitFreeBlock(wi,pRequestedSize);
     }// if pSize
@@ -4796,8 +4802,8 @@ ZRandomFile::checkSplitFreeBlock (long pZFBTRank, size_t pRequestedSize){
   } // if (ZFBT.Tab[pZFBTRank].State & ZBS_Deleted)
 
   if(__ZRFVERBOSE__)
-    _DBGPRINT( "ZRandomFile::checkSplitFreeBlock  Requested size %ld - given free block size %ld.\n",
-        pRequestedSize,ZFBT.Tab[pZFBTRank].BlockSize)
+    _DBGPRINT( "ZRandomFile::checkSplitFreeBlock  Requested size %ld - given free block size %ld address %ld.\n",
+        pRequestedSize,ZFBT.Tab[pZFBTRank].BlockSize,ZFBT.Tab[pZFBTRank].Address)
 
   /* see <when found or extended> found : must adjust sizes. Free block size must correspond exactly to requested size */
   if (pRequestedSize==ZFBT.Tab[pZFBTRank].BlockSize) {
@@ -4843,7 +4849,7 @@ ZRandomFile::checkSplitFreeBlock (long pZFBTRank, size_t pRequestedSize){
     return -1;
   }
   if(__ZRFVERBOSE__)
-    _DBGPRINT( "ZRandomFile::checkSplitFreeBlock  Writing to file new block header at address %ld.\n",wNewBlock.Address)
+    _DBGPRINT( "ZRandomFile::checkSplitFreeBlock  Writing to file new free block header at address %ld.\n",wNewBlock.Address)
 
   if ( (wSt=_writeBlockHeader((ZBlockHeader&)wNewBlock,wNewBlock.Address))!=ZS_SUCCESS) { // write it to file
     ZException.setMessage(_GET_FUNCTION_NAME_, ZS_CANTALLOCSPACE , Severity_Severe,
@@ -5102,22 +5108,22 @@ ZRandomFile::_add2Phases_Prepare(const ZDataBuffer &pUserContent,
   }
   size_t wNeededSize = pUserContent.Size + sizeof(ZBlockHeader_Export);
 
-  long pFreeBlockRank = _getFreeBlockEngine (wNeededSize,-1);
-  if (pFreeBlockRank <0) {
+  long wFreeBlockRank = _getFreeBlockEngine (wNeededSize,-1);
+  if (wFreeBlockRank <0) {
     return  ZException.getLastStatus();
   }
   /* if free block comes from a deleted block in free pool mark it specially (recover option with rollback) */
-  if (ZFBT[pFreeBlockRank].State==ZBS_Deleted){
-    ZFBT[pFreeBlockRank].State=ZBS_AllocFromDelete;
+  if (ZFBT[wFreeBlockRank].State==ZBS_Deleted){
+    ZFBT[wFreeBlockRank].State=ZBS_AllocFromDelete;
   }
   else
-    ZFBT[pFreeBlockRank].State=ZBS_Allocated;
+    ZFBT[wFreeBlockRank].State=ZBS_Allocated;
 
-  pZBATIndex=ZBAT.push(ZFBT[pFreeBlockRank]);
+  pZBATIndex=ZBAT.push(ZFBT[wFreeBlockRank]);
 
     // if block is in deleted pool remove it from deleted pool
 
-  ZFBT.erase(pFreeBlockRank);   /* remove allocated block from free blocks pool */
+  ZFBT.erase(wFreeBlockRank);   /* remove allocated block from free blocks pool */
 
   ZBAT.Tab[pZBATIndex].Pid       = Pid;
   ZBAT.Tab[pZBATIndex].Lock      = 0;
@@ -6708,7 +6714,10 @@ ZStatus
 ZRandomFile::_ZRFopen(const zmode_type pMode, const ZFile_type pFileType, bool pLockRegardless)
 {
 ZStatus wSt=ZS_SUCCESS;
-    fprintf (stdout,"ZRandomFile::_open-I-OPENNING Openning file <%s>.\n",URIContent.toCChar());
+
+    if (__ZRFVERBOSE__)
+      _DBGPRINT("ZRandomFile::_open-I-OPENNING Openning file <%s>.\n",URIContent.toCChar()) // debug
+
     if (_isOpen)
       {
       ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -6806,6 +6815,7 @@ ZStatus wSt=ZS_SUCCESS;
       {
         case ZFT_ZRandomFile :
         case ZFT_ZMasterFile :
+        case ZFT_ZRawMasterFile :
         case ZFT_ZIndexFile :
         case ZFT_DictionaryFile :
           break;
@@ -6869,43 +6879,32 @@ ZStatus wSt=ZS_SUCCESS;
 
             }// case ZFT_ZRandomFile
 
-        case ZFT_ZMasterFile :
-            {
-            if (pFileType==ZFT_ZMasterFile)
-                                {
-                                wSt=ZS_SUCCESS;
-                                break; // everything in line
-                                }
-            if (pFileType==ZFT_ZRandomFile)
-                {
-                if ((pMode & ZRF_Write_Only)||(pMode & ZRF_Delete_Only)) // Only ZRF_Read_Only - delete and write mode excluded
-                    {
-                    _forceClose();
-                    ZException.setMessage(_GET_FUNCTION_NAME_,
+        case ZFT_ZRawMasterFile :
+        case ZFT_ZMasterFile : {
+          if ((pFileType==ZFT_ZMasterFile)||(pFileType==ZFT_ZRawMasterFile)) {
+            wSt=ZS_SUCCESS;
+            break; // everything in line
+          }
+          if (pFileType==ZFT_ZRandomFile) {
+            if ((pMode & ZRF_Write_Only)||(pMode & ZRF_Delete_Only)) { // Only ZRF_Read_Only - delete and write mode excluded
+              _forceClose();
+              ZException.setMessage(_GET_FUNCTION_NAME_,
                                             ZS_MODEINVALID,
                                             Severity_Error,
                                             "file %s is of type <%s> and cannot be opened as type <%s> with mode<%s>",
                                             URIContent.toString(),
                                             decode_ZFile_type (ZHeader.FileType),
                                             decode_ZFile_type (pFileType),
-                                            decode_ZRFMode(pMode));
-                    return  ZS_MODEINVALID;
-                    }
-                // up to here file is opened as ZRF_Read_Only
-
-                ZException.setMessage(_GET_FUNCTION_NAME_,
-                                        ZS_FILETYPEWARN,
-                                        Severity_Warning,
-                                        "file %s has been opened but given type is <%s> while expected <%s>",
-                                        URIContent.toString(),
-                                        decode_ZFile_type (pFileType),
-                                        decode_ZFile_type (ZHeader.FileType));
-                wSt=ZS_FILETYPEWARN; // OK Open but emit a Warning
-                break;
-                }
-            // all other cases are errors
-            _forceClose();
-            ZException.setMessage(_GET_FUNCTION_NAME_,
+              decode_ZRFMode(pMode));
+              return  ZS_MODEINVALID;
+            }
+            // up to here file is opened as ZRF_Read_Only
+            wSt=ZS_SUCCESS;
+            break;
+          } // if (pFileType==ZFT_ZRandomFile)
+          // all other cases are errors
+          _forceClose();
+          ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_BADFILETYPE,
                                     Severity_Error,
                                     "file %s cannot be opened : invalid given type <%s> while expected <%s>",
@@ -6913,21 +6912,17 @@ ZStatus wSt=ZS_SUCCESS;
                                     decode_ZFile_type (pFileType),
                                     decode_ZFile_type (ZHeader.FileType));
             return  ZS_BADFILETYPE;
-            }// ZFT_ZMasterFile
+        }// ZFT_ZMasterFile or ZFT_ZRawMasterFile
 
-        case ZFT_DictionaryFile :
-            {
-            if (pFileType==ZFT_DictionaryFile)
-                                {
-                                wSt=ZS_SUCCESS;
-                                break; // everything in line
-                                }
-            if (pFileType==ZFT_ZRandomFile)
-                {
-                if ((pMode & ZRF_Write_Only)||(pMode & ZRF_Delete_Only)) // Only ZRF_Read_Only - delete and write mode excluded
-                    {
-                    _forceClose();
-                    ZException.setMessage(_GET_FUNCTION_NAME_,
+        case ZFT_DictionaryFile : {
+          if (pFileType==ZFT_DictionaryFile) {
+            wSt=ZS_SUCCESS;
+            break; // everything in line
+          }
+          if (pFileType==ZFT_ZRandomFile) {
+            if ((pMode & ZRF_Write_Only)||(pMode & ZRF_Delete_Only)) { // Only ZRF_Read_Only - delete and write mode excluded
+              _forceClose();
+              ZException.setMessage(_GET_FUNCTION_NAME_,
                                             ZS_MODEINVALID,
                                             Severity_Error,
                                             "file %s is of type <%s> and cannot be opened as type <%s> with mode<%s>",
@@ -6935,40 +6930,28 @@ ZStatus wSt=ZS_SUCCESS;
                                             decode_ZFile_type (ZHeader.FileType),
                                             decode_ZFile_type (pFileType),
                                             decode_ZRFMode(pMode));
-                    return  ZS_MODEINVALID;
-                    }
-                // up to here file is opened as ZRF_Read_Only
-
-                ZException.setMessage(_GET_FUNCTION_NAME_,
-                                        ZS_FILETYPEWARN,
-                                        Severity_Warning,
-                                        "file %s has been opened but given type is <%s> while expected <%s>",
-                                        URIContent.toString(),
-                                        decode_ZFile_type (pFileType),
-                                        decode_ZFile_type (ZHeader.FileType));
-                wSt=ZS_FILETYPEWARN; // OK Open but emit a Warning
-                break;
-                }
-            // all other cases are errors
-            _forceClose();
-            ZException.setMessage(_GET_FUNCTION_NAME_,
+              return  ZS_MODEINVALID;
+            }
+            // up to here file is opened as ZRF_Read_Only
+            break;
+          }
+          // all other cases are errors
+          _forceClose();
+          ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_BADFILETYPE,
                                     Severity_Error,
                                     "file %s cannot be opened : invalid given type <%s> while expected <%s>",
                                     URIContent.toString(),
                                     decode_ZFile_type (pFileType),
                                     decode_ZFile_type (ZHeader.FileType));
-            return  ZS_BADFILETYPE;
-            }// ZFT_DictionaryFile
-            case ZFT_ZIndexFile :
-            {
-              if (pFileType==ZFT_ZIndexFile)
-              {
+          return  ZS_BADFILETYPE;
+          }// ZFT_DictionaryFile
+        case ZFT_ZIndexFile : {
+              if (pFileType==ZFT_ZIndexFile) {
                 wSt=ZS_SUCCESS;
                 break; // everything in line
               }
-              if (pFileType==ZFT_ZRandomFile)
-              {
+              if (pFileType==ZFT_ZRandomFile) {
                 if ((pMode & ZRF_Write_Only)||(pMode & ZRF_Delete_Only)) // Only ZRF_Read_Only - delete and write mode excluded
                 {
                   _forceClose();
@@ -7335,12 +7318,12 @@ ZRandomFile::zutilityUnlockHeaderFile (const uriString& pHeaderFile)
       return  (ZS_BADFILEHEADER);
     }
   /* check this is a true Header file : start sign is a palyndroma and block id is one byte : no need of endian conversion */
-  if (( wHCB.StartSign != cst_ZBLOCKSTART)||(wHCB.BlockID != ZBID_FileHeader))
+  if (( wHCB.StartSign != cst_ZBLOCKSTART)||(wHCB.BlockId != ZBID_HCB))
     {
       ZException.setMessage("ZRandomFile::zutilityUnlockHeaderFile",ZS_BADFILEHEADER,Severity_Error,
           "Invalid or corruped header content : start sign read <%X> expected <%X> block id read <%2X> expected <%2X> for file <%s>",
           wHCB.StartSign,cst_ZBLOCKSTART,
-          wHCB.BlockID, wHCB.BlockID,
+          wHCB.BlockId, wHCB.BlockId,
           pHeaderFile.toCChar()
           );
       return (ZS_BADFILEHEADER);
@@ -7494,7 +7477,7 @@ ZStatus wSt;
 
 //FILE* wOutput=pErrorlog;
 
-  pErrorlog.setErrorLogContext("XmlWriteFileDefinition");
+  pErrorlog.setContext("XmlWriteFileDefinition");
   pErrorlog.setAutoPrintOn(ZAIES_Text);
 
     uriString uriOutput;
@@ -7555,7 +7538,7 @@ ZRandomFile::XmlWriteFileDefinition (FILE *pOutput)
             utf8String OutPath;
             utf8String OutBase;
 
-            uriOutput= URIContent.toString();
+            uriOutput = URIContent.toString();
             OutBase = uriOutput.getBasename();
             OutPath = uriOutput.getDirectoryPath();
             OutPath += OutBase;
@@ -8318,7 +8301,7 @@ ZHeaderControlBlock_Export wHeaderExp;
     " Reserved block size  %10ld\n"
     " Version              %10ld",
         getURIHeader().toString(),
-    decode_ZBID(  wHeaderExp.BlockID),
+    decode_ZBID(  wHeaderExp.BlockId),
     reverseByteOrder_Conditional<zaddress_type>(wHeaderExp.OffsetFCB),
     reverseByteOrder_Conditional<zsize_type>(wHeaderExp.SizeReserved),
     reverseByteOrder_Conditional<unsigned long>( wHeaderExp.ZRFVersion));
@@ -8331,7 +8314,7 @@ ZHeaderControlBlock_Export wHeaderExp;
       " Reserved block size  %10ld\n"
       " Version              %s",
       getURIHeader().toString(),
-      decode_ZBID(  wHeaderExp.BlockID),
+      decode_ZBID(  wHeaderExp.BlockId),
       wHeaderExp.OffsetFCB,
       wHeaderExp.SizeReserved,
       getVersionStr( wHeaderExp.ZRFVersion).toString() );
@@ -9205,7 +9188,7 @@ bool FOpen = false;
     wBS.Address = resetPosition() ; // get the start of data physical address and align logicalPosition
 
     wBS.BlockSize = wFreeBlockSize;
-//    wBS.BlockID = ZBID_Data ;
+//    wBS.BlockId = ZBID_Data ;
     wBS.State = ZBS_Free;
 //    wBS.Pid   = Pid;  // warning get the current pid
 
@@ -10294,7 +10277,7 @@ decode_ZBS (uint8_t pZBS)
 }//decode_ZBS
 
 const char *
-decode_ZBID (ZBlockID pZBID)
+decode_ZBID (ZBlockId pZBID)
     {
     switch (pZBID)
             {
@@ -10302,7 +10285,7 @@ decode_ZBID (ZBlockID pZBID)
                     {
                         return ("ZBID_Nothing");
                     }
-            case ZBID_FileHeader :
+            case ZBID_HCB :
                     {
                         return ("ZBID_FileHeader");
                     }
@@ -10326,7 +10309,7 @@ decode_ZBID (ZBlockID pZBID)
             }
     default :
             {
-                return ("Unknownn ZBlockID");
+                return ("Unknownn ZBlockId");
             }
 }//switch
 }//decode_ZBS

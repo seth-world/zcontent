@@ -1,12 +1,12 @@
 #include "zsjournalcontrolblock.h"
 
-#include <zindexedfile/zsjournal.h>
+#include <zindexedfile/zjournal.h>
 #include <zxml/zxmlprimitives.h>
 
 
 using namespace zbs;
 
-ZSJournalControlBlock& ZSJournalControlBlock::_copyFrom(const ZSJournalControlBlock& pIn)
+ZJournalControlBlock& ZJournalControlBlock::_copyFrom(const ZJournalControlBlock& pIn)
 {
   Journal=pIn.Journal;
   Remote=pIn.Remote;
@@ -17,7 +17,7 @@ ZSJournalControlBlock& ZSJournalControlBlock::_copyFrom(const ZSJournalControlBl
   return *this;
 }
 
-bool ZSJournalControlBlock::_isSameAs(const ZSJournalControlBlock* pJCB)
+bool ZJournalControlBlock::_isSameAs(const ZJournalControlBlock* pJCB)
 {
   if (pJCB==nullptr)
     return false;
@@ -75,11 +75,11 @@ bool ZSJournalControlBlock::_isSameAs(const ZSJournalControlBlock* pJCB)
   return true;
 }
 
-ZSJournalControlBlock::ZSJournalControlBlock()  {clear();}
+ZJournalControlBlock::ZJournalControlBlock()  {clear();}
 
 //-----------------ZSJournalControlBlock-----------------------------
 
-ZSJournalControlBlock::~ZSJournalControlBlock(void)
+ZJournalControlBlock::~ZJournalControlBlock(void)
 {
   if (Journal!=nullptr)
     delete Journal;
@@ -87,9 +87,9 @@ ZSJournalControlBlock::~ZSJournalControlBlock(void)
 }
 
 
-void ZSJournalControlBlock::clear(void)
+void ZJournalControlBlock::clear(void)
 {
-  memset(this,0,sizeof(ZSJournalControlBlock));
+  memset(this,0,sizeof(ZJournalControlBlock));
   JournalLocalDirectoryPath.clear();
   return ;
 }
@@ -214,14 +214,14 @@ ZSJCBOwnData::_import(const unsigned char* &pPtrIn)
  * @brief ZSJournalControlBlock::_exportJCB   exports ZSJournalControlBlock content to a flat ZDataBuffer.
  * @return a ZDataBuffer containing the flat raw data exported from ZJCB
  */
-ZDataBuffer& ZSJournalControlBlock::_exportJCB(ZDataBuffer &pJCBContent)
+ZDataBuffer& ZJournalControlBlock::_exportJCB(ZDataBuffer &pJCBContent)
 {
 
   return ZSJCBOwnData::_exportAppend(pJCBContent);
 }// _exportJCB
 
 size_t
-ZSJournalControlBlock::_getExportSize()
+ZJournalControlBlock::_getExportSize()
 {
   return (sizeof(ZSJCBOwnData_Export)+JournalLocalDirectoryPath._getexportUVFSize());
 }
@@ -232,7 +232,7 @@ ZSJournalControlBlock::_getExportSize()
  */
 
 ZStatus
-ZSJournalControlBlock::_import(const unsigned char* & pPtrIn)
+ZJournalControlBlock::_import(const unsigned char* & pPtrIn)
 {
   //ZStatus wSt;
   //long wIndexCountsv ;
@@ -247,7 +247,7 @@ ZSJournalControlBlock::_import(const unsigned char* & pPtrIn)
     ZException.setMessage("ZSJournalControlBlock::_import",
         ZS_BADDIC,
         Severity_Severe,
-        "Invalid Journal Control Block header : found Start marker <%X> ZBlockID <%X>. One of these is invalid (or both are).",
+        "Invalid Journal Control Block header : found Start marker <%X> ZBlockId <%X>. One of these is invalid (or both are).",
         wJCB.StartSign,
         wJCB.BlockId);
     return  ZS_BADDIC;
@@ -277,7 +277,7 @@ ZSJournalControlBlock::_import(const unsigned char* & pPtrIn)
 }//_importJCB
 
 ZStatus
-ZSJournalControlBlock::purge(const zrank_type pKeepRanks)
+ZJournalControlBlock::purge(const zrank_type pKeepRanks)
 {
 
   if (Journal==nullptr)
@@ -290,13 +290,13 @@ ZSJournalControlBlock::purge(const zrank_type pKeepRanks)
  * @brief ZSJournalControlBlock::setParameters sets the local journaling parameters (actually only JournalDirectoryPath)
  * @param pJournalPath
  */
-void ZSJournalControlBlock::setParameters (uriString &pJournalPath)
+void ZJournalControlBlock::setParameters (uriString &pJournalPath)
 {
   JournalLocalDirectoryPath=pJournalPath;
   return;
 }
 void
-ZSJournalControlBlock::setRemoteMirroring (int8_t pProtocol,
+ZJournalControlBlock::setRemoteMirroring (int8_t pProtocol,
     char* pHost,
     int   pPort,
     char* pAuthenticate,
@@ -346,7 +346,7 @@ ZSJournalControlBlock::setRemoteMirroring (int8_t pProtocol,
 */
 
 utf8String
-ZSJournalControlBlock::toXml(int pLevel,bool pComment)
+ZJournalControlBlock::toXml(int pLevel,bool pComment)
 {
   int wLevel=pLevel+1;
   utf8String wReturn;
@@ -376,7 +376,7 @@ ZSJournalControlBlock::toXml(int pLevel,bool pComment)
   return wReturn;
 } // ZMFDictionary::toXml
 
-ZStatus ZSJournalControlBlock::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog,ZaiE_Severity pSeverity)
+ZStatus ZJournalControlBlock::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog,ZaiE_Severity pSeverity)
 {
   zxmlElement *wRootNode=nullptr;
   zxmlElement *wRootNode_1=nullptr;

@@ -8,6 +8,8 @@
 #include <ztoolset/zbitset.h>
 #include <zindexedfile/zrawmasterfile.h>
 
+#include <zindexedfile/zindexitem.h>
+
 using namespace zbs;
 
 ZRawRecord::ZRawRecord(ZRawMasterFile *pFather)
@@ -20,8 +22,8 @@ ZRawRecord::ZRawRecord(ZRawMasterFile *pFather)
     else
         FieldPresence=new ZBitset(pMCB->MetaDic->size());
 */
-  for (long wi=0;wi< RawMasterFile->IndexCount;wi++)
-    KeyValue.push(new ZSIndexItem());
+  for (long wi=0;wi< RawMasterFile->IndexTable.count();wi++)
+    KeyValue.push(new ZIndexItem());
 }
 
 ZRawRecord::~ZRawRecord()
@@ -147,9 +149,9 @@ ZRawRecord::getContentFromRaw(ZDataBuffer& pContent,ZDataBuffer& pRaw )
 
 /*  if (FieldPresence==nullptr)
     FieldPresence=new ZBitset;*/
-  wSt=FieldPresence._importURF(wPtrIn);
+  size_t wS=FieldPresence._importURF(wPtrIn);
 
-  if ((wSt!=ZS_OMITTED)&&(wSt!=ZS_SUCCESS))
+  if (wS==0)
     {
     ZException.addToLast(" from ZRawRecord::getContentFromRaw");
     return wSt;
@@ -189,7 +191,7 @@ ZRawRecord::getContentFromRaw(ZDataBuffer& pContent,ZDataBuffer& pRaw )
     _importAtomic<uint32_t>(wKeySize,wPtrIn);
     if (wKeySize==cst_ZBLOCKEND)
       break;
-    KeyValue.push(new ZSIndexItem);
+    KeyValue.push(new ZIndexItem);
     KeyValue.last()->Operation = ZO_Nothing ;
     KeyValue.last()->ZMFaddress = 0L;
     KeyValue.last()->KeyContent.setData(wPtrIn,wKeySize);
@@ -219,8 +221,8 @@ ZRawRecord::setup()
   Content.reset();
   while (KeyValue.count())
     delete KeyValue.popR();
-  for (long wi=0;wi< RawMasterFile->IndexCount;wi++ )
-    KeyValue.push(new ZSIndexItem);
+  for (long wi=0;wi< RawMasterFile->IndexTable.count();wi++ )
+    KeyValue.push(new ZIndexItem);
 
  }//setup
 
@@ -239,8 +241,9 @@ ZRawRecord::getRawKeyContent(unsigned int pKeyIdx,ZDataBuffer& pKeyContent)
 {
   const unsigned char* wPtrIn=RawContent.Data;
   const unsigned char* wPtrEnd = wPtrIn + RawContent.Size;
-  ZStatus wSt= FieldPresence._importURF(wPtrIn);
-  if(wSt==ZS_INVTYPE)
+  ZStatus wSt;
+  size_t wS= FieldPresence._importURF(wPtrIn);
+  if(wS==0)
     {
     ZException.setMessage("ZRawRecord::getRawKeyContent",
         ZS_INVVALUE,

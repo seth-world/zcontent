@@ -5,10 +5,15 @@
 #include <zrandomfile/zrandomfiletypes.h>
 #include <zrandomfile/zsearchargument.h>
 
+#include <ztoolset/zarray.h>
+
+//
+
 
 namespace zbs {
 
-
+class ZRawMasterFile;
+class ZRawIndexFile;
 
 int ZKeyCompareBinary (const ZDataBuffer &pKey1, ZDataBuffer &pKey2, ssize_t pSize);
 
@@ -16,11 +21,9 @@ int ZKeyCompareAlpha (const ZDataBuffer &pKey1,ZDataBuffer &pKey2,ssize_t pSize)
 
 typedef int  (*ZIFCompare) (const ZDataBuffer &pKey1,ZDataBuffer &pKey2,ssize_t pSize);
 
-class ZIndexFile;
-class ZMasterFile;
-class ZIndexCollection;
+//class ZRawIndexFile;
 
-
+//class ZIndexCollection;
 
 /**
  * @brief The ZCollection_Op_type enum describes the last operation done on Collection
@@ -44,6 +47,7 @@ enum ZCollection_Op_type : uint16_t {
 };
 
 
+
 /**
  * @brief The ZMatchSize_type enum Option for defining the size of comparison while matching index records
  */
@@ -54,35 +58,31 @@ enum ZMatchSize_type
     ZMS_MatchKeySize    = 2   //!< Size of the search key buffer is the comparison size : Partial key search may use this
 };
 #endif // ZCOLLECTION_OP
-
 const char *decode_ZCOP (uint16_t pZCOP);
 /**
- * @brief The ZIndexResult class single element resulting of a search operation using indexes.
+ * @brief The ZSIndexResult class single element resulting of a search operation using indexes.
  * It gives the Index relative position (rank) and its corresponding ZMasterFile record address (Index is not sensible to ZMasterFile ranks, but only addresses).
  */
 class ZIndexResult
 {
 public:
-    ZIndexResult(void) {reset();}
-    ~ZIndexResult(void) {}
+  zrank_type      IndexRank=-1; //!< ZIndexFile rank
+  zaddress_type   ZMFAddress=-1;//!< Corresponding ZMasterFile address
 
-    zrank_type       IndexRank; //!< ZIndexFile rank
-    zaddress_type ZMFAddress;   //!< Corresponding ZMasterFile address
+  ZIndexResult(void) = default;
+  ZIndexResult(zaddress_type pZMFAddress,zrank_type pIndexRank) ;
+  ZIndexResult(const ZIndexResult &pIn) ;
+  ~ZIndexResult(void) {}
 
-    static
-    ZIndexResult create(zaddress_type pZMFAddress,zrank_type pIndexRank)
-    {
-        ZIndexResult wIR;
-        wIR.ZMFAddress = pZMFAddress;
-        wIR.IndexRank = pIndexRank;
-        return wIR;
-    }
-    /**
-     * @brief reset resets ZIndexResult to is 'null' value {-1 ; -1 }
-     */
-    void reset (void) {ZMFAddress=-1; IndexRank=-1;}
-    bool isNull (void) {return IndexRank<0;}
+  ZIndexResult&  _copyFrom(const ZIndexResult &pIn) ;
 
+  static ZIndexResult create(zaddress_type pZMFAddress,zrank_type pIndexRank);
+  /**
+   * @brief reset resets ZSIndexResult to is 'null' value {-1 ; -1 }
+   */
+  void reset (void) {ZMFAddress=-1; IndexRank=-1;}
+  bool isNull (void) const {return IndexRank<0;}
+  bool isInvalid(void) const {return ZMFAddress<0;}
 
     ZIndexResult& operator = (ZIndexResult &pZIR) {   memmove (this,&pZIR,sizeof(ZIndexResult)); return *this;}
 
@@ -96,7 +96,7 @@ public:
 
 
 /**
- * @brief The ZIndexCollectionContext class Maintain the context of a collection :
+ * @brief The ZSIndexCollectionContext class Maintain the context of a collection :
  * - various type of searches and other operations
  * - lock mask to be applied to records
  * - last operation code
@@ -111,64 +111,23 @@ class ZIndexCollectionContext
 public:
     ZIndexCollectionContext(void) { clear();}
 
-    void setup         (const ZDataBuffer &pKeyLow,
-                        const ZDataBuffer* pKeyHigh,
-                        ZIFCompare    pZIFCompare,
-                        const ssize_t pCompareSize)
-    {
-        clear();
-        KeyContent = pKeyLow;
-        if (pKeyHigh!=nullptr)
-                        KeyHigh    = *pKeyHigh;
-                else
-                        KeyHigh.clear();
-//        ZIFFile = pZIFFile;
-//        Collection = new ZIndexCollection(pZIFFile);
-//        ZMS=pZMS;
-//        Lock = pLock;
-        Op=ZCOP_Nothing;
-        CompareSize =pCompareSize;
-        Compare=pZIFCompare;
-        isInit=true;
-        return;
-    }
+    void setup ( const ZDataBuffer &pKeyLow,
+                 const ZDataBuffer* pKeyHigh,
+                 ZIFCompare    pZIFCompare,
+                 const ssize_t pCompareSize);
 
-    ZStatus setStatus(ZStatus pSt) {ZSt=pSt;
+
+    ZStatus setStatus(ZStatus pSt) {
+      ZSt=pSt;
 //                                    if (Collection!=nullptr)
 //                                            Collection->ZSt = pSt;
-                                   return ZSt;}
+      return ZSt;
+    }
     ZStatus getStatus (void) {return ZSt;}
 //    zlock_type getLock(void) {return Lock;}
 
-    void reset (void)
-    {
-      CurrentZIFrank = -1 ;
-      BaseIndex = -1;
-      InputCollectionIndex = -1 ;
-      FInitSearch     = false;
-      ZIFLast.reset();
-
-      Op=ZCOP_Nothing;
-      ZSt=ZS_NOTHING;
-
-      return;
-    }
-    void clear()
-    {
-//        ZIFFile = nullptr;
-        CurrentZIFrank=-1;
-        Compare=nullptr;
-        CompareSize=-1;
-//        ZMS = ZMS_MatchIndexSize;
-//        Lock = ZLock_Nolock;
-        Op = ZCOP_Nothing;
-        ZSt=ZS_NOTHING;
-        isInit=false;
-        FInitSearch=false;
-        KeyContent.clear();
-        KeyHigh.clear();
-        ZIFLast.reset();
-    }// clear
+    void reset (void) ;
+    void clear();
 
     ZDataBuffer         KeyContent;                 //!< In case of simple search : key content value to search, or lowest key value to search in case of Interval search
     ZDataBuffer         KeyHigh;                    //!< In case of Interval search : highest value to search for
@@ -182,7 +141,7 @@ public:
 
     ZIndexResult        ZIFLast;                    //!< last ZIndexFile rank content accessed ; either ZMasterFile rank & address if no collection - or collection content if there is a collection
     long                InputCollectionIndex=-1;    //!< either ZIndexFile record rank or InputCollection rank. In case of there is already a collection : current collection index . If no collection : ZIndexFile rank
-    long                BaseIndex=-1;               //!< current base collection index meaning rank for ZArray<ZIndexResult> defined as Base for ZIndexCollection.
+    long                BaseIndex=-1;               //!< current base collection index meaning rank for ZArray<ZSIndexResult> defined as Base for ZSIndexCollection.
 
     ZStatus ZSt=ZS_NOTHING;                         //!< last current status
     bool isInit=false;                              //!< Have collection been initialized (true)? or not (false)
@@ -194,16 +153,26 @@ public:
 class ZIndexCollection : public ZArray<ZIndexResult>  // Ranks of the corresponding index - & address of corresponding ZMasterFile block
 {
     typedef ZArray<ZIndexResult> _Base;
+
+
     friend class ZMasterFile;
     friend class ZIndexFile;
-public:
-    ZIndexCollection(void) {ZIFFile=nullptr;}
-    ZIndexCollection(ZIndexFile *pZIFFile) ;
-    ZIndexCollection(ZMasterFile &pZMFFile,const long pIndexRank) ;
+    friend class ZRawMasterFile;
+    friend class ZRawIndexFile;
 
-    ~ZIndexCollection(void) { if (InputCollection!=nullptr)
-                                                delete InputCollection;
-                            }  // And call _Base::ZArray destructor
+public:
+    ZIndexCollection(void) {
+//      ZIFFile=nullptr;
+    }
+    ZIndexCollection(const ZIndexCollection& pIn) { _copyFrom(pIn); }
+
+    ZIndexCollection(ZRawIndexFile *pZIFFile) ;
+    ZIndexCollection(ZRawMasterFile &pZMFFile, const long pIndexRank) ;
+
+    ~ZIndexCollection(void) {
+      if (InputCollection!=nullptr)
+        delete InputCollection;
+      }  // And call _Base::ZArray destructor
 
     ZStatus initSearch(ZArray<ZIndexResult> *pCollection);
 
@@ -211,19 +180,18 @@ public:
                         const ZDataBuffer* pKeyHigh,
                         ZIFCompare    pZIFCompare,
                         const ssize_t pCompareSize,
-                        const zlockmask_type pLock)
-             {
+                        const zlockmask_type pLock) {
              Context.setup(pKeyLow,
                            pKeyHigh,
                            pZIFCompare,
                            pCompareSize);
-             }
+    }
 
     ZStatus evaluate(ZDataBuffer&wRecordContent) {return (Argument.evaluate(wRecordContent)?ZS_FOUND:ZS_NOTFOUND);}
     void reset(void);
     void clear(void);
 
-    void copy(ZIndexCollection &pCollection);
+    ZIndexCollection& _copyFrom(const ZIndexCollection& pIn);
 
     ZStatus getZIRfromZIF(ZIndexResult &pZIR, const zrank_type pIndexRank);
 
@@ -237,7 +205,7 @@ public:
     ZStatus getFirstSelectedRank(ZDataBuffer &pRecordContent, ZIndexResult& pZIR);
 
     ZStatus getNextSelectedRank(ZDataBuffer &pRecordContent, ZIndexResult &pZIR);
-//    ZStatus zgetNextRetry(ZDataBuffer &pRecordContent, ZIndexResult &pZIR, long pWaitMs, int16_t pTimes);
+//    ZStatus zgetNextRetry(ZDataBuffer &pRecordContent, ZSIndexResult &pZIR, long pWaitMs, int16_t pTimes);
     ZStatus _getRetry(ZDataBuffer &pRecordContent, ZIndexResult &pZIR);
 
     ZIndexResult getPreviousSelectedRank (const zlockmask_type pLock);
@@ -260,12 +228,12 @@ public:
     ZIndexCollectionContext& getContext(void) {return Context;}
 
     ZStatus getStatus(void)             {return Context.ZSt;}
-    ZStatus setStatus(ZStatus pStatus)  {Context.ZSt=pStatus; return Context.ZSt;} //!< sets the current context status and returns it
+    ZStatus setStatus(ZStatus pStatus)  {Context.ZSt=pStatus; return Context.ZSt;} // sets the current context status and returns it
 //    zlock_type getLock(void)            {return Context.Lock;}
 //    void setLock(zlock_type pLock)      {Context.Lock = pLock;}
 
 private:
-    ZIndexFile *ZIFFile=nullptr;    //!< ZIndexFile file to work with
+    ZRawIndexFile *ZIFFile=nullptr;    //!< ZIndexFile file to work with
     ZSearchArgument Argument;       //!< stores the evaluation conditions for the current collection : one collection has one search argument data structure
 
     ZArray<ZIndexResult> *InputCollection=nullptr; //!< stores the collection as Input to work with for evaluating ranks. If nullptr the whole set of ZRF ranks is taken
@@ -274,7 +242,7 @@ private:
     ZIndexCollectionContext Context;    //!< current search context for
     ZMatchSize_type         ZMS;
 
-};//ZIndexCollection
+};//ZSIndexCollection
 
 
 

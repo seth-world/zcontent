@@ -1,7 +1,7 @@
 #ifndef ZSINDEXTYPE_CPP
 #define ZSINDEXTYPE_CPP
 
-#include <zindexedfile/zsindextype.h>
+#include <zindexedfile/zindextype.h>
 #include <zindexedfile/zmetadic.h>
 #include <zindexedfile/zindexfield.h>
 #include <zindexedfile/zkeydictionary.h>

@@ -12,7 +12,7 @@ void ZFileControlBlock::clear(void)
   memset(this,0,sizeof(ZFileControlBlock));
 //  StartSign=cst_ZSTART;
   StartOfData = 0L;
-//  BlockID = ZBID_FCB;
+//  BlockId = ZBID_FCB;
 //  EndSign=cst_ZEND;
   return;
 }
@@ -79,7 +79,7 @@ ZFileControlBlock::setUseableParams(const FCBParams& pIn)
 
 //=========================== ZFileControlBlock Export import==========================================
 
-ZDataBuffer&
+size_t
 ZFileControlBlock::_exportAppend(ZDataBuffer& pZDBExport)
 {
   ZFCB_Export wFCB;
@@ -88,7 +88,7 @@ ZFileControlBlock::_exportAppend(ZDataBuffer& pZDBExport)
 
   pZDBExport.appendData(&wFCB,sizeof(wFCB));
 
-  return pZDBExport;
+  return sizeof(ZFCB_Export);
 }// ZFileControlBlock::_exportAppend
 
 ZDataBuffer
@@ -123,7 +123,7 @@ ZFileControlBlock::_import(const unsigned char *&pZDBImport_Ptr)
             "File Control Block appears to be corrupted : invalid end block sign.");
         return  (ZS_CORRUPTED);
       }
-  if (wFCBe->BlockID!=ZBID_FCB)
+  if (wFCBe->BlockId!=ZBID_FCB)
       {
         ZException.setMessage("ZFileControlBlock::_import",
             ZS_INVTYPE,
@@ -141,7 +141,7 @@ ZFileControlBlock::_import(const unsigned char *&pZDBImport_Ptr)
 ZFCB_Export& ZFCB_Export::_copyFrom(const ZFCB_Export& pIn)
 {
   StartSign=pIn.StartSign;
-  BlockID=pIn.BlockID;
+  BlockId=pIn.BlockId;
   StartOfData=pIn.StartOfData;
   AllocatedBlocks=pIn.AllocatedBlocks;
   BlockExtentQuota=pIn.BlockExtentQuota;
@@ -174,7 +174,7 @@ ZFCB_Export& ZFCB_Export::_copyFrom(const ZFCB_Export& pIn)
 ZFCB_Export& ZFCB_Export::set(const ZFileControlBlock& pIn)
 {
   StartSign=cst_ZBLOCKSTART;
-  BlockID=ZBID_FCB;
+  BlockId=ZBID_FCB;
   EndianCheck=cst_EndianCheck_Normal;
 
   StartOfData=pIn.StartOfData;
@@ -210,7 +210,7 @@ void ZFCB_Export::setFromPtr(const unsigned char * &pPtrIn)
 {
   ZFCB_Export* pIn=(ZFCB_Export*)pPtrIn;
   StartSign=pIn->StartSign;
-  BlockID=pIn->BlockID;
+  BlockId=pIn->BlockId;
   EndianCheck=pIn->EndianCheck;
 
   StartOfData=pIn->StartOfData;
@@ -346,7 +346,7 @@ utf8String ZFileControlBlock::toXml(int pLevel,bool pComment)
   wReturn = fmtXMLnode("zfilecontrolblock",pLevel);
   wLevel++;
 
-  /* NB: StartSign and BlockID are not exported to xml */
+  /* NB: StartSign and BlockId are not exported to xml */
   wReturn+=fmtXMLint64("startofdata",StartOfData,wLevel);
   if (pComment)
     fmtXMLaddInlineComment(wReturn,"FYI : offset where Data storage starts - cannot be modified.");

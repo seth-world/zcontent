@@ -1,18 +1,101 @@
 #ifndef ZINDEXCOLLECTION_CPP
 #define ZINDEXCOLLECTION_CPP
 
-
-#include <zindexedfile/zindexfile.h>
-#include <zindexedfile/zmasterfile.h>
 #include <zindexedfile/zindexcollection.h>
-#include <zindexedfile/zjournal.h>
+
+#include <zindexedfile/zrawindexfile.h>
+#include <zindexedfile/zrawmasterfile.h>
+
+#include <zindexedfile/zindexitem.h>
+
+//#include <zindexedfile/zjournal.h>
+//#include <zindexedfile/zsjournalcontrolblock.h>
+
 
 using namespace zbs;
 
+ZIndexResult::ZIndexResult(const ZIndexResult &pIn) {
+  _copyFrom(pIn);
+}
+
+ZIndexResult::ZIndexResult(zaddress_type pZMFAddress,zrank_type pIndexRank) {
+  IndexRank=pIndexRank;
+  ZMFAddress=pZMFAddress;
+}
+
+ZIndexResult&  ZIndexResult::_copyFrom(const ZIndexResult &pIn) {
+  IndexRank=pIn.IndexRank;
+  ZMFAddress=pIn.ZMFAddress;
+  return *this;
+}
 
 
+ZIndexResult ZIndexResult::create(zaddress_type pZMFAddress,zrank_type pIndexRank)
+{
+  ZIndexResult wIR;
+  wIR.ZMFAddress = pZMFAddress;
+  wIR.IndexRank = pIndexRank;
+  return wIR;
+}
 
-//----------------ZIndexCollection-------------------------------------------------
+
+void
+ZIndexCollectionContext::setup( const ZDataBuffer &pKeyLow,
+                                const ZDataBuffer* pKeyHigh,
+                                ZIFCompare    pZIFCompare,
+                                const ssize_t pCompareSize)
+{
+  clear();
+  KeyContent = pKeyLow;
+  if (pKeyHigh!=nullptr)
+    KeyHigh    = *pKeyHigh;
+  else
+    KeyHigh.clear();
+  //        ZIFFile = pZIFFile;
+  //        Collection = new ZSIndexCollection(pZIFFile);
+  //        ZMS=pZMS;
+  //        Lock = pLock;
+  Op=ZCOP_Nothing;
+  CompareSize =pCompareSize;
+  Compare=pZIFCompare;
+  isInit=true;
+  return;
+}
+
+void
+ZIndexCollectionContext::reset (void)
+{
+  CurrentZIFrank = -1 ;
+  BaseIndex = -1;
+  InputCollectionIndex = -1 ;
+  FInitSearch     = false;
+  ZIFLast.reset();
+
+  Op=ZCOP_Nothing;
+  ZSt=ZS_NOTHING;
+
+  return;
+}
+
+void
+ZIndexCollectionContext::clear()
+{
+  //        ZIFFile = nullptr;
+  CurrentZIFrank=-1;
+  Compare=nullptr;
+  CompareSize=-1;
+  //        ZMS = ZMS_MatchIndexSize;
+  //        Lock = ZLock_Nolock;
+  Op = ZCOP_Nothing;
+  ZSt=ZS_NOTHING;
+  isInit=false;
+  FInitSearch=false;
+  KeyContent.clear();
+  KeyHigh.clear();
+  ZIFLast.reset();
+}// clear
+
+//----------------ZSIndexCollection-------------------------------------------------
 
 void
 ZIndexCollection::clear(void)
@@ -27,24 +110,24 @@ ZIndexCollection::clear(void)
 }// clear
 
 
-ZIndexCollection::ZIndexCollection(ZIndexFile *pZIFFile)
+ZIndexCollection::ZIndexCollection(ZRawIndexFile *pZIFFile)
 {
     clear();
     ZIFFile=pZIFFile;
     return;
 }
 
-ZIndexCollection::ZIndexCollection(ZMasterFile &pZMFFile,const long pIndexRank)
+ZIndexCollection::ZIndexCollection(ZRawMasterFile &pZMFFile,const long pIndexRank)
 {
 
-    ZIndexCollection(pZMFFile.ZMCB.IndexObjects[pIndexRank]);
+    ZIndexCollection(pZMFFile.IndexTable[pIndexRank]);
     return;
 }
 
 
 /**
- * @brief ZIndexCollection::clear Clears and resets anything within collection excepted Collection (ZArray<ssize_t> & bool)
- * in order to preserve recursivity of calls : ZIndexCollection could be itself given as a collection to refine with other search arguments.
+ * @brief ZSIndexCollection::clear Clears and resets anything within collection excepted Collection (ZArray<ssize_t> & bool)
+ * in order to preserve recursivity of calls : ZSIndexCollection could be itself given as a collection to refine with other search arguments.
  */
 void
 ZIndexCollection::reset(void)
@@ -53,7 +136,7 @@ ZIndexCollection::reset(void)
     Context.reset();
 }
 /**
- * @brief ZIndexCollection::initSearch Initialize a search on the given ZRandomFile (pZRFFile) using optional pCollection of ranks.
+ * @brief ZSIndexCollection::initSearch Initialize a search on the given ZRandomFile (pZRFFile) using optional pCollection of ranks.
  * @param[in] pZRFFile  a pointer to a ZRandomFile structure that is an opened ZRandomFile to process the search on
  * @param pCollection   Optionally, an existing collection of records that may result from a previous search operation
  * @return
@@ -67,7 +150,7 @@ ZIndexCollection::initSearch(ZArray<ZIndexResult> *pCollection)
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                 ZS_FILENOTOPEN,
                                 Severity_Error,
-                                "Reference ZIndexFile <%s> must be open to use a ZIndexCollection.",
+                                "Reference ZIndexFile <%s> must be open to use a ZSIndexCollection.",
                                 ZIFFile->getURIContent().toString());
         return ZS_FILENOTOPEN;
         }
@@ -77,7 +160,7 @@ ZIndexCollection::initSearch(ZArray<ZIndexResult> *pCollection)
         FCollection=true;
         if (InputCollection == nullptr)
                 InputCollection = new ZArray<ZIndexResult>();
-        InputCollection->_cloneFrom(*pCollection);
+        InputCollection->_copyFrom(*pCollection);
         }
         else
         {
@@ -96,37 +179,29 @@ ZIndexCollection::initSearch(ZArray<ZIndexResult> *pCollection)
 }// initSearch
 
 /**
- * @brief ZIndexCollection::copy Safely copies a collection given in input to current ZIndexCollection. It will further be the base of raw ranks.
+ * @brief ZSIndexCollection::copy Safely copies a collection given in input to current ZSIndexCollection. It will further be the base of raw ranks.
  * @param pCollection collection to copy
  */
-void
-ZIndexCollection::copy(ZIndexCollection &pCollection)
+ZIndexCollection&
+ZIndexCollection::_copyFrom(const ZIndexCollection &pIn)
 {
     clear();
-    _Base::_cloneFrom (pCollection);
-    for (long wi=0;wi<pCollection.size();wi++)
-            {
-            newBlankElement();
-            Argument.last().SizeToCollect =pCollection.Argument[wi].SizeToCollect;
-            Argument.last().FieldLength=pCollection.Argument[wi].FieldLength;
-            Argument.last().FieldOffset=pCollection.Argument[wi].FieldOffset;
-            Argument.last().FCaseRegardless=pCollection.Argument[wi].FCaseRegardless;
-            Argument.last().FString=pCollection.Argument[wi].FString;
-            Argument.last().FTrimSpace=pCollection.Argument[wi].FTrimSpace;
-            Argument.last().SearchType=pCollection.Argument[wi].SearchType;
-            Argument.last().SequenceOffset=pCollection.Argument[wi].SequenceOffset;
-            Argument.last().SequenceSize=pCollection.Argument[wi].SequenceSize;
-            Argument.last().SearchSequence=pCollection.Argument[wi].SearchSequence;
-            }
+    _Base::_baseAllocate(pIn.ZAllocation);   /* allocate without trimming */
+    _Base::ZReallocQuota = pIn.ZReallocQuota;
+//    _Base::_copyFrom(pIn);
+    for (long wi=0;wi < pIn.size();wi++) {
+      push((ZIndexResult )pIn[wi]);
+    }
+    return *this;
 }// copy
 //--------------------- Raw Indexes --------------------------------------------------
 /**
- * @brief ZIndexCollection::getZIRfromZIF
- * @param[out] pZIR      A ZIndexResult corresponding to pIndexRank
+ * @brief ZSIndexCollection::getZIRfromZIF
+ * @param[out] pZIR      A ZSIndexResult corresponding to pIndexRank
  * @param[in] pIndexRank
  * @return a ZStatus
  * - ZS_OUTBOUNDLOW or ZS_OUTBOUNDHIGH if pIndexRank points to a non existing low or high relative rank
- * - ZS_SUCCESS if Index has been validly accessed and returned ZIndexResult reflects the content of ZIndexFile record
+ * - ZS_SUCCESS if Index has been validly accessed and returned ZSIndexResult reflects the content of ZIndexFile record
  * - File error status if an error occurs. In this case ZException is set with appropriate error message.
  */
 ZStatus
@@ -169,17 +244,17 @@ ZIndexItem wIndexItem ;
 }//getZIRfromZIF
 
 /**
- * @brief ZIndexCollection::getFirstRawRank Delivers the first raw ZIndexFile rank as a ZIndexResult structure,
+ * @brief ZSIndexCollection::getFirstRawRank Delivers the first raw ZIndexFile rank as a ZSIndexResult structure,
  * either the native rank or through the saved collection rank - collection (a ZArray<ssize_t>) mentionned during initSearch.
  * This is given without having evaluated the test conditions.
  *
  * @note the returned rank is not yet evaluated, and the resulting field read from ZRandomFile must be evaluated using testSequence() routine.
  *
- * @param[out] pZIR the ZIndexResult rank to read or isNull() ({-1,-1}) if end of collection or end of file.
+ * @param[out] pZIR the ZSIndexResult rank to read or isNull() ({-1,-1}) if end of collection or end of file.
  * @return a ZStatus set to
  * - ZS_SUCCESS if a valid first rank has been found
  * - ZS_EOF if getNextRawIndex is called while there is an input collection and current input collection index is at already last collection rank (input collection is empty-or-Index file is empty)
- * - error status from ZIndexCollection::getZIRfromZIF()
+ * - error status from ZSIndexCollection::getZIRfromZIF()
  *
  */
 
@@ -190,7 +265,7 @@ ZStatus ZIndexCollection::getFirstRawRank(ZIndexResult & pZIR)
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                 ZS_INVINDEX,
                                 Severity_Fatal,
-                                "No ZIndexFile is mentionned while trying to access a ZMasterFile index.");
+                                "No ZIndexFile is mentionned while trying to access a ZSMasterFile index.");
         ZException.exit_abort();
         }
     if (InputCollection!=nullptr)    // there is a collection to refine
@@ -211,7 +286,7 @@ ZStatus ZIndexCollection::getFirstRawRank(ZIndexResult & pZIR)
         }
 // direct access to ZRandomFile : no collection to refine
     Context.InputCollectionIndex=0;
-    if (Context.InputCollectionIndex >= ZIFFile->getRecordCount())
+    if (Context.InputCollectionIndex >= ZIFFile->getSize())
                 {
                 Context.ZIFLast.reset();
                 Context.ZSt=ZS_EOF;
@@ -220,7 +295,7 @@ ZStatus ZIndexCollection::getFirstRawRank(ZIndexResult & pZIR)
      return getZIRfromZIF(Context.ZIFLast,Context.InputCollectionIndex);
 }//getFirstRawIndex
 /**
- * @brief ZIndexCollection::getNextRawRank Delivers the next raw ZRandomFile rank to read,
+ * @brief ZSIndexCollection::getNextRawRank Delivers the next raw ZRandomFile rank to read,
  * either the native rank or through the saved collection rank - collection (a ZArray<ssize_t>) mentionned during initSearch.
  * This is given without having evaluated the test conditions.
  *
@@ -230,11 +305,11 @@ ZStatus ZIndexCollection::getFirstRawRank(ZIndexResult & pZIR)
  *
  * @note the returned rank is not yet evaluated, and the resulting field read from ZRandomFile must be evaluated using testSequence() routine.
  *
- * @param[out] pZIR the ZIndexResult rank to read or isNull() ({-1,-1}) if end of collection / end of file or in case of file error (including record locked)
+ * @param[out] pZIR the ZSIndexResult rank to read or isNull() ({-1,-1}) if end of collection / end of file or in case of file error (including record locked)
  * @return a ZStatus set to
  * - ZS_SUCCESS if a valid first rank has been found
  * - ZS_EOF if getNextRawIndex is called while there is an input collection and current input collection index is at already last collection rank (input collection is empty)
- * - error status from ZIndexCollection::getZIRfromZIF()
+ * - error status from ZSIndexCollection::getZIRfromZIF()
  */
 ZStatus
 ZIndexCollection::getNextRawRank (ZIndexResult &pZIR)
@@ -244,7 +319,7 @@ ZIndexCollection::getNextRawRank (ZIndexResult &pZIR)
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                 ZS_INVINDEX,
                                 Severity_Fatal,
-                                "No ZIndexFile is mentionned while trying to access a ZMasterFile index.");
+                                "No ZIndexFile is mentionned while trying to access a ZSMasterFile index.");
         ZException.exit_abort();
         }
 
@@ -265,7 +340,7 @@ ZIndexCollection::getNextRawRank (ZIndexResult &pZIR)
         }
 // direct access to ZRandomFile : no collection to refine
 
-    if (Context.InputCollectionIndex >= ZIFFile->getRecordCount())
+    if (Context.InputCollectionIndex >= ZIFFile->getSize())
                 {
                 Context.ZIFLast.reset();
                 pZIR.reset();
@@ -274,7 +349,7 @@ ZIndexCollection::getNextRawRank (ZIndexResult &pZIR)
     return getZIRfromZIF(pZIR,Context.InputCollectionIndex);
 }//getNextRawIndex
 /**
- * @brief ZIndexCollection::getPreviousRawRank Delivers the previous raw ZRandomFile rank to read,
+ * @brief ZSIndexCollection::getPreviousRawRank Delivers the previous raw ZRandomFile rank to read,
  * either the native flat rank or through the saved collection rank - collection (a ZArray<ssize_t>) mentionned during initSearch
  * This is given without having evaluated the test conditions.
  *
@@ -290,7 +365,7 @@ ZStatus ZIndexCollection::getPreviousRawRank(ZIndexResult&pZIR)
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                 ZS_INVOP,
                                 Severity_Fatal,
-                                "No ZIndexFile is mentionned while trying to access a ZMasterFile index.");
+                                "No ZIndexFile is mentionned while trying to access a ZSMasterFile index.");
         ZException.exit_abort();
         }
     Context.InputCollectionIndex --;
@@ -313,7 +388,7 @@ ZStatus ZIndexCollection::getPreviousRawRank(ZIndexResult&pZIR)
     return getZIRfromZIF(pZIR,Context.InputCollectionIndex);
 }//getPreviousRawIndex
 /**
- * @brief ZIndexCollection::getCurrentRawRank Delivers the current raw ZRandomFile rank to read,
+ * @brief ZSIndexCollection::getCurrentRawRank Delivers the current raw ZRandomFile rank to read,
  * either from stored collection of ranks or directly from ZRandomFile rank if input collection is omitted.
  * This is given without having evaluated the test conditions.
  *
@@ -327,7 +402,7 @@ ZStatus ZIndexCollection::getCurrentRawRank(ZIndexResult&pZIR)
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                 ZS_INVOP,
                                 Severity_Fatal,
-                                "No ZIndexFile is mentionned while trying to access a ZMasterFile index.");
+                                "No ZIndexFile is mentionned while trying to access a ZSMasterFile index.");
         ZException.exit_abort();
         }
     if (Context.InputCollectionIndex<0)
@@ -350,7 +425,7 @@ ZStatus ZIndexCollection::getCurrentRawRank(ZIndexResult&pZIR)
         pZIR= InputCollection->Tab[Context.InputCollectionIndex];
         return setStatus(ZS_SUCCESS);
         }
-    if (Context.InputCollectionIndex>ZIFFile->getRecordCount())
+    if (Context.InputCollectionIndex>ZIFFile->getSize())
         {
         Context.ZSt=ZS_EOF;
         Context.ZIFLast.reset();
@@ -366,13 +441,13 @@ ZStatus ZIndexCollection::getCurrentRawRank(ZIndexResult&pZIR)
 //--------------Selected indexes-----------------------------------------
 
 /**
- * @brief ZIndexCollection::getFirstSelectedRank gets and returns the first ZMasterFile record rank matching field selection criterias
+ * @brief ZSIndexCollection::getFirstSelectedRank gets and returns the first ZSMasterFile record rank matching field selection criterias
  * This selection uses the sequential adhoc field selection mechanism.
  *
  * @return
  */
 /**
- * @brief ZIndexCollection::getFirstSelectedRank
+ * @brief ZSIndexCollection::getFirstSelectedRank
  * @param pRecordContent
  * @param[out] pZIR First ZRandomFile record rank  corresponding to selection criterias, or -1 if no match found till end of file
  * @param{in] pLock lock mask to set the found record if any
@@ -386,15 +461,15 @@ ZStatus
 ZIndexCollection::getFirstSelectedRank (ZDataBuffer &pRecordContent,ZIndexResult &pZIR)
 {
 ZStatus wSt;
-//ZIndexResult wZIR;
-ZMasterFile *wMasterFile ;
+//ZSIndexResult wZIR;
+ZRawMasterFile *wMasterFile ;
 
     if (ZIFFile==nullptr)
         {
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                 ZS_INVINDEX,
                                 Severity_Fatal,
-                                "No ZIndexFile is mentionned while trying to access a ZMasterFile index.");
+                                "No ZIndexFile is mentionned while trying to access a ZSMasterFile index.");
         ZException.exit_abort();
         }
 
@@ -408,7 +483,7 @@ ZMasterFile *wMasterFile ;
             Context.BaseIndex=-1;
             return getStatus();
             }
-    wMasterFile = static_cast<ZMasterFile*>(ZIFFile->ZMFFather);
+    wMasterFile = static_cast<ZRawMasterFile*>(ZIFFile->ZMFFather);
     Context.ZSt=ZS_NOTFOUND;
     while (Context.ZSt==ZS_NOTFOUND)
         {
@@ -417,7 +492,7 @@ ZMasterFile *wMasterFile ;
         if (Context.ZSt!=ZS_SUCCESS)
             {
             ZException.addToLast(" While getting first selected Index");
-    //        BaseIndex = -1;  // in case of status = ZS_LOCKED, BaseIndex contains the current rank on ZMasterFile or ZCollection to process
+    //        BaseIndex = -1;  // in case of status = ZS_LOCKED, BaseIndex contains the current rank on ZSMasterFile or ZCollection to process
             Context.ZIFLast.reset();
             return Context.ZSt;
             }
@@ -467,7 +542,7 @@ ZMasterFile *wMasterFile ;
 }//getFirstSelectedIndex
 
 /**
- * @brief ZIndexCollection::getNextSelectedRank gets and returns next ZRandomFile record rank matching field selection criterias
+ * @brief ZSIndexCollection::getNextSelectedRank gets and returns next ZRandomFile record rank matching field selection criterias
  *
  * ZSt is set to ZS_EOF if getNextSelectedIndex is called while Index is at already at last record rank or last collection rank
  *   or if no other record could match selection criterias until end of ZRandomFile.
@@ -486,7 +561,7 @@ ZStatus wSt;
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                 ZS_INVOP,
                                 Severity_Fatal,
-                                "No ZIndexFile is mentionned while trying to access a ZMasterFile index.");
+                                "No ZIndexFile is mentionned while trying to access a ZSMasterFile index.");
         ZException.exit_abort();
         }
 
@@ -502,9 +577,9 @@ ZStatus wSt;
 }//getNextSelectedRank
 
 /**
- * @brief ZIndexCollection::_getRetry gets the current index rank pointed by pZIR content test the corresponding ZMF record according selection rule using Argument::evaluate()
+ * @brief ZSIndexCollection::_getRetry gets the current index rank pointed by pZIR content test the corresponding ZMF record according selection rule using Argument::evaluate()
  * if a match occurs, returns
- * - a ZIndexResult with Index Rank & ZMF record address matching the Argument rules
+ * - a ZSIndexResult with Index Rank & ZMF record address matching the Argument rules
  * - corresponding ZMF record content
  * if no match, get next input collection or index record (if no input collection) until match, end of collection, record locked or other file error)
  *
@@ -513,10 +588,10 @@ ZStatus wSt;
  * - if there is an input collection : non matched record is unlocked before going to next
  * - if there is no input collection, no unlock.
  *
- * @param pRecordContent ZMasterFile record content for the found record matching Argument rules
- * @param[in,out] pZIR  a ZIndexResult
+ * @param pRecordContent ZSMasterFile record content for the found record matching Argument rules
+ * @param[in,out] pZIR  a ZSIndexResult
  * - input : index record and ZMF address to start matching,
- * - output : ZIndexResult with references of Index record (Index rank) and ZMF address for the matching record. If no match, then set to {-1;-1} (isNull()).
+ * - output : ZSIndexResult with references of Index record (Index rank) and ZMF address for the matching record. If no match, then set to {-1;-1} (isNull()).
  * @return a ZStatus
  * - ZS_FOUND a valid record has been found
  * - ZS_EOF no more matching record has been found since input pZIR till end of collection or file
@@ -527,10 +602,10 @@ ZStatus
 ZIndexCollection::_getRetry(ZDataBuffer &pRecordContent,ZIndexResult&pZIR)
 {
 ZStatus wSt;
-ZMasterFile *wMasterFile ;
+ZRawMasterFile *wMasterFile ;
 
     pZIR=Context.ZIFLast ;// ZIFLast is updated by getFirstRawRank and getNexRawRank
-    wMasterFile = static_cast<ZMasterFile*>(ZIFFile->ZMFFather);
+    wMasterFile = static_cast<ZRawMasterFile*>(ZIFFile->ZMFFather);
     setStatus(ZS_NOTFOUND);
     while (getStatus()==ZS_NOTFOUND)
         {
@@ -587,15 +662,15 @@ ZMasterFile *wMasterFile ;
 }//_getRetry
 #ifdef __COMMENT__
 /**
- * @brief ZIndexCollection::zgetNextRetry retry getting next selected record (matching Argument rules) starting from last accessed element (ZRFRank from context).
- * @param[out] pRecordContent ZMasterFile matching record content if successfull
+ * @brief ZSIndexCollection::zgetNextRetry retry getting next selected record (matching Argument rules) starting from last accessed element (ZRFRank from context).
+ * @param[out] pRecordContent ZSMasterFile matching record content if successfull
  * @param[out] pZIR ZIndexRank for the matching record
  * @param pWaitMs time to wait in milliseconds between two retry
  * @param pTimes number of times to retry operation if not successfull before returning the wrong status
- * @return ZStatus returned by ZIndexCollection::_getRetry()
+ * @return ZStatus returned by ZSIndexCollection::_getRetry()
  */
 ZStatus
-ZIndexCollection::zgetNextRetry(ZDataBuffer &pRecordContent,ZIndexResult& pZIR,long pWaitMs,int16_t pTimes)
+ZSIndexCollection::zgetNextRetry(ZDataBuffer &pRecordContent,ZSIndexResult& pZIR,long pWaitMs,int16_t pTimes)
 {
 
 int16_t wTimes=(pTimes>0?pTimes:1), wretryTimes = 0;
@@ -616,19 +691,19 @@ int16_t wTimes=(pTimes>0?pTimes:1), wretryTimes = 0;
 }//zgetNextRetry
 #endif //__COMMENT__
 /**
- * @brief ZIndexCollection::getPreviousSelectedRank returns the previous ZRandomFile selected index from Base ZArray<ssize_t>
+ * @brief ZSIndexCollection::getPreviousSelectedRank returns the previous ZRandomFile selected index from Base ZArray<ssize_t>
  *      In case of success, ZSt is set to ZS_SUCCESS. In case of error, ZSt is set to ZS_OUTBOUNDLOW.
  * @return ZRandomFile record rank for the previous record corresponding to selection criterias, or -1 if out of boundaries.
  */
 ZIndexResult
-ZIndexCollection::getPreviousSelectedRank (const zlock_type pLock)
+ZIndexCollection::getPreviousSelectedRank (const zlockmask_type pLock)
 {
     if (ZIFFile==nullptr)
         {
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                 ZS_INVOP,
                                 Severity_Fatal,
-                                "No ZIndexFile is mentionned while trying to access a ZMasterFile index.");
+                                "No ZIndexFile is mentionned while trying to access a ZSMasterFile index.");
         ZException.exit_abort();
         }
     Context.BaseIndex --;
@@ -644,7 +719,7 @@ ZIndexCollection::getPreviousSelectedRank (const zlock_type pLock)
     return Context.ZIFLast;
 }//getNextSelectedIndex
 /**
- * @brief ZIndexCollection::getCurrentSelectedRank Return the current ZRandomFile rank corresponding to selection criterias (Last accessed).
+ * @brief ZSIndexCollection::getCurrentSelectedRank Return the current ZRandomFile rank corresponding to selection criterias (Last accessed).
  *      If no current record rank is available (no selected record or criterias not initialized) a value of -1 is returned.
  * @return  last selected ZRandomFile record rank or -1 in case of empty selection
  */
@@ -656,7 +731,7 @@ ZIndexCollection::getCurrentSelectedRank(void)
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                 ZS_INVINDEX,
                                 Severity_Fatal,
-                                "No ZIndexFile is mentionned while trying to access a ZMasterFile index.");
+                                "No ZIndexFile is mentionned while trying to access a ZSMasterFile index.");
         ZException.exit_abort();
         }
     if (Context.BaseIndex<0)
@@ -678,13 +753,13 @@ ZIndexCollection::getCurrentSelectedRank(void)
 }//getCurrentSelectedIndex
 
 /**
- * @brief ZIndexCollection::getAllSelected creates the whole Collection, browsing the whole collection (or the whole ZMasterFile sequentially in record relative order if no collection),
+ * @brief ZSIndexCollection::getAllSelected creates the whole Collection, browsing the whole collection (or the whole ZSMasterFile sequentially in record relative order if no collection),
  *              and selects ZRandomFile record rank according selection criterias, populates its Base ZArray<ssize_t> collection.
  * @return a ZStatus set to ZS_FOUND if at least one rank has been selected - ZS_NOTFOUND if no record rank has been selected.
  *          In case of other error, the corresponding status is returned and ZException is set appropriately.
  */
 ZStatus
-ZIndexCollection::zgetAllSelected (const zlock_type pLock)
+ZIndexCollection::zgetAllSelected (const zlockmask_type pLock)
 {
 ZIndexResult wZIR;
 ZDataBuffer wRecordContent;
@@ -693,7 +768,7 @@ ZDataBuffer wRecordContent;
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                 ZS_INVOP,
                                 Severity_Fatal,
-                                "No ZIndexFile is mentionned while trying to access a ZMasterFile index.");
+                                "No ZIndexFile is mentionned while trying to access a ZSMasterFile index.");
         ZException.exit_abort();
         }
 
@@ -716,9 +791,9 @@ ZDataBuffer wRecordContent;
 
 #ifdef __COMMENT__
 ZStatus
-ZIndexCollection::_getAllRetry(void)
+ZSIndexCollection::_getAllRetry(void)
 {
-ZIndexResult wZIR;
+ZSIndexResult wZIR;
 ZDataBuffer wRecordContent ;
 
     setStatus(_getRetry(wRecordContent,wZIR));
@@ -739,13 +814,13 @@ ZDataBuffer wRecordContent ;
 
 
 /**
- * @brief ZIndexCollection::zgetAllRetry
+ * @brief ZSIndexCollection::zgetAllRetry
  * @param pWaitMs number of micro seconds to wait between each retry operation retrying
  * @param pTimes number of time we have to retry operation before it failss
  * @return
  */
 ZStatus
-ZIndexCollection::zgetAllRetry (long pWaitMs,int16_t pTimes)
+ZSIndexCollection::zgetAllRetry (long pWaitMs,int16_t pTimes)
 {
 
 int16_t wTimes=(pTimes>0?pTimes:1), wretryTimes = 0;
@@ -770,24 +845,24 @@ int16_t wTimes=(pTimes>0?pTimes:1), wretryTimes = 0;
 
 
 /**
- * @brief ZIndexCollection::zlockAll Locks the whole selected items contained in ZIndexCollection object with lockmask given by pLock.
+ * @brief ZSIndexCollection::zlockAll Locks the whole selected items contained in ZSIndexCollection object with lockmask given by pLock.
  *  This means that lock mask is set to pLock at record level and lock owner Pid is set to current pid.
  * @param[in] pLock lock mask see @ref ZLockMask_type
  * @return a ZStatus
  */
 ZStatus
-ZIndexCollection::zlockAll (const zlock_type pLock)
+ZSIndexCollection::zlockAll (const zlock_type pLock)
 {
 
     setLock (pLock);
-    for (Context.BaseIndex=0;Context.BaseIndex < size();Context.BaseIndex++)// lock corresponding ZMasterFile address with given lock mask
+    for (Context.BaseIndex=0;Context.BaseIndex < size();Context.BaseIndex++)// lock corresponding ZSMasterFile address with given lock mask
         {
-        Context.ZSt=static_cast<ZMasterFile*>(ZIFFile->ZMFFather)->zlockByAddress(Tab[Context.BaseIndex].ZMFAddress,pLock);
+        Context.ZSt=static_cast<ZSMasterFile*>(ZIFFile->ZMFFather)->zlockByAddress(Tab[Context.BaseIndex].ZMFAddress,pLock);
         if (Context.ZSt!=ZS_SUCCESS) // if not successfull : unlock what has been done and return status
             {
             for (long wj=0;wj<Context.BaseIndex;wj++)
                 {
-               static_cast<ZMasterFile*>(ZIFFile->ZMFFather)->zunlockByAddress(Tab[wj].ZMFAddress);
+               static_cast<ZSMasterFile*>(ZIFFile->ZMFFather)->zunlockByAddress(Tab[wj].ZMFAddress);
                 }
             } // !ZS_SUCCESS
         } // for
@@ -795,13 +870,13 @@ ZIndexCollection::zlockAll (const zlock_type pLock)
     return getStatus();
 }// zlockAll
 /**
- * @brief ZIndexCollection::zlockAllRetry
+ * @brief ZSIndexCollection::zlockAllRetry
  * @param pWaitMs number of micro seconds to wait between each retry operation retrying
  * @param pTimes number of time we have to retry operation before it fails
  * @return
  */
 ZStatus
-ZIndexCollection::zlockAllRetry (long pWaitMs,int16_t pTimes)
+ZSIndexCollection::zlockAllRetry (long pWaitMs,int16_t pTimes)
 {
 ZStatus wSt;
 int16_t wTimes=(pTimes>0?pTimes:1), wretryTimes = 0;
@@ -823,19 +898,19 @@ int16_t wTimes=(pTimes>0?pTimes:1), wretryTimes = 0;
 
 
 /**
- * @brief ZIndexCollection::zunlockAll unlocks the whole selected items contained in ZIndexCollection object.
+ * @brief ZSIndexCollection::zunlockAll unlocks the whole selected items contained in ZSIndexCollection object.
  * It means that lock mask is set to ZLock_Nolock and pid is set to O at record level.
  * @return a ZStatus
  */
 ZStatus
-ZIndexCollection::zunlockAll (void)
+ZSIndexCollection::zunlockAll (void)
 {
 ZStatus wSt;
 
 
-    for (Context.BaseIndex=0;Context.BaseIndex < size();Context.BaseIndex++)// lock corresponding ZMasterFile address with given lock mask
+    for (Context.BaseIndex=0;Context.BaseIndex < size();Context.BaseIndex++)// lock corresponding ZSMasterFile address with given lock mask
         {
-        wSt=static_cast<ZMasterFile*>(ZIFFile->ZMFFather)->zunlockByAddress(Tab[Context.BaseIndex].ZMFAddress);
+        wSt=static_cast<ZSMasterFile*>(ZIFFile->ZMFFather)->zunlockByAddress(Tab[Context.BaseIndex].ZMFAddress);
         if (wSt!=ZS_SUCCESS)
                 {
                 setStatus(wSt);
@@ -846,10 +921,10 @@ ZStatus wSt;
 }// zunlockAll
 #endif // __COMMENT__
 /**
-  * @brief ZIndexCollection::zsetFieldValue Changes the value of one field for all records of the current collection
+  * @brief ZSIndexCollection::zsetFieldValue Changes the value of one field for all records of the current collection
   * This collection routine allows to make massive change to the collection of records
   *
-  * A check is made on field definition (offset and size) with all ZMasterFile defined index key dictionaries, in order to prevent
+  * A check is made on field definition (offset and size) with all ZSMasterFile defined index key dictionaries, in order to prevent
   * modifying a field subject to being part of a key.
   * If such a violation occurs, then a ZS_INVADDRESS status is returned, without any modification made.
   *
@@ -861,18 +936,18 @@ ZStatus wSt;
  ZIndexCollection::zsetFieldValue(const ssize_t pOffset,ZDataBuffer &pFieldValue)
  {
 ZStatus wSt;
-ZMasterFile* wMasterFile =  static_cast<ZMasterFile*>(ZIFFile->ZMFFather);
+ZRawMasterFile* wMasterFile =  static_cast<ZRawMasterFile*>(ZIFFile->ZMFFather);
 ZBlock      wBlock;
 ssize_t     wSize;
 ZKeyDictionary *wZKDic ;
 
 ZDataBuffer wFormerFieldValue;
 
-// here check if massive change will affect one of defined key fields for ZMasterFile
+// here check if massive change will affect one of defined key fields for ZSMasterFile
 
-    for (zrank_type wi=0;wi<wMasterFile->ZMCB.Index.size();wi++)
+/*    for (zrank_type wi=0;wi<wMasterFile->IndexTable.size();wi++)
         {
-        wZKDic = wMasterFile->ZMCB.Index[wi].ZKDic;
+        wZKDic = wMasterFile->IndexTable[wi].ZKDic;
         for (long wj=0;wi<wZKDic->size();wj++)
                 {
                 if ((pOffset > wZKDic->fieldRecordOffset(wj))&&(pOffset < wZKDic->fieldRecordOffset(wj)))
@@ -880,12 +955,12 @@ ZDataBuffer wFormerFieldValue;
                 if (((pOffset+pFieldValue.Size) > wZKDic->fieldRecordOffset(wj))&&((pOffset+pFieldValue.Size) < wZKDic->fieldRecordOffset(wj)))
                                     return ZS_INVADDRESS ;
                 }
-        }// for
+        }// for*/
 // up to here field definition is checked
 
    for (Context.BaseIndex=0;Context.BaseIndex < size();Context.BaseIndex++)
        {
-       Context.ZSt=wMasterFile->_getByAddress(wMasterFile->ZDescriptor,wBlock,Tab[Context.BaseIndex].ZMFAddress);
+       Context.ZSt=wMasterFile->_getByAddress(wBlock,Tab[Context.BaseIndex].ZMFAddress);
        if (Context.ZSt!=ZS_SUCCESS)
                    {
                    return getStatus();
@@ -893,10 +968,10 @@ ZDataBuffer wFormerFieldValue;
        // check wether data size to change will not bypass the end of the record : if so, truncate it.
        // NB: we are in a record varying context
 
-       if (wMasterFile->ZMCB.ZJCB!=nullptr)
+       if (wMasterFile->ZJCB!=nullptr)
            {
            wFormerFieldValue.setData(wBlock.Content.Data+pOffset,pFieldValue.Size);
-           wMasterFile->ZMCB.ZJCB->Journal->enqueueSetFieldValue(ZJOP_ChgFld,
+           wMasterFile->ZJCB->Journal->enqueueSetFieldValue(ZJOP_ChgFld,
                                                                  wFormerFieldValue,
                                                                  pFieldValue,
                                                                  -1,
@@ -910,7 +985,7 @@ ZDataBuffer wFormerFieldValue;
                                     wSize=wBlock.Content.Size-pOffset;
        wBlock.Content.changeData(pFieldValue.Data,wSize,pOffset);
 
-       wSt=wMasterFile->_writeBlockAt(wMasterFile->ZDescriptor,wBlock,Tab[Context.BaseIndex].ZMFAddress);
+       wSt=wMasterFile->_writeBlockAt(wBlock,Tab[Context.BaseIndex].ZMFAddress);
        if (wSt!=ZS_SUCCESS)
                 return wSt;
 
@@ -921,16 +996,16 @@ ZDataBuffer wFormerFieldValue;
  }// zsetFieldValue
 
 /**
- * @brief ZIndexCollection::zremoveAll
+ * @brief ZSIndexCollection::zremoveAll
  * @return
  */
 ZStatus
 ZIndexCollection::zremoveAll (void)
 {
 
-    for (Context.BaseIndex=0;Context.BaseIndex < size();Context.BaseIndex++)// lock corresponding ZMasterFile address with given lock mask
+    for (Context.BaseIndex=0;Context.BaseIndex < size();Context.BaseIndex++)// lock corresponding ZSMasterFile address with given lock mask
         {
-        Context.ZSt=static_cast<ZMasterFile*>(ZIFFile->ZMFFather)->zremoveByAddress(Tab[Context.BaseIndex].ZMFAddress);
+        Context.ZSt=static_cast<ZRawMasterFile*>(ZIFFile->ZMFFather)->zremoveByAddress(Tab[Context.BaseIndex].ZMFAddress);
         if (Context.ZSt!=ZS_SUCCESS)
                     {
                     return getStatus();
@@ -944,9 +1019,9 @@ ZStatus
 ZIndexCollection::_removeAllRetry (void)
 {
 
-    for (long wi=Context.BaseIndex;wi < size();wi++)// lock corresponding ZMasterFile address with given lock mask
+    for (long wi=Context.BaseIndex;wi < size();wi++)// lock corresponding ZSMasterFile address with given lock mask
         {
-        setStatus(static_cast<ZMasterFile*>(ZIFFile->ZMFFather)->zremoveByAddress(Tab[wi].ZMFAddress));
+        setStatus(static_cast<ZRawMasterFile*>(ZIFFile->ZMFFather)->zremoveByAddress(Tab[wi].ZMFAddress));
         if (Context.ZSt!=ZS_SUCCESS) // if not successfull : unlock what has been done and return status
                     {
                     Context.BaseIndex=wi;
@@ -957,7 +1032,7 @@ ZIndexCollection::_removeAllRetry (void)
     return getStatus();
 }// _removeAllRetry
 /**
- * @brief ZIndexCollection::zremoveAllRetry
+ * @brief ZSIndexCollection::zremoveAllRetry
  * @param pWaitMs number of micro seconds to wait between each retry operation retrying
  * @param pTimes number of time we have to retry operation before it fails
  * @return
@@ -991,7 +1066,7 @@ int16_t wTimes=(pTimes>0?pTimes:1), wretryTimes = 0;
 //--------------End Selected indexes-----------------------------------------
 
 
-//--------------End ZIndexCollection------------------------------------------------
+//--------------End ZSIndexCollection------------------------------------------------
 
 
 #endif // ZINDEXCOLLECTION_CPP

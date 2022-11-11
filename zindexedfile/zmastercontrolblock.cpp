@@ -14,7 +14,11 @@
 
 using namespace zbs;
 
-ZMasterControlBlock::ZMasterControlBlock() {clear();}
+ZMasterControlBlock::ZMasterControlBlock(ZRawMasterFile* pMasterFile)
+{
+  clear();
+  RawMasterFile=pMasterFile;
+}
 
 
 // ----------ZMasterControlBlock ----------
@@ -39,23 +43,20 @@ ZMasterControlBlock::~ZMasterControlBlock(void)
 long ZMasterControlBlock::popIndex(void)
 {
   if (IndexTable.pop()<0)
-  {
     return -1;
-  }
-  IndexCount=IndexTable.size();
+
   return IndexTable.size();
 }
 
 
 void ZMasterControlBlock::clear(void)
 {
-  IndexCount=0;
-  //    HistoryOn=false;
-  //    JournalingOn = false;
-  MCBSize = 0;
-  //    BlockID=ZBID_MCB;                 // only used within _Export structures
-  //    ZMFVersion= __ZMF_VERSION__;
-  //    StartSign=cst_ZSTART;
+
+  HistoryOn=false;
+
+  delete Dictionary;
+  DictionaryName.clear();
+  DictionaryPath.clear();
   while (IndexTable.size() > 0)
     popIndex();
   IndexTable.clear();
@@ -64,7 +65,7 @@ void ZMasterControlBlock::clear(void)
 }
 
 
-ZSMCBOwnData_Export& ZSMCBOwnData_Export::_copyFrom(const ZSMCBOwnData_Export& pIn)
+ZMCB_Export& ZMCB_Export::_copyFrom(const ZMCB_Export& pIn)
 {
   StartSign=pIn.StartSign;
   BlockId=pIn.BlockId;
@@ -72,7 +73,7 @@ ZSMCBOwnData_Export& ZSMCBOwnData_Export::_copyFrom(const ZSMCBOwnData_Export& p
   MCBSize=pIn.MCBSize;
 //  MDicOffset=pIn.MDicOffset;
 //  MDicSize=pIn.MDicSize;
-  IndexCount=pIn.IndexCount;
+//  IndexCount=pIn.IndexCount;
   ICBOffset=pIn.ICBOffset;
   ICBOffset=pIn.ICBOffset;
   ICBSize=pIn.ICBSize;
@@ -82,47 +83,50 @@ ZSMCBOwnData_Export& ZSMCBOwnData_Export::_copyFrom(const ZSMCBOwnData_Export& p
   return *this;
 }
 
-ZSMCBOwnData_Export& ZSMCBOwnData_Export::set(const ZSMCBOwnData& pIn)
+/* export order ;
+ *
+ ZMCB_Export
+ - index file path
+ - dictionary Path
+ - dictionary Name
+
+ IndexCount
+ - index table :
+    ZICBs
+ - JCB
+
+
+ */
+
+size_t ZMCB_Export::_exportAppend(ZDataBuffer& pReturn)
 {
+  StartSign = cst_ZBLOCKSTART;
+  BlockId   = ZBID_MCB;
+  ZMFVersion =  __ZMF_VERSION__;
 
-  StartSign=cst_ZBLOCKSTART;
-  BlockId=ZBID_MCB;
-  ZMFVersion=__ZMF_VERSION__;
+  serialize();
 
-  MCBSize=pIn.MCBSize;
-//  MDicOffset=pIn.MDicOffset;
-//  MDicSize=pIn.MDicSize;
-  IndexCount=pIn.IndexCount;
-  ICBOffset=pIn.ICBOffset;
-  ICBSize=pIn.ICBSize;
-  JCBOffset=pIn.JCBOffset;
-  JCBSize=pIn.JCBSize;
-  HistoryOn=pIn.HistoryOn;
+  pReturn.appendData(this,sizeof(ZMCB_Export));
+  return sizeof(ZMCB_Export);
+}
+
+ZMCB_Export& ZMCB_Export::setFromPtr(const unsigned char*& pPtrIn)
+{
+  memmove (this,pPtrIn,sizeof(ZMCB_Export));
+  pPtrIn += sizeof(ZMCB_Export);
   return *this;
 }
-ZSMCBOwnData_Export& ZSMCBOwnData_Export::setFromPtr(const unsigned char*& pPtrIn)
+ZMCB_Export& ZMCB_Export::_import( const unsigned char*& pPtrIn)
 {
-  memmove (this,pPtrIn,sizeof(ZSMCBOwnData_Export));
-  pPtrIn += sizeof(ZSMCBOwnData_Export);
+  memmove (this,pPtrIn,sizeof(ZMCB_Export));
+  deserialize();
+  pPtrIn += sizeof(ZMCB_Export);
+
   return *this;
-}
-ZSMCBOwnData& ZSMCBOwnData_Export::_toMCBOwnData(ZSMCBOwnData& pOut)
-{
-  pOut.MCBSize=MCBSize;
-//  pOut.MDicOffset=MDicOffset;
-//  pOut.MDicSize=MDicSize;
-  pOut.IndexCount=IndexCount;
-  pOut.ICBOffset=ICBOffset;
-  pOut.ICBSize=ICBSize;
-  pOut.JCBOffset=JCBOffset;
-  pOut.JCBSize=JCBSize;
-  pOut.HistoryOn=HistoryOn;
-
-  return pOut;
-}
+} // _import
 
 
-void ZSMCBOwnData_Export::_convert()
+void ZMCB_Export::_convert()
 {
   if (!is_little_endian())
     return ;
@@ -138,12 +142,12 @@ void ZSMCBOwnData_Export::_convert()
   ICBSize=reverseByteOrder_Conditional<uint32_t>(ICBSize);
   JCBOffset=reverseByteOrder_Conditional<uint32_t>(JCBOffset);
   JCBSize=reverseByteOrder_Conditional<int32_t>(JCBSize);
-  IndexCount=reverseByteOrder_Conditional<uint32_t>(IndexCount);
+//  IndexCount=reverseByteOrder_Conditional<uint32_t>(IndexCount);
   return ;
 }
 
 void
-ZSMCBOwnData_Export::serialize()
+ZMCB_Export::serialize()
 {
   if (!is_little_endian())
     return ;
@@ -156,7 +160,7 @@ ZSMCBOwnData_Export::serialize()
 }
 
 void
-ZSMCBOwnData_Export::deserialize()
+ZMCB_Export::deserialize()
 {
   if (!is_little_endian())
     return ;
@@ -184,75 +188,6 @@ ZSMCBOwnData_Export::deserialize()
  * @return
  */
 
-ZDataBuffer&
-ZSMCBOwnData::_exportAppend(ZDataBuffer& pZDBExport)
-{
-  ZSMCBOwnData_Export wMCBE;
-  wMCBE.set(*this);
-  wMCBE.serialize();
-  pZDBExport.appendData(&wMCBE,sizeof(ZSMCBOwnData_Export));  // move all up until IndexFilePath
-      // append IndexFilePath without '\0' end character : NO END SIGN MARKER
-  IndexFilePath._exportAppendUVF(pZDBExport);
-//  pZDBExport.appendData(wIndexPath);
-
-  return pZDBExport;
-}//ZSMCBOwnData::_exportAppend
-
-
-ZDataBuffer
-ZSMCBOwnData::_export()
-{
-  ZDataBuffer wExp;
-  return _exportAppend(wExp);
-}//ZSMCBOwnData::_export
-
-ZStatus
-ZSMCBOwnData::_import(const unsigned char* &pPtrIn)
-{
-  ZStatus wSt;
-
-  ZSMCBOwnData_Export wMCBe;
-  memmove(&wMCBe,pPtrIn,sizeof(ZSMCBOwnData_Export));
-
-  if (wMCBe.StartSign!=cst_ZBLOCKSTART)
-    {
-      ZException.setMessage("ZSMCBOwnData::_import",
-          ZS_BADMCB,
-          Severity_Severe,
-          "Invalid Master Control Block header : found Start marker <%X>.",
-          wMCBe.StartSign);
-      return  ZS_BADMCB;
-    }
-  else if (wMCBe.BlockId!=ZBID_MCB)
-      {
-        ZException.setMessage("ZSMCBOwnData::_import",
-            ZS_BADMCB,
-            Severity_Severe,
-            "Invalid Master Control Block header : found  ZBlockID <%X>.",
-            wMCBe.BlockId);
-        return  ZS_BADMCB;
-      }
-
-  if (reverseByteOrder_Conditional<unsigned long>(wMCBe.ZMFVersion)!= __ZMF_VERSION__)
-    {
-    ZException.setMessage("ZSMCBOwnData::_import",
-                          ZS_BADFILEVERSION,
-                          Severity_Error,
-                          "Serialized Master Control Block : Found version <%ld> while current ZMF version is <%ld>",
-                          reverseByteOrder_Conditional<unsigned long>(wMCBe.ZMFVersion),
-                          __ZMF_VERSION__);
-    return (ZS_BADFILEVERSION);
-    }
-
-
-  wMCBe.deserialize();
-  wMCBe._toMCBOwnData(*this);
-
-  pPtrIn+=sizeof(ZSMCBOwnData_Export);
-  IndexFilePath._importUVF(pPtrIn);
-
-  return  ZS_SUCCESS;
-}//ZSMCBOwnData::_import
 
 /*
 <zmastercontrolblock>
@@ -281,7 +216,7 @@ ZMasterControlBlock::toXml(int pLevel,bool pComment)
   if (pComment)
     fmtXMLaddInlineComment(wReturn," Reserved for future use : will allow historization of journalling events if set to true.");
 
-  wReturn+=fmtXMLuint("indexcount",  IndexCount,wLevel);
+  wReturn+=fmtXMLuint("indexcount",  IndexTable.count(),wLevel);
   if (pComment)
     fmtXMLaddInlineComment(wReturn," FYI: Number of index keys for current file.");
 
@@ -363,7 +298,8 @@ ZStatus ZMasterControlBlock::fromXml(zxmlNode* pRootNode, ZaiErrors* pErrorlog)
   else
     HistoryOn=wBool;
 
-  if (XMLgetChildUInt32(wRootNode, "indexcount", IndexCount, pErrorlog)< 0) {
+  uint32_t wIndexCount;
+  if (XMLgetChildUInt32(wRootNode, "indexcount", wIndexCount, pErrorlog)< 0) {
     fprintf(stderr,
         "ZSMCBOwnData::fromXml-E-CNTFINDPAR Cannot find parameter %s.\n",
         "indexcount");
@@ -428,129 +364,108 @@ ZStatus ZMasterControlBlock::fromXml(zxmlNode* pRootNode, ZaiErrors* pErrorlog)
   Header Reserved components for Master file  (Master Control Block export)
 
   Master Control Block    ZBID_MCB
-    MCB Own Data : offsets to other "control blocks" and dictionary are here
-    IndexFilePath (UVF format)
+       |  MCB Own Data : offsets to other "control blocks" and dictionary are here
+       |
+       |  IndexFilePath (UVF format)
+       |  DictionaryName (UVF format)
+       |  DictionaryPath (UVF format)
+       |  IndexFilePath (UVF format)
 
-  Index Control Blocks ZBID_ICB
-      ICB 0
-      ICB 1
-      ...
-      ICB n
+    +------> if index count greater than 0
+    |
+    |  Index Control Blocks ZBID_ICB
+    |      | ICB 0
+    |      | IndexName (UVF format)
+    |      | URIIndex (UVF format)
+    |
+    |      | ICB 1
+    |      | IndexName (UVF format)
+    |      | URIIndex (UVF format)
+    |      ...
+    |      | ICB n
+    |      | IndexName (UVF format)
+    |      | URIIndex (UVF format)
+    +-------
+    cst_ZBLOCKEND (0xFCFCFCFC)
+
+
   Journal Control Block ZBID_JCB
 
-  Master Dictionary   ZBID_MDIC
-      Meta Dictionary
-      Key Dictionaries
+
 */
 
-ZDataBuffer ZMasterControlBlock::_exportMCB()
-{
-  ZDataBuffer wZDB;
-  return _exportMCBAppend(wZDB);
-}
 
-ZDataBuffer& ZMasterControlBlock::_exportMCBAppend(ZDataBuffer &pMCBContent)
+size_t ZMasterControlBlock::_exportAppend(ZDataBuffer &pMCBContent)
 {
   ZDataBuffer wJCB;
   ZDataBuffer wICB;
-  ZDataBuffer wMDic;
+ // ZDataBuffer wMCB;
 
+  ZMCB_Export wMCBExp;
+  ZDataBuffer wZDBIndexes;
 
-  IndexCount = IndexTable.size();
+  /* NB: before is ZMCB_Export (computed later) */
 
-  /* first ICBs */
+  size_t wRet;
 
-  wICB.clear();
-  for (long wi = 0;wi < IndexTable.size(); wi++)
-    {
-    IndexTable[wi]->_exportAppend(wICB);
-    }
+  if (IndexTable.count() > 0){
+  /* first export indexes */
+  for (long wi = 0;wi < IndexTable.size(); wi++) {
+    wRet=IndexTable[wi]->_exportAppend(wZDBIndexes);
+  }
+  wMCBExp.ICBSize=(uint32_t)wZDBIndexes.Size;
+  }
+  else {
+    wMCBExp.ICBOffset=0;
+    wMCBExp.ICBSize=0;
+  }
+  _exportAtomic<uint32_t>(cst_ZBLOCKEND,wZDBIndexes);
+
   /* second export journalling : if journalling exists */
-  wJCB.clear();
-  if (ZJCB!=nullptr)
-      ZJCB->_exportJCB(wJCB);
+  ZDataBuffer wZDBJCB ;
+  if (ZJCB!=nullptr) {
+    ZJCB->_exportJCB(wZDBJCB);
+    _exportAtomic<uint32_t>(cst_ZBLOCKEND,wZDBJCB);
+    wMCBExp.JCBSize = (uint32_t)wZDBJCB.Size;
+  }
+  else {
+    wMCBExp.JCBSize = 0;
+    wMCBExp.JCBOffset = 0;
+  }
 
-  /* third export master dic : if master dic exists */
-/*
-  wMDic.clear();
-  if (Dictionary != nullptr)
-    {
-    Dictionary->_exportAppend(wMDic);
-    }
-*/
+//  wMCBExp.IndexCount=uint32_t(IndexTable.count());
 
-  /* then start filling MCB owndata */
+  wMCBExp.JCBOffset=uint32_t(wMCBExp.ICBOffset + wMCBExp.ICBSize);
 
-  uint32_t wOffset=sizeof(ZSMCBOwnData_Export)+IndexFilePath._getexportUVFSize();
+  wMCBExp.MCBSize=uint32_t(sizeof(ZMCB_Export)
+                             + IndexFilePath._getexportUVFSize()
+                             + DictionaryPath._getexportUVFSize()
+                             + DictionaryName._getexportUVFSize() );
+  wMCBExp.ICBOffset=wMCBExp.MCBSize;
 
-  ZSMCBOwnData_Export wMCBe;
+  wMCBExp.HistoryOn=HistoryOn;
 
-  wMCBe.set(*this);
+  wRet=wMCBExp._exportAppend(pMCBContent);
 
-  if (wICB.Size)
-    {
-    wMCBe.ICBSize = (uint32_t)wICB.Size;
-    wMCBe.ICBOffset = (uint32_t)wOffset;
-    }
-    else
-      {
-      wMCBe.ICBSize = 0;
-      wMCBe.ICBOffset =0;
-      }
-  wOffset += wICB.Size;
-
-  if  (ZJCB==nullptr)
-    {
-    wMCBe.JCBSize = 0;
-    wMCBe.JCBOffset = 0;
-    }
-  else
-    {
-    wMCBe.JCBSize =  wJCB.Size;
-    wMCBe.JCBOffset = wOffset;
-    wOffset += wJCB.Size;
-    }
-  wOffset += wJCB.Size;
-/*
-  if (Dictionary == nullptr)
-    {
-      wMCBe.MDicSize = 0;
-      wMCBe.MDicOffset = 0;
-    }
-    else
-      {
-      wMCBe.MDicSize =  uint32_t(wMDic.Size);
-      wMCBe.MDicOffset = wOffset;
-      }
-  wOffset += wMDic.Size;
-*/
-//  wMCBe.MCBSize = wOffset ; /* updated offset gives the total size for MCB */
-
-//  wMCBe.MCBSize = sizeof(ZSMCBOwnData_Export)+IndexFilePath._getexportUVFSize() + wMCBe.MDicSize + wMCBe.JCBSize + wMCBe.ICBSize;
-  wMCBe.MCBSize = sizeof(ZSMCBOwnData_Export)+IndexFilePath._getexportUVFSize()  + wMCBe.JCBSize + wMCBe.ICBSize;
-
-  wMCBe.serialize();
-
-/* first MCB & MCBOwnData + IndexFilePath */
-
-  pMCBContent.setData(&wMCBe,sizeof(ZSMCBOwnData_Export)); /* because always not appended to anything else */
+  DictionaryName._exportAppendUVF(pMCBContent);
+  DictionaryPath._exportAppendUVF(pMCBContent);
   IndexFilePath._exportAppendUVF(pMCBContent);
+  /*
+  size_t      wMCBSize = wMCB.Size;
 
+  ZMCB_Export* wMCB_Fin = (ZMCB_Export*)wMCB.Data;
 
-/* second  ICBs if any */
-  if (!wICB.isEmpty())
-    pMCBContent.appendData(wICB);
+  wMCB_Fin->MCBSize = reverseByteOrder_Conditional<uint32_t>(uint32_t(wMCB.Size));
+  wMCB_Fin->ICBOffset = wMCB_Fin->MCBSize;
 
-/* third  JCB if exists  */
-  if (!wJCB.isEmpty())
-    pMCBContent.appendData(wJCB);
+  wMCB_Fin->ICBSize = reverseByteOrder_Conditional<uint32_t>(uint32_t(wZDBIndexes.Size));
+  wMCB_Fin->JCBOffset = reverseByteOrder_Conditional<uint32_t>(uint32_t (wZDBIndexes.Size+wMCB.Size));
+*/
+  pMCBContent.appendData(wZDBIndexes);
 
-/* fourth MDIC if exists  */
-  if (!wMDic.isEmpty())
-    pMCBContent.appendData(wMDic);
+  pMCBContent.appendData(wZDBJCB);
 
- /* done */
-  return  pMCBContent;
+  return pMCBContent.Size;
 }// _exportMCBAppend
 
 #ifdef __COMMENT__
@@ -653,11 +568,52 @@ ZSMasterControlBlock::_importMCB(ZDataBuffer& pBuffer)
  */
 
 ZStatus
-ZMasterControlBlock::_import(ZRawMasterFile*pMaster,const unsigned char*& pPtrIn,ZArray<ZPRES>& pIndexPresence)
-{
-  ZStatus wSt;
+//ZMasterControlBlock::_import(ZRawMasterFile*pMaster,const unsigned char*& pPtrIn,ZArray<ZPRES>& pIndexPresence) {
+ZMasterControlBlock::_import(const unsigned char*& pPtrIn) {
+
+
+  ZStatus wSt=ZS_SUCCESS;
+
+  ZMCB_Export wMCBExp;
+  wMCBExp._import(pPtrIn);
+
+  DictionaryName._importUVF(pPtrIn);
+  DictionaryPath._importUVF(pPtrIn);
+  IndexFilePath._importUVF(pPtrIn);
+
+
+  IndexTable.clear();
+
+  ZRawIndexFile* wIFile= nullptr;
+  uint32_t wIRank=0;
+  uint32_t* wEndMark=(uint32_t*)pPtrIn;
+//  while((wIRank < wMCBExp.IndexCount)&&(wSt!=ZS_EOF)) {
+
+  while((wSt==ZS_SUCCESS) && (*wEndMark !=  cst_ZBLOCKEND)) {
+    wIFile=new ZRawIndexFile(RawMasterFile);
+    wSt=wIFile->_import(pPtrIn);
+    wIRank++;
+    wEndMark=(uint32_t*)pPtrIn;
+  }// while
+  if ((wSt!=ZS_EOF) && (wSt!=ZS_SUCCESS))
+    return wSt;
+
+  wSt=ZS_SUCCESS;
+  if (ZJCB!=nullptr)
+    delete ZJCB;
+
+  ZJCB=nullptr;
+
+  if (wMCBExp.JCBSize!=0) {
+    ZJCB = new ZJournalControlBlock;
+    ZJCB->_import(pPtrIn);
+  }
+
+  return ZS_SUCCESS;
+
+#ifdef __COMMENT__
   //long wIndexCountsv ;
-  ZArray<ZIndexControlBlock*> wICBTable;
+  //  ZArray<ZIndexControlBlock*> wICBTable;
   /* IndexPresence values meaning
    * 0 : Index to be deleted
    * 1 : Index present but not to be rebuilt
@@ -666,15 +622,10 @@ ZMasterControlBlock::_import(ZRawMasterFile*pMaster,const unsigned char*& pPtrIn
    * 4 : Index errored
    */
 
-  const unsigned char* wPtrIn=pPtrIn; // save origin ptr
-  const unsigned char* wPtrDic=nullptr;
-
-  wSt=ZSMCBOwnData::_import(pPtrIn);  // wPtrIn is updated
+/*  wSt=ZMCBExport_import(pPtrIn);  // wPtrIn is updated
   if (wSt!=ZS_SUCCESS)
     return  wSt;
-
-
-
+*/
 
   //-----------Import defined IndexControlBlocks for the file
 
@@ -684,10 +635,10 @@ ZMasterControlBlock::_import(ZRawMasterFile*pMaster,const unsigned char*& pPtrIn
 
   /* import all index control blocks at once */
 
-  while (wi < IndexCount)
+  while (wi < wMCBExp.IndexCount)
     {
       pIndexPresence.push(ZPRES_Unchanged);
-      ZIndexFile* wZRIF= new ZIndexFile((ZMasterFile *)pMaster);
+      ZRawIndexFile* wZRIF= new ZRawIndexFile((ZRawMasterFile *)pMaster);
       wSt=wZRIF->ZIndexControlBlock::_import(pPtrIn);
       if (wSt!=ZS_SUCCESS)
         {
@@ -701,7 +652,7 @@ ZMasterControlBlock::_import(ZRawMasterFile*pMaster,const unsigned char*& pPtrIn
 
   ssize_t wInSize=0;
 
-#ifdef __COMEMENT__
+#ifdef __OLD_COMMENT__
   if (Dictionary!=nullptr)
           delete Dictionary;
   Dictionary=nullptr;
@@ -731,7 +682,7 @@ ZMasterControlBlock::_import(ZRawMasterFile*pMaster,const unsigned char*& pPtrIn
     }// for
 
     }//if (MDicSize > 0)
-#endif // __COMMENT__
+#endif // __OLD_COMMENT__
 
 
   if (ZJCB!=nullptr)
@@ -739,22 +690,24 @@ ZMasterControlBlock::_import(ZRawMasterFile*pMaster,const unsigned char*& pPtrIn
   ZJCB=nullptr;
   if (JCBSize > 0)
   {
-    ZJCB = new ZSJournalControlBlock;
+    ZJCB = new ZJournalControlBlock;
     wSt= ZJCB->_import(pPtrIn);
   }
 
   return  wSt;
+  #endif // __COMMENT__
 }//_import
+/*
 
 
 ZStatus
-ZMasterControlBlock::_import(ZRawMasterFile*pMaster, const unsigned char* &pDataIn)
+ZMasterControlBlock::_import(const unsigned char* &pDataIn)
 {
   ZArray<ZPRES> wIndexPresence;
 
   return _import(pMaster,pDataIn,wIndexPresence);
 }//_import
-
+*/
 /**
  * @brief ZMasterControlBlock::print Reports the whole content of ZMCB : indexes definitions and dictionaries
  */

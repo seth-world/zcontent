@@ -5,7 +5,7 @@
 #include <zrandomfile/zrandomfile.h>
 #include <ztoolset/zbasedatatypes.h>
 #include <znet/zbasenet/znetcommon.h>
-#include <ztoolset/userid.h>
+
 
 #define __JOURNAL_EXT__                 "jnl"
 #define __JOURNAL_ENDOFFILEPATH__       "_jnl.jnl"
@@ -21,7 +21,7 @@ enum ZJOperation:long {
     ZJOP_Close              =0x0000ffff
 };
 
-char * decode_ZJOP (const ZJOperation pOperation);
+const char *decode_ZJOP(const ZJOperation pOperation);
 
 typedef uint8_t ZJState_base;
 
@@ -37,7 +37,7 @@ struct ZJState
 //public:
     ZJState_base State;
     ZJState() {State = (ZJState_base)ZJS_Nothing;}
-    char *decode(void);
+    const char *decode(void);
     ZJState &encode(char *pString) ;
 
     ZJState& operator = (ZJState_type pState) {State=(ZJState_base)pState; return *this;}
@@ -108,9 +108,8 @@ public:
     ZJEvent(void) {}
     ZJEvent (const ZJOperation             pOperation,
              pid_t                  pPid,
-             ZSystemUserId          pUid,
-             utfdescString          pUsername,
-             ZDataBuffer            &pRecord,
+             const ZSystemUserId&   pUid,
+             const ZDataBuffer      &pRecord,
              const zrank_type       pRank,
              const zaddress_type    pAddress,
              const ssize_t          pOffset)
@@ -119,7 +118,7 @@ public:
         Header.Operation = pOperation;
         Header.Pid=pPid;
         Header.Uid=pUid;
-        Header.Username = pUsername;
+//        Header.Username = pUsername;
         Header.Rank = pRank;
         Header.Address = pAddress;
         Header.Offset   = pOffset;
@@ -138,8 +137,8 @@ public:
     ZJOperation     Operation;
     ZJState         State; //!< define the state of the journal record
     pid_t           Pid;
-    ZUserId         Uid;
-    utfdescString      Username;
+    ZSystemUserId   Uid;
+//    utfdescString   Username;
     ZDateFull       DateTime;
     zrank_type      Rank;
     zaddress_type   Address;
@@ -162,9 +161,8 @@ public:
 
     void enqueue (const ZJOperation &pZJOP,
                   pid_t pPid,
-                  ZUserId pUid,
-                  utfdescString &pUsername,
-                  ZDataBuffer &pRecord,
+                  const ZSystemUserId &pUid,
+                  const ZDataBuffer &pRecord,
                   const zrank_type pRank=-1,
                   const zaddress_type pAddress=-1,
                   const ssize_t pOffset=-1);
@@ -181,22 +179,21 @@ public:
     ZMutex Mtx;
 };
 
-
-class ZMasterFile;
-
-class ZJournal :  protected ZRandomFile
+class ZRawMasterFile;
+class ZSJournal :  protected ZRandomFile
 {
 typedef ZRandomFile _Base;
 public:
-    ZJournal(ZMasterFile* pFather) {Father = pFather;}
+    ZSJournal(ZRawMasterFile* pFather) {Father = pFather;}
+
 //                                    CMtx.init(false);}
 
-    ~ZJournal(void);
+    ~ZSJournal(void);
 
     ZStatus setUp(uriString &pJournalPath);
 
     ZStatus init(const bool pmustExist=false);
-    ZStatus reset(ZMasterFile* pFather);
+    ZStatus reset(ZRawMasterFile* pFather);
     ZStatus start(void);
     void    end(void);
 
@@ -210,7 +207,7 @@ public:
     ZStatus setJournalLocalDirectoryPath(void);
 
     void enqueue (const ZJOperation pOperation,
-                  ZDataBuffer &pRecord,
+                  const ZDataBuffer &pRecord,
                   const zrank_type pRank=-1,
                   const zaddress_type pAddress=-1,
                   const ssize_t pOffset=-1);
@@ -240,9 +237,9 @@ public:
 
 protected:
     pid_t       Pid;
-    ZUserId     Uid;
-    utfdescString  Username;
-    ZMasterFile* Father;
+    ZSystemUserId     Uid;
+    utf8String    Username;
+    ZRawMasterFile* Father;
 //    uriString   URIJournal;
 };
 

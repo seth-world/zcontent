@@ -11,11 +11,11 @@ ZFullIndexField::ZFullIndexField()
 
 }
 
-ZFullIndexField& ZFullIndexField::set(ZIndexFile* pZIF,long pKeyFieldRank)
+ZFullIndexField& ZFullIndexField::set(ZRawIndexFile* pZIF,long pKeyFieldRank)
 {
   ZIndexField::_copyFrom(pZIF->IdxKeyDic->Tab[pKeyFieldRank]);
 
-  ZMasterFile* wFather = pZIF->getMasterFile();
+  ZRawMasterFile* wFather = pZIF->getMasterFile();
 
   ZFieldDescription::_copyFrom(wFather->Dictionary->Tab[MDicRank]);
   return *this;

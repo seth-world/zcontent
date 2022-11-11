@@ -74,7 +74,7 @@ md5& ZFieldDescription::computeMd5()
   wFDCheck.set(*this);
   Hash.clear();
   Hash.compute((unsigned char*)&wFDCheck,sizeof(FieldDesc_Check));
-  fprintf (stderr,"ZFieldDescription::computeMd5-I-  md5 <%s>\n",Hash.toHexa().toChar());
+  fprintf (stderr,"ZFieldDescription::computeMd5-I-  md5 <%s>\n",Hash.toHexa().toCChar());
   std::cerr.flush();
   return Hash;
 } // computeMd5
@@ -185,16 +185,16 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, Za
     }
   else
     Name=wName.toCChar();
-
-    if (XMLgetChildText(wRootNode, "tooltip", wName, pErrorlog) < 0) {
-      pErrorlog->logZStatus(ZAIES_Warning,ZS_XMLEMPTY,
+    /*optional */
+    if (XMLgetChildText(wRootNode, "tooltip", wName, pErrorlog,ZAIES_Warning) < 0) {
+      pErrorlog->warningLog(
           "FieldDescription::fromXml-W-MISSTOOLTIP node <Tooltip> is missing for field named %s.",
           Name.toCChar());
     }
     else
       ToolTip=wName.toCChar();
-
-  if (XMLgetChildMd5(wRootNode, "hash", Hash, pErrorlog) < 0)
+/* optional */
+  if (XMLgetChildMd5(wRootNode, "hash", Hash, pErrorlog,ZAIES_Warning) < 0)
     {
       pErrorlog->warningLog(
         "FieldDescription::fromXml-W-CNTFINDHASH Cannot find node <hash> for field named <%s>. Hashcode will be recomputed.",
@@ -202,16 +202,16 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, Za
       wHashismissing=true;
     }
 
-  if (XMLgetChildUInt(wRootNode, "ztype", wInt, pErrorlog)< 0) {
-    pErrorlog->warningLog(
+  if (XMLgetChildUInt(wRootNode, "ztype", wInt, pErrorlog,ZAIES_Error)< 0) {
+    pErrorlog->errorLog(
         "FieldDescription::fromXml-E-CNTFINDNOD Cannot find node <%s>.",
         "ztype");
   }
   else
     ZType = (ZTypeBase)wInt;
 
-  if (XMLgetChildUInt(wRootNode, "capacity", wInt, pErrorlog)< 0) {
-    pErrorlog->warningLog(
+  if (XMLgetChildUInt(wRootNode, "capacity", wInt, pErrorlog,ZAIES_Error)< 0) {
+    pErrorlog->errorLog(
         "FieldDescription::fromXml-E-CNTFINDNOD Cannot find node <%s>.",
         "capacity");
     wErrored=true;
@@ -220,28 +220,28 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, Za
     Capacity = (uint16_t)wInt;
 
 
-  if (XMLgetChildULong(wRootNode, "headersize", HeaderSize, pErrorlog)< 0) {
+  if (XMLgetChildULong(wRootNode, "headersize", HeaderSize, pErrorlog,ZAIES_Error)< 0) {
     pErrorlog->errorLog(
         "FieldDescription::fromXml-E-CNTFINDNOD Cannot find node <%s>.",
         "headersize");
     wErrored=true;
   }
-  if (XMLgetChildULong(wRootNode, "universalsize", UniversalSize, pErrorlog)< 0) {
+  if (XMLgetChildULong(wRootNode, "universalsize", UniversalSize, pErrorlog,ZAIES_Error)< 0) {
     pErrorlog->errorLog(
         "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s.",
         "universalsize");
     wErrored=true;
   }
-  if (XMLgetChildULong(wRootNode, "naturalsize", NaturalSize, pErrorlog)< 0) {
+  if (XMLgetChildULong(wRootNode, "naturalsize", NaturalSize, pErrorlog,ZAIES_Error)< 0) {
     pErrorlog->errorLog(
         "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s.",
         "naturalsize");
     wErrored=true;
   }
 
-
-  if (XMLgetChildBool(wRootNode, "keyelibible", wBool, pErrorlog,ZAIES_Error)< 0) {
-    pErrorlog->errorLog(
+/* optional */
+  if (XMLgetChildBool(wRootNode, "keyelibible", wBool, pErrorlog,ZAIES_Warning)< 0) {
+    pErrorlog->warningLog(
         "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s. ",
         "keyelibible");
     wErrored=true;
@@ -255,7 +255,7 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, Za
     pErrorlog->infoLog(
         "FieldDescription::fromXml-I-RECOMPHASH Field <%s> : recomputing field's hashcode : value is <%s>.",
         Name.toCChar(),
-        Hash.toHexa().toChar());
+        Hash.toHexa().toCChar());
     }
     else if ((!wErrored) && pCheckHash)
     {
@@ -266,8 +266,8 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, Za
         pErrorlog->warningLog(
             "FieldDescription::fromXml-W-CHECKHASH Field <%s> : recomputed field's hashcode <%s> is not what has been loaded <%s>.",
             Name.toCChar(),
-            wFComp.Hash.toHexa().toChar(),
-            Hash.toHexa().toChar());
+            wFComp.Hash.toHexa().toCChar(),
+            Hash.toHexa().toCChar());
       }
     }//else if
   if (wErrored)
@@ -420,7 +420,7 @@ FieldDesc_Export::_convert()
 {
   if (is_big_endian())
     return ;
-  /* BlockID (byte), StartSign EndSign(palyndromas) do not need to be reversed */
+  /* BlockId (byte), StartSign EndSign(palyndromas) do not need to be reversed */
 
   EndianCheck=reverseByteOrder_Conditional(EndianCheck);
   ZType=reverseByteOrder_Conditional<ZTypeBase>(ZType);

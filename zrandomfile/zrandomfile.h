@@ -355,7 +355,7 @@ public:
     /**
      * @brief getMode returns the open mode of the file as a zmode_type
      */
-    zmode_type    getOpenMode(void)
+    zmode_type    getOpenMode(void) const
     {
       if (!_isOpen)
         return ZRF_NotOpen;
@@ -582,6 +582,7 @@ public:
     //!@brief UsedSize  gets the total used space in file (does not take into account free blocks space)
     zsize_type UsedSize(void)    {return (ZFCB.UsedSize);}
     //! @brief size  gets the number of used records in used blocks pool
+public:
     long getSize(void)              {return (ZBAT.size()); }
     long getRecordCount(void)       {return (ZBAT.size()); }
     //!@brief isEmpty Returns true if ZRandomFile has no record in used blocks pool
@@ -747,7 +748,7 @@ static    void zcontentDumpS(uriString pURIContent, int pColumn=16, FILE* pOutpu
 static    void zcontentDumpS (const char *pFilePath, int pColumn=16, FILE* pOutput=stdout)
         {
         uriString wFilePath;
-        wFilePath=(const utf8_t*)pFilePath;
+        wFilePath=pFilePath;
         zcontentDumpS(wFilePath,pColumn,pOutput);
         return;
         }
@@ -1017,10 +1018,9 @@ public:
 
     ZStatus _updateFileControlBlock();
 
-
-
+#ifdef __DEPRECATED__
     ZStatus _writeFullFileHeader(bool pForceWrite);// should be a duplicate of _writeReservedHeader but must be kept for logic
-
+#endif
 
     ZStatus _writeFileHeader(bool pForceWrite);
 
@@ -1104,7 +1104,7 @@ public:
 } // namespace zbs
 
 const char *
-decode_ZBID (ZBlockID pZBID);
+decode_ZBID (ZBlockId pZBID);
 
 ZStatus generateURIHeader(uriString pURIPath, uriString &pURIHeader);
 

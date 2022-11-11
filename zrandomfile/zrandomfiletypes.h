@@ -42,6 +42,7 @@ typedef uint32_t  zmode_type ;        //!< refers to ZRFMode_type
 #define __ZOPENZRFPOOL__
 namespace zbs {
 class ZRandomFile; }
+
 class ZOpenZRFPool: public zbs::ZArray <zbs::ZRandomFile*>
 {
 public:
@@ -72,10 +73,10 @@ enum ZPMSCounter_type {
     ZPMS_Other =            0xFF
 };
 
-enum ZBlockID : uint8_t
+enum ZBlockId : uint8_t
 {
     ZBID_Nothing        = 0,
-    ZBID_FileHeader     = 0x0F,
+    ZBID_HCB     = 0x0F,
     ZBID_FCB            = 0x1F, //!< File Control Block
     ZBID_MCB            = 0x2F, //!< Master Control Block
     ZBID_ICB            = 0x3F, //!< Index Control Block
@@ -87,7 +88,7 @@ enum ZBlockID : uint8_t
 
 };
 
-const char* decode_BlockId(ZBlockID pBID);  /* see zblock.cpp for function instantiation */
+const char* decode_BlockId(ZBlockId pBID);  /* see zblock.cpp for function instantiation */
 
 /** @endcond */ // Development
 /**

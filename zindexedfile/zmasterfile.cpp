@@ -2,10 +2,10 @@
 #define ZMASTERFILE_CPP
 
 #include <zindexedfile/zmasterfile.h>
-#include <zindexedfile/zskey.h>
+#include <zindexedfile/zkey.h>
 
 #include <zrandomfile/zrfcollection.h>
-#include <zindexedfile/zsjournal.h>
+#include <zindexedfile/zjournal.h>
 //#include <QUrl>
 #include <zindexedfile/zmasterfile_utilities.h>
 #include <zindexedfile/zmasterfiletype.h>
@@ -61,20 +61,14 @@ ZSMasterFile::ZSMasterFile(uriString pURI) : ZRawMasterFile(pURI)
 ZMasterFile:: ~ZMasterFile(void)
 {
   if (_isOpen)
-                        zclose();
-     while (IndexTable.size() >0)
-             {
-             if (IndexTable.last()->_isOpen)
-                                            IndexTable.last()->closeIndexFile();
-             IndexTable.pop(); // deletes the contained object
-             }
+    zclose();
+  while (IndexTable.size() >0) {
+    if (IndexTable.last()->_isOpen)
+        IndexTable.last()->closeIndexFile();
+    IndexTable.pop(); // deletes the contained object
+  }
 
-      while (IndexTable.size() >0)
-             {
-             IndexTable.pop();
-             }
-
-      setJournalingOff();
+  setJournalingOff();
 }// DTOR
 
 //------------Journaling (see raw master file )--------------------------------
@@ -134,10 +128,10 @@ ZDataBuffer wReserved;
         return  wSt;
         }
     IndexFilePath = pPath;
-
-    _Base::setReservedContent(_exportMCBAppend(wReserved));
+    ZMasterControlBlock::_exportAppend(wReserved);
+    _Base::setReservedContent(wReserved); /* zclose writes headers to file */
 //    wSt=_Base::_writeAllHeaders(true);
-    wSt=_Base::_writeAllFileHeader();
+//    wSt=_Base::_writeAllFileHeader();
     if (wSt!=ZS_SUCCESS)
         {
         ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -153,50 +147,46 @@ ZDataBuffer wReserved;
 ZStatus
 ZMasterFile::setJournalLocalDirectoryPath (uriString &pPath)
 {
-
-
 ZStatus wSt;
 ZDataBuffer wReserved;
-    if (isOpen())
-            {
-            ZException.setMessage(_GET_FUNCTION_NAME_,
+    if (isOpen()) {
+      ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_INVOP,
                                     Severity_Severe,
                                     " Cannot modify JournalingLocalDirectoryPath while Journaling is started for file  <%s>",
                                     getURIContent().toString());
-            return  ZS_INVOP;
-            }
-    if (!pPath.isDirectory())
-            {
-            ZException.setMessage(_GET_FUNCTION_NAME_,
+      return  ZS_INVOP;
+    }
+    if (!pPath.isDirectory()) {
+      ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_NOTDIRECTORY,
                                     Severity_Error,
                                     " Cannot set JournalingLocalDirectoryPath : path is not a valid directory. Content file is <%s>",
                                     URIContent.toString());
-            return  ZS_NOTDIRECTORY;
-            }
+      return  ZS_NOTDIRECTORY;
+    }
+
     wSt=_Base::_ZRFopen(ZRF_Exclusive|ZRF_All,ZFT_ZMasterFile);
-    if (wSt!=ZS_SUCCESS)
-        {
+    if (wSt!=ZS_SUCCESS) {
         ZException.addToLast("While openning for setting JournalingLocalDirectoryPath. File <%s>",
                                getURIContent().toString());
         return  wSt;
-        }
+    }
     ZJCB->JournalLocalDirectoryPath = pPath;
+    ZMasterControlBlock::_exportAppend(wReserved);
+    _Base::setReservedContent(wReserved);
 
-    _Base::setReservedContent(_exportMCBAppend(wReserved));
-//    wSt=_Base::_writeAllHeaders(true);
-    wSt=_Base::_writeAllFileHeader();
-    if (wSt!=ZS_SUCCESS)
-        {
+//    wSt=_Base::_writeAllFileHeader();  /* ZRandomFile::zclose flushes the headers to file */
+    if (wSt!=ZS_SUCCESS) {
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                 wSt,
                                 Severity_Error,
                                 " Cannot set IndexFilesDirectoryPath / cannot write Reserved header. Content file is <%s>",
                                 getURIContent().toString());
-        }
-    _Base::zclose();
-    return  wSt;
+    }
+
+    return _Base::zclose();
+//    return  wSt;
 }//setJournalingLocalDirectoryPath
 
 
@@ -349,7 +339,7 @@ uriString wIndexFileDirectoryPath;
       return wSt;
 
     uint32_t wKeyUniversalSize = pKeyDic->computeKeyUniversalSize();
-    ZIndexFile *wIndexObject=nullptr;
+    ZRawIndexFile *wIndexObject=nullptr;
     wSt=ZMasterFile::zcreateRawIndex(wIndexObject,pKeyDic->DicKeyName,wKeyUniversalSize,pDuplicates,pOutKeyRank,false);
     if (wSt==ZS_SUCCESS)
       {
@@ -430,7 +420,7 @@ ZMasterFile::zcreateIndexFromDictionary (const utf8String &pDicKeyName,
 
 
   uint32_t wKeyUniversalSize = wKeyDic->computeKeyUniversalSize();
-  ZIndexFile *wIndexObject=nullptr;
+  ZRawIndexFile *wIndexObject=nullptr;
   return zcreateRawIndex(wIndexObject,wKeyDic->DicKeyName,wKeyUniversalSize,pDuplicates,pOutKeyRank,false);
 }//ZSMasterFile::zcreateIndexFromDictionary
 
@@ -583,7 +573,7 @@ utfdescString wBase;
                              decode_ZStatus(wSt),
                              URIContent.toString());
                     }
-                ZException.addToLast(" Index rank <%ld>. Clearing ZMasterControlBlock of file <%s>.",
+                ZException.addToLast(" removing index rank <%ld>. While clearing ZMasterControlBlock of file <%s>.",
                                        IndexTable.lastIdx(),
                                        URIContent.toString());
                 return  wSt;
@@ -600,7 +590,8 @@ utfdescString wBase;
     if (FOutput)
             fclose(wOutput);
     ZMasterControlBlock::clear();
-    return   _Base::updateReservedBlock(_exportMCBAppend(wMCBContent),true);
+    size_t wRet=_exportAppend(wMCBContent);
+    return   _Base::updateReservedBlock(wMCBContent,true);
 }//zclearMCB
 
 /**
@@ -630,7 +621,7 @@ FILE* wOutput=nullptr;
 bool FOutput=false;
 utfdescString wBase;
 
-   wURIContent = (const utf8_t*)pZMFPath;
+   wURIContent = pZMFPath;
 
    wOutput=pOutput;
    if (pOutput==nullptr)
@@ -673,17 +664,21 @@ utfdescString wBase;
             wMasterFile.IndexTable.size());
 
     wSt=wMasterFile.zclearMCB(wOutput);
-    if (wSt!=ZS_SUCCESS)
-            {
-            ZException.exit_abort();
-            }
-    fprintf (wOutput,"%s>>  ZMCB cleared successfully\n",
-            _GET_FUNCTION_NAME_);
+    if (wSt!=ZS_SUCCESS) {
+      ZException.exit_abort();
+    }
+    if (__ZRFVERBOSE__) {
+      _DBGPRINT ("%s>>  ZMCB cleared successfully\n",
+                  _GET_FUNCTION_NAME_)
+    }
 
     wMasterFile.zclose();
 
-    fprintf (wOutput,"%s>>  Converting to ZRandomFile\n",
-            _GET_FUNCTION_NAME_);
+    if (__ZRFVERBOSE__) {
+      _DBGPRINT ("%s>>  Converting to ZRandomFile\n",
+          _GET_FUNCTION_NAME_)
+    }
+
     wSt=wMasterZRF.setPath(wURIContent);
     if (wSt!=ZS_SUCCESS)
            {
@@ -700,16 +695,20 @@ utfdescString wBase;
     wReservedBlock.clear();
     wMasterZRF.setReservedContent(wReservedBlock);
 
-    fprintf (wOutput,"%s>>  Writing new header to file\n",
-            _GET_FUNCTION_NAME_);
-    wSt=wMasterZRF._writeFullFileHeader(true);
-    if (wSt!=ZS_SUCCESS)
-           {
-           ZException.exit_abort();
-           }
+    if (__ZRFVERBOSE__) {
+      _DBGPRINT ("%s>>  Writing new header to file\n",
+            _GET_FUNCTION_NAME_)
+    }
+
+//    wSt=wMasterZRF._writeFullFileHeader(true);
+    wSt=wMasterZRF._writeAllFileHeader();
+    if (wSt!=ZS_SUCCESS) {
+      ZException.exit_abort();
+    }
 
    wMasterZRF.zclose();
-   fprintf (wOutput,"%s>>  File <%s> has been successfully converted from ZSMasterFile to ZRandomFile\n",
+   fprintf (wOutput,"%s>>  File <%s> has been successfully converted from ZSMasterFile to ZRandomFile\n"
+                    "   Note : reserved space, and then Master Control Block, has been cleared.\n",
            _GET_FUNCTION_NAME_,
             wURIContent.toString());
    fprintf (wOutput,
@@ -749,7 +748,7 @@ FILE* wOutput=nullptr;
 bool FOutput=false;
 utfdescString wBase;
 
-   wURIContent = (const utf8_t*)pZRFPath;
+   wURIContent = pZRFPath;
 
    wOutput=pOutput;
    if (pOutput==nullptr)
@@ -792,15 +791,15 @@ utfdescString wBase;
             {
             ZException.exit_abort();
             }
-    wMasterFile._exportMCBAppend(wReservedBlock);
-
+    wReservedBlock.clear();
+    wMasterFile._exportAppend(wReservedBlock);
     wMasterZRF.setReservedContent(wReservedBlock);
     wMasterZRF.ZHeader.FileType = ZFT_ZMasterFile;
-    wSt=wMasterZRF._writeFullFileHeader(true);
-    if (wSt!=ZS_SUCCESS)
-            {
-            ZException.exit_abort();
-            }
+//    wSt=wMasterZRF._writeFullFileHeader(true);
+    wSt=wMasterZRF._writeAllFileHeader();
+    if (wSt!=ZS_SUCCESS) {
+      ZException.exit_abort();
+    }
 
    wMasterZRF.zclose();
    fprintf (wOutput,"%s>>  File <%s> has been successfully converted from ZRandomFile to ZSMasterFile.\n",
@@ -875,11 +874,11 @@ ZArray<char> IndexPresence ; // 0 : Index to be deleted     1 : Index present bu
 
 long wIndexProcessed = 0,wMissIndexFile = 0, wCorruptZICB = 0, wCreatedIndex = 0, wRebuiltIndex = 0 ;
 
-ZSMCBOwnData wMCBOwn;
+ZMasterControlBlock wMCB(wMasterFile);
 const unsigned char* wPtrIn=nullptr;
 
 
-   wURIContent = (const utf8_t*)pZMFPath;
+   wURIContent = pZMFPath;
 
    wOutput=pOutput;
    if (pOutput==nullptr)
@@ -940,7 +939,7 @@ const unsigned char* wPtrIn=nullptr;
            ZException.exit_abort();
            }
   wPtrIn= wMasterZRF.ZReserved.Data;
-  wSt=wMasterFile._import(&wMasterFile,wPtrIn);     // load ZMCB from reserved block content
+  wSt=wMasterFile._import(wPtrIn);     // load ZMCB from reserved block content
   if (wSt!=ZS_SUCCESS)
            {
            ZException.exit_abort();
@@ -962,9 +961,9 @@ const unsigned char* wPtrIn=nullptr;
    IndexRank=0;
    for (IndexRank=0;IndexRank<wMasterFile.IndexTable.size();IndexRank++)
    {
-       wSt=generateIndexURI(wMasterFile.getURIContent(),
+       wSt=generateIndexURI(wIndexUri,
+                            wMasterFile.getURIContent(),
                             wMasterFile.IndexFilePath,
-                            wIndexUri,
                             IndexRank,
                             wMasterFile.IndexTable[IndexRank]->IndexName);
        if (wSt!=ZS_SUCCESS)
@@ -1130,7 +1129,7 @@ const unsigned char* wPtrIn=nullptr;
                 }
 
         wPtrIn=wReservedBlock.Data;
-        wMCBOwn._import(wPtrIn);
+        wMCB._import(wPtrIn);
 
 //        wSt=wZICB->_importICB(&wMasterFile.MetaDic,wReservedBlock,wMCBOwn.ICBSize,wMCBOwn.ICBOffset);  // load ZICB from reserved block content
 
@@ -1163,7 +1162,8 @@ const unsigned char* wPtrIn=nullptr;
         fprintf (wOutput,"%s>>  checking ZICB content alignment with ZSMasterFile\n",
                  _GET_FUNCTION_NAME_);
 
-        if (memcmp(wReservedBlock.Data,wMasterFile.IndexTable[IndexRank]->_exportAppend(wICBContent).Data,wReservedBlock.Size)==0)
+        size_t wRet = wMasterFile.IndexTable[IndexRank]->_exportAppend(wICBContent);
+        if (memcmp(wReservedBlock.Data,wICBContent.Data,wReservedBlock.Size)==0)
             {
             fprintf (wOutput,
                      "%s>>  ZICB content is aligned with its ZSMasterFile for index rank <%ld> path <%s>\n"
@@ -1338,7 +1338,10 @@ ZStatus
 ZMasterFile::zcreateMasterFile( const uriString pURI, const zsize_type pInitialSize, bool pBackup, bool pLeaveOpen)
 {
   ZStatus wSt;
-  printf ("ZSMasterFile::zcreate \n");
+  if (ZVerbose)
+    _DBGPRINT ("ZSMasterFile::zcreate \n")
+
+
  /* if (pDictionary==nullptr)
     {
     ZException.setMessage("ZSMasterFile::zcreate",ZS_NULLPTR,Severity_Severe,"Meta dictionary is nullptr while trying to create Master File <%s>.",URIContent.toCChar());
@@ -1370,10 +1373,14 @@ ZMasterFile::zcreateMasterFile( const uriString pURI, const zsize_type pInitialS
   ZDataBuffer wMCBContent;
   if (pLeaveOpen)
   {
-    _exportMCBAppend(wMCBContent);
-    ZRandomFile::setReservedContent(wMCBContent);
+    _Base::ZReserved.clear();
+    ZMasterControlBlock::_exportAppend(_Base::ZReserved);
+//    _exportAppend(wMCBContent);
+//    ZRandomFile::setReservedContent(wMCBContent);
     //    wSt=_Base::updateReservedBlock(_exportMCB());
-    wSt=ZRandomFile::_writeFullFileHeader(true);
+
+//    wSt=ZRandomFile::_writeFullFileHeader(true);
+    wSt=ZRandomFile::_writeAllFileHeader();
     if (wSt!=ZS_SUCCESS)
     {
       ZException.addToLast("\nWhile creating Raw Master file %s",
@@ -1383,7 +1390,8 @@ ZMasterFile::zcreateMasterFile( const uriString pURI, const zsize_type pInitialS
 
     return  wSt;
   }
-  printf ("ZRawMasterFile::zclose \n");
+
+
   zclose(); // updates headers including reserved block
   return  wSt;
 
@@ -1413,12 +1421,12 @@ ZMasterFile::initDictionary(const uriString& pDictionary, bool pKeepFileAsRefere
       return wSt;
   }
 
-  if (ZRawMasterFile::IndexCount > 0) {
+  if (IndexTable.count() > 0) {
     ZException.setMessage("ZMasterFile::initDictionary",ZS_INVOP,Severity_Severe,
         "File <%s> has already %ld defined %s.",
         URIContent.toCChar(),
-        ZRawMasterFile::IndexCount,
-        (ZRawMasterFile::IndexCount > 1) ?"indexes":"index");
+        IndexTable.count(),
+        (IndexTable.count() > 1) ?"indexes":"index");
     return ZS_INVOP;
   }
 
@@ -1448,7 +1456,7 @@ ZMasterFile::initDictionary(const uriString& pDictionary, bool pKeepFileAsRefere
 
   /* create all indexes */
   long wOutIndexRank;
-  ZIndexFile* wIdxFile;
+  ZRawIndexFile* wIdxFile;
   for (long wi=0 ; wi < Dictionary->KeyDic.count();wi++) {
     Dictionary->KeyDic[wi]->computeKeyUniversalSize();
     Dictionary->KeyDic[wi]->computeKeyOffsets();
@@ -1817,7 +1825,7 @@ long wIndexRank;
  * @return a pointer to a ZKey structure. ZKey object is instantiated by 'new' instruction and must be deleted by calling procedure.
  *
  */
-ZSKey*
+ZKey*
 ZMasterFile::createZKeyByName (const char* pKeyName)
 {
 
@@ -1846,7 +1854,7 @@ ZMasterFile::createZKeyByName (const char* pKeyName)
  * @return a pointer to a ZKey structure. ZKey object is instantiated by 'new' instruction and must be deleted by calling procedure.
 
  */
-ZSKey*
+ZKey*
 ZMasterFile::createZKey (const long pKeyNumber)
 {
 
@@ -1867,7 +1875,7 @@ ZMasterFile::createZKey (const long pKeyNumber)
                                 " Invalid key number while creating Key structure. given value is %ld", pKeyNumber);
         return  nullptr;
         }
-        ZSKey* wKey = new ZSKey(this,pKeyNumber);
+        ZKey* wKey = new ZKey(this,pKeyNumber);
     return  (wKey);
 }
 
@@ -1940,7 +1948,9 @@ ZMasterFile::zopen  (const uriString pURI, const int pMode)
   IndexTable.clear();
 
   const unsigned char*wPtrIn=ZReserved.Data;
-  wSt=ZMasterControlBlock::_import(this,wPtrIn, wIndexPresence);
+//  wSt=ZMasterControlBlock::_import(this,wPtrIn, wIndexPresence);
+  wSt=ZMasterControlBlock::_import(wPtrIn);
+
   if (wSt!=ZS_SUCCESS)
       {return  wSt;}
 
@@ -1972,7 +1982,7 @@ ZMasterFile::zopen  (const uriString pURI, const int pMode)
   //----------Journaling----------------------
 
   //    if (JournalingOn)
-  if (JCBSize>0)     // if journaling requested
+  if ( hasJournal() )     // if journaling requested
   {
     if (ZJCB->Journal==nullptr) // if no journaling : create one
     {
@@ -1980,7 +1990,7 @@ ZMasterFile::zopen  (const uriString pURI, const int pMode)
       wSt=ZJCB->Journal->init();
       if (wSt!=ZS_SUCCESS)
       {return  wSt;}// Beware return  is multiple instructions in debug mode
-      ZJCB->Journal->start();
+ //     ZJCB->Journal->start();
     }
     else
     {
@@ -1993,9 +2003,10 @@ ZMasterFile::zopen  (const uriString pURI, const int pMode)
       }
     }
 
-    const unsigned char* wPtrIn=ZReserved.Data+JCBOffset;
+    /* already loaded using ZMasterControlBlock::_import() */
+//    const unsigned char* wPtrIn=ZReserved.Data+JCBOffset;
 
-    ZJCB->_import(wPtrIn);
+//   ZJCB->_import(wPtrIn);
     ZJCB->Journal->init();
     ZJCB->Journal->start();
   } // JournalingOn
@@ -2020,7 +2031,7 @@ ZMasterFile::zopen  (const uriString pURI, const int pMode)
   {
     //            ZIndexFile* wIndex = new ZIndexFile (this,(ZSIndexControlBlock&)*IndexTable[wi]);
     //            IndexTable.push(wIndex);
-    ZIndexFile* wIndex = IndexTable[wi];
+    ZIndexFile* wIndex = static_cast<ZIndexFile*>(IndexTable[wi]);
     wIndexUri.clear();
 
     wSt=generateIndexURI(wIndexUri,getURIContent(),IndexFilePath,wi,IndexTable[wi]->IndexName);
@@ -2072,10 +2083,10 @@ ZStatus wSt;
 zrank_type      wZMFIdxCommit;
 zaddress_type   wZMFAddress;
 
-ZArray <zrank_type>    IndexRankProcessed; // stores ranks of already processed indexes (rollback purpose)
-ZSIndexItemList        IndexItemList;      // stores keys description per index processed
+ZArray <zrank_type>      IndexRankProcessed; // stores ranks of already processed indexes (rollback purpose)
+ZIndexItemList          IndexItemList;      // stores keys description per index processed
 
-ZSIndexItem             *wIndexItem;
+ZIndexItem             *wIndexItem;
 zrank_type              wIndex_Rank;
 long wi = 0;
 
@@ -2139,10 +2150,10 @@ ZStatus wSt;
 zrank_type      wZMFIdxCommit;
 zaddress_type   wZMFAddress;
 
-ZArray <zrank_type>       IndexRankProcessed; // stores ranks of already processed indexes (rollback purpose)
-ZSIndexItemList      IndexItemList;          // stores keys description per index processed
+ZArray <zrank_type>   IndexRankProcessed; // stores ranks of already processed indexes (rollback purpose)
+ZIndexItemList        IndexItemList;          // stores keys description per index processed
 
-ZSIndexItem*    wIndexItem;
+ZIndexItem*    wIndexItem;
 zrank_type      wIndex_Rank;
 long wi = 0;
 
@@ -2158,13 +2169,11 @@ long wi = 0;
 // update all Indexes
 //
 
-    for (wi=0;wi< IndexTable.size();wi++)
-    {
-        if (ZVerbose)
-        {
+    for (wi=0;wi< IndexTable.size();wi++) {
+        if (ZVerbose) {
             fprintf (stdout,"Index number <%ld>\n",wi);
         }
-        wIndexItem = new ZSIndexItem;
+        wIndexItem = new ZIndexItem;
         wIndexItem->Operation=ZO_Insert;
         wSt=static_cast<ZIndexFile*>(IndexTable[wi])->_keyExtraction(pRecord,wIndexItem->KeyContent);
         if (wSt!=ZS_SUCCESS)
@@ -2177,7 +2186,7 @@ long wi = 0;
           _Base::_add2Phases_Rollback(wZMFIdxCommit); // do not accept update on Master File and free resources
           goto zinsert_error;
         }
-        wSt=IndexTable[wi]->_addRawKeyValue_Prepare(wIndexItem,wIndex_Rank, wZMFAddress);// for indexes don't care about insert, this is an add key value
+        wSt=IndexTable[wi]->_addRawKeyValue_Prepare(*wIndexItem,wIndex_Rank, wZMFAddress);// for indexes don't care about insert, this is an add key value
         if (wSt!=ZS_SUCCESS)
                 {
                 ZException.addToLast("During zinsert operation on index number <%ld>",wi);
@@ -2292,9 +2301,9 @@ ZMasterFile::_add(ZRecord* pRecord)
   zaddress_type   wZMFAddress;
 
   ZArray <zrank_type>    IndexRankProcessed; // stores ranks of already processed indexes (rollback purpose)
-  ZSIndexItemList        IndexItemList;      // stores keys description per index processed
+  ZIndexItemList        IndexItemList;      // stores keys description per index processed
 
-  ZSIndexItem     *wIndexItem;
+  ZIndexItem     *wIndexItem;
   zrank_type      wIndex_Rank;
   long wi = 0;
 
@@ -2328,9 +2337,13 @@ ZMasterFile::_add(ZRecord* pRecord)
     {
       fprintf (stdout,"Index number <%ld>\n",wIndex_Rank);
     }
-    wIndexItem=new ZSIndexItem;
+    wIndexItem=new ZIndexItem;
     wIndexItem->Operation=ZO_Push;
-    wSt=IndexTable[wIndex_Rank]->_keyExtraction(pRecord,wIndexItem->KeyContent);
+    /* NB: ZIndexFile and ZRawIndexFile have the same data structure (ZIndexControlBlock and particularly KeyDic pointer)
+     * when a pure raw master / index file -> keydic pointer is set to nullptr.
+     * But ZIndexFile has routines to exploit keydic which is supposed to be not nullptr
+     */
+    wSt=static_cast<ZIndexFile*>(IndexTable[wIndex_Rank])->_keyExtraction(pRecord,wIndexItem->KeyContent);
     if (wSt!=ZS_SUCCESS)
     {
       ZException.addToLast("During zadd operation on index number <%ld>",wi);
@@ -2342,7 +2355,7 @@ ZMasterFile::_add(ZRecord* pRecord)
       goto zaddRaw_error;
     }
 
-    wSt=IndexTable[wIndex_Rank]->_addKeyValue_Prepare(wIndexItem,wIdxZBATIndex, wZMFAddress);
+    wSt=IndexTable[wIndex_Rank]->_addRawKeyValue_Prepare(*wIndexItem,wIdxZBATIndex, wZMFAddress);
     if (wSt!=ZS_SUCCESS)
     {
       ZException.addToLast("During zadd operation on index number <%ld>",wi);
@@ -2408,7 +2421,7 @@ zaddRaw_error:
 /** @cond Development */
 
 ZStatus
-ZMasterFile::_add_CommitIndexes (ZArray <ZSIndexItem*>  &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed)
+ZMasterFile::_add_CommitIndexes (ZArray <ZIndexItem*>  &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed)
 {
 ZStatus wSt;
 long wj = 0;
@@ -2571,7 +2584,7 @@ zmode_type wMode = ZRF_Nothing ;
 //            wSt=IndexTableObjects[wj]->_addRollBackIndex(pIndexRankProcessed.popR()); // rollback update on each index concerned
 //       wSt=IndexTable[wi]->zrebuildRawIndex(false,pOutput); // hard rollback update on each already committed index
 
-    wSt=IndexTable[wi]->zrebuildIndex(false,pOutput); // hard rollback update on each already committed index
+    wSt=static_cast<ZIndexFile*>(IndexTable[wi])->zrebuildIndex(false,pOutput); // hard rollback update on each already committed index
 
     if (wSt!=ZS_SUCCESS)
                {
@@ -2651,7 +2664,14 @@ ZMasterFile::zindexRebuild (const long pIndexRank,bool pStat, FILE *pOutput)
                                     URIContent.toString());
             return  ZS_OUTBOUND;
             }
- return  IndexTable[pIndexRank]->zrebuildRawIndex (pStat,pOutput);
+
+            /* @TODO implement index rebuild from dictionary */
+
+  /*
+  return  IndexTable[pIndexRank]->zrebuildRawIndex (pStat,pOutput);
+
+  */
+            return ZS_TOBEDONE;
 }//zindexRebuild
 
 
@@ -2696,8 +2716,8 @@ ZStatus     wSt;
 zrank_type              wZMFIdxCommit;
 zaddress_type           wZMFAddress;
 ZArray <zrank_type>     IndexRankProcessed; // stores ranks of already processed indexes (rollback purpose)
-ZSIndexItemList         IndexItemList;      // stores keys description per index processed (rollback purpose). Must stay as pointer (double free)
-ZSIndexItem             *wIndexItem;
+ZIndexItemList         IndexItemList;      // stores keys description per index processed (rollback purpose). Must stay as pointer (double free)
+ZIndexItem             *wIndexItem;
 ZDataBuffer             wKeyContent;
 
 ZBlock          wBlock;
@@ -2818,8 +2838,8 @@ ZMasterFile::_removeByRankRaw  (ZRawRecord *pZMFRecord,
   zrank_type              wZMFZBATIndex;
   zaddress_type           wZMFAddress;
   ZArray <zrank_type>     IndexRankProcessed; // stores ranks of already processed indexes (rollback purpose)
-  ZSIndexItemList         IndexItemList;      // stores keys description per index processed (rollback purpose). Must stay as pointer (double free)
-  ZSIndexItem             *wIndexItem;
+  ZIndexItemList         IndexItemList;      // stores keys description per index processed (rollback purpose). Must stay as pointer (double free)
+  ZIndexItem             *wIndexItem;
   ZDataBuffer             wKeyContent;
 
   ZBlock          wBlock;
@@ -2929,7 +2949,7 @@ _removeByRank_return :
  * @return  a ZStatus value. ZException is set appropriately with error message content in case of error.
  */
 ZStatus
-ZMasterFile::_remove_CommitIndexes (ZSIndexItemList & pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed)
+ZMasterFile::_remove_CommitIndexes (ZIndexItemList & pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed)
 {
 
 
@@ -2998,7 +3018,7 @@ long wi = 0;
 
 
 ZStatus
-ZMasterFile::_remove_HardRollbackIndexes (ZArray<ZSIndexItem*> &pIndexItemList,
+ZMasterFile::_remove_HardRollbackIndexes (ZArray<ZIndexItem*> &pIndexItemList,
                                            ZArray<zrank_type> &pIndexRankProcessed)
 {
 
@@ -3100,7 +3120,7 @@ ssize_t wKeyOffset = 0;
  * @return
  */
 ZStatus
-ZMasterFile::zsearch(ZDataBuffer &pRecord,ZSKey *pKey)
+ZMasterFile::zsearch(ZDataBuffer &pRecord,ZKey *pKey)
 {
 
     return (zsearch(pRecord,(ZDataBuffer &)*pKey,pKey->IndexNumber));
@@ -3121,14 +3141,14 @@ ZMasterFile::zsearch (ZDataBuffer &pRecord,ZDataBuffer &pKeyValue,const long pIn
 ZStatus wSt;
 //zaddress_type wAddress;
 //long wIndexRank;
-ZSIndexResult wZIR;
+ZIndexResult wZIR;
     wSt = IndexTable[pIndexNumber]->_Rawsearch(pKeyValue,*IndexTable[pIndexNumber],wZIR);
     if (wSt!=ZS_FOUND)
             { return  wSt;}
     return  zgetByAddress(pRecord,wZIR.ZMFAddress);
 }
 
-class ZSIndexCollection;
+class ZIndexCollection;
 
 /**
  * @brief ZSMasterFile::zsearchAll search for all index rank using a ZDataBuffer containing key value to search.
@@ -3145,16 +3165,16 @@ class ZSIndexCollection;
 ZStatus
 ZMasterFile::zsearchAll (ZDataBuffer &pKeyValue,
                           const long pIndexNumber,
-                          ZSIndexCollection& pIndexCollection,
+                          ZIndexCollection& pIndexCollection,
                           const ZMatchSize_type pZMS)
 {
 
 
-
-    return  IndexTable[pIndexNumber]->_searchAll(pKeyValue,
-                                                      *IndexTable[pIndexNumber],
-                                                      pIndexCollection,
-                                                      pZMS);
+  ZIndexFile* wIndexFilePtr = static_cast<ZIndexFile*>(IndexTable[pIndexNumber]);
+  return  wIndexFilePtr->_searchAll(pKeyValue,
+                                    *wIndexFilePtr,
+                                    pIndexCollection,
+                                    pZMS);
 
 }
 /**
@@ -3168,7 +3188,7 @@ ZMasterFile::zsearchAll (ZDataBuffer &pKeyValue,
  * @return
  */
 ZStatus
-ZMasterFile::zsearchAll (ZSKey &pZKey,ZSIndexCollection& pIndexCollection)
+ZMasterFile::zsearchAll (ZKey &pZKey,ZIndexCollection& pIndexCollection)
 {
 
 
@@ -3181,7 +3201,8 @@ ZStatus wSt;
 
     if (pZKey.FPartialKey)
             wZSC=ZMS_MatchKeySize ;
-    wSt = IndexTable[pZKey.IndexNumber]->_searchAll(pZKey,*IndexTable[pZKey.IndexNumber],pIndexCollection,wZSC);
+    ZIndexFile* wIndexFilePtr = static_cast<ZIndexFile*>(IndexTable[pZKey.IndexNumber]);
+    wSt = wIndexFilePtr->_searchAll(pZKey,*wIndexFilePtr,pIndexCollection,wZSC);
     return  wSt;
 }//zsearchAll
 
@@ -3217,21 +3238,21 @@ ZStatus wSt;
  * - ZS_NOTFOUND if key value is not found in the middle of index values set
  */
 ZStatus
-ZMasterFile::zsearchFirst (ZSKey &pZKey,
+ZMasterFile::zsearchFirst (ZKey &pZKey,
                            ZDataBuffer& pRecord,
-                           ZSIndexCollection *pCollection)
+                           ZIndexCollection *pCollection)
 {
 
 
 ZStatus wSt;
-ZSIndexResult wZIR;
+ZIndexResult wZIR;
 
     ZMatchSize_type wZMS = ZMS_MatchIndexSize;
 
 
     if (pZKey.FPartialKey)
             wZMS=ZMS_MatchKeySize ;
-    wSt = IndexTable[pZKey.IndexNumber]->_searchFirst(pZKey,
+    wSt = static_cast<ZIndexFile*>(IndexTable[pZKey.IndexNumber])->_searchFirst(pZKey,
                                                              *IndexTable[pZKey.IndexNumber],
                                                              pCollection,
                                                              wZIR,
@@ -3265,14 +3286,14 @@ ZSIndexResult wZIR;
  * - ZS_NOTFOUND if key value is not found in the middle of index values set
  */
 ZStatus
-ZMasterFile::zsearchNext (ZSKey &pZKey,
+ZMasterFile::zsearchNext (ZKey &pZKey,
                           ZDataBuffer & pRecord,
-                          ZSIndexCollection *pCollection)
+                          ZIndexCollection *pCollection)
 {
 
 
 ZStatus wSt;
-ZSIndexResult wZIR;
+ZIndexResult wZIR;
 
     if (pCollection==nullptr)
         {
@@ -3285,7 +3306,7 @@ ZSIndexResult wZIR;
 
     //pIndexCollection.ZIFFile = IndexTableObjects[pIndexNumber];// assign ZIndexFile object to Collection : NB Collection is NOT in charge of opening or closing files
 
-    wSt = IndexTable[pZKey.IndexNumber]->_searchNext(wZIR,pCollection);
+    wSt = static_cast<ZIndexFile*>(IndexTable[pZKey.IndexNumber])->_searchNext(wZIR,pCollection);
     if (wSt!=ZS_FOUND)
                 {return  wSt;}// Beware return  is multiple instructions in debug mode
 
@@ -3311,14 +3332,11 @@ ZSIndexResult wZIR;
  * @return a ZStatus
  */
 ZStatus
-ZMasterFile::getKeyIndexFields(ZDataBuffer &pKeyFieldValues, const zrank_type pIndexRank, const zrank_type pIndexNumber)
-{
-
-
+ZMasterFile::getKeyIndexFields(ZDataBuffer &pKeyFieldValues, const zrank_type pIndexRank, const zrank_type pIndexNumber) {
  ZStatus wSt;
  ZDataBuffer wIndexRawContent;
- ZSIndexItem  wIndexContent;
-    wSt=IndexTable[pIndexNumber]->_Base::zget(wIndexRawContent,pIndexRank);
+ ZIndexItem  wIndexContent;
+    wSt=IndexTable[pIndexNumber]->zget(wIndexRawContent,pIndexRank);
     if (wSt!=ZS_SUCCESS)
                 {return  wSt;}
     wIndexContent.fromFileKey(wIndexRawContent);
@@ -3333,13 +3351,13 @@ ZMasterFile::getKeyIndexFields(ZDataBuffer &pKeyFieldValues, const zrank_type pI
  * @return
  */
 ZStatus
-ZMasterFile::getRawIndex(ZSIndexItem &pIndexItem,const zrank_type pIndexRank,const zrank_type pIndexNumber)
+ZMasterFile::getRawIndex(ZIndexItem &pIndexItem,const zrank_type pIndexRank,const zrank_type pIndexNumber)
 {
 
 
     ZStatus wSt;
     ZDataBuffer wIndexContent;
-    wSt=IndexTable[pIndexNumber]->_Base::zget(wIndexContent,pIndexRank);
+    wSt=IndexTable[pIndexNumber]->zget(wIndexContent,pIndexRank);
     if (wSt!=ZS_SUCCESS)
                    { return  wSt;}// Beware return  is multiple instructions in debug mode
     pIndexItem.fromFileKey(wIndexContent);
@@ -3756,7 +3774,7 @@ ZSMasterFile::zextractXML_MetaDic(const char *pFilePath,
   zxmlElement* wIndexFirstElement=nullptr;
 
 
-  ErrorLog.setErrorLogContext("zextractXML_MetaDic");
+  ErrorLog.setContext("zextractXML_MetaDic");
   ErrorLog.setAutoPrintOn(true);
 
   wSt=_XMLzicmControl(pFilePath,wXmlDoc,wIndexFirstElement,pErrorlog);
@@ -3818,7 +3836,7 @@ ZSIndexControlBlock* wZICB=nullptr;
 
   pZICBList.clear();
 
-  ErrorLog.setErrorLogContext("zloadXML_Index");
+  ErrorLog.setContext("zloadXML_Index");
   ErrorLog.setAutoPrintOn(true);
 
     wSt=_XMLzicmControl(pFilePath,wXmlDoc,wIndexFirstElement,pErrorlog);

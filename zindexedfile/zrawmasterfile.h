@@ -16,9 +16,50 @@
 #include <zindexedfile/zmastercontrolblock.h>
 #include <zindexedfile/zindexcontrolblock.h>
 
-#include <zindexedfile/zsindexitem.h>
+//#include <zindexedfile/zindexitem.h>
+
+/** @brief RawDataDescription Raw data storage detailed description
+ * Raw data :
+ * if first uint_32_t is ZType_bitsetFull, then no bitset, all fields are reputed to be present,
+ * no dictionary is available (pure ZRawMasterRecord)
+ * else
+ * a bitset is present and must be read.
+ *
+ *
+ * @verbatim
+                      Raw Record bulk structure on file :
+
+RawMasterFile                   Master File
+    (no dictionary no presence)       with master dictionary
 
 
+    uint32_t        ZType_bitsetFull               ZType_bitset
+                    All fields present [...]    Zbitset content
+                               \                   /
+                                \                 /
+    uint64_t                  record content size
+
+    ...                       RECORD EFFECTIVE CONTENT
+    URF format
+
+    uint32_t                    Number of key contents
+
+    uint32_t                      Key 0 size
+    ...                           KEY 0 CONTENT
+
+    uint32_t                      Key 1 size
+    ...                           KEY 1 CONTENT
+
+    ....
+
+    uint32_t                      Key n size
+    ...                           KEY n CONTENT
+
+
+    uint32_t                      cst_ZEND  : end of record marker
+
+
+*/
 
 /* define functor for key extraction */
 
@@ -28,8 +69,14 @@ typedef ZStatus (*extractRawKey_type) (ZDataBuffer &pRawRecord,ZRawIndexFile* pZ
 namespace zbs //========================================================================
 {
 
+class ZKey;
+class ZIndexItem;
+class ZIndexItemList;
+
 class ZRawMasterFile: protected ZRandomFile, public ZMasterControlBlock
 {
+  friend class ZIndexCollection;
+
   typedef ZRandomFile _Base ;
 protected:  ZRawMasterFile(ZFile_type pType);
 public:
@@ -41,6 +88,7 @@ public:
   friend ::ZStatus createMasterFileFromXml(const char* pXMLPath,const char *pContentFilePath,bool pRealRun,bool pReplace,const char* pLogfile);
 */
   using ZRandomFile::getFileType;
+  using ZRandomFile::getMode;
   using ZRandomFile::setPath;
   using ZRandomFile::getFCB;
 
@@ -59,6 +107,9 @@ public:
   using ZRandomFile::getHighwaterMarking;
   using ZRandomFile::getInitialSize;
 
+  using ZRandomFile::_reorgFileInternals;
+
+//  ZFileControlBlock& getZFCB() {return ZFCB;}
   
 
 //    using _Base::zclearFile;  // for tests only : must be suppressed imperatively
@@ -81,7 +132,7 @@ public:
   ZStatus setIndexFilesDirectoryPath (uriString &pPath);
   ZStatus setJournalLocalDirectoryPath (uriString &pPath);
 
-  ZIndexFile* zgetIndexObject(const zrank_type pIndexRank) {return IndexTable[pIndexRank];}
+  ZRawIndexFile* zgetIndexObject(const zrank_type pIndexRank) {return IndexTable[pIndexRank];}
 
   ZStatus zcreateRawMasterFile(const uriString pURI,
                                 long pAllocatedBlocks,
@@ -128,7 +179,7 @@ public:
  *  ZS_MODEINVALID ZRawMasterFile must be closed when calling zcreateRawIndex. If not, this status is returned.
  *
  */
-  ZStatus zcreateRawIndex  (ZIndexFile *&pIndexObjectOut,  /* resulting created index object if successful, nullptr  if not*/
+  ZStatus zcreateRawIndex  (ZRawIndexFile *&pIndexObjectOut,  /* resulting created index object if successful, nullptr  if not*/
                             const utf8String &pIndexName,
                             uint32_t pKeyUniversalSize,
                             ZSort_Type pDuplicates,
@@ -136,7 +187,7 @@ public:
                             bool pBackup=true);
 
   ZStatus zinsertRawIndex  (long pIndexRank,
-                            ZIndexFile *&pIndexObjectOut,  /* resulting created index object if successful, nullptr  if not*/
+                            ZRawIndexFile *&pIndexObjectOut,  /* resulting created index object if successful, nullptr  if not*/
                             const utf8String &pIndexName,
                             uint32_t pKeyUniversalSize,
                             ZSort_Type pDuplicates,
@@ -208,8 +259,9 @@ public:
 
   void _testZReserved();
 
-  bool hasDictionary() {return Dictionary!=nullptr;}
-  bool hasIndexTable() {return IndexTable.count()>0;}
+  bool hasDictionary()  {return Dictionary!=nullptr;}
+  bool hasIndex()       {return IndexTable.count()>0;}
+  bool hasJournal()     {return ZJCB != nullptr;}
 
   ZStatus zopen       (const uriString& pURI, const int pMode=ZRF_All); // superseeds ZRandomfile zopen
   ZStatus zopen       (const int pMode=ZRF_All) {return (zopen(getURIContent(),pMode));}
@@ -219,7 +271,7 @@ public:
 
 
   /** @brief _removeFile   local method that removes all files component of ZRawMasterFile @see removeFile */
-  ZStatus _removeFile(const char* pContentPath, ZaiErrors *pErrorLog=nullptr);
+  ZStatus _removeFile(const uriString &pContentPath, ZaiErrors *pErrorLog=nullptr);
   /**
    * @brief removeFile   static function that physically removes all files component of ZRawMasterFile
    * whose Content file is pointed by pContentPath :
@@ -228,8 +280,9 @@ public:
    *
    * @return  a ZStatus  for errors @see ZRandomFile::_removeFile
    */
-  static ZStatus removeFile (const char* pContentPath, ZaiErrors *pErrorLog=nullptr);
+  static ZStatus removeMasterFile (const uriString &pContentPath, ZaiErrors *pErrorLog=nullptr);
 
+  utf8VaryingString getURIIndex(long pIndexRank) ;
 
   /**
    * @brief _renameBck   local method that renames all component files for ZRawMasterFile whose content file is pointed by pContentPath
@@ -282,6 +335,9 @@ public:
    *      As Raw Master File does not use any dictionary, user must extract and provide keys content (pKeys).
    */
   ZStatus zadd      (ZDataBuffer& pRecordContent, ZArray<ZDataBuffer> &pKeys );
+
+
+
   /**
    * @brief zinsert insert a new record whose content is pRecordContent within a Raw Master File at logical position pRank, and updates all indexes.
    *      As Raw Master File does not use any dictionary, user must extract and provide keys content (pKeys).
@@ -291,8 +347,13 @@ public:
 
 
 protected:
+#ifdef __OLD_VERSION__
   ZStatus _addRaw   (ZRawRecord *pRecord);
   ZStatus _insertRaw(ZRawRecord *pRecord, const zrank_type pZMFRank);
+#endif
+  ZStatus _addRaw   (ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeys);
+  ZStatus _insertRaw (const ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeys, const zrank_type pZMFRank);
+
   ZStatus _getRaw   (ZRawRecord *pRecord, const zrank_type pZMFRank);
   ZStatus _removeByRankR    (ZRawRecord* pZMFRecord, const zrank_type pZMFRank);
 
@@ -342,25 +403,24 @@ public:
   //    ZStatus zgenerateKeyValue (ZSIndexControlBlock& pICB, ZArray<void *> &pKeyValues, ZDataBuffer& pKey);
 
   ZStatus zsearch (ZDataBuffer &pRecord, ZDataBuffer &pKeyValue, const long pIndexNumber);
-  ZStatus zsearch (ZDataBuffer &pRecord, ZSKey *pKey);
+  ZStatus zsearch (ZDataBuffer &pRecord, ZKey *pKey);
 
   ZStatus zsearchAll (ZDataBuffer &pKeyValue,
                       const long pIndexNumber,
-                      ZSIndexCollection &pIndexCollection,
+                      ZIndexCollection &pIndexCollection,
                       const ZMatchSize_type pZMS=ZMS_MatchKeySize);
 
-  ZStatus zsearchAll (ZSKey &pZKey, ZSIndexCollection& pIndexCollection);
+  ZStatus zsearchAll (ZKey &pZKey, ZIndexCollection& pIndexCollection);
 
-  ZStatus zsearchFirst (ZSKey &pZKey, ZDataBuffer &pRecord, ZSIndexCollection *pCollection);
-  ZStatus zsearchNext (ZSKey &pZKey, ZDataBuffer &pRecord, ZSIndexCollection *pCollection);
-
+  ZStatus zsearchFirst (ZKey &pZKey, ZDataBuffer &pOutRecord, ZIndexCollection *pCollection);
+  ZStatus zsearchNext (ZKey &pZKey, ZDataBuffer &pRecord, ZIndexCollection *pCollection);
 
   using ZRandomFile::zsearchFieldAllCollection;
   using ZRandomFile::zsearchFieldFirstCollection;
   using ZRandomFile::zsearchFieldNextCollection;
 
 
-  ZStatus zsearchInterval (ZSKey &pZKeyLow, ZSKey &pZKeyHigh,const zrank_type pIndexNumber,ZSIndexCollectionContext *pSearchContext );
+  ZStatus zsearchInterval (ZKey &pZKeyLow, ZKey &pZKeyHigh,const zrank_type pIndexNumber,ZIndexCollectionContext *pSearchContext );
 
 
   //-------------Reports------------------------------------
@@ -375,9 +435,9 @@ public:
   ZStatus zclearMCB (FILE *pOutput=nullptr);
 
   static
-      void    zdowngradeZMFtoZRF (const char* pZMFPath,FILE* pOutput=nullptr);
+      void    zdowngradeZMFtoZRF (const  uriString & pZMFPath,FILE* pOutput=nullptr);
   static
-      void    zupgradeZRFtoZMF (const char* pZRFPath, FILE* pOutput=nullptr);
+      void    zupgradeZRFtoZMF (const uriString &pZRFPath, FILE* pOutput=nullptr);
 
   ZStatus zremoveIndex (const long pIndexRank, bool pBackup=false, ZaiErrors *pErrorLog=nullptr);
 
@@ -385,10 +445,11 @@ public:
   ZStatus shiftIndexNameUp(long pStartRank,ZaiErrors* pErrorLog);
 
   //------------Surface utilities---------------------------------
-
+  /* for the following routines : see zrawmasterfileutils.h -> using static templates */
+#ifdef __DEPRECATED__
   ZStatus zreorgRawFile(bool pDump=false, FILE *pOutput=stdout); // replaces the ZRandomFile::zreorgFile()
   ZStatus zindexRebuild (const long pIndexRank,bool pStat=false, FILE *pOutput=stdout);
-
+#endif
 
   //--------------XML reports & utilities---------------------------------
 
@@ -429,7 +490,7 @@ public:
    * @param pKeyNumber
    * @return
    */
-  ZStatus getRawIndex(ZSIndexItem &pIndexItem, const zrank_type pIndexRank, const zrank_type pKeyNumber);
+  ZStatus getRawIndex(ZIndexItem &pIndexItem, const zrank_type pIndexRank, const zrank_type pKeyNumber);
 
   // -------------------ZMasterFile operators-------------------------
 
@@ -447,9 +508,57 @@ public:
   */
   ZDataBuffer  operator [] (const long pIndex) { zget(CurrentRecord,pIndex);return CurrentRecord;}   // resulting _Type cannot be modified : use replace() method instead
 
-
-
   //------------------end operators------------------------
+
+   /* ------------following routines are to be used with a generated class----------------*/
+
+  template <class _Tp>
+  ZStatus zadd_T(_Tp& pClass) {
+    ZDataBuffer wRecordContent=pClass.toRecord();
+    ZArray<ZDataBuffer> wKeys = pClass.getAllKeys();
+    return _addRaw(wRecordContent,wKeys);
+  }
+
+
+  template <class _Tp>
+  ZStatus zinsert_T(_Tp& pClass, const zrank_type pZMFRank) {
+    ZDataBuffer wRecordContent=pClass.toRecord();
+    return zinsert(wRecordContent,pClass.getAllKeys(),pZMFRank);
+  }
+
+  template <class _Tp>
+  ZStatus zget_T(_Tp& pClass, const zrank_type pZMFRank) {
+    ZDataBuffer wRecordContent;
+    ZStatus wSt=zget(wRecordContent,pZMFRank);
+    if (wSt==ZS_SUCCESS)
+      pClass.fromRecord(wRecordContent);
+    return wSt;
+  }
+
+/* NB: zremoveByRankR() does not need to have a template here as it does not use record content */
+
+  template <class _Tp>
+  ZStatus zremoveByRankR_T(_Tp& pClass, const zrank_type pZMFRank) {
+    ZDataBuffer wRecordContent;
+    ZStatus wSt=zremoveByRankR(wRecordContent,pZMFRank);
+    if (wSt==ZS_SUCCESS)
+      pClass.fromRecord(wRecordContent);
+    return wSt;
+  }
+   //---------search and get operations--------------------------------
+
+  template <class _Tp>
+  ZStatus zsearch_T(_Tp& pClass, const long pIndexNumber) {
+    return zsearch(pClass.toRecord(),pClass.getAllKeys(),pIndexNumber);
+  }
+
+  template <class _Tp>
+  ZStatus zsearchAll_T(_Tp& pClass, const long pIndexNumber,ZIndexCollection &pIndexCollection,
+      const ZMatchSize_type pZMS=ZMS_MatchKeySize) {
+    return zsearchAll(pClass.toRecord(),pClass.getAllKeys(),pIndexNumber);
+  }
+
+
 private:
 
   //------------Add sequence---------------------------------------
@@ -457,7 +566,7 @@ private:
   ZStatus _add_RollbackIndexes (ZArray<zrank_type> &pIndexRankProcessed);
   ZStatus _add_HardRollbackIndexes (ZArray<zrank_type> &pIndexRankProcessed);
 
-  ZStatus _add_CommitIndexes (ZArray <ZSIndexItem*>  &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed);
+  ZStatus _add_CommitIndexes (ZArray <ZIndexItem*>  &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed);
 
   //-----------End Add sequence------------------------------------
 
@@ -471,9 +580,9 @@ private:
 
   ZStatus _remove_RollbackIndexes (ZArray<zrank_type> &pIndexRankProcessed);
 
-  ZStatus _remove_HardRollbackIndexes (ZArray<ZSIndexItem*> &pIndexItemList,ZArray<zrank_type> &pIndexRankProcessed);
+  ZStatus _remove_HardRollbackIndexes (ZArray<ZIndexItem*> &pIndexItemList,ZArray<zrank_type> &pIndexRankProcessed);
 
-  ZStatus _remove_CommitIndexes ( ZSIndexItemList &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed);
+  ZStatus _remove_CommitIndexes ( ZIndexItemList &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed);
   /** @endcond */
   //-----------End Remove sequence------------------------------------
 

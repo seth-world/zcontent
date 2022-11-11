@@ -20,6 +20,8 @@
 
 #include <ztoolset/zfunctions.h> /* for version numbers management */
 
+#include <qevent.h>
+
 extern Qt::AlignmentFlag QtAlignmentFlag;
 
 
@@ -62,6 +64,8 @@ DisplayMain::DisplayMain(ZContentVisuMain *parent) :QMainWindow((QWidget*)parent
 
   ui->OffsetLBl->setText("0  - Ox0");
 
+  ui->OffsetSLd->setSingleStep(1);
+
   QObject::connect(ui->OffsetSLd, SIGNAL(valueChanged(int)), this, SLOT(sliderChange(int)));
 }
 
@@ -98,6 +102,18 @@ DisplayMain::displayHCB(ZDataBuffer &pData)
   displayHCBValues(pData.Data);
 
 }
+void
+DisplayMain::setOffset(size_t pOffset,size_t pMax) {
+  Offset=pOffset;
+  ui->OffsetSLd->setMinimum(0);
+  ui->OffsetSLd->setMaximum(pMax);
+  ui->OffsetSLd->setValue (Offset);
+
+  utf8VaryingString wStr;
+  wStr.sprintf("%4ld - Ox%4lX",Offset,Offset);
+  ui->OffsetLBl->setText(wStr.toCChar());
+}
+
 
 void
 DisplayMain::displayFCB(ZDataBuffer &pData)
@@ -158,15 +174,15 @@ DisplayMain::displayFCB(ZDataBuffer &pData)
     return;
   }
 
+  setOffset(wOffset,pData.Size);
+/*
   Offset=wOffset;
   ui->OffsetSLd->setMinimum(0);
   ui->OffsetSLd->setMaximum(pData.Size);
   ui->OffsetSLd->setValue (Offset);
-
-
   wStr.sprintf("%4ld - Ox%4lX",Offset,Offset);
   ui->OffsetLBl->setText(wStr.toCChar());
-
+*/
   displayFCBValues(pData.Data+wOffset);
 }
 
@@ -201,14 +217,16 @@ DisplayMain::getMCB(ZDataBuffer& pData)
 
   ZHeaderControlBlock_Export* wHCBExport=(ZHeaderControlBlock_Export*)pData.Data;
   zaddress_type wOffset=reverseByteOrder_Conditional(wHCBExport->OffsetReserved);
-  if (pData.Size < (wOffset+sizeof(ZSMCBOwnData_Export)))
+  if (pData.Size < (wOffset+sizeof(ZMCB_Export)))
   {
     utf8String wStr;
     wStr.sprintf("Not enough loaded data. Requested minimum size <%ld> Bytes \n"
-                 "Only <%ld> Bytes have been loaded.",(wOffset+sizeof(ZSMCBOwnData_Export)),pData.Size);
+                 "Only <%ld> Bytes have been loaded.",(wOffset+sizeof(ZMCB_Export)),pData.Size);
     ZExceptionDLg::message("DisplayMain::getMCB",ZS_NEEDMORESPACE,Severity_Error,wStr.toCChar());
     return;
   }
+  setOffset(wOffset,pData.Size);
+  /*
   Offset=wOffset;
   wStr.sprintf("%4ld - Ox%4lX",Offset,Offset);
   ui->OffsetLBl->setText(wStr.toCChar());
@@ -216,7 +234,7 @@ DisplayMain::getMCB(ZDataBuffer& pData)
   ui->OffsetSLd->setMinimum(0);
   ui->OffsetSLd->setMaximum(pData.Size);
   ui->OffsetSLd->setValue (Offset);
-
+*/
   displayMCBValues(pData.Data+wOffset);
 }
 
@@ -237,15 +255,13 @@ DisplayMain::displayMCB(ZDataBuffer& pData)
     return;
   }
 
-
-
   ZHeaderControlBlock_Export* wHCBExport=(ZHeaderControlBlock_Export*)pData.Data;
   zaddress_type wOffset=reverseByteOrder_Conditional(wHCBExport->OffsetReserved);
-  if (pData.Size < (wOffset+sizeof(ZSMCBOwnData_Export)))
+  if (pData.Size < (wOffset+sizeof(ZMCB_Export)))
     {
     utf8String wStr;
     wStr.sprintf("Not enough loaded data. Requested minimum size <%ld> Bytes \n"
-                 "Only <%ld> Bytes have been loaded.",(wOffset+sizeof(ZSMCBOwnData_Export)),pData.Size);
+                 "Only <%ld> Bytes have been loaded.",(wOffset+sizeof(ZMCB_Export)),pData.Size);
     ZExceptionDLg::message("DisplayMain::displayMCB",ZS_NEEDMORESPACE,Severity_Error,wStr.toCChar());
     return;
     }
@@ -253,6 +269,8 @@ DisplayMain::displayMCB(ZDataBuffer& pData)
   CurrentDisplay= ZDW_MCB;
   ContentToDump.setData(pData);
 
+  setOffset(wOffset,pData.Size);
+  /*
   Offset=wOffset;
   wStr.sprintf("%4ld - Ox%4lX",Offset,Offset);
   ui->OffsetLBl->setText(wStr.toCChar());
@@ -260,7 +278,7 @@ DisplayMain::displayMCB(ZDataBuffer& pData)
   ui->OffsetSLd->setMinimum(0);
   ui->OffsetSLd->setMaximum(pData.Size);
   ui->OffsetSLd->setValue (Offset);
-
+*/
   displayMCBValues(pData.Data+wOffset);
 }
 
@@ -300,6 +318,9 @@ DisplayMain::sliderChange(int pValue)
   case ZDW_MCB:
     displayMCBValues(ContentToDump.Data+pValue);
     return;
+  case ZDW_ICB:
+    displayICBValues(ContentToDump.Data+pValue);
+    return;
   case ZDW_POOL:
     displayPoolValues(ContentToDump.Data+pValue);
     return;
@@ -322,7 +343,8 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
   long wOffset=Offset;
 
   int wRowOffsetFCB=0;
-  ui->ZEntityLBl->setText("ZHeaderControlBlock");
+//  ui->ZEntityLBl->setText("ZHeaderControlBlock");
+  setWindowTitle(QObject::tr("Header control block","DisplayMain"));
 /*
   ContentToDump.setData(pPtrIn,sizeof(ZHeaderControlBlock_Export));
   ZHeaderControlBlock_Export* wHCBExport=(ZHeaderControlBlock_Export*)ContentToDump.Data;
@@ -352,22 +374,18 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
 
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZHeaderControlBlock_Export,StartSign);
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
-  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
+  createMarginItem(Offset+offsetof(ZHeaderControlBlock_Export,StartSign),wRow++);
 
   wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wHCBExport->BlockID),"%ld");
-  wDumpRow << createItem( "BlockID");
+  wDumpRow << createItem(sizeof(wHCBExport->BlockId),"%ld");
+  wDumpRow << createItem( "BlockId");
   wDumpRow.last()->setToolTip("Block identification");
-  wDumpRow << createItem((uint8_t)wHCBExport->BlockID,"0x%02X");
-  wDumpRow << createItem((uint8_t)wHCBExport->BlockID,"0x%02X");
-  wDumpRow << createItem(decode_BlockId(wHCBExport->BlockID));
+  wDumpRow << createItem((uint8_t)wHCBExport->BlockId,"0x%02X");
+  wDumpRow << createItem((uint8_t)wHCBExport->BlockId,"0x%02X");
+  wDumpRow << createItem(decode_BlockId(wHCBExport->BlockId));
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZHeaderControlBlock_Export,BlockID);
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
-  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
+  createMarginItem(Offset+offsetof(ZHeaderControlBlock_Export,BlockId),wRow++);
 
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wHCBExport->EndianCheck),"%ld");
@@ -382,9 +400,7 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
   wDumpRow <<  createItem(wStr.toCChar());
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZHeaderControlBlock_Export,EndianCheck);
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
-  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
+  createMarginItem(Offset+offsetof(ZHeaderControlBlock_Export,EndianCheck),wRow++);
 
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wHCBExport->ZRFVersion),"%ld");
@@ -397,9 +413,7 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
 
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZHeaderControlBlock_Export,ZRFVersion);
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
-  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
+  createMarginItem(Offset+offsetof(ZHeaderControlBlock_Export,ZRFVersion),wRow++);
 
 
   wDumpRow.clear();
@@ -411,9 +425,7 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
   wDumpRow << createItem(decode_ZFile_type(wHCBExport->FileType));
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZHeaderControlBlock_Export,FileType);
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
-  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
+  createMarginItem(Offset+offsetof(ZHeaderControlBlock_Export,FileType),wRow++);
 
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wHCBExport->Lock),"%ld");
@@ -424,9 +436,8 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
   wDumpRow << createItem(decode_ZLockMask(wHCBExport->Lock).toChar());
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZHeaderControlBlock_Export,Lock);
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
-  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
+
+  createMarginItem(Offset+offsetof(ZHeaderControlBlock_Export,Lock),wRow++);
 
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wHCBExport->LockOwner),"%ld");
@@ -438,9 +449,8 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
   wDumpRow << createItem(wStr.toCChar());
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZHeaderControlBlock_Export,LockOwner);
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
-  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
+
+  createMarginItem(Offset+offsetof(ZHeaderControlBlock_Export,LockOwner),wRow++);
 
 
   wDumpRow.clear();
@@ -452,9 +462,7 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
 
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZHeaderControlBlock_Export,OffsetFCB);
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
-  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
+  createMarginItem(Offset+offsetof(ZHeaderControlBlock_Export,OffsetFCB),wRow++);
 
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wHCBExport->OffsetReserved),"%ld");
@@ -469,6 +477,8 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
   wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
 
+  createMarginItem(Offset+offsetof(ZHeaderControlBlock_Export,OffsetReserved),wRow++);
+
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wHCBExport->SizeReserved),"%ld");
   wDumpRow << createItem( "SizeReserved");
@@ -479,10 +489,7 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
 
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZHeaderControlBlock_Export,SizeReserved);
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
-  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
-
+  createMarginItem(Offset+offsetof(ZHeaderControlBlock_Export,SizeReserved),wRow++);
 
   /* update theorical offsetFCB value */
   wStr.sprintf("0x%X - %ld ",wInt64+wOffsetReserved,wInt64+wOffsetReserved);
@@ -499,9 +506,7 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
   wDumpRow << createItem(wStr.toCChar());
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZHeaderControlBlock_Export,EndSign);
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
-  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
+  createMarginItem(Offset+offsetof(ZHeaderControlBlock_Export,EndSign),wRow++);
 
   ui->displayTBv->resizeRowsToContents();
   ui->displayTBv->resizeColumnsToContents();
@@ -521,6 +526,9 @@ wStr.sprintf("0x%8X",Offset+offsetof(ZSMCBOwnData_Export,__NAME__)); \
 displayItemModel->setVerticalHeaderItem(wRow++,new QStandardItem(wStr.toCChar()));
 
 
+
+
+
 void
 DisplayMain::displayPoolValues(unsigned char* pPtrIn)
 {
@@ -529,40 +537,338 @@ DisplayMain::displayPoolValues(unsigned char* pPtrIn)
 
   utf8String wStr;
 
-  ui->ZEntityLBl->setText("ZPool Values");
+//  ui->ZEntityLBl->setText("ZPool Values");
+  setWindowTitle(QObject::tr("Pool","DisplayMain"));
 }
 
 
 void
-DisplayMain::displayMCBValues(unsigned char* pPtrIn)
+DisplayMain::displayICBs(ZDataBuffer &pData) {
+  CurrentDisplay= ZDW_ICB;
+  ContentToDump.setData(pData);
+
+  const unsigned char* wPtr = pData.Data;
+  ZHeaderControlBlock_Export wZHCBe;
+  memmove(&wZHCBe,ContentToDump.Data,sizeof(ZHeaderControlBlock_Export));
+  if (wZHCBe.StartSign!=cst_ZBLOCKSTART) {
+    ZExceptionDLg::adhocMessage("Invalid Header",Severity_Error,nullptr,"Header Control Block appears to be corrupted.");
+    return;
+  }
+  wZHCBe.deserialize();
+  ZMCB_Export wZMCBe;
+  memmove(&wZMCBe,wPtr+wZHCBe.OffsetReserved,sizeof(ZMCB_Export));
+  wZMCBe.deserialize();
+  if (!wZMCBe.isValid()) {
+    ZExceptionDLg::adhocMessage("Invalid MCB",Severity_Error,nullptr,"Master Control Block (Reserved space) appears to be corrupted.");
+    return;
+  }
+
+  size_t wOffset = wZHCBe.OffsetReserved + wZMCBe.ICBOffset;
+
+  setOffset(wOffset,pData.Size);
+
+  wPtr = wPtr + Offset;
+
+  displayICBValues(wPtr);
+
+}
+void
+//DisplayMain::displayICBValues(const unsigned char* pPtrIn,size_t &pOffsetFromMCB, int &wRow) {
+DisplayMain::displayICBValues(const unsigned char *pPtrIn) {
+
+  setWindowTitle(QObject::tr("Index control blocks","DisplayMain"));
+  const unsigned char* wPtr = pPtrIn ;
+  bool wRet = true;
+  int wCount=0;
+  int wRow=0;
+
+  displayItemModel->removeRows(0,displayItemModel->rowCount());
+
+  size_t wOffset=Offset;
+  while (wRet && (wCount++ < 20)) { /* no more than 20 indexes to display */
+    wRet=displaySingleICBValues(wPtr,wOffset,wRow);
+  }
+
+  ui->displayTBv->resizeRowsToContents();
+  ui->displayTBv->resizeColumnsToContents();
+
+  show();
+}
+
+
+void DisplayMain::createMarginItem(size_t pValue, int pRow) {
+  utf8VaryingString wStr;
+  wStr.sprintf("%4lu 0x%4lX",pValue,pValue);
+  displayItemModel->setVerticalHeaderItem(pRow,createItem(wStr.toCChar()));
+}
+
+
+/** pPtrIn is supposed to point to first ICB.
+ *  pOffset is offset to be displayed (since beginning of file)
+ */
+bool
+//DisplayMain::displayICBValues(const unsigned char* pPtrIn,size_t &pOffsetFromMCB, int &wRow) {
+DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDisplayOffset,int &wRow) {
+  if (pPtrIn==nullptr)
+    return false;
+
+//  ui->ZEntityLBl->setText("ZIndexControlBlock");
+
+  utf8VaryingString wStr;
+//  utf8VaryingString wIndexFilePath,wIndexName,wKeyName;
+
+
+  QList<QStandardItem*> wDumpRow;
+  uint32_t wUInt32;
+
+  const ZICB_Export* wICBe=(ZICB_Export*)pPtrIn;
+
+//  size_t wDisplayOffsetBase = pDisplayOffset ;  /* general offset shift */
+  size_t wCurrentOffset=pDisplayOffset;
+
+  if (wICBe->StartSign == cst_ZBLOCKEND) {
+    wDumpRow.clear();
+    wDumpRow << createItem(sizeof(uint32_t),"%u");
+    wDumpRow << createItem( "EndBlockMark");
+    wDumpRow << createItem(wICBe->StartSign,"0x%08X");
+    wDumpRow << createItem(reverseByteOrder_Conditional( wICBe->StartSign),"0x%08X");
+    wDumpRow << createItem("No more index control blocks");
+
+    displayItemModel->appendRow(wDumpRow);
+
+    createMarginItem(wCurrentOffset,wRow++);
+    wCurrentOffset += sizeof(uint32_t) ;
+    wDumpRow.clear();
+    wDumpRow << createItem(" ");
+    wDumpRow << createItem(" ");
+    wDumpRow << createItem("--end of ZICB--");
+    displayItemModel->appendRow(wDumpRow);
+
+    createMarginItem(wCurrentOffset,wRow++);
+
+    pDisplayOffset += sizeof(cst_ZBLOCKEND);
+    return false;
+  }
+
+  wDumpRow.clear();
+  wDumpRow << createItem(" ");
+  wDumpRow << createItem( "---");
+  wDumpRow << createItem(wICBe->StartSign,"Index Control Block");
+  wDumpRow << createItem("---");
+  wDumpRow << createItem(" ");
+  displayItemModel->appendRow(wDumpRow);
+
+  createMarginItem(wCurrentOffset,wRow++);
+
+  wDumpRow.clear();
+  wDumpRow << createItem(sizeof(wICBe->StartSign),"%u");
+  wDumpRow << createItem( "StartSign");
+  wDumpRow.last()->setToolTip("Special value that marks the beginning of the block");
+  wDumpRow << createItem(wICBe->StartSign,"0x%08X");
+  wDumpRow << createItem(reverseByteOrder_Conditional( wICBe->StartSign),"0x%08X");
+  wDumpRow << createItem(wICBe->StartSign==cst_ZBLOCKSTART?"correct":"incorrect");
+
+  displayItemModel->appendRow(wDumpRow);
+
+  createMarginItem(wCurrentOffset,wRow++);
+
+  wCurrentOffset += offsetof(ZHeaderControlBlock_Export,StartSign) ;
+
+
+  wDumpRow.clear();
+  wDumpRow << createItem(sizeof(wICBe->BlockId),"%lu");
+  wDumpRow << createItem( "BlockId");
+  wDumpRow.last()->setToolTip("Block identification");
+  wDumpRow << createItem((uint8_t)wICBe->BlockId,"0x%02X");
+  wDumpRow << createItem((uint8_t)wICBe->BlockId,"0x%02X");
+  wDumpRow << createItem(decode_BlockId(wICBe->BlockId));
+  displayItemModel->appendRow(wDumpRow);
+
+  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,BlockId),wRow++);
+
+
+  wDumpRow.clear();
+  wDumpRow << createItem(sizeof(wICBe->EndianCheck),"%lu");
+  wDumpRow << createItem( "EndianCheck");
+  wDumpRow.last()->setToolTip("Controls if values have been serialized or not");
+  wStr.sprintf("0x%04X",wICBe->EndianCheck);
+  wDumpRow << createItem( wStr.toCChar());
+  wStr.sprintf("%u",reverseByteOrder_Conditional(wICBe->EndianCheck));
+  wDumpRow <<  createItem( wStr.toCChar());
+  wStr.sprintf("%s",wICBe->isReversed()?"serialized":"NOT serialized");
+  wDumpRow <<  createItem(wStr.toCChar());
+  displayItemModel->appendRow(wDumpRow);
+
+  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,EndianCheck),wRow++);
+
+
+  wDumpRow.clear();
+  wDumpRow << createItem(sizeof(wICBe->ZMFVersion),"%lu");
+  wDumpRow << createItem( "ZMFVersion");
+  wDumpRow.last()->setToolTip("Master file full software version expressed as an unsigned long");
+  wDumpRow << createItem(wICBe->ZMFVersion,"0x%lX");
+  wDumpRow << createItem(reverseByteOrder_Conditional<unsigned long>(wICBe->ZMFVersion),"%lu");
+  unsigned long wVersion = reverseByteOrder_Conditional<unsigned long>(wICBe->ZMFVersion);
+  wDumpRow << createItem(getVersionStr(wVersion).toCChar());
+
+  displayItemModel->appendRow(wDumpRow);
+
+  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,ZMFVersion),wRow++);
+
+  wDumpRow.clear();
+  wDumpRow << createItem(sizeof(wICBe->ICBTotalSize),"%lu");
+  wDumpRow << createItem( "MCBSize");
+  wDumpRow.last()->setToolTip("Total size in bytes of exported index control block (including key dictionary)");
+  wDumpRow << createItem(wICBe->ICBTotalSize,"0x%X");
+  wUInt32=reverseByteOrder_Conditional<uint32_t>(wICBe->ICBTotalSize);
+  wDumpRow << createItem(wUInt32,"%u");
+
+  displayItemModel->appendRow(wDumpRow);
+
+  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,ICBTotalSize),wRow++);
+
+
+  wDumpRow.clear();
+  wDumpRow << createItem(sizeof(wICBe->ZKDicOffset),"%lu");
+  wDumpRow << createItem( "ZKDicOffset");
+  wDumpRow.last()->setToolTip("Offset in bytes to just following key dictionary.");
+  wDumpRow << createItem(wICBe->ZKDicOffset,"0x%X");
+  wUInt32=reverseByteOrder_Conditional(wICBe->ZKDicOffset);
+  wDumpRow << createItem(wUInt32,"%d");
+
+  displayItemModel->appendRow(wDumpRow);
+
+  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,ZKDicOffset),wRow++);
+
+  wDumpRow.clear();
+  wDumpRow << createItem(sizeof(wICBe->KeyUniversalSize),"%lu");
+  wDumpRow << createItem( "KeyUniversalSize");
+  wDumpRow.last()->setToolTip("Offset in bytes to first Index Control Block since beginning of Master Control Block");
+  wDumpRow << createItem(wICBe->KeyUniversalSize,"0x%X");
+  wUInt32=reverseByteOrder_Conditional(wICBe->KeyUniversalSize);
+  wDumpRow << createItem(wUInt32,"%u");
+
+  displayItemModel->appendRow(wDumpRow);
+
+  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,KeyUniversalSize),wRow++);
+
+  wDumpRow.clear();
+  wDumpRow << createItem(sizeof(wICBe->Duplicates),"%lu");
+  wDumpRow << createItem( "Duplicates");
+  wDumpRow.last()->setToolTip("Defines if index accepts duplicates (set) or not (unset)");
+  wDumpRow << createItem((uint8_t)wICBe->Duplicates,"0x%X");
+  wDumpRow << createItem(wICBe->Duplicates?"Yes":"No");
+
+  displayItemModel->appendRow(wDumpRow);
+
+  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,Duplicates),wRow++);
+
+  wCurrentOffset = pDisplayOffset + sizeof(ZICB_Export); /* update offset */
+
+  ZICB_Export wCheck ;
+  memmove(&wCheck,wICBe,sizeof(ZICB_Export));
+  wCheck.deserialize();
+  if (!wCheck.isValid()) { /* invalid block : no more to dump */
+
+    wDumpRow.clear();
+    wDumpRow << createItem(" ");
+    wDumpRow << createItem( " ");
+
+    wDumpRow << createItem("Invalid ICB. No more to display.");
+
+    displayItemModel->appendRow(wDumpRow);
+
+    createMarginItem(wCurrentOffset,wRow++);
+
+    ui->displayTBv->resizeRowsToContents();
+    ui->displayTBv->resizeColumnsToContents();
+    return false;
+  }
+  /* dump 2 strings (index name and index file name */
+  utf8VaryingString wIndexName ;
+  uriString    wURIIndex;
+
+  pPtrIn += sizeof(ZICB_Export) ;
+
+
+  size_t wSP=wIndexName._importUVF(pPtrIn); /* pPtrIn is updated */
+
+  wDumpRow.clear();
+  wDumpRow << createItem(wSP,"%lu");
+  wDumpRow << createItem( "IndexName");
+  wDumpRow.last()->setToolTip("Unique name for the index");
+  wDumpRow << createItem( wIndexName.toCChar());
+  wDumpRow <<  createItem( wIndexName.toCChar());
+
+  displayItemModel->appendRow(wDumpRow);
+
+  createMarginItem(wCurrentOffset,wRow++);
+  wCurrentOffset += wSP;
+
+
+  wSP=wURIIndex._importUVF(pPtrIn); /* pPtrIn is updated */
+
+  utf8VaryingString wDir=wURIIndex.getDirectoryPath() ;
+
+  if (wDir.strlen() > 20) {
+
+    wDir = wDir.Right(20).insert(utf8VaryingString((const utf8_t*)"◊"),0);
+  }
+  wDumpRow.clear();
+  wDumpRow << createItem(wSP,"%lu");
+  wDumpRow << createItem( "IndexFile");
+  wDumpRow.last()->setToolTip("Index file location and name");
+  wDumpRow << createItem( wDir.toCChar());
+  wDumpRow << createItem( wURIIndex.getBasename().toCChar());
+
+  displayItemModel->appendRow(wDumpRow);
+
+  createMarginItem(wCurrentOffset,wRow++);
+  wCurrentOffset += wSP;
+
+  wDumpRow.clear();
+  wDumpRow << createItem(" ");
+  wDumpRow << createItem(" ");
+  wDumpRow << createItem( "---end---");
+  displayItemModel->appendRow(wDumpRow);
+
+  createMarginItem(wCurrentOffset,wRow++);
+
+  pDisplayOffset = wCurrentOffset;
+  return true;
+
+}// displayICB
+void
+DisplayMain::displayMCBValues(const unsigned char* pPtrIn)
 {
   if (pPtrIn==nullptr)
     return;
 
   utf8String    wStr;
-  int           wOffset=Offset;
-  int64_t       wInt64;
+  size_t        wOffset=Offset;
+
   uint32_t      wUInt32;
 
-  ui->ZEntityLBl->setText("ZMasterControlBlock");
+  setWindowTitle(QObject::tr("Master control block","DisplayMain"));
+//  ui->ZEntityLBl->setText("ZMasterControlBlock");
 /*
   ContentToDump.setData(pPtrIn,sizeof(ZSMCBOwnData_Export));
   ZSMCBOwnData_Export* wMCBExport=(ZSMCBOwnData_Export*)ContentToDump.Data;
 */
-  ZSMCBOwnData_Export* wMCBExport=(ZSMCBOwnData_Export*)pPtrIn;
+  const ZMCB_Export* wMCBExport= (const ZMCB_Export*)(pPtrIn);
 
+  ZMCB_Export wMCBExportDeserialized;
+  wMCBExportDeserialized._import(pPtrIn);
 
   if (displayItemModel)
     if (displayItemModel->rowCount()>0)
       displayItemModel->removeRows(0,displayItemModel->rowCount());
 
-
   int wRow=0;
   QList<QStandardItem *> wDumpRow ;
 
-
   wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wMCBExport->StartSign),"%ld");
+  wDumpRow << createItem(sizeof(wMCBExport->StartSign),"%lu");
   wDumpRow << createItem( "StartSign");
   wDumpRow.last()->setToolTip("Special value that marks the beginning of the block");
   wDumpRow << createItem(wMCBExport->StartSign,"0x%08X");
@@ -572,25 +878,25 @@ DisplayMain::displayMCBValues(unsigned char* pPtrIn)
 
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZHeaderControlBlock_Export,StartSign);
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
+  wOffset=wOffset+offsetof(ZHeaderControlBlock_Export,StartSign);
+  wStr.sprintf("%4lu 0x%4lX",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
 
   wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wMCBExport->BlockId),"%ld");
-  wDumpRow << createItem( "BlockID");
+  wDumpRow << createItem(sizeof(wMCBExport->BlockId),"%lu");
+  wDumpRow << createItem( "BlockId");
   wDumpRow.last()->setToolTip("Block identification");
   wDumpRow << createItem((uint8_t)wMCBExport->BlockId,"0x%02X");
   wDumpRow << createItem((uint8_t)wMCBExport->BlockId,"0x%02X");
   wDumpRow << createItem(decode_BlockId(wMCBExport->BlockId));
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZHeaderControlBlock_Export,BlockID);
+  wOffset=wOffset+offsetof(ZHeaderControlBlock_Export,BlockId);
   wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
 
   wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wMCBExport->EndianCheck),"%ld");
+  wDumpRow << createItem(sizeof(wMCBExport->EndianCheck),"%lu");
   wDumpRow << createItem( "EndianCheck");
   wDumpRow.last()->setToolTip("Controls if values have been serialized or not");
   wStr.sprintf("0x%04X",wMCBExport->EndianCheck);
@@ -608,7 +914,7 @@ DisplayMain::displayMCBValues(unsigned char* pPtrIn)
 
 
   wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wMCBExport->ZMFVersion),"%ld");
+  wDumpRow << createItem(sizeof(wMCBExport->ZMFVersion),"%lu");
   wDumpRow << createItem( "ZMFVersion");
   wDumpRow.last()->setToolTip("Master file full software version expressed as an unsigned long");
   wDumpRow << createItem(wMCBExport->ZMFVersion,"0x%lX");
@@ -618,12 +924,12 @@ DisplayMain::displayMCBValues(unsigned char* pPtrIn)
 
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZSMCBOwnData_Export,ZMFVersion);
+  wOffset=Offset+offsetof(ZMCB_Export,ZMFVersion);
   wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
 
   wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wMCBExport->MCBSize),"%ld");
+  wDumpRow << createItem(sizeof(wMCBExport->MCBSize),"%lu");
   wDumpRow << createItem( "MCBSize");
   wDumpRow.last()->setToolTip("Size in bytes of exported Master Control Block");
   wDumpRow << createItem(wMCBExport->MCBSize,"0x%X");
@@ -632,12 +938,12 @@ DisplayMain::displayMCBValues(unsigned char* pPtrIn)
 
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZSMCBOwnData_Export,MCBSize);
+  wOffset=Offset+offsetof(ZMCB_Export,MCBSize);
   wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
-
+/*
   wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wMCBExport->IndexCount),"%ld");
+  wDumpRow << createItem(sizeof(wMCBExport->IndexCount),"%lu");
   wDumpRow << createItem( "IndexCount");
   wDumpRow.last()->setToolTip("Number of indexes (keys) contained in Master Control Block");
   wDumpRow << createItem(wMCBExport->IndexCount,"0x%X");
@@ -646,12 +952,12 @@ DisplayMain::displayMCBValues(unsigned char* pPtrIn)
 
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZSMCBOwnData_Export,IndexCount);
+  wOffset=Offset+offsetof(ZMCB_Export,IndexCount);
   wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
-
+*/
   wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wMCBExport->ICBOffset),"%ld");
+  wDumpRow << createItem(sizeof(wMCBExport->ICBOffset),"%lu");
   wDumpRow << createItem( "ICBOffset");
   wDumpRow.last()->setToolTip("Offset in bytes to first Index Control Block since beginning of Master Control Block");
   wDumpRow << createItem(wMCBExport->ICBOffset,"0x%X");
@@ -660,85 +966,54 @@ DisplayMain::displayMCBValues(unsigned char* pPtrIn)
 
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=int(Offset+offsetof(ZSMCBOwnData_Export,ICBOffset));
+  wOffset=Offset+offsetof(ZMCB_Export,ICBOffset);
   wStr.sprintf("%4ld 0x%4X",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
 
   wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wMCBExport->ICBSize),"%ld");
-  wDumpRow << createItem( "ICBOffset");
+  wDumpRow << createItem(sizeof(wMCBExport->ICBSize),"%lu");
+  wDumpRow << createItem( "ICBSize");
   wDumpRow.last()->setToolTip("Size in bytes of Index Control Blocks table");
   wDumpRow << createItem(wMCBExport->ICBSize,"0x%X");
-  wUInt32=reverseByteOrder_Conditional(wMCBExport->ICBSize);
-  wDumpRow << createItem(wUInt32,"%d");
+  wUInt32=reverseByteOrder_Conditional<uint32_t>(wMCBExport->ICBSize);
+  wDumpRow << createItem(wUInt32,"%u");
 
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=int(Offset+offsetof(ZSMCBOwnData_Export,ICBSize));
-  wStr.sprintf("%4ld 0x%4X",wOffset,wOffset);
+  wOffset=size_t(Offset)+offsetof(ZMCB_Export,ICBSize);
+  wStr.sprintf("%4lu 0x%4X",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
-
 
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wMCBExport->JCBOffset),"%ld");
   wDumpRow << createItem( "JCBOffset");
   wDumpRow.last()->setToolTip("Offset in bytes to Journal Control Block since beginning of Master Control Block");
   wDumpRow << createItem(wMCBExport->JCBOffset,"0x%X");
-  wUInt32=reverseByteOrder_Conditional(wMCBExport->JCBOffset);
-  wDumpRow << createItem(wUInt32,"%d");
+  wUInt32=reverseByteOrder_Conditional<uint32_t>(wMCBExport->JCBOffset);
+  wDumpRow << createItem(wUInt32,"%u");
 
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=int(Offset+offsetof(ZSMCBOwnData_Export,JCBOffset));
+  wOffset=size_t(Offset)+offsetof(ZMCB_Export,JCBOffset);
   wStr.sprintf("%4ld 0x%4X",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
 
   wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wMCBExport->JCBSize),"%ld");
+  wDumpRow << createItem(sizeof(wMCBExport->JCBSize),"%lu");
   wDumpRow << createItem( "JCBSize");
   wDumpRow.last()->setToolTip("Size in bytes of Journal Control Block");
   wDumpRow << createItem(wMCBExport->JCBSize,"0x%X");
-  wUInt32=reverseByteOrder_Conditional(wMCBExport->JCBSize);
-  wDumpRow << createItem(wUInt32,"%d");
+  wUInt32=reverseByteOrder_Conditional<uint32_t>(wMCBExport->JCBSize);
+  wDumpRow << createItem(wUInt32,"%u");
 
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=int(Offset+offsetof(ZSMCBOwnData_Export,JCBSize));
-  wStr.sprintf("%4ld 0x%4X",wOffset,wOffset);
-  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
-
-#ifdef __COMMENT__
-  wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wMCBExport->MDicOffset),"%ld");
-  wDumpRow << createItem( "MDicOffset");
-  wDumpRow.last()->setToolTip("Offset in bytes to serialized Meta Dictionary since beginning of Master Control Block");
-  wDumpRow << createItem(wMCBExport->MDicOffset,"0x%X");
-  wUInt32=reverseByteOrder_Conditional(wMCBExport->MDicOffset);
-  wDumpRow << createItem(wUInt32,"%d");
-
-  displayItemModel->appendRow(wDumpRow);
-
-  wOffset=int(Offset+offsetof(ZSMCBOwnData_Export,MDicOffset));
-  wStr.sprintf("%4ld 0x%4X",wOffset,wOffset);
+  wOffset=size_t(Offset)+offsetof(ZMCB_Export,JCBSize);
+  wStr.sprintf("%4l 0x%4X",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
 
   wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wMCBExport->MDicSize),"%ld");
-  wDumpRow << createItem( "MDicSize");
-  wDumpRow.last()->setToolTip("Full size in bytes of serialized Meta Dictionary (including keys)");
-  wDumpRow << createItem(wMCBExport->MDicSize,"0x%X");
-  wUInt32=reverseByteOrder_Conditional(wMCBExport->MDicSize);
-  wDumpRow << createItem(wUInt32,"%d");
-
-  displayItemModel->appendRow(wDumpRow);
-
-  wOffset=int(Offset+offsetof(ZSMCBOwnData_Export,MDicSize));
-  wStr.sprintf("%4ld 0x%4X",wOffset,wOffset);
-  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
-#endif // __COMMENT__
-
-  wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wMCBExport->HistoryOn),"%ld");
+  wDumpRow << createItem(sizeof(wMCBExport->HistoryOn),"%lu");
   wDumpRow << createItem( "HistoryOn");
   wDumpRow.last()->setToolTip("(Option) If set, historize process is on (Reserved for future use).");
   wStr.sprintf("0x%X",wMCBExport->HistoryOn);
@@ -748,32 +1023,80 @@ DisplayMain::displayMCBValues(unsigned char* pPtrIn)
 
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZSMCBOwnData_Export,HistoryOn);
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
+  wOffset=Offset+ offsetof(ZMCB_Export,HistoryOn);
+  wStr.sprintf("%4lu 0x%4lX",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
 
 
-  utf8String wIndexFilePath;
-  const unsigned char* wPtrIn=pPtrIn+sizeof(ZSMCBOwnData_Export);
-  size_t wSP=wIndexFilePath._importUVF(wPtrIn);
-  if (wIndexFilePath.UnitCount > 20)
-    wIndexFilePath.Right(25);
+  if (wMCBExport->StartSign != cst_ZBLOCKSTART) {
+    ui->displayTBv->resizeRowsToContents();
+    ui->displayTBv->resizeColumnsToContents();
+    return;
+  }
+
+  /* display 3 strings */
+/*
+  wReturn.appendData(DictionaryName._exportUVF());
+  wReturn.appendData(DictionaryPath._exportUVF());
+  wReturn.appendData(IndexFilePath._exportUVF());
+*/
+
+  utf8VaryingString wDictionaryName,wDictionaryPath,wIndexFilePath;
+  wOffset = Offset + sizeof(ZMCB_Export);
+  const unsigned char* wPtr = pPtrIn + wOffset;
+
+  size_t wSP=wDictionaryName._importUVF(wPtr); /* wPtr is updated */
 
   wDumpRow.clear();
-  wDumpRow << createItem(wSP,"%ld");
+  wDumpRow << createItem(wSP,"%lu");
+  wDumpRow << createItem( "DictionaryName");
+  wDumpRow.last()->setToolTip("Dictionary name used");
+  wDumpRow << createItem( wDictionaryName.toCChar());
+  wDumpRow <<  createItem( wDictionaryName.toCChar());
+
+  displayItemModel->appendRow(wDumpRow);
+
+  wStr.sprintf("%4lu 0x%4X",wOffset,wOffset);
+  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
+
+  wOffset += wSP;
+
+  wSP=wDictionaryPath._importUVF(wPtr); /* wPtr is updated */
+
+  wDumpRow.clear();
+  wDumpRow << createItem(wSP,"%lu");
+  wDumpRow << createItem( "DictionaryPath");
+  wDumpRow.last()->setToolTip("Optional dictionary path");
+  wDumpRow << createItem( wDictionaryName.toCChar());
+  wDumpRow <<  createItem( wDictionaryName.toCChar());
+
+  displayItemModel->appendRow(wDumpRow);
+
+  wStr.sprintf("%4lu 0x%4X",wOffset,wOffset);
+  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
+
+  wOffset += wSP;
+
+  wSP=wIndexFilePath._importUVF(wPtr); /* wPtr is updated */
+
+  wDumpRow.clear();
+  wDumpRow << createItem(wSP,"%lu");
   wDumpRow << createItem( "IndexFilePath");
-  wDumpRow.last()->setToolTip("Optional path to index files directory");
+  wDumpRow.last()->setToolTip("Optional index file path");
   wDumpRow << createItem( wIndexFilePath.toCChar());
   wDumpRow <<  createItem( wIndexFilePath.toCChar());
 
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=int(Offset+sizeof(ZSMCBOwnData_Export));
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
+  wStr.sprintf("%4lu 0x%4X",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
+
+  wOffset += wSP;
 
   ui->displayTBv->resizeRowsToContents();
   ui->displayTBv->resizeColumnsToContents();
+
+  return;
 }
 
 void
@@ -785,7 +1108,8 @@ DisplayMain::displayFCBValues(unsigned char *pPtrIn)
   utf8String wStr;
   int wOffset=0;
 
-  ui->ZEntityLBl->setText("ZFileControlBlock");
+  setWindowTitle(QObject::tr("File control block","DisplayMain"));
+//  ui->ZEntityLBl->setText("ZFileControlBlock");
 /*
   ContentToDump.setData(pPtrIn,sizeof(ZFCB_Export));
   ZFCB_Export* wFCBExport=(ZFCB_Export*)ContentToDump.Data;
@@ -816,15 +1140,15 @@ DisplayMain::displayFCBValues(unsigned char *pPtrIn)
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
 
   wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wFCBExport->BlockID),"%ld");
-  wDumpRow << createItem( "BlockID");
+  wDumpRow << createItem(sizeof(wFCBExport->BlockId),"%ld");
+  wDumpRow << createItem( "BlockId");
   wDumpRow.last()->setToolTip("Block identification");
-  wDumpRow << createItem((uint8_t)wFCBExport->BlockID,"0x%02X");
-  wDumpRow << createItem((uint8_t)wFCBExport->BlockID,"0x%02X");
-  wDumpRow << createItem(decode_BlockId(wFCBExport->BlockID));
+  wDumpRow << createItem((uint8_t)wFCBExport->BlockId,"0x%02X");
+  wDumpRow << createItem((uint8_t)wFCBExport->BlockId,"0x%02X");
+  wDumpRow << createItem(decode_BlockId(wFCBExport->BlockId));
   displayItemModel->appendRow(wDumpRow);
 
-  wOffset=Offset+offsetof(ZFCB_Export,BlockID);
+  wOffset=Offset+offsetof(ZFCB_Export,BlockId);
   wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
 
@@ -1183,3 +1507,33 @@ DisplayMain::~DisplayMain()
 }
 
 
+
+void DisplayMain::resizeEvent(QResizeEvent* pEvent)
+{
+  QSize wGOldSize = pEvent->oldSize();
+
+  QWidget::resize(pEvent->size().width(),pEvent->size().height());
+
+  if (FResizeInitial) {
+    FResizeInitial=false;
+    return;
+  }
+  QRect wCWg = ui->centralwidget->geometry();
+
+  int wWMargin = wGOldSize.width()- wCWg.width();
+  int wVW=pEvent->size().width() - wWMargin;
+  int wHMargin = wGOldSize.height() - wCWg.height();
+  int wVH=pEvent->size().height() - wHMargin ;
+
+  ui->centralwidget->resize(wVW,wVH);  /* expands in width and height */
+
+  QRect wOldTBv = ui->displayTBv->geometry();
+
+  int wTBwMargin = wCWg.width()- wOldTBv.width();
+  int wTBvWidth= wVW - wTBwMargin;
+  int wTBvHMargin = wCWg.height() - wOldTBv.height();
+  int wTBvHeight= wVH - wTBvHMargin ;
+
+  ui->displayTBv->resize(wTBvWidth,wTBvHeight);  /* expands in width and height */
+
+}//ZContentVisuMain::resizeEvent

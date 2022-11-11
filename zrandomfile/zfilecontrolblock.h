@@ -50,7 +50,7 @@ class ZFCB_Export
 {
 public:
     uint32_t        StartSign=cst_ZBLOCKSTART; /**< StartSign word that mark start of data */
-    ZBlockID        BlockID=ZBID_FCB;     /**< Block id is set to ZBID_FCB */
+    ZBlockId        BlockId=ZBID_FCB;     /**< Block id is set to ZBID_FCB */
     uint16_t        EndianCheck=cst_EndianCheck_Normal;
 
     zaddress_type   StartOfData;          /**< offset where Data storage starts : 0L */
@@ -92,6 +92,9 @@ public:
     ZFCB_Export& operator = (const ZFCB_Export& pIn){return _copyFrom(pIn);}
     ZFCB_Export& operator = (const ZFileControlBlock& pIn);
 
+    bool isValid() {
+      return (StartSign==cst_ZBLOCKSTART) && (BlockId==ZBID_FCB) && (EndianCheck==cst_EndianCheck_Normal);
+    }
 
     ZFCB_Export&        set(const ZFileControlBlock& pIn);
     void                setFromPtr(const unsigned char *&pPtrIn);
@@ -101,8 +104,8 @@ public:
     void serialize();
     void deserialize();
 
-    bool isReversed() {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
-    bool isNotReversed() {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
+    bool isReversed() const {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
+    bool isNotReversed() const {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
 
 };
 #pragma pack(pop)
@@ -246,7 +249,7 @@ public:
      */
   int fromXml(zxmlNode* pFCBRootNode, ZaiErrors* pErrorlog);
 
-  ZDataBuffer& _exportAppend(ZDataBuffer& pZDBExport);
+  size_t _exportAppend(ZDataBuffer& pZDBExport);
   ZDataBuffer _export();
 
   ZStatus _import(const unsigned char *&pZDBImport_Ptr);

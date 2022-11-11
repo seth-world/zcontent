@@ -323,7 +323,7 @@ public:
         label_3->setGeometry(QRect(20, 60, 91, 16));
         LoadAllBTn = new QPushButton(MainFRm);
         LoadAllBTn->setObjectName(QString::fromUtf8("LoadAllBTn"));
-        LoadAllBTn->setGeometry(QRect(810, 97, 41, 41));
+        LoadAllBTn->setGeometry(QRect(800, 97, 51, 41));
         ProgressPGb = new QProgressBar(MainFRm);
         ProgressPGb->setObjectName(QString::fromUtf8("ProgressPGb"));
         ProgressPGb->setGeometry(QRect(20, 100, 191, 20));

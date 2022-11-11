@@ -414,9 +414,7 @@ ZFileDescriptor::setPath (const uriString &pURIPath)
 
   if (URIDirectoryPath.isEmpty())  // if directory path is not mentionned : then current working directory is taken
   {
-    char wB[cst_filename_max];
-    URIDirectoryPath = (const utf8_t*)getcwd(wB,cst_filename_max);
-    URIContent.setDirectoryPath(URIDirectoryPath);
+    URIDirectoryPath=uriString::currentWorkingDirectory();
   }
 
   return generateURIHeader( pURIPath,URIHeader);

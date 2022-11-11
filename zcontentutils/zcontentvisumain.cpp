@@ -32,6 +32,8 @@
 
 #include <QGroupBox>
 
+#include <zrawmasterfilevisu.h>
+
 #define __FIXED_FONT__ "courrier"
 
 using namespace std;
@@ -114,6 +116,15 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
   mainQAg->addAction(ui->displayFCBQAc);
   mainQAg->addAction(ui->displayMCBQAc);
 
+  mainQAg->addAction(ui->rawDumpQAc);
+
+  displayICBQAc = new QAction(QObject::tr("Index control blocks","ZContentVisuMain"));
+  mainQAg->addAction(displayICBQAc);
+
+  ui->headerMEn->insertAction(ui->displayMCBQAc,displayICBQAc);
+
+  mainQAg->addAction(displayICBQAc);
+
   /* dictionary sub-choice */
   mainQAg->addAction(ui->DictionaryQAc);
 
@@ -169,12 +180,15 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
 
   ui->displayHCBQAc->setEnabled(false);
   ui->displayMCBQAc->setEnabled(false);
+  displayICBQAc->setEnabled(false);
   ui->displayFCBQAc->setEnabled(false);
 
 
   ui->BackwardBTn->setVisible(false);
   ui->ForwardBTn->setVisible(false);
   ui->LoadAllBTn->setVisible(false);
+
+  ui->LoadAllBTn->setText(QObject::tr("All","ZContentVisuMain"));
 
   ui->ProgressPGb->setVisible(false);
 
@@ -878,17 +892,23 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
   ZStatus wSt=ZS_SUCCESS;
 
 
-
   if (pAction==ui->openByTypeQAc)
   {
     actionOpenFileByType();
 
     return;
   }
-  if (pAction==ui->openRawQAc)
-  {
+  if (pAction==ui->openRawQAc) {
     openRaw();
     ui->OpenModeLbl->setText("Raw file");
+    return;
+  }
+
+  if (pAction==ui->rawDumpQAc) {
+    ZRawMasterFileVisu* wVisu= new ZRawMasterFileVisu(this);
+    wVisu->setup(URICurrent, Fd);
+    wVisu->setModal(false);
+    wVisu->show();
     return;
   }
   if (pAction==GetRawQAc)
@@ -978,6 +998,12 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
     displayMCB();
     return;
   }
+  if (pAction==displayICBQAc)
+  {
+    displayICBs();
+    return;
+  }
+
   if (pAction==ui->displayZBATQAc)
   {
     displayZBAT();
@@ -1227,6 +1253,7 @@ ZContentVisuMain::actionOpenFileByType(bool pChecked)
     {
       removeAllRows();
       ui->LoadAllBTn->setVisible(true);
+      ui->LoadAllBTn->setText(QObject::tr("All","ZContentVisuMain"));
       return;
     }
 
@@ -1408,15 +1435,14 @@ ZContentVisuMain::openZRH()
 void
 ZContentVisuMain::openRaw()
 {
-
-  if (openOther(URICurrent.toCChar())!= ZS_SUCCESS)
-  {
-    QMessageBox::critical(this,tr("Random File open error"),ZException.formatFullUserMessage().toCChar());
+  ZStatus wSt;
+  if ((wSt=openOther(URICurrent.toCChar()))!= ZS_SUCCESS) {
+    utf8VaryingString wStr=ZException.formatFullUserMessage();
+    ZExceptionDLg::messageWAdd("openRaw",wSt, Severity_Error,wStr,"Random File open error. File %s",URICurrent.toCChar());
     return;
   }
 
   removeAllRows();
-  //  displayFdNextRawBlock(BlockSize,16);
 
   ui->BackwardBTn->setVisible(false);
   ui->ForwardBTn->setVisible(true);
@@ -1491,6 +1517,7 @@ ZStatus wSt=ZS_SUCCESS;
   ui->RecordTotalLBl->setText(wStr.toCChar());
 
   ui->LoadAllBTn->setVisible(false);
+
   ui->BackwardBTn->setVisible(false);
   if (RandomFile->getFileDescriptor().ZBAT.count() > 1)
     ui->BackwardBTn->setVisible(true);
@@ -1683,6 +1710,7 @@ ZContentVisuMain::openOther(const char* pFileName)
 
   RawData.clear();
   ui->LoadAllBTn->setVisible(true);
+  ui->LoadAllBTn->setText(QObject::tr("All","ZContentVisuMain"));
   getFileSize(pFileName);
 
   if (MasterFile)
@@ -1708,10 +1736,9 @@ ZContentVisuMain::openOther(const char* pFileName)
   ui->SequentialFRm->setVisible(true);
   ui->RecordFRm->setVisible(false);
 
-  ui->LoadAllBTn->setVisible(true);
-
   ui->displayHCBQAc->setEnabled(true);
   ui->displayMCBQAc->setEnabled(true);
+  displayICBQAc->setEnabled(true);
   ui->displayFCBQAc->setEnabled(true);
 
   ui->headerMEn->setEnabled(true);
@@ -1750,6 +1777,7 @@ ZContentVisuMain::openZRH(const char* pFileName)
 
   RawData.clear();
   ui->LoadAllBTn->setVisible(true);
+  ui->LoadAllBTn->setText(QObject::tr("All","ZContentVisuMain"));
   getFileSize(pFileName);
 
   if (MasterFile)
@@ -1779,6 +1807,7 @@ ZContentVisuMain::openZRH(const char* pFileName)
   ui->LoadAllBTn->setVisible(true);
 
   ui->displayHCBQAc->setEnabled(true);
+  displayICBQAc->setEnabled(true);
   ui->displayMCBQAc->setEnabled(true);
   ui->displayFCBQAc->setEnabled(true);
 
@@ -1801,37 +1830,8 @@ ZContentVisuMain::openZRH(const char* pFileName)
 void
 ZContentVisuMain::displayHCB()
 {
-  if (RawData.Size < sizeof(ZHeaderControlBlock_Export))
-  {
-    ZExceptionBase wE= ZExceptionBase::create("ZContentVisuMain::displayHCB",ZS_INVSIZE,Severity_Error,
-        "Not enough data loaded. Requested minimum size is <%ld> bytes.\n"
-        "Only <%ld> Bytes have been loaded.\n\n"
-        "Load / reload file content <Reload>\n"
-        "Quit <Quit>",sizeof(ZHeaderControlBlock_Export),RawData.Size);
-
-    int wRet=ZExceptionDLg::display2B("HCB Exception",wE,"Quit","Reload");
-    if (wRet==ZEDLG_Rejected)
-      return;
-    //      case ZEDLG_Accepted:
-    if (URICurrent.getFileSize()>100000000)
-    {
-      ZExceptionDLg::message("ZContentVisuMain::displayHCB",ZS_INVSIZE,Severity_Error,
-          "Cannot load content of file <%s> size <%lld> exceeds capacity",
-          URICurrent.toCChar(),
-          URICurrent.getFileSize());
-      return;
-    }
-    if (URICurrent.getFileSize()<(sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+1))
-    {
-      ZExceptionDLg::message("ZContentVisuMain::displayHCB",ZS_INVSIZE,Severity_Error,
-          "file <%s> has size <%lld> that does not allow to store requested header data.",
-          URICurrent.toCChar(),
-          URICurrent.getFileSize());
-      return;
-    }
-    URICurrent.loadContent(RawData);
-  }//if (RawData.Size < sizeof(ZHeaderControlBlock_Export))
-
+  if (!testRequestedSize(sizeof(ZHeaderControlBlock_Export)))
+    return;
 
   if (!entityWnd)
     entityWnd=new DisplayMain(this);
@@ -1841,112 +1841,68 @@ ZContentVisuMain::displayHCB()
 void
 ZContentVisuMain::displayFCB()
 {
-  if (RawData.Size < sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export))
-  {
-    ZExceptionBase wE= ZExceptionBase::create("ZContentVisuMain::displayFCB",ZS_INVSIZE,Severity_Error,
-        "Not enough data loaded. Requested minimum size is <%ld> bytes.\n"
-        "Only <%ld> Bytes have been loaded.\n\n"
-        "Load / reload file content <Reload>\n"
-        "Quit <Quit>",sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export),RawData.Size);
+  if (!testRequestedSize(sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)))
+    return;
 
-    int wRet=ZExceptionDLg::display2B("FCB Exception",wE,"Quit","Reload");
-    if (wRet==ZEDLG_Rejected)
-      return;
-    //      case ZEDLG_Accepted:
-    if (URICurrent.getFileSize()>100000000)
-    {
-      ZExceptionDLg::message("ZContentVisuMain::displayHCB",ZS_INVSIZE,Severity_Error,
-          "Cannot load content of file <%s>. Size <%lld> exceeds memory capacity",
-          URICurrent.toCChar(),
-          URICurrent.getFileSize());
-      return;
-    }
-    if (URICurrent.getFileSize()<(sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+1))
-    {
-      ZExceptionDLg::message("ZContentVisuMain::displayHCB",ZS_INVSIZE,Severity_Error,
-          "File <%s> has size <%lld> that does not allow to store requested header data.",
-          URICurrent.toCChar(),
-          URICurrent.getFileSize());
-      return;
-    }
-    URICurrent.loadContent(RawData);
-  }//if (RawData.Size < sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export))
   if (!entityWnd)
     entityWnd=new DisplayMain(this);
   entityWnd->displayFCB(RawData);
 }
+
 void
 ZContentVisuMain::displayMCB()
 {
-  if (RawData.Size < sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZSMCBOwnData_Export))
-  {
-    ZExceptionBase wE= ZExceptionBase::create("ZContentVisuMain::displayMCB",ZS_INVSIZE,Severity_Error,
-        "Not enough data loaded. Requested minimum size is <%ld> bytes.\n"
-        "Only <%ld> Bytes have been loaded.\n\n"
-        "Load / reload file content <Reload>\n"
-        "Quit <Quit>",sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export),RawData.Size);
+  if (!testRequestedSize(sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
+    return ;
 
-    int wRet=ZExceptionDLg::display2B("MCB Exception",wE,"Quit","Reload");
-    if (wRet==ZEDLG_Rejected)
-      return;
-    //      case ZEDLG_Accepted:
-    if (URICurrent.getFileSize()>100000000)
-    {
-      ZExceptionDLg::message("ZContentVisuMain::displayMCB",ZS_INVSIZE,Severity_Error,
-          "Cannot load content of file <%s> size <%lld> exceeds memory capacity",
-          URICurrent.toCChar(),
-          URICurrent.getFileSize());
-      return;
-    }
-    if (URICurrent.getFileSize()<(sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZSMCBOwnData_Export)+1))
-    {
-      ZExceptionDLg::message("ZContentVisuMain::displayMCB",ZS_INVSIZE,Severity_Error,
-          "file <%s> has size <%lld> that does not allow to store requested header data.",
-          URICurrent.toCChar(),
-          URICurrent.getFileSize());
-      return;
-    }
-    URICurrent.loadContent(RawData);
-  }//if (RawData.Size < sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZSMCBOwnData_Export))
   if (!entityWnd)
       entityWnd=new DisplayMain(this);
   entityWnd->displayMCB(RawData);
 }
 
+
+void
+ZContentVisuMain::displayICBs()
+{
+  /* HCB and MCB are deserialized here just to test if there is enough space.
+   * these values are computed again within DisplayMain::--- to access real values
+   */
+  if (!testRequestedSize(sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
+    return ;
+
+  const unsigned char* wPtr = RawData.Data;
+  ZHeaderControlBlock_Export wZHCBe;
+  memmove(&wZHCBe,RawData.Data,sizeof(ZHeaderControlBlock_Export));
+  if (wZHCBe.StartSign!=cst_ZBLOCKSTART) {
+    ZExceptionDLg::adhocMessage("Invalid Header",Severity_Error,nullptr,"Header Control Block appears to be corrupted.");
+    return;
+  }
+  wZHCBe.deserialize();
+  ZMCB_Export wZMCBe;
+  memmove(&wZMCBe,wPtr+wZHCBe.OffsetReserved,sizeof(ZMCB_Export));
+
+  wZMCBe.deserialize();
+
+  if (!wZMCBe.isValid()) {
+    ZExceptionDLg::adhocMessage("Invalid MCB",Severity_Error,nullptr,"Master Control Block (Reserved space) appears to be corrupted.");
+    return;
+  }
+
+  if (!testRequestedSize(sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)+wZMCBe.ICBOffset + wZMCBe.ICBSize))
+    return;
+  if (!entityWnd)
+    entityWnd=new DisplayMain(this);
+
+  entityWnd->displayICBs(RawData);
+
+  return;
+}
+
 void
 ZContentVisuMain::displayZBAT()
 {
-  if (RawData.Size < sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZSMCBOwnData_Export))
-  {
-    ZExceptionBase wE= ZExceptionBase::create("ZContentVisuMain::displayZBAT",ZS_INVSIZE,Severity_Error,
-        "Not enough data loaded. Requested minimum size is <%ld> bytes.\n"
-        "Only <%ld> Bytes have been loaded.\n\n"
-        "Load / reload file content <Reload>\n"
-        "Quit <Quit>",sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export),RawData.Size);
-
-    int wRet=ZExceptionDLg::display2B("ZBAT Exception",wE,"Quit","Reload");
-    if (wRet==ZEDLG_Rejected)
-      return;
-    //      case ZEDLG_Accepted:
-    if (URICurrent.getFileSize()>100000000)
-    {
-      ZExceptionDLg::message("ZContentVisuMain::displayZBAT",ZS_INVSIZE,Severity_Error,
-          "Cannot load content of file <%s> size <%lld> exceeds memory capacity",
-          URICurrent.toCChar(),
-          URICurrent.getFileSize());
-      return;
-    }
-    if (URICurrent.getFileSize()<(sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZSMCBOwnData_Export)+1))
-    {
-      ZExceptionDLg::message("ZContentVisuMain::displayZBAT",ZS_INVSIZE,Severity_Error,
-          "file <%s> has size <%lld> that does not allow to store requested header data.",
-          URICurrent.toCChar(),
-          URICurrent.getFileSize());
-      return;
-    }
-    URICurrent.loadContent(RawData);
-  }//if (RawData.Size < sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZSMCBOwnData_Export))
-
+  if (!testRequestedSize(sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
+    return ;
 
   unsigned char* wPtr=RawData.Data;
   ZHeaderControlBlock_Export* wHe = (ZHeaderControlBlock_Export*)RawData.Data;
@@ -1969,7 +1925,7 @@ ZContentVisuMain::displayZBAT()
 }
 
 void
-ZContentVisuMain::displayPool(unsigned char* pPtr,zaddress_type pOffset,const char* pTitle)
+ZContentVisuMain::displayPool(const unsigned char* pPtr,zaddress_type pOffset,const char* pTitle)
 {
   ZAExport* wZAEe=(ZAExport*) pPtr;
   utf8VaryingString wOut;
@@ -2014,7 +1970,7 @@ ZContentVisuMain::displayPool(unsigned char* pPtr,zaddress_type pOffset,const ch
     return;
   }
 
-  unsigned char* wPtr = pPtr+sizeof(ZAExport);
+  const unsigned char* wPtr = pPtr+sizeof(ZAExport);
   ZBlockDescriptor_Export wBDe;
   wOut=
       " \n\n"
@@ -2052,39 +2008,10 @@ ZContentVisuMain::displayPool(unsigned char* pPtr,zaddress_type pOffset,const ch
 void
 ZContentVisuMain::displayZDBT()
 {
-  if (RawData.Size < sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZSMCBOwnData_Export))
-  {
-    ZExceptionBase wE= ZExceptionBase::create("ZContentVisuMain::displayZBAT",ZS_INVSIZE,Severity_Error,
-        "Not enough data loaded. Requested minimum size is <%ld> bytes.\n"
-        "Only <%ld> Bytes have been loaded.\n\n"
-        "Load / reload file content <Reload>\n"
-        "Quit <Quit>",sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export),RawData.Size);
+  if (!testRequestedSize(sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
+    return;
 
-    int wRet=ZExceptionDLg::display2B("ZDBT Exception",wE,"Quit","Reload");
-    if (wRet==ZEDLG_Rejected)
-      return;
-    //      case ZEDLG_Accepted:
-    if (URICurrent.getFileSize()>100000000)
-    {
-      ZExceptionDLg::message("ZContentVisuMain::displayZBAT",ZS_INVSIZE,Severity_Error,
-          "Cannot load content of file <%s> size <%lld> exceeds memory capacity",
-          URICurrent.toCChar(),
-          URICurrent.getFileSize());
-      return;
-    }
-    if (URICurrent.getFileSize()<(sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZSMCBOwnData_Export)+1))
-    {
-      ZExceptionDLg::message("ZContentVisuMain::displayZBAT",ZS_INVSIZE,Severity_Error,
-          "file <%s> has size <%lld> that does not allow to store requested header data.",
-          URICurrent.toCChar(),
-          URICurrent.getFileSize());
-      return;
-    }
-    URICurrent.loadContent(RawData);
-  }//if (RawData.Size < sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZSMCBOwnData_Export))
-
-
-  unsigned char* wPtr=RawData.Data;
+  const unsigned char* wPtr=RawData.Data;
   ZHeaderControlBlock_Export* wHe = (ZHeaderControlBlock_Export*)RawData.Data;
   if (wHe->isNotReversed())
   {
@@ -2105,37 +2032,8 @@ ZContentVisuMain::displayZDBT()
 void
 ZContentVisuMain::displayZFBT()
 {
-  if (RawData.Size < sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZSMCBOwnData_Export))
-  {
-    ZExceptionBase wE= ZExceptionBase::create("ZContentVisuMain::displayZBAT",ZS_INVSIZE,Severity_Error,
-        "Not enough data loaded. Requested minimum size is <%ld> bytes.\n"
-        "Only <%ld> Bytes have been loaded.\n\n"
-        "Load / reload file content <Reload>\n"
-        "Quit <Quit>",sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export),RawData.Size);
-
-    int wRet=ZExceptionDLg::display2B("HCB_Export Exception",wE,"Quit","Reload");
-    if (wRet==ZEDLG_Rejected)
-      return;
-    //      case ZEDLG_Accepted:
-    if (URICurrent.getFileSize()>100000000)
-    {
-      ZExceptionDLg::message("ZContentVisuMain::displayZBAT",ZS_INVSIZE,Severity_Error,
-          "Cannot load content of file <%s> size <%lld> exceeds memory capacity",
-          URICurrent.toCChar(),
-          URICurrent.getFileSize());
-      return;
-    }
-    if (URICurrent.getFileSize()<(sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZSMCBOwnData_Export)+1))
-    {
-      ZExceptionDLg::message("ZContentVisuMain::displayZBAT",ZS_INVSIZE,Severity_Error,
-          "file <%s> has size <%lld> that does not allow to store requested header data.",
-          URICurrent.toCChar(),
-          URICurrent.getFileSize());
-      return;
-    }
-    URICurrent.loadContent(RawData);
-  }//if (RawData.Size < sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZSMCBOwnData_Export))
-
+  if (!testRequestedSize(sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
+    return;
 
   unsigned char* wPtr=RawData.Data;
   ZHeaderControlBlock_Export* wHe = (ZHeaderControlBlock_Export*)RawData.Data;
@@ -2150,10 +2048,50 @@ ZContentVisuMain::displayZFBT()
   {
     _ABORT_
   }
+
   wOffset= reverseByteOrder_Conditional<size_t>(wFCBe->ZFBT_DataOffset);
   wPtr += wOffset;
   displayPool(wPtr,wOffset,"FBT Free blocks table");
 }//displayZFBT
+
+
+
+bool
+ZContentVisuMain::testRequestedSize(size_t pRequestedSize){
+  if (RawData.Size < pRequestedSize)
+  {
+    int wRet=ZExceptionDLg::adhocMessage2B("displayICBs",Severity_Warning,"Quit","Load",nullptr,
+        "Not enough data loaded. Requested minimum size is <%ld> bytes.\n"
+        "Only <%ld> Bytes have been loaded.\n\n"
+        "Load / reload file content <Reload>\n"
+        "Quit <Quit>",pRequestedSize);
+
+    if (wRet==ZEDLG_Rejected)
+      return false;
+    //      case ZEDLG_Accepted:
+    if (URICurrent.getFileSize()>100000000)
+    {
+      ZExceptionDLg::message("ZContentVisuMain::displayMCB",ZS_INVSIZE,Severity_Error,
+          "Cannot load content of file <%s> size <%lld> exceeds memory capacity",
+          URICurrent.toCChar(),
+          URICurrent.getFileSize());
+      return false;
+    }
+    if (URICurrent.getFileSize()<(pRequestedSize+1))
+    {
+      ZExceptionDLg::message("ZContentVisuMain::displayMCB",ZS_INVSIZE,Severity_Error,
+          "file <%s> has size <%lld> that does not allow to store requested header data.",
+          URICurrent.toCChar(),
+          URICurrent.getFileSize());
+      return false;
+    }
+    if (URICurrent.loadContent(RawData)!=ZS_SUCCESS)
+      return false;
+  }//if (RawData.Size < sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZSMCBOwnData_Export))
+  return true;
+}
+
+
 /*
 void
 ZContentVisuMain::Dictionary()
@@ -2298,87 +2236,6 @@ ZContentVisuMain::displayFdNextRawBlock(ssize_t pBlockSize,size_t pWidth)
   return displayWidgetBlock(wRecord);
 }//displayFdNextRawBlock
 
-ZStatus
-ZContentVisuMain::displayWidgetBlock_old(ZDataBuffer& pData,int pWidth)
-{
-  ui->ProgressPGb->setRange(0,pData.Size);
-  ui->ProgressPGb->setValue(0);
-  ui->ProgressPGb->setVisible(true);
-
-  /* how many lines within pData block */
-
-  int wLines=pData.Size / pWidth;
-
-  int wRem=pData.Size - ( wLines * pWidth);
-
-  if (wRem > 0)
-    wLines++;
-
-  int wBaseLine=VisuTBv->ItemModel->rowCount();
-
-  VisuTBv->ItemModel->setRowCount(VisuTBv->ItemModel->rowCount()+wLines);
-
-  utf8String  wLineHexa,wLineAscii,wlineOffset;
-
-  /* cut by chunk of pWidth bytes */
-  long  wRemain=pData.Size;
-  unsigned char* wPtr = pData.Data;
-  unsigned char* wPtrEnd = pData.Data+pData.Size;
-
-  int wTick = 0;
-  long wProgress=0;
-  int wCurLine=wBaseLine;
-  while ((wPtr < wPtrEnd)&&(wRemain >= pWidth))
-  {
-//    wlineOffset.sprintf("%6X - %6ld",FileOffset,FileOffset);
-    wlineOffset.sprintf("%6d-%6X",FileOffset,FileOffset);
-    zmemDumpHexa(wPtr,pWidth,wLineHexa,wLineAscii);
-    VisuTBv->ItemModel->setVerticalHeaderItem (wCurLine,new QStandardItem(wlineOffset.toCChar()));
-
-    VisuTBv->ItemModel->setItem(wCurLine,0,new QStandardItem(wLineHexa.toCChar()));
-    VisuTBv->ItemModel->setItem(wCurLine,1,new QStandardItem(wLineAscii.toCChar()));
-
-
-
-    wPtr+= pWidth;
-    FileOffset += pWidth;
-    wRemain -= pWidth;
-    wProgress += pWidth;
-    wCurLine++;
-    if (wTick++ > 10)
-      {
-      wTick=0;
-      ui->ProgressPGb->setValue(wProgress);
-      }
-  }
-  if (wRemain > 0)
-    {
-    zmemDumpHexa(wPtr,wRemain,wLineHexa,wLineAscii);
-//    wlineOffset.sprintf("%6X - %6ld",FileOffset,FileOffset);
-    wlineOffset.sprintf("%6d-%6X",FileOffset,FileOffset);
-    VisuTBv->ItemModel->setVerticalHeaderItem(wCurLine,new QStandardItem(wlineOffset.toCChar()));
-    VisuTBv->ItemModel->setItem(wCurLine,0,new QStandardItem(wLineHexa.toCChar()));
-    VisuTBv->ItemModel->setItem(wCurLine,1,new QStandardItem(wLineAscii.toCChar()));
-    }
-
-//  VisuTBv->resizeRowsToContents();
-//  VisuTBv->resizeColumnsToContents();
-
-    for (int wi=0;wi < VisuTBv->ItemModel->rowCount();wi++)
-      VisuTBv->resizeRowToContents(wi);
-    for (int wi=0;wi < VisuTBv->ItemModel->columnCount();wi++)
-      VisuTBv->resizeColumnToContents(wi);
-
-  if (!displayWidgetBlockOnce)
-    {
-//    VisuTBv->resizeRowsToContents();
-//    VisuTBv->resizeColumnsToContents();
-    displayWidgetBlockOnce=true;
-    }
-  ui->ProgressPGb->setValue(pData.Size);
-return ZS_SUCCESS;
-}//displayBlock
-
 
 void
 ZContentVisuMain::displayOneLine(int pRow,unsigned char* &wPtr,unsigned char* wPtrEnd) {
@@ -2440,7 +2297,7 @@ ZContentVisuMain::displayWidgetBlock(ZDataBuffer& pData) {
 
   VisuTBv->ItemModel->setRowCount(VisuTBv->ItemModel->rowCount()+wLines);
 
-  utf8String  wLineHexa,wLineAscii,wlineOffset;
+  utf8VaryingString  wLineHexa,wLineAscii,wlineOffset;
 
   /* cut by chunk of Width bytes */
   long  wRemain=pData.Size;
@@ -2468,10 +2325,10 @@ ZContentVisuMain::displayWidgetBlock(ZDataBuffer& pData) {
     displayOneLine(wCurLine,wPtr,wPtrEnd);
   }
 
-  for (int wi=0;wi < VisuTBv->ItemModel->rowCount();wi++)
-    VisuTBv->resizeRowToContents(wi);
   for (int wi=0;wi < VisuTBv->ItemModel->columnCount();wi++)
     VisuTBv->resizeColumnToContents(wi);
+  for (int wi=0;wi < VisuTBv->ItemModel->rowCount();wi++)
+    VisuTBv->resizeRowToContents(wi);
 
   VisuTBv->setColumnWidth(4,4);
   VisuTBv->setColumnWidth(9,4);
@@ -2668,11 +2525,15 @@ ZContentVisuMain::loadAll()
 {
   ui->BackwardBTn->setVisible(false);
   ui->ForwardBTn->setVisible(false);
-  ui->LoadAllBTn->setVisible(false);
+
+  ui->LoadAllBTn->setVisible(true);
+  ui->LoadAllBTn->setText(QObject::tr("Reload","ZContentVisuMain"));
 
   ui->SequentialFRm->setVisible(true);
 
   FileOffset=0;
+
+  RawData.clear();
   URICurrent.loadContent(RawData);
   removeAllRows();
   ZStatus wSt=displayWidgetBlock(RawData);

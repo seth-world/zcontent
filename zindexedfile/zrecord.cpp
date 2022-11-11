@@ -88,7 +88,7 @@ ZRecordDic::clearURFData(void)
 
 }// reset
 
-ZRecord::ZRecord(ZMasterFile *pZMF) : ZRawRecord(pZMF)
+ZRecord::ZRecord(ZRawMasterFile *pZMF) : ZRawRecord(pZMF)
 {
   if (pZMF->Dictionary==nullptr)
     {
@@ -227,7 +227,8 @@ ZRecord::_setupRecordData(void)
     FieldPresence=new ZBitset();
 */
     const unsigned char* wPtrF=Content.Data;
-    ZStatus wSt=FieldPresence._importURF(wPtrF);
+    ZStatus wSt;
+    size_t wS=FieldPresence._importURF(wPtrF);
 
     wOffset = FieldPresence.getURFSize();
 // get fields (that are present within the record) and setup record dictionary
@@ -668,7 +669,10 @@ ZRecord::getUniversalbyRank (ZDataBuffer &pOutValue,const long pRank,bool pTrunc
 
     case ZType_Blob:
         {
-      return ZBlob::getUniversalFromURF(wDataPtr->Data,pOutValue);
+      const unsigned char* wPtr=wDataPtr->Data;
+      pOutValue._importURF(wPtr)  ;
+      return ZS_SUCCESS;
+//      return ZDataBuffer::getUniversalFromURF(wDataPtr->Data,pOutValue);
         }
 
     }// switch (wType)
@@ -785,7 +789,7 @@ ZStatus ZRecord::RecordCheckAndMap(const ZDataBuffer& pRawContent, FILE*pOutput)
         "Found <cst_ZBLOCKSTART> mark.\n",
         pRawContent.Size);
     wURFDataPtr += sizeof(cst_ZBLOCKSTART);
-    ZBlockID wId = (ZBlockID)*wURFDataPtr;
+    ZBlockId wId = (ZBlockId)*wURFDataPtr;
     if (wId!=ZBID_Data)
       {
         ZException.setMessage("ZRecord::RecordCheckAndMap",ZS_MALFORMED,Severity_Error,
@@ -810,7 +814,7 @@ ZStatus ZRecord::RecordCheckAndMap(const ZDataBuffer& pRawContent, FILE*pOutput)
 
   fprintf(pOutput,"    1.1-Checking Presence bitset.\n");
 
-  wSt=wBitset._importURF(wURFDataPtr); /* wURFDataPtr is upated by the routine */
+  size_t wS=wBitset._importURF(wURFDataPtr); /* wURFDataPtr is upated by the routine */
 
   wOffset = wURFDataPtr-pRawContent.Data;
 
@@ -1290,9 +1294,10 @@ size_t wFieldSize;
         }
 
 
-    wSt= FieldPresence._importURF(wURFDataPtr);
 
-    if(wSt==ZS_INVTYPE)
+    size_t wS= FieldPresence._importURF(wURFDataPtr);
+
+    if(wS==0)
       {
       ZException.setMessage("ZRecord::_split",
                             ZS_INVTYPE,
@@ -1575,7 +1580,7 @@ ZRecord::_extractAllKeys(void)
   ZKeyDictionary* wZKDic;
   ZDataBuffer wFieldUValue;
 
-  printf ("ZRecord::_extractAllKeys-I extracting <%ld> index keys from record.\n",RawMasterFile->IndexCount);
+  printf ("ZRecord::_extractAllKeys-I extracting <%ld> index keys from record.\n",RawMasterFile->IndexTable.count());
   /* compute offset of all record fields : some fields may be of variable length */
 
   for (long wi=0 ; wi < RawMasterFile->IndexTable.count() ; wi++)
@@ -1681,7 +1686,7 @@ APICEXPORT ZStatus getFieldValueByRank_Array(void* pRecordCTX,void* pValue,const
 }
 
 APICEXPORT ZStatus  setFieldURFfN (void* &pSourceNatural,
-                          ZDataBuffer *pTargetURFData,        // out data in URF format (out)
+                          ZDataBuffer &pTargetURFData,        // out data in URF format (out)
                           ZTypeBase& pSourceType,       // source natural type (out)
                           uint64_t &pSourceNSize,       // source natural size(out)
                           uint64_t &pSourceUSize,       // source universal size (URF size minus header size)(out)
@@ -1755,27 +1760,31 @@ ZStatus wSt=ZS_SUCCESS;
         case ZType_CharFixedString:
         case ZType_Utf8FixedString:
         case ZType_Utf16FixedString:
-        case ZType_Utf32FixedString:
+        case ZType_Utf32FixedString:{
+          utfStringHeader *wString=static_cast<utfStringHeader*>(pSourceNatural);
+          wString->_exportURFGeneric(pTargetURFData);
+          return ZS_SUCCESS;
+        }
+
         case ZType_CharVaryingString:
-        case ZType_Utf8VaryingString:
-        case ZType_Utf16VaryingString:
-        case ZType_Utf32VaryingString:
-            {
-//            utfStringHeader *wString=static_cast<utfStringHeader*>(wNaturalPtr);
-//            return  wString->_exportURFGeneric(pTargetURFData);
-             return  (setFieldURFfZString(&pSourceNatural,
-                                           pTargetURFData,
-                                           pTargetType,
-                                           pTargetCapacity));
-/*           return (setFieldURFfFixedC(&pNatural,
-                                       pURFData,
-                                       pSourceType,
-                                       pSourceNSize,
-                                       pSourceUSize,
-                                       pSourceArrayCount,
-                                       pTargetType,
-                                       pTargetArrayCount));*/
-            }
+        case ZType_Utf8VaryingString: {
+          utf8VaryingString *wString=static_cast<utf8VaryingString*>(pSourceNatural);
+          wString->_exportURF(pTargetURFData);
+          return ZS_SUCCESS;
+        }
+        case ZType_Utf16VaryingString: {
+          utf16VaryingString *wString=static_cast<utf16VaryingString*>(pSourceNatural);
+          wString->_exportURF(pTargetURFData);
+          return ZS_SUCCESS;
+        }
+        case ZType_Utf32VaryingString:{
+
+          utf32VaryingString *wString=static_cast<utf32VaryingString*>(pSourceNatural);
+          wString->_exportURF(pTargetURFData);
+          return ZS_SUCCESS;
+        }
+
+
 #ifdef __DEPRECATED_FIELD__
        case ZType_FixedCString:
             {

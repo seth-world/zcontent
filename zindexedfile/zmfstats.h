@@ -2,6 +2,7 @@
 #define ZMFSTATS_H
 
 #include <zrandomfile/zrfpms.h>
+#include <ztoolset/ztimer.h>
 
 /**
 * @addtogroup ZMFSTATS

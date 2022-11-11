@@ -1,10 +1,9 @@
-#ifndef ZSEARCHARGUMENT_H
-#define ZSEARCHARGUMENT_H
+#ifndef ZSSEARCHARGUMENT_H
+#define ZSSEARCHARGUMENT_H
 #include <ztoolset/zarray.h>
 #include <ztoolset/zbasedatatypes.h>
 #include <zrandomfile/zrandomfiletypes.h>
 namespace zbs {
-
 
 #ifndef ZRFSEARCH
 #define ZRFSEARCH
@@ -26,31 +25,64 @@ enum ZRFSearch_type : uint16_t
     ZRFTrimspace      = 0x0300  //!< For a cstring : request to trim leading and trailing spaces before test evaluation
 };
 
+
 /** @addtogroup ZRFFreeSearch */
+enum FreeFieldSearch_type : uint8_t {
+  FFS_Nothing             = 0,
+  FFS_OR                  = 1, /// by default any search argument is ANDED. if OR is set, then it is ORED.
+  /// OR is used to link current argument with previous, so that First OR is always set to false
+  FFS_CaseRegardless      = 2,
+  FFS_String              = 4,
+  FFS_TrimSpace           = 8
 
+};
 
-struct FreeFieldSearch_struct
+class FreeFieldSearch
 {
-ZDataBuffer SearchSequence;     /**< byte sequence or string to search for */
+public:
+  FreeFieldSearch()=default;
+  FreeFieldSearch(const FreeFieldSearch& pIn) {_copyFrom(pIn);}
+
+ZDataBuffer SearchSequence;     /** byte sequence or string to search for */
 ssize_t     SequenceOffset=0 ,
             SequenceSize=0 ;
 uint16_t    SearchType = 0;
-bool        FCaseRegardless, FString,FTrimSpace ;
 ssize_t     FieldOffset , FieldLength , SizeToCollect;
-bool        OR = false; //!< by default any search argument is ANDED. if OR is set, then it is ORED.
-// OR apply to link current argument with previous, so that First OR is always set to false
+uint8_t     FFS=FFS_Nothing;
+//bool        FCaseRegardless, FString,FTrimSpace ;
+//bool        OR = false; /// by default any search argument is ANDED. if OR is set, then it is ORED.
+// OR is used to link current argument with previous, so that First OR is always set to false
+
+FreeFieldSearch& _copyFrom(const FreeFieldSearch& pIn) {
+  SearchSequence=pIn.SearchSequence;
+  SequenceOffset=pIn.SequenceOffset;
+  SearchSequence=pIn.SearchSequence;
+  SequenceSize=pIn.SequenceSize;
+  /*
+  FCaseRegardless=pIn.FCaseRegardless;
+  FString=pIn.FString;
+  FTrimSpace=pIn.FTrimSpace;
+  OR=pIn.OR;
+  */
+  FieldOffset=pIn.FieldOffset;
+  FieldLength=pIn.FieldLength;
+  SizeToCollect=pIn.SizeToCollect;
+  FFS=pIn.FFS;
+  return *this;
+}
+
 } ;
 #endif // ZRFSEARCH
 /**
- * @brief The ZSearchArgument class holds and manages the matching rules for a collection in order
+ * @brief The ZSSearchArgument class holds and manages the matching rules for a collection in order
  *
  */
-class ZSearchArgument : private ZArray<FreeFieldSearch_struct>
+class ZSearchArgument : private ZArray<FreeFieldSearch>
 {
-    friend class ZIndexCollection;
+    friend class ZSIndexCollection;
     friend class ZRFCollection;
 public:
-    typedef ZArray<FreeFieldSearch_struct> _Base;
+    typedef ZArray<FreeFieldSearch> _Base;
 
     friend class ZRFCollection;
 
@@ -84,6 +116,13 @@ public:
 
 } // namespace zbs
 
+bool
+_testSequence(ZDataBuffer &wFieldContent,           // Field  (Record segment) to explore
+    ZDataBuffer &pSequence,  // Sequence to find
+    ssize_t wSequenceSize,   // real sequence size according ZRFString conditions or not
+    uint16_t wSearchType,    // Expurged ZSearch_type  (no ZRFString , ZRFCaseregardles
+    uint8_t pFFS);
+/*
 bool _testSequence(ZDataBuffer &wFieldContent,  // Field  (Record segment) to explore
                            ZDataBuffer &pSequence,       // Sequence to find
                            ssize_t wSequenceSize,          // real sequence size according ZRFString conditions or not
@@ -91,10 +130,9 @@ bool _testSequence(ZDataBuffer &wFieldContent,  // Field  (Record segment) to ex
                            bool FString,                // Are we looking for a string (true) or binary sequence (false)
                            bool FTrimSpace,             // Request to trim leading and trailing spaces
                            bool FCaseregardless);       // should we disregard case (true) or not (false)
-
-const char *
-decode_ZSearchType(const uint16_t pSearchType );
-
+*/
+const char *decode_ZSearchType(const uint16_t pSearchType );
 
 
-#endif // ZSEARCHARGUMENT_H
+
+#endif // ZSSearchArgument_H

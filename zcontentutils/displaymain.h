@@ -35,13 +35,18 @@ public:
 
   void setFileClosed(bool pYesNo);
 
+  void setOffset(size_t pOffset,size_t pMax);
+
   void displayHCB(ZDataBuffer& pData);
   void displayFCB(ZDataBuffer &pData);
   void displayMCB(ZDataBuffer &pData);
+  void displayICBs(ZDataBuffer &pData);
   void displayPool(ZDataBuffer &pData);
   void displayHCBValues(unsigned char *pPtrIn);
   void displayFCBValues(unsigned char* pPtrIn);
-  void displayMCBValues(unsigned char *pPtrIn);
+  void displayMCBValues(const unsigned char *pPtrIn);
+  void displayICBValues(const unsigned char *pPtrIn);
+  bool displaySingleICBValues(const unsigned char *&pPtrIn, size_t &pOffset, int &wRow);
   void displayPoolValues(unsigned char* pPtrIn);
 
   void displayAll(unsigned char *pPtrIn);
@@ -49,9 +54,13 @@ public:
 
   void getMCB(ZDataBuffer &pData);
 
+  void createMarginItem(size_t pValue, int pRow);
+
+  void resizeEvent(QResizeEvent*) override;
+  bool FResizeInitial=true;
 
   ZDataBuffer           ContentToDump;
-  long                  Offset=0;
+  size_t                Offset=0;
   unsigned char*        PtrIn=nullptr;
   ZContentVisuMain*     VisuMain=nullptr;
 
@@ -60,7 +69,8 @@ public:
     ZDW_HCB = 1,
     ZDW_FCB = 2,
     ZDW_MCB = 3,
-    ZDW_POOL = 4
+    ZDW_ICB = 4,
+    ZDW_POOL = 5
   };
 
   DisplayWhat CurrentDisplay=ZDW_Nothing;

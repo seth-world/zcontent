@@ -216,7 +216,7 @@ ZParsingRulesDLg::ZTypeListClicked() {
 
   ui->KeyEligibleCHk->setChecked(!(ConversionElt.ZType & ZType_VaryingLength));
 
-  ConversionElt.HeaderSize=_getURFHeaderSize(ConversionElt.ZType);
+  ConversionElt.HeaderSize=getURFHeaderSize(ConversionElt.ZType);
   wStr.sprintf("%ld",ConversionElt.HeaderSize);
 
   ui->HeaderSizeLEd->setText(wStr.toCChar());

@@ -44,6 +44,8 @@ public:
   ZLockPool(const ZLockPool& pIn) {_copyFrom(pIn);}
   ZLockPool(const ZLockPool&& pIn) {_copyFrom(pIn);}
 
+  ~ZLockPool() {}
+
   ZLockPool& operator = (const ZLockPool& pIn) {return _copyFrom(pIn);}
 
   ZLockPool& _copyFrom(const ZLockPool& pIn)
@@ -67,7 +69,7 @@ public:
 
   ZBlockPool& operator = (ZBlockPool& pIn){return (ZBlockPool&)ZArray<ZBlockDescriptor>::_copyFrom(pIn);}
 
-  ZDataBuffer&  _exportAppendPool(ZDataBuffer&pZDBExport);
+  size_t        _exportAppendPool(ZDataBuffer&pZDBExport);
   size_t        getPoolExportSize();
   size_t        _importPool(const unsigned char *&pPtrIn);
 };
@@ -139,6 +141,8 @@ public:
   ZFDOwnData() =default;
   ZFDOwnData(const ZFDOwnData& pIn) {_copyFrom(pIn);}
   ZFDOwnData(const ZFDOwnData&& pIn) {_copyFrom(pIn);}
+
+  ~ZFDOwnData() {}
 
   ZFDOwnData& _copyFrom(const ZFDOwnData& pIn);
 

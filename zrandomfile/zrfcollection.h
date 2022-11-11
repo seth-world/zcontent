@@ -1,15 +1,12 @@
 #ifndef ZRFCOLLECTION_H
 #define ZRFCOLLECTION_H
 #include <zrandomfile/zrandomfile.h>
-#ifdef ZMASTERFILE_H
 #include <zrandomfile/zsearchargument.h>
-#else
-#include <zrandomfile/zssearchargument.h>
-#endif
+
 namespace zbs {
 
 /**
- * @brief The ZRFCollection class contains in its base class (ZArray<ssize_t>)the resulting ranks set of a query operation
+ * @brief The ZSRFCollection class contains in its base class (ZArray<ssize_t>)the resulting ranks set of a query operation
  *                  on an ZRandomFile or ZMasterFile thru various queries and specifically free search by field.
  *
  *  This objects holds and manages
@@ -81,7 +78,7 @@ public:
 
 private:
     ZStatus ZSt ;                        //!< the status of the query operation
-    ZSSearchArgument Argument;            //!< stores the evaluation conditions for the current collection
+    ZSearchArgument Argument;            //!< stores the evaluation conditions for the current collection
 
     zrank_type  ZRFRank=-1;              //!< last index accessed ; either ZRandomFile rank if no collection - or collection index if there is a collection */
     zrank_type  InputCollectionIndex=-1; //!< In case of there is already a collection : current collection index
@@ -91,8 +88,8 @@ private:
     zlockmask_type  Lock=ZLock_Nolock ;      //!< lock mask used for setting lock on matched records (and only on matched records)
 
     ZRFCollection *InputCollection=nullptr; //!< stores the collection as Input to work with for evaluating ranks
-                                            //! If nullptr the whole set of ZRF ranks is taken see @ref ZRFCollection::getNextRawRank
-};// ZRFCollection
+                                            //! If nullptr the whole set of ZRF ranks is taken see @ref ZSRFCollection::getNextRawRank
+};// ZSRFCollection
 
 } // namespace zbs
 

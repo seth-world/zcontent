@@ -26,7 +26,7 @@ ZBlockHeader_Export& ZBlockHeader_Export::set(const ZBlockHeader& pIn)
   return *this;
 }
 
-ZBlockHeader_Export& ZBlockHeader_Export::setFromPtr(unsigned char *&pPtrIn)
+ZBlockHeader_Export& ZBlockHeader_Export::setFromPtr(const unsigned char *&pPtrIn)
 {
   ZBlockHeader_Export* wIne=(ZBlockHeader_Export*)pPtrIn;
   StartSign=wIne->StartSign;
@@ -89,7 +89,7 @@ void ZBlockDescriptor_Export::set(const ZBlockDescriptor &pIn)
   return ;
 }
 
-void ZBlockDescriptor_Export::setFromPtr(unsigned char *&pPtrIn)
+void ZBlockDescriptor_Export::setFromPtr(const unsigned char *&pPtrIn)
 {
   ZBlockDescriptor_Export* wIne=(ZBlockDescriptor_Export*)pPtrIn;
   ZBlockHeader_Export::setFromPtr(pPtrIn);
@@ -176,7 +176,7 @@ ZBlockDescriptor& ZBlockDescriptor::_copyFrom(const ZBlockDescriptor& pIn)
 
 
 ZStatus
-ZBlockHeader::_import(unsigned char *pPtrIn)
+ZBlockHeader::_import(const unsigned char *pPtrIn)
 {
   ZBlockHeader_Export wZBHe;
   wZBHe.setFromPtr(pPtrIn);
@@ -188,7 +188,7 @@ ZBlockHeader::_import(unsigned char *pPtrIn)
 }
 
 ZStatus
-ZBlockDescriptor::_import(unsigned char *pPtrIn)
+ZBlockDescriptor::_import(const unsigned char *pPtrIn)
 {
   ZBlockDescriptor_Export wZBDe;
   wZBDe.setFromPtr(pPtrIn);
@@ -264,7 +264,7 @@ ZBlockDescriptor::_importConvert(ZBlockDescriptor& pOut, ZBlockDescriptor_Export
   pOut.clear();
 
   //        pOut.StartBlock = _reverseByteOrder_T<int32_t>(pIn->StartBlock);
-  //        pOut.BlockID= pIn->BlockID;   // unsigned char
+  //        pOut.BlockId= pIn->BlockId;   // unsigned char
   pOut.BlockSize=reverseByteOrder_Conditional<zsize_type>(pIn->BlockSize);
   pOut.State= pIn->State;   // unsigned char
   pOut.Lock=reverseByteOrder_Conditional<zlockmask_type>(pIn->Lock);
@@ -331,13 +331,13 @@ ZBlockHeader::_importConvert(ZBlockHeader& pOut,ZBlockHeader_Export* pIn)
 
 
 const char*
-decode_BlockId(ZBlockID pBID)
+decode_BlockId(ZBlockId pBID)
 {
   switch (pBID)
   {
   case ZBID_Nothing:
     return "ZBID_Nothing";
-  case ZBID_FileHeader:
+  case ZBID_HCB:
     return "ZBID_FileHeader";
   case ZBID_FCB:
     return "ZBID_FCB";

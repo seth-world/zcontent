@@ -184,13 +184,13 @@ size_t ZResource::_import(const unsigned char *&pUniversalPtr)
 }
 
 
-ZDataBuffer* ZResource::_exportURF(ZDataBuffer* pReturn) const
+size_t ZResource::_exportURF(ZDataBuffer& pReturn) const
 {
-  unsigned char* wPtrOut=pReturn->extend(sizeof(ZTypeBase)+sizeof(ZEntity_type)+sizeof(Resourceid_type));
+  unsigned char* wPtrOut=pReturn.extend(sizeof(ZTypeBase)+sizeof(ZEntity_type)+sizeof(Resourceid_type));
   _exportAtomicPtr<ZTypeBase>(ZType_Resource, wPtrOut);
   _exportAtomicPtr<ZEntity_type>(Entity, wPtrOut);
   _exportAtomicPtr<Resourceid_type>(id, wPtrOut);
-  return pReturn;
+  return sizeof(ZTypeBase)+sizeof(ZEntity_type)+sizeof(Resourceid_type);
 }
 
 size_t ZResource::_exportURF_Ptr(unsigned char* &pURF) const
@@ -203,6 +203,11 @@ size_t ZResource::_exportURF_Ptr(unsigned char* &pURF) const
 size_t ZResource::getURFSize() const
 {
   return sizeof(ZTypeBase)+sizeof(ZEntity_type)+sizeof(Resourceid_type);
+}
+
+size_t ZResource::getUniversalSize() const
+{
+  return sizeof(ZEntity_type)+sizeof(Resourceid_type);
 }
 
 ssize_t ZResource::_importURF(const unsigned char *&pUniversalPtr)

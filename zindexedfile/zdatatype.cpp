@@ -1,8 +1,9 @@
 #ifndef ZDATATYPE_CPP
 #define ZDATATYPE_CPP
 
-#include <zindexedfile/zsindextype.h>
+#include <zindexedfile/zindextype.h>
 #include <zindexedfile/zindexfile.h>
+#include <zindexedfile/zdataconversion.h>
 
 /*
  *  get urf size from ZType
@@ -163,8 +164,6 @@ return 0;
 }//getNaturalSize
 
 
-//
-
 
 
 //------------------Extract Key field from record------------------------------------------------------------
@@ -231,7 +230,7 @@ uint64_t wSize;
 ZStatus
 getAtomicZType_Sizes(ZTypeBase pType,ssize_t& pNaturalSize,ssize_t& pUniversalSize) // not a template
 {
-    switch (pType)
+    switch ( pType & ZType_AtomicMask)
     {
     case ZType_UChar :
     case ZType_Char : // array of char is a special case because no sign byte is added
@@ -491,5 +490,4 @@ getAtomicURFSize(ZTypeBase pType) {
     return    sizeof(ZTypeBase) + getAtomicUniversalSize(pType);
   return    sizeof(ZTypeBase) + getAtomicUniversalSize(pType);
 }
-
 #endif // ZDATATYPE_CPP

@@ -2,7 +2,7 @@
 #define ZSINDEXITEM_H
 
 #include <ztoolset/zdatabuffer.h>
-#include <zindexedfile/zsindextype.h>
+#include <zindexedfile/zindextype.h>
 #include <zcontentcommon/zoperation.h>
 
 
@@ -13,13 +13,15 @@ namespace zbs {
 The key effective content as it will be stored using ZIndexFile object (and not its Fields structure definition).
 
 */
-class ZSIndexItem : public ZDataBuffer
+class ZIndexItem : public ZDataBuffer
 {
 public:
-  ZSIndexItem();
-  ~ZSIndexItem() {}
-  ZSIndexItem(const ZSIndexItem& pIn) {_copyFrom(pIn);}
-  ZSIndexItem& _copyFrom(const ZSIndexItem& pIn)
+  ZIndexItem();
+  ~ZIndexItem() {}
+
+  ZIndexItem(const ZIndexItem& pIn): ZDataBuffer(pIn) {_copyFrom(pIn);}
+  ZIndexItem(const ZDataBuffer& pKeyValue):ZDataBuffer(pKeyValue) {}
+  ZIndexItem& _copyFrom(const ZIndexItem& pIn)
   {
     ZMFaddress=pIn.ZMFaddress;
     Operation=pIn.Operation;
@@ -27,30 +29,30 @@ public:
     this->ZDataBuffer::_copyFrom(pIn);
     return *this;
   }
-  ZSIndexItem& operator = (const ZSIndexItem& pIn) { return _copyFrom(pIn); }
+  ZIndexItem& operator = (const ZIndexItem& pIn) { return _copyFrom(pIn); }
 
   zaddress_type ZMFaddress;    //!< Master file block record address to link index key with
   ZOp           Operation;     //!< this is NOT stored on index file (see toFileKey() method) but only for history & journaling purpose
   ZDataBuffer   KeyContent;    //!< extracted key content from user record according key extraction rules. Size of content is fixed and value is ZIndexControlBlock::KeySize.
 
-
+  void set(const ZDataBuffer& pKeyContent) ;
   void clear (void) {KeyContent.clearData(); ZMFaddress=0L; Operation = ZO_Nothing;
     //State = ZAMNothing;
     return;}
   ZDataBuffer& toFileKey(void);
-  ZSIndexItem&  fromFileKey (ZDataBuffer &pFileKey);
+  ZIndexItem&  fromFileKey (ZDataBuffer &pFileKey);
 
 };
 
 
 
 
-class ZSIndexItemList : public ZArray<ZSIndexItem*>
+class ZIndexItemList : public ZArray<ZIndexItem*>
 {
-  typedef ZArray<ZSIndexItem*> _Base;
+  typedef ZArray<ZIndexItem*> _Base;
 public:
-  ZSIndexItemList() {}
-  ~ZSIndexItemList(void)
+  ZIndexItemList() {}
+  ~ZIndexItemList(void)
   {
     clear();
   }
@@ -59,6 +61,7 @@ public:
   {
     while (size()>0)
       delete popR();
+
     _Base::reset();
   }
 };

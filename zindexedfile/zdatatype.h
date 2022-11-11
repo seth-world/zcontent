@@ -19,6 +19,8 @@
 #include <zcrypt/checksum.h>
 
 #include <ztoolset/charman.h>
+#include <ztoolset/zdate.h>
+#include <ztoolset/zdatefull.h>
 
 namespace zbs
 {
@@ -115,7 +117,7 @@ namespace zbs
 
 
 ZStatus getAtomicZType_Sizes(ZTypeBase pType, uint64_t& pNaturalSize, uint64_t& pUniversalSize);
-
+size_t getAtomicUniversalSize(const ZTypeBase pType);
 
 //ZStatus _castAtomicValue_A (auto pValue,const ZType_type pTargetType,ZDataBuffer &pOutValue);
 

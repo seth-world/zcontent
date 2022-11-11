@@ -28,15 +28,15 @@ setZDateNfURF (void* pNatural,
                 ZType_type &pTargetType,
                 int32_t &pTargetArrayCount);
 
-ZStatus get_121_BlobNfURF(void* pValue,ZDataBuffer * pURFData);
+ssize_t get_121_BlobNfURF(void* pValue,const unsigned char * pURFData);
 
-ZStatus get_121_ZDateFullNfURF(void* pValue, ZDataBuffer * pURFData);
-ZStatus get_121_ZDateNfURF(void* pValue, ZDataBuffer *pURFData);
+ssize_t get_121_ZDateFullNfURF(void* pValue, ZDataBuffer * pURFData);
+ssize_t get_121_ZDateNfURF(void* pValue, ZDataBuffer *pURFData);
 
 
-ZStatus get_121_CheckSumNfURF(void* pValue,ZDataBuffer * pURFData);
+ssize_t get_121_CheckSumNfURF(void* pValue,ZDataBuffer * pURFData);
 
-ZStatus get_ZStringNfURF(void* pValue, ZTypeBase pType, ZDataBuffer *&pURFData);
+ssize_t get_ZStringNfURF(void* pValue, ZTypeBase pType, ZDataBuffer *&pURFData);
 /*ZStatus get_121_utf16FixedStringNfURF(void* pValue, unsigned char* pURFData);
 ZStatus get_121_utf32FixedStringNfURF(void* pValue, unsigned char* pURFData);
 
@@ -79,7 +79,7 @@ ZStatus _getURFHeaderData(const unsigned char *pURF_Ptr,
                                  uint64_t &pHeaderSize,
                           const unsigned char **pURFDataPtr);
 
-size_t  _getURFHeaderSize (ZTypeBase &pZType);
+
 
 
 template <class _Tp>

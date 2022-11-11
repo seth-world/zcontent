@@ -23,7 +23,7 @@ class ZHeaderControlBlock_Export
 {
 public:
   uint32_t                StartSign   = cst_ZBLOCKSTART;  /**< check for block start */
-  ZBlockID                BlockID     = ZBID_FileHeader;  /**< identification is file header */
+  ZBlockId                BlockId     = ZBID_HCB;         /**< identification is file header */
   uint16_t                EndianCheck = cst_EndianCheck_Normal;
   unsigned long           ZRFVersion  = __ZRF_VERSION__;  /**< software version */
 
@@ -43,6 +43,10 @@ public:
 
   ZHeaderControlBlock_Export& operator=(ZHeaderControlBlock_Export& pIn) {return _copyFrom(pIn);}
 
+  bool isValid() {
+    return (StartSign==cst_ZBLOCKSTART) && (BlockId==ZBID_HCB) && (EndianCheck==cst_EndianCheck_Normal)&& (EndSign==cst_ZBLOCKEND);
+  }
+
   void    set(const ZHeaderControlBlock& pIn);
   void    setFromPtr(const unsigned char *&pPtrIn);
   ZHeaderControlBlock&          toHCB(ZHeaderControlBlock& pOut);
@@ -53,12 +57,12 @@ public:
 
   ZHeaderControlBlock_Export& _copyFrom(ZHeaderControlBlock_Export& pIn);
 
-  bool isReversed()
+  bool isReversed() const
   {
     if (EndianCheck==cst_EndianCheck_Reversed) return true;
     return false;
   }
-  bool isNotReversed()
+  bool isNotReversed() const
   {
     if (EndianCheck==cst_EndianCheck_Normal) return true;
     return false;
@@ -95,7 +99,7 @@ public:
   zlockmask_type          Lock    = ZLock_Nolock ;   /**< Lock mask (int32_t) at file header level (Exclusive lock) @see ZLockMask_type one lock at a time is authorized */
   pid_t                   LockOwner = 0L;            /**< Owner process for the lock */
 
-  //    ZBlockID                BlockID     = ZBID_FileHeader;  /**< identification is file header */
+  //    ZBlockId                BlockId     = ZBID_FileHeader;  /**< identification is file header */
   //    unsigned long           ZRFVersion  = __ZRF_VERSION__;  /**< software version */
   ZFile_type              FileType    = ZFT_Nothing ;     /**< File type see ref ZFile_type */
   zaddress_type           OffsetFCB;                      /**< offset to ZFileControlBlock when written in file */
@@ -124,7 +128,7 @@ public:
      */
   int fromXml(zxmlNode* pHCBRootNode,ZaiErrors* pErrorlog);
 
-  ZDataBuffer& _exportAppend(ZDataBuffer& pZDBExport);
-  ZStatus      _import(const unsigned char *&pPtrIn);
+  size_t    _exportAppend(ZDataBuffer& pZDBExport);
+  ZStatus   _import(const unsigned char *&pPtrIn);
 };
 #endif // ZHEADERCONTROLBLOCK_H

@@ -18,17 +18,17 @@ public:
   ZBlockHeader_Export& _copyFrom(const ZBlockHeader_Export& pIn);
 
   ZBlockHeader_Export& set(const ZBlockHeader &pIn);
-  ZBlockHeader_Export& setFromPtr(unsigned char* &pIn);
+  ZBlockHeader_Export& setFromPtr(const unsigned char *&pIn);
 
   void _convert();
   void serialize();
   void deserialize();
 
-  bool isReversed() {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
-  bool isNotReversed() {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
+  bool isReversed() const {return (EndianCheck==cst_EndianCheck_Reversed) ;}
+  bool isNotReversed() const {return (EndianCheck==cst_EndianCheck_Normal) ;}
 
   uint32_t            StartSign=cst_ZFILEBLOCKSTART ;    // Start marker
-  ZBlockID            BlockId=ZBID_Data;         // Block identification : always ZBID_Data here
+  ZBlockId            BlockId=ZBID_Data;         // Block identification : always ZBID_Data here
   uint16_t            EndianCheck=cst_EndianCheck_Normal;
   zsize_type          BlockSize;      // total size of the physical block, ZBH_Export size+user content size
   uint8_t             State;          // state of the block see @ref ZBlockState_type
@@ -40,7 +40,7 @@ class ZBlockDescriptor_Export: public ZBlockHeader_Export
 {
 public:
   void set(const ZBlockDescriptor& pIn);
-  void setFromPtr(unsigned char* &pPtrIn);
+  void setFromPtr(const unsigned char* &pPtrIn);
 
   void _convert();
   void serialize();
@@ -49,7 +49,11 @@ public:
   bool isReversed() {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
   bool isNotReversed() {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
 
-  zaddress_type        Address;      // Offset from begining of file : Physical Address (starting 0)
+  bool isValid() {
+    return (StartSign==cst_ZBLOCKSTART) && (BlockId==ZBID_Data) && (EndianCheck==cst_EndianCheck_Normal);
+  }
+
+  zaddress_type        Address=0;      // Offset from begining of file : Physical Address (starting 0)
 };
 
 #pragma pack(pop)
@@ -63,7 +67,7 @@ class ZBlockHeader
 public:
 
   //    uint32_t            StartBlock ;    //!< Start sign
-  //    ZBlockID            BlockID;        // Block identification
+  //    ZBlockId            BlockId;        // Block identification
   zsize_type          BlockSize;      // total size of the physical block on file  including ZBlockHeader_Export size
   //                                       ZBlockHeader_Export plus user content size
   uint8_t             State=0;          // state of the block see @ref ZBlockState_type
@@ -89,7 +93,7 @@ public:
   ZBlockHeader& operator = (const ZBlock& pBlock) {return _FromZBlock(pBlock);}
 
 
-  ZStatus _import(unsigned char *pPtrIn);
+  ZStatus _import(const unsigned char *pPtrIn);
   ZDataBuffer& _exportAppend(ZDataBuffer &pZDB);
 
   /* required for exporting Pool with ZArray export facilities */
@@ -120,7 +124,7 @@ public:
   ZBlockDescriptor& operator = (const ZBlockHeader& pBlockHeader) { ZBlockHeader::_copyFrom(pBlockHeader); return *this;}
   ZBlockDescriptor& operator = (const ZBlock &pBlock) {ZBlockHeader::_copyFrom((const ZBlockHeader&)pBlock); return *this;}
 
-  ZStatus _import(unsigned char *pPtrIn);
+  ZStatus _import(const unsigned char *pPtrIn);
   ZDataBuffer& _exportAppend(ZDataBuffer &pZDB);
 
   /* required for exporting Pool with ZArray export facilities */

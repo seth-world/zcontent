@@ -11,7 +11,9 @@
 
 
 
-#define __GENERATE_PARAMETER_FILE__ "zcppgenerateparameters.xml"
+#define __CPPGENERATE_PARAMETER_FILE__ "zcppgenerateparameters.xml"
+
+#define __CPPGENERATE_VERSION__ "1.0-1"
 
 namespace zbs {
 
@@ -84,7 +86,7 @@ public:
 
   utf8VaryingString genHeaderFields(utf8VaryingString& pFileIncludeList);
 
-  utf8VaryingString genCopyFrom(utf8VaryingString& pClassName);
+//  utf8VaryingString genCopyFrom(utf8VaryingString& pClassName);
 
   ZStatus genHeader(const utf8VaryingString& pClassName,
                               const uriString &pHeaderFile,
@@ -105,9 +107,11 @@ public:
   uriString getGenHeaderFile() {return GenHeaderFile;}
 
   bool testErrored(long pRank);
-
+  void setXmlDictionaryFile(const utf8VaryingString& pXmlDictionaryFile) {XmlDictionaryFile=pXmlDictionaryFile;}
 private:
-  ZDictionaryFile* DictionaryFile=nullptr;
+  ZDictionaryFile*    DictionaryFile=nullptr;
+  uriString           XmlGenParamsFile;
+  uriString           XmlDictionaryFile;
   ZArray<GenObj>      GenObjList;
   ZArray<GenInclude>  GenIncludeList;
 
@@ -117,6 +121,7 @@ private:
   uriString           GenHeaderFile;
 
   uriString           GenPath;
+  utf8VaryingString   CommentBanner;
   ZaiErrors           ErrorLog;
 };
 

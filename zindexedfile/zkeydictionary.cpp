@@ -416,10 +416,10 @@ ZKeyDictionary::_import(const unsigned char* &pZDBImport_Ptr)
 
  */
 
-utf8String ZKeyDictionary::toXml(int pLevel,int pRank, bool pComment)
+utf8VaryingString ZKeyDictionary::toXml(int pLevel,int pRank, bool pComment)
 {
   int wLevel=pLevel;
-  utf8String wReturn;
+  utf8VaryingString wReturn;
   wReturn = fmtXMLnode("key",pLevel);
   wLevel++;
 //  wReturn+=fmtXMLuint64("kdicsize",KDicSize,wLevel);    // KDicSize is export size : dont care
@@ -436,6 +436,9 @@ utf8String ZKeyDictionary::toXml(int pLevel,int pRank, bool pComment)
   wReturn+=fmtXMLbool("duplicates",(bool)Duplicates,wLevel);
   if (pComment)
     fmtXMLaddInlineComment(wReturn," If set, key allows duplicates. if not - key must be unique ");
+
+  if (!ToolTip.isEmpty())
+    wReturn+=fmtXMLstring("tooltip",ToolTip,wLevel);
 
   wReturn += fmtXMLnode("keyfields",wLevel);
   /* key fields */
@@ -481,12 +484,13 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
   unsigned int wInt;
   ZStatus   wSt;
 
+  pErrorlog->setContext("ZKeyDictionary::fromXml");
   int wErroredFields=0,wWarnedFields=0;
 
   if( pKeyDicNode->getName() != "key") {
     pErrorlog->logZStatus(ZAIES_Fatal,
         ZS_XMLINVROOTNAME,
-        "ZMetaDic::fromXml-F-INVROOTNAME Wrong name <%s> for given root node. Expected <metadictionary> ",pKeyDicNode->getName().toCChar());
+        "ZKeyDictionary::fromXml-F-INVROOTNAME Wrong name <%s> for given root node. Expected <metadictionary> ",pKeyDicNode->getName().toCChar());
     return ZS_XMLINVROOTNAME;
   }
 
@@ -501,21 +505,27 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
   if (XMLgetChildBool(wKeyRootNode,"duplicates",wBool,pErrorlog,ZAIES_Error)<0)
       {
         pErrorlog->logZStatus(ZAIES_Error, ZS_XMLMISSREQ,"ZSKeyDictionary::fromXml-E-MISSREQFLD Missing mandatory field <keyname>");
+         wErroredFields ++;
         return ZS_XMLMISSREQ;
-        wErroredFields ++;
       }
       else
         Duplicates=(uint8_t)wBool;
 
+  if (XMLgetChildText(wKeyRootNode,"tooltip",ToolTip,pErrorlog,ZAIES_Warning)<0){
+    wWarnedFields++;
+    pErrorlog->warningLog("ZSKeyDictionary::fromXml-W-OPTMISS Missing optional key field <tooltip> for key <%s>",
+        DicKeyName.toString());
+  }
 
     wSt = wKeyRootNode->getChildByName((zxmlNode *&) wFieldsRootNode, "keyfields");
     if (wSt != ZS_SUCCESS) {
       pErrorlog->logZStatus(
           ZAIES_Error,
           wSt,
-          "ZSKeyDictionary::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
+          "ZSKeyDictionary::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status <%s> for key <%s>",
           "keyfields",
-          decode_ZStatus(wSt));
+          decode_ZStatus(wSt),DicKeyName.toString());
+      pErrorlog->popContext();
       return wSt;
     }
     wSt=wFieldsRootNode->getFirstChildElement(wSwapNode);
@@ -574,7 +584,7 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
         }//if (wSingleFieldNode->getName()=="field")
 
       wSwapNode=nullptr;
-      wSt=wSingleFieldNode->getNextElementSibling(wSwapNode);
+      wSt=wSingleFieldNode->getNextNode((zxmlNode*&)wSwapNode);
       XMLderegister(wSingleFieldNode);
       wSingleFieldNode=wSwapNode;
       }//while (wSt==ZS_SUCCESS)
@@ -589,7 +599,7 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
         wErroredFields);
 
 
-
+  pErrorlog->popContext();
   XMLderegister(wKeyRootNode);
   return pErrorlog->hasError()?ZS_XMLERROR:ZS_SUCCESS;
 }//ZSKeyDictionary::fromXml
@@ -684,6 +694,7 @@ ZKeyDictionary& ZKeyDictionary ::_copyFrom(const ZKeyDictionary &pIn)
     _Base::push(pIn.Tab[wi]);
   ToolTip = pIn.ToolTip;
   DicKeyName = pIn.DicKeyName;
+  Duplicates = pIn.Duplicates;
   return *this;
 } //fieldOffset
 

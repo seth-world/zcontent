@@ -112,8 +112,10 @@ utf8String generateIndexRootName(const utf8String &pMasterRootName,
                 wIndexRootName += pIndexName.toCChar();
                 }
 //    wIndexRootName += (utf8_t)'-';
-    wIndexRootName.addUtfUnit('-');
-    wIndexRootName.addsprintf("%02ld",pRank);
+    wIndexRootName.eliminateChar(' ');
+    wIndexRootName = wIndexRootName.toLower();
+//    wIndexRootName.addUtfUnit('-');
+//    wIndexRootName.addsprintf("%02ld",pRank);
 //    sprintf(&DSRootName.content[DSRootName.size()],"%02ld",pRank);
 
 //    wIndexRootName.eliminateChar(' ');
@@ -394,7 +396,7 @@ utf8String wMessage;
 utf8String wTagName;
 //--------------ZFileControlBlock modifiable fields----------------
 
-    pErrorLog->setErrorLogContext("_testXMLZFileControlBlock");
+    pErrorLog->setContext("_testXMLZFileControlBlock");
     pErrorLog->setAutoPrintOn(ZAIES_Text);
 /*
     wSt=pFileNode->getChildByName(wFileDescNode,"ZFileDescriptor");
@@ -508,7 +510,7 @@ zxmlNode * wHCBNode=nullptr;
 ZFileDescriptor wFileDescriptor;
 
 pErrorLog->setAutoPrintOn(ZAIES_Text);
-pErrorLog->setErrorLogContext("_testXMLZFileDescriptor");
+pErrorLog->setContext("_testXMLZFileDescriptor");
 
     if (pFileNode->getName()!="file")
       {
@@ -983,7 +985,7 @@ validateXmlDicDefinition(ZMFDictionary* pDictionary,ZArray<IndexData_st>* pIndex
   if (pIndexData==nullptr)
     return ZS_NULLPTR;
 
-  pErrorLog->setErrorLogContext("validateXmlDicDefinition");
+  pErrorLog->setContext("validateXmlDicDefinition");
   pErrorLog->textLog("Check xml dictionary definition against xml index control block definitions.");
 
   if (pIndexData->count()!=pDictionary->KeyDic.count())
@@ -1271,6 +1273,7 @@ EndloadXMLDictionary:
     return wSt;
 }//loadXMLDictionaryForCreate
 
+#ifdef __DEPRECATED__
 
 /**
  * @brief applyXMLDictionaryChange
@@ -1310,7 +1313,7 @@ applyXMLDictionaryChange(ZRawMasterFile* pMasterFile, zxmlElement* pRoot, bool p
   ZPRES wMetaDicStatus=ZPRES_Nothing;
   ZPRES wKeyDicStatus=ZPRES_Nothing;
 
-  pMessageLog->setErrorLogContext(_GET_FUNCTION_NAME_);
+  pMessageLog->setContext(_GET_FUNCTION_NAME_);
 
   if (pMasterFile->getOpenMode()==ZRF_NotOpen)
   {
@@ -1390,7 +1393,7 @@ applyXMLDictionaryChange(ZRawMasterFile* pMasterFile, zxmlElement* pRoot, bool p
       wCannotProcess=true;
       XMLderegister(wDictionaryNode);
       break;
-      }
+      }__DEPRECATED__
 
     pMessageLog->textLog("loadXMLDictionary: Meta dictionary loaded. <%ld> field definitions loaded.",wDictionary->count());
 
@@ -2032,7 +2035,7 @@ createMasterFileFromXml(const char* pXMLPath,
 
 
   FCBParams* wMasterFCB=nullptr;
-  ZSJournalControlBlock* wJCB=nullptr;
+  ZJournalControlBlock* wJCB=nullptr;
   ZMFDictionary*  wDictionary=nullptr;
 
   MCB_st        wMCB;
@@ -2060,7 +2063,7 @@ createMasterFileFromXml(const char* pXMLPath,
     else
       wBase=pLogfile;
 
-  wErrorLog.setErrorLogContext("createFromXml");
+  wErrorLog.setContext("createFromXml");
   wErrorLog.setAutoPrintOn(ZAIES_Text);
   if (!wBase.isEmpty())
     wErrorLog.setOutput(wBase.toCChar());
@@ -2362,7 +2365,7 @@ createMasterFileFromXml(const char* pXMLPath,
 //       wMayCreateJCB=false;
       break;
       }
-    wJCB=new ZSJournalControlBlock;
+    wJCB=new ZJournalControlBlock;
     wSt=wJCB->fromXml(wMCBNode,&wErrorLog,ZAIES_Warning);
     if (wSt!=ZS_SUCCESS)
       {
@@ -2550,7 +2553,7 @@ createMasterFileFromXml(const char* pXMLPath,
   if (wJCB!=nullptr)
     {
     wErrorLog.textLog("About to create and enable journaling for created file.\n");
-    wMasterFile.ZJCB = new ZSJournalControlBlock(*wJCB);
+    wMasterFile.ZJCB = new ZJournalControlBlock(*wJCB);
     wMasterFile.setJournalingOn();
     wErrorLog.textLog(" Journaling has been defined and enabled.\n");
     }
@@ -2920,7 +2923,7 @@ applyXmltoFile(const char* pXMLPath,
 
 
   FCBParams*            wMasterFCB=nullptr;
-  ZSJournalControlBlock*wJCB=nullptr;
+  ZJournalControlBlock*wJCB=nullptr;
 
   ZMFDictionary*        wDictionary=nullptr;
 //  ZArray<ZPRES>*        wKeyStatus=nullptr;
@@ -2954,7 +2957,7 @@ applyXmltoFile(const char* pXMLPath,
   else
     wBase=pLogfile;
 
-  wMessageLog.setErrorLogContext("applyXmltoFile");
+  wMessageLog.setContext("applyXmltoFile");
   wMessageLog.setAutoPrintOn(ZAIES_Text);
   if (!wBase.isEmpty())
     wMessageLog.setOutput(wBase.toCChar());
@@ -3402,7 +3405,7 @@ PostMCBapplyXMLtoFile:
                           "Journal control block if exists will remain unchanged.");
       break;
     }
-    wJCB= new ZSJournalControlBlock;
+    wJCB= new ZJournalControlBlock;
     wSt=wJCB->fromXml(wMCBNode,&wMessageLog,ZAIES_Warning);
     if (wSt!=ZS_SUCCESS)
     {
@@ -3418,7 +3421,7 @@ PostMCBapplyXMLtoFile:
         break;
       delete wMasterFile.ZJCB;
     }
-    wMasterFile.ZJCB = new ZSJournalControlBlock(*wJCB);
+    wMasterFile.ZJCB = new ZJournalControlBlock(*wJCB);
     wMessageLog.textLog("Replaced ZSJournalControlBlock.");
     delete wJCB;
     break;
@@ -3481,7 +3484,7 @@ PostMCBapplyXMLtoFile:
 
   if ((wJCB!=nullptr)&&!wCannotProcess)
     {
-    wMasterFile.ZJCB = new ZSJournalControlBlock(*wJCB);
+    wMasterFile.ZJCB = new ZJournalControlBlock(*wJCB);
     wMasterFile.setJournalingOn();
     wMessageLog.textLog(" Journaling has been defined and enabled.\n");
     }
@@ -3736,7 +3739,7 @@ ErrorapplyXMLtoFile:
   goto EndapplyXMLtoFile;
 }// applyXmltoFile
 
-
+#endif // __DEPRECATED__
 
 /**
  * @brief ZRawMasterFile::_XMLLoadAndControl Loads an XML document and Makes all XML controls to have an appropriate <zicm> document
@@ -3775,10 +3778,9 @@ _XMLLoadAndControl(const char *pFilePath,
   utf8String wN;
   utf8String wAttribute;
 
-  wUriPath = (const utf8_t*)pFilePath;
+  wUriPath = pFilePath;
 
-  if (!wUriPath.exists())
-  {
+  if (!wUriPath.exists()) {
     pErrorLog->errorLog("_XMLLoadAndControl-E-FILNTFND File <%s> does not exist while trying to load it.",pFilePath);
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_FILENOTEXIST,
@@ -3914,7 +3916,7 @@ createZRandomFileFromXml(const char* pXMLPath,
   else
     wBase=pLogfile;
 
-  wErrorLog.setErrorLogContext("createZRandomFileFromXml");
+  wErrorLog.setContext("createZRandomFileFromXml");
   wErrorLog.setAutoPrintOn(ZAIES_Text);
   if (!wBase.isEmpty())
     wErrorLog.setOutput(wBase.toCChar());

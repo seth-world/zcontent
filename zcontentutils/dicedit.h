@@ -305,9 +305,11 @@ fieldTBv
    */
 //  bool displayFieldChange(ZFieldDescription& pField, QModelIndex pIdx);
 
+#ifdef __DEPRECATED__
   void importDicFromFullHeader(ZDataBuffer &pHeaderContent);
   void importDicFromReserved(const unsigned char *pPtrReserved);
   void importDic(const unsigned char *pPtrIn);
+#endif
 
   /* Set-up MetaDic and KeyDictionary display views */
 
@@ -428,6 +430,11 @@ private:
   QAction*  genShowHeaderQAc=nullptr;
   QAction*  genShowCppQAc=nullptr;
 
+  QMenu*    genFileMEn=nullptr;
+  QAction*  fileXmlGenQAc=nullptr;
+  QAction*  fileCreateQAc=nullptr;
+
+
   QMenu *keyFlexMEn=nullptr;
   QActionGroup* keyActionGroup=nullptr;
   QAction* KInsertKeyQAc=nullptr;
@@ -472,6 +479,9 @@ private:
   QItemSelectionModel* FieldSM=nullptr;
   QItemSelectionModel* KeySM=nullptr;
 
+
+  QLineEdit* GenPathLEd=nullptr;
+
 //  ZMFDictionary* MasterDic=nullptr;
 
   ZaiErrors Errorlog;
@@ -481,6 +491,7 @@ private:
   QPersistentModelIndex OriginIndex;
 
   ZDictionaryFile* DictionaryFile=nullptr;
+  uriString XmlDictionaryFile;
   bool DictionaryChanged=false;
 
   QWidget* Parent=nullptr;

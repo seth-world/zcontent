@@ -17,12 +17,14 @@
 
 #include <zindexedfile/zmfconfig.h>
 #include <cstdarg>
-#include <zindexedfile/zmf_limits.h>
-#include <zrandomfile/zrandomfile.h>
-#include <zindexedfile/zindexfile.h>
-#include <zindexedfile/zskey.h>
+
+
+#include <zcontent/zindexedfile/zmf_limits.h>
+#include <zcontent/zrandomfile/zrandomfile.h>
+#include <zcontent/zindexedfile/zindexfile.h>
+#include <zindexedfile/zkey.h>
 #include <znet/zbasenet/znetcommon.h>
-#include <zindexedfile/zmetadic.h>
+#include <zcontent/zindexedfile/zmetadic.h>
 
 #include <ztoolset/zutfstrings.h>
 
@@ -49,7 +51,6 @@
 
 namespace zbs //========================================================================
 {
-
 
 
 
@@ -89,8 +90,8 @@ class ZMasterFile : public ZRawMasterFile
 {
 
 public:
-    friend class ZSKey;
-    friend class ZSIndexCollection;
+    friend class ZKey;
+    friend class ZIndexCollection;
     friend class ZSJournal;
 
     friend class ZContentVisuMain;
@@ -103,8 +104,8 @@ typedef ZRawMasterFile _Base ;
     ~ZMasterFile(void);
 
 
-    ZSKey* createZKeyByName (const char* pKeyName);
-    ZSKey* createZKey (const long pKeyNumber);
+    ZKey* createZKeyByName (const char* pKeyName);
+    ZKey* createZKey (const long pKeyNumber);
 
 // what we can externally use of ZRandomFile methods (included from ZIndexFile class)
 
@@ -346,17 +347,17 @@ typedef ZRawMasterFile _Base ;
 //    ZStatus zgenerateKeyValue (ZSIndexControlBlock& pICB, ZArray<void *> &pKeyValues, ZDataBuffer& pKey);
 
     ZStatus zsearch (ZDataBuffer &pRecord, ZDataBuffer &pKeyValue, const long pIndexNumber=0);
-    ZStatus zsearch (ZDataBuffer &pRecord,ZSKey *pKey);
+    ZStatus zsearch (ZDataBuffer &pRecord,ZKey *pKey);
 
     ZStatus zsearchAll (ZDataBuffer &pKeyValue,
                         const long pIndexNumber,
-                        ZSIndexCollection &pIndexCollection,
+                        ZIndexCollection &pIndexCollection,
                         const ZMatchSize_type pZMS=ZMS_MatchKeySize);
 
-    ZStatus zsearchAll (ZSKey &pZKey, ZSIndexCollection& pIndexCollection);
+    ZStatus zsearchAll (ZKey &pZKey, ZIndexCollection& pIndexCollection);
 
-    ZStatus zsearchFirst (ZSKey &pZKey, ZDataBuffer &pRecord, ZSIndexCollection *pCollection);
-    ZStatus zsearchNext (ZSKey &pZKey, ZDataBuffer &pRecord, ZSIndexCollection *pCollection);
+    ZStatus zsearchFirst (ZKey &pZKey, ZDataBuffer &pRecord, ZIndexCollection *pCollection);
+    ZStatus zsearchNext (ZKey &pZKey, ZDataBuffer &pRecord, ZIndexCollection *pCollection);
 
 
     using ZRandomFile::zsearchFieldAllCollection;
@@ -364,7 +365,7 @@ typedef ZRawMasterFile _Base ;
     using ZRandomFile::zsearchFieldNextCollection;
 
 
-    ZStatus zsearchInterval (ZSKey &pZKeyLow, ZSKey &pZKeyHigh,const zrank_type pIndexNumber,ZSIndexCollectionContext *pSearchContext );
+    ZStatus zsearchInterval (ZKey &pZKeyLow, ZKey &pZKeyHigh,const zrank_type pIndexNumber,ZIndexCollectionContext *pSearchContext );
 
 
 //-------------Reports------------------------------------
@@ -479,7 +480,7 @@ typedef ZRawMasterFile _Base ;
 
 //---------End Stats-------------------------------------------
 
-    ZStatus getRawIndex(ZSIndexItem &pIndexItem, const zrank_type pIndexRank, const zrank_type pIndexNumber);
+    ZStatus getRawIndex(ZIndexItem &pIndexItem, const zrank_type pIndexRank, const zrank_type pIndexNumber);
 
     ZStatus getKeyIndexFields(ZDataBuffer &pKeyFieldValues, const zrank_type pIndexRank,const zrank_type pIndexNumber);
 
@@ -515,7 +516,7 @@ friend ZStatus operator << (ZMasterFile &pZMF,ZRecord& pInput)
 /** @cond Development */
     ZStatus _add_RollbackIndexes ( ZArray<zrank_type> &pIndexRankProcessed);
     ZStatus _add_HardRollbackIndexes (ZArray<zrank_type> &pIndexRankProcessed);
-    ZStatus _add_CommitIndexes (ZArray <ZSIndexItem*>  &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed);
+    ZStatus _add_CommitIndexes (ZArray <ZIndexItem*>  &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed);
 
 //-----------End Add sequence------------------------------------
 
@@ -529,9 +530,9 @@ friend ZStatus operator << (ZMasterFile &pZMF,ZRecord& pInput)
 
     ZStatus _remove_RollbackIndexes (ZArray<zrank_type> &pIndexRankProcessed);
 
-    ZStatus _remove_HardRollbackIndexes (ZArray<ZSIndexItem*> &pIndexItemList,
+    ZStatus _remove_HardRollbackIndexes (ZArray<ZIndexItem*> &pIndexItemList,
                                          ZArray<zrank_type> &pIndexRankProcessed);
-    ZStatus _remove_CommitIndexes ( ZSIndexItemList &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed);
+    ZStatus _remove_CommitIndexes ( ZIndexItemList &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed);
 /** @endcond */
 //-----------End Remove sequence------------------------------------
 

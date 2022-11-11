@@ -10,13 +10,16 @@
 //#include <ztoolset/zsacommon.h> // for types and getDataType
 //#include <zam/zam_include.h> // for ZOp
 
-#include <zindexedfile/zsindextype.h>
-#include <zindexedfile/zsindexcollection.h>
+#include <zindexedfile/zindextype.h>
+#include <zindexedfile/zindexcollection.h>
 #include <zcontentcommon/zoperation.h>
 #include <zindexedfile/zmfstats.h>
 #include <zindexedfile/zindexcontrolblock.h>
 #include <zindexedfile/zindexdata.h>
 
+#include <zindexedfile/zindextable.h>
+
+#include <zindexedfile/zindexitem.h>
 
 /*
 #ifdef ZVerbose
@@ -70,21 +73,24 @@ Integrity controls are done to garanty an alignment with its ZMasterFile father.
 
  */
 //class ZSIndexControlBlock;
-class ZSIndexItem;
+class ZIndexItem;
 class ZRawRecord;
 //class ZRawRecord;
 class ZRawMasterFile;
 
 class ZRawIndexFile : protected ZRandomFile, public ZIndexControlBlock
 {
-friend class ZSIndexCollection;
+friend class ZIndexCollection;
 friend class ZRawMasterFile;
 friend class ZIndexTable;
+friend class ZIndexFile;
 
-protected:
-        typedef ZRandomFile                   _Base   ;
+
 public:
     friend class ZMasterFile;
+
+    friend ZStatus zrebuildRawIndex(ZRawIndexFile& pIF,bool pStat, FILE*pOutput);
+
 //    ZSIndexControlBlock   *ZICB=nullptr;    //!< ZICB pointer to ZMF father's ZICB content
 //    ZSIndexControlBlock   ZICB ;    //!< ZICB content
 
@@ -110,30 +116,32 @@ public:
     //~ZIndexFile() {if (ZMFFather!=nullptr)
     //                             _deregister();}
 
-    using _Base::getSize ;
-    using _Base::getAllocatedBlocks;
-    using _Base::getAllocatedSize;
-    using _Base::getBlockExtentQuota;
-    using _Base::getGrabFreeSpace;
-    using _Base::getHighwaterMarking;
-    using _Base::getBlockTargetSize;
+    using ZRandomFile::getSize ;
+    using ZRandomFile::getAllocatedBlocks;
+    using ZRandomFile::getAllocatedSize;
+    using ZRandomFile::getBlockExtentQuota;
+    using ZRandomFile::getGrabFreeSpace;
+    using ZRandomFile::getHighwaterMarking;
+    using ZRandomFile::getBlockTargetSize;
 
-    using _Base::setGrabFreeSpace;
-    using _Base::setHighwaterMarking;
+    using ZRandomFile::setGrabFreeSpace;
+    using ZRandomFile::setHighwaterMarking;
 
-    using _Base::getURIContent;
-    using _Base::getURIHeader;
-    using _Base::getFileDescriptor;
+    using ZRandomFile::getURIContent;
+    using ZRandomFile::getURIHeader;
+    using ZRandomFile::getFileDescriptor;
 
-    using _Base::isOpen;
+    using ZRandomFile::isOpen;
 
-    using _Base::getFCB;
-    using _Base::getFileType;
+    using ZRandomFile::getFCB;
+    using ZRandomFile::getFileType;
 
-    using _Base::lastIdx;
-    using _Base::last;
+    using ZRandomFile::lastIdx;
+    using ZRandomFile::last;
 
-    using _Base::zget;
+    using ZRandomFile::zget;
+    using ZRandomFile::getOpenMode;
+    using ZRandomFile::zclearFile;
 
 
     IndexData_st getIndexData()
@@ -147,6 +155,17 @@ public:
       return wReturn;
     }
 
+    /**
+     * @brief searchURFField searches for a record field in pPtrIn, extracts its URF value and appends it to pKeyContent.
+     *  record field is searched using its position given by pPosition.
+     *  A control is made with pFieldPresence : field must be present. If not, ZS_OMITTED is returned.
+     *  When found and set, ZS_SUCCESS is returned.
+     */
+
+    ZStatus extractAllURFKeyFields (ZDataBuffer& pKeyContent,
+                            const unsigned char *&pPtrIn,
+                            const ZArray<long> pPosition,
+                            const ZBitset& pFieldPresence) ;
 
     ZStatus setIndexURI(uriString &pUri);
     void setIndexName (utf8String &pName);
@@ -159,7 +178,7 @@ public:
                             const bool pHighwaterMarking,
                             const ssize_t pBlockTargetSize,
                             const size_t pBlockExtentQuota)
-    { return _Base::_setParameters( ZFT_ZIndexFile,
+    { return ZRandomFile::_setParameters( ZFT_ZIndexFile,
                                     pGrabFreeSpace,
                                     pHighwaterMarking,
                                     pBlockTargetSize,
@@ -208,6 +227,9 @@ public:
                           bool pBackup=false,
                           bool pLeaveOpen=true);
 
+/* for new version of zrebuildRawIndex() see zrawmasterfileutils.h (template) */
+#ifdef __DEPRECATED__
+
 /**
  * @brief ZIndexFile::zrebuildIndex rebuilds the current index
  *
@@ -221,8 +243,10 @@ public:
  * @param[in] pOutput   a FILE* pointer where the reporting will be made. Defaulted to stdout.
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
+    template <class _Tp>
     ZStatus zrebuildRawIndex (bool pStat=false, FILE *pOutput=stdout) ;
 
+#endif
     ZStatus openIndexFile (uriString &pIndexUri, long pIndexRank, const int pMode);
     ZStatus closeIndexFile (void);
 
@@ -242,44 +266,58 @@ public:
 
     ZStatus _extractRawKey(ZRawRecord *pRawRecord, ZDataBuffer& pKeyContent);
 
+    ZStatus _extractKeyLevel1(ZDataBuffer *pRawRecord, ZDataBuffer& pKeyContent);
+#ifdef __DEPRECATED__
     ZStatus _addRawKeyValue(ZRawRecord *pZMFRecord, zrank_type &pIndexRank, const zaddress_type pZMFAddress);
+#endif
 
     /** reserves space for key in ZBAT pool at pZBATIndex address pZMFAddress */
-    ZStatus _addRawKeyValue_Prepare(ZSIndexItem *&pIndexItem, zrank_type &pZBATIndex, const zaddress_type pZMFAddress);
-
+#ifdef __OLD_VERSION__
+    ZStatus _addRawKeyValue_Prepare(ZIndexItem *&pIndexItem, zrank_type &pZBATIndex, const zaddress_type pZMFAddress);
+#endif
+    ZStatus _addRawKeyValue_Prepare(ZIndexItem&pIndexItem, zrank_type &pZBATIndex, const zaddress_type pZMFAddress);
     /** effective write of key content in reserved record */
-    ZStatus _addRawKeyValue_Commit(ZSIndexItem* pIndexItem, const zrank_type pZBATIndex);
+    ZStatus _addRawKeyValue_Commit(ZIndexItem* pIndexItem, const zrank_type pZBATIndex);
     /** index key space has been reserved in ZBAT pool and needs to be released */
     ZStatus _addRawKeyValue_Rollback(const zrank_type pIndexCommit);
     /** index key has been created in file and needs to be suppressed */
     ZStatus _addKeyValue_HardRollback(const zrank_type pIndexCommit);
 
-    ZStatus _removeKeyValue_Prepare (ZDataBuffer &pKey, ZSIndexItem *&pIndexItem, long &pIndexRank, zaddress_type &pZMFAddress);
-    ZStatus _removeIndexItem_Prepare(ZSIndexItem &pIndexItem, long &pIndexRank);
+    ZStatus _removeKeyValue_Prepare (ZDataBuffer &pKey, ZIndexItem *&pIndexItem, long &pIndexRank, zaddress_type &pZMFAddress);
+    ZStatus _removeIndexItem_Prepare(ZIndexItem &pIndexItem, long &pIndexRank);
 
     ZStatus _removeKeyValue_Commit  (const zrank_type pIndexCommit);
     ZStatus _removeKeyValue_Rollback( const zrank_type pIndexCommit);
-    ZStatus _removeKeyValue_HardRollback(ZSIndexItem *pIndexItem, const zrank_type pIndexCommit);
+    ZStatus _removeKeyValue_HardRollback(ZIndexItem *pIndexItem, const zrank_type pIndexCommit);
 /** @endcond */
 
   //  ZStatus getKeyIndexFields(ZDataBuffer &pIndexContent,ZDataBuffer& pKeyValue);
   //  ZStatus zprintKeyFieldsValues (const zrank_type pRank, bool pHeader=true, bool pKeyDump=false, FILE*pOutput=stdout) ;
 
-    ZMasterFile* getMasterFile() {return (ZMasterFile*)ZMFFather;}
+    ZRawMasterFile* getMasterFile() {return (ZRawMasterFile*)ZMFFather;}
     ZRawMasterFile* getRawMasterFile() {return ZMFFather;}
+
+
+    ZStatus
+    _URFsearch( const ZDataBuffer &pKey,
+                ZIndexResult &pZIR,
+                const zlockmask_type pLock=ZLock_Nolock);
+
 
     ZStatus
     _Rawsearch( const ZDataBuffer &pKey,
-                ZSIndexResult &pZIR,
+                ZIndexResult &pZIR,
                 //            ZIFCompare pZIFCompare = ZKeyCompareBinary,
                 const zlockmask_type pLock=ZLock_Nolock);
+
+
 
 
     static inline
     ZStatus
     _Rawsearch(const ZDataBuffer &pKey,
               ZRawIndexFile &pZIF,
-              ZSIndexResult &pZIR,
+              ZIndexResult &pZIR,
   //            ZIFCompare pZIFCompare = ZKeyCompareBinary,
               const zlockmask_type pLock=ZLock_Nolock);
 
@@ -287,43 +325,44 @@ public:
     ZStatus
     _RawsearchAll(const ZDataBuffer &pKey,
                    ZRawIndexFile &pZIF,
-                   ZSIndexCollection &pCollection,
+                   ZIndexCollection &pCollection,
                    const ZMatchSize_type pZMS= ZMS_MatchIndexSize);
     static
     ZStatus
     _RawsearchNext(const ZDataBuffer &pKey,
                 ZRawIndexFile &pZIF,
-                ZSIndexCollection &pCollection,
+                ZIndexCollection &pCollection,
                 const ZMatchSize_type pZSC );
 
     static
-    ZStatus _RawsearchFirst (const ZDataBuffer        &pKey,     // key content to find out in index
+    ZStatus _RawsearchFirst (const ZDataBuffer        &pKeyContent,     // key content to find out in index
                           ZRawIndexFile               &pZIF,
-                          ZSIndexCollection         *pCollection,
-                          ZSIndexResult             &pZIR, const ZMatchSize_type pZMS) ;
+                          ZIndexCollection           *pCollection,
+                          ZIndexResult               &pZIR,
+                          const ZMatchSize_type pZMS) ;
     static
-    ZStatus _RawsearchNext (ZSIndexResult             &pZIR,
-                         ZSIndexCollection *pCollection) ;
+    ZStatus _RawsearchNext (ZIndexResult             &pZIR,
+                         ZIndexCollection *pCollection) ;
 
     static
     ZStatus _RawsearchIntervalFirst (const ZDataBuffer        &pKeyLow,     // lowest value of key content to find out in index
                                   const ZDataBuffer        &pKeyHigh,    // highest value of key content to find out in index
                                   ZRawIndexFile               &pZIF,       // ZIndexFile object to search on
-                                  ZSIndexCollection         *pCollection, // collection and context
-                                  ZSIndexResult             &pZIR,       // First (in key order) index rank & ZMF addresses found matching key value
+                                  ZIndexCollection         *pCollection, // collection and context
+                                  ZIndexResult             &pZIR,       // First (in key order) index rank & ZMF addresses found matching key value
                                   const bool               pExclude); // Exclude KeyLow and KeyHigh value from selection (i. e. > pKeyLow and < pKeyHigh)
 
 
     static ZStatus _RawsearchIntervalAll  (const ZDataBuffer      &pKeyLow,  // Lowest key content value to find out in index
                                         const ZDataBuffer      &pKeyHigh, // Highest key content value to find out in index
                                         ZRawIndexFile             &pZIF,     // pointer to ZIndexControlBlock containing index description
-                                        ZSIndexCollection       *pCollection,   // enriched collection of reference (ZIndexFile rank, ZMasterFile record address)
+                                        ZIndexCollection       *pCollection,   // enriched collection of reference (ZIndexFile rank, ZMasterFile record address)
                                         const bool             pExclude);
 
 
     static
-    ZStatus _RawsearchIntervalNext (ZSIndexResult       &pZIR,
-                                 ZSIndexCollection   *pCollection) ;
+    ZStatus _RawsearchIntervalNext (ZIndexResult       &pZIR,
+                                 ZIndexCollection   *pCollection) ;
 
 
 
@@ -348,6 +387,30 @@ public: utf8String toXml(int pLevel,bool pComment);
 public: ZStatus  fromXml(zxmlNode* pIndexNode, ZaiErrors* pErrorlog);
 
 
+  template <class _Tp>
+  ZStatus _addRawKeyValue(const ZDataBuffer& pZMFRecord,  zrank_type& pIndexRank, zaddress_type pZMFAddress) {
+    ZStatus wSt;
+    _Tp wRecord;
+    wRecord.fromRecord(pZMFRecord);
+
+    ZIndexItem* wIndexItem = new ZIndexItem (wRecord.getKey(pIndexRank)) ;
+
+    zrank_type wIndexIdxCommit;
+
+    wIndexItem->ZMFaddress=pZMFAddress;
+    wIndexItem->Operation=ZO_Push;
+
+//    wSt=_extractRawKey(pZMFRecord,wIndexItem->KeyContent);
+    if (wSt!=ZS_SUCCESS)
+    {  return  wSt;}// Beware return  is multiple instructions in debug mode
+    wSt=_addRawKeyValue_Prepare(*wIndexItem,wIndexIdxCommit,pZMFAddress);
+    if (wSt!=ZS_SUCCESS)
+    {  return  wSt;}// Beware return  is multiple instructions in debug mode
+    wSt= _addRawKeyValue_Commit(wIndexItem,wIndexIdxCommit);
+    delete wIndexItem;
+    return  wSt;
+  }
+
 
 private:
     long                  IndexCommitRank;
@@ -356,20 +419,20 @@ private:
 };// class ZIndexFile
 
 
-
-class ZIndexTable :  private ZArray<ZIndexFile*>
+/*
+class ZIndexTable :  private ZArray<ZRawIndexFile*>
 {
-  typedef ZArray<ZIndexFile*> _Base ;
+  typedef ZArray<ZRawIndexFile*> ZRandomFile ;
 public:
   ZIndexTable() {}
   ~ZIndexTable() {}// just to call the base destructor
-  using _Base::push;
-  using _Base::size;
-  using _Base::count;
-  using _Base::last;
-  using _Base::lastIdx;
-  using _Base::newBlankElement;
-  using _Base::operator [];
+  using ZRandomFile::push;
+  using ZRandomFile::size;
+  using ZRandomFile::count;
+  using ZRandomFile::last;
+  using ZRandomFile::lastIdx;
+  using ZRandomFile::newBlankElement;
+  using ZRandomFile::operator [];
 
   long pop (void);
   long erase (long pRank);
@@ -386,7 +449,7 @@ public:
   ZStatus fromXml(zxmlNode* pRoot,ZaiErrors*pErrorlog);
 } ;
 
-
+*/
 
 
 /** @} */ // ZIndexGroup
@@ -395,6 +458,28 @@ public:
 
 
 } // namespace zbs
+
+
+int URFCompare(const ZDataBuffer &pKey1,ZDataBuffer &pKey2) ;
+/**
+ * @brief extractURF_Append
+ * @return
+ */
+ZStatus extractURF_Append( ZDataBuffer& pURF,const unsigned char* &pPtrIn) ;
+
+ZStatus getURFTypeAndSize( const unsigned char* pPtrIn , ZTypeBase& pType , size_t &pSize ) ;
+
+/**
+ * @brief skipURFUntilPosition parse an URF formatted record pointed by pPtrIn
+ *        and skip URF fields (present or not present vs pFieldPresence) until position pPosition.
+ * @return
+ */
+ZStatus skipURFUntilPosition( const unsigned char* &pPtrIn,
+                              const long pPosition,
+                              const ZBitset& pFieldPresence);
+
+int URFCompareValues( const unsigned char* &pURF1,const unsigned char* pURF1_End,
+                      const unsigned char* &pURF2,const unsigned char* pURF2_End);
 
 ZStatus _printKeyFieldsValues (ZDataBuffer *wKeyContent,ZIndexFile* pZIF, bool pHeader,bool pKeyDump,FILE*pOutput);
 

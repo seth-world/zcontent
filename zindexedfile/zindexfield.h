@@ -1,7 +1,7 @@
 #ifndef ZINDEXFIELD_H
 #define ZINDEXFIELD_H
 
-#include <zindexedfile/zsindextype.h>
+#include <zindexedfile/zindextype.h>
 #include <zcrypt/checksum.h>
 #include <zindexedfile/zfielddescription.h>
 
@@ -79,12 +79,12 @@ public:
   void serialize();
   void deserialize();
 
-  bool isReversed()
+  bool isReversed() const
   {
     if (EndianCheck==cst_EndianCheck_Reversed) return true;
     return false;
   }
-  bool isNotReversed()
+  bool isNotReversed() const
   {
     if (EndianCheck==cst_EndianCheck_Normal) return true;
     return false;

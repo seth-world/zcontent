@@ -20,22 +20,22 @@
 
 ZStatus
 setFieldURFfBlob(void* pSourceNatural,
-                 ZDataBuffer* pTargetURFData,
+                 ZDataBuffer &pTargetURFData,
                  ZTypeBase &pSourceType,
                  ZTypeBase &pTargetType);
 ZStatus
 setFieldURFfZDate(void* pSourceNatural,
-                  ZDataBuffer* pTargetURFData,
+                  ZDataBuffer& pTargetURFData,
                   ZTypeBase &pSourceType,
                   ZTypeBase &pTargetType);
 ZStatus
 setFieldURFfZDateFull(void* pSourceNatural,
-                      ZDataBuffer* pTargetURFData,
+                      ZDataBuffer &pTargetURFData,
                       ZTypeBase &pSourceType,
                       ZTypeBase &pTargetType);
 ZStatus
 setFieldURFfCheckSum(void* pSourceNatural,
-                      ZDataBuffer* pTargetURFData,
+                      ZDataBuffer& pTargetURFData,
                       ZTypeBase &pSourceType,
                       ZTypeBase &pTargetType);
 
@@ -59,7 +59,7 @@ setFieldURFfCheckSum(void* pSourceNatural,
 
 ZStatus
 setFieldURFfChar(void* pSourceNatural,
-                 ZDataBuffer* pTargetURFData,
+                 ZDataBuffer& pTargetURFData,
                  ZTypeBase &pSourceType,
                  uint64_t &pSourceNSize,
                  URF_Capacity_type &pSourceCapacity,
@@ -485,7 +485,7 @@ decltype(pNatural[0]) wZeroValue=0;
 
 
 ZStatus  setFieldURFfStdString (void* pNatural,
-                                ZDataBuffer *pURFData,
+                                ZDataBuffer &pURFData,
                                 uint64_t &pSourceNSize,
                                 uint64_t &pSourceUSize,        // out data in URF format (out)
                                 URF_Capacity_type &pSourceCapacity,
@@ -531,6 +531,7 @@ ZStatus  setFieldURFfStdWString (void* pNatural,
  *  Blob                -No-             -No-               -No-               -No-        X       -No-         -No-
  *
  */
+#ifdef __DEPRECATED__
 template <class _Tp>
 /**
  * @brief setFieldURFfN_T  Set value of a target field defined by its metadic definition from a source variable
@@ -621,6 +622,7 @@ ZStatus wSt=ZS_SUCCESS;
 
             }*/
         case ZType_CharFixedString:
+
         case ZType_Utf8FixedString:
         case ZType_Utf16FixedString:
         case ZType_Utf32FixedString:
@@ -728,7 +730,7 @@ ZStatus wSt=ZS_SUCCESS;
     return  wSt;
 
 }// setFieldURF_T for Classes
-
+#endif // __DEPRECATED__
 #ifdef __FIELD_CONVERSION_DEPRECATED__
 /**
  *  input data type : Class
@@ -919,15 +921,15 @@ ZDataBuffer wUValue;
     return wSt;
 
 }// setFieldURF_T for Classes
-#endif // __FIELD_CONVERSION_DEPRECATED__
+
 
 ZStatus
 setFieldURFfZString(void* pSourceNaturalPtr,
-                    ZDataBuffer* pTargetURFData,
+                    ZDataBuffer& pTargetURFData,
                     ZTypeBase pTargetType,
                     URF_Capacity_type pTargetCapacity);
 
-
+#endif // __FIELD_CONVERSION_DEPRECATED__
 
 /*ZStatus  setFieldURFfN_A (auto &pValue,
                           ZDataBuffer* pURFData,        // out data in URF format

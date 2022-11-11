@@ -9,6 +9,7 @@
 
 #include <ztoolset/charfixedstring.h>
 #include <ztoolset/utffixedstring.h>
+#ifdef __DEPRECATED__
 /**
  * @brief setFieldURFfZString exports a
  * @param pSourceNaturalPtr natural data to export from
@@ -27,10 +28,11 @@ setFieldURFfZString(void* pSourceNaturalPtr,
            utfStringHeader *wString=static_cast<utfStringHeader*>(pSourceNaturalPtr);
             return  wString->_exportURFAnyGeneric(pTargetURFData,pTargetType,pTargetCapacity);
 }
+#endif // __DEPRECATED__
 
 ZStatus
 setFieldURFfZDate(void* pSourceNatural,
-                  ZDataBuffer *pTargetURFData,
+                  ZDataBuffer &pTargetURFData,
                   ZTypeBase &pSourceType,
                   ZTypeBase &pTargetType)
 {
@@ -52,7 +54,7 @@ setFieldURFfZDate(void* pSourceNatural,
 
 ZStatus
 setFieldURFfZDateFull(void* pSourceNatural,
-                      ZDataBuffer* pTargetURFData,
+                      ZDataBuffer& pTargetURFData,
                       ZTypeBase &pSourceType,
                       ZTypeBase &pTargetType)
 {
@@ -75,7 +77,7 @@ setFieldURFfZDateFull(void* pSourceNatural,
 }// setFieldURFfZDateFull
 ZStatus
 setFieldURFfCheckSum(void* pSourceNatural,
-                      ZDataBuffer* pTargetURFData,
+                      ZDataBuffer &pTargetURFData,
                       ZTypeBase &pSourceType,
                       ZTypeBase &pTargetType)
 {
@@ -114,7 +116,7 @@ setFieldURFfCheckSum(void* pSourceNatural,
 
 ZStatus
 setFieldURFfChar(void* pSourceNatural,
-                 ZDataBuffer* pTargetURFData,
+                 ZDataBuffer& pTargetURFData,
                  ZTypeBase &pSourceType,
                  uint64_t &pSourceNSize,
                   URF_Capacity_type &pSourceCapacity,
@@ -128,8 +130,8 @@ ZTypeBase wSourceAtomicType=pSourceType&ZType_AtomicMask;
 ZStatus wSt;
     if (pTargetType==ZType_Blob)  // blob capture anything
         {
-        ZBlob wB;
-        wB.setData(pSourceNatural,pSourceNSize);
+        ZDataBuffer wB;
+//        wB.setData(pSourceNatural,pSourceNSize);
         wB._exportURF(pTargetURFData);
         return ZS_SUCCESS;
         }
@@ -292,15 +294,15 @@ ZStatus wSt;
                     }//pSourceArrayCount!=pTargetArrayCount
                 // write URF header
                 wType=reverseByteOrder_Conditional<ZTypeBase>(wType);
-                pTargetURFData->setData(&wType,sizeof(wType));
+                pTargetURFData.setData(&wType,sizeof(wType));
 
                 size_t wUniversalSize=wArrayCountRef;
                 wUniversalSize=reverseByteOrder_Conditional<size_t>(wUniversalSize);
-                pTargetURFData->appendData(&wUniversalSize,sizeof(wUniversalSize));
+                pTargetURFData.appendData(&wUniversalSize,sizeof(wUniversalSize));
 
-                pTargetURFData->appendData(pSourceNatural,wArrayCountRef); // wArrayCountRef == wUniversalSize, by the way
+                pTargetURFData.appendData(pSourceNatural,wArrayCountRef); // wArrayCountRef == wUniversalSize, by the way
 
-                pTargetURFData->extendBZero((ssize_t)pTargetCapacity-wArrayCountRef);
+                pTargetURFData.extendBZero((ssize_t)pTargetCapacity-wArrayCountRef);
                 return wSt;
                 }// if (wTargetAtomicType==ZType_Char)
 /*
@@ -1733,7 +1735,7 @@ ZStatus wSt=ZS_SUCCESS;
 
 
 ZStatus  setFieldURFfStdString (void* pNatural,
-                                ZDataBuffer*pURFData,        // out data in URF format (out)
+                                ZDataBuffer&pURFData,        // out data in URF format (out)
                                 uint64_t &pSourceNSize,
                                 uint64_t &pSourceUSize,
                                 URF_Capacity_type &pSourceCapacity,
@@ -1782,7 +1784,7 @@ ZTypeBase wSourceType = ZType_Pointer|ZType_WChar;  // change ZType_type to corr
 #endif // #ifdef __DEPRECATED_FIELD__
 ZStatus
 setFieldURFfBlob(void* pSourceNatural,
-                ZDataBuffer* pTargetURFData,
+                ZDataBuffer& pTargetURFData,
                 ZTypeBase &pSourceType,
                 ZTypeBase &pTargetType)
 {
@@ -1796,7 +1798,7 @@ setFieldURFfBlob(void* pSourceNatural,
                               decode_ZType(pSourceType));
         return ZS_INVTYPE;
         }
-    ZBlob* wZDB=static_cast<ZBlob*>(pSourceNatural);
+    ZDataBuffer* wZDB=static_cast<ZDataBuffer*>(pSourceNatural);
     wZDB->_exportURF(pTargetURFData);
     return ZS_SUCCESS;
 
