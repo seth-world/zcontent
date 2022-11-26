@@ -242,7 +242,7 @@ ZMetaDic::searchFieldByHash(const md5& pHash)
       ZS_INVNAME,
       Severity_Error,
       " Field with hascode <%s> does not exist within Dictionary named <%s>",
-      pHash.toHexa().toChar(), DicName.toCChar());
+      pHash.toHexa().toCChar(), DicName.toCChar());
   return (zrank_type)-1;
 }
 

@@ -575,7 +575,7 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
             pErrorlog->logZStatus(ZAIES_Error,ZS_NOTFOUND,
                 "ZSKeyDictionary::fromXml-E-NTFND Key field name <%s> hash <%s> declared meta dic rank <%s> has not been found within meta dictionary",
                 wName.toCChar(),
-                wIFld.Hash.toHexa().toChar(),
+                wIFld.Hash.toHexa().toCChar(),
                 wIFld.MDicRank);
           }
           else

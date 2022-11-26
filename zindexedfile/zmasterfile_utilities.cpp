@@ -886,7 +886,7 @@ zmuXMLgetChild(zxmlElement* pRootNode,const char* pName,md5& pValue,ZaiErrors* p
   {
     if (!pMandatory)
     {
-      pErrorlog->log(pSeverity,"failed to get optional parameter <%s>. Default value <%s> will be used.\n",pName,pValue.StrHexa);
+      pErrorlog->log(pSeverity,"failed to get optional parameter <%s>. Default value <%s> will be used.\n",pName,pValue.toHexa().toCChar());
       return ZS_XMLWARNING;
     }
     pErrorlog->log(pSeverity,"failed to get mandatory parameter <%s>.\n", pName);
@@ -894,9 +894,9 @@ zmuXMLgetChild(zxmlElement* pRootNode,const char* pName,md5& pValue,ZaiErrors* p
   }
 
   if (wInitial==pValue)
-    pErrorlog->textLog(" got parameter <%s> value <%s> ===unchanged===.\n",pName,pValue.StrHexa);
+    pErrorlog->textLog(" got parameter <%s> value <%s> ===unchanged===.\n",pName,pValue.toHexa().toCChar());
   else
-    pErrorlog->textLog(" got parameter <%s> value <%s> former value <%s>.\n",pName,pValue.StrHexa,wInitial.StrHexa);
+    pErrorlog->textLog(" got parameter <%s> value <%s> former value <%s>.\n",pName,pValue.toHexa().toCChar(),wInitial.toHexa().toCChar());
   return ZS_SUCCESS;
 }
 
@@ -1891,7 +1891,7 @@ displayKeyDicElement(ZKeyDictionary* pKeyDic,ZaiErrors* pMessageLog)
         wh,
         pKeyDic->Dictionary->Tab[wMR].getName().toCChar(),
         decode_ZType( pKeyDic->Dictionary->Tab[wMR].ZType),
-        pKeyDic->Tab[wh].Hash.toHexa().toChar(),
+        pKeyDic->Tab[wh].Hash.toHexa().toCChar(),
         pKeyDic->Dictionary->Tab[wMR].UniversalSize,
         pKeyDic->Tab[wh].KeyOffset);
   }

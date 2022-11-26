@@ -2747,21 +2747,21 @@ ZFullIndexField wField ;
             {
             checkSum wChk(wKeyContent->Data+wKeyOffset,wUSize);
 //            memmove(wChk.content,wKeyContent->DataChar +wKeyOffset,wUSize);
-            fprintf (pOutput,wChk.toHexa().toChar());
+            fprintf (pOutput,wChk.toHexa().toCChar());
             break;
             }
         case ZType_ZDate:
             {
             ZDate wDate;
             wDate._import(*(uint32_t*)(wKeyContent->DataChar +wKeyOffset));
-            fprintf(pOutput,wDate.toFormatted().toCString_Strait());
+            fprintf(pOutput,wDate.toFormatted().toCChar());
             break;
             }
         case ZType_ZDateFull:
             {
             ZDateFull wDate;
             wDate._import(*(uint64_t*)(wKeyContent->DataChar +wKeyOffset));
-            fprintf(pOutput,wDate.toFormatted().toCString_Strait());
+            fprintf(pOutput,wDate.toFormatted().toCChar());
             }
         case ZType_VaryingCString:  // this cannot be for an index field
 //        case ZType_VaryingWString:  // this cannot be for an index field
