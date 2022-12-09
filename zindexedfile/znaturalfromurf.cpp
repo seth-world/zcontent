@@ -147,11 +147,11 @@ ZStatus _getURFHeaderData(const unsigned char* pURF_Ptr,
 {
 
 
-URF_Fixed_Size_type     wFUniversalSize;
-URF_Varying_Size_type   wVUniversalSize;
+URF_UnitCount_type  wFUniversalSize;
+URF_UnitCount_type  wVUniversalSize;
 
-ZTypeBase wStructType;
-uint64_t wUSize=0;
+ZTypeBase           wStructType;
+URF_UnitCount_type  wUSize=0;
 const unsigned char* wURFDataPtr;
 
     wURFDataPtr=getURFBufferValue<ZTypeBase>(&pZType,pURF_Ptr);
@@ -159,9 +159,9 @@ const unsigned char* wURFDataPtr;
     switch (pZType)
     {
     case ZType_Blob:  // header is
-        pHeaderSize=sizeof(ZTypeBase)+sizeof(URF_Varying_Size_type);
+        pHeaderSize=sizeof(ZTypeBase)+sizeof(URF_UnitCount_type);
 
-        wURFDataPtr=getURFBufferValue<URF_Varying_Size_type>(&wUSize,wURFDataPtr);
+        wURFDataPtr=getURFBufferValue<URF_UnitCount_type>(&wUSize,wURFDataPtr);
         pNaturalSize=pUniversalSize=wUSize;
 
         pEffectiveUSize=pCapacity=1;
@@ -234,10 +234,10 @@ const unsigned char* wURFDataPtr;
     case ZType_Utf8FixedString:
     case ZType_Utf16FixedString:
     case ZType_Utf32FixedString:
-        pHeaderSize=sizeof(ZTypeBase)+sizeof(URF_Fixed_Size_type)+sizeof(URF_Capacity_type);
+        pHeaderSize=sizeof(ZTypeBase)+sizeof(URF_UnitCount_type)+sizeof(URF_Capacity_type);
 
         wURFDataPtr=getURFBufferValue<URF_Capacity_type>(&pCapacity,wURFDataPtr);
-        wURFDataPtr=getURFBufferValue<URF_Fixed_Size_type>(&wFUniversalSize,wURFDataPtr);
+        wURFDataPtr=getURFBufferValue<URF_UnitCount_type>(&wFUniversalSize,wURFDataPtr);
         pNaturalSize= (uint64_t)pCapacity;
         pUniversalSize=(uint64_t)wFUniversalSize;
         if (pURFdDataPtr)
@@ -249,10 +249,10 @@ const unsigned char* wURFDataPtr;
     case ZType_Utf16VaryingString:
     case ZType_Utf32VaryingString:
     case ZType_URIString:
-        pHeaderSize=sizeof(ZTypeBase)+sizeof(URF_Varying_Size_type);
+        pHeaderSize=sizeof(ZTypeBase)+sizeof(URF_UnitCount_type);
 
-        wURFDataPtr=getURFBufferValue<URF_Varying_Size_type>(&pUniversalSize,wURFDataPtr);
-        pNaturalSize= (uint64_t)pUniversalSize;
+        wURFDataPtr=getURFBufferValue<URF_UnitCount_type>(&wFUniversalSize,wURFDataPtr);
+        pNaturalSize= pUniversalSize=(uint64_t)wFUniversalSize;
         pCapacity = 0;
         if (pURFdDataPtr)
                 *pURFdDataPtr=wURFDataPtr;
@@ -303,6 +303,8 @@ const unsigned char* wURFDataPtr;
     return  ZS_INVOP; // not understood - by the way not possible too.
 }//_getURFHeaderData
 
+
+#ifdef __DEPRECATED__
 ZStatus
 getUniversalFromURF (ZDataBuffer &pValue,const unsigned char* pDataPtr,bool pTruncate,const unsigned char** pDataPtrOut)
 {
@@ -437,7 +439,7 @@ getUniversalFromURF (ZDataBuffer &pValue,const unsigned char* pDataPtr,bool pTru
   return ZS_INVTYPE;
 }//getUniversalbyField
 
-
+#endif // __DEPRECATED__
 
 /**
  *  One to one conversion routines for =====object classes======

@@ -4,10 +4,13 @@
 #include <zindexedfile/zmasterfile.h>
 #include <zindexedfile/zmfdictionary.h>
 
-#include <zindexedfile/zrecord.h>
+//#include <zindexedfile/zrecord.h>
 
 #include <zindexedfile/zfullindexfield.h>
 #include <zcontentcommon/zresult.h>
+
+#include <zcontentcommon/urfparser.h>
+
 
 using namespace zbs ;
 
@@ -153,7 +156,9 @@ ZIndexFile::zrebuildIndex(bool pStat, FILE*pOutput)
 
 ZStatus         wSt = ZS_SUCCESS;
 //ZRawRecord *wRecord = static_cast<ZRawMasterFile *>(ZMFFather)->getRawRecord();
-ZRecord *wRecord = (ZRecord *)ZMFFather->generateRawRecord();
+//ZRecord *wRecord = (ZRecord *)ZMFFather->generateRawRecord();
+
+ZDataBuffer     wRecord;
 zrank_type      wZMFRank = 0;
 zaddress_type   wZMFAddress=0;
 
@@ -202,7 +207,7 @@ long            wIndexCount=0;
 
     ZDataBuffer wKeyContent;
 
-    wSt=ZMFFather->zgetWAddress(wRecord->Content,wZMFRank,wZMFAddress);
+    wSt=ZMFFather->zgetWAddress(wRecord,wZMFRank,wZMFAddress);
     for (long wi=0;(wSt==ZS_SUCCESS)&&(wi < wFatherSize);wi++ )
             {
  //           wZMFRank = wFather->zgetCurrentRank();
@@ -214,7 +219,7 @@ long            wIndexCount=0;
             wSt=addKeyValue(wRecord,wZMFAddress);
             if (wSt!= ZS_SUCCESS)
                                 break;
-            wSt=ZMFFather->zgetNextWAddress(wRecord->Content,wZMFRank,wZMFAddress) ;
+            wSt=ZMFFather->zgetNextWAddress(wRecord,wZMFRank,wZMFAddress) ;
             } // for
     if ((wSt==ZS_EOF)||(wSt==ZS_OUTBOUNDHIGH))
             wSt=ZS_SUCCESS;
@@ -652,7 +657,7 @@ ZIndexFile::getUniversalbyRank (ZDataBuffer &pOutValue,
  * @return
  */
 ZStatus
-ZIndexFile::addKeyValue(ZRecord* pZMFRecord,   zaddress_type pZMFAddress)
+ZIndexFile::addKeyValue(const ZDataBuffer &pZMFRecord,   zaddress_type pZMFAddress)
 {
 
 long ZJoinIndex;
@@ -676,8 +681,33 @@ zrank_type wIndexIdxCommit;
     delete wIndexItem;
     return  wSt;
 }// _addKeyValue
+#ifdef __DEPRECATED__
+ZStatus
+ZIndexFile::addKeyValue(ZRecord* pZMFRecord,   zaddress_type pZMFAddress)
+{
 
+  long ZJoinIndex;
+  ZStatus wSt;
 
+  ZOp wZIndexOp;  // for journaling & history purpose
+
+  ZIndexItem* wIndexItem = new ZIndexItem ;
+
+  zrank_type wIndexIdxCommit;
+
+  wIndexItem->Operation=ZO_Push;
+  wIndexItem->ZMFaddress=pZMFAddress;
+
+  wSt=_keyExtraction(pZMFRecord,wIndexItem->KeyContent);
+
+  wSt=_addKeyValue_Prepare(wIndexItem,wIndexIdxCommit,pZMFAddress);
+  if (wSt!=ZS_SUCCESS)
+  {  return  wSt;}// Beware return  is multiple instructions in debug mode
+  wSt= _addKeyValue_Commit(wIndexItem,wIndexIdxCommit);
+  delete wIndexItem;
+  return  wSt;
+}// _addKeyValue
+#endif // __DEPRECATED__
 
 
 
@@ -1308,64 +1338,101 @@ ZStatus wSt;
  * @return
  */
 
-ZStatus ZIndexFile::_keyExtraction(ZRecord *pRecord, ZDataBuffer& pKeyOut)
+ZStatus ZIndexFile::_keyExtraction(const ZDataBuffer &pRecord, ZDataBuffer& pKeyOut)
 {
 ZStatus wSt;
-size_t wKeyOffset = 0;
-long wRDicRank=0;
+
 ZDataBuffer wFieldUValue;
 
-// at this stage _recomputeSize should have been done and total sizes should be OK.
+URFParser wURFParser;
 
-  if (pRecord==nullptr)
-    {
-      ZException.setMessage (_GET_FUNCTION_NAME_,
-          ZS_NULLPTR,
-          Severity_Severe,
-          "Input record is nullptr for index <%s>.",IndexName.toCChar());
-      return  ZS_NULLPTR;
-    }
 
-  if ((IdxKeyDic==nullptr)||(IdxKeyDic->isEmpty()))
-      {
+  pKeyOut.clear();
+
+  if (pRecord.isEmpty()) {
+    ZException.setMessage (_GET_FUNCTION_NAME_,
+        ZS_EMPTY,
+        Severity_Severe,
+        "Input record is empty for index <%s>.",IndexName.toCChar());
+    return  ZS_EMPTY;
+  }
+
+  if ((IdxKeyDic==nullptr)||(IdxKeyDic->isEmpty())) {
       ZException.setMessage (_GET_FUNCTION_NAME_,
                                ZS_BADDIC,
                                Severity_Severe,
                                " Index Control Block appears to be malformed. Key dictionary for index <%s> is nullptr or empty",IndexName.toCChar());
       return  ZS_BADDIC;
-      }
+  }
 
-/*
+  wSt=wURFParser.set(&pRecord);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
 
-  if ((ZMFFather->Dictionary==nullptr)||(ZMFFather->Dictionary->isEmpty()))
-      {
-        ZException.setMessage (_GET_FUNCTION_NAME_,
-            ZS_BADDIC,
-            Severity_Severe,
-            " Dictionary is null or empty");
-        return  ZS_BADDIC;
-      }
-*/
-
-    pKeyOut.allocate(KeyUniversalSize+1);
-
-    for (long wi=0;wi<IdxKeyDic->size();wi++)
-        {
-        pKeyOut.reset(); /* set space to 0 */
-
-// here put extraction rules. RFFU : Extraction could be complex. To be investigated and implemented
-
-        wRDicRank=IdxKeyDic->Tab[wi].MDicRank;
-        pRecord->getUniversalbyRank(wFieldUValue,wRDicRank);
-        pKeyOut.changeData(wFieldUValue,wKeyOffset);
-
-        wKeyOffset += pRecord->RDic->Tab[wRDicRank].MDicField->UniversalSize;
-        }//for
-
+  for (long wi=0; wi < IdxKeyDic->count(); wi++) {
+    pKeyOut.appendData(wURFParser.getURFFieldByRank(IdxKeyDic->Tab[wi].MDicRank));
+  }
 return  ZS_SUCCESS;
 }//zKeyValueExtraction
 
+#ifdef __DEPRECATED__
+ZStatus ZIndexFile::_keyExtraction(ZRecord *pRecord, ZDataBuffer& pKeyOut)
+{
+  ZStatus wSt;
+  size_t wKeyOffset = 0;
+  long wRDicRank=0;
+  ZDataBuffer wFieldUValue;
 
+  // at this stage _recomputeSize should have been done and total sizes should be OK.
+
+  if (pRecord==nullptr)
+  {
+    ZException.setMessage (_GET_FUNCTION_NAME_,
+        ZS_NULLPTR,
+        Severity_Severe,
+        "Input record is nullptr for index <%s>.",IndexName.toCChar());
+    return  ZS_NULLPTR;
+  }
+
+  if ((IdxKeyDic==nullptr)||(IdxKeyDic->isEmpty()))
+  {
+    ZException.setMessage (_GET_FUNCTION_NAME_,
+        ZS_BADDIC,
+        Severity_Severe,
+        " Index Control Block appears to be malformed. Key dictionary for index <%s> is nullptr or empty",IndexName.toCChar());
+    return  ZS_BADDIC;
+  }
+
+  /*
+
+  if ((ZMFFather->Dictionary==nullptr)||(ZMFFather->Dictionary->isEmpty()))
+  {
+    ZException.setMessage (_GET_FUNCTION_NAME_,
+        ZS_BADDIC,
+        Severity_Severe,
+        " Dictionary is null or empty");
+    return  ZS_BADDIC;
+  }
+  */
+
+      pKeyOut.allocate(KeyUniversalSize+1);
+
+  for (long wi=0;wi<IdxKeyDic->size();wi++)
+  {
+    pKeyOut.reset(); /* set space to 0 */
+
+    // here put extraction rules. RFFU : Extraction could be complex. To be investigated and implemented
+
+    wRDicRank=IdxKeyDic->Tab[wi].MDicRank;
+    pRecord->getUniversalbyRank(wFieldUValue,wRDicRank);
+    pKeyOut.changeData(wFieldUValue,wKeyOffset);
+
+    wKeyOffset += pRecord->RDic->Tab[wRDicRank].MDicField->UniversalSize;
+  }//for
+
+  return  ZS_SUCCESS;
+}//zKeyValueExtraction
+#endif // __DEPRECATED__
 
 /** @endcond */
 

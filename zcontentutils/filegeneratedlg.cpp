@@ -43,6 +43,12 @@
 
 #include <zxml/zxmlprimitives.h>
 
+const int cst_KeySizeCol =  2 ;
+const int cst_KeyAllocCol =  4 ;
+const int cst_KeyAllocSizeCol =  5 ;
+const int cst_KeyExtentQuotaCol =  6 ;
+const int cst_KeyExtentSizeCol =  7 ;
+
 using namespace zbs;
 void
 FileGenerateDLg::initLayout() {
@@ -117,6 +123,7 @@ FileGenerateDLg::initLayout() {
   } else {
     RootName = DictionaryFile->DicName;
     RootName.eliminateChar(' ');
+    RootName = RootName.toLower();
     RootNameLEd->setText(RootName.toCChar());
   }
   RootNameLEd->setToolTip(QObject::tr("Root name of generated files (content files, header files).","FileGenerateDLg"));
@@ -289,7 +296,7 @@ FileGenerateDLg::initLayout() {
 
   KeyTBv->ItemModel->setHorizontalHeaderItem(0,new QStandardItem(tr("Name")));
   KeyTBv->ItemModel->setHorizontalHeaderItem(1,new QStandardItem(tr("Index base name")));
-  KeyTBv->ItemModel->setHorizontalHeaderItem(2,new QStandardItem(tr("Key size")));
+  KeyTBv->ItemModel->setHorizontalHeaderItem(2,new QStandardItem(tr("Guessed key size")));
   KeyTBv->ItemModel->setHorizontalHeaderItem(3,new QStandardItem(tr("Duplicates")));
   KeyTBv->ItemModel->setHorizontalHeaderItem(4,new QStandardItem(tr("Allocated")));
   KeyTBv->ItemModel->setHorizontalHeaderItem(5,new QStandardItem(tr("Allocated Size")));
@@ -363,13 +370,11 @@ FileGenerateDLg::dataSetupFromDictionary() {
     wKeyData.Duplicates   = DictionaryFile->KeyDic.Tab[wi]->Duplicates;
     KeyValues->push(wKeyData);
 
-    wKeyRow.push_back(new QStandardItem(wKeyDic->DicKeyName.toCChar()));
+    wKeyRow << new QStandardItem(wKeyDic->DicKeyName.toCChar());
 
     wKeyRow << new QStandardItem(wKeyData.IndexRootName.toCChar());
 
-    wStr.sprintf("%ld",wKeyData.KeySize);
-    wKeyRow.push_back(new QStandardItem(wStr.toCChar()));
-    wKeyRow.last()->setTextAlignment(Qt::AlignRight);
+    wKeyRow << createItemAligned(wKeyData.KeySize,Qt::AlignRight,"%ld");
 
     QStandardItem* wDup=new QStandardItem("Duplicates");
     wDup->setTextAlignment(Qt::AlignLeft);
@@ -383,16 +388,16 @@ FileGenerateDLg::dataSetupFromDictionary() {
     wKeyRow.push_back(wDup);
 
     wKeyRow << createItemAligned(wKeyData.Allocated,Qt::AlignRight,"%ld");
-    wKeyRow.last()->setEditable(false);
+    wKeyRow.last()->setEditable(true);
 
     wKeyRow << createItemAligned(wKeyData.AllocatedSize,Qt::AlignRight,"%ld");
-    wKeyRow.last()->setEditable(false);
+    wKeyRow.last()->setEditable(true);
 
     wKeyRow << createItemAligned(wKeyData.ExtentQuota,Qt::AlignRight,"%ld");
-    wKeyRow.last()->setEditable(false);
+    wKeyRow.last()->setEditable(true);
 
     wKeyRow << createItemAligned(wKeyData.ExtentSize,Qt::AlignRight,"%ld");
-    wKeyRow.last()->setEditable(false);
+    wKeyRow.last()->setEditable(true);
 
     KeyTBv->ItemModel->appendRow(wKeyRow);
 
@@ -434,7 +439,7 @@ FileGenerateDLg::dataSetupFromDictionary() {
 
 
   QObject::connect(GuessTBv->ItemModel,&QStandardItemModel::itemChanged,this,&FileGenerateDLg::GuessItemChanged);
-
+  QObject::connect(KeyTBv->ItemModel,&QStandardItemModel::itemChanged,this,&FileGenerateDLg::KeyItemChanged);
 } // dataSetupFromDictionary
 
 
@@ -765,6 +770,161 @@ FileGenerateDLg::GuessItemChanged(QStandardItem* pItem){
   return;
 }//FileGenerateDLg::GuessItemChanged
 
+
+void
+FileGenerateDLg::KeyItemChanged(QStandardItem* pItem){
+
+  if (DoNotChangeKeyValues)
+    return;
+  utf8VaryingString wStr;
+  static bool wFTwice=false;
+  if (wFTwice==true) {
+    wFTwice=false;
+    return;
+  }
+
+  wFTwice=true;
+  QVariant wV;
+  wStr = pItem->text().toUtf8().data();
+  size_t wValue=getValueFromString<size_t>(wStr);
+
+  QStandardItem* wMainKeyItem = KeyTBv->ItemModel->item(pItem->row(),0);
+
+  const char* wName=nullptr;
+  int wCol = pItem->column();
+  while (true) {
+    if (wCol==cst_KeySizeCol) {
+      wName="Guessed key size";
+
+      KeyValues->Tab[pItem->row()].KeySize = wValue;
+      wStr.sprintf( "%s Value %s for key <%s> has been guessed to <%ld>.",
+          ZDateFull::currentDateTime().toFormatted().toString(),
+          wName,
+          wMainKeyItem->text().toUtf8().data(),
+          KeyValues->Tab[pItem->row()].KeySize  );
+      plainTextEdit->appendPlainText(wStr.toCChar());
+
+      DoNotChangeKeyValues = true;
+
+      KeyValues->Tab[pItem->row()].AllocatedSize =  KeyValues->Tab[pItem->row()].Allocated * wValue;
+      wStr.sprintf("%ld",KeyValues->Tab[pItem->row()].AllocatedSize);
+      KeyTBv->ItemModel->item(pItem->row(),cst_KeyAllocSizeCol)->setText(wStr.toCChar());
+
+      wName="Key Allocation Size";
+      wStr.sprintf( "%s Value %s for key <%s> has been computed to <%ld>.",
+          ZDateFull::currentDateTime().toFormatted().toString(),
+          wName,
+          wMainKeyItem->text().toUtf8().data(),
+          KeyValues->Tab[pItem->row()].AllocatedSize );
+      plainTextEdit->appendPlainText(wStr.toCChar());
+
+      KeyValues->Tab[pItem->row()].ExtentSize = KeyValues->Tab[pItem->row()].ExtentQuota * wValue;
+      wStr.sprintf("%ld",KeyValues->Tab[pItem->row()].ExtentSize);
+      KeyTBv->ItemModel->item(pItem->row(),cst_KeyExtentSizeCol)->setText(wStr.toCChar());
+
+      wName="Key Extent Size";
+      wStr.sprintf( "%s Value %s for key <%s> has been computed to <%ld>.",
+          ZDateFull::currentDateTime().toFormatted().toString(),
+          wName,
+          wMainKeyItem->text().toUtf8().data(),
+          KeyValues->Tab[pItem->row()].ExtentSize );
+      plainTextEdit->appendPlainText(wStr.toCChar());
+
+      DoNotChangeKeyValues = false;
+
+      return ;
+    }
+    if (wCol==cst_KeyAllocCol) {
+      wName="Allocation";
+
+      KeyValues->Tab[pItem->row()].Allocated = wValue;
+
+      wName="Allocated";
+      wStr.sprintf( "%s Value %s for key <%s> has been changed to <%ld>.",
+          ZDateFull::currentDateTime().toFormatted().toString(),
+          wName,
+          wMainKeyItem->text().toUtf8().data(),
+          KeyValues->Tab[pItem->row()].Allocated );
+
+      DoNotChangeKeyValues = true;
+
+      KeyValues->Tab[pItem->row()].AllocatedSize = KeyValues->Tab[pItem->row()].KeySize * wValue; 
+      wStr.sprintf("%ld",KeyValues->Tab[pItem->row()].AllocatedSize);
+      KeyTBv->ItemModel->item(pItem->row(),cst_KeyAllocSizeCol)->setText(wStr.toCChar());
+
+      wName="Key Allocation Size";
+      wStr.sprintf( "%s Value %s for key <%s> has been computed to <%ld>.",
+          ZDateFull::currentDateTime().toFormatted().toString(),
+          wName,
+          wMainKeyItem->text().toUtf8().data(),
+          KeyValues->Tab[pItem->row()].AllocatedSize);
+      plainTextEdit->appendPlainText(wStr.toCChar());
+
+      DoNotChangeKeyValues = false;
+
+      return ;
+    }
+    if (wCol==cst_KeyAllocSizeCol) {
+      wName="Allocation size";
+
+      KeyValues->Tab[pItem->row()].AllocatedSize = wValue;
+
+      break;
+    }
+    if (wCol==cst_KeyExtentQuotaCol) {
+
+
+      KeyValues->Tab[pItem->row()].ExtentQuota = wValue;
+      wName="Extent quota";
+      wStr.sprintf( "%s Value %s for key <%s> has been changed to <%ld>.",
+          ZDateFull::currentDateTime().toFormatted().toString(),
+          wName,
+          wMainKeyItem->text().toUtf8().data(),
+          KeyValues->Tab[pItem->row()].ExtentQuota );
+      plainTextEdit->appendPlainText(wStr.toCChar());
+
+      DoNotChangeKeyValues = true;
+
+      KeyValues->Tab[pItem->row()].ExtentSize = KeyValues->Tab[pItem->row()].KeySize * wValue;
+      wStr.sprintf("%ld",KeyValues->Tab[pItem->row()].ExtentSize);
+      KeyTBv->ItemModel->item(pItem->row(),cst_KeyExtentSizeCol)->setText(wStr.toCChar());
+
+      wName="Extent quota size";
+      wStr.sprintf( "%s Value %s for key <%s> has been computed to <%ld>.",
+          ZDateFull::currentDateTime().toFormatted().toString(),
+          wName,
+          wMainKeyItem->text().toUtf8().data(),
+          KeyValues->Tab[pItem->row()].ExtentSize);
+      plainTextEdit->appendPlainText(wStr.toCChar());
+
+      DoNotChangeKeyValues = false;
+      return ;
+    }
+    if (wCol==cst_KeyExtentSizeCol) {
+
+      KeyValues->Tab[pItem->row()].ExtentSize = wValue;
+
+      wName="Extent quota size";
+      break;
+    }
+    plainTextEdit->appendPlainText("Modifying this column is not authorized.");
+    return;
+  }
+  if (wName != nullptr){
+    wStr.sprintf( "%s Value %s for key <%s> has been guessed to <%ld>.",
+        ZDateFull::currentDateTime().toFormatted().toString(),
+        wName,
+        wMainKeyItem->text().toUtf8().data(),
+        getValueFromString<size_t>(wStr) );
+    plainTextEdit->appendPlainText(wStr.toCChar());
+  }
+  wV.setValue<size_t>(wValue);
+  pItem->setData(wV,Qt::UserRole);
+
+//  Compute();
+  return;
+}//FileGenerateDLg::GuessItemChanged
+
 void
 FileGenerateDLg::Compute() {
   ZArray<utf8VaryingString> wWarnedFields;
@@ -776,6 +936,7 @@ FileGenerateDLg::Compute() {
     if ((DictionaryFile->Tab[wi].ZType & ZType_VaryingMask) || (DictionaryFile->Tab[wi].UniversalSize==0)) {
     }
   } // for
+
 
   for (int wi=0;wi < GuessTBv->ItemModel->rowCount();wi++) {
     QVariant wV = GuessTBv->ItemModel->item(wi,3)->data(Qt::UserRole);
@@ -851,7 +1012,8 @@ FileGenerateDLg::MenuAction(QAction* pAction){
 void FileGenerateDLg::LoadFromFile() {
   utf8VaryingString wStr;
 
-  QFileDialog wFDLg((QWidget*)this,QObject::tr("Search master file","FileGenerateDLg"),getParserWorkDirectory());
+  QFileDialog wFDLg((QWidget*)this,QObject::tr("Search master file","FileGenerateDLg"),getParserWorkDirectory(),
+      "ZMF files (*.zmf);;All files (*.*)");
 
   wFDLg.setLabelText(QFileDialog::Accept,  QObject::tr("Select","FileGenerateDLg"));
   wFDLg.setLabelText(QFileDialog::Reject,  QObject::tr("Cancel","FileGenerateDLg"));
@@ -883,6 +1045,50 @@ void FileGenerateDLg::GenFile() {
   wURIFile += __MASTER_FILEEXTENSION__;
 
   bool wBackup=false;
+  const char* wF=nullptr;
+  long wBadRank=0;
+
+  utf8VaryingString wMissfields;
+  for (long wi=0;wi < KeyValues->count(); wi ++) {
+    if (KeyValues->Tab[wi].KeySize==0){
+      wF="Guessed key size";
+      wBadRank=wi;
+      wMissfields.addsprintf(" Key <%s> field <%s> value 0 is invalid and must be guessed.\n",
+          DictionaryFile->KeyDic[wBadRank]->DicKeyName.toString(),
+          wF);
+    }
+    if (KeyValues->Tab[wi].Allocated==0){
+      wF="Allocated blocks";
+      wBadRank=wi;
+      wMissfields.addsprintf(" Key <%s> field <%s> value 0 is invalid and must be guessed.\n",
+          DictionaryFile->KeyDic[wBadRank]->DicKeyName.toString(),
+          wF);
+    }
+    if (KeyValues->Tab[wi].ExtentQuota==0){
+      wF="Extent quota";
+      wBadRank=wi;
+      wMissfields.addsprintf(" Key <%s> field <%s> value 0 is invalid and must be guessed.\n",
+          DictionaryFile->KeyDic[wBadRank]->DicKeyName.toString(),
+          wF);
+    }
+    if (KeyValues->Tab[wi].AllocatedSize==0){
+      wF="Allocated size";
+      wBadRank=wi;
+      wMissfields.addsprintf(" Key <%s> field <%s> value 0 is invalid and must be guessed.\n",
+          DictionaryFile->KeyDic[wBadRank]->DicKeyName.toString(),
+          wF);
+    }
+  }
+
+  if (wF!=nullptr) {
+
+    ZExceptionDLg::adhocMessage("File generation",Severity_Error,nullptr,&wMissfields,
+        "Cannot create file. Some invalid values have been detected.\n"
+        "click <More> to have details.");
+    return;
+  }
+
+
 
   if (wURIFile.exists()) {
     uriStat wStat;
@@ -919,7 +1125,11 @@ void FileGenerateDLg::GenFile() {
                                                 true);
 
   if (wSt!=ZS_SUCCESS) {
-
+    ZExceptionDLg::adhocMessage("Master file creation",Severity_Error,nullptr,nullptr,
+        " Error while creating raw master file <%s> \n"
+        " status <%s>",
+        wURIFile.toString(),
+        decode_ZStatus(wSt));
     return;
   }
   wStr.sprintf("%s - created Master file <%s>.",
@@ -934,7 +1144,6 @@ void FileGenerateDLg::GenFile() {
   wMasterFile->setIndexFilesDirectoryPath(IndexDirectory);
 
   for (long wi=0;wi < KeyValues->count(); wi ++) {
-//    generateIndexURI(wIndexUri,wURIFile,TargetDirectory,wi,KeyValues[wi].)
     wIndexUri = IndexDirectory ;
     wIndexUri.addConditionalDirectoryDelimiter();
     wIndexUri += KeyValues->Tab[wi].IndexRootName;
@@ -950,6 +1159,15 @@ void FileGenerateDLg::GenFile() {
                                           GrabFreeSpaceCHk->checkState(),
                                           wBackup,
                                           &wErrorLog);
+   if (wSt!=ZS_SUCCESS) {
+     utf8VaryingString wErrContent = ZException.last().formatUtf8();
+//     ZExceptionDLg::adhocMessage("Raw index creation",Severity_Severe,&wErrorLog,&wErrContent,"Error while creating index rank <%ld> name <%s> file <%s>",
+//         wi,DictionaryFile->KeyDic[wi]->DicKeyName.toString(),wMasterFile->getURIContent().toString());
+     ZExceptionDLg::adhocMessage("Raw index creation",Severity_Severe,nullptr,&wErrContent,"Error while creating index rank <%ld> name <%s> file <%s>",
+         wi,DictionaryFile->KeyDic[wi]->DicKeyName.toString(),wMasterFile->getURIContent().toString());
+     wMasterFile->zclose();
+     return;
+   }
    wStr.sprintf("%s - created index file <%s>.",
        ZDateFull::currentDateTime().toFormatted().toString(),
        wMasterFile->getURIIndex(wIndexRank).toString());

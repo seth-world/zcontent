@@ -59,6 +59,8 @@ public:
                           bool pDontShow=false);
   ~ZExceptionDLg();
 
+  void setErrorLog(ZaiErrors* pErrorLog) ;
+
   void init(const utf8VaryingString& pTitle,Severity_type pSeverity,ZStatus pStatus,const utf8VaryingString& pMessage, const utf8VaryingString& pComplement,bool pDontShow)  ;
 
   void applySeverity(Severity_type pSeverity, const utf8VaryingString &pTitle);
@@ -80,7 +82,11 @@ public:
    * @param pFormat       the main message with variadic content
    * @return  a return type corresponding to the button pressed
    */
-  static int adhocMessage(const utf8VaryingString &pTitle, Severity_type pSeverity, const utf8VaryingString *pComplement, const char *pFormat,...);
+  static int adhocMessage(const utf8VaryingString &pTitle,
+                          Severity_type pSeverity,
+                          ZaiErrors *pErrorlog,
+                          const utf8VaryingString *pComplement,
+                          const char *pFormat,...);
   /**
    * @brief adhocMessage2B displays an adhoc message(not dependant from ZException) with two buttons, cancel and ok button.
    * @param pTitle        displayed dialog title
@@ -143,10 +149,13 @@ public Q_SLOTS:
   void buttonPressed(int pValue);
   void DontShowClicked();
   void MoreClicked();
+  void ErrlogClicked();
 
 private Q_SLOTS :
   void resizeEvent(QResizeEvent* pEvent);
 public:
+  ZaiErrors* ErrorLog=nullptr;
+
   QWidget *VVLWDg=nullptr;
   QVBoxLayout *VLayout=nullptr;
   QLabel*   LabLBl=nullptr;

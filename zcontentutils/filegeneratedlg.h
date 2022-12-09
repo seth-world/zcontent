@@ -76,6 +76,7 @@ Q_SLOT
   void Compute();
   void Guess();
   void GuessItemChanged(QStandardItem* pItem);
+  void KeyItemChanged(QStandardItem* pItem);
   void SearchDir();
   void BaseNameEdit();
   void AllocatedEdit();
@@ -88,7 +89,7 @@ Q_SLOT
   void MenuAction(QAction* pAction);
 
 private:
-
+  bool DoNotChangeKeyValues=false;
   void IndexSearchDir();
 
   uriString TargetDirectory;

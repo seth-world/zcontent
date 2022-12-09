@@ -131,7 +131,7 @@ ZDicDLg::setDicFile(const uriString& pDicFile) {
   DicFile->zclose();
   if (wSt!=ZS_EOF) {
     if (wSt==ZS_EMPTY){
-      ZExceptionDLg::adhocMessage("Dictionaries load",Severity_Warning,nullptr,
+      ZExceptionDLg::adhocMessage("Dictionaries load",Severity_Warning,nullptr,nullptr,
           "Dictionary file <%s> is empty.",pDicFile.getBasename().toCChar());
       return wSt;
     }
@@ -175,7 +175,8 @@ ZDicDLg::AcceptClicked() {
     reject();
   }
   if (!TableView->currentIndex().isValid()) {
-    ZExceptionDLg::adhocMessage(QCoreApplication::translate("ZDicDLg","Dictionary").toUtf8().data(),Severity_Error,nullptr,
+    ZExceptionDLg::adhocMessage(QCoreApplication::translate("ZDicDLg","Dictionary").toUtf8().data(),Severity_Error,
+        nullptr,nullptr,
         QCoreApplication::translate("ZDicDLg","Please select a dictionary").toUtf8().data());
     return;
   }

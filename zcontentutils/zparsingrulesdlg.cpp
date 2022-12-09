@@ -140,12 +140,12 @@ ZParsingRulesDLg::getSyntaxFromClipboard() {
   const QMimeData * wMData=wClipboard->mimeData(QClipboard::Clipboard);
   if (wMData==nullptr)
   {
-    ZExceptionDLg::adhocMessage("Clipboard",Severity_Error,nullptr,QObject::tr("Clipboard is empty.","RawFields").toUtf8().data());
+    ZExceptionDLg::adhocMessage("Clipboard",Severity_Error,&Errorlog,nullptr,QObject::tr("Clipboard is empty.","RawFields").toUtf8().data());
     return false;
   }
   if (!wMData->hasFormat("text/plain"))
   {
-    ZExceptionDLg::adhocMessage("Clipboard",Severity_Error,nullptr,QObject::tr("Clipboard has no text data.","RawFields").toUtf8().data());
+    ZExceptionDLg::adhocMessage("Clipboard",Severity_Error,&Errorlog,nullptr,QObject::tr("Clipboard has no text data.","RawFields").toUtf8().data());
     return false;
   }
   wClipContent = wMData->data("text/plain").data();  /* load mime data as utf8 string */

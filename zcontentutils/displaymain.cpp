@@ -551,7 +551,7 @@ DisplayMain::displayICBs(ZDataBuffer &pData) {
   ZHeaderControlBlock_Export wZHCBe;
   memmove(&wZHCBe,ContentToDump.Data,sizeof(ZHeaderControlBlock_Export));
   if (wZHCBe.StartSign!=cst_ZBLOCKSTART) {
-    ZExceptionDLg::adhocMessage("Invalid Header",Severity_Error,nullptr,"Header Control Block appears to be corrupted.");
+    ZExceptionDLg::adhocMessage("Invalid Header",Severity_Error,nullptr,nullptr,"Header Control Block appears to be corrupted.");
     return;
   }
   wZHCBe.deserialize();
@@ -559,7 +559,7 @@ DisplayMain::displayICBs(ZDataBuffer &pData) {
   memmove(&wZMCBe,wPtr+wZHCBe.OffsetReserved,sizeof(ZMCB_Export));
   wZMCBe.deserialize();
   if (!wZMCBe.isValid()) {
-    ZExceptionDLg::adhocMessage("Invalid MCB",Severity_Error,nullptr,"Master Control Block (Reserved space) appears to be corrupted.");
+    ZExceptionDLg::adhocMessage("Invalid MCB",Severity_Error,nullptr,nullptr,"Master Control Block (Reserved space) appears to be corrupted.");
     return;
   }
 

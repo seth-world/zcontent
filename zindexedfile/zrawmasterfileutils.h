@@ -20,39 +20,43 @@
 
 template <class _Tp>
 ZStatus
-zrebuildRawIndex(ZRawIndexFile& pIF,bool pStat=false, FILE*pOutput=stdout)
+zrebuildRawIndex(ZRawMasterFile& pMasterFile,const long pIndexRank,bool pStat=false, FILE*pOutput=stdout)
 {
   ZStatus         wSt = ZS_SUCCESS;
-  //ZRawRecord *wRecord = static_cast<ZRawMasterFile *>(ZMFFather)->getRawRecord();
-//  ZRawRecord *wRecord =pIF.getRawMasterFile()->generateRawRecord();
   ZDataBuffer     wRecord;
   zrank_type      wZMFRank = 0;
+  zrank_type      wIndexRank=0;
   zaddress_type   wZMFAddress=0;
-  long            wIndexRank;
+  ZIndexItem      wIndexItem;
+
+  ZRawIndexFile&  wIF = *pMasterFile.IndexTable[pIndexRank];
+ // long            wIndexRank;
+
+  _Tp             wClass;
 
   long            wIndexCount=0;
 
-  if ((((ZRandomFile&)pIF).getOpenMode()==ZRF_NotOpen )||!(((ZRandomFile&)pIF).getOpenMode() & ZRF_Exclusive)||((((ZRandomFile&)pIF).getOpenMode() & ZRF_All )!=ZRF_All))
+  if (((pMasterFile.getOpenMode()==ZRF_NotOpen )||!(pMasterFile.getOpenMode() & ZRF_Exclusive)||((pMasterFile).getOpenMode() & ZRF_All )!=ZRF_All))
   {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_MODEINVALID,
         Severity_Error,
-        "Request to rebuild file <%s> while open mode is invalid <%s>. Must be (ZRF_Exclusive | ZRF_All)",
-        pIF.getURIContent().toCChar(),
-        decode_ZRFMode(pIF.getOpenMode()));
+        "Request to rebuild index for master file <%s> while open mode is invalid <%s>. Must be (ZRF_Exclusive | ZRF_All)",
+        pMasterFile.getURIContent().toCChar(),
+        decode_ZRFMode(pMasterFile.getOpenMode()));
     return  ZS_MODEINVALID;
   }
 
   if (pStat)
-    pIF.ZPMSStats.init();
+    wIF.ZPMSStats.init();
   fprintf (pOutput,
       "______________Rebuilding Index <%s>_______________\n"
       " File is %s \n",
-      pIF.IndexName.toCChar(),
-      pIF.getURIContent().toCChar());
+      wIF.IndexName.toCChar(),
+      wIF.getURIContent().toCChar());
 
-  zsize_type wFatherSize = pIF.getRawMasterFile()->getSize();
-  zsize_type wSize = pIF.IndexRecordSize() * wFatherSize ;
+  zsize_type wFatherSize = pMasterFile.getSize();
+  zsize_type wSize = wIF.IndexRecordSize() * wFatherSize ;
   if (ZVerbose)
   {
     fprintf (pOutput,
@@ -62,37 +66,40 @@ zrebuildRawIndex(ZRawIndexFile& pIF,bool pStat=false, FILE*pOutput=stdout)
     fprintf (pOutput,"Clearing index file\n");
   }
 
-  wSt=pIF.zclearFile(wSize);  // clearing file with a free block space equals to the whole index
+  wSt=wIF.zclearFile(wSize);  // clearing file with a free block space equals to the whole index
 
-  if (pIF.getRawMasterFile()->isEmpty())
+  if (wIF.getRawMasterFile()->isEmpty())
   {
     fprintf(pOutput,
         " ------------No record in ZMasterFile <%s> : no index to rebuild..........\n",
-        pIF.getRawMasterFile()->getURIContent().toString());
+        pMasterFile.getURIContent().toString());
 
 
     return  ZS_SUCCESS;
   }
 
 
-  wSt=pIF.getRawMasterFile()->zgetWAddress(wRecord,wZMFRank,wZMFAddress);
-  for (zsize_type wi=0;(wSt==ZS_SUCCESS)&&(wi <wFatherSize);wi++ )
+  wSt=pMasterFile.zgetWAddress(wRecord,wZMFRank,wZMFAddress);
+
+  for (zsize_type wi=0;(wSt==ZS_SUCCESS)&&(wi < wFatherSize);wi++ )
   {
+    wClass.fromRecord(wRecord);
     //           wZMFRank = wFather->zgetCurrentRank();
     //           wZMFAddress=wFather->zgetCurrentLogicalPosition();
     wIndexCount++;
-    wSt=pIF._addRawKeyValue<_Tp>(wRecord,wIndexRank,wZMFAddress);
+    wSt=wIF._addRawKeyValue_Prepare(wIndexItem,wIndexRank,wClass.getKey(pIndexRank),wZMFAddress);
+//    wSt=pIF._addRawKeyValue(wRecord,wIndexRank,wZMFAddress);
     if (wSt!= ZS_SUCCESS)
       break;
-    wSt=pIF.getRawMasterFile()->zgetNextWAddress(wRecord,wZMFRank,wZMFAddress) ;
+    wSt=pMasterFile.zgetNextWAddress(wRecord,wZMFRank,wZMFAddress) ;
   } // for
   if ((wSt==ZS_EOF)||(wSt==ZS_OUTBOUNDHIGH))
     wSt=ZS_SUCCESS;
 
   if (pStat)
   {
-    pIF.ZPMSStats.end();
-    pIF.ZPMSStats.reportFull(pOutput);
+    wIF.ZPMSStats.end();
+    wIF.ZPMSStats.reportFull(pOutput);
   }
   fprintf (pOutput,"\n   %ld index keys added to index \n", wIndexCount);
 
@@ -103,7 +110,7 @@ zrebuildRawIndex(ZRawIndexFile& pIF,bool pStat=false, FILE*pOutput=stdout)
     return  wSt;
   }
   fprintf (pOutput," ---------Successfull end rebuilding process for Index <%s>------------\n",
-      pIF.IndexName.toCChar());
+      wIF.IndexName.toCChar());
   return  wSt;
 
 }//zrebuildIndex

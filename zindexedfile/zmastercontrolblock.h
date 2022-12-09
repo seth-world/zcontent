@@ -102,7 +102,7 @@ public:
      */
   ZStatus fromXml(zxmlNode* pRootNode, ZaiErrors* pErrorlog);
 
-  size_t _exportAppend(ZDataBuffer &pMCBContent);
+  ssize_t _exportAppend(ZDataBuffer &pMCBContent);
   /**
    * @brief _import imports a full MCB to an existing Master control block. Eventually, adds indexes whenever required.
    *  When added, index file remains empty, only Index Control Block is feeded.

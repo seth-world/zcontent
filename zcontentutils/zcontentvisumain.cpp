@@ -34,6 +34,8 @@
 
 #include <zrawmasterfilevisu.h>
 
+#include <visulinecol.h>
+
 #define __FIXED_FONT__ "courrier"
 
 using namespace std;
@@ -721,11 +723,7 @@ ZContentVisuMain::setSelectionBackGround(QVariant& pBackground,ssize_t pOffset,s
   wVLC.compute(pOffset);
   int wStartLine = wVLC.line;
   int wStartColumn = wVLC.col;
-/*
-  wVLC.compute(pOffset+pSize);
-  int wEndLine = wVLC.line;
-  int wEndColumn = wVLC.col;
-*/
+
   int wCurLine = wStartLine;
   int wCurCol = wStartColumn;
   int wCount=0;
@@ -776,7 +774,7 @@ bool ZContentVisuMain::searchHexa(bool pReverse) {
   long wOffset=0;
   while (*wChar) {
     if (getHexaDigits(wChar,wHexaValue)) {
-      ZExceptionDLg::adhocMessage("Invalid hexadecimal string",Severity_Error,&wSearchStr,"Invalid hexadecimal string. Cannot convert.");
+      ZExceptionDLg::adhocMessage("Invalid hexadecimal string",Severity_Error,nullptr,&wSearchStr,"Invalid hexadecimal string. Cannot convert.");
       return false;
     }
     SearchContent[wOffset++]=wHexaValue;
@@ -784,7 +782,7 @@ bool ZContentVisuMain::searchHexa(bool pReverse) {
 
   if (pReverse) {
     if (SearchOffset==0) {
-      ZExceptionDLg::adhocMessage("Search",Severity_Error,&wSearchStr,"Already at beginning.");
+      ZExceptionDLg::adhocMessage("Search",Severity_Error,nullptr,&wSearchStr,"Already at beginning.");
       return false;
     }
     SearchOffset -=   SearchContent.Size ;
@@ -804,7 +802,7 @@ bool ZContentVisuMain::searchHexa(bool pReverse) {
   FormerSearchSize=SearchContent.Size;
 
   if (SearchOffset < 0) {
-    ZExceptionDLg::adhocMessage("Search",Severity_Error,&wSearchStr,"Value not found.");
+    ZExceptionDLg::adhocMessage("Search",Severity_Error,nullptr,&wSearchStr,"Value not found.");
     return false;
   }
 
@@ -820,7 +818,7 @@ bool ZContentVisuMain::searchAscii(bool pCaseRegardless, bool pReverse) {
   utf8VaryingString wSearchStr=ui->searchLEd->text().toUtf8().data();
   if (pReverse) {
     if (SearchOffset==0) {
-    ZExceptionDLg::adhocMessage("Search",Severity_Error,&wSearchStr,"Already at beginning.");
+    ZExceptionDLg::adhocMessage("Search",Severity_Error,nullptr,&wSearchStr,"Already at beginning.");
     return false;
     }
     SearchOffset -=   wSearchStr.strlen();
@@ -852,7 +850,7 @@ bool ZContentVisuMain::searchAscii(bool pCaseRegardless, bool pReverse) {
   FormerSearchSize=SearchContent.Size;
 
   if (SearchOffset < 0) {
-    ZExceptionDLg::adhocMessage("Search",Severity_Error,&wSearchStr,"Value not found.");
+    ZExceptionDLg::adhocMessage("Search",Severity_Error,nullptr,&wSearchStr,"Value not found.");
     return false;
   }
 
@@ -1622,7 +1620,7 @@ ZContentVisuMain::getRaw()
     return ;
   if (openOther(URICurrent.toCChar())!= ZS_SUCCESS) {
     utf8VaryingString wAdd = ZException.last().formatFullUserMessage().toString();
-    ZExceptionDLg::adhocMessage(tr("Random File open error").toUtf8().data(),ZException.last().Severity,&wAdd,
+    ZExceptionDLg::adhocMessage(tr("Random File open error").toUtf8().data(),ZException.last().Severity,nullptr,&wAdd,
         QCoreApplication::translate("ZContentVisuMain","Cannot load file",nullptr).toUtf8().data());
 //    QMessageBox::critical(this,tr("Random File open error"),ZException.formatFullUserMessage().toCChar());
     return;
@@ -1874,7 +1872,7 @@ ZContentVisuMain::displayICBs()
   ZHeaderControlBlock_Export wZHCBe;
   memmove(&wZHCBe,RawData.Data,sizeof(ZHeaderControlBlock_Export));
   if (wZHCBe.StartSign!=cst_ZBLOCKSTART) {
-    ZExceptionDLg::adhocMessage("Invalid Header",Severity_Error,nullptr,"Header Control Block appears to be corrupted.");
+    ZExceptionDLg::adhocMessage("Invalid Header",Severity_Error,nullptr,nullptr,"Header Control Block appears to be corrupted.");
     return;
   }
   wZHCBe.deserialize();
@@ -1884,7 +1882,7 @@ ZContentVisuMain::displayICBs()
   wZMCBe.deserialize();
 
   if (!wZMCBe.isValid()) {
-    ZExceptionDLg::adhocMessage("Invalid MCB",Severity_Error,nullptr,"Master Control Block (Reserved space) appears to be corrupted.");
+    ZExceptionDLg::adhocMessage("Invalid MCB",Severity_Error,nullptr,nullptr,"Master Control Block (Reserved space) appears to be corrupted.");
     return;
   }
 

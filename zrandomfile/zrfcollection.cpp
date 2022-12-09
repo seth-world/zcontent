@@ -2,6 +2,8 @@
 #define ZRFCOLLECTION_CPP
 #include <zrandomfile/zrfcollection.h>
 
+#include <ztoolset/utfvaryingstring.h>
+
 using namespace zbs;
 //-----------------ZRFCollection------------------------------------------------------
 /**
@@ -580,70 +582,6 @@ ZDataBuffer wRecord;
 /** @cond Development */
 
 /** @endcond */ // Development
-
-utfmessageString wSearchLib;
-/**
- * @brief decode_ZSearchType translates ZSearch type in clear text
- * @param pSearchType
- * @return
- */
-const char *
-decode_ZSearchType(const uint16_t pSearchType )
-{
-uint16_t wSearchType = pSearchType;
-
-    wSearchLib.clear();
-    if (wSearchType & ZRFString)
-      {
-          wSearchLib +=  "ZRFString | ";
-          wSearchType = wSearchType  &  ~ZRFString;
-      }
-    if (wSearchType & ZRFCaseRegardless)
-      {
-          wSearchLib +=  "ZRFCaseRegardless | ";
-          wSearchType = wSearchType  &  ~ZRFCaseRegardless;
-      }
-    if (wSearchType & ZRFTrimspace)
-      {
-          wSearchLib +=  "ZRFTrimspace | ";
-          wSearchType = wSearchType  &  ~ZRFTrimspace;
-      }
-
-    switch (wSearchType)
-    {
-    case ZRFEqualsTo:
-        {
-        wSearchLib +=  "ZRFEqualsTo";
-        break;
-        }
-    case ZRFStartsWith:
-        {
-        wSearchLib +=  "ZRFStartsWith";
-        break;
-        }
-    case ZRFEndsWith:
-        {
-        wSearchLib +=  "ZRFEndsWith";
-        break;
-        }
-    case ZRFContains:
-        {
-        wSearchLib +=  "ZRFContains";
-        break;
-        }
-    case ZRFGreaterThan:
-        {
-        wSearchLib +=  "ZRFGreaterThan";
-        break;
-        }
-    case ZRFLessThan:
-        {
-        wSearchLib +=  "ZRFLessThan";
-        break;
-        }
-    }// switch
-    return wSearchLib.toCString_Strait();
-}// decode_ZSearchType
 
 
 #endif //ZRFCOLLECTION_CPP

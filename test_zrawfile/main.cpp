@@ -1,5 +1,6 @@
 
 #include <zcontent/zindexedfile/zrawmasterfile.h>
+#include <zcontent/zindexedfile/zrawmasterfileutils.h>
 #include "zdocphysical.h"
 #include <QApplication>
 
@@ -97,13 +98,19 @@ int main(int argc, char *argv[])
 
   uriString wDocFile = wWD ;
   wDocFile.addConditionalDirectoryDelimiter();
-  wDocFile += "zdocphysical_nokey.zmf";
+  wDocFile += "physicaldocument.zmf";
 
 // uriString wPictureDir;
 
   ZRawMasterFile wMasterFile;
 
   wSt=wMasterFile.zopen(wDocFile,ZRF_All);
+/*
+  wSt=zrebuildRawIndex<ZDocPhysical>(*wMasterFile.IndexTable[0],true);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+*/
   ZDocPhysical wDocPhy;
 
   ZArray<ZDataBuffer> wKeys;
@@ -115,6 +122,8 @@ int main(int argc, char *argv[])
   wDocPhy.Storage = Storage_External ;  // not in vault
   wDocPhy.URI = wPictureDir ;      // not in vault
   wDocPhy.URI.addConditionalDirectoryDelimiter();
+  wDocPhy.Short = "Short description for picure used figuring an email connection";
+  wDocPhy.Desc="Picture used for figuring an email connection.";
   wDocPhy.URI += "emailconnection.jpg";
   wDocPhy.DocSize= wDocPhy.URI.getFileSize();
 
@@ -128,7 +137,6 @@ int main(int argc, char *argv[])
   wDocPhy.AccessRights = 00001;
 
   wDocPhy.CheckSum  = wDocPhy.URI.getChecksum();
-
   wDocPhy.Temporary=0;
   wDocPhy.Ownerid = ZResource::getNew(ZEntity_User);
   wDocPhy.Vaultid = ZResource::getNew(ZEntity_Vault);
@@ -148,6 +156,7 @@ int main(int argc, char *argv[])
   wDocPhy.Storage = Storage_External ;  // not in vault
   wDocPhy.URI = wPictureDir ;      // not in vault
   wDocPhy.URI.addConditionalDirectoryDelimiter();
+  wDocPhy.Desc="a simple grave for resting in peace";
   wDocPhy.URI += "graverip.jpg";
   wDocPhy.DocSize= wDocPhy.URI.getFileSize();
 
@@ -175,6 +184,7 @@ int main(int argc, char *argv[])
 
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_other ;
+  wDocPhy.Desc="This is iceberg";
   wDocPhy.Storage = Storage_External ;  // not in vault
   wDocPhy.URI = wPictureDir ;      // not in vault
   wDocPhy.URI.addConditionalDirectoryDelimiter();

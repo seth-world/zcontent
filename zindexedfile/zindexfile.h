@@ -141,8 +141,10 @@ ZStatus getUniversalbyRank (ZDataBuffer &pOutValue,
                             const long pKeyRank,
                             const long pFieldRank,
                             bool pTruncate);
-
+#ifdef __DEPRECATED__
 ZStatus addKeyValue(ZRecord *pZMFRecord, zaddress_type pZMFAddress);
+#endif
+ZStatus addKeyValue(const ZDataBuffer &pZMFRecord, zaddress_type pZMFAddress);
 ZStatus _addKeyValue_Prepare(ZIndexItem *&pIndexItem, zrank_type &pZBATIndex, const zaddress_type pZMFAddress);
 ZStatus _addKeyValue_Commit(ZIndexItem *pIndexItem, const zrank_type pZBATIndex);
 ZStatus _addKeyValue_Rollback(const zrank_type pIndexCommit);
@@ -183,7 +185,10 @@ ZStatus zrebuildIndex(bool pStat, FILE*pOutput);
  * @param[out] pKey  Resulting concatenated key content
  * @return ZStatus
  */
+#ifdef __DEPRECATED__
 ZStatus _keyExtraction(ZRecord *pRecord, ZDataBuffer& pKeyOut);
+#endif
+ZStatus _keyExtraction(const ZDataBuffer &pRecord, ZDataBuffer& pKeyOut);
 
 ZStatus getKeyIndexFields(ZDataBuffer &pIndexContent,ZDataBuffer& pKeyValue);
 ZStatus zprintKeyFieldsValues (const zrank_type pRank,bool pHeader,bool pKeyDump,FILE*pOutput);

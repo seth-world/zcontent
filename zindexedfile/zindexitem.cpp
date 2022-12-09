@@ -19,14 +19,15 @@ ZIndexItem::set(const ZDataBuffer& pKeyContent) {
  *
  * @return a reference to a ZDataBuffer containing the flat content of ZIndexItem being processed
  */
-ZDataBuffer&
+ZDataBuffer
 ZIndexItem::toFileKey(void)
 {
+  ZDataBuffer wReturn;
   zaddress_type wAddress;
   wAddress = reverseByteOrder_Conditional<zaddress_type>(ZMFaddress);
-  setData(&wAddress,sizeof(zaddress_type));
-  appendData(KeyContent);
-  return  (ZDataBuffer&)*this;
+  wReturn.setData(&wAddress,sizeof(zaddress_type));
+  wReturn.appendData(KeyContent);
+  return  wReturn;
 }
 
 /**
@@ -37,18 +38,18 @@ ZIndexItem::toFileKey(void)
  * @return a reference to current ZIndexItem being processed
  */
 ZIndexItem&
-ZIndexItem::fromFileKey (ZDataBuffer &pFileKey)
+ZIndexItem::fromFileKey (ZDataBuffer &pKeyFileRecord)
 {
   size_t wOffset =0;
   size_t wSize;
 
   clear();
-  memmove (&ZMFaddress,pFileKey.Data,sizeof(ZMFaddress));
+  memmove (&ZMFaddress,pKeyFileRecord.Data,sizeof(ZMFaddress));
 
   ZMFaddress = reverseByteOrder_Conditional<zaddress_type>(ZMFaddress);
   wOffset += sizeof(ZMFaddress);
-  wSize = pFileKey.Size - sizeof(ZMFaddress) ;
-  KeyContent.setData(pFileKey.Data+wOffset,wSize);
+  wSize = pKeyFileRecord.Size - sizeof(ZMFaddress) ;
+  ZDataBuffer::setData(pKeyFileRecord.Data+wOffset,wSize);
   return *this;
 }
 

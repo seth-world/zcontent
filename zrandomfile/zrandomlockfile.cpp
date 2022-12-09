@@ -97,7 +97,7 @@ ZStatus ZRandomLockFile::_lock(const zaddress_type pAddress,
     if (wSt != ZS_SUCCESS) {
         return (ZStatus) wSt;
     }
-    if (wBlockHeader.Lock != ZLock_Nolock)
+    if (wBlockHeader.Lock != ZLock_Nolock) {
         if (wBlockHeader.Pid != Pid) {
             wSt = ZS_LOCKED;
             if (wBlockHeader.Lock & ZLock_Read)
@@ -114,7 +114,7 @@ ZStatus ZRandomLockFile::_lock(const zaddress_type pAddress,
                 decode_ZLockMask(wBlockHeader.Lock).toChar());
             return (ZStatus) wSt;
         }
-
+    }
     wBlockHeader.Lock = pLock;
     wBlockHeader.Pid = Pid;
 
@@ -127,7 +127,7 @@ ZStatus ZRandomLockFile::_lock(const zaddress_type pAddress,
         return (ZStatus) wSt;
 
     wlockS.Lock = pLock;
-//    wlockS.Rank = pRank;
+
     wlockS.Address = pAddress;
     ZBlockLock.push(wlockS);
     return (_writeFCB(pForceWrite));

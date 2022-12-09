@@ -207,7 +207,7 @@ ZIndexControlBlock::_import(const unsigned char* &pPtrIn)
   Duplicates=wICBe.Duplicates; // uint8_t
   //  KeyType=wICBOwn_Import->KeyType; // uint8_t
 
-  pPtrIn+=sizeof(ZICB_Export); // index Name is stored just after ZSICBOwnData_Export structure
+//  pPtrIn+=sizeof(ZICB_Export); // index Name is stored just after ZSICBOwnData_Export structure
       // format is Universal format with leading unit size and text size (uint16_t)
 
   IndexName._importUVF(pPtrIn);  // Name is stored after ZSICBOwnData_Export as a varying number of byte (uint16_t is leading string size)
@@ -234,7 +234,7 @@ ZIndexControlBlock::_export()
  * @brief ZIndexControlBlock::_exportICB exports ZIndexControlBlock content to a flat ZDataBuffer.
  * @return a ZDataBuffer containing the flat content of ZIndexControlBlock
  */
-size_t
+ssize_t
 ZIndexControlBlock::_exportAppend(ZDataBuffer &pICBContent)
 {
 //  ZSICB_Export* wICBE;
@@ -250,7 +250,7 @@ ZIndexControlBlock::_exportAppend(ZDataBuffer &pICBContent)
 
   /* no key dictionary in ZIndexControlBlock */
 
-  return  pICBContent.Size-wRetSize ;
+  return  ssize_t(pICBContent.Size - wRetSize) ;
 }// _exportAppend
 
 

@@ -193,21 +193,21 @@ template <class _Tp>
 ZStatus _getByteSeqUfN_T_Ptr(unsigned char* pInData,
                          ZDataBuffer     &pOutData,
                          const ZType_type pType,
-                         URF_Varying_Size_type &pSize)
+                         URF_UnitCount_type &pSize)
 {
 uint64_t wSize;
 
     if (pType & ZType_Blob)
     {
                 ZDataBuffer*wZDB=(ZDataBuffer*)pInData;
-                wSize = (URF_Varying_Size_type)wZDB->Size;
+                wSize = (URF_UnitCount_type)wZDB->Size;
                 pOutData.setData(wZDB->Data,wSize);
                 return ZS_SUCCESS;
     }
     if (pType & ZType_bitset)
     {
                 ZBitset*wZDB=(ZBitset*)pInData;
-                wSize = (URF_Varying_Size_type)(wZDB->Size*wZDB->UnitByteSize);
+                wSize = (URF_UnitCount_type)(wZDB->Size*wZDB->UnitByteSize);
                 pOutData.setData(wZDB->bit,wSize);
                 return ZS_SUCCESS;
     }

@@ -393,13 +393,10 @@ ZStatus ZMasterControlBlock::fromXml(zxmlNode* pRootNode, ZaiErrors* pErrorlog)
 
 
 */
-
-
-size_t ZMasterControlBlock::_exportAppend(ZDataBuffer &pMCBContent)
+ssize_t ZMasterControlBlock::_exportAppend(ZDataBuffer &pMCBContent)
 {
   ZDataBuffer wJCB;
   ZDataBuffer wICB;
- // ZDataBuffer wMCB;
 
   ZMCB_Export wMCBExp;
   ZDataBuffer wZDBIndexes;
@@ -568,9 +565,7 @@ ZSMasterControlBlock::_importMCB(ZDataBuffer& pBuffer)
  */
 
 ZStatus
-//ZMasterControlBlock::_import(ZRawMasterFile*pMaster,const unsigned char*& pPtrIn,ZArray<ZPRES>& pIndexPresence) {
 ZMasterControlBlock::_import(const unsigned char*& pPtrIn) {
-
 
   ZStatus wSt=ZS_SUCCESS;
 
@@ -581,17 +576,16 @@ ZMasterControlBlock::_import(const unsigned char*& pPtrIn) {
   DictionaryPath._importUVF(pPtrIn);
   IndexFilePath._importUVF(pPtrIn);
 
-
   IndexTable.clear();
 
   ZRawIndexFile* wIFile= nullptr;
   uint32_t wIRank=0;
   uint32_t* wEndMark=(uint32_t*)pPtrIn;
-//  while((wIRank < wMCBExp.IndexCount)&&(wSt!=ZS_EOF)) {
 
   while((wSt==ZS_SUCCESS) && (*wEndMark !=  cst_ZBLOCKEND)) {
     wIFile=new ZRawIndexFile(RawMasterFile);
     wSt=wIFile->_import(pPtrIn);
+    IndexTable.push(wIFile);
     wIRank++;
     wEndMark=(uint32_t*)pPtrIn;
   }// while

@@ -166,13 +166,7 @@ ZStatus wSt;
                 wString._exportURF(pTargetURFData);
                 return ZS_SUCCESS;
                 }
-            case cst_messagelen+1:
-                {
-                utfmessageString wString;
-                wString.strset((utf8_t*)pSourceNatural);
-                wString._exportURF(pTargetURFData);
-                return ZS_SUCCESS;
-                }
+
             case cst_keywordlen+1:
                 {
                 utfkeywordString wString;

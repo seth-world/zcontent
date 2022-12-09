@@ -1177,8 +1177,7 @@ uriString wFormerHeaderURI;
 
     printf ("ZRandomFile::_create \n");
 
-    if (pInitialSize<=0)
-        {
+    if (pInitialSize<=0) {
         ZException.setMessage(_GET_FUNCTION_NAME_,
                               ZS_INVSIZE,
                               Severity_Severe,
@@ -6718,8 +6717,7 @@ ZStatus wSt=ZS_SUCCESS;
     if (__ZRFVERBOSE__)
       _DBGPRINT("ZRandomFile::_open-I-OPENNING Openning file <%s>.\n",URIContent.toCChar()) // debug
 
-    if (_isOpen)
-      {
+    if (_isOpen) {
       ZException.setMessage(_GET_FUNCTION_NAME_,
                               ZS_INVOP,
                               Severity_Error,
@@ -6727,52 +6725,49 @@ ZStatus wSt=ZS_SUCCESS;
                               URIContent.toString(),
                               decode_ZRFMode(Mode));
       return  (ZS_INVOP);
-      }
+    }
     CurrentRank = -1;
 
     ZPMS.clear();                   // reset performance data collection
 
-    if (!URIContent.exists())
-        {
+    if (!URIContent.exists()) {
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                ZS_FILENOTEXIST,
                                Severity_Error,
                                "File <%s> does not exist. It must exist to be opened. Use zcreate with appropriate options.",
                                URIContent.toString());
         return  (ZS_FILENOTEXIST);
-        }
+    }
 
     ContentFd = open(URIContent.toCChar(),O_RDWR);
 
-   if (ContentFd<0)
-               {
-               ZException.getErrno(errno,
-                               _GET_FUNCTION_NAME_,
-                               ZS_ERROPEN,
-                               Severity_Severe,
-                               "Error opening file <%s> ",
-                               URIContent.toCChar());
-               return  (ZS_ERROPEN);
-               }
+   if (ContentFd<0) {
+       ZException.getErrno(errno,
+                       _GET_FUNCTION_NAME_,
+                       ZS_ERROPEN,
+                       Severity_Severe,
+                       "Error opening file <%s> ",
+                       URIContent.toCChar());
+       return  (ZS_ERROPEN);
+   }
 
     wSt = generateURIHeader (URIContent,URIHeader);
     if (wSt!=ZS_SUCCESS)
                 {return  wSt;}
     HeaderFd = open(URIHeader.toCChar(),O_RDWR);
-    if (HeaderFd < 0)
-        {
-        ZException.getErrno(errno,
-                        _GET_FUNCTION_NAME_,
-                        ZS_ERROPEN,
-                        Severity_Severe,
-                        "Error opening header file <%s>. ZRF file has not been opened.",
-                        URIHeader.toString());
-        _isOpen=false;
-        HeaderAccessed = ZHAC_Nothing;
-        close(ContentFd);
+    if (HeaderFd < 0) {
+      ZException.getErrno(errno,
+                      _GET_FUNCTION_NAME_,
+                      ZS_ERROPEN,
+                      Severity_Severe,
+                      "Error opening header file <%s>. ZRF file has not been opened.",
+                      URIHeader.toString());
+      _isOpen=false;
+      HeaderAccessed = ZHAC_Nothing;
+      close(ContentFd);
 
-        return  (ZS_ERROPEN);
-        }
+      return  (ZS_ERROPEN);
+    }
 
 //    setupFCB();  // update pDescriptor
   wSt=_importAllFileHeader();  // get header and force read pForceRead = true, whatever the open mode is

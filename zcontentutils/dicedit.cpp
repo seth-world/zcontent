@@ -334,7 +334,7 @@ DicEdit::generalActionEvent(QAction* pAction) {
   if (pAction == generateQAc) {
 
     if (fieldTBv->ItemModel->rowCount()==0) {
-      ZExceptionDLg::adhocMessage("Generate",Severity_Error,nullptr,"Nothing to generate");
+      ZExceptionDLg::adhocMessage("Generate",Severity_Error,&Errorlog, nullptr,"Nothing to generate");
       return;
     }
 
@@ -417,7 +417,7 @@ DicEdit::generalActionEvent(QAction* pAction) {
   if (pAction == fileCreateQAc) {
 
     if (fieldTBv->ItemModel->rowCount()==0) {
-      ZExceptionDLg::adhocMessage("Generate",Severity_Error,nullptr,"Nothing to generate");
+      ZExceptionDLg::adhocMessage("Generate",Severity_Error,&Errorlog,nullptr,"Nothing to generate");
       return;
     }
     FileGenerateDLg* wFDLg=new FileGenerateDLg(DictionaryFile, this);
@@ -427,7 +427,7 @@ DicEdit::generalActionEvent(QAction* pAction) {
   if (pAction == fileXmlGenQAc) {
 
     if (fieldTBv->ItemModel->rowCount()==0) {
-      ZExceptionDLg::adhocMessage("Generate",Severity_Error,nullptr,"Nothing to generate");
+      ZExceptionDLg::adhocMessage("Generate",Severity_Error,&Errorlog,nullptr,"Nothing to generate");
       return;
     }
   }
@@ -552,11 +552,11 @@ DicEdit::setupReadWriteMenu()
   FwritetoMEn->addAction(FwritetoDicQAc);
 
   FwritetoclipQAc = new QAction(QObject::tr("clipboard as xml","DicEdit"),this);
-  FwritetoclipQAc->setObjectName("FwritetoclipQAc");
+
   FwritetoMEn->addAction(FwritetoclipQAc);
 
   FwriteXmltofileQAc = new QAction(QObject::tr("xml file","DicEdit"),this);
-  FwriteXmltofileQAc->setObjectName("FwriteXmltofileQAc");
+
   FwritetoMEn->addAction(FwriteXmltofileQAc);
 
   FviewXmlQAc = new QAction(QObject::tr("view xml","DicEdit"),this);
@@ -1236,12 +1236,12 @@ DicEdit::getGenerationNames(utf8VaryingString& pOutFileBaseName,utf8VaryingStrin
       pGenPath = GenPathLEd->text().toUtf8().data();
 
       if (wClass.contains((utf8_t*)" ")) {
-        ZExceptionDLg::adhocMessage("Invalid name",Severity_Error,nullptr,"Class name <%s> must not contain space(s)",wClass.toString());
+        ZExceptionDLg::adhocMessage("Invalid name",Severity_Error,&Errorlog,nullptr,"Class name <%s> must not contain space(s)",wClass.toString());
         continue;
       }
       uriString wGenPath=GenPathLEd->text().toUtf8().data();
       if (!wGenPath.exists()) {
-        ZExceptionDLg::adhocMessage("Generation directory",Severity_Error,nullptr,"Generation directory <%s> does not exist.",wGenPath.toString());
+        ZExceptionDLg::adhocMessage("Generation directory",Severity_Error,&Errorlog,nullptr,"Generation directory <%s> does not exist.",wGenPath.toString());
         continue;
       }
       pClass = wClass;
@@ -1275,7 +1275,7 @@ DicEdit::searchDirectory() {
 
     if (wD.isEmpty()) {
 //    if (wFd.selectedFiles().isEmpty()) {
-      ZExceptionDLg::adhocMessage("Source directory",Severity_Warning,nullptr,"No directory has been selected.\nPlease select a valid directory.");
+      ZExceptionDLg::adhocMessage("Source directory",Severity_Warning,&Errorlog,nullptr,"No directory has been selected.\nPlease select a valid directory.");
       continue;
     }
     SelectedDirectory = wD.toUtf8().data();
@@ -1305,7 +1305,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
   if  (pAction==SaveQAc) /* save to dictionary file if exists otherwise recursive call with */
   {
     if (fieldTBv->ItemModel->rowCount()==0) {
-      ZExceptionDLg::adhocMessage("Save",Severity_Error,nullptr,"Nothing to save");
+      ZExceptionDLg::adhocMessage("Save",Severity_Error,&Errorlog,nullptr,"Nothing to save");
       return;
     }
     if (DictionaryFile==nullptr) {
@@ -1331,7 +1331,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
   if  (pAction==FwritetoclipQAc) /* generate xml from current content and write xml to clipboard */
   {
     if (fieldTBv->ItemModel->rowCount()==0) {
-      ZExceptionDLg::adhocMessage("Save",Severity_Error,nullptr,"Nothing to write");
+      ZExceptionDLg::adhocMessage("Save",Severity_Error,&Errorlog,nullptr,"Nothing to write");
       return;
     }
     /* generate xml from current views content */
@@ -1441,8 +1441,8 @@ DicEdit::readWriteActionEvent(QAction*pAction)
     const char* wWD=getenv(__PARSER_WORK_DIRECTORY__);
     if (!wWD)
       wWD="";
-    QFileDialog wFd(this,QObject::tr("Xml file","DicEdit"),wWD);
-
+    QFileDialog wFd(this,QObject::tr("Xml file","DicEdit"),wWD,
+        "Xml files (*.xml);;All files (*.*)");
 //    wFd.setWindowTitle(QObject::tr("Xml file","DicEdit"));
     wFd.setLabelText(QFileDialog::Accept,  "Select");
     wFd.setLabelText(QFileDialog::Reject ,  "Cancel");
@@ -1488,7 +1488,8 @@ DicEdit::readWriteActionEvent(QAction*pAction)
     const char* wWD=getenv(__PARSER_WORK_DIRECTORY__);
     if (!wWD)
       wWD="";
-    QFileDialog wFd(this,QObject::tr("Xml file","DicEdit"),wWD);
+    QFileDialog wFd(this,QObject::tr("Xml file","DicEdit"),wWD,
+        "Xml files (*.xml);;All files (*.*)");
     wFd.setLabelText(QFileDialog::Accept,  "Select");
     wFd.setLabelText(QFileDialog::Reject ,  "Cancel");
     while (true) {
@@ -1498,7 +1499,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
       if (wFd.selectedFiles().isEmpty())
         {
-        ZExceptionDLg::adhocMessage("No file selected",Severity_Error,nullptr,"Please select a valid file");
+        ZExceptionDLg::adhocMessage("No file selected",Severity_Error,&Errorlog,nullptr,"Please select a valid file");
         }
       else
         break;
@@ -1556,7 +1557,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
   if  (pAction==FwritetoDicQAc) {
     if (fieldTBv->ItemModel->rowCount()==0) {
-      ZExceptionDLg::adhocMessage("Save",Severity_Error,nullptr,"Nothing to write");
+      ZExceptionDLg::adhocMessage("Save",Severity_Error,&Errorlog,nullptr,"Nothing to write");
       return;
     }
     if (saveOrCreateDictionaryFile()!=ZS_SUCCESS)
@@ -3052,7 +3053,7 @@ DicEdit::fieldChange(QModelIndex pIdx)
 
   ZFieldDescription* wFD=getItemData<ZFieldDescription>(wItem);
   if (wFD==nullptr) {
-    ZExceptionDLg::adhocMessage("field change",Severity_Error,nullptr,"Invalid infra data for row %d.",wIdx.row());
+    ZExceptionDLg::adhocMessage("field change",Severity_Error,&Errorlog,nullptr,"Invalid infra data for row %d.",wIdx.row());
     return nullptr;
   }
 
@@ -3168,7 +3169,7 @@ QStandardItem* DicEdit::fieldChangeDLg( QStandardItem* pFieldItem) {
 //    FieldDLg=new ZFieldDLg(this);
   ZFieldDescription* wFieldIn=getItemData<ZFieldDescription>(pFieldItem);
   if (wFieldIn==nullptr) {
-    ZExceptionDLg::adhocMessage("field change",Severity_Error,nullptr,"Invalid infra data for row %d.",pFieldItem->row());
+    ZExceptionDLg::adhocMessage("field change",Severity_Error,&Errorlog,nullptr,"Invalid infra data for row %d.",pFieldItem->row());
     return nullptr;
   }
   ZFieldDescription wField;
@@ -4704,7 +4705,7 @@ DicEdit::saveOrCreateDictionaryFile() {
     delete wDic;
     wSt= DictionaryFile->zinitalize(wSelected,true);
     if (wSt > 0) {
-      ZExceptionDLg::adhocMessage("Dictionary created",Severity_Information,nullptr,
+      ZExceptionDLg::adhocMessage("Dictionary created",Severity_Information,&Errorlog,nullptr,
           "New dictionary file %s.\n"
           "Created dic <%s> version <%s> status <%s>",
           wSelected.getBasename().toCChar(),
@@ -4764,7 +4765,7 @@ DicEdit::saveCurrentDictionary (unsigned long &pVersion,bool &pActive,utf8Varyin
     return wSt;
   }
 
-  ZExceptionDLg::adhocMessage("Dictionary saved",Severity_Information,nullptr,
+  ZExceptionDLg::adhocMessage("Dictionary saved",Severity_Information,&Errorlog,nullptr,
       "Existing dictionary file %s\n"
       "Created dictionary <%s> version <%s> status <%s>",
       DictionaryFile->getURIContent().getBasename().toCChar(),
@@ -4829,7 +4830,7 @@ DicEdit::loadDictionaryFile(){
     wSt=DictionaryFile->loadDictionaryByRank(wDicDLg->getRank());
     if (wSt!=ZS_SUCCESS) {
       utf8VaryingString* wXMes=new utf8VaryingString(ZException.last().formatFullUserMessage());
-      if (ZExceptionDLg::adhocMessage("Dictionary file",Severity_Error,
+      if (ZExceptionDLg::adhocMessage("Dictionary file",Severity_Error,&Errorlog,
               wXMes,"File %s has been errored while trying to load dictionary rank  %d.",
               wDicDLg->getDicFileURI().toCChar(),wDicDLg->getRank())==QDialog::Rejected)
         delete wDicDLg;
@@ -4996,7 +4997,7 @@ DicEdit::manageDictionaryFiles(){
     wSt=DictionaryFile->loadDictionaryByRank(wDicDLg->getRank());
     if (wSt!=ZS_SUCCESS) {
       utf8VaryingString* wXMes=new utf8VaryingString(ZException.last().formatFullUserMessage());
-      if (ZExceptionDLg::adhocMessage("Dictionary file",Severity_Error,
+      if (ZExceptionDLg::adhocMessage("Dictionary file",Severity_Error,&Errorlog,
               wXMes,"File %s has been errored while trying to load dictionary rank  %d.",
               wDicDLg->getDicFileURI().toCChar(),wDicDLg->getRank())==QDialog::Rejected)
         delete wDicDLg;

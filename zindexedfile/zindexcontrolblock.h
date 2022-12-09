@@ -136,7 +136,7 @@ public:
 
 //  void newKeyDic(ZSKeyDictionary *pZKDic, ZMetaDic *pMetaDic);
 
-  size_t _exportAppend(ZDataBuffer &pICBContent) ;
+  ssize_t _exportAppend(ZDataBuffer &pICBContent) ;
   ZDataBuffer _export() ;
 /*  no dictionary in icb
  *

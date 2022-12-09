@@ -48,6 +48,13 @@ public:
     QLabel *BitsetHeaderLBl;
     QComboBox *ViewModeCBx;
     QLabel *FieldsNbLBl;
+    QGroupBox *ColorsGBx;
+    QLabel *HeaderColorLBl;
+    QLabel *PresenceColorLBl;
+    QLabel *URFSizeColorLBl;
+    QLabel *WrongColorLBl;
+    QLabel *StartColorLBl;
+    QComboBox *ColorModeCBx;
     QPlainTextEdit *MessagePTe;
 
     void setupUi(QDialog *ZRawMasterFileVisu)
@@ -57,7 +64,7 @@ public:
         ZRawMasterFileVisu->resize(684, 546);
         groupBox = new QGroupBox(ZRawMasterFileVisu);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        groupBox->setGeometry(QRect(10, 10, 661, 111));
+        groupBox->setGeometry(QRect(10, 10, 661, 131));
         label = new QLabel(groupBox);
         label->setObjectName(QString::fromUtf8("label"));
         label->setGeometry(QRect(150, 30, 54, 15));
@@ -78,25 +85,25 @@ public:
         StateLBl->setGeometry(QRect(380, 30, 81, 16));
         BackwardBTn = new QPushButton(groupBox);
         BackwardBTn->setObjectName(QString::fromUtf8("BackwardBTn"));
-        BackwardBTn->setGeometry(QRect(530, 50, 31, 23));
+        BackwardBTn->setGeometry(QRect(530, 40, 31, 23));
         QIcon icon;
         icon.addFile(QString::fromUtf8("../../zqt/icons/backward.gif"), QSize(), QIcon::Normal, QIcon::Off);
         BackwardBTn->setIcon(icon);
         ForwardBTn = new QPushButton(groupBox);
         ForwardBTn->setObjectName(QString::fromUtf8("ForwardBTn"));
-        ForwardBTn->setGeometry(QRect(570, 50, 31, 23));
+        ForwardBTn->setGeometry(QRect(570, 40, 31, 23));
         QIcon icon1;
         icon1.addFile(QString::fromUtf8("../../zqt/icons/forward.gif"), QSize(), QIcon::Normal, QIcon::Off);
         ForwardBTn->setIcon(icon1);
         BeginBTn = new QPushButton(groupBox);
         BeginBTn->setObjectName(QString::fromUtf8("BeginBTn"));
-        BeginBTn->setGeometry(QRect(490, 50, 31, 23));
+        BeginBTn->setGeometry(QRect(490, 40, 31, 23));
         QIcon icon2;
         icon2.addFile(QString::fromUtf8("../../zqt/icons/tobegin.gif"), QSize(), QIcon::Normal, QIcon::Off);
         BeginBTn->setIcon(icon2);
         EndBTn = new QPushButton(groupBox);
         EndBTn->setObjectName(QString::fromUtf8("EndBTn"));
-        EndBTn->setGeometry(QRect(610, 50, 31, 23));
+        EndBTn->setGeometry(QRect(610, 40, 31, 23));
         QIcon icon3;
         icon3.addFile(QString::fromUtf8("../../zqt/icons/toend.gif"), QSize(), QIcon::Normal, QIcon::Off);
         EndBTn->setIcon(icon3);
@@ -144,13 +151,34 @@ public:
         BitsetHeaderLBl->setGeometry(QRect(170, 70, 311, 16));
         ViewModeCBx = new QComboBox(groupBox);
         ViewModeCBx->setObjectName(QString::fromUtf8("ViewModeCBx"));
-        ViewModeCBx->setGeometry(QRect(490, 80, 151, 23));
+        ViewModeCBx->setGeometry(QRect(490, 70, 151, 23));
         FieldsNbLBl = new QLabel(groupBox);
         FieldsNbLBl->setObjectName(QString::fromUtf8("FieldsNbLBl"));
         FieldsNbLBl->setGeometry(QRect(130, 80, 31, 16));
+        ColorsGBx = new QGroupBox(groupBox);
+        ColorsGBx->setObjectName(QString::fromUtf8("ColorsGBx"));
+        ColorsGBx->setGeometry(QRect(320, 50, 161, 61));
+        HeaderColorLBl = new QLabel(ColorsGBx);
+        HeaderColorLBl->setObjectName(QString::fromUtf8("HeaderColorLBl"));
+        HeaderColorLBl->setGeometry(QRect(70, 30, 21, 21));
+        PresenceColorLBl = new QLabel(ColorsGBx);
+        PresenceColorLBl->setObjectName(QString::fromUtf8("PresenceColorLBl"));
+        PresenceColorLBl->setGeometry(QRect(100, 30, 21, 21));
+        URFSizeColorLBl = new QLabel(ColorsGBx);
+        URFSizeColorLBl->setObjectName(QString::fromUtf8("URFSizeColorLBl"));
+        URFSizeColorLBl->setGeometry(QRect(130, 30, 21, 21));
+        WrongColorLBl = new QLabel(ColorsGBx);
+        WrongColorLBl->setObjectName(QString::fromUtf8("WrongColorLBl"));
+        WrongColorLBl->setGeometry(QRect(10, 30, 21, 21));
+        StartColorLBl = new QLabel(ColorsGBx);
+        StartColorLBl->setObjectName(QString::fromUtf8("StartColorLBl"));
+        StartColorLBl->setGeometry(QRect(40, 30, 21, 21));
+        ColorModeCBx = new QComboBox(groupBox);
+        ColorModeCBx->setObjectName(QString::fromUtf8("ColorModeCBx"));
+        ColorModeCBx->setGeometry(QRect(490, 100, 151, 23));
         MessagePTe = new QPlainTextEdit(ZRawMasterFileVisu);
         MessagePTe->setObjectName(QString::fromUtf8("MessagePTe"));
-        MessagePTe->setGeometry(QRect(10, 119, 659, 41));
+        MessagePTe->setGeometry(QRect(10, 140, 659, 41));
 
         retranslateUi(ZRawMasterFileVisu);
 
@@ -183,6 +211,12 @@ public:
         BitsetContentLBl->setText(QCoreApplication::translate("ZRawMasterFileVisu", "TextLabel", nullptr));
         BitsetHeaderLBl->setText(QCoreApplication::translate("ZRawMasterFileVisu", "01234567890123456789", nullptr));
         FieldsNbLBl->setText(QString());
+        ColorsGBx->setTitle(QString());
+        HeaderColorLBl->setText(QString());
+        PresenceColorLBl->setText(QString());
+        URFSizeColorLBl->setText(QString());
+        WrongColorLBl->setText(QString());
+        StartColorLBl->setText(QString());
     } // retranslateUi
 
 };

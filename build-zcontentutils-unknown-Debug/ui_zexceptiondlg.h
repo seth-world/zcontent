@@ -31,6 +31,7 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QCheckBox *dontShowCKb;
     QSpacerItem *horizontalSpacer_2;
+    QPushButton *ErrlogBTn;
     QPushButton *MoreBTn;
     QPushButton *OtherBTn;
     QPushButton *OKBTn;
@@ -52,10 +53,10 @@ public:
     {
         if (ZExceptionDLg->objectName().isEmpty())
             ZExceptionDLg->setObjectName(QString::fromUtf8("ZExceptionDLg"));
-        ZExceptionDLg->resize(560, 270);
+        ZExceptionDLg->resize(575, 270);
         layoutWidget = new QWidget(ZExceptionDLg);
         layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(10, 230, 531, 25));
+        layoutWidget->setGeometry(QRect(10, 230, 557, 25));
         horizontalLayout_2 = new QHBoxLayout(layoutWidget);
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
@@ -67,6 +68,11 @@ public:
         horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer_2);
+
+        ErrlogBTn = new QPushButton(layoutWidget);
+        ErrlogBTn->setObjectName(QString::fromUtf8("ErrlogBTn"));
+
+        horizontalLayout_2->addWidget(ErrlogBTn);
 
         MoreBTn = new QPushButton(layoutWidget);
         MoreBTn->setObjectName(QString::fromUtf8("MoreBTn"));
@@ -125,7 +131,7 @@ public:
         label_8->setGeometry(QRect(10, 30, 54, 15));
         verticalLayoutWidget = new QWidget(ZExceptionDLg);
         verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
-        verticalLayoutWidget->setGeometry(QRect(10, 100, 541, 111));
+        verticalLayoutWidget->setGeometry(QRect(10, 100, 551, 111));
         VertLayoutMsgVLy_2 = new QVBoxLayout(verticalLayoutWidget);
         VertLayoutMsgVLy_2->setObjectName(QString::fromUtf8("VertLayoutMsgVLy_2"));
         VertLayoutMsgVLy_2->setContentsMargins(0, 0, 0, 0);
@@ -150,6 +156,7 @@ public:
     {
         ZExceptionDLg->setWindowTitle(QCoreApplication::translate("ZExceptionDLg", "Dialog", nullptr));
         dontShowCKb->setText(QCoreApplication::translate("ZExceptionDLg", "Don't show again", nullptr));
+        ErrlogBTn->setText(QCoreApplication::translate("ZExceptionDLg", "Error log", nullptr));
         MoreBTn->setText(QCoreApplication::translate("ZExceptionDLg", "More", nullptr));
         OtherBTn->setText(QCoreApplication::translate("ZExceptionDLg", "Other", nullptr));
         OKBTn->setText(QCoreApplication::translate("ZExceptionDLg", "OK", nullptr));

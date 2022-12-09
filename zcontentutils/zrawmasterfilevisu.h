@@ -27,14 +27,23 @@ public:
 
   ZStatus displayURFBlock(ZDataBuffer& pData);
 
+
   ZStatus displayRawBlock(ZDataBuffer& pData);
+  void    colorizeURFBlock(ZDataBuffer & pData);
+  void    colorizeURFKeyBlock(ZDataBuffer & pData);
+  void    colorizeOneURFFields(const ZDataBuffer& pData,const unsigned char* &pPtr, const unsigned char* pPtrEnd, size_t &pColorOffset);
+
   void    displayOneLine(int pRow,unsigned char* &wPtr,unsigned char* wPtrEnd) ;
+
+  bool    displayOneURFField(zaddress_type &wOffset, const unsigned char* &wPtr, const unsigned char* wPtrEnd);
+
+  ZStatus displayURFKeyBlock(ZDataBuffer & pData);
 
   ZStatus seekAndGet(ZDataBuffer& pOut, ssize_t &pSize, size_t pAddress);
 
   ZStatus searchStartSign(ZDataBuffer& wRecord, zaddress_type &pAddress);
 
-  ZStatus searchNextValidZType(ZDataBuffer& wRecord,
+  ZStatus searchNextValidZType(const ZDataBuffer &wRecord,
                                 zaddress_type & pAddress,
                                 const unsigned char *&pPtr);
 
@@ -44,6 +53,13 @@ public:
 
   void resizeEvent(QResizeEvent*) override;
 
+  void setSelectionBackGround(QVariant& pBackground,
+                              QVariant &pBackgroundFirst,
+                              ssize_t pOffset,
+                              size_t pSize,
+                              const utf8VaryingString &pToolTip="",
+                              bool pScrollTo=false);
+
 private slots:
   void Forward();
   void Backward();
@@ -52,6 +68,16 @@ private slots:
   void ViewModeChange(int pIndex);
 
 private:
+  QVariant          DefaultBackGround;
+  QVariant          WrongBackGround = QVariant(QBrush(Qt::magenta));
+  QVariant          BlockHeaderBackGround =  QVariant(QBrush(Qt::green));
+  QVariant          BlockHeaderBackGround_first =  QVariant(QBrush(Qt::darkGreen));
+  QVariant          PresenceBackGround =  QVariant(QBrush(Qt::yellow));
+  QVariant          PresenceBackGround_first =  QVariant(QBrush(Qt::darkYellow));
+  QVariant          URFSizeBackGround =  QVariant(QBrush(Qt::lightGray));
+  QVariant          URFSizeBackGround_first =  QVariant(QBrush(Qt::darkGray));
+  QVariant          URFHeaderBackGround =  QVariant(QBrush(Qt::cyan));
+  QVariant          URFHeaderBackGround_first =  QVariant(QBrush(Qt::green));
   int Width = 16;
   bool  Raw=false;
   ZBlockDescriptor_Export BlockCur;

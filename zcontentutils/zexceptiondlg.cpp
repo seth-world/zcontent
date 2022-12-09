@@ -3,6 +3,9 @@
 #include "ui_zexceptiondlg.h"
 #include <ztoolset/zexceptionmin.h>
 
+#include <texteditmwn.h>
+#include <ztoolset/zaierrors.h>
+
 #include <qevent.h>
 
 
@@ -39,6 +42,8 @@ ZExceptionDLg::ZExceptionDLg(const utf8VaryingString& pTitle,Severity_type pSeve
 
   ui->ExceptionFRm->setVisible(false);
 
+  ui->ErrlogBTn->setVisible(true);
+
   applySeverity(pSeverity,pTitle);
 
   ui->MessageTEd->setText(pMessage.toCChar());
@@ -56,6 +61,7 @@ ZExceptionDLg::ZExceptionDLg(const utf8VaryingString& pTitle,Severity_type pSeve
   QObject::connect (ui->OKBTn,&QAbstractButton::pressed,this,[this]{ accept(); });
   QObject::connect (ui->OtherBTn,&QAbstractButton::pressed,this,[this]{ done(ZEDLG_Third); });
   QObject::connect (ui->MoreBTn,&QAbstractButton::pressed,this,[this]{ MoreClicked(); });
+  QObject::connect (ui->ErrlogBTn,&QAbstractButton::pressed,this,[this]{ ErrlogClicked(); });
 }
 
 /** ZException message */
@@ -98,12 +104,13 @@ ZExceptionDLg::ZExceptionDLg(const utf8VaryingString& pTitle,const ZExceptionBas
   else
     ui->MoreBTn->setVisible(false);
 
-
+  ui->ErrlogBTn->setVisible(true);
 
   QObject::connect (ui->CancelBTn,&QAbstractButton::pressed,this,[this]{ reject(); });
   QObject::connect (ui->OKBTn,&QAbstractButton::pressed,this,[this]{ accept(); });
   QObject::connect (ui->OtherBTn,&QAbstractButton::pressed,this,[this]{ done(ZEDLG_Third); });
   QObject::connect (ui->MoreBTn,&QAbstractButton::pressed,this,[this]{ MoreClicked(); });
+  QObject::connect (ui->ErrlogBTn,&QAbstractButton::pressed,this,[this]{ ErrlogClicked(); });
 
 }
 
@@ -286,6 +293,36 @@ void ZExceptionDLg::MoreClicked()
 
   QGuiApplication::processEvents();
   ui->MoreBTn->setText(QObject::tr("Less","ZExceptionDLg"));
+  return;
+}
+
+void ZExceptionDLg::setErrorLog(ZaiErrors* pErrorLog) {
+  ErrorLog=pErrorLog;
+  ui->ErrlogBTn->setVisible(true);
+}
+
+void ZExceptionDLg::ErrlogClicked()
+{
+  utf8VaryingString wStr;
+  textEditMWn* wTE=new textEditMWn(this,TEOP_ShowLineNumbers);
+
+  if (ErrorLog==nullptr) {
+    for (long wi = ZException.count()-1;wi >= 0; wi--) {
+      wTE->appendText(ZException.Tab[wi]->formatFullUserMessage(false));
+    }
+
+    wTE->show();
+    return;
+  }
+
+  for (long wi = 0; wi < ErrorLog->count(); wi++){
+    wStr.sprintf( "<%s> %s",decode_ZAIES(ErrorLog->Tab[wi]->Severity),ErrorLog->Tab[wi]->Message());
+    wTE->appendText(wStr);
+  }
+
+  wTE->show();
+
+  QGuiApplication::processEvents();
   return;
 }
 
@@ -579,8 +616,13 @@ ZExceptionDLg::displayLast(const utf8VaryingString& pTitle,bool pDontShow)
   return display(pTitle,ZException.last(),pDontShow);
 }
 
+
 int
-ZExceptionDLg::adhocMessage(const utf8VaryingString& pTitle, Severity_type pSeverity,const utf8VaryingString* pComplement,const char *pFormat,...) {
+ZExceptionDLg::adhocMessage(const utf8VaryingString& pTitle,
+    Severity_type pSeverity,
+    ZaiErrors* pErrorlog,
+    const utf8VaryingString* pComplement,
+    const char *pFormat,...) {
   utf8VaryingString wMessage;
   va_list arglist;
   va_start (arglist, pFormat);
@@ -589,10 +631,14 @@ ZExceptionDLg::adhocMessage(const utf8VaryingString& pTitle, Severity_type pSeve
 
   ZExceptionDLg* wDlg=new ZExceptionDLg(pTitle,pSeverity,wMessage,pComplement,false);
 
+  if (pErrorlog)
+    wDlg->setErrorLog(pErrorlog);
+
   wDlg->ui->OKBTn->setVisible(true);
   wDlg->ui->OKBTn->setText("Close");
   wDlg->ui->CancelBTn->setVisible(false);
   wDlg->ui->OtherBTn->setVisible(false);
+
 
   wDlg->ui->TitleLBl->setText(pTitle.toCChar());
 

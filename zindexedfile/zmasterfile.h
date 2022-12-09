@@ -252,7 +252,7 @@ typedef ZRawMasterFile _Base ;
      */
     static ZStatus applyDictionary(const uriString& pURIDictionary,
         const uriString& pURIMasterFile,
-        std::function<ZStatus (ZRecord*,ZRecord*)> pApplyDictionaryConvert=nullptr,
+        std::function<ZStatus (ZDataBuffer &, ZDataBuffer &)> pApplyDictionaryConvert=nullptr,
         bool pKeepFileAsReference=false,
         FILE *pOutput=stdout);
 /**
@@ -319,18 +319,19 @@ typedef ZRawMasterFile _Base ;
     ZStatus zopen       (const int pMode=ZRF_All) {return (zopen(getURIContent(),pMode));}
 
 
-    ZStatus zadd      (ZRecord *pRecord );
-    ZStatus _add(ZRecord* pRecord);
+    ZStatus zadd      (const ZDataBuffer &pRecord );
+    ZStatus _add      (const ZDataBuffer &pRecord);
 
-    ZStatus zinsert   (ZRecord *pRecord, const zrank_type pZMFRank);
-    ZStatus zget      (ZRecord* pRecord, const zrank_type pZMFRank);
+    ZStatus zinsert   (const ZDataBuffer &pRecord, const zrank_type pZMFRank);
+    ZStatus zget      (ZDataBuffer &pRecord, const zrank_type pZMFRank);
 
     ZStatus zaddRaw   (ZRawRecord &pRecord);
     ZStatus _insertRaw(ZRawRecord &pRecord, const zrank_type pZMFRank);
-    ZStatus _getRaw   (ZRawRecord &pRecord, const zrank_type pZMFRank);
+    ZStatus _getRaw   (ZDataBuffer &pRecord, const zrank_type pZMFRank);
 
     ZStatus zremoveByRank     (const zrank_type pZMFRank) ;
-    ZStatus zremoveByRankR    (ZRecord *pZMFRecord, const zrank_type pZMFRank);
+//    ZStatus zremoveByRankR    (ZRecord *pZMFRecord, const zrank_type pZMFRank);
+    ZStatus zremoveByRankR    (ZDataBuffer &pZMFRecord, const zrank_type pZMFRank);
 
 
 
@@ -524,7 +525,9 @@ friend ZStatus operator << (ZMasterFile &pZMF,ZRecord& pInput)
 
 
 //    ZStatus _removeByRank  (ZFileDescriptor &pDescriptor, ZMasterControlBlock &pZMCB, ZDataBuffer &pZMFRecord, const long pZMFRank);
-    ZStatus _removeByRank  (ZRecord *pZMFRecord, const zrank_type pZMFRank);
+//    ZStatus _removeByRank  (ZRecord *pZMFRecord, const zrank_type pZMFRank);
+
+    ZStatus _removeByRank  (ZDataBuffer &pZMFRecord, const zrank_type pZMFRank);
 
     ZStatus _removeByRankRaw  (ZRawRecord *pZMFRecord, const zrank_type pZMFRank);
 
@@ -540,7 +543,7 @@ friend ZStatus operator << (ZMasterFile &pZMF,ZRecord& pInput)
 //-------------------base methods overload-----------------
 //
     ZStatus push(ZRecord &pElement) ;
-    ZStatus push_front (ZRecord *pElement) {return(zinsert (pElement,0L));}
+    ZStatus push_front (const ZDataBuffer &pElement) {return(zinsert (pElement,0L));}
 
 //    long move (size_t pDest, size_t pOrig,size_t pNumber=1)     _METHOD_NOT_ALLOWED__  // forbidden  (because of possible Index corruption)
 //    long swap (size_t pDest, size_t pOrig,  size_t pNumber=1)   _METHOD_NOT_ALLOWED__  // forbidden  (because of possible Index corruption)
@@ -561,9 +564,11 @@ friend ZStatus operator << (ZMasterFile &pZMF,ZRecord& pInput)
 
   ZStatus _seek (ZMasterControlBlock &pMCB, long pIndexNumber, const ZDataBuffer &pKey,ZDataBuffer &pUserRecord);
 
-
+#ifdef __DEPRECATED__
   ZRecord* generateRecord();
+#endif
 
+  ZStatus _extractAllKeys(ZArray<ZDataBuffer>& pKeys);
 
 }; //--------------------end class ZMasterFile-------------------------------
 

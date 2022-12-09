@@ -27,24 +27,7 @@ class ZDictionaryFile;
 
 class ZCppGenerate;
 }
-/*
-#define __GENERATE_PARAMETER_FILE__ "zcppgenerateparameters.xml"
-class GenObj {
-public:
-  GenObj()=default;
-  GenObj(ZTypeBase pZType,long pIncludeRank) {ZType=pZType; IncludeRank=pIncludeRank;}
-  ZTypeBase   ZType=ZType_Nothing;
-  long        IncludeRank=-1;
-};
 
-class GenInclude {
-public:
-  GenInclude()=default;
-  GenInclude(const utf8VaryingString& pInclude) {Include=pInclude; Used=false;}
-  utf8VaryingString Include;
-  bool              Used = false;
-};
-*/
 namespace Ui {
 class DicEdit;
 }

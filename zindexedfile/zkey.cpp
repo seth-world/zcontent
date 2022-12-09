@@ -11,7 +11,7 @@
 
 
 #include <zindexedfile/zmasterfile.h>
-#include <zindexedfile/zrecord.h>
+//#include <zindexedfile/zrecord.h>
 
 #include <zindexedfile/zfullindexfield.h>
 

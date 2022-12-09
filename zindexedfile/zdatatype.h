@@ -201,7 +201,7 @@ static const size_t Prohibit= typeid(void*).hash_code();
 static const size_t descStringType= typeid(utfdescString).hash_code();
 static const size_t codeStringType= typeid(utfcodeString).hash_code();
 static const size_t uriStringType= typeid(uriString).hash_code();
-static const size_t messageStringType= typeid(utfmessageString).hash_code();
+
 static const size_t keywordStringType= typeid(utfkeywordString).hash_code();
 static const size_t identityStringType= typeid(utfidentityString).hash_code();
 
@@ -933,8 +933,7 @@ _getClassZType(size_t pTypeHashCode)
     return ZType_Utf8FixedString;
   if (pTypeHashCode==codeStringType)
     return ZType_Utf8FixedString;
-  if (pTypeHashCode==messageStringType)
-    return ZType_Utf8FixedString;
+
   if (pTypeHashCode==keywordStringType)
     return ZType_Utf8FixedString;
   if (pTypeHashCode==identityStringType)
@@ -1084,14 +1083,7 @@ _getClassZTypeFull( _Tp*  pValue,               /* value is required to get much
     _getUtfStringData<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
     return pType;
   }
-  if (wTypeHashCode==messageStringType)
-  {
-    _getUtfStringData<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
-    return pType;
-    /*        pType=ZType_Utf8FixedString;
-        pNaturalSize = pUniversalSize =pUnitCount = cst_messagelen+1;
-        return ZS_SUCCESS ;*/
-  }
+
   if (wTypeHashCode==keywordStringType)
   {
     _getUtfStringData<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;

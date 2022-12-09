@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>560</width>
+    <width>575</width>
     <height>270</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
     <rect>
      <x>10</x>
      <y>230</y>
-     <width>531</width>
+     <width>557</width>
      <height>25</height>
     </rect>
    </property>
@@ -42,6 +42,13 @@
        </size>
       </property>
      </spacer>
+    </item>
+    <item>
+     <widget class="QPushButton" name="ErrlogBTn">
+      <property name="text">
+       <string>Error log</string>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QPushButton" name="MoreBTn">
@@ -203,7 +210,7 @@
     <rect>
      <x>10</x>
      <y>100</y>
-     <width>541</width>
+     <width>551</width>
      <height>111</height>
     </rect>
    </property>

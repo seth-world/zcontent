@@ -131,7 +131,7 @@ bool _testSequence(ZDataBuffer &wFieldContent,  // Field  (Record segment) to ex
                            bool FTrimSpace,             // Request to trim leading and trailing spaces
                            bool FCaseregardless);       // should we disregard case (true) or not (false)
 */
-const char *decode_ZSearchType(const uint16_t pSearchType );
+utf8VaryingString decode_ZSearchType(const uint16_t pSearchType );
 
 
 

@@ -91,6 +91,7 @@ unix:{
 #                $$TOOLSET_ROOT
 
 HEADERS += \
+    ../zcontentcommon/urfparser.h \
     ../zcontentcommon/zcontentconstants.h \
     ../zcontentcommon/zidentity.h \
     ../zcontentcommon/zlock.h \
@@ -106,6 +107,7 @@ HEADERS += \
     ../zindexedfile/zindexcollection.h \
     ../zindexedfile/zindexcontrolblock.h \
     ../zindexedfile/zindexdata.h \
+    ../zindexedfile/zindexedfile_release.h \
     ../zindexedfile/zindexfield.h \
     ../zindexedfile/zindexfile.h \
     ../zindexedfile/zindexitem.h \
@@ -127,7 +129,6 @@ HEADERS += \
     ../zindexedfile/zrawmasterfile.h \
     ../zindexedfile/zrawmasterfileutils.h \
     ../zindexedfile/zrawrecord.h \
-    ../zindexedfile/zrecord.h \
 #    ../zindexedfile/zsifgeneric.h \
     ../zindexedfile/zsjournalcontrolblock.h \
     ../zindexedfile/zurffromnatural.h \
@@ -162,6 +163,7 @@ HEADERS += \
 FURTHER_H =     ../zrandomfile/zrandomlockfile.h
 
 SOURCES += \
+    ../zcontentcommon/urfparser.cpp \
     ../zcontentcommon/zidentity.cpp \
     ../zcontentcommon/zlock.cpp \
     ../zcontentcommon/zoperation.cpp \
@@ -192,7 +194,6 @@ SOURCES += \
     ../zindexedfile/zrawindexfile.cpp \
     ../zindexedfile/zrawmasterfile.cpp \
     ../zindexedfile/zrawrecord.cpp \
-    ../zindexedfile/zrecord.cpp \
     ../zindexedfile/zsjournalcontrolblock.cpp \
     ../zindexedfile/zurffromnatural.cpp \
     ../zrandomfile/zblock.cpp \

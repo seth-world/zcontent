@@ -3,9 +3,10 @@
 #include <zrandomfile/zsearchargument.h>
 #include <ztoolset/zexceptionmin.h>
 
-#include <ztoolset/zutfstrings.h> // for utfmessageString
+
 
 #include <ztoolset/zmem.h>
+#include <ztoolset/utfvaryingstring.h>
 
 using namespace zbs;
 
@@ -171,7 +172,7 @@ ZSearchArgument::report(FILE*pOutput)
             "Trim space");
     for (long wi=0;wi < size();wi++)
     {
-    utfmessageString wFlag;
+    utf8VaryingString wFlag;
     wFlag.clear();
     wFlag += Tab[wi].FFS & FFS_String?"ZRFString":"Binary";
     wFlag += Tab[wi].FFS & FFS_CaseRegardless?"|ZRFCaseRegardless":"";
@@ -334,6 +335,71 @@ _testSequence(ZDataBuffer &wFieldContent,           // Field  (Record segment) t
 
   return false;
 } //_testSequence
+
+
+
+/**
+ * @brief decode_ZSearchType translates ZSearch type in clear text
+ * @param pSearchType
+ * @return
+ */
+utf8VaryingString
+decode_ZSearchType(const uint16_t pSearchType )
+{
+  uint16_t wSearchType = pSearchType;
+  utf8VaryingString wRet;
+  wRet.clear();
+  if (wSearchType & ZRFString)
+  {
+    wRet +=  "ZRFString | ";
+    wSearchType = wSearchType  &  ~ZRFString;
+  }
+  if (wSearchType & ZRFCaseRegardless)
+  {
+    wRet +=  "ZRFCaseRegardless | ";
+    wSearchType = wSearchType  &  ~ZRFCaseRegardless;
+  }
+  if (wSearchType & ZRFTrimspace)
+  {
+    wRet +=  "ZRFTrimspace | ";
+    wSearchType = wSearchType  &  ~ZRFTrimspace;
+  }
+
+  switch (wSearchType)
+  {
+  case ZRFEqualsTo:
+  {
+    wRet +=  "ZRFEqualsTo";
+    break;
+  }
+  case ZRFStartsWith:
+  {
+    wRet +=  "ZRFStartsWith";
+    break;
+  }
+  case ZRFEndsWith:
+  {
+    wRet +=  "ZRFEndsWith";
+    break;
+  }
+  case ZRFContains:
+  {
+    wRet +=  "ZRFContains";
+    break;
+  }
+  case ZRFGreaterThan:
+  {
+    wRet +=  "ZRFGreaterThan";
+    break;
+  }
+  case ZRFLessThan:
+  {
+    wRet +=  "ZRFLessThan";
+    break;
+  }
+  }// switch
+  return wRet;
+}// decode_ZSearchType
 
 
 #endif // ZSSearchArgument_H

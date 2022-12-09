@@ -39,8 +39,8 @@ public:
   void clear (void) {KeyContent.clearData(); ZMFaddress=0L; Operation = ZO_Nothing;
     //State = ZAMNothing;
     return;}
-  ZDataBuffer& toFileKey(void);
-  ZIndexItem&  fromFileKey (ZDataBuffer &pFileKey);
+  ZDataBuffer   toFileKey(void);
+  ZIndexItem&   fromFileKey (ZDataBuffer &pKeyFileRecord);
 
 };
 

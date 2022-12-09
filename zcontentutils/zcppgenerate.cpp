@@ -209,7 +209,7 @@ const char* wCppToRecordBegin =
     "   ZDataBuffer wReturn;\n\n"
     "   FieldPresence._allocate(%d);\n"
     "   FieldPresence.setAll();\n"
-    "   FieldPresence._exportAppendURF(wReturn);\n\n"
+    "   FieldPresence._exportURF(wReturn);\n\n"
     "\n"
     "/*         User content size computation  */\n"
     "   uint64_t wURFSize=0;\n";
@@ -691,27 +691,7 @@ ZCppGenerate::genCppKeys(const utf8VaryingString& pClassName) {
 
   const char* cst_CppKeyHeader=
       " ZDataBuffer %s::getKey%ld() {\n"
-      "   ZDataBuffer wReturn;\n"
-//      "   ZTypeBase wType;\n\n"
-//      "   size_t wUniversalSize=0;\n"
-      ;
-/*
-  const char* cst_CppKeyAtomicSize=
-      "   wUniversalSize += getAtomicUniversalSize_T<%s>(%s);\n";
-  const char* cst_CppKeyClassSize=
-      "   wUniversalSize += %s.getUniversalSize();\n";
-
-  const char* cst_CppKeyMiddle=
-      "\n"
-      "   unsigned char* wPtr=wReturn.allocate(wUniversalSize+sizeof(uint32_t));\n"
-      "   _exportAtomicPtr<uint32_t>(uint32_t(wUniversalSize,wPtr));\n\n"
-      ;
-*/
-//  const char* cst_CppKeyAtomicMove=
-//      "   _getAtomicUfN_Ptr<%s>(%s,wPtr);\n";
-
-//  const char* cst_CppKeyClassMove=
-//      "   %s.getUniversal_Ptr(wPtr);\n";
+      "   ZDataBuffer wReturn;\n" ;
 
   const char* cst_CppKeyTrailer=
       "   return wReturn;\n"

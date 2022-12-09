@@ -679,20 +679,20 @@ size_t getURFHeaderSize(ZTypeBase pZType)
       return sizeof(ZTypeBase);
     case ZType_URIString:
     case ZType_URI:
-      return sizeof(ZTypeBase) + sizeof(URF_Varying_Size_type);
+      return sizeof(ZTypeBase) + sizeof(URF_UnitCount_type);
     case ZType_Utf8VaryingString:
-      return sizeof(ZTypeBase) + sizeof(URF_Varying_Size_type);
+      return sizeof(ZTypeBase) + sizeof(URF_UnitCount_type);
     case ZType_Utf16VaryingString:
-      return sizeof(ZTypeBase) + sizeof(URF_Varying_Size_type);
+      return sizeof(ZTypeBase) + sizeof(URF_UnitCount_type);
     case ZType_Utf32VaryingString:
-      return sizeof(ZTypeBase) + sizeof(URF_Varying_Size_type) ;
+      return sizeof(ZTypeBase) + sizeof(URF_UnitCount_type) ;
 
     case ZType_Utf8FixedString:
-      return sizeof(URF_Fixed_Size_type) + sizeof(URF_Capacity_type) + sizeof(ZTypeBase);
+      return sizeof(URF_UnitCount_type) + sizeof(URF_Capacity_type) + sizeof(ZTypeBase);
     case ZType_Utf16FixedString:
-      return sizeof(URF_Fixed_Size_type) + sizeof(URF_Capacity_type) + sizeof(ZTypeBase);
+      return sizeof(URF_UnitCount_type) + sizeof(URF_Capacity_type) + sizeof(ZTypeBase);
     case ZType_Utf32FixedString:
-      return sizeof(URF_Fixed_Size_type) + sizeof(URF_Capacity_type) + sizeof(ZTypeBase);
+      return sizeof(URF_UnitCount_type) + sizeof(URF_Capacity_type) + sizeof(ZTypeBase);
 
     case ZType_Blob:
       return sizeof(ZTypeBase)+sizeof(uint64_t);
@@ -705,7 +705,7 @@ size_t getURFHeaderSize(ZTypeBase pZType)
     return sizeof(ZTypeBase)+sizeof(uint64_t);
 
   if (wType & ZType_String) // Fixed strings
-    return sizeof(ZTypeBase)+sizeof(URF_Capacity_type)+sizeof(URF_Fixed_Size_type);
+    return sizeof(ZTypeBase)+sizeof(URF_Capacity_type)+sizeof(URF_UnitCount_type);
 
    // Other types : data length is on uint32_t, canonical (array) count is systematically set to 1
   return sizeof(ZTypeBase)+sizeof(uint32_t);

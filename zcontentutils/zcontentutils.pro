@@ -131,6 +131,7 @@ SOURCES += \
     $${ZQT_WIDGET}/zqtwidgettypes.cpp \
     $${ZQT_WIDGET}/zqplaintextedit.cpp \
 #    $${ZQT_WIDGET}/zqpixlabelchecked.cpp \
+    ../zcontentcommon/urfparser.cpp \
 \
     $${ZCONTENT_ROOT}/zcontentcommon/zresource.cpp \
     $${ZCONTENT_ROOT}/zindexedfile/zfielddescription.cpp \
@@ -157,6 +158,7 @@ SOURCES += \
     $${ZCONTENT_ROOT}/zcontentutils/zscan.cpp \
     filegeneratedlg.cpp \
     main.cpp \
+    visulinecol.cpp \
     zcppgenerate.cpp \
     zdicdlg.cpp \
     zfilegenerate.cpp \
@@ -178,6 +180,8 @@ HEADERS += \
     $${ZQT_WIDGET}/zqtwidgettypes.h \
     $${ZQT_WIDGET}/zqplaintextedit.h \
 #    $${ZQT_WIDGET}/zqpixlabelchecked.h \
+    ../../zqt/zqtwidget/zqtwidgets_release.h \
+    ../zcontentcommon/urfparser.h \
 \
     $${ZCONTENT_ROOT}/zcontentcommon/zresource.h \
     $${ZCONTENT_ROOT}/zindexedfile/zfielddescription.h \
@@ -202,6 +206,8 @@ HEADERS += \
 \
     $${TOOLSET_ROOT}/zcppparser/zcppparserutils/rawfields.h \
     filegeneratedlg.h \
+    visulinecol.h \
+    zcontentutils_release.h \
     zcppgenerate.h \
     zdicdlg.h \
     zfilegenerate.h \

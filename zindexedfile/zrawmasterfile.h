@@ -351,7 +351,7 @@ protected:
   ZStatus _addRaw   (ZRawRecord *pRecord);
   ZStatus _insertRaw(ZRawRecord *pRecord, const zrank_type pZMFRank);
 #endif
-  ZStatus _addRaw   (ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeys);
+  ZStatus _addRaw   (ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeysContent);
   ZStatus _insertRaw (const ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeys, const zrank_type pZMFRank);
 
   ZStatus _getRaw   (ZRawRecord *pRecord, const zrank_type pZMFRank);

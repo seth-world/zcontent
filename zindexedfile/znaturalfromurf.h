@@ -627,9 +627,9 @@ unsigned char* wData_Ptr= _getURFHeaderData(pURFData,
 
 #endif //__DEPRECATED_FIELD_CONVERSION__
 
-
+#ifdef __DEPRECATED__
 ZStatus
 getUniversalFromURF (ZDataBuffer &pValue,const unsigned char* pDataPtr, bool pTruncate, const unsigned char **pDataPtrOut=nullptr);
-
+#endif // __DEPRECATED__
 
 #endif // ZNATURALFROMURF_H
