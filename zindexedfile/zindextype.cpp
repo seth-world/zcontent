@@ -7,8 +7,8 @@
 #include <zindexedfile/zkeydictionary.h>
 #include <zindexedfile/zmfdictionary.h>
 
-#include <zindexedfile/zfullindexfield.h>
-#include <zindexedfile/zindexfile.h>
+//#include <zindexedfile/zfullindexfield.h>
+#include <zindexedfile/zrawindexfile.h>
 
 /** @addtogroup ZIndexFileGroup
 
@@ -125,6 +125,8 @@ unsigned char* _negate(unsigned char* pValue, ssize_t pSize)
     return (pValue);
 }// _negate
 #endif // __COMMENT__
+
+#ifdef __DEPRECATED__
 template <class _Tp>
 /**
  * @brief _getValueAFK  get Atomic ( value ) From  Key
@@ -1135,6 +1137,7 @@ case ZType_Float :
 return pOutValue;
 }//_printArrayValueFromKey
 
+
 template <class _Tp>
 ZDataBuffer&
 _convertAtomicEdian(ZDataBuffer& pData,_Tp &pValue, ZFullIndexField & pField)
@@ -1206,7 +1209,7 @@ ZDataBuffer &
 _convert(typename std::enable_if<std::is_class<_Tp>::value, _Tp>::type &pValue) {
 
 }
-
+#endif
 //---------------- building a key with fields----------------------
 //
 

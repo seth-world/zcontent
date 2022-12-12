@@ -403,18 +403,18 @@ public:
   //    ZStatus zgenerateKeyValue (ZSIndexControlBlock& pICB, ZArray<void *> &pKeyValues, ZDataBuffer& pKey);
 
   ZStatus zsearch (ZDataBuffer &pRecord, ZDataBuffer &pKeyValue, const long pIndexNumber);
-  ZStatus zsearch (ZDataBuffer &pRecord, ZKey *pKey);
+//  ZStatus zsearch (ZDataBuffer &pRecord, ZKey *pKey);
 
   ZStatus zsearchAll (ZDataBuffer &pKeyValue,
                       const long pIndexNumber,
                       ZIndexCollection &pIndexCollection,
                       const ZMatchSize_type pZMS=ZMS_MatchKeySize);
-
+#ifdef __DEPRECATED__
   ZStatus zsearchAll (ZKey &pZKey, ZIndexCollection& pIndexCollection);
 
   ZStatus zsearchFirst (ZKey &pZKey, ZDataBuffer &pOutRecord, ZIndexCollection *pCollection);
   ZStatus zsearchNext (ZKey &pZKey, ZDataBuffer &pRecord, ZIndexCollection *pCollection);
-
+#endif // __DEPRECATED__
   using ZRandomFile::zsearchFieldAllCollection;
   using ZRandomFile::zsearchFieldFirstCollection;
   using ZRandomFile::zsearchFieldNextCollection;

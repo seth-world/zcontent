@@ -794,9 +794,8 @@ ZRawMasterFileVisu::setSelectionBackGround( QVariant& pBackground,
       }
       else
         wItem->setData(pBackground, Qt::BackgroundRole);
-      wCount++;
     } // if (wItem != nullptr)
-
+    wCount++; /* advance even if item is nullptr */
     wCurCol++;
     if (wCurCol >= wColLimit ) {
       wCurCol = 0;
@@ -1483,7 +1482,7 @@ ZRawMasterFileVisu::displayOneURFField(zaddress_type &wOffset,const unsigned cha
       wRow << new QStandardItem("<Invalid resource>");
     }
     else {
-      wStr.sprintf("%s-%ld",decode_ZEntity(wValue.Entity).toChar(),wValue.id);
+      wStr.sprintf("entity<%s> id<%ld>",decode_ZEntity(wValue.Entity).toChar(),wValue.id);
       wRow << new QStandardItem(wStr.toCChar());
     }
 

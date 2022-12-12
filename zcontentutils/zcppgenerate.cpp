@@ -152,6 +152,7 @@ const char* wHMethods =
     "   %s()=default;\n"
     "   %s& _copyFrom(const %s& pIn);\n"
     "   %s& operator = (const %s& pIn) { return _copyFrom(pIn); }\n"
+    "   void clear();\n"
 //    "   void setFromPtr(const unsigned char *&pPtrIn);\n"
 //    "   void set(const %s& pIn);\n"
     "   ZDataBuffer toRecord();\n"
@@ -830,6 +831,58 @@ ZCppGenerate::genCppKeys(const utf8VaryingString& pClassName) {
   return wReturn;
 } // genCppKeys
 
+utf8VaryingString
+ZCppGenerate::genCppClear(  const utf8VaryingString& pClassName) {
+  utf8VaryingString wReturn;
+  ZTypeBase wZType;
+  wReturn.sprintf("   void %s::clear() {\n",pClassName.toString());
+
+
+  /* atomic data */
+
+  for (long wi=0; wi < DictionaryFile->count() ; wi ++) {
+
+
+    wZType = DictionaryFile->Tab[wi].ZType ;
+    if (wZType & ZType_Atomic) {
+      wZType &= ~ZType_Atomic ;
+
+      if ((DictionaryFile->Tab[wi].ZType & ZType_Float) == ZType_Float) {
+        wReturn.addsprintf("      %s=0.0f ;\n",DictionaryFile->Tab[wi].getName().toString());
+        continue;
+      }
+      if ((DictionaryFile->Tab[wi].ZType & ZType_Double) == ZType_Double) {
+        wReturn.addsprintf("      %s=0.0 ;\n",DictionaryFile->Tab[wi].getName().toString());
+        continue;
+      }
+      if ((DictionaryFile->Tab[wi].ZType & ZType_LDouble) == ZType_LDouble) {
+        wReturn.addsprintf("      %s=0.0L ;\n",DictionaryFile->Tab[wi].getName().toString());
+        continue;
+      }
+      if ((DictionaryFile->Tab[wi].ZType & ZType_U64) == ZType_U64) {
+        wReturn.addsprintf("      %s=0L ;\n",DictionaryFile->Tab[wi].getName().toString());
+        continue;
+      }
+      if ((DictionaryFile->Tab[wi].ZType & ZType_S64) == ZType_S64) {
+        wReturn.addsprintf("      %s=0L ;\n",DictionaryFile->Tab[wi].getName().toString());
+        continue;
+      }
+
+      /* other atomic are set to zero */
+      wReturn.addsprintf("      %s=0 ;\n",DictionaryFile->Tab[wi].getName().toString());
+      continue;
+    } // if (wZType & ZType_Atomic)
+
+    /* class structures */
+    wReturn.addsprintf("      %s.clear() ;\n",DictionaryFile->Tab[wi].getName().toString());
+
+  }// for
+  wReturn += "      return; \n"
+             "   }\n";
+  return wReturn;
+}// genCppClear
+
+
 ZStatus
 ZCppGenerate::genCpp( const utf8VaryingString& pClassName,
                       const uriString& pHeaderFile,
@@ -907,6 +960,11 @@ ZCppGenerate::genCpp( const utf8VaryingString& pClassName,
   }// for
   wCppContent += "    return *this;\n";
   wCppContent.addsprintf(wSMethodEnd,"_copyFrom");
+
+  /* clear routine */
+
+  wCppContent += genCppClear(pClassName);
+
 
   /* move to record */
   wCppContent.addsprintf(wCppToRecordBegin,pClassName.toCChar(),DictionaryFile->count());

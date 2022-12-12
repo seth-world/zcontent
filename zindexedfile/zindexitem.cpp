@@ -10,7 +10,7 @@ ZIndexItem::ZIndexItem()
 //
 void
 ZIndexItem::set(const ZDataBuffer& pKeyContent) {
-  setData(pKeyContent);
+  ZDataBuffer::setData(pKeyContent);
 }
 
 /**
@@ -26,7 +26,7 @@ ZIndexItem::toFileKey(void)
   zaddress_type wAddress;
   wAddress = reverseByteOrder_Conditional<zaddress_type>(ZMFaddress);
   wReturn.setData(&wAddress,sizeof(zaddress_type));
-  wReturn.appendData(KeyContent);
+  wReturn.appendData(*this);
   return  wReturn;
 }
 

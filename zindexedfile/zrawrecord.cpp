@@ -39,7 +39,7 @@ ZRawRecord::setRawKeyContent(long pIdx,const ZDataBuffer& pKeyContent)
 {
   if (pIdx > KeyValue.count())
     return ZS_OUTBOUND;
-  KeyValue[pIdx]->KeyContent = pKeyContent;
+  KeyValue[pIdx]->set( pKeyContent );
   return ZS_SUCCESS;
 }
 
@@ -116,10 +116,10 @@ ZRawRecord::prepareForWrite(ZDataBuffer& pContent)
   for (long wi=0;wi < KeyValue.count();wi++)
   {
     /* size of next key content */
-    _exportAtomic<uint32_t>((uint32_t)KeyValue[wi]->KeyContent.Size,RawContent);
+    _exportAtomic<uint32_t>((uint32_t)KeyValue[wi]->Size,RawContent);
 
     /* key content */
-    RawContent.appendData(KeyValue[wi]->KeyContent);
+    RawContent.appendData(*KeyValue[wi]);
   }
 
 //  RawContent.appendData(&cst_ZBLOCKEND,sizeof(cst_ZBLOCKEND)); /* no need to indian convert */
@@ -194,7 +194,7 @@ ZRawRecord::getContentFromRaw(ZDataBuffer& pContent,ZDataBuffer& pRaw )
     KeyValue.push(new ZIndexItem);
     KeyValue.last()->Operation = ZO_Nothing ;
     KeyValue.last()->ZMFaddress = 0L;
-    KeyValue.last()->KeyContent.setData(wPtrIn,wKeySize);
+    KeyValue.last()->setData(wPtrIn,wKeySize);
     wPtrIn += wKeySize;
     wi++;
     }
@@ -210,7 +210,7 @@ ZRawRecord::resetAll()
   RawContent.reset();
   Content.reset();
   for (long wi=0;wi<KeyValue.count();wi++ )
-    KeyValue[wi]->KeyContent.reset();
+    KeyValue[wi]->reset();
 }//resetAll
 
 

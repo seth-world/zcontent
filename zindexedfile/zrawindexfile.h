@@ -488,7 +488,7 @@ public:
 /**
  * @brief URFCompare  Compare two buffers composed each of one or many URF fields, each field potentially of variable length.
  */
-int URFCompare(const ZDataBuffer &pKey1,ZDataBuffer &pKey2) ;
+//int URFCompare(const ZDataBuffer &pKey1,ZDataBuffer &pKey2) ;
 
 /**
  * @brief extractURF_Append

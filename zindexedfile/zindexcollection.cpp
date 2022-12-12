@@ -41,9 +41,9 @@ ZIndexResult ZIndexResult::create(zaddress_type pZMFAddress,zrank_type pIndexRan
 
 void
 ZIndexCollectionContext::setup( const ZDataBuffer &pKeyLow,
-                                const ZDataBuffer* pKeyHigh,
-                                ZIFCompare    pZIFCompare,
-                                const ssize_t pCompareSize)
+                                const ZDataBuffer* pKeyHigh)
+//                                ZIFCompare    pZIFCompare,
+//                                const ssize_t pCompareSize)
 {
   clear();
   KeyContent = pKeyLow;
@@ -56,8 +56,8 @@ ZIndexCollectionContext::setup( const ZDataBuffer &pKeyLow,
   //        ZMS=pZMS;
   //        Lock = pLock;
   Op=ZCOP_Nothing;
-  CompareSize =pCompareSize;
-  Compare=pZIFCompare;
+//  CompareSize =pCompareSize;
+//  Compare=pZIFCompare;
   isInit=true;
   return;
 }
@@ -82,8 +82,8 @@ ZIndexCollectionContext::clear()
 {
   //        ZIFFile = nullptr;
   CurrentZIFrank=-1;
-  Compare=nullptr;
-  CompareSize=-1;
+//  Compare=nullptr;
+//  CompareSize=-1;
   //        ZMS = ZMS_MatchIndexSize;
   //        Lock = ZLock_Nolock;
   Op = ZCOP_Nothing;

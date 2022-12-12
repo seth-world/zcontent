@@ -1,6 +1,6 @@
 #include "zindextable.h"
 
-#include <zcontent/zindexedfile/zindexfile.h>
+#include <zcontent/zindexedfile/zrawindexfile.h>
 
 #include <zxml/zxmlprimitives.h>
 

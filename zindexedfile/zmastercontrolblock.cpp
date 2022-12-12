@@ -9,7 +9,7 @@
 #include <zindexedfile/zindexdata.h>
 #include <ztoolset/zarray.h>
 
-#include <zindexedfile/zindexfile.h>
+#include <zindexedfile/zrawindexfile.h>
 
 
 using namespace zbs;

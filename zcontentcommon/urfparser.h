@@ -58,6 +58,13 @@ public:
   const unsigned char*  wPtrEnd=nullptr;
 };
 
+/** @brief URFCompare  Compare two buffers composed each of one or many URF fields, each field potentially of variable length.
+*/
+int URFComparePtr(const unsigned char* pKey1, size_t pSize1, const unsigned char* pKey2, size_t pSize2);
+
+int URFCompareValues( const unsigned char* &pURF1,const unsigned char* pURF1_End,
+                      const unsigned char* &pURF2,const unsigned char* pURF2_End);
+
 
 
 template <class _Tp>

@@ -103,21 +103,17 @@ HEADERS += \
     ../zindexedfile/zdatatype.h \
     ../zindexedfile/zdictionaryfile.h \
     ../zindexedfile/zfielddescription.h \
-    ../zindexedfile/zfullindexfield.h \
     ../zindexedfile/zindexcollection.h \
     ../zindexedfile/zindexcontrolblock.h \
     ../zindexedfile/zindexdata.h \
     ../zindexedfile/zindexedfile_release.h \
     ../zindexedfile/zindexfield.h \
-    ../zindexedfile/zindexfile.h \
     ../zindexedfile/zindexitem.h \
     ../zindexedfile/zindextable.h \
     ../zindexedfile/zindextype.h \
     ../zindexedfile/zjournal.h \
-    ../zindexedfile/zkey.h \
     ../zindexedfile/zkeydictionary.h \
     ../zindexedfile/zmastercontrolblock.h \
-    ../zindexedfile/zmasterfile.h \
     ../zindexedfile/zmasterfile_utilities.h \
     ../zindexedfile/zmasterfiletype.h \
     ../zindexedfile/zmetadic.h \
@@ -173,20 +169,15 @@ SOURCES += \
     ../zindexedfile/zdatatype.cpp \
     ../zindexedfile/zdictionaryfile.cpp \
     ../zindexedfile/zfielddescription.cpp \
-    ../zindexedfile/zfullindexfield.cpp \
     ../zindexedfile/zindexcollection.cpp \
     ../zindexedfile/zindexcontrolblock.cpp \
     ../zindexedfile/zindexfield.cpp \
-    ../zindexedfile/zindexfile.cpp \
     ../zindexedfile/zindexitem.cpp \
     ../zindexedfile/zindextable.cpp \
     ../zindexedfile/zindextype.cpp \
     ../zindexedfile/zjournal.cpp \
-    ../zindexedfile/zkey.cpp \
     ../zindexedfile/zkeydictionary.cpp \
     ../zindexedfile/zmastercontrolblock.cpp \
-    ../zindexedfile/zmasterfile.cpp \
-    ../zindexedfile/zmasterfile_utilities.cpp \
     ../zindexedfile/zmetadic.cpp \
     ../zindexedfile/zmfdictionary.cpp \
     ../zindexedfile/zmfstats.cpp \

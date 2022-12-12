@@ -787,3 +787,98 @@ URFParser::getKeyFieldValue (const unsigned char* &pPtrIn,ZDataBuffer& pValue){
   return ZS_SUCCESS;
 }// getURFFieldValue
 
+/** @brief URFCompare  Compare two buffers composed each of one or many URF fields, each field potentially of variable length.
+   */
+int URFComparePtr(const unsigned char* pKey1, size_t pSize1, const unsigned char* pKey2, size_t pSize2) {
+  if ((pKey1 == nullptr)||(pSize1==0)) {
+    if ((pKey2 == nullptr)||(pSize2==0))
+      return 0;   /* both keys are empty : equality */
+    return - 1;   /* key2 greater than key1 : negative value */
+  }
+  if ((pKey2 == nullptr)||(pSize2==0)) {
+    return 1 ;    /* key1 (whatever value) greater than key2 (empty) : positive value */
+  }
+
+  ZDataBuffer wValue1,wValue2;
+  ZStatus wSt;
+  ZTypeBase wType;
+  ssize_t    wSize;
+  const unsigned char* wURF1 = pKey1;
+  const unsigned char* wURF1_End = pKey1 + pSize1;
+  const unsigned char* wEnd1 = pKey1 + pSize1;
+  const unsigned char* wURF2 = pKey2 ;
+  const unsigned char* wURF2_End = pKey2 + pSize2;
+  const unsigned char* wEnd2 = pKey2 + pSize2;
+
+  int wRet=0;
+  wSt=URFParser::getURFTypeAndSize(pKey1,wType,wSize);
+  if (wSt!=ZS_SUCCESS) {
+    ZException.setMessage("URFCompare",wSt,Severity_Fatal,"Error while comparing key values. Key1 type %X %s size %ld");
+    ZException.exit_abort();
+  }
+  wURF1_End = wURF1 + wSize;
+
+  wSt=URFParser::getURFTypeAndSize(pKey2,wType,wSize);
+  if (wSt!=ZS_SUCCESS){
+    ZException.setMessage("URFCompare",wSt,Severity_Fatal,"Error while comparing key values.");
+    ZException.exit_abort();
+  }
+  wURF2_End = wURF2 + wSize;
+
+  wRet = URFCompareValues (wURF1,wURF1_End,wURF2,wURF2_End);  /* pURF1 and pURF2 are updated */
+
+  while ( (wRet==0) && (wSt == ZS_SUCCESS ) && (wURF1 < wEnd1) && (wURF2 < wEnd2) ) {
+    wSt=URFParser::getURFTypeAndSize(wURF1,wType,wSize);
+    if (wSt!=ZS_SUCCESS)
+      break;
+    wURF1_End = wURF1 + wSize;
+    wSt=URFParser::getURFTypeAndSize(wURF2,wType,wSize);
+    if (wSt!=ZS_SUCCESS)
+      break;
+    wURF2_End = wURF2 + wSize;
+    wRet = URFCompareValues (wURF1,wURF1_End,wURF2,wURF2_End);  /* pURF1 and pURF2 are updated */
+  }// while
+  return wRet;
+} // URFCompare
+
+
+
+
+
+int URFCompareValues( const unsigned char* &pURF1,const unsigned char* pURF1_End,
+                      const unsigned char* &pURF2,const unsigned char* pURF2_End) {
+  int wRet=0;
+
+  if (pURF1==nullptr) {
+    if (pURF2==nullptr)
+      return 0;
+    else {
+      pURF2 = pURF2_End;
+      return -1;
+    }
+  }
+  if (pURF2==nullptr)
+    return 1;
+
+  wRet=0;
+  while ((wRet==0) && (pURF1 < pURF1_End) && (pURF2 < pURF2_End)){
+    wRet = (*pURF1++)-(*pURF2++);
+  }
+  if (wRet==0) {
+    if (pURF1 > pURF1_End) {
+      pURF2 = pURF2_End;
+      pURF1 = pURF1_End;
+      return 1; /* key1 is greater than key2 */
+    }
+    if (pURF2 > pURF2_End) {
+      pURF2 = pURF2_End;
+      pURF1 = pURF1_End;
+      return -1; /* key1 is less than key2 */
+    }
+    pURF2 = pURF2_End;
+    pURF1 = pURF1_End;
+    /* equality in size and in values */
+    return 0;
+  }
+  return wRet;
+}

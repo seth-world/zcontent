@@ -19,7 +19,7 @@ int ZKeyCompareBinary (const ZDataBuffer &pKey1, ZDataBuffer &pKey2, ssize_t pSi
 
 int ZKeyCompareAlpha (const ZDataBuffer &pKey1,ZDataBuffer &pKey2,ssize_t pSize);
 
-typedef int  (*ZIFCompare) (const ZDataBuffer &pKey1,ZDataBuffer &pKey2,ssize_t pSize);
+//typedef int  (*ZIFCompare) (const ZDataBuffer &pKey1,ZDataBuffer &pKey2,ssize_t pSize);
 
 //class ZRawIndexFile;
 
@@ -111,10 +111,8 @@ class ZIndexCollectionContext
 public:
     ZIndexCollectionContext(void) { clear();}
 
-    void setup ( const ZDataBuffer &pKeyLow,
-                 const ZDataBuffer* pKeyHigh,
-                 ZIFCompare    pZIFCompare,
-                 const ssize_t pCompareSize);
+    void setup (const ZDataBuffer &pKeyLow,
+                 const ZDataBuffer* pKeyHigh);
 
 
     ZStatus setStatus(ZStatus pSt) {
@@ -134,8 +132,8 @@ public:
 //    ZIndexFile*         ZIFFile=nullptr;            //!< ZIndexFile to refer to
     ssize_t             CurrentZIFrank=-1;            //!< Current ZIndexFile rank during search operations.
 //    ZMatchSize_type     ZMS=ZMS_Nothing;            //!< Matching type
-    ZIFCompare          Compare=ZKeyCompareBinary;  //!< Comparison routine : deduced from key data type
-    ssize_t             CompareSize=-1;             //!< Size of key content to compare : deduced from ZMatchSize_type
+//    ZIFCompare          Compare=ZKeyCompareBinary;  //!< Comparison routine : deduced from key data type
+//    ssize_t             CompareSize=-1;             //!< Size of key content to compare : deduced from ZMatchSize_type
 //    zlock_type          Lock=ZLock_Nolock;          //!< Last lock mask applied or tried to be applied (in case of error)
     uint16_t            Op;                         //!< Last operation on collection see @ref ZCollection_Op_type
 
@@ -178,13 +176,11 @@ public:
 
     void setup         (const ZDataBuffer &pKeyLow,
                         const ZDataBuffer* pKeyHigh,
-                        ZIFCompare    pZIFCompare,
+//                        ZIFCompare    pZIFCompare,
                         const ssize_t pCompareSize,
                         const zlockmask_type pLock) {
              Context.setup(pKeyLow,
-                           pKeyHigh,
-                           pZIFCompare,
-                           pCompareSize);
+                           pKeyHigh);
     }
 
     ZStatus evaluate(ZDataBuffer&wRecordContent) {return (Argument.evaluate(wRecordContent)?ZS_FOUND:ZS_NOTFOUND);}

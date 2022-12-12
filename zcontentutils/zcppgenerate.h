@@ -91,9 +91,12 @@ public:
   ZStatus genHeader(const utf8VaryingString& pClassName,
                               const uriString &pHeaderFile,
                               const utf8VaryingString &pBrief);
+  /* generates all keys declarative stuff */
   utf8VaryingString genHeaderKeys() ;
+  /* generates all keys management body routines */
   utf8VaryingString genCppKeys(const utf8VaryingString& pClassName);
-
+  /* generates the void clear() body method */
+  utf8VaryingString genCppClear(  const utf8VaryingString& pClassName);
   ZStatus genCpp(const utf8VaryingString& pClassName, const uriString &pHeaderFile, const uriString& pCppFile);
 
   ZStatus generateInterface(const utf8VaryingString &pOutBase,

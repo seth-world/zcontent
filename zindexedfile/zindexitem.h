@@ -25,7 +25,7 @@ public:
   {
     ZMFaddress=pIn.ZMFaddress;
     Operation=pIn.Operation;
-    KeyContent=pIn.KeyContent;
+//    KeyContent=pIn.KeyContent;
     this->ZDataBuffer::_copyFrom(pIn);
     return *this;
   }
@@ -33,10 +33,10 @@ public:
 
   zaddress_type ZMFaddress;    //!< Master file block record address to link index key with
   ZOp           Operation;     //!< this is NOT stored on index file (see toFileKey() method) but only for history & journaling purpose
-  ZDataBuffer   KeyContent;    //!< extracted key content from user record according key extraction rules. Size of content is fixed and value is ZIndexControlBlock::KeySize.
+  //  ZDataBuffer   KeyContent;    //!< extracted key content from user record according key extraction rules. Size of content is fixed and value is ZIndexControlBlock::KeySize.
 
   void set(const ZDataBuffer& pKeyContent) ;
-  void clear (void) {KeyContent.clearData(); ZMFaddress=0L; Operation = ZO_Nothing;
+  void clear (void) { ZDataBuffer::clearData(); ZMFaddress=0L; Operation = ZO_Nothing;
     //State = ZAMNothing;
     return;}
   ZDataBuffer   toFileKey(void);

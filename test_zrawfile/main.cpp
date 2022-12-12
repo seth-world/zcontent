@@ -36,6 +36,7 @@ enum DocumentMetaType : DocumentMetaType_t
   ZDMT_mail     = 1,
   ZDMT_text     = 2,
   ZDMT_memo     = 6,
+  ZDMT_picture  = 7,
   ZDMT_other    = 8
 };
 
@@ -113,6 +114,8 @@ int main(int argc, char *argv[])
 */
   ZDocPhysical wDocPhy;
 
+  ZResource wCollisionId = ZResource::getNew(ZEntity_DocPhysical);
+
   ZArray<ZDataBuffer> wKeys;
 
   wDocPhy.Documentid  = ZResource::getNew(ZEntity_DocPhysical);
@@ -123,7 +126,7 @@ int main(int argc, char *argv[])
   wDocPhy.URI = wPictureDir ;      // not in vault
   wDocPhy.URI.addConditionalDirectoryDelimiter();
   wDocPhy.Short = "Short description for picure used figuring an email connection";
-  wDocPhy.Desc="Picture used for figuring an email connection.";
+  wDocPhy.Desc="Picture used for figuring an email connection.record #0";
   wDocPhy.URI += "emailconnection.jpg";
   wDocPhy.DocSize= wDocPhy.URI.getFileSize();
 
@@ -144,19 +147,20 @@ int main(int argc, char *argv[])
 
   wSt=wMasterFile.zadd_T(wDocPhy);
   if (wSt!=ZS_SUCCESS) {
-    ZException.exit_abort();
+    goto endofmain;
   }
 
   /* second record */
+  wDocPhy.clear();
 
-  wDocPhy.Documentid  = ZResource::getNew(ZEntity_DocPhysical);
+  wDocPhy.Documentid  = wCollisionId ;
 
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_text ;
   wDocPhy.Storage = Storage_External ;  // not in vault
   wDocPhy.URI = wPictureDir ;      // not in vault
   wDocPhy.URI.addConditionalDirectoryDelimiter();
-  wDocPhy.Desc="a simple grave for resting in peace";
+  wDocPhy.Desc="a simple grave for resting in peace zmf record #1";
   wDocPhy.URI += "graverip.jpg";
   wDocPhy.DocSize= wDocPhy.URI.getFileSize();
 
@@ -176,15 +180,17 @@ int main(int argc, char *argv[])
 
   wSt=wMasterFile.zadd_T(wDocPhy);
   if (wSt!=ZS_SUCCESS) {
-    ZException.exit_abort();
+    goto endofmain;
   }
 
   /* record #3 */
+  wDocPhy.clear();
+
   wDocPhy.Documentid  = ZResource::getNew(ZEntity_DocPhysical);
 
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_other ;
-  wDocPhy.Desc="This is iceberg";
+  wDocPhy.Desc="This is iceberg zmf record #2";
   wDocPhy.Storage = Storage_External ;  // not in vault
   wDocPhy.URI = wPictureDir ;      // not in vault
   wDocPhy.URI.addConditionalDirectoryDelimiter();
@@ -208,8 +214,118 @@ int main(int argc, char *argv[])
 
   wSt=wMasterFile.zadd_T(wDocPhy);
   if (wSt!=ZS_SUCCESS) {
-    ZException.exit_abort();
+    goto endofmain;
   }
 
-  wMasterFile.zclose();
+  /* record #4 */
+  wDocPhy.clear();
+
+  wDocPhy.Documentid  = wCollisionId;
+
+  wDocPhy.DataRank = 0;
+  wDocPhy.DocMetaType = ZDMT_other ;
+  wDocPhy.Short = "skull head";
+  wDocPhy.Desc="No more than a skull head record #3";
+  wDocPhy.Storage = Storage_External ;  // not in vault
+  wDocPhy.URI = wPictureDir ;      // not in vault
+  wDocPhy.URI.addConditionalDirectoryDelimiter();
+  wDocPhy.URI += "skullhead.png";
+  wDocPhy.DocSize= wDocPhy.URI.getFileSize();
+
+
+  wDocPhy.Registrated = ZDateFull::fromDMY("02/10");
+  wDocPhy.Created = ZDateFull::fromDMY("02/10");
+  wDocPhy.LastModified = ZDateFull::currentDateTime();
+
+  wDocPhy.OwnerOrigin = wUserId;
+
+  wDocPhy.AccessRights = 00001;
+
+  wDocPhy.CheckSum  = wDocPhy.URI.getChecksum();
+
+  wDocPhy.Temporary=0;
+  wDocPhy.Ownerid=wUserId;
+  wDocPhy.Vaultid=ZResource();
+
+  wSt=wMasterFile.zadd_T(wDocPhy);
+  if (wSt!=ZS_SUCCESS) {
+    goto endofmain;
+  }
+
+  /* record #5 */
+  wDocPhy.clear();
+
+  wDocPhy.Documentid  = ZResource::getNew(ZEntity_DocPhysical);
+
+  wDocPhy.DataRank = 0;
+  wDocPhy.DocMetaType = ZDMT_picture ;
+  wDocPhy.Short = "smashed paper";
+  wDocPhy.Desc="A smashed paper bowl record #4";
+  wDocPhy.Storage = Storage_External ;  // not in vault
+  wDocPhy.URI = wPictureDir ;      // not in vault
+  wDocPhy.URI.addConditionalDirectoryDelimiter();
+  wDocPhy.URI += "smashedpaper.jpg";
+  wDocPhy.DocSize= wDocPhy.URI.getFileSize();
+
+
+  wDocPhy.Registrated = ZDateFull::fromDMY("02/10");
+  wDocPhy.Created = ZDateFull::fromDMY("02/10");
+  wDocPhy.LastModified = ZDateFull::currentDateTime();
+
+  wDocPhy.OwnerOrigin = wUserId;
+
+  wDocPhy.AccessRights = 00001;
+
+  wDocPhy.CheckSum  = wDocPhy.URI.getChecksum();
+
+  wDocPhy.Temporary=0;
+  wDocPhy.Ownerid=wUserId;
+  wDocPhy.Vaultid=ZResource();
+
+  wSt=wMasterFile.zadd_T(wDocPhy);
+  if (wSt!=ZS_SUCCESS) {
+    goto endofmain;
+  }
+
+  /* record #6 */
+  wDocPhy.clear();
+
+  wDocPhy.Documentid  = ZResource::getNew(ZEntity_DocPhysical);
+
+  wDocPhy.DataRank = 0;
+  wDocPhy.DocMetaType = ZDMT_picture ;
+  wDocPhy.Short = "stylo";
+  wDocPhy.Desc="Simple ink pen record #5";
+  wDocPhy.Storage = Storage_External ;  // not in vault
+  wDocPhy.URI = wPictureDir ;      // not in vault
+  wDocPhy.URI.addConditionalDirectoryDelimiter();
+  wDocPhy.URI += "stylo.jpeg";
+  wDocPhy.DocSize= wDocPhy.URI.getFileSize();
+
+
+  wDocPhy.Registrated = ZDateFull::fromDMY("02/10");
+  wDocPhy.Created = ZDateFull::fromDMY("02/10");
+  wDocPhy.LastModified = ZDateFull::currentDateTime();
+
+  wDocPhy.OwnerOrigin = wUserId;
+
+  wDocPhy.AccessRights = 00001;
+
+  wDocPhy.CheckSum  = wDocPhy.URI.getChecksum();
+
+  wDocPhy.Temporary=0;
+  wDocPhy.Ownerid=wUserId;
+  wDocPhy.Vaultid=ZResource();
+
+  wSt=wMasterFile.zadd_T(wDocPhy);
+  if (wSt!=ZS_SUCCESS) {
+    goto endofmain;
+  }
+
+ endofmain:
+   wMasterFile.zclose();
+   if (wSt!=ZS_SUCCESS) {
+     ZException.exit_abort();
+   }
+
 }

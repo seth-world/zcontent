@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 
-#include <zindexedfile/zkey.h>
+//#include <zindexedfile/zkey.h>
 #include <zindexedfile/zindexitem.h>
 
 #include <zrandomfile/zrfcollection.h>
@@ -3550,7 +3550,7 @@ long wi = 0;
 
 //----------------End Remove sequence------------------------------------------------------
 
-
+#ifdef __DEPRECATED__
 /**
  * @brief ZRawMasterFile::zsearch searches for a single key value using a ZKey Object
  *
@@ -3566,6 +3566,7 @@ ZRawMasterFile::zsearch(ZDataBuffer &pRecord,ZKey *pKey)
 
     return (zsearch(pRecord,(ZDataBuffer &)*pKey,pKey->IndexNumber));
 }
+#endif
 /**
  * @brief ZRawMasterFile::zsearch searches for a single key value using a ZDataBuffer containing key value to search
  * Key to search for has to be previously formatted to index internal format using appropriate routines
@@ -3620,6 +3621,7 @@ ZRawMasterFile::zsearchAll (ZDataBuffer &pKeyValue,
                                                       pZMS);
 
 }
+#ifdef __DEPRECATED__
 /**
  * @brief ZRawMasterFile::zsearchAll search for all index rank using a ZKey object. Exact or Partial key search is set by ZKey
  *
@@ -3754,7 +3756,7 @@ ZIndexResult wZIR;
     return  ZS_FOUND;
 }// zsearchFirst
 
-
+#endif // __DEPRECATED__
 
 //----------------End Search sequence----------------------------------------------------
 

@@ -2,7 +2,7 @@
 #define ZDATATYPE_CPP
 
 #include <zindexedfile/zindextype.h>
-#include <zindexedfile/zindexfile.h>
+#include <zindexedfile/zrawindexfile.h>
 #include <zindexedfile/zdataconversion.h>
 
 /*
