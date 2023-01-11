@@ -250,13 +250,14 @@ public:
   zaddress_type getCurrentPosition(void)  {return LogicalPosition; }
 
   /**
-     * @brief setPhysicalFromLogical converts a physical to a logical address
+     * @brief setLogicalFromPhysical converts a physical to a logical address
      * @param pLogical logical address to convert
      * @return the physical address duly converted
      */
   inline
   zaddress_type    setLogicalFromPhysical (zaddress_type pPhysical) {if (pPhysical<0) return -1; return (pPhysical-ZFCB.StartOfData);}
-
+  inline
+  zaddress_type    setPhysicalFromLogical (zaddress_type pLogical) {if (pLogical<0) return -1; return (pLogical+ZFCB.StartOfData);}
   /**
      * @brief getAddressFromRank  returns the physical address within file of the relative position of record given by pRank
      * @param pRank  Record's relative position within ZBlockAccessTable (ZBAT)
@@ -350,7 +351,7 @@ public:
 
 
 
-
+protected:
     void clear (void)
       {
       clearFCB();

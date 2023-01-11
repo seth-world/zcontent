@@ -4,12 +4,14 @@ using namespace zbs;
 
 ZIndexItem::ZIndexItem()
 {
-
+  Operation = ZO_Nothing;
+  ZMFaddress = -1;
+  IndexRank = -1;
 }
 //---------ZIndexItem_struct routines-------------------------------------------------------
 //
 void
-ZIndexItem::set(const ZDataBuffer& pKeyContent) {
+ZIndexItem::setBuffer(const ZDataBuffer& pKeyContent) {
   ZDataBuffer::setData(pKeyContent);
 }
 
@@ -53,3 +55,65 @@ ZIndexItem::fromFileKey (ZDataBuffer &pKeyFileRecord)
   return *this;
 }
 
+utf8VaryingString
+ZIndexItem::display() {
+  utf8VaryingString wReturn ;
+
+  wReturn.sprintf("ZMFaddress %lld\n"
+                  "IndexAddress %lld\n"
+                  "IndexRank %lld\n"
+                  "Operation %lld\n"
+                  "Buffer size %ld\n" ,
+      ZMFaddress,IndexAddress,IndexRank,decode_ZOperation(Operation).toCChar(),ZDataBuffer::Size
+      );
+  return wReturn;
+}
+
+size_t ZIndexItemList::_exportAppend(ZDataBuffer& pOut) {
+  size_t wSize = sizeof(uint64_t) ;
+
+  for (long wi=0;wi < count();wi++) {
+    wSize += sizeof(ZIIExport) +  Tab[wi]->getURFSize() ;
+  }
+
+  unsigned char* wPtr=pOut.extend(wSize);
+
+  _exportAtomicPtr<uint64_t>(uint64_t(wSize),wPtr);
+
+  for (long wi=0;wi < count();wi++) {
+    ZIIExport* wZIIe =  (ZIIExport*) wPtr;
+    wZIIe->set(*Tab[wi]);
+    wZIIe->serialize();
+
+    wPtr += sizeof(ZIIExport) ;
+    Tab[wi]->_exportURF_Ptr(wPtr);
+  }// for
+
+  return wSize;
+}
+
+ZIIExport& ZIIExport::_copyFrom(const ZIIExport& pIn) {
+  ZMFaddress = pIn.ZMFaddress;
+  IndexAddress = pIn.IndexAddress;
+  Operation = pIn.Operation;
+  IndexRank = pIn.IndexRank;
+  EndianCheck = pIn.EndianCheck;
+  return *this;
+}
+
+void ZIIExport::reverse() {
+  EndianCheck = reverseByteOrder_Conditional(EndianCheck);
+  ZMFaddress = reverseByteOrder_Conditional(ZMFaddress);
+  IndexAddress = reverseByteOrder_Conditional(IndexAddress);
+  Operation = reverseByteOrder_Conditional(Operation);
+  IndexRank = reverseByteOrder_Conditional(IndexRank);
+  return ;
+}
+
+void ZIIExport::set(const ZIndexItem& pIn) {
+  ZMFaddress = pIn.ZMFaddress;
+  IndexAddress = pIn.IndexAddress;
+  Operation = pIn.Operation;
+  IndexRank = pIn.IndexRank;
+  EndianCheck = cst_EndianCheck_Normal;
+}

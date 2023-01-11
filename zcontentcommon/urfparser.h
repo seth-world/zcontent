@@ -49,11 +49,13 @@ public:
   ZStatus getURFFieldValue (const unsigned char* &wPtr, ZDataBuffer& pValue);
   ZStatus getKeyFieldValue (const unsigned char* &wPtr, ZDataBuffer& pValue);
 
+  static utf8VaryingString displayOneURFField(const unsigned char* &wPtr);
+
   bool                  AllFieldsPresent=false;
   const ZDataBuffer*    Record=nullptr;
   ZArray<URFField>      URFFieldList;
   ZBitset               Presence;
-  size_t                URFDataSize=0;
+  uint64_t              URFDataSize=0;
   const unsigned char*  wPtr=nullptr;
   const unsigned char*  wPtrEnd=nullptr;
 };
@@ -62,8 +64,8 @@ public:
 */
 int URFComparePtr(const unsigned char* pKey1, size_t pSize1, const unsigned char* pKey2, size_t pSize2);
 
-int URFCompareValues( const unsigned char* &pURF1,const unsigned char* pURF1_End,
-                      const unsigned char* &pURF2,const unsigned char* pURF2_End);
+int URFCompareValues( const unsigned char* &pURF1,size_t pSize1,
+                      const unsigned char* &pURF2,size_t pSize2);
 
 
 

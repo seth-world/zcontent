@@ -82,10 +82,20 @@ enum Storage_type:Storage_t
 
 /* end applicationtype.h */
 
+
+void displayKeys (ZRawMasterFile& pMasterFile);
+
 const char* wPictureDir = "/home/gerard/Development/zmftest/testpicture/";
 
 int main(int argc, char *argv[])
 {
+
+  ZDataBuffer wS1,wKey;
+  ZDataBuffer wRecord;
+  ZResource wResource;
+  ZIndexItem wII;
+  utf8VaryingString wStr;
+
   ZStatus wSt;
   ZVerbose |= ZVB_ZRF;
   QApplication a(argc, argv);
@@ -99,7 +109,7 @@ int main(int argc, char *argv[])
 
   uriString wDocFile = wWD ;
   wDocFile.addConditionalDirectoryDelimiter();
-  wDocFile += "physicaldocument.zmf";
+  wDocFile += "physicaldocumentonekey.zmf";
 
 // uriString wPictureDir;
 
@@ -112,13 +122,27 @@ int main(int argc, char *argv[])
     ZException.exit_abort();
   }
 */
+
   ZDocPhysical wDocPhy;
 
-  ZResource wCollisionId = ZResource::getNew(ZEntity_DocPhysical);
+//#ifdef __POPULATE__
+
+
+  ZResource wR1 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR2 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR3 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR4 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR5 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR6 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR7 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR8 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR9 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR10 = ZResource::getNew(ZEntity_DocPhysical);
+
 
   ZArray<ZDataBuffer> wKeys;
 
-  wDocPhy.Documentid  = ZResource::getNew(ZEntity_DocPhysical);
+  wDocPhy.Documentid  = wR1;
 
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_mail ;
@@ -152,8 +176,9 @@ int main(int argc, char *argv[])
 
   /* second record */
   wDocPhy.clear();
+  _DBGPRINT("                   Record #2\n")
 
-  wDocPhy.Documentid  = wCollisionId ;
+  wDocPhy.Documentid  = wR2;
 
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_text ;
@@ -183,10 +208,15 @@ int main(int argc, char *argv[])
     goto endofmain;
   }
 
+  wStr.sprintf("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id);
+  _DBGPRINT(wStr.toCChar())
+  displayKeys(wMasterFile);
+
+  _DBGPRINT("                   Record #3\n")
   /* record #3 */
   wDocPhy.clear();
 
-  wDocPhy.Documentid  = ZResource::getNew(ZEntity_DocPhysical);
+  wDocPhy.Documentid  = wR10;
 
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_other ;
@@ -217,10 +247,14 @@ int main(int argc, char *argv[])
     goto endofmain;
   }
 
+  wStr.sprintf("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id);
+  _DBGPRINT(wStr.toCChar())
+  displayKeys(wMasterFile);
+  _DBGPRINT("                   Record #4\n")
   /* record #4 */
   wDocPhy.clear();
 
-  wDocPhy.Documentid  = wCollisionId;
+  wDocPhy.Documentid  = wR9;
 
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_other ;
@@ -252,10 +286,13 @@ int main(int argc, char *argv[])
     goto endofmain;
   }
 
+  wStr.sprintf("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id);
+  _DBGPRINT(wStr.toCChar())
+  _DBGPRINT("                   Record #5\n")
   /* record #5 */
   wDocPhy.clear();
 
-  wDocPhy.Documentid  = ZResource::getNew(ZEntity_DocPhysical);
+  wDocPhy.Documentid  = wR8;
 
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_picture ;
@@ -268,8 +305,8 @@ int main(int argc, char *argv[])
   wDocPhy.DocSize= wDocPhy.URI.getFileSize();
 
 
-  wDocPhy.Registrated = ZDateFull::fromDMY("02/10");
-  wDocPhy.Created = ZDateFull::fromDMY("02/10");
+  wDocPhy.Registrated = ZDateFull::fromDMY("03/10");
+  wDocPhy.Created = ZDateFull::fromDMY("03/10");
   wDocPhy.LastModified = ZDateFull::currentDateTime();
 
   wDocPhy.OwnerOrigin = wUserId;
@@ -287,10 +324,13 @@ int main(int argc, char *argv[])
     goto endofmain;
   }
 
+  wStr.sprintf("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id);
+  _DBGPRINT(wStr.toCChar())
+  _DBGPRINT("                   Record #6\n")
   /* record #6 */
   wDocPhy.clear();
 
-  wDocPhy.Documentid  = ZResource::getNew(ZEntity_DocPhysical);
+  wDocPhy.Documentid  = wR5;
 
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_picture ;
@@ -303,8 +343,8 @@ int main(int argc, char *argv[])
   wDocPhy.DocSize= wDocPhy.URI.getFileSize();
 
 
-  wDocPhy.Registrated = ZDateFull::fromDMY("02/10");
-  wDocPhy.Created = ZDateFull::fromDMY("02/10");
+  wDocPhy.Registrated = ZDateFull::fromDMY("04/10");
+  wDocPhy.Created = ZDateFull::fromDMY("04/10");
   wDocPhy.LastModified = ZDateFull::currentDateTime();
 
   wDocPhy.OwnerOrigin = wUserId;
@@ -322,10 +362,166 @@ int main(int argc, char *argv[])
     goto endofmain;
   }
 
+  wStr.sprintf("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id);
+  _DBGPRINT(wStr.toCChar())
+  _DBGPRINT("                   Record #7\n")
+  /* record #7 */
+  wDocPhy.clear();
+
+  wDocPhy.Documentid  = wR6;
+
+  wDocPhy.DataRank = 0;
+  wDocPhy.DocMetaType = ZDMT_picture ;
+  wDocPhy.Short = "stylo";
+  wDocPhy.Desc="closed trash bin #6";
+  wDocPhy.Storage = Storage_External ;  // not in vault
+  wDocPhy.URI = wPictureDir ;      // not in vault
+  wDocPhy.URI.addConditionalDirectoryDelimiter();
+  wDocPhy.URI += "trash-closed.jpg";
+  wDocPhy.DocSize= wDocPhy.URI.getFileSize();
+
+
+  wDocPhy.Registrated = ZDateFull::fromDMY("04/09");
+  wDocPhy.Created = ZDateFull::fromDMY("04/09");
+  wDocPhy.LastModified = ZDateFull::currentDateTime();
+
+  wDocPhy.OwnerOrigin = wUserId;
+
+  wDocPhy.AccessRights = 00001;
+
+  wDocPhy.CheckSum  = wDocPhy.URI.getChecksum();
+
+  wDocPhy.Temporary=0;
+  wDocPhy.Ownerid=wUserId;
+  wDocPhy.Vaultid=ZResource();
+
+  wSt=wMasterFile.zadd_T(wDocPhy);
+  if (wSt!=ZS_SUCCESS) {
+    goto endofmain;
+  }
+
+  wStr.sprintf("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id);
+  _DBGPRINT(wStr.toCChar())
+  _DBGPRINT("                   Record #8\n")
+
+  wDocPhy.Documentid  = wR7;
+
+  wDocPhy.DataRank = 0;
+  wDocPhy.DocMetaType = ZDMT_picture ;
+  wDocPhy.Short = "key";
+  wDocPhy.Desc="image of key #7";
+  wDocPhy.Storage = Storage_External ;  // not in vault
+  wDocPhy.URI = wPictureDir ;      // not in vault
+  wDocPhy.URI.addConditionalDirectoryDelimiter();
+  wDocPhy.URI += "key.png";
+  wDocPhy.DocSize= wDocPhy.URI.getFileSize();
+
+
+  wDocPhy.Registrated = ZDateFull::fromDMY("04/09");
+  wDocPhy.Created = ZDateFull::fromDMY("06/09");
+  wDocPhy.LastModified = ZDateFull::currentDateTime();
+
+  wDocPhy.OwnerOrigin = wUserId;
+
+  wDocPhy.AccessRights = 00001;
+
+  wDocPhy.CheckSum  = wDocPhy.URI.getChecksum();
+
+  wDocPhy.Temporary=0;
+  wDocPhy.Ownerid=wUserId;
+  wDocPhy.Vaultid=ZResource();
+
+  wSt=wMasterFile.zadd_T(wDocPhy);
+  if (wSt!=ZS_SUCCESS) {
+    goto endofmain;
+  }
+//#endif  // __POPULATE__
+
+
+  _DBGPRINT("                  End populate\n")
+  displayKeys(wMasterFile);
+
+
+
+
+
+
  endofmain:
    wMasterFile.zclose();
    if (wSt!=ZS_SUCCESS) {
      ZException.exit_abort();
    }
+
+
+}//main
+
+
+
+
+void
+displayKeys (ZRawMasterFile& pMasterFile) {
+  ZStatus wSt;
+  ZDataBuffer wKey;
+  ZIndexItem wII;
+  ZResource wResource;
+  long wIdx=0;
+
+  _DBGPRINT("           Keys\n")
+
+  while (true) {
+    long wi=0;
+    _DBGPRINT("Index %ld - %s\n",wIdx,pMasterFile.IndexTable[wIdx]->IndexName.toCChar())
+    wSt=pMasterFile.IndexTable[wIdx]->zget(wKey,wi++);
+    while (wSt==ZS_SUCCESS) {
+      wII.fromFileKey(wKey);
+      const unsigned char* wPtr=wII.Data;
+      wResource._importURF(wPtr);
+      _DBGPRINT("%6ld %6ld %s %ld\n",
+          wi,
+          wII.ZMFaddress,
+          decode_ZEntity( wResource.Entity).toChar(),
+          wResource.id)
+      wSt=pMasterFile.IndexTable[wIdx]->zget(wKey,wi++);
+    }
+    wIdx++;
+    if (wIdx >= pMasterFile.IndexTable.count())
+      break;
+    wi=0;
+    _DBGPRINT("Index %ld - %s\n",wIdx,pMasterFile.IndexTable[wIdx]->IndexName.toCChar())
+    utf8VaryingString wStr;
+    wSt=pMasterFile.IndexTable[wIdx]->zget(wKey,wi++);
+    while (wSt==ZS_SUCCESS) {
+      wII.fromFileKey(wKey);
+      const unsigned char* wPtr=wII.Data;
+      wStr._importURF(wPtr);
+      _DBGPRINT("%6ld %6ld <%s>\n",
+          wi,
+          wII.ZMFaddress,
+          wStr.toCChar())
+      wSt=pMasterFile.IndexTable[wIdx]->zget(wKey,wi++);
+    }
+
+
+    wIdx++;
+    wi=0;
+    if (wIdx >= pMasterFile.IndexTable.count())
+      break;
+    _DBGPRINT("Index %ld - %s\n",wIdx,pMasterFile.IndexTable[wIdx]->IndexName.toCChar())
+    ZDateFull wD1,wD2;
+    wSt=pMasterFile.IndexTable[wIdx]->zget(wKey,wi++);
+    while (wSt==ZS_SUCCESS) {
+      wII.fromFileKey(wKey);
+
+      const unsigned char* wPtr=wII.Data;
+      wD1._importURF(wPtr);
+      wD2._importURF(wPtr);
+      _DBGPRINT("%6ld %6ld <%s><%s>\n",
+          wi,
+          wII.ZMFaddress,
+          wD1.toLocale().toCChar(),
+          wD2.toLocale().toCChar())
+      wSt=pMasterFile.IndexTable[wIdx]->zget(wKey,wi++);
+    }
+  }// while true
 
 }

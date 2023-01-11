@@ -69,7 +69,7 @@ public:
   zrank_type      IndexRank=-1; //!< ZIndexFile rank
   zaddress_type   ZMFAddress=-1;//!< Corresponding ZMasterFile address
 
-  ZIndexResult(void) = default;
+  ZIndexResult(void)  {memset(this,0,sizeof(ZIndexResult)); IndexRank=-1;ZMFAddress=-1;};
   ZIndexResult(zaddress_type pZMFAddress,zrank_type pIndexRank) ;
   ZIndexResult(const ZIndexResult &pIn) ;
   ~ZIndexResult(void) {}
@@ -84,7 +84,7 @@ public:
   bool isNull (void) const {return IndexRank<0;}
   bool isInvalid(void) const {return ZMFAddress<0;}
 
-    ZIndexResult& operator = (ZIndexResult &pZIR) {   memmove (this,&pZIR,sizeof(ZIndexResult)); return *this;}
+  ZIndexResult& operator = (ZIndexResult &pZIR) { return _copyFrom(pZIR);}
 
     bool operator == (ZIndexResult &pZIR) {  return  memcmp (this,&pZIR,sizeof(ZIndexResult)); }
 

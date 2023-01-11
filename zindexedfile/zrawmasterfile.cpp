@@ -29,7 +29,7 @@ using namespace  zbs;
 
 ZRawMasterFile::ZRawMasterFile(ZFile_type pType) : ZRandomFile(pType),ZMasterControlBlock(this)
 {
-  RawRecord=new ZRawRecord(this);
+//  RawRecord=new ZRawRecord(this);
   ZJCB=nullptr;
   // MetaDic = nullptr;
   Dictionary = nullptr;
@@ -40,9 +40,8 @@ ZRawMasterFile::ZRawMasterFile(ZFile_type pType) : ZRandomFile(pType),ZMasterCon
 
 ZRawMasterFile::ZRawMasterFile() : ZRandomFile(ZFT_ZRawMasterFile),ZMasterControlBlock(this)
 {
-  RawRecord=new ZRawRecord(this);
+//  RawRecord=new ZRawRecord(this);
   ZJCB=nullptr;
-// MetaDic = nullptr;
   Dictionary = nullptr;
   return ;
 }
@@ -74,10 +73,10 @@ ZRawMasterFile:: ~ZRawMasterFile(void)
 
       setJournalingOff();
 
-
+/*
   if (RawRecord!=nullptr)
     delete RawRecord;
-
+*/
 }// DTOR
 
 //------------Journaling--------------------------------
@@ -471,13 +470,13 @@ zmode_type wFormerMode=ZRF_Nothing;
             }
     return  wSt;
 } // setJournalingOff
-
+/*
 ZRawRecord*
 ZRawMasterFile::generateRawRecord()
 {
   return new ZRawRecord (this);
 }
-
+*/
 //----------- ZRawMasterFile Index methods----------------
 //
 
@@ -1968,220 +1967,6 @@ utfdescString wBase;
     return   _Base::updateReservedBlock(_exportAppend(wMCBContent),true);
 }//zclearMCB
 
-/**
- * @brief ZRawMasterFile::zdowngradeZMFtoZRF downgrades a ZRawMasterFile structure to a ZRandomFile structure. Content data is not impacted.
- *  This is a static method.
- *
- * Former dependant index files are left to themselves and not destroyed by this method.
- *
- * @param[in] pZMFPath      file path of the ZRawMasterFile to convert
- * @param[in] pOutput defaulted to nullptr. Could be stdout or stderr.
- *                    If set to its default value (nullptr), then an log file is generated with name <directory path><base name>.downgradelog
- */
-void
-ZRawMasterFile::zdowngradeZMFtoZRF (const uriString &pZMFPath, FILE* pOutput)
-{
-
-
-ZStatus wSt;
-ZRawMasterFile wMasterFile;
-ZRandomFile wMasterZRF;
-
-uriString   wURIContent;
-
-ZDataBuffer wReservedBlock;
-
-FILE* wOutput=nullptr;
-bool FOutput=false;
-utfdescString wBase;
-
-   wURIContent = pZMFPath;
-
-   wOutput=pOutput;
-   if (pOutput==nullptr)
-       {
-//       utfdescString wDInfo;
-       wBase=wURIContent.getBasename().toCChar();
-       wBase+=(const utf8_t*)".downgradelog";
-       wOutput=fopen(wBase.toCString_Strait(),"w");
-       if (wOutput==nullptr)
-                   {
-           wOutput=stdout;
-           fprintf(wOutput,
-                   "%s>>  cannot open file <%s> redirected to stdout\n",
-                   _GET_FUNCTION_NAME_,
-                   wBase.toString());
-                   }
-       else
-           {
-           FOutput=true;
-           }
-       } // if nullptr
-
-   fprintf (wOutput,
-            "_____________________________________________________________________________________________\n");
-   fprintf (wOutput,"%s>> starting downgrading ZRawMasterFile to ZRandomFile file path <%s>  \n",
-            _GET_FUNCTION_NAME_,
-            pZMFPath.toString());
-
-
-    wSt=wMasterFile.zopen(wURIContent,(ZRF_Exclusive|ZRF_All));
-
-    fprintf (wOutput,"%s>> getting ZReservedBlock content and load ZMasterControlBlock\n",
-            _GET_FUNCTION_NAME_);
-
-
-   fprintf (wOutput,
-            "%s>> clearing ZMCB\n"
-            "            <%ld>  defined index(es) in ZMasterControlBlock. Destroying all index files & definitions from ZMasterControlBlock\n",
-            _GET_FUNCTION_NAME_,
-            wMasterFile.IndexTable.size());
-
-    wSt=wMasterFile.zclearMCB(wOutput);
-    if (wSt!=ZS_SUCCESS) {
-      ZException.exit_abort();
-    }
-
-    fprintf (wOutput,"%s>>  ZMCB cleared successfully\n",
-            _GET_FUNCTION_NAME_);
-
-    wMasterFile.zclose();
-
-    fprintf (wOutput,"%s>>  Converting to ZRandomFile\n",
-            _GET_FUNCTION_NAME_);
-    wSt=wMasterZRF.setPath(wURIContent);
-    if (wSt!=ZS_SUCCESS) {
-      ZException.exit_abort();
-    }
-
-   wSt=wMasterZRF._ZRFopen (ZRF_Exclusive | ZRF_All,ZFT_ZMasterFile);  // open ZMF using ZRandomFile routines
-   if (wSt!=ZS_SUCCESS) {
-     ZException.exit_abort();
-   }
-
-    wMasterZRF.ZHeader.FileType = ZFT_ZRandomFile;
-    wReservedBlock.clear();
-    wMasterZRF.setReservedContent(wReservedBlock);
-
-    fprintf (wOutput,"%s>>  Writing new header to file\n",
-            _GET_FUNCTION_NAME_);
-
-    wSt=wMasterZRF._writeAllFileHeader();
-    if (wSt!=ZS_SUCCESS)
-           {
-           ZException.exit_abort();
-           }
-
-   wMasterZRF.zclose();
-   fprintf (wOutput,"%s>>  File <%s> has been successfully converted from ZRawMasterFile to ZRandomFile\n",
-           _GET_FUNCTION_NAME_,
-            wURIContent.toString());
-   fprintf (wOutput,
-            "_____________________________________________________________________________________________\n");
-   ZException.printUserMessage(wOutput);
-   fprintf (wOutput,
-            "_____________________________________________________________________________________________\n");
-//   if (wSt==ZS_SUCCESS)
-           ZException.clearStack();
-   if (FOutput)
-          fclose(wOutput);
-   return ;
-}//zdowngradeZMFtoZRF
-
-/**
- * @brief ZRawMasterFile::zupgradeZRFtoZMF upgrades a ZRandomFile structure to an empty ZRawMasterFile structure. Content data is not impacted.
- *  This is a static method.
- *
- * @param pZRFPath file path of the ZRandomFile to upgrade
- * @param[in] pOutput defaulted to nullptr. Could be stdout or stderr.
- *                    If set to its default value (nullptr), then an log file is generated with name <directory path><base name>.upgradelog
- */
-void
-ZRawMasterFile::zupgradeZRFtoZMF (const uriString& pZRFPath,FILE* pOutput)
-{
-
-
-ZStatus wSt;
-ZRawMasterFile wMasterFile;
-ZRandomFile wMasterZRF;
-
-uriString   wURIContent;
-
-ZDataBuffer wReservedBlock;
-
-FILE* wOutput=nullptr;
-bool FOutput=false;
-utfdescString wBase;
-
-   wURIContent = pZRFPath;
-
-   wOutput=pOutput;
-   if (pOutput==nullptr)
-       {
-//       utfdescString wDInfo;
-       wBase=wURIContent.getBasename().toCChar();
-       wBase+=".upgradelog";
-       wOutput=fopen(wBase.toCString_Strait(),"w");
-       if (wOutput==nullptr)
-                   {
-           wOutput=stdout;
-           fprintf(wOutput,
-                   "%s>>  cannot open file <%s> redirected to stdout\n",
-                   _GET_FUNCTION_NAME_,
-                   wBase.toString());
-                   }
-       else
-           {
-           FOutput=true;
-           }
-       } // if nullptr
-
-   fprintf (wOutput,
-            "_____________________________________________________________________________________________\n");
-   fprintf (wOutput,"%s>> starting upgrading ZRandomFile to ZRawMasterFile file path <%s>  \n",
-            _GET_FUNCTION_NAME_,
-            pZRFPath.toString());
-
-
-    wSt=wMasterZRF.zopen(wURIContent,(ZRF_Exclusive|ZRF_All));
-    if (wSt!=ZS_SUCCESS)
-            {
-            ZException.exit_abort();
-            }
-    fprintf (wOutput,"%s>> creating ZReservedBlock content and write ZMasterControlBlock\n",
-            _GET_FUNCTION_NAME_);
-
-    wSt=wMasterFile.setPath(wURIContent);
-    if (wSt!=ZS_SUCCESS)
-            {
-            ZException.exit_abort();
-            }
-    wMasterFile._exportAppend(wReservedBlock);
-    wMasterZRF.setReservedContent(wReservedBlock);
-    wMasterZRF.ZHeader.FileType = ZFT_ZMasterFile;
-    wSt=wMasterZRF._writeAllFileHeader();
-    if (wSt!=ZS_SUCCESS)
-            {
-            ZException.exit_abort();
-            }
-
-   wMasterZRF.zclose();
-   fprintf (wOutput,"%s>>  File <%s> has been successfully converted from ZRandomFile to ZRawMasterFile.\n",
-           _GET_FUNCTION_NAME_,
-            wURIContent.toString());
-   fprintf (wOutput,
-            "_____________________________________________________________________________________________\n");
-   ZException.printUserMessage(wOutput);
-   fprintf (wOutput,
-            "_____________________________________________________________________________________________\n");
- //  if (wSt==ZS_SUCCESS)
-           ZException.clearStack();
-   if (FOutput)
-           fclose(wOutput);
-   return ;
-}//zupgradeZRFtoZMF
-
-
 /** @ */ // ZMFUtilities
 
 
@@ -2627,10 +2412,7 @@ ZRawMasterFile::renameBck (const char* pContentPath, ZaiErrors* pErrorLog, const
  */
 ZStatus ZRawMasterFile::zget(ZDataBuffer &pRecordContent, const zrank_type pZMFRank)
 {
-  ZStatus wSt = _getRaw(RawRecord, pZMFRank);
-  if (wSt == ZS_SUCCESS)
-    pRecordContent = RawRecord->Content;
-  return wSt;
+  return _getRaw(pRecordContent, pZMFRank);
 }// ZRawMasterFile::zget
 /**
  * @brief ZRawMasterFile::_getRaw gets a raw record pRecord at relative file position pZMFRank.
@@ -2643,15 +2425,34 @@ ZStatus ZRawMasterFile::zget(ZDataBuffer &pRecordContent, const zrank_type pZMFR
  * @return a ZStatus
  */
 ZStatus
-ZRawMasterFile::_getRaw(ZRawRecord* pRecord, const zrank_type pZMFRank)
+ZRawMasterFile::_getRaw(ZDataBuffer& pRecord, const zrank_type pRank)
 {
-  pRecord->Rank=pZMFRank;
-  ZStatus wSt= ZRandomFile::zgetWAddress(pRecord->RawContent,pRecord->Rank,pRecord->Address);
+  zaddress_type wAddress;
+  ZDataBuffer   wRawRecord;
+  ZStatus wSt= ZRandomFile::zgetWAddress(wRawRecord,pRank,wAddress);
   if (wSt!=ZS_SUCCESS)
     return wSt;
-  pRecord->getContentFromRaw(pRecord->Content,pRecord->RawContent);
-  return  wSt;
+
+  uint64_t wRecSize;
+  const unsigned char* wPtr=wRawRecord.Data;
+  _importAtomic<uint64_t>(wRecSize,wPtr);
+
+  pRecord.setData(wPtr,size_t(wRecSize));
+  return wSt;
 }// ZRawMasterFile::_getRaw
+
+
+ZStatus ZRawMasterFile::_getFirst (ZDataBuffer &pRecord) {
+  return _getRaw(pRecord,0L);
+}
+ZStatus ZRawMasterFile::_getNext (ZDataBuffer &pRecord) {
+  ZStatus wSt=ZS_SUCCESS;
+  wSt=testRank(CurrentRank+1,"ZRawMasterFile::_getNext");
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+  CurrentRank++;
+  return _getRaw(pRecord,CurrentRank);
+}
 
 //----------------Insert sequence------------------------------------------------------
 
@@ -2681,115 +2482,9 @@ ZRawMasterFile::zinsert (ZDataBuffer& pRecordContent, ZArray<ZDataBuffer> &pKeys
         pKeys.count(), IndexTable.count());
     return ZS_INVSIZE;
     }
-  RawRecord->Content = pRecordContent;
-  for (long wi = 0; wi < pKeys.count(); wi++)
-    RawRecord->setRawKeyContent(wi, pKeys[wi]);
-  RawRecord->prepareForWrite(pRecordContent);
-
-  return _insertRaw(RawRecord->Content, pKeys ,pZMFRank);
+    return _insertRaw(pRecordContent,pKeys,pZMFRank);
 }// zinsert
 
-
-ZStatus
-ZRawMasterFile::_insertRaw (const ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeys, const zrank_type pZMFRank)
-{
-  ZStatus wSt;
-
-  zrank_type      wZMFIdxCommit;
-  zaddress_type   wZMFAddress=0;
-
-  ZArray <zrank_type> IndexRankProcessed; // stores ranks of already processed indexes (rollback purpose)
-  ZIndexItemList      IndexItemList;          // stores keys description per index processed
-
-  ZIndexItem*     wIndexItem=nullptr;
-  zrank_type      wIndex_Rank;
-
-  /* prepare the add on Master File, reserve appropriate space, get entry in pool.
-   * NB: wZMFIdxCommit must be equal to requested rank (pRecord->Rank) in case of success or -1 if fails.
-   */
-
-//  pRecord->Rank = pZMFRank;
-//  wZMFIdxCommit=pRecord->Rank ;
-  wZMFIdxCommit = pZMFRank;
-  wSt=_Base::_insert2Phases_Prepare(pRecord,wZMFIdxCommit,wZMFAddress);
-  if (wSt!=ZS_SUCCESS)
-    goto _insertRaw_error;
-
-  //
-  // update all Indexes
-  //
-
-  for (wIndex_Rank=0;wIndex_Rank< IndexTable.size();wIndex_Rank++)
-  {
- //   wIndexItem = new ZIndexItem(pKeys[wIndex_Rank]);
- //   wIndexItem->Operation=ZO_Insert;
-
-/*    wSt=IndexTable[wIndex_Rank]->_extractRawKey(pRecord,wIndexItem->KeyContent);
-    if (wSt!=ZS_SUCCESS)
-    {
-      ZException.addToLast("During _extractRawKey operation on index number <%ld>",wIndex_Rank);
-      delete wIndexItem;
-      // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
-      _add_RollbackIndexes (IndexRankProcessed); // An additional error during index rollback will pushed on exception stack
-      // on error reset ZMF in its original state
-      _Base::_add2Phases_Rollback(wZMFIdxCommit); // do not accept update on Master File and free resources
-      goto _insertRaw_error;
-    }
-
-*/
-    wSt=IndexTable[wIndex_Rank]->_addRawKeyValue_Prepare(wIndexItem,wZMFIdxCommit,pKeys[wIndex_Rank], wZMFAddress);// for indexes don't care about insert, this is an add key value
-    if (wSt!=ZS_SUCCESS)
-    {
-      ZException.addToLast("During zinsert operation on index number <%ld>",wIndex_Rank);
-      delete wIndexItem;
-      // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
-      _add_RollbackIndexes ( IndexRankProcessed); // An additional error during index rollback will pushed on exception stack
-      // on error reset ZMF in its original state
-      _Base::_add2Phases_Rollback(wZMFIdxCommit); // do not accept update on Master File and free resources
-      goto _insertRaw_error;
-    }
-
-    IndexRankProcessed.push(wIndex_Rank) ;     // this index has been added to this rank
-    IndexItemList.push(wIndexItem);          // with that key content
-
-    //        ZMFJournaling.push (ZO_Add,wi,pRecord,wAddress);
-  }// main for
-
-  // so far everything when well
-  //     commit Indexes changes
-  //      if an error occurs during index commit :
-  //          indexes are rolled back (soft or hard) appropriately within _add_CommitIndexes
-  // Nb: Exception(s) is(are) pushed on stack
-  wSt=_add_CommitIndexes (IndexItemList,IndexRankProcessed) ;
-  if (wSt!=ZS_SUCCESS)
-    {
-    // Soft rollback master update regardless returned ZStatus
-    // Nb: Exception is pushed on stack. ZException keeps the last status.
-    _Base::_add2Phases_Rollback(wZMFIdxCommit);
-
-    goto _insertRaw_error;
-    }
-
-  // at this stage all indexes have been committed
-  //         commit for Master file data must be done now
-  //
-  wSt = _Base::_insert2Phases_Commit(pRecord,wZMFIdxCommit,wZMFAddress);// accept insert update on Master File
-  if (wSt!=ZS_SUCCESS)    //! and if then an error occur : hard rollback all indexes and signal exception
-    {
-    _add_HardRollbackIndexes (IndexRankProcessed); // indexes are already committed so use hardRollback to counter pass
-    }                                                    // don't care about the status . In case of error exception stack will trace it
-
-
-  if (getJournalingStatus())
-    {
-    ZJCB->Journal->enqueue(ZJOP_Insert,pRecord);
-    }
-
-_insertRaw_error:
-//  _Base::_unlockFile () ; // set Master file unlocked
-  IndexItemList.clear();
-  return  wSt;
-}// _insertRaw
 
 #ifdef __OLD_VERSION__
 
@@ -2936,13 +2631,12 @@ ZStatus ZRawMasterFile::zadd (ZDataBuffer& pRecordContent,ZArray<ZDataBuffer>& p
 ZStatus
 ZRawMasterFile::_addRaw(ZDataBuffer& pRecord, ZArray<ZDataBuffer> &pKeysContent)
 {
+  ZDataBuffer wEffectiveRecord;
   ZStatus wSt=ZS_SUCCESS;
-  //    wSt=_Base::zaddWithAddress (pRecord,wAddress);      // record must stay locked until successfull commit for indexes
 
-  zrank_type      wZMFZBATIndex, wIdxZBATIndex;
+  zrank_type      wZMFZBATIndex ;
   zaddress_type   wZMFAddress;
 
-  ZArray <zrank_type>   IndexRankProcessed; // stores ranks of already processed indexes (rollback purpose)
   ZIndexItemList        IndexItemList;      // stores keys description per index processed
 
   ZIndexItem     *wIndexItem=nullptr;
@@ -2961,8 +2655,28 @@ ZRawMasterFile::_addRaw(ZDataBuffer& pRecord, ZArray<ZDataBuffer> &pKeysContent)
 
 // prepare the add on Master File, reserve appropriate space, get entry in pool, lock it
 
-  wSt=_Base::_add2Phases_Prepare( pRecord,  wZMFZBATIndex,   // get internal ZBAT pool allocated index
-                                            wZMFAddress);       // get also zmf record address
+/* Appropriate space ;
+    uint64_t  size of user record
+
+    ....  record content (pRecord) ....
+
+    user record buffer space given by pRecord.Size
+    uint32_t  number of keys
+    zaddress_type for key 1
+    zaddress_type for key 2
+      ...
+    zaddress_type for key n
+
+
+IMPORTANT : wEffectiveRecord must not be modified until its final setup
+
+*/
+  wEffectiveRecord.setData_T<uint64_t>(uint64_t(pRecord.Size));
+  wEffectiveRecord.appendData( pRecord);
+  unsigned char* wPtr=wEffectiveRecord.extend(sizeof(uint32_t)+ (pKeysContent.count() * sizeof(zaddress_type)));
+
+  wSt=_Base::_add2Phases_Prepare( wEffectiveRecord,  wZMFZBATIndex,   // get internal ZBAT pool allocated index
+                                                     wZMFAddress);       // get also zmf record address
   if (wSt!=ZS_SUCCESS)
     {
     goto zaddRaw_error;
@@ -2970,7 +2684,6 @@ ZRawMasterFile::_addRaw(ZDataBuffer& pRecord, ZArray<ZDataBuffer> &pKeysContent)
 
   // =========== update all defined Indexes ======================
 
-  IndexRankProcessed.clear();
 
   for (wIndex_Rank=0;wIndex_Rank< IndexTable.size();wIndex_Rank++)
   {
@@ -2978,35 +2691,19 @@ ZRawMasterFile::_addRaw(ZDataBuffer& pRecord, ZArray<ZDataBuffer> &pKeysContent)
     {
       _DBGPRINT( "Index number <%ld>\n",wIndex_Rank)
     }
-//    wIndexItem=new ZIndexItem(pKeys[wIndex_Rank]);
-//    wIndexItem->Operation=ZO_Push;
- /*   wSt=IndexTable[wIndex_Rank]->_extractRawKey(pRecord,wIndexItem->KeyContent);
-    if (wSt!=ZS_SUCCESS)
-    {
-      ZException.addToLast("During zadd operation on index number <%ld>",wi);
-      delete wIndexItem;
-      // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
-      _add_RollbackIndexes (IndexRankProcessed); // An additional error during index rollback will pushed on exception stack
-      // on error reset ZMF in its original state
-      _Base::_add2Phases_Rollback(wZMFZBATIndex); // do not accept update on Master File and free resources
-      goto zaddRaw_error;
-    }
-*/
-    /* key from record is not to be extracted : given by pKey[] */
 
-    wSt=IndexTable[wIndex_Rank]->_addRawKeyValue_Prepare(wIndexItem,wIdxZBATIndex,pKeysContent[wIndex_Rank], wZMFAddress);
+    wSt=IndexTable[wIndex_Rank]->_addRawKeyValue_Prepare(wIndexItem,pKeysContent[wIndex_Rank], wZMFAddress);
     if (wSt!=ZS_SUCCESS)
       {
       ZException.addToLast("During zadd operation on index number <%ld>",wi);
       delete wIndexItem;
       // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
-      _add_RollbackIndexes ( IndexRankProcessed); // An additional error during index rollback will pushed on exception stack
+      _rollbackIndexes ( IndexItemList); // An additional error during index rollback will pushed on exception stack
       // on error reset ZMF in its original state
       _Base::_add2Phases_Rollback(wZMFZBATIndex); // do not accept update on Master File and free resources
       goto zaddRaw_error;
       }
 
-    IndexRankProcessed.push(wIdxZBATIndex) ;   // this index has been added to this rank
     IndexItemList.push(wIndexItem);            // with that key content
 
     //        ZMFJournaling.push (ZO_Add,wi,pRecord,wAddress);
@@ -3019,15 +2716,25 @@ ZRawMasterFile::_addRaw(ZDataBuffer& pRecord, ZArray<ZDataBuffer> &pKeysContent)
   //          indexes are rolled back (soft or hard) appropriately within _add_CommitIndexes
   // Nb: Exception(s) is(are) pushed on stack
 
-  wSt=_add_CommitIndexes (IndexItemList,IndexRankProcessed) ;
+  wSt=_commitIndexes (IndexItemList) ;
   if (wSt!=ZS_SUCCESS)
   {
+    _rollbackIndexes ( IndexItemList); // An additional error during index rollback will pushed on exception stack
+
     // Soft rollback master update regardless returned ZStatus
     // Nb: Exception is pushed on stack. ZException keeps the last status.
     _Base::_add2Phases_Rollback(wZMFZBATIndex);
 
     goto zaddRaw_error;
   }
+
+  /* Before committing Raw Master File (writting record)
+          set all index record addresses to ZMF record
+   */
+  _exportAtomicPtr<uint32_t>(pKeysContent.count() , wPtr);
+
+  for (long wi = 0; wi < pKeysContent.count() ; wi++)
+    _exportAtomicPtr<zaddress_type>(IndexItemList[wi]->IndexAddress , wPtr);
 
   // at this stage all indexes have been committed
   //         commit for Master file data must be done now
@@ -3037,182 +2744,285 @@ ZRawMasterFile::_addRaw(ZDataBuffer& pRecord, ZArray<ZDataBuffer> &pKeysContent)
 
 // Then: if then an error occurs at this stage : hard rollback all indexes since begin till processed index
   if (wSt!=ZS_SUCCESS) {
-    _add_HardRollbackIndexes ( IndexRankProcessed);// indexes are already committed so use hardRollback regardless returned ZStatus
+    _rollbackIndexes ( IndexItemList); // An additional error during index rollback will pushed on exception stack
   }                                              // we don't care about the status . In case of error exception stack will trace it
 
   if ((wSt==ZS_SUCCESS) && getJournalingStatus())
     {
-    ZJCB->Journal->enqueue(ZJOP_Add,pRecord);
+    IndexItemList._exportAppend(wEffectiveRecord);
+    ZJCB->Journal->enqueue(ZJOP_Add,wEffectiveRecord);
     }
 zaddRaw_error:
 //  _Base::_unlockFile () ; // set Master file unlocked
-  IndexItemList.clear();
-  //    while (IndexItemList.size()>0)
-  //                delete IndexItemList.popR();
 
   return  wSt;
 }// _addRaw
 
-#ifdef __OLD_VERSION__
 ZStatus
-ZRawMasterFile::_addRawOld(ZRawRecord* pRecord)
+ZRawMasterFile::_insertRaw (const ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeys, const zrank_type pZMFRank)
 {
-  ZStatus wSt=ZS_SUCCESS;
-  //    wSt=_Base::zaddWithAddress (pRecord,wAddress);      // record must stay locked until successfull commit for indexes
+  ZDataBuffer wEffectiveRecord;
+  ZStatus wSt;
 
-  zrank_type      wZMFZBATIndex, wIdxZBATIndex;
-  zaddress_type   wZMFAddress;
+  //  zrank_type      wZMFIdxCommit;
+  zaddress_type   wZMFAddress=0;
 
-  ZArray <zrank_type>    IndexRankProcessed; // stores ranks of already processed indexes (rollback purpose)
-  ZIndexItemList        IndexItemList;      // stores keys description per index processed
+  //  ZArray <zrank_type> IndexRankProcessed; // stores ranks of already processed indexes (rollback purpose)
+  ZIndexItemList      IndexItemList;          // stores keys description per index processed
 
-  ZIndexItem     *wIndexItem;
+  ZIndexItem*     wIndexItem=nullptr;
   zrank_type      wIndex_Rank;
-  long wi = 0;
 
-  if (!isOpen())
-  {
-    ZException.setMessage("ZRawMasterFile::zaddRaw",
-        ZS_FILENOTOPEN,
-        Severity_Severe,
-        " File <%s> is not open while trying to access it",
-        getURIContent().toString());
-    return  ZS_FILENOTOPEN;
-  }
+/* Appropriate space ;
+    uint64_t  size of user record
 
-  // prepare the add on Master File, reserve appropriate space, get entry in pool, lock it
+    ....  record content (pRecord) ....
 
-  wSt=_Base::_add2Phases_Prepare( pRecord->RawContent,
-      wZMFZBATIndex,     // get internal ZBAT pool allocated index
-      wZMFAddress);
+    user record buffer space given by pRecord.Size
+    uint32_t  number of keys
+    zaddress_type for key 1
+    zaddress_type for key 2
+      ...
+    zaddress_type for key n
+
+
+IMPORTANT : wEffectiveRecord must not be modified until its final setup
+
+*/
+  wEffectiveRecord.setData_T<uint64_t>(uint64_t(pRecord.Size));
+  wEffectiveRecord.appendData( pRecord);
+  unsigned char* wPtr=wEffectiveRecord.extend(sizeof(uint32_t)+ (pKeys.count() * sizeof(zaddress_type)));
+
+  wSt=_Base::_insert2Phases_Prepare(wEffectiveRecord,pZMFRank,wZMFAddress);
   if (wSt!=ZS_SUCCESS)
-  {
-    goto zaddRaw_error;
-  }
-
-  // =========== update all defined Indexes ======================
-
-  IndexRankProcessed.clear();
+    goto _insertRaw_error;
+  //
+  // update all Indexes
+  //
 
   for (wIndex_Rank=0;wIndex_Rank< IndexTable.size();wIndex_Rank++)
   {
-    if (ZVerbose)
-    {
-      fprintf (stdout,"Index number <%ld>\n",wIndex_Rank);
-    }
-    wIndexItem=new ZIndexItem;
-    wIndexItem->Operation=ZO_Push;
-    wSt=IndexTable[wIndex_Rank]->_extractRawKey(pRecord,wIndexItem->KeyContent);
+    wSt=IndexTable[wIndex_Rank]->_addRawKeyValue_Prepare(wIndexItem,pKeys[wIndex_Rank], wZMFAddress);// for indexes don't care about insert, this is an add key value
+
     if (wSt!=ZS_SUCCESS)
     {
-      ZException.addToLast("During zadd operation on index number <%ld>",wi);
+      ZException.addToLast("During zinsert operation on index number <%ld>",wIndex_Rank);
       delete wIndexItem;
       // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
-      _add_RollbackIndexes (IndexRankProcessed); // An additional error during index rollback will pushed on exception stack
+      _rollbackIndexes ( IndexItemList); // An additional error during index rollback will pushed on exception stack
       // on error reset ZMF in its original state
-      _Base::_add2Phases_Rollback(wZMFZBATIndex); // do not accept update on Master File and free resources
-      goto zaddRaw_error;
+      _Base::_add2Phases_Rollback(pZMFRank); // do not accept update on Master File and free resources
+      goto _insertRaw_error;
     }
 
-    wSt=IndexTable[wIndex_Rank]->_addRawKeyValue_Prepare(wIndexItem,wIdxZBATIndex, wZMFAddress);
-    if (wSt!=ZS_SUCCESS)
-    {
-      ZException.addToLast("During zadd operation on index number <%ld>",wi);
-      delete wIndexItem;
-      // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
-      _add_RollbackIndexes ( IndexRankProcessed); // An additional error during index rollback will pushed on exception stack
-      // on error reset ZMF in its original state
-      _Base::_add2Phases_Rollback(wZMFZBATIndex); // do not accept update on Master File and free resources
-      goto zaddRaw_error;
-    }
-
-    IndexRankProcessed.push(wIdxZBATIndex) ;   // this index has been added to this rank
-    IndexItemList.push(wIndexItem);            // with that key content
+    //    IndexRankProcessed.push(wIndex_Rank) ;     // this index has been added to this rank
+    IndexItemList.push(wIndexItem);          // with that key content
 
     //        ZMFJournaling.push (ZO_Add,wi,pRecord,wAddress);
-
-  }// main for - IndexTableObjects.size()
+  }// main for
 
   // so far everything when well
   //     commit Indexes changes
   //      if an error occurs during index commit :
   //          indexes are rolled back (soft or hard) appropriately within _add_CommitIndexes
   // Nb: Exception(s) is(are) pushed on stack
-
-  wSt=_add_CommitIndexes (IndexItemList,IndexRankProcessed) ;
+  wSt=_commitIndexes (IndexItemList) ;
   if (wSt!=ZS_SUCCESS)
   {
     // Soft rollback master update regardless returned ZStatus
     // Nb: Exception is pushed on stack. ZException keeps the last status.
-    _Base::_add2Phases_Rollback(wZMFZBATIndex);
-
-    goto zaddRaw_error;
+    _Base::_add2Phases_Rollback(pZMFRank);
+    _rollbackIndexes ( IndexItemList);
+    goto _insertRaw_error;
   }
 
   // at this stage all indexes have been committed
-  //         commit for Master file data must be done now
   //
-  //  wSt = _Base::_add2PhasesCommit_Commit(_Base::pRecord->RawContent,wZMFZBATIndex,wZMFAddress);// accept update on Master File
-  wSt = _Base::_add2Phases_Commit(pRecord->RawContent,pRecord->Rank,pRecord->Address);// accept update on Master File
+  /* Before committing Raw Master File (writting record)
+          set all index record addresses to ZMF record
+   */
+  _exportAtomicPtr<uint32_t>(pKeys.count() , wPtr);
 
-  if (wSt!=ZS_SUCCESS)    // and if then an error occur : hard rollback all indexes
+  for (long wi = 0; wi < pKeys.count() ; wi++)
+    _exportAtomicPtr<zaddress_type>(IndexItemList[wi]->IndexAddress , wPtr);
+
+
+  wSt = _Base::_insert2Phases_Commit(pRecord,pZMFRank,wZMFAddress);// accept insert update on Master File
+  if (wSt!=ZS_SUCCESS)    //! and if then an error occur : hard rollback all indexes and signal exception
   {
-    _add_HardRollbackIndexes ( IndexRankProcessed);// indexes are already committed so use hardRollback regardless returned ZStatus
-  }                                                   // don't care about the status . In case of error exception stack will trace it
+    _rollbackIndexes (IndexItemList); // indexes are already committed so use hardRollback to counter pass
+        // nb: roll back routine manages soft and hard rollback
+  }                                 // don't care about the status . In case of error exception stack will trace it
 
 
-  if ((wSt==ZS_SUCCESS) && getJournalingStatus())
+  if (getJournalingStatus())
   {
-    ZJCB->Journal->enqueue(ZJOP_Add,pRecord->RawContent);
+    IndexItemList._exportAppend(wEffectiveRecord);
+    ZJCB->Journal->enqueue(ZJOP_Insert,wEffectiveRecord);
   }
-zaddRaw_error:
+
+_insertRaw_error:
   //  _Base::_unlockFile () ; // set Master file unlocked
   IndexItemList.clear();
-  //    while (IndexItemList.size()>0)
-  //                delete IndexItemList.popR();
-
   return  wSt;
-}// _addRaw
+}// _insertRaw
 
 
-#endif // __OLD_VERSION__
+/**
+ * @brief ZRawMasterFile::_removeByRankRaw Removes a record corresponding to logical position pZMFRank within Master File and updates all indexes
+ *
+ * Remove operation is done in a two phase commit, so that Master file is only updated when all indexes are updated and ok.
+ *
+ * @note  If an error occurs during processing, Indexes are rolled back to previous state and Master file resources are freed (rolled back)
+ * If all indexes are successfully updated, then update on Master File is committed .
+ * if then an error occurred during Master File commit, all indexes are Hard Rolledback, meaning they are physically recreated within index file.
+ * ZRawMasterFile internal data structures (descriptor, MCB, ICBs) are updated during remove operation.
+ *
+ * @param[out] pZMFRecord the Raw Record updated with record content that is being removed
+ * @param[in] pZMFRank the logical position (rank) of the record to remove
+ * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
+ */
+
+ZStatus
+ZRawMasterFile::_removeByRankR  (ZDataBuffer &pRecord, const zrank_type pZMFRank)
+{
+  ZStatus     wSt;
+  ZArray<zaddress_type>   wIndexAddresses;
+  ZIndexItemList          IndexItemList;      // stores keys description per index processed (rollback purpose). Must stay as pointer (double free)
+  ZIndexItem              *wIndexItem;
+  ZDataBuffer             wKeyContent;
+  zaddress_type           wZMFAddress;
+
+  ZDataBuffer         wEffectiveRecord;
+  ZArray<ZDataBuffer> wKeys;
+
+  //---- get Master File header test for lock - if OK lock it
+
+  wSt=_Base::_removeR_Prepare(wEffectiveRecord,pZMFRank,wZMFAddress);  // prepare remove on Master File mark entry in pool as to be deleted
+  if (wSt!=ZS_SUCCESS)
+  {
+    _Base::_remove_Rollback(pZMFRank);
+    return  wSt;
+  }
+
+  /* extract record data : user record content - list of corresponding index record addresses*/
+  uint64_t wUserContentSize;
+
+  const unsigned char* wPtr = wEffectiveRecord.Data;
+
+  _importAtomic<uint64_t>(wUserContentSize,wPtr);
+
+  /* point to index addresses block */
+  wPtr += size_t(wUserContentSize);
+  uint32_t wIndexCount;
+
+  _importAtomic<uint32_t>(wIndexCount,wPtr);
+
+  /* import all adresses */
+  zaddress_type wIdxAd;
+  for (uint32_t wi=0 ; wi < wIndexCount ; wi++) {
+    _importAtomic<zaddress_type>(wIdxAd,wPtr);
+    wIndexAddresses.push(wIdxAd);
+  }
+  //
+  // update all Indexes
+  //
+
+  IndexItemList.clear();
+  long wi;
+  long wIdxRank;
+  // must extract keys value per key to remove each index key one by one
+  //  pRawRecord->getContentFromRaw(pRawRecord->Content,pRawRecord->RawContent);
+
+  for (wi=0;wi< wKeys.count();wi++) {
+
+    wIndexItem = new ZIndexItem;
+    wIndexItem->setBuffer(wKeys[wi]);
+    wIndexItem->ZMFaddress = wZMFAddress;
+    wIndexItem->IndexAddress = wIndexAddresses[wi];
+
+    wSt=IndexTable[wi]->_removeRByAddress_Prepare(wKeyContent,wIdxRank , wIndexAddresses[wi]);
+
+//    wSt=IndexTable[wi]->_removeIndexItem_Prepare(wIndexItem , wi);
+    if (wSt!=ZS_SUCCESS)
+    {
+      //                delete wIndexItem; // free memory for errored key value
+      // on error reset all already processed indexes in their original state
+      // (IndexRankProcessed heap contains the Index ranks added)
+      // An additional error during index rollback will be put on exception stack
+
+      _rollbackIndexes ( IndexItemList); // do not care about ZStatus : exception will be on stack
+
+      // on error reset ZMF in its original state
+      _Base::_remove_Rollback(pZMFRank); // do not accept update on Master File and free resources
+
+      //                if (HistoryOn)
+      //                      ZMFHistory.push (ZO_Add,wi,wAddress,wSt); //! journalize Error on index if journaling is enabled
+
+      // _Base::_unlockFile (ZDescriptor) ; // unlock done in remove rollback
+
+      goto _removeByRank_return ;    // and send appropriate status
+    }
+
+    wIndexItem->fromFileKey(wKeyContent);
+    wIndexItem->IndexRank = wIdxRank;
+    IndexItemList.push(wIndexItem);
+
+    //        ZMFJournaling.push (ZO_Add,wi,pRecord,wAddress);
+  }// main for
+
+  // so far everything when well
+  //     commit changes
+
+  wSt=_commitIndexes (IndexItemList) ;
+  if (wSt!=ZS_SUCCESS)
+  {
+    // in case of error : appropriate indexes soft or hard rollback is made in Commit Indexes routine
+
+    _Base::_remove_Rollback(pZMFRank); // an error occurred on indexes : rollback all MasterFile
+    // _Base::_unlockFile (ZDescriptor) ; // unlock is done in rollback routine
+    goto _removeByRank_return ;// if an error occurs here : this is a severe error that only may be caused by an HW or IO subsystem failure.
+  }
+
+  wSt = _Base::_remove_Commit(pZMFRank);// accept update on Master File
+  if (wSt!=ZS_SUCCESS)    // and if then an error occur : rollback all indexes and signal exception
+  {
+    _rollbackIndexes (IndexItemList);    // indexes are already committed so use hardRollback to counter pass
+    goto _removeByRank_return ;
+  }
+
+  if ((wSt==ZS_SUCCESS) && getJournalingStatus()) {
+    IndexItemList._exportAppend(wEffectiveRecord);
+    ZJCB->Journal->enqueue(ZJOP_RemoveByRank,wEffectiveRecord);
+  }
+
+_removeByRank_return :
+  //  _Base::_unlockFile () ;
+
+  IndexItemList.clear();
+  return  wSt;
+}// _removeByRankRaw
+
 
 /** @cond Development */
 
 ZStatus
-ZRawMasterFile::_add_CommitIndexes (ZArray <ZIndexItem*>  &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed)
+ZRawMasterFile::_commitIndexes (ZArray <ZIndexItem*>  &pIndexItemList)
 {
+  ZStatus wSt;
+  long wj = 0;
+  wj=0;
 
-ZStatus wSt;
-long wj = 0;
-    wj=0;
-
-    for (wj=0;wj<pIndexRankProcessed.size();wj++)
-      {
-       wSt=IndexTable[wj]->_addRawKeyValue_Commit(pIndexItemList[wj],pIndexRankProcessed[wj]);
-       if (wSt!=ZS_SUCCESS)
-           {
-           ZException.addToLast("While committing add operation on index(es)");
-//  and soft rollback not yet processed indexes
-//  wj = errored index rank : up to wj : hardRollback - from wj included to pIndexTableObjects.size() soft rollback
-
-            for (long wR=0;wR < wj;wR++) // Hard rollback for already committed indexes
-              {
-              IndexTable[wR]->_addKeyValue_HardRollback(pIndexRankProcessed[wR]); // rollback update on each index concerned
-                                                                                      // regardless ZStatus (exception is on stack)
-              } // for
-
-              for (long wR = wj;wR<pIndexRankProcessed.size();wR++) // soft rollback
-              {
-              IndexTable[wR]->_addRawKeyValue_Rollback(pIndexRankProcessed[wR]); // rollback update on each index concerned
-                                                                                  // regardless ZStatus (exception is on stack)
-              } //for
-
-              return  ZException.getLastStatus(); // return  the very last status encountered
-          }//wSt
-      } // for
-   return  ZS_SUCCESS;
-} // _add_CommitIndexes
+  for (wj=0;wj<pIndexItemList.size();wj++)
+  {
+    wSt=IndexTable[wj]->_rawKeyValue_Commit(pIndexItemList[wj]);
+    if (wSt!=ZS_SUCCESS){
+      _rollbackIndexes(pIndexItemList);
+      return wSt;
+    }//wSt
+  } // for
+  return  ZS_SUCCESS;
+} // _commitIndexes
 
 /**
  * @brief ZRawMasterFile::_add_RollbackIndexes During an add operation, soft rollback indexes
@@ -3225,59 +3035,26 @@ long wj = 0;
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZRawMasterFile::_add_RollbackIndexes ( ZArray<zrank_type> &pIndexRankProcessed)
+ZRawMasterFile::_rollbackIndexes ( ZArray <ZIndexItem*>  &pIndexItemList)
 {
-ZStatus wSt;
-long wi = 0;
-/*    if (pIndexTableObjects.size()!=pIndexTable.size())
-            {
-                ZException.setMessage(_GET_FUNCTION_NAME_,
-                                        ZS_CORRUPTED,
-                                        Severity_Fatal,
-                                        " Fatal error (ZICB) Indexes definition number <%s> is not aligned with ZIndexFile objects number <%s>",
-                                        pIndexTable.size(),
-                                        pIndexTableObjects.size());
-                ZException.exit_abort();
-            }*/
-
-//    ZException.getLastStatus() = ZS_SUCCESS;
-    if (ZVerbose)
-            fprintf(stderr,"_add_RollbackIndexes Soft Rollback of indexes on add \n");
-
-    for (wi=0;wi < pIndexRankProcessed.size();wi++)
-            {
-            IndexTable[wi]->_addRawKeyValue_Rollback(pIndexRankProcessed[wi]); // rollback add on each index concerned
-            }//for                                                                  // don't care about ZStatus: exception stack will track
-
-   return  ZException.getLastStatus();
-} // _add_RollbackIndexes
-
-/**
- * @brief ZRawMasterFile::_add_HardRollbackIndexes Hard rollback : counter-pass the operation done to restore indexes in their previous state
- * @param pZMCB
- * @param pIndexRankProcessed
- * @return
- */
-ZStatus
-ZRawMasterFile::_add_HardRollbackIndexes ( ZArray<zrank_type> &pIndexRankProcessed)
-{
+  ZStatus wSt;
+  long wi = 0;
+  ZOp_type wOp;
 
 
-ZStatus wSt;
-long wi = 0;
-//    ZException.getLastStatus() = ZS_SUCCESS;
+  for (wi=0;wi < pIndexItemList.size();wi++)
+  {
+    if (pIndexItemList[wi]->Operation & ZO_Processed)
+      IndexTable[wi]->_rawKeyValue_HardRollback(pIndexItemList[wi]);
+    else
+      IndexTable[wi]->_rawKeyValue_Rollback(pIndexItemList[wi]); // rollback add on each index concerned
+  }//for                                                                  // don't care about ZStatus: exception stack will track
 
-    if (ZVerbose)
-            fprintf(stderr,"Hard Rollback of indexes on add operation\n");
+  return  ZS_SUCCESS;
+} // _rollbackIndexes
 
-    for (wi=0;wi < pIndexRankProcessed.size();wi++)
-            {
-            IndexTable[wi]->_addKeyValue_HardRollback(pIndexRankProcessed[wi]); // hard rollback update on each already committed index
-            }// for                                                                     // don't care about ZStatus: exception stack will track
 
-   return  ZException.getLastStatus();
 
-} // _add_HardRollbackIndexes
 
 /** @endcond */
 //----------------End Add sequence------------------------------------------------------
@@ -3319,18 +3096,18 @@ ZRawMasterFile::zindexRebuild (const long pIndexRank,bool pStat, FILE *pOutput)
             }
  return  IndexTable[pIndexRank]->zrebuildRawIndex (pStat,pOutput);
 }//zindexRebuild
-#endif// __DEPRECATED__
+
 
 //----------------Remove sequence------------------------------------------------------
-
+template <class _Tp>
 ZStatus
-ZRawMasterFile::zremoveByRank    (const zrank_type pZMFRank)
+ZRawMasterFile::zremoveByRank    (_Tp& pContent, const zrank_type pZMFRank)
 {
     return _removeByRankRaw (RawRecord,pZMFRank);
 } // zremoveByRank
-
+template <class _Tp>
 ZStatus
-ZRawMasterFile::zremoveByRankR     (ZDataBuffer& pRecordContent,const zrank_type pZMFRank)
+ZRawMasterFile::zremoveByRankR     (_Tp& pContent,const zrank_type pZMFRank)
 {
     ZStatus wSt= _removeByRankRaw (RawRecord,pZMFRank);
     if (wSt!=ZS_SUCCESS)
@@ -3340,127 +3117,6 @@ ZRawMasterFile::zremoveByRankR     (ZDataBuffer& pRecordContent,const zrank_type
 } // zremoveByRankR
 
 
-/**
- * @brief ZRawMasterFile::_removeByRankRaw Removes a record corresponding to logical position pZMFRank within Master File and updates all indexes
- *
- * Remove operation is done in a two phase commit, so that Master file is only updated when all indexes are updated and ok.
- *
- * @note  If an error occurs during processing, Indexes are rolled back to previous state and Master file resources are freed (rolled back)
- * If all indexes are successfully updated, then update on Master File is committed .
- * if then an error occurred during Master File commit, all indexes are Hard Rolledback, meaning they are physically recreated within index file.
- * ZRawMasterFile internal data structures (descriptor, MCB, ICBs) are updated during remove operation.
- *
- * @param[out] pZMFRecord the Raw Record updated with record content that is being removed
- * @param[in] pZMFRank the logical position (rank) of the record to remove
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
-ZStatus
-ZRawMasterFile::_removeByRankRaw  (ZRawRecord *pRawRecord,
-                                    const zrank_type pZMFRank)
-{
-  ZStatus     wSt;
-
-  ZArray <zrank_type>     IndexRankProcessed; // stores ranks of already processed indexes (rollback purpose)
-  ZIndexItemList         IndexItemList;      // stores keys description per index processed (rollback purpose). Must stay as pointer (double free)
-  ZIndexItem             *wIndexItem;
-  ZDataBuffer             wKeyContent;
-
-  ZBlock          wBlock;
-
-  //---- get Master File header test for lock - if OK lock it
-  pRawRecord->Rank=pZMFRank;
-  wSt=_Base::_remove_Prepare(pRawRecord->Rank,pRawRecord->Address);  // prepare remove on Master File mark entry in pool as to be deleted
-  if (wSt!=ZS_SUCCESS)
-    {
-    _Base::_remove_Rollback(pRawRecord->Rank);
-    return  wSt;
-    }
-
-  wSt=_Base::_readBlockAt(wBlock,pRawRecord->Address);  // we know that it is locked as ZBS_BeingDeleted
-  if (wSt!=ZS_SUCCESS)
-    {
-    _Base::_remove_Rollback(pRawRecord->Rank);
-    return  wSt;
-    }
-
-  pRawRecord->RawContent=wBlock.Content;  /* save record content */
-  //    pZMFRecord.setData(wBlock.Content.Data,wBlock.Content.Size);
-  wBlock.Content.clear();
-  //
-  // update all Indexes
-  //
-  IndexRankProcessed.clear();
-  IndexItemList.clear();
-  zrank_type wIndex_Rank;
-  long wi;
-
-  // must extract keys value per key to remove each index key one by one
-  pRawRecord->getContentFromRaw(pRawRecord->Content,pRawRecord->RawContent);
-
-  for (wi=0;wi< pRawRecord->KeyValue.count();wi++)
-  {
-    wSt=IndexTable[wi]->_removeIndexItem_Prepare(*pRawRecord->KeyValue[wi],
-        wIndex_Rank);
-    if (wSt!=ZS_SUCCESS)
-    {
-      //                delete wIndexItem; // free memory for errored key value
-      // on error reset all already processed indexes in their original state
-      // (IndexRankProcessed heap contains the Index ranks added)
-      // An additional error during index rollback will be put on exception stack
-
-      _remove_RollbackIndexes ( IndexRankProcessed); // do not care about ZStatus : exception will be on stack
-
-      // on error reset ZMF in its original state
-      _Base::_remove_Rollback(pRawRecord->Rank); // do not accept update on Master File and free resources
-
-      //                if (HistoryOn)
-      //                      ZMFHistory.push (ZO_Add,wi,wAddress,wSt); //! journalize Error on index if journaling is enabled
-
-      // _Base::_unlockFile (ZDescriptor) ; // unlock done in remove rollback
-
-      goto _removeByRank_return ; ;   // and send appropriate status
-    }
-    IndexRankProcessed.push(wIndex_Rank) ; // this index has been added to this rank
-    IndexItemList.push(wIndexItem);        // with that key content
-    //        ZMFJournaling.push (ZO_Add,wi,pRecord,wAddress);
-  }// main for
-
-  // so far everything when well
-  //     commit changes
-
-  wSt=_remove_CommitIndexes (IndexItemList,IndexRankProcessed) ;
-  if (wSt!=ZS_SUCCESS)
-  {
-    // in case of error : appropriate indexes soft or hard rollback is made in Commit Indexes routine
-
-    _Base::_remove_Rollback(pRawRecord->Rank); // an error occurred on indexes : rollback all MasterFile
-    // _Base::_unlockFile (ZDescriptor) ; // unlock is done in rollback routine
-    goto _removeByRank_return ;// if an error occurs here : this is a severe error that only may be caused by an HW or IO subsystem failure.
-  }
-
-  wSt = _Base::_remove_Commit(pRawRecord->Rank);// accept update on Master File
-  if (wSt!=ZS_SUCCESS)    // and if then an error occur : rollback all indexes and signal exception
-  {
-    _remove_HardRollbackIndexes (IndexItemList,IndexRankProcessed);    // indexes are already committed so use hardRollback to counter pass
-    goto _removeByRank_return ;
-  }
-
-  if ((wSt==ZS_SUCCESS)&&getJournalingStatus())
-  {
-    ZJCB->Journal->enqueue(ZJOP_RemoveByRank,pRawRecord->RawContent,pRawRecord->Rank,pRawRecord->Address);
-  }
-
-_removeByRank_return :
-//  _Base::_unlockFile () ;
-  pRawRecord->Address = -1;/* if successfully removed, then address becomes invalid */
-  pRawRecord->Rank = -1;/* if successfully removed, then rank becomes invalid */
-  /*
-    while (IndexItemList.size()>0)
-                  delete IndexItemList.popR();
-*/
-  IndexItemList.clear();
-  return  wSt;
-}// _removeByRankRaw
 
 
 
@@ -3482,7 +3138,7 @@ long wj = 0;
 //    ZException.getLastStatus() =ZS_SUCCESS;
     for (wj=0;wj<pIndexRankProcessed.size();wj++)
             {
-            wSt=IndexTable[wj]->_removeKeyValue_Commit(pIndexRankProcessed[wj]);
+            wSt=IndexTable[wj]->_rawKeyValue_Commit(pIndexItemList[wj]);
             if (wSt!=ZS_SUCCESS)
                 {
 //  hard roll back already processed indexes
@@ -3491,13 +3147,13 @@ long wj = 0;
 
                 for (long wR=0;wR < wj;wR++) // Hard rollback for already committed indexes
                 {
-                IndexTable[wR]->_removeKeyValue_HardRollback(pIndexItemList[wR] ,pIndexRankProcessed[wR]); // rollback update on each index concerned
+                IndexTable[wR]->_rawKeyValue_HardRollback(pIndexItemList[wR] ,pIndexRankProcessed[wR]); // rollback update on each index concerned
                                                                                         // regardless ZStatus (exception is on stack)
                 } // for
 
                 for (long wR = wj;wR<pIndexRankProcessed.size();wR++) // soft rollback
                 {
-                IndexTable[wR]->_removeKeyValue_Rollback(pIndexRankProcessed[wR]); // rollback update on each index concerned
+                IndexTable[wR]->_rawKeyValue_Rollback(pIndexItemList[wR] ,pIndexRankProcessed[wR]); // rollback update on each index concerned
                                                                                     // regardless ZStatus (exception is on stack)
                 }// for
 
@@ -3510,7 +3166,7 @@ long wj = 0;
 
 
 ZStatus
-ZRawMasterFile::_remove_RollbackIndexes (ZArray<zrank_type> &pIndexRankProcessed)
+ZRawMasterFile::_remove_RollbackIndexes (ZArray<ZIndexItem*> &pIndexItemList,ZArray<zrank_type> &pIndexRankProcessed)
 {
 
 
@@ -3524,7 +3180,7 @@ long wi = 0;
 
     for (wi=0;wi < pIndexRankProcessed.size();wi++)
             {
-            IndexTable[wi]->_removeKeyValue_Rollback(pIndexRankProcessed[wi]);  // rollback remove on each index concerned
+            IndexTable[wi]->_rawKeyValue_Rollback(pIndexItemList[wi],pIndexRankProcessed[wi]);  // rollback remove on each index concerned
             }// for                                                                     // don't care about ZStatus: exception stack will track
 
    return  ZException.getLastStatus();
@@ -3542,14 +3198,14 @@ long wi = 0;
 
     for (wi=0;wi < pIndexRankProcessed.size();wi++)
             {
-            IndexTable[wi]->_removeKeyValue_HardRollback(pIndexItemList[wi],pIndexRankProcessed[wi]); // hard rollback update on each already committed index
+            IndexTable[wi]->_rawKeyValue_HardRollback(pIndexItemList[wi],pIndexRankProcessed[wi]); // hard rollback update on each already committed index
             } // for                                                    // don't care about ZStatus: exception stack will track
 
    return  ZException.getLastStatus();
 } // _remove_HardRollbackIndexes
 
 //----------------End Remove sequence------------------------------------------------------
-
+#endif// __DEPRECATED__
 #ifdef __DEPRECATED__
 /**
  * @brief ZRawMasterFile::zsearch searches for a single key value using a ZKey Object
@@ -3584,14 +3240,31 @@ ZStatus wSt;
 //zaddress_type wAddress;
 //long wIndexRank;
 ZIndexResult wZIR;
-    wSt = IndexTable[pIndexNumber]->_URFsearch(pKeyValue,wZIR,ZLock_Nolock);
+ZIndexItemList  IndexItemList;      // stores keys description per index processed
+ZIndexItem      wIndexItem;
+ZDataBuffer     wRawRecord;
+
+    wSt = IndexTable[pIndexNumber]->_URFsearchUnique(pKeyValue,&wIndexItem,ZLock_Nolock);
     if (wSt!=ZS_FOUND)
             { return  wSt;}
 
-    RawRecord->Address=wZIR.ZMFAddress;
 
-    return  zgetByAddress(RawRecord->RawContent,wZIR.ZMFAddress);
+    wSt =   zgetByAddress(wRawRecord,wZIR.ZMFAddress);
+    if (wSt!=ZS_SUCCESS)
+      return wSt;
+
+
+
 }
+
+ZStatus
+ZRawMasterFile::_getByKey (ZDataBuffer &pRecord, ZDataBuffer &pKeyValue, const zrank_type pKeyNumber,ZIndexItem* pOutIndexItem) {
+  pOutIndexItem=new ZIndexItem;
+//  pOutIndexItem->setBuffer(pKeyValue);
+  return IndexTable[pKeyNumber]->_URFsearchUnique(pKeyValue,pOutIndexItem,ZLock_Nolock);
+}
+
+
 
 class ZIndexCollection;
 
@@ -4031,6 +3704,115 @@ ZRawMasterFile::zreportIndexPMSMonitoring (const long pIndex, FILE* pOutput)
    IndexTable[pIndex]->ZPMSStats.reportFull(pOutput);
    return  ZS_SUCCESS;
 }// zreportIndexPMSMonitoring
+
+
+
+
+#ifdef __FROMZMASTERFILE__
+    /**
+ * @brief ZSMasterFile::zclearMCB Sets the current ZSMasterFile's ZMCB to its minimum value. Destroys all existing indexes, and their related files.
+ * @param[in] pOutput defaulted to nullptr. Could be stdout or stderr.
+ *                    If set to its default value (nullptr), then an xml file is generated with name <directory path><base name>.upgradelog
+ * @return
+ */
+    ZStatus
+    ZMasterFile::zclearMCB (FILE* pOutput)
+    {
+  ZStatus wSt;
+  ZDataBuffer wMCBContent;
+
+      FILE* wOutput=nullptr;
+  bool FOutput=false;
+  utfdescString wBase;
+
+
+         wOutput=pOutput;
+     if (pOutput==nullptr)
+             {
+    //       utfdescString wDInfo;
+               wBase=URIContent.getBasename().toCChar();
+           wBase+=".downgradelog";
+           wOutput=fopen(wBase.toCString_Strait(),"w");
+           if (wOutput==nullptr)
+                           {
+                 wOutput=stdout;
+                 fprintf(wOutput,
+                             "%s>>  cannot open file <%s> redirected to stdout\n",
+                             _GET_FUNCTION_NAME_,
+                             wBase.toString());
+                         }
+           else
+                   {
+                 FOutput=true;
+                 }
+           } // if nullptr
+
+          if ((getOpenMode()&(ZRF_Exclusive|ZRF_All))!=(ZRF_Exclusive|ZRF_All))
+                  {
+                fprintf(wOutput,
+                            "%s>>  ZSMasterFile <%s> is open in bad mode for zcreateIndex. Must be (ZRF_Exclusive|ZRF_All) or closed",
+                             _GET_FUNCTION_NAME_,
+                            getURIContent().toString());
+
+                    ZException.setMessage (_GET_FUNCTION_NAME_,
+                                                 ZS_MODEINVALID,
+                                                 Severity_Error,
+                                                 " ZSMasterFile <%s> is open in bad mode. Must be (ZRF_Exclusive|ZRF_All) or closed",
+                                                 URIContent.toString());
+                return  ZS_MODEINVALID;
+                }
+
+
+          if (ZVerbose)
+              {
+            fprintf (wOutput,
+                         "%s>>      Clearing ZMasterControlBlock of file <%s>\n"
+                             "              Actual content\n",
+                         _GET_FUNCTION_NAME_,
+                         URIContent.toString());
+            report(pOutput);
+            }
+
+          while (IndexTable.size()>0)
+                  {
+                wSt=zremoveIndex(IndexTable.lastIdx());
+                if (wSt!=ZS_SUCCESS)
+                        {
+                      if (ZVerbose)
+                              {
+                            fprintf (wOutput,
+                                         "%s>> ****Error: removing index rank <%ld> status <%s> clearing ZMasterControlBlock of file <%s>\n"
+                                             "              Actual content\n",
+                                         _GET_FUNCTION_NAME_,
+                                         IndexTable.lastIdx(),
+                                         decode_ZStatus(wSt),
+                                         URIContent.toString());
+                            }
+                      ZException.addToLast(" removing index rank <%ld>. While clearing ZMasterControlBlock of file <%s>.",
+                                                 IndexTable.lastIdx(),
+                                                 URIContent.toString());
+                      return  wSt;
+                      }// not ZS_SUCCESS
+                if (ZVerbose)
+                        {
+                      fprintf (pOutput,
+                                   "%s>>      Index successfully removed\n",
+                                   _GET_FUNCTION_NAME_);
+                      report(wOutput);
+                      }
+                }//while
+
+          if (FOutput)
+                  fclose(wOutput);
+      ZMasterControlBlock::clear();
+      size_t wRet=_exportAppend(wMCBContent);
+      return   _Base::updateReservedBlock(wMCBContent,true);
+  }//zclearMCB
+#endif // __FROMZMASTERFILE__
+
+
+
+
 
 
 #endif // ZRAWMASTERFILE_CPP

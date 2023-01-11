@@ -1,5 +1,10 @@
 #include "urfparser.h"
 #include <zcontentcommon/zresource.h>
+#include <zcontentutils/zentity.h>
+#include <ztoolset/zdate.h>
+#include <ztoolset/zdatefull.h>
+#include <ztoolset/zdatabuffer.h>
+
 
 ZStatus URFParser::set(const ZDataBuffer* pRecord) {
   Record = pRecord;
@@ -787,7 +792,307 @@ URFParser::getKeyFieldValue (const unsigned char* &pPtrIn,ZDataBuffer& pValue){
   return ZS_SUCCESS;
 }// getURFFieldValue
 
+
+
+utf8VaryingString
+URFParser::displayOneURFField(const unsigned char* &wPtr) {
+  utf8VaryingString wReturn;
+  ZTypeBase wZType;
+
+  ZStatus wSt=ZS_SUCCESS;
+
+  utf8VaryingString wStr;
+  _importAtomic<ZTypeBase>(wZType,wPtr);
+
+
+  /* for atomic URF data, value is just following ZType. For other types, use _importURF function that implies ZType */
+  if (!(wZType & ZType_Atomic))
+    wPtr -= sizeof(ZTypeBase);
+  else  {
+    wZType &= ~ZType_Atomic;
+  }
+  switch (wZType) {
+  case ZType_UChar:
+  case ZType_U8: {
+    uint8_t wValue;
+
+    wValue=convertAtomicBack<uint8_t> (ZType_U8,wPtr);
+    wReturn.sprintf("uint8_t[%d]",wValue);
+    return wReturn;
+  }
+  case ZType_Char:
+  case ZType_S8: {
+    int8_t wValue;
+    wValue=convertAtomicBack<int8_t> (ZType_S8,wPtr);
+    wReturn.sprintf("int8_t[%d]",wValue);
+    return wReturn;
+  }
+  case ZType_U16:{
+    uint16_t wValue;
+    wValue=convertAtomicBack<uint16_t> (ZType_U16,wPtr);
+    wReturn.sprintf("uint16_t[%d]",wValue);
+    return wReturn;
+  }
+  case ZType_S16: {
+    int16_t wValue;
+    wValue=convertAtomicBack<int16_t> (ZType_S16,wPtr);
+    wReturn.sprintf("int16_t[%d]",wValue);
+    return wReturn;
+  }
+
+  case ZType_U32:{
+    uint32_t wValue;
+    wValue=convertAtomicBack<uint32_t> (ZType_U32,wPtr);
+    wReturn.sprintf("uint32_t[%d]",wValue);
+    return wReturn;
+  }
+  case ZType_S32: {
+    int32_t wValue;
+    wValue=convertAtomicBack<int32_t> (ZType_S32,wPtr);
+    wReturn.sprintf("int32_t[%d]",wValue);
+    return wReturn;
+  }
+  case ZType_U64: {
+    uint64_t wValue;
+    wValue=convertAtomicBack<uint64_t> (ZType_U64,wPtr);
+    wReturn.sprintf("uint64_t[%ld]",wValue);
+    return wReturn;
+  }
+  case ZType_S64: {
+    int64_t wValue;
+    wValue=convertAtomicBack<int64_t> (ZType_S64,wPtr);
+    wReturn.sprintf("int64_t[%ld]",wValue);
+    return wReturn;
+  }
+  case ZType_Float: {
+    float wValue;
+    wValue=convertAtomicBack<float> (ZType_Float,wPtr);
+    wReturn.sprintf("float[%g]",double(wValue));
+    return wReturn;
+  }
+
+  case ZType_Double: {
+    double wValue;
+    wValue=convertAtomicBack<double> (ZType_Double,wPtr);
+    wReturn.sprintf("double[%g]",wValue);
+    return wReturn;
+  }
+
+  case ZType_LDouble: {
+    long double wValue;
+    wValue=convertAtomicBack<long double> (ZType_LDouble,wPtr);
+    wReturn.sprintf("double[%g]",wValue);
+    return wReturn;
+  }
+
+    /* from here <wPtr -= sizeof(ZTypeBase);>  has been made and wPtr points on ZType */
+
+  case ZType_ZDate: {
+    ssize_t wSize;
+    ZDate wZDate;
+    if ((wSize = wZDate._importURF(wPtr)) < 0) {
+      wReturn = "ZDate[**Invalid value**]" ;
+      return wReturn;
+    }
+    wReturn.sprintf("ZDate[%s]",wZDate.toLocale().toCChar());
+    return wReturn;
+  }
+  case ZType_ZDateFull: {
+    ssize_t wSize;
+    ZDateFull wZDateFull;
+
+    if ((wSize = wZDateFull._importURF(wPtr)) < 0) {
+      wReturn = "ZDateFull[**Invalid value**]" ;
+      return wReturn;
+    }
+    wReturn.sprintf("ZDateFull[%s]",wZDateFull.toLocale().toCChar());
+    return wReturn;
+  }
+
+  case ZType_URIString:{
+    uriString wString;
+    ssize_t wSize = wString._importURF(wPtr);
+    wReturn.sprintf("uriString[%s]",wString.toCChar());
+    return wReturn;
+  }
+  case ZType_Utf8VaryingString: {
+    utf8VaryingString wString;
+    ssize_t wSize = wString._importURF(wPtr);
+    wReturn.sprintf("utf8VaryingString[%s]",wString.toCChar());
+    return wReturn;
+  }
+
+
+  case ZType_Utf16VaryingString:{
+    utf16VaryingString wString;
+
+    ssize_t wSize = wString._importURF(wPtr);
+    wReturn.sprintf("utf16VaryingString[%s]",wString.toUtf8().toCChar());
+    return wReturn;
+  }
+  case ZType_Utf32VaryingString:{
+    utf32VaryingString wString;
+    utf16VaryingString wAdd;
+
+    ssize_t wSize = wString._importURF(wPtr);
+    wReturn.sprintf("utf32VaryingString[%s]",wString.toUtf8().toCChar());
+    return wReturn;
+  }
+
+  case ZType_Utf8FixedString:{
+    utf8VaryingString wString;
+
+    URF_Capacity_type   wCapacity;
+    URF_UnitCount_type  wUnitsCount;
+    size_t              wStringByteSize;
+
+    wPtr += sizeof(ZTypeBase);
+
+    _importAtomic<URF_Capacity_type>(wCapacity,wPtr);
+    _importAtomic<URF_UnitCount_type>(wUnitsCount,wPtr);
+
+    wStringByteSize = size_t (wUnitsCount) * sizeof(utf8_t);
+
+    URF_Capacity_type wI = wUnitsCount;
+
+    wString.allocateUnitsBZero(size_t(wUnitsCount+1));
+
+    utf8_t* wPtrOut = (utf8_t*)wString.Data;
+    utf8_t* wPtrIn = (utf8_t*)wPtr;
+    while (wI--&& *wPtrIn )
+      *wPtrOut++ = *wPtrIn++;
+
+    wPtr = (unsigned char*) wPtrIn;
+
+    wReturn.sprintf("utf8FixedString[%s]",wString.toCChar());
+    return wReturn;
+  }
+
+    /* for fixed string URF header is different */
+
+  case ZType_Utf16FixedString:{
+    utf16VaryingString wString;
+
+    URF_Capacity_type wCapacity;
+    URF_UnitCount_type  wUnitsCount;
+
+
+    wPtr += sizeof(ZTypeBase);
+
+    _importAtomic<URF_Capacity_type>(wCapacity,wPtr);
+    _importAtomic<URF_UnitCount_type>(wUnitsCount,wPtr);
+
+    size_t wStringByteSize = size_t (wUnitsCount) * sizeof(utf16_t);
+
+    /* the whole string must be imported, then possibly truncated afterwards to maximum displayable */
+
+    URF_Capacity_type wI = wUnitsCount;
+
+    wString.allocateUnitsBZero(size_t(wUnitsCount+1));
+
+    utf16_t* wPtrOut = (utf16_t*)wString.Data;
+    utf16_t* wPtrIn = (utf16_t*)wPtr;
+    while ( wI-- && *wPtrIn )
+      *wPtrOut++ = *wPtrIn++;
+
+    wPtr = (unsigned char*) wPtrIn;
+
+    wReturn.sprintf("utf16FixedString[%s]",wString.toUtf8().toCChar());
+    return wReturn;
+  }
+
+  case ZType_Utf32FixedString:{
+    utf32VaryingString wString;
+    URF_Capacity_type wCapacity;
+    URF_UnitCount_type  wUnitsCount;
+
+    wPtr += sizeof(ZTypeBase);
+
+    _importAtomic<URF_Capacity_type>(wCapacity,wPtr);
+    _importAtomic<URF_UnitCount_type>(wUnitsCount,wPtr);
+
+    size_t wStringByteSize = size_t (wUnitsCount) * sizeof(utf32_t);
+
+    URF_Capacity_type wI = wUnitsCount;
+
+    wString.allocateUnitsBZero(size_t(wUnitsCount+1));
+
+    utf32_t* wPtrOut = (utf32_t*)wString.Data;
+    utf32_t* wPtrIn = (utf32_t*)wPtr;
+
+    while (wI--&& *wPtrIn )
+      *wPtrOut++ = *wPtrIn++;
+
+    wPtr = (unsigned char*) wPtrIn;
+
+    wReturn.sprintf("utf32FixedString[%s]",wString.toUtf8().toCChar());
+    return wReturn;
+  }
+
+  case ZType_CheckSum: {
+    checkSum wCheckSum;
+
+    wCheckSum._importURF(wPtr);
+
+    wReturn.sprintf("checksum[%s]",wCheckSum.toHexa().toCChar());
+    return wReturn;
+  }
+
+  case ZType_MD5: {
+    md5 wCheckSum;
+
+    wCheckSum._importURF(wPtr);
+
+    wReturn.sprintf("md5[%s]",wCheckSum.toHexa().toCChar());
+    return wReturn;
+  }
+
+  case ZType_Blob: {
+    ZDataBuffer wBlob;
+    ssize_t wSize=wBlob._importURF(wPtr);
+
+    wReturn.sprintf("blob[%s]",wBlob.DumpS(16,60).toCChar());
+    return wReturn;
+  }
+
+  case ZType_bitset: {
+    ZBitset wBitset;
+
+    ssize_t wSize=wBitset._importURF(wPtr);
+    wReturn.sprintf("ZBitset[%s]",wBitset.toString().toCChar());
+    return wReturn;
+  }
+
+  case ZType_bitsetFull: {
+    wReturn = "ZBitsetFull[]";
+    return wReturn;
+  }
+
+  case ZType_Resource: {
+    ZResource wValue;
+    ssize_t wSize=wValue._importURF(wPtr);
+
+    wReturn.sprintf("ZResource[<%s>-<%ld>]",decode_ZEntity(wValue.Entity).toChar(),wValue.id);
+    return wReturn;
+  }
+
+  default: {
+    wReturn.sprintf("Unknown data type[----]");
+    return wReturn;
+  }
+
+  }// switch
+
+} // display urf field
+
+
+
+
 /** @brief URFCompare  Compare two buffers composed each of one or many URF fields, each field potentially of variable length.
+ *  returns 0 when both buffers are equal
+ *          1 or positive value if pKey1 is greater than pKey2
+ *          -1 or negative value if pKey1 is less than pKey2
+ *
    */
 int URFComparePtr(const unsigned char* pKey1, size_t pSize1, const unsigned char* pKey2, size_t pSize2) {
   if ((pKey1 == nullptr)||(pSize1==0)) {
@@ -798,45 +1103,40 @@ int URFComparePtr(const unsigned char* pKey1, size_t pSize1, const unsigned char
   if ((pKey2 == nullptr)||(pSize2==0)) {
     return 1 ;    /* key1 (whatever value) greater than key2 (empty) : positive value */
   }
-
   ZDataBuffer wValue1,wValue2;
   ZStatus wSt;
   ZTypeBase wType;
-  ssize_t    wSize;
+  ssize_t    wSize1,wSize2;
   const unsigned char* wURF1 = pKey1;
-  const unsigned char* wURF1_End = pKey1 + pSize1;
   const unsigned char* wEnd1 = pKey1 + pSize1;
   const unsigned char* wURF2 = pKey2 ;
-  const unsigned char* wURF2_End = pKey2 + pSize2;
   const unsigned char* wEnd2 = pKey2 + pSize2;
 
   int wRet=0;
-  wSt=URFParser::getURFTypeAndSize(pKey1,wType,wSize);
+  wSt=URFParser::getURFTypeAndSize(pKey1,wType,wSize1);
   if (wSt!=ZS_SUCCESS) {
     ZException.setMessage("URFCompare",wSt,Severity_Fatal,"Error while comparing key values. Key1 type %X %s size %ld");
     ZException.exit_abort();
   }
-  wURF1_End = wURF1 + wSize;
 
-  wSt=URFParser::getURFTypeAndSize(pKey2,wType,wSize);
+  wSt=URFParser::getURFTypeAndSize(pKey2,wType,wSize2);
   if (wSt!=ZS_SUCCESS){
     ZException.setMessage("URFCompare",wSt,Severity_Fatal,"Error while comparing key values.");
     ZException.exit_abort();
   }
-  wURF2_End = wURF2 + wSize;
 
-  wRet = URFCompareValues (wURF1,wURF1_End,wURF2,wURF2_End);  /* pURF1 and pURF2 are updated */
+  wRet = URFCompareValues (wURF1,wSize1,wURF2,wSize2);  /* pURF1 and pURF2 are updated */
 
   while ( (wRet==0) && (wSt == ZS_SUCCESS ) && (wURF1 < wEnd1) && (wURF2 < wEnd2) ) {
-    wSt=URFParser::getURFTypeAndSize(wURF1,wType,wSize);
+    wSt=URFParser::getURFTypeAndSize(wURF1,wType,wSize1);
     if (wSt!=ZS_SUCCESS)
-      break;
-    wURF1_End = wURF1 + wSize;
-    wSt=URFParser::getURFTypeAndSize(wURF2,wType,wSize);
+      ZException.exit_abort();
+
+    wSt=URFParser::getURFTypeAndSize(wURF2,wType,wSize2);
     if (wSt!=ZS_SUCCESS)
-      break;
-    wURF2_End = wURF2 + wSize;
-    wRet = URFCompareValues (wURF1,wURF1_End,wURF2,wURF2_End);  /* pURF1 and pURF2 are updated */
+      ZException.exit_abort();
+
+    wRet = URFCompareValues (wURF1,wSize1,wURF2,wSize2);  /* pURF1 and pURF2 are updated */
   }// while
   return wRet;
 } // URFCompare
@@ -845,15 +1145,18 @@ int URFComparePtr(const unsigned char* pKey1, size_t pSize1, const unsigned char
 
 
 
-int URFCompareValues( const unsigned char* &pURF1,const unsigned char* pURF1_End,
-                      const unsigned char* &pURF2,const unsigned char* pURF2_End) {
+int URFCompareValues( const unsigned char* &pURF1,size_t pSize1,
+                      const unsigned char* &pURF2,size_t pSize2) {
   int wRet=0;
+  size_t wSize1=pSize1,wSize2=pSize2;
+  const unsigned char* wURF1=pURF1;
+  const unsigned char* wURF2=pURF2;
 
   if (pURF1==nullptr) {
     if (pURF2==nullptr)
       return 0;
     else {
-      pURF2 = pURF2_End;
+      pURF2 += pSize2;
       return -1;
     }
   }
@@ -861,24 +1164,23 @@ int URFCompareValues( const unsigned char* &pURF1,const unsigned char* pURF1_End
     return 1;
 
   wRet=0;
-  while ((wRet==0) && (pURF1 < pURF1_End) && (pURF2 < pURF2_End)){
-    wRet = (*pURF1++)-(*pURF2++);
+  while ((wRet==0) && wSize1-- && wSize2--){
+    wRet = (*wURF1++) - (*wURF2++);
   }
-  if (wRet==0) {
-    if (pURF1 > pURF1_End) {
-      pURF2 = pURF2_End;
-      pURF1 = pURF1_End;
-      return 1; /* key1 is greater than key2 */
-    }
-    if (pURF2 > pURF2_End) {
-      pURF2 = pURF2_End;
-      pURF1 = pURF1_End;
-      return -1; /* key1 is less than key2 */
-    }
-    pURF2 = pURF2_End;
-    pURF1 = pURF1_End;
-    /* equality in size and in values */
-    return 0;
+  pURF1 += pSize1;
+  pURF2 += pSize2;
+  if (wRet){
+    return wRet;
   }
-  return wRet;
+  /* one of the two or both keys are at the end and so far they are equal */
+
+
+  if (wSize1) { /* but Key1 has a greater size than key2 */
+    return 1; /* key1 is greater than key2 */
+  }
+  if (wSize2) { /* Key2 has a greater size than key 1 */
+    return -1; /* key1 is less than key2 */
+  }
+    /* both are equal in values and sizes */
+  return 0;
 }

@@ -158,6 +158,7 @@ SOURCES += \
     $${ZCONTENT_ROOT}/zcontentutils/zscan.cpp \
     filegeneratedlg.cpp \
     main.cpp \
+    poolvisu.cpp \
     visulinecol.cpp \
     zcppgenerate.cpp \
     zdicdlg.cpp \
@@ -206,6 +207,7 @@ HEADERS += \
 \
     $${TOOLSET_ROOT}/zcppparser/zcppparserutils/rawfields.h \
     filegeneratedlg.h \
+    poolvisu.h \
     visulinecol.h \
     zcontentutils_release.h \
     zcppgenerate.h \
@@ -233,6 +235,8 @@ FORMS += \
     $${ZCONTENT_ROOT}/zcontentutils/zscan.ui \
     ../../zcppparser/zcppparserutils/rawfields.ui \
     filegeneratedlg.ui \
+    poolvisu.ui \
+    poolvisuDLg.ui \
     zrawmasterfilevisu.ui
     $${TOOLSET_ROOT}/zcppparser/zcppparserutils/rawfields.ui
 

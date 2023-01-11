@@ -83,14 +83,20 @@ class ZRawMasterFile;
 
 class ZRawIndexFile : protected ZRandomFile, public ZIndexControlBlock
 {
-friend class ZIndexCollection;
-friend class ZRawMasterFile;
-friend class ZIndexTable;
-friend class ZIndexFile;
 
 
 public:
-    friend class ZMasterFile;
+  friend class ZIndexCollection;
+  friend class ZRawMasterFile;
+  friend class ZIndexTable;
+  friend class ZIndexFile;
+
+  friend class ZMasterFile;
+
+  friend ZStatus zrepairIndexes (const char *pZMFPath,
+                                  bool pRepair,
+                                  bool pRebuildAll,
+                                  FILE* pOutput);
 
 /* for new version of zrebuildRawIndex() see zrawmasterfileutils.h (template) */
     friend ZStatus zrebuildRawIndex(ZRawIndexFile& pIF,bool pStat, FILE*pOutput);
@@ -147,6 +153,8 @@ public:
     using ZRandomFile::getOpenMode;
     using ZRandomFile::zclearFile;
 
+    using ZRandomFile::zclose;
+
 
     IndexData_st getIndexData()
     {
@@ -191,7 +199,8 @@ public:
 
     zrank_type getCurrentRank (void) {return CurrentRank;}
 /**
-   * @brief ZIndexFile::zcreateIndex creates a new index file corresponding to the given specification ICB and ZRF parameters
+   * @brief
+   * zcreateIndexFile creates a new index file corresponding to the given specification ICB and ZRF parameters
    *
    *  @note This could be NOT a good idea to set GrabFreeSpace option : Indexes are fixed length then search in Free Pool are only made with the same size.
    *
@@ -254,15 +263,9 @@ public:
     ZStatus openIndexFile (uriString &pIndexUri, long pIndexRank, const int pMode);
     ZStatus closeIndexFile (void);
 
-    ZStatus writeIndexControlBlock(checkSum **pCheckSum=nullptr);
+//    ZStatus writeIndexControlBlock(checkSum **pCheckSum=nullptr);
+    ZStatus writeIndexControlBlock();
 
-    ZStatus removeIndexValue    (const ZDataBuffer& pKey , zaddress_type &pAddress);
-//    ZStatus insertIndexValue    (ZDataBuffer& pRecord ,zaddress_type &pAddress, long &pZMFRank);
-
-/*    ZStatus addRollback         (ZDataBuffer& pRecord , long &pZMFRank,zaddress_type &pAddress);
-    ZStatus removeRollback      (ZDataBuffer& pRecord , long &pZMFRank,zaddress_type &pAddress);
-    ZStatus insertRollback      (ZDataBuffer& pRecord , long &pZMFRank,zaddress_type &pAddress);
-*/
     ZStatus searchIndex     (ZDataBuffer& KeyValue);
 
     ZStatus clearIndexFile  (void);
@@ -280,9 +283,25 @@ public:
     ZStatus _addRawKeyValue_Prepare(ZIndexItem *&pIndexItem, zrank_type &pZBATIndex, const zaddress_type pZMFAddress);
 #endif
     ZStatus _addRawKeyValue_Prepare(ZIndexItem *&pOutIndexItem,
-                                    zrank_type &pZBATIndex,
+//                                    zrank_type &pZBATIndex,
                                     ZDataBuffer &pKeyContent,
                                     const zaddress_type pZMFAddress);
+
+    ZStatus _removeRawKeyValue_Prepare (ZIndexItem *&pIndexItem,
+                                          zrank_type &pIndexRank,
+                                          ZDataBuffer &pKey,
+                                          zaddress_type &pIndexAddress);
+/*
+    ZStatus _removeIndexItem_Prepare(ZIndexItem *pIndexItem, long &pIndexRank);
+
+    ZStatus _rawKeyValue_Commit(ZIndexItem* pIndexItem, const zrank_type pZBATIndex);
+    ZStatus _rawKeyValue_Rollback(ZIndexItem *pIndexItem,const zrank_type pZBATIndex);
+    ZStatus _rawKeyValue_HardRollback(ZIndexItem *pIndexItem,const zrank_type pZBATIndex);
+*/
+    ZStatus _rawKeyValue_Commit(ZIndexItem* pIndexItem);
+    ZStatus _rawKeyValue_Rollback(ZIndexItem *pIndexItem);
+    ZStatus _rawKeyValue_HardRollback(ZIndexItem *pIndexItem);
+  #ifdef __DEPRECATED__
     /** effective write of key content in reserved record */
     ZStatus _addRawKeyValue_Commit(ZIndexItem* pIndexItem, const zrank_type pZBATIndex);
     /** index key space has been reserved in ZBAT pool and needs to be released */
@@ -290,12 +309,10 @@ public:
     /** index key has been created in file and needs to be suppressed */
     ZStatus _addKeyValue_HardRollback(const zrank_type pIndexCommit);
 
-    ZStatus _removeKeyValue_Prepare (ZDataBuffer &pKey, ZIndexItem *&pIndexItem, long &pIndexRank, zaddress_type &pZMFAddress);
-    ZStatus _removeIndexItem_Prepare(ZIndexItem &pIndexItem, long &pIndexRank);
-
     ZStatus _removeKeyValue_Commit  (const zrank_type pIndexCommit);
     ZStatus _removeKeyValue_Rollback( const zrank_type pIndexCommit);
     ZStatus _removeKeyValue_HardRollback(ZIndexItem *pIndexItem, const zrank_type pIndexCommit);
+  #endif // __DEPRECATED__
 /** @endcond */
 
   //  ZStatus getKeyIndexFields(ZDataBuffer &pIndexContent,ZDataBuffer& pKeyValue);
@@ -305,9 +322,9 @@ public:
     ZRawMasterFile* getRawMasterFile() {return ZMFFather;}
 
 
-    ZStatus _URFsearch( const ZDataBuffer &pKey,
-                        ZIndexResult &pZIR,
-                        const zlockmask_type pLock=ZLock_Nolock);
+    ZStatus _URFsearchUnique(const ZDataBuffer &pKeyToSearch,
+                              ZIndexItem *pOutIndexItem,
+                              const zlockmask_type pLock=ZLock_Nolock);
 
     ZStatus _URFsearchAll(const ZDataBuffer &pKey,
                           ZIndexCollection &pCollection,
@@ -512,5 +529,10 @@ int URFCompareValues( const unsigned char* &pURF1,const unsigned char* pURF1_End
                       const unsigned char* &pURF2,const unsigned char* pURF2_End);
 
 ZStatus _printKeyFieldsValues (ZDataBuffer *wKeyContent,ZIndexFile* pZIF, bool pHeader,bool pKeyDump,FILE*pOutput);
+
+ZStatus zrepairIndexes (const char *pZMFPath,
+    bool pRepair,
+    bool pRebuildAll,
+    FILE* pOutput);
 
 #endif  //ZRAWINDEXFILE_H

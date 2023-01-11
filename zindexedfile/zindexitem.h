@@ -25,20 +25,32 @@ public:
   {
     ZMFaddress=pIn.ZMFaddress;
     Operation=pIn.Operation;
+    IndexRank = pIn.IndexRank;
+    IndexAddress = pIn.IndexAddress ;
 //    KeyContent=pIn.KeyContent;
     this->ZDataBuffer::_copyFrom(pIn);
     return *this;
   }
   ZIndexItem& operator = (const ZIndexItem& pIn) { return _copyFrom(pIn); }
 
-  zaddress_type ZMFaddress;    //!< Master file block record address to link index key with
-  ZOp           Operation;     //!< this is NOT stored on index file (see toFileKey() method) but only for history & journaling purpose
-  //  ZDataBuffer   KeyContent;    //!< extracted key content from user record according key extraction rules. Size of content is fixed and value is ZIndexControlBlock::KeySize.
+  zaddress_type ZMFaddress;     //!< Master file block record address to link index key with
+  zaddress_type IndexAddress;   //!< Index record address : to be stored in ZMF record
+  ZOp_type      Operation;      //!< this is NOT stored on index file (see toFileKey() method) but only for history & journaling purpose
+  zrank_type    IndexRank;      //!< index rank for the on going operation : set by prepare operation and used in commit rollback and hardrollback operations
 
-  void set(const ZDataBuffer& pKeyContent) ;
-  void clear (void) { ZDataBuffer::clearData(); ZMFaddress=0L; Operation = ZO_Nothing;
+  void setBuffer(const ZDataBuffer& pKeyContent) ;
+  void clear (void) {
+    ZDataBuffer::clearData();
+    ZMFaddress=-1L;
+    Operation = ZO_Nothing;
+    IndexAddress=-1L;
+    IndexRank=0L;
     //State = ZAMNothing;
-    return;}
+    return;
+  }
+
+  utf8VaryingString display();
+
   ZDataBuffer   toFileKey(void);
   ZIndexItem&   fromFileKey (ZDataBuffer &pKeyFileRecord);
 
@@ -46,7 +58,7 @@ public:
 
 
 
-
+/* NB: Index item list must be exported to be saved in journalling base */
 class ZIndexItemList : public ZArray<ZIndexItem*>
 {
   typedef ZArray<ZIndexItem*> _Base;
@@ -57,6 +69,8 @@ public:
     clear();
   }
 
+  size_t _exportAppend(ZDataBuffer& pOut);
+
   void clear(void)
   {
     while (size()>0)
@@ -65,6 +79,40 @@ public:
     _Base::reset();
   }
 };
+
+#pragma pack(push)
+#pragma pack(1)         // memory alignment on byte
+class ZIIExport {
+public:
+  ZIIExport()=default;
+  ~ZIIExport() {}
+  ZIIExport(const ZIIExport& pIn) {_copyFrom(pIn);}
+
+  uint32_t      EndianCheck = cst_EndianCheck_Normal;
+  zaddress_type ZMFaddress;     //!< Master file block record address to link index key with
+  zaddress_type IndexAddress;   //!< Index record address : to be stored in ZMF record
+  ZOp_type      Operation;      //!< this is NOT stored on index file (see toFileKey() method) but only for history & journaling purpose
+  zrank_type    IndexRank;      //!< index rank for the on going operation : set by prepare operation and used in commit rollback and hardrollback operations
+
+  ZIIExport& _copyFrom(const ZIIExport& pIn);
+
+  ZIIExport& operator= (const ZIIExport& pIn) {return _copyFrom(pIn);}
+
+  bool isReversed () {return EndianCheck==cst_EndianCheck_Reversed;}
+  void set(const ZIndexItem& pIn);
+  void reverse();
+  void serialize() {
+    if (isReversed())
+      return;
+    reverse();
+  }
+  void deserialize() {
+    if (!isReversed())
+      return;
+    reverse();
+  }
+};
+#pragma pack(pop) // end no memory alignment
 
 } // namespace zbs
 

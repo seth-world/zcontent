@@ -99,6 +99,7 @@ HEADERS += \
     ../zcontentcommon/zresource.h \
     ../zcontentcommon/zresult.h \
     ../zcontentcommon/zresult.h \
+    ../zcontentutils/zentity.h \
     ../zindexedfile/zdataconversion.h \
     ../zindexedfile/zdatatype.h \
     ../zindexedfile/zdictionaryfile.h \
@@ -165,6 +166,7 @@ SOURCES += \
     ../zcontentcommon/zoperation.cpp \
     ../zcontentcommon/zresource.cpp \
     ../zcontentcommon/zresult.cpp \
+    ../zcontentutils/zentity.cpp \
     ../zindexedfile/zdataconversion.cpp \
     ../zindexedfile/zdatatype.cpp \
     ../zindexedfile/zdictionaryfile.cpp \
@@ -184,6 +186,7 @@ SOURCES += \
     ../zindexedfile/znaturalfromurf.cpp \
     ../zindexedfile/zrawindexfile.cpp \
     ../zindexedfile/zrawmasterfile.cpp \
+    ../zindexedfile/zrawmasterfileutils.cpp \
     ../zindexedfile/zrawrecord.cpp \
     ../zindexedfile/zsjournalcontrolblock.cpp \
     ../zindexedfile/zurffromnatural.cpp \

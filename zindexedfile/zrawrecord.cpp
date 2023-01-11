@@ -39,7 +39,7 @@ ZRawRecord::setRawKeyContent(long pIdx,const ZDataBuffer& pKeyContent)
 {
   if (pIdx > KeyValue.count())
     return ZS_OUTBOUND;
-  KeyValue[pIdx]->set( pKeyContent );
+  KeyValue[pIdx]->setBuffer( pKeyContent );
   return ZS_SUCCESS;
 }
 

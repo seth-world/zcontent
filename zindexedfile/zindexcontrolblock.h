@@ -128,8 +128,8 @@ public:
 //  ZMetaDic*               MetaDic=nullptr;  // reference to meta dictionary for the indexed file
   /* no dictionary in ICB, in MCB */
 //  ZMFDictionary*          Dictionary=nullptr;  // main dictionary if exists : managed at ZMasterFile level
-  checkSum*   CheckSum=nullptr;
-  md5         MD5;
+//  checkSum*   CheckSum=nullptr;
+//  md5         MD5;
 //  void clear(ZMetaDic *pMetaDic);
 //  bool hasDictionary() {return ZKDic!=nullptr;}
 //  bool hasDictionary() {return Dictionary!=nullptr;}
@@ -149,7 +149,7 @@ public:
 
   // generates checksum for Index Control block on ZMasterFile side
 
-  checkSum* generateCheckSum(void) { CheckSum = _export().newcheckSum(); return CheckSum;}
+//  checkSum* generateCheckSum(void) { CheckSum = _export().newcheckSum(); return CheckSum;}
 
   /**
     * @brief IndexRecordSize() computes and return the effective size of a ZIndex key record.

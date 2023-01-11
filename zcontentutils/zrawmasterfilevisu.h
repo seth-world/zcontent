@@ -60,6 +60,20 @@ public:
                               const utf8VaryingString &pToolTip="",
                               bool pScrollTo=false);
 
+  /* evaluate actions */
+
+  QAction* uint16QAc = nullptr;
+  QAction* int16QAc = nullptr;
+  QAction* uint32QAc = nullptr;
+  QAction* int32QAc = nullptr;
+  QAction* uint64QAc = nullptr;
+  QAction* int64QAc = nullptr;
+  QAction* sizetQAc = nullptr;
+
+  void goToAddress(zaddress_type pAddress);
+
+  void firstIterate() { Forward();}
+
 private slots:
   void Forward();
   void Backward();
@@ -67,7 +81,15 @@ private slots:
   void ToBegin();
   void ViewModeChange(int pIndex);
 
+
+  void visuActionEvent(QAction* pAction);
+  void VisuBvFlexMenuCallback(QContextMenuEvent *event);
+//  void VisuMouseCallback(int pZEF, QMouseEvent *pEvent);
+
 private:
+  ZDataBuffer RawRecord;
+
+  bool              BackGroundOnce=true;
   QVariant          DefaultBackGround;
   QVariant          WrongBackGround = QVariant(QBrush(Qt::magenta));
   QVariant          BlockHeaderBackGround =  QVariant(QBrush(Qt::green));
@@ -99,5 +121,7 @@ private:
 
 
 bool ZTypeExists(ZTypeBase pType);
+
+ssize_t computeOffsetFromCoord(int pRow, int pCol);
 
 #endif // ZRAWMASTERFILEVISU_H

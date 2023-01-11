@@ -1,9 +1,32 @@
-#ifndef ZRAWMASTERFILEUTILS_H
+﻿#ifndef ZRAWMASTERFILEUTILS_H
 #define ZRAWMASTERFILEUTILS_H
 
 #include <zindexedfile/zrawmasterfile.h>
 #include <zindexedfile/zrawindexfile.h>
 
+  ZStatus zrepairIndexes (const char *pZMFPath,
+                          bool pRepair=false,
+                          bool pRebuildAll=false,
+                          FILE *pOutput=nullptr);
+
+
+
+  void    zdowngradeZMFtoZRF (const  uriString & pZMFPath,FILE* pOutput=nullptr);
+
+  void    zupgradeZRFtoZMF (const uriString &pZRFPath, FILE* pOutput=nullptr);
+
+utf8VaryingString generateIndexRootName(const utf8String &pMasterRootName,
+                                        const long pRank,
+                                        const utf8String &pIndexName);
+
+ZStatus
+generateIndexURI( uriString &pIndexFileUri,
+                  const uriString pMasterFileUri,
+                  const uriString &pDirectory,
+                  const long pRank,
+                  const utf8String& pIndexName);
+
+const char *decode_ZCOP (uint16_t pZCOP);
 /**
  * @brief ZIndexFile::zrebuildIndex rebuilds the current index
  *

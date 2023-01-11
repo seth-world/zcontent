@@ -20,7 +20,7 @@ using namespace zbs;
 ZDataBuffer&
 ZFileDescriptor::_exportFCB(ZDataBuffer& pZDBExport)
 {
-  printf ("ZFileDescriptor::_exportFCB>>\n");
+  _DBGPRINT ("ZFileDescriptor::_exportFCB>>\n")
   ZFileControlBlock wFileControlBlock;
 
   wFileControlBlock.ZBAT_DataOffset =  sizeof(ZFCB_Export);  // ZBAT data Pool is stored first just after ZFCB
@@ -29,24 +29,22 @@ ZFileDescriptor::_exportFCB(ZDataBuffer& pZDBExport)
   wFileControlBlock.BlockExtentQuota = ZBAT.getQuota();
 
   ZDataBuffer wZBAT_export;
-  ZBAT._exportAppendPool(wZBAT_export);
-  wFileControlBlock.ZBAT_ExportSize = wZBAT_export.getByteSize();
+  size_t wExpSize=ZBAT._exportAppendPool(wZBAT_export);
+  wFileControlBlock.ZBAT_ExportSize = wExpSize ;
 
-  wFileControlBlock.ZFBT_DataOffset = (zaddress_type)(ZFCB.ZBAT_DataOffset
-                                                      +ZFCB.ZBAT_ExportSize); // then ZFBT
+  wFileControlBlock.ZFBT_DataOffset = (zaddress_type)(ZFCB.ZBAT_DataOffset + ZFCB.ZBAT_ExportSize); // then ZFBT
   //    wFileControlBlock.ZFBT_ExportSize = ZFBT._getExportAllocatedSize();
   ZDataBuffer wZFBT_export;
-  ZFBT._exportAppendPool(wZFBT_export);
-  wFileControlBlock.ZFBT_ExportSize = wZFBT_export.getByteSize();
+  wExpSize = ZFBT._exportAppendPool(wZFBT_export);
+  wFileControlBlock.ZFBT_ExportSize = wExpSize ;
 
-  wFileControlBlock.ZDBT_DataOffset = (zaddress_type)(ZFCB.ZFBT_DataOffset
-                                                      +ZFCB.ZFBT_ExportSize); // then ZDBT
+  wFileControlBlock.ZDBT_DataOffset = (zaddress_type)(ZFCB.ZFBT_DataOffset + ZFCB.ZFBT_ExportSize); // then ZDBT
   //    wFileControlBlock.ZDBT_ExportSize = ZDBT._getExportAllocatedSize();
   ZDataBuffer wZDBT_export;
   ZFBT._exportAppendPool(wZDBT_export);
-  wFileControlBlock.ZDBT_ExportSize = wZDBT_export.getByteSize();
+  wFileControlBlock.ZDBT_ExportSize = wExpSize ;
 
-  wFileControlBlock._exportAppend(pZDBExport);
+  wExpSize = wFileControlBlock._exportAppend(pZDBExport);
 
   pZDBExport.appendData(wZBAT_export);
   pZDBExport.appendData(wZFBT_export);

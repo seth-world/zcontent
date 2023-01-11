@@ -46,8 +46,8 @@ public:
   void serialize();
   void deserialize();
 
-  bool isReversed() {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
-  bool isNotReversed() {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
+  bool isReversed() const {if (EndianCheck==cst_EndianCheck_Reversed) return true; return false;}
+  bool isNotReversed() const {if (EndianCheck==cst_EndianCheck_Normal) return true; return false;}
 
   bool isValid() {
     return (StartSign==cst_ZBLOCKSTART) && (BlockId==ZBID_Data) && (EndianCheck==cst_EndianCheck_Normal);

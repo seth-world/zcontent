@@ -37,7 +37,7 @@
 #include <zcppparser/zcppparsertype.h> // for getParserWorkDirectory
 #include <zcontent/zindexedfile/zmasterfile_utilities.h> // for generateIndexRootName
 
-#include <zcontent/zindexedfile/zmasterfile.h>
+#include <zcontent/zindexedfile/zrawmasterfile.h>
 
 #include <zexceptiondlg.h>
 
@@ -930,6 +930,21 @@ FileGenerateDLg::Compute() {
   ZArray<utf8VaryingString> wWarnedFields;
   size_t  MeanRecordSize=0;
   utf8VaryingString wStr;
+
+  MeanRecordSize += sizeof(uint64_t);  /* user record size */
+
+  /* size of key section : address array */
+
+  MeanRecordSize += sizeof(uint32_t);  /* number of key addresses */
+  MeanRecordSize += sizeof(zaddress_type) * DictionaryFile->KeyDic.count() ;
+
+  /* bitset size */
+  ZBitset wBS;
+  wBS._allocate(DictionaryFile->count() );
+  MeanRecordSize += wBS.getURFSize();
+
+  MeanRecordSize += sizeof(uint64_t);  /* URF Data size */
+
   for (long wi=0 ; wi < DictionaryFile->count() ; wi++) {
     MeanRecordSize += DictionaryFile->Tab[wi].HeaderSize;
     MeanRecordSize += DictionaryFile->Tab[wi].UniversalSize;
@@ -1038,7 +1053,7 @@ void FileGenerateDLg::GenXml() {
 void FileGenerateDLg::GenFile() {
   utf8VaryingString wStr;
   ZaiErrors wErrorLog;
-  ZMasterFile* wMasterFile=new ZMasterFile;
+  ZRawMasterFile* wMasterFile=new ZRawMasterFile;
   uriString wURIFile = TargetDirectory ;
   wURIFile.addConditionalDirectoryDelimiter();
   wURIFile += RootName;

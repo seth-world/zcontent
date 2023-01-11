@@ -227,7 +227,7 @@ const char* wCppToRSizeAtomic =
 const char* wCppToRecordMiddle =
     "\n"
     "   unsigned char* wPtr = wReturn.extend(wURFSize+sizeof(uint64_t));\n"
-    "   _exportAtomicPtr(wURFSize,wPtr); /* user record size is in universal format but not in URF (no preceeding URF header) */\n\n"
+//    "   _exportAtomicPtr(wURFSize,wPtr); /* user record size is in universal format but not in URF (no preceeding URF header) */\n\n"
     "/*              move of individual fields to record space */\n";
 
 const char* wCppToRecordMoveErrored =

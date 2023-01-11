@@ -1,55 +1,54 @@
 #include <zcontentcommon/zoperation.h>
-
+#include <ztoolset/utfvaryingstring.h>
 
 /**
  * @brief DecodeZOperation   gives a const char string of max 25 chars mentioning the ZOperation given in parameter
  * @param pOp
  * @return              a constant string that names the given code
  */
-const char* decode_ZOperation(ZOp &pOp)
+utf8VaryingString decode_ZOperation(ZOp_type &pOp)
 {
-    switch (pOp)
-    {
+  utf8VaryingString wReturn;
+
+  uint32_t wOp=pOp;
+
+  if (wOp & ZO_Processed)
+    wReturn = "ZO_Processed | " ;
+
+  wOp &= ZO_OpMask;
+
+  switch (wOp) {
     case    ZO_Nothing :
-    {
-        return ("ZO_Nothing");
-    }
+        wReturn += "ZO_Nothing" ;
+        return wReturn;
     case     ZO_Add  :
-    {
-        return ("ZO_Add");
-    }
+      wReturn += "ZO_Add" ;
+      return wReturn;
     case    ZO_Erase :
-    {
-        return ("ZO_Erase");
-    }
+      wReturn += "ZO_Erase" ;
+      return wReturn;
     case    ZO_Replace :
-    {
-        return ("ZO_Replace");
-    }
+      wReturn += "ZO_Replace" ;
+      return wReturn;
     case    ZO_Insert  :
-    {
-        return ("ZO_Insert");
-    }
+      wReturn += "ZO_Insert" ;
+      return wReturn;
     case    ZO_Swap :
-    {
-        return ("ZO_Swap");
-    }
-    case    ZO_Push :
-    {
-        return ("ZO_Push");
-    }
+      wReturn += "ZO_Swap" ;
+      return wReturn;
+      wReturn += "ZO_Push" ;
+      return wReturn;
     case    ZO_Push_front :
-    {
-        return ("ZO_Push_front");
-    }
+      wReturn += "ZO_Push_front" ;
+      return wReturn;
     case    ZO_Pop :
-    {
-        return ("ZO_Pop");
-    }
+      wReturn += "ZO_Pop" ;
+      return wReturn;
     case    ZO_Pop_front :
-    {
-        return ("ZO_Pop_front");
-    }
+      wReturn += "ZO_Pop_front" ;
+      return wReturn;
+
+/*
     case    ZO_Reset :
     {
         return ("ZO_Reset");
@@ -108,11 +107,11 @@ const char* decode_ZOperation(ZOp &pOp)
     }
 
         //!----------------End ZRF Add-ons----------------
-
+*/
     default:
-    {
-        return ("Unknown Zoperation");
-    }
+      wReturn += "Unknown operation" ;
+      return wReturn;
+
     } // switch
 }//decode_ZOperation
 

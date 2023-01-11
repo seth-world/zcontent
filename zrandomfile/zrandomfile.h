@@ -131,9 +131,20 @@ class ZRandomFile : protected ZFileDescriptor
 
 // friend class ZContentVisuMain;
 
+
+
 public:
+  friend ZStatus zrepairIndexes ( const char *pZMFPath,
+      bool pRepair,
+      bool pRebuildAll,
+      FILE* pOutput);
 
-
+  using ZFileDescriptor::setPath;
+  using ZFileDescriptor::getBlockTargetSize;
+  using ZFileDescriptor::getAllocatedBlocks;
+  using ZFileDescriptor::getBlockExtentQuota;
+  using ZFileDescriptor::getAllocatedSize;
+  using ZFileDescriptor::getHighwaterMarking;
 
 // ZBlockDescriptor CurrentBlockDescriptor;
 
@@ -167,9 +178,9 @@ public:
 
   uint8_t  getFileType() {return ZHeader.FileType;}
 
-  ZFileControlBlock* getFCB() {return &ZFCB ;}
+  ZFileControlBlock*  getFCB() {return &ZFCB ;}
 
-protected:  void setFileType(ZFile_type pType) {ZHeader.FileType=pType;}
+public:  void setFileType(ZFile_type pType) {ZHeader.FileType=pType;}
 
 public:
 
@@ -511,7 +522,7 @@ public:
      * @return
      */
 
-    ZFileDescriptor & getFileDescriptor(void) {return *this;}
+    const ZFileDescriptor & getFileDescriptor(void) {return *this;}
 
     /**
      * @brief zgetUsedSize returns the used space of the file
@@ -765,7 +776,7 @@ protected:
 
 //-----------End Dump---------------------------------------------
 //
-protected:
+public:
 
     //  routines prefixed with '_' are low level routines
     //
@@ -790,7 +801,7 @@ protected:
     ZStatus updateReservedBlock(bool pForceWrite);
     ZStatus updateReservedBlock(const ZDataBuffer &pReserved, bool pForceWrite);
 
-
+public:
     ZStatus _ZRFopen(const zmode_type pMode,
                   const ZFile_type pFileType,
                   bool pLockRegardless=false);
@@ -804,13 +815,13 @@ protected:
 public:
     ZStatus _getByRank(ZBlock &pBlock,
                  const long pRank,
-                 zaddress_type &pAddress);
+                 zaddress_type &pPhysicalAddress);
 
     ZStatus _getNext(ZBlock &pBlock,               // write
         zrank_type &pRank,
         zaddress_type &pAddress);                 // read
   protected:
-    ZStatus _getByAddress (ZBlock &pBlock, const zaddress_type pAddress);
+    ZStatus _getByAddress (ZBlock &pBlock, const zaddress_type pPhysicalAddress);
 
     ZStatus _add(const ZDataBuffer &pUserBuffer, zaddress_type &pAddress);
 
@@ -847,8 +858,8 @@ public:
 #endif //__DEPRECATED__
 
     ZStatus _insert2Phases_Prepare(const ZDataBuffer &pUserBuffer,
-                                  zrank_type &pZBATIndex,
-                                  zaddress_type &pLogicalAddress);
+                                  const zrank_type pZBATIndex,
+                                  zaddress_type &pPhysicalAddress);
 
     ZStatus _insert2Phases_Commit(const ZDataBuffer &pUserBuffer,
                                   const zrank_type  pZBATIndex,
@@ -865,11 +876,13 @@ public:
 */
 
     ZStatus _remove(const zrank_type pRank);
-    ZStatus _remove_Prepare(const zrank_type pRank, zaddress_type &pLogicalAddress);
+    ZStatus _remove_Prepare(const zrank_type pRank, zaddress_type &pPhysicalAddress);
+
     ZStatus _removeR(ZDataBuffer &pUserBuffer,const zrank_type pRank);
+    ZStatus _removeR_Prepare(ZDataBuffer &pUserBuffer, const zrank_type pRank, zaddress_type &pPhysicalAddress);
 
-
-    ZStatus _removeR_Prepare(ZDataBuffer &pUserBuffer, const zrank_type pRank, zaddress_type &pAddress);
+    ZStatus _remove_Commit(const zrank_type pIdxCommit);
+    ZStatus _remove_Rollback(const zrank_type pIdxCommit);
 
 
     ZStatus _removeRByAddress(ZDataBuffer &pUserBuffer, zrank_type &pIdxCommit, const zaddress_type pAddress);
@@ -877,15 +890,9 @@ public:
     ZStatus _removeRByAddress_Prepare(ZDataBuffer &pUserBuffer, zrank_type &pIdxCommit, const zaddress_type pAddress);
 
 
-    ZStatus _removeByAddress( const zaddress_type &pAddress);
+    ZStatus _removeByAddress(const zaddress_type &LogicalpAddress);
 
     ZStatus _removeByAddress_Prepare(zrank_type &pIdxCommit, const zaddress_type pAddress);
-
-
-
-    ZStatus _remove_Commit(const zrank_type pIdxCommit);
-
-    ZStatus _remove_Rollback(const zrank_type pIdxCommit);
 
 
     ZStatus _create (const zsize_type pInitialSize,
@@ -972,7 +979,7 @@ public:
                                       ZBlockHeader &pBlockHeader) ;
 
 
-    ZStatus _getBlockHeader(zaddress_type pAddress,
+    ZStatus _getBlockHeader(zaddress_type pPhysicalAddress,
                             ZBlockHeader &pBlockHeader);
 
 /*     ZStatus
@@ -1012,8 +1019,9 @@ public:
     ZStatus _getFileHeader_Export(ZHeaderControlBlock_Export* pHCB_Export);
 
 
-    ZStatus _getReservedHeader(bool pForceRead);
+public:    ZStatus _getReservedHeader(bool pForceRead);
 
+protected:
     ZStatus _getFileControlBlock(bool pForceRead);
 
     ZStatus _updateFileControlBlock();
@@ -1029,6 +1037,7 @@ public:
     ZStatus _writeFCB(zaddress_type pOffsetFCB);
     ZStatus _writeReserved(zaddress_type pOffsetReserved);
 
+  public:
     ZStatus _writeAllFileHeader();
 
      ZStatus _importAllFileHeader();

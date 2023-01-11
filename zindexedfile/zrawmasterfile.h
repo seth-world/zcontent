@@ -76,6 +76,8 @@ class ZIndexItemList;
 class ZRawMasterFile: protected ZRandomFile, public ZMasterControlBlock
 {
   friend class ZIndexCollection;
+  friend void zupgradeZRFtoZMF (const uriString& pZRFPath,FILE* pOutput);
+  friend void zdowngradeZMFtoZRF (const uriString &pZMFPath, FILE* pOutput);
 
   typedef ZRandomFile _Base ;
 protected:  ZRawMasterFile(ZFile_type pType);
@@ -347,16 +349,21 @@ public:
 
 
 protected:
-#ifdef __OLD_VERSION__
-  ZStatus _addRaw   (ZRawRecord *pRecord);
-  ZStatus _insertRaw(ZRawRecord *pRecord, const zrank_type pZMFRank);
-#endif
+
   ZStatus _addRaw   (ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeysContent);
   ZStatus _insertRaw (const ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeys, const zrank_type pZMFRank);
+  ZStatus _removeByRankR  (ZDataBuffer &pRecord, const zrank_type pZMFRank);
 
-  ZStatus _getRaw   (ZRawRecord *pRecord, const zrank_type pZMFRank);
-  ZStatus _removeByRankR    (ZRawRecord* pZMFRecord, const zrank_type pZMFRank);
 
+  ZStatus _commitIndexes(ZArray <ZIndexItem*>  &pIndexItemList);
+  ZStatus _rollbackIndexes (ZArray <ZIndexItem*>  &pIndexItemList);
+
+  ZStatus _getRaw   (ZDataBuffer &pRecord, const zrank_type pRank);
+
+  ZStatus _getFirst (ZDataBuffer &pRecord) ;
+  ZStatus _getNext (ZDataBuffer &pRecord) ;
+
+  ZStatus _getByKey (ZDataBuffer &pRecord, ZDataBuffer &pKeyValue, const zrank_type pKeyNumber,ZIndexItem* pOutIndexItem);
 
   /**
  * @brief ZRawMasterFile::writeMasterControlBlock updates ZMasterControlBlock AND ZSJournalControlBlock (if exists)
@@ -419,25 +426,18 @@ public:
   using ZRandomFile::zsearchFieldFirstCollection;
   using ZRandomFile::zsearchFieldNextCollection;
 
+  using ZRandomFile::getFileDescriptor ;
+
 
   ZStatus zsearchInterval (ZKey &pZKeyLow, ZKey &pZKeyHigh,const zrank_type pIndexNumber,ZIndexCollectionContext *pSearchContext );
 
 
-  //-------------Reports------------------------------------
+  //                  Reports
   void ZMCBreport(FILE *pOutput=stdout);
-  //---------------------Utilities-----------------------------------
-  static
-      ZStatus zrepairIndexes (const char *pZMFPath,
-                              bool pRepair=false,
-                              bool pRebuildAll=false,
-                              FILE *pOutput=nullptr);
+  //                  Utilities
+
 
   ZStatus zclearMCB (FILE *pOutput=nullptr);
-
-  static
-      void    zdowngradeZMFtoZRF (const  uriString & pZMFPath,FILE* pOutput=nullptr);
-  static
-      void    zupgradeZRFtoZMF (const uriString &pZRFPath, FILE* pOutput=nullptr);
 
   ZStatus zremoveIndex (const long pIndexRank, bool pBackup=false, ZaiErrors *pErrorLog=nullptr);
 
@@ -561,32 +561,6 @@ public:
 
 private:
 
-  //------------Add sequence---------------------------------------
-  /** @cond Development */
-  ZStatus _add_RollbackIndexes (ZArray<zrank_type> &pIndexRankProcessed);
-  ZStatus _add_HardRollbackIndexes (ZArray<zrank_type> &pIndexRankProcessed);
-
-  ZStatus _add_CommitIndexes (ZArray <ZIndexItem*>  &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed);
-
-  //-----------End Add sequence------------------------------------
-
-  // ----------Remove sequence-------------------------------------
-
-
-
-  ZStatus _removeByRankRaw  (ZRawRecord *pRawRecord, const zrank_type pZMFRank);
-
-
-
-  ZStatus _remove_RollbackIndexes (ZArray<zrank_type> &pIndexRankProcessed);
-
-  ZStatus _remove_HardRollbackIndexes (ZArray<ZIndexItem*> &pIndexItemList,ZArray<zrank_type> &pIndexRankProcessed);
-
-  ZStatus _remove_CommitIndexes ( ZIndexItemList &pIndexItemList, ZArray<zrank_type> &pIndexRankProcessed);
-  /** @endcond */
-  //-----------End Remove sequence------------------------------------
-
-
 
   ZStatus _seek (ZMasterControlBlock &pMCB, long pIndexNumber, const ZDataBuffer &pKey,ZDataBuffer &pUserRecord);
 
@@ -624,15 +598,12 @@ public:
   }
 
   ZStatus journalingSetup (uriString &pJournalPath);
-
   ZStatus setJournalingOn (void);
-
   ZStatus initJournaling (uriString &pJournalPath);
-
   ZStatus setJournalingOff (void);
 
 
-  ZRawRecord* generateRawRecord();
+//  ZRawRecord* generateRawRecord();
 
 
   void setExtractKeyRoutine(extractRawKey_type pExtract)
@@ -654,7 +625,7 @@ protected:
 protected:
 
 
-  ZRawRecord*  RawRecord=nullptr;
+//  ZRawRecord*  RawRecord=nullptr;
 
 public:
 
@@ -667,6 +638,8 @@ public:
 
   ZaiErrors             ErrorLog;
 }; //--------------------end class ZMasterFile-------------------------------
+
+
 
 
 } // namespace zbs

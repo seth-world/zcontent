@@ -340,18 +340,19 @@ ZStatus wSt;
 
 /*     Compare Index Control Block read from Index File to the one stored in ZSMasterFile MCB  */
 
-    ZDataBuffer wRawICB;
+//    ZDataBuffer wRawICB;
 
-    wSt=ZRandomFile::getReservedBlock(wRawICB,true);  // get ICB on local ZIndex file
+//    wSt=ZRandomFile::getReservedBlock(wRawICB,true);  // get ICB on local ZIndex file
+    wSt=ZRandomFile::_getReservedHeader(true);  // get ICB on local ZIndex file
 
-    if (wSt!=ZS_SUCCESS)
-                {
-                 ZException.addToLast( " Reading Reserved header zone ZIndexFile %s",
-                                        pIndexUri.toString());
-                 ZException.setLastSeverity(Severity_Severe);
-                return  wSt;
-                }
-    if (CheckSum!=nullptr)
+    if (wSt!=ZS_SUCCESS) {
+      ZException.addToLast( " Reading Reserved header zone ZIndexFile %s",
+                            pIndexUri.toString());
+                            ZException.setLastSeverity(Severity_Severe);
+                            return  wSt;
+    }
+
+/*    if (CheckSum!=nullptr)
     {
     checkSum* wLocalCheckSum = wRawICB.newcheckSum();// compute checksum on it
 
@@ -408,9 +409,17 @@ ZStatus wSt;
 // zstatistic intitialization
     delete wLocalCheckSum;
     }//if (CheckSum!=nullptr)
+*/
 
-    ZPMSStats = ZPMS ;
-    return  ZS_SUCCESS ;
+  const unsigned char* wPtr=  ZReserved.Data;
+  wSt=ZIndexControlBlock::_import(wPtr) ;
+  if (wSt!=ZS_SUCCESS) {
+    ZException.addToLast( " ZIndexFile %s", pIndexUri.toString());
+    ZException.setLastSeverity(Severity_Severe);
+    return  wSt;
+  }
+  ZPMSStats = ZPMS ;
+  return  ZS_SUCCESS ;
 }//zopenIndexFile
 
 
@@ -426,8 +435,9 @@ ZDataBuffer wICBContent;
 //
   if (getMode()==ZRF_NotOpen)
     return ZS_SUCCESS;
-  size_t wRet=ZIndexControlBlock::_exportAppend(wICBContent);
-  setReservedContent(wICBContent); /* zclose updates file's blocks (header - index file control block etc.)*/
+
+  size_t wRet=ZIndexControlBlock::_exportAppend(ZReserved);
+//  setReservedContent(wICBContent);
 /*  wSt=ZRandomFile::updateReservedBlock(ZIndexControlBlock::_exportAppend(wICBContent),true);
     if (wSt!=ZS_SUCCESS)
                 {
@@ -436,7 +446,7 @@ ZDataBuffer wICBContent;
                 return  wSt;
                 }
 */
-    return  ZRandomFile::zclose();
+    return  ZRandomFile::zclose();/* zclose updates file's blocks (header - index file control block etc.)*/
 }//closeIndexFile
 /**
  * @brief ZIndexFile::writeIndexControlBlock
@@ -446,9 +456,8 @@ ZDataBuffer wICBContent;
  * @return ZStatus
  */
 ZStatus
-ZRawIndexFile::writeIndexControlBlock(checkSum **pCheckSum)
-{
-
+//ZRawIndexFile::writeIndexControlBlock(checkSum **pCheckSum)
+ZRawIndexFile::writeIndexControlBlock() {
 ZStatus wSt;
 ZDataBuffer wICBContent;
 //
@@ -472,88 +481,17 @@ ZDataBuffer wICBContent;
                 ZException.setLastSeverity(Severity_Severe);
                 return  wSt;
                 }
-    if (pCheckSum==nullptr)
+/*    if (pCheckSum==nullptr)
         {
         return  ZS_SUCCESS;        // no checkSum requested
         }
-   *(pCheckSum) = wICBContent.newcheckSum();  // else compute checksum and return pointer to it (pointer to pointer)
-    return  ZS_SUCCESS;
+   (pCheckSum) = wICBContent.newcheckSum();  // else compute checksum and return pointer to it (pointer to pointer)
+*/
+  return  ZS_SUCCESS;
 }//writeIndexControlBlock
 
 
 
-
-/*
-ZStatus
-ZIndexFile::removeRollback         (ZDataBuffer& pRecord , long &pZMFRank,zaddress_type &pAddress)
-{
-    return  (addIndexValue(pRecord,pZMFRank,pAddress));
-}
-ZStatus
-ZIndexFile::insertRollback         (ZDataBuffer& pRecord , long &pZMFRank,zaddress_type &pAddress)
-{
-    return  (removeIndexValue(pRecord,pZMFRank,pAddress));
-}
-*/
-ZStatus
-ZRawIndexFile::removeIndexValue        (const ZDataBuffer& pKey , zaddress_type &pAddress)
-{
-
-ZStatus         wSt;
-
-ZIndexCollection wZIRList(this);
-//zaddress_type   wZMFAddress;
-//long            wIndexRank;
-ZIndexResult wZIR;
-
-    if (Duplicates == ZST_DUPLICATES)
-            {
-//            wSt=_RawsearchAll(pKey,*this,wZIRList,ZMS_MatchIndexSize);
-            wSt = _URFsearchAll(pKey,wZIRList,ZMS_MatchIndexSize);
-            if (wSt!=ZS_FOUND)
-                        {return  wSt;}
-            wZIR.IndexRank = -1;
-            if (pAddress==-1)       // if no ZMF address specified get the first one to be removed
-                        {
- //                       wZMFAddress= ZMFAddressList[0];
- //                       wIndexRank = wIndexRankList[0];
-                        wZIR = wZIRList[0]  ;
-                        }
-                else
-                    {
-                wZIR.IndexRank = -1;
-            for (long wi=0;wi<wZIRList.size(); wi++)
-                if (wZIRList[wi].ZMFAddress == pAddress )
-                            {
-                                            wZIR= wZIRList[wi];
-                                            break;
-                            }
-            if (wZIR.IndexRank<0)
-                        {
-                        ZException.setMessage(_GET_FUNCTION_NAME_,
-                                                ZS_INVADDRESS,
-                                                Severity_Error,
-                                                " given MasterFile's Address %ld has not been matched in index <%s>",
-                                                pAddress,
-                                                IndexName.toCChar()
-                                                );
-                        ZException.setLastSeverity(Severity_Severe);
-                        return  (ZS_INVADDRESS); // pAddress has not been matched
-                        }
-                    } // else
-            }// if duplicates
-            else
-            {   // meaning No duplicates
-//        wSt=_Rawsearch(pKey,*this,wZIR,ZMS_MatchIndexSize);
-//        wSt=_Rawsearch(pKey,*this,wZIR);
-        wSt = _URFsearch(pKey,wZIR,ZLock_Nolock);
-        if (wSt!=ZS_FOUND)
-                    {  return  wSt;}
-            }
-// At this stage we have one ZIR with the IndexRank to remove within ZIndexFile
-
-    return  (ZRandomFile::zremove(wZIR.IndexRank));
-}// removeIndexValue
 
 
 #ifdef __DEPRECATED__
@@ -1071,129 +1009,99 @@ zaddress_type wAddress;
 
 
  * @param[in] pZMFRecord user's record content to extract key value from
- * @param[in-out] pIndexItem a pointer to ZIndexItem struct that will contain the Index element to be added
- * @param[out] pIndexIdxCommit
- * @param[in] pZMFAddress The ZMF block address to set the index rank with
+ * @param[out] pIndexItem a pointer to a generated ZIndexItem that will contain the informations (ZMFAddress, IndexRank, Operation)
+ * @param[in] pZMFAddress The ZMF block address to set the index record with
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
 ZRawIndexFile::_addRawKeyValue_Prepare( ZIndexItem* &pOutIndexItem,
-                                        zrank_type &pZBATIndex,
                                         ZDataBuffer& pKeyContent,
                                         const zaddress_type pZMFAddress)
 {
 
 ZStatus wSt=ZS_SUCCESS;
-//zaddress_type wZMFAddress;
-//zaddress_type wIndexAddress; // not used but necessary for base ZRandomFile class calls
-ZIndexResult wZIR;
-
-//ZIFCompare wZIFCompare = ZKeyCompareBinary;
+//ZIndexResult wZIR;
+//zaddress_type wIndexAddress; /* returned index record address is not used */
 
 
-//-----------Comparison routine selection------------------------------------
-/*
-    if (IdxKeyDic->size()==1)           // if only one field
-        {
-            wZIFCompare = ZKeyCompareAlpha; // use string comparison
-        } // in all other cases, use binary comparison
-*/
-
-// get with seekGeneric the ZIndexFile row position to insert
-
-//  1-insert accordingly (push_front, push , insert)
-
-//  2- shift all ZAM indexes references according pZAMIdx value :
-//  NB We do not care about that : only addresses are stored, not the order
-
-    pOutIndexItem=new ZIndexItem(pKeyContent);
-//    pOutIndexItem.set(pKeyContent);
+    pOutIndexItem=new ZIndexItem;
     pOutIndexItem->Operation = ZO_Add;
     pOutIndexItem->ZMFaddress = pZMFAddress ;  // store address to ZMF Block
-    pOutIndexItem->set(pKeyContent) ;
-//    pKeyValue.State = ZAMInserted ;
+//    pOutIndexItem->setBuffer(pKeyContent) ;
 
-/* key data is supposed to have been extracted when coming here */
-//    _keyValueExtraction(ZICB->ZKDic,pZMFRecord,pIndexItem->KeyContent);        // create key value content from user record
-
-//    wSt= _Rawsearch (pIndexItem->KeyContent,*this,wZIR,ZMS_MatchIndexSize,wZIFCompare);  // will not use wStats except for special seek mesure on add
-//    wSt= _Rawsearch (pIndexItem.KeyContent,*this,wZIR,ZLock_Nolock);  // will not use wStats except for special seek mesure on add
-    wSt = _URFsearch(pKeyContent,wZIR,ZLock_Nolock);
+  wSt = _URFsearchUnique(pKeyContent,pOutIndexItem,ZLock_Nolock);
 
 #if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
-        _Mtx.lock();
+  _Mtx.lock();
 #endif
-    if (ZVerbose)
-            {
-            _DBGPRINT ("_addKeyValue_Prepare : _Rawsearch return status <%s> rank <%ld>\n", decode_ZStatus(wSt),wZIR.IndexRank);
-            }
+  if (ZVerbose)
+      {
+      _DBGPRINT ("_addKeyValue_Prepare : _Rawsearch return status <%s> rank <%ld>\n", decode_ZStatus(wSt),pOutIndexItem->IndexRank)
+      }
 
-    switch (wSt)
-            {
-            case (ZS_OUTBOUNDLOW):
-                {
-                pOutIndexItem->Operation=ZO_Push_front ;
-//                ZJoinIndex=0;
-                pZBATIndex=0L;
-                wSt=_insert2Phases_Prepare (pOutIndexItem->toFileKey(),pZBATIndex,wZIR.ZMFAddress);// equivalent to push_front
-                if (ZVerbose)
-                        _DBGPRINT ("Index Push_Front  (index rank 0L )\n")
+  switch (wSt){
+    case (ZS_OUTBOUNDLOW):
+      pOutIndexItem->Operation=ZO_Insert ;
+//    ZJoinIndex=0;
+      wSt=_insert2Phases_Prepare (pOutIndexItem->toFileKey(),pOutIndexItem->IndexRank,pOutIndexItem->IndexAddress);// equivalent to push_front
+      if (ZVerbose)
+        _DBGPRINT ("Index Push_Front  (index rank 0L )\n")
+      break;
 
-                break;
-                }
-            case (ZS_OUTBOUNDHIGH):
-                {
-                pOutIndexItem->Operation=ZO_Push ;
-//                ZJoinIndex=this->size();
-                wSt=ZRandomFile::_add2Phases_Prepare(pOutIndexItem->toFileKey(),pZBATIndex,wZIR.ZMFAddress);// equivalent to push
-                if (ZVerbose)
-                        _DBGPRINT ("Index Push\n")
-                break;
-                }
-            case (ZS_NOTFOUND):
-                {
-                pOutIndexItem->Operation=ZO_Insert ;
-                pZBATIndex=wZIR.IndexRank;
-                wSt=ZRandomFile::_insert2Phases_Prepare(pOutIndexItem->toFileKey(),pZBATIndex,wZIR.ZMFAddress);// insert at position returned by seekGeneric
-//                ZJoinIndex=wRes.ZIdx;
-                if (ZVerbose)
-                  _DBGPRINT ("Index insert at rank <%ld>\n", wZIR.IndexRank)
-                break;
-                }
-            case (ZS_FOUND):
-                {
-                if (Duplicates==ZST_NODUPLICATES)
-                            {
-                            if (ZVerbose)
-                                    _DBGPRINT("***Index Duplicate key exception at rank <%ld>\n", wZIR.IndexRank)
-                            ZException.setMessage(_GET_FUNCTION_NAME_,
+    case (ZS_OUTBOUNDHIGH):
+      pOutIndexItem->Operation=ZO_Push ;
+//    ZJoinIndex=this->size();
+      wSt=ZRandomFile::_add2Phases_Prepare(pOutIndexItem->toFileKey(),pOutIndexItem->IndexRank,pOutIndexItem->IndexAddress);// equivalent to push
+      if (ZVerbose) {
+        _DBGPRINT ("Index Push (last) %ld\n",pOutIndexItem->IndexRank)
+      }
+      break;
+
+    case (ZS_NOTFOUND):
+      pOutIndexItem->Operation=ZO_Insert ;
+//      pOutIndexItem->IndexRank=pOutIndexItem->IndexRank;
+      wSt=ZRandomFile::_insert2Phases_Prepare(pOutIndexItem->toFileKey(),pOutIndexItem->IndexRank,pOutIndexItem->IndexAddress);// insert at position returned by seekGeneric
+//    ZJoinIndex=wRes.ZIdx;
+      if (ZVerbose) {
+        _DBGPRINT ("Index insert at rank <%ld>\n", pOutIndexItem->IndexRank)
+      }
+      break;
+
+    case (ZS_FOUND):
+      if (Duplicates==ZST_NODUPLICATES) {
+        if (ZVerbose)
+          _DBGPRINT("***Index Duplicate key exception at rank <%ld>\n", pOutIndexItem->IndexRank)
+        ZException.setMessage(_GET_FUNCTION_NAME_,
                                                     ZS_DUPLICATEKEY,
                                                     Severity_Error,
-                                                    " Duplicate value on key set to ZST_NODUPLICATES index rank <%ld>",wZIR.IndexRank);
-                            wSt=ZS_DUPLICATEKEY;
-                            break;
-                            }
-                pOutIndexItem->Operation=ZO_Insert ;
+                                                    " Duplicate value on key set to ZST_NODUPLICATES index rank <%ld>",pOutIndexItem->IndexRank);
+        wSt=ZS_DUPLICATEKEY;
+        break;
+      } //  if no duplicates allowed
+      pOutIndexItem->Operation=ZO_Insert ;
 
-                if (ZVerbose)
-                        _DBGPRINT ("Index Duplicate key insert at rank <%ld>\n", wZIR.IndexRank)
-                pZBATIndex=wZIR.IndexRank;
-                wSt=ZRandomFile::_insert2Phases_Prepare(pOutIndexItem->toFileKey(),pZBATIndex,wZIR.ZMFAddress); // insert at position returned by seekGeneric
+    /* if duplicates allowed */
+      if (ZVerbose) {
+        _DBGPRINT ("Index Duplicate key insert at rank <%ld>\n", pOutIndexItem->IndexRank)
+      }
+//      pOutIndexItem->IndexRank=pOutIndexItem->IndexRank;
+      wSt=ZRandomFile::_insert2Phases_Prepare(pOutIndexItem->toFileKey(),pOutIndexItem->IndexRank,pOutIndexItem->IndexAddress); // insert at position returned by seekGeneric
 
-//                ZJoinIndex=wRes.ZIdx;
-                break;
-                }
-            default :// there was an error or a lock on file during seek operation on given key
-                {
+//    ZJoinIndex=wRes.ZIdx;
+      break;
+
+    default :// there was an error or a lock on file during seek operation on given key
 //                wSt=ZS_INVOP;
-                break;
-                }
-            }// switch
+      break;
 
-    if (wSt!=ZS_SUCCESS)
-                {
-                goto _addKeyValuePrepareReturn;     // not necessary for the moment but RFFU
-                 }
+  }// switch
+
+  if (wSt!=ZS_SUCCESS) {
+      if (ZVerbose) {
+        _DBGPRINT ("Index operation error <%s>\n", decode_ZStatus(wSt))
+      }
+      goto _addKeyValuePrepareReturn;     // not necessary for the moment but RFFU
+    }
 
 _addKeyValuePrepareReturn:
     if (wSt!=ZS_SUCCESS)
@@ -1215,26 +1123,162 @@ _addKeyValuePrepareReturn:
 }//_addRawKeyValue_Prepare
 
 ZStatus
-ZRawIndexFile::_addRawKeyValue_Commit(ZIndexItem *pIndexItem, const zrank_type pZBATIndex)
+//ZRawIndexFile::_rawKeyValue_Commit(ZIndexItem *pIndexItem, const zrank_type pZBATIndex)
+ZRawIndexFile::_rawKeyValue_Commit(ZIndexItem *pIndexItem)
+
 {
+  ZStatus wSt;
+  const char* wAction=nullptr;
+  zaddress_type wAddress; // local index address : of no use there
 
-ZStatus wSt;
-zaddress_type wAddress; // local index address : of no use there
-
+  switch (pIndexItem->Operation) {
+  case ZO_Insert :
+    wSt=ZRandomFile::_insert2Phases_Commit(pIndexItem->toFileKey(),pIndexItem->IndexRank,wAddress);
+    wAction="_insert2Phases_Commit";
+    break;
+  case ZO_Add :
+    wSt=ZRandomFile::_add2Phases_Commit(pIndexItem->toFileKey(),pIndexItem->IndexRank,wAddress);
+    wAction="_add2Phases_Commit";
+    break;
+  case ZO_Erase :
+    wSt=ZRandomFile::_remove_Commit(pIndexItem->IndexRank);
+    wAction="_remove_Commit";
+    break;
+  default:
+    ZException.setMessage("ZRawIndexFile::_rawKeyValue_Commit",ZS_INVOP,Severity_Severe,
+        "Invalid commit operation code <%s> for index <%s>",
+        decode_ZOperation(pIndexItem->Operation).toCChar(),IndexName.toCChar());
+    return ZS_INVOP;
+  }//switch
+  /*
     wSt=ZRandomFile::_add2Phases_Commit(pIndexItem->toFileKey(),pZBATIndex,wAddress);
-    if (wSt!=ZS_SUCCESS)
-            {
-            ZException.addToLast(" during Index _addKeyValue_Commit on index <%s> rank <%02ld> ",
-                                                 IndexName.toCChar(),
-                                                 pZBATIndex);
-            ZException.setLastSeverity(Severity_Severe);
-            }
-// history and journaling take place here
+*/
+  if (wSt!=ZS_SUCCESS)
+  {
+    ZException.addToLast(" during Index commit operation <%s> action <%s> on index <%s> rank <%ld> ",
+        wAction,
+        decode_ZOperation(pIndexItem->Operation).toCChar(),
+        IndexName.toCChar(),
+        pIndexItem->IndexRank);
+    ZException.setLastSeverity(Severity_Severe);
+  }
 
-    return  wSt;
-} // _addKeyValue_Commit
+  pIndexItem->Operation |= ZO_Processed ;
+  // history and journaling take place here
+
+  return  wSt;
+} // _rawKeyValue_Commit
 
 
+ZStatus
+ZRawIndexFile::_rawKeyValue_Rollback(ZIndexItem *pIndexItem)
+{
+  ZStatus wSt;
+  const char* wAction=nullptr;
+
+  if (pIndexItem->Operation & ZO_Processed)
+    return _rawKeyValue_HardRollback(pIndexItem);
+  ZOp_type wOp = pIndexItem->Operation & ZO_OpMask;
+  switch (wOp) {
+  case ZO_Add :
+    wSt=ZRandomFile::_add2Phases_Rollback (pIndexItem->IndexRank);
+    wAction="_add2Phases_Rollback";
+    break;
+  case ZO_Insert :
+    wSt=ZRandomFile::_insert2Phases_Rollback(pIndexItem->IndexRank);
+    wAction="_insert2Phases_Rollback";
+    break;
+  case ZO_Erase :
+    wSt=ZRandomFile::_remove_Rollback(pIndexItem->IndexRank);
+    wAction="_remove_Rollback";
+    break;
+  default:
+    ZException.setMessage("ZRawIndexFile::_rawKeyValue_Rollback",ZS_INVOP,Severity_Severe,
+        "Invalid rollback operation code <%s> for index <%s>",decode_ZOperation(pIndexItem->Operation).toCChar(),IndexName.toCChar());
+    return ZS_INVOP;
+  }//switch
+
+  if (wSt!=ZS_SUCCESS)
+  {
+    ZException.addToLast(" during Index rollback operation <%s> action <%s> on index <%s> rank <%ld> ",
+        wAction,
+        decode_ZOperation(pIndexItem->Operation).toCChar(),
+        IndexName.toCChar(),
+        pIndexItem->IndexRank);
+    ZException.setLastSeverity(Severity_Severe);
+  }
+  // history and journaling take place here
+  pIndexItem->Operation |= ZO_RolledBack ;
+  return  wSt;
+} // _rawKeyValue_Commit
+
+
+
+/**
+ * @brief ZRawIndexFile::_addKeyValue_HardRollback routine used when
+ *        - index key add operation has been fully committed
+ *    and
+ *        - a problem occurred on Master file
+ *
+    So there is need to remove key Index rank at pIndexCommit to restore situation as aligned with Master file.
+
+* @param pIndexCommit
+     * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
+                                                                                 */
+
+ZStatus
+ZRawIndexFile::_rawKeyValue_HardRollback(ZIndexItem *pIndexItem)
+{
+  const char* wAction=nullptr;
+  ZStatus wSt;
+  zaddress_type wAddress;
+
+  ZOp_type wOp = pIndexItem->Operation & ZO_OpMask ;
+
+  switch (wOp) {
+  case ZO_Add :
+    wAction="remove";
+    wSt=ZRandomFile::_remove (pIndexItem->IndexRank);
+    break;
+  case ZO_Insert :
+    wAction="remove";
+    wSt=ZRandomFile::_remove (pIndexItem->IndexRank);
+    break;
+  case ZO_Erase :
+    wAction="insert";
+    wSt=ZRandomFile::_insert(pIndexItem->toFileKey(),pIndexItem->IndexRank,wAddress);
+    break;
+  default:
+    ZException.setMessage("ZRawIndexFile::_rawKeyValue_HardRollback",ZS_INVOP,Severity_Severe,
+        "Invalid hard rollback operation code <%s> for index <%s>",
+        decode_ZOperation(pIndexItem->Operation).toCChar(),IndexName.toCChar());
+    return ZS_INVOP;
+  }//switch
+
+
+  if (ZVerbose)
+    _DBGPRINT( "Index raw Key Value Hard rollback of op <%s> action <%s> for index <%s> rank <%ld>\n",
+                decode_ZOperation(pIndexItem->Operation).toCChar(),
+                wAction,
+                IndexName.toCChar(),
+                pIndexItem->IndexRank)
+
+  if (wSt!=ZS_SUCCESS)
+  {
+    ZException.addToLast(" during Index raw Key Value Hard rollback of op <%s> action <%s>  on index rank <%s> rank <%ld> ",
+        decode_ZOperation(pIndexItem->Operation).toCChar(),
+        wAction,
+        IndexName.toCChar(),
+        pIndexItem->IndexRank);
+    ZException.setLastSeverity(Severity_Severe);
+  }
+
+  pIndexItem->Operation |= ZO_HardRolledBack ;
+
+  return  wSt;
+} // _addKeyValue_HardRollback
+
+#ifdef __DEPRECATED__
 /**
  * @brief ZIndexFile::_addKeyValue_Rollback used when a problem occurred when
  *    - index file ZBAT has been reserved for index key at pIndexCommit
@@ -1245,7 +1289,6 @@ zaddress_type wAddress; // local index address : of no use there
 ZStatus
 ZRawIndexFile::_addRawKeyValue_Rollback(const zrank_type pIndexCommit)
 {
-
 ZStatus wSt;
     wSt=ZRandomFile::_add2Phases_Rollback (pIndexCommit);
     if (wSt!=ZS_SUCCESS)
@@ -1292,7 +1335,7 @@ ZRawIndexFile::_addKeyValue_HardRollback(const zrank_type pIndexCommit)
     }
   return  wSt;
 } // _addKeyValue_HardRollback
-
+#endif // __DEPRECATED__
 
 #ifdef __OLD_VERSION__
 ZStatus
@@ -1539,6 +1582,8 @@ ZRawIndexFile::_addRawKeyValue_Rollback(const zrank_type pIndexCommit)
  *  - other internal status in case of IO error
  *@see ZStatus
  *
+ * NB: Not found status got on index remove operation is an invalid status and must be signalled as an error
+ *
  *  In all error cases, ZException is set with an appropriate message describing error.
  *
  * @param[in] pKey key content with a ZIndex format. @see _keyValueExtraction()
@@ -1549,56 +1594,57 @@ ZRawIndexFile::_addRawKeyValue_Rollback(const zrank_type pIndexCommit)
  */
 
 ZStatus
-ZRawIndexFile::_removeKeyValue_Prepare(ZDataBuffer & pKey,
-                                    ZIndexItem* &pIndexItem,
-                                    long& pIndexRank,
-                                    zaddress_type &pZMFAddress)
+ZRawIndexFile::_removeRawKeyValue_Prepare(ZIndexItem* &pOutIndexItem,
+                                        zrank_type &pIndexRank,
+                                        ZDataBuffer & pKey,
+                                        zaddress_type &pIndexAddress)
 {
 
 ZStatus wSt;
 ZResult wRes;
 //zaddress_type wIndexAddress;
-ZIndexResult wZIResult;
+//ZIndexResult wZIResult;
 
-//ZIFCompare         wZIFCompare = ZKeyCompareBinary;
-
-//-----------Comparison routine selection------------------------------------
-
+  pOutIndexItem= new ZIndexItem;
+//  pOutIndexItem->setBuffer(pKey);
 
 //    wSt=_Rawsearch(pKey, *this,wZIR,ZMS_MatchIndexSize,wZIFCompare);
 //    wSt=_Rawsearch(pKey, *this,wZIResult,ZLock_Nolock);
-    wSt = _URFsearch(pKey,wZIResult,ZLock_Nolock);
-    if (wSt!=ZS_FOUND)  // Return status is either not found, record lock or other error
-            {
-            ZException.setMessage(_GET_FUNCTION_NAME_,
-                                    wRes.ZSt,
-                                    Severity_Error,
-                                    "During remove operation : Index value not found on index name <%s>",
-                                     IndexName.toCChar());
-            ZException.setLastSeverity(Severity_Severe);
-            return  wSt;
-            } // wSt!=ZS_FOUND
+  wSt = _URFsearchUnique(pKey,pOutIndexItem,ZLock_Nolock);
+  /* only status valid is ZS_FOUND */
+  if (wSt!=ZS_FOUND)  // Return status is either not found, record lock or other error
+  {
+    ZException.setMessage(  "ZRawIndexFile::_removeKeyValue_Prepare",
+                            wRes.ZSt,
+                            Severity_Severe,
+                            "During remove operation : Index value not found on index name <%s>",
+                            IndexName.toCChar());
+    return  wSt;
+  } // wSt!=ZS_FOUND
 
 #if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
     _Mtx.lock();
 #endif
 
-    pIndexRank=wZIResult.IndexRank ;
+//  pIndexRank=wZIResult.IndexRank ;
 
-    pIndexItem = new ZIndexItem ;
-    pIndexItem->Operation=ZO_Erase ;
-    pIndexItem->set(pKey);
-    pIndexItem->ZMFaddress = 0 ; // dont know yet
+//  pIndexItem = new ZIndexItem ;
+  pOutIndexItem->Operation=ZO_Erase ;
+//  pIndexItem->setBuffer(pKey);
 
-    wSt=ZRandomFile::_remove_Prepare(wZIResult.IndexRank,wZIResult.ZMFAddress);
+  // Do not confuse ZMFAddress and index record address that will be suppressed
+
+  pIndexAddress = pOutIndexItem->IndexAddress  ;
+
+  wSt=ZRandomFile::_remove_Prepare(pOutIndexItem->IndexRank,pOutIndexItem->IndexAddress);
 #if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
     _Mtx.unlock();
 #endif
 
-    return  wSt;
+  return  wSt;
 }//_removeKeyValue_Prepare
 
-
+#ifdef __DEPRECATED__
 /**
  * @brief ZRawIndexFile::_removeIndexItem_Prepare  ZSIndexItem::KeyContent must content key value to erase in input.
  * @param pIndexItem
@@ -1608,7 +1654,6 @@ ZIndexResult wZIResult;
 ZStatus
 ZRawIndexFile::_removeIndexItem_Prepare(ZIndexItem &pIndexItem,long & pIndexRank)
 {
-
   ZStatus wSt;
   ZResult wRes;
   //zaddress_type wIndexAddress;
@@ -1680,6 +1725,9 @@ ZStatus wSt;
      return (wSt);
 
 }//ZIndexFile::_removeKeyValue_Prepare
+
+
+
 /**
  * @brief ZIndexFile::_removeKeyValue_Rollback
  * @param pIndexCommit
@@ -1750,7 +1798,7 @@ ZStatus wSt;
 }//_removeKeyValue_HardRollback
 
 //#endif // __COMMENT__
-
+#endif //__DEPRECATED__
 //-------------------Generic Functions---------------------------------------
 
 namespace zbs{
@@ -1878,19 +1926,79 @@ ssize_t wSize = pSize;
 } // URFCompare
 */
 
+void displayURFCompare(long pPivot,int pR,unsigned char* pPtr1, unsigned char* pPtr2) {
+  utf8VaryingString wValue1 , wValue2;
+  const unsigned char* wPtr1=pPtr1, * wPtr2=pPtr2;
+  wValue1 = URFParser::displayOneURFField(wPtr1);
+  wValue2 = URFParser::displayOneURFField(wPtr2);
+
+  if (pR == 0) {
+    _DBGPRINT("pivot <%ld> %s greater than %s.\n",pPivot,wValue1.toCChar(),wValue2.toCChar())
+    return;
+  }
+  if (pR > 0) {
+    _DBGPRINT("pivot <%ld> %s greater than %s.\n",pPivot,wValue1.toCChar(),wValue2.toCChar())
+    return;
+  }
+  _DBGPRINT("pivot <%ld> %s less than %s.\n",pPivot,wValue1.toCChar(),wValue2.toCChar())
+  return;
+}
+
+
+/**
+ * @brief ZRawIndexFile::_URFsearchUnique Searches for a UNIQUE value for a given index without duplicates and in any cases
+ *  sets pOutIndexItem with accurate values :
+ * - key content,
+ * - master file address ,
+ * - last accessed index record address,
+ * - last accessed index record rank
+ *
+ *  This search may be EXACT or PARTIAL.
+ *
+ * Size of comparison is given by the Size field fo pKey (ZDataBuffer) : if partial key Size will be shorter than Index key size.
+ * - Exact is when comparizon size is the whole index key internal size
+ * - Partial is when  comparison is made on the size of the given key (may be a fragment of index key)
+ * - Exact : means that both content (Key content and index content) much match exactly in terms of size AND content.
+ * - First or Unique : means that a unique index rank is returned corresponding to the unique index content value if found
+ * or the first index value matching in case of multiple values found in index (ZST_DUPLICATES).
+ *
+ * - Exact search with duplicate key index : the first matching value found is returned.
+ * What is returned is not the first matching value in Index order but the first found value according the search algorithm.
+ * - Partial search : the first matching value found is returned.
+ * What is returned is not the first matching value in Index order but the first found value according the search algorithm.
+ * - Exact search with no duplicate key index : the unique found value is returned
+ *
+ *
+ *
+ * Returns a ZSIndexResult structure for the unique index reference if found : Index record rank ; ZMasterFile corresponding address
+ * see @ref ZSIndexResult.
+ *
+ * @param[in] pKeyToSearch key content to find : one or more URF formatted fields
+ *
+ * @param[out] pOutIndexItem a ZIndexItem object with ZIndexFile relative key position (rank within index file) corresponding to key content if found
+ *                  associated to ZMasterFile corresponding record (block) address and many other informations.
+ * @param[in] pLock a zlock_type mask build using ZLockMask_type containing the lock mask to apply onto the found records.
+ * @note this lock mask applies to Master File record. Indexes are never locked.
+ * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
+* - ZS_FOUND in case of success (And NOT ZS_SUCCESS). pOutIndexItem is filled with found index record values.
+* - ZS_OUTBOUNDLOW if key value in lower than the lowest (first) index value. pOutIndexItem is filled with last processed index record values.
+* - ZS_OUTBOUNDHIGH if key value is higher than the highest (last) index value. pOutIndexItem is filled with last processed index record values.
+* - ZS_NOTFOUND if key value is not found in the middle of index values set.
+*       pOutIndexItem is filled with last processed index record values i. e. exact index to insert key if necessary.
+* other status : any status that may be given by underneeth ZRandowFile access routines. These are severe errors.
+ */
 ZStatus
-ZRawIndexFile::_URFsearch(  const ZDataBuffer &pKey,
-                            ZIndexResult &pZIR,
-                            const zlockmask_type pLock)
+ZRawIndexFile::_URFsearchUnique(  const ZDataBuffer &pKeyToSearch,
+                                  ZIndexItem* pOutIndexItem,
+                                  const zlockmask_type pLock)
 {
   ZStatus     wSt= ZS_NOTFOUND;
 
-  pZIR.IndexRank = 0;
-  ZDataBuffer wIndexRecord;
-  ZIndexItem wIndexItem ;
-  ssize_t wCompareSize=0;
+  pOutIndexItem->IndexRank = 0L;
 
- // ZIFCompare    wZIFCompare=ZKeyCompareBinary; /* use binary compare */
+  ZDataBuffer wIndexRecord;
+
+  ZIndexItem wPrevious;
 
   int wR;
 
@@ -1898,136 +2006,154 @@ ZRawIndexFile::_URFsearch(  const ZDataBuffer &pKey,
   long wlow = 0;
   long wpivot = 0;
 
-  if (getSize()==0)
-  {
+
+  if (getSize() == 0L) {
     wSt= ZS_OUTBOUNDHIGH ;
     goto _URFsearch_Return;
   }
-  // Size of comparison is given by pKey.Size : if partial key Size will be shorter than Index key size.
-
-//  wCompareSize = pKey.Size;
 
   whigh = lastIdx();  // last element : highest boundary
   wlow = 0;           // first element : lowest boundary
 
   wSt=ZS_NOTFOUND;
 
-  pZIR.IndexRank = wlow ;
+//  pZIR.IndexRank = wlow ;
+  pOutIndexItem->IndexRank = wlow;
 
   ZPMSStats.Reads ++;
-  if ((wSt=zget(wIndexRecord,0L))!=ZS_SUCCESS)
+  if ((wSt=zgetWAddress(wIndexRecord,0L,pOutIndexItem->IndexAddress)) != ZS_SUCCESS)
     goto _URFsearch_Return;
+
   if (wIndexRecord.isEmpty()) {
     fprintf(stderr,"ZRawIndexFile::_URFsearch-W-EMPTY Index file <%s> : index record rank 0 is empty.",
         getURIContent().toString());
   }
 
-  wIndexItem.fromFileKey(wIndexRecord);
+  pOutIndexItem->fromFileKey(wIndexRecord);
 
-  if (wIndexItem.isEmpty()){
+  if (pOutIndexItem->isEmpty()){
     fprintf(stderr,"ZRawIndexFile::_URFsearch-W-EMPTY Index file <%s> : index record rank 0 is empty.",
         getURIContent().toString());
   }
 
-  wR = URFComparePtr(pKey.Data,pKey.Size,wIndexItem.Data,wIndexItem.Size);
-  if (wR==0)
-  {
-    wSt=ZS_FOUND ;
-    pZIR.IndexRank = wlow ;
-    goto _URFsearch_Return;
-  }
-  if (wR<0)
-  {return  ZS_OUTBOUNDLOW;}
+  wR = URFComparePtr(pKeyToSearch.Data,pKeyToSearch.Size,pOutIndexItem->Data,pOutIndexItem->Size);
+  displayURFCompare(wpivot,wR,pKeyToSearch.Data,pOutIndexItem->Data);
 
-  pZIR.IndexRank = whigh ;
+  if (wR==0) {
+//    pZIR.ZMFAddress = wIndexItem.ZMFaddress ;
+    wSt=ZS_FOUND ;
+    _DBGPRINT("ZS_FOUND %ld\n",pOutIndexItem->IndexRank)
+    return ZS_FOUND;
+  }
+  if (wR<0) {
+    pOutIndexItem->IndexRank = wpivot;
+//    pZIR.ZMFAddress = pIndexItem.ZMFaddress ;
+    _DBGPRINT("ZS_OUTBOUNDLOW %ld\n",pOutIndexItem->IndexRank)
+    return  ZS_OUTBOUNDLOW;
+  }
+
+/* there wR > 0 : key to search is greater than low boundary */
+
+  pOutIndexItem->IndexRank = whigh ;
 
   ZPMSStats.Reads ++;
-  if ((wSt=zget(wIndexRecord,whigh))!=ZS_SUCCESS)
+  if ((wSt=zgetWAddress(wIndexRecord,whigh,pOutIndexItem->IndexAddress))!=ZS_SUCCESS)
     goto _URFsearch_Return;
-  wIndexItem.fromFileKey(wIndexRecord);
-  wR = URFComparePtr(pKey.Data,pKey.Size,wIndexItem.Data,wIndexItem.Size);
+  pOutIndexItem->fromFileKey(wIndexRecord);
+  wR = URFComparePtr(pKeyToSearch.Data,pKeyToSearch.Size,pOutIndexItem->Data,pOutIndexItem->Size);
+  displayURFCompare(wpivot,wR,pKeyToSearch.Data,pOutIndexItem->Data);
 
-  if (wR==0)
-  {
+  if (wR==0) {
     wSt=ZS_FOUND ;
-    pZIR.IndexRank = whigh ;
-    goto _URFsearch_Return;
+    pOutIndexItem->IndexRank = whigh ;
+    _DBGPRINT("ZS_FOUND %ld\n",pOutIndexItem->IndexRank)
+    return wSt ;
   }
-  if (wR>0)
-  {return  ZS_OUTBOUNDHIGH;}
 
-  wpivot = ((whigh-wlow)/2) +wlow ;
-
-  while ((whigh-wlow)>2)// ---------------Main loop around pivot----------------------
-  {
-    pZIR.IndexRank = wpivot ;
-
-    ZPMSStats.Reads ++;
-    if ((wSt=zget(wIndexRecord,wpivot))!=ZS_SUCCESS)
-      goto _URFsearch_Return;
-    wIndexItem.fromFileKey(wIndexRecord);
-    wR = URFComparePtr(pKey.Data,pKey.Size,wIndexItem.Data,wIndexItem.Size);
-
-    if (wR==0)
-    {
-      wSt=ZS_FOUND ;
-      goto _URFsearch_Return;
+  if (wR>0) {
+    _DBGPRINT("ZS_OUTBOUNDHIGH %ld\n",pOutIndexItem->IndexRank)
+    return  ZS_OUTBOUNDHIGH;
     }
 
-    if (wR>0)
+  /* key to search is less than high boundary */
+
+//  wpivot = ((whigh-wlow)/2) + wlow ;
+  wpivot = ((whigh-wlow)/2) ;
+
+  while ((whigh-wlow) > 4)// ---------------Main loop around pivot----------------------
+  {
+    pOutIndexItem->IndexRank = wpivot ;
+
+    ZPMSStats.Reads ++;
+    if ((wSt=zgetWAddress(wIndexRecord,wpivot,pOutIndexItem->IndexAddress))!=ZS_SUCCESS)
+      return wSt ;
+    pOutIndexItem->fromFileKey(wIndexRecord);
+    wR = URFComparePtr(pKeyToSearch.Data,pKeyToSearch.Size,pOutIndexItem->Data,pOutIndexItem->Size);
+    displayURFCompare(wpivot,wR,pKeyToSearch.Data,pOutIndexItem->Data);
+    if (wR==0) {
+      _DBGPRINT("ZS_FOUND %ld\n",pOutIndexItem->IndexRank)
+      wSt=ZS_FOUND ;
+      return wSt ;
+    }
+
+    if (wR > 0)
       wlow = wpivot ;
     else
       whigh = wpivot ;
-
-    if ((whigh-wlow)==1)
-    {
-      pZIR.IndexRank = wpivot ;
-      return  ZS_NOTFOUND;
+/*
+    if ((whigh-wlow) < 3) {
+      break;
     }
-
-    wpivot = ((whigh-wlow)/2) + wlow ;
-    pZIR.IndexRank = wpivot ;
+*/
+    wpivot = ((whigh - wlow) / 2) + wlow ;
     ZPMSStats.Iterations ++;
   }// while (whigh-wlow)>2---------------Main loop around pivot----------------------
 
   /*
    *
-   *  Process the remaining collection
+   *  Process the remaining collection : here at maximum, we have whigh - wlow equals 2 or less
    */
 
   wpivot = wlow;
-  pZIR.IndexRank = wpivot;
+  pOutIndexItem->IndexRank = wpivot;
   ZPMSStats.Reads ++;
-  if ((wSt=zget(wIndexRecord,wpivot))!=ZS_SUCCESS)
-  { return  wSt;}
-  wIndexItem.fromFileKey(wIndexRecord);
-  wR = URFComparePtr(pKey.Data,pKey.Size,wIndexItem.Data,wIndexItem.Size);
+  if ( (wSt=zgetWAddress(wIndexRecord,wpivot,pOutIndexItem->IndexAddress)) != ZS_SUCCESS )
+    { return wSt ; }
 
-  //        while ((wpivot<whigh)&&(_Compare::_compare(&pKey,&pZTab[wpivot]._Key) > 0))
-  while ((wpivot<whigh)&& (wR > 0))
+  pOutIndexItem->fromFileKey(wIndexRecord);
+  wR = URFComparePtr(pKeyToSearch.Data,pKeyToSearch.Size,pOutIndexItem->Data,pOutIndexItem->Size);
+  displayURFCompare(wpivot,wR,pKeyToSearch.Data,pOutIndexItem->Data);
+
+  while ((wpivot <= whigh)&& (wR > 0))
   {
+    wPrevious = *pOutIndexItem;
+/*    wPrevious.IndexRank = wpivot ;
+    wPrevious.ZMFAddress = pIndexItem.ZMFaddress ;
+*/
     wpivot ++;
-    pZIR.IndexRank=wpivot;
 
     ZPMSStats.Reads ++;
-    if ((wSt=zget(wIndexRecord,wpivot))!=ZS_SUCCESS)
-    { return  wSt;}
-    wIndexItem.fromFileKey(wIndexRecord);
-    wR = URFComparePtr(pKey.Data,pKey.Size,wIndexItem.Data,wIndexItem.Size);
-  }
-  if (wR==0)
-  {
-    pZIR.IndexRank = wpivot ;
-    wSt=ZS_FOUND;
-  }
-  else
-  {
-    pZIR.IndexRank = wpivot ; // because only 2 slots between wlow and whigh remain and we should insert before whigh
-    return  ZS_NOTFOUND ;
+
+    if ((wSt=zgetWAddress(wIndexRecord,wpivot,pOutIndexItem->IndexAddress))!=ZS_SUCCESS)
+      { return wSt ;}
+    pOutIndexItem->fromFileKey(wIndexRecord);
+    wR = URFComparePtr(pKeyToSearch.Data,pKeyToSearch.Size,pOutIndexItem->Data,pOutIndexItem->Size);
+    displayURFCompare(wpivot,wR,pKeyToSearch.Data,pOutIndexItem->Data);
   }
 
+  if (wR==0) {
+    pOutIndexItem->IndexRank = wpivot ;
+    _DBGPRINT("ZS_FOUND %ld\n",pOutIndexItem->IndexRank)
+    wSt=ZS_FOUND;
+  }
+  /* here search key is greater than compare key */
+  /* get the rank before */
+  pOutIndexItem->_copyFrom( wPrevious );
+
+  _DBGPRINT("ZS_NOTFOUND %ld\n",pOutIndexItem->IndexRank)
+  return  ZS_NOTFOUND ;
+
 _URFsearch_Return:
-  pZIR.ZMFAddress = wIndexItem.ZMFaddress ;
   /*    if ((wSt=ZS_FOUND)&&(pLock != ZLock_Nolock ))
             {
             return  static_cast<ZMasterFile*>(pZIF.ZMFFather)->zlockByAddress(wIndexItem.ZMFaddress,pLock); // lock corresponding ZMasterFile address with given lock mask
@@ -2279,8 +2405,6 @@ ZRawIndexFile::_URFsearchAll( const ZDataBuffer        &pKey,     // key content
                                ZIndexCollection &pCollection,
                                const ZMatchSize_type    pZMS)
 {
-
-
 ZStatus     wSt=ZS_NOTFOUND;
 //long        wIndexRank;
 ZIndexResult wZIR;

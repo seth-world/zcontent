@@ -13,6 +13,8 @@
 #include <zcontent/zrandomfile/zrandomfile.h>
 #include <QModelIndex>
 
+extern const int cst_maxraisonablevalue;
+
 class ZQTableView;
 
 #define __DISPLAYCALLBACK__(__NAME__)  std::function<void (const utf8VaryingString&)> __NAME__
@@ -71,7 +73,7 @@ class QAction;
 class QFileDialog;
 namespace zbs {
 //class ZRandomFile;
-class ZMasterFile;
+class ZRawMasterFile;
 }
 
 
@@ -99,7 +101,7 @@ public:
   ~ZContentVisuMain();
 
 
-  ZStatus openZRF(const char *pFilePath);
+  ZStatus openZRF();
   ZStatus openZMF(const char* pFileName);
   ZStatus openZRH(const char* pFileName);
   ZStatus openOther(const char *pFileName);
@@ -125,7 +127,7 @@ public:
   void ZRFUnlock();
   void ZHeaderRawUnlock();
 
-  bool testRequestedSize(size_t pRequestedSize);
+  static bool testRequestedSize(const uriString &pURI, ZDataBuffer &pRawData, size_t pRequestedSize);
 
   void displayHCB();
   void displayFCB();
@@ -157,7 +159,7 @@ public:
   void reportMCB();
 
 
-  void getFileSize(const char *pFilePath);
+  void getFileSize(const uriString &pFile);
   void setFileType (const char* pFilePath);
 
   void removeAllRows();
@@ -182,7 +184,7 @@ public:
 
 
   zbs::ZRandomFile* RandomFile=nullptr;
-  zbs::ZMasterFile* MasterFile=nullptr;
+  zbs::ZRawMasterFile* MasterFile=nullptr;
 
   int   Fd=-1;
   long  FileOffset=0;
@@ -211,6 +213,17 @@ public:
   QAction*      DictionaryQAc = nullptr;
   QAction*      GetRawQAc=nullptr;
 
+  QAction*      openZRFQAc=nullptr;
+
+  /* evaluate actions */
+
+  QAction* uint16QAc = nullptr;
+  QAction* int16QAc = nullptr;
+  QAction* uint32QAc = nullptr;
+  QAction* int32QAc = nullptr;
+  QAction* uint64QAc = nullptr;
+  QAction* int64QAc = nullptr;
+  QAction* sizetQAc = nullptr;
 
   bool searchHexa(bool pReverse=false);
   bool searchAscii(bool pCaseRegardless=false, bool pReverse=false);
@@ -234,33 +247,18 @@ private slots:
 
   void VisuClicked(QModelIndex pIdx);
 
-  void visuActionEvent(QAction* pAction);
-
 
   void backward();
   void forward();
   void loadAll();
 
+  void visuActionEvent(QAction* pAction);
   void VisuBvFlexMenuCallback(QContextMenuEvent *event);
   void VisuMouseCallback(int pZEF, QMouseEvent *pEvent);
 
 private:
 
   QAction* displayICBQAc = nullptr;
-
-  /* evaluate actions */
-
-  QAction* uint16QAc = nullptr;
-
-
-  QAction* int16QAc = nullptr;
-  QAction* uint32QAc = nullptr;
-  QAction* int32QAc = nullptr;
-  QAction* uint64QAc = nullptr;
-  QAction* int64QAc = nullptr;
-  QAction* sizetQAc = nullptr;
-
-
 
 
   ZDataBuffer       SearchContent;

@@ -19,11 +19,13 @@ ZIndexResult::ZIndexResult(const ZIndexResult &pIn) {
 }
 
 ZIndexResult::ZIndexResult(zaddress_type pZMFAddress,zrank_type pIndexRank) {
+  memset(this,0,sizeof(ZIndexResult));
   IndexRank=pIndexRank;
   ZMFAddress=pZMFAddress;
 }
 
 ZIndexResult&  ZIndexResult::_copyFrom(const ZIndexResult &pIn) {
+  memset(this,0,sizeof(ZIndexResult));
   IndexRank=pIn.IndexRank;
   ZMFAddress=pIn.ZMFAddress;
   return *this;

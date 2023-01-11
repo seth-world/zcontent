@@ -46,8 +46,6 @@ DisplayMain::DisplayMain(ZContentVisuMain *parent) :QMainWindow((QWidget*)parent
   displayItemModel->setHorizontalHeaderItem(3,new QStandardItem(tr("converted")));
   displayItemModel->setHorizontalHeaderItem(4,new QStandardItem(tr("additional info")));
 
-
-
   ui->displayTBv->setModel(displayItemModel );
   ui->displayTBv->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   ui->displayTBv->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -64,9 +62,11 @@ DisplayMain::DisplayMain(ZContentVisuMain *parent) :QMainWindow((QWidget*)parent
 
   ui->OffsetLBl->setText("0  - Ox0");
 
-  ui->OffsetSLd->setSingleStep(1);
+//  ui->OffsetSLd->setSingleStep(1);
 
-  QObject::connect(ui->OffsetSLd, SIGNAL(valueChanged(int)), this, SLOT(sliderChange(int)));
+  ui->offsetSBx->setSingleStep(1);
+
+  QObject::connect(ui->offsetSBx, SIGNAL(valueChanged(int)), this, SLOT(sliderChange(int)));
 }
 
 void DisplayMain::setFileClosed(bool pYesNo)
@@ -94,10 +94,15 @@ DisplayMain::displayHCB(ZDataBuffer &pData)
   show();
 
   Offset=0;
-  ui->OffsetSLd->setMinimum(0);
+
+  ui->offsetSBx->setMaximum(int(pData.Size));
+
+/*  ui->OffsetSLd->setMinimum(0);
   ui->OffsetSLd->setMaximum(pData.Size);
   ui->OffsetSLd->setValue (0);
   ui->OffsetSLd->setSingleStep(1);
+*/
+  ui->offsetSBx->setValue(0);
 
   displayHCBValues(pData.Data);
 
@@ -105,9 +110,14 @@ DisplayMain::displayHCB(ZDataBuffer &pData)
 void
 DisplayMain::setOffset(size_t pOffset,size_t pMax) {
   Offset=pOffset;
+  /*
   ui->OffsetSLd->setMinimum(0);
   ui->OffsetSLd->setMaximum(pMax);
   ui->OffsetSLd->setValue (Offset);
+*/
+  ui->offsetSBx->setMaximum(int(pMax));
+  ui->offsetSBx->setValue(int(Offset));
+
 
   utf8VaryingString wStr;
   wStr.sprintf("%4ld - Ox%4lX",Offset,Offset);
@@ -338,7 +348,7 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
     return;
 
   utf8String wStr;
-  zaddress_type wOffsetReserved;
+  zaddress_type wOffsetReserved=0;
   int64_t       wInt64;
   long wOffset=Offset;
 
@@ -473,10 +483,6 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
 
   displayItemModel->appendRow(wDumpRow);
 
-  wOffsetReserved=Offset+offsetof(ZHeaderControlBlock_Export,OffsetReserved);
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
-  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
-
   createMarginItem(Offset+offsetof(ZHeaderControlBlock_Export,OffsetReserved),wRow++);
 
   wDumpRow.clear();
@@ -508,6 +514,17 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
 
   createMarginItem(Offset+offsetof(ZHeaderControlBlock_Export,EndSign),wRow++);
 
+  size_t wCurrentOffset = sizeof(ZHeaderControlBlock_Export);
+
+  wDumpRow.clear();
+  wDumpRow << createItem(" ");
+  wDumpRow << createItem(" ");
+  wDumpRow << createItem( "---end---");
+  displayItemModel->appendRow(wDumpRow);
+
+  createMarginItem(wCurrentOffset,displayItemModel->rowCount()-1);
+  wRow++;
+
   ui->displayTBv->resizeRowsToContents();
   ui->displayTBv->resizeColumnsToContents();
 }// displayHCBValues
@@ -537,7 +554,6 @@ DisplayMain::displayPoolValues(unsigned char* pPtrIn)
 
   utf8String wStr;
 
-//  ui->ZEntityLBl->setText("ZPool Values");
   setWindowTitle(QObject::tr("Pool","DisplayMain"));
 }
 
@@ -576,7 +592,7 @@ void
 //DisplayMain::displayICBValues(const unsigned char* pPtrIn,size_t &pOffsetFromMCB, int &wRow) {
 DisplayMain::displayICBValues(const unsigned char *pPtrIn) {
 
-  setWindowTitle(QObject::tr("Index control blocks","DisplayMain"));
+  setWindowTitle(QObject::tr("Master File ICBs list","DisplayMain"));
   const unsigned char* wPtr = pPtrIn ;
   bool wRet = true;
   int wCount=0;
@@ -636,7 +652,9 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
 
     displayItemModel->appendRow(wDumpRow);
 
-    createMarginItem(wCurrentOffset,wRow++);
+    createMarginItem(wCurrentOffset,displayItemModel->rowCount()-1);
+    wRow++;
+
     wCurrentOffset += sizeof(uint32_t) ;
     wDumpRow.clear();
     wDumpRow << createItem(" ");
@@ -644,7 +662,8 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
     wDumpRow << createItem("--end of ZICB--");
     displayItemModel->appendRow(wDumpRow);
 
-    createMarginItem(wCurrentOffset,wRow++);
+    createMarginItem(wCurrentOffset,displayItemModel->rowCount()-1);
+    wRow++;
 
     pDisplayOffset += sizeof(cst_ZBLOCKEND);
     return false;
@@ -658,7 +677,8 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
   wDumpRow << createItem(" ");
   displayItemModel->appendRow(wDumpRow);
 
-  createMarginItem(wCurrentOffset,wRow++);
+  createMarginItem(wCurrentOffset,displayItemModel->rowCount()-1);
+  wRow++;
 
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wICBe->StartSign),"%u");
@@ -670,7 +690,8 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
 
   displayItemModel->appendRow(wDumpRow);
 
-  createMarginItem(wCurrentOffset,wRow++);
+  createMarginItem(wCurrentOffset,displayItemModel->rowCount()-1);
+  wRow++;
 
   wCurrentOffset += offsetof(ZHeaderControlBlock_Export,StartSign) ;
 
@@ -684,7 +705,8 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
   wDumpRow << createItem(decode_BlockId(wICBe->BlockId));
   displayItemModel->appendRow(wDumpRow);
 
-  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,BlockId),wRow++);
+  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,BlockId),displayItemModel->rowCount()-1);
+  wRow++;
 
 
   wDumpRow.clear();
@@ -699,7 +721,8 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
   wDumpRow <<  createItem(wStr.toCChar());
   displayItemModel->appendRow(wDumpRow);
 
-  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,EndianCheck),wRow++);
+  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,EndianCheck),displayItemModel->rowCount()-1);
+  wRow++;
 
 
   wDumpRow.clear();
@@ -713,11 +736,12 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
 
   displayItemModel->appendRow(wDumpRow);
 
-  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,ZMFVersion),wRow++);
+  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,ZMFVersion),displayItemModel->rowCount()-1);
+  wRow++;
 
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wICBe->ICBTotalSize),"%lu");
-  wDumpRow << createItem( "MCBSize");
+  wDumpRow << createItem( "ICBSize");
   wDumpRow.last()->setToolTip("Total size in bytes of exported index control block (including key dictionary)");
   wDumpRow << createItem(wICBe->ICBTotalSize,"0x%X");
   wUInt32=reverseByteOrder_Conditional<uint32_t>(wICBe->ICBTotalSize);
@@ -725,7 +749,8 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
 
   displayItemModel->appendRow(wDumpRow);
 
-  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,ICBTotalSize),wRow++);
+  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,ICBTotalSize),displayItemModel->rowCount()-1);
+  wRow++;
 
 
   wDumpRow.clear();
@@ -738,7 +763,8 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
 
   displayItemModel->appendRow(wDumpRow);
 
-  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,ZKDicOffset),wRow++);
+  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,ZKDicOffset),displayItemModel->rowCount()-1);
+  wRow++;
 
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wICBe->KeyUniversalSize),"%lu");
@@ -750,7 +776,8 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
 
   displayItemModel->appendRow(wDumpRow);
 
-  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,KeyUniversalSize),wRow++);
+  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,KeyUniversalSize),displayItemModel->rowCount()-1);
+  wRow++;
 
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wICBe->Duplicates),"%lu");
@@ -761,7 +788,9 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
 
   displayItemModel->appendRow(wDumpRow);
 
-  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,Duplicates),wRow++);
+  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,Duplicates),displayItemModel->rowCount()-1);
+  wRow++;
+
 
   wCurrentOffset = pDisplayOffset + sizeof(ZICB_Export); /* update offset */
 
@@ -778,7 +807,8 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
 
     displayItemModel->appendRow(wDumpRow);
 
-    createMarginItem(wCurrentOffset,wRow++);
+    createMarginItem(wCurrentOffset,displayItemModel->rowCount()-1);
+    wRow++;
 
     ui->displayTBv->resizeRowsToContents();
     ui->displayTBv->resizeColumnsToContents();
@@ -802,9 +832,10 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
 
   displayItemModel->appendRow(wDumpRow);
 
-  createMarginItem(wCurrentOffset,wRow++);
-  wCurrentOffset += wSP;
+  createMarginItem(wCurrentOffset,displayItemModel->rowCount()-1);
+  wRow++;
 
+  wCurrentOffset += wSP;
 
   wSP=wURIIndex._importUVF(pPtrIn); /* pPtrIn is updated */
 
@@ -823,7 +854,9 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
 
   displayItemModel->appendRow(wDumpRow);
 
-  createMarginItem(wCurrentOffset,wRow++);
+  createMarginItem(wCurrentOffset,displayItemModel->rowCount()-1);
+  wRow++;
+
   wCurrentOffset += wSP;
 
   wDumpRow.clear();
@@ -832,9 +865,14 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
   wDumpRow << createItem( "---end---");
   displayItemModel->appendRow(wDumpRow);
 
-  createMarginItem(wCurrentOffset,wRow++);
+  createMarginItem(wCurrentOffset,displayItemModel->rowCount()-1);
+  wRow++;
 
   pDisplayOffset = wCurrentOffset;
+
+  ui->displayTBv->resizeRowsToContents();
+  ui->displayTBv->resizeColumnsToContents();
+
   return true;
 
 }// displayICB
@@ -941,21 +979,7 @@ DisplayMain::displayMCBValues(const unsigned char* pPtrIn)
   wOffset=Offset+offsetof(ZMCB_Export,MCBSize);
   wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
-/*
-  wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wMCBExport->IndexCount),"%lu");
-  wDumpRow << createItem( "IndexCount");
-  wDumpRow.last()->setToolTip("Number of indexes (keys) contained in Master Control Block");
-  wDumpRow << createItem(wMCBExport->IndexCount,"0x%X");
-  wUInt32=reverseByteOrder_Conditional(wMCBExport->IndexCount);
-  wDumpRow << createItem(wUInt32,"%d");
 
-  displayItemModel->appendRow(wDumpRow);
-
-  wOffset=Offset+offsetof(ZMCB_Export,IndexCount);
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
-  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
-*/
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wMCBExport->ICBOffset),"%lu");
   wDumpRow << createItem( "ICBOffset");
@@ -1009,7 +1033,7 @@ DisplayMain::displayMCBValues(const unsigned char* pPtrIn)
   displayItemModel->appendRow(wDumpRow);
 
   wOffset=size_t(Offset)+offsetof(ZMCB_Export,JCBSize);
-  wStr.sprintf("%4l 0x%4X",wOffset,wOffset);
+  wStr.sprintf("%4lu 0x%4X",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
 
   wDumpRow.clear();
@@ -1092,6 +1116,15 @@ DisplayMain::displayMCBValues(const unsigned char* pPtrIn)
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
 
   wOffset += wSP;
+
+  wDumpRow.clear();
+  wDumpRow << createItem(" ");
+  wDumpRow << createItem(" ");
+  wDumpRow << createItem( "---end---");
+  displayItemModel->appendRow(wDumpRow);
+
+  createMarginItem(wOffset,displayItemModel->rowCount()-1);
+  wRow++;
 
   ui->displayTBv->resizeRowsToContents();
   ui->displayTBv->resizeColumnsToContents();
@@ -1311,37 +1344,6 @@ DisplayMain::displayFCBValues(unsigned char *pPtrIn)
   wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
 
-/*  wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wFCBExport->ZReserved_DataOffset),"%ld");
-  wDumpRow << createItem( "ZReserved_DataOffset");
-  wDumpRow.last()->setToolTip("Offset in bytes to Reserved Section (may contain MCB for instance) since beginning of File Control Block");
-  wStr.sprintf("0x%lX",wFCBExport->ZReserved_DataOffset);
-  wDumpRow << createItem( wStr.toCChar());
-  wStr.sprintf("%ld",reverseByteOrder_Conditional<size_t>(wFCBExport->ZReserved_DataOffset));
-  wDumpRow <<  createItem( wStr.toCChar());
-
-  displayItemModel->appendRow(wDumpRow);
-
-  wOffset=Offset+offsetof(ZFCB_Export,ZReserved_DataOffset);
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
-  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
-
-
-  wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wFCBExport->ZReserved_ExportSize),"%ld");
-  wDumpRow << createItem( "ZReserved_ExportSize");
-  wDumpRow.last()->setToolTip("Size in bytes of Reserved Section (may contain MCB for instance)");
-  wStr.sprintf("0x%lX",wFCBExport->ZReserved_ExportSize);
-  wDumpRow << createItem( wStr.toCChar());
-  wStr.sprintf("%ld",reverseByteOrder_Conditional<size_t>(wFCBExport->ZReserved_ExportSize));
-  wDumpRow <<  createItem( wStr.toCChar());
-
-  displayItemModel->appendRow(wDumpRow);
-
-  wOffset=Offset+offsetof(ZFCB_Export,ZReserved_ExportSize);
-  wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
-  displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
-*/
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wFCBExport->InitialSize),"%ld");
   wDumpRow << createItem( "InitialSize");
@@ -1481,6 +1483,18 @@ DisplayMain::displayFCBValues(unsigned char *pPtrIn)
   wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
 
+  wOffset += sizeof(wFCBExport->EndSign);
+
+  wDumpRow.clear();
+  wDumpRow << createItem(" ");
+  wDumpRow << createItem(" ");
+  wDumpRow << createItem( "---end---");
+  displayItemModel->appendRow(wDumpRow);
+
+  createMarginItem(wOffset,displayItemModel->rowCount()-1);
+  wRow++;
+
+
 
   ui->displayTBv->resizeRowsToContents();
   ui->displayTBv->resizeColumnsToContents();
@@ -1495,7 +1509,8 @@ DisplayMain::clear()
     if (displayItemModel->rowCount()>0)
       displayItemModel->removeRows(0,displayItemModel->rowCount());
 
-  ui->OffsetSLd->setValue(0);
+//  ui->OffsetSLd->setValue(0);
+  ui->offsetSBx->setValue(0);
   ui->OffsetLBl->setText("0");
 }
 

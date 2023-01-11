@@ -172,8 +172,9 @@ ZIndexControlBlock::_import(const unsigned char* &pPtrIn)
     ZException.setMessage("ZSIndexControlBlock::_import",
         ZS_BADFILEHEADER,
         Severity_Severe,
-        "Invalid Index Control Block header : found Start marker <%X>.",
-        wICBe.StartSign);
+        "Invalid Index Control Block header : Expected <%X> while found Start marker <%X>.",
+        cst_ZBLOCKSTART,
+        *wStart);
     return  ZS_BADICB;
   }
 
@@ -252,8 +253,6 @@ ZIndexControlBlock::_exportAppend(ZDataBuffer &pICBContent)
 
   return  ssize_t(pICBContent.Size - wRetSize) ;
 }// _exportAppend
-
-
 
 /*
  <indexcontrolblock> <!-- no dictionary in index control block -->
@@ -339,9 +338,9 @@ ZIndexControlBlock::_copyFrom( const ZIndexControlBlock& pIn)
 ZIndexControlBlock::~ZIndexControlBlock (void)
 {
 
-  if (CheckSum!=nullptr)
+ /* if (CheckSum!=nullptr)
     delete CheckSum;
-
+*/
   return;
 }
 /*

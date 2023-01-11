@@ -1,5 +1,5 @@
 //#include <common/zentity.h>
-#include <zentity.h>
+#include <zcontentutils/zentity.h>
 #include <ztoolset/charman.h>
 
 

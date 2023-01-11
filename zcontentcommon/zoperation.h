@@ -2,8 +2,8 @@
 #define ZOPERATION_H
 
 #include <stdint.h> // for uint32_t
-
-enum ZOp:  uint32_t
+typedef  uint32_t ZOp_type;
+enum ZOp:  ZOp_type
 {
     ZO_Nothing              =0,
     ZO_Add                  =0x01,
@@ -15,16 +15,19 @@ enum ZOp:  uint32_t
     ZO_Push_front           =0x15,
     ZO_Pop                  =0x22,
     ZO_Pop_front            =0x26,
-    ZO_Reset                =0xFF,
+//    ZO_Reset                =0xFF,
 
+    ZO_Processed            =0x0100,
+    ZO_RolledBack           =0x0200,
+    ZO_HardRolledBack       =0x0600,
+    ZO_OpMask               =0x00FF
+    //----------ZRF add-ons------------------------
+    //
+ /*   ZO_Free                 =0x004200,
+    ZO_Writeblock           =0x004400,
+    ZO_Remove               =0x004800,
 
-    //!----------ZRF add-ons------------------------
-    //!
-    ZO_Free                 =0x004100,
-    ZO_Writeblock           =0x004200,
-    ZO_Remove               =0x004400,
-
-    //!---------End ZRF add-ons----------------------
+    //---------End ZRF add-ons----------------------
 
     ZO_RollBack             =0x00001000,
     ZO_RollBack_Insert      =ZO_RollBack|ZO_Insert,
@@ -32,9 +35,6 @@ enum ZOp:  uint32_t
     ZO_RollBack_Replace     =ZO_RollBack|ZO_Replace,
     ZO_RollBack_Pop         =ZO_RollBack|ZO_Pop,
     ZO_RollBack_Erase       =ZO_RollBack|ZO_Erase,
-
-    ZO_Master               =0x00001000,
-    ZO_Slave                =0x00002000,
 
     ZO_join                 =0x00010000,
     ZO_joinWithDefault      =0x00020000,
@@ -46,6 +46,7 @@ enum ZOp:  uint32_t
 
 
     ZO_Historized           =0x10000000
+*/
 };
 
 //! @brief ZCommitStatus is returned by user's function if any defined (not nullptr). It indicates the behavior to be taken just after the call.
@@ -65,8 +66,9 @@ struct CUF_struct
     typedef  ZCommitStatus (*CUF) (const _Type&,ZOp,void *) ;  //! commit user function
 };
 
+class utf8VaryingString;
 
 /* code located within zam.h */
-const char *decode_ZOperation(ZOp &pOp);
+utf8VaryingString decode_ZOperation(ZOp_type &pOp);
 
 #endif // ZOPERATION_H
