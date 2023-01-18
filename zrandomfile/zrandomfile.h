@@ -820,7 +820,7 @@ public:
     ZStatus _getNext(ZBlock &pBlock,               // write
         zrank_type &pRank,
         zaddress_type &pAddress);                 // read
-  protected:
+public:
     ZStatus _getByAddress (ZBlock &pBlock, const zaddress_type pPhysicalAddress);
 
     ZStatus _add(const ZDataBuffer &pUserBuffer, zaddress_type &pAddress);

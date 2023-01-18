@@ -862,6 +862,19 @@ ZRawMasterFileVisu::displayBlock(ZBlockDescriptor_Export & pBlock)
   }
 }//displayBlock
 
+int SpaceCount=5;
+const int MaxCol=19;
+void addCurCol(int &pCol, int &pLine) {
+  pCol++;
+  if (pCol >= MaxCol ) {
+    pCol = 0;
+    pLine ++;
+  }
+  if (((pCol +1) % SpaceCount)==0) {
+    pCol++;
+  }
+}
+
 void
 ZRawMasterFileVisu::setSelectionBackGround( QVariant& pBackground,
                                             QVariant& pBackgroundFirst,
@@ -908,11 +921,15 @@ ZRawMasterFileVisu::setSelectionBackGround( QVariant& pBackground,
         wItem->setData(pBackground, Qt::BackgroundRole);
     } // if (wItem != nullptr)
     wCount++; /* advance even if item is nullptr */
+
+    addCurCol(wCurCol,wCurLine);
+/*
     wCurCol++;
     if (wCurCol >= wColLimit ) {
       wCurCol = 0;
       wCurLine ++;
     }
+*/
   }// while true
 
   if (pScrollTo) {
@@ -1689,6 +1706,8 @@ ZRawMasterFileVisu::displayOneURFField(zaddress_type &wOffset,const unsigned cha
 }
 
 
+
+
 void
 ZRawMasterFileVisu::colorizeURFBlock(ZDataBuffer & pData)
 {
@@ -1764,23 +1783,6 @@ ZRawMasterFileVisu::colorizeURFKeyBlock(ZDataBuffer & pData)
 
   const unsigned char* wPtr = pData.Data + sizeof(ZBlockHeader_Export) ;
   const unsigned char* wPtrEnd = pData.Data + pData.Size;
-#ifdef __COMMENT__
-  /* colorize presence bitset */
-
-  ZBitset wPresence;
-
-
-  ssize_t wSize = wPresence._importURF(wPtr);
-  if (wSize < 0) {
-    return;
-  }
-  setSelectionBackGround(PresenceBackGround,PresenceBackGround_first,wColorOffset,wSize,"Presence bit field (ZBitset)",false);
-
-
-
-
-  wColorOffset += size_t(wSize);
-#endif // __COMMENT__
 
   /* colorize ZMF address */
   while (wPtr < wPtrEnd ) {
@@ -2093,7 +2095,7 @@ void ZRawMasterFileVisu::resizeEvent(QResizeEvent* pEvent)
 
 
 void ZRawMasterFileVisu::visuActionEvent(QAction* pAction) {
-  QDialog wVisuDLg (this);
+  QDialog wVisuDLg (nullptr);
   wVisuDLg.setWindowTitle(QObject::tr("Evaluate values","ZContentVisuMain"));
 
   wVisuDLg.resize(450,150);
@@ -2101,16 +2103,16 @@ void ZRawMasterFileVisu::visuActionEvent(QAction* pAction) {
   QVBoxLayout* QVL=new QVBoxLayout(&wVisuDLg);
   wVisuDLg.setLayout(QVL);
 
-  QGridLayout* QGLyt=new QGridLayout(this);
+  QGridLayout* QGLyt=new QGridLayout(&wVisuDLg);
   QVL->insertLayout(0,QGLyt);
 
-  QHBoxLayout* QHL=new QHBoxLayout;
+  QHBoxLayout* QHL=new QHBoxLayout(&wVisuDLg);
   QGLyt->addLayout(QHL,0,4);
   QHL->setAlignment(Qt::AlignCenter);
 
-  QLabel* LBlType=new QLabel("Type",this);
+  QLabel* LBlType=new QLabel("Type",&wVisuDLg);
   QHL->addWidget(LBlType);
-  QLabel* wTypeLBl=new QLabel(this);
+  QLabel* wTypeLBl=new QLabel(&wVisuDLg);
   QHL->addWidget(wTypeLBl);
 
 
@@ -2146,6 +2148,11 @@ void ZRawMasterFileVisu::visuActionEvent(QAction* pAction) {
   QHLBtn->setObjectName("QHLBtn");
   QVL->insertLayout(1,QHLBtn);
 
+  QLineEdit* wAlphaLEd=new QLineEdit(&wVisuDLg);
+  QVL->insertWidget(2,wAlphaLEd);
+
+
+
   QPushButton* wNext=new QPushButton(QObject::tr("Next","ZContentVisuMain"),&wVisuDLg);
   QPushButton* wClose=new QPushButton(QObject::tr("Close","ZContentVisuMain"),&wVisuDLg);
   QSpacerItem* wSpacer= new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -2155,6 +2162,8 @@ void ZRawMasterFileVisu::visuActionEvent(QAction* pAction) {
   QHLBtn->addWidget(wClose);
 
 
+
+
   QObject::connect(wNext, &QPushButton::clicked, &wVisuDLg, &QDialog::accept);
   QObject::connect(wClose, &QPushButton::clicked, &wVisuDLg, &QDialog::reject);
 
@@ -2162,14 +2171,31 @@ void ZRawMasterFileVisu::visuActionEvent(QAction* pAction) {
   QModelIndex wIdx=BlockDumpTBv->currentIndex();
   if (!wIdx.isValid())
     return;
+
   ssize_t wOffset=computeOffsetFromCoord(wIdx.row(),wIdx.column());
-/*  SearchOffset=wOffset;
 
 
-  wStr.sprintf("%ld",wOffset);
-  ui->CurAddressLBl->setText(wStr.toCChar());
-*/
   utf8VaryingString wStr;
+
+  if (pAction==ZTypeQAc) {
+    wValueSize=sizeof(ZTypeBase);
+    if (wOffset+sizeof(ZTypeBase) > RawRecord.Size )
+      return;
+    wTypeLBl->setText("ZType");
+    ZTypeBase * wValuePtr = (ZTypeBase *)(RawRecord.Data + wOffset);
+    ZTypeBase wValue = *wValuePtr;
+    ZTypeBase wDeSerialized = reverseByteOrder_Conditional<ZTypeBase>(wValue);
+    wStr.sprintf("%u",wValue);
+    wRawValueLEd->setText(wStr.toCChar());
+    wStr.sprintf("%04X",wValue);
+    wRawHexaLEd->setText(wStr.toCChar());
+    wStr.sprintf("%d",wDeSerialized);
+    wDeserializedLEd->setText(wStr.toCChar());
+    wStr.sprintf("%04X",wDeSerialized);
+    wDeserializedHexaLEd->setText(wStr.toCChar());
+    wAlphaLEd->setText(decode_ZType(wDeSerialized));
+
+  }
 
   if (pAction==uint16QAc) {
     wValueSize=sizeof(uint16_t);
@@ -2306,8 +2332,9 @@ void ZRawMasterFileVisu::visuActionEvent(QAction* pAction) {
   }
   int wRet=wVisuDLg.exec();
 
-  if (wRet==QDialog::Rejected)
+  if (wRet==QDialog::Rejected) {
     return;
+  }
   /* skip value in offset */
 
   if ( (wOffset + wValueSize) > RawRecord.Size )
@@ -2339,6 +2366,11 @@ void ZRawMasterFileVisu::VisuBvFlexMenuCallback(QContextMenuEvent *event)
   QActionGroup* visuActionGroup=new QActionGroup(visuFlexMEn) ;
   //  QObject::connect(visuActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(visuActionEvent(QAction*)));
   QObject::connect(visuActionGroup, &QActionGroup::triggered,  this, &ZRawMasterFileVisu::visuActionEvent);
+
+  ZTypeQAc = new QAction("ZType",visuFlexMEn);
+  visuFlexMEn->addAction(ZTypeQAc);
+  visuActionGroup->addAction(ZTypeQAc);
+
   uint16QAc= new QAction("uint16",visuFlexMEn);
   visuFlexMEn->addAction(uint16QAc);
   visuActionGroup->addAction(uint16QAc);
@@ -2370,3 +2402,7 @@ void ZRawMasterFileVisu::VisuBvFlexMenuCallback(QContextMenuEvent *event)
   visuFlexMEn->exec(event->globalPos());
   visuFlexMEn->deleteLater();
 }//VisuBvFlexMenu
+
+void ZRawMasterFileVisu::setVisuIndexFile() {
+  ui->ColorModeCBx->setCurrentIndex(2);
+}

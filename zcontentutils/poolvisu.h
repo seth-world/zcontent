@@ -108,6 +108,8 @@ public:
   void poolMouseCallback(int pZEF, QMouseEvent *pEvent);
   ZStatus updateHeader();
 
+  bool isIndexFile=false;
+
 private slots:
   void refresh();
   void udpdateHeaderWnd();

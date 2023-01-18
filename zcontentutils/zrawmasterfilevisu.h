@@ -60,8 +60,11 @@ public:
                               const utf8VaryingString &pToolTip="",
                               bool pScrollTo=false);
 
+  void setVisuIndexFile() ;
+
   /* evaluate actions */
 
+  QAction* ZTypeQAc = nullptr;
   QAction* uint16QAc = nullptr;
   QAction* int16QAc = nullptr;
   QAction* uint32QAc = nullptr;

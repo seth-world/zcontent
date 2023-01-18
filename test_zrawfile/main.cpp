@@ -4,6 +4,8 @@
 #include "zdocphysical.h"
 #include <QApplication>
 
+#include <zcontent/zrandomfile/zrandomfile.h>
+
 #include <zentity.h>
 
 #include <QFile>
@@ -83,6 +85,48 @@ enum Storage_type:Storage_t
 /* end applicationtype.h */
 
 
+utf8String displayResource(ZResource& pRes) {
+  utf8String wReturn;
+  wReturn.sprintf("%s-%ld",
+      decode_ZEntity(pRes.Entity).toChar(),pRes.id);
+  return wReturn;
+}
+
+ZStatus displayAll(ZRandomFile& pZRF) {
+
+  ZDataBuffer wRecord;
+  ZIndexItem wItem;
+  ZResource wRes;
+
+  _DBGPRINT(" List all\n")
+
+  int wi=0;
+  ZStatus wSt=pZRF.zgetFirst(wRecord);
+  while (wSt==ZS_SUCCESS) {
+    wItem.fromFileKey(wRecord);
+    const unsigned char* wPtr = wItem.Data;
+    wRes._importURF(wPtr);
+    _DBGPRINT(" rank %d  Address %ld resource %s\n",wi,wItem.ZMFAddress,displayResource(wRes).toString())
+    wSt=pZRF.zgetNext(wRecord);
+    wi++;
+  }
+  return wSt;
+}
+
+
+ZStatus displayRank(ZRandomFile& pZRF,long pRank){
+  ZDataBuffer wRecord;
+  ZIndexItem wItem;
+  ZResource wRes;
+  ZStatus wSt=pZRF.zget(wRecord,pRank);
+  wItem.fromFileKey(wRecord);
+  const unsigned char* wPtr = wItem.Data;
+  wRes._importURF(wPtr);
+  _DBGPRINT(" rank %ld  Address %ld resource %s\n",pRank,wItem.ZMFAddress,displayResource(wRes).toString())
+  return wSt;
+}
+
+
 void displayKeys (ZRawMasterFile& pMasterFile);
 
 const char* wPictureDir = "/home/gerard/Development/zmftest/testpicture/";
@@ -96,8 +140,10 @@ int main(int argc, char *argv[])
   ZIndexItem wII;
   utf8VaryingString wStr;
 
+  zaddress_type wAddress=0;
+
   ZStatus wSt;
-  ZVerbose |= ZVB_ZRF;
+  ZVerbose |= ZVB_FileEngine | ZVB_SearchEngine | ZVB_MemEngine ;
   QApplication a(argc, argv);
 
 
@@ -106,6 +152,211 @@ int main(int argc, char *argv[])
     wWD="";
 
   ZResource wUserId=ZResource::getNew(ZEntity_User);
+
+  ZResource wR1 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR2 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR3 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR4 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR5 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR6 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR7 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR8 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR9 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR10 = ZResource::getNew(ZEntity_DocPhysical);
+
+  ZResource wRes;
+
+  ZIndexItem wItem;
+
+  long wRank=0;
+  uriString wUriZRF = wWD;
+
+  wUriZRF.addConditionalDirectoryDelimiter();
+  wUriZRF += "zrftest.zrf";
+
+  ZRandomFile wZRF;
+
+  wSt=wZRF.zcreate(wUriZRF,1000,10,5,49,false,true,false,false);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+  wSt=wZRF.zopen(wUriZRF,ZRF_All);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+  wRecord.clear();
+  wR1._exportURF(wRecord);
+  wRecord.setData(wRecord);
+
+  wItem.setBuffer(wRecord);
+  wItem.ZMFAddress = 0;
+  wRecord=wItem.toFileKey();
+
+  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR1).toString())
+  wRank++;
+  wSt=wZRF.zadd(wRecord);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+
+  wRecord.clear();
+  wR2._exportURF(wRecord);
+  wRecord.setData(wRecord);
+  wItem.setBuffer(wRecord);
+  wItem.ZMFAddress ++;
+  wRecord=wItem.toFileKey();
+
+  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR2).toString())
+  wRank++;
+  wSt=wZRF.zadd(wRecord);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+
+  wRecord.clear();
+  wR3._exportURF(wRecord);
+  wRecord.setData(wRecord);
+  wItem.setBuffer(wRecord);
+  wItem.ZMFAddress ++;
+  wRecord=wItem.toFileKey();
+
+  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR3).toString())
+  wRank++;
+
+  wSt=wZRF.zadd(wRecord);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+  wSt=wZRF._writeAllFileHeader();
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+  _DBGPRINT("insert at %d resource %s\n",2,displayResource(wR4).toString())
+
+  wRecord.clear();
+  wR4._exportURF(wRecord);
+  wRecord.setData(wRecord);
+  wItem.setBuffer(wRecord);
+  wItem.ZMFAddress ++;
+  wRecord=wItem.toFileKey();
+
+  wSt=wZRF._insert2Phases_Prepare(wRecord,2,wAddress);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+
+  wSt=wZRF._insert2Phases_Commit(wRecord,2,wAddress);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+  wRecord.clear();
+  wR5._exportURF(wRecord);
+  wRecord.setData(wRecord);
+  wItem.setBuffer(wRecord);
+  wItem.ZMFAddress ++;
+  wRecord=wItem.toFileKey();
+
+  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR5).toString())
+  wRank++;
+
+  wSt=wZRF.zadd(wRecord);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+  wRecord.clear();
+  wR6._exportURF(wRecord);
+  wRecord.setData(wRecord);
+  wItem.setBuffer(wRecord);
+  wItem.ZMFAddress ++;
+  wRecord=wItem.toFileKey();
+
+  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR6).toString())
+  wRank++;
+
+  wSt=wZRF.zadd(wRecord);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+  wRecord.clear();
+  wR7._exportURF(wRecord);
+  wRecord.setData(wRecord);
+  wItem.setBuffer(wRecord);
+  wItem.ZMFAddress ++;
+  wRecord=wItem.toFileKey();
+
+  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR7).toString())
+  wRank++;
+
+  wSt=wZRF.zadd(wRecord);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+  displayAll(wZRF);
+
+
+  long wEraseRank=2L;
+  _DBGPRINT(" Erase %ld\n",wEraseRank)
+
+  wSt=wZRF._remove_Prepare(wEraseRank,wAddress);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+  wSt=wZRF._remove_Commit(wEraseRank);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+
+  wEraseRank=5L;
+  _DBGPRINT(" Erase %ld\n",wEraseRank)
+
+  wSt=wZRF._remove_Prepare(wEraseRank,wAddress);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+  wSt=wZRF._remove_Commit(wEraseRank);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+  displayAll(wZRF);
+
+  wEraseRank = 2;
+  _DBGPRINT(" Replace rank %ld with %s\nCurrent content is :",wEraseRank, displayResource( wR10).toString() )
+  displayRank(wZRF,wEraseRank);
+
+  wRecord.clear();
+  wR10._exportURF(wRecord);
+  wRecord.setData(wRecord);
+  wItem.setBuffer(wRecord);
+  wItem.ZMFAddress ++;
+  wRecord=wItem.toFileKey();
+
+  wSt = wZRF._replace(wRecord,wEraseRank,wAddress);
+
+  wZRF.zclose();
+
+  wSt=wZRF.zopen(ZRF_Read_Only);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+  displayAll(wZRF);
+
+  wZRF.zclose();
+  return 0;
 
   uriString wDocFile = wWD ;
   wDocFile.addConditionalDirectoryDelimiter();
@@ -126,18 +377,6 @@ int main(int argc, char *argv[])
   ZDocPhysical wDocPhy;
 
 //#ifdef __POPULATE__
-
-
-  ZResource wR1 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR2 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR3 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR4 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR5 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR6 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR7 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR8 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR9 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR10 = ZResource::getNew(ZEntity_DocPhysical);
 
 
   ZArray<ZDataBuffer> wKeys;
@@ -168,11 +407,15 @@ int main(int argc, char *argv[])
   wDocPhy.Ownerid = ZResource::getNew(ZEntity_User);
   wDocPhy.Vaultid = ZResource::getNew(ZEntity_Vault);
 
+  wKeys = wDocPhy.getAllKeys();
 
   wSt=wMasterFile.zadd_T(wDocPhy);
   if (wSt!=ZS_SUCCESS) {
     goto endofmain;
   }
+
+  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
+  displayKeys(wMasterFile);
 
   /* second record */
   wDocPhy.clear();
@@ -208,8 +451,8 @@ int main(int argc, char *argv[])
     goto endofmain;
   }
 
-  wStr.sprintf("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id);
-  _DBGPRINT(wStr.toCChar())
+
+  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
   displayKeys(wMasterFile);
 
   _DBGPRINT("                   Record #3\n")
@@ -247,9 +490,10 @@ int main(int argc, char *argv[])
     goto endofmain;
   }
 
-  wStr.sprintf("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id);
-  _DBGPRINT(wStr.toCChar())
+
+  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
   displayKeys(wMasterFile);
+
   _DBGPRINT("                   Record #4\n")
   /* record #4 */
   wDocPhy.clear();
@@ -286,8 +530,9 @@ int main(int argc, char *argv[])
     goto endofmain;
   }
 
-  wStr.sprintf("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id);
-  _DBGPRINT(wStr.toCChar())
+  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
+  displayKeys(wMasterFile);
+
   _DBGPRINT("                   Record #5\n")
   /* record #5 */
   wDocPhy.clear();
@@ -324,8 +569,9 @@ int main(int argc, char *argv[])
     goto endofmain;
   }
 
-  wStr.sprintf("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id);
-  _DBGPRINT(wStr.toCChar())
+  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
+  displayKeys(wMasterFile);
+
   _DBGPRINT("                   Record #6\n")
   /* record #6 */
   wDocPhy.clear();
@@ -361,10 +607,10 @@ int main(int argc, char *argv[])
   if (wSt!=ZS_SUCCESS) {
     goto endofmain;
   }
+  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
+  displayKeys(wMasterFile);
 
-  wStr.sprintf("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id);
-  _DBGPRINT(wStr.toCChar())
-  _DBGPRINT("                   Record #7\n")
+  _DBGPRINT("\n                   Record #7\n")
   /* record #7 */
   wDocPhy.clear();
 
@@ -400,8 +646,9 @@ int main(int argc, char *argv[])
     goto endofmain;
   }
 
-  wStr.sprintf("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id);
-  _DBGPRINT(wStr.toCChar())
+  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
+  displayKeys(wMasterFile);
+
   _DBGPRINT("                   Record #8\n")
 
   wDocPhy.Documentid  = wR7;
@@ -438,12 +685,8 @@ int main(int argc, char *argv[])
 //#endif  // __POPULATE__
 
 
-  _DBGPRINT("                  End populate\n")
+  _DBGPRINT("\n                  End populate\n")
   displayKeys(wMasterFile);
-
-
-
-
 
 
  endofmain:
@@ -464,30 +707,34 @@ displayKeys (ZRawMasterFile& pMasterFile) {
   ZDataBuffer wKey;
   ZIndexItem wII;
   ZResource wResource;
+  zaddress_type wIndexAddress;
   long wIdx=0;
 
-  _DBGPRINT("           Keys\n")
+  _DBGPRINT("\n\n           List of all keys\n")
 
   while (true) {
     long wi=0;
-    _DBGPRINT("Index %ld - %s\n",wIdx,pMasterFile.IndexTable[wIdx]->IndexName.toCChar())
-    wSt=pMasterFile.IndexTable[wIdx]->zget(wKey,wi++);
+    _DBGPRINT("Index key rank <%ld> - <%s>\n"
+              "rank  index address  zmf address       Resource\n",wIdx,pMasterFile.IndexTable[wIdx]->IndexName.toCChar())
+    wSt=pMasterFile.IndexTable[wIdx]->zgetWAddress(wKey,wi,wIndexAddress);
     while (wSt==ZS_SUCCESS) {
       wII.fromFileKey(wKey);
       const unsigned char* wPtr=wII.Data;
       wResource._importURF(wPtr);
-      _DBGPRINT("%6ld %6ld %s %ld\n",
+      _DBGPRINT("%6ld %12ld %12ld %s %ld\n",
           wi,
-          wII.ZMFaddress,
+          wIndexAddress,
+          wII.ZMFAddress,
           decode_ZEntity( wResource.Entity).toChar(),
           wResource.id)
-      wSt=pMasterFile.IndexTable[wIdx]->zget(wKey,wi++);
+      wi++;
+      wSt=pMasterFile.IndexTable[wIdx]->zgetWAddress(wKey,wi,wIndexAddress);
     }
     wIdx++;
     if (wIdx >= pMasterFile.IndexTable.count())
       break;
     wi=0;
-    _DBGPRINT("Index %ld - %s\n",wIdx,pMasterFile.IndexTable[wIdx]->IndexName.toCChar())
+    _DBGPRINT("Index key rank <%ld> - <%s>\n",wIdx,pMasterFile.IndexTable[wIdx]->IndexName.toCChar())
     utf8VaryingString wStr;
     wSt=pMasterFile.IndexTable[wIdx]->zget(wKey,wi++);
     while (wSt==ZS_SUCCESS) {
@@ -496,11 +743,10 @@ displayKeys (ZRawMasterFile& pMasterFile) {
       wStr._importURF(wPtr);
       _DBGPRINT("%6ld %6ld <%s>\n",
           wi,
-          wII.ZMFaddress,
+          wII.ZMFAddress,
           wStr.toCChar())
       wSt=pMasterFile.IndexTable[wIdx]->zget(wKey,wi++);
     }
-
 
     wIdx++;
     wi=0;
@@ -517,11 +763,12 @@ displayKeys (ZRawMasterFile& pMasterFile) {
       wD2._importURF(wPtr);
       _DBGPRINT("%6ld %6ld <%s><%s>\n",
           wi,
-          wII.ZMFaddress,
+          wII.ZMFAddress,
           wD1.toLocale().toCChar(),
           wD2.toLocale().toCChar())
       wSt=pMasterFile.IndexTable[wIdx]->zget(wKey,wi++);
     }
   }// while true
 
+  _DBGPRINT("_____________________________________________\n\n")
 }

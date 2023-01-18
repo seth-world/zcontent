@@ -5,7 +5,7 @@ using namespace zbs;
 ZIndexItem::ZIndexItem()
 {
   Operation = ZO_Nothing;
-  ZMFaddress = -1;
+  ZMFAddress = -1;
   IndexRank = -1;
 }
 //---------ZIndexItem_struct routines-------------------------------------------------------
@@ -26,7 +26,7 @@ ZIndexItem::toFileKey(void)
 {
   ZDataBuffer wReturn;
   zaddress_type wAddress;
-  wAddress = reverseByteOrder_Conditional<zaddress_type>(ZMFaddress);
+  wAddress = reverseByteOrder_Conditional<zaddress_type>(ZMFAddress);
   wReturn.setData(&wAddress,sizeof(zaddress_type));
   wReturn.appendData(*this);
   return  wReturn;
@@ -34,7 +34,9 @@ ZIndexItem::toFileKey(void)
 
 /**
  * @brief ZIndexItem_struct::fromFileKey loads a ZIndexItem_struct from an Index file record contained in a ZDataBuffer structure (pFileKey)
- * @note ZOp Operation field is not stored on Index File, and therefore is not subject to be loaded
+ *
+ *  ZMFAddress is feeded with index record content
+ *  key content is feeded with index record content
  *
  * @param[in] pFileKey ZIndexFile record content to load into current ZIndexItem
  * @return a reference to current ZIndexItem being processed
@@ -42,16 +44,16 @@ ZIndexItem::toFileKey(void)
 ZIndexItem&
 ZIndexItem::fromFileKey (ZDataBuffer &pKeyFileRecord)
 {
-  size_t wOffset =0;
+//  size_t wOffset =0;
   size_t wSize;
 
   clear();
-  memmove (&ZMFaddress,pKeyFileRecord.Data,sizeof(ZMFaddress));
+  memmove (&ZMFAddress,pKeyFileRecord.Data,sizeof(ZMFAddress));
 
-  ZMFaddress = reverseByteOrder_Conditional<zaddress_type>(ZMFaddress);
-  wOffset += sizeof(ZMFaddress);
-  wSize = pKeyFileRecord.Size - sizeof(ZMFaddress) ;
-  ZDataBuffer::setData(pKeyFileRecord.Data+wOffset,wSize);
+  ZMFAddress = reverseByteOrder_Conditional<zaddress_type>(ZMFAddress);
+//  wOffset += sizeof(ZMFaddress);
+  wSize = pKeyFileRecord.Size - sizeof(ZMFAddress) ;
+  ZDataBuffer::setData(pKeyFileRecord.Data + sizeof(ZMFAddress),wSize);
   return *this;
 }
 
@@ -64,7 +66,7 @@ ZIndexItem::display() {
                   "IndexRank %lld\n"
                   "Operation %lld\n"
                   "Buffer size %ld\n" ,
-      ZMFaddress,IndexAddress,IndexRank,decode_ZOperation(Operation).toCChar(),ZDataBuffer::Size
+      ZMFAddress,IndexAddress,IndexRank,decode_ZOperation(Operation).toCChar(),ZDataBuffer::Size
       );
   return wReturn;
 }
@@ -111,7 +113,7 @@ void ZIIExport::reverse() {
 }
 
 void ZIIExport::set(const ZIndexItem& pIn) {
-  ZMFaddress = pIn.ZMFaddress;
+  ZMFaddress = pIn.ZMFAddress;
   IndexAddress = pIn.IndexAddress;
   Operation = pIn.Operation;
   IndexRank = pIn.IndexRank;

@@ -1504,7 +1504,7 @@ ZContentVisuMain::openZRF()
 
     QString wFileName = QFileDialog::getOpenFileName(this, tr("Open File"),
         wWDWork,
-        "Random files(*.zmf *.zfr *.zix);;All(*.*)");
+        "Random files(*.zmf *.zrf *.zix);;All(*.*)");
 
     if (wFileName.isEmpty())
       return ZS_CANCEL;

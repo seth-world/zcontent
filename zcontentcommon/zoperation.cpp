@@ -14,6 +14,10 @@ utf8VaryingString decode_ZOperation(ZOp_type &pOp)
 
   if (wOp & ZO_Processed)
     wReturn = "ZO_Processed | " ;
+  if (wOp & ZO_RolledBack)
+    wReturn = "ZO_RolledBack | " ;
+  if (wOp & ZO_HardRolledBack)
+    wReturn = "ZO_HardRolledBack | " ;
 
   wOp &= ZO_OpMask;
 
@@ -36,6 +40,8 @@ utf8VaryingString decode_ZOperation(ZOp_type &pOp)
     case    ZO_Swap :
       wReturn += "ZO_Swap" ;
       return wReturn;
+
+    case    ZO_Push :
       wReturn += "ZO_Push" ;
       return wReturn;
     case    ZO_Push_front :

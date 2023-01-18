@@ -156,9 +156,8 @@ zmode_type wFormerMode=ZRF_Nothing;
                 {
                     return  wSt; // Beware return  is multiple instructions in debug mode
                 }
-    if (ZVerbose)
-            fprintf(stdout,
-                    "setJournalingOn-I-JCB Journaling set on within JournalingControlBlock\n");
+    if (ZVerbose & ZVB_FileEngine)
+            _DBGPRINT("setJournalingOn-I-JCB Journaling set on within JournalingControlBlock\n")
 
     if (!wasOpen)  // if was not open at routine entrance, then it has been openned locally and must be closed
                 {return  zclose();}
@@ -168,17 +167,16 @@ zmode_type wFormerMode=ZRF_Nothing;
             zclose();       // close it
             wSt=zopen(wFormerMode); // re-open with former mode
             }
-    if (ZVerbose)
-            fprintf(stdout,
-                    "setJournalingOn-I- starting journaling.  journaling file %s \n",
-                    ZJCB->Journal->getURIContent().toString());
+    if (ZVerbose & ZVB_FileEngine)
+            _DBGPRINT("setJournalingOn-I- starting journaling.  journaling file %s \n",
+                    ZJCB->Journal->getURIContent().toString())
     wSt=ZJCB->Journal->start();
     if (wSt==ZS_SUCCESS)
     {
-    if (ZVerbose)
-            fprintf(stdout,
+    if (ZVerbose & ZVB_FileEngine)
+            _DBGPRINT(
                     "setJournalingOn-I- Journaling active with journaling file %s \n",
-                    ZJCB->Journal->getURIContent().toString());
+                    ZJCB->Journal->getURIContent().toString())
     }
     else
         {
@@ -208,22 +206,23 @@ if (!_isOpen)
         return  ZS_INVOP;
         }
 
-    if (ZVerbose)
-            fprintf (stderr,
+    if (ZVerbose & ZVB_FileEngine)
+            _DBGPRINT(
                      "setJournalingOn-I Starting/restarting journaling on for file %s\n",
-                     getURIContent().toString());
-    if (ZJCB->Journal==nullptr)
-                {
-                fprintf (stderr,
+                     getURIContent().toString())
+    if (ZJCB->Journal==nullptr) {
+      if (ZVerbose & ZVB_FileEngine)
+                _DBGPRINT(
                          "setJournalingOn-E Journaling has not be defined for file %s. Cannot start/restart journaling.\n",
-                         getURIContent().toString());
-                ZException.setMessage(_GET_FUNCTION_NAME_,
-                                        ZS_INVOP,
-                                        Severity_Error,
-                                        "Journaling has not be defined for file %s. Cannot start/restart journaling.",
-                                        getURIContent().toString());
-                return  ZS_INVOP;
-                }
+                         getURIContent().toString())
+
+      ZException.setMessage(_GET_FUNCTION_NAME_,
+                              ZS_INVOP,
+                              Severity_Error,
+                              "Journaling has not be defined for file %s. Cannot start/restart journaling.",
+                              getURIContent().toString());
+      return  ZS_INVOP;
+    }
 
     if (ZJCB->Journal->JThread.getState() > ZTHS_Nothing)
             {
@@ -254,25 +253,25 @@ if (!_isOpen)
         }
 
 
-    if (ZVerbose)
-            fprintf(stdout,
+    if (ZVerbose & ZVB_FileEngine)
+            _DBGPRINT(
                     "setJournalingOn-I- starting journaling.  journaling file %s \n",
-                    ZJCB->Journal->getURIContent().toString());
+                    ZJCB->Journal->getURIContent().toString())
     wSt=ZJCB->Journal->start();
     if (wSt==ZS_SUCCESS)
     {
-    if (ZVerbose)
-            fprintf(stdout,
+    if (ZVerbose & ZVB_FileEngine)
+            _DBGPRINT(
                     "setJournalingOn-I- Journaling active with journaling file %s \n",
-                    ZJCB->Journal->getURIContent().toString());
+                    ZJCB->Journal->getURIContent().toString())
     }
     else
     {
-        if (ZVerbose)
+        if (ZVerbose & ZVB_FileEngine)
             {
-                fprintf(stdout,
+                _DBGPRINT(
                         "setJournalingOn-E-Failure Journaling on file %s has not started.See ZException stack dump (following) to get information\n",
-                        ZJCB->Journal->getURIContent().toString());
+                        ZJCB->Journal->getURIContent().toString())
                 ZException.printUserMessage();
             }
     }// else
@@ -421,10 +420,9 @@ zmode_type wFormerMode=ZRF_Nothing;
         }// else
 
 
-    if (ZVerbose)
-            fprintf (stderr,
-                     "setJournalingOff-I Stopping journaling for file %s\n",
-                     getURIContent().toString());
+    if (ZVerbose & ZVB_FileEngine)
+            _DBGPRINT("setJournalingOff-I Stopping journaling for file %s\n",
+                     getURIContent().toString())
     if (ZJCB==nullptr)
             { return  ZS_SUCCESS;}  // Beware return  is multiple instructions in debug mode
     if (ZJCB->Journal==nullptr)
@@ -454,10 +452,9 @@ zmode_type wFormerMode=ZRF_Nothing;
     wSt=writeControlBlocks();
     if (wSt!=ZS_SUCCESS)
                 { return  wSt;} // Beware return  is multiple instructions in debug mode
-    if (ZVerbose)
-            fprintf(stdout,
-                    "setJournalingOn-I-MCB Journaling for file %s has been set off within MCB header \n",
-                    getURIContent().toCChar());
+    if (ZVerbose & ZVB_FileEngine)
+            _DBGPRINT("setJournalingOn-I-MCB Journaling for file %s has been set off within MCB header \n",
+                    getURIContent().toCChar())
 
 
     if (!wasOpen)  // if was not open close it
@@ -1922,13 +1919,11 @@ utfdescString wBase;
             }
 
 
-    if (ZVerbose)
+    if (ZVerbose & ZVB_FileEngine)
         {
-        fprintf (wOutput,
-                 "%s>>      Clearing ZMasterControlBlock of file <%s>\n"
-                 "              Actual content\n",
+        _DBGPRINT("%s>>      Clearing ZMasterControlBlock of file <%s>\n",
                  _GET_FUNCTION_NAME_,
-                 URIContent.toString());
+                 URIContent.toString())
         report(pOutput);
         }
 
@@ -1937,22 +1932,22 @@ utfdescString wBase;
             wSt=zremoveIndex(IndexTable.lastIdx());
             if (wSt!=ZS_SUCCESS)
                 {
-                if (ZVerbose)
+                if (ZVerbose & ZVB_FileEngine)
                     {
-                    fprintf (wOutput,
+                    _DBGPRINT(
                              "%s>> ****Error: removing index rank <%ld> status <%s> clearing ZMasterControlBlock of file <%s>\n"
                              "              Actual content\n",
                              _GET_FUNCTION_NAME_,
                              IndexTable.lastIdx(),
                              decode_ZStatus(wSt),
-                             URIContent.toString());
+                             URIContent.toString())
                     }
                 ZException.addToLast(" Index rank <%ld>. Clearing ZMasterControlBlock of file <%s>.",
                                        IndexTable.lastIdx(),
                                        URIContent.toString());
                 return  wSt;
                 }// not ZS_SUCCESS
-            if (ZVerbose)
+            if (ZVerbose & ZVB_FileEngine)
                 {
                 fprintf (pOutput,
                          "%s>>      Index successfully removed\n",
@@ -2233,7 +2228,7 @@ long wi;
                     {
                     return  wSt;// Beware return  is multiple instructions in debug mode
                     }
-            if (ZVerbose)
+            if (ZVerbose & ZVB_FileEngine)
               _DBGPRINT("Opening Index file <%s>\n",(const char*)wIndexUri.toString())
 
             wSt=IndexTable[wi]->openIndexFile(wIndexUri,wi,pMode);
@@ -2641,7 +2636,6 @@ ZRawMasterFile::_addRaw(ZDataBuffer& pRecord, ZArray<ZDataBuffer> &pKeysContent)
 
   ZIndexItem     *wIndexItem=nullptr;
   zrank_type      wIndex_Rank;
-  long wi = 0;
 
   if (!isOpen())
     {
@@ -2679,7 +2673,8 @@ IMPORTANT : wEffectiveRecord must not be modified until its final setup
                                                      wZMFAddress);       // get also zmf record address
   if (wSt!=ZS_SUCCESS)
     {
-    goto zaddRaw_error;
+    _Base::_add2Phases_Rollback(wZMFZBATIndex);
+    goto zaddRaw_end;
     }
 
   // =========== update all defined Indexes ======================
@@ -2687,21 +2682,20 @@ IMPORTANT : wEffectiveRecord must not be modified until its final setup
 
   for (wIndex_Rank=0;wIndex_Rank< IndexTable.size();wIndex_Rank++)
   {
-    if (ZVerbose)
-    {
-      _DBGPRINT( "Index number <%ld>\n",wIndex_Rank)
-    }
+    if (ZVerbose & ZVB_FileEngine)
+      _DBGPRINT( "ZRawMasterFile::_addRaw  processing key rank <%ld>\n",wIndex_Rank)
+
 
     wSt=IndexTable[wIndex_Rank]->_addRawKeyValue_Prepare(wIndexItem,pKeysContent[wIndex_Rank], wZMFAddress);
     if (wSt!=ZS_SUCCESS)
       {
-      ZException.addToLast("During zadd operation on index number <%ld>",wi);
+      ZException.addToLast(" During _addRawKeyValue_Prepare operation on key rank <%ld>",wIndex_Rank);
       delete wIndexItem;
       // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
       _rollbackIndexes ( IndexItemList); // An additional error during index rollback will pushed on exception stack
       // on error reset ZMF in its original state
       _Base::_add2Phases_Rollback(wZMFZBATIndex); // do not accept update on Master File and free resources
-      goto zaddRaw_error;
+      goto zaddRaw_end;
       }
 
     IndexItemList.push(wIndexItem);            // with that key content
@@ -2725,7 +2719,7 @@ IMPORTANT : wEffectiveRecord must not be modified until its final setup
     // Nb: Exception is pushed on stack. ZException keeps the last status.
     _Base::_add2Phases_Rollback(wZMFZBATIndex);
 
-    goto zaddRaw_error;
+    goto zaddRaw_end;
   }
 
   /* Before committing Raw Master File (writting record)
@@ -2752,10 +2746,11 @@ IMPORTANT : wEffectiveRecord must not be modified until its final setup
     IndexItemList._exportAppend(wEffectiveRecord);
     ZJCB->Journal->enqueue(ZJOP_Add,wEffectiveRecord);
     }
-zaddRaw_error:
+zaddRaw_end:
 //  _Base::_unlockFile () ; // set Master file unlocked
-
   return  wSt;
+zaddRaw_error:
+  goto zaddRaw_end;
 }// _addRaw
 
 ZStatus
@@ -2938,7 +2933,7 @@ ZRawMasterFile::_removeByRankR  (ZDataBuffer &pRecord, const zrank_type pZMFRank
 
     wIndexItem = new ZIndexItem;
     wIndexItem->setBuffer(wKeys[wi]);
-    wIndexItem->ZMFaddress = wZMFAddress;
+    wIndexItem->ZMFAddress = wZMFAddress;
     wIndexItem->IndexAddress = wIndexAddresses[wi];
 
     wSt=IndexTable[wi]->_removeRByAddress_Prepare(wKeyContent,wIdxRank , wIndexAddresses[wi]);
@@ -3239,17 +3234,17 @@ ZRawMasterFile::zsearch (ZDataBuffer &pRecord,ZDataBuffer &pKeyValue,const long 
 ZStatus wSt;
 //zaddress_type wAddress;
 //long wIndexRank;
-ZIndexResult wZIR;
 ZIndexItemList  IndexItemList;      // stores keys description per index processed
 ZIndexItem      wIndexItem;
 ZDataBuffer     wRawRecord;
 
-    wSt = IndexTable[pIndexNumber]->_URFsearchUnique(pKeyValue,&wIndexItem,ZLock_Nolock);
+//    wSt = IndexTable[pIndexNumber]->_URFsearchDychoUnique(pKeyValue,wIndexItem.IndexRank,wIndexItem.IndexAddress,wIndexItem.ZMFaddress,ZLock_Nolock);
+    wSt = IndexTable[pIndexNumber]->_URFsearchUnique(pKeyValue,wIndexItem,ZLock_Nolock);
     if (wSt!=ZS_FOUND)
             { return  wSt;}
 
 
-    wSt =   zgetByAddress(wRawRecord,wZIR.ZMFAddress);
+    wSt =   zgetByAddress(wRawRecord,wIndexItem.ZMFAddress);
     if (wSt!=ZS_SUCCESS)
       return wSt;
 
@@ -3260,8 +3255,8 @@ ZDataBuffer     wRawRecord;
 ZStatus
 ZRawMasterFile::_getByKey (ZDataBuffer &pRecord, ZDataBuffer &pKeyValue, const zrank_type pKeyNumber,ZIndexItem* pOutIndexItem) {
   pOutIndexItem=new ZIndexItem;
-//  pOutIndexItem->setBuffer(pKeyValue);
-  return IndexTable[pKeyNumber]->_URFsearchUnique(pKeyValue,pOutIndexItem,ZLock_Nolock);
+//  return IndexTable[pKeyNumber]->_URFsearchDychoUnique(pKeyValue,pOutIndexItem->IndexRank,pOutIndexItem->IndexAddress,pOutIndexItem->ZMFaddress,ZLock_Nolock);
+  return IndexTable[pKeyNumber]->_URFsearchUnique(pKeyValue,*pOutIndexItem,ZLock_Nolock);
 }
 
 

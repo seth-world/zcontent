@@ -154,6 +154,7 @@ public:
     using ZRandomFile::zclearFile;
 
     using ZRandomFile::zclose;
+    using ZRandomFile::zgetWAddress;
 
 
     IndexData_st getIndexData()
@@ -322,9 +323,22 @@ public:
     ZRawMasterFile* getRawMasterFile() {return ZMFFather;}
 
 
-    ZStatus _URFsearchUnique(const ZDataBuffer &pKeyToSearch,
-                              ZIndexItem *pOutIndexItem,
+    ZStatus _URFsearchDychoUnique(const ZDataBuffer &pKeyToSearch,
+                              long &pIndexRank,
+                              zaddress_type &pIndexAddress,
+                              zaddress_type &pZMFAddress,
                               const zlockmask_type pLock=ZLock_Nolock);
+
+    ZStatus _URFtestRank( const ZDataBuffer &pKeyToSearch,
+                          const long        pIndexRank,
+                          ZIndexItem        &pIndexItem,
+                          int               &pReturn,
+                          const zlockmask_type pLock);
+
+    ZStatus _URFsearchUnique( const ZDataBuffer &pKeyToSearch,
+                              ZIndexItem &pIndexItem,
+                              const zlockmask_type pLock=ZLock_Nolock);
+
 
     ZStatus _URFsearchAll(const ZDataBuffer &pKey,
                           ZIndexCollection &pCollection,
@@ -426,73 +440,13 @@ public: utf8String toXml(int pLevel,bool pComment);
 
 public: ZStatus  fromXml(zxmlNode* pIndexNode, ZaiErrors* pErrorlog);
 
-/*
-  template <class _Tp>
-  ZStatus _addRawKeyValue(const ZDataBuffer& pZMFRecord,  zrank_type& pIndexRank, zaddress_type pZMFAddress) {
-    _Tp wClass;
-    ZStatus wSt;
-    _Tp wRecord;
-    wRecord.fromRecord(pZMFRecord);
 
-    ZIndexItem* wIndexItem = new ZIndexItem (wRecord.getKey(pIndexRank)) ;
-
-    zrank_type wIndexIdxCommit;
-
-    wClass.fromRecord(pZMFRecord);
-
-    wIndexItem->ZMFaddress=pZMFAddress;
-    wIndexItem->Operation=ZO_Push;
-
-//    wSt=_extractRawKey(pZMFRecord,wIndexItem->KeyContent);
-    if (wSt!=ZS_SUCCESS)
-    {  return  wSt;}// Beware return  is multiple instructions in debug mode
-    wSt=_addRawKeyValue_Prepare(*wIndexItem,wIndexIdxCommit,pZMFAddress);
-    if (wSt!=ZS_SUCCESS)
-    {  return  wSt;}// Beware return  is multiple instructions in debug mode
-    wSt= _addRawKeyValue_Commit(wIndexItem,wIndexIdxCommit);
-    delete wIndexItem;
-    return  wSt;
-  }
-
-*/
 private:
     long                  IndexCommitRank;
     zaddress_type         ZMFAddress;
     ZDataBuffer           CurrentKeyContent;
 };// class ZIndexFile
 
-
-/*
-class ZIndexTable :  private ZArray<ZRawIndexFile*>
-{
-  typedef ZArray<ZRawIndexFile*> ZRandomFile ;
-public:
-  ZIndexTable() {}
-  ~ZIndexTable() {}// just to call the base destructor
-  using ZRandomFile::push;
-  using ZRandomFile::size;
-  using ZRandomFile::count;
-  using ZRandomFile::last;
-  using ZRandomFile::lastIdx;
-  using ZRandomFile::newBlankElement;
-  using ZRandomFile::operator [];
-
-  long pop (void);
-  long erase (long pRank);
-  long insert(ZIndexFile* pIndexFile, long pRank);
-  void clear(void);
-
-
-  long searchIndexByName (const char* pName);
-  long searchCaseIndexByName (const char* pName);
-  long searchIndexByName (const utf8String& pName);
-  long searchCaseIndexByName (const utf8String& pName);
-
-  utf8String toXml(int pLevel,bool pComment=true);
-  ZStatus fromXml(zxmlNode* pRoot,ZaiErrors*pErrorlog);
-} ;
-
-*/
 
 
 /** @} */ // ZIndexGroup

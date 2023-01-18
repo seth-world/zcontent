@@ -193,7 +193,7 @@ ZRawRecord::getContentFromRaw(ZDataBuffer& pContent,ZDataBuffer& pRaw )
       break;
     KeyValue.push(new ZIndexItem);
     KeyValue.last()->Operation = ZO_Nothing ;
-    KeyValue.last()->ZMFaddress = 0L;
+    KeyValue.last()->ZMFAddress = 0L;
     KeyValue.last()->setData(wPtrIn,wKeySize);
     wPtrIn += wKeySize;
     wi++;

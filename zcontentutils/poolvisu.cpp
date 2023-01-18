@@ -378,6 +378,11 @@ void poolVisu::dataSetup(int pPoolid) {
     return ;
   }
 
+  if (wHe->FileType == ZFT_ZIndexFile)  /* FileType is uint8_t */
+    isIndexFile = true;
+  else
+    isIndexFile = false;
+
   size_t wOffset= size_t(reverseByteOrder_Conditional<zaddress_type>(wHe->OffsetFCB));
   wPtr += wOffset;
   const ZFCB_Export* wFCBe = (const ZFCB_Export*)(wPtr);
@@ -786,6 +791,10 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
     ContentVisu->setModal(false);
     ContentVisu->goToAddress(wAddress);
     ContentVisu->show();
+
+    if (isIndexFile) {
+      ContentVisu->setVisuIndexFile();
+    }
     return;
   }
 

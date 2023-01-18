@@ -23,7 +23,7 @@ public:
   ZIndexItem(const ZDataBuffer& pKeyValue):ZDataBuffer(pKeyValue) {}
   ZIndexItem& _copyFrom(const ZIndexItem& pIn)
   {
-    ZMFaddress=pIn.ZMFaddress;
+    ZMFAddress=pIn.ZMFAddress;
     Operation=pIn.Operation;
     IndexRank = pIn.IndexRank;
     IndexAddress = pIn.IndexAddress ;
@@ -33,7 +33,7 @@ public:
   }
   ZIndexItem& operator = (const ZIndexItem& pIn) { return _copyFrom(pIn); }
 
-  zaddress_type ZMFaddress;     //!< Master file block record address to link index key with
+  zaddress_type ZMFAddress;     //!< Master file block record address to link index key with
   zaddress_type IndexAddress;   //!< Index record address : to be stored in ZMF record
   ZOp_type      Operation;      //!< this is NOT stored on index file (see toFileKey() method) but only for history & journaling purpose
   zrank_type    IndexRank;      //!< index rank for the on going operation : set by prepare operation and used in commit rollback and hardrollback operations
@@ -41,7 +41,7 @@ public:
   void setBuffer(const ZDataBuffer& pKeyContent) ;
   void clear (void) {
     ZDataBuffer::clearData();
-    ZMFaddress=-1L;
+    ZMFAddress=-1L;
     Operation = ZO_Nothing;
     IndexAddress=-1L;
     IndexRank=0L;

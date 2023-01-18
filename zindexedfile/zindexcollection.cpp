@@ -240,7 +240,7 @@ ZIndexItem wIndexItem ;
 
     wIndexItem.fromFileKey(wIndexRecord);
     Context.ZIFLast.IndexRank = pIndexRank;
-    Context.ZIFLast.ZMFAddress = wIndexItem.ZMFaddress ;
+    Context.ZIFLast.ZMFAddress = wIndexItem.ZMFAddress ;
     pZIR=Context.ZIFLast;
     return Context.ZSt;
 }//getZIRfromZIF
