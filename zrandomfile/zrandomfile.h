@@ -86,10 +86,10 @@ enum ZBATAllocate_type: int {
 @verbatim
 OL                                                                                                         expansion direction
 !--------------------------!-----------------------------------!-----------------------------------!-------!------!---------->
- ZHeaderControlBlock       |    ZReserved                      |   ZFileControlBlock               | ZBAT  |ZFBT  | ZDBT
+ ZHeaderControlBlock       |    ZReserved                      |   ZFileControlBlock               | ZBAT  |ZFBT  | --ZDBT-- Deprecated
                            |    (used by derived classes       |     ZBAT_Offset (relative to FCB)-+ pool  |pool  | pool
      ZReserved_Offset------+     as ZMasterFile & ZIndexFile)  |     ZFBT_Offset (relative to FCB)---------+      |
-                                                               |     ZDBT_Offset (relative to FCB)----------------+
+                                                               |  Deprecated   ZDBT_Offset (relative to FCB)----------------+
      ZFCB_Offset-----------------------------------------------+
 
 @endverbatim
@@ -923,8 +923,6 @@ public:
         zrank_type pZBATRank=-1,
         const zaddress_type pBaseAddress=-1);
 
-    /* somehow same as _insert2PhasesCommit_Rollback */
-    long _deleteZBAT (const size_t pRank);
 
     ZStatus _getExtent(ZBlockDescriptor &pBlockDesc,
                        const size_t pExtentSize);     //! get a free block extension with size greater or equal to pSize (according ExtentQuotaSize)
@@ -935,28 +933,28 @@ public:
                              long pZBATRank=-1);
 
 
-
+#ifdef __DEPRECATED__
     void _cleanDeletedBlocks(ZBlockDescriptor &pBD);
-
+#endif // __DEPRECATED__
     /** @brief _freeBlock_Prepare Prepares to delete an entry of ZBAT pool. */
     void _freeBlock_Prepare (zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
     /** @brief _freeBlock_Rollback Invalidate freeBlock operation and sets the ZBAT block again to ZBS_Used */
     void _freeBlock_Rollback(zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
     /** @brief _freeBlock_Commit Deletes (Frees) definitively an entry of ZBlockAccessTable pool - updates file */
-    ZStatus _freeBlock_Commit  (zrank_type pRank, bool pKeepZBATElement=false); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
+    ZStatus _freeBlock_Commit  (zrank_type pZBATRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
 
 
     ZStatus _replace(const ZDataBuffer &pUserBuffer, const zrank_type pRank, zaddress_type &pAddress);
-    ZStatus _replaceErrored(const ZDataBuffer &pUserBuffer, const zrank_type pRank, zaddress_type &pAddress);
 
-    ZStatus _freeBlock(zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
+    /** @brief _poolDelete Moves block at rank pZBATRank from ZBAT to ZFBT. State is set to ZBS_Deleted.
+     * ZFBT is ordered upon block Addres. If pKeepZBAT is set, then ZBAT element remains available. If not, ZBAT element is removed.
+     * Returns ZFBT rank of deleted block. */
+    zrank_type _poolDelete(const zrank_type &pZBATRank) ;
 
-
-    ZStatus _grabFreeSpacePhysical(zrank_type pRank,
+    ZStatus _grabFreeSpacePhysical(zrank_type pZBATRank,
                                    ZBlockDescriptor &pBS);   // reference to aggregated block to be freed : output
 
-    ZStatus _grabFreeSpaceLogical(zrank_type pRank,
-                                  ZBlockDescriptor &pBS);   // reference to aggregated block to be freed : output
+    ZStatus _grabFreeSpaceLogical(zrank_type pZFBTRank);   // reference to aggregated block to be freed : output
 
 
     ZStatus _searchPreviousPhysicalBlock (zaddress_type pCurrentAddress,
@@ -996,14 +994,10 @@ public:
     ZStatus _markBlockAsDeleted ( zrank_type pRank);
 
 
-    ZStatus _markFreeBlockAsDeleted ( zrank_type pRank);
-    ZStatus _markDeletedBlockAsFree ( zrank_type pRank);
-    ZStatus _markFreeBlockAsUsed ( zrank_type pRank);
-
     ZStatus _recoverFreeBlock ( zrank_type pRank);
 
 
-    ZStatus _highwaterMark_Block (const zsize_type pFreeUserSize);
+    ZStatus _highwaterMark_Block (const ZBlockDescriptor &pBlock);
 
 // ------------header file  operations-----------------------
 
@@ -1104,6 +1098,9 @@ protected:
     __DISPLAYCALLBACK__(_displayCallback)=nullptr;
     __PROGRESSCALLBACK__(_progressCallBack)=nullptr;
     FILE* Output=nullptr;
+
+private:
+  bool PoolHasChanged=false;
 
 }; // ZRandomFile
 

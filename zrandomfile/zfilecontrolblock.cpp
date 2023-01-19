@@ -28,9 +28,10 @@ ZFileControlBlock& ZFileControlBlock::_copyFrom(const ZFileControlBlock& pIn)
   ZFBT_DataOffset=pIn.ZFBT_DataOffset;
   ZFBT_ExportSize=pIn.ZFBT_ExportSize;
 
+/* // Deprecated
   ZDBT_DataOffset=pIn.ZDBT_DataOffset;
   ZDBT_ExportSize=pIn.ZDBT_ExportSize;
-
+*/
   ZReserved_DataOffset=pIn.ZReserved_DataOffset;
   ZReserved_ExportSize=pIn.ZReserved_ExportSize;
 
@@ -186,9 +187,10 @@ ZFCB_Export& ZFCB_Export::set(const ZFileControlBlock& pIn)
   ZFBT_DataOffset=pIn.ZFBT_DataOffset;
   ZFBT_ExportSize=pIn.ZFBT_ExportSize;
 
+  /* // Deprecated
   ZDBT_DataOffset=pIn.ZDBT_DataOffset;
   ZDBT_ExportSize=pIn.ZDBT_ExportSize;
-
+*/
 /*  ZReserved_DataOffset=pIn.ZReserved_DataOffset;
   ZReserved_ExportSize=pIn.ZReserved_ExportSize;
 */
@@ -256,9 +258,10 @@ ZFileControlBlock& ZFCB_Export::toFCB(ZFileControlBlock& pOut)
   pOut.ZFBT_DataOffset=ZFBT_DataOffset;
   pOut.ZFBT_ExportSize=ZFBT_ExportSize;
 
+  /*// Deprecated
   pOut.ZDBT_DataOffset=ZDBT_DataOffset;
   pOut.ZDBT_ExportSize=ZDBT_ExportSize;
-
+*/
 /* pOut.ZReserved_DataOffset=ZReserved_DataOffset;
   pOut.ZReserved_ExportSize=ZReserved_ExportSize;
 */

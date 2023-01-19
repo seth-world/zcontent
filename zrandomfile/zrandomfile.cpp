@@ -253,7 +253,7 @@ offset
 |-->sizeof(ZAExport)
 |
 |
-| ZDBT flat content
+| --ZDBT flat content-- Deprecated
 |
 |
 |
@@ -1242,7 +1242,7 @@ uriString wFormerHeaderURI;
       {
       ZBAT.setAllocation(ZFCB.AllocatedBlocks);
       ZFBT.setAllocation(ZFCB.AllocatedBlocks);
-      ZDBT.setAllocation(ZFCB.AllocatedBlocks);
+//      ZDBT.setAllocation(ZFCB.AllocatedBlocks);  // Deprecated
       }
       else
       ZFCB.AllocatedBlocks = ZBAT.getAllocation();  // get the value from default actual values
@@ -1251,7 +1251,7 @@ uriString wFormerHeaderURI;
       {
       ZBAT.setQuota(ZFCB.BlockExtentQuota);
       ZFBT.setQuota(ZFCB.BlockExtentQuota);
-      ZDBT.setQuota(ZFCB.BlockExtentQuota);
+//      ZDBT.setQuota(ZFCB.BlockExtentQuota); // Deprecated
       }
       else
       ZFCB.BlockExtentQuota = ZBAT.getQuota();  // get the value from default actual values
@@ -1268,7 +1268,7 @@ uriString wFormerHeaderURI;
       }
   ZBAT.reset();       // reset number of elements to zero but keep allocation
   ZFBT.reset();
-  ZDBT.reset();
+//  ZDBT.reset(); // Deprecated
 
 
 //------------Extending file (content file) to its initial allocation-------------------
@@ -1335,7 +1335,7 @@ uriString wFormerHeaderURI;
 
     // create entry in ZFreeBlockPool with initial file size as free space
 
-     ZFBT.push(wFreeBlock);
+     ZFBT._addSorted(wFreeBlock);
 
 //--------write header----------------------
 //
@@ -1664,7 +1664,7 @@ ssize_t wSWrite;
 #endif // __COMMENT__
 
 /**
- * @brief ZRandomFile::_writeFCB writes to disk File Control Block and Pool (ZBAT, ZFBT, ZDBT)
+ * @brief ZRandomFile::_writeFCB writes to disk File Control Block and Pool (ZBAT, ZFBT, --ZDBT--// Deprecated)
  *
  * @param[out] pForceWrite  if true : will write any time. if false and file is opened in exclusive mode : will not write
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
@@ -1694,9 +1694,9 @@ ZRandomFile::_writeFCB(bool pForceWrite)
 //    ZFCB.ZFBT_ExportSize = ZFBT._getExportAllocatedSize();
     ZFCB.ZFBT_ExportSize = ZFBT.getPoolExportSize();
 
-    ZFCB.ZDBT_DataOffset = (zaddress_type)(ZFCB.ZFBT_DataOffset + ZFCB.ZFBT_ExportSize); // then ZDBT
+//    ZFCB.ZDBT_DataOffset = (zaddress_type)(ZFCB.ZFBT_DataOffset + ZFCB.ZFBT_ExportSize); // then ZDBT --DEPRECATED
 //    ZFCB.ZDBT_ExportSize = ZDBT._getExportAllocatedSize();
-    ZFCB.ZDBT_ExportSize = ZDBT.getPoolExportSize();
+ //   ZFCB.ZDBT_ExportSize = ZDBT.getPoolExportSize();// Deprecated
 
 //====================Export updated FCB and write it to file===============================
 
@@ -1705,7 +1705,7 @@ ZRandomFile::_writeFCB(bool pForceWrite)
 
     ZBAT._exportAppendPool(wZDBFCB);
     ZFBT._exportAppendPool(wZDBFCB);
-    ZDBT._exportAppendPool(wZDBFCB);
+//    ZDBT._exportAppendPool(wZDBFCB); // Deprecated
 
     if (lseek(HeaderFd,ZHeader.OffsetFCB,SEEK_SET) < 0)
                 {
@@ -1752,7 +1752,7 @@ ZRandomFile::_writeFCB(zaddress_type pOffsetFCB)
   //
   ZDataBuffer wZDBZBATExport;
   ZDataBuffer wZDBZFBTExport;
-  ZDataBuffer wZDBZDBTExport;
+//  ZDataBuffer wZDBZDBTExport; // Deprecated
   ssize_t wSWrite;
 
   //    printf("ZRandomFile::_writeFileDescriptor\n");
@@ -1771,13 +1771,12 @@ ZRandomFile::_writeFCB(zaddress_type pOffsetFCB)
  *
  *  write FCB to file
  *
- *  write ZBAT , then ZFBT, then ZDBT to file
+ *  write ZBAT , then ZFBT --, then ZDBT--// Deprecated to file
  *
  */
   ZBAT._exportAppendPool(wZDBZBATExport);
   ZFBT._exportAppendPool(wZDBZFBTExport);
-  ZDBT._exportAppendPool(wZDBZDBTExport);
-
+//  ZDBT._exportAppendPool(wZDBZDBTExport); // Deprecated
   // ==================Update FCB with offsets and sizes then export it===================================================
 
   ZFCB.ZBAT_DataOffset =  sizeof(ZFileControlBlock);  // ZBAT data Pool is stored first just after ZFCB
@@ -1792,9 +1791,9 @@ ZRandomFile::_writeFCB(zaddress_type pOffsetFCB)
   //    ZFCB.ZFBT_ExportSize = ZFBT._getExportAllocatedSize();
   ZFCB.ZFBT_ExportSize = wZDBZFBTExport.Size;
 
-  ZFCB.ZDBT_DataOffset = (zaddress_type)(ZFCB.ZFBT_DataOffset + ZFCB.ZFBT_ExportSize); // then ZDBT
+//  ZFCB.ZDBT_DataOffset = (zaddress_type)(ZFCB.ZFBT_DataOffset + ZFCB.ZFBT_ExportSize); // then ZDBT
   //    ZFCB.ZDBT_ExportSize = ZDBT._getExportAllocatedSize();
-  ZFCB.ZDBT_ExportSize = wZDBZDBTExport.Size;
+//  ZFCB.ZDBT_ExportSize = wZDBZDBTExport.Size; // Deprecated
 
   //====================Export updated FCB and write it to file===============================
 
@@ -1803,7 +1802,7 @@ ZRandomFile::_writeFCB(zaddress_type pOffsetFCB)
 
   wZDBFCB.appendData(wZDBZBATExport);
   wZDBFCB.appendData(wZDBZFBTExport);
-  wZDBFCB.appendData(wZDBZDBTExport);
+//  wZDBFCB.appendData(wZDBZDBTExport); // Deprecated
 
   if (lseek(HeaderFd,pOffsetFCB,SEEK_SET) < 0)
   {
@@ -1919,9 +1918,10 @@ ZRandomFile::_writeAllFileHeader()
   //    ZFCB.ZFBT_ExportSize = ZFBT._getExportAllocatedSize();
   ZFCB.ZFBT_ExportSize = ZFBT.getPoolExportSize();
 
-  ZFCB.ZDBT_DataOffset = (zaddress_type)(ZFCB.ZFBT_DataOffset + ZFCB.ZFBT_ExportSize); // then ZDBT
+  // Deprecated
+//  ZFCB.ZDBT_DataOffset = (zaddress_type)(ZFCB.ZFBT_DataOffset + ZFCB.ZFBT_ExportSize); // then ZDBT
   //    ZFCB.ZDBT_ExportSize = ZDBT._getExportAllocatedSize();
-  ZFCB.ZDBT_ExportSize = ZDBT.getPoolExportSize();
+//  ZFCB.ZDBT_ExportSize = ZDBT.getPoolExportSize();
 
   //====================Export updated FCB and write it to file===============================
 
@@ -1930,7 +1930,7 @@ ZRandomFile::_writeAllFileHeader()
 
   ZBAT._exportAppendPool(wZDB);  /* first block access table */
   ZFBT._exportAppendPool(wZDB);  /* second free blocks table */
-  ZDBT._exportAppendPool(wZDB);  /* third deleted blocks table */
+//  ZDBT._exportAppendPool(wZDB);  /* third deleted blocks table */ // Deprecated
 
 
   if (lseek(HeaderFd,0L,SEEK_SET) < 0)
@@ -2056,7 +2056,7 @@ ZRandomFile::_importAllFileHeader()
 
   ZBAT._importPool(wPtr);
   ZFBT._importPool(wPtr);
-  ZDBT._importPool(wPtr);
+//  ZDBT._importPool(wPtr); // Deprecated
 
   HeaderAccessed |= ZHAC_HCB | ZHAC_FCB | ZHAC_RESERVED ;
   return ZS_SUCCESS;
@@ -2487,8 +2487,9 @@ ZRandomFile::_getFileControlBlock ( bool pForceRead)
     const unsigned char* wPtr=wZDB.Data;
     ZFCB._import(wPtr);/* beware wPtr is updated by _import */
 
-    size_t wPoolSize = ZFCB.ZBAT_ExportSize + ZFCB.ZFBT_ExportSize + ZFCB.ZDBT_ExportSize;
-
+    // Deprecated
+//    size_t wPoolSize = ZFCB.ZBAT_ExportSize + ZFCB.ZFBT_ExportSize + ZFCB.ZDBT_ExportSize;
+    size_t wPoolSize = ZFCB.ZBAT_ExportSize + ZFCB.ZFBT_ExportSize ;
     ZDataBuffer wBuffer;
     wBuffer.allocateBZero( wPoolSize+1);
 /*
@@ -2537,12 +2538,12 @@ ZRandomFile::_getFileControlBlock ( bool pForceRead)
 #endif
     ZFBT._importPool(wPtr);/* beware wPtr is updated by _importPool */
 
-
+/* // Deprecated
 #ifdef __REPORT_POOLS__
   fprintf (stdout," import ZDBT pool \n");
 #endif
     ZDBT._importPool(wPtr);
-
+*/
     HeaderAccessed|=ZHAC_FCB;
     return  ZS_SUCCESS;
 }// _getFileControlBlock
@@ -2640,6 +2641,8 @@ ZRandomFile::_updateFileControlBlock ( )
   wPtr=wZDB.getData();
   ZFBT._importPool(wPtr);
 
+  /*
+  // Deprecated
   wBuffer.allocateBZero(ZFCB.ZDBT_ExportSize);
   wSRead =read(HeaderFd,wBuffer.DataChar,ZFCB.ZDBT_ExportSize);
   //    if ((wSRead<64)||(wSRead !=ZFCB.ZDBT_ExportSize))
@@ -2658,6 +2661,7 @@ ZRandomFile::_updateFileControlBlock ( )
   }
   wPtr=wZDB.getData();
   ZDBT._importPool(wPtr);
+*/
   return  ZS_SUCCESS;
 }// _getFileDescriptor
 
@@ -2781,6 +2785,7 @@ ZStatus wSt;
 }//zopen
 
 /** @cond Development */
+#ifdef __DEPRECATED__
 /**
  * @brief _cleanDeletedBlocks Deletes blocks in free blocks pool that are included in the area covered by block pBD.
  *  @note When a free block is allocated to ZBAT all deleted blocks within it are no more recoverable.
@@ -2811,7 +2816,7 @@ ZRandomFile::_cleanDeletedBlocks(ZBlockDescriptor &pBD)
     } // while
     return;
 } // _cleanDeletedBlocks
-
+#endif // #ifdef __DEPRECATED__
 /**
  * @brief ZRandomFile::_allocateFreeBlock
  * --------------------------------------------------------------
@@ -2895,7 +2900,7 @@ zrank_type wZBATRank=pZBATRank;
       /* send former block to deleted pool */
       ZBAT[pZBATRank].State |= ZBS_Deleted;
       /* free block without removing its position in ZBAT pool (pReplace set to true) */
-      if ((wSt=_freeBlock_Commit(pZBATRank,true))!=ZS_SUCCESS)
+      if ((wSt=_freeBlock_Commit(pZBATRank))!=ZS_SUCCESS)
         return wSt;
       /* replace block data at pZBATRank with allocated block data */
       ZBAT[pZBATRank]=wBD;
@@ -2918,14 +2923,11 @@ zrank_type wZBATRank=pZBATRank;
 
 
 
-    if (wRemainingSize==0)                      // sizes are equal : reuse this Free Table Entry as it is and transfer it to ZBAT
-            {
-              ZFBT.erase(pZFBTRank);      // just suppress ZFBT entry : it is transferred to ZBAT
-
-              _cleanDeletedBlocks(wBD);     // remove deleted block included in free block from Recovery Pool
-
-              return  (wZBATRank);              // return ZBAT entry index created or reused
-            } // wS==0 : sizes are equal
+    if (wRemainingSize==0)  {  // sizes are equal : reuse this Free Table Entry as it is and transfer it to ZBAT
+      ZFBT.erase(pZFBTRank);      // just suppress ZFBT entry : it is transferred to ZBAT
+//      _cleanDeletedBlocks(wBD);     // remove deleted block included in free block from Recovery Pool
+      return  (wZBATRank);              // return ZBAT entry index created or reused
+    } // wS==0 : sizes are equal
 
 
 // otherwise :
@@ -2954,8 +2956,7 @@ zrank_type wZBATRank=pZBATRank;
      if (wRemainingSize > sizeof(ZBlockHeader_Export)) // if and only if remaining space can contain more than a block header (otherwise leave as hole)
             {
             // must create a new free block entry in memory(ZBlockHeader) and on file (ZBlockHeader_Export)
-
-            ZFBT.push(wRemainingFreeBlock) ;
+            ZFBT._addSorted(wRemainingFreeBlock);
 
 //      need to write block header here at new address : export is made within _writeBlockHeader
 
@@ -2968,7 +2969,7 @@ zrank_type wZBATRank=pZBATRank;
                           wRemainingFreeBlock.BlockSize,
                           wRemainingFreeBlock.Address,
                           ZFBT.lastIdx()
-                          );
+                          )
             } // wRemainingSize > sizeof(ZBlockHeader_Export)
      // debug
      //
@@ -2983,7 +2984,7 @@ zrank_type wZBATRank=pZBATRank;
 
     // end debug
 
-    _cleanDeletedBlocks(wBD);     //! remove deleted block included in free block from Recovery Pool
+//    _cleanDeletedBlocks(wBD);     //! remove deleted block included in free block from Recovery Pool
 
 // need to update file control block too : take account of modified pools
  //    if ( _writeFileDescriptor(pDescriptor)!=ZS_SUCCESS)   // File descriptor will be written once commit has been done
@@ -3356,144 +3357,39 @@ ZRandomFile::_freeBlock_Rollback (zrank_type pRank )
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZRandomFile::_freeBlock_Commit(zrank_type pRank, bool pKeepZBATElement) {
+ZRandomFile::_freeBlock_Commit(zrank_type pZBATRank) {
 ZStatus wSt;
 ZBlockDescriptor wBS;
 
-    wBS   = ZBAT.Tab[pRank];
+    zrank_type wZFBTRank= _poolDelete(pZBATRank);
+
+    ZBAT.erase(pZBATRank);
 
     if (ZFCB.GrabFreeSpace) {
-      if ((wSt=_grabFreeSpaceLogical(pRank,wBS))!=ZS_SUCCESS)
-        return wSt;
+      wSt=_grabFreeSpaceLogical(wZFBTRank);
     }
-
-    /* mark block on disk as free */
-    wBS.State       =  ZBS_Deleted;
-    wSt=_writeBlockHeader((ZBlockHeader&)wBS,wBS.Address);
+    else {
+      /* simply update block on disk */
+      wSt=_writeBlockHeader((ZBlockHeader&)ZFBT[wZFBTRank],ZFBT[wZFBTRank].Address);
+    }
     if (wSt!=ZS_SUCCESS)
-                return wSt;
+      return wSt;
 
+    if (ZFCB.HighwaterMarking) {     // if highwatermarking then set user content file region to binary zero
+       wSt=_highwaterMark_Block(ZFBT[wZFBTRank]);
+      if (wSt!=ZS_SUCCESS) {
+        return wSt;
+      }
 
-    if (ZFCB.HighwaterMarking)      // if highwatermarking then set user content file region to binary zero
-            {
-            wSt=_highwaterMark_Block(wBS.BlockSize-sizeof(ZBlockHeader_Export));
-            if (wSt!=ZS_SUCCESS)
-                        {
-                        return wSt;
-                        }
-
-            } // if Highwater
-
-    ZFBT.push(wBS);     // create entry into free blocks pool
-    ZDBT.push(wBS);     // create entry into deleted pool
+    } // if Highwater
 
     ZFCB.UsedSize -= wBS.BlockSize ;
 
-    if (!pKeepZBATElement) {
-      ZBAT.erase(pRank);  // remove entry from ZBAT
-      return(_writeFCB(true));
-    }
     return ZS_SUCCESS;
 }//_freeBlock_commit
 
 /**
- * @brief ZRandomFile::_freeBlock former freeblock routine
- * @param[in] pDescriptor File descriptor
- * @param[in] pRank ZBAT rank to be freed (record rank)
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
-ZStatus
-ZRandomFile::_freeBlock(zrank_type pRank)
-{
-
-ZStatus wSt;
-ZBlockDescriptor wBS;
-ZBlockDescriptor_Export wBS_Exp;
-
-    wBS   = ZBAT.Tab[pRank];
-//    wBS.State       = ZBS_BeingDeleted;
-    wBS.State       = ZBS_Deleted;
-//    wBS.Lock        = ZLock_All;
-//    wBS.LockReason  = ZReason_Delete ;
-    wBS.Pid         = Pid;      // warning get the current pid
-
-    if (ZFCB.GrabFreeSpace)
-            {
-            if ((wSt=_grabFreeSpaceLogical(pRank,wBS))!=ZS_SUCCESS)
-                { return  wSt;}
-
-            }
-
-
-//    ZFCB.ZBATNbEntries --;
-
-    ZBlock wBlock;
-    wBlock.clear();
-
-    wBlock.allocate(wBS.BlockSize-sizeof(ZBlockHeader_Export));
-    wBlock.resetData();
-    wBlock.State=ZBS_Deleted;
-    wBlock.BlockSize = wBS.BlockSize;
-//    wBlock.BlockId =ZBID_Nothing;
-
-    wSt=_writeBlockHeader((ZBlockHeader&)wBlock,wBS.Address);
-    if (wSt!=ZS_SUCCESS)
-                { return  wSt;}
-
-
-    if (ZFCB.HighwaterMarking) {     // if highwatermarking then set the file region to zero
-            ZPMS.HighWaterWrites ++;
-
-            ssize_t wSWrite=write (ContentFd,wBlock.DataChar(), wBlock.DataSize());
-            if (wSWrite<0)
-                        {
-                        ZException.getErrno(errno,
-                                         _GET_FUNCTION_NAME_,
-                                         ZS_WRITEERROR,
-                                         Severity_Severe,
-                                         "Severe Error while high water marking freed block for file %s at address %lld",
-                                         URIContent.toString(),
-                                         getPhysicalPosition());
-                        return  (ZS_WRITEERROR);
-                        }
-
-            ZPMS.HighWaterBytesSize += wSWrite;
-            if (wSWrite!=wBlock.DataSize())
-                        {
-                        ZException.getErrno(errno,
-                                         _GET_FUNCTION_NAME_,
-                                         ZS_WRITEPARTIAL,
-                                         Severity_Error,
-                                         "Error: data partially written to file while high water marking freed block for file %s at address %lld requested %ld written %ld",
-                                         URIContent.toString(),
-                                         getPhysicalPosition(),
-                                         wBlock.DataSize(),
-                                         wSWrite);
-                        return  (ZS_WRITEPARTIAL);
-                        }
- //           incrementPosition( wSWrite );
-
-            fdatasync(ContentFd); // better than flush : writes only data and not metadata to file
-    } // if Highwater
-
-    wBS.State = ZBS_Free;
-    ZFBT.push(wBS);      // create entry into ZFBT for freed Block
-    ZBAT.erase(pRank);  // remove entry from ZBAT
-
-    ZFCB.UsedSize -= wBS.BlockSize ;
-
-// current index and positions are invalid after removing of the block from ZBAT
-
-    CurrentRank = -1;
-    LogicalPosition = -1;
-    PhysicalPosition = -1;
-
-    return (_writeFCB(true));
-}//_freeBlock
-
-
-/**
- * @brief ZRandomFile::_grabFreeSpace collects free space adjacent to block given by its rank pIndex
+ * @brief ZRandomFile::_grabFreeSpace collects free space adjacent to block given by its rank pRank
  *
  * For a block to be freed given by pIndex pointing to a block in pZBAT,
  * _grabFreeSpace identifies and collects adjacent free space and/or holes,
@@ -3507,13 +3403,13 @@ ZBlockDescriptor_Export wBS_Exp;
  *
  *
  * @param[in] pDescriptor File descriptor
- * @param[in] pIndex ZBAT index to be freed (record rank)
+ * @param[in] pZBATRank ZBAT index to be freed (record rank)
  * @param[out] pBS   free block to be returned as a ZBlockDescriptor with all space and aggregated free blocks found
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 
 ZStatus
-ZRandomFile::_grabFreeSpacePhysical(zrank_type pRank,
+ZRandomFile::_grabFreeSpacePhysical(zrank_type pZBATRank,
                                     ZBlockDescriptor &pBS)
 {
 
@@ -3522,11 +3418,11 @@ zaddress_type wStartFreeBlockAddress ;
 
 zsize_type wSizeFreeSpace;
 
-    pBS.Address     = ZBAT.Tab[pRank].Address;
-    pBS.BlockSize   = ZBAT.Tab[pRank].BlockSize;
+    pBS.Address     = ZBAT.Tab[pZBATRank].Address;
+    pBS.BlockSize   = ZBAT.Tab[pZBATRank].BlockSize;
 
-    wStartFreeBlockAddress = ZBAT.Tab[pRank].Address;
-    wSizeFreeSpace =  ZBAT.Tab[pRank].BlockSize;
+    wStartFreeBlockAddress = ZBAT.Tab[pZBATRank].Address;
+    wSizeFreeSpace =  ZBAT.Tab[pZBATRank].BlockSize;
 
     //-----------Gather free blocks and grab holes---------------
     // search for adjacent free blocks and holes that might be agregated to the one to be freed
@@ -3553,64 +3449,51 @@ ZBlockHeader wPreviousBlockHeader;
 zaddress_type wPreviousAddress;
 
 
+    wStartFreeBlockAddress = ZBAT.Tab[pZBATRank].Address;
 
-    wStartFreeBlockAddress = ZBAT.Tab[pRank].Address;
+    wSt=_searchPreviousPhysicalBlock(ZBAT.Tab[pZBATRank].Address,wPreviousAddress,wPreviousBlockHeader);
 
-    wSt=_searchPreviousPhysicalBlock(ZBAT.Tab[pRank].Address,wPreviousAddress,wPreviousBlockHeader);
+    while (true) {
 
-    if (wSt==ZS_OUTBOUNDLOW)
-      // just get from Start of Data - returned by _searchPreviousBlock
-            wStartFreeBlockAddress = wPreviousAddress ;
-    else {
-       // if previous block is available : Keep Address of previous block to group with current block
-      if (wPreviousBlockHeader.State & (ZBS_Free | ZBS_Deleted) )
-                                                // Address is : address of reading + wOffset1
-                                                // Additional Length has to be computed
-                                                // Think to erase current block header
-      {
-        wStartFreeBlockAddress=wPreviousAddress;            // grab this space !
-        if(ZVerbose & ZVB_MemEngine)
+      if (wSt==ZS_OUTBOUNDLOW) { /* no block found : try to check if there is a hole */
+        wStartFreeBlockAddress = wPreviousAddress = ZFCB.StartOfData;
+        break;
+      }
+      if (!(wPreviousBlockHeader.State & (ZBS_Free | ZBS_Deleted)) ) {
+        wStartFreeBlockAddress = wPreviousAddress + wPreviousBlockHeader.BlockSize + 1;
+        break;
+      }
+      /* here previous block header has a state either free or deleted */
+
+       wStartFreeBlockAddress=wPreviousAddress;            // grab this space !
+       if(ZVerbose & ZVB_MemEngine)
             _DBGPRINT("Grabbing previous free block : address %ld size %ld\n",
                       wPreviousAddress,
                       wPreviousBlockHeader.BlockSize)
 
-// get free block in ZFBT free block pool and suppress it
-
+// search by address free block in ZFBT free block pool and suppress it
         long wi;
-        for (wi=0;wi<ZFBT.size();wi++) {
-          if (ZFBT.Tab[wi].Address == wPreviousAddress) {
+        for (wi=0;wi < ZFBT.size();wi++) {
+          if (ZFBT[wi].Address == wPreviousAddress) {
             ZFBT.erase(wi);  // suppress this block from free block pool
             break;
           }
         }// for
         /* if block to aggregate was a deleted block : remove it from deleted blocks pool */
-        if (wPreviousBlockHeader.State & ZBS_Deleted ){
-          for (wi=0;wi<ZDBT.size();wi++) {
-            if (ZDBT.Tab[wi].Address == wPreviousAddress) {
-                ZDBT.erase(wi);  // suppress this block from free block pool
-                break;
-              }
-          }// for
-        } //  if (wPreviousBlockHeader.State & ZBS_Deleted )
-      } // if (wPreviousBlockHeader.State & (ZBS_Free | ZBS_Deleted) )
-
-    else {
+        break;
+    } // while true
 
 // previous physical block in file is Not ZBS_Free,
 // so we must test wether there is a hole between previous block and freed block
 //  previous block start address + blockSize + 1 < freed block start address : there is a hole
 
-      zaddress_type wHoleAddress = (zaddress_type) wPreviousAddress+ wPreviousBlockHeader.BlockSize + 1;
-      if (wHoleAddress < ZBAT.Tab[pRank].Address)   {   // yes there is a hole there
-                                                                    // hole starts at wHoleAddress : grab it !
-        wStartFreeBlockAddress = wHoleAddress;  // grab hole address (between previous used block and current address)
+      if (wStartFreeBlockAddress < ZBAT.Tab[pZBATRank].Address)   {   // yes there is a hole there
         if(ZVerbose & ZVB_MemEngine)
-          _DBGPRINT("Grabbing hole : address %ld\n", wHoleAddress)
-                        }
+          _DBGPRINT("Grabbing previous hole and/or block from address %ld\n", wStartFreeBlockAddress)
+      }
         // else no Hole no Previous Free block : use current block address - as initialized
-      } // if (wHoleAddress < ZBAT.Tab[pRank].Address)
+//      } // if (wHoleAddress < ZBAT.Tab[pRank].Address)
 
-    }  // else wSt==ZS_OUTBOUNDLOW
 
 
 // ---------let's investigate for NEXT BLOCK to get the size ---------------
@@ -3622,8 +3505,7 @@ zaddress_type wPreviousAddress;
     zaddress_type wNextAddress;
     zaddress_type wEndingAddress;
 
-    zaddress_type wStartAddress = ZBAT.Tab[pRank].Address + ZBAT.Tab[pRank].BlockSize;  // the byte after block to search next
-
+    zaddress_type wStartAddress = ZBAT.Tab[pZBATRank].Address + ZBAT.Tab[pZBATRank].BlockSize;  // the byte after block to search next
 
     wSt= _searchNextPhysicalBlock(wStartAddress,wNextAddress,wNextBlockHeader);
     if (wSt<0)
@@ -3631,39 +3513,46 @@ zaddress_type wPreviousAddress;
     wEndingAddress = wNextAddress;
     if (wSt==ZS_FOUND)
       // if next block is free : grab its space and remove this block from freeblock pool
-      if (wNextBlockHeader.State & (ZBS_Free & ZBS_Deleted) )
-                        {
-                        wEndingAddress = wNextAddress + wNextBlockHeader.BlockSize ;
-                        long wi;
-                        for (wi=0;wi<ZFBT.size();wi++)
-                                        if (ZFBT.Tab[wi].Address == wNextAddress)
-                                                        {
-                                                        ZFBT.erase(wi);  // suppress this block from free block pool
-                                                        break;
-                                                        }
-                        }
+      if (wNextBlockHeader.State & (ZBS_Free & ZBS_Deleted) ) {
+        if(ZVerbose & ZVB_MemEngine)
+          _DBGPRINT("Grabbing next free block from address %ld size %ld\n",
+              wNextAddress,wNextBlockHeader.BlockSize)
+
+            wEndingAddress = wNextAddress + wNextBlockHeader.BlockSize ;
+            long wi;
+            for (wi=0;wi<ZFBT.size();wi++)
+              if (ZFBT.Tab[wi].Address == wNextAddress) {
+                ZFBT.erase(wi);  // suppress this block from free block pool
+                break;
+              }
+      }
 
 
     wSizeFreeSpace = (zaddress_type)  (wEndingAddress  - wStartFreeBlockAddress);
 
-    pBS.Address     = wStartFreeBlockAddress;
-    pBS.BlockSize   = wSizeFreeSpace;
+
+
+    ZBAT.Tab[pZBATRank].Address     = wStartFreeBlockAddress;
+    ZBAT.Tab[pZBATRank].BlockSize   = wSizeFreeSpace;
+
+    if(ZVerbose & ZVB_MemEngine)
+      _DBGPRINT("Final block for ZBAT rank %ld is address %ld size %ld\n",
+          ZBAT.Tab[pZBATRank].Address ,ZBAT.Tab[pZBATRank].BlockSize)
 
 //------End Gather free blocks and grab holes-----------------
 
-    if (pBS.Address!=ZBAT.Tab[pRank].Address)
-                        {
-                        ZBAT.Tab[pRank].State = ZBS_Deleted;
-                        ZDBT.push(ZBAT.Tab[pRank]);
-                        return (_markBlockAsDeleted (pRank));
-                        }
-    return ZS_SUCCESS;
+  return ZS_SUCCESS;
+
 }// _grabFreeSpacePhysical
 
 
 
 /**
- * @brief ZRandomFile::_grabFreeSpaceLogical collects free blocks and holes adjacent to the block in ZBAT given by its rank and creates a new consolidated block
+ * @brief ZRandomFile::_grabFreeSpaceLogical Takes a free block from free block pool
+ * and aggregates it with leading or trailing free block or deleted block space.
+ * Free block is modified accordingly.
+ *
+ * Collects free blocks and holes adjacent to the block in ZFBT given by its rank and creates a new consolidated block
  *
  *      for a block to be freed given by pIndex pointing to a block in pZBAT,
  *      _grabFreeSpace identifies and collects adjacent free space and/or holes,
@@ -3680,20 +3569,18 @@ zaddress_type wPreviousAddress;
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZRandomFile::_grabFreeSpaceLogical (zrank_type pRank,       // ZBAT index to be freed
-                                   ZBlockDescriptor &pBS)   // free block to be returned
+ZRandomFile::_grabFreeSpaceLogical (zrank_type pZFBTRank)
 {
 ZStatus wSt;
 zaddress_type wStartFreeBlockAddress ;
-long wgrab;
-
 zsize_type wSizeFreeSpace;
+long wgrab;
+ZBlockDescriptor wBS;
 
-    pBS     = ZBAT.Tab[pRank];
+    wBS  = ZFBT[pZFBTRank];
 
-    wStartFreeBlockAddress = ZBAT.Tab[pRank].Address;
-    wSizeFreeSpace =  ZBAT.Tab[pRank].BlockSize;
-
+    wStartFreeBlockAddress = ZFBT[pZFBTRank].Address;
+    wSizeFreeSpace =  ZFBT[pZFBTRank].BlockSize;
 
 /* Grab before */
 
@@ -3704,19 +3591,12 @@ zsize_type wSizeFreeSpace;
         if (wStartFreeBlockAddress == (ZFBT.Tab[wgrab].Address+ZFBT.Tab[wgrab].BlockSize)) {
           // if block is not free or deleted (meaning allocated) in the pool : cannot grab it
           if (!(ZFBT.Tab[wgrab].State & (ZBS_Free | ZBS_Deleted))) {
-//          if ((ZFBT.Tab[wgrab].State != ZBS_Free) && (ZFBT.Tab[wgrab].State != ZBS_Deleted))  {
-            if(ZVerbose & ZVB_MemEngine) {
-              _DBGPRINT("ZRandomFile::_grabFreeSpaceLogical Found block to grab but it is allocated : address %ld size %ld - state %s .\n",
-                  ZFBT.Tab[wgrab].Address,
-                  ZFBT.Tab[wgrab].BlockSize,
-                  decode_ZBS( ZFBT.Tab[wgrab].State))
-            }// __ZRFVERBOSE
             break ;
           } //  State != ZBS_Free
 
-        pBS = ZFBT.Tab[wgrab];
+        wBS = ZFBT.Tab[wgrab];
         wSizeFreeSpace += ZFBT.Tab[wgrab].BlockSize ;
-        pBS.BlockSize = wSizeFreeSpace ;
+        wBS.BlockSize = wSizeFreeSpace ;
 
         if(ZVerbose & ZVB_MemEngine) {
           _DBGPRINT("ZRandomFile::_grabFreeSpaceLogical  Grabbing previous free block : address %ld size %ld\n",
@@ -3724,16 +3604,14 @@ zsize_type wSizeFreeSpace;
         }
 
         // mark ZTAB block header as deleted on file (new active header is ZFBT one)
-
-        ZBAT.Tab[pRank].State |= ZBS_Deleted ;
-        if ((wSt=_markBlockAsDeleted(pRank))!=ZS_SUCCESS) {
+        ZFBT[wgrab].State = ZBS_Deleted;
+        wSt=_writeBlockHeader((ZBlockHeader&) ZFBT[wgrab],ZFBT[wgrab].Address);
+        if (wSt!=ZS_SUCCESS) {
           return wSt;
         }
-        ZDBT.push(ZBAT.Tab[pRank]); // add entry into deleted blocks : it will no more be the blockheader
-
         ZFBT.erase(wgrab);  // suppress this block from free block pool
         break;
-                            }
+        }
       }// for
 
     }// if (wStartFreeBlockAddress > ZFCB.StartOfData)
@@ -3746,45 +3624,52 @@ zsize_type wSizeFreeSpace;
 
   // compute theorical beginning address of following block
 
- zaddress_type wEndAddress = ZBAT.Tab[pRank].Address + ZBAT.Tab[pRank].BlockSize;
+ zaddress_type wEndAddress = ZFBT.Tab[pZFBTRank].Address + ZFBT.Tab[pZFBTRank].BlockSize;
  if (wEndAddress != ZFCB.AllocatedSize) {
-
-   for (wgrab=0; wgrab<ZFBT.size();wgrab++) {
+   for (wgrab=0; wgrab < ZFBT.size() ;wgrab++) {
+     if (wgrab==pZFBTRank)
+       continue;
      if (wEndAddress == (ZFBT.Tab[wgrab].Address)) {
 
        // if block is not free or deleted (meaning allocated) in the pool : cannot grab it
-       if ((ZFBT.Tab[wgrab].State != ZBS_Free) && (ZFBT.Tab[wgrab].State != ZBS_Deleted))  {
+       if ((ZFBT[wgrab].State != ZBS_Free) && (ZFBT[wgrab].State != ZBS_Deleted))  {
           if(ZVerbose & ZVB_MemEngine) {
            _DBGPRINT("ZRandomFile::_grabFreeSpaceLogical  Found block to grab but it is locked : address %ld size %ld - sate %s locked mask %uc reason %s \n",
                           ZFBT.Tab[wgrab].Address,
                           ZFBT.Tab[wgrab].BlockSize,
                           decode_ZBS( ZFBT.Tab[wgrab].State) )
           } //_ZRFVERBOSE
-
         break ;
        }//  if (ZFBT.Tab[wgrab].State != ZBS_Free)
 
-       wEndAddress = ZFBT.Tab[wgrab].Address + ZFBT.Tab[wgrab].BlockSize;
+       wEndAddress = ZFBT[wgrab].Address + ZFBT[wgrab].BlockSize;
 
        if(ZVerbose & ZVB_MemEngine)
-          _DBGPRINT("ZRandomFile::_grabFreeSpaceLogical Grabbing following free block : address %ld size %ld\n",
-                                   ZFBT.Tab[wgrab].Address,
-                                   ZFBT.Tab[wgrab].BlockSize)
+          _DBGPRINT("ZRandomFile::_grabFreeSpaceLogical Grabbing following free block : rank %ld address %ld size %ld\n",
+             wgrab,
+             ZFBT[wgrab].Address,
+             ZFBT[wgrab].BlockSize)
 
         // mark grabbed following free ZFBT block as deleted (grabbed to current)
-
-        if ((wSt=_markFreeBlockAsDeleted(wgrab))!=ZS_SUCCESS)
+       ZFBT[wgrab].State=ZBS_Deleted;
+       wSt=_writeBlockHeader( (ZBlockHeader&) ZFBT[wgrab], ZFBT[wgrab].Address);
+       if (wSt!=ZS_SUCCESS)
           return wSt;
-        ZFBT.Tab[wgrab].State = ZBS_Deleted;
-        ZDBT.push(ZFBT.Tab[wgrab]);  //! add entry into deleted blocks
-        ZFBT.erase(wgrab);                        //! suppress ZFBT block from free block pool
+        ZFBT.erase(wgrab); //! suppress ZFBT block from free block pool
         break;
       }// if (wEndAddress == (ZFBT.Tab[wgrab].Address))if
     } // for (wgrab=0; wgrab<ZFBT.size();wgrab++)
 
-    pBS.BlockSize = wEndAddress - pBS.Address;
   }//    if (wEndAddress != ZFCB.AllocatedSize)
-  return ZS_SUCCESS;
+
+  wBS.BlockSize = wEndAddress - wBS.Address;
+  ZFBT[pZFBTRank] = wBS;
+
+/* see wether it is necessary to set ZFBT[pZFBTRank].State to ZBS_Free */
+  ZFBT[pZFBTRank].State = ZBS_Free ;
+ /* update block header with new data */
+
+ return _writeBlockHeader( (ZBlockHeader&) ZFBT[pZFBTRank], ZFBT[pZFBTRank].Address);
 }// _grabFreeSpaceLogical
 
 
@@ -3813,74 +3698,6 @@ ZRandomFile::_markBlockAsDeleted (zrank_type pRank)
 }//_markBlockAsDeleted
 
 /**
- * @brief ZRandomFile::_markFreeBlockAsDeleted Marks a free block from ZFBT as deleted on disk and moves it to deleted pool
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
-
-ZStatus
-ZRandomFile::_markFreeBlockAsDeleted (zrank_type pRank)
-{
-    if(ZVerbose & ZVB_MemEngine)
-        _DBGPRINT("ZRandomFile::_markFreeBlockAsDeleted  Marking block from Free Pool as ZBS_Deleted address %ld size %ld\n",
-                  ZFBT.Tab[pRank].Address,
-                  ZFBT.Tab[pRank].BlockSize)
-
-    ZFBT.Tab[pRank].State = ZBS_Deleted;
-    ZDBT.push(ZFBT.Tab[pRank]);  // move the block header to deleted pool
-    return _writeBlockHeader(
-                             (ZBlockHeader&) ZFBT.Tab[pRank],
-                             ZFBT.Tab[pRank].Address);
-
-}//_markBlockAsDeleted
-/**
- * @brief ZRandomFile::_markDeletedBlockAsFree marks a deleted block header from deleted pool as free to disk
- * It does not modify free blocks pool.
- *
- * @param pDescriptor
- * @param pAddress
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
-
-ZStatus
-ZRandomFile::_markDeletedBlockAsFree (zrank_type pRank)
-{
-    if(ZVerbose & ZVB_MemEngine)
-        _DBGPRINT("Marking deleted block from Recovery Pool as ZBS_Free address %ld size %ld\n",
-                  ZDBT.Tab[pRank].Address,
-                  ZDBT.Tab[pRank].BlockSize)
-
-    ZDBT.Tab[pRank].State = ZBS_Free;
-
-    return _writeBlockHeader((ZBlockHeader&) ZDBT.Tab[pRank],
-                             ZDBT.Tab[pRank].Address);
-
-}//_markDeletedBlockAsFree
-
-/**
- * @brief ZRandomFile::_markFreeBlockAsUsed gets a block header at given address pAddress sets its State flag to ZBS_Used and write it to disk
- *
- * @param pDescriptor
- * @param pAddress
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
-
-ZStatus
-ZRandomFile::_markFreeBlockAsUsed (zrank_type pRank)
-{
-    if(ZVerbose & ZVB_MemEngine)
-        _DBGPRINT("Marking block from Free Pool as ZBS_Used address %ld size %ld\n",
-                  ZFBT.Tab[pRank].Address,
-                  ZFBT.Tab[pRank].BlockSize);
-
-    ZFBT.Tab[pRank].State = ZBS_Used;
-    return _writeBlockHeader(
-                             (ZBlockHeader&) ZFBT.Tab[pRank],
-                             ZFBT.Tab[pRank].Address);
-
-}//_markFreeBlockAsUsed
-
-
-/**
  * @brief ZRandomFile::_recoverFreeBlock
  *      recover a Free Block to Block Access Table (ZBAT)
  *      after having previously ungrabbed possible deleted blocks from Recovery Pool (ZDBT)
@@ -3899,7 +3716,7 @@ ZStatus wSt;
     if(ZVerbose & ZVB_MemEngine)
             _DBGPRINT("Recovering Free block from Free block Pool  address %ld size %ld\n",
                       ZFBT.Tab[pRank].Address,
-                      ZFBT.Tab[pRank].BlockSize);
+                      ZFBT.Tab[pRank].BlockSize)
 
 // ungrab free block---------------------------------------------------------------------------------
 //     search for any deleted block (grabbed blocks) inside free block  (from Deleted Block Pool)
@@ -3910,38 +3727,7 @@ ZStatus wSt;
     zaddress_type wAddMax = ZFBT.Tab[pRank].Address + ZFBT.Tab[pRank].BlockSize;
 
     long widx = 0;
-    ZArray <long> wB;
-    while (widx < ZDBT.size())
-    {
-        wAddMin = ZFBT.Tab[pRank].Address;
-        wAddMax = ZFBT.Tab[pRank].Address + ZFBT.Tab[pRank].BlockSize;
-        if ((ZDBT.Tab[widx].Address > wAddMin)&&(ZDBT.Tab[widx].Address < wAddMax)) // it belongs to this free block
-                    {
-                    wB.push(widx);
-                    }
-        widx ++;
-    }// while
 
-    if (!wB.isEmpty())
-            {
-            zaddress_type wAddM1 = wAddMax;
-            long wIdxMin = 0;
-            for (long wi = 0 ; wi < wB.size();wi++)
-                    {
-                        if (ZDBT.Tab[wB[wi]].Address<wAddM1)
-                                    {
-                                    wAddM1 = ZDBT.Tab[wB[wi]].Address;
-                                    wIdxMin = wB[wi];
-                                    }
-                    }
-            //! compute the former size of the block before it has been agglomerated by grabbing process
-            //!
-            ZFBT.Tab[pRank].BlockSize = ZDBT.Tab[wIdxMin].Address-ZFBT.Tab[pRank].Address ;
-            ZDBT.Tab[wIdxMin].State = ZBS_Free;
-            ZFBT.push(ZDBT.Tab[wIdxMin]); //! set the ungrabbed block to Free Pool as new free block
-            _markDeletedBlockAsFree(wIdxMin);
-            ZDBT.erase(wIdxMin);                       //! then remove it from recovery pool
-            }
 
 //  then   move free block from Free Pool to Block Access Table
 //         mark it as ZBS_Used on file surface
@@ -3949,8 +3735,8 @@ ZStatus wSt;
 //
     ZFBT.Tab[pRank].State = ZBS_Used;
     ZBAT.push(ZFBT.Tab[pRank]);
-    if ((wSt=_markFreeBlockAsUsed(pRank))!=ZS_SUCCESS)
-                            return wSt;
+    wSt = _writeBlockHeader( (ZBlockHeader&) ZFBT.Tab[pRank], ZFBT.Tab[pRank].Address);
+
     ZFBT.erase(pRank);
 
     return _writeFCB(true) ;
@@ -4218,6 +4004,7 @@ ZDataBuffer     wBuffer;
                  { return (wSt); }
     return  (ZS_FOUND) ;
 }//_searchNextPhysicalBlock
+
 #ifdef __DEPRECATED__
 
 /** ========== DEPRECATED - NO MORE USED =============
@@ -4605,7 +4392,7 @@ ZRandomFile::_getFreeBlockEngine (const size_t pRequestedSize, const zaddress_ty
     if (ZFBT.Tab[wi].Address <= pBaseAddress)  // must match base address condition
       continue;
 
-    // if block is not free or deleted (meaning it is allocated) in the pool : skip it
+    // if block is not free or deleted (meaning it is allocated) in free block pool : skip it
     if ((ZFBT.Tab[wi].State != ZBS_Free) && (ZFBT.Tab[wi].State != ZBS_Deleted))
       continue;
 
@@ -4641,8 +4428,12 @@ ZRandomFile::_getFreeBlockEngine (const size_t pRequestedSize, const zaddress_ty
   ZBlockDescriptor wBlockMan;
   ZStatus wSt;
 
+
   zaddress_type wLastFileOffset;
   zsize_type   wNeededExtent = pRequestedSize;
+
+
+  PoolHasChanged=true;
 
    // position to end of file and get position in return
   if ((wLastFileOffset=(zaddress_type)lseek(ContentFd,0L,SEEK_END))<0)  {
@@ -4691,7 +4482,7 @@ ZRandomFile::_getFreeBlockEngine (const size_t pRequestedSize, const zaddress_ty
   /* create a ZFBT entry for this space using returned ZBlockDescriptor (wBlockMan) */
 
     wBlockMan.State = ZBS_Free;
-    ZFBT.push(wBlockMan);
+    ZFBT._addSorted(wBlockMan);
 
   /* then take what space is appropriate :
    * IMPORTANT REMARK : checkSplitFreeBlock() split free space appropriately, and creates block headers on file, */
@@ -4730,49 +4521,9 @@ ZRandomFile::_getFreeBlockEngine (const size_t pRequestedSize, const zaddress_ty
 
 //  return  (wZBATIndex);  // if OK : return index of free block allocated to ZBAT : either lastIdx() or the result of inserted block index
 
-  ZFBT.push(wBlock);
+  ZFBT._addSorted(wBlock);
   return ZFBT.lastIdx();
 } // _getFreeBlockEngine
-
-/**
- * @brief ZRandomFile::_deleteZBAT
- *  Removes a ZBAT rank and moves it to free block pool.
- *  If GrabFreeSpace is set, tries to grab free space (see routine _grabFreeSpaceLogical())
- *  Updates block header on disc.
- *
- * @param pRank
- * @return
- */
-long
-ZRandomFile::_deleteZBAT (const size_t pRank)
-{
-  ZStatus wSt;
-  ZBlockDescriptor wBS;
-
-  wBS   = ZBAT.Tab[pRank];
-  wBS.State       = ZBS_Free;
-
-  if (ZFCB.GrabFreeSpace) {
-    if ((wSt=_grabFreeSpaceLogical(pRank,wBS))!=ZS_SUCCESS)
-      return wSt;
-  }
-
-
-  long wFBTRank=ZFBT.push(ZBAT[pRank]);
-  if ( _writeBlockHeader((ZBlockHeader&)ZFBT.last(),ZFBT.last().Address)!=ZS_SUCCESS){     // mark block as free to file
-    ZException.setMessage(_GET_FUNCTION_NAME_,
-        ZS_CANTALLOCSPACE,
-        Severity_Severe,
-        "Severe error while writing free block header at address %ld file %s",
-        ZFBT.last().Address,
-        URIContent.toString());
-
-    return -1;
-  }
-  ZBAT.erase(pRank);
-  return wFBTRank;
-
-} // _deleteZBAT
 
 /**
  * @brief ZRandomFile::checkSplitFreeBlock
@@ -4793,7 +4544,7 @@ ZRandomFile::checkSplitFreeBlock (long pZFBTRank, size_t pRequestedSize){
   if (pRequestedSize==0) {  /* just to debug */
     abort();
   }
-
+#ifdef __DEPRECATED__  // no more use of Deleted block pool
   if (ZFBT.Tab[pZFBTRank].State & ZBS_Deleted) {
     for (long wi=0; wi < ZDBT.count();wi++) {
       if (ZDBT[wi].Address==ZFBT.Tab[pZFBTRank].Address) {
@@ -4804,6 +4555,7 @@ ZRandomFile::checkSplitFreeBlock (long pZFBTRank, size_t pRequestedSize){
       }
     }// for
   } // if (ZFBT.Tab[pZFBTRank].State & ZBS_Deleted)
+#endif // __DEPRECATED__
 
   if(ZVerbose & ZVB_MemEngine)
     _DBGPRINT( "ZRandomFile::checkSplitFreeBlock  Requested size %ld - given free block size %ld address %ld.\n",
@@ -4814,7 +4566,7 @@ ZRandomFile::checkSplitFreeBlock (long pZFBTRank, size_t pRequestedSize){
 
     if(ZVerbose & ZVB_MemEngine)
       _DBGPRINT( "ZRandomFile::checkSplitFreeBlock  Sizes match. No split.\n")
-    ZFBT.Tab[pZFBTRank].State = (uint8_t)ZFBT.Tab[pZFBTRank].State  | ZBS_Allocated ;
+    ZFBT.Tab[pZFBTRank].State =  ZBS_Allocated ;
     return pZFBTRank;
   }
   /* here free block size is greater than requested size */
@@ -4826,10 +4578,12 @@ ZRandomFile::checkSplitFreeBlock (long pZFBTRank, size_t pRequestedSize){
   wNewBlock.State = ZBS_Free;
   wNewBlock.Pid = wNewBlock.Lock = 0;
 
-  ZFBT.push(wNewBlock);   /* create new entry within pool */
+  zrank_type wZFBTRank = ZFBT._addSorted(wNewBlock);/* create new entry within free block pool */
+//  ZFBT._addSorted(wNewBlock);   /* create new entry within pool */
 
   if(ZVerbose & ZVB_MemEngine)
-    _DBGPRINT( "ZRandomFile::checkSplitFreeBlock  Creating new free block entry in ZFBT pool of size %ld address %ld.\n",wNewBlock.BlockSize,wNewBlock.Address)
+    _DBGPRINT( "ZRandomFile::checkSplitFreeBlock  Creating new free block entry in ZFBT pool at rank %ld of size %ld address %ld.\n",
+        wZFBTRank , wNewBlock.BlockSize , wNewBlock.Address)
 
   /* adjust block to its required size */
   ZFBT.Tab[pZFBTRank].BlockSize = pRequestedSize;
@@ -4866,7 +4620,6 @@ ZRandomFile::checkSplitFreeBlock (long pZFBTRank, size_t pRequestedSize){
 
   return pZFBTRank;  /* return rank from free block pool for selected block */
 } //checkSplitFreeBlock
-
 
 
 /**
@@ -5021,7 +4774,9 @@ long wRank = ZBAT.lastIdx();
     pUserBuffer=wBlock.Content;
     if (wSt!=ZS_SUCCESS)
             return wSt;
-    return(_freeBlock(wRank));
+    _freeBlock_Prepare(wRank);
+
+    return(_freeBlock_Commit(wRank));
 }//popRP
 
 /*
@@ -5178,6 +4933,7 @@ ZBlock  wBlock;
     wBlock = ZBAT.Tab[pZBATIndex];
     wBlock.State = ZBS_Used ;
     wBlock.Content=pUserContent;
+
     if ((wSt=_writeBlockAt(wBlock,ZBAT.Tab[pZBATIndex].Address))!=ZS_SUCCESS) {
       ZException.last().setComplement("during _add2Phases_Commit");
       return  wSt;
@@ -5190,26 +4946,6 @@ ZBlock  wBlock;
           ZBAT.Tab[pZBATIndex].BlockSize)
 
     ZFCB.UsedSize += wBlock.BlockSize ;
-
-    if (ZBAT.Tab[pZBATIndex].State & ZBS_Deleted) { /* if free block comes from a deleted block */
-      long wi=0 ;
-      /* search block by address in deleted pool */
-      for ( ; wi < ZDBT.count() ; wi++) {
-        if (ZDBT.Tab[wi].Address==ZBAT.Tab[pZBATIndex].Address){
-          break;
-        }
-      }// for
-      if (ZDBT.Tab[wi].Address==ZBAT.Tab[pZBATIndex].Address){
-        /* if found : remove it from pool */
-        ZDBT.erase(wi);
-      }
-      else { /* this is totally abnormal and must be signalled in any case */
-        fprintf(stderr,"ZRandomFile::_insert2Phases_Commit Allocated free block from deleted block address %ld has not been found in deleted block pool.\n", ZBAT.Tab[pZBATIndex].Address);
-        std::cout.flush();
-      }
-
-    } //if (ZBAT.Tab[pZBATIndex].State == ZBS_AllocFromDelete)
-    ZBAT.Tab[pZBATIndex].State = ZBS_Used ;
 
     pLogicalAddress = setLogicalFromPhysical( ZBAT.Tab[pZBATIndex].Address);
 
@@ -5249,7 +4985,7 @@ ZBlockDescriptor wBS;
   else
     wBS.State = ZBS_Free;
 
-  ZFBT.push(wBS);            // create entry into ZFBT for freed Block
+  ZFBT._addSorted(wBS);            // create entry into ZFBT for freed Block
   ZBAT.erase(pZBATIndex);    // remove entry from ZBAT
 
   if ( _writeBlockHeader((ZBlockHeader&)wBS,wBS.Address)!=ZS_SUCCESS){     // write free block header to file
@@ -5609,7 +5345,7 @@ ZRandomFile::_remove_Commit(const zrank_type pIdxCommit)
 ZStatus wSt;
 
     CurrentRank = -1 ;
-    wSt=_freeBlock_Commit(pIdxCommit,false);
+    wSt=_freeBlock_Commit(pIdxCommit);
 
 //  ZStatus wSt1 = _unlockFile () ; // lock Master File for update after having tested if already locked
 
@@ -5647,100 +5383,59 @@ zaddress_type wLogicalAddress=0;
     return _insert2Phases_Commit(pUserBuffer,pRank,wLogicalAddress);
 }//_insert
 
-ZStatus
-ZRandomFile::_replace( const ZDataBuffer &pUserContent, const zrank_type pRank, zaddress_type &pAddress)
-{
-  ZDataBuffer wFormerRecord;
-  ZStatus wSt = _removeR(wFormerRecord,pRank);
-  if (wSt!=ZS_SUCCESS)
-    return wSt;
+zrank_type
+ZRandomFile::_poolDelete(const zrank_type &pZBATRank) {
 
-  wSt=_insert(pUserContent,pRank,pAddress);
-  if (wSt==ZS_SUCCESS) {
-    return wSt;
-  }
-  /* if error, first rollback then return errored status */
-  ZException.setMessage("ZRandomFile::_replace",wSt,Severity_Severe,"Cannot insert record at rank %ld file <%s>",
-      pRank,URIContent.getBasename().toCChar());
+  if(ZVerbose & ZVB_MemEngine)
+    _DBGPRINT("ZRandomFile::_poolDelete Deleting ZBAT block rank %ld size %ld address %ld\n",
+        pZBATRank,ZBAT[pZBATRank].BlockSize,ZBAT[pZBATRank].Address)
+
+   ZBAT[pZBATRank].State = ZBS_Deleted;
+
+   return ZFBT._addSorted(ZBAT[pZBATRank]);
+}
 
 
-  ZStatus wSt1= _insert(wFormerRecord,pRank,pAddress);
-  if (wSt1!=ZS_SUCCESS) {
-    utf8VaryingString wPrevious = ZException.popR()->formatUtf8();
-    ZException.setMessage("ZRandomFile::_replace",wSt,Severity_Severe,"Cannot rollback (after errored insert) record at rank %ld file <%s>\n See first insert error in complement.",
-        pRank,URIContent.getBasename().toCChar());
-    ZException.last().setComplement(wPrevious);
-    return wSt1;
-  }
-  return wSt;
 
-}//_replace
 
 ZStatus
-ZRandomFile::_replaceErrored( const ZDataBuffer &pUserContent, const zrank_type pRank, zaddress_type &pAddress)
+ZRandomFile::_replace( const ZDataBuffer &pUserContent, const zrank_type pZBATRank, zaddress_type &pAddress)
 {
   ZBlock wBlock;
 
-  /* some controls */
+  ZBAT[pZBATRank].State = ZBS_Deleted;
+  zrank_type wF= ZFBT._addSorted(ZBAT[pZBATRank]);
 
-  if ((pRank > ZBAT.size())||(pRank < 0 )) {
-    ZException.setMessage("ZRandomFile::_replace",ZS_OUTBOUND,Severity_Severe,"Record rank to replace <%ld> is out of ZBAT boundaries (size %ld).",
-        pRank, ZBAT.size());
-    return ZS_OUTBOUND;
+  zrank_type wN = _getFreeBlockEngine(pUserContent.Size,ZFCB.StartOfData);
+  ZFBT[wN].State = ZBS_Allocated;
+  ZBAT[pZBATRank] = ZFBT[wN];
+  pAddress = ZFBT[wN].Address;
+
+  ZBAT[pZBATRank] .State = ZBS_Used;
+  wBlock = ZBAT[pZBATRank] ;
+  wBlock.setBuffer(pUserContent);
+  ZStatus wSt = _writeBlockAt(wBlock,ZBAT[pZBATRank].Address);
+
+  if (wSt==ZS_SUCCESS) {
+    if(ZVerbose & ZVB_MemEngine)
+      _DBGPRINT("ZRandomFile::_replace Replaced ZBAT block rank %ld size %ld address %ld with block size %ld address %ld\n",
+          pZBATRank,
+          ZFBT[wN].BlockSize,ZFBT[wN].Address,
+          ZBAT[pZBATRank].BlockSize,ZBAT[pZBATRank].Address)
+    return wSt;
   }
 
-  /* search ZBAT for address */
+  /* if error, first rollback then return errored status */
+  ZException.setMessage("ZRandomFile::_replace",wSt,Severity_Severe,"Cannot insert record at rank %ld file <%s>",
+      pZBATRank,URIContent.getBasename().toCChar());
 
-  pAddress=  ZBAT[pRank].Address;
+  /* rollback */
 
-  /* if user content has same size, just replace and write as it is */
-  if ((ZBAT[pRank].BlockSize-sizeof(ZBlockDescriptor_Export)) == pUserContent.Size) {
-    wBlock.Content = pUserContent;
-    return _writeBlockAt(wBlock,pAddress);
-  }
-  /* size is changed */
+  ZBAT[pZBATRank] = ZFBT[wF];
+  ZBAT[pZBATRank].State = ZBS_Used;
+  ZFBT.erase(wF);
 
-  /* request from free block pool without deleting ZBAT rank for a new block corresponding to BlockHeader size + user content size
-   * delete former block : mark block as deleted send it to deleted blocks pool
-   * use new block as current rank and write to file it with user content
-   *
-   */
-
-  size_t wNeededSize = pUserContent.Size + sizeof(ZBlockHeader_Export);
-
-  //  ZBlockDescriptor  wFormerBlock;
-
-  long wFBTRank;
-
-  /* prepare deleting former block */
-
-  _freeBlock_Prepare(pRank);
-
-  //  wFormerBlock = ZBAT[pRank];  /* save former block */
-
-
-  wFBTRank=_getFreeBlockEngine(wNeededSize,-1);/* request a free block with exact wNeededSize size */
-
-  if(wFBTRank < 0) {
-    ZException.setMessage("ZRandomFile::_replace",ZS_CANTALLOCSPACE,Severity_Error,"Cannot get free space. Requested size %ld file %s",
-        wNeededSize,URIContent.toCChar());
-
-    _freeBlock_Rollback(pRank); /* restore from deleting block */
-    return ZS_CANTALLOCSPACE;
-  }
-
-  _freeBlock_Commit(pRank,true) ; /* effective delete of former block : keep ZBAT entry available (do not delete entry in ZBAT Pool */
-
-  ZBAT[pRank]=ZFBT[wFBTRank]; /* move allocated free block to former ZBAT element */
-  ZFBT.erase(wFBTRank);       /* remove it from free block pool */
-
-  ZBAT[pRank].State=ZBS_Used; /* set up block with appropriate infos */
-  ZBAT[pRank].Pid=getpid();
-
-  /* write new data to file */
-  wBlock=ZBAT[pRank];
-  wBlock.Content=pUserContent;
-  return _writeBlockAt(wBlock,pAddress);
+  return wSt;
 
 }//_replace
 
@@ -5836,8 +5531,8 @@ ZStatus wSt;
 ZBlock  wBlock;
 
 
-    ZBAT.Tab[pZBATIndex].State = ZBS_Used ;
-    wBlock = ZBAT.Tab[pZBATIndex];
+    ZBAT[pZBATIndex].State = ZBS_Used ;
+    wBlock = ZBAT[pZBATIndex];
     wBlock.State = ZBS_Used ;
     wBlock.Content=pUserBuffer;
     if ((wSt=_writeBlockAt(wBlock,ZBAT.Tab[pZBATIndex].Address))!=ZS_SUCCESS) {
@@ -5847,31 +5542,10 @@ ZBlock  wBlock;
     if(ZVerbose & ZVB_MemEngine)
       _DBGPRINT("ZRandomFile::_insert2Phases_Commit-- commit inserting block rank %ld @ %ld size %ld \n",
           pZBATIndex,
-          ZBAT.Tab[pZBATIndex].Address,
-          ZBAT.Tab[pZBATIndex].BlockSize)
+          ZBAT[pZBATIndex].Address,
+          ZBAT[pZBATIndex].BlockSize)
 
     ZFCB.UsedSize += wBlock.BlockSize ;
-
-    if (ZBAT.Tab[pZBATIndex].State == ZBS_AllocFromDelete) { /* if free block comes from a deleted block */
-      long wi=0 ;
-      /* search block by address in deleted pool */
-      for ( ; wi < ZDBT.count() ; wi++) {
-        if (ZDBT.Tab[wi].Address==ZBAT.Tab[pZBATIndex].Address){
-          break;
-        }
-      }// for
-      if (ZDBT.Tab[wi].Address==ZBAT.Tab[pZBATIndex].Address){
-        /* if found : remove it from pool */
-        ZDBT.erase(wi);
-      }
-      else { /* this is totally abnormal and must be signalled in any case */
-        _DBGPRINT("ZRandomFile::_insert2Phases_Commit Allocated free block from deleted block address %ld has not been found in deleted block pool.\n", ZBAT.Tab[pZBATIndex].Address);
-      }
-
-    } //if (ZBAT.Tab[pZBATIndex].State == ZBS_AllocFromDelete)
-
-
-    ZBAT.Tab[pZBATIndex].State = ZBS_Used ;
 
 
     pLogicalAddress = setLogicalFromPhysical( ZBAT.Tab[pZBATIndex].Address);
@@ -5911,7 +5585,7 @@ ZBlockDescriptor wBS;
       wBS.State = ZBS_Free;
 
 
-    ZFBT.push(wBS);            // create entry into ZFBT for freed Block
+    ZFBT._addSorted(wBS);            // create entry into ZFBT for freed Block
     ZBAT.erase(pZBATIndex);    // remove entry from ZBAT
 
     if ( _writeBlockHeader((ZBlockHeader&)wBS,wBS.Address)!=ZS_SUCCESS){     // write free block header to file
@@ -8355,7 +8029,7 @@ ZHeaderControlBlock_Export wHeaderExp;
         " Block extent quota   %10ld\n"
         " Used blocks          %10ld\n"
         " Free blocks          %10ld\n"
-        " Deleted blocks       %10ld\n"
+//        " Deleted blocks       %10ld\n"
         " Block target  size   %10ld\n"
         " Highwater Marking    %10s\n"
         " GrabFreeSpace        %10s",
@@ -8367,7 +8041,7 @@ ZHeaderControlBlock_Export wHeaderExp;
         ZFCB.BlockExtentQuota,
         ZBAT.size(),
         ZFBT.size(),
-        ZDBT.size(),
+//        ZDBT.size(),
         ZFCB.BlockTargetSize,
         ZFCB.HighwaterMarking?"On":"Off",
         ZFCB.GrabFreeSpace?"On":"Off");
@@ -8386,21 +8060,7 @@ ZHeaderControlBlock_Export wHeaderExp;
         " ",
         ZBAT.Tab[wi].Address,
         ZBAT.Tab[wi].BlockSize );
- /*       fprintf(pOutput,
-        "------+------------+------+--------------------+--------------------+\n");
-        fprintf(pOutput,
-        " Free Blocks Pool (ZFBT)\n"
-        "------+--------------------+--------------------+\n"
-        " Rank |    Address         |          Block size|\n"
-        "------+--------------------+--------------------+\n");
 
-        for (long wi=0; wi<ZFBT.size();wi++)
-        fprintf(pOutput,
-        "%5ld |%20lld|%20lld|\n",
-        wi,
-        ZFBT.Tab[wi].Address,
-        ZFBT.Tab[wi].BlockSize);
-*/
   if (ZBAT.size()>0)
     _print(
                 "------+------------+------+--------------------+--------------------+");
@@ -8421,6 +8081,7 @@ ZHeaderControlBlock_Export wHeaderExp;
 
   if (ZFBT.size()>0)
     _print("------+------------+------+--------------------+--------------------+");
+#ifdef __DEPRECATED__
   _print(
         " Deleted Blocks Pool(ZDBT) - Recovery Pool\n"
         "------+------------+------+--------------------+--------------------+\n"
@@ -8438,6 +8099,7 @@ ZHeaderControlBlock_Export wHeaderExp;
 
   if (ZDBT.size()>0)
     _print( "------+------------+------+--------------------+--------------------+");
+#endif // __DEPRECATED__
 
   return;
 }// _headerDump
@@ -8484,7 +8146,7 @@ ZBlockDescriptor wBD;
                 wBD.BlockSize);
     if (pCreateZFBTEntry) {
       wBD.State = ZBS_Free;
-      ZFBT.push(wBD);
+      ZFBT._addSorted(wBD);
       if (__ZRFVERBOSE__)
                     fprintf (stdout,
                          " put to free blocks pool ZFBT. Pool rank %ld\n ",
@@ -8536,52 +8198,54 @@ ZRandomFile::zheaderRebuild(uriString pContentURI,bool pDump, FILE*pOutput)
 {
 
 ZStatus wSt;
-ZFileDescriptor wDescriptor;
+//ZFileDescriptor wDescriptor;
+
+ZRandomFile wZRF;
 int wS;
 ZBlockDescriptor wBlockDescriptor;
 
 zaddress_type wAddress, wAddressNext,wOldAddress,wTheoricAddress;
 zsize_type wOldSize;
 
-    wDescriptor.setPath(pContentURI);
+    wZRF.setPath(pContentURI);
 
 
     _print(
              " Rebuilding header for ZRandomFile content file <%s>\n"
              "     Header file will be <%s>\n"
              "   **************Surface scan of content file*****************\n",
-             wDescriptor.URIContent.toString(),
-             wDescriptor.URIHeader.toString());
-    if (!wDescriptor.URIContent.exists())
+             wZRF.URIContent.toString(),
+             wZRF.URIHeader.toString());
+    if (!wZRF.URIContent.exists())
             {
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                    ZS_FILENOTEXIST,
                                    Severity_Error,
                                    "File <%s> does not exist. It must exist to be opened.",
-                                   wDescriptor.URIContent.toString());
+                                   wZRF.URIContent.toString());
             ZException.printUserMessage(pOutput);
             return  (ZS_FILENOTEXIST);
             }
-    wDescriptor.ContentFd = open(wDescriptor.URIContent.toCChar(),O_RDONLY);       // open content file for read only
-    if (wDescriptor.ContentFd<0)
+    wZRF.ContentFd = open(wZRF.URIContent.toCChar(),O_RDONLY);       // open content file for read only
+    if (wZRF.ContentFd<0)
             {
             ZException.getErrno(errno,
                              _GET_FUNCTION_NAME_,
                              ZS_ERROPEN,
                              Severity_Severe,
                              " Error opening ZRandomFile content file %s ",
-                             wDescriptor.URIContent.toString());
+                             wZRF.URIContent.toString());
             return  ZS_ERROPEN;
             }
     if (pDump)
         _surfaceScan();
 
     mode_t wPosixMode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-    wDescriptor.HeaderFd = open(wDescriptor.URIHeader.toCChar(),O_RDWR|O_CREAT|O_TRUNC,wPosixMode); // open header file read write
+    wZRF.HeaderFd = open(wZRF.URIHeader.toCChar(),O_RDWR|O_CREAT|O_TRUNC,wPosixMode); // open header file read write
 
     ssize_t wHeaderSize = sizeof (ZHeaderControlBlock_Export) + sizeof (ZFCB_Export) ;
 
-    wS=    posix_fallocate(wDescriptor.HeaderFd,0L,(off_t)wHeaderSize);
+    wS=    posix_fallocate(wZRF.HeaderFd,0L,(off_t)wHeaderSize);
     if (wS!=0)
             {
             ZException.getErrno(wS,  // no errno is set by posix_fallocate : returned value is the status : ENOSPC means no space
@@ -8589,12 +8253,12 @@ zsize_type wOldSize;
                              ZS_WRITEERROR,
                              Severity_Severe,
                              " Error during creation of file <%s> cannot allocate disk space",
-                             wDescriptor.URIHeader.toCChar());
+                             wZRF.URIHeader.toCChar());
             wSt=ZS_WRITEERROR;
             goto end_zheaderRebuild;
             }
     wAddress=0L;
-    wS=lseek(wDescriptor.ContentFd,wAddress,SEEK_SET);
+    wS=lseek(wZRF.ContentFd,wAddress,SEEK_SET);
     if (wS<0)
         {
         ZException.getErrno(errno,
@@ -8602,7 +8266,7 @@ zsize_type wOldSize;
                         ZS_FILEPOSERR,
                         Severity_Severe,
                         "Error while positionning file <%s> at address <%lld>",
-                        wDescriptor.URIContent.toCChar(),
+                        wZRF.URIContent.toCChar(),
                         wAddress);
         return  (ZS_FILEPOSERR);
         }
@@ -8615,32 +8279,32 @@ zsize_type wOldSize;
                                         ZS_EMPTYFILE,
                                         Severity_Severe,
                                         " No valid block has been found in content file %s",
-                                        wDescriptor.URIContent.toCChar());
+                                        wZRF.URIContent.toCChar());
                 goto error_zheaderRebuild;
                 }
         wBlockDescriptor.Address = wAddressNext;
 
 
         // first block
-        wDescriptor.ZFCB.StartOfData = wBlockDescriptor.Address;
-        if (wBlockDescriptor.State==ZBS_Deleted)
-                        {
+        wZRF.ZFCB.StartOfData = wBlockDescriptor.Address;
+        if (wBlockDescriptor.State==ZBS_Deleted) {
             if (__ZRFVERBOSE__)
                     fprintf(pOutput,
-                            "--%18lld|%15s|%20lld|%20lld|%20s\n",
+                            "--%18ld|%15s|%20ld|%20ld|%20s\n",
                             wAddressNext,
                             decode_ZBS( wBlockDescriptor.State),
                             wBlockDescriptor.BlockSize,
                             (wBlockDescriptor.BlockSize-(zsize_type)sizeof(ZBlockHeader_Export)),
                             "--deleted block--");
 
-                     wAddressNext += sizeof(ZBlockHeader_Export);
+        wAddressNext += sizeof(ZBlockHeader_Export);
 
-                     wDescriptor.ZDBT.push(wBlockDescriptor);
-                        }
-            else
-                    break;
-           }// while true
+        zrank_type wi=wZRF.ZFBT._addSorted(wBlockDescriptor);
+
+        }
+        else
+          break;
+    }// while true
 
     while (wSt==ZS_FOUND)
         {
@@ -8649,7 +8313,7 @@ zsize_type wOldSize;
                     {
             if (__ZRFVERBOSE__)
                     fprintf(pOutput,
-                            "%20lld|%15s|%20lld|                    |\n",
+                            "%20ld|%15s|%20ld|                    |\n",
                             wTheoricAddress,
                             "--- <Hole> ---",
                             wAddressNext-wTheoricAddress
@@ -8657,7 +8321,7 @@ zsize_type wOldSize;
                     }
         if (__ZRFVERBOSE__)
             fprintf(pOutput,
-                "%20lld|%15s|%20lld|%20lld|%20lld\n",
+                "%20ld|%15s|%20ld|%20ld|%20ld\n",
                 wAddressNext,
                 decode_ZBS( wBlockDescriptor.State),
                 wBlockDescriptor.BlockSize,
@@ -8669,31 +8333,29 @@ zsize_type wOldSize;
         wOldSize = wBlockDescriptor.BlockSize ;
         if (wBlockDescriptor.State == ZBS_Used)
         {
-            wDescriptor.ZBAT.push(wBlockDescriptor);
+            wZRF.ZBAT.push(wBlockDescriptor);
 
-            wDescriptor.ZFCB.UsedSize += wBlockDescriptor.BlockSize ;  // sum used size and recompute block target size
-            wDescriptor.ZFCB.BlockTargetSize = (long)((float)wDescriptor.ZFCB.UsedSize/(float)wDescriptor.ZBAT.size());
+            wZRF.ZFCB.UsedSize += wBlockDescriptor.BlockSize ;  // sum used size and recompute block target size
+            wZRF.ZFCB.BlockTargetSize = (long)((float)wZRF.ZFCB.UsedSize/(float)wZRF.ZBAT.size());
 
             wAddressNext += wBlockDescriptor.BlockSize;
         }
         else
         {
             if (wBlockDescriptor.State == ZBS_Free)
-                    wDescriptor.ZFBT.push(wBlockDescriptor);
-//                else
-//                    wDescriptor.ZDBT.push(wBlockHeader);
+                    wZRF.ZFBT._addSorted(wBlockDescriptor);
+
             wAddressNext += sizeof(ZBlockHeader_Export);   // just to grab deleted Blocks
         }
-        while (true)
-            {
-            wSt=_searchNextPhysicalBlock(wAddressNext,wAddressNext,wBlockDescriptor); // get first physical block of the file
-            if (wSt!=ZS_FOUND)
+        while (true) {
+          wSt=_searchNextPhysicalBlock(wAddressNext,wAddressNext,wBlockDescriptor); // get first physical block of the file
+          if (wSt!=ZS_FOUND)
                         break;
 
-            wBlockDescriptor.Address = wAddressNext;
-            if (wBlockDescriptor.State==ZBS_Deleted)
-                            {
-                            if (__ZRFVERBOSE__)
+          wBlockDescriptor.Address = wAddressNext;
+
+          if (wBlockDescriptor.State==ZBS_Deleted) {
+            if (__ZRFVERBOSE__)
                                 fprintf(pOutput,
                                     "--%18ld|%15s|%20ld|%20ld|%20s\n",
                                     wAddressNext,
@@ -8702,19 +8364,19 @@ zsize_type wOldSize;
                                     (wBlockDescriptor.BlockSize-(zsize_type)sizeof(ZBlockHeader_Export)),
                                     "--deleted block--");
 
-                            wDescriptor.ZDBT.push(wBlockDescriptor);
-                            wAddressNext += sizeof(ZBlockHeader_Export);
-                            }
-                        else
-                            break;
-               }// while true
-        }// while ZS_FOUND
+            wZRF.ZFBT._addSorted(wBlockDescriptor);
+            wAddressNext += sizeof(ZBlockHeader_Export);
+          }
+          else
+            break;
+        }// while true
+    }// while ZS_FOUND
 
     if (wSt==ZS_EOF)
         {
         if (__ZRFVERBOSE__)
             fprintf(pOutput,
-                "\n       **** End of File reached at address <%lld> *****\n",
+                "\n       **** End of File reached at address <%ld> *****\n",
                 wAddressNext);
         }
         else
@@ -8723,7 +8385,7 @@ zsize_type wOldSize;
         }
 
 
-    _writeFileHeader(true);
+    wZRF._writeFileHeader(true);
 
     _print(
              " *********Header rebuild results**************\n");
@@ -8731,9 +8393,9 @@ zsize_type wOldSize;
     _headerDump();
 
 end_zheaderRebuild:
-     _writeFileHeader(true);
-    close (wDescriptor.HeaderFd);
-    close (wDescriptor.ContentFd);
+     _writeAllFileHeader();
+    close (wZRF.HeaderFd);
+    close (wZRF.ContentFd);
     return  wSt;
 error_zheaderRebuild:
   _print(ZException.last().formatFullUserMessage());
@@ -8953,7 +8615,7 @@ ZStatus wSt;
     if (wSt!=ZS_SUCCESS)
                 return wSt;
     wHighBlock.State = ZBS_Free;
-    ZFBT.push(wHighBlock);
+    ZFBT._addSorted(wHighBlock);
 
     return (_writeFCB(true));
 }
@@ -9156,7 +8818,7 @@ bool FOpen = false;
                                                 return wSt;
     for (wi=0;(wi<ZBAT.size())&&(wSt==ZS_SUCCESS);wi++)
                     {
-                    wSt=_freeBlock_Commit(wi,false);
+                    wSt=_freeBlock_Commit(wi);
                     }
     if (wSt!=ZS_SUCCESS)
                 { return  wSt;}
@@ -9230,17 +8892,18 @@ bool FOpen = false;
 // Then reset all pools
 //
 
-    ZDBT.reset();
+//    ZDBT.reset();
     ZBAT.reset();
     ZFBT.reset();
 // up to here nothing in the file
-    ZFBT.push(wBS);  // put block in free block pool
+
+    ZFBT._addSorted(wBS); // put block in free block pool
+//    ZFBT._addSorted(wBS);  // put block in free block pool
 // just the mega free block in free block pool
 
 // Now take care of HighwaterMarking : if no HWM : job is done
-    if (ZFCB.HighwaterMarking)      // if highwatermarking then set the file region to zero
-        {
-        wSt=_highwaterMark_Block(wFreeUserSize);
+    if (ZFCB.HighwaterMarking)  {    // if highwatermarking then set the file region to zero
+        wSt=_highwaterMark_Block(wBS);
         if (wSt!=ZS_SUCCESS)
                     {
                     zclose();
@@ -9671,7 +9334,7 @@ zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
 // create a free block in pool for the former block address
 // TODO see later highwaterMarking impact
 
-//   ZFBT.push(ZBAT.Tab[wZBATIdx]);
+//   ZFBT._addSorted(ZBAT.Tab[wZBATIdx]);
 //   ZFBT.last().State =ZBS_Free; // with correct State
 
     ZBAT.Tab[wZBATIdx].Address = wCurrentAddress;  // update pool with the new address
@@ -9746,7 +9409,7 @@ zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
                 }
 //
     wCurrentBlock.BlockSize -= wCurrentAddress;
-    ZFBT.push(wCurrentBlock);
+    ZFBT._addSorted(wCurrentBlock);
     wSt=_writeBlockHeader(wCurrentBlock,wCurrentAddress);
     if (wSt!=ZS_SUCCESS)
                 { return  wSt;}
@@ -9873,46 +9536,58 @@ ZRandomFile::putTheMess (void)
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZRandomFile::_highwaterMark_Block (const zsize_type pFreeUserSize)
+//ZRandomFile::_highwaterMark_Block (const zsize_type pFreeUserSize)
+ZRandomFile::_highwaterMark_Block (const ZBlockDescriptor& pBlock)
 {
 ZDataBuffer wHWBuffer;
 ssize_t     wSWrite;
-zsize_type  wFreeUserSize=pFreeUserSize;
+zsize_type  wFreeUserSize = pBlock.BlockSize ;
 // HighwaterMarking process : if space to mark is greater than __HIGHWATER_MODULO__
 
+  /* point to user data (after block header ) */
+off_t wOff = lseek (ContentFd,pBlock.Address + sizeof(ZBlockHeader_Export),SEEK_SET);
+      if (wOff < 0) {
+        ZException.getErrno(errno,
+            _GET_FUNCTION_NAME_,
+            ZS_FILEPOSERR,
+            Severity_Severe,
+            " Severe error while positionning to beginning of file %s",
+            URIContent.toString());
+
+        return ZS_FILEPOSERR;
+      }
+
 //    zsize_type wModulo = __HIGHWATER_MODULO__ ;  // for debug
-    if (pFreeUserSize >__HIGHWATER_MODULO__)
-        {
+    if (pBlock.BlockSize > __HIGHWATER_MODULO__) {
         wHWBuffer.allocate(__HIGHWATER_MODULO__);
         wHWBuffer.clearData();                              // set buffer to binary zero
-        while (wFreeUserSize >__HIGHWATER_MODULO__)
-                {
-                ZPMS.HighWaterWrites ++;
+        while (wFreeUserSize >__HIGHWATER_MODULO__) {
+          ZPMS.HighWaterWrites ++;
 
-                wSWrite=write (ContentFd,wHWBuffer.DataChar, wHWBuffer.Size);
-                if (wSWrite<0)
-                        {
-                        ZException.getErrno(errno,
-                                         _GET_FUNCTION_NAME_,
-                                         ZS_WRITEERROR,
-                                         Severity_Severe,
-                                         "Severe Error while high water marking freed block for file %s at address %lld",
-                                         URIContent.toString(),
-                                         getPhysicalPosition());
-                         return  (ZS_WRITEERROR);
-                        }
+          wSWrite=write (ContentFd,wHWBuffer.DataChar, wHWBuffer.Size);
+          if (wSWrite<0) {
+            ZException.getErrno(errno,
+                             _GET_FUNCTION_NAME_,
+                             ZS_WRITEERROR,
+                             Severity_Severe,
+                             "Severe Error while high water marking block for file %s at address %lld",
+                             URIContent.toString(),
+                             getPhysicalPosition());
+             return  (ZS_WRITEERROR);
+          }
 
-                incrementPhysicalPosition(wSWrite);
-                wFreeUserSize -= __HIGHWATER_MODULO__;
-                } // while
+          incrementPhysicalPosition(wSWrite);
+          wFreeUserSize -= __HIGHWATER_MODULO__;
+          } // while
+          return ZS_SUCCESS;
         } // if (wFreeUserSize >__HIGHWATER_MODULO__)
-    wHWBuffer.allocate(pFreeUserSize);
+
+    wHWBuffer.allocate(pBlock.BlockSize);
     wHWBuffer.clearData();
     ZPMS.HighWaterWrites ++;
 
     wSWrite=write (ContentFd,wHWBuffer.DataChar, wHWBuffer.Size);
-    if (wSWrite<0)
-            {
+    if (wSWrite<0) {
             ZException.getErrno(errno,
                              _GET_FUNCTION_NAME_,
                              ZS_WRITEERROR,

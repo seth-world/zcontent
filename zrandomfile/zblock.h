@@ -165,6 +165,8 @@ public:
 
   ZBlock (void) {clear();}
 
+  void setBuffer(const ZDataBuffer& pContent) {Content.setData(pContent);}
+
   void clear(void) {memset(this,0,sizeof(ZBlock)); ZBlockHeader::clear();}
   void resetData(void) {Content.reset();}
 

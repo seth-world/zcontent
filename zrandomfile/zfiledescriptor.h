@@ -69,6 +69,16 @@ public:
 
   ZBlockPool& operator = (ZBlockPool& pIn){return (ZBlockPool&)ZArray<ZBlockDescriptor>::_copyFrom(pIn);}
 
+  inline long _addSorted(ZBlockDescriptor& pBlockDescriptor) {
+    zrank_type wi=0;
+    while ((wi < count()) && (Tab[wi].Address < pBlockDescriptor.Address)) {
+      wi++;
+    }
+    if (wi==count())
+      return _Base::push(pBlockDescriptor);
+    return _Base::insert(pBlockDescriptor,wi);
+  }
+
   size_t        _exportAppendPool(ZDataBuffer&pZDBExport);
   size_t        getPoolExportSize();
   size_t        _importPool(const unsigned char *&pPtrIn);
@@ -125,8 +135,11 @@ public:
   //    zaddress_type       OffsetFCB=0L;  /**< offset to ZFCB : OL if no derived class infradata space allocation. Else gives the size of reserved space.
   ZFileControlBlock ZFCB;
   ZBlockPool        ZBAT; /** Blocks access table pool : contains references to any used block in file (Primary pool)*/
+
   ZBlockPool        ZFBT; /** Free blocks pool : contains references to any free space in file  (Primary pool)*/
-  ZBlockPool        ZDBT; /** Deleted blocks pool : keep references to dead blocks included into free blocks (Secondary pool)*/
+                          /** Sorted by Address : must use
+  /* Deprecated */
+//  ZBlockPool        ZDBT; /** Deleted blocks pool : keep references to dead blocks included into free blocks (Secondary pool)*/
   ZDataBuffer       ZReserved;   /** used by derived classes to store infradata. The first info MUST BE sized to reserved infradata (equals to offsetFCB): gives the offset to effective ZFileDescriptor data.
                                              @ref ZRandomFile::setReservedContent and @ref ZRandomFile::getReservedContent */
 
@@ -379,7 +392,7 @@ protected:
 
       ZBAT.clear();
       ZFBT.clear();
-      ZDBT.clear();
+//      ZDBT.clear();  // Deprecated
       ZReserved.clear();
     //                        ZSystemUser wUser;
     //                        Uid.Username = wUser.setToCurrentUser().getName().toString();

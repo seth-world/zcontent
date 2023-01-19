@@ -202,9 +202,9 @@ public:
 
     size_t          ZFBT_DataOffset;           /**< offset to Free Blocks Table array since begining of ZFCB */
     size_t          ZFBT_ExportSize;           /**< size in bytes of ZFBT : to be written on file */
-
-    size_t          ZDBT_DataOffset;           /**< offset to Deleted Blocks Table array since begining of ZFCB */
-    size_t          ZDBT_ExportSize;           /**< size in bytes of ZDBT : to be written on file */
+/* Deprecated*/
+//    size_t          ZDBT_DataOffset;           /**< offset to Deleted Blocks Table array since begining of ZFCB */
+//    size_t          ZDBT_ExportSize;           /**< size in bytes of ZDBT : to be written on file */
 
     size_t          ZReserved_DataOffset;      /**<  Written on file header : Reserved space address . Must be 0L */
     size_t          ZReserved_ExportSize;      /**<  given by _getReservedSize */

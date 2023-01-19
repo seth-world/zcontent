@@ -13,7 +13,7 @@ using namespace zbs;
  *                      File control block (FCB)
  *                      pools : ZBAT   active blocks pool
  *                              ZFBT   free blocks pool
- *                              ZDBT   deleted blocks pool
+ *                              (ZDBT   deleted blocks pool --DEPRECATED--)
  * @param pZDBExport
  * @return
  */
@@ -37,7 +37,7 @@ ZFileDescriptor::_exportFCB(ZDataBuffer& pZDBExport)
   ZDataBuffer wZFBT_export;
   wExpSize = ZFBT._exportAppendPool(wZFBT_export);
   wFileControlBlock.ZFBT_ExportSize = wExpSize ;
-
+#ifdef __DEPRECATED__
   wFileControlBlock.ZDBT_DataOffset = (zaddress_type)(ZFCB.ZFBT_DataOffset + ZFCB.ZFBT_ExportSize); // then ZDBT
   //    wFileControlBlock.ZDBT_ExportSize = ZDBT._getExportAllocatedSize();
   ZDataBuffer wZDBT_export;
@@ -45,10 +45,10 @@ ZFileDescriptor::_exportFCB(ZDataBuffer& pZDBExport)
   wFileControlBlock.ZDBT_ExportSize = wExpSize ;
 
   wExpSize = wFileControlBlock._exportAppend(pZDBExport);
-
+#endif // __DEPRECATED__
   pZDBExport.appendData(wZBAT_export);
   pZDBExport.appendData(wZFBT_export);
-  pZDBExport.appendData(wZDBT_export);
+//  pZDBExport.appendData(wZDBT_export);
   return pZDBExport;
 }// ZFileDescriptor::_exportFCB
 
@@ -64,7 +64,7 @@ ZFileDescriptor::_importFCB(const unsigned char* pPtrIn)
 
   ZFBT._importPool(wPtrIn);
 
-  ZDBT._importPool(wPtrIn);
+//  ZDBT._importPool(wPtrIn);
 
   return *this;
 }// ZFileDescriptor::_importFCB
@@ -106,7 +106,7 @@ ZFDOwnData& ZFDOwnData::_copyFrom(const ZFDOwnData& pIn)
   ZFCB=pIn.ZFCB;
   ZBAT=(ZBlockPool&)pIn.ZBAT;
   ZFBT=(ZBlockPool&)pIn.ZFBT;
-  ZDBT=(ZBlockPool&)pIn.ZDBT;
+//  ZDBT=(ZBlockPool&)pIn.ZDBT;  // Deprecated
   ZReserved=pIn.ZReserved;
   ZBlockLock=pIn.ZBlockLock;
   PhysicalPosition=pIn.PhysicalPosition;
@@ -267,7 +267,7 @@ ZFileDescriptor::clearFCB (void)
   ZFCB.clear();
   ZBAT.clear();
   ZFBT.clear();
-  ZDBT.clear();
+//  ZDBT.clear();  // Deprecated
   ZBAT.clear();
 
   return;
