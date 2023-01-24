@@ -1036,11 +1036,13 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
     displayZBAT();
     return;
   }
+  /*
   if (pAction==ui->displayZDBTQAc)
   {
     displayZDBT();
     return;
   }
+*/
   if (pAction==ui->displayZFBTQAc)
   {
     displayZFBT();
@@ -2102,7 +2104,7 @@ ZContentVisuMain::displayPool(const unsigned char* pPtr,zaddress_type pOffset,co
 
 }// displayPool
 
-
+#ifdef __DEPRECATED__
 void
 ZContentVisuMain::displayZDBT()
 {
@@ -2127,6 +2129,7 @@ ZContentVisuMain::displayZDBT()
   displayPool(wPtr,wOffset,"DBT Deleted blocks table");
 
 }
+#endif // __DEPRECATED__
 void
 ZContentVisuMain::displayZFBT()
 {

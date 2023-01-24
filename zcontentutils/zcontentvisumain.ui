@@ -677,7 +677,6 @@
      </property>
      <addaction name="displayZBATQAc"/>
      <addaction name="displayZFBTQAc"/>
-     <addaction name="displayZDBTQAc"/>
     </widget>
     <addaction name="headerFileUnlockQAc"/>
     <addaction name="displayFCBQAc"/>

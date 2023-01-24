@@ -128,7 +128,7 @@ public:
   ZDataBuffer& _exportAppend(ZDataBuffer &pZDB);
 
   /* required for exporting Pool with ZArray export facilities */
-  static ZBlockDescriptor_Export _exportConvert(ZBlockDescriptor& pIn,ZBlockDescriptor_Export* pOut);
+  static ZBlockDescriptor_Export _exportConvert(ZBlockDescriptor_Export* pOut,ZBlockDescriptor& pIn);
   static ZStatus _importConvert(ZBlockDescriptor& pOut,ZBlockDescriptor_Export* pIn);
 
 };

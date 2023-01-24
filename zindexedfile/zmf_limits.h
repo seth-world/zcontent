@@ -9,8 +9,8 @@
 #define __ZIF_VERSION__ 2003001UL
 
 #define __ZRF_VERSION__  3002010UL
-#define __ZRF_VERSION_CHAR__  "\"3.2-10\""
-#define __ZRF_XMLVERSION_CONTROL__  "3.2-10"
+#define __ZRF_VERSION_CHAR__  "\"3.3-0\""
+#define __ZRF_XMLVERSION_CONTROL__  "3.3-0"
 
 #define __ZDIC_VERSION__ 30000UL
 //#define __ZDIC_VERSION_CHAR__  "'3.0-00'"

@@ -130,6 +130,7 @@ HEADERS += \
     ../zindexedfile/zsjournalcontrolblock.h \
     ../zindexedfile/zurffromnatural.h \
     ../zrandomfile/zblock.h \
+    ../zrandomfile/zblockpool.h \
     ../zrandomfile/zfilecontrolblock.h \
     ../zrandomfile/zfiledescriptor.h \
     ../zrandomfile/zheadercontrolblock.h \
@@ -191,6 +192,7 @@ SOURCES += \
     ../zindexedfile/zsjournalcontrolblock.cpp \
     ../zindexedfile/zurffromnatural.cpp \
     ../zrandomfile/zblock.cpp \
+    ../zrandomfile/zblockpool.cpp \
     ../zrandomfile/zfilecontrolblock.cpp \
     ../zrandomfile/zfiledescriptor.cpp \
     ../zrandomfile/zheadercontrolblock.cpp \

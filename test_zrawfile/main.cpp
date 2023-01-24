@@ -185,6 +185,9 @@ int main(int argc, char *argv[])
   if (wSt!=ZS_SUCCESS){
     ZException.exit_abort();
   }
+
+  wZRF.setUpdateHeader(true);
+
   wRecord.clear();
   wR1._exportURF(wRecord);
   wRecord.setData(wRecord);
@@ -200,7 +203,6 @@ int main(int argc, char *argv[])
     ZException.exit_abort();
   }
 
-
   wRecord.clear();
   wR2._exportURF(wRecord);
   wRecord.setData(wRecord);
@@ -215,6 +217,7 @@ int main(int argc, char *argv[])
     ZException.exit_abort();
   }
 
+  displayAll(wZRF);
 
   wRecord.clear();
   wR3._exportURF(wRecord);
@@ -231,10 +234,7 @@ int main(int argc, char *argv[])
     ZException.exit_abort();
   }
 
-  wSt=wZRF._writeAllFileHeader();
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
+  displayAll(wZRF);
 
   _DBGPRINT("insert at %d resource %s\n",2,displayResource(wR4).toString())
 
@@ -250,11 +250,12 @@ int main(int argc, char *argv[])
     ZException.exit_abort();
   }
 
-
   wSt=wZRF._insert2Phases_Commit(wRecord,2,wAddress);
   if (wSt!=ZS_SUCCESS){
     ZException.exit_abort();
   }
+
+  displayAll(wZRF);
 
   wRecord.clear();
   wR5._exportURF(wRecord);
@@ -271,6 +272,8 @@ int main(int argc, char *argv[])
     ZException.exit_abort();
   }
 
+  displayAll(wZRF);
+
   wRecord.clear();
   wR6._exportURF(wRecord);
   wRecord.setData(wRecord);
@@ -285,6 +288,8 @@ int main(int argc, char *argv[])
   if (wSt!=ZS_SUCCESS){
     ZException.exit_abort();
   }
+
+  displayAll(wZRF);
 
   wRecord.clear();
   wR7._exportURF(wRecord);
@@ -303,8 +308,7 @@ int main(int argc, char *argv[])
 
   displayAll(wZRF);
 
-
-  long wEraseRank=2L;
+  long wEraseRank = 2L;
   _DBGPRINT(" Erase %ld\n",wEraseRank)
 
   wSt=wZRF._remove_Prepare(wEraseRank,wAddress);
@@ -317,8 +321,7 @@ int main(int argc, char *argv[])
     ZException.exit_abort();
   }
 
-
-  wEraseRank=5L;
+  wEraseRank = 5L ;
   _DBGPRINT(" Erase %ld\n",wEraseRank)
 
   wSt=wZRF._remove_Prepare(wEraseRank,wAddress);
@@ -333,7 +336,7 @@ int main(int argc, char *argv[])
 
   displayAll(wZRF);
 
-  wEraseRank = 2;
+  wEraseRank = 2L ;
   _DBGPRINT(" Replace rank %ld with %s\nCurrent content is :",wEraseRank, displayResource( wR10).toString() )
   displayRank(wZRF,wEraseRank);
 

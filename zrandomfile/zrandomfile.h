@@ -894,6 +894,8 @@ public:
 
     ZStatus _removeByAddress_Prepare(zrank_type &pIdxCommit, const zaddress_type pAddress);
 
+    void setUpdateHeader(bool pOnOff) {UpdateHeader=pOnOff;}
+
 
     ZStatus _create (const zsize_type pInitialSize,
                      ZFile_type pFileType,
@@ -901,39 +903,28 @@ public:
                      bool pLeaveOpen) ;
  //   ZStatus _extend (zoffset_type pSize) ;
 
-// obtains a free block of pSize  (within ZFBT) and moves it to ZBAT
 
-    long _getFreeBlockOld(const size_t pSize,
-                      ZBlockMin &pBlock,
-                      int pFlag,
-                      zrank_type pZBATRank=-1,
-                      const zaddress_type pBaseAddress=-1);
 
-    long checkSplitFreeBlock (long pRank, size_t pRequestedSize);
 
     /** @brief ZRandomFile::_getFreeBlockEngine core free block engine search
       *  Obtains a free block of size pSize searching at minimum pBaseAddress,
       *  Extends file whenever required, creates an entry in free blocks pool
       *  Returns corresponding block rank in free blocks pool or -1 if error */
     long _getFreeBlockEngine(const size_t pSize, const zaddress_type pBaseAddress=-1);
-    /* deprecated version */
-    long _getFreeBlock(const size_t pSize,
-        ZBlockMin &pBlock,
-        int pFlag,
-        zrank_type pZBATRank=-1,
-        const zaddress_type pBaseAddress=-1);
+    long checkSplitFreeBlock (long pRank, size_t pRequestedSize);
 
 
     ZStatus _getExtent(ZBlockDescriptor &pBlockDesc,
                        const size_t pExtentSize);     //! get a free block extension with size greater or equal to pSize (according ExtentQuotaSize)
-// allocates a free block to used block (from ZFBT to ZBAT) at rank pZBABRank, or by push (pZBABRank=-1)
+
+#ifdef __DEPRECATED__
+    // allocates a free block to used block (from ZFBT to ZBAT) at rank pZBABRank, or by push (pZBABRank=-1)
     long _allocateFreeBlock (zrank_type pZFBTRank,
                              zsize_type pSize,
                              int pFlag=0,
                              long pZBATRank=-1);
 
 
-#ifdef __DEPRECATED__
     void _cleanDeletedBlocks(ZBlockDescriptor &pBD);
 #endif // __DEPRECATED__
     /** @brief _freeBlock_Prepare Prepares to delete an entry of ZBAT pool. */
@@ -949,7 +940,9 @@ public:
     /** @brief _poolDelete Moves block at rank pZBATRank from ZBAT to ZFBT. State is set to ZBS_Deleted.
      * ZFBT is ordered upon block Addres. If pKeepZBAT is set, then ZBAT element remains available. If not, ZBAT element is removed.
      * Returns ZFBT rank of deleted block. */
-    zrank_type _poolDelete(const zrank_type &pZBATRank) ;
+    zrank_type _moveZBAT2ZFBT(const zrank_type &pZBATRank) ;
+
+    ZStatus _postProcessZFBT(zrank_type pZFBTRank);
 
     ZStatus _grabFreeSpacePhysical(zrank_type pZBATRank,
                                    ZBlockDescriptor &pBS);   // reference to aggregated block to be freed : output

@@ -42,6 +42,10 @@ enum ZEntity : ZEntity_type  /* application defined ZEntity */
     ZEntity_CppClass    =          0x0000201,   /* ZCppParser class */
     ZEntity_CppParsingSelection =  0x0000401,   /* multiline selection with either ZEntity_CppClass and/or ZEntity_CppField */
 
+    ZEntity_ZBAT        =          0x0001000,
+    ZEntity_ZFBT        =          0x0002000,
+
+
     // -----------Document entities  ---------------------
     //
     ZEntity_MasterDoc  =           0x0000091,
@@ -58,9 +62,7 @@ enum ZEntity : ZEntity_type  /* application defined ZEntity */
     //                                  +-----> reserved for future use
     //                                  !
     ZEntity_DocPhysical =         0x00001001,
-    ZEntity_DocPhyCreation=       0x00003001,     // DocPhysical is not yet created but in process of being created (typically in Cache and validated before being confirmed)
-
-
+    ZEntity_DocPhyCreation=       0x00003001,     // DocPhysical is not yet created but in process of being created (typically in Cache and validated before being confirmed)  
 
     //-------------_End Data structure----------------------------
     //

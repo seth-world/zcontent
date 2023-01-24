@@ -31,12 +31,21 @@ using namespace std::placeholders ; // for std::bind
 
 #include <zexceptiondlg.h>
 
+#include <zentity.h>
+
 #include <qevent.h>
 #include <QStandardItem>
 #include <QList>
 #include <QMenu>
 #include <QAction>
 #include <QActionGroup>
+
+#include <QGraphicsView>
+#include <zqt/zqtwidget/zqgraphicscene.h>
+#include <QGraphicsItem>
+#include <QGraphicsRectItem>
+
+#include <QGraphicsSceneMouseEvent>
 
 extern const int cst_maxraisonablevalue;
 
@@ -81,7 +90,7 @@ poolVisu::poolVisu(QWidget *parent) :
 
   ui->PoolCBx->addItem("ZBAT");
   ui->PoolCBx->addItem("ZFBT");
-  ui->PoolCBx->addItem("ZDBT");
+//  ui->PoolCBx->addItem("ZDBT");  // Deprecated
 
   QMenu*  generalMEn=new QMenu("General",this);
 
@@ -150,6 +159,17 @@ poolVisu::poolVisu(QWidget *parent) :
   listMEn->addAction(displayICBQAc);
   actionAGp->addAction(displayICBQAc);
   listMEn->addSeparator();
+
+  displayZBATQAc = new QAction("ZBAT raw list",this);
+  listMEn->addAction(displayZBATQAc);
+  actionAGp->addAction(displayZBATQAc);
+
+  displayZFBTQAc = new QAction("ZFBT raw list",this);
+  listMEn->addAction(displayZFBTQAc);
+  actionAGp->addAction(displayZFBTQAc);
+
+  listMEn->addSeparator();
+
 
   unlockHeaderQAc = new QAction("Unlock header file",this);
   listMEn->addAction(unlockHeaderQAc);
@@ -259,7 +279,6 @@ poolVisu::generalActionEvent(QAction* pAction) {
     entityWnd->displayMCB(wRawData);
     entityWnd->show();
 
-
     const unsigned char* wPtr = wRawData.Data;
     ZHeaderControlBlock_Export wZHCBe;
     memmove(&wZHCBe,wRawData.Data,sizeof(ZHeaderControlBlock_Export));
@@ -306,11 +325,161 @@ poolVisu::generalActionEvent(QAction* pAction) {
     entityWnd->displayICBs(wRawData);
 
     return;
+  }
 
-
+  if (pAction == displayZBATQAc) {
+    displayZBAT();
     return;
   }
+  if (pAction == displayZFBTQAc) {
+    displayZFBT();
+    return;
+  }
+  return;
 }
+
+void
+poolVisu::displayZBAT()
+{
+  ZDataBuffer wRawData;
+  URIHeader.loadContent(wRawData);
+  if (!ZContentVisuMain::testRequestedSize(URIHeader,wRawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
+    return ;
+
+  unsigned char* wPtr=wRawData.Data;
+  ZHeaderControlBlock_Export* wHe = (ZHeaderControlBlock_Export*)wRawData.Data;
+  if (wHe->isNotReversed())
+  {
+    _ABORT_
+  }
+  zaddress_type wOffset= reverseByteOrder_Conditional<zaddress_type>(wHe->OffsetFCB);
+  wPtr += wOffset;
+  ZFCB_Export* wFCBe = (ZFCB_Export*)(wPtr);
+  if (wFCBe->isNotReversed())
+  {
+    _ABORT_
+  }
+  wOffset= reverseByteOrder_Conditional<size_t>(wFCBe->ZBAT_DataOffset);
+  wPtr += wOffset;
+
+  displayPool(wRawData,wPtr,wOffset,"ZBAT Block Access Table");
+  return;
+}
+
+void
+poolVisu::displayZFBT()
+{
+  ZDataBuffer wRawData;
+  URIHeader.loadContent(wRawData);
+  if (!ZContentVisuMain::testRequestedSize(URIHeader,wRawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
+    return ;
+
+  unsigned char* wPtr=wRawData.Data;
+  ZHeaderControlBlock_Export* wHe = (ZHeaderControlBlock_Export*)wRawData.Data;
+  if (wHe->isNotReversed())
+  {
+    _ABORT_
+  }
+  zaddress_type wOffset= reverseByteOrder_Conditional<zaddress_type>(wHe->OffsetFCB);
+  wPtr += wOffset;
+  ZFCB_Export* wFCBe = (ZFCB_Export*)(wPtr);
+  if (wFCBe->isNotReversed())
+  {
+    _ABORT_
+  }
+  wOffset= reverseByteOrder_Conditional<size_t>(wFCBe->ZFBT_DataOffset);
+  wPtr += wOffset;
+
+  displayPool(wRawData,wPtr,wOffset,"FBT Free blocks table");
+  return;
+}
+void
+poolVisu::displayPool(ZDataBuffer& pRawData,const unsigned char* pPtr,zaddress_type pOffset,const char* pTitle)
+{
+  ZAExport* wZAEe=(ZAExport*) pPtr;
+  utf8VaryingString wOut;
+  utf8VaryingString wStr;
+  utf8VaryingString wEndianStatus;
+  wStr.sprintf("%08X",wZAEe->StartSign);
+  wOut.sprintf (
+      "offset  absolute %ld 0x%X relative to FCB %ld 0x%X \n"
+      "Field name                          Raw value              Deserialized Complement/Comment\n"
+      "StartSign                            %08X                  %08X %s\n"
+      "EndianCheck         %25d %25d %s\n"
+      "AllocatedSize       %25ld %25ld Size in bytes of allocated space\n"
+      "CurrentSize         %25ld %25ld Current data size in bytes (data not exported)\n"
+      "DataSize            %25ld %25ld ZArray content export size\n"
+      "FullSize            %25ld %25ld Total exported size in bytes including this header\n"
+      "AllocatedElements   %25ld %25ld Number of allocated elements\n"
+      "ExtentQuota         %25ld %25ld Extension quota : number of elements ZArray will be increased each time\n"
+      "InitialAllocation   %25ld %25ld Number of elements intially allocated during creation\n"
+      "NbElements          %25ld %25ld Number of current elements\n",
+      size_t(pPtr-pRawData.Data),size_t(pPtr-pRawData.Data),pOffset,pOffset,
+      wZAEe->StartSign,wZAEe->StartSign,wZAEe->StartSign==cst_ZMSTART?"cst_ZMSTART":"Wrong",
+      wZAEe->EndianCheck,reverseByteOrder_Conditional<uint16_t>(wZAEe->EndianCheck),wZAEe->isReversed()?"Serialized":"NOT Serialized",
+      wZAEe->AllocatedSize,reverseByteOrder_Conditional (wZAEe->AllocatedSize),
+      wZAEe->CurrentSize,reverseByteOrder_Conditional (wZAEe->CurrentSize),
+      wZAEe->DataSize,reverseByteOrder_Conditional (wZAEe->DataSize),
+      wZAEe->FullSize,reverseByteOrder_Conditional (wZAEe->FullSize),
+      wZAEe->AllocatedElements,reverseByteOrder_Conditional (wZAEe->AllocatedElements),
+      wZAEe->ExtentQuota,reverseByteOrder_Conditional (wZAEe->ExtentQuota),
+      wZAEe->InitialAllocation,reverseByteOrder_Conditional (wZAEe->InitialAllocation),
+      wZAEe->NbElements,reverseByteOrder_Conditional (wZAEe->NbElements));
+
+
+  //  textEditMWn* wTEx=openGenLogWin();
+  textEditMWn* wTEx= new textEditMWn(this);
+  wTEx->setText(wOut,pTitle);
+
+  int wNbElt = int(reverseByteOrder_Conditional<ssize_t> (wZAEe->NbElements));
+  if (wNbElt==0)
+  {
+    wOut.sprintf("\n\n           No element in Pool.\n");
+    wTEx->appendText(wOut);
+    wTEx->show();
+    return;
+  }
+  if (wNbElt > cst_maxraisonablevalue ) {
+    wOut.sprintf("\n\n           value <%d> is not a reasonable value.\n"
+                 "               Pool might be corrupted.\n"
+                 "               Limiting number elements to 10.\n",wNbElt);
+    wNbElt = 10;
+  }
+
+  const unsigned char* wPtr = pPtr+sizeof(ZAExport);
+  ZBlockDescriptor_Export wBDe;
+  wOut=
+      " \n\n"
+      "------+-------------------+---------------+---------------+---------------+---------------------------------+-------------------------------------+\n"
+      " Rank |     StartSign     |   EndianCheck |   BlockId     |   State       |      Address (deserialized)     |          Block size                 |\n"
+      "      | hexa       state  |Value  Meaning |Val    Meaning |Val    Meaning |           Decimal        Hexa   |      Raw (Hexa)         deserialized|\n"
+      "------+-------------------+---------------+---------------+---------------+---------------------------------+-------------------------------------+";
+  wTEx->appendText(wOut);
+  int wi=0;
+  while (wi < wNbElt)
+  {
+    wBDe.setFromPtr(wPtr);
+
+    wOut.sprintf(
+        "%5ld |%08X %10s|%4X %10s|%2X %12s|%2X %12s|%20lld 0x%10llX|%16llX %20lld|",
+        wi,
+        wBDe.StartSign ,wBDe.StartSign==cst_ZFILEBLOCKSTART?"Valid":"Invalid",
+        wBDe.EndianCheck ,wBDe.isReversed()?"Reversed":"Not Rever.",
+        wBDe.BlockId,decode_ZBID(wBDe.BlockId),  // BlockId is uint8_t and do not need to be deserialized
+        wBDe.State , decode_ZBS(wBDe.State),                      // State is uint8_t and does not need to be deserialized
+        reverseByteOrder_Conditional<zaddress_type>(wBDe.Address),reverseByteOrder_Conditional<zaddress_type>(wBDe.Address),
+        wBDe.BlockSize,reverseByteOrder_Conditional<zsize_type>(wBDe.BlockSize)
+        );
+    wTEx->appendText(wOut);
+    wi++;
+  }
+
+  wTEx->appendText("------+-------------------+---------------+---------------+---------------+---------------------------------+-------------------------------------+\n");
+  wTEx->show();
+
+}// displayPool
+
+
 
 ZStatus
 poolVisu::set(const uriString& pContentUri,const uriString& pHeaderUri)
@@ -354,6 +523,33 @@ poolVisu::set(const uriString& pContentUri,const uriString& pHeaderUri)
 
 
 void poolVisu::refresh() {
+
+  ::close(FdHeader);
+  FdHeader = ::open(URIHeader.toCChar(),O_RDWR);
+  if (FdHeader<0) {
+    ZException.getErrno(errno,
+        _GET_FUNCTION_NAME_,
+        ZS_ERROPEN,
+        Severity_Severe,
+        "Error opening file <%s> ",
+        URIHeader.toCChar());
+    ZExceptionDLg::displayLast("Refresh");
+    return;
+  }
+  ::close(FdContent);
+  FdContent = ::open(URIContent.toCChar(),O_RDWR);
+  if (FdHeader<0) {
+    ZException.getErrno(errno,
+        _GET_FUNCTION_NAME_,
+        ZS_ERROPEN,
+        Severity_Severe,
+        "Error opening file <%s> ",
+        URIContent.toCChar());
+    ZExceptionDLg::displayLast("Refresh");
+    return;
+  }
+
+
   URIHeader.loadContent(HeaderContent);
   dataSetup(ui->PoolCBx->currentIndex());
 }
@@ -362,13 +558,13 @@ void poolVisu::dataSetup(int pPoolid) {
 
   ZBAT.clear();
   ZFBT.clear();
-  ZDBT.clear();
+//  ZDBT.clear(); // Deprecated
 
   PoolId = pPoolid;
 
   utf8VaryingString wStr;
 
-  ContentSize = size_t(URIContent.getFileSize());
+  ContentFileSize = size_t(URIContent.getFileSize());
 
   const unsigned char* wPtr=HeaderContent.Data;
 
@@ -401,7 +597,7 @@ void poolVisu::dataSetup(int pPoolid) {
 
   const unsigned char* wPtrZBAT= wPtr + reverseByteOrder_Conditional<size_t>(wFCBe->ZBAT_DataOffset);
   const unsigned char* wPtrZFBT= wPtr + reverseByteOrder_Conditional<size_t>(wFCBe->ZFBT_DataOffset);
-  const unsigned char* wPtrZDBT= wPtr + reverseByteOrder_Conditional<size_t>(wFCBe->ZDBT_DataOffset);
+//  const unsigned char* wPtrZDBT= wPtr + reverseByteOrder_Conditional<size_t>(wFCBe->ZDBT_DataOffset); // Deprecated
 
   PoolNotLoaded = false;
   while (true) {
@@ -428,7 +624,7 @@ void poolVisu::dataSetup(int pPoolid) {
     }
     /* effective pool import */
     ZFBT._importPool(wPtrZFBT);
-
+#ifdef __DEPRECATED__
     /* check pool import structure validity for ZDBT */
     memmove(&wZAEMe,wPtrZDBT,sizeof(ZAExport));
     wZAEMe.deserialize();
@@ -439,6 +635,7 @@ void poolVisu::dataSetup(int pPoolid) {
     }
     /* effective pool import */
     ZDBT._importPool(wPtrZDBT);
+#endif // __DEPRECATED__
     break;
   }// while true
 
@@ -453,10 +650,12 @@ void poolVisu::dataSetup(int pPoolid) {
     wOffset= reverseByteOrder_Conditional<size_t>(wFCBe->ZFBT_DataOffset);
     ui->PoolNameLBl->setText("Free blocks table");
     break;
+/*
   case 2:
     wOffset= reverseByteOrder_Conditional<size_t>(wFCBe->ZDBT_DataOffset);
     ui->PoolNameLBl->setText("Deleted blocks table");
     break;
+*/
   }
 
   wPtr += wOffset;
@@ -600,8 +799,6 @@ void poolVisu::dataSetup(int pPoolid) {
     //    wRow << createItem(uint8_t(wBDe[wi].BlockId),"%2X");
     wRow << createItem(decode_ZBID(BDe[wi].BlockId));
 
-
-
     //    wRow << createItem(uint8_t(wBDe[wi].State),"%2X");
     wRow << createItem(decode_ZBS(BDe[wi].State));
 
@@ -637,7 +834,6 @@ void poolVisu::dataSetup(int pPoolid) {
       wRow[wi]->setData(WrongBackGround, Qt::BackgroundRole);
   }
 
-
   wi++;
 }
 
@@ -646,9 +842,172 @@ for (long wi=0; wi < ContentTBv->ItemModel->columnCount();wi++)
 for (long wi=0; wi < ContentTBv->ItemModel->rowCount();wi++)
   ContentTBv->resizeRowToContents(wi);
 
+/* graphical view set-up */
+
+  QRect wGR = ui->FileGraphicGVw->geometry();
+
+  /* create a scene with
+   *
+   *   0-->File content size
+   *   |
+   *
+   *   20.0
+   *   |
+   *   v
+   *
+   */
+  QColor lightBlue(51, 190, 255,255);
+  QColor erroredBlue(51, 118, 255,255);
+  QBrush validZBATBrush(lightBlue);
+  QBrush erroredZBATBrush(erroredBlue);
+  QBrush greenBrush(Qt::green);
+  QBrush yellowBrush(Qt::yellow);
+  QBrush darkYellowBrush(Qt::darkYellow);
+  QBrush blueBrush(Qt::blue);
+  QBrush redBrush(Qt::red);
+  QBrush cyanBrush(Qt::cyan);
+  QBrush magentaBrush(Qt::magenta);
+  QBrush grayBrush(Qt::lightGray);
+  QPen outlinePen(Qt::yellow);
+  outlinePen.setWidth(1);
+
+  GScene=new ZQGraphicScene(ui->FileGraphicGVw);
+
+  GScene->setSceneRect(-2.0,-2.0,double(ContentFileSize+4),22.0);
+
+  GScene->doubleClickCallBack = std::bind(&poolVisu::GSceneDoubleClick, this,_1) ;
+
+  QGraphicsRectItem* wB1=nullptr;
+
+  for (long wi=0;wi < ZBAT.count();wi++)  {
+    uint16_t wBE=checkContentBlock(ZPTP_ZBAT,FdContent, ZBAT[wi]);
+    if (wBE!=ZBEX_Correct){
+      wB1=GScene->addRect(qreal(ZFBT[wi].Address),1.0,qreal(ZFBT[wi].BlockSize),19.0,outlinePen,redBrush);
+    }
+    else {
+      wB1=GScene->addRect(qreal(ZBAT[wi].Address),1.0,qreal(ZBAT[wi].BlockSize),19.0,outlinePen,validZBATBrush);
+    }
+    QVariant wV;
+    ZResource wRes ;
+    wRes = ZResource::getNew(ZEntity_ZBAT);
+    ZDataReference wDRef (ZLayout_FileBlock,wRes,-1);
+    wDRef.setPtr(&ZBAT[wi]);
+//    wDRef.ResourceReference.Entity=ZEntity_ZBAT;
+    wV.setValue<ZDataReference>(wDRef);
+    wB1->setData(ZQtDataReference,wV);
+  }
+
+  for (long wi=0;wi < ZFBT.count();wi++)  {
+
+    uint16_t wBE=checkContentBlock(ZPTP_ZFBT,FdContent, ZFBT[wi]);
+    if (wBE!=ZBEX_Correct){
+      wB1=GScene->addRect(qreal(ZFBT[wi].Address),1.0,qreal(ZFBT[wi].BlockSize),19.0,outlinePen,magentaBrush);
+    }
+    else {
+    if (ZFBT[wi].State==ZBS_Free)
+      wB1=GScene->addRect(qreal(ZFBT[wi].Address),1.0,qreal(ZFBT[wi].BlockSize),19.0,outlinePen,grayBrush);
+    else if (ZFBT[wi].State==ZBS_Deleted)
+      wB1=GScene->addRect(qreal(ZFBT[wi].Address),1.0,qreal(ZFBT[wi].BlockSize),19.0,outlinePen,greenBrush);
+    else
+      wB1=GScene->addRect(qreal(ZFBT[wi].Address),1.0,qreal(ZFBT[wi].BlockSize),19.0,outlinePen,magentaBrush);
+    }
+    QVariant wV;
+    ZResource wRes ;
+    wRes = ZResource::getNew(ZEntity_ZFBT);
+    ZDataReference wDRef (ZLayout_FileBlock,wRes,-1);
+//    wDRef.ResourceReference.Entity=ZEntity_ZFBT;
+    wDRef.setPtr(&ZFBT[wi]);
+    wV.setValue<ZDataReference>(wDRef);
+    wB1->setData(ZQtDataReference,wV);
+  }
+  ui->FileGraphicGVw->setScene(GScene);
+  ui->FileGraphicGVw->show();
 
 } // poolVisu::dataSetup
 
+void poolVisu::GSceneDoubleClick(QGraphicsSceneMouseEvent *pEvent) {
+  utf8VaryingString wStr;
+  int   wPoolId = 0;
+  QGraphicsItem *wItem = GScene->itemAt(pEvent->scenePos(), QTransform());// it is your clicked item, you can do everything what you want. for example send it somewhere
+  if (wItem==nullptr)
+    return;
+  ZDataReference wDRef;
+  QVariant wV;
+  wV = wItem->data(ZQtDataReference);
+  wDRef = wV.value<ZDataReference>();
+
+  ZBlockDescriptor* wBD=(ZBlockDescriptor*)wDRef.getPtr<ZBlockDescriptor*>();
+
+  QDialog wBlockViewDLg (this);
+  wBlockViewDLg.setWindowTitle(QObject::tr("file block","poolVisu"));
+  wBlockViewDLg.resize(400,150);
+
+  QVBoxLayout* QVL=new QVBoxLayout(&wBlockViewDLg);
+  wBlockViewDLg.setLayout(QVL);
+
+  QHBoxLayout* QHL=new QHBoxLayout;
+  QVL->insertLayout(0,QHL);
+
+  QLabel* wPoolLBl ;
+  if (wDRef.ResourceReference.Entity == ZEntity_ZBAT) {
+    wPoolId = 0;
+    wPoolLBl = new QLabel("Block access table",this);
+  }
+  else if (wDRef.ResourceReference.Entity == ZEntity_ZFBT) {
+    wPoolId = 1;
+    wPoolLBl = new QLabel("Free blocks table",this);
+  } else {
+    wPoolLBl = new QLabel("Unknown pool",this);
+  }
+
+  QHL->addWidget(wPoolLBl,0,Qt::AlignCenter);
+
+  QGridLayout* QGLyt=new QGridLayout(this);
+  QVL->insertLayout(1,QGLyt);
+
+
+
+  QLabel* wLb1=new QLabel(QObject::tr("Address","poolVisu"),&wBlockViewDLg);
+  QGLyt->addWidget(wLb1,0,0);
+
+  wStr.sprintf("%ld",wBD->Address);
+  QLabel* wAddress = new QLabel(wStr.toCChar());
+  QGLyt->addWidget(wAddress,0,1);
+
+  QLabel* wLb2=new QLabel(QObject::tr("Block size","poolVisu"),&wBlockViewDLg);
+  QGLyt->addWidget(wLb2,1,0);
+
+  wStr.sprintf("%ld",wBD->BlockSize);
+  QLabel* wSize = new QLabel(wStr.toCChar());
+  QGLyt->addWidget(wSize,1,1);
+
+
+  QLabel* wLb3=new QLabel(QObject::tr("State","poolVisu"),&wBlockViewDLg);
+  QGLyt->addWidget(wLb3,2,0);
+
+  QLabel* wState = new QLabel(decode_ZBS(wBD->State));
+  QGLyt->addWidget(wState,2,1);
+
+
+  QLabel* wLb4=new QLabel(QObject::tr("Status","poolVisu"),&wBlockViewDLg);
+  QGLyt->addWidget(wLb4,3,0);
+
+  QLabel* wStatus= new QLabel(decode_ZBEx(checkContentBlock(wPoolId,FdContent,*wBD)).toCChar());
+  QGLyt->addWidget(wStatus,3,1);
+
+  QHBoxLayout* QHLBtn=new QHBoxLayout;
+  QVL->insertLayout(2,QHLBtn);
+
+  QPushButton* wClose = new QPushButton(QObject::tr("Close","poolVisu"),&wBlockViewDLg);
+  QSpacerItem* wSpacer= new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+  QHLBtn->addItem(wSpacer);
+
+  QHLBtn->addWidget(wClose);
+
+  QObject::connect(wClose, &QPushButton::clicked, &wBlockViewDLg, &QDialog::close);
+
+  int wRet=wBlockViewDLg.exec();
+}
 
 
 void poolVisu::poolMouseCallback(int pZEF, QMouseEvent *pEvent)
@@ -671,7 +1030,6 @@ void poolVisu::poolMouseCallback(int pZEF, QMouseEvent *pEvent)
   ContentVisu->setModal(false);
   ContentVisu->goToAddress(wAddress);
   ContentVisu->show();
-
 
 }//VisuMouseCallback
 
@@ -751,7 +1109,7 @@ poolVisu::menuFlex(QContextMenuEvent *event) {
     }
 
     break;
-
+/*
   case ZPTP_ZDBT:
     undeleteQAc =  new QAction("undelete block",flexMEn);
     flexAGp->addAction(undeleteQAc);
@@ -766,6 +1124,7 @@ poolVisu::menuFlex(QContextMenuEvent *event) {
     }
 
     break;
+*/
   }// switch
 
   flexMEn->exec(event->globalPos());
@@ -814,7 +1173,7 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
       long widx=ZFBT.push(ZBAT[wi]);
       ZBAT.erase(wi);
 
-      wSt = grabFreeForward(URIContent,FdContent,ContentSize , StartOfData,ZFBT,widx,nullptr);
+      wSt = grabFreeForward(URIContent,FdContent,ContentFileSize , StartOfData,ZFBT,widx,nullptr);
 
       ContentTBv->ItemModel->removeRow(int(wi));
       PoolChanged=true;
@@ -902,9 +1261,39 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
       PoolChanged=true;
       break;
     }
+    if (pAction==undeleteQAc) {
+      /*  - check block is valid
+       *  - move block from ZDBT to ZBAT
+       *  - change block state from ZBS_Deleted to ZBS_Used
+       */
+      long wi = long(wIdx.row());
+      uint16_t wZBEx=checkContentBlock(PoolId,FdContent,ZFBT[wi]);
+      if (wZBEx != ZBEX_Correct) {
+        ZExceptionDLg::adhocMessage("Undelete block",Severity_Error,nullptr,
+            nullptr,"Block rank %ld is not correct and cannot be modified",wi);
+        return;
+      }
+
+      wSt=updateBlockHeaderState(URIContent,FdContent,ZFBT[wi].Address,ZBS_Used);
+      if (wSt!=ZS_SUCCESS) {
+        utf8VaryingString wExcp;
+        wExcp = ZException.last().formatFullUserMessage();
+        ZExceptionDLg::adhocMessage("Undelete block",Severity_Severe,nullptr,
+            &wExcp,"Error while updating block state on content file <%s>",URIContent.toString());
+        return;
+      }
+
+      ZFBT[wi].State = ZBS_Used;
+      ZBAT.push(ZFBT[wi]);
+      ZFBT.erase(wi);
+      ContentTBv->ItemModel->removeRow(int(wi));
+
+      PoolChanged=true;
+      break;
+    } // if (pAction==undeleteQAc)
     break;
 
-
+#ifdef __DEPRECATED__
   case ZPTP_ZDBT:
     if (pAction==removeNullQAc) {
       /* removing a block from pool (any pool) is possible if
@@ -954,9 +1343,10 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
 
       PoolChanged=true;
       break;
-    }
+    } // if (pAction==undeleteQAc)
 
     break;
+#endif // __DEPRECATED__
   }
   return;
 }//flexMenActionEvent
@@ -992,7 +1382,8 @@ poolVisu::updateHeader() {
   if (PoolNotLoaded)
     return ZS_OMITTED;
 
-  ZStatus wSt= updateHeaderFromPool(URIHeader,&ZBAT,&ZFBT,&ZDBT);
+//  ZStatus wSt= updateHeaderFromPool(URIHeader,&ZBAT,&ZFBT,&ZDBT);
+  ZStatus wSt= updateHeaderFromPool(URIHeader,&ZBAT,&ZFBT);
 
   if (wSt==ZS_SUCCESS) {
     ZExceptionDLg::adhocMessage("Update header",Severity_Information,nullptr,nullptr,
@@ -1089,13 +1480,13 @@ poolVisu::checkContentBlock(int pPoolId,int pFdContent,ZBlockDescriptor& pBlockD
   if ((pPoolId==ZPTP_ZBAT)&&(pBlockDesc.State!=ZBS_Used)) {
     wRet |= ZBEX_MustBeUsed ;
   }
-  if ((pPoolId==ZPTP_ZFBT)&&(pBlockDesc.State!=ZBS_Free)) {
-    wRet |= ZBEX_MustBeFree;
+  if ((pPoolId==ZPTP_ZFBT)&&(pBlockDesc.State!=ZBS_Free) && (pBlockDesc.State!=ZBS_Deleted)) {
+    wRet |= ZBEX_MustBeFreeOrDeleted;
   }
-  if ((pPoolId==ZPTP_ZDBT)&&(pBlockDesc.State!=ZBS_Deleted)) {
+/*  if ((pPoolId==ZPTP_ZDBT)&&(pBlockDesc.State!=ZBS_Deleted)) {
     wRet |= ZBEX_MustBeDeleted;
   }
-
+*/
   return wRet;
 } // checkContentBlock
 
@@ -1124,10 +1515,10 @@ decode_ZBEx(uint16_t pBEx) {
   /* these following are mutually exclusive */
   if (pBEx & ZBEX_MustBeUsed)
     return "<ZBEX_MustBeUsed> Block state must be ZBS_Used";
-  if (pBEx & ZBEX_MustBeFree)
-    return "<ZBEX_MustBeFree> Block state must be ZBS_Free";
-  if (pBEx & ZBEX_MustBeDeleted)
-    return "<ZBEX_MustBeDeleted> Block state must be ZBS_Deleted";
+  if (pBEx & ZBEX_MustBeFreeOrDeleted)
+    return "<ZBEX_MustBeFree> Block state must be ZBS_Free or ZBS_Deleted";
+//  if (pBEx & ZBEX_MustBeDeleted)
+//    return "<ZBEX_MustBeDeleted> Block state must be ZBS_Deleted";
 
   if (pBEx & ZBEX_Size)
     return "<ZBEX_Size> Block size in pool differs with block size on content file.";
@@ -1149,8 +1540,9 @@ getPoolName(uint8_t pPoolType) {
     return "ZBAT";
   case ZPTP_ZFBT:
     return "ZFBT";
-  case ZPTP_ZDBT:
+/*  case ZPTP_ZDBT:
     return "ZDBT";
+*/
   default:
     return "Unknown Pool type";
   }
@@ -1247,7 +1639,7 @@ fixPool(const utf8VaryingString& pURIContent, int pFdContent,uint8_t pPoolType,Z
           return wSt;
         }
       } // if (wBE & ZBEX_MustBeUsed)
-      if (wBE & ZBEX_MustBeFree) {
+      if (wBE & ZBEX_MustBeFreeOrDeleted) {
         wStr.sprintf("<ZPOR_FixState> Changing pool block state to ZBS_Free from %s pool rank %ld address %lld",
             getPoolName(pPoolType),wi,pPool->Tab[wi].Address);
 
@@ -1259,7 +1651,7 @@ fixPool(const utf8VaryingString& pURIContent, int pFdContent,uint8_t pPoolType,Z
           return wSt;
         }
       } // if (wBE & ZBEX_MustBeFree)
-      if (wBE & ZBEX_MustBeDeleted) {
+/*      if (wBE & ZBEX_MustBeDeleted) {
         wStr.sprintf("<ZPOR_FixState> Changing pool block state to ZBS_Deleted from %s pool rank %ld address %lld",
             getPoolName(pPoolType),wi,pPool->Tab[wi].Address);
 
@@ -1271,6 +1663,7 @@ fixPool(const utf8VaryingString& pURIContent, int pFdContent,uint8_t pPoolType,Z
           return wSt;
         }
       } // if (wBE & ZBEX_MustBeDeleted)
+*/
 
     } //if (pFlag & ZPOR_FixState)
   } // for
@@ -1504,7 +1897,7 @@ poolVisu::repair(const uriString& pURIContent,const uriString& pURIHeader,uint8_
   ZDataBuffer wHeaderContent;
   ZBlockPool ZBAT;
   ZBlockPool ZFBT;
-  ZBlockPool ZDBT;
+//  ZBlockPool ZDBT;  // Deprecated
 
 
   size_t wFileSize = size_t(pURIContent.getFileSize());
@@ -1597,7 +1990,7 @@ poolVisu::repair(const uriString& pURIContent,const uriString& pURIHeader,uint8_
 
   const unsigned char* wPtrZBAT= wPtr + reverseByteOrder_Conditional<size_t>(wFCBe->ZBAT_DataOffset);
   const unsigned char* wPtrZFBT= wPtr + reverseByteOrder_Conditional<size_t>(wFCBe->ZFBT_DataOffset);
-  const unsigned char* wPtrZDBT= wPtr + reverseByteOrder_Conditional<size_t>(wFCBe->ZDBT_DataOffset);
+//  const unsigned char* wPtrZDBT= wPtr + reverseByteOrder_Conditional<size_t>(wFCBe->ZDBT_DataOffset);
 
   wStr="Importing Block access table";
   pDisplay(wStr);
@@ -1637,7 +2030,7 @@ poolVisu::repair(const uriString& pURIContent,const uriString& pURIHeader,uint8_
 
   wStr="Importing Deleted blocks table";
   pDisplay(wStr);
-
+#ifdef __DEPRECATED__
   /* check pool import structure validity for ZDBT */
   memmove(&wZAEMe,wPtrZDBT,sizeof(ZAExport));
   wZAEMe.deserialize();
@@ -1652,7 +2045,7 @@ poolVisu::repair(const uriString& pURIContent,const uriString& pURIHeader,uint8_
 
   wStr.sprintf("Deleted blocks table imported. %ld blocks defined.",ZDBT.count());
   pDisplay(wStr);
-
+#endif // __DEPRECATED__
   wStr = "Scroll / fix pools.";
   pDisplay(wStr);
 
@@ -1707,7 +2100,7 @@ poolVisu::repair(const uriString& pURIContent,const uriString& pURIHeader,uint8_
       }
     }
   }// for
-
+#ifdef __DEPRECATED__
   for (long wi=0;wi < ZDBT.count(); wi++) {
     if (ZDBT[wi].BlockSize==0) {
       wStr.sprintf("<ZeroSizedBlock> Found pool block with size equal to 0 from ZDBT pool rank %ld address %lld.",
@@ -1723,7 +2116,7 @@ poolVisu::repair(const uriString& pURIContent,const uriString& pURIHeader,uint8_
       }
     }
   }// for
-
+#endif // __DEPRECATED__
   /*
   wSt = fixPool(pURIContent, FdContent,ZPTP_ZBAT,&ZBAT,pFlag,pDisplay);
   if (wSt!=ZS_SUCCESS)
@@ -1740,7 +2133,8 @@ poolVisu::repair(const uriString& pURIContent,const uriString& pURIHeader,uint8_
   wStr = "Updating header file.";
   pDisplay(wStr);
 
-  wSt= updateHeaderFromPool(pURIHeader,&ZBAT,&ZFBT,&ZDBT);
+//  wSt= updateHeaderFromPool(pURIHeader,&ZBAT,&ZFBT,&ZDBT);
+  wSt= updateHeaderFromPool(pURIHeader,&ZBAT,&ZFBT);
   if (wSt!=ZS_SUCCESS) {
     ZException.setMessage("poolVisu::repair",wSt,Severity_Severe,"Writing header file. File<%s>",pURIHeader.toString());
    return ZExceptionDisplayAll(pDisplay);
@@ -1753,7 +2147,8 @@ poolVisu::repair(const uriString& pURIContent,const uriString& pURIHeader,uint8_
 } //poolVisu::repair
 
 ZStatus
-poolVisu::updateHeaderFromPool(const uriString& pURIHeader,ZBlockPool* pZBAT,ZBlockPool* pZFBT,ZBlockPool* pZDBT) {
+//poolVisu::updateHeaderFromPool(const uriString& pURIHeader,ZBlockPool* pZBAT,ZBlockPool* pZFBT,ZBlockPool* pZDBT) {
+poolVisu::updateHeaderFromPool(const uriString& pURIHeader,ZBlockPool* pZBAT,ZBlockPool* pZFBT) {
   ZDataBuffer wHeaderContent,wNewHeaderContent;
 
   //  ZDataBuffer WReserved;
@@ -1798,11 +2193,11 @@ poolVisu::updateHeaderFromPool(const uriString& pURIHeader,ZBlockPool* pZBAT,ZBl
 
   ZDataBuffer wZBATb;
   ZDataBuffer wZFBTb;
-  ZDataBuffer wZDBTb;
+//  ZDataBuffer wZDBTb;  // Deprecated
 
   pZBAT->_exportAppendPool(wZBATb);
   pZFBT->_exportAppendPool(wZFBTb);
-  pZDBT->_exportAppendPool(wZDBTb);
+//  pZDBT->_exportAppendPool(wZDBTb);  // Deprecated
 
   /* update offsets and sizes within FCB */
 
@@ -1815,13 +2210,14 @@ poolVisu::updateHeaderFromPool(const uriString& pURIHeader,ZBlockPool* pZBAT,ZBl
   wFCBe->ZFBT_ExportSize = reverseByteOrder_Conditional<size_t>(wZFBTb.Size);
 
   wOffset += wZFBTb.Size ;
-
+/*
   wFCBe->ZDBT_DataOffset = reverseByteOrder_Conditional<size_t>(wOffset);
   wFCBe->ZDBT_ExportSize = reverseByteOrder_Conditional<size_t>(wZDBTb.Size);
-
+*/
   wNewHeaderContent.appendData(wZBATb);
   wNewHeaderContent.appendData(wZFBTb);
-  wNewHeaderContent.appendData(wZDBTb);
+//  wNewHeaderContent.appendData(wZDBTb); // Deprecated
+
   return pURIHeader.writeContent(wNewHeaderContent);
 }
 

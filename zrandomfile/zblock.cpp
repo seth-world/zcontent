@@ -222,7 +222,7 @@ ZBlockDescriptor::_exportAppend(ZDataBuffer &pZDB)
 }
 
 
-ZBlockDescriptor_Export ZBlockDescriptor:: _exportConvert(ZBlockDescriptor& pIn,ZBlockDescriptor_Export* pOut)
+ZBlockDescriptor_Export ZBlockDescriptor:: _exportConvert(ZBlockDescriptor_Export* pOut,ZBlockDescriptor& pIn)
 {
   memset(pOut,0,sizeof(ZBlockDescriptor_Export));
   pOut->StartSign = cst_ZFILEBLOCKSTART;

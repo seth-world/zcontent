@@ -12,6 +12,7 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
@@ -42,6 +43,7 @@ public:
     QLabel *HeaderLBl;
     QLabel *ContentLBl;
     QPushButton *RefreshBTn;
+    QGraphicsView *FileGraphicGVw;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -49,7 +51,7 @@ public:
     {
         if (poolVisu->objectName().isEmpty())
             poolVisu->setObjectName(QString::fromUtf8("poolVisu"));
-        poolVisu->resize(820, 600);
+        poolVisu->resize(820, 726);
         centralwidget = new QWidget(poolVisu);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         PoolCBx = new QComboBox(centralwidget);
@@ -57,7 +59,7 @@ public:
         PoolCBx->setGeometry(QRect(630, 10, 171, 23));
         verticalLayoutWidget_2 = new QWidget(centralwidget);
         verticalLayoutWidget_2->setObjectName(QString::fromUtf8("verticalLayoutWidget_2"));
-        verticalLayoutWidget_2->setGeometry(QRect(10, 300, 791, 251));
+        verticalLayoutWidget_2->setGeometry(QRect(10, 420, 791, 251));
         ContentVBl = new QVBoxLayout(verticalLayoutWidget_2);
         ContentVBl->setObjectName(QString::fromUtf8("ContentVBl"));
         ContentVBl->setContentsMargins(0, 0, 0, 0);
@@ -73,7 +75,7 @@ public:
         PoolNameLBl->setFont(font);
         verticalLayoutWidget = new QWidget(centralwidget);
         verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
-        verticalLayoutWidget->setGeometry(QRect(10, 100, 791, 191));
+        verticalLayoutWidget->setGeometry(QRect(10, 230, 791, 191));
         HeaderVBl = new QVBoxLayout(verticalLayoutWidget);
         HeaderVBl->setObjectName(QString::fromUtf8("HeaderVBl"));
         HeaderVBl->setContentsMargins(0, 0, 0, 0);
@@ -106,6 +108,9 @@ public:
         RefreshBTn = new QPushButton(centralwidget);
         RefreshBTn->setObjectName(QString::fromUtf8("RefreshBTn"));
         RefreshBTn->setGeometry(QRect(630, 40, 80, 23));
+        FileGraphicGVw = new QGraphicsView(centralwidget);
+        FileGraphicGVw->setObjectName(QString::fromUtf8("FileGraphicGVw"));
+        FileGraphicGVw->setGeometry(QRect(10, 100, 791, 101));
         poolVisu->setCentralWidget(centralwidget);
         menubar = new QMenuBar(poolVisu);
         menubar->setObjectName(QString::fromUtf8("menubar"));

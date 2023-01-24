@@ -1314,6 +1314,7 @@ DisplayMain::displayFCBValues(unsigned char *pPtrIn)
   wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
 
+/* Deprecated  - ZDBT removed
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wFCBExport->ZDBT_DataOffset),"%ld");
   wDumpRow << createItem( "ZDBT_DataOffset");
@@ -1343,6 +1344,7 @@ DisplayMain::displayFCBValues(unsigned char *pPtrIn)
   wOffset=Offset+offsetof(ZFCB_Export,ZDBT_ExportSize);
   wStr.sprintf("%4ld 0x%4lX",wOffset,wOffset);
   displayItemModel->setVerticalHeaderItem(wRow++,createItem(wStr.toCChar()));
+*/
 
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wFCBExport->InitialSize),"%ld");

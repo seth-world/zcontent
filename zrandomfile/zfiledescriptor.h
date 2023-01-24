@@ -11,7 +11,7 @@
 
 #include <zrandomfile/zheadercontrolblock.h>
 #include <zrandomfile/zfilecontrolblock.h>
-
+#include <zrandomfile/zblockpool.h>
 #include <zrandomfile/zrfpms.h>
 
 
@@ -59,30 +59,6 @@ public:
 };
 
 
-class ZBlockPool:public ZArray<ZBlockDescriptor>
-{
-public:
-  typedef ZArray<ZBlockDescriptor> _Base;
-  ZBlockPool():ZArray<ZBlockDescriptor>() {}
-  ZBlockPool(ZBlockPool& pIn):ZArray<ZBlockDescriptor>(pIn) {}
-  ZBlockPool(ZBlockPool&& pIn):ZArray<ZBlockDescriptor>(pIn) {}
-
-  ZBlockPool& operator = (ZBlockPool& pIn){return (ZBlockPool&)ZArray<ZBlockDescriptor>::_copyFrom(pIn);}
-
-  inline long _addSorted(ZBlockDescriptor& pBlockDescriptor) {
-    zrank_type wi=0;
-    while ((wi < count()) && (Tab[wi].Address < pBlockDescriptor.Address)) {
-      wi++;
-    }
-    if (wi==count())
-      return _Base::push(pBlockDescriptor);
-    return _Base::insert(pBlockDescriptor,wi);
-  }
-
-  size_t        _exportAppendPool(ZDataBuffer&pZDBExport);
-  size_t        getPoolExportSize();
-  size_t        _importPool(const unsigned char *&pPtrIn);
-};
 /*
 typedef ZBlockPool ZBlockAccessTable;     //!< Blocks access table pool : contains references to any used block in file (Primary pool)
 typedef ZBlockPool ZFreeBlockPool;        //!< Free blocks pool : contains references to any free space in file  (Primary pool)
@@ -149,7 +125,16 @@ public:
   zaddress_type LogicalPosition=0;   /**< current offset since beginning of data : updated by any read / write operation done on ZRandomFile. Not updated by remove operation (set to -1) */
   long          CurrentRank=0;        /**< current ZBAT rank. set to -1 if no current rank */
 
-  bool          Changed=false;
+  bool          HeaderChanged=false;
+  /* if set, header is updated at each major input/ouput operation (inducing change)*/
+  /* these operation are :
+                                       *  - remove  :  ZRandomFile::_remove_Commit()
+                                       *  - add     : ZRandomFile::_add2Phases_Commit()
+                                       *  - insert  : ZRandomFile::_insert2Phases_Commit()
+                                       *  - replace : ZRandomFile::_replace()
+                                       */
+  bool          UpdateHeader=false;
+
 
   ZFDOwnData() =default;
   ZFDOwnData(const ZFDOwnData& pIn) {_copyFrom(pIn);}

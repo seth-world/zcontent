@@ -20,6 +20,9 @@ class QActionGroup;
 class QAction;
 class textEditMWn;
 
+class ZQGraphicScene;
+class QGraphicsSceneMouseEvent;
+
 namespace Ui {
 class poolVisu;
 }
@@ -36,7 +39,7 @@ enum ZPoolRepair : uint8_t {
 enum ZPoolType : uint8_t {
   ZPTP_ZBAT     = 0 ,
   ZPTP_ZFBT     = 1 ,
-  ZPTP_ZDBT     = 2 ,
+//  ZPTP_ZDBT     = 2 ,  // Deprecated
   ZPTP_Unknown
 };
 
@@ -50,8 +53,8 @@ enum ZBlockExistence : uint16_t {
   ZBEX_PoolZeroSize     =   0x20,  /* block size in pool has zero value */
   ZBEX_ContentZeroSize  =   0x40,  /* block size on content file has zero value */
   ZBEX_MustBeUsed       =   0x80,  /* invalid block state : must be ZBS_Used */
-  ZBEX_MustBeFree       = 0x0100,  /* invalid block state : must be ZBS_Free */
-  ZBEX_MustBeDeleted    = 0x0200,  /* invalid block state : must be ZBS_Deleted */
+  ZBEX_MustBeFreeOrDeleted       = 0x0100,  /* invalid block state : must be ZBS_Free Or ZBS_Deleted*/
+//  ZBEX_MustBeDeleted    = 0x0200,  /* invalid block state : must be ZBS_Deleted */
 };
 
 class poolVisu : public QMainWindow
@@ -72,7 +75,8 @@ public:
   static ZStatus updateBlockHeaderState(const utf8VaryingString &pURIContent,
                                         int pFdContent, zaddress_type &pAddress, ZBlockState_type pState);
 
-  static ZStatus updateHeaderFromPool(const uriString &pURIHeader, ZBlockPool* pZBAT, ZBlockPool* pZFBT, ZBlockPool* pZDBT);
+//  static ZStatus updateHeaderFromPool(const uriString &pURIHeader, ZBlockPool* pZBAT, ZBlockPool* pZFBT, ZBlockPool* pZDBT);
+  static ZStatus updateHeaderFromPool(const uriString &pURIHeader, ZBlockPool* pZBAT, ZBlockPool* pZFBT);
 
   static uint16_t checkContentBlock(int pPoolId, int pFdContent, ZBlockDescriptor &pBlockDesc);
 
@@ -83,7 +87,7 @@ public:
   uriString URIContent;
   uriString URIHeader;
 
-  size_t        ContentSize=0;
+  size_t        ContentFileSize=0;
   zaddress_type StartOfData=0L;
 
   ZDataBuffer HeaderContent;
@@ -119,8 +123,13 @@ private slots:
 
   void generalActionEvent(QAction* pAction);
 
+  void displayZBAT();
+  void displayZFBT();
+  void displayPool(ZDataBuffer &pRawData, const unsigned char* pPtr, zaddress_type pOffset, const char* pTitle);
 private:
   void resizeEvent(QResizeEvent*) override;
+
+
   /* flex menu */
   QAction*  blockVisuQAc=nullptr;
   QAction*  moveFreeQAc =nullptr;
@@ -149,8 +158,14 @@ private:
   QAction* displayMCBQAc = nullptr;
   QAction* displayICBQAc = nullptr;
 
-   QAction* unlockHeaderQAc = nullptr;
+  QAction* displayZBATQAc = nullptr;
+  QAction* displayZFBTQAc = nullptr;
 
+  QAction* unlockHeaderQAc = nullptr;
+
+  ZQGraphicScene* GScene=nullptr;
+
+  void GSceneDoubleClick(QGraphicsSceneMouseEvent *pEvent);
 
   const ZBlockDescriptor_Export* BDe=nullptr;
 
@@ -158,7 +173,7 @@ private:
 
   ZBlockPool  ZBAT;
   ZBlockPool  ZFBT;
-  ZBlockPool  ZDBT;
+//  ZBlockPool  ZDBT; // Deprecated
 
   bool          FResizeInitial=true;
   Ui::poolVisu *ui;

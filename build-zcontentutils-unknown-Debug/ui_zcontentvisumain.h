@@ -471,7 +471,6 @@ public:
         headerMEn->addAction(menuView_pool->menuAction());
         menuView_pool->addAction(displayZBATQAc);
         menuView_pool->addAction(displayZFBTQAc);
-        menuView_pool->addAction(displayZDBTQAc);
         toolBar->addAction(HeaderRawUnlockQAc);
 
         retranslateUi(ZContentVisuMain);

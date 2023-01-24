@@ -46,6 +46,8 @@ enum ZLayout_type : uint32_t
    ZLayout_ParsingResultTRv   =   0x08,
    ZLayout_ParsingFieldTBv   =   0x10,
 
+    ZLayout_FileBlock = 0x20,
+
 
   //--------Admin layouts---------------------------------------
   //
