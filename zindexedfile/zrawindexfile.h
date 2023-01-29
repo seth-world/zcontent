@@ -21,6 +21,14 @@
 
 #include <zindexedfile/zindexitem.h>
 
+
+enum ZIXMode : uint8_t {
+  ZIXM_Nothing      = 0,
+  ZIXM_Dycho        = 1,
+  ZIXM_Debug        = 2,
+  ZIXM_UpdateHeader = 4
+};
+
 /*
 #ifdef ZVerbose
 extern ZVerbose_type ZVerbose;
@@ -114,10 +122,10 @@ public:
  * @note if you want to create a ZIX without knowing in advance if there will be duplicates on key or not : you should set pDuplicates to ZST_DUPLICATES.
  *      Do not create ZIndexFilees with rejected key values : you will have holes into your index tables that will induce an impredictable result as soon as you will update any part of the hierarchy (ZAM and other dependant ZIXs).
  *
- * @param[in] pFather ZAM to which the ZIX refers
- * @param[in] pDuplicates ZSort_Type defining how duplicates will be managed. (set to ZST_DUPLICATES by default)
+ * @param[in] pFather mandatory ZMF to which the ZIX refers or may be nullptr if debug mode is set
+ * @param[in] pDebugMode optional switch to authorize using ZRawIndexFile as a standalone object withous its ZMF father
  */
-    ZRawIndexFile  (ZRawMasterFile *pFather);
+    ZRawIndexFile  (ZRawMasterFile *pFather, uint8_t pRunMode=ZIXM_Nothing);
     ZRawIndexFile  (ZRawMasterFile *pFather,ZIndexControlBlock& pZICB);
     ZRawIndexFile  (ZRawMasterFile *pFather,int pKeyUniversalsize,const utf8String &pIndexName ,ZSort_Type pDuplicates=ZST_NODUPLICATES);
 
@@ -156,6 +164,7 @@ public:
     using ZRandomFile::zclose;
     using ZRandomFile::zgetWAddress;
 
+    using ZRandomFile::setUpdateHeader;
 
     IndexData_st getIndexData()
     {
@@ -218,14 +227,15 @@ public:
    * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
    */
     ZStatus zcreateIndexFile(ZIndexControlBlock &pICB,
-                         uriString &pIndexUri,
-                         long pAllocatedBlocks,
-                         long pBlockExtentQuota,
-                         zsize_type pInitialSize,
-                         bool pHighwaterMarking=false,
-                         bool pGrabFreeSpace=false,
-                         bool pBackup=false,
-                         bool pLeaveOpen=true);
+                            uriString &pIndexUri,
+                            long pAllocatedBlocks,
+                            long pBlockExtentQuota,
+                            zsize_type pInitialSize,
+                            bool pHighwaterMarking=false,
+                            bool pGrabFreeSpace=false,
+                            bool pBackup=false,
+                            bool pLeaveOpen=true,
+                            uint8_t pRunMode=ZIXM_Nothing);
   /**
    * @brief ZIndexFile::zcreateIndex creates a new index file corresponding to the given specification ICB and ZRF parameters
    *      same as previous but with explicit pBlockTargetSize
@@ -239,7 +249,8 @@ public:
                           bool pHighwaterMarking=false,
                           bool pGrabFreeSpace=false,
                           bool pBackup=false,
-                          bool pLeaveOpen=true);
+                          bool pLeaveOpen=true,
+                          uint8_t pRunMode=ZIXM_Nothing);
 
 
 #ifdef __DEPRECATED__
@@ -324,9 +335,7 @@ public:
 
 
     ZStatus _URFsearchDychoUnique(const ZDataBuffer &pKeyToSearch,
-                              long &pIndexRank,
-                              zaddress_type &pIndexAddress,
-                              zaddress_type &pZMFAddress,
+                              ZIndexItem &pOutIndexItem,
                               const zlockmask_type pLock=ZLock_Nolock);
 
     ZStatus _URFtestRank( const ZDataBuffer &pKeyToSearch,
@@ -440,11 +449,13 @@ public: utf8String toXml(int pLevel,bool pComment);
 
 public: ZStatus  fromXml(zxmlNode* pIndexNode, ZaiErrors* pErrorlog);
 
-
+  void setRunMode(uint8_t pOnOff) ;
+  void showRunMode() ;
 private:
     long                  IndexCommitRank;
     zaddress_type         ZMFAddress;
     ZDataBuffer           CurrentKeyContent;
+    uint8_t               RunMode=false;
 };// class ZIndexFile
 
 

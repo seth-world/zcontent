@@ -131,6 +131,7 @@ SOURCES += \
     $${ZQT_WIDGET}/zqtwidgettypes.cpp \
     $${ZQT_WIDGET}/zqplaintextedit.cpp \
 #    $${ZQT_WIDGET}/zqpixlabelchecked.cpp \
+    ../../zcppparser/zcppparsertype.cpp \
     ../../zqt/zqtwidget/zqgraphicscene.cpp \
     ../../zqt/zqtwidget/zqrectangle.cpp \
     ../zcontentcommon/urfparser.cpp \
@@ -183,8 +184,10 @@ HEADERS += \
     $${ZQT_WIDGET}/zqtwidgettypes.h \
     $${ZQT_WIDGET}/zqplaintextedit.h \
 #    $${ZQT_WIDGET}/zqpixlabelchecked.h \
+    ../../zcppparser/zcppparsertype.h \
     ../../zqt/zqtwidget/zqgraphicscene.h \
     ../../zqt/zqtwidget/zqrectangle.h \
+    ../../zqt/zqtwidget/zqtutils.h \
     ../../zqt/zqtwidget/zqtwidgets_release.h \
     ../zcontentcommon/urfparser.h \
 \

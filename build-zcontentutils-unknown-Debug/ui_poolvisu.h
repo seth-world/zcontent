@@ -44,6 +44,11 @@ public:
     QLabel *ContentLBl;
     QPushButton *RefreshBTn;
     QGraphicsView *FileGraphicGVw;
+    QPushButton *ZoomInBTn;
+    QPushButton *ZoomOutBTn;
+    QPushButton *FitBTn;
+    QLabel *label_9;
+    QLabel *ContentSizeLBl;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -65,7 +70,7 @@ public:
         ContentVBl->setContentsMargins(0, 0, 0, 0);
         label_8 = new QLabel(centralwidget);
         label_8->setObjectName(QString::fromUtf8("label_8"));
-        label_8->setGeometry(QRect(260, 70, 161, 16));
+        label_8->setGeometry(QRect(260, 90, 161, 16));
         PoolNameLBl = new QLabel(centralwidget);
         PoolNameLBl->setObjectName(QString::fromUtf8("PoolNameLBl"));
         PoolNameLBl->setGeometry(QRect(230, 10, 261, 20));
@@ -75,7 +80,7 @@ public:
         PoolNameLBl->setFont(font);
         verticalLayoutWidget = new QWidget(centralwidget);
         verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
-        verticalLayoutWidget->setGeometry(QRect(10, 230, 791, 191));
+        verticalLayoutWidget->setGeometry(QRect(10, 210, 791, 211));
         HeaderVBl = new QVBoxLayout(verticalLayoutWidget);
         HeaderVBl->setObjectName(QString::fromUtf8("HeaderVBl"));
         HeaderVBl->setContentsMargins(0, 0, 0, 0);
@@ -87,14 +92,14 @@ public:
         label_6->setGeometry(QRect(10, 30, 71, 16));
         OffsetRelLBl = new QLabel(centralwidget);
         OffsetRelLBl->setObjectName(QString::fromUtf8("OffsetRelLBl"));
-        OffsetRelLBl->setGeometry(QRect(410, 70, 111, 16));
+        OffsetRelLBl->setGeometry(QRect(410, 90, 111, 16));
         OffsetRelLBl->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         label_4 = new QLabel(centralwidget);
         label_4->setObjectName(QString::fromUtf8("label_4"));
-        label_4->setGeometry(QRect(10, 70, 121, 16));
+        label_4->setGeometry(QRect(10, 90, 121, 16));
         OffsetAbsLBl = new QLabel(centralwidget);
         OffsetAbsLBl->setObjectName(QString::fromUtf8("OffsetAbsLBl"));
-        OffsetAbsLBl->setGeometry(QRect(120, 70, 111, 16));
+        OffsetAbsLBl->setGeometry(QRect(120, 90, 111, 16));
         OffsetAbsLBl->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         SaveBTn = new QPushButton(centralwidget);
         SaveBTn->setObjectName(QString::fromUtf8("SaveBTn"));
@@ -110,7 +115,22 @@ public:
         RefreshBTn->setGeometry(QRect(630, 40, 80, 23));
         FileGraphicGVw = new QGraphicsView(centralwidget);
         FileGraphicGVw->setObjectName(QString::fromUtf8("FileGraphicGVw"));
-        FileGraphicGVw->setGeometry(QRect(10, 100, 791, 101));
+        FileGraphicGVw->setGeometry(QRect(10, 110, 791, 101));
+        ZoomInBTn = new QPushButton(centralwidget);
+        ZoomInBTn->setObjectName(QString::fromUtf8("ZoomInBTn"));
+        ZoomInBTn->setGeometry(QRect(630, 70, 41, 23));
+        ZoomOutBTn = new QPushButton(centralwidget);
+        ZoomOutBTn->setObjectName(QString::fromUtf8("ZoomOutBTn"));
+        ZoomOutBTn->setGeometry(QRect(760, 70, 41, 23));
+        FitBTn = new QPushButton(centralwidget);
+        FitBTn->setObjectName(QString::fromUtf8("FitBTn"));
+        FitBTn->setGeometry(QRect(690, 70, 41, 23));
+        label_9 = new QLabel(centralwidget);
+        label_9->setObjectName(QString::fromUtf8("label_9"));
+        label_9->setGeometry(QRect(10, 70, 91, 16));
+        ContentSizeLBl = new QLabel(centralwidget);
+        ContentSizeLBl->setObjectName(QString::fromUtf8("ContentSizeLBl"));
+        ContentSizeLBl->setGeometry(QRect(100, 70, 101, 16));
         poolVisu->setCentralWidget(centralwidget);
         menubar = new QMenuBar(poolVisu);
         menubar->setObjectName(QString::fromUtf8("menubar"));
@@ -139,6 +159,11 @@ public:
         HeaderLBl->setText(QCoreApplication::translate("poolVisu", "123", nullptr));
         ContentLBl->setText(QCoreApplication::translate("poolVisu", "123", nullptr));
         RefreshBTn->setText(QCoreApplication::translate("poolVisu", "Refresh", nullptr));
+        ZoomInBTn->setText(QCoreApplication::translate("poolVisu", "+", nullptr));
+        ZoomOutBTn->setText(QCoreApplication::translate("poolVisu", "-", nullptr));
+        FitBTn->setText(QCoreApplication::translate("poolVisu", "Fit", nullptr));
+        label_9->setText(QCoreApplication::translate("poolVisu", "Content size", nullptr));
+        ContentSizeLBl->setText(QCoreApplication::translate("poolVisu", "123", nullptr));
     } // retranslateUi
 
 };

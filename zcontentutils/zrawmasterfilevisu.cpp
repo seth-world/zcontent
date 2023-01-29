@@ -1,6 +1,8 @@
 #include "zrawmasterfilevisu.h"
 #include "ui_zrawmasterfilevisu.h"
 
+#include <zqt/zqtwidget/zqtutils.h> // for  setQLabelNum() template
+
 #include <qnamespace.h>
 
 #include <fcntl.h>
@@ -33,6 +35,8 @@
 const long StringDiplayMax = 64;
 extern const int cst_maxraisonablevalue;
 
+extern const long cst_FileNudge ;
+
 ZRawMasterFileVisu::ZRawMasterFileVisu( QWidget *parent) :
                                                           QDialog(parent),
                                                           ui(new Ui::ZRawMasterFileVisu)
@@ -42,10 +46,6 @@ ZRawMasterFileVisu::ZRawMasterFileVisu( QWidget *parent) :
   ui->BottomLBl->setVisible(false);
   ui->TopLBl->setVisible(false);
 
-  ui->ViewModeCBx->addItem(QObject::tr("Raw view","ZRawMasterFileVisu"));
-  ui->ViewModeCBx->addItem(QObject::tr("URF Fields","ZRawMasterFileVisu"));
-
-  ui->ViewModeCBx->setCurrentIndex(1);
 
   QFont wVisuFont ("Monospace");
   ui->BitsetHeaderLBl->setFont(wVisuFont);
@@ -85,17 +85,23 @@ ZRawMasterFileVisu::ZRawMasterFileVisu( QWidget *parent) :
   ui->URFSizeColorLBl->setToolTip(QObject::tr("Leading URF data size value (uint64_t)","ZRawMasterFileVisu"));
 
 
-  ui->ColorModeCBx->addItem("No color");
+  ui->ColorModeCBx->addItem("Unknown record");
   ui->ColorModeCBx->addItem("Master file record");
   ui->ColorModeCBx->addItem("Key record");
 
   ui->ColorModeCBx->setCurrentIndex(0);
+
+  ui->ViewModeCBx->addItem("Raw view");
+  ui->ViewModeCBx->addItem("URF Fields");
+
+  ui->ViewModeCBx->setCurrentIndex(1);
 
   QObject::connect(ui->BackwardBTn, SIGNAL(clicked(bool)), this, SLOT(Backward()));
   QObject::connect(ui->ForwardBTn, SIGNAL(clicked(bool)), this, SLOT(Forward()));
   QObject::connect(ui->BeginBTn, SIGNAL(clicked(bool)), this, SLOT(ToBegin()));
   QObject::connect(ui->EndBTn, SIGNAL(clicked(bool)), this, SLOT(ToEnd()));
   QObject::connect(ui->ViewModeCBx, SIGNAL(currentIndexChanged(int)), this, SLOT(ViewModeChange(int)));
+  QObject::connect(ui->ColorModeCBx, SIGNAL(currentIndexChanged(int)), this, SLOT(RecStructChange(int)));
 
 }
 ZRawMasterFileVisu::~ZRawMasterFileVisu()
@@ -105,22 +111,28 @@ ZRawMasterFileVisu::~ZRawMasterFileVisu()
 
 ZStatus
 ZRawMasterFileVisu::setup(const uriString& pURI , int pFd) {
+
+  ui->ForwardBTn->setEnabled(true);
+  ui->BackwardBTn->setEnabled(true);
+  ui->BeginBTn->setEnabled(true);
+  ui->EndBTn->setEnabled(true);
+
   utf8VaryingString wStr;
   if (pFd < -1)
     return ZS_FILENOTOPEN;
   if (!pURI.exists())
     return ZS_FILENOTEXIST;
 
+  BlockCur.BlockSize=0L;
+  BlockCur.Address=0L;
+
   Fd = pFd;
 
   FileSize=size_t(pURI.getFileSize());
-  wStr.sprintf("%ld",FileSize);
 
-  ui->FileSizeLBl->setText(wStr.toCChar());
+  setQLabelNum(ui->FileSizeLBl,FileSize);
+
   AllFileLoaded=false;
-
-  wStr.sprintf("%d",BlockRank);
-  ui->BlockNbLBl->setText(wStr.toCChar()) ;
 
 /*
   Fd = ::open(pURI.toCChar(),O_RDONLY);// open content file for read only
@@ -136,7 +148,7 @@ ZRawMasterFileVisu::setup(const uriString& pURI , int pFd) {
   }
 */
   URICurrent = pURI;
-  BlockList.clear();
+//  BlockList.clear();
 
   BlockTBv = new ZQTableView(this);
   BlockTBv->newModel(5);
@@ -187,8 +199,6 @@ ZRawMasterFileVisu::setup(const uriString& pURI , int pFd) {
   BlockTBv->setVisible(false);
   BlockDumpTBv->setVisible(true);
 
-  Forward();
-
   return ZS_SUCCESS;
 } // setup
 
@@ -199,6 +209,8 @@ ZRawMasterFileVisu::displayRawBlock(ZDataBuffer& pData) {
   ui->ColorsGBx->setVisible(true);
   ui->StartColorLBl->setVisible(true);
   ui->WrongColorLBl->setVisible(true);
+
+  BlockDumpTBv->setGeometry(BlockTBv->geometry());
 
   BlockDumpTBv->ItemModel->removeRows(0,BlockDumpTBv->ItemModel->rowCount());
 
@@ -377,365 +389,326 @@ ZRawMasterFileVisu::searchNextValidZType(const ZDataBuffer& pRecord,
     return ZS_NOTFOUND;
 }// searchNextValidZType
 
+ZStatus
+ZRawMasterFileVisu::searchNextBlock(ZBlockDescriptor_Export& pBlock, zaddress_type pStartAddress) {
+  ZBlockHeader_Export wBExp;
+  ZDataBuffer wRecord;
+  ssize_t wSize= ssize_t(sizeof(ZBlockHeader_Export));
+
+  zaddress_type pOutAddress;
+
+  ZStatus wSt=searchNextStartSign(pStartAddress,pOutAddress);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+  wSt=seekAndGet(wRecord,wSize,pOutAddress);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+  memmove(&wBExp,wRecord.Data,sizeof(ZBlockHeader_Export));
+  wBExp.deserialize();
+  pBlock.State = wBExp.State;
+  pBlock.Pid = wBExp.Pid;
+  pBlock.Lock = wBExp.Lock;
+  pBlock.BlockSize = wBExp.BlockSize;
+  pBlock.Address = pOutAddress;
+
+  return ZS_SUCCESS;
+}
+ZStatus
+ZRawMasterFileVisu::searchPreviousBlock(ZBlockDescriptor_Export& pBlock, zaddress_type pStartAddress) {
+  ZDataBuffer wRecord;
+  zaddress_type pOutAddress;
+  ZBlockHeader_Export wBExp;
+  ssize_t wSize= ssize_t(sizeof(ZBlockHeader_Export));
+  ZStatus wSt=searchPreviousStartSign(pStartAddress,pOutAddress);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+  wSt=seekAndGet(wRecord,wSize,pOutAddress);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+  memmove(&wBExp,wRecord.Data,sizeof(ZBlockHeader_Export));
+  wBExp.deserialize();
+  pBlock.State = wBExp.State;
+  pBlock.Pid = wBExp.Pid;
+  pBlock.Lock = wBExp.Lock;
+  pBlock.BlockSize = wBExp.BlockSize;
+  pBlock.Address = pOutAddress;
+
+  BlockCur = pBlock;
+
+  return ZS_SUCCESS;
+} //searchPreviousBlock
+
+
 /** pAddress is the file offset that corresponds to wRecord.Data */
 ZStatus
-ZRawMasterFileVisu::searchStartSign(ZDataBuffer& wRecord,zaddress_type & pAddress) {
+ZRawMasterFileVisu::searchNextStartSign(zaddress_type pStartAddress, zaddress_type & pOutAddress) {
+
+
+  if ((pStartAddress < 0)||(pStartAddress>FileSize)) {
+    utf8VaryingString wStr;
+    wStr.sprintf("Invalid address to search <%lld>.",pStartAddress);
+    ui->MessagePTe->appendPlainText(wStr.toCChar());
+    return ZS_OUTBOUND;
+  }
+
   ZStatus wSt=ZS_SUCCESS;
-  unsigned char* wPtr = wRecord.Data;
-  unsigned char* wPtrEnd = wRecord.Data + wRecord.Size ;
+  long wNudge = FileNudge;
+
+  ZDataBuffer wRecord;
+  if ( long(pStartAddress) - long(FileSize) < wNudge)
+    wNudge = long(FileSize) - long(pStartAddress) ;
+  else
+    pStartAddress += wNudge;
+
+  wSt=seekAndGet(wRecord,wNudge,pStartAddress);
+
+  unsigned char* wPtr = wRecord.Data ;
+  unsigned char* wPtrEnd = wRecord.Data + wRecord.Size;
 
   uint32_t* wStartSign = (uint32_t*)wPtr;
-  zaddress_type wAddress = pAddress;
-  while ((wAddress < zaddress_type(FileSize)) && (wPtr < wPtrEnd) && (wSt==ZS_SUCCESS)) {
+  if (*wStartSign== cst_ZFILEBLOCKSTART) {
+    pOutAddress = pStartAddress;
+    FileOffset = off_t(pStartAddress);
+    return ZS_SUCCESS;
+  }
+
+
+  while ((pStartAddress < zaddress_type(FileSize)) && (wSt==ZS_SUCCESS)) {
 
     while ((*wStartSign!=cst_ZFILEBLOCKSTART) && (wPtr < wPtrEnd)) {
       wStartSign = (uint32_t*)wPtr;
-      wAddress ++;
+      pStartAddress ++;
+      FileOffset++;
       wPtr++;
     }
     if (*wStartSign==cst_ZFILEBLOCKSTART)
       break;
 
-    /* here wPtr == wPtrEnd */
-    ssize_t wSize;
-    if (BlockList.count()>0)
-      wSize = BlockList.last().BlockSize;
-    else {
-      wSize = 10000;
-    }
-    if (wAddress == zaddress_type(FileSize)) {
-//      utf8VaryingString wStr;
-//      wStr.sprintf("No start block mark found. File surface exhausted.");
+    if (pStartAddress >= zaddress_type(FileSize)) {
       ui->MessagePTe->appendPlainText("No start block mark found. File surface exhausted.");
-      return ZS_NOTFOUND;
+      return ZS_OUTBOUNDHIGH;
     }
-    wAddress -= 3;
-    wSt=seekAndGet(wRecord,wSize,wAddress);
+    pStartAddress -= 3;
+    FileOffset -= 3;
+    wSt=seekAndGet(wRecord,wNudge,pStartAddress);
     if (wSt!=ZS_SUCCESS)
       return wSt;
     wPtr = wRecord.Data;
     wPtrEnd = wRecord.Data + wRecord.Size ;
   } // while wAddress
 
-  if (wAddress != pAddress){
-    ZDataBuffer wNewBuffer;
-    size_t wNewSize = wPtrEnd-wPtr;
 
-    wNewBuffer.allocate(wNewSize);
-    wNewBuffer.setData(wPtr,wNewSize);
-
-    wRecord.setData(wNewBuffer);
-  }
-  pAddress = wAddress;
+  pOutAddress = pStartAddress;
+  FileOffset = off_t(pStartAddress);
 
   return ZS_SUCCESS;
-}// searchStartSign
+}// searchNextStartSign
 
 
-ZStatus
-ZRawMasterFileVisu::getNextBlock(ZDataBuffer & wRecord,ssize_t wSize,zaddress_type & wAddress) {
-
-  ZStatus wSt = seekAndGet(wRecord,wSize,wAddress);
-  if (wSt!=ZS_SUCCESS) {
-    return wSt;
+void ZRawMasterFileVisu::getPrevAddrVal(zaddress_type &pAddress, long &pNudge, long &pBucket){
+  pNudge = FileNudge ;
+  if (pAddress < pNudge) {
+    pNudge = pBucket =  pAddress ;
+    pAddress = 0L;
+    return;
   }
 
-  /* search next startblock */
+  pAddress -= pNudge;
 
-  return  searchStartSign(wRecord,wAddress) ;
-}// getNextBlock
+  if ((pAddress + FileNudge) > FileSize){
+    pBucket = FileSize - pAddress ;
+  }
+  else
+    pBucket = FileNudge + sizeof(cst_ZFILEBLOCKSTART) -1 ;
+}
+
+/* search previous start block starting at pAddress and decreasing to beginning of file */
+ZStatus
+ZRawMasterFileVisu::searchPreviousStartSign(zaddress_type pStartAddress, zaddress_type & pOutAddress ) {
+
+  if ((pStartAddress < 0)||(pStartAddress>FileSize)) {
+    utf8VaryingString wStr;
+    wStr.sprintf("Invalid address to search <%lld>.",pStartAddress);
+    ui->MessagePTe->appendPlainText(wStr.toCChar());
+    return ZS_OUTBOUND;
+  }
+
+  ZStatus wSt=ZS_SUCCESS;
+
+  long wNudge = FileNudge ;
+  long wBucket = wNudge + sizeof(cst_ZFILEBLOCKSTART) -1; /* just to take a truncated start sign into account */
+
+  FileOffset = off_t(pStartAddress);
+
+  ZDataBuffer wRecord;
+  zaddress_type wAddress=pStartAddress;
+
+  unsigned char* wPtr ;
+  unsigned char* wPtrEnd ;
+  uint32_t* wStartSign ;
+
+  getPrevAddrVal(wAddress,wNudge,wBucket);
+
+  wSt=seekAndGet(wRecord,wBucket,wAddress);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+  wPtrEnd = wRecord.Data ;
+  wPtr =  wRecord.Data + wRecord.Size - sizeof(cst_ZFILEBLOCKSTART) ;
+  pStartAddress = wAddress + wRecord.Size - sizeof(cst_ZFILEBLOCKSTART);
+  wStartSign=(uint32_t*)wPtr;
+  while ((pStartAddress >= zaddress_type(0L)) && (wSt==ZS_SUCCESS)) {
+    while ((*wStartSign!=cst_ZFILEBLOCKSTART) && (wPtr >= wPtrEnd)) {
+      wStartSign = (uint32_t*)wPtr;
+//      pStartAddress --;
+//      FileOffset --;
+      wPtr--;
+    }
+    if (*wStartSign==cst_ZFILEBLOCKSTART)
+      break;
+
+    /* here wPtr == wRecord.Data */
+
+    getPrevAddrVal(wAddress,wNudge,wBucket);
+
+    wSt=seekAndGet(wRecord,wBucket,wAddress);
+    if (wSt!=ZS_SUCCESS)
+      return wSt;
+
+    wPtrEnd = wRecord.Data  ;
+    wPtr =  wRecord.Data + wRecord.Size - sizeof(cst_ZFILEBLOCKSTART);
+    wStartSign=(uint32_t*)wPtr;
+  } // while wAddress
+
+  size_t wOffset = (wPtr-wRecord.Data) + 1;
+  pOutAddress = wAddress + wOffset ;
+  FileOffset = off_t(pOutAddress);
+  return ZS_SUCCESS;
+}// searchNextStartSign
+
+
+void
+ZRawMasterFileVisu::Backward(){
+
+  ui->BottomLBl->setVisible(false);
+  zaddress_type wAdr= BlockCur.Address - sizeof(cst_ZFILEBLOCKSTART);
+  ZStatus wSt=searchPreviousBlock(BlockCur,wAdr);
+
+  if ((wAdr == 0) || (wSt==ZS_OUTBOUNDLOW)) {
+    ui->TopLBl->setVisible(true);
+    return;
+  }
+  ui->BottomLBl->setVisible(false);
+  displayBlock(BlockCur);
+  return;
+}
 
 
 void
 ZRawMasterFileVisu::Forward() {
   ZStatus wSt;
-  ssize_t wSize;
   ZDataBuffer wRecord;
-  zaddress_type wAddress=0;
+  zaddress_type wStartAddress=BlockCur.Address + BlockCur.BlockSize;
 
-  ui->TopLBl->setVisible(false);
-
+  wSt=searchNextBlock(BlockCur,wStartAddress);
+  if (wSt==ZS_OUTBOUNDHIGH) {
+    ui->BottomLBl->setVisible(true);
+    return;
+  }
   if (FileOffset >= off_t(FileSize)) {
     ui->BottomLBl->setVisible(true);
     return;
   }
 
-  if (BlockList.count() > 0) {
-    FileOffset = BlockList[BlockRank].Address + BlockList[BlockRank].BlockSize ;
-    if (FileOffset == off_t(FileSize)) {
-      ui->BottomLBl->setVisible(true);
-      ui->TopLBl->setVisible(false);
-      return;
-    }
-    if ((BlockRank >= 0) && (BlockRank < (BlockList.count() - 2) )) {
-      ++BlockRank;
-      displayBlock(BlockList[BlockRank]);
-      return;
-    }
-    wAddress = BlockList.last().Address + BlockList.last().BlockSize;
-    if (wAddress >= zaddress_type(FileSize)) {
-      ui->BottomLBl->setVisible(true);
-      ui->TopLBl->setVisible(false);
-    }
-
-    wSize = ssize_t(BlockList.last().BlockSize);
-  }
-  else
-    wSize = 1000; /* if no block registered yet, then used 1000 as hopefully value */
-
-  /* need to access a block that is not already stored */
-
-  wSt=getNextBlock(wRecord,wSize,wAddress);
-  if (wSt!=ZS_SUCCESS){
-    if (wSt==ZS_EOF) {
-      ui->BottomLBl->setVisible(true);
-      ui->TopLBl->setVisible(false);
-      return;
-    }
-    ZExceptionDLg::messageWAdd("ZRawMasterFileVisu::Forward",wSt,Severity_Severe,
-        ZException.last().formatUtf8(),
-        "Cannot get next block on file %s,",URICurrent.toCChar());
-    return;
-  }
-
-  if (wRecord.Size < sizeof(ZBlockHeader_Export)) {
-    wSize = sizeof(ZBlockHeader_Export);
-    wSt = seekAndGet(wRecord,wSize,wAddress);
-    if (wSt!=ZS_SUCCESS) {
-      if (wSt==ZS_EOF) {
-        ui->BottomLBl->setVisible(true);
-        ui->TopLBl->setVisible(false);
-        return;
-      }
-      return;
-    } //if (wSt!=ZS_SUCCESS)
-  }
-
-  memmove (&BlockCur,wRecord.Data,sizeof(ZBlockHeader_Export));
-
-  BlockCur.deserialize();
-  BlockCur.Address = wAddress;
-
-  BlockList.push(BlockCur);
-  BlockRank = BlockList.lastIdx();
-
   ui->TopLBl->setVisible(false);
-
   displayBlock(BlockCur);
   return;
 } // Forward
 
-
 void
-ZRawMasterFileVisu::goToAddress(zaddress_type pAddress) {
-  ZStatus wSt;
-  ssize_t wSize;
-  ZDataBuffer wRecord;
-  zaddress_type wAddress=pAddress;
-
-#ifdef __COMMENT__
-  ui->TopLBl->setVisible(false);
-
-  if (FileOffset >= off_t(FileSize)) {
-    ui->BottomLBl->setVisible(true);
-    return;
-  }
-
-  if (BlockList.count() > 0) {
-    long wi=0;
-    for (; (wi < BlockList.count()) && (BlockList[wi].Address < pAddress) ; wi++  ) ;
-
-    if (wi < BlockList.count()) {
-
-    }
-
-
-    FileOffset = BlockList[BlockRank].Address + BlockList[BlockRank].BlockSize ;
-    if (FileOffset == off_t(FileSize)) {
-      ui->BottomLBl->setVisible(true);
-      ui->TopLBl->setVisible(false);
-      return;
-    }
-    if ((BlockRank >= 0) && (BlockRank < (BlockList.count() - 2) )) {
-      ++BlockRank;
-      displayBlock(BlockList[BlockRank]);
-      return;
-    }
-    wAddress = BlockList.last().Address + BlockList.last().BlockSize;
-    if (wAddress >= zaddress_type(FileSize)) {
-      ui->BottomLBl->setVisible(true);
-      ui->TopLBl->setVisible(false);
-    }
-
-    wSize = ssize_t(BlockList.last().BlockSize);
-  }
-  else
-    wSize = 1000; /* if no block registered yet, then used 1000 as hopefully value */
-
-  /* need to access a block that is not already stored */
-#endif //__COMMENT__
-
-  wSt = seekAndGet(wRecord,wSize,wAddress);
-  if (wSt!=ZS_SUCCESS) {
-    ZExceptionDLg::adhocMessage("ZRawMasterFileVisu::setToAddress",Severity_Error,nullptr,nullptr,
-        "Cannot set to address %lld for file <%s>",wAddress,URICurrent.toString());
-    return;
-  }
-
-#ifdef __COMMENT__
-  /* search next startblock */
-
-  wSt = searchStartSign(wRecord,wAddress) ;
-  if (wSt!=ZS_SUCCESS){
-    if (wSt==ZS_EOF) {
-      ui->BottomLBl->setVisible(true);
-      ui->TopLBl->setVisible(false);
-      return;
-    }
-    ZExceptionDLg::messageWAdd("ZRawMasterFileVisu::setToAddress",wSt,Severity_Severe,
-        ZException.last().formatUtf8(),
-        "Cannot set block to address %lld on file %s,",wAddress,URICurrent.toCChar());
-    return;
-  }
-#endif // __COMMENT__
-/*
-  if (wRecord.Size < sizeof(ZBlockHeader_Export)) {
-    wSize = sizeof(ZBlockHeader_Export);
-    wSt = seekAndGet(wRecord,wSize,wAddress);
-    if (wSt!=ZS_SUCCESS) {
-      if (wSt==ZS_EOF) {
-        ui->BottomLBl->setVisible(true);
-        ui->TopLBl->setVisible(false);
-        return;
-      }
-      return;
-    } //if (wSt!=ZS_SUCCESS)
-    }
-*/
-  memmove (&BlockCur,wRecord.Data,sizeof(ZBlockHeader_Export));
-
-  BlockCur.deserialize();
-  BlockCur.Address = wAddress;
-
-  BlockList.push(BlockCur);
-  BlockRank = BlockList.lastIdx();
-
-  ui->TopLBl->setVisible(false);
-
-  displayBlock(BlockCur);
-  return;
-} // Forward
-
-
-
-void
-ZRawMasterFileVisu::Backward(){
-  if (BlockRank == 0) {
-    ui->BottomLBl->setVisible(false);
-    ui->TopLBl->setVisible(true);
-    return;
-  }
-  --BlockRank;
-  ui->BottomLBl->setVisible(false);
-  displayBlock(BlockList[BlockRank]);
-  return;
+ZRawMasterFileVisu::setViewModeRaw() {
+  ui->ViewModeCBx->setCurrentIndex(0);
 }
+void
+ZRawMasterFileVisu::setViewModeURF() {
+  ui->ViewModeCBx->setCurrentIndex(1);
+}
+void
+ZRawMasterFileVisu::goToAddress(zaddress_type pAddress, zrank_type pRank) {
+  ZStatus wSt;
+  ssize_t wSize = sizeof(ZBlockHeader_Export);
+  ZDataBuffer wRecord;
+
+/*
+  ui->ForwardBTn->setEnabled(false);
+  ui->BackwardBTn->setEnabled(false);
+  ui->BeginBTn->setEnabled(false);
+  ui->EndBTn->setEnabled(false);
+*/
+//  BlockRank = pRank;
+
+
+
+  wSt = seekAndGet(wRecord,wSize,pAddress);
+  if (wSt!=ZS_SUCCESS) {
+    ZExceptionDLg::adhocMessage("ZRawMasterFileVisu::goToAddress",Severity_Error,nullptr,nullptr,
+        "Cannot set to address %lld for file <%s>",pAddress,URICurrent.toString());
+    return;
+  }
+  memmove (&BlockCur,wRecord.Data,sizeof(ZBlockHeader_Export));
+
+  if (BlockCur.StartSign!=cst_ZFILEBLOCKSTART){
+    ZExceptionDLg::adhocMessage("ZRawMasterFileVisu::goToAddress",Severity_Error,nullptr,nullptr,
+        "Invalid block found at address %lld for file <%s>",pAddress,URICurrent.toString());
+    return;
+
+  }
+
+  BlockCur.deserialize();
+  BlockCur.Address = pAddress;
+
+//  BlockList.push(BlockCur);
+//  BlockRank = BlockList.lastIdx();
+
+  ui->TopLBl->setVisible(false);
+
+  displayBlock(BlockCur);
+  return;
+} // goToAddress
 
 void
 ZRawMasterFileVisu::ToEnd(){
 
-  ZDataBuffer wRecord;
-  ssize_t wSize=0;
   ZStatus wSt=ZS_SUCCESS;
 
   ui->TopLBl->setVisible(false);
 
-  FileOffset = 0; /* reset file offset to beginning */
+  FileOffset = FileSize ;
 
-  if (BlockList.count()>0) {
-    FileOffset = off_t(BlockList.last().Address);
-    if ((FileOffset+BlockList.last().BlockSize) >= FileSize) {  /* all blocks have been already stored */
-      BlockCur = BlockList.last();
-      displayBlock(BlockCur);
-      return;
-    }
-    /* here blocks have been partially stored. FileOffset points to beginning of last read block */
-    FileOffset +=  off_t(BlockList.last().BlockSize); /* let's point to theorical beginning of next block */
-  }
-
-  wSize = sizeof(ZBlockHeader_Export);
-  wSt=getNextBlock(wRecord,wSize,FileOffset);
+  wSt=searchPreviousBlock(BlockCur,zaddress_type(FileOffset));
   if (wSt!=ZS_SUCCESS){
-    if (wSt==ZS_EOF) {
-      ui->BottomLBl->setVisible(true);
-      ui->TopLBl->setVisible(false);
-      return;
-    }
-    ZExceptionDLg::messageWAdd("ZRawMasterFileVisu::Forward",wSt,Severity_Severe,
-        ZException.last().formatUtf8(),
-        "Cannot get next block on file %s,",URICurrent.toCChar());
-    return;
-  } //if (wSt!=ZS_SUCCESS)
-
-  while (wSt==ZS_SUCCESS) {
-    if (wRecord.Size < sizeof(ZBlockHeader_Export)) {
-      wSize = sizeof(ZBlockHeader_Export);
-      wSt = seekAndGet(wRecord,wSize,FileOffset);
-      if (wSt!=ZS_SUCCESS) {
-        if (wSt==ZS_EOF) {
-          ui->BottomLBl->setVisible(true);
-          ui->TopLBl->setVisible(false);
-          return;
-        }
-        return;
-      } //if (wSt!=ZS_SUCCESS)
-    }
-    memmove (&BlockCur,wRecord.Data,sizeof(ZBlockHeader_Export));
-    BlockCur.deserialize();
-    BlockCur.Address = zaddress_type(FileOffset);
-
-    BlockList.push(BlockCur);
-    BlockRank = BlockList.lastIdx();
-
-    if ((BlockCur.BlockSize+BlockCur.Address) >= FileSize)
-      break;
-
-    FileOffset += off_t(BlockCur.BlockSize);
-
-    wSt=getNextBlock(wRecord,wSize,FileOffset);
-    if (wSt!=ZS_SUCCESS){
-      if (wSt==ZS_EOF) {
-        ui->BottomLBl->setVisible(true);
-        ui->TopLBl->setVisible(false);
-        return;
-      }
-      ZExceptionDLg::messageWAdd("ZRawMasterFileVisu::Forward",wSt,Severity_Severe,
+      ZExceptionDLg::messageWAdd("ZRawMasterFileVisu::ToEnd",wSt,Severity_Severe,
           ZException.last().formatUtf8(),
-          "Cannot get next block on file %s,",URICurrent.toCChar());
+          "Cannot get last block on file %s,",URICurrent.toCChar());
       return;
     }
-  }//while (wSt==ZS_SUCCESS)
-  if (BlockList.count() > 0) {
-    displayBlock(BlockCur);  /* BlockCur contains the last accessed Block */
-  }
 
+  displayBlock(BlockCur);  /* BlockCur contains the last accessed Block */
 }
 
 void
 ZRawMasterFileVisu::ToBegin(){
-  BlockRank = 0;
+  FileOffset=0;
   ui->BottomLBl->setVisible(false);
-  displayBlock(BlockList[BlockRank]);
+  ZStatus wSt=searchNextBlock(BlockCur,zaddress_type(FileOffset));
+  if (wSt!=ZS_SUCCESS){
+    ZExceptionDLg::messageWAdd("ZRawMasterFileVisu::ToBegin",wSt,Severity_Severe,
+        ZException.last().formatUtf8(),
+        "Cannot get first block on file %s,",URICurrent.toCChar());
+    return;
+  }
+
+  displayBlock(BlockCur);
   return;
-}
-template <class _Tp>
-void setQLabel(QLabel* pLabel,_Tp pValue) {
-  utf8VaryingString wStr;
-  if (sizeof(_Tp)>4)
-    wStr.sprintf("%ld",pValue);
-  else
-    wStr.sprintf("%d",pValue);
-  pLabel->setText(wStr.toCChar());
 }
 
 
@@ -760,19 +733,15 @@ convertAtomicBack(ZType_type pType,const unsigned char* &pPtrIn) {
 
 void
 ZRawMasterFileVisu::ViewModeChange(int pIndex) {
-  if (pIndex==0) {
+
+  if (pIndex==0){
     BlockTBv->setVisible(false);
     BlockDumpTBv->setVisible(true);
     Raw=true;
 
     ui->URFSizeLabelLBl->setVisible(false);
     ui->URFSizeLBl->setVisible(false);
-    ui->FieldPresenceLabelLBl->setVisible(false);
-    ui->BitsetHeaderLBl->setVisible(false);
-    ui->BitsetContentLBl->setVisible(false);
-
-    if (BlockRank > -1)
-      displayBlock(BlockList[BlockRank]);
+    displayBlock(BlockCur);
     return;
   }
   BlockTBv->setVisible(true);
@@ -781,12 +750,27 @@ ZRawMasterFileVisu::ViewModeChange(int pIndex) {
 
   ui->URFSizeLabelLBl->setVisible(true);
   ui->URFSizeLBl->setVisible(true);
-  ui->FieldPresenceLabelLBl->setVisible(true);
-  ui->BitsetHeaderLBl->setVisible(true);
-  ui->BitsetContentLBl->setVisible(true);
 
-  if (BlockRank > -1)
-    displayBlock(BlockList[BlockRank]);
+  displayBlock(BlockCur);
+
+  return;
+}
+void
+ZRawMasterFileVisu::RecStructChange(int pIndex) {
+  if ((pIndex==0)||(pIndex==2)) {
+    ui->URFSizeLabelLBl->setVisible(false);
+    ui->URFSizeLBl->setVisible(false);
+    ui->FieldPresenceGBx->setVisible(false);
+    displayBlock(BlockCur);
+
+    return;
+  }
+
+  ui->URFSizeLabelLBl->setVisible(true);
+  ui->URFSizeLBl->setVisible(true);
+  ui->FieldPresenceGBx->setVisible(true);
+  displayBlock(BlockCur);
+
   return;
 }
 
@@ -832,16 +816,18 @@ ZRawMasterFileVisu::displayBlock(ZBlockDescriptor_Export & pBlock)
   QList<QStandardItem*> wRow;
   RawRecord.allocate(pBlock.BlockSize);
 
+  setQLabelNum<zsize_type>(ui->FileSizeLBl,pBlock.BlockSize);
+//  setQLabel<long>(ui->BlockNbLBl,BlockRank);
+
   ZStatus wSt = seekAndRead(RawRecord,pBlock);
   if (wSt!=ZS_SUCCESS)
     return wSt;
 
-  setQLabel(ui->BeginLBl,pBlock.Address);
-  setQLabel<zaddress_type>(ui->EndLBl,zaddress_type(pBlock.Address+pBlock.BlockSize));
-  setQLabel<size_t>(ui->FileSizeLBl,FileSize);
+  setQLabelNum(ui->BeginLBl,pBlock.Address);
+  setQLabelNum<zaddress_type>(ui->EndLBl,zaddress_type(pBlock.Address+pBlock.BlockSize));
+  setQLabelNum<size_t>(ui->FileSizeLBl,pBlock.BlockSize);
 
   ui->StateLBl->setText(decode_ZBS(pBlock.State));
-  setQLabel<long>(ui->BlockNbLBl,BlockRank);
 
   if (Raw) {
     if (BlockTBv->isVisible()) {
@@ -953,6 +939,8 @@ ZRawMasterFileVisu::displayURFBlock(ZDataBuffer & pData)
   QList<QStandardItem*> wRow;
   zaddress_type wOffset=0;
   const unsigned char* wPtr = pData.Data;
+
+  setQLabelNum<size_t>(ui->FileSizeLBl,pData.Size);
 
   /* for debug purpose */
   ZBlockDescriptor_Export wBlke;
@@ -2086,6 +2074,7 @@ void ZRawMasterFileVisu::resizeEvent(QResizeEvent* pEvent)
 
   BlockTBv->resize(wVW,wVH);
   BlockDumpTBv->resize(wVW,wVH);
+//  BlockDumpTBv->setGeometry(BlockTBv->geometry());
 /*  wBTBv.setWidth(wVW);
   wBTBv.setHeight(wVH);
   ui->centerWidgetWDg->setGeometry(wBTBv);

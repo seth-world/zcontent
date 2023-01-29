@@ -45,7 +45,18 @@ public:
   ZDataBuffer getURFFieldByRank (long pRank);
 
   static ssize_t getURFFieldSize (const unsigned char *pPtrIn); /* pPtrIn is NOT updated */
-  static ZStatus getURFTypeAndSize (const unsigned char *pPtrIn,ZTypeBase& pType,ssize_t & pSize); /* pPtrIn is NOT updated */
+
+  /**
+   *  */
+  /**
+   * @brief getURFFieldAllSizes gets ZType (pType) URF header size (pURFHeaderSize) and data size(pDataSize) without header
+   *  from an URF field pointed by pPtr.
+   *  pPtr is updated to point to first byte of field data : returns the size of the whole field including URF header
+   */
+  static ssize_t getURFFieldAllSizes (const unsigned char* &pPtr,ZTypeBase& pType,size_t &pURFHeaderSize,size_t &pDataSize);
+
+
+  static ZStatus getURFTypeAndSize (const unsigned char *&pPtrIn, ZTypeBase& pType, ssize_t & pSize); /* pPtrIn is NOT updated */
   ZStatus getURFFieldValue (const unsigned char* &wPtr, ZDataBuffer& pValue);
   ZStatus getKeyFieldValue (const unsigned char* &wPtr, ZDataBuffer& pValue);
 

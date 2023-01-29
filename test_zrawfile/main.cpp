@@ -1,6 +1,7 @@
 
 #include <zcontent/zindexedfile/zrawmasterfile.h>
 #include <zcontent/zindexedfile/zrawmasterfileutils.h>
+#include <zcontent/zindexedfile/zrawindexfile.h>
 #include "zdocphysical.h"
 #include <QApplication>
 
@@ -113,6 +114,26 @@ ZStatus displayAll(ZRandomFile& pZRF) {
   return wSt;
 }
 
+ZStatus displayAllUtf8(ZRandomFile& pZRF) {
+
+  ZDataBuffer wRecord;
+  ZIndexItem wItem;
+  utf8VaryingString wStr;
+
+  _DBGPRINT(" List all utf8\n")
+
+  int wi=0;
+  ZStatus wSt=pZRF.zgetFirst(wRecord);
+  while (wSt==ZS_SUCCESS) {
+    wItem.fromFileKey(wRecord);
+    const unsigned char* wPtr=wItem.Data;
+    wStr._importURF( wPtr );
+    _DBGPRINT(" rank %d  Address %ld content <%s>\n",wi,wItem.ZMFAddress,wStr.toString())
+    wSt=pZRF.zgetNext(wRecord);
+    wi++;
+  }
+  return wSt;
+}
 
 ZStatus displayRank(ZRandomFile& pZRF,long pRank){
   ZDataBuffer wRecord;
@@ -131,6 +152,20 @@ void displayKeys (ZRawMasterFile& pMasterFile);
 
 const char* wPictureDir = "/home/gerard/Development/zmftest/testpicture/";
 
+
+void addKeyValue (ZRawIndexFile& wZIX,ZIndexItem* wIndexItem,ZDataBuffer& pRecord,const zaddress_type pAddress) {
+  ZStatus wSt=wZIX._addRawKeyValue_Prepare(wIndexItem,pRecord,pAddress);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+  wSt=wZIX._rawKeyValue_Commit(wIndexItem);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+}
+
+
+
 int main(int argc, char *argv[])
 {
 
@@ -143,7 +178,9 @@ int main(int argc, char *argv[])
   zaddress_type wAddress=0;
 
   ZStatus wSt;
+//  ZVerbose |= ZVB_FileEngine | ZVB_SearchEngine | ZVB_MemEngine ;
   ZVerbose |= ZVB_FileEngine | ZVB_SearchEngine | ZVB_MemEngine ;
+
   QApplication a(argc, argv);
 
 
@@ -167,7 +204,7 @@ int main(int argc, char *argv[])
   ZResource wRes;
 
   ZIndexItem wItem;
-
+#ifdef __TESTRUN_1__
   long wRank=0;
   uriString wUriZRF = wWD;
 
@@ -193,7 +230,7 @@ int main(int argc, char *argv[])
   wRecord.setData(wRecord);
 
   wItem.setBuffer(wRecord);
-  wItem.ZMFAddress = 0;
+  wItem.ZMFAddress = 1;
   wRecord=wItem.toFileKey();
 
   _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR1).toString())
@@ -207,7 +244,7 @@ int main(int argc, char *argv[])
   wR2._exportURF(wRecord);
   wRecord.setData(wRecord);
   wItem.setBuffer(wRecord);
-  wItem.ZMFAddress ++;
+  wItem.ZMFAddress = 2;
   wRecord=wItem.toFileKey();
 
   _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR2).toString())
@@ -223,7 +260,7 @@ int main(int argc, char *argv[])
   wR3._exportURF(wRecord);
   wRecord.setData(wRecord);
   wItem.setBuffer(wRecord);
-  wItem.ZMFAddress ++;
+  wItem.ZMFAddress = 3;
   wRecord=wItem.toFileKey();
 
   _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR3).toString())
@@ -236,13 +273,14 @@ int main(int argc, char *argv[])
 
   displayAll(wZRF);
 
+  wRank=2;
   _DBGPRINT("insert at %d resource %s\n",2,displayResource(wR4).toString())
 
   wRecord.clear();
   wR4._exportURF(wRecord);
   wRecord.setData(wRecord);
   wItem.setBuffer(wRecord);
-  wItem.ZMFAddress ++;
+  wItem.ZMFAddress = 4;
   wRecord=wItem.toFileKey();
 
   wSt=wZRF._insert2Phases_Prepare(wRecord,2,wAddress);
@@ -257,11 +295,13 @@ int main(int argc, char *argv[])
 
   displayAll(wZRF);
 
+  wRank = wZRF.getRecordCount();
+
   wRecord.clear();
   wR5._exportURF(wRecord);
   wRecord.setData(wRecord);
   wItem.setBuffer(wRecord);
-  wItem.ZMFAddress ++;
+  wItem.ZMFAddress = 5;
   wRecord=wItem.toFileKey();
 
   _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR5).toString())
@@ -278,7 +318,7 @@ int main(int argc, char *argv[])
   wR6._exportURF(wRecord);
   wRecord.setData(wRecord);
   wItem.setBuffer(wRecord);
-  wItem.ZMFAddress ++;
+  wItem.ZMFAddress = 6;
   wRecord=wItem.toFileKey();
 
   _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR6).toString())
@@ -295,7 +335,7 @@ int main(int argc, char *argv[])
   wR7._exportURF(wRecord);
   wRecord.setData(wRecord);
   wItem.setBuffer(wRecord);
-  wItem.ZMFAddress ++;
+  wItem.ZMFAddress = 7;
   wRecord=wItem.toFileKey();
 
   _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR7).toString())
@@ -336,19 +376,39 @@ int main(int argc, char *argv[])
 
   displayAll(wZRF);
 
-  wEraseRank = 2L ;
-  _DBGPRINT(" Replace rank %ld with %s\nCurrent content is :",wEraseRank, displayResource( wR10).toString() )
-  displayRank(wZRF,wEraseRank);
+  wRank = 2L ;
+  _DBGPRINT(" Replace rank %ld with R9 %s\nContent before replace is :\n",wRank, displayResource( wR9).toString() )
+  displayRank(wZRF,wRank);
+
+  wRecord.clear();
+  wR9._exportURF(wRecord);
+  wRecord.setData(wRecord);
+  wItem.setBuffer(wRecord);
+  wItem.ZMFAddress = 9;
+  wRecord=wItem.toFileKey();
+
+  wSt = wZRF._replace(wRecord,wRank,wAddress);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+  _DBGPRINT("Content after replace is :\n")
+  displayRank(wZRF,wRank);
+
+
+  wRank = wZRF.getRecordCount();
+  _DBGPRINT(" Add rank %ld with R10 %s\n",wRank, displayResource( wR10).toString() )
 
   wRecord.clear();
   wR10._exportURF(wRecord);
   wRecord.setData(wRecord);
   wItem.setBuffer(wRecord);
-  wItem.ZMFAddress ++;
+  wItem.ZMFAddress = 10;
   wRecord=wItem.toFileKey();
 
-  wSt = wZRF._replace(wRecord,wEraseRank,wAddress);
+   wSt=wZRF.zadd(wRecord);
 
+  _DBGPRINT("Content after add is :\n")
+  displayRank(wZRF,wRank);
   wZRF.zclose();
 
   wSt=wZRF.zopen(ZRF_Read_Only);
@@ -356,10 +416,235 @@ int main(int argc, char *argv[])
     ZException.exit_abort();
   }
 
+
   displayAll(wZRF);
 
   wZRF.zclose();
   return 0;
+#endif // __TESTRUN_1__
+
+  /* test run 2 */
+#ifdef __TESTRUN_2__
+  long wRank=0;
+  uriString wUriZix = wWD;
+
+  wUriZix.addConditionalDirectoryDelimiter();
+  wUriZix += "zixtest.zix";
+
+
+  ZRawIndexFile wZRF(nullptr,ZIXM_Debug | ZIXM_Dycho | ZIXM_UpdateHeader);
+  ZIndexControlBlock wICB;
+
+  wICB.IndexName= "Test index";
+  wICB.URIIndex = wUriZix;
+  wICB.KeyUniversalSize = 49 ;
+  wICB.Duplicates=ZST_NODUPLICATES;
+
+  wSt=wZRF.zcreateIndexFile(wICB,wUriZix,10,5,49,false,true,false,false,
+      ZIXM_Debug | ZIXM_Dycho | ZIXM_UpdateHeader); /*run mode*/
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+  wZRF.setRunMode(ZIXM_Debug | ZIXM_Dycho | ZIXM_UpdateHeader);
+
+  wSt=wZRF.openIndexFile(wUriZix,0,ZRF_All);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+  //  wZRF.setUpdateHeader(true);
+
+
+  wZRF.showRunMode();
+
+  ZIndexItem* wIndexItem=nullptr;
+
+  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR1).toString())
+  wRecord.clear();
+  wR1._exportURF(wRecord);
+  wRecord.setData(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,1L);
+  displayAll((ZRandomFile&)wZRF);
+
+  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR2).toString())
+  wRecord.clear();
+  wR2._exportURF(wRecord);
+  wRecord.setData(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,2L);
+  displayAll((ZRandomFile&)wZRF);
+
+  _DBGPRINT("                   Record #3\n")
+  /* record #3 */
+  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR10).toString())
+  wRecord.clear();
+  wR10._exportURF(wRecord);
+  wRecord.setData(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,10L);
+  displayAll((ZRandomFile&)wZRF);
+
+  _DBGPRINT("                   Record #4\n")
+  /* record #4 */
+  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR9).toString())
+  wRecord.clear();
+  wR9._exportURF(wRecord);
+  wRecord.setData(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,9L);
+  displayAll((ZRandomFile&)wZRF);
+
+  _DBGPRINT("                   Record #5\n")
+  /* record #5 */
+  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR8).toString())
+  wRecord.clear();
+  wR8._exportURF(wRecord);
+  wRecord.setData(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,8L);
+  displayAll((ZRandomFile&)wZRF);
+
+  _DBGPRINT("                   Record #6\n")
+  /* record #6 */
+  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR5).toString())
+  wRecord.clear();
+  wR5._exportURF(wRecord);
+  wRecord.setData(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,5L);
+  displayAll((ZRandomFile&)wZRF);
+
+  _DBGPRINT("\n                   Record #7\n")
+  /* record #7 */
+  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR6).toString())
+  wRecord.clear();
+  wR6._exportURF(wRecord);
+  wRecord.setData(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,6L);
+  displayAll((ZRandomFile&)wZRF);
+
+  _DBGPRINT("                   Record #8\n")
+  /* record #8 */
+  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR7).toString())
+  wRecord.clear();
+  wR7._exportURF(wRecord);
+  wRecord.setData(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,7L);
+  displayAll((ZRandomFile&)wZRF);
+
+  wZRF.zclose();
+  return 0;
+
+  /* End test run 2 */
+
+#endif
+  long wRank=0;
+  uriString wUriZix = wWD;
+
+  wUriZix.addConditionalDirectoryDelimiter();
+  wUriZix += "zixtestAlpha.zix";
+
+
+  ZRawIndexFile wZRF(nullptr,ZIXM_Debug | ZIXM_Dycho | ZIXM_UpdateHeader);
+  ZIndexControlBlock wICB;
+
+  wICB.IndexName= "Test index";
+  wICB.URIIndex = wUriZix;
+  wICB.KeyUniversalSize = 150 ;
+  wICB.Duplicates=ZST_NODUPLICATES;
+
+  wSt=wZRF.zcreateIndexFile(wICB,wUriZix,10,5,150,false,true,false,false,
+                            ZIXM_Debug | ZIXM_Dycho | ZIXM_UpdateHeader); /*run mode*/
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+  wZRF.setRunMode(ZIXM_Debug | ZIXM_UpdateHeader);
+
+  wSt=wZRF.openIndexFile(wUriZix,0,ZRF_All);
+  if (wSt!=ZS_SUCCESS){
+    ZException.exit_abort();
+  }
+
+//  wZRF.setUpdateHeader(true);
+
+
+  wZRF.showRunMode();
+
+  ZIndexItem* wIndexItem=nullptr;
+
+  utf8VaryingString  wDesc;
+  wDesc="Picture used for figuring an email connection.record #1";
+  _DBGPRINT("add desc <%s>\n",wDesc.toString())
+  wRecord.clear();
+  wDesc._exportURF(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,1L);
+  displayAllUtf8((ZRandomFile&)wZRF);
+
+  wDesc="a simple grave for resting in peace zmf record #2";
+  _DBGPRINT("add desc <%s>\n",wDesc.toString())
+  wRecord.clear();
+  wDesc._exportURF(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,2L);
+  displayAllUtf8((ZRandomFile&)wZRF);
+
+  _DBGPRINT("                   Record #3\n")
+  /* record #3 */
+  wDesc="This is iceberg zmf record #3";
+  _DBGPRINT("add desc <%s>\n",wDesc.toString())
+  wRecord.clear();
+  wDesc._exportURF(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,3L);
+  displayAllUtf8((ZRandomFile&)wZRF);
+
+  _DBGPRINT("                   Record #4\n")
+  /* record #4 */
+  wDesc="No more than a skull head record #4";
+  _DBGPRINT("add desc <%s>\n",wDesc.toString())
+  wRecord.clear();
+  wDesc._exportURF(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,4L);
+  displayAllUtf8((ZRandomFile&)wZRF);
+
+  _DBGPRINT("                   Record #5\n")
+  /* record #5 */
+  wDesc="A smashed paper bowl record #5";
+  _DBGPRINT("add desc <%s>\n",wDesc.toString())
+  wRecord.clear();
+  wDesc._exportURF(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,5L);
+  displayAllUtf8((ZRandomFile&)wZRF);
+
+  _DBGPRINT("                   Record #6\n")
+  /* record #6 */
+  wDesc="Simple ink pen record #6";
+  _DBGPRINT("add desc <%s>\n",wDesc.toString())
+  wRecord.clear();
+  wDesc._exportURF(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,6L);
+  displayAllUtf8((ZRandomFile&)wZRF);
+
+  _DBGPRINT("\n                   Record #7\n")
+  /* record #7 */
+  wDesc="closed trash bin #7";
+  _DBGPRINT("add desc <%s>\n",wDesc.toString())
+  wRecord.clear();
+  wDesc._exportURF(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,7L);
+  displayAllUtf8((ZRandomFile&)wZRF);
+
+  _DBGPRINT("                   Record #8\n")
+  /* record #8 */
+  _DBGPRINT("add desc <%s>\n",wDesc.toString())
+  wDesc="image of key #8";
+  _DBGPRINT("add desc <%s>\n",wDesc.toString())
+  wRecord.clear();
+  wDesc._exportURF(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,8L);
+  displayAllUtf8((ZRandomFile&)wZRF);
+
+  wZRF.zclose();
+  return 0;
+
+  /* End test run 2 */
+//#endif //
+
 
   uriString wDocFile = wWD ;
   wDocFile.addConditionalDirectoryDelimiter();
@@ -385,6 +670,8 @@ int main(int argc, char *argv[])
   ZArray<ZDataBuffer> wKeys;
 
   wDocPhy.Documentid  = wR1;
+
+  _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_mail ;
@@ -426,6 +713,8 @@ int main(int argc, char *argv[])
 
   wDocPhy.Documentid  = wR2;
 
+  _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
+
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_text ;
   wDocPhy.Storage = Storage_External ;  // not in vault
@@ -464,6 +753,8 @@ int main(int argc, char *argv[])
 
   wDocPhy.Documentid  = wR10;
 
+  _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
+
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_other ;
   wDocPhy.Desc="This is iceberg zmf record #2";
@@ -498,10 +789,12 @@ int main(int argc, char *argv[])
   displayKeys(wMasterFile);
 
   _DBGPRINT("                   Record #4\n")
+
   /* record #4 */
   wDocPhy.clear();
 
   wDocPhy.Documentid  = wR9;
+  _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_other ;
@@ -541,6 +834,7 @@ int main(int argc, char *argv[])
   wDocPhy.clear();
 
   wDocPhy.Documentid  = wR8;
+  _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_picture ;
@@ -580,6 +874,7 @@ int main(int argc, char *argv[])
   wDocPhy.clear();
 
   wDocPhy.Documentid  = wR5;
+  _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_picture ;
@@ -618,6 +913,7 @@ int main(int argc, char *argv[])
   wDocPhy.clear();
 
   wDocPhy.Documentid  = wR6;
+  _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_picture ;
@@ -655,6 +951,7 @@ int main(int argc, char *argv[])
   _DBGPRINT("                   Record #8\n")
 
   wDocPhy.Documentid  = wR7;
+  _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
   wDocPhy.DataRank = 0;
   wDocPhy.DocMetaType = ZDMT_picture ;

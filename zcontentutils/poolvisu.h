@@ -22,6 +22,7 @@ class textEditMWn;
 
 class ZQGraphicScene;
 class QGraphicsSceneMouseEvent;
+class QGraphicsRectItem;
 
 namespace Ui {
 class poolVisu;
@@ -115,6 +116,10 @@ public:
   bool isIndexFile=false;
 
 private slots:
+  void zoomIn();
+  void zoomOut();
+  void zoomFit();
+
   void refresh();
   void udpdateHeaderWnd();
   void PoolChange(int pIdx);
@@ -126,9 +131,12 @@ private slots:
   void displayZBAT();
   void displayZFBT();
   void displayPool(ZDataBuffer &pRawData, const unsigned char* pPtr, zaddress_type pOffset, const char* pTitle);
+
+  void viewBlock(zaddress_type pAddress, zrank_type pRank);
 private:
   void resizeEvent(QResizeEvent*) override;
 
+  long BlockTargetSize=100;
 
   /* flex menu */
   QAction*  blockVisuQAc=nullptr;
@@ -189,6 +197,9 @@ grabFreeForward(const utf8VaryingString& pURIContent,
                 long &pFreeRank,
                 std::function<void (utf8VaryingString&)> pDisplay=nullptr );
 
+
+void positionText(ZQGraphicScene* pScene,QGraphicsRectItem* pItem,const utf8VaryingString& pText,QFont& pFont,QBrush* pBrush=nullptr);
+void positionValue(ZQGraphicScene* pScene,QGraphicsRectItem* pItem,zaddress_type pValue,QFont& pFont,QBrush* pBrush=nullptr);
 
 ZStatus ZExceptionDisplayAll(std::function<void (utf8VaryingString&)> pDisplay);
 

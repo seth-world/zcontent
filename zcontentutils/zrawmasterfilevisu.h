@@ -8,7 +8,11 @@
 
 #include <zcontent/zrandomfile/zblock.h>
 
+
+const long cst_FileNudge = 100;
+
 class ZQTableView;
+class QLabel;
 
 namespace Ui {
 class ZRawMasterFileVisu;
@@ -39,9 +43,48 @@ public:
 
   ZStatus displayURFKeyBlock(ZDataBuffer & pData);
 
+  /** @brief getNextBlock search file surface for next block following pStartAddress (included)
+   *   When found returns a ZBlockDescriptor with accurate data (including address) and a ZStatus of ZS_SUCCESS
+   *    BlockCur and FileOffset are updated accordingly by this operation
+   * @return
+   *    ZS_SUCCESS  Block is found
+   *    ZS_OUTBOUND if pStartAddress is invalid
+   *    ZS_OUTBOUNDHIGH no next valid block is found on file surface since pStartAddress up to end of file
+   * @param pBlock
+   * @param pStartAddress
+   */
+  ZStatus searchNextBlock(ZBlockDescriptor_Export &pBlock, zaddress_type pStartAddress);
+  ZStatus searchPreviousBlock(ZBlockDescriptor_Export &pBlock, zaddress_type pStartAddress);
+
   ZStatus seekAndGet(ZDataBuffer& pOut, ssize_t &pSize, size_t pAddress);
 
-  ZStatus searchStartSign(ZDataBuffer& wRecord, zaddress_type &pAddress);
+
+  /** @brief searchNextStartSign Searches file surface for start sign beginning at pStartAddress up to end of file
+   *                                and return its file address in pOutAddress with a status set to ZS_SUCCESS.
+   *  if pStartAddress points to a valid start sign then pStartAddress is returned
+   *  if no start sign is found before end of file ZS_OUTBOUNDHIGH is returned
+   *
+   * @return
+   * ZS_SUCCESS : start block has been found. pOutAddress contains start sign address on file
+   * ZS_OUTBOUND : pStartAddress is out of file's boundaries
+   * ZS_OUTBOUNDHIGH : no start sign has been found while end of file surface has been reached
+   *  Any other status that may be emitted by low level routines.
+   */
+  ZStatus searchNextStartSign(zaddress_type pStartAddress, zaddress_type &pOutAddress);
+
+
+  /** @brief searchPreviousStartSign Searches file surface for start sign beginning at pStartAddress down to beginning of file
+   *                                and return its file address in pOutAddress with a status set to ZS_SUCCESS.
+   *  if pStartAddress points to a valid start sign then pStartAddress is returned
+   *  if no start sign is found before beginning of file ZS_OUTBOUNDLOW is returned
+   *
+   * @return
+   * ZS_SUCCESS : start block has been found. pOutAddress contains start sign address on file
+   * ZS_OUTBOUND : pStartAddress is out of file's boundaries
+   * ZS_OUTBOUNDLOW : no start sign has been found while beginning of file surface has been reached
+   *  Any other status that may be emitted by low level routines.
+   */
+  ZStatus searchPreviousStartSign(zaddress_type pStartAddress, zaddress_type &pOutAddress) ;
 
   ZStatus searchNextValidZType(const ZDataBuffer &wRecord,
                                 zaddress_type & pAddress,
@@ -49,7 +92,7 @@ public:
 
   ZStatus seekAndRead(ZDataBuffer& pRecord,ZBlockDescriptor_Export & pBlock);
 
-  ZStatus getNextBlock(ZDataBuffer & wRecord,ssize_t wSize,zaddress_type & wAddress);
+  ZStatus searchNextBlock(ZDataBuffer & wRecord,ssize_t wSize,zaddress_type & wAddress);
 
   void resizeEvent(QResizeEvent*) override;
 
@@ -62,6 +105,8 @@ public:
 
   void setVisuIndexFile() ;
 
+  void setNudge(long pNudge) { if (pNudge > 0) FileNudge=pNudge; }
+
   /* evaluate actions */
 
   QAction* ZTypeQAc = nullptr;
@@ -73,9 +118,25 @@ public:
   QAction* int64QAc = nullptr;
   QAction* sizetQAc = nullptr;
 
-  void goToAddress(zaddress_type pAddress);
+
+
+
+  long FileNudge=cst_FileNudge;
+
+  void goToAddress(zaddress_type pAddress, zrank_type pRank=0);
+  void setViewModeRaw();
+  void setViewModeURF();
+
+  /* search next block from pAddress (included)  - fills up BlockCur with accurate date*/
+  ZStatus searchNextBlock(zaddress_type pAddress, ZBlockDescriptor_Export& pBlock);
+  /* search previous block from pAddress  - fills up BlockCur with accurate date*/
+  ZStatus searchPreviousBlock(zaddress_type pAddress,ZBlockDescriptor_Export& pBlock);
+  /* search the block whose address equals pAddress, fills BlockList array whenever required and returns it */
+  ZBlockDescriptor_Export searchBlockByAddress(zaddress_type pAddress);
 
   void firstIterate() { Forward();}
+
+  void getPrevAddrVal(zaddress_type &pAddress, long &pNudge, long &pBucket);
 
 private slots:
   void Forward();
@@ -83,6 +144,8 @@ private slots:
   void ToEnd();
   void ToBegin();
   void ViewModeChange(int pIndex);
+
+  void RecStructChange(int pIndex);
 
 
   void visuActionEvent(QAction* pAction);
@@ -107,7 +170,7 @@ private:
   bool  Raw=false;
   ZBlockDescriptor_Export BlockCur;
 
-  ZArray<ZBlockDescriptor_Export> BlockList;
+//  ZArray<ZBlockDescriptor_Export> BlockList;
 
   size_t        CurrentAddress=0;
   size_t        FileSize=0;
@@ -115,7 +178,7 @@ private:
   ZQTableView*  BlockTBv=nullptr;
   ZQTableView*  BlockDumpTBv=nullptr;
   int           Fd=-1;
-  long          BlockRank=-1;
+//  long          BlockRank=-1;
   uriString     URICurrent;
   bool          AllFileLoaded=false;
   bool          FResizeInitial=true;
@@ -126,5 +189,8 @@ private:
 bool ZTypeExists(ZTypeBase pType);
 
 ssize_t computeOffsetFromCoord(int pRow, int pCol);
+
+
+
 
 #endif // ZRAWMASTERFILEVISU_H

@@ -6,6 +6,7 @@
 using namespace std::placeholders ; // for std::bind
 #include <functional>               // for std::function<>
 
+#include <zqt/zqtwidget/zqtutils.h> // for setQLabelNum() template
 
 #include <ztoolset/zexceptionmin.h>
 
@@ -35,6 +36,8 @@ using namespace std::placeholders ; // for std::bind
 
 #include <qevent.h>
 #include <QStandardItem>
+#include <QHeaderView>
+
 #include <QList>
 #include <QMenu>
 #include <QAction>
@@ -48,6 +51,12 @@ using namespace std::placeholders ; // for std::bind
 #include <QGraphicsSceneMouseEvent>
 
 extern const int cst_maxraisonablevalue;
+
+
+const double cst_GBlockheight = 30.0 ;
+const double cst_GAddrPosHeight = 10.0 ;
+const double cst_GAddrPosXNudge = 0.5 ;
+const double cst_GAddrPosYNudge = 0.5 ;
 
 poolVisu::poolVisu(QWidget *parent) :
                                       QMainWindow(parent),
@@ -64,6 +73,8 @@ poolVisu::poolVisu(QWidget *parent) :
   HeaderTBv->ItemModel->setHorizontalHeaderItem(2,new QStandardItem("Deserialized"));
   HeaderTBv->ItemModel->setHorizontalHeaderItem(3,new QStandardItem("Comment"));
 
+
+  HeaderTBv->verticalHeader()->hide();
 
   ContentTBv = new ZQTableView(this);
   ContentTBv->newModel(7);
@@ -180,6 +191,13 @@ poolVisu::poolVisu(QWidget *parent) :
 
   QObject::connect(ui->SaveBTn, SIGNAL(clicked()), this, SLOT(udpdateHeaderWnd()));
   QObject::connect(ui->RefreshBTn, SIGNAL(clicked()), this, SLOT(refresh()));
+
+
+  QObject::connect(ui->ZoomInBTn, SIGNAL(clicked()), this, SLOT(zoomIn()));
+  QObject::connect(ui->ZoomOutBTn, SIGNAL(clicked()), this, SLOT(zoomOut()));
+  QObject::connect(ui->FitBTn, SIGNAL(clicked()), this, SLOT(zoomFit()));
+
+
 
   QObject::connect(actionAGp, SIGNAL(triggered(QAction*)), this, SLOT(generalActionEvent(QAction*)));
 
@@ -549,6 +567,9 @@ void poolVisu::refresh() {
     return;
   }
 
+  off_t wS=lseek(FdContent,0L,SEEK_END);
+  setQLabelNum<off_t>(ui->ContentSizeLBl, wS);
+
 
   URIHeader.loadContent(HeaderContent);
   dataSetup(ui->PoolCBx->currentIndex());
@@ -565,6 +586,8 @@ void poolVisu::dataSetup(int pPoolid) {
   utf8VaryingString wStr;
 
   ContentFileSize = size_t(URIContent.getFileSize());
+
+  setQLabelNum<size_t>(ui->ContentSizeLBl,ContentFileSize);
 
   const unsigned char* wPtr=HeaderContent.Data;
 
@@ -594,6 +617,12 @@ void poolVisu::dataSetup(int pPoolid) {
   }
 
   StartOfData = size_t(reverseByteOrder_Conditional<zaddress_type>(wFCBe->StartOfData));
+
+  BlockTargetSize=long(reverseByteOrder_Conditional<size_t>(wFCBe->BlockTargetSize));
+
+  if (BlockTargetSize < 10) {
+    BlockTargetSize = cst_FileNudge;
+  }
 
   const unsigned char* wPtrZBAT= wPtr + reverseByteOrder_Conditional<size_t>(wFCBe->ZBAT_DataOffset);
   const unsigned char* wPtrZFBT= wPtr + reverseByteOrder_Conditional<size_t>(wFCBe->ZFBT_DataOffset);
@@ -828,6 +857,7 @@ void poolVisu::dataSetup(int pPoolid) {
       FErrored = true;
     }
   ContentTBv->ItemModel->appendRow(wRow);
+  ContentTBv->ItemModel->setVerticalHeaderItem(int(wi),createItem(wi));
 
   if (FErrored) {
     for (int wi=0;wi < wRow.count();wi++)
@@ -842,9 +872,11 @@ for (long wi=0; wi < ContentTBv->ItemModel->columnCount();wi++)
 for (long wi=0; wi < ContentTBv->ItemModel->rowCount();wi++)
   ContentTBv->resizeRowToContents(wi);
 
-/* graphical view set-up */
+/* ----------------------
+ * graphical view set-up
+ * ----------------------
+ */
 
-  QRect wGR = ui->FileGraphicGVw->geometry();
 
   /* create a scene with
    *
@@ -856,10 +888,13 @@ for (long wi=0; wi < ContentTBv->ItemModel->rowCount();wi++)
    *   v
    *
    */
+  /* see https://htmlcolorcodes.com/color-picker/ */
   QColor lightBlue(51, 190, 255,255);
+  QColor darkBlue(38, 77, 115,255);
   QColor erroredBlue(51, 118, 255,255);
   QBrush validZBATBrush(lightBlue);
   QBrush erroredZBATBrush(erroredBlue);
+  QBrush holeBrush(darkBlue);
   QBrush greenBrush(Qt::green);
   QBrush yellowBrush(Qt::yellow);
   QBrush darkYellowBrush(Qt::darkYellow);
@@ -868,72 +903,162 @@ for (long wi=0; wi < ContentTBv->ItemModel->rowCount();wi++)
   QBrush cyanBrush(Qt::cyan);
   QBrush magentaBrush(Qt::magenta);
   QBrush grayBrush(Qt::lightGray);
+  QBrush darkGrayBrush(Qt::gray);
+
   QPen outlinePen(Qt::yellow);
   outlinePen.setWidth(1);
 
+  QFont wFont;
+  wFont.setPointSize(6);
+//  wFont.setBold(true);
+//  wFont.setWeight(75);
+
   GScene=new ZQGraphicScene(ui->FileGraphicGVw);
 
-  GScene->setSceneRect(-2.0,-2.0,double(ContentFileSize+4),22.0);
+  GScene->setSceneRect(0.0,0.0,double(ContentFileSize+4),30.0);
 
   GScene->doubleClickCallBack = std::bind(&poolVisu::GSceneDoubleClick, this,_1) ;
 
   QGraphicsRectItem* wB1=nullptr;
+  QGraphicsTextItem* wAdd=nullptr;
+  QGraphicsTextItem* wSize=nullptr;
+
+  QBrush wblueBrush(Qt::blue);
+
+  zaddress_type wAddressMax = 0L ;
+
+  zaddress_type wAddressMin = 0L ;
+
+
+  wB1=GScene->addRect(0.0,1.0,qreal(ContentFileSize),cst_GBlockheight,outlinePen,holeBrush);
+
+
+
+  if (ZBAT.count())
+    wAddressMin = ZBAT[0].Address;
 
   for (long wi=0;wi < ZBAT.count();wi++)  {
     uint16_t wBE=checkContentBlock(ZPTP_ZBAT,FdContent, ZBAT[wi]);
     if (wBE!=ZBEX_Correct){
-      wB1=GScene->addRect(qreal(ZFBT[wi].Address),1.0,qreal(ZFBT[wi].BlockSize),19.0,outlinePen,redBrush);
+      wB1=GScene->addRect(qreal(ZBAT[wi].Address),1.0,qreal(ZBAT[wi].BlockSize),cst_GBlockheight,outlinePen,redBrush);
     }
     else {
-      wB1=GScene->addRect(qreal(ZBAT[wi].Address),1.0,qreal(ZBAT[wi].BlockSize),19.0,outlinePen,validZBATBrush);
+      wB1=GScene->addRect(qreal(ZBAT[wi].Address),1.0,qreal(ZBAT[wi].BlockSize),cst_GBlockheight,outlinePen,validZBATBrush);
     }
+
+    positionValue (GScene,wB1,ZBAT[wi].Address,wFont,&wblueBrush);
+
     QVariant wV;
     ZResource wRes ;
     wRes = ZResource::getNew(ZEntity_ZBAT);
     ZDataReference wDRef (ZLayout_FileBlock,wRes,-1);
     wDRef.setPtr(&ZBAT[wi]);
+    wDRef.DataRank = wi;
+
 //    wDRef.ResourceReference.Entity=ZEntity_ZBAT;
     wV.setValue<ZDataReference>(wDRef);
     wB1->setData(ZQtDataReference,wV);
-  }
+
+    if ((ZBAT[wi].Address+ZBAT[wi].BlockSize) > wAddressMax)
+       wAddressMax = ZBAT[wi].Address +ZBAT[wi].BlockSize;
+
+    if (ZBAT[wi].Address < wAddressMin)
+      wAddressMin = ZBAT[wi].Address ;
+  } // for
 
   for (long wi=0;wi < ZFBT.count();wi++)  {
 
     uint16_t wBE=checkContentBlock(ZPTP_ZFBT,FdContent, ZFBT[wi]);
     if (wBE!=ZBEX_Correct){
-      wB1=GScene->addRect(qreal(ZFBT[wi].Address),1.0,qreal(ZFBT[wi].BlockSize),19.0,outlinePen,magentaBrush);
+      wB1=GScene->addRect(qreal(ZFBT[wi].Address),1.0,qreal(ZFBT[wi].BlockSize),cst_GBlockheight,outlinePen,magentaBrush);
     }
     else {
     if (ZFBT[wi].State==ZBS_Free)
-      wB1=GScene->addRect(qreal(ZFBT[wi].Address),1.0,qreal(ZFBT[wi].BlockSize),19.0,outlinePen,grayBrush);
+      wB1=GScene->addRect(qreal(ZFBT[wi].Address),1.0,qreal(ZFBT[wi].BlockSize),cst_GBlockheight,outlinePen,grayBrush);
     else if (ZFBT[wi].State==ZBS_Deleted)
-      wB1=GScene->addRect(qreal(ZFBT[wi].Address),1.0,qreal(ZFBT[wi].BlockSize),19.0,outlinePen,greenBrush);
+      wB1=GScene->addRect(qreal(ZFBT[wi].Address),1.0,qreal(ZFBT[wi].BlockSize),cst_GBlockheight,outlinePen,greenBrush);
     else
-      wB1=GScene->addRect(qreal(ZFBT[wi].Address),1.0,qreal(ZFBT[wi].BlockSize),19.0,outlinePen,magentaBrush);
+      wB1=GScene->addRect(qreal(ZFBT[wi].Address),1.0,qreal(ZFBT[wi].BlockSize),cst_GBlockheight,outlinePen,magentaBrush);
     }
+
+    positionValue (GScene,wB1,ZFBT[wi].Address,wFont);
+
     QVariant wV;
     ZResource wRes ;
     wRes = ZResource::getNew(ZEntity_ZFBT);
     ZDataReference wDRef (ZLayout_FileBlock,wRes,-1);
 //    wDRef.ResourceReference.Entity=ZEntity_ZFBT;
     wDRef.setPtr(&ZFBT[wi]);
+    wDRef.DataRank = wi;
+
     wV.setValue<ZDataReference>(wDRef);
     wB1->setData(ZQtDataReference,wV);
-  }
+
+    if ((ZFBT[wi].Address+ZFBT[wi].BlockSize) > wAddressMax)
+      wAddressMax = ZFBT[wi].Address +ZFBT[wi].BlockSize;
+
+    if (ZFBT[wi].Address < wAddressMin)
+      wAddressMin = ZFBT[wi].Address ;
+
+  }// for
   ui->FileGraphicGVw->setScene(GScene);
   ui->FileGraphicGVw->show();
 
 } // poolVisu::dataSetup
 
+
+
+void positionText(ZQGraphicScene* pScene,QGraphicsRectItem* pItem,const utf8VaryingString& pText,QFont& pFont, QBrush* pBrush) {
+  QRectF wRB1 = pItem->rect();
+  QGraphicsSimpleTextItem* wT1 =  pScene->addSimpleText(pText.toCChar(),pFont);
+  if (pBrush)
+    wT1->setBrush(*pBrush);
+  QRectF wRT1 = wT1->boundingRect();
+  if (wRT1.width() > wRB1.width()) {
+    size_t wL=pText.strlen();
+    utf8VaryingString wStr1;
+    while ((wRT1.width() > wRB1.width())&&(--wL>0)) {
+      wStr1 = pText.Left(wL);
+      wT1->setText(wStr1.toCChar());
+    }
+  }
+  wT1->setPos(wRB1.x()+cst_GAddrPosXNudge,wRB1.y()+cst_GAddrPosYNudge);
+}//positionText
+
+void positionValue(ZQGraphicScene* pScene, QGraphicsRectItem* pItem, zaddress_type pValue, QFont& pFont, QBrush *pBrush) {
+  utf8VaryingString wStr;
+  wStr.sprintf("@%lld",pValue);
+  positionText(pScene,pItem,wStr,pFont,pBrush);
+}
+
+void poolVisu::zoomIn() {
+  ui->FileGraphicGVw->scale(1.1,1.1);
+}
+void poolVisu::zoomOut() {
+  ui->FileGraphicGVw->scale(0.9,0.9);
+}
+void poolVisu::zoomFit() {
+  QRectF wR = GScene->sceneRect();
+  ui->FileGraphicGVw->fitInView(wR,Qt::KeepAspectRatio);
+}
+
 void poolVisu::GSceneDoubleClick(QGraphicsSceneMouseEvent *pEvent) {
   utf8VaryingString wStr;
   int   wPoolId = 0;
   QGraphicsItem *wItem = GScene->itemAt(pEvent->scenePos(), QTransform());// it is your clicked item, you can do everything what you want. for example send it somewhere
-  if (wItem==nullptr)
+  if (wItem==nullptr) /* if no graphic widget, then outside any stuff */
     return;
   ZDataReference wDRef;
   QVariant wV;
+
   wV = wItem->data(ZQtDataReference);
+  if (!wV.isValid()) {
+    /* this is a hole : there is a graphic widget but with no data */
+    QPointF wPoint = pEvent->scenePos();
+    int wOffset = int(wPoint.x());
+    ZExceptionDLg::adhocMessage("Hole",Severity_Information,nullptr,nullptr,"Offset %d is within a hole",wOffset);
+    return;
+  }
   wDRef = wV.value<ZDataReference>();
 
   ZBlockDescriptor* wBD=(ZBlockDescriptor*)wDRef.getPtr<ZBlockDescriptor*>();
@@ -962,58 +1087,90 @@ void poolVisu::GSceneDoubleClick(QGraphicsSceneMouseEvent *pEvent) {
 
   QHL->addWidget(wPoolLBl,0,Qt::AlignCenter);
 
-  QGridLayout* QGLyt=new QGridLayout(this);
+  QGridLayout* QGLyt=new QGridLayout();
   QVL->insertLayout(1,QGLyt);
 
+  int wLine=0;
 
+  QLabel* wLb0=new QLabel(QObject::tr("Pool rank","poolVisu"),&wBlockViewDLg);
+  QGLyt->addWidget(wLb0,wLine,0);
+
+  wStr.sprintf("%ld",wDRef.DataRank);
+  QLabel* wRank = new QLabel(wStr.toCChar());
+  QGLyt->addWidget(wRank,wLine,1);
+
+  wLine++;
 
   QLabel* wLb1=new QLabel(QObject::tr("Address","poolVisu"),&wBlockViewDLg);
-  QGLyt->addWidget(wLb1,0,0);
+  QGLyt->addWidget(wLb1,wLine,0);
 
   wStr.sprintf("%ld",wBD->Address);
   QLabel* wAddress = new QLabel(wStr.toCChar());
-  QGLyt->addWidget(wAddress,0,1);
+  QGLyt->addWidget(wAddress,wLine,1);
+
+  wLine++;
 
   QLabel* wLb2=new QLabel(QObject::tr("Block size","poolVisu"),&wBlockViewDLg);
-  QGLyt->addWidget(wLb2,1,0);
+  QGLyt->addWidget(wLb2,wLine,0);
 
   wStr.sprintf("%ld",wBD->BlockSize);
   QLabel* wSize = new QLabel(wStr.toCChar());
-  QGLyt->addWidget(wSize,1,1);
+  QGLyt->addWidget(wSize,wLine,1);
 
+  wLine++;
 
   QLabel* wLb3=new QLabel(QObject::tr("State","poolVisu"),&wBlockViewDLg);
-  QGLyt->addWidget(wLb3,2,0);
+  QGLyt->addWidget(wLb3,wLine,0);
 
   QLabel* wState = new QLabel(decode_ZBS(wBD->State));
-  QGLyt->addWidget(wState,2,1);
+  QGLyt->addWidget(wState,wLine,1);
 
+  wLine++;
 
   QLabel* wLb4=new QLabel(QObject::tr("Status","poolVisu"),&wBlockViewDLg);
-  QGLyt->addWidget(wLb4,3,0);
+  QGLyt->addWidget(wLb4,wLine,0);
 
   QLabel* wStatus= new QLabel(decode_ZBEx(checkContentBlock(wPoolId,FdContent,*wBD)).toCChar());
-  QGLyt->addWidget(wStatus,3,1);
+  QGLyt->addWidget(wStatus,wLine,1);
 
   QHBoxLayout* QHLBtn=new QHBoxLayout;
   QVL->insertLayout(2,QHLBtn);
 
-  QPushButton* wClose = new QPushButton(QObject::tr("Close","poolVisu"),&wBlockViewDLg);
+  QPushButton* wCloseBTn = new QPushButton(QObject::tr("Close","poolVisu"),&wBlockViewDLg);
+  QPushButton* wViewBTn = new QPushButton(QObject::tr("Content","poolVisu"),&wBlockViewDLg);
   QSpacerItem* wSpacer= new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
   QHLBtn->addItem(wSpacer);
 
-  QHLBtn->addWidget(wClose);
+  QHLBtn->addWidget(wViewBTn);
+  QHLBtn->addWidget(wCloseBTn);
 
-  QObject::connect(wClose, &QPushButton::clicked, &wBlockViewDLg, &QDialog::close);
+  QObject::connect(wCloseBTn, &QPushButton::clicked, &wBlockViewDLg, &QDialog::close);
+  QObject::connect(wViewBTn, &QPushButton::clicked, &wBlockViewDLg, &QDialog::accept);
 
   int wRet=wBlockViewDLg.exec();
+  if (wRet==QDialog::Accepted) {
+    viewBlock(wBD->Address, wDRef.DataRank);
+  }
+}
+
+void poolVisu::viewBlock(zaddress_type pAddress, zrank_type pRank) {
+  if (ContentVisu==nullptr)
+    ContentVisu= new ZRawMasterFileVisu(this);
+  ContentVisu->setup(URIContent, FdContent);
+  ContentVisu->setModal(false);
+  ContentVisu->setViewModeRaw();
+  ContentVisu->goToAddress(pAddress,pRank);
+
+
+
+  ContentVisu->show();
 }
 
 
 void poolVisu::poolMouseCallback(int pZEF, QMouseEvent *pEvent)
 {
 
-  QModelIndex wIdx;
+  QModelIndex wIdx=ContentTBv->currentIndex();
   if (!wIdx.isValid())
     return;
 
@@ -1027,8 +1184,10 @@ void poolVisu::poolMouseCallback(int pZEF, QMouseEvent *pEvent)
   if (ContentVisu==nullptr)
     ContentVisu= new ZRawMasterFileVisu(this);
   ContentVisu->setup(URIContent, FdContent);
+  ContentVisu->setViewModeRaw();
   ContentVisu->setModal(false);
-  ContentVisu->goToAddress(wAddress);
+  ContentVisu->goToAddress(wAddress,zrank_type(wIdx.row()));
+
   ContentVisu->show();
 
 }//VisuMouseCallback
@@ -1148,7 +1307,8 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
       ContentVisu= new ZRawMasterFileVisu(this);
     ContentVisu->setup(URIContent, FdContent);
     ContentVisu->setModal(false);
-    ContentVisu->goToAddress(wAddress);
+    ContentVisu->setViewModeRaw();
+    ContentVisu->goToAddress(wAddress,zrank_type(wIdx.row()));
     ContentVisu->show();
 
     if (isIndexFile) {
@@ -2030,22 +2190,7 @@ poolVisu::repair(const uriString& pURIContent,const uriString& pURIHeader,uint8_
 
   wStr="Importing Deleted blocks table";
   pDisplay(wStr);
-#ifdef __DEPRECATED__
-  /* check pool import structure validity for ZDBT */
-  memmove(&wZAEMe,wPtrZDBT,sizeof(ZAExport));
-  wZAEMe.deserialize();
-  if ((wZAEMe.StartSign!=cst_ZMSTART) || (wZAEMe.NbElements > cst_maxraisonablevalue)||(wZAEMe.EndianCheck!=cst_EndianCheck_Normal)) {
-    ZException.setMessage("poolVisu::repair",ZS_INVBLOCK,Severity_Severe,"ZDBT (deleted blocks) pool header is corrupted. File<%s>",pURIHeader.toString());
-    return ZExceptionDisplayAll(pDisplay);
-  }
 
-  /* effective ZDBT pool import */
-
-  ZDBT._importPool(wPtrZDBT);
-
-  wStr.sprintf("Deleted blocks table imported. %ld blocks defined.",ZDBT.count());
-  pDisplay(wStr);
-#endif // __DEPRECATED__
   wStr = "Scroll / fix pools.";
   pDisplay(wStr);
 
@@ -2100,36 +2245,7 @@ poolVisu::repair(const uriString& pURIContent,const uriString& pURIHeader,uint8_
       }
     }
   }// for
-#ifdef __DEPRECATED__
-  for (long wi=0;wi < ZDBT.count(); wi++) {
-    if (ZDBT[wi].BlockSize==0) {
-      wStr.sprintf("<ZeroSizedBlock> Found pool block with size equal to 0 from ZDBT pool rank %ld address %lld.",
-          wi,ZDBT[wi].Address);
-      pDisplay(wStr);
-      if (pFlag & ZPOR_FixSize) {
-        wStr.sprintf("            <ZPOR_FixSize> suppressing zero sized block from ZDBT pool at rank %ld.",
-            wi);
-        pDisplay(wStr);
-        ZDBT.erase(wi);
-        wi--;
-        continue;
-      }
-    }
-  }// for
-#endif // __DEPRECATED__
-  /*
-  wSt = fixPool(pURIContent, FdContent,ZPTP_ZBAT,&ZBAT,pFlag,pDisplay);
-  if (wSt!=ZS_SUCCESS)
-    return ZExceptionDisplayAll(pDisplay);
 
-
-  wSt = fixPool(pURIContent, FdContent,ZPTP_ZFBT,&ZFBT,pFlag,pDisplay);
-  if (wSt!=ZS_SUCCESS)
-    return ZExceptionDisplayAll(pDisplay);
-  wSt = fixPool(pURIContent, FdContent,ZPTP_ZDBT,&ZDBT,pFlag,pDisplay);
-  if (wSt!=ZS_SUCCESS)
-    return ZExceptionDisplayAll(pDisplay);
-*/
   wStr = "Updating header file.";
   pDisplay(wStr);
 
@@ -2189,7 +2305,7 @@ poolVisu::updateHeaderFromPool(const uriString& pURIHeader,ZBlockPool* pZBAT,ZBl
   size_t wOffset= size_t(reverseByteOrder_Conditional<zaddress_type>(wHCBe->OffsetFCB));
   wPtr += wOffset;
   ZFCB_Export* wFCBe = (ZFCB_Export*)(wPtr);
-  wFCBe=(ZFCB_Export*)(wNewHeaderContent.Data + size_t(reverseByteOrder_Conditional<zaddress_type>(wHCBe->OffsetFCB)));
+  wFCBe=(ZFCB_Export*)(wNewHeaderContent.Data + reverseByteOrder_Conditional<zaddress_type>(wHCBe->OffsetFCB));
 
   ZDataBuffer wZBATb;
   ZDataBuffer wZFBTb;

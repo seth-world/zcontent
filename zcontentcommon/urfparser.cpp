@@ -249,7 +249,7 @@ ZTypeExists(ZTypeBase pType) {
 
 } // ZTypeExists
 
-ZStatus URFParser::getURFTypeAndSize (const unsigned char *pPtrIn,ZTypeBase& pType,ssize_t & pSize) {
+ZStatus URFParser::getURFTypeAndSize (const unsigned char *& pPtrIn,ZTypeBase& pType,ssize_t & pSize) {
   pSize = getURFFieldSize (pPtrIn);
   _importAtomic<ZTypeBase>(pType,pPtrIn);
   if (pSize < 0)
@@ -386,7 +386,7 @@ URFParser::getURFFieldSize (const unsigned char* pPtrIn){
 
     size_t wByteSize = size_t(wUnitsCount * URF_UnitCount_type(sizeof(utf8_t)));
 
-    return sizeof(ZTypeBase)+ sizeof(URF_UnitCount_type)+ wByteSize;
+    return sizeof(ZTypeBase)+ sizeof(URF_Capacity_type) + sizeof(URF_UnitCount_type)+ wByteSize;
   }
   case ZType_Utf16FixedString:
   {
@@ -398,7 +398,7 @@ URFParser::getURFFieldSize (const unsigned char* pPtrIn){
 
     size_t wByteSize = size_t(wUnitsCount * URF_UnitCount_type(sizeof(utf16_t)));
 
-    return sizeof(ZTypeBase)+ sizeof(URF_UnitCount_type)+ wByteSize;
+    return sizeof(ZTypeBase)+ sizeof(URF_Capacity_type) + sizeof(URF_UnitCount_type)+ wByteSize;
   }
   case ZType_Utf32FixedString:
   {
@@ -410,7 +410,7 @@ URFParser::getURFFieldSize (const unsigned char* pPtrIn){
 
     size_t wByteSize = size_t(wUnitsCount * URF_UnitCount_type(sizeof(utf32_t)));
 
-    return sizeof(ZTypeBase)+ sizeof(URF_UnitCount_type)+ wByteSize;
+    return sizeof(ZTypeBase)+ sizeof(URF_Capacity_type) + sizeof(URF_UnitCount_type)+ wByteSize;
   }
 
     /* NB neither bitset nor bitsetfull are relevant for a key field */
@@ -440,6 +440,249 @@ URFParser::getURFFieldSize (const unsigned char* pPtrIn){
   }// switch
 } // getURFSize
 
+ssize_t
+URFParser::getURFFieldAllSizes (const unsigned char*& pPtr, ZTypeBase& pType, size_t &pURFHeaderSize, size_t &pDataSize) {
+
+  _importAtomic<ZTypeBase>(pType,pPtr);
+  switch (pType) {
+    /* atomic data :
+     *  - ZTypeBase           (Raw)
+     *  - Fixed size Value    (Raw)
+     */
+  case ZType_AtomicUChar:
+  case ZType_UChar: {
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = sizeof(unsigned char);
+    return sizeof(ZTypeBase)+sizeof(unsigned char);
+  }
+  case ZType_AtomicChar:
+  case ZType_Char: {
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = sizeof(char);
+    return sizeof(ZTypeBase)+sizeof(char);
+  }
+  case ZType_U8:
+  case ZType_AtomicU8: {
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = sizeof(uint8_t);
+    return sizeof(ZTypeBase)+sizeof(uint8_t);
+  }
+  case ZType_AtomicS8:
+  case ZType_S8: {
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = sizeof(int8_t)+1;
+    return sizeof(ZTypeBase)+sizeof(int8_t)+1;
+  }
+  case ZType_AtomicU16:
+  case ZType_U16:{
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = sizeof(uint16_t);
+    return sizeof(ZTypeBase)+sizeof(uint16_t);
+  }
+  case ZType_AtomicS16:
+  case ZType_S16: {
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = sizeof(int16_t)+1;
+    return sizeof(ZTypeBase)+sizeof(int16_t)+1;
+  }
+  case ZType_AtomicU32:
+  case ZType_U32:{
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = sizeof(uint32_t);
+    return sizeof(ZTypeBase)+sizeof(uint32_t);
+  }
+  case ZType_AtomicS32:
+  case ZType_S32: {
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = sizeof(int32_t)+1;
+    return sizeof(ZTypeBase)+sizeof(int32_t)+1;
+  }
+  case ZType_AtomicU64:
+  case ZType_U64: {
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = sizeof(uint64_t);
+    return sizeof(ZTypeBase)+sizeof(uint64_t);
+  }
+  case ZType_AtomicS64:
+  case ZType_S64: {
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = sizeof(int64_t)+1;
+    return sizeof(ZTypeBase)+sizeof(int64_t)+1;
+  }
+  case ZType_AtomicFloat:
+  case ZType_Float: {
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = sizeof(float)+1;
+    return sizeof(ZTypeBase)+sizeof(float)+1;
+  }
+  case ZType_AtomicDouble:
+  case ZType_Double: {
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = sizeof(double)+1;
+    return sizeof(ZTypeBase)+sizeof(double)+1;
+  }
+  case ZType_AtomicLDouble:
+  case ZType_LDouble: {
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = sizeof(long double)+1;
+    return sizeof(ZTypeBase)+sizeof(long double)+1;
+  }
+
+    /* Non atomic data : fixed length structures */
+
+  case ZType_ZDate: {
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = sizeof(uint32_t);
+    return sizeof(ZTypeBase)+sizeof(uint32_t);
+  }
+
+  case ZType_ZDateFull: {
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = sizeof(uint64_t);
+    return sizeof(ZTypeBase)+sizeof(uint64_t);
+  }
+
+  case ZType_CheckSum: {
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = cst_checksum;
+    return sizeof(ZTypeBase)+cst_checksum;
+  }
+
+  case ZType_MD5: {
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = cst_md5;
+    return sizeof(ZTypeBase)+cst_md5;
+  }
+
+    /* Varying length storage types
+      ZTypeBase               (Raw)
+      URF_Varying_Size_type   (Raw)  Effective byte size (Warning: Standard for string is units count)
+      varying length data     (Raw)
+  */
+
+  case ZType_URIString:
+  case ZType_Utf8VaryingString:{
+
+    URF_UnitCount_type wUnitsCount;
+
+    _importAtomic<URF_UnitCount_type>(wUnitsCount,pPtr); /* pPtr is updated */
+    size_t wByteSize = size_t(wUnitsCount * URF_UnitCount_type(sizeof(utf8_t)));
+
+    pURFHeaderSize=sizeof(ZTypeBase)+sizeof(URF_UnitCount_type);
+    pDataSize = wByteSize;
+
+    return sizeof(ZTypeBase)+ sizeof(URF_UnitCount_type)+ size_t(wByteSize);
+  }
+
+  case ZType_Utf16VaryingString:{
+    URF_UnitCount_type wUnitsCount;
+
+    _importAtomic<URF_UnitCount_type>(wUnitsCount,pPtr); /* pPtrIn is updated */
+    size_t wByteSize = size_t(wUnitsCount * URF_UnitCount_type(sizeof(utf16_t)));
+
+    pURFHeaderSize=sizeof(ZTypeBase)+sizeof(URF_UnitCount_type);
+    pDataSize = wByteSize;
+
+    return sizeof(ZTypeBase)+ sizeof(URF_UnitCount_type)+ size_t(wByteSize);
+  }
+  case ZType_Utf32VaryingString:{
+    URF_UnitCount_type wUnitsCount;
+
+    _importAtomic<URF_UnitCount_type>(wUnitsCount,pPtr); /* pPtrIn is updated */
+    size_t wByteSize = size_t(wUnitsCount * URF_UnitCount_type(sizeof(utf32_t)));
+
+
+    pURFHeaderSize=sizeof(ZTypeBase)+sizeof(URF_UnitCount_type);
+    pDataSize = wByteSize;
+
+    return sizeof(ZTypeBase)+ sizeof(URF_UnitCount_type)+ size_t(wByteSize);
+  }
+
+    /* for fixed string URF header is different */
+
+  case ZType_Utf8FixedString:
+  {
+    URF_Capacity_type   wCapacity;
+    URF_UnitCount_type  wUnitsCount;
+
+    _importAtomic<URF_Capacity_type>(wCapacity,pPtr);     /* pPtr is updated */
+    _importAtomic<URF_UnitCount_type>(wUnitsCount,pPtr);
+
+    size_t wByteSize = size_t(wUnitsCount * URF_UnitCount_type(sizeof(utf8_t)));
+
+
+    pURFHeaderSize=sizeof(ZTypeBase)+sizeof(URF_Capacity_type) + sizeof(URF_UnitCount_type);
+    pDataSize = wByteSize;
+
+    return sizeof(ZTypeBase)+ sizeof(URF_Capacity_type)+ sizeof(URF_UnitCount_type)+ wByteSize;
+  }
+  case ZType_Utf16FixedString:
+  {
+    URF_Capacity_type   wCapacity;
+    URF_UnitCount_type  wUnitsCount;
+
+    _importAtomic<URF_Capacity_type>(wCapacity,pPtr);
+    _importAtomic<URF_UnitCount_type>(wUnitsCount,pPtr);
+
+    size_t wByteSize = size_t(wUnitsCount * URF_UnitCount_type(sizeof(utf16_t)));
+
+    pURFHeaderSize=sizeof(ZTypeBase)+sizeof(URF_Capacity_type) + sizeof(URF_UnitCount_type);
+    pDataSize = wByteSize;
+
+    return sizeof(ZTypeBase)+ sizeof(URF_Capacity_type)+ sizeof(URF_UnitCount_type)+ wByteSize;
+  }
+  case ZType_Utf32FixedString:
+  {
+    URF_Capacity_type   wCapacity;
+    URF_UnitCount_type  wUnitsCount;
+
+    _importAtomic<URF_Capacity_type>(wCapacity,pPtr);
+    _importAtomic<URF_UnitCount_type>(wUnitsCount,pPtr);
+
+    size_t wByteSize = size_t(wUnitsCount * URF_UnitCount_type(sizeof(utf32_t)));
+
+    pURFHeaderSize=sizeof(ZTypeBase)+sizeof(URF_Capacity_type) + sizeof(URF_UnitCount_type);
+    pDataSize = wByteSize;
+
+    return sizeof(ZTypeBase)+ sizeof(URF_Capacity_type)+ sizeof(URF_UnitCount_type)+ wByteSize;
+  }
+
+    /* NB neither bitset nor bitsetfull are relevant for a key field */
+  case ZType_bitset: {
+    URF_UnitCount_type  wByteSize;
+    uint16_t wByteSize1, wEBitSize;
+    _importAtomic<uint16_t>(wByteSize1,pPtr);
+    _importAtomic<uint16_t>(wEBitSize,pPtr);
+
+    wByteSize = wByteSize1;
+
+    pURFHeaderSize=sizeof(ZTypeBase)+sizeof(uint16_t) + sizeof(uint16_t);
+    pDataSize = wByteSize;
+
+    return sizeof(ZTypeBase)+ sizeof(uint16_t)+ sizeof(uint16_t) +size_t(wByteSize);
+  }
+
+  case ZType_bitsetFull: {
+    /* no value */
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = 0;
+    return sizeof(ZTypeBase);
+  }
+
+  case ZType_Resource: {
+    pURFHeaderSize=sizeof(ZTypeBase);
+    pDataSize = sizeof(ZEntity_type) + sizeof(Resourceid_type);
+
+    return sizeof(ZTypeBase) + sizeof(ZEntity_type) + sizeof(Resourceid_type);
+  }
+
+  default: {
+    ZException.setMessage("URFParser::getURFFieldAllSizes",ZS_INVTYPE,Severity_Error,"Invalid/unknown given type %X %d",pType);
+    return -1;
+  }
+
+  }// switch
+} // URFParser::getURFFieldAllSizes
 
 ZStatus
 URFParser::getKeyFieldValue (const unsigned char* &pPtrIn,ZDataBuffer& pValue){
@@ -1106,37 +1349,48 @@ int URFComparePtr(const unsigned char* pKey1, size_t pSize1, const unsigned char
   ZDataBuffer wValue1,wValue2;
   ZStatus wSt;
   ZTypeBase wType;
-  ssize_t    wSize1,wSize2;
+  size_t    wSize1,wSize2,wURFHSize1,wURFHSize2;
   const unsigned char* wURF1 = pKey1;
   const unsigned char* wEnd1 = pKey1 + pSize1;
   const unsigned char* wURF2 = pKey2 ;
   const unsigned char* wEnd2 = pKey2 + pSize2;
 
   int wRet=0;
-  wSt=URFParser::getURFTypeAndSize(pKey1,wType,wSize1);
-  if (wSt!=ZS_SUCCESS) {
-    ZException.setMessage("URFCompare",wSt,Severity_Fatal,"Error while comparing key values. Key1 type %X %s size %ld");
+//  wSt=URFParser::getURFTypeAndSize(pKey1,wType,wSize1);
+  ssize_t wParserRet=URFParser::getURFFieldAllSizes(pKey1,wType,wURFHSize1,wSize1); /* pKey1 is updated and points to true field data */
+  if (wParserRet < 0) {
+    ZException.setMessage("URFCompare",wSt,Severity_Fatal,"Error while comparing key values. Key1 type %X %s size %ld decoded type %s",
+                            wType,wType,wSize1,decode_ZType(wType));
     ZException.exit_abort();
   }
 
-  wSt=URFParser::getURFTypeAndSize(pKey2,wType,wSize2);
-  if (wSt!=ZS_SUCCESS){
-    ZException.setMessage("URFCompare",wSt,Severity_Fatal,"Error while comparing key values.");
+//  wSt=URFParser::getURFTypeAndSize(pKey2,wType,wSize2);
+  wParserRet=URFParser::getURFFieldAllSizes(pKey2,wType,wURFHSize2,wSize2); /* pKey2 is updated and points to true field data */
+  if (wParserRet < 0) {
+    ZException.setMessage("URFCompare",wSt,Severity_Fatal,"Error while comparing key values. Key2 type %X %s size %ld decoded type %s",
+        wType,wType,wSize2,decode_ZType(wType));
     ZException.exit_abort();
   }
 
-  wRet = URFCompareValues (wURF1,wSize1,wURF2,wSize2);  /* pURF1 and pURF2 are updated */
+  wRet = URFCompareValues (pKey1,wSize1,pKey2,wSize2);  /* pKey1 and pKey2 are updated */
 
-  while ( (wRet==0) && (wSt == ZS_SUCCESS ) && (wURF1 < wEnd1) && (wURF2 < wEnd2) ) {
-    wSt=URFParser::getURFTypeAndSize(wURF1,wType,wSize1);
-    if (wSt!=ZS_SUCCESS)
+  while ( (wRet==0) && (wSt == ZS_SUCCESS ) && (pKey1 < wEnd1) && (pKey2 < wEnd2) ) {
+
+    wParserRet=URFParser::getURFFieldAllSizes(pKey1,wType,wURFHSize1,wSize1); /* pKey1 is updated and points to true field data */
+    if (wParserRet < 0) {
+      ZException.setMessage("URFCompare",wSt,Severity_Fatal,"Error while comparing key values. Key1 type %X %s size %ld decoded type %s",
+          wType,wType,wSize1,decode_ZType(wType));
       ZException.exit_abort();
+    }
 
-    wSt=URFParser::getURFTypeAndSize(wURF2,wType,wSize2);
-    if (wSt!=ZS_SUCCESS)
+    wParserRet=URFParser::getURFFieldAllSizes(pKey2,wType,wURFHSize2,wSize2); /* pKey2 is updated and points to true field data */
+    if (wParserRet < 0) {
+      ZException.setMessage("URFCompare",wSt,Severity_Fatal,"Error while comparing key values. Key2 type %X %s size %ld decoded type %s",
+          wType,wType,wSize2,decode_ZType(wType));
       ZException.exit_abort();
+    }
 
-    wRet = URFCompareValues (wURF1,wSize1,wURF2,wSize2);  /* pURF1 and pURF2 are updated */
+    wRet = URFCompareValues (pKey1,wSize1,pKey2,wSize2);  /* pURF1 and pURF2 are updated */
   }// while
   return wRet;
 } // URFCompare

@@ -28,6 +28,30 @@ using namespace zbs ;
 */
 
 
+
+void ZRawIndexFile::setRunMode(uint8_t pOnOff) {
+  RunMode=pOnOff;
+  if (RunMode & ZIXM_UpdateHeader)
+    setUpdateHeader(true);
+}
+void ZRawIndexFile::showRunMode() {
+  if (RunMode & ZIXM_Debug)
+    _DBGPRINT("ZRawIndexFile-I-DBGSET Debug mode is set.\n")
+  else
+    _DBGPRINT("ZRawIndexFile-I-DBGRST Debug mode is off.\n")
+  if (RunMode & ZIXM_Dycho)
+    _DBGPRINT("ZRawIndexFile-I-DYCHSET Search mode is set to dychotomic search.\n")
+  else
+    _DBGPRINT("ZRawIndexFile-I-SEQSET Search mode is set to sequential search.\n")
+
+  if (RunMode & ZIXM_UpdateHeader) {
+    _DBGPRINT("ZRawIndexFile-I-UPDTSET Search mode is set to update header at high frequence.\n")
+  }
+  else {
+    _DBGPRINT("ZRawIndexFile-I-UPDTSET Search mode is set to update header at low frequence.\n")
+  }
+}
+
 //---------ZIndexControlBlock routines----------------------------------------------------
 
 
@@ -77,19 +101,22 @@ ZSIndexControlBlock::zkeyValueExtraction (ZRecord *pRecord, ZDataBuffer& pKey)
 //----------ZRawIndexFile-----------------------------------------------
 
 
-ZRawIndexFile::ZRawIndexFile  (ZRawMasterFile *pFather): ZRandomFile()
+ZRawIndexFile::ZRawIndexFile  (ZRawMasterFile *pFather, uint8_t pRunMode): ZRandomFile()
 {
 
+    setRunMode(pRunMode);
+
     ZMFFather=pFather;
-    if (pFather==nullptr)
-                {
+    if (pFather==nullptr) {
+      if (!(RunMode & ZIXM_Debug)) {
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_INVADDRESS,
                                     Severity_Fatal,
                                     "ZRawIndexFile::CTOR-F-IVFATHER ZMasterFile pointer is invalid (null value) \n");
             this->~ZRawIndexFile();
             ZException.exit_abort();
-                }
+      }
+    }
     return ;
 }// ZIF CTOR
 
@@ -99,15 +126,16 @@ ZRawIndexFile::ZRawIndexFile  (ZRawMasterFile *pFather, ZIndexControlBlock &pZIC
 
     ZMFFather=pFather;
 
-    if (pFather==nullptr)
-                {
+    if (pFather==nullptr) {
+      if (!(RunMode & ZIXM_Debug)) {
                 ZException.setMessage(_GET_FUNCTION_NAME_,
                                         ZS_INVADDRESS,
                                         Severity_Fatal,
-                                        "ZIndexFile::CTOR-F-IVFATHER ZMasterFile pointer is invalid (null value) \n");
+                                        "ZRawIndexFile::CTOR-F-IVFATHER ZMasterFile pointer is invalid (null value) \n");
                 this->~ZRawIndexFile();
                 ZException.exit_abort();
-                }
+      }
+    }
 
 }// ZIF CTOR 2 w
 
@@ -116,14 +144,15 @@ ZRawIndexFile::ZRawIndexFile  (ZRawMasterFile *pFather, int pKeyUniversalsize, c
 
   ZMFFather=pFather;
 
-  if (pFather==nullptr)
-  {
+  if (pFather==nullptr) {
+    if (!(RunMode & ZIXM_Debug)) {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_INVADDRESS,
         Severity_Fatal,
         "ZRawIndexFile::CTOR-F-IVFATHER ZMasterFile pointer is invalid (null value) \n");
     this->~ZRawIndexFile();
     ZException.exit_abort();
+    }
   }
 
   KeyUniversalSize=pKeyUniversalsize;
@@ -179,20 +208,24 @@ return  ZRandomFile::_removeFile(pErrorLog);
  */
 ZStatus
 ZRawIndexFile::zcreateIndexFile(ZIndexControlBlock &pICB,
-                         uriString &pIndexUri,
-                         long pAllocatedBlocks,
-                         long pBlockExtentQuota,
-                         zsize_type pInitialSize,
-                         bool pHighwaterMarking,
-                         bool pGrabFreeSpace,
-                         bool pBackup,
-                         bool pLeaveOpen)
+                                 uriString &pIndexUri,
+                                 long pAllocatedBlocks,
+                                 long pBlockExtentQuota,
+                                 zsize_type pInitialSize,
+                                 bool pHighwaterMarking,
+                                 bool pGrabFreeSpace,
+                                 bool pBackup,
+                                 bool pLeaveOpen,
+                                  uint8_t pRunMode)
 {
 ZStatus wSt;
 
-    ZIndexControlBlock::_copyFrom(pICB);
-    wSt=setIndexURI(pIndexUri);
-    if (wSt!=ZS_SUCCESS)
+
+  setRunMode(pRunMode);
+
+  ZIndexControlBlock::_copyFrom(pICB);
+  wSt=setIndexURI(pIndexUri);
+  if (wSt!=ZS_SUCCESS)
                 {
                 ZException.addToLast(" While Creating ZIndexFile %s\n",
                                          pIndexUri.toString());
@@ -254,9 +287,12 @@ ZRawIndexFile::zcreateIndexFile(ZIndexControlBlock &pICB,
                                 bool pHighwaterMarking,
                                 bool pGrabFreeSpace,
                                 bool pBackup,
-                                bool pLeaveOpen)
+                                bool pLeaveOpen,
+                                uint8_t pRunMode)
 {
   ZStatus wSt;
+
+  setRunMode(pRunMode);
 
   ZIndexControlBlock::_copyFrom(pICB);
   wSt=setIndexURI(pIndexUri);
@@ -817,6 +853,10 @@ ZRawIndexFile::extractAllURFKeyFields (ZDataBuffer& pKeyContent,
 ZStatus
 ZRawIndexFile::_extractRawKey(ZDataBuffer& pRawRecord,   ZDataBuffer& pKeyContent)
 {
+  if (!(RunMode & ZIXM_Debug)) {
+    _DBGPRINT("ZRawIndexFile::_extractRawKey-F-DBGMODE Cannot extract key in Debug mode.\n")
+    abort();
+  }
 
   if (ZMFFather->extractRawKey_func==nullptr)
     {
@@ -1033,9 +1073,10 @@ ZIndexItem wIndexItem;
 //    long wIndexRank;
 //    zaddress_type wIndexAddress,wZMFAddress;
 
-
-//  wSt = _URFsearchDychoUnique(pKeyContent,wIndexRank,wIndexAddress,wZMFAddress, ZLock_Nolock);
-  wSt = _URFsearchUnique(pKeyContent,wIndexItem, ZLock_Nolock);
+    if (RunMode&ZIXM_Dycho)
+      wSt = _URFsearchDychoUnique(pKeyContent,wIndexItem, ZLock_Nolock);
+    else
+      wSt = _URFsearchUnique(pKeyContent,wIndexItem, ZLock_Nolock);
 
 
 #if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
@@ -2029,11 +2070,11 @@ void displayURFCompare(long pRank,int pR,unsigned char* pPtr1, unsigned char* pP
  */
 ZStatus
 ZRawIndexFile::_URFsearchDychoUnique(  const ZDataBuffer &pKeyToSearch,
-//                                  ZIndexItem* pOutIndexItem,
-                                  long              &pIndexRank,
-                                  zaddress_type     &pIndexAddress,
-                                  zaddress_type     &pZMFAddress,
-                                  const zlockmask_type pLock)
+                                        ZIndexItem& pOutIndexItem,
+//                                  long              &pIndexRank,
+//                                  zaddress_type     &pIndexAddress,
+//                                  zaddress_type     &pZMFAddress,
+                                        const zlockmask_type pLock)
 {
   ZStatus     wSt= ZS_NOTFOUND;
   ZIndexItem  wIndexItem;
@@ -2041,7 +2082,7 @@ ZRawIndexFile::_URFsearchDychoUnique(  const ZDataBuffer &pKeyToSearch,
   long              wPreviousRank;
   zaddress_type     wPreviousAddress;
 
-  pIndexRank=0L;
+  pOutIndexItem.IndexRank=0L;
 
   ZDataBuffer wIndexRecord;
 
@@ -2064,10 +2105,10 @@ ZRawIndexFile::_URFsearchDychoUnique(  const ZDataBuffer &pKeyToSearch,
 
   wSt=ZS_NOTFOUND;
 
-  pIndexRank=wlow;
+  pOutIndexItem.IndexRank=wlow;
 
   ZPMSStats.Reads ++;
-  if ((wSt=zgetWAddress(wIndexRecord,0L,pIndexAddress)) != ZS_SUCCESS)
+  if ((wSt=zgetWAddress(wIndexRecord,0L,pOutIndexItem.IndexAddress)) != ZS_SUCCESS)
     goto _URFsearch_Return;
 
   if (wIndexRecord.isEmpty()) {
@@ -2087,26 +2128,26 @@ ZRawIndexFile::_URFsearchDychoUnique(  const ZDataBuffer &pKeyToSearch,
   wR = URFComparePtr(pKeyToSearch.Data,pKeyToSearch.Size,wIndexItem.Data,wIndexItem.Size);
   displayURFCompare(wpivot,wR,pKeyToSearch.Data,wIndexItem.Data);
 
-  pIndexRank = wpivot;
+  pOutIndexItem.IndexRank = wpivot;
 
   if (wR==0) {
     wSt=ZS_FOUND ;
     if (ZVerbose & ZVB_SearchEngine)
-      _DBGPRINT("ZRawIndexFile::_URFsearchUnique  Match index at rank %ld index address %ld\n",pIndexRank,pIndexAddress)
+      _DBGPRINT("ZRawIndexFile::_URFsearchUnique  Match index at rank %ld index address %ld\n",pOutIndexItem.IndexRank,pOutIndexItem.IndexAddress)
     return ZS_FOUND;
   }
   if (wR<0) {
     if (ZVerbose & ZVB_SearchEngine)
-      _DBGPRINT("ZRawIndexFile::_URFsearchUnique ZS_OUTBOUNDLOW rank %ld\n",pIndexRank)
+      _DBGPRINT("ZRawIndexFile::_URFsearchUnique ZS_OUTBOUNDLOW rank %ld\n",pOutIndexItem.IndexRank)
     return  ZS_OUTBOUNDLOW;
   }
 
 /* there wR > 0 : key to search is greater than low boundary */
 
-  pIndexRank = whigh ;
+  pOutIndexItem.IndexRank = whigh ;
 
   ZPMSStats.Reads ++;
-  if ((wSt=zgetWAddress(wIndexRecord,whigh,pIndexAddress))!=ZS_SUCCESS)
+  if ((wSt=zgetWAddress(wIndexRecord,whigh,pOutIndexItem.IndexAddress))!=ZS_SUCCESS)
     goto _URFsearch_Return;
   wIndexItem.fromFileKey(wIndexRecord);
   wR = URFComparePtr(pKeyToSearch.Data,pKeyToSearch.Size,wIndexItem.Data,wIndexItem.Size);
@@ -2115,19 +2156,19 @@ ZRawIndexFile::_URFsearchDychoUnique(  const ZDataBuffer &pKeyToSearch,
 
   if (wR==0) {
     wSt=ZS_FOUND ;
-    pIndexRank = whigh ;
-    pZMFAddress = wIndexItem.ZMFAddress;
+    pOutIndexItem.IndexRank = whigh ;
+    pOutIndexItem.ZMFAddress = wIndexItem.ZMFAddress;
     if (ZVerbose & ZVB_SearchEngine)
-      _DBGPRINT("ZRawIndexFile::_URFsearchUnique  Match index at rank %ld index address %ld zmf address %ld\n",pIndexRank,pIndexAddress,pZMFAddress)
+      _DBGPRINT("ZRawIndexFile::_URFsearchUnique  Match index at rank %ld index address %ld zmf address %ld\n",pOutIndexItem.IndexRank,pOutIndexItem.IndexAddress,pOutIndexItem.ZMFAddress)
     wSt=ZS_FOUND ;
     return wSt ;
   }
 
   if (wR>0) {
+    pOutIndexItem.IndexRank = whigh ;
+    pOutIndexItem.IndexAddress = pOutIndexItem.ZMFAddress = -1 ;
     if (ZVerbose & ZVB_SearchEngine)
-      _DBGPRINT("ZRawIndexFile::_URFsearchUnique ZS_OUTBOUNDHIGH rank %ld\n",pIndexRank)
-    pIndexRank = whigh ;
-    pIndexAddress = pZMFAddress = -1 ;
+      _DBGPRINT("ZRawIndexFile::_URFsearchUnique ZS_OUTBOUNDHIGH rank %ld\n",pOutIndexItem.IndexRank)
     return  ZS_OUTBOUNDHIGH;
     }
 
@@ -2138,19 +2179,19 @@ ZRawIndexFile::_URFsearchDychoUnique(  const ZDataBuffer &pKeyToSearch,
 
   while ((whigh-wlow) > 4)// ---------------Main loop around pivot----------------------
   {
-    pIndexRank = wpivot ;
+    pOutIndexItem.IndexRank = wpivot ;
 
     ZPMSStats.Reads ++;
-    if ((wSt=zgetWAddress(wIndexRecord,wpivot,pIndexAddress))!=ZS_SUCCESS)
+    if ((wSt=zgetWAddress(wIndexRecord,wpivot,pOutIndexItem.IndexAddress))!=ZS_SUCCESS)
       return wSt ;
     wIndexItem.fromFileKey(wIndexRecord);
     wR = URFComparePtr(pKeyToSearch.Data,pKeyToSearch.Size,wIndexItem.Data,wIndexItem.Size);
     if (ZVerbose & ZVB_SearchEngine)
       displayURFCompare(wpivot,wR,pKeyToSearch.Data,wIndexItem.Data);
     if (wR==0) {
-      pZMFAddress = wIndexItem.ZMFAddress;
+      pOutIndexItem.ZMFAddress = wIndexItem.ZMFAddress;
       if (ZVerbose & ZVB_SearchEngine)
-        _DBGPRINT("ZRawIndexFile::_URFsearchUnique  Match index at rank %ld index address %ld zmf address %ld\n",pIndexRank,pIndexAddress,pZMFAddress)
+        _DBGPRINT("ZRawIndexFile::_URFsearchUnique  Match index at rank %ld index address %ld zmf address %ld\n",pOutIndexItem.IndexRank,pOutIndexItem.IndexAddress,pOutIndexItem.ZMFAddress)
       wSt=ZS_FOUND ;
       return wSt ;
     }
@@ -2174,42 +2215,42 @@ ZRawIndexFile::_URFsearchDychoUnique(  const ZDataBuffer &pKeyToSearch,
    */
 
   wpivot = wlow;
-  wPreviousRank =  pIndexRank = wpivot;
-  wPreviousAddress = pIndexAddress ;
+  wPreviousRank =  pOutIndexItem.IndexRank = wpivot;
+  wPreviousAddress = pOutIndexItem.IndexAddress ;
   ZPMSStats.Reads ++;
-  if ( (wSt=zgetWAddress(wIndexRecord,wpivot,pIndexAddress)) != ZS_SUCCESS )
+  if ( (wSt=zgetWAddress(wIndexRecord,wpivot,pOutIndexItem.IndexAddress)) != ZS_SUCCESS )
     { return wSt ; }
 
   wIndexItem.fromFileKey(wIndexRecord);
-  pZMFAddress = wIndexItem.ZMFAddress;
+  pOutIndexItem.ZMFAddress = wIndexItem.ZMFAddress;
   wR = URFComparePtr(pKeyToSearch.Data,pKeyToSearch.Size,wIndexItem.Data,wIndexItem.Size);
   if (ZVerbose & ZVB_SearchEngine)
     displayURFCompare(wpivot,wR,pKeyToSearch.Data,wIndexItem.Data);
 
   while ((wpivot <= whigh)&& (wR > 0))
   {
-    wPreviousRank = pIndexRank;
-    wPreviousAddress = pIndexAddress;
+    wPreviousRank = pOutIndexItem.IndexRank;
+    wPreviousAddress = pOutIndexItem.IndexAddress;
 
     wpivot ++;
 
     ZPMSStats.Reads ++;
 
-    if ((wSt=zgetWAddress(wIndexRecord,wpivot,pIndexAddress))!=ZS_SUCCESS)
+    if ((wSt=zgetWAddress(wIndexRecord,wpivot,pOutIndexItem.IndexAddress))!=ZS_SUCCESS)
       { return wSt ;}
     wIndexItem.fromFileKey(wIndexRecord);
-    pZMFAddress = wIndexItem.ZMFAddress;
+    pOutIndexItem.ZMFAddress = wIndexItem.ZMFAddress;
     wR = URFComparePtr(pKeyToSearch.Data,pKeyToSearch.Size,wIndexItem.Data,wIndexItem.Size);
     if (ZVerbose & ZVB_SearchEngine)
       displayURFCompare(wpivot,wR,pKeyToSearch.Data,wIndexItem.Data);
   }
 
-  pIndexRank = wpivot ;
+  pOutIndexItem.IndexRank = wpivot ;
 
   if (wR==0) {
-    pZMFAddress = wIndexItem.ZMFAddress;
+    pOutIndexItem.ZMFAddress = wIndexItem.ZMFAddress;
     if (ZVerbose & ZVB_SearchEngine)
-      _DBGPRINT("ZRawIndexFile::_URFsearchUnique  Match index at rank %ld index address %ld zmf address %ld\n",pIndexRank,pIndexAddress,pZMFAddress)
+      _DBGPRINT("ZRawIndexFile::_URFsearchUnique  Match index at rank %ld index address %ld zmf address %ld\n",pOutIndexItem.IndexRank,pOutIndexItem.IndexAddress,pOutIndexItem.ZMFAddress)
     wSt=ZS_FOUND;
   }
   /* here search key is greater than compare key */
@@ -2217,9 +2258,9 @@ ZRawIndexFile::_URFsearchDychoUnique(  const ZDataBuffer &pKeyToSearch,
 //  pOutIndexItem->_copyFrom( wPrevious );
 
 //  pIndexRank = wPreviousRank;
-  pIndexAddress = pZMFAddress = -1 ;
+  pOutIndexItem.IndexAddress = pOutIndexItem.ZMFAddress = -1 ;
   if (ZVerbose & ZVB_SearchEngine)
-    _DBGPRINT("ZRawIndexFile::_URFsearchUnique ZS_NOTFOUND last index rank %ld\n",pIndexRank)
+    _DBGPRINT("ZRawIndexFile::_URFsearchUnique ZS_NOTFOUND last index rank %ld\n",pOutIndexItem.IndexRank)
   return  ZS_NOTFOUND ;
 
 _URFsearch_Return:

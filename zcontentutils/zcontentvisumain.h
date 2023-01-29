@@ -70,7 +70,6 @@ class ZContentVisuMain;
 class QStandardItemModel;
 class QActionGroup;
 class QAction;
-class QFileDialog;
 namespace zbs {
 //class ZRandomFile;
 class ZRawMasterFile;
@@ -243,7 +242,7 @@ private slots:
   void openRaw();
   void actionClose(bool pChecked=true);
 
-  bool chooseFile(bool pChecked);
+//  bool chooseFile(bool pChecked);
 
   void VisuClicked(QModelIndex pIdx);
 

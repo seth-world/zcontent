@@ -16,10 +16,10 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>661</width>
-     <height>131</height>
+     <x>0</x>
+     <y>0</y>
+     <width>671</width>
+     <height>151</height>
     </rect>
    </property>
    <property name="title">
@@ -197,32 +197,6 @@
      <string>TextLabel</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>50</y>
-      <width>54</width>
-      <height>15</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Rank</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="BlockNbLBl">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>50</y>
-      <width>101</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>TextLabel</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="TopLBl">
     <property name="geometry">
      <rect>
@@ -297,45 +271,6 @@
      <string>TextLabel</string>
     </property>
    </widget>
-   <widget class="QLabel" name="FieldPresenceLabelLBl">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>80</y>
-      <width>91</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Field presence</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="BitsetContentLBl">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>90</y>
-      <width>311</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>TextLabel</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="BitsetHeaderLBl">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>70</y>
-      <width>311</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>01234567890123456789</string>
-    </property>
-   </widget>
    <widget class="QComboBox" name="ViewModeCBx">
     <property name="geometry">
      <rect>
@@ -349,8 +284,8 @@
    <widget class="QLabel" name="FieldsNbLBl">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>80</y>
+      <x>80</x>
+      <y>50</y>
       <width>31</width>
       <height>16</height>
      </rect>
@@ -365,7 +300,7 @@
       <x>320</x>
       <y>50</y>
       <width>161</width>
-      <height>61</height>
+      <height>51</height>
      </rect>
     </property>
     <property name="title">
@@ -447,13 +382,52 @@
      </rect>
     </property>
    </widget>
+   <widget class="QGroupBox" name="FieldPresenceGBx">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>401</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Field presence</string>
+    </property>
+    <widget class="QLabel" name="BitsetHeaderLBl">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>20</y>
+       <width>401</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>01234567890123456789</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="BitsetContentLBl">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>40</y>
+       <width>391</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </widget>
   </widget>
   <widget class="QPlainTextEdit" name="MessagePTe">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>140</y>
-     <width>659</width>
+     <x>0</x>
+     <y>150</y>
+     <width>661</width>
      <height>41</height>
     </rect>
    </property>

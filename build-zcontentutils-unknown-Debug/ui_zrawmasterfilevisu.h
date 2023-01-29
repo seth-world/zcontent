@@ -37,15 +37,10 @@ public:
     QPushButton *EndBTn;
     QLabel *label_4;
     QLabel *FileSizeLBl;
-    QLabel *label_5;
-    QLabel *BlockNbLBl;
     QLabel *TopLBl;
     QLabel *BottomLBl;
     QLabel *URFSizeLabelLBl;
     QLabel *URFSizeLBl;
-    QLabel *FieldPresenceLabelLBl;
-    QLabel *BitsetContentLBl;
-    QLabel *BitsetHeaderLBl;
     QComboBox *ViewModeCBx;
     QLabel *FieldsNbLBl;
     QGroupBox *ColorsGBx;
@@ -55,6 +50,9 @@ public:
     QLabel *WrongColorLBl;
     QLabel *StartColorLBl;
     QComboBox *ColorModeCBx;
+    QGroupBox *FieldPresenceGBx;
+    QLabel *BitsetHeaderLBl;
+    QLabel *BitsetContentLBl;
     QPlainTextEdit *MessagePTe;
 
     void setupUi(QDialog *ZRawMasterFileVisu)
@@ -64,7 +62,7 @@ public:
         ZRawMasterFileVisu->resize(684, 546);
         groupBox = new QGroupBox(ZRawMasterFileVisu);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        groupBox->setGeometry(QRect(10, 10, 661, 131));
+        groupBox->setGeometry(QRect(0, 0, 671, 151));
         label = new QLabel(groupBox);
         label->setObjectName(QString::fromUtf8("label"));
         label->setGeometry(QRect(150, 30, 54, 15));
@@ -113,12 +111,6 @@ public:
         FileSizeLBl = new QLabel(groupBox);
         FileSizeLBl->setObjectName(QString::fromUtf8("FileSizeLBl"));
         FileSizeLBl->setGeometry(QRect(50, 30, 101, 16));
-        label_5 = new QLabel(groupBox);
-        label_5->setObjectName(QString::fromUtf8("label_5"));
-        label_5->setGeometry(QRect(10, 50, 54, 15));
-        BlockNbLBl = new QLabel(groupBox);
-        BlockNbLBl->setObjectName(QString::fromUtf8("BlockNbLBl"));
-        BlockNbLBl->setGeometry(QRect(50, 50, 101, 16));
         TopLBl = new QLabel(groupBox);
         TopLBl->setObjectName(QString::fromUtf8("TopLBl"));
         TopLBl->setGeometry(QRect(490, 20, 141, 16));
@@ -140,24 +132,15 @@ public:
         URFSizeLBl = new QLabel(groupBox);
         URFSizeLBl->setObjectName(QString::fromUtf8("URFSizeLBl"));
         URFSizeLBl->setGeometry(QRect(380, 50, 81, 16));
-        FieldPresenceLabelLBl = new QLabel(groupBox);
-        FieldPresenceLabelLBl->setObjectName(QString::fromUtf8("FieldPresenceLabelLBl"));
-        FieldPresenceLabelLBl->setGeometry(QRect(10, 80, 91, 16));
-        BitsetContentLBl = new QLabel(groupBox);
-        BitsetContentLBl->setObjectName(QString::fromUtf8("BitsetContentLBl"));
-        BitsetContentLBl->setGeometry(QRect(170, 90, 311, 16));
-        BitsetHeaderLBl = new QLabel(groupBox);
-        BitsetHeaderLBl->setObjectName(QString::fromUtf8("BitsetHeaderLBl"));
-        BitsetHeaderLBl->setGeometry(QRect(170, 70, 311, 16));
         ViewModeCBx = new QComboBox(groupBox);
         ViewModeCBx->setObjectName(QString::fromUtf8("ViewModeCBx"));
         ViewModeCBx->setGeometry(QRect(490, 70, 151, 23));
         FieldsNbLBl = new QLabel(groupBox);
         FieldsNbLBl->setObjectName(QString::fromUtf8("FieldsNbLBl"));
-        FieldsNbLBl->setGeometry(QRect(130, 80, 31, 16));
+        FieldsNbLBl->setGeometry(QRect(80, 50, 31, 16));
         ColorsGBx = new QGroupBox(groupBox);
         ColorsGBx->setObjectName(QString::fromUtf8("ColorsGBx"));
-        ColorsGBx->setGeometry(QRect(320, 50, 161, 61));
+        ColorsGBx->setGeometry(QRect(320, 50, 161, 51));
         HeaderColorLBl = new QLabel(ColorsGBx);
         HeaderColorLBl->setObjectName(QString::fromUtf8("HeaderColorLBl"));
         HeaderColorLBl->setGeometry(QRect(70, 30, 21, 21));
@@ -176,9 +159,18 @@ public:
         ColorModeCBx = new QComboBox(groupBox);
         ColorModeCBx->setObjectName(QString::fromUtf8("ColorModeCBx"));
         ColorModeCBx->setGeometry(QRect(490, 100, 151, 23));
+        FieldPresenceGBx = new QGroupBox(groupBox);
+        FieldPresenceGBx->setObjectName(QString::fromUtf8("FieldPresenceGBx"));
+        FieldPresenceGBx->setGeometry(QRect(10, 90, 401, 61));
+        BitsetHeaderLBl = new QLabel(FieldPresenceGBx);
+        BitsetHeaderLBl->setObjectName(QString::fromUtf8("BitsetHeaderLBl"));
+        BitsetHeaderLBl->setGeometry(QRect(0, 20, 401, 16));
+        BitsetContentLBl = new QLabel(FieldPresenceGBx);
+        BitsetContentLBl->setObjectName(QString::fromUtf8("BitsetContentLBl"));
+        BitsetContentLBl->setGeometry(QRect(0, 40, 391, 16));
         MessagePTe = new QPlainTextEdit(ZRawMasterFileVisu);
         MessagePTe->setObjectName(QString::fromUtf8("MessagePTe"));
-        MessagePTe->setGeometry(QRect(10, 140, 659, 41));
+        MessagePTe->setGeometry(QRect(0, 150, 661, 41));
 
         retranslateUi(ZRawMasterFileVisu);
 
@@ -201,15 +193,10 @@ public:
         EndBTn->setText(QString());
         label_4->setText(QCoreApplication::translate("ZRawMasterFileVisu", "Size", nullptr));
         FileSizeLBl->setText(QCoreApplication::translate("ZRawMasterFileVisu", "TextLabel", nullptr));
-        label_5->setText(QCoreApplication::translate("ZRawMasterFileVisu", "Rank", nullptr));
-        BlockNbLBl->setText(QCoreApplication::translate("ZRawMasterFileVisu", "TextLabel", nullptr));
         TopLBl->setText(QCoreApplication::translate("ZRawMasterFileVisu", "Top", nullptr));
         BottomLBl->setText(QCoreApplication::translate("ZRawMasterFileVisu", "Bottom", nullptr));
         URFSizeLabelLBl->setText(QCoreApplication::translate("ZRawMasterFileVisu", "URF size", nullptr));
         URFSizeLBl->setText(QCoreApplication::translate("ZRawMasterFileVisu", "TextLabel", nullptr));
-        FieldPresenceLabelLBl->setText(QCoreApplication::translate("ZRawMasterFileVisu", "Field presence", nullptr));
-        BitsetContentLBl->setText(QCoreApplication::translate("ZRawMasterFileVisu", "TextLabel", nullptr));
-        BitsetHeaderLBl->setText(QCoreApplication::translate("ZRawMasterFileVisu", "01234567890123456789", nullptr));
         FieldsNbLBl->setText(QString());
         ColorsGBx->setTitle(QString());
         HeaderColorLBl->setText(QString());
@@ -217,6 +204,9 @@ public:
         URFSizeColorLBl->setText(QString());
         WrongColorLBl->setText(QString());
         StartColorLBl->setText(QString());
+        FieldPresenceGBx->setTitle(QCoreApplication::translate("ZRawMasterFileVisu", "Field presence", nullptr));
+        BitsetHeaderLBl->setText(QCoreApplication::translate("ZRawMasterFileVisu", "01234567890123456789", nullptr));
+        BitsetContentLBl->setText(QCoreApplication::translate("ZRawMasterFileVisu", "TextLabel", nullptr));
     } // retranslateUi
 
 };

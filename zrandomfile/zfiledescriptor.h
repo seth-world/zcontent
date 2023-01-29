@@ -305,6 +305,11 @@ public:
   inline
       ZStatus testRank(zrank_type pRank, const char *pModule);
 
+  inline bool invalidAddress(zaddress_type pAddress) {
+    return ((pAddress < 0) || (pAddress > ZFCB.AllocatedSize));
+  }
+
+  inline zaddress_type getFileSize() {return ZFCB.AllocatedSize ;}
 
   inline
       void incrementPosition (ssize_t pIncrement) {   PhysicalPosition += pIncrement ;

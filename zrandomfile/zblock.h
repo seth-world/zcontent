@@ -30,9 +30,9 @@ public:
   uint32_t            StartSign=cst_ZFILEBLOCKSTART ;    // Start marker
   ZBlockId            BlockId=ZBID_Data;         // Block identification : always ZBID_Data here
   uint16_t            EndianCheck=cst_EndianCheck_Normal;
-  zsize_type          BlockSize;      // total size of the physical block, ZBH_Export size+user content size
-  uint8_t             State;          // state of the block see @ref ZBlockState_type
-  zlockmask_type      Lock;           // relates to ZLockMask_type (zlockmanager.h)
+  zsize_type          BlockSize=0;      // total size of the physical block, ZBH_Export size+user content size
+  uint8_t             State=0;          // state of the block see @ref ZBlockState_type
+  zlockmask_type      Lock=0;           // relates to ZLockMask_type (zlockmanager.h)
   //    ZLock_Reason        LockReason;     // RFFU (zlockmanager.h)
   pid_t               Pid;            // process identification that locked the block
 };

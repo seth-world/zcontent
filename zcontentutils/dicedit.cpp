@@ -67,6 +67,8 @@
 
 #include <filegeneratedlg.h>
 
+#include <zcppparser/zcppparsertype.h> // for getParserWorkDirectory
+
 #ifdef __USE_WINDOWS__
 #include <io.h>
 #else
@@ -1256,32 +1258,15 @@ DicEdit::getGenerationNames(utf8VaryingString& pOutFileBaseName,utf8VaryingStrin
 
 void
 DicEdit::searchDirectory() {
-  QFileDialog wFd;
-/*
-  wFd.setWindowTitle(QObject::tr("Source directory","DicEdit"));
-  wFd.setLabelText(QFileDialog::Accept,  "Select");
-  wFd.setLabelText(QFileDialog::Reject ,  "Cancel");
 
-  wFd.setOption(QFileDialog::ShowDirsOnly,true);
-  wFd.setDirectory(SelectedDirectory.toCChar());
-*/
-  while (true)
-  {
- /*   int wRet=wFd.exec();
-    if (wRet==QDialog::Rejected)
-      return;
-  */
+
     QString wD=QFileDialog::getExistingDirectory(this,"Source directory",SelectedDirectory.toCChar(),QFileDialog::ShowDirsOnly);
-
     if (wD.isEmpty()) {
-//    if (wFd.selectedFiles().isEmpty()) {
-      ZExceptionDLg::adhocMessage("Source directory",Severity_Warning,&Errorlog,nullptr,"No directory has been selected.\nPlease select a valid directory.");
-      continue;
+      return;
     }
     SelectedDirectory = wD.toUtf8().data();
     GenPathLEd->setText(wD);
-    break;
-  }//while (true)
+    return;
 }
 
 void
@@ -1438,32 +1423,18 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
   if  (pAction==FwriteXmltofileQAc)
   {
-    const char* wWD=getenv(__PARSER_WORK_DIRECTORY__);
-    if (!wWD)
-      wWD="";
-    QFileDialog wFd(this,QObject::tr("Xml file","DicEdit"),wWD,
-        "Xml files (*.xml);;All files (*.*)");
-//    wFd.setWindowTitle(QObject::tr("Xml file","DicEdit"));
-    wFd.setLabelText(QFileDialog::Accept,  "Select");
-    wFd.setLabelText(QFileDialog::Reject ,  "Cancel");
-    while (true)
-    {
-      int wRet=wFd.exec();
-      if (wRet==QDialog::Rejected)
-        return;
+    const char* wDir=getParserParamDirectory();
 
-      if (wFd.selectedFiles().isEmpty())
-      {
-        ZExceptionDLg::message("FviewXmlQAc",ZS_EMPTY,Severity_Warning,"No file has been selected.\nPlease select a valid file.");
-//        QMessageBox::critical(this,tr("No file selected"),"Please select a valid file");
-      }
-      else
-        break;
-    }//while (true)
+    QString wFileName = QFileDialog::getSaveFileName(this, tr("Save as xml file"),
+                                                      wDir,
+                                                      "Xml files (*.xml);;All (*.*)");
+    if (wFileName.isEmpty()) {
+          return ;
+    }
 
-    uriString wOutFile= wFd.selectedFiles()[0].toUtf8().data();
+    uriString wOutFile= wFileName.toUtf8().data();
     if (wOutFile.getFileExtension().isEmpty()) {
-      wOutFile.changeFileExtension(".xml");
+        wOutFile.changeFileExtension(".xml");
     }
     bool Fexists=wOutFile.exists();
 
@@ -1485,27 +1456,14 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
   if  (pAction==FloadfromXmlFileQAc) {
 
-    const char* wWD=getenv(__PARSER_WORK_DIRECTORY__);
-    if (!wWD)
-      wWD="";
-    QFileDialog wFd(this,QObject::tr("Xml file","DicEdit"),wWD,
-        "Xml files (*.xml);;All files (*.*)");
-    wFd.setLabelText(QFileDialog::Accept,  "Select");
-    wFd.setLabelText(QFileDialog::Reject ,  "Cancel");
-    while (true) {
-      int wRet=wFd.exec();
-      if (wRet==QDialog::Rejected)
-        return;
+    const char* wDir=getParserParamDirectory();
+    QString wFileName = QFileDialog::getOpenFileName(this, tr("Open xml file"),
+        wDir,
+        "Xml files (*.xml);;All (*.*)");
+    if (wFileName.isEmpty())
+      return;
 
-      if (wFd.selectedFiles().isEmpty())
-        {
-        ZExceptionDLg::adhocMessage("No file selected",Severity_Error,&Errorlog,nullptr,"Please select a valid file");
-        }
-      else
-        break;
-      }//while (true)
-
-    XmlDictionaryFile= wFd.selectedFiles()[0].toUtf8().data();
+    XmlDictionaryFile= wFileName.toUtf8().data();
 
     ZMFDictionary wMasterDic;
     utf8VaryingString wXmlContent;
@@ -4629,20 +4587,18 @@ DicEdit::loadDictionaryFile(const uriString& pDicPath){
 bool
 DicEdit::saveOrCreateDictionaryFile() {
 
-  const char* wWD=getenv(__PARSER_WORK_DIRECTORY__);
-  if (!wWD)
-    wWD="";
   ZStatus wSt;
-  QFileDialog wFD(this,"Dictionary file ",wWD,"Dictionary (*." __DICTIONARY_EXTENSION__");; All files (*.*)");
 
-  wFD.setLabelText(QFileDialog::Accept,"Choose or new");
-  wFD.setLabelText(QFileDialog::Reject,"Give up");
-
-  int wRet=wFD.exec();
-
-  if (wRet==QDialog::Rejected)
+  const char* wDir=getParserWorkDirectory();
+  QString wFileName = QFileDialog::getSaveFileName(this, "Dictionary file",
+                                                  wDir,
+                                                  "Dictionary files (*.dic);;All (*.*)");
+  if (wFileName.isEmpty()) {
     return false;
-  uriString wSelected = wFD.selectedFiles()[0].toUtf8().data();
+  }
+
+
+  uriString wSelected = wFileName.toUtf8().data();
 
   if (wSelected.getFileExtension().isEmpty()) {
     wSelected += ".";
@@ -4782,33 +4738,28 @@ DicEdit::loadDictionaryFile(){
   ZStatus wSt;
   uriString wEnvDir;
   ZDicHeaderList wDicHList;
+  utf8VaryingString wStr;
 
-  const char* wWD=getenv(__PARSER_WORK_DIRECTORY__);
-  if (!wWD)
-    wWD="";
+  const char* wDir=getParserWorkDirectory();
+  QString wFileName = QFileDialog::getOpenFileName(this, "Dictionary file",
+      wDir,
+      "Dictionary files (*.dic);;All (*.*)");
+  if (wFileName.isEmpty()) {
+    return false;
+  }
+  uriString wSelected = wFileName.toUtf8().data();
 
-  QFileDialog wFD(this,"Dictionary file",wWD);
-
-  while (true) {
-    int wRet=wFD.exec();
-
-    if (wRet==QDialog::Rejected)
+  if (!wSelected.exists()){
+    ZExceptionDLg::adhocMessage("Dictionary file",Severity_Error,nullptr,nullptr,"File %s does not exist ",wSelected.toCChar());
       return false;
-    uriString wSelected = wFD.selectedFiles()[0].toUtf8().data();
-
-    if (!wSelected.exists()){
-      if (ZExceptionDLg::adhocMessage2B("Dictionary file",Severity_Error,"Give up","Retry",nullptr,"File %s does not exist ",wSelected.toCChar())==QDialog::Rejected) {
-        return false;
-      }
-      continue;
-    }
+  }
 
     ZDicDLg* wDicDLg=new ZDicDLg (this);
     wSt=wDicDLg->setDicFile( wSelected);
     if (wSt!=ZS_SUCCESS)
       return false;
     wDicDLg->dataSetup() ;
-    wRet=wDicDLg->exec();
+    int wRet=wDicDLg->exec();
     if (wRet==QDialog::Rejected)
       return false;
     if (DictionaryFile==nullptr)
@@ -4836,7 +4787,6 @@ DicEdit::loadDictionaryFile(){
         delete wDicDLg;
         return false;
     }
-    utf8String wStr;
     wStr.sprintf("Dictionary %s version %s status %s has been loaded",DictionaryFile->DicName.toCChar(),getVersionStr(DictionaryFile->Version).toCChar(),
         DictionaryFile->Active?"Active":"Not active");
     ui->statusBar->showMessage(wStr.toCChar(),cst_MessageDuration);
@@ -4856,14 +4806,13 @@ DicEdit::loadDictionaryFile(){
     wSt=DictionaryFile->zopen(wSelected,ZRF_Modify);
     if (wSt!=ZS_SUCCESS) {
       utf8VaryingString* wXMes=new utf8VaryingString(ZException.last().formatFullUserMessage());
-      if (ZExceptionDLg::adhocMessage2B("Dictionary file",Severity_Error,"Give up","Try another",
+      if (ZExceptionDLg::adhocMessage("Dictionary file",Severity_Error,nullptr,
               wXMes,"File %s has been errored while trying to open it.",wSelected.toCChar())==QDialog::Rejected)
         return false;
-      continue;
     }
     /* if only one dictionary version stored, no need of choosing */
     if (DictionaryFile->getRecordCount()==1) {
-      utf8VaryingString wStr;
+
       wSt= DictionaryFile->loadDictionaryByRank(0);
       if (wSt!=ZS_SUCCESS) {
         ZExceptionDLg::displayLast("Dictionary load",false);
@@ -4885,26 +4834,21 @@ DicEdit::loadDictionaryFile(){
     if (wDicHList.count()==0) {
       if (wSt!=ZS_EOF) {
         utf8VaryingString* wXMes=new utf8VaryingString(ZException.last().formatFullUserMessage());
-        if (ZExceptionDLg::adhocMessage2B("Dictionary file",Severity_Error,"Give up","Try another",
+        if (ZExceptionDLg::adhocMessage("Dictionary file",Severity_Error,nullptr,
                 wXMes,"File %s has been errored while being read.",wSelected.toCChar())==QDialog::Rejected)
           return false;
       }
       else{
-        if (ZExceptionDLg::adhocMessage2B("Dictionary file",Severity_Error,"Give up","Try another",nullptr,"File %s does not contain any valid dictionary version.",wSelected.toCChar())==QDialog::Rejected)
+        if (ZExceptionDLg::adhocMessage("Dictionary file",Severity_Error,nullptr,nullptr,"File %s does not contain any valid dictionary version.",wSelected.toCChar())==QDialog::Rejected)
             return false;
       }
-      continue;
     }// count==0
-    break;   /* everything normal */
-  } // while true
-
 
   ZStdListDLg wListDlg(this);
 
   ZStdListDLgLine     wTitle;
   ZStdListDLgLine     wLine;
   ZStdListDLgContent  wContent;
-  utf8VaryingString   wStr;
 
   wTitle.add("Dictionary Name");
   wTitle.add("Version");

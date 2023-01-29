@@ -13,7 +13,6 @@ class DisplayMain;
 class QStandardItemModel;
 class QActionGroup;
 class QAction;
-class QFileDialog;
 namespace zbs {
 class ZRandomFile;
 class ZMasterFile;

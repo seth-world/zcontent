@@ -38,7 +38,6 @@
 
 #include <visulinecol.h>
 
-
 #include <poolvisu.h>
 
 #define __FIXED_FONT__ "courrier"
@@ -981,7 +980,19 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
 
   if (pAction==ui->setfileQAc)
   {
-    chooseFile(true);
+    const char* wWD = getParserWorkDirectory();
+    QString wFileName = QFileDialog::getOpenFileName(this, tr("Open File"),
+        wWD,
+        "ZContent files (*.zrf *.zmf *.zix *.zrh);;All (*.*)");
+    if (wFileName.isEmpty()) {
+      QMessageBox::critical(this,tr("No file selected"),"Please select a valid file");
+      return;
+    }
+    URICurrent = wFileName.toUtf8().data();
+    ui->FullPathLbl->setText(wFileName);
+
+    setFileType (wFileName.toUtf8().data());
+//    chooseFile(true);
     return;
   }
 
@@ -1244,9 +1255,18 @@ void
 ZContentVisuMain::actionOpenFileByType(bool pChecked)
 {
   ZStatus wSt;
-
-  if (!chooseFile(false))
+  const char* wWD = getParserWorkDirectory();
+  QString wFileName = QFileDialog::getOpenFileName(this, tr("Open File"),
+      wWD,
+      "ZContent files (*.zrf *.zmf *.zix *.zrh);;All (*.*)");
+  if (wFileName.isEmpty()) {
+    QMessageBox::critical(this,tr("No file selected"),"Please select a valid file");
     return;
+  }
+  URICurrent = wFileName.toUtf8().data();
+  ui->FullPathLbl->setText(wFileName);
+
+  setFileType (wFileName.toUtf8().data());
 
   if (URICurrent.getFileExtension()=="zrf")
     {
@@ -1380,7 +1400,7 @@ ZContentVisuMain::actionOpenFileByType(bool pChecked)
 
   return;
 } // actionOpenFileByType
-#endif //  __COMMENT__
+
 
 bool
 ZContentVisuMain::chooseFile(bool pChecked)
@@ -1398,6 +1418,10 @@ ZContentVisuMain::chooseFile(bool pChecked)
 
   wFileSelectionDLg->setLabelText(QFileDialog::Accept,  "Select");
   wFileSelectionDLg->setLabelText(QFileDialog::Reject ,  "Cancel");
+  const char* wWDParam = getParserParamDirectory();
+  QString wFileName = QFileDialog::getOpenFileName(this, tr("Open File"),
+      wWDParam,
+      "ZContent files (*.zrh) ; All (*.*)");
 
   while (true)
   {
@@ -1429,7 +1453,7 @@ ZContentVisuMain::chooseFile(bool pChecked)
 
   return true;
 }//chooseFile
-
+#endif //  __COMMENT__
 void
 ZContentVisuMain::openZRH()
 {
@@ -1524,7 +1548,7 @@ ZContentVisuMain::openZRF()
         return ZS_CANCEL;
       wFileName = QFileDialog::getOpenFileName(this, tr("Open File"),
           wWDParam,
-          "Header (*.zrh) ; All (*.*)");
+          "Header (*.zrh);;All (*.*)");
       if (wFileName.isEmpty())
         return ZS_CANCEL;
 
@@ -1693,8 +1717,22 @@ ZStatus wSt=ZS_SUCCESS;
 void
 ZContentVisuMain::getRaw()
 {
-  if (!chooseFile(true))
+
+  const char* wDir=getParserWorkDirectory();
+  QString wFileName = QFileDialog::getOpenFileName(this, "Dictionary file",
+      wDir,"ZContent files (*.zrf *.zmf *.zix *.zrh);;All (*.*)");
+  if (wFileName.isEmpty()) {
     return ;
+  }
+  uriString wSelected = wFileName.toUtf8().data();
+
+  if (!wSelected.exists()){
+    ZExceptionDLg::adhocMessage("File",Severity_Error,nullptr,nullptr,"File %s does not exist ",wSelected.toCChar());
+    return ;
+  }
+  URICurrent = wSelected;
+//  if (!chooseFile(true))
+//    return ;
   if (openOther(URICurrent.toCChar())!= ZS_SUCCESS) {
     utf8VaryingString wAdd = ZException.last().formatFullUserMessage().toString();
     ZExceptionDLg::adhocMessage(tr("Random File open error").toUtf8().data(),ZException.last().Severity,nullptr,&wAdd,

@@ -184,9 +184,7 @@ public:  void setFileType(ZFile_type pType) {ZHeader.FileType=pType;}
 
 public:
 
-//! @cond Test
     void putTheMess (void);
-//! @endcond
 
 //----------------Set parameters------------------------------------
 

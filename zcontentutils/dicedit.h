@@ -35,7 +35,6 @@ class DicEdit;
 class QStandardItemModel;
 class QActionGroup;
 class QAction;
-class QFileDialog;
 
 namespace zbs {
 class ZRandomFile;
