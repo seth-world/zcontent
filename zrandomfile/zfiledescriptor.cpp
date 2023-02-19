@@ -13,6 +13,7 @@ using namespace zbs;
  *                      File control block (FCB)
  *                      pools : ZBAT   active blocks pool
  *                              ZFBT   free blocks pool
+ *                              ZHOT   holes table
  *                              (ZDBT   deleted blocks pool --DEPRECATED--)
  * @param pZDBExport
  * @return
@@ -37,17 +38,25 @@ ZFileDescriptor::_exportFCB(ZDataBuffer& pZDBExport)
   ZDataBuffer wZFBT_export;
   wExpSize = ZFBT._exportAppendPool(wZFBT_export);
   wFileControlBlock.ZFBT_ExportSize = wExpSize ;
+
+  wFileControlBlock.ZHOT_DataOffset = (zaddress_type)(ZFCB.ZFBT_DataOffset + ZFCB.ZFBT_ExportSize); // then ZDBT
+  ZDataBuffer wZHOT_export;
+  wExpSize = ZHOT._exportAppendPool(wZHOT_export);
+  wFileControlBlock.ZHOT_ExportSize = wExpSize ;
+
 #ifdef __DEPRECATED__
   wFileControlBlock.ZDBT_DataOffset = (zaddress_type)(ZFCB.ZFBT_DataOffset + ZFCB.ZFBT_ExportSize); // then ZDBT
   //    wFileControlBlock.ZDBT_ExportSize = ZDBT._getExportAllocatedSize();
   ZDataBuffer wZDBT_export;
   ZFBT._exportAppendPool(wZDBT_export);
   wFileControlBlock.ZDBT_ExportSize = wExpSize ;
+#endif // __DEPRECATED__
 
   wExpSize = wFileControlBlock._exportAppend(pZDBExport);
-#endif // __DEPRECATED__
+
   pZDBExport.appendData(wZBAT_export);
   pZDBExport.appendData(wZFBT_export);
+  pZDBExport.appendData(wZHOT_export);
 //  pZDBExport.appendData(wZDBT_export);
   return pZDBExport;
 }// ZFileDescriptor::_exportFCB
@@ -63,6 +72,8 @@ ZFileDescriptor::_importFCB(const unsigned char* pPtrIn)
   ZBAT._importPool(wPtrIn);  /* wPtrIn is updated by ZBlockPool::_importPool */
 
   ZFBT._importPool(wPtrIn);
+
+  ZHOT._importPool(wPtrIn);
 
 //  ZDBT._importPool(wPtrIn);
 
@@ -106,6 +117,7 @@ ZFDOwnData& ZFDOwnData::_copyFrom(const ZFDOwnData& pIn)
   ZFCB=pIn.ZFCB;
   ZBAT=(ZBlockPool&)pIn.ZBAT;
   ZFBT=(ZBlockPool&)pIn.ZFBT;
+  ZHOT=(ZBlockPool&)pIn.ZHOT;
 //  ZDBT=(ZBlockPool&)pIn.ZDBT;  // Deprecated
   ZReserved=pIn.ZReserved;
   ZBlockLock=pIn.ZBlockLock;
@@ -267,8 +279,8 @@ ZFileDescriptor::clearFCB (void)
   ZFCB.clear();
   ZBAT.clear();
   ZFBT.clear();
+  ZHOT.clear();
 //  ZDBT.clear();  // Deprecated
-  ZBAT.clear();
 
   return;
 }

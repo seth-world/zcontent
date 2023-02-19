@@ -135,6 +135,7 @@ public:
     //                             _deregister();}
 
     using ZRandomFile::getSize ;
+    using ZRandomFile::getRecordCount ;
     using ZRandomFile::getAllocatedBlocks;
     using ZRandomFile::getAllocatedSize;
     using ZRandomFile::getBlockExtentQuota;

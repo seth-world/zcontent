@@ -909,6 +909,8 @@ public:
       *  Extends file whenever required, creates an entry in free blocks pool
       *  Returns corresponding block rank in free blocks pool or -1 if error */
     long _getFreeBlockEngine(const size_t pSize, const zaddress_type pBaseAddress=-1);
+
+    /** @brief ZRandomFile::checkSplitFreeBlock this routine is in charge of splitting a free block into two blocks according a requested size pRequestedSize */
     long checkSplitFreeBlock (long pRank, size_t pRequestedSize);
 
 
@@ -945,7 +947,15 @@ public:
     ZStatus _grabFreeSpacePhysical(zrank_type pZBATRank,
                                    ZBlockDescriptor &pBS);   // reference to aggregated block to be freed : output
 
-    ZStatus _grabFreeSpaceLogical(zrank_type pZFBTRank);   // reference to aggregated block to be freed : output
+    void _grabHoleBefore(long &pHoleRankTBD, ZBlockDescriptor& pBS);
+    void _grabHoleAfter(long &pHoleRankTBD, ZBlockDescriptor& pBS);
+
+
+    void _grabFreeBefore(long &pFreeRankTBD,ZBlockDescriptor &pBS);
+    void _grabFreeAfter(long &pFreeRankTBD,ZBlockDescriptor &pBS);
+
+    ZStatus _grabFreeSpaceLogical(zrank_type &pZFBTRank);   // reference to aggregated block to be freed : output
+    ZStatus _grabHolesOnly(zrank_type &pZFBTRank);   // reference to aggregated block to be freed : output
 
 
     ZStatus _searchPreviousPhysicalBlock (zaddress_type pCurrentAddress,
@@ -1008,8 +1018,6 @@ public:    ZStatus _getReservedHeader(bool pForceRead);
 
 protected:
     ZStatus _getFileControlBlock(bool pForceRead);
-
-    ZStatus _updateFileControlBlock();
 
 #ifdef __DEPRECATED__
     ZStatus _writeFullFileHeader(bool pForceWrite);// should be a duplicate of _writeReservedHeader but must be kept for logic

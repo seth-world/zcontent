@@ -583,7 +583,7 @@ ZRawMasterFileVisu::searchPreviousStartSign(zaddress_type pStartAddress, zaddres
   pOutAddress = wAddress + wOffset ;
   FileOffset = off_t(pOutAddress);
   return ZS_SUCCESS;
-}// searchNextStartSign
+}// searchPreviousStartSign
 
 
 void

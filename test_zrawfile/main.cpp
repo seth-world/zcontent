@@ -533,7 +533,8 @@ int main(int argc, char *argv[])
 
   /* End test run 2 */
 
-#endif
+#endif // __TESTRUN_2__
+#ifdef __TESTRUN_3__
   long wRank=0;
   uriString wUriZix = wWD;
 
@@ -555,7 +556,7 @@ int main(int argc, char *argv[])
     ZException.exit_abort();
   }
 
-  wZRF.setRunMode(ZIXM_Debug | ZIXM_UpdateHeader);
+  wZRF.setRunMode(ZIXM_Dycho | ZIXM_Debug | ZIXM_UpdateHeader);
 
   wSt=wZRF.openIndexFile(wUriZix,0,ZRF_All);
   if (wSt!=ZS_SUCCESS){
@@ -602,6 +603,20 @@ int main(int argc, char *argv[])
   addKeyValue(wZRF,wIndexItem,wRecord,4L);
   displayAllUtf8((ZRandomFile&)wZRF);
 
+
+  /* hole test */
+
+  wDesc="a simple grave for resting in peace zmf record #2";
+  _DBGPRINT("**** remove desc <%s>\n",wDesc.toString())
+  wRecord.clear();
+  wDesc._exportURF(wRecord);
+
+  wSt=wZRF._removeRawKeyValue_Prepare(wIndexItem,wRank,wRecord,wAddress);
+
+  wSt=wZRF._rawKeyValue_Commit(wIndexItem);
+
+  displayAllUtf8((ZRandomFile&)wZRF);
+
   _DBGPRINT("                   Record #5\n")
   /* record #5 */
   wDesc="A smashed paper bowl record #5";
@@ -619,6 +634,21 @@ int main(int argc, char *argv[])
   wDesc._exportURF(wRecord);
   addKeyValue(wZRF,wIndexItem,wRecord,6L);
   displayAllUtf8((ZRandomFile&)wZRF);
+
+
+  // hole grabbing test
+
+  wDesc="This is iceberg zmf record #3";
+  _DBGPRINT("**** remove desc <%s>\n",wDesc.toString())
+  wRecord.clear();
+  wDesc._exportURF(wRecord);
+
+  wSt=wZRF._removeRawKeyValue_Prepare(wIndexItem,wRank,wRecord,wAddress);
+
+  wSt=wZRF._rawKeyValue_Commit(wIndexItem);
+
+  displayAllUtf8((ZRandomFile&)wZRF);
+
 
   _DBGPRINT("\n                   Record #7\n")
   /* record #7 */
@@ -639,16 +669,41 @@ int main(int argc, char *argv[])
   addKeyValue(wZRF,wIndexItem,wRecord,8L);
   displayAllUtf8((ZRandomFile&)wZRF);
 
+  _DBGPRINT("                   Record #9\n")
+  /* record #9 */
+  _DBGPRINT("add desc <%s>\n",wDesc.toString())
+  wDesc="Nothing more than 9 #9";
+  _DBGPRINT("add desc <%s>\n",wDesc.toString())
+  wRecord.clear();
+  wDesc._exportURF(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,9L);
+  displayAllUtf8((ZRandomFile&)wZRF);
+
+
+
+  _DBGPRINT("                   Record #10\n")
+  /* record #10 */
+  _DBGPRINT("add desc <%s>\n",wDesc.toString())
+  wDesc="THIS is number 10 #10";
+  _DBGPRINT("add desc <%s>\n",wDesc.toString())
+  wRecord.clear();
+  wDesc._exportURF(wRecord);
+  addKeyValue(wZRF,wIndexItem,wRecord,10L);
+  displayAllUtf8((ZRandomFile&)wZRF);
+
+
+
+
   wZRF.zclose();
   return 0;
 
-  /* End test run 2 */
-//#endif //
+  /* End test run 3 */
+#endif //__TESTRUN_3__
 
 
   uriString wDocFile = wWD ;
   wDocFile.addConditionalDirectoryDelimiter();
-  wDocFile += "physicaldocumentonekey.zmf";
+  wDocFile += "physicaldocument.zmf";
 
 // uriString wPictureDir;
 
@@ -1010,14 +1065,16 @@ displayKeys (ZRawMasterFile& pMasterFile) {
   zaddress_type wIndexAddress;
   long wIdx=0;
 
+  ZRawIndexFile* wIFile=nullptr;
+
   _DBGPRINT("\n\n           List of all keys\n")
 
-  while (true) {
+  while (wIdx < pMasterFile.IndexTable.count()) {
     long wi=0;
     _DBGPRINT("Index key rank <%ld> - <%s>\n"
               "rank  index address  zmf address       Resource\n",wIdx,pMasterFile.IndexTable[wIdx]->IndexName.toCChar())
     wSt=pMasterFile.IndexTable[wIdx]->zgetWAddress(wKey,wi,wIndexAddress);
-    while (wSt==ZS_SUCCESS) {
+    while ((wi < pMasterFile.IndexTable[wIdx]->getRecordCount())&&(wSt==ZS_SUCCESS)) {
       wII.fromFileKey(wKey);
       const unsigned char* wPtr=wII.Data;
       wResource._importURF(wPtr);
@@ -1037,7 +1094,7 @@ displayKeys (ZRawMasterFile& pMasterFile) {
     _DBGPRINT("Index key rank <%ld> - <%s>\n",wIdx,pMasterFile.IndexTable[wIdx]->IndexName.toCChar())
     utf8VaryingString wStr;
     wSt=pMasterFile.IndexTable[wIdx]->zget(wKey,wi++);
-    while (wSt==ZS_SUCCESS) {
+    while  ((wi < pMasterFile.IndexTable[wIdx]->getRecordCount())&&(wSt==ZS_SUCCESS)) {
       wII.fromFileKey(wKey);
       const unsigned char* wPtr=wII.Data;
       wStr._importURF(wPtr);
@@ -1055,7 +1112,7 @@ displayKeys (ZRawMasterFile& pMasterFile) {
     _DBGPRINT("Index %ld - %s\n",wIdx,pMasterFile.IndexTable[wIdx]->IndexName.toCChar())
     ZDateFull wD1,wD2;
     wSt=pMasterFile.IndexTable[wIdx]->zget(wKey,wi++);
-    while (wSt==ZS_SUCCESS) {
+    while  ((wi < pMasterFile.IndexTable[wIdx]->getRecordCount())&&(wSt==ZS_SUCCESS)) {
       wII.fromFileKey(wKey);
 
       const unsigned char* wPtr=wII.Data;
@@ -1068,6 +1125,7 @@ displayKeys (ZRawMasterFile& pMasterFile) {
           wD2.toLocale().toCChar())
       wSt=pMasterFile.IndexTable[wIdx]->zget(wKey,wi++);
     }
+    break;
   }// while true
 
   _DBGPRINT("_____________________________________________\n\n")

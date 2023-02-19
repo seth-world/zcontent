@@ -218,7 +218,8 @@ ssize_t ZResource::_importURF(const unsigned char *&pUniversalPtr)
   _importAtomic<ZTypeBase>(wType, pUniversalPtr);
   if (wType!=ZType_Resource)
     {
-    fprintf(stderr,"ZResource::_importURF-E-INVTYP Invalid data type found while expecting <ZType_Resource>.\n");
+    fprintf(stderr,"ZResource::_importURF-E-INVTYP Invalid data type found <%X> <%s>while expecting <ZType_Resource>.\n",
+        wType,decode_ZType(wType));
     return -1;
     }
 

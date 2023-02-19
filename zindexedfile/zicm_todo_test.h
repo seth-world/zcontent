@@ -56,7 +56,8 @@ if pFreeBlocks = -1 (default) then BlockTargetSize is taken.
     + search physical block after physical block :
         - block is ZBS_Used create an entry in ZBAT
         - block is ZBS_Free create an entry in ZFBT
-        - block is ZBS_Deleted create an entry in ZDBT
+        - block is ZBS_Hole create an entry in ZHOT
+DEPRECATED [- block is ZBS_Deleted create an entry in ZDBT]
 
     + test it (done) &radic;
 */

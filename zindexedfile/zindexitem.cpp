@@ -47,7 +47,7 @@ ZIndexItem::fromFileKey (ZDataBuffer &pKeyFileRecord)
 //  size_t wOffset =0;
   size_t wSize;
 
-  clear();
+//  clear();
   memmove (&ZMFAddress,pKeyFileRecord.Data,sizeof(ZMFAddress));
 
   ZMFAddress = reverseByteOrder_Conditional<zaddress_type>(ZMFAddress);

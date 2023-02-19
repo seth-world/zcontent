@@ -63,9 +63,13 @@ public:
     size_t          ZFBT_DataOffset;           /**< offset to Free Blocks Table array since begining of ZFCB */
     size_t          ZFBT_ExportSize;           /**< size in bytes of ZFBT : to be written on file */
 
+    size_t          ZHOT_DataOffset;           /**< offset to Hole Blocks Table array since begining of ZFCB */
+    size_t          ZHOT_ExportSize;           /**< size in bytes of ZHOT : to be written on file */
+
+#ifdef __DEPRECATED__
     size_t          ZDBT_DataOffset;           /**< offset to Deleted Blocks Table array since begining of ZFCB */
     size_t          ZDBT_ExportSize;           /**< size in bytes of ZDBT : to be written on file */
-
+#endif
 //    size_t          ZReserved_DataOffset;      /**<  Written on file header : Reserved space address . Must be 0L */
 //    size_t          ZReserved_ExportSize;      /**<  given by _getReservedSize */
 
@@ -118,7 +122,8 @@ This block is written in header file.
 It contains in particular the 3 block pools :
    - ZBlockAccessTable (ZBAT): block pool that gives for a used block its address within the file using its rank number
    - ZFreeBlockPool (ZFBT): block pool of free/deleted blocks available for usage in record creation process
-   - ZDeletedBlockPool (ZDBT): pool of deleted block before they could have been grabbed by grab mechanism
+    - ZHOT : block pool of holes
+deprecated   [- ZDeletedBlockPool (ZDBT): pool of deleted block before they could have been grabbed by grab mechanism]
 
 @par ZFileDescriptor simplified map
 @verbatim
@@ -202,7 +207,11 @@ public:
 
     size_t          ZFBT_DataOffset;           /**< offset to Free Blocks Table array since begining of ZFCB */
     size_t          ZFBT_ExportSize;           /**< size in bytes of ZFBT : to be written on file */
-/* Deprecated*/
+
+    size_t          ZHOT_DataOffset;           /**< offset to Holes Table array since begining of ZFCB */
+    size_t          ZHOT_ExportSize;           /**< size in bytes of ZHOT : to be written on file */
+
+    /* Deprecated*/
 //    size_t          ZDBT_DataOffset;           /**< offset to Deleted Blocks Table array since begining of ZFCB */
 //    size_t          ZDBT_ExportSize;           /**< size in bytes of ZDBT : to be written on file */
 

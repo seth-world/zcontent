@@ -5,6 +5,7 @@
 #include <ztoolset/zdatefull.h>
 #include <ztoolset/zdatabuffer.h>
 
+#include <ztoolset/zcharset.h>
 
 ZStatus URFParser::set(const ZDataBuffer* pRecord) {
   Record = pRecord;
@@ -684,6 +685,8 @@ URFParser::getURFFieldAllSizes (const unsigned char*& pPtr, ZTypeBase& pType, si
   }// switch
 } // URFParser::getURFFieldAllSizes
 
+
+
 ZStatus
 URFParser::getKeyFieldValue (const unsigned char* &pPtrIn,ZDataBuffer& pValue){
   ZTypeBase wType;
@@ -1357,6 +1360,7 @@ int URFComparePtr(const unsigned char* pKey1, size_t pSize1, const unsigned char
 
   int wRet=0;
 //  wSt=URFParser::getURFTypeAndSize(pKey1,wType,wSize1);
+  /* pKey1 is updated and points to true field data - wSize1 is the effective data byte size */
   ssize_t wParserRet=URFParser::getURFFieldAllSizes(pKey1,wType,wURFHSize1,wSize1); /* pKey1 is updated and points to true field data */
   if (wParserRet < 0) {
     ZException.setMessage("URFCompare",wSt,Severity_Fatal,"Error while comparing key values. Key1 type %X %s size %ld decoded type %s",
@@ -1365,14 +1369,24 @@ int URFComparePtr(const unsigned char* pKey1, size_t pSize1, const unsigned char
   }
 
 //  wSt=URFParser::getURFTypeAndSize(pKey2,wType,wSize2);
-  wParserRet=URFParser::getURFFieldAllSizes(pKey2,wType,wURFHSize2,wSize2); /* pKey2 is updated and points to true field data */
+  /* pKey2 is updated and points to true field data - wSize2 is the effective data byte size */
+  wParserRet=URFParser::getURFFieldAllSizes(pKey2,wType,wURFHSize2,wSize2);
   if (wParserRet < 0) {
     ZException.setMessage("URFCompare",wSt,Severity_Fatal,"Error while comparing key values. Key2 type %X %s size %ld decoded type %s",
         wType,wType,wSize2,decode_ZType(wType));
     ZException.exit_abort();
   }
 
-  wRet = URFCompareValues (pKey1,wSize1,pKey2,wSize2);  /* pKey1 and pKey2 are updated */
+  /* pKey1 and pKey2 are updated to point outside key content at the end of compare routine */
+  if (wType & ZType_U8) {
+    wRet = UTFCompare<utf8_t>(pKey1,wSize1,pKey2,wSize2);
+  } else if (wType & ZType_U16) {
+    wRet = UTFCompare<utf16_t>(pKey1,wSize1,pKey2,wSize2);
+  } else if (wType & ZType_U32) {
+    wRet = UTFCompare<utf32_t>(pKey1,wSize1,pKey2,wSize2);
+  }
+  else
+    wRet = URFCompareValues (pKey1,wSize1,pKey2,wSize2);
 
   while ( (wRet==0) && (wSt == ZS_SUCCESS ) && (pKey1 < wEnd1) && (pKey2 < wEnd2) ) {
 
@@ -1389,8 +1403,16 @@ int URFComparePtr(const unsigned char* pKey1, size_t pSize1, const unsigned char
           wType,wType,wSize2,decode_ZType(wType));
       ZException.exit_abort();
     }
-
-    wRet = URFCompareValues (pKey1,wSize1,pKey2,wSize2);  /* pURF1 and pURF2 are updated */
+    /* pKey1 and pKey2 are updated to point outside key content at the end of compare routine */
+    if (wType & ZType_U8) {
+      wRet = UTFCompare<utf8_t>(pKey1,wSize1,pKey2,wSize2);
+    } else if (wType & ZType_U16) {
+      wRet = UTFCompare<utf16_t>(pKey1,wSize1,pKey2,wSize2);
+    } else if (wType & ZType_U32) {
+      wRet = UTFCompare<utf32_t>(pKey1,wSize1,pKey2,wSize2);
+    }
+    else
+      wRet = URFCompareValues (pKey1,wSize1,pKey2,wSize2);
   }// while
   return wRet;
 } // URFCompare
@@ -1414,8 +1436,10 @@ int URFCompareValues( const unsigned char* &pURF1,size_t pSize1,
       return -1;
     }
   }
-  if (pURF2==nullptr)
+  if (pURF2==nullptr) {
+    pURF1 += pSize1;
     return 1;
+  }
 
   wRet=0;
   while ((wRet==0) && wSize1-- && wSize2--){
@@ -1428,13 +1452,119 @@ int URFCompareValues( const unsigned char* &pURF1,size_t pSize1,
   }
   /* one of the two or both keys are at the end and so far they are equal */
 
+  /* if equals and both length are equal */
+  if ((!wSize1)&&(!wSize2)) {
+    return wRet;
+  }
 
   if (wSize1) { /* but Key1 has a greater size than key2 */
+    wURF1 += wSize1;
     return 1; /* key1 is greater than key2 */
   }
   if (wSize2) { /* Key2 has a greater size than key 1 */
+    wURF2 += wSize2;
     return -1; /* key1 is less than key2 */
   }
-    /* both are equal in values and sizes */
+    /* both are equal in values and sizes (sizes are exhausted) */
   return 0;
-}
+}// URFCompareValues
+
+
+#ifdef __COMMENT__
+
+int UTF8Compare(const unsigned char* &pKey1,size_t pSize1,const unsigned char* &pKey2,size_t pSize2) {
+  utf8_t* wKey1 = (utf8_t* )pKey1;
+  utf8_t* wKey2 = (utf8_t* )pKey2;
+  if (pKey1==nullptr) {
+    if (pKey2==nullptr)
+      return 0;
+    else {
+      pKey2 += pSize2;
+      return -1;
+    }
+  }
+  if (pKey2==nullptr) {
+    pKey1 += pSize1;
+    return 1;
+  }
+
+  utf8_t pV1,pV2;
+
+  size_t wI1=0, wI2=0;
+  int wRet=0;
+
+  //  while ((wRet==0)&&(wI1<pSize1) &&(wI2<pSize2) && pKey1[wI1] && pKey2[wI2]) {
+  while ((wRet==0) && (wI1<pSize1) && (wI2<pSize2) ) {
+    /*  uppercase no accute */
+    pV1=KeyCharConvert(pKey1[wI1++]);
+    pV2=KeyCharConvert(pKey2[wI2++]);
+
+    wRet=pV1-pV2;
+  }
+
+  pKey1 += pSize1;
+  pKey2 += pSize2;
+
+  /* one of the two -or both- strings are at the end and so far they are equal */
+  if (wI1==pSize1) { /* but Key1 has a greater size than key2 */
+    return 1; /* key1 is greater than key2 */
+  }
+  if (wI2==pSize2) { /* Key2 has a greater size than key 1 */
+    return -1; /* key1 is less than key2 */
+  }
+  /* both are equal in values and sizes (sizes are exhausted) */
+
+  return wRet;
+}//compareUtf8
+
+
+int UTF32Compare(const unsigned char* &pKey1,size_t pSize1,const unsigned char* &pKey2,size_t pSize2) {
+
+  size_t wCount1=pSize1/sizeof(utf32_t);
+  size_t wCount2=pSize1/sizeof(utf32_t);
+
+  utf32_t* wKey1 = (utf32_t* )pKey1;
+  utf32_t* wKey2 = (utf32_t* )pKey2;
+
+  if (pKey1==nullptr) {
+    if (pKey2==nullptr)
+      return 0;
+    else {
+      pKey2 += pSize2;
+      return -1;
+    }
+  }
+  if (pKey2==nullptr) {
+    pKey1 += pSize1;
+    return 1;
+  }
+
+  utf32_t pV1,pV2;
+
+  size_t wI1=0, wI2=0;
+  int wRet=0;
+
+  //  while ((wRet==0)&&(wI1<pSize1) &&(wI2<pSize2) && pKey1[wI1] && pKey2[wI2]) {
+  while ((wRet==0) && (wI1<wCount1) && (wI2<wCount2) ) {
+    /*  uppercase no accute */
+    pV1=convertChar<utf32_t>(wKey1[wI1++]);
+    pV2=convertChar<utf32_t>(wKey2[wI2++]);
+
+    wRet=pV1-pV2;
+  }
+
+  pKey1 += pSize1;
+  pKey2 += pSize2;
+
+  /* one of the two -or both- strings are at the end and so far they are equal */
+  if (wI1==wCount1) { /* but Key1 has a greater size than key2 */
+    return 1; /* key1 is greater than key2 */
+  }
+  if (wI2==wCount2) { /* Key2 has a greater size than key 1 */
+    return -1; /* key1 is less than key2 */
+  }
+  /* both are equal in values and sizes (sizes are exhausted) */
+
+  return wRet;
+} // UTF32Compare
+#endif // __COMMENT__

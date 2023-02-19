@@ -28,6 +28,9 @@ ZFileControlBlock& ZFileControlBlock::_copyFrom(const ZFileControlBlock& pIn)
   ZFBT_DataOffset=pIn.ZFBT_DataOffset;
   ZFBT_ExportSize=pIn.ZFBT_ExportSize;
 
+  ZHOT_DataOffset=pIn.ZHOT_DataOffset;
+  ZHOT_ExportSize=pIn.ZHOT_ExportSize;
+
 /* // Deprecated
   ZDBT_DataOffset=pIn.ZDBT_DataOffset;
   ZDBT_ExportSize=pIn.ZDBT_ExportSize;
@@ -152,9 +155,12 @@ ZFCB_Export& ZFCB_Export::_copyFrom(const ZFCB_Export& pIn)
   ZFBT_DataOffset=pIn.ZFBT_DataOffset;
   ZFBT_ExportSize=pIn.ZFBT_ExportSize;
 
+  ZHOT_DataOffset=pIn.ZHOT_DataOffset;
+  ZHOT_ExportSize=pIn.ZHOT_ExportSize;
+/*  Deprecated
   ZDBT_DataOffset=pIn.ZDBT_DataOffset;
   ZDBT_ExportSize=pIn.ZDBT_ExportSize;
-
+*/
 /*  ZReserved_DataOffset=pIn.ZReserved_DataOffset;
   ZReserved_ExportSize=pIn.ZReserved_ExportSize;
 */
@@ -186,6 +192,9 @@ ZFCB_Export& ZFCB_Export::set(const ZFileControlBlock& pIn)
 
   ZFBT_DataOffset=pIn.ZFBT_DataOffset;
   ZFBT_ExportSize=pIn.ZFBT_ExportSize;
+
+  ZHOT_DataOffset=pIn.ZHOT_DataOffset;
+  ZHOT_ExportSize=pIn.ZHOT_ExportSize;
 
   /* // Deprecated
   ZDBT_DataOffset=pIn.ZDBT_DataOffset;
@@ -224,9 +233,14 @@ void ZFCB_Export::setFromPtr(const unsigned char * &pPtrIn)
   ZFBT_DataOffset=pIn->ZFBT_DataOffset;
   ZFBT_ExportSize=pIn->ZFBT_ExportSize;
 
+  ZHOT_DataOffset=pIn->ZHOT_DataOffset;
+  ZHOT_ExportSize=pIn->ZHOT_ExportSize;
+
+  /* // Deprecated
+
   ZDBT_DataOffset=pIn->ZDBT_DataOffset;
   ZDBT_ExportSize=pIn->ZDBT_ExportSize;
-
+*/
 /*  ZReserved_DataOffset=pIn->ZReserved_DataOffset;
   ZReserved_ExportSize=pIn->ZReserved_ExportSize;
 */
@@ -257,6 +271,9 @@ ZFileControlBlock& ZFCB_Export::toFCB(ZFileControlBlock& pOut)
 
   pOut.ZFBT_DataOffset=ZFBT_DataOffset;
   pOut.ZFBT_ExportSize=ZFBT_ExportSize;
+
+  pOut.ZHOT_DataOffset=ZHOT_DataOffset;
+  pOut.ZHOT_ExportSize=ZHOT_ExportSize;
 
   /*// Deprecated
   pOut.ZDBT_DataOffset=ZDBT_DataOffset;
@@ -298,8 +315,14 @@ void ZFCB_Export::_convert()
   ZBAT_ExportSize=reverseByteOrder_Conditional<size_t>(ZBAT_ExportSize);
   ZFBT_DataOffset=reverseByteOrder_Conditional<size_t>(ZFBT_DataOffset);
   ZFBT_ExportSize=reverseByteOrder_Conditional<size_t>(ZFBT_ExportSize);
+
+  ZHOT_DataOffset=reverseByteOrder_Conditional<size_t>(ZHOT_DataOffset);
+  ZHOT_ExportSize=reverseByteOrder_Conditional<size_t>(ZHOT_ExportSize);
+
+/* Deprecated
   ZDBT_DataOffset=reverseByteOrder_Conditional<size_t>(ZDBT_DataOffset);
   ZDBT_ExportSize=reverseByteOrder_Conditional<size_t>(ZDBT_ExportSize);
+*/
 //  ZReserved_DataOffset=reverseByteOrder_Conditional<size_t>(ZReserved_DataOffset);
 //  ZReserved_ExportSize=reverseByteOrder_Conditional<size_t>(ZReserved_ExportSize);
   InitialSize=reverseByteOrder_Conditional<zsize_type>(InitialSize);

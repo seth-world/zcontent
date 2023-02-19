@@ -113,7 +113,8 @@ public:
   ZBlockPool        ZBAT; /** Blocks access table pool : contains references to any used block in file (Primary pool)*/
 
   ZBlockPool        ZFBT; /** Free blocks pool : contains references to any free space in file  (Primary pool)*/
-                          /** Sorted by Address : must use
+                          /** Sorted by Address : must use*/
+  ZBlockPool        ZHOT; /** Holes Table : gathers segments of file with no ZBlockHeader_Export (not enough room) */
   /* Deprecated */
 //  ZBlockPool        ZDBT; /** Deleted blocks pool : keep references to dead blocks included into free blocks (Secondary pool)*/
   ZDataBuffer       ZReserved;   /** used by derived classes to store infradata. The first info MUST BE sized to reserved infradata (equals to offsetFCB): gives the offset to effective ZFileDescriptor data.
@@ -382,6 +383,7 @@ protected:
 
       ZBAT.clear();
       ZFBT.clear();
+      ZHOT.clear();
 //      ZDBT.clear();  // Deprecated
       ZReserved.clear();
     //                        ZSystemUser wUser;

@@ -2637,6 +2637,16 @@ ZRawMasterFile::_addRaw(ZDataBuffer& pRecord, ZArray<ZDataBuffer> &pKeysContent)
   ZIndexItem     *wIndexItem=nullptr;
   zrank_type      wIndex_Rank;
 
+  if (pKeysContent.count() != IndexTable.count()) {
+    ZException.setMessage("ZRawMasterFile::zaddRaw",
+        ZS_CORRUPTED,
+        Severity_Severe,
+        "Master file number of indexes <%ld> does not correspond to given keys <%ld>. File <%s> cannot be accessed.",
+        IndexTable.count(),pKeysContent.count() ,
+        getURIContent().toString());
+    return  ZS_CORRUPTED;
+  }
+
   if (!isOpen())
     {
     ZException.setMessage("ZRawMasterFile::zaddRaw",

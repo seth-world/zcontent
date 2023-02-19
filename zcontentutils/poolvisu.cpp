@@ -653,6 +653,8 @@ void poolVisu::dataSetup(int pPoolid) {
     }
     /* effective pool import */
     ZFBT._importPool(wPtrZFBT);
+
+    ZHOT._importPool(wPtrZFBT);
 #ifdef __DEPRECATED__
     /* check pool import structure validity for ZDBT */
     memmove(&wZAEMe,wPtrZDBT,sizeof(ZAExport));
@@ -892,9 +894,10 @@ for (long wi=0; wi < ContentTBv->ItemModel->rowCount();wi++)
   QColor lightBlue(51, 190, 255,255);
   QColor darkBlue(38, 77, 115,255);
   QColor erroredBlue(51, 118, 255,255);
+  QColor holeColor(102, 102, 153,255);
   QBrush validZBATBrush(lightBlue);
   QBrush erroredZBATBrush(erroredBlue);
-  QBrush holeBrush(darkBlue);
+  QBrush unmanagedHoleBrush(darkBlue);
   QBrush greenBrush(Qt::green);
   QBrush yellowBrush(Qt::yellow);
   QBrush darkYellowBrush(Qt::darkYellow);
@@ -904,6 +907,8 @@ for (long wi=0; wi < ContentTBv->ItemModel->rowCount();wi++)
   QBrush magentaBrush(Qt::magenta);
   QBrush grayBrush(Qt::lightGray);
   QBrush darkGrayBrush(Qt::gray);
+
+  QBrush holeBrush(holeColor);
 
   QPen outlinePen(Qt::yellow);
   outlinePen.setWidth(1);
@@ -930,7 +935,7 @@ for (long wi=0; wi < ContentTBv->ItemModel->rowCount();wi++)
   zaddress_type wAddressMin = 0L ;
 
 
-  wB1=GScene->addRect(0.0,1.0,qreal(ContentFileSize),cst_GBlockheight,outlinePen,holeBrush);
+  wB1=GScene->addRect(0.0,1.0,qreal(ContentFileSize),cst_GBlockheight,outlinePen,unmanagedHoleBrush);
 
 
 
@@ -964,7 +969,7 @@ for (long wi=0; wi < ContentTBv->ItemModel->rowCount();wi++)
 
     if (ZBAT[wi].Address < wAddressMin)
       wAddressMin = ZBAT[wi].Address ;
-  } // for
+  } // for ZBAT
 
   for (long wi=0;wi < ZFBT.count();wi++)  {
 
@@ -1000,7 +1005,30 @@ for (long wi=0; wi < ContentTBv->ItemModel->rowCount();wi++)
     if (ZFBT[wi].Address < wAddressMin)
       wAddressMin = ZFBT[wi].Address ;
 
-  }// for
+  }// for ZFBT
+
+
+  for (long wi=0;wi < ZHOT.count();wi++)  {
+    wB1=GScene->addRect(qreal(ZHOT[wi].Address),1.0,qreal(ZHOT[wi].BlockSize),cst_GBlockheight,outlinePen,holeBrush);
+    QVariant wV;
+    ZResource wRes ;
+    wRes = ZResource::getNew(ZEntity_ZHOT);
+    ZDataReference wDRef (ZLayout_FileBlock,wRes,-1);
+    //    wDRef.ResourceReference.Entity=ZEntity_ZFBT;
+    wDRef.setPtr(&ZHOT[wi]);
+    wDRef.DataRank = wi;
+
+    wV.setValue<ZDataReference>(wDRef);
+    wB1->setData(ZQtDataReference,wV);
+
+    if ((ZHOT[wi].Address+ZHOT[wi].BlockSize) > wAddressMax)
+      wAddressMax = ZHOT[wi].Address +ZHOT[wi].BlockSize;
+
+    if (ZHOT[wi].Address < wAddressMin)
+      wAddressMin = ZHOT[wi].Address ;
+
+  }// for ZHOT
+
   ui->FileGraphicGVw->setScene(GScene);
   ui->FileGraphicGVw->show();
 
@@ -1081,6 +1109,10 @@ void poolVisu::GSceneDoubleClick(QGraphicsSceneMouseEvent *pEvent) {
   else if (wDRef.ResourceReference.Entity == ZEntity_ZFBT) {
     wPoolId = 1;
     wPoolLBl = new QLabel("Free blocks table",this);
+  }
+  else if (wDRef.ResourceReference.Entity == ZEntity_ZHOT) {
+    wPoolId = 2;
+    wPoolLBl = new QLabel("Hole table",this);
   } else {
     wPoolLBl = new QLabel("Unknown pool",this);
   }
@@ -1543,7 +1575,7 @@ poolVisu::updateHeader() {
     return ZS_OMITTED;
 
 //  ZStatus wSt= updateHeaderFromPool(URIHeader,&ZBAT,&ZFBT,&ZDBT);
-  ZStatus wSt= updateHeaderFromPool(URIHeader,&ZBAT,&ZFBT);
+  ZStatus wSt= updateHeaderFromPool(URIHeader,&ZBAT,&ZFBT,&ZHOT);
 
   if (wSt==ZS_SUCCESS) {
     ZExceptionDLg::adhocMessage("Update header",Severity_Information,nullptr,nullptr,
@@ -1700,6 +1732,8 @@ getPoolName(uint8_t pPoolType) {
     return "ZBAT";
   case ZPTP_ZFBT:
     return "ZFBT";
+  case ZPTP_ZHOT:
+    return "ZHOT";
 /*  case ZPTP_ZDBT:
     return "ZDBT";
 */
@@ -2057,6 +2091,7 @@ poolVisu::repair(const uriString& pURIContent,const uriString& pURIHeader,uint8_
   ZDataBuffer wHeaderContent;
   ZBlockPool ZBAT;
   ZBlockPool ZFBT;
+  ZBlockPool ZHOT;
 //  ZBlockPool ZDBT;  // Deprecated
 
 
@@ -2250,7 +2285,7 @@ poolVisu::repair(const uriString& pURIContent,const uriString& pURIHeader,uint8_
   pDisplay(wStr);
 
 //  wSt= updateHeaderFromPool(pURIHeader,&ZBAT,&ZFBT,&ZDBT);
-  wSt= updateHeaderFromPool(pURIHeader,&ZBAT,&ZFBT);
+  wSt= updateHeaderFromPool(pURIHeader,&ZBAT,&ZFBT,&ZHOT);
   if (wSt!=ZS_SUCCESS) {
     ZException.setMessage("poolVisu::repair",wSt,Severity_Severe,"Writing header file. File<%s>",pURIHeader.toString());
    return ZExceptionDisplayAll(pDisplay);
@@ -2264,7 +2299,7 @@ poolVisu::repair(const uriString& pURIContent,const uriString& pURIHeader,uint8_
 
 ZStatus
 //poolVisu::updateHeaderFromPool(const uriString& pURIHeader,ZBlockPool* pZBAT,ZBlockPool* pZFBT,ZBlockPool* pZDBT) {
-poolVisu::updateHeaderFromPool(const uriString& pURIHeader,ZBlockPool* pZBAT,ZBlockPool* pZFBT) {
+poolVisu::updateHeaderFromPool(const uriString& pURIHeader,ZBlockPool* pZBAT,ZBlockPool* pZFBT,ZBlockPool* pZHOT) {
   ZDataBuffer wHeaderContent,wNewHeaderContent;
 
   //  ZDataBuffer WReserved;
@@ -2309,10 +2344,12 @@ poolVisu::updateHeaderFromPool(const uriString& pURIHeader,ZBlockPool* pZBAT,ZBl
 
   ZDataBuffer wZBATb;
   ZDataBuffer wZFBTb;
+  ZDataBuffer wZHOTb;
 //  ZDataBuffer wZDBTb;  // Deprecated
 
   pZBAT->_exportAppendPool(wZBATb);
   pZFBT->_exportAppendPool(wZFBTb);
+  pZHOT->_exportAppendPool(wZHOTb);
 //  pZDBT->_exportAppendPool(wZDBTb);  // Deprecated
 
   /* update offsets and sizes within FCB */
@@ -2326,16 +2363,22 @@ poolVisu::updateHeaderFromPool(const uriString& pURIHeader,ZBlockPool* pZBAT,ZBl
   wFCBe->ZFBT_ExportSize = reverseByteOrder_Conditional<size_t>(wZFBTb.Size);
 
   wOffset += wZFBTb.Size ;
+
+  wFCBe->ZHOT_DataOffset = reverseByteOrder_Conditional<size_t>(wOffset);
+  wFCBe->ZHOT_ExportSize = reverseByteOrder_Conditional<size_t>(wZHOTb.Size);
+
+  wOffset += wZHOTb.Size ;
 /*
   wFCBe->ZDBT_DataOffset = reverseByteOrder_Conditional<size_t>(wOffset);
   wFCBe->ZDBT_ExportSize = reverseByteOrder_Conditional<size_t>(wZDBTb.Size);
 */
   wNewHeaderContent.appendData(wZBATb);
   wNewHeaderContent.appendData(wZFBTb);
+  wNewHeaderContent.appendData(wZHOTb);
 //  wNewHeaderContent.appendData(wZDBTb); // Deprecated
 
   return pURIHeader.writeContent(wNewHeaderContent);
-}
+} //updateHeaderFromPool
 
 
 void
@@ -2361,6 +2404,13 @@ void poolVisu::resizeEvent(QResizeEvent* pEvent) {
   int wWMargHeader = (wDlgOld.width()-wHeaderQR.width());
   int wHeaderWidth=pEvent->size().width() - wWMargHeader;
   ui->verticalLayoutWidget->resize(wHeaderWidth,wHeaderQR.height());  /* resize only in width */
+
+  /* graphic zone is only resized in width */
+  QRect wGraphicQR = ui->FileGraphicGVw->geometry();
+  int wWMargGraphic = (wDlgOld.width()-wGraphicQR.width());
+  int wGraphicWidth=pEvent->size().width() - wWMargGraphic;
+  ui->FileGraphicGVw->resize(wGraphicWidth,wGraphicQR.height());  /* resize only in width */
+
 
   /* Table view zone is resized both in width and height */
   QRect wBTBv = ui->verticalLayoutWidget_2->geometry();

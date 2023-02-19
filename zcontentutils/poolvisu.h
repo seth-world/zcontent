@@ -40,6 +40,7 @@ enum ZPoolRepair : uint8_t {
 enum ZPoolType : uint8_t {
   ZPTP_ZBAT     = 0 ,
   ZPTP_ZFBT     = 1 ,
+  ZPTP_ZHOT     = 2 ,
 //  ZPTP_ZDBT     = 2 ,  // Deprecated
   ZPTP_Unknown
 };
@@ -77,7 +78,7 @@ public:
                                         int pFdContent, zaddress_type &pAddress, ZBlockState_type pState);
 
 //  static ZStatus updateHeaderFromPool(const uriString &pURIHeader, ZBlockPool* pZBAT, ZBlockPool* pZFBT, ZBlockPool* pZDBT);
-  static ZStatus updateHeaderFromPool(const uriString &pURIHeader, ZBlockPool* pZBAT, ZBlockPool* pZFBT);
+  static ZStatus updateHeaderFromPool(const uriString &pURIHeader, ZBlockPool* pZBAT, ZBlockPool* pZFBT, ZBlockPool *pZHOT);
 
   static uint16_t checkContentBlock(int pPoolId, int pFdContent, ZBlockDescriptor &pBlockDesc);
 
@@ -181,6 +182,7 @@ private:
 
   ZBlockPool  ZBAT;
   ZBlockPool  ZFBT;
+  ZBlockPool  ZHOT;
 //  ZBlockPool  ZDBT; // Deprecated
 
   bool          FResizeInitial=true;

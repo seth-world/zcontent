@@ -44,6 +44,7 @@ enum ZEntity : ZEntity_type  /* application defined ZEntity */
 
     ZEntity_ZBAT        =          0x0001000,
     ZEntity_ZFBT        =          0x0002000,
+    ZEntity_ZHOT        =          0x0003000,
 
 
     // -----------Document entities  ---------------------

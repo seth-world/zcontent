@@ -454,9 +454,14 @@ ZStatus wSt;
     ZException.setLastSeverity(Severity_Severe);
     return  wSt;
   }
+  if (ZVerbose & ZVB_FileEngine) {
+    _DBGPRINT(" ZRawIndexFile::openIndexFile Index <%s> Duplicates <%d> <%s> file <%s>",
+        IndexName.toString(), int(Duplicates), Duplicates ? "Yes":"No",
+        pIndexUri.toString())
+  }
   ZPMSStats = ZPMS ;
   return  ZS_SUCCESS ;
-}//zopenIndexFile
+}//ZRawIndexFile::openIndexFile
 
 
 
@@ -1084,10 +1089,10 @@ ZIndexItem wIndexItem;
 #endif
   if (ZVerbose & ZVB_FileEngine)
       {
-      _DBGPRINT ("_addKeyValue_Prepare : _Rawsearch return status <%s> rank <%ld>\n", decode_ZStatus(wSt),wIndexItem.IndexRank)
+      _DBGPRINT ("_addKeyValue_Prepare : _Rawsearch Index <%s> Duplicates <%d> <%s> return status <%s> rank <%ld> \n",
+        IndexName.toString(), int(Duplicates), Duplicates ? "Yes":"No",
+        decode_ZStatus(wSt),wIndexItem.IndexRank)
       }
-
-
 
   switch (wSt){
     case (ZS_OUTBOUNDLOW):
@@ -1127,8 +1132,8 @@ ZIndexItem wIndexItem;
       pOutIndexItem->IndexRank = wIndexItem.IndexRank;
       if (Duplicates==ZST_NODUPLICATES) {
         if (ZVerbose & ZVB_FileEngine)
-          _DBGPRINT("_addKeyValue_Prepare : ***Index Duplicate Index key <%s> exception at index rank <%ld>\n",
-              IndexName.toCChar(),
+          _DBGPRINT("_addKeyValue_Prepare : ***Index Duplicate Index key <%s> Duplicates <%d> <%s>  exception at index rank <%ld>\n",
+              IndexName.toCChar(), int(Duplicates), Duplicates ? "Yes":"No",
               wIndexItem.IndexRank)
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                                     ZS_DUPLICATEKEY,
@@ -1217,8 +1222,8 @@ ZRawIndexFile::_rawKeyValue_Commit(ZIndexItem *pIndexItem)
   }//switch
 
   if (ZVerbose & ZVB_FileEngine)
-    _DBGPRINT("ZRawIndexFile::_rawKeyValue_Commit  index key <%s> commit done. status is <%s> \n",
-        IndexName.toCChar(),decode_ZStatus(wSt))
+    _DBGPRINT("ZRawIndexFile::_rawKeyValue_Commit  index key <%s> commit operation <%s> done. status is <%s> \n",
+        IndexName.toCChar(),wAction,decode_ZStatus(wSt))
 
   if (wSt!=ZS_SUCCESS)
   {
@@ -2014,7 +2019,7 @@ void displayURFCompare(long pRank,int pR,unsigned char* pPtr1, unsigned char* pP
   wValue2 = URFParser::displayOneURFField(wPtr2);
 
   if (pR == 0) {
-    _DBGPRINT("rank <%ld> %s greater than %s.\n",pRank,wValue1.toCChar(),wValue2.toCChar())
+    _DBGPRINT("rank <%ld> %s is equal to %s.\n",pRank,wValue1.toCChar(),wValue2.toCChar())
     return;
   }
   if (pR > 0) {
@@ -2338,6 +2343,8 @@ ZRawIndexFile::_URFsearchUnique(  const ZDataBuffer &pKeyToSearch,
   }
   if (wR==0) {
     wSt=ZS_FOUND ;
+    pIndexItem.IndexRank=wIndexRank;
+    pIndexItem.IndexAddress=wIndexRank;
     goto _URFsearch_Return;
   }
 

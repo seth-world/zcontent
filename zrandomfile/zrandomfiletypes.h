@@ -150,7 +150,7 @@ enum ZBlockState_type : uint8_t
     ZBS_BeingDeleted    = 0x12, // block has been marked for deletion but is still not deleted yet : it could be restored using a rollback operation
     ZBS_Allocated       = 0x04, // block in allocated from free blocks pool - an entry has been created in ZBAT . But still not allocated. It still could be freed if create operation is not committed
     ZBS_AllocFromDelete = 0x14, // block is allocated from a deleted block in free block pool
-
+    ZBS_Hole            = 0x08, // block is a hole and is not marked on file
     ZBS_Control         = 0x20,  //  used for file reorganization
 
     ZBS_Split           = 0x40, //  checksplit has splitted this block with previous or next block

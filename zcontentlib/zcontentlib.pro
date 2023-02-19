@@ -137,6 +137,7 @@ HEADERS += \
     ../zrandomfile/zrandomlockfile.h \
     ../zrandomfile/zrfcollection.h \
     ../zrandomfile/zrfpms.h \
+    ../zrandomfile/zrfutilities.h \
     ../zrandomfile/zsearchargument.h \
     ../zrandomfile/zrandomfile.h \
     ../zrandomfile/zrandomfiletypes.h \
@@ -200,6 +201,7 @@ SOURCES += \
     ../zrandomfile/zrandomlockfile.cpp \
     ../zrandomfile/zrfcollection.cpp \
     ../zrandomfile/zrfpms.cpp \
+    ../zrandomfile/zrfutilities.cpp \
     ../zrandomfile/zsearchargument.cpp
 
 FURTHER_CPP=         ../zrandomfile/zrandomlockfile.cpp
