@@ -228,7 +228,7 @@ ZStatus _getArrayUfN_T_Ptr(_Tp* pInData_Ptr,
 
 template <class _Tp>
 static inline
-    void _getAtomicURF_Append(_Tp pInData, ZDataBuffer &pURFOut,const ZTypeBase pType ) {
+void _getAtomicURF_Append(_Tp pInData, ZDataBuffer &pURFOut,const ZTypeBase pType ) {
 
   _Tp wValue=pInData , wValue2;
 
@@ -265,7 +265,7 @@ static inline
 
 template <class _Tp>
 static inline
-    void getAtomicURF_Append(_Tp pInData, ZDataBuffer &pURFOut,const ZTypeBase pType ) {
+void getAtomicURF_Append(_Tp pInData, ZDataBuffer &pURFOut,const ZTypeBase pType ) {
 
   _Tp wValue=pInData , wValue2;
 

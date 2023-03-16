@@ -160,8 +160,8 @@ public:
  */
 class ZFieldDescription
 {
-  friend class zbs::FieldDesc_Export;
-  friend class zbs::FieldDesc_Pack;
+  friend class FieldDesc_Export;
+  friend class FieldDesc_Pack;
   friend class FieldDesc_Check;
 public:
   ZFieldDescription() = default;
@@ -240,7 +240,9 @@ public:  md5                Hash;        //!< unique hashcode value for the fiel
 };
 
 } // namespace zbs
+
 using namespace  zbs;
+
 Q_DECLARE_METATYPE(zbs::ZFieldDescription );   // required for using such structure as variant
 Q_DECLARE_METATYPE(zbs::FieldDesc_Pack);   // required for using such structure as variant
 #endif // ZFIELDDESCRIPTION_H

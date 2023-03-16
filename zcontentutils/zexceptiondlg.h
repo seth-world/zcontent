@@ -3,6 +3,16 @@
 
 #include <QDialog>
 
+#include <ztoolset/utfvaryingstring.h>
+typedef utf8VaryingString utf8String;
+typedef utf16VaryingString utf16String;
+typedef utf32VaryingString utf32String;
+#include <ztoolset/uristring.h>
+
+
+class QCheckBox;
+class QFrame;
+
 enum ZExceptionDlg_type : uint16_t
 {
   ZEXDLG_Nothing = 0,
@@ -23,10 +33,24 @@ enum ZExceptionDlg_type : uint16_t
 
   ZEXDLG_SeverityMask=0xFF00
 };
-
+/*
 namespace Ui {
 class ZExceptionDLg;
 }
+*/
+
+class ZExceptionDLgOptions {
+public:
+  ZExceptionDLgOptions() {}
+
+  utf8VaryingString* OKBtnText=nullptr;
+  utf8VaryingString* CancelBtnText=nullptr;
+  utf8VaryingString* ThirdBtnText=nullptr;
+
+  utf8VaryingString* OKLabel=nullptr;
+  utf8VaryingString* CancelLabel=nullptr;
+  utf8VaryingString* ThirdLabel=nullptr;
+};
 
 enum ZEDLGReturn : int{
   ZEDLG_Rejected = QDialog::Rejected,
@@ -34,11 +58,7 @@ enum ZEDLGReturn : int{
   ZEDLG_Third    = 0xFF
 };
 
-#include <ztoolset/utfvaryingstring.h>
-typedef utf8VaryingString utf8String;
-typedef utf16VaryingString utf16String;
-typedef utf32VaryingString utf32String;
-#include <ztoolset/uristring.h>
+
 
 class ZExceptionBase;
 class QWidget;
@@ -56,12 +76,16 @@ public:
   explicit ZExceptionDLg( const utf8VaryingString& pTitle, Severity_type pSeverity,
                           const utf8VaryingString& pMessage,
                           const utf8VaryingString *pComplement=nullptr,
+                          bool pHtml=false,
                           bool pDontShow=false);
+
   ~ZExceptionDLg();
 
   void setErrorLog(ZaiErrors* pErrorLog) ;
 
-  void init(const utf8VaryingString& pTitle,Severity_type pSeverity,ZStatus pStatus,const utf8VaryingString& pMessage, const utf8VaryingString& pComplement,bool pDontShow)  ;
+  static void setFixedFont(bool pOnOff=true);
+
+  void applyFixedFont();
 
   void applySeverity(Severity_type pSeverity, const utf8VaryingString &pTitle);
 
@@ -74,19 +98,29 @@ public:
 
   void setButtonText(int pOrder,const utf8String& pButtonText);
   void setThirdButton(const utf8String& pButtonText);
+
+  static int adhocMessage(const utf8VaryingString &pTitle, Severity_type pSeverity, const char *pFormat,...);
   /**
    * @brief adhocMessage  displays an adhoc message(not dependant from ZException) with one button <close>
    * @param pTitle        displayed dialog title
    * @param pSeverity     induces the severity logo (one of info,warning, error, fatal) in the top right corner of dialog
-   * @param pComplement   a string with potential complement to be displayed
+   * @param pErrorlog     when exists (not nullptr) must point to a valid Error log object. Then an <ErrorLog> button becomes visible.
+   * Error log full content is displayed in a separate window when clicked.
+   * @param pComplement   a string with potential complement to be displayed.
+   * If exists (not nullptr) then <More> button becomes visible
+   * and complement is displayed in a separate text widget when more is clicked.
    * @param pFormat       the main message with variadic content
    * @return  a return type corresponding to the button pressed
    */
-  static int adhocMessage(const utf8VaryingString &pTitle,
-                          Severity_type pSeverity,
-                          ZaiErrors *pErrorlog,
-                          const utf8VaryingString *pComplement,
+  static int adhocMessage(const utf8VaryingString &pTitle, Severity_type pSeverity,
+                          ZaiErrors *pErrorlog, const utf8VaryingString *pComplement,
                           const char *pFormat,...);
+  static int adhocMessageHtml(const utf8VaryingString &pTitle, Severity_type pSeverity,
+      ZaiErrors *pErrorlog, const utf8VaryingString *pComplement,
+      const char *pFormat,...);
+  static int _adhocMessage(const utf8VaryingString &pTitle, Severity_type pSeverity,
+      ZaiErrors *pErrorlog, const utf8VaryingString *pComplement, bool pHtml,
+      const utf8VaryingString &pMessage);
   /**
    * @brief adhocMessage2B displays an adhoc message(not dependant from ZException) with two buttons, cancel and ok button.
    * @param pTitle        displayed dialog title
@@ -97,8 +131,42 @@ public:
    * @param pFormat       the main message with variadic content
    * @return  a return type corresponding to the button pressed (Dialog::Rejected or Dialog::Accepted)
    */
-  static int adhocMessage2B(const utf8String&pTitle, Severity_type pSeverity,const utf8String& pCancelText, const utf8String& pOkText,const utf8VaryingString *pComplement, const char *pFormat,...);
-  static int adhocMessage3B(const utf8String&pTitle, Severity_type pSeverity,const utf8String& pOtherText,const utf8String& pCancelText, const utf8String& pOkText,const utf8VaryingString *pComplement, const char *pFormat,...);
+  static int adhocMessage2B(const utf8String&pTitle, Severity_type pSeverity,
+      const utf8String& pCancelText, const utf8String& pOkText,
+      const char *pFormat,...);
+
+  static int adhocMessage2B(const utf8String&pTitle, Severity_type pSeverity,
+      const utf8String& pCancelText, const utf8String& pOkText,
+      ZaiErrors *pErrorlog, const utf8VaryingString *pComplement,
+      const char *pFormat,...);
+
+  static int adhocMessage2BHtml(const utf8String&pTitle, Severity_type pSeverity,
+      const utf8String& pCancelText, const utf8String& pOkText,
+      ZaiErrors *pErrorlog, const utf8VaryingString *pComplement,
+      const char *pFormat,...);
+
+  static int _adhocMessage2B(const utf8VaryingString &pTitle, Severity_type pSeverity,
+      const utf8String& pCancelText, const utf8String& pOkText,
+      ZaiErrors *pErrorlog, const utf8VaryingString *pComplement, bool pHtml,
+      const utf8VaryingString &pMessage);
+
+  static int adhocMessage3B(const utf8String&pTitle, Severity_type pSeverity,
+      const utf8String& pOtherText, const utf8String& pCancelText, const utf8String& pOkText,
+      const char *pFormat,...);
+  static int adhocMessage3B(const utf8String&pTitle, Severity_type pSeverity,
+      const utf8String& pOtherText, const utf8String& pCancelText, const utf8String& pOkText,
+      ZaiErrors *pErrorlog, const utf8VaryingString *pComplement,
+      const char *pFormat,...);
+
+  static int adhocMessage3BHtml(const utf8String&pTitle, Severity_type pSeverity,
+      const utf8String& pOtherText, const utf8String& pCancelText, const utf8String& pOkText,
+      ZaiErrors *pErrorlog, const utf8VaryingString *pComplement,
+      const char *pFormat,...);
+
+  static int _adhocMessage3B(const utf8VaryingString &pTitle, Severity_type pSeverity,
+      const utf8String& pOtherText,const utf8String& pCancelText, const utf8String& pOkText,
+      ZaiErrors *pErrorlog, const utf8VaryingString *pComplement, bool pHtml,
+      const utf8VaryingString &pMessage);
 
   static int message(const char *pModule, ZStatus pStatus, Severity_type pSeverity,const char *pFormat,...);
   static int message2B(const char *pModule, ZStatus pStatus, Severity_type pSeverity, const utf8String& pCancelText, const utf8String& pOkText, const char *pFormat,...);
@@ -131,17 +199,9 @@ public:
   static int display3B(const utf8VaryingString &pTitle, const ZExceptionBase pException, const utf8String& pButtonText, const char *pCancelText=nullptr, const char *pOKText=nullptr);
 
 
-  static int info(ZExceptionBase& pException, QWidget *parent = nullptr);
-  static int warning(ZExceptionBase& pException, QWidget *parent = nullptr);
-  static int error(ZExceptionBase& pException, QWidget *parent = nullptr);
-  static int severe(ZExceptionBase& pException, QWidget *parent = nullptr);
-  static int fatal(ZExceptionBase& pException, QWidget *parent = nullptr);
-
-
-
   static void resetDontShow() ;
 
-  void setAdditionalInfo(const utf8VaryingString& pComp);
+  void setAdditionalInfo(const utf8VaryingString& pComp, bool pHtml=false);
   void removeAdditionalInfo ();
 
 public Q_SLOTS:
@@ -151,27 +211,46 @@ public Q_SLOTS:
   void MoreClicked();
   void ErrlogClicked();
 
+  void layoutSetup(const utf8VaryingString &pTitle, bool pDontShow);
+
 private Q_SLOTS :
   void resizeEvent(QResizeEvent* pEvent);
 public:
   ZaiErrors* ErrorLog=nullptr;
 
-  QWidget *VVLWDg=nullptr;
-  QVBoxLayout *VLayout=nullptr;
-  QLabel*   LabLBl=nullptr;
-  QTextEdit * AdditionalTEd=nullptr;
+
 private:
   ZStatus currentStatus=ZS_INVALIDSTATUS;
-
-  utf8VaryingString Additional;
 
   bool FResizeInitial=true;
   bool DoNotShow=false;
   bool FMore=false;
-  Ui::ZExceptionDLg *ui;
+//  Ui::ZExceptionDLg *ui;
+
+private:
+  QWidget *verticalLayoutWidget=nullptr;
+
+  QCheckBox *dontShowCKb=nullptr;
+
+  QPushButton *ErrlogBTn=nullptr;
+  QPushButton *MoreBTn=nullptr;
+  QPushButton *OtherBTn=nullptr;
+  QPushButton *OKBTn=nullptr;
+  QPushButton *CancelBTn=nullptr;
+  QLabel *LogoLBl=nullptr;
+  QFrame *ExceptionFRm=nullptr;
+  QLabel *ZStatusLBl=nullptr;
+
+  QLabel *ModuleLBl=nullptr;
+  QLabel *SeverityLBl=nullptr;
+
+//  QLabel *TitleLBl=nullptr;
+  QTextEdit *MessageTEd=nullptr;
+  QWidget *VVLWDg=nullptr;
+  QVBoxLayout *VLayout=nullptr;
+  QLabel*   LabLBl=nullptr;
+  QTextEdit * AdditionalTEd=nullptr;
 };
-
-
 
 
 #endif // ZEXCEPTIONDLG_H

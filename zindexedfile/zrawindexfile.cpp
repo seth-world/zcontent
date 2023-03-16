@@ -11,6 +11,7 @@
 //#include <zindexedfile/zindexitem.h>
 
 #include <zindexedfile/zrawmasterfile.h>
+#include <zindexedfile/zmasterfile.h>
 
 #include <zxml/zxmlprimitives.h>
 
@@ -489,6 +490,17 @@ ZDataBuffer wICBContent;
 */
     return  ZRandomFile::zclose();/* zclose updates file's blocks (header - index file control block etc.)*/
 }//closeIndexFile
+
+
+ZStatus
+ZRawIndexFile::_removeAll() {
+  ZDataBuffer wRecord;
+  ZStatus wSt=ZS_SUCCESS;
+  while (wSt==ZS_SUCCESS)
+    wSt=zremove(0L);
+  return ZS_SUCCESS;
+}
+
 /**
  * @brief ZIndexFile::writeIndexControlBlock
  * @param pCheckSum a pointer to a pointer on checkSum field.
@@ -2362,7 +2374,7 @@ ZRawIndexFile::_URFsearchUnique(  const ZDataBuffer &pKeyToSearch,
 
 _URFsearch_Return:
   if (ZVerbose & ZVB_SearchEngine)
-    _DBGPRINT("ZRawIndexFile::_URFsearchUnique  Index key <%s> status <%s> index rank %ld index address %ld zmf address %ld \n",
+    _DBGPRINT("ZRawIndexFile::_URFsearchUnique  Index key <%s> status <%s> index rank %ld index address %ld zmf address %lld \n",
         IndexName.toCChar(),
         decode_ZStatus(wSt), pIndexItem.IndexRank,pIndexItem.IndexAddress,pIndexItem.ZMFAddress)
   /*    if ((wSt==ZS_FOUND)&&(pLock != ZLock_Nolock ))

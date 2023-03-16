@@ -21,17 +21,20 @@ class ZKeyDictionary;
 
 namespace zbs {
 class ZRawMasterFile;
+class ZMasterFile;
 }
 
 utf8String generateIndexRootName(const utf8String &pMasterRootName,
                                  const long pRank,
                                  const utf8String &pIndexName);
+/* see zrawmasterfileutils.h
 ZStatus
 generateIndexURI(uriString &pIndexFileUri,
                 const uriString pMasterFileUri,
                 const uriString &pDirectory,
-                const long pRank,
+//                const long pRank,
                 const utf8String& pIndexName);
+*/
 /*
 ZStatus getChildElementValue(QDomNode pNodeWork,const char*pTagName,QString &pContent, bool pMandatory);
 

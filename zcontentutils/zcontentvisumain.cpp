@@ -39,6 +39,7 @@
 #include <visulinecol.h>
 
 #include <poolvisu.h>
+#include <filegeneratedlg.h>
 
 #define __FIXED_FONT__ "courrier"
 
@@ -46,6 +47,9 @@ const int cst_maxraisonablevalue = 100000;
 
 using namespace std;
 using namespace zbs;
+
+
+class DicEditMWn* DicEdit=nullptr;
 
 ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
                                                      ui(new Ui::ZContentVisuMain)
@@ -116,6 +120,9 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
   ui->menubar->addAction(openZRFQAc);
 
 
+  GetZmfDefQAc = new QAction("Master file");
+  ui->menubar->addAction(GetZmfDefQAc);
+
   mainQAg = new QActionGroup(this);
 
   mainQAg->addAction(DictionaryQAc);
@@ -133,7 +140,7 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
   mainQAg->addAction(GetRawQAc);     /* Shortcut to open file as raw */
 
   mainQAg->addAction(ui->surfaceScanZRFQAc); /* surface scan ZRF file */
-   mainQAg->addAction(ui->surfaceScanRawQAc); /* surface scan raw file */
+  mainQAg->addAction(ui->surfaceScanRawQAc); /* surface scan raw file */
 
   mainQAg->addAction(ui->closeQAc);
 
@@ -158,6 +165,9 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
   /* dictionary menu */
   mainQAg->addAction(ui->dictionaryQAc);
 //  actionGroup->addAction(ui->dicLoadXmlQAc);
+
+  /* get definition from ZMF */
+  mainQAg->addAction(GetZmfDefQAc);
 
   /* display pool choices */
 
@@ -1062,15 +1072,38 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
 
   if (pAction==DictionaryQAc)
   {
-    if (!dictionaryWnd)
-      dictionaryWnd=new DicEdit(std::bind(&ZContentVisuMain::DicEditQuitCallback, this),this);
-    dictionaryWnd->clear();
+    if (DicEdit==nullptr)
+      DicEdit=new DicEditMWn(std::bind(&ZContentVisuMain::DicEditQuitCallback, this),this);
+    DicEdit->clear();
 
 //    dictionaryWnd->setNewDictionary();
 
-    dictionaryWnd->show();
+    DicEdit->show();
     return;
   }
+
+
+  if (pAction==GetZmfDefQAc) {
+/*    const char* wDir=getParserWorkDirectory();
+    QString wFileName = QFileDialog::getOpenFileName(this, tr("Master file"),
+        wDir,
+        "master files (*.zmf);;All (*.*)");
+    if (wFileName.isEmpty())
+      return;
+    uriString wZMFURI= wFileName.toUtf8().data();
+    if (!wZMFURI.exists())
+      return;
+*/
+    FileGenerateMWn* wFGDlg= new FileGenerateMWn(this);
+//    if (!wFGDlg->LoadFromFile())  /* returns false if cancelled */
+//      return;
+
+    wFGDlg->show();
+    return;
+  }
+
+
+
 /*
   if (pAction==ui->dicLoadXmlQAc)
   {
@@ -1541,7 +1574,8 @@ ZContentVisuMain::openZRF()
     generateURIHeader(URICurrent,wURIHeader);
 
     while (!wURIHeader.exists()) {
-      int wRet = ZExceptionDLg::adhocMessage2B("Header file",Severity_Error,"Give up","Search",nullptr,
+      int wRet = ZExceptionDLg::adhocMessage2B("Header file",Severity_Error,"Give up","Search",
+          nullptr,nullptr,
           "Header file <%s> does not exist.\n"
           "Give up operation or search a new one.",wURIHeader.toCChar());
       if (wRet==QDialog::Rejected)
@@ -2199,7 +2233,8 @@ bool
 ZContentVisuMain::testRequestedSize(const uriString& pURI, ZDataBuffer& pRawData,size_t pRequestedSize){
   if (pRawData.Size < pRequestedSize)
   {
-    int wRet=ZExceptionDLg::adhocMessage2B("displayICBs",Severity_Warning,"Quit","Load",nullptr,
+    int wRet=ZExceptionDLg::adhocMessage2B("displayICBs",Severity_Warning,"Quit","Load",
+        nullptr,nullptr,
         "Not enough data loaded. Requested minimum size is <%ld> bytes.\n"
         "Only <%ld> Bytes have been loaded.\n\n"
         "Load / reload file content <Reload>\n"
@@ -3218,7 +3253,7 @@ textEditMWn*  ZContentVisuMain::openGenLogWin()
 
 void ZContentVisuMain::DicEditQuitCallback(){
 //  delete dictionaryWnd;
-  dictionaryWnd = nullptr;
+  DicEdit = nullptr;
 }
 
 

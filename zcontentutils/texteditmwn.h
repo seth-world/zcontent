@@ -21,6 +21,10 @@ class ZQPlainTextEdit;
 class QTextCursor;
 class QTextCharFormat;
 
+class QActionGroup;
+class QAction;
+class QMenu;
+
 namespace Ui {
 class textEditMWn;
 }
@@ -28,7 +32,9 @@ class textEditMWn;
 enum ZTextEditOption : uint32_t {
   TEOP_Nothing        = 0,
   TEOP_CloseBtnHide   = 0x01,     /* if set Close button hides dialog, while if not set close button closes */
-  TEOP_ShowLineNumbers= 0x04
+  TEOP_ShowLineNumbers= 0x04,
+  TEOP_NoCloseBtn     = 0x08,      /* no close button */
+  TEOP_NoFileLab      = 0x10      /* hide label closed / open file */
 };
 
 class ZContentVisuMain;
@@ -41,15 +47,15 @@ class textEditMWn : public QMainWindow
 
   void _init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack) );
 public:
-//  explicit textEditMWn(ZContentVisuMain*parent,__CLOSE_CALLBACK__(pCloseCallBack) );
-  explicit textEditMWn(QWidget*parent ,uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack));
-  explicit textEditMWn(QWidget*parent, uint32_t pOptions );
+  explicit textEditMWn(QWidget*parent ,uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)=nullptr);
   explicit textEditMWn(QWidget*parent );
   ~textEditMWn();
 
   ZStatus setTextFromFile(const uriString& pTextFile);
   void setText(const utf8VaryingString& pText, const utf8VaryingString &pTitle);
   void appendText(const utf8VaryingString& pText);
+  void appendText(const char *pText,...);
+//  void _appendText(const utf8VaryingString& pText,va_list arglist);
 
   void setPositionOrigin ();
 
@@ -79,19 +85,36 @@ public:
   void closeEvent(QCloseEvent *event) override;
   void keyPressEvent(QKeyEvent *pEvent) override;
 
+  bool hasLineNumbers();
+  void lineNumbersOnOff();
+  void wordWrap();
+
 private Q_SLOTS :
   void morePressed();
   void closePressed();
   void wrapPressed();
   void filterPressed();
-  void lineNumbersOnOff();
+  void lineNumbersBTnClicked();
   void searchMainPressed();
   void searchPressed();
   void searchReturnPressed();
 
+  void MenuAction(QAction* pAction);
+
 private:
   void search(const utf8VaryingString &pSearchString);
   void searchFirst(const utf8VaryingString &pSearchString);
+
+private:
+  QMenu*        genMEn=nullptr;
+  QAction*      writeQAc=nullptr;
+  QAction*      clearQAc=nullptr;
+  QAction*      lineNbQAc=nullptr;
+  QAction*      wrapQAc=nullptr;
+  QAction*      quitQAc=nullptr;
+  QActionGroup* menuActionQAg=nullptr;
+
+private:
   QTextDocument*  searchDoc=nullptr;
   QTextCursor     searchCursor;
   QTextCursor     oldSearchCursor;

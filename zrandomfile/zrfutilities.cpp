@@ -502,7 +502,6 @@ ZFileUtils::writeHeaderFromPool(const uriString& pURIHeader,
 
   //  ZDataBuffer WReserved;
 
-
   /*
   ZHeader.OffsetReserved = sizeof(ZHeaderControlBlock_Export) ;
   ZHeader.SizeReserved = ZReserved.Size ;
@@ -521,3 +520,22 @@ ZFileUtils::writeHeaderFromPool(const uriString& pURIHeader,
 
   return pURIHeader.writeContent(wHeaderContent);
 } //updateHeaderFromPool
+
+ZStatus renameFile(const uriString& pFormerName,const utf8VaryingString& pNewName) {
+  int wRet=::rename(pFormerName.toCChar(),pNewName.toCChar());
+  if (wRet!=0) {
+    ZException.getErrno(errno,"renameFile",ZS_FILEERROR,Severity_Severe,
+        "Error renaming file %s to %s",pFormerName.toString(),pNewName.toString());
+    return ZS_FILEERROR;
+  }
+  return ZS_SUCCESS;
+}
+ZStatus removeFile(const uriString& pFormerName) {
+  int wRet=::remove(pFormerName.toCChar());
+  if (wRet!=0) {
+    ZException.getErrno(errno,"removeFile",ZS_FILEERROR,Severity_Severe,
+        "Error removing file %s.",pFormerName.toString());
+    return ZS_FILEERROR;
+  }
+  return ZS_SUCCESS;
+}

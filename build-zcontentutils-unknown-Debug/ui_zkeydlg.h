@@ -30,6 +30,8 @@ public:
     QPushButton *DisguardBTn;
     QLineEdit *TooltipLEd;
     QLabel *label_3;
+    QLabel *label_4;
+    QLineEdit *KeySizeLEd;
 
     void setupUi(QDialog *ZKeyDLg)
     {
@@ -60,6 +62,12 @@ public:
         label_3 = new QLabel(ZKeyDLg);
         label_3->setObjectName(QString::fromUtf8("label_3"));
         label_3->setGeometry(QRect(20, 80, 91, 16));
+        label_4 = new QLabel(ZKeyDLg);
+        label_4->setObjectName(QString::fromUtf8("label_4"));
+        label_4->setGeometry(QRect(220, 50, 141, 16));
+        KeySizeLEd = new QLineEdit(ZKeyDLg);
+        KeySizeLEd->setObjectName(QString::fromUtf8("KeySizeLEd"));
+        KeySizeLEd->setGeometry(QRect(350, 40, 151, 23));
         QWidget::setTabOrder(KeyNameLEd, DuplicatesCHk);
         QWidget::setTabOrder(DuplicatesCHk, TooltipLEd);
         QWidget::setTabOrder(TooltipLEd, OKBTn);
@@ -79,6 +87,7 @@ public:
         OKBTn->setText(QCoreApplication::translate("ZKeyDLg", "OK", nullptr));
         DisguardBTn->setText(QCoreApplication::translate("ZKeyDLg", "Discard", nullptr));
         label_3->setText(QCoreApplication::translate("ZKeyDLg", "Tooltip", nullptr));
+        label_4->setText(QCoreApplication::translate("ZKeyDLg", "Universal size", nullptr));
     } // retranslateUi
 
 };

@@ -14,6 +14,11 @@
 
 #include <zcontentutilsparams.h>
 
+class FileGenerateMWn;
+
+extern class FileGenerateMWn* FileGenerate;
+extern class DicEditMWn* DicEdit;
+
 class textEditMWn;
 
 
@@ -56,16 +61,16 @@ class ZKeyFieldRow;
 }
 
 
-class DicEdit : public QMainWindow
+class DicEditMWn : public QMainWindow
 {
   Q_OBJECT
 
   friend class RawFields;
 
 public:
-  explicit DicEdit(QWidget *parent = nullptr);
-  explicit DicEdit(std::function<void()> pQuitCallback,QWidget *parent );
-  ~DicEdit();
+  explicit DicEditMWn(QWidget *parent = nullptr);
+  explicit DicEditMWn(std::function<void()> pQuitCallback,QWidget *parent );
+  ~DicEditMWn();
 
   void init();
 
@@ -192,15 +197,6 @@ fieldTBv
    */
   QStandardItem* insertNewKey();
 
-#ifdef __DEPRECATED__
-  /**  @brief keyCopyToPinboard Duplicates and copies the whole key data (key and key fields) to a temporary data structure held by Pinboard
-   *  If this routine is successful, Pinboard.last() contains the duplicated data under a ZDataReference with type <ZEntity_KeyField> */
-  bool keyCopyToPinboard(QModelIndex pIdx);
-  /** @brief keyDelete Deletes the whole key (key and key fields) from tree view as well as from key dictionary
-   *          deletes also associated infradata */
-//  bool keyDelete(const QModelIndex &pIdx) { return _keyDelete(pIdx);}
-#endif // __DEPRECATED__
-
   /**  @brief _keyDelete Deletes the whole key (key and children key fields) from tree view
    *          deletes also associated infradata and release associated resource. */
   bool _keyDelete(const QModelIndex &pIdx);
@@ -211,51 +207,6 @@ fieldTBv
    */
   QStandardItem* keyChange();
 //  inline bool _keyChange(const QModelIndex &pIdx, ZKeyHeaderRow & pKHR);
-
-#ifdef __DEPRECATED__
-
-  /** @brief KeyfieldInsert   creates a key field from a ZFieldDescription pField
-   * within current key and inserts it before key field pointed by pIdx.
-   * If key has no children fields, then it is appended.*/
-  bool fieldInsertToKey(const QModelIndex &pIdx,ZFieldDescription& pField);
-
-
-  /**  @brief _keyFieldCopy Duplicates and copies the key field data to a temporary structure  ZKeyFieldRowTemporary.
-   *  this routine delivers a ZKeyFieldRowTemporary content with effective key field data as ZKeyFieldRow and a QList<QList> with QStandardItem rows :
-   *  Corresponding infradata is created and copied within duplicated rows (item column 0) */
-  bool keyFieldCopyToPinboard (QModelIndex pIdx);
-  /** @brief keyTRvInsertFromPinboard   inserts a key field from Pinboard last element
-   * towards current key before key field pointed by pIdx.
-   * If key has no children fields, then it is appended.
-   * At the end of the process, temporary structure is deleted.
-   * Accepts only a key field in input. Return false otherwise without any message.
-   * @param pIdx: index to insert key before
-  */
-  bool keyTRvInsertFromPinboard(QModelIndex pIdx);
-
-
-//  bool _keyInsertToKey(QModelIndex pIdx,ZKeyHeaderRow* pKHR);
-//  bool _keyFieldInsertToKey(QModelIndex pIdx,ZKeyFieldRow* pKFR);
-
-  bool _fieldInsertToKey(QModelIndex pIdx, QStandardItem *pFieldItem);
-
-
-//  bool _keyAppendToKey(QModelIndex pIdx,ZKeyHeaderRow* pKHR);
-  bool _keyFieldAppendToKey(QModelIndex pIdx,ZKeyFieldRow* pKFR);
-  bool _fieldAppendToKey(QModelIndex pIdx,ZFieldDescription* pField);
-
-  /** @brief keyfieldAppendFromPinboard pIdx must point to a key row
-   * Accepts only a key field in input. Return false otherwise without any message. */
-  bool keyTRvAppendFromPinboard(const QModelIndex &pIdx);
-
-
-  /** @brief fieldAppendToKey  creates a key field from given field description ZFieldDescription
-   *  and append this key field to current key (last position)
-   *  if tree view is empty (no key defined yet) : create a key with name __NEW_KEY__ and append the key field to that key
-   *  accepts a normal field and format a key field from it before appending it to the key pointed by pIdx */
-  bool fieldAppendToKey(const QModelIndex &pIdx, ZFieldDescription& pField);
-  bool fieldAppendToKeyFromPinboard(const QModelIndex &pIdx);
-#endif // __DEPRECATED__
 
   /** @brief DicEdit::_keyDelete deletes key field pointed by pIdx :
    *  - delete key field row and deletes infradata associated to it
@@ -283,30 +234,25 @@ fieldTBv
 /** @brief acceptFieldChange replaces the values (displayed value and dictionary value) of a field at model index wIdx */
   void acceptFieldChange(ZFieldDescription& pField, QModelIndex &wIdx);
 
-  /** @brief displayFieldChange manage to change a field description : display the new field description and change dictionary accordingly
-   */
-//  bool displayFieldChange(ZFieldDescription& pField, QModelIndex pIdx);
-
-#ifdef __DEPRECATED__
-  void importDicFromFullHeader(ZDataBuffer &pHeaderContent);
-  void importDicFromReserved(const unsigned char *pPtrReserved);
-  void importDic(const unsigned char *pPtrIn);
-#endif
-
   /* Set-up MetaDic and KeyDictionary display views */
 
   ZStatus loadXmlDictionary (const uriString& pXmlDic);
   void displayZMFDictionary(ZMFDictionary &pDic);
   void displayKeyDictionaries(ZMFDictionary &pDic);
 
-
+#ifdef __DEPRECATED__
   bool saveOrCreateDictionaryFile();
   bool loadDictionaryFile();
-  void manageDictionaryFiles();
-
   ZStatus saveCurrentDictionary (unsigned long &pVersion, bool &pActive, utf8VaryingString &pDicName);
-
   ZStatus loadDictionaryFile(const uriString& pDicPath);
+  void manageDictionaryFiles();
+#endif // __DEPRECATED__
+  /* new version (simplyfied) of managedDictionaryFiles() */
+    void manageDictionaryFiles();
+    /* new version (simplyfied) of saveOrCreateDictionaryFile() */
+    bool saveOrCreateDictionaryFile();
+
+    bool updateEmbedded();
 
   /** @brief recomputeKeyValues recomputes and updates all key values for key whose model index is pKeyIdx.
    *  These values are Key universal size, and for each field, key offset, depending on field row position
@@ -384,6 +330,13 @@ fieldTBv
   void closeGenShowCppCB(QEvent *pEvent);
   void closeGenShowHeaderCB(QEvent *pEvent);
 
+
+  void setMasterFile(ZMasterFile* pMasterFile) {
+    if (MasterFile!=nullptr)
+      delete MasterFile ; // if open does the close operation
+    MasterFile = pMasterFile;
+  }
+
 public slots:
   void keyActionEvent(QAction*pAction);
   void fieldActionEvent(QAction*pAction);
@@ -447,6 +400,7 @@ private:
   QAction* FmovedownQAc=nullptr;
 
   QAction* SaveQAc=nullptr;
+  QAction* UpdateEmbeddedQAc=nullptr;
   QMenu *  FwritetoMEn=nullptr;
   QAction* FwritetoclipQAc=nullptr;
   QAction* FviewXmlQAc=nullptr;
@@ -473,6 +427,7 @@ private:
   QPersistentModelIndex OriginIndex;
 
   ZDictionaryFile* DictionaryFile=nullptr;
+  ZMasterFile* MasterFile=nullptr;
   uriString XmlDictionaryFile;
   bool DictionaryChanged=false;
 

@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#include <ztoolset/uristring.h>
+
 #define __DICTIONARY_EXTENSION__ "dic"
 
 const unsigned long cst_DictionaryVersionAny = 0xFFFFFFFFFF;
@@ -57,47 +59,35 @@ public:
   ZDicHeaderList& operator = (const ZDicHeaderList& pIn) {return _copyFrom(pIn);}
 };
 
-class ZDictionaryFile : public ZRandomFile , public ZMFDictionary
+class ZDictionaryFile :  public ZMFDictionary
 {
 public:
   ZDictionaryFile();
+  ZDictionaryFile(const ZDictionaryFile& pIn) { _copyFrom(pIn);}
 
-  using ZMFDictionary::push;
+  ZDictionaryFile& _copyFrom(const ZDictionaryFile& pIn) ;
 
-  ZStatus zcreate(const uriString &pFilename, size_t pInitialSize, bool pBackup=true, bool pLeaveOpen=false);
-  ZStatus zcreate(const uriString &pFilename, size_t pInitialSize,
-                  const long pAllocatedBlocks,
-                  const long pBlockExtentQuota,
-                  const long pBlockTargetSize,
-                  const bool pHighwaterMarking,
-                  const bool pGrabFreeSpace, bool pBackup, bool pLeaveOpen);
+  ZMFDictionary& getDictionary() { return *this; }
 
-  ZStatus zinitalize(const uriString &pFilename, bool pBackup=true);
+  ZStatus create(const uriString &pDicFilename,  bool pBackup=true);
 
-  ZStatus zopen(const uriString &pFilename,const zmode_type pMode);
-  ZStatus zopen(const zmode_type pMode);
+  ZStatus load();
+  ZStatus save(bool pBackup=true);
 
-  ZStatus loadDictionaryByVersion(unsigned long pVersion );
-  ZStatus loadDictionaryByRank(long pRank );
-  ZStatus loadActiveDictionary();
+  /** @brief savetoDicFile updates URIDictionary and save current dictionary content to this file */
+  ZStatus saveToDicFile (const uriString& pURIDicFile) {
+    URIDictionary = pURIDicFile;
+    return save();
+  }
 
+  ZStatus saveAsEmbedded(const uriString& pZMFURIContent) {
+    URIDictionary = generateDicFileName(pZMFURIContent);
+    return save();
+  }
 
-  ZStatus getDictionaryHeader(ZMFDicExportHeader& wHeader,long pRank );
-
-  ZStatus searchActiveDictionary(long &pRank);
-
-  ZStatus searchDictionary(long &pRank,const utf8VaryingString& pDicName ,unsigned long pVersion);
-
-  ZStatus searchAndWrite();
-
-  ZStatus save();
-//  ZStatus saveDictionary();
-
-  void setDictionary(const ZMFDictionary& pDictionary) {ZMFDictionary::_copyFrom( pDictionary);}
-  ZMFDictionary& getDictionary() {return *this;}
-
-  long findDictionaryByVersion(unsigned long pVersion );
-  long findDictionaryByName(const utf8VaryingString& pName );
+  void setDicFilename(const uriString& pDicFilename) { URIDictionary=pDicFilename; }
+  void setDictionary(const ZMFDictionary& pDic) ;
+  ZStatus loadDictionary(const uriString& pDicFilename);
 
   utf8VaryingString exportToXmlString(bool pComment);
   ZStatus exportToXmlFile(const uriString &pXmlFile,bool pComment);
@@ -105,11 +95,11 @@ public:
   ZStatus importFromXmlString(const utf8VaryingString& pXmlContent);
   ZStatus importFromXmlFile(const uriString &pXmlFile);
 
-  ZStatus getAllDicHeaders(ZDicHeaderList& wDicHeaderList);
-  ZStatus getAllDictionaries(ZDicList& pDiclist);
+  static utf8VaryingString generateDicFileName(const uriString& pURIContent);
 
-  ZStatus generateAndSetFileName(const uriString& pURIContent);
-  static utf8VaryingString generateFileName(const uriString& pURIContent);
+
+  uriString URIDictionary;
+
 //  ZMFDictionary Dictionary ;
 };
 } // namespace zbs

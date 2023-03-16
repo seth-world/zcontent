@@ -111,6 +111,29 @@
     <string>Tooltip</string>
    </property>
   </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>50</y>
+     <width>141</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Universal size</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="KeySizeLEd">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>40</y>
+     <width>151</width>
+     <height>23</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <tabstops>
   <tabstop>KeyNameLEd</tabstop>

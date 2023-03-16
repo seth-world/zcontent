@@ -88,8 +88,11 @@ enum VisuMode_type : uint8_t
 };
 
 class DisplayMain;
-class DicEdit;
 class textEditMWn;
+
+class DicEditMWn;
+extern class DicEditMWn* DicEdit;
+
 
 class ZContentVisuMain : public QMainWindow
 {
@@ -176,7 +179,6 @@ public:
   __DISPLAYCALLBACK__(_displayCallBack)=nullptr;
 */
   DisplayMain* entityWnd=nullptr;
-  DicEdit* dictionaryWnd=nullptr;
 
   textEditMWn* MCBWin=nullptr;
   textEditMWn* GenlogWin=nullptr;
@@ -211,6 +213,7 @@ public:
   QActionGroup* mainQAg=nullptr;
   QAction*      DictionaryQAc = nullptr;
   QAction*      GetRawQAc=nullptr;
+  QAction*      GetZmfDefQAc = nullptr;
 
   QAction*      openZRFQAc=nullptr;
 

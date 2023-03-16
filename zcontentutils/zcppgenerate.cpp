@@ -622,10 +622,10 @@ ZCppGenerate::genHeader(const utf8VaryingString& pClassName,
   /* ---------- effective write to header file  ------------------*/
 
   utf8VaryingString wDic ;
-  if (DictionaryFile->getURIContent().isEmpty())
+  if (DictionaryFile->URIDictionary.isEmpty())
     wDic = XmlGenParamsFile;
   else
-    wDic = DictionaryFile->getURIContent() ;
+    wDic = DictionaryFile->URIDictionary ;
 
   if (ErroredFields.count()==0) {
       wHBanner.sprintf(GenerateBanner,
@@ -1051,10 +1051,10 @@ ZCppGenerate::genCpp( const utf8VaryingString& pClassName,
 
   /* ---------- effective write to cpp file  ------------------*/
   utf8VaryingString wDic ;
-  if (DictionaryFile->getURIContent().isEmpty())
+  if (DictionaryFile->URIDictionary.isEmpty())
     wDic = XmlGenParamsFile;
   else
-    wDic = DictionaryFile->getURIContent() ;
+    wDic = DictionaryFile->URIDictionary ;
 
   if (wErroredInstructions==0) {
     wCppBanner.sprintf(GenerateBanner,

@@ -21,12 +21,10 @@
  * @return an utf8String with the appropriate ZIndexFile root name
  */
 utf8VaryingString generateIndexRootName(const utf8String &pMasterRootName,
-                                        const long pRank,
                                         const utf8String &pIndexName)
 {
   utf8String wIndexRootName;
   wIndexRootName = pMasterRootName;
-  //    wIndexRootName += (utf8_t)'-';
   wIndexRootName.addUtfUnit('-');
   if (pIndexName.isEmpty())
   {
@@ -36,17 +34,20 @@ utf8VaryingString generateIndexRootName(const utf8String &pMasterRootName,
   {
     wIndexRootName += pIndexName.toCChar();
   }
-  //    wIndexRootName += (utf8_t)'-';
   wIndexRootName.eliminateChar(' ');
   wIndexRootName = wIndexRootName.toLower();
-  //    wIndexRootName.addUtfUnit('-');
-  //    wIndexRootName.addsprintf("%02ld",pRank);
-  //    sprintf(&DSRootName.content[DSRootName.size()],"%02ld",pRank);
-
-  //    wIndexRootName.eliminateChar(' ');
-  wIndexRootName += __ZINDEX_FILEEXTENSION__;
+//  wIndexRootName += __ZINDEX_FILEEXTENSION__;
   return wIndexRootName;
 } // generateIndexRootName
+
+utf8VaryingString generateIndexBaseName(const utf8String &pMasterRootName,
+    const utf8String &pIndexName)
+{
+  utf8String wIndexRootName = generateIndexRootName(pMasterRootName,pIndexName);
+  wIndexRootName += __ZINDEX_FILEEXTENSION__;
+  return wIndexRootName;
+} // generateIndexBaseName
+
 /**
  * @brief generateIndexURI
  *              generates the index uri full base name (including directory path) but without any extension (and without '.' char)
@@ -66,10 +67,9 @@ utf8VaryingString generateIndexRootName(const utf8String &pMasterRootName,
  */
 ZStatus
 generateIndexURI( uriString &pIndexFileUri,
-                  const uriString pMasterFileUri,
-                  const uriString &pDirectory,
-                  const long pRank,
-                  const utf8String& pIndexName)
+                  const uriString& pMasterFileUri,
+                  const uriString& pDirectory,
+                  const utf8VaryingString& pIndexName)
 {
   uriString  wPath_Uri;
   utf8String wMasterRoot;
@@ -102,8 +102,9 @@ generateIndexURI( uriString &pIndexFileUri,
   }
 
   utf8String wM;
-  wM=generateIndexRootName(wMasterRoot,pRank,pIndexName);
-  pIndexFileUri += wM.toCChar();
+
+  wM=generateIndexBaseName(wMasterRoot,pIndexName);
+  pIndexFileUri += wM.toString();
 
   return(ZS_SUCCESS);
 } //generateIndexURI
@@ -291,7 +292,7 @@ ZStatus zrepairIndexes (const char *pZMFPath,
     wSt=generateIndexURI(wIndexUri,
         wMasterFile.getURIContent(),
         wMasterFile.IndexFilePath,
-        IndexRank,
+//        IndexRank,
         wMasterFile.IndexTable[IndexRank]->IndexName);
     if (wSt!=ZS_SUCCESS)
     {

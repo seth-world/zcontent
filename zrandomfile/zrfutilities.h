@@ -69,6 +69,17 @@ public:
   FILE* Output;
 };
 
+/**
+ * @brief renameFile renames pFormerName to pNewName.  Returns ZS_SUCCESS is OK.
+ * Returns ZS_FILEERR if any error occurred. In this case, ZException is set with appropriate error info.
+ */
+ZStatus renameFile(const uriString& pFormerName,const utf8VaryingString& pNewName);
+/**
+ * @brief removeFile removes pFormerName from file system.  Returns ZS_SUCCESS is OK.
+ * Returns ZS_FILEERR if any error occurred. In this case, ZException is set with appropriate error info.
+ */
+ZStatus removeFile(const uriString& pFormerName);
+
 ZStatus rebuildZRFHeader(uriString& pURIContent);
 
 #endif // ZRFUTILITIES_H

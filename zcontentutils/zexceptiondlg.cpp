@@ -1,5 +1,19 @@
 #include "zexceptiondlg.h"
 
+#include <QFrame>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QSpacerItem>
+
+#include <QRect>
+
+#include <QPushButton>
+#include <QLabel>
+#include <QTextEdit>
+#include <QCheckBox>
+#include <QCoreApplication>
+#include <QGuiApplication>
+
 #include "ui_zexceptiondlg.h"
 #include <ztoolset/zexceptionmin.h>
 
@@ -8,7 +22,7 @@
 
 #include <qevent.h>
 
-
+bool FixedFont = false;
 #define __ICON_PATH__ "/home/gerard/Development/zbasetools/zqt/icons/"
 #define __INFO_ICON__ "info.png"
 #define __WARNING_ICON__ "warning.png"
@@ -20,151 +34,248 @@
 ZStatus DontShowStatus=ZS_NOTHING;
 
 /** adhoc message */
-ZExceptionDLg::ZExceptionDLg(const utf8VaryingString& pTitle,Severity_type pSeverity,
+ZExceptionDLg::ZExceptionDLg(const utf8VaryingString& pTitle, Severity_type pSeverity,
                             const utf8VaryingString& pMessage,
-                            const utf8VaryingString* pComplement,
-                            bool pDontShow) : QDialog(nullptr), ui(new Ui::ZExceptionDLg)
+                            const utf8VaryingString* pComplement, bool pHtml,
+                            bool pDontShow) : QDialog(nullptr)
 {
-  DoNotShow=false;
-  ui->setupUi(this);
+  layoutSetup( pTitle,pDontShow);
+  applySeverity(pSeverity,pTitle);
 
-  setWindowTitle(pTitle.toCChar());
+  ExceptionFRm->setVisible(false);
+
+  if (pHtml)
+    MessageTEd->setHtml(pMessage.toCChar());
+  else
+    MessageTEd->setText(pMessage.toCChar());
+  if (pComplement && !pComplement->isEmpty())
+    setAdditionalInfo(*pComplement,pHtml);
+  else
+    MoreBTn->setVisible(false);
+
+  AdditionalTEd->setVisible(false);
+  FMore=false;
+
+  CancelBTn->setVisible(false);
+  OKBTn->setText("Close");
+
+  OtherBTn->setVisible(false);
+}
+
+
+/* ZException message */
+
+ZExceptionDLg::ZExceptionDLg(const utf8VaryingString& pTitle,const ZExceptionBase& pException, bool pDontShow) : QDialog(nullptr) {
+
+  layoutSetup( pTitle,pDontShow);
+  DoNotShow=false;
+  ExceptionFRm->setVisible(true);
+
+  currentStatus=pException.Status;
+  if (pException.Status==DontShowStatus)
+  {
+    DoNotShow=true;
+    return;
+  }
 
   if (pDontShow)
   {
-    ui->dontShowCKb->setVisible(true);
-    //    QObject::connect (ui->dontShowCKb,&QCheckBox::clicked,this,[this]{ DontShowClicked(pException.Status); });
-    QObject::connect (ui->dontShowCKb,&QCheckBox::clicked,this,&ZExceptionDLg::DontShowClicked);
+    dontShowCKb->setVisible(true);
+    //    QObject::connect (dontShowCKb,&QCheckBox::clicked,this,[this]{ DontShowClicked(pException.Status); });
+    QObject::connect (dontShowCKb,&QCheckBox::clicked,this,&ZExceptionDLg::DontShowClicked);
 
   }
   else
-    ui->dontShowCKb->setVisible(false);
-
-  ui->ExceptionFRm->setVisible(false);
-
-  ui->ErrlogBTn->setVisible(true);
-
-  applySeverity(pSeverity,pTitle);
-
-  ui->MessageTEd->setText(pMessage.toCChar());
-
-  ui->CancelBTn->setText("Cancel");
-  ui->OKBTn->setText("OK");
-  ui->OtherBTn->setText("");
-
-  if (pComplement && !pComplement->isEmpty())
-    setAdditionalInfo(*pComplement);
-  else
-    ui->MoreBTn->setVisible(false);
-
-  QObject::connect (ui->CancelBTn,&QAbstractButton::pressed,this,[this]{ reject(); });
-  QObject::connect (ui->OKBTn,&QAbstractButton::pressed,this,[this]{ accept(); });
-  QObject::connect (ui->OtherBTn,&QAbstractButton::pressed,this,[this]{ done(ZEDLG_Third); });
-  QObject::connect (ui->MoreBTn,&QAbstractButton::pressed,this,[this]{ MoreClicked(); });
-  QObject::connect (ui->ErrlogBTn,&QAbstractButton::pressed,this,[this]{ ErrlogClicked(); });
-}
-
-/** ZException message */
-
-ZExceptionDLg::ZExceptionDLg(const utf8VaryingString& pTitle,const ZExceptionBase& pException, bool pDontShow) :
-                                                QDialog(nullptr),
-                                                ui(new Ui::ZExceptionDLg) {
-  DoNotShow=false;
-  ui->setupUi(this);
-  currentStatus=pException.Status;
-  if (pException.Status==DontShowStatus)
-    {
-    DoNotShow=true;
-    return;
-    }
-
-  if (pDontShow)
-    {
-    ui->dontShowCKb->setVisible(true);
-//    QObject::connect (ui->dontShowCKb,&QCheckBox::clicked,this,[this]{ DontShowClicked(pException.Status); });
-    QObject::connect (ui->dontShowCKb,&QCheckBox::clicked,this,&ZExceptionDLg::DontShowClicked);
-
-    }
-  else
-    ui->dontShowCKb->setVisible(false);
+    dontShowCKb->setVisible(false);
 
 
-  ui->ModuleLBl->setText(pException.Module.toCChar());
-  ui->ZStatusLBl->setText(decode_ZStatus(pException.Status));
-  ui->SeverityLBl->setText(decode_Severity(pException.Severity));
+  ModuleLBl->setText(pException.Module.toCChar());
+  ZStatusLBl->setText(decode_ZStatus(pException.Status));
+  SeverityLBl->setText(decode_Severity(pException.Severity));
 
-  ui->MessageTEd->setText(pException.Message.toCChar());
+  MessageTEd->setText(pException.Message.toCChar());
 
-  ui->CancelBTn->setText("Cancel");
-  ui->OKBTn->setText("OK");
-  ui->OtherBTn->setText("");
+  CancelBTn->setText("Close");
+  OKBTn->setText("OK");
+  OtherBTn->setText("");
+  OtherBTn->setVisible(false);
+
 
   if (!pException.Complement.isEmpty())
     setAdditionalInfo(pException.Complement);
   else
-    ui->MoreBTn->setVisible(false);
+    MoreBTn->setVisible(false);
 
-  ui->ErrlogBTn->setVisible(true);
+  AdditionalTEd->setVisible(false);
+  FMore=false;
 
-  QObject::connect (ui->CancelBTn,&QAbstractButton::pressed,this,[this]{ reject(); });
-  QObject::connect (ui->OKBTn,&QAbstractButton::pressed,this,[this]{ accept(); });
-  QObject::connect (ui->OtherBTn,&QAbstractButton::pressed,this,[this]{ done(ZEDLG_Third); });
-  QObject::connect (ui->MoreBTn,&QAbstractButton::pressed,this,[this]{ MoreClicked(); });
-  QObject::connect (ui->ErrlogBTn,&QAbstractButton::pressed,this,[this]{ ErrlogClicked(); });
+  ErrlogBTn->setVisible(true);
+
+  QObject::connect (CancelBTn,&QAbstractButton::pressed,this,[this]{ reject(); });
+  QObject::connect (OKBTn,&QAbstractButton::pressed,this,[this]{ accept(); });
+  QObject::connect (OtherBTn,&QAbstractButton::pressed,this,[this]{ done(ZEDLG_Third); });
+  QObject::connect (MoreBTn,&QAbstractButton::pressed,this,[this]{ MoreClicked(); });
+  QObject::connect (ErrlogBTn,&QAbstractButton::pressed,this,[this]{ ErrlogClicked(); });
 
 }
 
 void
-ZExceptionDLg::init(const utf8VaryingString& pTitle,Severity_type pSeverity,ZStatus pStatus,const utf8VaryingString& pMessage, const utf8VaryingString& pComplement,bool pDontShow)
+ZExceptionDLg::layoutSetup( const utf8VaryingString& pTitle,
+                            bool pDontShow)
 {
   DoNotShow=false;
-  ui->setupUi(this);
 
-  setWindowTitle(pTitle.toCChar());
+  QHBoxLayout *wButtonBoxHLy;
+  QLabel *label_6;
+  QSpacerItem *whorizontalSpacer;
+  QLabel *label_7;
+  QLabel *label_8;
 
-  currentStatus=pStatus;
-  if (pStatus==DontShowStatus)
-  {
-    DoNotShow=true;
-    return;
-  }
+  this->resize(587, 349);
+
+  ExceptionFRm = new QFrame(this);
+  ExceptionFRm->setGeometry(QRect(10, 10, 391, 81));
+  ExceptionFRm->setFrameShape(QFrame::StyledPanel);
+  ExceptionFRm->setFrameShadow(QFrame::Raised);
+  ZStatusLBl = new QLabel(ExceptionFRm);
+  ZStatusLBl->setGeometry(QRect(80, 30, 151, 16));
+  label_6 = new QLabel(ExceptionFRm);
+  label_6->setGeometry(QRect(10, 10, 54, 15));
+  ModuleLBl = new QLabel(ExceptionFRm);
+  ModuleLBl->setGeometry(QRect(80, 10, 301, 16));
+  SeverityLBl = new QLabel(ExceptionFRm);
+  SeverityLBl->setGeometry(QRect(80, 50, 141, 16));
+  label_7 = new QLabel(ExceptionFRm);
+  label_7->setGeometry(QRect(10, 50, 54, 15));
+  label_8 = new QLabel(ExceptionFRm);
+  label_8->setGeometry(QRect(10, 30, 54, 15));
+
+
+  verticalLayoutWidget = new QWidget(this);
+
+  QRect wR = ExceptionFRm->geometry();
+//  layoutWidget->setGeometry(QRect(10, 300, 557, 25));
+  wR.setY( wR.y() + wR.height() + 2 );
+  wR.setWidth(560);
+  wR.setHeight( 250 );
+
+  verticalLayoutWidget->setGeometry(wR);
+
+  QVBoxLayout *wMainVLayoutVLy=new QVBoxLayout(verticalLayoutWidget);
+  verticalLayoutWidget->setLayout(wMainVLayoutVLy);
+
+  QVBoxLayout *wVLayoutMsgVLy=new QVBoxLayout(verticalLayoutWidget);
+
+  wMainVLayoutVLy->addLayout(wVLayoutMsgVLy);
+  MessageTEd = new QTextEdit(this);
+  wVLayoutMsgVLy->addWidget(MessageTEd);
+
+  wButtonBoxHLy = new QHBoxLayout(verticalLayoutWidget);
+  wButtonBoxHLy->setContentsMargins(0, 0, 0, 0);
+  dontShowCKb = new QCheckBox(verticalLayoutWidget);
+  wButtonBoxHLy->addWidget(dontShowCKb);
+
+  whorizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+  wButtonBoxHLy->addItem(whorizontalSpacer);
+  ErrlogBTn = new QPushButton(verticalLayoutWidget);
+  ErrlogBTn->setText("Error log");
+
+  wButtonBoxHLy->addWidget(ErrlogBTn);
+
+  MoreBTn = new QPushButton(verticalLayoutWidget);
+  MoreBTn->setText("More");
+
+  wButtonBoxHLy->addWidget(MoreBTn);
+
+  OtherBTn = new QPushButton(verticalLayoutWidget);
+  OtherBTn->setText("Other");
+
+  wButtonBoxHLy->addWidget(OtherBTn);
+
+  OKBTn = new QPushButton(verticalLayoutWidget);
+  OKBTn->setObjectName(QString::fromUtf8("OKBTn"));
+
+  wButtonBoxHLy->addWidget(OKBTn);
+
+  CancelBTn = new QPushButton(verticalLayoutWidget);
+  CancelBTn->setText("Close");
+
+  wButtonBoxHLy->addWidget(CancelBTn);
+  wMainVLayoutVLy->addLayout(wButtonBoxHLy);
+
+  LogoLBl = new QLabel(this);
+  LogoLBl->setGeometry(QRect(410, 10, 61, 61));
+  QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  sizePolicy.setHorizontalStretch(0);
+  sizePolicy.setVerticalStretch(0);
+  sizePolicy.setHeightForWidth(LogoLBl->sizePolicy().hasHeightForWidth());
+  LogoLBl->setSizePolicy(sizePolicy);
+  LogoLBl->setAutoFillBackground(false);
+  LogoLBl->setStyleSheet(QString::fromUtf8("background:transparent"));
+  LogoLBl->setFrameShape(QFrame::StyledPanel);
+  LogoLBl->setScaledContents(true);
+
+
+  dontShowCKb->setText(QCoreApplication::translate("ZExceptionDLg", "Don't show again", nullptr));
+  ErrlogBTn->setText(QCoreApplication::translate("ZExceptionDLg", "Error log", nullptr));
+  MoreBTn->setText(QCoreApplication::translate("ZExceptionDLg", "More", nullptr));
+  OtherBTn->setText(QCoreApplication::translate("ZExceptionDLg", "Other", nullptr));
+  OKBTn->setText(QCoreApplication::translate("ZExceptionDLg", "OK", nullptr));
+  CancelBTn->setText(QCoreApplication::translate("ZExceptionDLg", "Cancel", nullptr));
+  LogoLBl->setText(QCoreApplication::translate("ZExceptionDLg", "logo", nullptr));
+  ZStatusLBl->setText(QCoreApplication::translate("ZExceptionDLg", "ZStatus", nullptr));
+  label_6->setText(QCoreApplication::translate("ZExceptionDLg", "Module", nullptr));
+  ModuleLBl->setText(QCoreApplication::translate("ZExceptionDLg", "module", nullptr));
+  SeverityLBl->setText(QCoreApplication::translate("ZExceptionDLg", "Severity", nullptr));
+  label_7->setText(QCoreApplication::translate("ZExceptionDLg", "Severity", nullptr));
+  label_8->setText(QCoreApplication::translate("ZExceptionDLg", "Status", nullptr));
+
+  QVBoxLayout* wAddHLy=new QVBoxLayout(verticalLayoutWidget);
+  AdditionalTEd = new QTextEdit(verticalLayoutWidget);
+  wAddHLy->addWidget(AdditionalTEd);
+
+  wMainVLayoutVLy->addLayout(wAddHLy);
 
   if (pDontShow)
   {
-    ui->dontShowCKb->setVisible(true);
-    //    QObject::connect (ui->dontShowCKb,&QCheckBox::clicked,this,[this]{ DontShowClicked(pException.Status); });
-    QObject::connect (ui->dontShowCKb,&QCheckBox::clicked,this,&ZExceptionDLg::DontShowClicked);
-
+    dontShowCKb->setVisible(true);
+    QObject::connect (dontShowCKb,&QCheckBox::clicked,this,&ZExceptionDLg::DontShowClicked);
   }
   else
-    ui->dontShowCKb->setVisible(false);
+    dontShowCKb->setVisible(false);
 
-/*
-  ui->ModuleLBl->setText(pException.Module.toCChar());
-  ui->ZStatusLBl->setText(decode_ZStatus(pException.Status));
-  ui->SeverityLBl->setText(decode_Severity(pException.Severity));
-*/
-  ui->MessageTEd->setText(pMessage.toCChar());
+  if (FixedFont) {
+    MessageTEd->setFontFamily(QString::fromUtf8("Courier"));
+  }
 
-  ui->CancelBTn->setText("Cancel");
-  ui->OKBTn->setText("OK");
-  ui->OtherBTn->setText("");
+  ExceptionFRm->setVisible(false);
+  ErrlogBTn->setVisible(true);
 
-  if (!pComplement.isEmpty())
-    setAdditionalInfo(pComplement);
-  else
-    ui->MoreBTn->setVisible(false);
+  CancelBTn->setText("Cancel");
+  OKBTn->setText("OK");
+  OtherBTn->setText("");
+
+  setWindowTitle(pTitle.toCChar());
 
 
-
-  QObject::connect (ui->CancelBTn,&QAbstractButton::pressed,this,[this]{ reject(); });
-  QObject::connect (ui->OKBTn,&QAbstractButton::pressed,this,[this]{ accept(); });
-  QObject::connect (ui->OtherBTn,&QAbstractButton::pressed,this,[this]{ done(ZEDLG_Third); });
-  QObject::connect (ui->MoreBTn,&QAbstractButton::pressed,this,[this]{ MoreClicked(); });
-
+  QObject::connect (CancelBTn,&QAbstractButton::pressed,this,[this]{ reject(); });
+  QObject::connect (OKBTn,&QAbstractButton::pressed,this,[this]{ accept(); });
+  QObject::connect (OtherBTn,&QAbstractButton::pressed,this,[this]{ done(ZEDLG_Third); });
+  QObject::connect (MoreBTn,&QAbstractButton::pressed,this,[this]{ MoreClicked(); });
+  QObject::connect (ErrlogBTn,&QAbstractButton::pressed,this,[this]{ ErrlogClicked(); });
 }
 
 
+void
+ZExceptionDLg::setFixedFont(bool pOnOff) {
+  FixedFont = pOnOff;
+}
+void
+ZExceptionDLg::applyFixedFont() {
+  MessageTEd->setFontFamily(QString::fromUtf8("Courier"));
+  MessageTEd->setFontWeight( QFont::Bold);
+}
 
 /**
  * @brief ZExceptionDLg::resizeEvent resizes two layout widgets :
@@ -184,28 +295,17 @@ void ZExceptionDLg::resizeEvent(QResizeEvent* pEvent)
     return;
   }
 
-  QRect wR1 = ui->verticalLayoutWidget->geometry();
+  QRect wR1 = verticalLayoutWidget->geometry();
 
 
-//  int wHMargin = (wRDlg.height()-wR1.height());  /* keep the same height margin */
-//  int wVH=pEvent->size().height() - wHMargin;
-  int wVH=wR1.height();
+  int wHMargin = (wRDlg.height()-wR1.height());  /* keep the same height margin */
+  int wVH=pEvent->size().height() - wHMargin;
+//  int wVH=wR1.height();
   int wWMargin = (wRDlg.width()-wR1.width());  /* keep the same width margin */
   int wVW=pEvent->size().width() - wWMargin;
 
-  ui->verticalLayoutWidget->resize(wVW,wVH);  /* does not expand in height */
+  verticalLayoutWidget->resize(wVW,wVH);  /* does not expand in height */
 
-  /* VVLWDg expands in width and height */
-  if (VVLWDg)
-    {
-    QRect wR2 = VVLWDg->geometry();
-
-    int wWMargin = (wRDlg.width()-wR2.width());
-    int wVW=pEvent->size().width() - wWMargin;
-    int wHMargin = wRDlg.height() - wR2.height();
-    int wVH=pEvent->size().height() - wHMargin ;
-    VVLWDg->resize(wVW,wVH);
-    }
   return;
 }
 
@@ -222,7 +322,7 @@ void ZExceptionDLg::resetDontShow()
 
 void ZExceptionDLg::DontShowClicked()
 {
-  if (ui->dontShowCKb->isChecked())
+  if (dontShowCKb->isChecked())
       {
       DontShowStatus=currentStatus;
       DoNotShow=true;
@@ -235,76 +335,29 @@ void ZExceptionDLg::MoreClicked()
   if (FMore)
   {
     FMore=false;
-
-    if (VVLWDg!=nullptr)  /* deleting the father is enough for deleting the whole */
-    {
-      delete AdditionalTEd;
-      AdditionalTEd=nullptr;
-      delete LabLBl;
-      LabLBl=nullptr;
-      delete VLayout;
-      VLayout=nullptr;
-      delete VVLWDg;
-      VVLWDg = nullptr;
-    }
-
+    AdditionalTEd->setVisible(false);
     this->resize(560, 270);
-    ui->MoreBTn->setText(QObject::tr("More","ZExceptionDLg"));
-    ui->MoreBTn->setVisible(true);
-
-    QGuiApplication::processEvents();
+    MoreBTn->setText(QObject::tr("More","ZExceptionDLg"));
+    MoreBTn->setVisible(true);
     return;
   }
 
   FMore=true;
-
   this->resize(560, 450);
-
-  if (VVLWDg==nullptr)
-    {
-    VVLWDg = new QWidget(this);
-    VVLWDg->setObjectName(QString::fromUtf8("VVLWDg"));
-    }
-  VVLWDg->setGeometry(QRect(10, 260, 550, 170));
-  if (VLayout==nullptr)
-    {
-    VLayout = new QVBoxLayout(VVLWDg);
-    VLayout->setObjectName(QString::fromUtf8("VLayout"));
-    }
-  VLayout->setContentsMargins(0, 0, 0, 0);
-  if (LabLBl==nullptr)
-    {
-    LabLBl = new QLabel(QObject::tr("Additional information","ZExceptionDLg"),VVLWDg);
-    LabLBl->setObjectName(QString::fromUtf8("LabLBl"));
-    LabLBl->setAlignment(Qt::AlignCenter);
-    }
-  VLayout->addWidget(LabLBl);
-  if (AdditionalTEd==nullptr)
-    {
-    AdditionalTEd = new QTextEdit(VVLWDg);
-    AdditionalTEd->setObjectName(QString::fromUtf8("ComplementTEd"));
-    AdditionalTEd->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    AdditionalTEd->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    }
-  VLayout->addWidget(AdditionalTEd);
-  AdditionalTEd->setText(Additional.toCChar());
-
-  VVLWDg->show();
-
-  QGuiApplication::processEvents();
-  ui->MoreBTn->setText(QObject::tr("Less","ZExceptionDLg"));
+  AdditionalTEd->setVisible(true);
+  MoreBTn->setText(QObject::tr("Less","ZExceptionDLg"));
   return;
 }
 
 void ZExceptionDLg::setErrorLog(ZaiErrors* pErrorLog) {
   ErrorLog=pErrorLog;
-  ui->ErrlogBTn->setVisible(true);
+  ErrlogBTn->setVisible(true);
 }
 
 void ZExceptionDLg::ErrlogClicked()
 {
   utf8VaryingString wStr;
-  textEditMWn* wTE=new textEditMWn(this,TEOP_ShowLineNumbers);
+  textEditMWn* wTE=new textEditMWn(this,TEOP_ShowLineNumbers | TEOP_NoFileLab);
 
   if (ErrorLog==nullptr) {
     for (long wi = ZException.count()-1;wi >= 0; wi--) {
@@ -326,21 +379,19 @@ void ZExceptionDLg::ErrlogClicked()
   return;
 }
 
-void ZExceptionDLg::setAdditionalInfo(const utf8VaryingString& pComp)
+void ZExceptionDLg::setAdditionalInfo(const utf8VaryingString& pComp,bool pHtml)
 {
-  Additional = pComp;
-  ui->MoreBTn->setVisible(true);
+  if (pHtml)
+    AdditionalTEd->setHtml(pComp.toCChar());
+  else
+    AdditionalTEd->setText(pComp.toCChar());
+  MoreBTn->setVisible(true);
 }
 
-void ZExceptionDLg::removeAdditionalInfo()
-{
-  Additional.clear();
-  ui->MoreBTn->setVisible(false);
-}
 
 ZExceptionDLg::~ZExceptionDLg()
 {
-  delete ui;
+  //delete ui;
 }
 void ZExceptionDLg::applySeverity(Severity_type pSeverity,const utf8VaryingString& pTitle) {
   switch(pSeverity)
@@ -376,8 +427,8 @@ void ZExceptionDLg::setInfo(const utf8VaryingString& pTitle)
 
   QPixmap wPxMp;
   wPxMp.load(wImgFile.toCChar());
-  ui->LogoLBl->setScaledContents(true);
-  ui->LogoLBl->setPixmap(wPxMp);
+  LogoLBl->setScaledContents(true);
+  LogoLBl->setPixmap(wPxMp);
   if (pTitle.isEmpty())
     setWindowTitle("Information");
   else
@@ -390,8 +441,8 @@ void ZExceptionDLg::setWarning(const utf8VaryingString &pTitle)
 
   QPixmap wPxMp;
   wPxMp.load(wImgFile.toCChar());
-  ui->LogoLBl->setScaledContents(true);
-  ui->LogoLBl->setPixmap(wPxMp);
+  LogoLBl->setScaledContents(true);
+  LogoLBl->setPixmap(wPxMp);
   if (pTitle.isEmpty())
     setWindowTitle("Warning");
   else
@@ -404,8 +455,8 @@ void ZExceptionDLg::setError(const utf8VaryingString &pTitle)
 
   QPixmap wPxMp;
   wPxMp.load(wImgFile.toCChar());
-  ui->LogoLBl->setScaledContents(true);
-  ui->LogoLBl->setPixmap(wPxMp);
+  LogoLBl->setScaledContents(true);
+  LogoLBl->setPixmap(wPxMp);
   if (pTitle.isEmpty())
     setWindowTitle("Error");
   else
@@ -418,8 +469,8 @@ void ZExceptionDLg::setSevere(const utf8VaryingString &pTitle)
 
   QPixmap wPxMp;
   wPxMp.load(wImgFile.toCChar());
-  ui->LogoLBl->setScaledContents(true);
-  ui->LogoLBl->setPixmap(wPxMp);
+  LogoLBl->setScaledContents(true);
+  LogoLBl->setPixmap(wPxMp);
   if (pTitle.isEmpty())
     setWindowTitle("Severe error");
   else
@@ -433,8 +484,8 @@ void ZExceptionDLg::setFatal(const utf8VaryingString &pTitle)
 
   QPixmap wPxMp;
   wPxMp.load(wImgFile.toCChar());
-  ui->LogoLBl->setScaledContents(true);
-  ui->LogoLBl->setPixmap(wPxMp);
+  LogoLBl->setScaledContents(true);
+  LogoLBl->setPixmap(wPxMp);
   if (pTitle.isEmpty())
     setWindowTitle("Fatal error");
   else
@@ -448,8 +499,8 @@ void ZExceptionDLg::setHighest(const utf8VaryingString &pTitle)
 
   QPixmap wPxMp;
   wPxMp.load(wImgFile.toCChar());
-  ui->LogoLBl->setScaledContents(true);
-  ui->LogoLBl->setPixmap(wPxMp);
+  LogoLBl->setScaledContents(true);
+  LogoLBl->setPixmap(wPxMp);
   if (pTitle.isEmpty())
     setWindowTitle("Highest Error");
   else
@@ -463,13 +514,13 @@ ZExceptionDLg::setButtonText(int pButtonOrder,const utf8String& pButtonText)
   switch (pButtonOrder)
   {
   case 0:
-    ui->CancelBTn->setText(pButtonText.toCChar());
+    CancelBTn->setText(pButtonText.toCChar());
     return;
   case 1:
-    ui->OKBTn->setText(pButtonText.toCChar());
+    OKBTn->setText(pButtonText.toCChar());
     return;
   case 2:
-    ui->OtherBTn->setText(pButtonText.toCChar());
+    OtherBTn->setText(pButtonText.toCChar());
     return;
   default:
     fprintf(stderr,"ZExceptionDLg::setButtonText-E-IVBTN error invalid button order <%d>\n",pButtonOrder);
@@ -478,34 +529,10 @@ ZExceptionDLg::setButtonText(int pButtonOrder,const utf8String& pButtonText)
 void
 ZExceptionDLg::setThirdButton(const utf8String& pButtonText)
 {
-  ui->OtherBTn->setText(pButtonText.toCChar());
-  ui->OtherBTn->setVisible(true);
+  OtherBTn->setText(pButtonText.toCChar());
+  OtherBTn->setVisible(true);
 }
 
-
-
-int
-ZExceptionDLg::info(ZExceptionBase& pException, QWidget *parent)
-{
-  ZExceptionDLg* wDlg=new ZExceptionDLg("Information",pException,false);
-  wDlg->ui->CancelBTn->setVisible(false);
-  wDlg->setInfo("Information");
-
-  int wRet= wDlg->exec();
-  wDlg->deleteLater();
-  return wRet;
-}
-int
-ZExceptionDLg::warning(ZExceptionBase& pException, QWidget *parent)
-{
-  ZExceptionDLg* wDlg=new ZExceptionDLg("Warning",pException,false);
-  wDlg->ui->CancelBTn->setVisible(false);
-  wDlg->setWarning("Warning");
-
-  int wRet= wDlg->exec();
-  wDlg->deleteLater();
-  return wRet;
-}
 
 int
 ZExceptionDLg::message(const char *pModule, ZStatus pStatus, Severity_type pSeverity,const char *pFormat,...)
@@ -619,39 +646,84 @@ ZExceptionDLg::displayLast(const utf8VaryingString& pTitle,bool pDontShow)
 
 int
 ZExceptionDLg::adhocMessage(const utf8VaryingString& pTitle,
+                            Severity_type pSeverity,
+                            ZaiErrors* pErrorlog,
+                            const utf8VaryingString* pComplement,
+                            const char *pFormat,...) {
+  utf8VaryingString wMessage;
+  va_list arglist;
+  va_start (arglist, pFormat);
+
+  wMessage.vsnprintf(2000,pFormat,arglist);
+  va_end(arglist);
+
+  return _adhocMessage(pTitle,pSeverity,pErrorlog,pComplement,false,wMessage);
+}
+int
+ZExceptionDLg::adhocMessage(const utf8VaryingString& pTitle,
     Severity_type pSeverity,
-    ZaiErrors* pErrorlog,
-    const utf8VaryingString* pComplement,
     const char *pFormat,...) {
   utf8VaryingString wMessage;
   va_list arglist;
   va_start (arglist, pFormat);
+
   wMessage.vsnprintf(2000,pFormat,arglist);
   va_end(arglist);
 
-  ZExceptionDLg* wDlg=new ZExceptionDLg(pTitle,pSeverity,wMessage,pComplement,false);
+  return _adhocMessage(pTitle,pSeverity,nullptr,nullptr,false,wMessage);
+}
+
+int
+ZExceptionDLg::adhocMessageHtml(const utf8VaryingString& pTitle,
+                                Severity_type pSeverity,
+                                ZaiErrors* pErrorlog,
+                                const utf8VaryingString* pComplement,
+                                const char *pFormat,...) {
+  utf8VaryingString wMessage;
+  va_list arglist;
+  va_start (arglist, pFormat);
+
+  wMessage.vsnprintf(2000,pFormat,arglist);
+  va_end(arglist);
+
+  return _adhocMessage(pTitle,pSeverity,pErrorlog,pComplement,true,wMessage);
+}
+int
+ZExceptionDLg::_adhocMessage( const utf8VaryingString& pTitle,
+                              Severity_type pSeverity,
+                              ZaiErrors* pErrorlog,
+                              const utf8VaryingString* pComplement,
+                              bool pHtml,
+                              const utf8VaryingString& pMessage) {
+
+  ZExceptionDLg* wDlg=new ZExceptionDLg(pTitle,pSeverity,pMessage,pComplement,pHtml,false);
 
   if (pErrorlog)
     wDlg->setErrorLog(pErrorlog);
 
-  wDlg->ui->OKBTn->setVisible(true);
-  wDlg->ui->OKBTn->setText("Close");
-  wDlg->ui->CancelBTn->setVisible(false);
-  wDlg->ui->OtherBTn->setVisible(false);
+  wDlg->OKBTn->setVisible(true);
+  wDlg->OKBTn->setText("Close");
+  wDlg->CancelBTn->setVisible(false);
+  wDlg->OtherBTn->setVisible(false);
 
+  if (FixedFont) {
+    wDlg->applyFixedFont();
+  }
 
-  wDlg->ui->TitleLBl->setText(pTitle.toCChar());
+  wDlg->setWindowTitle(pTitle.toCChar());
+  //  wDlg->TitleLBl->setText(pTitle.toCChar());
 
   int wRet= wDlg->exec();
+
+  setFixedFont(false);
+
   wDlg->deleteLater();
   return wRet;
 }
 
 int
 ZExceptionDLg::adhocMessage2B(const utf8String&pTitle, Severity_type pSeverity,
-    const utf8String& pCancelText,
-    const utf8String& pOkText,
-    const utf8VaryingString *pComplement,
+    const utf8String& pCancelText, const utf8String& pOkText,
     const char *pFormat,...) {
 
   utf8VaryingString wMessage;
@@ -659,65 +731,155 @@ ZExceptionDLg::adhocMessage2B(const utf8String&pTitle, Severity_type pSeverity,
   va_start (arglist, pFormat);
   wMessage.vsnprintf(2000,pFormat,arglist);
   va_end(arglist);
+  return _adhocMessage2B(pTitle,pSeverity,pCancelText,pOkText,nullptr,nullptr,false,wMessage);
+}
 
-  ZExceptionDLg* wDlg=new ZExceptionDLg(pTitle,pSeverity,wMessage,pComplement);
+int
+ZExceptionDLg::adhocMessage2B(const utf8String&pTitle, Severity_type pSeverity,
+    const utf8String& pCancelText, const utf8String& pOkText,
+    ZaiErrors* pErrorlog, const utf8VaryingString *pComplement,
+    const char *pFormat,...) {
 
-  wDlg->ui->OKBTn->setVisible(true);
+  utf8VaryingString wMessage;
+  va_list arglist;
+  va_start (arglist, pFormat);
+  wMessage.vsnprintf(2000,pFormat,arglist);
+  va_end(arglist);
+  return _adhocMessage2B(pTitle,pSeverity,pCancelText,pOkText,pErrorlog,pComplement,false,wMessage);
+}
+
+int
+ZExceptionDLg::adhocMessage2BHtml(const utf8String&pTitle, Severity_type pSeverity,
+    const utf8String& pCancelText, const utf8String& pOkText,
+    ZaiErrors* pErrorlog, const utf8VaryingString *pComplement,
+    const char *pFormat,...) {
+
+  utf8VaryingString wMessage;
+  va_list arglist;
+  va_start (arglist, pFormat);
+  wMessage.vsnprintf(2000,pFormat,arglist);
+  va_end(arglist);
+  return _adhocMessage2B(pTitle,pSeverity,pCancelText,pOkText,pErrorlog,pComplement,true,wMessage);
+}
+int
+ZExceptionDLg::_adhocMessage2B(const utf8String&pTitle, Severity_type pSeverity,
+    const utf8String& pCancelText, const utf8String& pOkText,
+    ZaiErrors* pErrorlog, const utf8VaryingString *pComplement, bool pHtml,
+    const utf8String& pMessage) {
+
+
+  ZExceptionDLg* wDlg=new ZExceptionDLg(pTitle,pSeverity,pMessage,pComplement,pHtml);
+
+  if (pErrorlog)
+    wDlg->setErrorLog(pErrorlog);
+
+  wDlg->OKBTn->setVisible(true);
   if (pOkText.isEmpty())
-    wDlg->ui->OKBTn->setText("Ok");
+    wDlg->OKBTn->setText("Ok");
   else
-    wDlg->ui->OKBTn->setText(pOkText.toCChar());
-  wDlg->ui->CancelBTn->setVisible(true);
+    wDlg->OKBTn->setText(pOkText.toCChar());
+  wDlg->CancelBTn->setVisible(true);
   if (pCancelText.isEmpty())
-    wDlg->ui->CancelBTn->setText("Cancel");
+    wDlg->CancelBTn->setText("Cancel");
   else
-    wDlg->ui->CancelBTn->setText(pCancelText.toCChar());
+    wDlg->CancelBTn->setText(pCancelText.toCChar());
 
-  wDlg->ui->OtherBTn->setVisible(false);
+  wDlg->OtherBTn->setVisible(false);
 
-  wDlg->ui->TitleLBl->setText(pTitle.toCChar());
+  //  wDlg->TitleLBl->setText(pTitle.toCChar());
 
+  if (FixedFont) {
+    wDlg->applyFixedFont();
+  }
   int wRet= wDlg->exec();
+  setFixedFont(false);
   wDlg->deleteLater();
   return wRet;
 }
 
 int
-ZExceptionDLg::adhocMessage3B(const utf8String&pTitle, Severity_type pSeverity,const utf8String& pOtherText,const utf8String& pCancelText, const utf8String& pOkText,const utf8VaryingString *pComplement, const char *pFormat,...) {
+ZExceptionDLg::adhocMessage3B(const utf8String&pTitle, Severity_type pSeverity,
+    const utf8String& pOtherText,const utf8String& pCancelText, const utf8String& pOkText,
+    ZaiErrors* pErrorlog,const utf8VaryingString *pComplement, const char *pFormat,...) {
   utf8VaryingString wMessage;
   va_list arglist;
   va_start (arglist, pFormat);
   wMessage.vsnprintf(2000,pFormat,arglist);
   va_end(arglist);
 
-  ZExceptionDLg* wDlg=new ZExceptionDLg(pTitle,pSeverity,wMessage,pComplement);
 
-  wDlg->ui->OKBTn->setVisible(true);
+  return _adhocMessage3B(pTitle,pSeverity,pOtherText,pCancelText,pOkText,pErrorlog,pComplement,false,wMessage);
+}
+
+int
+ZExceptionDLg::adhocMessage3B(const utf8String&pTitle, Severity_type pSeverity,
+    const utf8String& pOtherText,const utf8String& pCancelText, const utf8String& pOkText,
+     const char *pFormat,...) {
+  utf8VaryingString wMessage;
+  va_list arglist;
+  va_start (arglist, pFormat);
+  wMessage.vsnprintf(2000,pFormat,arglist);
+  va_end(arglist);
+
+
+  return _adhocMessage3B(pTitle,pSeverity,pOtherText,pCancelText,pOkText,nullptr,nullptr,false,wMessage);
+}
+int
+ZExceptionDLg::adhocMessage3BHtml(const utf8String&pTitle, Severity_type pSeverity,
+    const utf8String& pOtherText,const utf8String& pCancelText, const utf8String& pOkText,
+    ZaiErrors* pErrorlog,const utf8VaryingString *pComplement, const char *pFormat,...) {
+  utf8VaryingString wMessage;
+  va_list arglist;
+  va_start (arglist, pFormat);
+  wMessage.vsnprintf(2000,pFormat,arglist);
+  va_end(arglist);
+
+
+  return _adhocMessage3B(pTitle,pSeverity,pOtherText,pCancelText,pOkText,pErrorlog,pComplement,true,wMessage);
+}
+
+int
+ZExceptionDLg::_adhocMessage3B(const utf8String&pTitle, Severity_type pSeverity,
+                                const utf8String& pOtherText,const utf8String& pCancelText, const utf8String& pOkText,
+                                ZaiErrors* pErrorlog,const utf8VaryingString *pComplement,bool pHtml,
+                                const utf8String& pMessage) {
+
+
+  ZExceptionDLg* wDlg=new ZExceptionDLg(pTitle,pSeverity,pMessage,pComplement,pHtml);
+
+  if (pErrorlog)
+    wDlg->setErrorLog(pErrorlog);
+
+  wDlg->OKBTn->setVisible(true);
   if (pOkText.isEmpty())
-    wDlg->ui->OKBTn->setText("Ok");
+    wDlg->OKBTn->setText("Ok");
   else
-    wDlg->ui->OKBTn->setText(pOkText.toCChar());
+    wDlg->OKBTn->setText(pOkText.toCChar());
 
-  wDlg->ui->CancelBTn->setVisible(true);
+  wDlg->CancelBTn->setVisible(true);
   if (pCancelText.isEmpty())
-    wDlg->ui->CancelBTn->setText("Cancel");
+    wDlg->CancelBTn->setText("Cancel");
   else
-    wDlg->ui->CancelBTn->setText(pCancelText.toCChar());
+    wDlg->CancelBTn->setText(pCancelText.toCChar());
 
   if (pOtherText.isEmpty())
-    wDlg->ui->OtherBTn->setText("Other");
+    wDlg->OtherBTn->setText("Other");
   else
-    wDlg->ui->OtherBTn->setText(pOtherText.toCChar());
+    wDlg->OtherBTn->setText(pOtherText.toCChar());
 
-  wDlg->ui->OtherBTn->setVisible(true);
+  wDlg->OtherBTn->setVisible(true);
 
-  wDlg->ui->TitleLBl->setText(pTitle.toCChar());
+  //  wDlg->TitleLBl->setText(pTitle.toCChar());
+
+  if (FixedFont) {
+    wDlg->applyFixedFont();
+  }
 
   int wRet= wDlg->exec();
+  setFixedFont(false);
   wDlg->deleteLater();
   return wRet;
 }
-
 int
 ZExceptionDLg::display(const utf8VaryingString &pTitle, const ZExceptionBase pException, bool pDontShow)
 {
@@ -731,10 +893,10 @@ ZExceptionDLg::display(const utf8VaryingString &pTitle, const ZExceptionBase pEx
   if (!pException.Complement.isEmpty())
     wDlg->setAdditionalInfo(pException.Complement);
 
-  wDlg->ui->OKBTn->setVisible(true);
-  wDlg->ui->OKBTn->setText("Close");
-  wDlg->ui->CancelBTn->setVisible(false);
-  wDlg->ui->OtherBTn->setVisible(false);
+  wDlg->OKBTn->setVisible(true);
+  wDlg->OKBTn->setText("Close");
+  wDlg->CancelBTn->setVisible(false);
+  wDlg->OtherBTn->setVisible(false);
 
   switch(pException.Severity)
   {
@@ -761,9 +923,13 @@ ZExceptionDLg::display(const utf8VaryingString &pTitle, const ZExceptionBase pEx
     break;
   }
 
+  if (FixedFont)
+    wDlg->MessageTEd->setFontFamily(QString::fromUtf8("Courier"));
+
  int wRet= wDlg->exec();
-  wDlg->deleteLater();
-  return wRet;
+ setFixedFont(false);
+ wDlg->deleteLater();
+ return wRet;
 }
 
 int
@@ -774,18 +940,18 @@ ZExceptionDLg::display2B(const utf8VaryingString &pTitle,const ZExceptionBase pE
   ZExceptionDLg* wDlg=new ZExceptionDLg(pTitle,pException,false);
 
 
-  wDlg->ui->CancelBTn->setVisible(true);
+  wDlg->CancelBTn->setVisible(true);
   if (pCancelText)
-    wDlg->ui->CancelBTn->setText(pCancelText);
+    wDlg->CancelBTn->setText(pCancelText);
   else
-    wDlg->ui->CancelBTn->setText("Cancel");
-  wDlg->ui->OKBTn->setVisible(true);
+    wDlg->CancelBTn->setText("Cancel");
+  wDlg->OKBTn->setVisible(true);
   if (pOKText)
-    wDlg->ui->OKBTn->setText(pOKText);
+    wDlg->OKBTn->setText(pOKText);
   else
-    wDlg->ui->OKBTn->setText("OK");
+    wDlg->OKBTn->setText("OK");
 
-  wDlg->ui->OtherBTn->setVisible(false);
+  wDlg->OtherBTn->setVisible(false);
 
   switch(pException.Severity)
   {
@@ -812,7 +978,11 @@ ZExceptionDLg::display2B(const utf8VaryingString &pTitle,const ZExceptionBase pE
     break;
   }
 
+  if (FixedFont)
+    wDlg->MessageTEd->setFontFamily(QString::fromUtf8("Courier"));
+
   int wRet= wDlg->exec();
+  setFixedFont(false);
   wDlg->deleteLater();
   return wRet;
 }//display2B
@@ -827,16 +997,16 @@ ZExceptionDLg::display3B(const utf8VaryingString& pTitle,const ZExceptionBase pE
 
   wDlg->setThirdButton(pButtonText);
 
-  wDlg->ui->CancelBTn->setVisible(true);
+  wDlg->CancelBTn->setVisible(true);
   if (pCancelText)
-    wDlg->ui->CancelBTn->setText(pCancelText);
+    wDlg->CancelBTn->setText(pCancelText);
   else
-    wDlg->ui->CancelBTn->setText("Cancel");
-  wDlg->ui->OKBTn->setVisible(true);
+    wDlg->CancelBTn->setText("Cancel");
+  wDlg->OKBTn->setVisible(true);
   if (pCancelText)
-    wDlg->ui->OKBTn->setText(pOKText);
+    wDlg->OKBTn->setText(pOKText);
   else
-    wDlg->ui->OKBTn->setText("OK");
+    wDlg->OKBTn->setText("OK");
 
 
   switch(pException.Severity)
@@ -864,7 +1034,11 @@ ZExceptionDLg::display3B(const utf8VaryingString& pTitle,const ZExceptionBase pE
     break;
   }
 
+  if (FixedFont)
+    wDlg->MessageTEd->setFontFamily(QString::fromUtf8("Courier"));
+
   int wRet= wDlg->exec();
+  setFixedFont(false);
   wDlg->deleteLater();
   return wRet;
 }

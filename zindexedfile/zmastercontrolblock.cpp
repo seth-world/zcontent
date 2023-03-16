@@ -55,7 +55,7 @@ void ZMasterControlBlock::clear(void)
   HistoryOn=false;
 
   delete Dictionary;
-  DictionaryName.clear();
+//  DictionaryName.clear();
   DictionaryPath.clear();
   while (IndexTable.size() > 0)
     popIndex();
@@ -436,15 +436,15 @@ ssize_t ZMasterControlBlock::_exportAppend(ZDataBuffer &pMCBContent)
 
   wMCBExp.MCBSize=uint32_t(sizeof(ZMCB_Export)
                              + IndexFilePath._getexportUVFSize()
-                             + DictionaryPath._getexportUVFSize()
-                             + DictionaryName._getexportUVFSize() );
+                             + DictionaryPath._getexportUVFSize());
+//                             + DictionaryName._getexportUVFSize() );
   wMCBExp.ICBOffset=wMCBExp.MCBSize;
 
   wMCBExp.HistoryOn=HistoryOn;
 
   wRet=wMCBExp._exportAppend(pMCBContent);
 
-  DictionaryName._exportAppendUVF(pMCBContent);
+  //DictionaryName._exportAppendUVF(pMCBContent);
   DictionaryPath._exportAppendUVF(pMCBContent);
   IndexFilePath._exportAppendUVF(pMCBContent);
   /*
@@ -572,7 +572,7 @@ ZMasterControlBlock::_import(const unsigned char*& pPtrIn) {
   ZMCB_Export wMCBExp;
   wMCBExp._import(pPtrIn);
 
-  DictionaryName._importUVF(pPtrIn);
+//  DictionaryName._importUVF(pPtrIn);
   DictionaryPath._importUVF(pPtrIn);
   IndexFilePath._importUVF(pPtrIn);
 
@@ -780,5 +780,10 @@ ZMasterControlBlock::report(FILE*pOutput)
       "___________________________________________________________________________\n");
   return ;
 } // report
+
+ZStatus
+ZMasterControlBlock::loadDictionary(){
+  return Dictionary->load();
+}
 
 #endif // ZSMASTERCONTROLBLOCK_CPP

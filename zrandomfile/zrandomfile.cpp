@@ -1058,7 +1058,8 @@ uriString wFormerHeaderURI;
                             Severity_Severe,
                             "Error opening file for creation <%s> ",
                             URIContent.toString());
-            ZException.printLastUserMessage();
+            if (ZVerbose & ZVB_FileEngine)
+              ZException.printLastUserMessage();
             }
 
 
@@ -6004,7 +6005,7 @@ ZRandomFile::zreplace(const ZDataBuffer &pRecord, zrank_type pRank)
  *
 */
 ZStatus
-ZRandomFile::_ZRFopen(const zmode_type pMode, const ZFile_type pFileType, bool pLockRegardless)
+ZRandomFile::_ZRFopen(zmode_type pMode, const ZFile_type pFileType, bool pLockRegardless)
 {
 ZStatus wSt=ZS_SUCCESS;
 
@@ -6067,7 +6068,7 @@ ZStatus wSt=ZS_SUCCESS;
   wSt=_importAllFileHeader();  // get header and force read pForceRead = true, whatever the open mode is
   if (wSt!=ZS_SUCCESS)
     {return  wSt;}
-    if (!pLockRegardless)
+  if (!pLockRegardless)
       {
         if (ZHeader.Lock & ZRF_Exclusive)
         {
@@ -6083,6 +6084,11 @@ ZStatus wSt=ZS_SUCCESS;
         }
     } //if (!pLockRegardless)
 //-----------------------------File type test------------------------------------
+    while (true) {
+      if (pMode & ZRF_TypeRegardless) {
+        pMode = pMode & ~ ZRF_TypeRegardless;
+        break;
+      }
 
     if (pFileType == ZFT_Nothing)
         {
@@ -6119,9 +6125,9 @@ ZStatus wSt=ZS_SUCCESS;
               decode_ZFile_type (pFileType));
           return ZS_BADFILETYPE;
       }// switch
+      break;
     }
-    else
-    {
+
     switch (ZHeader.FileType)
       {
       case ZFT_ZRandomFile :
@@ -6277,7 +6283,7 @@ ZStatus wSt=ZS_SUCCESS;
                   decode_ZFile_type (ZHeader.FileType));
               return  ZS_BADFILETYPE;
             }// ZFT_ZIndexFile
-    default:
+      default:
         {
         // all other cases are errors
         _forceClose();
@@ -6290,13 +6296,14 @@ ZStatus wSt=ZS_SUCCESS;
                                 decode_ZFile_type (ZHeader.FileType));
         return  ZS_BADFILETYPE;
         }
-    }//switch
-  }//if (pFileType != ZFT_Any)
+      }//switch
+      break;
+  }// while true
 
 //-----------------------------End File type test------------------------------------
 
     _isOpen = true ;
-    Mode = pMode;
+    Mode = pMode ;
 /*
     if (pMode & ZRF_Exclusive)
             {
@@ -9612,17 +9619,20 @@ decode_ZRFMode (zmode_type pZRF)
   if (pZRF==ZRF_NotOpen)
     return "ZRF_NotOpen";
 
-    if (pZRF&ZRF_Exclusive)
-      wMode= (const utf8_t*)"ZRF_Exclusive";
+    if (pZRF & ZRF_Exclusive)
+      wMode = "ZRF_Exclusive";
+
+    if (pZRF & ZRF_TypeRegardless)
+      wMode.addConditionalOR( "ZRF_TypeRegardless");
 
     if (pZRF & ZRF_ManualLock)
-      wMode.addConditionalOR( (utf8_t*)"ZRF_ManualLock");
+      wMode.addConditionalOR( "ZRF_ManualLock");
     if (pZRF&ZRF_Read_Only)
-      wMode.addConditionalOR( (utf8_t*)"ZRF_Read");
+      wMode.addConditionalOR( "ZRF_Read");
     if (pZRF&ZRF_Write_Only)
-      wMode.addConditionalOR( (utf8_t*)"ZRF_Write");
+      wMode.addConditionalOR( "ZRF_Write");
     if (pZRF&ZRF_Delete_Only)
-      wMode.addConditionalOR( (utf8_t*)"ZRF_Delete");
+      wMode.addConditionalOR( "ZRF_Delete");
     if (wMode.isEmpty())
                 return ("Unknownn ZRFMode_type");
     wMode+=(utf8_t)'\0';
@@ -9636,6 +9646,9 @@ zmode_type wRet = ZRF_Nothing;
 
   if (strstr(pZRF,"ZRF_NotOpen" )!=nullptr)
       return ZRF_NotOpen;
+
+  if (strstr(pZRF,"ZRF_TypeRegardless" )!=nullptr)
+    wRet |= ZRF_TypeRegardless;
 
     if (strstr(pZRF,"ZRF_Exclusive" )!=nullptr)
                             wRet |= ZRF_Exclusive;
@@ -9659,54 +9672,49 @@ zmode_type wRet = ZRF_Nothing;
     return wRet;
 }//encode_ZRFMode
 
-const char *
-decode_ZFile_type (uint8_t pType)
-    {
-    switch (pType)
-            {
-            case ZFT_Nothing :
-                    {
-                        return ("ZFT_Nothing");
-                    }
-            case ZFT_ZRandomFile :
-                    {
-                        return ("ZFT_ZRandomFile");
-                    }
+const char*
+decode_ZFile_type (uint8_t pType) {
 
-            case ZFT_ZRawMasterFile :
-                {
-                    return ("ZFT_ZRawMasterFile");
-                }
-            case ZFT_ZIndexFile :
-                {
-                    return ("ZFT_ZIndexFile");
-                }
-        case ZFT_ZMasterFile :
-            {
-                return ("ZFT_ZMasterFile");
-            }
-        case ZFT_DictionaryFile :
-            {
-              return ("ZFT_DictionaryFile");
-            }
+  switch (pType) {
+    case ZFT_Nothing :
+      return "ZFT_Nothing";
+
+    case ZFT_ZRandomFile :
+      return"ZFT_ZRandomFile";
+
+    case ZFT_ZRawMasterFile :
+      return ("ZFT_ZRawMasterFile");
+
+    case ZFT_ZIndexFile :
+      return ("ZFT_ZIndexFile");
+    case ZFT_ZMasterFile :
+      return ("ZFT_ZMasterFile");
+
+    case ZFT_DictionaryFile :
+      return ("ZFT_DictionaryFile");
+
     default :
-            {
-                return ("Unknownn ZFile_type");
-            }
+      return ("Unknownn ZFile_type");
+
     }//switch
 }//encode_ZFile_type
 
-ZFile_type
-encode_ZFile_type (char* pType)
+uint8_t
+encode_ZFile_type (const utf8VaryingString& pType)
 {
+  uint8_t wType=0;
+    if (pType.strstr("ZFT_ZRandomFile"))
+      wType |= ZFT_ZRandomFile;
+    if (pType.strstr("ZFT_ZRandomFile"))
+      wType |= ZFT_ZRandomFile;
+    if (pType.strstr("ZFT_ZMasterFile"))
+      wType |= ZFT_ZMasterFile;
+    if (pType.strstr("ZFT_ZIndexFile"))
+      wType |= ZFT_ZIndexFile;
+    if (pType.strstr("ZFT_ZRawMasterFile"))
+      wType |= ZFT_ZRawMasterFile;
 
-    if (strcmp(pType,"ZFT_ZRandomFile"))
-                    return ZFT_ZRandomFile;
-    if (strcmp(pType,"ZFT_ZMasterFile"))
-                    return ZFT_ZMasterFile;
-    if (strcmp(pType,"ZFT_ZIndexFile"))
-                    return ZFT_ZIndexFile;
-    return ZFT_Nothing;
+    return wType;
 
 }//encode_ZFile_type
 

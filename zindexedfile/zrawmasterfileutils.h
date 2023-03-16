@@ -15,16 +15,18 @@
 
   void    zupgradeZRFtoZMF (const uriString &pZRFPath, FILE* pOutput=nullptr);
 
-utf8VaryingString generateIndexRootName(const utf8String &pMasterRootName,
-                                        const long pRank,
-                                        const utf8String &pIndexName);
+  /* returns index root name (without index file extension) */
+  utf8VaryingString generateIndexRootName(const utf8String &pMasterRootName,
+                                          const utf8String &pIndexName);
+  /* return index base name : i. e. <index root name>.<index file extension> */
+  utf8VaryingString generateIndexBaseName(const utf8String &pMasterRootName,
+      const utf8String &pIndexName);
 
 ZStatus
-generateIndexURI( uriString &pIndexFileUri,
-                  const uriString pMasterFileUri,
+generateIndexURI(uriString &pIndexFileUri,
+                  const uriString &pMasterFileUri,
                   const uriString &pDirectory,
-                  const long pRank,
-                  const utf8String& pIndexName);
+                  const utf8VaryingString& pIndexName);
 
 const char *decode_ZCOP (uint16_t pZCOP);
 /**

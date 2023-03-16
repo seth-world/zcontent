@@ -18,7 +18,7 @@ class ZIndexTable :  private ZArray<ZRawIndexFile*>
 public:
   ZIndexTable() ;
   ~ZIndexTable() {}// just to call the base destructor
-  using _Base::push;
+//  using _Base::push;
   using _Base::size;
   using _Base::count;
   using _Base::last;
@@ -28,7 +28,8 @@ public:
 
   long pop (void);
   long erase (long pRank);
-  long insert(ZRawIndexFile* pIndexFile, long pRank);
+  long insert(ZRawIndexFile* pIn, long pRank);
+  long push(ZRawIndexFile*pIn) ;
   void clear(void);
 
 
@@ -36,6 +37,8 @@ public:
   long searchCaseIndexByName (const char* pName);
   long searchIndexByName (const utf8String& pName);
   long searchCaseIndexByName (const utf8String& pName);
+
+
 
   utf8String toXml(int pLevel,bool pComment=true);
   ZStatus fromXml(zxmlNode* pRoot,ZaiErrors*pErrorlog);

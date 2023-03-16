@@ -4,11 +4,20 @@
 #include <ztoolset/uristring.h>
 #include <ztoolset/utfvaryingstring.h>
 #include <QtWidgets/QPlainTextEdit>
+
+#include <zcontent/zcontentutils/zexceptiondlg.h>
+
+#include <zcppparser/zcppparsertype.h> // for getParserWorkDirectory()
+
 #include <QTextCursor>
 #include <QTextBlock>
 #include <QWidget>
 
+#include <QAction>
+#include <QMenu>
+#include <QActionGroup>
 
+#include <QFileDialog>
 
 void
 textEditMWn::_init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)) {
@@ -16,6 +25,43 @@ textEditMWn::_init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)) {
   ui->setupUi(this);
 
   Options = pOptions;
+
+  genMEn = new QMenu("General",this);
+
+  ui->menubar->addMenu(genMEn);
+
+  menuActionQAg = new QActionGroup(this);
+  menuActionQAg->setExclusive(false);
+
+  lineNbQAc = new QAction("line numbers",genMEn);
+  lineNbQAc->setCheckable(true);
+  lineNbQAc->setChecked(false);
+
+  wrapQAc = new QAction("word wrap",genMEn);
+  wrapQAc->setCheckable(true);
+  wrapQAc->setChecked(false);
+
+  writeQAc = new QAction("write to text file",genMEn);
+
+  clearQAc = new QAction("clear",genMEn);
+
+
+
+  genMEn->addAction(lineNbQAc);
+  genMEn->addAction(wrapQAc);
+
+  genMEn->addSeparator();
+
+  genMEn->addAction(writeQAc);
+  genMEn->addAction(clearQAc);
+
+  genMEn->addSeparator();
+
+  menuActionQAg->addAction(lineNbQAc);
+  menuActionQAg->addAction(wrapQAc);
+  menuActionQAg->addAction(writeQAc);
+  menuActionQAg->addAction(clearQAc);
+
 
   Text= ui->textPTe;
   Text->setUseLineNumbers(Options & TEOP_ShowLineNumbers);
@@ -50,8 +96,12 @@ textEditMWn::_init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)) {
 
   QMainWindow::setWindowTitle("Text");
 
+  if (pOptions & TEOP_NoCloseBtn) {
+    setWindowFlag(Qt::WindowCloseButtonHint,false ); // no close button
+    ui->closeBTn->setVisible(false);
+  }
   //  QObject::connect(this, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(resizeWindow(QResizeEvent*)));
-  QObject::connect(ui->lineNumbersBTn, SIGNAL(pressed()), this, SLOT(lineNumbersOnOff()));
+  QObject::connect(ui->lineNumbersBTn, SIGNAL(pressed()), this, SLOT(lineNumbersBTnClicked()));
   QObject::connect(ui->closeBTn, SIGNAL(pressed()), this, SLOT(closePressed()));
   QObject::connect(ui->wrapBTn, SIGNAL(pressed()), this, SLOT(wrapPressed()));
   QObject::connect(ui->filterBTn, SIGNAL(pressed()), this, SLOT(filterPressed()));
@@ -61,6 +111,10 @@ textEditMWn::_init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)) {
 
   QObject::connect(ui->searchLEd, SIGNAL(returnPressed()), this, SLOT(searchReturnPressed()));
 
+  QObject::connect(menuActionQAg, &QActionGroup::triggered, this, &textEditMWn::MenuAction);
+
+  if (pOptions & TEOP_NoFileLab)
+    ui->ClosedLBl->setVisible(false);
 
   setCloseButtonRole();
 }
@@ -70,10 +124,6 @@ textEditMWn::textEditMWn(QWidget *parent) :QMainWindow(parent),ui(new Ui::textEd
   _init(TEOP_Nothing,nullptr);
 }
 
-textEditMWn::textEditMWn(QWidget *parent,uint32_t pOptions) :QMainWindow(parent),ui(new Ui::textEditMWn)
-{
-  _init(TEOP_Nothing,nullptr);
-}
 
 textEditMWn::textEditMWn(QWidget *parent,uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)) :QMainWindow(parent),ui(new Ui::textEditMWn)
 {
@@ -83,6 +133,61 @@ textEditMWn::~textEditMWn()
 {
   delete ui;
 }
+
+void
+textEditMWn::MenuAction(QAction* pAction) {
+  if (pAction==quitQAc) {
+    closePressed();
+  }
+  if (pAction==lineNbQAc) {
+    if (lineNbQAc->isChecked()){
+      if (hasLineNumbers())
+        return;
+      lineNumbersOnOff();
+      return;
+    }
+    if (!hasLineNumbers())
+      return;
+    lineNumbersOnOff();
+    return;
+  }// lineNbQAc
+
+  if (pAction==wrapQAc) {
+    if (wrapQAc->isChecked()){
+      if (Text->wordWrapMode()==QTextOption::WordWrap)
+        return;
+      wordWrap();
+      return;
+    }
+    if (Text->wordWrapMode()==QTextOption::NoWrap)
+      return;
+    wordWrap();
+    return;
+  }// wrapQAc
+
+  if (pAction==writeQAc) {
+    const char* wWD = getParserWorkDirectory();
+    QString wFileName = QFileDialog::getSaveFileName(this, "text log file",
+        wWD,
+        "Text files (*.txt *.log);;All (*.*)");
+    if (wFileName.isEmpty())
+      return;
+    uriString wFN=wFileName.toUtf8().data();
+    QString wC=Text->toPlainText();
+    utf8VaryingString wTS=wC.toUtf8().data();
+    ZStatus wSt=wFN.writeContent(wTS);
+    if (wSt!=ZS_SUCCESS) {
+      ZExceptionDLg::displayLast("Saving text file");
+      return;
+    }
+
+  }//writeQAc
+
+  if (pAction==clearQAc) {
+    Text->clear();
+  } //clearQAc
+} //MenuAction
+
 
 
 void textEditMWn::useLineNumbers(bool pOnOff) {
@@ -152,35 +257,53 @@ void textEditMWn::morePressed()
   if (MoreCallBack!=nullptr)
     MoreCallBack();
 }
+bool textEditMWn::hasLineNumbers() {
+  return Text->getUseLineNumbers();
+}
+
+void textEditMWn::lineNumbersBTnClicked()
+{
+  lineNumbersOnOff();
+  if (hasLineNumbers()){
+    if (lineNbQAc->isChecked())
+        return;
+    lineNbQAc->setChecked(true);
+    return;
+  }
+  if (!lineNbQAc->isChecked())
+    return;
+  lineNbQAc->setChecked(false);
+}
+
 void textEditMWn::lineNumbersOnOff()
 {
   Text->setUseLineNumbers(!Text->getUseLineNumbers());
   if (Text->getUseLineNumbers())  {
     ui->lineNumbersBTn->setText(tr("Hide line numbers"));
     Options &= ~ TEOP_ShowLineNumbers;
-  }
-  else {
-    ui->lineNumbersBTn->setText(tr("Show line numbers"));
-    Options |=  TEOP_ShowLineNumbers;
-  }
-}
-
-void textEditMWn::closePressed()
-{
-  if (Options & TEOP_CloseBtnHide) {
-    this->hide();
-    if (CloseCallBack) {
-      QEvent wEv(QEvent::Hide);
-
-      CloseCallBack(&wEv);
-    }
     return;
   }
-  this->close();
-  this->deleteLater();
-  return;
+
+  ui->lineNumbersBTn->setText(tr("Show line numbers"));
+  Options |=  TEOP_ShowLineNumbers;
+
 }
+
 void textEditMWn::wrapPressed()
+{
+  wordWrap();
+  if (Text->wordWrapMode()==QTextOption::WordWrap){
+    if (wrapQAc->isChecked())
+      return;
+    wrapQAc->setChecked(true);
+    return;
+  }
+  if (!wrapQAc->isChecked())
+    return;
+  wrapQAc->setChecked(false);
+}
+
+void textEditMWn::wordWrap()
 {
   if (Text->wordWrapMode()==QTextOption::NoWrap) {
     Text->setWordWrapMode(QTextOption::WordWrap);
@@ -217,6 +340,21 @@ void textEditMWn::searchReturnPressed()
   searchFirst(ui->searchLEd->text().toUtf8().data());
 }
 
+void textEditMWn::closePressed()
+{
+  if (Options & TEOP_CloseBtnHide) {
+    this->hide();
+    if (CloseCallBack) {
+      QEvent wEv(QEvent::Hide);
+
+      CloseCallBack(&wEv);
+    }
+    return;
+  }
+  this->close();
+  this->deleteLater();
+  return;
+}
 
 void textEditMWn::setFileClosed(bool pYesNo)
 {
@@ -250,14 +388,22 @@ textEditMWn::setText(const utf8VaryingString& pText,const utf8VaryingString& pTi
 }
 
 void
-textEditMWn::appendText(const utf8VaryingString& pText)
-{
+textEditMWn::appendText(const utf8VaryingString& pText) {
   Text->appendPlainText(pText.toCChar());
 }
 
 void
-textEditMWn::clear()
-{
+textEditMWn::appendText(const char* pText,...) {
+  utf8VaryingString wT;
+  va_list args;
+  va_start (args, pText);
+  wT.vsnprintf(cst_messagelen,pText, args);
+  va_end(args);
+
+  Text->appendPlainText(wT.toCChar());
+}
+void
+textEditMWn::clear() {
   Text->clear();
 }
 

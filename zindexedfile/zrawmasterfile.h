@@ -79,6 +79,8 @@ class ZRawMasterFile: protected ZRandomFile, public ZMasterControlBlock
   friend void zupgradeZRFtoZMF (const uriString& pZRFPath,FILE* pOutput);
   friend void zdowngradeZMFtoZRF (const uriString &pZMFPath, FILE* pOutput);
 
+  friend class ZMasterFile;
+
   typedef ZRandomFile _Base ;
 protected:  ZRawMasterFile(ZFile_type pType);
 public:
@@ -111,8 +113,37 @@ public:
 
   using ZRandomFile::_reorgFileInternals;
 
+  using ZRandomFile::getRecordCount;
+
 //  ZFileControlBlock& getZFCB() {return ZFCB;}
-  
+
+  void setTypeRaw() { ZRandomFile::setFileType(ZFT_ZRawMasterFile); }
+  void setTypeMasterFile() { ZRandomFile::setFileType(ZFT_ZMasterFile); }
+
+  ZStatus createDictionary(const ZMFDictionary& pDic) {
+    setTypeMasterFile();
+    uriString wURIdic = ZDictionaryFile::generateDicFileName(getURIContent());
+    Dictionary = new ZDictionaryFile;
+    Dictionary->setDictionary(pDic);
+    return Dictionary->saveToDicFile(wURIdic);
+  }
+
+  ZStatus createExternalDictionary(const uriString& pDicPath) {
+    if (!pDicPath.exists()) {
+      ZException.setMessage("ZRawMasterFile::createExternalDictionary",ZS_FILENOTEXIST,Severity_Error,"Dictionary file %s does not exist.",pDicPath.toString());
+      return ZS_FILENOTEXIST;
+    }
+    setTypeMasterFile();
+    Dictionary = new ZDictionaryFile;
+    DictionaryPath=pDicPath;
+    Dictionary->URIDictionary = pDicPath;
+    ZStatus wSt=Dictionary->load();
+
+    DictionaryPath = pDicPath;
+    return wSt;
+  }
+
+
 
 //    using _Base::zclearFile;  // for tests only : must be suppressed imperatively
 
@@ -259,6 +290,9 @@ public:
                               bool pReplace,
                               ZaiErrors* pErrorLog);
 
+  ZStatus backupAll(const char* pBckExt="bck");
+
+
   void _testZReserved();
 
   bool hasDictionary()  {return Dictionary!=nullptr;}
@@ -267,7 +301,8 @@ public:
 
   ZStatus zopen       (const uriString& pURI, const int pMode=ZRF_All); // superseeds ZRandomfile zopen
   ZStatus zopen       (const int pMode=ZRF_All) {return (zopen(getURIContent(),pMode));}
-  //    ZStatus zopen       (const int pMode=ZRF_All) {return zopen(ZDescriptor.URIContent,pMode);}
+
+  ZStatus zopenIndexFile(long pRank, const int pMode);
 
   ZStatus zclose (void);
 

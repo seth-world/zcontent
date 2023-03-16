@@ -781,7 +781,7 @@ ZRawMasterFile::zcreateRawIndex ( ZRawIndexFile *&pIndexObjectOut,
   wSt=generateIndexURI( wIndexURI,
                         getURIContent(),
                         wIndexFileDirectoryPath,
-                        IndexTable.lastIdx(),
+ //                       IndexTable.lastIdx(),
                         pIndexName);
   if (wSt!=ZS_SUCCESS)
   {return  wSt;} // Beware return  is multiple instructions in debug mode
@@ -927,7 +927,7 @@ ZRawMasterFile::zinsertRawIndex ( long pIndexRank,
   wSt=generateIndexURI( wIndexURI,
                         getURIContent(),
                         wIndexFileDirectoryPath,
-                        IndexTable.lastIdx(),
+//                        IndexTable.lastIdx(),
                         pIndexName);
   if (wSt!=ZS_SUCCESS)
   {return  wSt;} // Beware return  is multiple instructions in debug mode
@@ -1344,7 +1344,7 @@ ZRawMasterFile::_createRawIndexDet (long &pOutRank,
   wSt=generateIndexURI( wIndexURI,
                         getURIContent(),
                         wIndexFileDirectoryPath,
-                        pOutRank,
+//                        pOutRank,
                         pIndexName);
   if (wSt!=ZS_SUCCESS)
   {goto createRawIndexDet1End;}
@@ -1508,7 +1508,7 @@ ZRawMasterFile::_insertRawIndexDet (long pInputIndexRank,
   wSt=generateIndexURI( getURIContent(),
                         wIndexFileDirectoryPath,
                         wIndexURI,
-                        pInputIndexRank,
+//                        pInputIndexRank,
                         pIndexName);
   if (wSt!=ZS_SUCCESS)
   {goto insertRawIndexDet1Error;}
@@ -1721,7 +1721,8 @@ ZRawMasterFile::shiftIndexNameDown(long pStartRank,ZaiErrors* pErrorLog) {
 
     IndexTable[wi]->zclose();// close index files before renaming its files
 
-    wSt=generateIndexURI(NewIndexContent,getURIContent(),IndexFilePath,wi,IndexTable[wi]->IndexName);
+//    wSt=generateIndexURI(NewIndexContent,getURIContent(),IndexFilePath,wi,IndexTable[wi]->IndexName);
+    wSt=generateIndexURI(NewIndexContent,getURIContent(),IndexFilePath,IndexTable[wi]->IndexName);
     if (wSt!=ZS_SUCCESS)
     {
       return  wSt;// Beware return  is multiple instructions in debug mode
@@ -1800,7 +1801,8 @@ ZRawMasterFile::shiftIndexNameUp(long pStartRank,ZaiErrors* pErrorLog) {
 
     IndexTable[wi]->zclose();// close index files before renaming its files
 
-    wSt=generateIndexURI(NewIndexContent,getURIContent(),IndexFilePath,wi+1,IndexTable[wi]->IndexName);
+//    wSt=generateIndexURI(NewIndexContent,getURIContent(),IndexFilePath,wi+1,IndexTable[wi]->IndexName);
+    wSt=generateIndexURI(NewIndexContent,getURIContent(),IndexFilePath,IndexTable[wi]->IndexName);
     if (wSt!=ZS_SUCCESS)
     {
       return  wSt;// Beware return  is multiple instructions in debug mode
@@ -1860,6 +1862,29 @@ ZRawMasterFile::shiftIndexNameUp(long pStartRank,ZaiErrors* pErrorLog) {
   }// for
   return ZS_SUCCESS;
 }
+
+ZStatus
+ZRawMasterFile::backupAll(const char* pBckExt) {
+
+  ZStatus wSt= getURIContent().backupFile(pBckExt);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+  wSt= getURIHeader().backupFile(pBckExt);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+
+  for (long wi=0; wi < IndexTable.count() ; wi++ ) {
+    wSt= IndexTable[wi]->getURIContent().backupFile(pBckExt);
+    if (wSt!=ZS_SUCCESS)
+      return wSt;
+    wSt= IndexTable[wi]->getURIHeader().backupFile(pBckExt);
+    if (wSt!=ZS_SUCCESS)
+      return wSt;
+  }
+  return ZS_SUCCESS;
+}
+
+
 //---------------------------------Utilities-----------------------------------------------------
 
 /**  * @addtogroup ZMFUtilities
@@ -2154,7 +2179,7 @@ ZStatus
 ZRawMasterFile::zopen  (const uriString &pURI, const int pMode)
 {
 ZStatus wSt;
-ZArray<ZPRES> wIndexPresence;
+
 const unsigned char*wPtrIn = nullptr;
 
   if (pURI.isEmpty())
@@ -2223,7 +2248,8 @@ long wi;
 //            IndexTable.push(wIndex);
             wIndexUri.clear();
 
-            wSt=generateIndexURI(wIndexUri,getURIContent(),IndexFilePath,wi,IndexTable[wi]->IndexName);
+//            wSt=generateIndexURI(wIndexUri,getURIContent(),IndexFilePath,wi,IndexTable[wi]->IndexName);
+            wSt=generateIndexURI(wIndexUri,getURIContent(),IndexFilePath,IndexTable[wi]->IndexName);
             if (wSt!=ZS_SUCCESS)
                     {
                     return  wSt;// Beware return  is multiple instructions in debug mode
@@ -2251,6 +2277,23 @@ long wi;
 
     return  ZS_SUCCESS;
 }// zopen
+
+
+ZStatus
+ZRawMasterFile::zopenIndexFile(long pRank,const int pMode) {
+  uriString wIndexUri;
+
+//  ZStatus wSt=generateIndexURI(wIndexUri,getURIContent(),IndexFilePath,pRank,IndexTable[pRank]->IndexName);
+  ZStatus wSt=generateIndexURI(wIndexUri,getURIContent(),IndexFilePath,IndexTable[pRank]->IndexName);
+  if (wSt!=ZS_SUCCESS)
+  {
+    return  wSt;// Beware return  is multiple instructions in debug mode
+  }
+  if (ZVerbose & ZVB_FileEngine)
+    _DBGPRINT("Opening Index file <%s>\n",(const char*)wIndexUri.toString())
+
+  return IndexTable[pRank]->openIndexFile(wIndexUri,pRank,pMode);
+} // zopenIndexFile
 
 /**
  * @brief ZRawMasterFile::zclose close the ZRawMasterFile, and all dependent ZIndexFiles

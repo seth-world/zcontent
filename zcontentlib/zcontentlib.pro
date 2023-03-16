@@ -115,6 +115,7 @@ HEADERS += \
     ../zindexedfile/zjournal.h \
     ../zindexedfile/zkeydictionary.h \
     ../zindexedfile/zmastercontrolblock.h \
+    ../zindexedfile/zmasterfile.h \
     ../zindexedfile/zmasterfile_utilities.h \
     ../zindexedfile/zmasterfiletype.h \
     ../zindexedfile/zmetadic.h \
@@ -182,6 +183,7 @@ SOURCES += \
     ../zindexedfile/zjournal.cpp \
     ../zindexedfile/zkeydictionary.cpp \
     ../zindexedfile/zmastercontrolblock.cpp \
+    ../zindexedfile/zmasterfile.cpp \
     ../zindexedfile/zmetadic.cpp \
     ../zindexedfile/zmfdictionary.cpp \
     ../zindexedfile/zmfstats.cpp \

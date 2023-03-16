@@ -119,7 +119,7 @@ public:
   uriString   IndexFilePath;  // Directory path for index files. If empty, then directory path of main content file is taken
   //    uriString               JournalPath;        // see ZJCB - Directory path for journal file. If empty, then directory path of main content file is taken
   //    uint32_t                EndSign=cst_ZEND ;
-  utf8VaryingString DictionaryName; /* name of the dictionary to search for within dictionary file. If empty, then first active dictionary is taken */
+//  utf8VaryingString DictionaryName; /* name of the dictionary to search for within dictionary file. If empty, then first active dictionary is taken */
   uriString         DictionaryPath; /* Directory path for dictionary- If empty, then directory path of main content file is taken */
 
   ZDictionaryFile*        Dictionary=nullptr;
@@ -127,10 +127,11 @@ public:
   ZIndexTable             IndexTable;     // List of effective index objects that will manage physical ZIndexFile
   ZJournalControlBlock*   ZJCB=nullptr;
 
-
   ZRawMasterFile* RawMasterFile=nullptr;
 
   bool hasDictionary() {return Dictionary != nullptr;}
+
+  ZStatus loadDictionary();
 
 } ;
 

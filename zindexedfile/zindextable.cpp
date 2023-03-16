@@ -44,14 +44,7 @@ long ZIndexTable::erase (long pRank)
   return  _Base::erase(pRank);
 } // erase
 
-long ZIndexTable::insert (ZRawIndexFile *pIndexFile, long pRank)
-{
-  if (pRank > lastIdx()) {
-    return  -1;
-  }
 
-  return _Base::insert(pIndexFile,pRank);
-} // erase
 
 void ZIndexTable::clear(void)
 {
@@ -109,6 +102,30 @@ long ZIndexTable::searchCaseIndexByName (const utf8String& pName)
   return -1;
 }//zsearchIndexByName
 
+
+long ZIndexTable::push(ZRawIndexFile* pIn){
+  if (searchIndexByName(pIn->IndexName) < 0){  /* if index name not found -> OK can create */
+    return _Base::push(pIn);
+  }
+  ZException.setMessage("ZIndexTable::push",ZS_DUPVIOLATION,Severity_Error,
+      "Index name <%s> already exists within index table.",pIn->IndexName.toString());
+  return -1;
+}
+
+long ZIndexTable::insert (ZRawIndexFile *pIn, long pRank)
+{
+  if (pRank > lastIdx()) {
+    ZException.setMessage("ZIndexTable::insert",ZS_OUTBOUNDHIGH,Severity_Error,
+        "Index rank <%ld> for inserting index name <%s> is out of index table boundaries [0,%ld].",pRank,pIn->IndexName.toString(),lastIdx());
+    return  -1;
+  }
+  if (searchIndexByName(pIn->IndexName) < -1) {
+    ZException.setMessage("ZIndexTable::insert",ZS_DUPVIOLATION,Severity_Error,
+        "Index name <%s> already exists within index table.",pIn->IndexName.toString());
+        return  -1;
+  }
+  return _Base::insert(pIn,pRank);
+} // insert
 //------------------End ZIndexObjectTable ---------------------
 
 //----------------XML---------------------------------------

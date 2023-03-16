@@ -3,6 +3,7 @@
 #include <zcontent/zindexedfile/zrawmasterfileutils.h>
 #include <zcontent/zindexedfile/zrawindexfile.h>
 #include "zdocphysical.h"
+#include "zdocphyonekey.h"
 #include <QApplication>
 
 #include <zcontent/zrandomfile/zrandomfile.h>
@@ -164,7 +165,7 @@ void addKeyValue (ZRawIndexFile& wZIX,ZIndexItem* wIndexItem,ZDataBuffer& pRecor
   }
 }
 
-
+ZStatus populateOneKey(const uriString& pZMF);
 
 int main(int argc, char *argv[])
 {
@@ -703,23 +704,45 @@ int main(int argc, char *argv[])
 
   uriString wDocFile = wWD ;
   wDocFile.addConditionalDirectoryDelimiter();
-  wDocFile += "physicaldocument.zmf";
+  wDocFile += "zdocphyonekey.zmf";
 
 // uriString wPictureDir;
 
+  populateOneKey(wDocFile);
+}//main
+
+ZStatus populateOneKey(const uriString& pZMF) {
+  ZStatus wSt=ZS_SUCCESS;
+
+  ZResource wUserId=ZResource::getNew(ZEntity_User);
+
+  ZResource wR1 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR2 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR3 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR4 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR5 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR6 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR7 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR8 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR9 = ZResource::getNew(ZEntity_DocPhysical);
+  ZResource wR10 = ZResource::getNew(ZEntity_DocPhysical);
+
+
+
   ZRawMasterFile wMasterFile;
 
-  wSt=wMasterFile.zopen(wDocFile,ZRF_All);
-/*
+  wSt=wMasterFile.zopen(pZMF,ZRF_All);
+  if (wSt!=ZS_SUCCESS) {
+    ZException.exit_abort();
+  }
+  /*
   wSt=zrebuildRawIndex<ZDocPhysical>(*wMasterFile.IndexTable[0],true);
   if (wSt!=ZS_SUCCESS){
     ZException.exit_abort();
   }
 */
 
-  ZDocPhysical wDocPhy;
-
-//#ifdef __POPULATE__
+  ZDocPhyOneKey wDocPhy;
 
 
   ZArray<ZDataBuffer> wKeys;
@@ -756,7 +779,7 @@ int main(int argc, char *argv[])
 
   wSt=wMasterFile.zadd_T(wDocPhy);
   if (wSt!=ZS_SUCCESS) {
-    goto endofmain;
+    ZException.exit_abort();
   }
 
   _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
@@ -795,7 +818,7 @@ int main(int argc, char *argv[])
 
   wSt=wMasterFile.zadd_T(wDocPhy);
   if (wSt!=ZS_SUCCESS) {
-    goto endofmain;
+    ZException.exit_abort();
   }
 
 
@@ -836,7 +859,7 @@ int main(int argc, char *argv[])
 
   wSt=wMasterFile.zadd_T(wDocPhy);
   if (wSt!=ZS_SUCCESS) {
-    goto endofmain;
+    ZException.exit_abort();
   }
 
 
@@ -878,7 +901,7 @@ int main(int argc, char *argv[])
 
   wSt=wMasterFile.zadd_T(wDocPhy);
   if (wSt!=ZS_SUCCESS) {
-    goto endofmain;
+    ZException.exit_abort();
   }
 
   _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
@@ -918,7 +941,7 @@ int main(int argc, char *argv[])
 
   wSt=wMasterFile.zadd_T(wDocPhy);
   if (wSt!=ZS_SUCCESS) {
-    goto endofmain;
+    ZException.exit_abort();
   }
 
   _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
@@ -958,7 +981,7 @@ int main(int argc, char *argv[])
 
   wSt=wMasterFile.zadd_T(wDocPhy);
   if (wSt!=ZS_SUCCESS) {
-    goto endofmain;
+    ZException.exit_abort();
   }
   _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
   displayKeys(wMasterFile);
@@ -997,7 +1020,7 @@ int main(int argc, char *argv[])
 
   wSt=wMasterFile.zadd_T(wDocPhy);
   if (wSt!=ZS_SUCCESS) {
-    goto endofmain;
+    ZException.exit_abort();
   }
 
   _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
@@ -1035,25 +1058,22 @@ int main(int argc, char *argv[])
 
   wSt=wMasterFile.zadd_T(wDocPhy);
   if (wSt!=ZS_SUCCESS) {
-    goto endofmain;
+    ZException.exit_abort();
   }
-//#endif  // __POPULATE__
+  //#endif  // __POPULATE__
 
 
   _DBGPRINT("\n                  End populate\n")
   displayKeys(wMasterFile);
 
 
- endofmain:
-   wMasterFile.zclose();
-   if (wSt!=ZS_SUCCESS) {
-     ZException.exit_abort();
-   }
+endofmain:
+  wMasterFile.zclose();
+  if (wSt!=ZS_SUCCESS) {
+    ZException.exit_abort();
+  }
 
-
-}//main
-
-
+}
 
 
 void

@@ -87,19 +87,27 @@ Integrity controls are done to garanty an alignment with its ZMasterFile father.
 class ZIndexItem;
 class ZRawRecord;
 //class ZRawRecord;
+
 class ZRawMasterFile;
+class ZMasterFile;
 
 class ZRawIndexFile : protected ZRandomFile, public ZIndexControlBlock
 {
-
+public:
+  ZRawIndexFile()=default;
+  ZRawIndexFile(ZRawIndexFile&)=delete;
 
 public:
-  friend class ZIndexCollection;
-  friend class ZRawMasterFile;
-  friend class ZIndexTable;
-  friend class ZIndexFile;
+  void setAllocatedBlocks(size_t pAll) {ZFCB.AllocatedBlocks=pAll;}
+  void setBlockExtentQuota(size_t pAll) {ZFCB.BlockExtentQuota=pAll;}
+  void setBlockTargetSize(size_t pAll) {ZFCB.BlockTargetSize=pAll;}
 
-  friend class ZMasterFile;
+public:
+
+  friend class ZIndexCollection;
+  friend class zbs::ZRawMasterFile;
+  friend class zbs::ZIndexTable;
+  friend class zbs::ZMasterFile;
 
   friend ZStatus zrepairIndexes (const char *pZMFPath,
                                   bool pRepair,
@@ -166,6 +174,8 @@ public:
     using ZRandomFile::zgetWAddress;
 
     using ZRandomFile::setUpdateHeader;
+    using ZRandomFile::getMode;
+
 
     IndexData_st getIndexData()
     {
@@ -207,6 +217,9 @@ public:
                                     pBlockTargetSize,
                                     pBlockExtentQuota);
     }
+
+    /* removes all records within the current index file. Used by ZMasterFile::zrebuildIndex() */
+    ZStatus _removeAll();
 
     zrank_type getCurrentRank (void) {return CurrentRank;}
 /**
@@ -452,6 +465,9 @@ public: ZStatus  fromXml(zxmlNode* pIndexNode, ZaiErrors* pErrorlog);
 
   void setRunMode(uint8_t pOnOff) ;
   void showRunMode() ;
+
+
+
 private:
     long                  IndexCommitRank;
     zaddress_type         ZMFAddress;

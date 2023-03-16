@@ -4,7 +4,6 @@
 
 #include <unistd.h>
 
-
 #include <zrandomfile/zheadercontrolblock.h>
 #include <zrandomfile/zfilecontrolblock.h>
 #include <zindexedfile/zmastercontrolblock.h>
@@ -63,7 +62,7 @@
 #include <zstdlistdlg.h>
 #include <zcontent/zcontentutils/zdisplayedfield.h>
 
-#include <zcontent/zcontentutils/zdicdlg.h>
+//#include <zcontent/zcontentutils/zdicdlg.h>  //renamed to be saved to zdicdlg_zrf.h (and .cpp)
 
 #include <filegeneratedlg.h>
 
@@ -87,11 +86,14 @@ int cst_KeyOffsetColumn = 2 ;
 int cst_KeyUSizeColumn = 1 ;
 
 
+FileGenerateMWn* FileGenerate=nullptr;
+
+
 extern ZPinboard   Pinboard;
 extern bool        UseMimeData;
 extern bool        DragEngaged;
 
-DicEdit::~DicEdit()
+DicEditMWn::~DicEditMWn()
 {
   if (FieldDLg) {
     delete FieldDLg;
@@ -104,37 +106,37 @@ DicEdit::~DicEdit()
 //    delete MasterDic;
 
   if (DictionaryFile) {
-    if (DictionaryFile->isOpen())
+/*    if (DictionaryFile->isOpen())
       DictionaryFile->zclose();
-
+*/
     delete DictionaryFile;
   }
 
   delete ui;
 }
 void
-DicEdit::displayErrorCallBack(const utf8VaryingString& pMessage) {
+DicEditMWn::displayErrorCallBack(const utf8VaryingString& pMessage) {
     statusBar()->showMessage(QObject::tr(pMessage.toCChar()),cst_MessageDuration);
 }
 
-DicEdit::DicEdit(QWidget *parent) : QMainWindow(parent),ui(new Ui::DicEdit) , Parent(parent)
+DicEditMWn::DicEditMWn(QWidget *parent) : QMainWindow(parent),ui(new Ui::DicEdit) , Parent(parent)
 {
   init();
 }
 
-DicEdit::DicEdit(std::function<void()> pQuitCallback,QWidget *parent ) : QMainWindow(parent),ui(new Ui::DicEdit) , Parent(parent) {
+DicEditMWn::DicEditMWn(std::function<void()> pQuitCallback,QWidget *parent ) : QMainWindow(parent),ui(new Ui::DicEdit) , Parent(parent) {
   QuitDicEditCallback = pQuitCallback;
   init();
 }
 void
-DicEdit::init() {
+DicEditMWn::init() {
 
   ui->setupUi(this);
 
   setWindowTitle("Master Dictionary");
 
   Errorlog.setAutoPrintOn(ZAIES_Text);
-  Errorlog.setDisplayCallback(std::bind(&DicEdit::displayErrorCallBack, this,_1));
+  Errorlog.setDisplayCallback(std::bind(&DicEditMWn::displayErrorCallBack, this,_1));
 
   ui->ActiveCBx->addItem("Not active");
   ui->ActiveCBx->addItem("Active");
@@ -275,8 +277,11 @@ DicEdit::init() {
 
 
   generalMEn->addAction(SaveQAc);
+  generalMEn->addAction(UpdateEmbeddedQAc);
 
   generalGroup->addAction(SaveQAc);
+  generalGroup->addAction(UpdateEmbeddedQAc);
+
   generalGroup->addAction(FwritetoDicQAc);
   generalGroup->addAction(FwritetoclipQAc);
   generalGroup->addAction(FwriteXmltofileQAc);
@@ -303,7 +308,7 @@ DicEdit::init() {
 }
 
 void
-DicEdit::dicDescriptionClicked() {
+DicEditMWn::dicDescriptionClicked() {
   utf8VaryingString wDicName = ui->DicNameLBl->text().toUtf8().data();
   unsigned long wVersion = getVersionNum(ui->VersionLBl->text().toUtf8().data());
   bool wActive = ui->ActiveCBx->currentIndex()==1 ;
@@ -317,7 +322,7 @@ DicEdit::dicDescriptionClicked() {
 }
 
 void
-DicEdit::generalActionEvent(QAction* pAction) {
+DicEditMWn::generalActionEvent(QAction* pAction) {
 
   if (pAction == parserQAc) {
 
@@ -356,7 +361,16 @@ DicEdit::generalActionEvent(QAction* pAction) {
     utf8VaryingString wOutFileBaseName, wClass , wBrief = DictionaryFile->DicName.toString();
     if (!getGenerationNames(wOutFileBaseName,wClass,wBrief,wGenPath))
         return;
+    /*
     if (DictionaryFile->getURIContent().isEmpty()) {
+      GenerateEngine->setXmlDictionaryFile( XmlDictionaryFile);
+    }
+    */
+    if (DictionaryFile==nullptr) {
+      GenerateEngine->setXmlDictionaryFile( XmlDictionaryFile);
+    }
+    else
+        if (DictionaryFile->URIDictionary.isEmpty()) {
       GenerateEngine->setXmlDictionaryFile( XmlDictionaryFile);
     }
 
@@ -365,14 +379,14 @@ DicEdit::generalActionEvent(QAction* pAction) {
     if (GenCppFileWin==nullptr) {
       GenCppFileWin = new textEditMWn(this,
           TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
-          std::bind(&DicEdit::closeGenShowCppCB, this,std::placeholders::_1));
+          std::bind(&DicEditMWn::closeGenShowCppCB, this,std::placeholders::_1));
       if (genShowCppQAc->isChecked())
         GenCppFileWin->show();
     }
     if (GenHeaderFileWin==nullptr) {
       GenHeaderFileWin = new textEditMWn(this,
           TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
-          std::bind(&DicEdit::closeGenShowHeaderCB, this,std::placeholders::_1));
+          std::bind(&DicEditMWn::closeGenShowHeaderCB, this,std::placeholders::_1));
       if (genShowHeaderQAc->isChecked())
         GenHeaderFileWin->show();
     }
@@ -388,7 +402,7 @@ DicEdit::generalActionEvent(QAction* pAction) {
     if (GenCppFileWin==nullptr) {
       GenCppFileWin = new textEditMWn(this,
           TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
-          std::bind(&DicEdit::closeGenShowCppCB, this,std::placeholders::_1));
+          std::bind(&DicEditMWn::closeGenShowCppCB, this,std::placeholders::_1));
 
       if (GenerateEngine && GenerateEngine->getGenCppFile().exists())
         GenCppFileWin->setTextFromFile(GenerateEngine->getGenCppFile());
@@ -404,7 +418,7 @@ DicEdit::generalActionEvent(QAction* pAction) {
     if (GenHeaderFileWin==nullptr) {
       GenHeaderFileWin = new textEditMWn(this,
           TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
-          std::bind(&DicEdit::closeGenShowHeaderCB, this,std::placeholders::_1));
+          std::bind(&DicEditMWn::closeGenShowHeaderCB, this,std::placeholders::_1));
 
       if (GenerateEngine && GenerateEngine->getGenHeaderFile().exists())
         GenHeaderFileWin->setTextFromFile(GenerateEngine->getGenHeaderFile());
@@ -422,8 +436,8 @@ DicEdit::generalActionEvent(QAction* pAction) {
       ZExceptionDLg::adhocMessage("Generate",Severity_Error,&Errorlog,nullptr,"Nothing to generate");
       return;
     }
-    FileGenerateDLg* wFDLg=new FileGenerateDLg(DictionaryFile, this);
-    wFDLg->show();
+    FileGenerate=new FileGenerateMWn(DictionaryFile, this);
+    FileGenerate->show();
     return;
   }
   if (pAction == fileXmlGenQAc) {
@@ -440,7 +454,7 @@ DicEdit::generalActionEvent(QAction* pAction) {
   readWriteActionEvent(pAction);
 }
 
-void DicEdit::closeGenShowCppCB(QEvent *pEvent)
+void DicEditMWn::closeGenShowCppCB(QEvent *pEvent)
 {
   if (pEvent->type()==QEvent::Destroy) {
     genShowCppQAc->setEnabled(false);
@@ -465,7 +479,7 @@ void DicEdit::closeGenShowCppCB(QEvent *pEvent)
   }
 }//DicEdit::closeGenShowCppCB
 
-void DicEdit::closeGenShowHeaderCB(QEvent *pEvent)
+void DicEditMWn::closeGenShowHeaderCB(QEvent *pEvent)
 {
   if (pEvent->type()==QEvent::Destroy) {
     genShowHeaderQAc->setEnabled(false);
@@ -491,10 +505,10 @@ void DicEdit::closeGenShowHeaderCB(QEvent *pEvent)
 }//DicEdit::closeGenShowCppCB
 
 void
-DicEdit::Quit() {
+DicEditMWn::Quit() {
 
   if (DictionaryChanged) {
-    int wRet=ZExceptionDLg::adhocMessage2B("",Severity_Warning,"Continue","Quit",nullptr,
+    int wRet=ZExceptionDLg::adhocMessage2B("",Severity_Warning,"Continue","Quit",nullptr, nullptr,
           "Dictionary has been changed.\n"
           "Are you sure you want to quit and loose changes ?");
     if (wRet==QDialog::Rejected)
@@ -510,7 +524,7 @@ DicEdit::Quit() {
 } // Quit
 
 void
-DicEdit::clear()
+DicEditMWn::clear()
 {
 //  fieldTBv->ItemModel->clear();
 //  keyTRv->I
@@ -522,14 +536,14 @@ DicEdit::clear()
   ui->DicNameLBl->clear();
 }
 
-void DicEdit::KeyTRvFlexMenu(QContextMenuEvent *event) {
+void DicEditMWn::KeyTRvFlexMenu(QContextMenuEvent *event) {
   if (keyFlexMEn==nullptr)
             setupKeyFlexMenu();
   keyFlexMEn->exec(event->globalPos());
 //  menuFlex->deleteLater();
 }
 
-void DicEdit::FieldTBvFlexMenu(QContextMenuEvent *event)
+void DicEditMWn::FieldTBvFlexMenu(QContextMenuEvent *event)
 {
   if (fieldFlexMEn==nullptr)
     setupFieldFlexMenu();
@@ -542,12 +556,11 @@ void DicEdit::FieldTBvFlexMenu(QContextMenuEvent *event)
 
 
 void
-DicEdit::setupReadWriteMenu()
+DicEditMWn::setupReadWriteMenu()
 {
   SaveQAc = new QAction(QObject::tr("Save","DicEdit"),this);
-  SaveQAc->setObjectName("SaveQAc");
-
   FwritetoMEn=new QMenu(QObject::tr("Save as","DicEdit"),this);
+  UpdateEmbeddedQAc = new QAction(QObject::tr("Update embedded","DicEdit"),this);
 
   FwritetoDicQAc = new QAction(QObject::tr("dictionary file","DicEdit"),this);
   FwritetoDicQAc->setObjectName("FwritetoDicQAc");
@@ -583,7 +596,7 @@ DicEdit::setupReadWriteMenu()
 
 
 QMenu *
-DicEdit::setupFieldFlexMenu()
+DicEditMWn::setupFieldFlexMenu()
 {
   fieldFlexMEn=new QMenu(keyTRv);
 
@@ -670,7 +683,7 @@ DicEdit::setupFieldFlexMenu()
 
 
 
-void DicEdit::fieldActionEvent(QAction* pAction)
+void DicEditMWn::fieldActionEvent(QAction* pAction)
 {
   utf8String wMsg;
   if (pAction==FInsertQAc) {
@@ -815,7 +828,7 @@ void DicEdit::fieldActionEvent(QAction* pAction)
 
 
 QMenu *
-DicEdit::setupKeyFlexMenu()
+DicEditMWn::setupKeyFlexMenu()
 {
   keyFlexMEn=new QMenu(keyTRv);
   keyFlexMEn->setTitle(QCoreApplication::translate("DicEdit", "Keys", nullptr));
@@ -913,7 +926,7 @@ DicEdit::setupKeyFlexMenu()
   return keyFlexMEn;
 } // setupKeyFlexMenu
 
-void DicEdit::keyActionEvent(QAction* pAction)
+void DicEditMWn::keyActionEvent(QAction* pAction)
 {
   utf8String wMsg;
   if (pAction==KInsertKeyQAc) {
@@ -1058,7 +1071,7 @@ void DicEdit::keyActionEvent(QAction* pAction)
 }//keyActionEvent
 
 bool
-DicEdit::getDicName(unsigned long &pVersion,bool &pActive,utf8VaryingString& pDicName)
+DicEditMWn::getDicName(unsigned long &pVersion,bool &pActive,utf8VaryingString& pDicName)
 {
   utf8VaryingString wDicName;
   if (pDicName.isEmpty())
@@ -1135,7 +1148,7 @@ DicEdit::getDicName(unsigned long &pVersion,bool &pActive,utf8VaryingString& pDi
 }//getDicName
 
 bool
-DicEdit::getGenerationNames(utf8VaryingString& pOutFileBaseName,utf8VaryingString& pClass,utf8VaryingString& pBrief,utf8VaryingString& pGenPath)
+DicEditMWn::getGenerationNames(utf8VaryingString& pOutFileBaseName,utf8VaryingString& pClass,utf8VaryingString& pBrief,utf8VaryingString& pGenPath)
 {
 
   utf8VaryingString wClass=pClass,wOutFileName;
@@ -1224,7 +1237,7 @@ DicEdit::getGenerationNames(utf8VaryingString& pOutFileBaseName,utf8VaryingStrin
   QObject::connect(wOk, &QPushButton::clicked, &wGenNamesDLg, &QDialog::accept);
   QObject::connect(wCancel, &QPushButton::clicked, &wGenNamesDLg, &QDialog::reject);
 
-  QObject::connect(wDirBTn, &QPushButton::clicked, this, &DicEdit::searchDirectory);
+  QObject::connect(wDirBTn, &QPushButton::clicked, this, &DicEditMWn::searchDirectory);
 
 
   while (true) {
@@ -1257,7 +1270,7 @@ DicEdit::getGenerationNames(utf8VaryingString& pOutFileBaseName,utf8VaryingStrin
 }//getGenNames
 
 void
-DicEdit::searchDirectory() {
+DicEditMWn::searchDirectory() {
 
 
     QString wD=QFileDialog::getExistingDirectory(this,"Source directory",SelectedDirectory.toCChar(),QFileDialog::ShowDirsOnly);
@@ -1270,17 +1283,18 @@ DicEdit::searchDirectory() {
 }
 
 void
-DicEdit:: renewDicFile(ZMFDictionary& pDic){
+DicEditMWn:: renewDicFile(ZMFDictionary& pDic){
   if (DictionaryFile==nullptr)
     DictionaryFile = new ZDictionaryFile;
-
+/*
   if (DictionaryFile->isOpen())
     DictionaryFile->zclose();
+*/
   DictionaryFile->setDictionary(pDic);
 }
 
 void
-DicEdit::readWriteActionEvent(QAction*pAction)
+DicEditMWn::readWriteActionEvent(QAction*pAction)
 {
   utf8String wMsg;
 
@@ -1289,29 +1303,24 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
   if  (pAction==SaveQAc) /* save to dictionary file if exists otherwise recursive call with */
   {
+
     if (fieldTBv->ItemModel->rowCount()==0) {
       ZExceptionDLg::adhocMessage("Save",Severity_Error,&Errorlog,nullptr,"Nothing to save");
       return;
     }
-    if (DictionaryFile==nullptr) {
-      if (saveOrCreateDictionaryFile()!=ZS_SUCCESS)
-        ZExceptionDLg::displayLast();
-      return;
-    }
-    if (DictionaryFile->getURIContent().isEmpty()) {
-      if (saveOrCreateDictionaryFile()!=ZS_SUCCESS)
-        ZExceptionDLg::displayLast();
-      return;
-    }
-    utf8VaryingString wDicName = ui->DicNameLBl->text().toUtf8().data();
-    unsigned long wVersion = getVersionNum(ui->VersionLBl->text().toUtf8().data());
-    bool wActive = ui->ActiveCBx->currentIndex()==1 ;
-
-    getDicName(wVersion,wActive, wDicName);
-
-    saveCurrentDictionary(wVersion,wActive,wDicName);
+    saveOrCreateDictionaryFile();
     return;
   }// SaveQAc
+
+  if  (pAction==UpdateEmbeddedQAc) /* save to dictionary embedded in MasterFile if exists and if open */
+  {
+    if (fieldTBv->ItemModel->rowCount()==0) {
+      ZExceptionDLg::adhocMessage("Save",Severity_Error,&Errorlog,nullptr,"Nothing to save");
+      return;
+    }
+    updateEmbedded();
+    return;
+  }// SaveEmbeddedQAc
   /* @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types */
   if  (pAction==FwritetoclipQAc) /* generate xml from current content and write xml to clipboard */
   {
@@ -1423,7 +1432,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
   if  (pAction==FwriteXmltofileQAc)
   {
-    const char* wDir=getParserParamDirectory();
+    const char* wDir=getParserWorkDirectory();
 
     QString wFileName = QFileDialog::getSaveFileName(this, tr("Save as xml file"),
                                                       wDir,
@@ -1456,7 +1465,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
   if  (pAction==FloadfromXmlFileQAc) {
 
-    const char* wDir=getParserParamDirectory();
+    const char* wDir=getParserWorkDirectory();
     QString wFileName = QFileDialog::getOpenFileName(this, tr("Open xml file"),
         wDir,
         "Xml files (*.xml);;All (*.*)");
@@ -1527,7 +1536,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
   if  (pAction==FloadfromDicQAc)
     {
-    loadDictionaryFile();
+    manageDictionaryFiles();
     return;
     } // FloadfromDicQAc
 
@@ -1535,7 +1544,7 @@ DicEdit::readWriteActionEvent(QAction*pAction)
 
 }//readWriteActionEvent
 void
-DicEdit::statusBarMessage(const char* pFormat,...) {
+DicEditMWn::statusBarMessage(const char* pFormat,...) {
   if (pFormat==nullptr)
     ui->statusBar->showMessage("<nullptr>");
 
@@ -1554,7 +1563,7 @@ DicEdit::statusBarMessage(const char* pFormat,...) {
 }
 
 QStandardItem*
-DicEdit::insertNewKey() {
+DicEditMWn::insertNewKey() {
 
   if (keyTRv->ItemModel->rowCount()==0)
     return appendNewKey();
@@ -1666,7 +1675,7 @@ DicEdit::_keyInsert (const QModelIndex& pIdx,ZKeyHeaderRow*  wKHR) {
 #endif
 
 QStandardItem*
-DicEdit::appendNewKey () {
+DicEditMWn::appendNewKey () {
   ZKeyHeaderRow wNewKey;
   if (!keyCreateDLg(wNewKey))
     return nullptr;
@@ -1680,7 +1689,7 @@ DicEdit::appendNewKey () {
 
 
 QStandardItem*
-DicEdit::keyChange() {
+DicEditMWn::keyChange() {
   QModelIndex wIdx=keyTRv->currentIndex();
   if (!wIdx.isValid()) {
     return nullptr ;
@@ -1752,7 +1761,7 @@ DicEdit::keyChange() {
  *  - release associated resources
  */
 bool
-DicEdit::_keyDelete (const QModelIndex& pIdx) {
+DicEditMWn::_keyDelete (const QModelIndex& pIdx) {
   QVariant wV;
   ZDataReference  wDRef , wFDRef;
   ZKeyHeaderRow*  wKHR=nullptr;
@@ -1813,7 +1822,7 @@ DicEdit::_keyDelete (const QModelIndex& pIdx) {
  *  - recomputes and displays key universal size value and each key field offset within the mother key.
  */
 bool
-DicEdit::_keyfieldDelete (QModelIndex pIdx) {
+DicEditMWn::_keyfieldDelete (QModelIndex pIdx) {
   QVariant wV;
   ZDataReference  wDRef , wFDRef;
   ZKeyHeaderRow*  wKHR=nullptr;
@@ -1864,7 +1873,7 @@ DicEdit::_keyfieldDelete (QModelIndex pIdx) {
 /** @brief DicEdit::_recomputeKeyValues  recomputes and displays for each field key offset and key Universal Size for the key
  *            computation is made from infra data objects.
 */
-void DicEdit::_recomputeKeyValues(QStandardItem* wKeyItem) {
+void DicEditMWn::_recomputeKeyValues(QStandardItem* wKeyItem) {
 
   QVariant wV;
   ZDataReference  wDRef , wFDRef;
@@ -2153,7 +2162,7 @@ DicEdit::keyTRvInsertFromPinboard(QModelIndex pIdx) {
 
 
 bool
-DicEdit::fieldMoveup() {
+DicEditMWn::fieldMoveup() {
 
   QModelIndex  wIdx= fieldTBv->currentIndex();
   if (!wIdx.isValid()) {
@@ -2171,7 +2180,7 @@ DicEdit::fieldMoveup() {
   return true;
  }//fieldMoveup
  bool
- DicEdit::fieldMovedown() {
+ DicEditMWn::fieldMovedown() {
 
    QModelIndex  wIdx= fieldTBv->currentIndex();
    if (!wIdx.isValid()) {
@@ -2189,7 +2198,7 @@ DicEdit::fieldMoveup() {
    return true;
  }//fieldMovedown
 bool
-DicEdit::keyMoveup() {
+DicEditMWn::keyMoveup() {
 
   QModelIndex  wIdx= keyTRv->currentIndex();
   if (!wIdx.isValid()) {
@@ -2230,7 +2239,7 @@ DicEdit::keyMoveup() {
 }//keyMoveup
 
 bool
-DicEdit::keyMovedown() {
+DicEditMWn::keyMovedown() {
 
   QModelIndex  wIdx= keyTRv->currentIndex();
   if (!wIdx.isValid()) {
@@ -2270,7 +2279,7 @@ DicEdit::keyMovedown() {
   return true;
 }//keyMovedown
 bool
-DicEdit::keyfieldMoveup() {
+DicEditMWn::keyfieldMoveup() {
 
   QModelIndex  wIdx= keyTRv->currentIndex();
   if (!wIdx.isValid()) {
@@ -2310,7 +2319,7 @@ DicEdit::keyfieldMoveup() {
 }//keyfieldMoveup
 
 bool
-DicEdit::keyfieldMovedown() {
+DicEditMWn::keyfieldMovedown() {
 
   QModelIndex  wIdx= keyTRv->currentIndex();
   if (!wIdx.isValid()) {
@@ -2754,7 +2763,7 @@ DicEdit::keyTRvAppendFromPinboard(const QModelIndex &pIdx) {
 #endif //
 
 bool
-DicEdit::updateKeyValues(const QModelIndex& pKeyIdx)
+DicEditMWn::updateKeyValues(const QModelIndex& pKeyIdx)
 {
   utf8String wStr;
   if (!pKeyIdx.isValid())
@@ -2843,7 +2852,7 @@ DicEdit::updateKeyValues(const QModelIndex& pKeyIdx)
 
 
 void
-DicEdit::KeyTRvKeyFiltered(int pKey,QKeyEvent* pEvent)
+DicEditMWn::KeyTRvKeyFiltered(int pKey,QKeyEvent* pEvent)
 {
 
   if(pKey == Qt::Key_Escape) {
@@ -2883,7 +2892,7 @@ DicEdit::KeyTRvKeyFiltered(int pKey,QKeyEvent* pEvent)
 }//KeyTReKeyFiltered
 
 void
-DicEdit::KeyTRvMouseFiltered(int pKey,QMouseEvent* pEvent)
+DicEditMWn::KeyTRvMouseFiltered(int pKey,QMouseEvent* pEvent)
 {
 
 }
@@ -2891,7 +2900,7 @@ DicEdit::KeyTRvMouseFiltered(int pKey,QMouseEvent* pEvent)
  *  search for all key field item linked with current field item
  */
 
-bool DicEdit::fieldDelete()
+bool DicEditMWn::fieldDelete()
 {
   utf8VaryingString wStr;
   QModelIndex pIdx=fieldTBv->currentIndex();
@@ -2937,7 +2946,7 @@ bool DicEdit::fieldDelete()
 
 
     int wRet=ZExceptionDLg::adhocMessage2B("Delete field",Severity_Information,"Do not delete","Delete all",
-        &wComplement,
+        nullptr,&wComplement,
         "Field to delete <%s> is used in %ld key(s).\n"
         "    click <More> for details.\n"
         "Removing this field will modify these keys.\n"
@@ -2959,7 +2968,7 @@ bool DicEdit::fieldDelete()
     /* if key has no more key field row : ask wether to delete key or not */
     if (wKeyItem->rowCount()==0){
       int wRet=ZExceptionDLg::adhocMessage2B("Empty key",Severity_Information,"Do not remove","Remove",
-          nullptr,
+          nullptr,nullptr,
           "Key <%s> has no more fields.\n"
           "Do you wish to remove this key?\n",
           wKeyItem->text().toUtf8().data());
@@ -2997,7 +3006,7 @@ bool DicEdit::fieldDelete()
 
 
 QStandardItem*
-DicEdit::fieldChange(QModelIndex pIdx)
+DicEditMWn::fieldChange(QModelIndex pIdx)
 {
   QModelIndex wIdx=fieldTBv->currentIndex();
   if (!wIdx.isValid()) {
@@ -3072,7 +3081,7 @@ void processItem(QStandardItem* pItem, long pDataRank)
   }
 }
 
-bool DicEdit::fieldAppend() {
+bool DicEditMWn::fieldAppend() {
 
   ZFieldDescription wFDesc;
   if (!fieldCreateDLg(wFDesc))
@@ -3081,7 +3090,7 @@ bool DicEdit::fieldAppend() {
 
 }//fieldAppend
 
-bool DicEdit::fieldCreateDLg(ZFieldDescription &pNewField) {
+bool DicEditMWn::fieldCreateDLg(ZFieldDescription &pNewField) {
   ZFieldDLg* wFieldDLg= new ZFieldDLg(this);
 //  if (FieldDLg==nullptr)
 //    FieldDLg=new ZFieldDLg(this);
@@ -3099,7 +3108,8 @@ bool DicEdit::fieldCreateDLg(ZFieldDescription &pNewField) {
       /* second control case regardless */
       if ((wRow=searchForFieldNameCase(pNewField.getName())) < 0)
         break;
-      wRet=ZExceptionDLg::adhocMessage2B("Field creation",Severity_Error,"Force","Change",nullptr,
+      wRet=ZExceptionDLg::adhocMessage2B("Field creation",Severity_Error,"Force","Change",
+          nullptr,nullptr,
           "A field with different name but with only uppercase/lowercase difference(s) exists at row %d.\n"
           "It is highly recommended that field names differs drastically.\n"
           "Keep anyway this name (Force) or change its spelling (Change).");
@@ -3107,7 +3117,8 @@ bool DicEdit::fieldCreateDLg(ZFieldDescription &pNewField) {
         break;
       continue;
     }
-    wRet=ZExceptionDLg::adhocMessage2B("Field creation",Severity_Error,"Give up","Change",nullptr,
+    wRet=ZExceptionDLg::adhocMessage2B("Field creation",Severity_Error,"Give up","Change",
+        nullptr,nullptr,
         "A field with same name exists at row %d.\n"
         "This is forbidden and may induce malfunctions.\n"
         "Please change.",wRow);
@@ -3120,7 +3131,7 @@ bool DicEdit::fieldCreateDLg(ZFieldDescription &pNewField) {
   return true;
 }//fieldCreateDLg
 
-QStandardItem* DicEdit::fieldChangeDLg( QStandardItem* pFieldItem) {
+QStandardItem* DicEditMWn::fieldChangeDLg( QStandardItem* pFieldItem) {
 
   ZFieldDLg* wFieldDLg= new ZFieldDLg(this);
 //  if (FieldDLg==nullptr)
@@ -3146,7 +3157,8 @@ QStandardItem* DicEdit::fieldChangeDLg( QStandardItem* pFieldItem) {
       /* second control case regardless */
       if ((wRow=searchForFieldNameCase(wField.getName())) < 0)
         break;
-      wRet=ZExceptionDLg::adhocMessage2B("Field creation",Severity_Error,"Force","Change",nullptr,
+      wRet=ZExceptionDLg::adhocMessage2B("Field creation",Severity_Error,"Force","Change",
+          nullptr,nullptr,
           "A field with different name but with only uppercase/lowercase difference(s) exists at row %d.\n"
           "It is highly recommended that field names differs drastically.\n"
           "Keep anyway this name (Force) or change its spelling (Change).");
@@ -3154,7 +3166,8 @@ QStandardItem* DicEdit::fieldChangeDLg( QStandardItem* pFieldItem) {
         break;
       continue;
     }
-    wRet=ZExceptionDLg::adhocMessage2B("Field creation",Severity_Error,"Give up","Change",nullptr,
+    wRet=ZExceptionDLg::adhocMessage2B("Field creation",Severity_Error,"Give up","Change",
+        nullptr,nullptr,
         "A field with same name exists at row %d.\n"
         "This is forbidden and may induce malfunctions.\n"
         "Please change.");
@@ -3195,7 +3208,7 @@ QStandardItem* DicEdit::fieldChangeDLg( QStandardItem* pFieldItem) {
       }
 
       int wRet=ZExceptionDLg::adhocMessage2B("Change field",Severity_Information,"Do not change","Change all",
-          &wComplement,
+          nullptr,&wComplement,
           "Changed field <%s> is used in %ld key(s).\n"
           "    see complement for details.\n"
           "Changing this field will modify these keys.\n"
@@ -3330,7 +3343,7 @@ QStandardItem* DicEdit::fieldChangeDLg( QStandardItem* pFieldItem) {
 }//fieldChangeDLg
 
 bool
-DicEdit::keyCreateDLg(ZKeyHeaderRow &pNewKey) {
+DicEditMWn::keyCreateDLg(ZKeyHeaderRow &pNewKey) {
 
   ZKeyDLg* wKeyDLg=new ZKeyDLg(this);
   wKeyDLg->setWindowTitle("Key");
@@ -3352,7 +3365,8 @@ DicEdit::keyCreateDLg(ZKeyHeaderRow &pNewKey) {
       /* second control case regardless */
       if ((wRow=searchForKeyNameCase(pNewKey.DicKeyName)) < 0)
         break;
-      wRet=ZExceptionDLg::adhocMessage2B("New key",Severity_Error,"Force","Change",nullptr,
+      wRet=ZExceptionDLg::adhocMessage2B("New key",Severity_Error,"Force","Change",
+          nullptr,nullptr,
           "A key with different name but with only uppercase/lowercase difference(s) exists at row %d.\n"
           "It is highly recommended that key names differs drastically.\n"
           "Keep anyway this name (Force) or change its spelling (Change).");
@@ -3361,7 +3375,8 @@ DicEdit::keyCreateDLg(ZKeyHeaderRow &pNewKey) {
       continue;
     }
 
-    wRet=ZExceptionDLg::adhocMessage2B("New key",Severity_Error,"Give up","Change",nullptr,
+    wRet=ZExceptionDLg::adhocMessage2B("New key",Severity_Error,"Give up","Change",
+        nullptr,nullptr,
         "A key with same name exists at row %d.\n"
         "This is forbidden and may induce malfunctions.\n"
         "Please change." , wRow);
@@ -3374,7 +3389,7 @@ DicEdit::keyCreateDLg(ZKeyHeaderRow &pNewKey) {
 }//keyCreateDLg
 
 bool
-DicEdit::keyChangeDLg(ZKeyHeaderRow &pKey) {
+DicEditMWn::keyChangeDLg(ZKeyHeaderRow &pKey) {
 
   ZKeyHeaderRow wKey;
   ZKeyDLg* wKeyDLg=new ZKeyDLg(this);
@@ -3399,7 +3414,8 @@ DicEdit::keyChangeDLg(ZKeyHeaderRow &pKey) {
       /* second control case regardless */
       if ((wRow=searchForKeyNameCase(wKey.DicKeyName)) < 0)
         break;
-      wRet=ZExceptionDLg::adhocMessage2B("New key",Severity_Error,"Force","Change",nullptr,
+      wRet=ZExceptionDLg::adhocMessage2B("New key",Severity_Error,"Force","Change",
+          nullptr,nullptr,
           "A key with different name but with only uppercase/lowercase difference(s) exists at row %d.\n"
           "It is highly recommended that key names differs drastically.\n"
           "Keep anyway this name (Force) or change its spelling (Change).");
@@ -3408,7 +3424,8 @@ DicEdit::keyChangeDLg(ZKeyHeaderRow &pKey) {
       continue;
     }
 
-    wRet=ZExceptionDLg::adhocMessage2B("New key",Severity_Error,"Give up","Change",nullptr,
+    wRet=ZExceptionDLg::adhocMessage2B("New key",Severity_Error,"Give up","Change",
+        nullptr,nullptr,
         "A key with same name exists at row %d.\n"
         "This is forbidden and may induce malfunctions.\n"
         "Please change." , wRow);
@@ -3423,7 +3440,7 @@ DicEdit::keyChangeDLg(ZKeyHeaderRow &pKey) {
 
 
 
-bool DicEdit::fieldInsertNewBefore(QModelIndex pIdx) {
+bool DicEditMWn::fieldInsertNewBefore(QModelIndex pIdx) {
   ZFieldDescription wFDesc;
 
   if (!fieldCreateDLg(wFDesc))
@@ -3451,7 +3468,7 @@ bool DicEdit::fieldInsertNewAfter(QModelIndex pIdx) {
 
 }//fieldInsertNewAfter
 */
-bool DicEdit::_fieldAppend(ZFieldDescription &wFDesc) {
+bool DicEditMWn::_fieldAppend(ZFieldDescription &wFDesc) {
   QVariant wV;
   ZDataReference wDRef;
   QList<QStandardItem*> wRow = createFieldRowFromField(&wFDesc);
@@ -3476,7 +3493,7 @@ bool DicEdit::_fieldAppend(ZFieldDescription &wFDesc) {
 }//_fieldAppend
 
 
-bool DicEdit::fieldInsertAfterFromPinboard(QModelIndex pIdx)
+bool DicEditMWn::fieldInsertAfterFromPinboard(QModelIndex pIdx)
 {
   if (Pinboard.isEmpty()) {
     ui->statusBar->showMessage(QObject::tr("Nothing in pinboard.","DicEdit"),cst_MessageDuration);
@@ -3506,7 +3523,7 @@ bool DicEdit::fieldInsertAfterFromPinboard(QModelIndex pIdx)
   return wRet;
 }//fieldInsertAfterFromPinboard
 
-bool DicEdit::_fieldInsertAfter(QModelIndex pIdx, ZFieldDescription &pFDesc) {
+bool DicEditMWn::_fieldInsertAfter(QModelIndex pIdx, ZFieldDescription &pFDesc) {
   if (!pIdx.isValid()) {
     ui->statusBar->showMessage(QObject::tr("No valid field row selected.","DicEdit"),cst_MessageDuration);
     return false;
@@ -3546,7 +3563,7 @@ bool DicEdit::_fieldInsertAfter(QModelIndex pIdx, ZFieldDescription &pFDesc) {
   return true;
 }//_fieldInsertAfter
 
-bool DicEdit::_fieldInsertNewBefore(QModelIndex pIdx, ZFieldDescription &pFDesc) {
+bool DicEditMWn::_fieldInsertNewBefore(QModelIndex pIdx, ZFieldDescription &pFDesc) {
   if (!pIdx.isValid()) {
     ui->statusBar->showMessage(QObject::tr("No valid field row selected.","DicEdit"),cst_MessageDuration);
     return false;
@@ -3580,7 +3597,7 @@ bool DicEdit::_fieldInsertNewBefore(QModelIndex pIdx, ZFieldDescription &pFDesc)
 }//_fieldInsertAfter
 
 
-int DicEdit::searchForFieldName (const utf8VaryingString& pName) {
+int DicEditMWn::searchForFieldName (const utf8VaryingString& pName) {
   ZFieldDescription* wFD=nullptr;
   ZDataReference wDRef;
   QVariant wV;
@@ -3605,7 +3622,7 @@ int DicEdit::searchForFieldName (const utf8VaryingString& pName) {
   return -1;
 }//searchForFieldName
 
-int DicEdit::searchForFieldNameCase (const utf8VaryingString& pName) {
+int DicEditMWn::searchForFieldNameCase (const utf8VaryingString& pName) {
   ZFieldDescription* wFD=nullptr;
   ZDataReference wDRef;
   QVariant wV;
@@ -3631,7 +3648,7 @@ int DicEdit::searchForFieldNameCase (const utf8VaryingString& pName) {
 }//searchForFieldNameCase
 
 
-int DicEdit::searchForKeyName (const utf8VaryingString& pName) {
+int DicEditMWn::searchForKeyName (const utf8VaryingString& pName) {
   ZKeyHeaderRow* wKHR=nullptr;
   ZDataReference wDRef;
   QVariant wV;
@@ -3658,7 +3675,7 @@ int DicEdit::searchForKeyName (const utf8VaryingString& pName) {
 
 
 int
-DicEdit::searchForKeyNameCase (const utf8VaryingString& pName) {
+DicEditMWn::searchForKeyNameCase (const utf8VaryingString& pName) {
   ZKeyHeaderRow* wKHR=nullptr;
   ZDataReference wDRef;
   QVariant wV;
@@ -3683,7 +3700,7 @@ DicEdit::searchForKeyNameCase (const utf8VaryingString& pName) {
   return -1;
 }//searchForKeydName
 
-bool DicEdit::fieldAppendFromPinboard()
+bool DicEditMWn::fieldAppendFromPinboard()
 {
   if (Pinboard.isEmpty())
     return false;
@@ -3711,7 +3728,7 @@ bool DicEdit::fieldAppendFromPinboard()
 }//_fieldAppendFromPinboard
 
 /* replaces the values (displayed value and dictionary value) of a field at model index wIdx */
-void DicEdit::acceptFieldChange(ZFieldDescription& pField,QModelIndex &wIdx)
+void DicEditMWn::acceptFieldChange(ZFieldDescription& pField,QModelIndex &wIdx)
 {
   utf8String wStr;
 //  QModelIndex wIdx=fieldTBv->currentIndex();
@@ -3742,7 +3759,7 @@ void DicEdit::acceptFieldChange(ZFieldDescription& pField,QModelIndex &wIdx)
 
 
 void
-DicEdit::FieldTBvKeyFiltered(int pKey, QKeyEvent *pEvent)
+DicEditMWn::FieldTBvKeyFiltered(int pKey, QKeyEvent *pEvent)
 {
 
   if(pKey == Qt::Key_Escape) {
@@ -3773,7 +3790,7 @@ DicEdit::FieldTBvKeyFiltered(int pKey, QKeyEvent *pEvent)
 }//KeyTReKeyFiltered
 
 void
-DicEdit::FieldTBvMouseFiltered(int pKey, QMouseEvent *pEvent)
+DicEditMWn::FieldTBvMouseFiltered(int pKey, QMouseEvent *pEvent)
 {
   switch (pKey)
   {
@@ -3796,7 +3813,7 @@ DicEdit::FieldTBvMouseFiltered(int pKey, QMouseEvent *pEvent)
 
 
 
-ZQTableView* DicEdit::setupFieldTBv(ZQTableView* pFieldTBv, bool pColumnAutoAdjust, int pColumns)
+ZQTableView* DicEditMWn::setupFieldTBv(ZQTableView* pFieldTBv, bool pColumnAutoAdjust, int pColumns)
 {
   int wFilter =  ZEF_Escape | ZEF_CommonControlKeys | ZEF_DragAndDrop ;
 
@@ -3839,12 +3856,12 @@ ZQTableView* DicEdit::setupFieldTBv(ZQTableView* pFieldTBv, bool pColumnAutoAdju
   wRawStartDrag     = std::bind(&DicEdit::FieldTBvRawStartDrag, this);
   wRawDropEventCBF  = std::bind(&DicEdit::FieldTBvRawDropEvent, this,_1);
 */
-  pFieldTBv->_registerCallBacks(std::bind(&DicEdit::FieldTBvKeyFiltered, this,_1,_2),
-                      std::bind(&DicEdit::FieldTBvMouseFiltered, this,_1,_2),
-                      std::bind(&DicEdit::FieldTBvFlexMenu, this,_1),
+  pFieldTBv->_registerCallBacks(std::bind(&DicEditMWn::FieldTBvKeyFiltered, this,_1,_2),
+                      std::bind(&DicEditMWn::FieldTBvMouseFiltered, this,_1,_2),
+                      std::bind(&DicEditMWn::FieldTBvFlexMenu, this,_1),
                       nullptr);
 
-  pFieldTBv->setDestructorCallback(std::bind(&DicEdit::DestructorCallback, this));
+  pFieldTBv->setDestructorCallback(std::bind(&DicEditMWn::DestructorCallback, this));
 
   pFieldTBv->setEditTriggers(QAbstractItemView::NoEditTriggers);  /* it is not editable */
   pFieldTBv->setSelectionBehavior(QAbstractItemView::SelectRows); /* select line per line */
@@ -3852,13 +3869,13 @@ ZQTableView* DicEdit::setupFieldTBv(ZQTableView* pFieldTBv, bool pColumnAutoAdju
 
   pFieldTBv->setSupportedDropActions(Qt::CopyAction|Qt::MoveAction);
 
-  pFieldTBv->setRawStartDragCallback(std::bind(&DicEdit::FieldTBvRawStartDrag, this));
-  pFieldTBv->setRawDropEventCallback(std::bind(&DicEdit::FieldTBvRawDropEvent, this,_1));
+  pFieldTBv->setRawStartDragCallback(std::bind(&DicEditMWn::FieldTBvRawStartDrag, this));
+  pFieldTBv->setRawDropEventCallback(std::bind(&DicEditMWn::FieldTBvRawDropEvent, this,_1));
 
   return pFieldTBv;
 }//setupFieldTBv
 
-void DicEdit::DestructorCallback() {
+void DicEditMWn::DestructorCallback() {
   int wFieldRows=fieldTBv->ItemModel->rowCount();
   QStandardItem* wItem;
   QVariant wV;
@@ -3874,7 +3891,7 @@ void DicEdit::DestructorCallback() {
   }
 } // DestructorCallback
 
-ZQTreeView *DicEdit::setupKeyTRv(ZQTreeView* pKeyTRv, bool pColumnAutoAdjust, int pColumns)
+ZQTreeView *DicEditMWn::setupKeyTRv(ZQTreeView* pKeyTRv, bool pColumnAutoAdjust, int pColumns)
 {
 //  FGeneric=true;
   int wFilter =  ZEF_Escape | ZEF_CommonControlKeys | ZEF_DragAndDrop ;
@@ -3912,15 +3929,15 @@ ZQTreeView *DicEdit::setupKeyTRv(ZQTreeView* pKeyTRv, bool pColumnAutoAdjust, in
   std::function<void ()>                                      wRawStartDragCBF;
   std::function<bool (QDropEvent *)>                          wRawDropEventCBF;
 
-  wKeyFilterCBF     = std::bind(&DicEdit::KeyTRvKeyFiltered, this,_1,_2);
-  wContextMenuCBF   = std::bind(&DicEdit::KeyTRvFlexMenu, this,_1);         // for context menu callback for ZQTreeView
+  wKeyFilterCBF     = std::bind(&DicEditMWn::KeyTRvKeyFiltered, this,_1,_2);
+  wContextMenuCBF   = std::bind(&DicEditMWn::KeyTRvFlexMenu, this,_1);         // for context menu callback for ZQTreeView
 
-  wRawStartDragCBF  = std::bind(&DicEdit::KeyTRvRawStartDrag, this);     // for raw drag and drop
-  wRawDropEventCBF  = std::bind(&DicEdit::KeyTRvRawDropEvent, this,_1);  // for raw drag and drop
+  wRawStartDragCBF  = std::bind(&DicEditMWn::KeyTRvRawStartDrag, this);     // for raw drag and drop
+  wRawDropEventCBF  = std::bind(&DicEditMWn::KeyTRvRawDropEvent, this,_1);  // for raw drag and drop
 
-  pKeyTRv->_register( std::bind(&DicEdit::KeyTRvKeyFiltered, this,_1,_2),
+  pKeyTRv->_register( std::bind(&DicEditMWn::KeyTRvKeyFiltered, this,_1,_2),
                       nullptr,
-                      std::bind(&DicEdit::KeyTRvFlexMenu, this,_1),
+                      std::bind(&DicEditMWn::KeyTRvFlexMenu, this,_1),
                       nullptr);
 
   pKeyTRv->setSortingEnabled(false);  // will be set to true in the end of setup_effective
@@ -3929,8 +3946,8 @@ ZQTreeView *DicEdit::setupKeyTRv(ZQTreeView* pKeyTRv, bool pColumnAutoAdjust, in
   pKeyTRv->setSelectionBehavior(QAbstractItemView::SelectRows); /* select line per line */
   pKeyTRv->setSelectionMode(QAbstractItemView::SingleSelection); /* only one line */
 
-  pKeyTRv->setRawStartDragCallback(std::bind(&DicEdit::KeyTRvRawStartDrag, this));
-  pKeyTRv->setRawDropEventCallback(std::bind(&DicEdit::KeyTRvRawDropEvent,this,_1));
+  pKeyTRv->setRawStartDragCallback(std::bind(&DicEditMWn::KeyTRvRawStartDrag, this));
+  pKeyTRv->setRawDropEventCallback(std::bind(&DicEditMWn::KeyTRvRawDropEvent,this,_1));
 
   pKeyTRv->setSupportedDropActions(Qt::CopyAction|Qt::MoveAction);
 
@@ -3940,7 +3957,7 @@ ZQTreeView *DicEdit::setupKeyTRv(ZQTreeView* pKeyTRv, bool pColumnAutoAdjust, in
 
 
 /* during start drag, only source item reference is copied to pinboard : it is up to drop operation to select the row */
-void DicEdit::KeyTRvRawStartDrag() {
+void DicEditMWn::KeyTRvRawStartDrag() {
   QModelIndex wIndex=keyTRv->currentIndex();
   if (!wIndex.isValid())
     return;
@@ -3991,13 +4008,13 @@ void DicEdit::KeyTRvRawStartDrag() {
  *
  */
 
-bool DicEdit::KeyTRvRawDropEvent(QDropEvent *pEvent) {
+bool DicEditMWn::KeyTRvRawDropEvent(QDropEvent *pEvent) {
    QModelIndex wIdx = keyTRv->indexAt (pEvent->pos());
    return keyTRvInsertFromPinboard(wIdx);
 }// KeyTRvRawDropEvent
 
 
-bool DicEdit::keyTRvInsertFromPinboard (QModelIndex pIdx) {
+bool DicEditMWn::keyTRvInsertFromPinboard (QModelIndex pIdx) {
   ZPinboard* wPinboard=&Pinboard; /* debug */
 
   if (Pinboard.isEmpty()) {
@@ -4270,7 +4287,7 @@ bool DicEdit::keyTRvInsertFromPinboard (QModelIndex pIdx) {
 }
 
 /* during start drag, only source item reference is copied to pinboard : it is up to drop operation to select the row */
-void DicEdit::FieldTBvRawStartDrag()
+void DicEditMWn::FieldTBvRawStartDrag()
 {
   QModelIndex wIndex=fieldTBv->currentIndex();
   if (!wIndex.isValid())
@@ -4287,7 +4304,7 @@ void DicEdit::FieldTBvRawStartDrag()
   return;
 }//FieldTBvRawStartDrag
 
-bool DicEdit::FieldTBvRawDropEvent(QDropEvent *pEvent)
+bool DicEditMWn::FieldTBvRawDropEvent(QDropEvent *pEvent)
 {
   const QMimeData *wMimeData = pEvent->mimeData();
 
@@ -4445,7 +4462,7 @@ DicEdit::importDicFromFullHeader(ZDataBuffer& pHeaderContent)
 #endif //__DEPRECATED__
 
 ZMFDictionary*
-DicEdit::screenToDic()
+DicEditMWn::screenToDic()
 {
   ZMFDictionary* wMetaDic=new ZMFDictionary;
   ZKeyDictionary* wKeyDic=nullptr;
@@ -4523,7 +4540,7 @@ DicEdit::screenToDic()
   wMetaDic->Active = ui->ActiveCBx->currentIndex()==1 ;
   return wMetaDic;
 }//screenToDic
-
+#ifdef __DEPRECATED__
 ZStatus
 DicEdit::loadDictionaryFile(const uriString& pDicPath){
   ZDataBuffer wRecord;
@@ -4991,11 +5008,228 @@ DicEdit::manageDictionaryFiles(){
     break;   /* everything normal */
   } // while true
 }
+#endif //__DEPRECATED__
 
+void
+DicEditMWn::manageDictionaryFiles(){
+  utf8VaryingString wStr;
+  ZStatus wSt;
+  uriString wEnvDir;
+  ZDicHeaderList wDicHList;
+
+  const char* wWD=getenv(__PARSER_WORK_DIRECTORY__);
+  if (!wWD)
+    wWD="";
+
+  QString wQDicFile=QFileDialog::getOpenFileName(this,"Dictionary Files",wWD,
+        "Dictionaries (*.dic);;All (*.*)");
+  if (wQDicFile.isEmpty())
+      return;
+
+  uriString wSelected = wQDicFile.toUtf8().data();
+
+
+  if (DictionaryFile!=nullptr) {
+      int wRet= ZExceptionDLg::adhocMessage2B("Dictionary file",Severity_Information,
+          "No","Replace",nullptr,nullptr,
+          "Replace current dictionary <%s> with loaded dictionary ?",DictionaryFile->DicName.toString());
+      if (wRet==QDialog::Rejected)
+        return;
+  }
+  else
+      DictionaryFile = new ZDictionaryFile;
+
+  wSt = DictionaryFile->loadDictionary(wSelected);
+  if (wSt!=ZS_SUCCESS) {
+      wStr = ZException.last().formatFullUserMessage();
+      ZExceptionDLg::adhocMessage("Dictionary file",Severity_Error,&Errorlog,
+          &wStr,"File %s has been errored while trying to load dictionary.",
+          wSelected.toString());
+      return ;
+  }
+
+  wStr.sprintf("Dictionary %s version %s status %s has been loaded",DictionaryFile->DicName.toCChar(),getVersionStr(DictionaryFile->Version).toCChar(),
+          DictionaryFile->Active?"Active":"Not active");
+  ui->statusBar->showMessage(wStr.toCChar(),cst_MessageDuration);
+
+  displayZMFDictionary(*DictionaryFile);
+  DictionaryChanged=false;
+  return ;
+}
+
+
+bool
+DicEditMWn::saveOrCreateDictionaryFile() {
+
+  ZStatus wSt;
+
+  const char* wDir=getParserWorkDirectory();
+  QString wFileName = QFileDialog::getSaveFileName(this, "Dictionary file",
+                                                  wDir,
+                                                  "Dictionary files (*.dic);;All (*.*)");
+  if (wFileName.isEmpty()) {
+    return false;
+  }
+
+  uriString wSelected = wFileName.toUtf8().data();
+
+  if (wSelected.getFileExtension().isEmpty()) {
+    wSelected += ".";
+    wSelected += __DICTIONARY_EXTENSION__;
+  }
+
+  utf8VaryingString wDicName = ui->DicNameLBl->text().toUtf8().data();
+  unsigned long     wVersion = getVersionNum(ui->VersionLBl->text().toUtf8().data());
+  bool              wActive=ui->ActiveCBx->currentIndex()==1;
+
+  if (!getDicName(wVersion,wActive,wDicName))/* name meta dictionary and version */
+    return false;
+
+  /* update appropriately name and version */
+
+  ui->DicNameLBl->setText(wDicName.toCChar());
+  ui->VersionLBl->setText( getVersionStr( wVersion).toCChar());
+  ui->ActiveCBx->setCurrentIndex(wActive?1:0);
+  /*
+  ---------------------------------------------------------------------------------
+  dictionary file does not exist         create and don't care active (zinitialize)
+  ---------------------------------------------------------------------------------
+
+  dictionary file exits
+
+  open it
+
+  ------saving rules-----------
+
+  Dic content to write is not active :
+      [searchAndWrite] search for (DicName , Version) in file :
+        not exists -> append
+        exists -> replace
+
+  Dic content to write is active :
+      search for active in file :
+      active not exists :
+        [searchAndWrite] search for (DicName , Version) in file :
+          not exists -> append
+          exists -> replace
+      active exists :
+        (DicName , Version) are the same : replace.
+        (DicName , Version) are not the same :
+          found in Dictionary set to not Active, and replace
+          [searchAndWrite] search for (DicName , Version) in file :
+            not exists -> append
+            exists -> replace
+*/
+
+
+  if (DictionaryFile==nullptr)
+      DictionaryFile = new ZDictionaryFile;
+    else
+      DictionaryFile->clear();
+
+  DictionaryChanged=false;
+
+  ZMFDictionary* wDic= screenToDic();
+  DictionaryFile->setDictionary(*wDic);
+  delete wDic;
+
+  wSt= DictionaryFile->create(wSelected,true);
+  if (wSt != ZS_SUCCESS) {
+    ZExceptionDLg::display("Dictionary creation",ZException.last(),false);
+    return false;
+  }
+  ZExceptionDLg::adhocMessage("Dictionary created",Severity_Information,&Errorlog,nullptr,
+      "New dictionary file %s.\n"
+      "Created dic <%s> version <%s> status <%s>",
+      wSelected.getBasename().toCChar(),
+      DictionaryFile->DicName.toCChar(),
+      getVersionStr( DictionaryFile->Version).toCChar(),
+      DictionaryFile->Active?"Active":"Not active");
+  return true;
+}//saveOrCreateDictionaryFile
+
+
+bool
+DicEditMWn::updateEmbedded() {
+
+  ZStatus wSt;
+
+  if (MasterFile==nullptr) {
+    ZExceptionDLg::adhocMessage("Embedded dictionary",Severity_Error,nullptr,nullptr,
+        "No target master file has been defined.\n"
+        "Go to file generation dialog and open a valid master file.");
+    return false;
+  }
+  if (MasterFile->Dictionary==nullptr) {
+    ZExceptionDLg::adhocMessage("Embedded dictionary",Severity_Error,nullptr,nullptr,
+        "Target master file has no dictionary defined.\n"
+        "Go to file generation dialog and open a valid master file with a dictionary.");
+    return false;
+  }
+
+
+  utf8VaryingString wDicName = ui->DicNameLBl->text().toUtf8().data();
+  unsigned long     wVersion = getVersionNum(ui->VersionLBl->text().toUtf8().data());
+  bool              wActive=ui->ActiveCBx->currentIndex()==1;
+
+  if (!getDicName(wVersion,wActive,wDicName))/* name meta dictionary and version */
+    return false;
+
+  /* update appropriately name and version */
+
+  ui->DicNameLBl->setText(wDicName.toCChar());
+  ui->VersionLBl->setText( getVersionStr( wVersion).toCChar());
+  ui->ActiveCBx->setCurrentIndex(wActive?1:0);
+
+
+  ZMFDictionary* wZMFDic = screenToDic();
+/*
+  ZExceptionDLg::setFixedFont();
+  utf8VaryingString wComplement;
+  wComplement.sprintf("Dictionary name <%s> version <%s> status <%s>\n"
+                        " created <%s>\n"
+                        " last modified <%s>",
+                        MasterFile->Dictionary->DicName.toString(),
+                        getVersionStr( MasterFile->Dictionary->Version).toString(),
+                        MasterFile->Dictionary->Active?"Active":"Not active",
+                        MasterFile->Dictionary->CreationDate.toMDY().toString(),
+                        MasterFile->Dictionary->ModificationDate.toMDY().toString());
+    int wRet=ZExceptionDLg::adhocMessage2B("Replace dictionary",Severity_Information,"Quit","Replace",
+        nullptr,&wComplement,
+        "MasterFile <%s>\n"
+        "has already a dictionary named <%s> embedded to it."
+        "    click <More> for details.\n"
+        "Proceed anyway and replace <Replace>\n"
+        "Give up and do not replace <Quit>.",
+        MasterFile->getURIContent().toString(),
+        MasterFile->Dictionary->DicName.toString());
+    if (wRet==QDialog::Rejected)
+      return false;
+*/
+  wSt=MasterFile->setDictionary(*wZMFDic);
+  if (wSt!=ZS_SUCCESS) {
+    utf8VaryingString wComplement;
+    wComplement=ZException.last().formatFullUserMessage();
+    int wRet=ZExceptionDLg::adhocMessage("Replace dictionary",Severity_Error,
+        nullptr,&wComplement,
+        "Cannot updated embedded dictionary for MasterFile <%s>",
+        MasterFile->getURIContent().toString());
+    return false;
+  }
+
+  utf8VaryingString wMsg;
+  wMsg.sprintf("Dictionary <%s> has been successfully updated.",MasterFile->Dictionary->DicName.toString());
+  statusBar()->showMessage(QObject::tr(wMsg.toCChar(),"DicEdit"),cst_MessageDuration);
+
+  DictionaryChanged=false;
+  delete wZMFDic;
+
+  return true;
+}//updateEmbedded
 
 
 ZStatus
-DicEdit::loadXmlDictionary (const uriString& pXmlDic)
+DicEditMWn::loadXmlDictionary (const uriString& pXmlDic)
 {
   ZMFDictionary wMasterDic;
   utf8VaryingString wXmlContent,wStr;
@@ -5045,7 +5279,7 @@ DicEdit::loadXmlDictionary (const uriString& pXmlDic)
 }// loadXmlDictionary
 
 void
-DicEdit::displayZMFDictionary(ZMFDictionary &pDic)
+DicEditMWn::displayZMFDictionary(ZMFDictionary &pDic)
 {
   utf8String wStr;
   QVariant   wV;
@@ -5099,12 +5333,12 @@ DicEdit::displayZMFDictionary(ZMFDictionary &pDic)
   displayKeyDictionaries(pDic);
 
   generateQAc->setEnabled(true);
-  DictionaryChanged=true;
+  DictionaryChanged=false;
 
 }//DicEdit::displayZMFDictionary
 
 void
-DicEdit::displayKeyDictionaries(ZMFDictionary &pDic)
+DicEditMWn::displayKeyDictionaries(ZMFDictionary &pDic)
 {
   ZKeyHeaderRow* wKHR=nullptr;
   ZKeyFieldRow* wKFR=nullptr;
@@ -5209,22 +5443,20 @@ createKeyDicRow(const ZKeyHeaderRow& pKHR) {
     wKeyRow << createItemAligned( pKHR.ToolTip.toCChar(),Qt::AlignLeft);
   wKeyRow.last()->setEditable(false);
 
-
-
   return wKeyRow;
 }
 
 
 
 void
-DicEdit::clearAllRows()
+DicEditMWn::clearAllRows()
 {
   clearKeyRows();
   clearFieldRows();
 } // clearAllRows
 
 void
-DicEdit::clearFieldRows() {
+DicEditMWn::clearFieldRows() {
   ZDataReference wDRef;
   QVariant wV;
 
@@ -5244,7 +5476,7 @@ DicEdit::clearFieldRows() {
 }
 
 void
-DicEdit::clearKeyRows() {
+DicEditMWn::clearKeyRows() {
   ZDataReference wDRef;
   QVariant wV;
   if (keyTRv) {
@@ -5253,7 +5485,7 @@ DicEdit::clearKeyRows() {
 
         for (int wi=0;wi < keyTRv->ItemModel->rowCount();wi++) {
           /* delete all data for key fields in the key */
-          QStandardItem* wKeyItem = fieldTBv->ItemModel->item(wi,0);
+          QStandardItem* wKeyItem = keyTRv->ItemModel->item(wi,0);
           for (int wj=0;wj < wKeyItem->rowCount();wj++) {
             wV = wKeyItem->child(wj,0)->data(ZQtDataReference);
             wDRef = wV.value<ZDataReference>();
@@ -5275,7 +5507,7 @@ DicEdit::clearKeyRows() {
 }
 
 void
-DicEdit::resizeEvent(QResizeEvent* pEvent)
+DicEditMWn::resizeEvent(QResizeEvent* pEvent)
 {
   QSize wRDlg = pEvent->oldSize();
   QWidget::resize(pEvent->size().width(),pEvent->size().height());
@@ -5449,7 +5681,7 @@ QStandardItem* setFieldRowFromField(QStandardItemModel *pModel, int pRow, ZField
   return pModel->item(pRow,0);
 }//setFieldRowFromField
 
-QStandardItem* DicEdit::changeFieldRowFromField(int pRow,ZFieldDescription& pField) {
+QStandardItem* DicEditMWn::changeFieldRowFromField(int pRow,ZFieldDescription& pField) {
   utf8String wStr;
   /* first delete infradata for item (pRow,0) : release resource and delete ZFieldDescription */
   QVariant wV=fieldTBv->ItemModel->item(pRow,0)->data(ZQtDataReference);

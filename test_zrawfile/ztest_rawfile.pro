@@ -123,6 +123,7 @@ SOURCES += \
     ../zcontentcommon/zresource.cpp \
     ../zcontentutils/zentity.cpp \
     main.cpp \
+    zdocphyonekey.cpp \
     zdocphysical.cpp
 
 
@@ -131,6 +132,7 @@ SOURCES += \
 HEADERS += \
     ../../zconfig_general.h \
     ../zcontentcommon/zresource.h \
+    zdocphyonekey.h \
     zdocphysical.h
 
 

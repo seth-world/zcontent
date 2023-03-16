@@ -106,6 +106,10 @@ OL                                                                              
 /** @} */  // ZHeaderGroup
 
 class ZRFCollection;
+class ZRawMasterFile;
+class ZIndexTable;
+class ZRawIndexFile;
+class ZMasterFile;
 
 /**
  * @brief The ZRandomFile class This class holds the tools to manage the whole ZRandomFile structure
@@ -118,16 +122,16 @@ class ZRFCollection;
 class ZRandomFile : protected ZFileDescriptor
 {
 // friend class ZFileDescriptor ;
- friend class ZIndexFile;
+// friend class ZIndexFile;
 
- friend class ZIndexFile;
- friend class ZMasterFile;
 
- friend class ZRawMasterFile;
+  friend class zbs::ZMasterFile;
 
- friend class ZOpenZRFPool;
+ friend class zbs::ZRawMasterFile;
 
- friend class zZIndexTable;
+ friend class ::ZOpenZRFPool;
+
+ friend class zbs::ZIndexTable;
 
 // friend class ZContentVisuMain;
 
@@ -145,6 +149,8 @@ public:
   using ZFileDescriptor::getBlockExtentQuota;
   using ZFileDescriptor::getAllocatedSize;
   using ZFileDescriptor::getHighwaterMarking;
+
+  using ZFileDescriptor::getMode;
 
 // ZBlockDescriptor CurrentBlockDescriptor;
 
@@ -176,12 +182,12 @@ public:
     }
 
 
-  uint8_t  getFileType() {return ZHeader.FileType;}
+
 
   ZFileControlBlock*  getFCB() {return &ZFCB ;}
 
-public:  void setFileType(ZFile_type pType) {ZHeader.FileType=pType;}
-
+public:   void setFileType(ZFile_type pType) {ZHeader.FileType=pType;}
+          uint8_t  getFileType() {return ZHeader.FileType;}
 public:
 
     void putTheMess (void);
@@ -800,7 +806,7 @@ public:
     ZStatus updateReservedBlock(const ZDataBuffer &pReserved, bool pForceWrite);
 
 public:
-    ZStatus _ZRFopen(const zmode_type pMode,
+    ZStatus _ZRFopen(zmode_type pMode,
                   const ZFile_type pFileType,
                   bool pLockRegardless=false);
 

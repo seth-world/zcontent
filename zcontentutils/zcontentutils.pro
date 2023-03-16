@@ -48,9 +48,9 @@ include ($$TOOLSET_ROOT/common/zbasecommon.pri)
 
 # QMAKE_CXXFLAGS += -fpermissive
 
-QMAKE_CXXFLAGS+= -std=c++17 -Wall -pthread
+QMAKE_CXXFLAGS+= -std=c17 -Wall -pthread
 
-QMAKE_LFLAGS +=  -std=c++17 -lpthread
+QMAKE_LFLAGS +=  -std=c17 -lpthread
 
 QMAKE_LFLAGS +=   -lssl
 
@@ -160,12 +160,14 @@ SOURCES += \
     $${ZCONTENT_ROOT}/zcontentutils/zlayout.cpp \
     $${ZCONTENT_ROOT}/zcontentutils/zscan.cpp \
     filegeneratedlg.cpp \
+    keydata.cpp \
     main.cpp \
     poolvisu.cpp \
     visulinecol.cpp \
+    zchangerecord.cpp \
     zcppgenerate.cpp \
-    zdicdlg.cpp \
     zfilegenerate.cpp \
+    zkeylistdlg.cpp \
     zrawmasterfilevisu.cpp
 
 
@@ -214,12 +216,14 @@ HEADERS += \
 \
     $${TOOLSET_ROOT}/zcppparser/zcppparserutils/rawfields.h \
     filegeneratedlg.h \
+    keydata.h \
     poolvisu.h \
     visulinecol.h \
+    zchangerecord.h \
     zcontentutils_release.h \
     zcppgenerate.h \
-    zdicdlg.h \
     zfilegenerate.h \
+    zkeylistdlg.h \
     zrawmasterfilevisu.h
 
 

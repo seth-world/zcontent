@@ -53,10 +53,10 @@ public:
     {
         if (ZExceptionDLg->objectName().isEmpty())
             ZExceptionDLg->setObjectName(QString::fromUtf8("ZExceptionDLg"));
-        ZExceptionDLg->resize(575, 270);
+        ZExceptionDLg->resize(587, 349);
         layoutWidget = new QWidget(ZExceptionDLg);
         layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
-        layoutWidget->setGeometry(QRect(10, 230, 557, 25));
+        layoutWidget->setGeometry(QRect(10, 300, 557, 25));
         horizontalLayout_2 = new QHBoxLayout(layoutWidget);
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
@@ -106,6 +106,7 @@ public:
         LogoLBl->setStyleSheet(QString::fromUtf8("background:transparent"));
         LogoLBl->setFrameShape(QFrame::StyledPanel);
         LogoLBl->setScaledContents(true);
+
         ExceptionFRm = new QFrame(ZExceptionDLg);
         ExceptionFRm->setObjectName(QString::fromUtf8("ExceptionFRm"));
         ExceptionFRm->setGeometry(QRect(10, 10, 391, 81));
@@ -131,7 +132,7 @@ public:
         label_8->setGeometry(QRect(10, 30, 54, 15));
         verticalLayoutWidget = new QWidget(ZExceptionDLg);
         verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
-        verticalLayoutWidget->setGeometry(QRect(10, 100, 551, 111));
+        verticalLayoutWidget->setGeometry(QRect(10, 100, 551, 191));
         VertLayoutMsgVLy_2 = new QVBoxLayout(verticalLayoutWidget);
         VertLayoutMsgVLy_2->setObjectName(QString::fromUtf8("VertLayoutMsgVLy_2"));
         VertLayoutMsgVLy_2->setContentsMargins(0, 0, 0, 0);

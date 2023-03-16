@@ -111,6 +111,9 @@ enum ZRFMode_type : zmode_type
 
     ZRF_ManualLock      =   0x20,   /**< by default, Lock management mode is Automatic unless ZRF_ManualLock is set to open Mode */
 
+    ZRF_TypeRegardless  =   0x30, /* Do not check ZFT_xxx file type when opening file */
+
+
     ZRF_Modify      = ZRF_Read_Only | ZRF_Write_Only | ZRF_Delete_Only, //!< file is open for any operation
 
     ZRF_Write       = ZRF_Read_Only | ZRF_Write_Only , //!< file is open for read & write (either modify or add )
@@ -171,8 +174,8 @@ const char * decode_ZRFMode (zmode_type pZRF);
 zmode_type encode_ZRFMode (char* pZRF);
 
 
-const char * decode_ZFile_type (uint8_t pType);
-ZFile_type encode_ZFile_type (char * pType);
+const char *decode_ZFile_type(uint8_t pType);
+uint8_t encode_ZFile_type(const utf8VaryingString &pType);
 
 utf8VaryingString getVersionStr (unsigned long pVersion); // defined in zrandomfile.cpp
 unsigned long getVersionNum (const utf8VaryingString& pVersion);// defined in zrandomfile.cpp
