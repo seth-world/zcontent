@@ -168,6 +168,7 @@ SOURCES += \
     zcppgenerate.cpp \
     zfilegenerate.cpp \
     zkeylistdlg.cpp \
+    zrawkeylistdlg.cpp \
     zrawmasterfilevisu.cpp
 
 
@@ -224,6 +225,7 @@ HEADERS += \
     zcppgenerate.h \
     zfilegenerate.h \
     zkeylistdlg.h \
+    zrawkeylistdlg.h \
     zrawmasterfilevisu.h
 
 

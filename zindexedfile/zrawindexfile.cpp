@@ -492,14 +492,6 @@ ZDataBuffer wICBContent;
 }//closeIndexFile
 
 
-ZStatus
-ZRawIndexFile::_removeAll() {
-  ZDataBuffer wRecord;
-  ZStatus wSt=ZS_SUCCESS;
-  while (wSt==ZS_SUCCESS)
-    wSt=zremove(0L);
-  return ZS_SUCCESS;
-}
 
 /**
  * @brief ZIndexFile::writeIndexControlBlock

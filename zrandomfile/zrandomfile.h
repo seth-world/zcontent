@@ -474,6 +474,11 @@ public:
     ZStatus _moveBlock (const zaddress_type pFrom,
                         const zaddress_type pTo,
                         bool pCreateZFBTEntry=true);
+    /**
+     * @brief zremoveAll delete all active records without changing any record structure.
+     * Records are moved to free block pool with a deleted state.
+     */
+    ZStatus zremoveAll();
 
     ZStatus zclearFile(const zsize_type pSize=-1) ;
 

@@ -1,4 +1,5 @@
 #include "zindexitem.h"
+#include <zcontentcommon/urfparser.h>
 
 using namespace zbs;
 
@@ -54,6 +55,24 @@ ZIndexItem::fromFileKey (ZDataBuffer &pKeyFileRecord)
 //  wOffset += sizeof(ZMFaddress);
   wSize = pKeyFileRecord.Size - sizeof(ZMFAddress) ;
   ZDataBuffer::setData(pKeyFileRecord.Data + sizeof(ZMFAddress),wSize);
+
+  const unsigned char* wPtr = pKeyFileRecord.Data + sizeof(ZMFAddress);
+
+  const unsigned char* wPtrEnd = pKeyFileRecord.Data + pKeyFileRecord.Size;
+  URFFields.clear();
+  while (wPtr < wPtrEnd) {
+    ssize_t wS=URFParser::getURFFieldSize(wPtr);
+    if (wS < 0 ){
+      fprintf(stderr,"ZIndexItem::fromFileKey-S-URFCORRUPT URF format is corrupted.\n");
+      break;
+    }
+    ZDataBuffer wURFField;
+    wURFField.setData(wPtr,size_t(wS));
+    URFFields.push(wURFField);
+    wPtr += size_t(wS);
+  }// while
+
+
   return *this;
 }
 

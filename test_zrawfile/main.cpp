@@ -741,6 +741,10 @@ ZStatus populateOneKey(const uriString& pZMF) {
     ZException.exit_abort();
   }
 */
+  wSt=wMasterFile.zremoveAll();
+  if (wSt!=ZS_SUCCESS)
+    ZException.exit_abort();
+
 
   ZDocPhyOneKey wDocPhy;
 

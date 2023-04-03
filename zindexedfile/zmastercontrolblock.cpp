@@ -187,7 +187,12 @@ ZMCB_Export::deserialize()
  * @param pZDBExport
  * @return
  */
+uriString ZMasterControlBlock::getURIDictionary() {
+  if (Dictionary==nullptr)
+    return "<no dictionary>";
 
+  return Dictionary->URIDictionary;
+}
 
 /*
 <zmastercontrolblock>

@@ -110,6 +110,8 @@ public:
   using ZRandomFile::getBlockExtentQuota;
   using ZRandomFile::getHighwaterMarking;
   using ZRandomFile::getInitialSize;
+  using ZRandomFile::getFileSize;
+
 
   using ZRandomFile::_reorgFileInternals;
 
@@ -119,6 +121,7 @@ public:
 
   void setTypeRaw() { ZRandomFile::setFileType(ZFT_ZRawMasterFile); }
   void setTypeMasterFile() { ZRandomFile::setFileType(ZFT_ZMasterFile); }
+
 
   ZStatus createDictionary(const ZMFDictionary& pDic) {
     setTypeMasterFile();
@@ -291,7 +294,10 @@ public:
                               ZaiErrors* pErrorLog);
 
   ZStatus backupAll(const char* pBckExt="bck");
-
+  /**
+   * @brief zremoveAll removes all records from master file as well as from all index files.
+   */
+  ZStatus zremoveAll();
 
   void _testZReserved();
 

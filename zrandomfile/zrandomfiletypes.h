@@ -97,7 +97,7 @@ const char* decode_BlockId(ZBlockId pBID);  /* see zblock.cpp for function insta
 enum ZRFMode_type : zmode_type
 {
     ZRF_Nothing          =   0,  //!< NOP
-    ZRF_NotOpen          =0xFF00,//!< file not open
+    ZRF_NotOpen          =0x00,//!< file not open
     ZRF_Read_Only        =   1,  //!< file is open for read only
     ZRF_Write_Only       =   2,  //!< file is open  write only ( This value is not operational )
     ZRF_Delete_Only      =   4,  //!< file is open for read and delete mode

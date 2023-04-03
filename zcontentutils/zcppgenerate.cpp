@@ -226,7 +226,8 @@ const char* wCppToRSizeAtomic =
 
 const char* wCppToRecordMiddle =
     "\n"
-    "   unsigned char* wPtr = wReturn.extend(wURFSize+sizeof(uint64_t));\n"
+//    "   unsigned char* wPtr = wReturn.extend(wURFSize+sizeof(uint64_t));\n"
+    "   unsigned char* wPtr = wReturn.extend(wURFSize);\n"
 //    "   _exportAtomicPtr(wURFSize,wPtr); /* user record size is in universal format but not in URF (no preceeding URF header) */\n\n"
     "/*              move of individual fields to record space */\n";
 
@@ -911,13 +912,13 @@ ZCppGenerate::genCpp( const utf8VaryingString& pClassName,
       "   FieldPresence.clear();\n"
       "   FieldPresence._importURF(wPtr);\n"
       "\n"
-      "   uint64_t wURFSize=0;\n"
-      "\n"
-      "   if ((wPtr + sizeof(uint64_t)) >= wPtrEnd) {\n"
-      "     fprintf(stderr, \"%s::fromRecord-F-OUTBOUND Out of input boundaries while getting field <wURFSize>.\\n\");\n"
-      "     return ZS_OUTBOUND;\n"
-      "   }\n"
-      "   _importAtomic<uint64_t>(wURFSize,wPtr);  /* size is in universal format but not in URF (no preceeding URF header) */\n"
+//      "   uint64_t wURFSize=0;\n"
+//      "\n"
+//      "   if ((wPtr + sizeof(uint64_t)) >= wPtrEnd) {\n"
+//      "     fprintf(stderr, \"%s::fromRecord-F-OUTBOUND Out of input boundaries while getting field <wURFSize>.\\n\");\n"
+//      "     return ZS_OUTBOUND;\n"
+//      "   }\n"
+//      "   _importAtomic<uint64_t>(wURFSize,wPtr);  /* size is in universal format but not in URF (no preceeding URF header) */\n"
       "   int wRank=0;\n";
 
 

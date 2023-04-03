@@ -169,6 +169,12 @@ public:
   void displayChangeLog();
   void displayChangeLine(const ZChangeRecord& pChgRec);
 
+  /* controls master file and its index keys values before creation or applying changes
+   * returns true if errors have been detected
+   * returns false if no error has been detected
+   */
+  bool ValuesControl();
+
 Q_SLOT
   void Quit();
   void Compute();
@@ -273,6 +279,8 @@ private:
 
   QAction* EditLoadedDicQAc=nullptr;
   QAction* EditEmbeddedDicQAc=nullptr;
+  QAction* EmbedDicQAc=nullptr;
+
 
   QActionGroup* GenActionGroup=nullptr;
 

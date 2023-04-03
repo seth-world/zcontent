@@ -27,8 +27,10 @@ public:
     Operation=pIn.Operation;
     IndexRank = pIn.IndexRank;
     IndexAddress = pIn.IndexAddress ;
-//    KeyContent=pIn.KeyContent;
     this->ZDataBuffer::_copyFrom(pIn);
+    URFFields.clear();
+    for (long wi=0;wi < pIn.URFFields.count();wi++)
+      URFFields.push(ZDataBuffer(pIn.URFFields[wi]));
     return *this;
   }
   ZIndexItem& operator = (const ZIndexItem& pIn) { return _copyFrom(pIn); }
@@ -38,6 +40,8 @@ public:
   ZOp_type      Operation;      //!< this is NOT stored on index file (see toFileKey() method) but only for history & journaling purpose
   zrank_type    IndexRank;      //!< index rank for the on going operation : set by prepare operation and used in commit rollback and hardrollback operations
 
+  ZArray<ZDataBuffer> URFFields;
+
   void setBuffer(const ZDataBuffer& pKeyContent) ;
   void clear (void) {
     ZDataBuffer::clearData();
@@ -45,6 +49,7 @@ public:
     Operation = ZO_Nothing;
     IndexAddress=-1L;
     IndexRank=0L;
+    URFFields.clear();
     //State = ZAMNothing;
     return;
   }
@@ -52,7 +57,16 @@ public:
   utf8VaryingString display();
 
   ZDataBuffer   toFileKey(void);
+  /**
+   * @brief fromFileKey takes a raw index record (pKeyFileRecord) and:
+   * - extracts correspond ZMF record address and makes it available into ZMFAddress
+   * - makes URF field concatenated list available into a ZDataBuffer
+   * Fields may be retrieved / extracted using URFParser appropriate
+   * @param pKeyFileRecord
+   * @return
+   */
   ZIndexItem&   fromFileKey (ZDataBuffer &pKeyFileRecord);
+
 
 };
 

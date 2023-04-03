@@ -175,6 +175,7 @@ public:
 
     using ZRandomFile::setUpdateHeader;
     using ZRandomFile::getMode;
+    using ZRandomFile::zremoveAll;
 
 
     IndexData_st getIndexData()
@@ -218,8 +219,6 @@ public:
                                     pBlockExtentQuota);
     }
 
-    /* removes all records within the current index file. Used by ZMasterFile::zrebuildIndex() */
-    ZStatus _removeAll();
 
     zrank_type getCurrentRank (void) {return CurrentRank;}
 /**

@@ -41,6 +41,8 @@
 #include <poolvisu.h>
 #include <filegeneratedlg.h>
 
+#include "zrawkeylistdlg.h"
+
 #define __FIXED_FONT__ "courrier"
 
 const int cst_maxraisonablevalue = 100000;
@@ -119,9 +121,14 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
   openZRFQAc = new QAction("Random file");
   ui->menubar->addAction(openZRFQAc);
 
+  MasterFileMEn = new QMenu("Master file",this);
+  ui->menubar->addMenu(MasterFileMEn);
 
-  GetZmfDefQAc = new QAction("Master file");
-  ui->menubar->addAction(GetZmfDefQAc);
+  ZmfDefQAc = new QAction("Master file definition");
+  MasterFileMEn->addAction(ZmfDefQAc);
+
+  IndexRebuildQAc = new QAction("Rebuild index");
+  MasterFileMEn->addAction(IndexRebuildQAc);
 
   mainQAg = new QActionGroup(this);
 
@@ -166,8 +173,11 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
   mainQAg->addAction(ui->dictionaryQAc);
 //  actionGroup->addAction(ui->dicLoadXmlQAc);
 
+  /* Master file menus */
+
   /* get definition from ZMF */
-  mainQAg->addAction(GetZmfDefQAc);
+  mainQAg->addAction(ZmfDefQAc);
+  mainQAg->addAction(IndexRebuildQAc);
 
   /* display pool choices */
 
@@ -1083,8 +1093,14 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
   }
 
 
-  if (pAction==GetZmfDefQAc) {
-/*    const char* wDir=getParserWorkDirectory();
+  if (pAction==ZmfDefQAc) {
+    FileGenerate= new FileGenerateMWn(this);
+    FileGenerate->show();
+    return;
+  }
+
+  if (pAction==IndexRebuildQAc) {
+    const char* wDir=getParserWorkDirectory();
     QString wFileName = QFileDialog::getOpenFileName(this, tr("Master file"),
         wDir,
         "master files (*.zmf);;All (*.*)");
@@ -1093,52 +1109,44 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
     uriString wZMFURI= wFileName.toUtf8().data();
     if (!wZMFURI.exists())
       return;
-*/
-    FileGenerateMWn* wFGDlg= new FileGenerateMWn(this);
-//    if (!wFGDlg->LoadFromFile())  /* returns false if cancelled */
-//      return;
+    ZMasterFile wZMF;
+    ZStatus wSt=wZMF.zopen(wZMFURI,ZRF_All);
+    if (wSt!=ZS_SUCCESS) {
+      utf8VaryingString wExcp = ZException.last().formatFullUserMessage().toString();
+      ZExceptionDLg::adhocMessage("Rebuild index",Severity_Error,
+          nullptr,&wExcp,"Error while opening master file %s",wZMFURI.toString());
+      return;
+    }
+    if (wZMF.IndexTable.count()==0) {
+      ZExceptionDLg::adhocMessage("Rebuild index",Severity_Error,
+          "Master file %s\nhas no index key.",wZMFURI.toString());
+       wZMF.zclose();
+      return;
+    }
 
-    wFGDlg->show();
-    return;
-  }
+    ZRawKeyListDLg* KeyListDLg=new ZRawKeyListDLg(this);
+    KeyListDLg->set(&wZMF);
 
+    int wRet = KeyListDLg->exec();
+    if (wRet==QDialog::Rejected) {
+      wZMF.zclose();
+      delete KeyListDLg;
+      return;
+    }
 
+    if (wRet==QDialog::Accepted) {
 
-/*
-  if (pAction==ui->dicLoadXmlQAc)
-  {
-    QFileDialog wFd;
-    wFd.setWindowTitle(QObject::tr("Xml file","DicEdit"));
-    wFd.setLabelText(QFileDialog::Accept,  QObject::tr("Select","ZContentVisuMain"));
-    wFd.setLabelText(QFileDialog::Reject ,  QObject::tr("Cancel","ZContentVisuMain"));
-    wFd.setFileMode(QFileDialog::ExistingFile);
-    while (true)
-      {
-      int wRet=wFd.exec();
-      if (wRet==QDialog::Rejected)
-        return;
-
-      if (wFd.selectedFiles().isEmpty())
-        ZExceptionDLg::message("dicLoadXmlQAc",ZS_EMPTY,Severity_Error,QObject::tr("No file selected.Please select a valid file.","ZContentVisuMain").toUtf8().data());
-      else
-        break;
-      }//while (true)
-
-    uriString wXmlFile= wFd.selectedFiles()[0].toUtf8().data();
-
-    if (!dictionaryWnd)
-      dictionaryWnd=new DicEdit(this);
-
-    wSt=dictionaryWnd->loadXmlDictionary(wXmlFile);
-    if (wSt==ZS_SUCCESS)
-      {
-      wStr.sprintf("Xml file %s has been successfully loaded.",wXmlFile.toCChar());
-      statusBar()->showMessage(QObject::tr(wStr.toCChar(),"DicEdit"),cst_MessageDuration);
+      wSt=wZMF.rebuildIndex(KeyListDLg->getCurrentIndexRank());
+      if (wSt!=ZS_SUCCESS) {
+        ZExceptionDLg::displayLast("Index rebuild");
       }
-    dictionaryWnd->show();
-    return;
+      wZMF.zclose();
+      delete KeyListDLg;
+      return;
+    }
+
   }
-*/
+
   if (pAction==ui->surfaceScanZRFQAc) {
     surfaceScanZRF(URICurrent);
     return;
@@ -1160,13 +1168,12 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
 
   /* ZMFMEn */
 
-  if (pAction==ui->runRepairQAc)
-  {
+  if (pAction==ui->runRepairQAc) {
     repairIndexes(ui->testRunQAc->isChecked(), ui->rebuilAllQAc->isChecked());
     return;
   }
-  if (pAction==ui->MCBReportQAc)
-  {
+
+  if (pAction==ui->MCBReportQAc) {
     reportMCB();
     return;
   }
@@ -1174,7 +1181,6 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
   return;
 
 }//actionMenuEvent
-
 
 void ZContentVisuMain::reportMCB()
 {

@@ -1864,6 +1864,32 @@ ZRawMasterFile::shiftIndexNameUp(long pStartRank,ZaiErrors* pErrorLog) {
 }
 
 ZStatus
+ZRawMasterFile::zremoveAll() {
+  ZStatus wSt=ZS_SUCCESS;
+
+  if (getOpenMode()!=ZRF_All) {
+    ZException.setMessage("ZRawMasterFile::zremoveAll",ZS_INVOPENMODE,Severity_Error,
+        "Master file %s must be open in ZRF_All mode while mode is %s",
+        getURIContent().toString(),
+        decode_ZRFMode(getOpenMode()));
+    return ZS_INVOPENMODE;
+  }
+
+  /* first delete all index key files records */
+
+  for (long wi=0; wi < IndexTable.count(); wi++) {
+    wSt=IndexTable[wi]->zremoveAll();
+    if (wSt!=ZS_SUCCESS) {
+      ZException.addToLast(" While deleting index key");
+      return wSt;
+    }
+  }// for
+
+  return ZRandomFile::zremoveAll();
+}// zremoveAll
+
+
+ZStatus
 ZRawMasterFile::backupAll(const char* pBckExt) {
 
   ZStatus wSt= getURIContent().backupFile(pBckExt);
@@ -2142,25 +2168,7 @@ ZDataBuffer wMCBContent;
     return  wSt;
 }//zcreate
 
-/**
- * @brief ZRawMasterFile::zcreate Creates the raw content file and its header as a ZRandomFile with a structure capable of creating indexes.
- *  @note if a file of the same name already exists (either content file or header file)
- *        then content and header file will be renamed to  <base file name>.<extension>_bck<nn>
- *        where <nn> is a version number
- *
- * @param[in] pPathHame  a C string (const char*) containing the path of the future ZRawMasterFile main content file. Other file names will be deduced from this main name.
- * @param[in] pInitialSize      Initial file space in byte that is allocated at creation time. This space is placed in Free block pool as one block.
- * @param[in] pLeaveOpen   if set to true file is left open after its creation with open mode mask (ZRF_Exclusive | ZRF_All ). If false, file is closed.
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
-/*ZStatus
-ZRawMasterFile::zcreate (const char* pPathName, const zsize_type pInitialSize, bool pBackup, bool pLeaveOpen)
-{
-uriString wURI(pPathName);
-//    ZMFURI=pPathName;
-    return (zcreate(wURI,pInitialSize,pBackup,pLeaveOpen));
-}//zcreate
-*/
+
 
 
 

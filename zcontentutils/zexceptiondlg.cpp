@@ -31,12 +31,15 @@ bool FixedFont = false;
 #define __FATAL_ICON__ "skullhead.png"
 #define __HIGHEST_ICON__ "graverip.png"
 
+
+
 ZStatus DontShowStatus=ZS_NOTHING;
 
 /** adhoc message */
 ZExceptionDLg::ZExceptionDLg(const utf8VaryingString& pTitle, Severity_type pSeverity,
                             const utf8VaryingString& pMessage,
-                            const utf8VaryingString* pComplement, bool pHtml,
+                            const utf8VaryingString* pComplement,
+                            bool pHtml,
                             bool pDontShow) : QDialog(nullptr)
 {
   layoutSetup( pTitle,pDontShow);
@@ -44,10 +47,12 @@ ZExceptionDLg::ZExceptionDLg(const utf8VaryingString& pTitle, Severity_type pSev
 
   ExceptionFRm->setVisible(false);
 
-  if (pHtml)
+  if (pHtml)  {
     MessageTEd->setHtml(pMessage.toCChar());
-  else
+  }
+  else {
     MessageTEd->setText(pMessage.toCChar());
+  }
   if (pComplement && !pComplement->isEmpty())
     setAdditionalInfo(*pComplement,pHtml);
   else
@@ -180,8 +185,11 @@ ZExceptionDLg::layoutSetup( const utf8VaryingString& pTitle,
   wButtonBoxHLy->addItem(whorizontalSpacer);
   ErrlogBTn = new QPushButton(verticalLayoutWidget);
   ErrlogBTn->setText("Error log");
-
   wButtonBoxHLy->addWidget(ErrlogBTn);
+
+  ZExceptionBTn = new QPushButton(verticalLayoutWidget);
+  ZExceptionBTn->setText("Except stack");
+  wButtonBoxHLy->addWidget(ZExceptionBTn);
 
   MoreBTn = new QPushButton(verticalLayoutWidget);
   MoreBTn->setText("More");
@@ -264,6 +272,7 @@ ZExceptionDLg::layoutSetup( const utf8VaryingString& pTitle,
   QObject::connect (OtherBTn,&QAbstractButton::pressed,this,[this]{ done(ZEDLG_Third); });
   QObject::connect (MoreBTn,&QAbstractButton::pressed,this,[this]{ MoreClicked(); });
   QObject::connect (ErrlogBTn,&QAbstractButton::pressed,this,[this]{ ErrlogClicked(); });
+  QObject::connect (ZExceptionBTn,&QAbstractButton::pressed,this,[this]{ ZExceptionClicked(); });
 }
 
 
@@ -358,6 +367,7 @@ void ZExceptionDLg::ErrlogClicked()
 {
   utf8VaryingString wStr;
   textEditMWn* wTE=new textEditMWn(this,TEOP_ShowLineNumbers | TEOP_NoFileLab);
+  wTE->setWindowTitle("Error log");
 
   if (ErrorLog==nullptr) {
     for (long wi = ZException.count()-1;wi >= 0; wi--) {
@@ -376,6 +386,18 @@ void ZExceptionDLg::ErrlogClicked()
   wTE->show();
 
   QGuiApplication::processEvents();
+  return;
+}
+void ZExceptionDLg::ZExceptionClicked()
+{
+  utf8VaryingString wStr;
+  textEditMWn* wTE=new textEditMWn(this,TEOP_ShowLineNumbers | TEOP_NoFileLab);
+  wTE->setWindowTitle("ZException stack");
+  for (long wi = ZException.count()-1;wi >= 0; wi--) {
+      wTE->appendText(ZException.Tab[wi]->formatFullUserMessage(false));
+    }
+
+  wTE->show();
   return;
 }
 
@@ -659,6 +681,9 @@ ZExceptionDLg::adhocMessage(const utf8VaryingString& pTitle,
 
   return _adhocMessage(pTitle,pSeverity,pErrorlog,pComplement,false,wMessage);
 }
+
+
+
 int
 ZExceptionDLg::adhocMessage(const utf8VaryingString& pTitle,
     Severity_type pSeverity,
@@ -678,16 +703,26 @@ ZExceptionDLg::adhocMessageHtml(const utf8VaryingString& pTitle,
                                 Severity_type pSeverity,
                                 ZaiErrors* pErrorlog,
                                 const utf8VaryingString* pComplement,
-                                const char *pFormat,...) {
+                                const char* pFormat,...) {
+
+
+  /* replace '<%s>' with '&lt%s&gt` */
+  utf8VaryingString wFormat=escapeHtmlSeq(pFormat);
+
   utf8VaryingString wMessage;
   va_list arglist;
   va_start (arglist, pFormat);
 
-  wMessage.vsnprintf(2000,pFormat,arglist);
+  wMessage.vsnprintf(2000,wFormat.toCChar(),arglist);
   va_end(arglist);
 
-  return _adhocMessage(pTitle,pSeverity,pErrorlog,pComplement,true,wMessage);
+  if (pComplement!=nullptr){
+    wFormat=escapeHtmlSeq(pComplement->toCChar());
+    return _adhocMessage(pTitle,pSeverity,pErrorlog,&wFormat,true,wMessage);
+  }
+  return _adhocMessage(pTitle,pSeverity,pErrorlog,nullptr,true,wMessage);
 }
+
 int
 ZExceptionDLg::_adhocMessage( const utf8VaryingString& pTitle,
                               Severity_type pSeverity,
@@ -754,12 +789,21 @@ ZExceptionDLg::adhocMessage2BHtml(const utf8String&pTitle, Severity_type pSeveri
     ZaiErrors* pErrorlog, const utf8VaryingString *pComplement,
     const char *pFormat,...) {
 
+  /* replace '<%s>' with '&lt%s&gt` */
+  utf8VaryingString wFormat=escapeHtmlSeq(pFormat);
+
   utf8VaryingString wMessage;
   va_list arglist;
   va_start (arglist, pFormat);
-  wMessage.vsnprintf(2000,pFormat,arglist);
+  wMessage.vsnprintf(2000,wFormat.toCChar(),arglist);
   va_end(arglist);
-  return _adhocMessage2B(pTitle,pSeverity,pCancelText,pOkText,pErrorlog,pComplement,true,wMessage);
+
+  if (pComplement!=nullptr){
+    wFormat=escapeHtmlSeq(pComplement->toCChar());
+    return _adhocMessage2B(pTitle,pSeverity,pCancelText,pOkText,pErrorlog,&wFormat,true,wMessage);
+  }
+  return _adhocMessage2B(pTitle,pSeverity,pCancelText,pOkText,pErrorlog,nullptr,true,wMessage);
+
 }
 int
 ZExceptionDLg::_adhocMessage2B(const utf8String&pTitle, Severity_type pSeverity,
@@ -824,18 +868,26 @@ ZExceptionDLg::adhocMessage3B(const utf8String&pTitle, Severity_type pSeverity,
 
   return _adhocMessage3B(pTitle,pSeverity,pOtherText,pCancelText,pOkText,nullptr,nullptr,false,wMessage);
 }
+
 int
 ZExceptionDLg::adhocMessage3BHtml(const utf8String&pTitle, Severity_type pSeverity,
     const utf8String& pOtherText,const utf8String& pCancelText, const utf8String& pOkText,
     ZaiErrors* pErrorlog,const utf8VaryingString *pComplement, const char *pFormat,...) {
+
+  /* replace '<%s>' with '&lt%s&gt` */
+  utf8VaryingString wFormat=escapeHtmlSeq(pFormat);
+
   utf8VaryingString wMessage;
   va_list arglist;
   va_start (arglist, pFormat);
-  wMessage.vsnprintf(2000,pFormat,arglist);
+  wMessage.vsnprintf(2000,wFormat.toCChar(),arglist);
   va_end(arglist);
 
-
-  return _adhocMessage3B(pTitle,pSeverity,pOtherText,pCancelText,pOkText,pErrorlog,pComplement,true,wMessage);
+  if (pComplement!=nullptr){
+    wFormat=escapeHtmlSeq(pComplement->toCChar());
+    return _adhocMessage3B(pTitle,pSeverity,pOtherText,pCancelText,pOkText,pErrorlog,&wFormat,true,wMessage);
+  }
+  return _adhocMessage3B(pTitle,pSeverity,pOtherText,pCancelText,pOkText,pErrorlog,nullptr,true,wMessage);
 }
 
 int
@@ -1041,4 +1093,17 @@ ZExceptionDLg::display3B(const utf8VaryingString& pTitle,const ZExceptionBase pE
   setFixedFont(false);
   wDlg->deleteLater();
   return wRet;
+}
+
+utf8VaryingString escapeHtmlSeq(const char* pString) {
+  utf8VaryingString wStr=pString;
+
+
+  wStr.replace("<%s>","&lt;%s&gt;");
+  wStr.replace("<%d>","&lt;%d&gt;");
+  wStr.replace("<%ld>","&lt;%ld&gt;");
+
+  wStr.replace("\n","<br>");
+
+  return wStr;
 }

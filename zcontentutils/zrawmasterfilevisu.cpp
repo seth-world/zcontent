@@ -909,13 +909,6 @@ ZRawMasterFileVisu::setSelectionBackGround( QVariant& pBackground,
     wCount++; /* advance even if item is nullptr */
 
     addCurCol(wCurCol,wCurLine);
-/*
-    wCurCol++;
-    if (wCurCol >= wColLimit ) {
-      wCurCol = 0;
-      wCurLine ++;
-    }
-*/
   }// while true
 
   if (pScrollTo) {
@@ -955,16 +948,17 @@ ZRawMasterFileVisu::displayURFBlock(ZDataBuffer & pData)
   zaddress_type wKeyAddress=0;
 
   /* leading user record size */
-  _importAtomic<uint64_t>(wURFDataSize,wPtr);
+/*  _importAtomic<uint64_t>(wURFDataSize,wPtr);
   wStr.sprintf("%ld",wURFDataSize);
   ui->URFSizeLBl->setText(wStr.toCChar());
 
   const unsigned char* wPtrEnd = pData.Data + size_t(wURFDataSize);
+*/
 
 
   int wErrored=0;
   bool wZTypeErrored=false;
-#ifdef __COMMENT__
+//#ifdef __COMMENT__
   _importAtomic<ZTypeBase>(wZType,wPtr);
   while (true) {
     if ((wZType != ZType_bitset) && (wZType != ZType_bitsetFull)) {
@@ -1009,16 +1003,17 @@ ZRawMasterFileVisu::displayURFBlock(ZDataBuffer & pData)
     } // if (wZType==ZType_bitsetFull)
 
     /* second get user URF data size */
-
+/*
     _importAtomic<uint64_t>(wURFDataSize,wPtr);
     utf8VaryingString wStr;
     wStr.sprintf("%ld",wURFDataSize);
     ui->URFSizeLBl->setText(wStr.toCChar());
     wOffset += sizeof(uint64_t);
+*/
     break;
   }// while true
-#endif // __COMMENT__
-
+//#endif // __COMMENT__
+  const unsigned char* wPtrEnd = pData.Data + pData.Size;
   while ((wPtr < wPtrEnd )&&(wErrored < 10)) {
 
 

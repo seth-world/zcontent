@@ -116,11 +116,11 @@ public:
                           ZaiErrors *pErrorlog, const utf8VaryingString *pComplement,
                           const char *pFormat,...);
   static int adhocMessageHtml(const utf8VaryingString &pTitle, Severity_type pSeverity,
-      ZaiErrors *pErrorlog, const utf8VaryingString *pComplement,
-      const char *pFormat,...);
+                              ZaiErrors *pErrorlog, const utf8VaryingString *pComplement,
+                              const char *pFormat,...);
   static int _adhocMessage(const utf8VaryingString &pTitle, Severity_type pSeverity,
-      ZaiErrors *pErrorlog, const utf8VaryingString *pComplement, bool pHtml,
-      const utf8VaryingString &pMessage);
+                            ZaiErrors *pErrorlog, const utf8VaryingString *pComplement, bool pHtml,
+                            const utf8VaryingString &pMessage);
   /**
    * @brief adhocMessage2B displays an adhoc message(not dependant from ZException) with two buttons, cancel and ok button.
    * @param pTitle        displayed dialog title
@@ -210,6 +210,7 @@ public Q_SLOTS:
   void DontShowClicked();
   void MoreClicked();
   void ErrlogClicked();
+  void ZExceptionClicked();
 
   void layoutSetup(const utf8VaryingString &pTitle, bool pDontShow);
 
@@ -233,6 +234,7 @@ private:
   QCheckBox *dontShowCKb=nullptr;
 
   QPushButton *ErrlogBTn=nullptr;
+  QPushButton *ZExceptionBTn=nullptr;
   QPushButton *MoreBTn=nullptr;
   QPushButton *OtherBTn=nullptr;
   QPushButton *OKBTn=nullptr;
@@ -252,5 +254,6 @@ private:
   QTextEdit * AdditionalTEd=nullptr;
 };
 
+utf8VaryingString escapeHtmlSeq(const char* pString);
 
 #endif // ZEXCEPTIONDLG_H

@@ -435,6 +435,8 @@ URFParser::getURFFieldSize (const unsigned char* pPtrIn){
   }
 
   default: {
+    fprintf(stderr,"ZURFParser::getURFFieldSize-S-INVTYP Found invalid ZType <%X>. URF Format may be corrupted\n",
+        wType);
     return -1;
   }
 

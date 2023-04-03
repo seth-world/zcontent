@@ -84,8 +84,8 @@ FileGenerateMWn::initLayout() {
       "About to change index file name <br>"
       "from s to s.<br><br>"
       "<table border=\"1\">"
-      "<tr><td>Abandon operation and keep index name</td>  <td>Do not Change</td></tr>.\n"
-      "<tr><td>Change index name and rename index file </td>   <td>Change</td></tr>."
+      "<tr><td>Abandon operation and keep index name</td>  <td><b>Do not Change</b></td></tr>.\n"
+      "<tr><td>Change index name and rename index file </td>   <td><b>Change</b></td></tr>."
       "</table>");
 */
 
@@ -165,12 +165,13 @@ FileGenerateMWn::initLayout() {
   QMenu* DictionariesMEn = new QMenu("Dictionaries");
   GenMenuBar->addMenu(DictionariesMEn);
 
-  EditLoadedDicQAc = new QAction("Edit loaded dictionary",GenMEn);
+  EmbedDicQAc = new QAction("Embed external dictionary",GenMEn);
+  EditLoadedDicQAc = new QAction("Edit external dictionary",GenMEn);
   EditEmbeddedDicQAc = new QAction("Edit embedded dictionary",GenMEn);
 
+  DictionariesMEn->addAction(EmbedDicQAc);
   DictionariesMEn->addAction(EditLoadedDicQAc);
   DictionariesMEn->addAction(EditEmbeddedDicQAc);
-
 
 
   QMenu* ApplySaveMEn = new QMenu("Apply-Save");
@@ -227,6 +228,7 @@ FileGenerateMWn::initLayout() {
   GenActionGroup->addAction(ShowGenLogQAc);
   GenActionGroup->addAction(HideGenLogQAc);
 
+  GenActionGroup->addAction(EmbedDicQAc);
   GenActionGroup->addAction(EditLoadedDicQAc);
   GenActionGroup->addAction(EditEmbeddedDicQAc);
 
@@ -722,7 +724,9 @@ FileGenerateMWn::dataSetupFromMasterFile(const uriString& pURIMaster) {
   RootName = MasterFile->getURIContent().getRootname();
   MeanRecordSize = MasterFile->getFCB()->BlockTargetSize;
   AllocatedBlocks = MasterFile->getFCB()->AllocatedBlocks;
+  AllocatedSize = MasterFile->getFileSize();
   ExtentQuota = MasterFile->getFCB()->BlockExtentQuota;
+  ExtentQuotaSize = MasterFile->getFCB()->BlockExtentQuota*MasterFile->getFCB()->BlockTargetSize;
 
   InitialSize= MasterFile->getFCB()->InitialSize;
 
@@ -1023,6 +1027,10 @@ FileGenerateMWn::_dataSetup() {
   AllocatedLEd->setText(wStr.toCChar());
   wStr.sprintf("%ld",ExtentQuota);
   ExtentQuotaLEd->setText(wStr.toCChar());
+  wStr.sprintf("%ld",ExtentQuotaSize);
+  ExtentQuotaSizeLEd->setText(wStr.toCChar());
+  wStr.sprintf("%ld",AllocatedSize);
+  AllocatedSizeLEd->setText(wStr.toCChar());
   wStr.sprintf("%ld",InitialSize);
   InitialSizeLEd->setText(wStr.toCChar());
 
@@ -1567,10 +1575,10 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
 void
 FileGenerateMWn::Compute() {
   ZArray<utf8VaryingString> wWarnedFields;
-  size_t  MeanRecordSize=0;
+  MeanRecordSize=0;
   utf8VaryingString wStr;
 
-  MeanRecordSize += sizeof(uint64_t);  /* user record size */
+//  MeanRecordSize += sizeof(uint64_t);  /* user record size */  // no --deprecated--
 
   /* size of key section : address array */
 
@@ -1661,36 +1669,138 @@ FileGenerateMWn::MenuAction(QAction* pAction){
     }
 
     if (DictionaryFile==nullptr) {
-      ZExceptionDLg::adhocMessage("Loaded dictionary",Severity_Error,nullptr,nullptr,
-          "No external dictionary has been loaded.");
+      ZExceptionDLg::adhocMessage("External dictionary",Severity_Error,nullptr,nullptr,
+          "No external dictionary has been loaded yet.\n"
+          "Please load one before trying to edit it.");
       return;
     }
     DicEdit->displayZMFDictionary(DictionaryFile->getDictionary());
     DicEdit->show();
     return;
-  }
+  }//if (pAction==EditLoadedDicQAc)
 
-  if (pAction==EditEmbeddedDicQAc){
-
-    if (DicEdit==nullptr) {
-      DicEdit = new DicEditMWn(std::bind(&FileGenerateMWn::DicEditQuitCallback, this),this);
-    }
+  if (pAction==EmbedDicQAc){
 
     if (MasterFile==nullptr) {
       ZExceptionDLg::adhocMessage("Embedded dictionary",Severity_Error,nullptr,nullptr,
-          "No master file has been loaded.");
+          "No current master file has been set.\n"
+          "Either generate one or load an existing one.\n"
+          "You may afterwards embed a dictionary.");
+      return;
+    }
+
+    if (DictionaryFile==nullptr) {
+      ZExceptionDLg::adhocMessage("Embed dictionary",Severity_Error,
+          "No External dictionary to embed.\n"
+          "Please load an external dictionary prior embedding.");
+      return;
+    }
+    if (MasterFile->Dictionary!=nullptr) {
+      int wRet = ZExceptionDLg::adhocMessage2B("Embed dictionary",Severity_Error,
+          "Give up","Confirm",
+          nullptr,nullptr,
+          "Current file <%s> \n"
+          "has already an embedded dictionary <%s> version <%s> created <%s>.\n"
+          "Embedding external dictionary <%s> will overwrite former one.\n"
+          "External dictionary has name <%s> version <%s> created <%s>.\n\n"
+          "It is requested that you confirm your choice."
+          ,
+          MasterFile->getURIContent().toString(),
+          MasterFile->Dictionary->DicName.toString(),
+          getVersionStr( MasterFile->Dictionary->Version).toString(),
+          MasterFile->Dictionary->CreationDate.toDMY().toString(),
+          DictionaryFile->DicName.toString(),
+          getVersionStr( DictionaryFile->Version).toString(),
+          DictionaryFile->CreationDate.toDMY().toString()
+          );
+      if (wRet==QDialog::Rejected)
+        return;
+      ComLog->appendText("Confirmed request to replace embedded dictionary <%s> version file <%s>",
+          MasterFile->Dictionary->DicName.toString(),
+          getVersionStr( MasterFile->Dictionary->Version).toString(),
+          MasterFile->getURIDictionary().toString());
+      ComLog->appendText("with external dictionary <%s> version from file <%s>",
+          DictionaryFile->DicName.toString(),
+          getVersionStr( DictionaryFile->Version).toString(),
+          DictionaryFile->URIDictionary.toString());
+
+      } // if (MasterFile->Dictionary!=nullptr)
+
+    ZStatus wSt = MasterFile->setDictionary(*DictionaryFile);
+    if (wSt!=ZS_SUCCESS) {
+      ZExceptionDLg::adhocMessage("Embedded dictionary",Severity_Error,
+          "Cannot embed dictionary %s file %s.\n"
+          "See ZException stack for more information.",
+          DictionaryFile->DicName.toString(),
+          DictionaryFile->URIDictionary.toString());
+      ComLog->appendText("Cannot create dictionary to embed.\n"
+                         "Exception follows :\n"
+                         "%s",ZException.last().formatFullUserMessage().toString());
+      return;
+    }
+
+    ComLog->appendText("Dictionary embedded into master file with file name <%s>.",MasterFile->getURIDictionary().toString());
+    return;
+    }//if (pAction==EmbedDicQAc)
+
+
+  if (pAction==EditEmbeddedDicQAc){
+
+    if (MasterFile==nullptr) {
+      ZExceptionDLg::adhocMessage("Embedded dictionary",Severity_Error,nullptr,nullptr,
+          "No current master file has been set.\n"
+          "Either generate one or load an existing one.\n"
+          "You may afterwards edit its embedded dictionary.");
       return;
     }
     if (MasterFile->Dictionary==nullptr) {
+      if (DictionaryFile == nullptr) {
       ZExceptionDLg::adhocMessage("Embedded dictionary",Severity_Error,nullptr,nullptr,
-          "Raw master file <%s> \n" "has no embedded dictionary.",MasterFile->getURIContent().toString());
+            "Current file <%s> \n"
+            "has no embedded dictionary (Raw master file).\n"
+            "No external dictionary has been loaded.\n"
+            "Either you may define one new dictionary to embed\n"
+            "Or load an existing external one and embed it.",MasterFile->getURIContent().toString());
       return;
+      }
+      /* here there is an external dictionary loaded */
+      int wRet = ZExceptionDLg::adhocMessage2B("Embedded dictionary",Severity_Error,
+          "Give up","Embed",
+          nullptr,nullptr,
+          "Current file <%s> \n"
+          "has no embedded dictionary (Raw master file).\n"
+          "But an external dictionary <%s> has been loaded.\n"
+          "Either you may define one new dictionary to embed\n"
+          "Or load an existing external one and embed it.",
+          MasterFile->getURIContent().toString(),
+          DictionaryFile->DicName.toString());
+      if (wRet==QDialog::Rejected)
+        return;
+      ComLog->appendText("Request to embed dictionary %s to raw master file <%s>",
+                DictionaryFile->DicName.toString(),
+                MasterFile->getURIContent().toString());
+      ZStatus wSt = MasterFile->setDictionary(*DictionaryFile);
+      if (wSt!=ZS_SUCCESS) {
+        ZExceptionDLg::adhocMessage("Embedded dictionary",Severity_Error,
+            "Cannot create dictionary to embed.\n"
+            "See ZException stack for more information.");
+        ComLog->appendText("Cannot create dictionary to embed.\n"
+            "Exception follows :\n"
+            "%s",ZException.last().formatFullUserMessage().toString());
+        return;
+      }
+      ComLog->appendText("Dictionary embedded into master file with file name <%s>.",MasterFile->getURIDictionary().toString());
+//      return; // let normal embedded dic edit from newly embedded dictionary
+    }
+    if (DicEdit==nullptr) {
+      DicEdit = new DicEditMWn(std::bind(&FileGenerateMWn::DicEditQuitCallback, this),this);
     }
     DicEdit->setMasterFile(MasterFile);
     DicEdit->displayZMFDictionary(MasterFile->Dictionary->getDictionary());
     DicEdit->show();
     return;
   }
+
   if (pAction==LoadFromZmfQAc){
     LoadFromZmfFile();
     return;
@@ -2084,6 +2194,11 @@ bool FileGenerateMWn::LoadFromXmlDef() {
   return true;
 }
 bool FileGenerateMWn::applyToCurrentZmf() {
+
+  if (ValuesControl()) {
+        return false;
+      }
+
   if (MasterFile==nullptr) {
     ZExceptionDLg::adhocMessage("FileGenerateDLg::applyToZmf",Severity_Error,nullptr,nullptr,
         "No master file loaded. Please load one.");
@@ -2100,6 +2215,10 @@ bool FileGenerateMWn::applyToCurrentZmf() {
 }
 
 bool FileGenerateMWn::changeChosenZmf() {
+
+  if (ValuesControl()) {
+    return false;
+  }
 
   utf8VaryingString wStr;
 
@@ -2125,6 +2244,11 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
   zbs::ZArray<utf8VaryingString> wIndexToRebuild;
 
   _refresh(); /* update some booleans like GrabFreeSpace */
+
+  if (ValuesControl()) {
+    return ZS_INVPARAMS;
+  }
+
   utf8VaryingString wStr;
 
   ComLog->appendText("Applying changes to file <%s>.", pURIMaster.toString());
@@ -2309,15 +2433,17 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
       wNewKeyName = ChangeLog[wi].getPostString();
 
       wComplement = "Changing index name induces a change in index file name accordingly.";
-      ZExceptionDLg::setFixedFont();
-      int wRet=ZExceptionDLg::adhocMessage2B("Change index name",Severity_Information,
+//      ZExceptionDLg::setFixedFont();
+      int wRet=ZExceptionDLg::adhocMessage2BHtml("Change index name",Severity_Information,
           "Do not change","Change",
           nullptr,&wComplement,
           "Index file <%s>\n"
           "About to change index file name \n"
           "from <%s> to <%s>.\n\n"
-          "Abandon operation and keep index name      <Do not Change>.\n"
-          "Change index name and rename index file    <Change>.",
+          "<table>"
+          "<tr><td> Abandon operation and keep index name</td>      <td><b>Do not Change</b></td> </tr>"
+          "<tr><td> Change index name and rename index file</td>    <td><b>Change</b></td> </tr>"
+          "</table>",
           pMasterFile.IndexTable[wIndexRank]->getURIContent().toString(),
           wOldKeyName.toString(),
           wNewKeyName.toString());
@@ -2413,13 +2539,16 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
           true,&ErrorLog);
 
       if (wSt!=ZS_SUCCESS) {
-        ZExceptionDLg::setFixedFont();
+//        ZExceptionDLg::setFixedFont();
         utf8VaryingString wComplement = ZException.last().formatFullUserMessage();
-        int wRet = ZExceptionDLg::adhocMessage2B("Index file creation",Severity_Error,"Abort","Continue",
+        int wRet = ZExceptionDLg::adhocMessage2BHtml("Index file creation",Severity_Error,"Abort","Continue",
             &ErrorLog,&wComplement,
             "Cannot create index file for index key <%s>\n\n"
-            "terminate processing of changes <Abort>\n"
-            "continue anyway                 <Continue>",wKD.IndexName.toString());
+            "<table>"
+            "<tr><td> terminate processing of changes</td>      <td><b>Abort</b></td></tr>"
+            "<tr><td> continue anyway</td>    <td><b>Continue</b></td></tr>"
+            "</table>"
+            ,wKD.IndexName.toString());
         if (wRet==QDialog::Rejected)
           return wSt;
       }
@@ -2507,6 +2636,78 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
   return wSt;
 }
 
+
+bool
+FileGenerateMWn::ValuesControl() {
+  utf8VaryingString wStr, wErrComp;
+
+  wStr.sprintf("Controlling values for (raw) master file creation or change ");
+  ComLog->appendText(wStr);
+  int wErrored=0;
+
+  if (AllocatedBlocks==0) {
+    wErrComp += "Raw master file : Allocated blocks cannot be zero.\n";
+    wErrored++;
+  }
+  if (ExtentQuota==0) {
+    wErrComp += "Raw master file : ExtentQuota cannot be zero.\n";
+    wErrored++;
+  }
+  if (MeanRecordSize==0) {
+    wErrComp += "Raw master file : MeanRecordSize cannot be zero.\n";
+    wErrored++;
+  }
+  if (AllocatedSize==0) {
+    wErrComp += "Raw master file : AllocatedSize cannot be zero.\n";
+    wErrored++;
+  }
+  if (MeanRecordSize > AllocatedSize) {
+    wErrComp += "Raw master file : MeanRecordSize cannot be greater than AllocatedSize.\n";
+    wErrored++;
+  }
+
+  if (KeyValues->count() > 0) {
+    for (long wi=0;wi < KeyValues->count(); wi ++) {
+      if (KeyValues->Tab[wi].IndexName.isEmpty()) {
+        wErrComp.addsprintf("Index <%ld> : IndexName cannot be empty.\n",wi);
+        wErrored++;
+      }
+      if (KeyValues->Tab[wi].KeySize==0) {
+        wErrComp.addsprintf("Index <%ld><%s> : KeySize cannot be zero.\n",wi,KeyValues->Tab[wi].IndexName.toString());
+        wErrored++;
+      }
+      if (KeyValues->Tab[wi].Allocated==0) {
+        wErrComp.addsprintf("Index <%ld><%s> : Allocated blocks cannot be zero.\n",wi,KeyValues->Tab[wi].IndexName.toString());
+        wErrored++;
+      }
+      if (KeyValues->Tab[wi].ExtentQuota==0) {
+        wErrComp.addsprintf("Index <%ld> : ExtentQuota cannot be zero.\n",wi,KeyValues->Tab[wi].IndexName.toString());
+        wErrored++;
+      }
+      if (KeyValues->Tab[wi].AllocatedSize==0) {
+        wErrComp.addsprintf("Index <%ld><%s> : AllocatedSize cannot be zero.\n",wi,KeyValues->Tab[wi].IndexName.toString());
+        wErrored++;
+      }
+      if (KeyValues->Tab[wi].KeySize > KeyValues->Tab[wi].AllocatedSize) {
+        wErrComp.addsprintf("Index <%ld><%s> : KeySize cannot be greater than AllocatedSize.\n",wi,KeyValues->Tab[wi].IndexName.toString());
+        wErrored++;
+      }
+    }// for
+  }// if (KeyValues->count() > 0)
+
+  if (wErrored > 0) {
+    ComLog->appendText(wErrComp);
+    ZExceptionDLg::adhocMessage("Master file creation",Severity_Error,nullptr,&wErrComp,
+                                "%d errors have been detected.\n"
+                                "click <More> to have a detailed report",wErrored);
+
+    return true;
+  }
+  ComLog->appendText("Controls passed successfully.");
+  return false;
+}
+
+
 void FileGenerateMWn::GenFile() {
 
   if (RootName.isEmpty()){
@@ -2526,7 +2727,6 @@ void FileGenerateMWn::GenFile() {
   wURIFile.addConditionalDirectoryDelimiter();
   wURIFile += RootName;
   wURIFile += __MASTER_FILEEXTENSION__;
-
 
   wStr.sprintf("Creating (raw) master file <%s>",wURIFile.toString());
   ComLog->appendText(wStr);
@@ -2574,7 +2774,9 @@ void FileGenerateMWn::GenFile() {
     return;
   }
 
-
+  if (ValuesControl()) {
+    return;
+  }
 
   if (wURIFile.exists()) {
     uriStat wStat;
@@ -2655,7 +2857,7 @@ void FileGenerateMWn::GenFile() {
   }
 
 
-  if (KeyValues->count() != 0) {
+  if (KeyValues->count() == 0) {
     ComLog->appendText("%s - set no index key has been defined.");
   }
   else {
@@ -2735,9 +2937,11 @@ void FileGenerateMWn::GenFile() {
         nullptr,nullptr,
         "A master file is loaded <%s>.\n"
         "Current Master file has its own embedded dictionary <%s>.\n"
-        "Create file \n"
-        "   as raw master file without dictionary <Raw>\n"
-        "   using embedded file dictionary        <Embedded>",
+        "<table>"
+        "<th><tr>Create file </tr></th>"
+        "<tr><td> as raw master file without dictionary</td>      <td><b>Raw</b></td> </tr>"
+        "<tr><td> using embedded file dictionary </td>    <td><b>Embedded</b></td> </tr>"
+        "</table>",
         MasterFile->getURIContent().toString(),
         MasterFile->Dictionary->DicName.toString());
     if (wRet==ZEDLG_Rejected){
@@ -2759,16 +2963,18 @@ void FileGenerateMWn::GenFile() {
 
       if (MasterFile->Dictionary!=nullptr) {
         ZExceptionDLg::setFixedFont(true);
-        int wRet=ZExceptionDLg::adhocMessage3B("Generate file",Severity_Information,
+        int wRet=ZExceptionDLg::adhocMessage3BHtml("Generate file",Severity_Information,
             "Raw","Loaded","Embedded",
             nullptr,nullptr,
             "A dictionary is loaded <%s>.\n"
             "A master file is loaded <%s>.\n"
             "Master file has its own dictionary <%s>.\n"
             "Create file \n"
-            "   as raw master file without dictionary <Raw>\n"
-            "   using loaded dictionary               <Loaded>\n"
-            "   using embedded file dictionary        <Embedded>",
+            "<table>"
+            "<tr><td>as raw master file without dictionary</td>      <td><b>Raw</b></td></tr>"
+            "<tr><td>using loaded file dictionary </td>    <td><b>Loaded</b></td></tr>"
+            "<tr><td>using embedded file dictionary  </td>    <td><b>Embedded</b></td></tr>"
+            "</table>",
             DictionaryFile->DicName.toString(),
             MasterFile->getURIContent().toString(),
             MasterFile->Dictionary->DicName.toString());
@@ -2807,8 +3013,10 @@ void FileGenerateMWn::GenFile() {
           "A raw master file has been loaded <%s>.\n"
           "Raw master file has no dictionary.\n"
           "Create file \n"
-          "   as raw master file without dictionary <Raw>\n"
-          "   using loaded dictionary               <Loaded>\n",
+          "<table>"
+          "<tr><td>as raw master file without dictionary</td>      <td><b>Raw</b></td></tr>"
+          "<tr><td>using loaded file dictionary </td>    <td><b>Loaded</b></td></tr>"
+          "</table>",
           DictionaryFile->DicName.toString(),
           MasterFile->getURIContent().toString());
       switch (wRet) {
@@ -2834,14 +3042,16 @@ void FileGenerateMWn::GenFile() {
 
   if (DictionaryFile!=nullptr) {
     ZExceptionDLg::setFixedFont();
-      int wRet=ZExceptionDLg::adhocMessage2B("Generate file",Severity_Information,
+      int wRet=ZExceptionDLg::adhocMessage2BHtml("Generate file",Severity_Information,
           "Raw","Loaded",
           nullptr,nullptr,
           "A dictionary is loaded <%s>.\n"
           "No master file loaded.\n"
           "Create file \n"
-          "   as raw master file without dictionary <Raw>\n"
-          "   using loaded dictionary               <Loaded>\n",
+          "<table>"
+          "<tr><td>as raw master file without dictionary</td>      <td><b>Raw</b></td></tr>"
+          "<tr><td>using loaded file dictionary </td>    <td><b>Loaded</b></td></tr>"
+          "</table>",
           DictionaryFile->DicName.toString());
       switch (wRet) {
       case ZEDLG_Accepted:  { /* include loaded dictionary */
@@ -2879,15 +3089,17 @@ GenFileEnd:
   wMasterFile->zclose();
   ComLog->appendText("Master file closed.");
 
-  ZExceptionDLg::setFixedFont(true);
-  int wRet=ZExceptionDLg::adhocMessage2B("Generate file",Severity_Information,
+//  ZExceptionDLg::setFixedFont(true);
+  int wRet=ZExceptionDLg::adhocMessage2BHtml("Generate file",Severity_Information,
       "No","Yes",
       nullptr,nullptr,
-      "Do you want to make generated file\n"
-      "<%s>\n"
-      "current master file ?\n"
-      "   set this file as current  <Yes>\n"
-      "   forget this file and stay <No>\n",
+      "Do you want to make generated file<br>"
+      "%s<br>"
+      "current master file ?<br>"
+      "<table>"
+      "<tr><td>   set this file as current</td>   <td><b>Yes</b></td></tr>"
+      "<tr><td>   forget this file and stay</td>   <td><b>No</b></td></tr>"
+      "</table>",
       wMasterFile->getURIContent().toString());
   if (wRet==QDialog::Rejected) {
     return;

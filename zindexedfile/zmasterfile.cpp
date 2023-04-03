@@ -83,10 +83,10 @@ ZMasterFile::rebuildIndex(long pIndexRank) {
   zaddress_type wZMFAddress;
   ZIndexItem* wIndexItem=nullptr;
   long wRank=0;
-  if (!isOpen() || (getMode()!=ZRF_All)) {
+  if (getMode()!=ZRF_All) {
     ZException.setMessage("ZMasterFile::rebuildIndex",ZS_FILENOTOPEN,Severity_Error,
-        "File must be open with access mode ZRF_All.");
-    return ZS_FILENOTOPEN;
+        "File is open in mode %s. It must be open with access mode ZRF_All.",decode_ZRFMode(getMode()));
+    return ZS_MODEINVALID;
   }
 
   if (pIndexRank >= IndexTable.count()) {
@@ -95,15 +95,21 @@ ZMasterFile::rebuildIndex(long pIndexRank) {
     return ZS_INVTYPE;
   }
   ZStatus wSt;
-  if (!IndexTable[pIndexRank]->isOpen()) {
+/*  if (!IndexTable[pIndexRank]->isOpen()) {
     IndexTable[pIndexRank]->zclose();
   }
   wSt=zopenIndexFile(pIndexRank,ZRF_All);
-
-  wSt=IndexTable[pIndexRank]->_removeAll();
+*/
+  wSt=IndexTable[pIndexRank]->zremoveAll();
+  if (wSt!=ZS_SUCCESS){
+    return wSt;
+  }
 
   /* browse all master file records, extract key and feed index file */
   wSt=zgetWAddress(wRecord,wRank,wZMFAddress);
+  if (wSt!=ZS_SUCCESS){
+    return wSt;
+  }
 
   while (wSt==ZS_SUCCESS) {
     wSt=extractKeyValues(wRecord,wKeyRecord,pIndexRank);
@@ -390,8 +396,10 @@ getURFField(const unsigned char* &pPtrIn) {
     ZException.setMessage("getURFField",ZS_INVTYPE,Severity_Error,"Invalid ZType found %X ",wType);
     wF.Size=0;
     wF.Ptr=nullptr;
+    wF.Present = false;
     return wF;
   }
   } // switch
+  wF.Present = true;
   return wF;
 } //getURFField

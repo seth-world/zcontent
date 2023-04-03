@@ -115,6 +115,9 @@ public:
   void report(FILE *pOutput=stdout);
 
 
+  uriString getURIDictionary();
+
+
   uint8_t     HistoryOn=false; /* RFFU: if set, journaling events are historized see if no duplicate role with journaling keep option */
   uriString   IndexFilePath;  // Directory path for index files. If empty, then directory path of main content file is taken
   //    uriString               JournalPath;        // see ZJCB - Directory path for journal file. If empty, then directory path of main content file is taken
@@ -123,6 +126,7 @@ public:
   uriString         DictionaryPath; /* Directory path for dictionary- If empty, then directory path of main content file is taken */
 
   ZDictionaryFile*        Dictionary=nullptr;
+
 
   ZIndexTable             IndexTable;     // List of effective index objects that will manage physical ZIndexFile
   ZJournalControlBlock*   ZJCB=nullptr;

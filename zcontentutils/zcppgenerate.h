@@ -86,8 +86,6 @@ public:
 
   utf8VaryingString genHeaderFields(utf8VaryingString& pFileIncludeList);
 
-//  utf8VaryingString genCopyFrom(utf8VaryingString& pClassName);
-
   ZStatus genHeader(const utf8VaryingString& pClassName,
                               const uriString &pHeaderFile,
                               const utf8VaryingString &pBrief);

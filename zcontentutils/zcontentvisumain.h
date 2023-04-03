@@ -213,7 +213,10 @@ public:
   QActionGroup* mainQAg=nullptr;
   QAction*      DictionaryQAc = nullptr;
   QAction*      GetRawQAc=nullptr;
-  QAction*      GetZmfDefQAc = nullptr;
+  QMenu *       MasterFileMEn=nullptr;
+  QAction*      ZmfDefQAc = nullptr;
+  QAction*      IndexRebuildQAc = nullptr;
+
 
   QAction*      openZRFQAc=nullptr;
 
@@ -226,6 +229,7 @@ public:
   QAction* uint64QAc = nullptr;
   QAction* int64QAc = nullptr;
   QAction* sizetQAc = nullptr;
+
 
   bool searchHexa(bool pReverse=false);
   bool searchAscii(bool pCaseRegardless=false, bool pReverse=false);

@@ -51,6 +51,10 @@ public:
 
   ZDataBuffer getURFFieldByRank (long pRank);
 
+  /** @brief getURFFieldSize returns size of URF field pointed by pPtrIn.
+   * pPtrIn is not modified, and size includes URF header size.
+   * Return -1 if URF format is malformed.
+   */
   static ssize_t getURFFieldSize (const unsigned char *pPtrIn); /* pPtrIn is NOT updated */
 
   /**

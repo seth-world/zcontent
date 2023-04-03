@@ -1022,13 +1022,11 @@ int wS;
 uriString wFormerContentURI;
 uriString wFormerHeaderURI;
 
-//    _DBGPRINT("ZRandomFile::_create \n")
-
     if (pInitialSize<=0) {
         ZException.setMessage(_GET_FUNCTION_NAME_,
                               ZS_INVSIZE,
                               Severity_Severe,
-                              "Invalid file size <%ld> given for creating file <%s>\n",
+                              "Invalid initial file size <%ld> given for creating file <%s>\n",
                               pInitialSize,
                               URIContent.toString());
         return (ZS_INVSIZE);
@@ -4532,7 +4530,6 @@ ZBlockDescriptor wBS;
 ZStatus
 ZRandomFile::zremove(long pRank)
 {
-
     return(_remove(pRank));
 
 }// zremove
@@ -6176,7 +6173,7 @@ ZStatus wSt=ZS_SUCCESS;
 
         case ZFT_ZRawMasterFile :
         case ZFT_ZMasterFile : {
-          if ((pFileType==ZFT_ZMasterFile)||(pFileType==ZFT_ZRawMasterFile)) {
+          if ((pFileType==ZFT_ZMasterFile)||(pFileType==ZFT_ZRawMasterFile)||(pFileType==ZFT_ZDicMasterFile)) {
             wSt=ZS_SUCCESS;
             break; // everything in line
           }
@@ -8339,6 +8336,18 @@ zsize_type wFreeSpace = (pFreeSpace < 0)?ZFCB.BlockTargetSize : pFreeSpace ;
     return  (_writeFCB(true));
 } //ztruncateFile
 
+ZStatus
+ZRandomFile::zremoveAll() {
+  ZStatus wSt=ZS_SUCCESS;
+  while ((getRecordCount() > 0) && (wSt==ZS_SUCCESS) ) {
+    wSt=_remove(0L);
+  }
+  if (wSt!=ZS_SUCCESS) {
+    ZException.setMessage("ZRandomFile::zremoveAll",wSt,Severity_Error,
+        "Error while removing all records file %s",getURIContent().toString());
+  }
+  return wSt;
+}
 
 /**
  * @brief zclearFile Clearing file content for the current opened ZRandomFile
@@ -8376,8 +8385,6 @@ zsize_type wFreeSpace = (pFreeSpace < 0)?ZFCB.BlockTargetSize : pFreeSpace ;
 ZStatus
 ZRandomFile::zclearFile(const zsize_type pSize)
 {
-
-
 ZStatus wSt;
 long wi;
 zmode_type wMode = ZRF_Nothing ;
@@ -9692,6 +9699,8 @@ decode_ZFile_type (uint8_t pType) {
 
     case ZFT_DictionaryFile :
       return ("ZFT_DictionaryFile");
+    case ZFT_ZDicMasterFile :
+      return ("ZFT_ZDicMasterFile");
 
     default :
       return ("Unknownn ZFile_type");
