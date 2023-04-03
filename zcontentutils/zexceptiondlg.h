@@ -81,7 +81,8 @@ public:
 
   ~ZExceptionDLg();
 
-  void setErrorLog(ZaiErrors* pErrorLog) ;
+  void setErrorLogBTn(ZaiErrors* pErrorLog) ;
+
 
   static void setFixedFont(bool pOnOff=true);
 

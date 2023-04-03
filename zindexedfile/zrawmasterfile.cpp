@@ -1877,14 +1877,28 @@ ZRawMasterFile::zremoveAll() {
 
   /* first delete all index key files records */
 
+  if (ZVerbose & ZVB_FileEngine) {
+    _DBGPRINT("ZRawMasterFile::zremoveAll-I- Removing all content of file <%s>.\n",getURIContent().toString())
+    _DBGPRINT("ZRawMasterFile::zremoveAll-I- Removing content for indexes.\n")
+  }
+
+
   for (long wi=0; wi < IndexTable.count(); wi++) {
+    if (ZVerbose & ZVB_FileEngine) {
+    _DBGPRINT("ZRawMasterFile::zremoveAll-I- Removing all content for index file <%s>\n",IndexTable[wi]->getURIContent().toString())
+    }
     wSt=IndexTable[wi]->zremoveAll();
     if (wSt!=ZS_SUCCESS) {
       ZException.addToLast(" While deleting index key");
+      if (ZVerbose & ZVB_FileEngine) {
+        _DBGPRINT("ZRawMasterFile::zremoveAll-E Error while removing index file's content\n%s\n",ZException.last().formatFullUserMessage().toString())
+      }
       return wSt;
     }
   }// for
-
+  if (ZVerbose & ZVB_FileEngine) {
+    _DBGPRINT("ZRawMasterFile::zremoveAll-I- Removing all content for master file itself.\n")
+  }
   return ZRandomFile::zremoveAll();
 }// zremoveAll
 
@@ -2119,6 +2133,32 @@ ZDataBuffer wMCBContent;
 
     return   zclose();
 }// zcreate
+
+ZStatus ZRawMasterFile::_writeAllHeaders() {
+  _Base::ZReserved.clear();
+  ZMasterControlBlock::_exportAppend(_Base::ZReserved);
+
+  ZStatus wSt=ZRandomFile::_writeAllFileHeader();
+  if (wSt!=ZS_SUCCESS)
+  {
+    ZException.addToLast(" writing headers for Master file %s",
+        getURIContent().toString());
+    return  wSt;
+  }
+
+
+  for (long wi=0;wi < IndexTable.count() ; wi++) {
+    wSt=IndexTable[wi]->_writeAllFileHeader();
+    if (wSt!=ZS_SUCCESS)
+    {
+      ZException.addToLast(" writing headers for Master file %s",
+          getURIContent().toString());
+      return  wSt;
+    }
+  }
+  return ZS_SUCCESS;
+}
+
 
 /**
  * @brief ZRawMasterFile::zcreate Creates the raw content file and its header as a ZRandomFile with a structure capable of creating indexes.

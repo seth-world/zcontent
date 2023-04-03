@@ -4,6 +4,8 @@
 #include "zrawmasterfile.h"
 #include "zmasterfile_utilities.h"
 
+#include <ztoolset/zlimit.h>
+
 #include <cstdarg>
 
 class URFField;
@@ -23,8 +25,14 @@ public:
   ZStatus setExternDictionary(const uriString& pDicPath);
 
   utf8VaryingString getDictionaryName() ;
-
-  ZStatus rebuildIndex(long pIndexRank) ;
+  /**
+   * @brief rebuildIndex  For index key of rank pIndexRank:<br>
+   * Clears index file. Re-create sequentially from master file content, record per record, index key records using extractKeyValues() routine.
+   * @param pIndexRank rank of index to rebuild
+   * @param pRank       Optional (omitted if nullptr) : if mentionned, currently processed ZMF rank is updated there.
+   * @return a ZStatus : ZS_SUCCESS if OK, otherwise the faulty status is returned and ZException is set with appropriate message data.
+   */
+  ZStatus rebuildIndex(long pIndexRank, long *pRank=nullptr) ;
   ZStatus extractKeyValues(const ZDataBuffer& pRecord, ZDataBuffer& pKeyContent, long pIndexRank);
 };
 

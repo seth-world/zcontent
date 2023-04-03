@@ -116,6 +116,7 @@ ZExceptionDLg::ZExceptionDLg(const utf8VaryingString& pTitle,const ZExceptionBas
 
   ErrlogBTn->setVisible(true);
 
+
   QObject::connect (CancelBTn,&QAbstractButton::pressed,this,[this]{ reject(); });
   QObject::connect (OKBTn,&QAbstractButton::pressed,this,[this]{ accept(); });
   QObject::connect (OtherBTn,&QAbstractButton::pressed,this,[this]{ done(ZEDLG_Third); });
@@ -358,9 +359,20 @@ void ZExceptionDLg::MoreClicked()
   return;
 }
 
-void ZExceptionDLg::setErrorLog(ZaiErrors* pErrorLog) {
+void ZExceptionDLg::setErrorLogBTn(ZaiErrors* pErrorLog) {
   ErrorLog=pErrorLog;
-  ErrlogBTn->setVisible(true);
+  if (pErrorLog==nullptr)
+     ErrlogBTn->setVisible(false);
+  else {
+    if (pErrorLog->count()==0)
+      ErrlogBTn->setVisible(false);
+    else
+      ErrlogBTn->setVisible(true);
+  }
+  if (ZException.count()==0)
+    ZExceptionBTn->setVisible(false);
+  else
+    ZExceptionBTn->setVisible(true);
 }
 
 void ZExceptionDLg::ErrlogClicked()
@@ -733,8 +745,8 @@ ZExceptionDLg::_adhocMessage( const utf8VaryingString& pTitle,
 
   ZExceptionDLg* wDlg=new ZExceptionDLg(pTitle,pSeverity,pMessage,pComplement,pHtml,false);
 
-  if (pErrorlog)
-    wDlg->setErrorLog(pErrorlog);
+
+  wDlg->setErrorLogBTn(pErrorlog);
 
   wDlg->OKBTn->setVisible(true);
   wDlg->OKBTn->setText("Close");
@@ -814,8 +826,7 @@ ZExceptionDLg::_adhocMessage2B(const utf8String&pTitle, Severity_type pSeverity,
 
   ZExceptionDLg* wDlg=new ZExceptionDLg(pTitle,pSeverity,pMessage,pComplement,pHtml);
 
-  if (pErrorlog)
-    wDlg->setErrorLog(pErrorlog);
+  wDlg->setErrorLogBTn(pErrorlog);
 
   wDlg->OKBTn->setVisible(true);
   if (pOkText.isEmpty())
@@ -899,8 +910,7 @@ ZExceptionDLg::_adhocMessage3B(const utf8String&pTitle, Severity_type pSeverity,
 
   ZExceptionDLg* wDlg=new ZExceptionDLg(pTitle,pSeverity,pMessage,pComplement,pHtml);
 
-  if (pErrorlog)
-    wDlg->setErrorLog(pErrorlog);
+  wDlg->setErrorLogBTn(pErrorlog);
 
   wDlg->OKBTn->setVisible(true);
   if (pOkText.isEmpty())

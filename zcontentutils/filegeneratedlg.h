@@ -1,25 +1,29 @@
 #ifndef FILEGENERATEDLG_H
 #define FILEGENERATEDLG_H
 
-//#include <QDialog>
 #include <QMainWindow>
 #include <QAction>
 #include <QActionGroup>
 
-#include <ztoolset/uristring.h>
+
+
+#include "masterfilevalues.h"
 #include <ztoolset/zaierrors.h>
 
-#include <zcontent/zindexedfile/zmasterfile.h>
-
-#include "keydata.h"
-#include "zchangerecord.h"
+extern const QColor ErroredQCl;
 
 #define __SAME_AS_MASTER__ "<same as master file>"
 
-class DicEditMWn;
-class FileGenerateMWn;
-extern class DicEditMWn* DicEdit;
-extern class FileGenerateMWn* FileGenerate;
+
+namespace zbs {
+class ZDictionaryFile;
+class ZMasterFile;
+class ZMFDictionary;
+template <class _Tp>
+class ZArray;
+}
+
+
 
 class QPlainTextEdit;
 class QPushButton;
@@ -35,76 +39,6 @@ class QStandardItem;
 class textEditMWn;
 
 
-namespace zbs {
-class ZDictionaryFile;
-template <class _Tp>
-class ZArray;
-}
-
-
-
-class MasterFileValues {
-public:
-  MasterFileValues()=default;
-  ~MasterFileValues() {
-    if (KeyValues!=nullptr)
-      delete KeyValues;
-    if (DeletedKeyValues!=nullptr)
-      delete DeletedKeyValues;
-  }
-  MasterFileValues(MasterFileValues& pIn) {_copyFrom(pIn);}
-  MasterFileValues& _copyFrom(MasterFileValues& pIn) {
-    TargetDirectory=pIn.TargetDirectory;
-    IndexDirectory=pIn.IndexDirectory;
-    RootName=pIn.RootName;
-    MeanRecordSize=pIn.MeanRecordSize;
-    AllocatedBlocks=pIn.AllocatedBlocks;
-    AllocatedSize=pIn.AllocatedSize;
-    ExtentQuota=pIn.ExtentQuota;
-    ExtentQuotaSize=pIn.ExtentQuotaSize;
-    InitialBlocks=pIn.InitialBlocks;
-    InitialSize=pIn.InitialSize;
-
-    GrabFreeSpace=pIn.GrabFreeSpace;
-    HighWaterMarking=pIn.HighWaterMarking;
-    Journaling=pIn.Journaling;
-
-    if (pIn.KeyValues==nullptr) {
-      if (KeyValues!=nullptr) {
-        delete KeyValues;
-        KeyValues=nullptr;
-      }
-      return *this;
-    }// if (pIn.KeyValues==nullptr)
-    if (KeyValues==nullptr)
-      KeyValues = new zbs::ZArray<KeyData>;
-    else
-      KeyValues->clear();
-    for (long wi=0;wi < pIn.KeyValues->count();wi++) {
-      KeyValues->push(pIn.KeyValues->Tab[wi]);
-    } // for
-    return *this;
-  } // _copyFrom
-
-  MasterFileValues& operator=(MasterFileValues& pIn) {return _copyFrom(pIn);}
-
-  uriString TargetDirectory;
-  uriString IndexDirectory;
-  utf8VaryingString RootName;
-  size_t MeanRecordSize=0;
-  size_t AllocatedBlocks = 0, AllocatedSize = 0;
-  size_t ExtentQuota = 0, ExtentQuotaSize = 0;
-  size_t InitialBlocks = 0, InitialSize = 0;
-  bool HighWaterMarking = false ;
-  bool GrabFreeSpace = true;
-  bool Journaling = false;
-
-  zbs::ZArray<KeyData>* KeyValues=nullptr;
-  zbs::ZArray<KeyData>* DeletedKeyValues=nullptr;
-
-//  zbs::ZArray<KeyChange> KeyLog;
-  zbs::ZArray<ZChangeRecord> ChangeLog;
-};
 
 enum FGState : uint8_t {
   FGST_Nothing  = 0,
@@ -112,10 +46,11 @@ enum FGState : uint8_t {
   FGST_FRawMF   = 2,
   FGST_FZMF     = 3
 };
-
+/*
 namespace Ui {
 class FileGenerateDLg;
 }
+*/
 
 class FileGenerateMWn : public QMainWindow , MasterFileValues
 {
@@ -124,7 +59,7 @@ class FileGenerateMWn : public QMainWindow , MasterFileValues
 public:
   explicit FileGenerateMWn(QWidget *parent = nullptr);
   explicit FileGenerateMWn(ZDictionaryFile *pDictionary, QWidget *parent = nullptr);
-  ~FileGenerateMWn();
+  ~FileGenerateMWn()override ;
 
   void initLayout() ;
   void dataSetupFromDictionary() ;
@@ -137,21 +72,32 @@ public:
 
   void _refresh();
 
-  bool LoadFromZmfFile(); /* load definition from an existing master file  */
-  bool LoadFromXmlDic();  /* generate a definition from an xml dictionary file */
-  bool LoadFromXmlDef();  /* load definition from an xml file */
+  bool setupFromZmfFile(); /* set up definition from an existing master file  */
+  bool setupFromXmlDic();  /* generate a definition and set up from an xml dictionary file */
+  bool setupFromDicFile();  /* generate a definition and set up from a dictionary file */
+  bool setupFromXmlDef();  /* load definition set up from a definition contained in an xml file */
 
 
-  ZStatus XmlSave(uriString& pXmlFile,bool pComment=true); /* save definition to an xml formatted text file */
-  ZStatus XmlLoad(const utf8VaryingString&pXmlContent, ZaiErrors* pErrorlog);
+  /* loads an external dictionary from an xml file without setting up parameters */
+  ZStatus loadExternalXmlDic();
+  /* loads an external dictionary from a dic file without setting up parameters */
+  ZStatus loadExternalDicFile();
+
+
+  ZStatus XmlDefinitionSave(uriString& pXmlFile,bool pComment=true); /* save definition to an xml formatted text file */
+  ZStatus XmlDefinitionLoad(const utf8VaryingString&pXmlContent, ZaiErrors* pErrorlog);
 
   bool changeChosenZmf(); /* apply to a zmf file current definition */
   bool applyToCurrentZmf(); /* apply to currently loaded ZMF */
 
   /* no test run possible */
-  ZStatus processZmf(const uriString &pURIMaster, bool pBackup=true);
+  ZStatus applyChangesZmf(const uriString &pURIMaster, bool pBackup=true);
 
   ZStatus createDic(ZMFDictionary& pDic, const uriString &pURIMaster);
+
+
+  ZStatus rebuildIndex(ZMasterFile &pMasterFile, long pIndexRankToRebuild);
+
 
   void resizeEvent(QResizeEvent*) override;
 
@@ -169,11 +115,15 @@ public:
   void displayChangeLog();
   void displayChangeLine(const ZChangeRecord& pChgRec);
 
+  void changeKeySize(KeyData& pKeyData,size_t pNewKeySize);
+
   /* controls master file and its index keys values before creation or applying changes
    * returns true if errors have been detected
    * returns false if no error has been detected
    */
   bool ValuesControl();
+
+  ZStatus indexRebuildFromMenu();
 
 Q_SLOT
   void Quit();
@@ -200,7 +150,6 @@ private:
   textEditMWn* ChangeLogMWn=nullptr;
 
   bool DoNotChangeKeyValues=false;
-
 
   ZaiErrors  ErrorLog;
 
@@ -248,9 +197,13 @@ private:
   QAction* SameAsMasterQAc=nullptr;
   QAction* GenXmlQAc=nullptr;
 
-  QAction* LoadFromZmfQAc=nullptr;
-  QAction* LoadFromXmlDicQAc=nullptr;
-  QAction* LoadFromXmlDefQAc=nullptr;
+  QAction* SetupFromZmfQAc=nullptr;
+  QAction* SetupFromXmlDicQAc=nullptr;
+  QAction* SetupFromDicFileQAc=nullptr;
+  QAction* SetupFromXmlDefQAc=nullptr;
+
+  QAction* LoadXmlDicQAc=nullptr;   /* load external dictionary from xml dictionary definition */
+  QAction* LoadDicFileQAc=nullptr;  /* load external dictionary from dictionary file */
 
   QAction* ApplyToZmfQAc=nullptr;
   QAction* SaveToXmlQAc=nullptr;
@@ -274,6 +227,7 @@ private:
   QAction* GenFileQAc=nullptr;
   QAction* ApplyToCurrentQAc=nullptr;
   QAction* ApplyToLoadedQAc=nullptr;
+  QAction* indexRebuildQAc=nullptr;
   QAction* TestRunQAc=nullptr;
   QAction* QuitQAc=nullptr;
 
@@ -289,6 +243,11 @@ private:
 
   bool FResizeInitial=true;
 };
+
+
+
+extern class DicEditMWn* DicEdit;
+extern class FileGenerateMWn* FileGenerate;
 
 
 #endif // FILEGENERATEDLG_H

@@ -5573,6 +5573,7 @@ zrank_type      wRank;
  * @param[out] pAddress address of the block read
  * @param[in] pLock     Locks the block read with this mask.
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
+ *  ZS_EOF returned when end of file is reached : in this case, pRecord does not contain valid data.
  */
 ZStatus
 ZRandomFile::zgetNextWAddress(ZDataBuffer &pRecord, zrank_type &pRank, zaddress_type &pAddress)

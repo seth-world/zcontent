@@ -312,6 +312,7 @@ public:
 
   ZStatus zclose (void);
 
+  ZStatus _writeAllHeaders();
 
   /** @brief _removeFile   local method that removes all files component of ZRawMasterFile @see removeFile */
   ZStatus _removeFile(const uriString &pContentPath, ZaiErrors *pErrorLog=nullptr);

@@ -78,11 +78,11 @@ ZMasterFile::setExternDictionary(const uriString& pDicPath)
 }
 
 ZStatus
-ZMasterFile::rebuildIndex(long pIndexRank) {
+ZMasterFile::rebuildIndex(long pIndexRank,long* pRank) {
   ZDataBuffer wRecord, wKeyRecord;
   zaddress_type wZMFAddress;
   ZIndexItem* wIndexItem=nullptr;
-  long wRank=0;
+  long wRank=0L;
   if (getMode()!=ZRF_All) {
     ZException.setMessage("ZMasterFile::rebuildIndex",ZS_FILENOTOPEN,Severity_Error,
         "File is open in mode %s. It must be open with access mode ZRF_All.",decode_ZRFMode(getMode()));
@@ -100,13 +100,13 @@ ZMasterFile::rebuildIndex(long pIndexRank) {
   }
   wSt=zopenIndexFile(pIndexRank,ZRF_All);
 */
-  wSt=IndexTable[pIndexRank]->zremoveAll();
+  wSt=IndexTable[pIndexRank]->zclearFile(-1);
   if (wSt!=ZS_SUCCESS){
     return wSt;
   }
 
   /* browse all master file records, extract key and feed index file */
-  wSt=zgetWAddress(wRecord,wRank,wZMFAddress);
+  wSt=zgetWAddress(wRecord,0L,wZMFAddress);
   if (wSt!=ZS_SUCCESS){
     return wSt;
   }
@@ -114,19 +114,30 @@ ZMasterFile::rebuildIndex(long pIndexRank) {
   while (wSt==ZS_SUCCESS) {
     wSt=extractKeyValues(wRecord,wKeyRecord,pIndexRank);
     if (wSt!=ZS_SUCCESS)
-      return ZException.last().Status;
+      goto rebuildIndexError;
     wSt=IndexTable[pIndexRank]->_addRawKeyValue_Prepare(wIndexItem,wKeyRecord,wZMFAddress);
     if (wSt!=ZS_SUCCESS)
-      return ZException.last().Status;
+      goto rebuildIndexError;
     wSt=IndexTable[pIndexRank]->_rawKeyValue_Commit(wIndexItem);
     if (wSt!=ZS_SUCCESS)
-      return ZException.last().Status;
+      goto rebuildIndexError;
     wSt=zgetNextWAddress(wRecord,wRank,wZMFAddress);
+    if (pRank!=nullptr)
+      *pRank=wRank;
   }
 
   IndexTable[pIndexRank]->zclose();
-
-  return ZS_SUCCESS;
+  if (wSt==ZS_EOF)
+    wSt=ZS_SUCCESS;
+  return wSt;
+rebuildIndexError:
+  if (ZException.count()==0){
+    ZException.setMessage("ZMasterFile::rebuildIndex",wSt,Severity_Error,"Error while rebuilding index");
+  }
+  else {
+    ZException.addToLast(" calling module <ZMasterFile::rebuildIndex>");
+  }
+  return wSt;
 }
 
 

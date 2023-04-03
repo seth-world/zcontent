@@ -1,3 +1,4 @@
+
 #include "filegeneratedlg.h"
 //#include "ui_filegeneratedlg.h"
 
@@ -15,10 +16,12 @@
 #include <QCheckBox>
 #include <QTableWidget>
 #include <QSpacerItem>
+#include <QProgressBar>
 
 #include <ztoolset/zlimit.h>
 
 #include <zcontent/zindexedfile/zdictionaryfile.h>
+#include <zcontent/zindexedfile/zmasterfile.h>
 
 #include <zcontent/zindexedfile/zdataconversion.h>
 
@@ -34,12 +37,12 @@
 #include <QMenuBar>
 
 #include <QFileDialog>
+
+
 #include <zcppparser/zcppparsertype.h> // for getParserWorkDirectory
 #include <zcontent/zindexedfile/zrawmasterfileutils.h> // for generateIndexRootName
 
 #include <zqt/zqtwidget/zqtutils.h>
-
-//#include <zcontent/zindexedfile/zrawmasterfile.h>
 
 #include <zexceptiondlg.h>
 
@@ -54,6 +57,12 @@
 
 #include "zkeydlg.h"
 
+#include <ztoolset/ztime.h>
+
+
+const QColor ErroredQCl=Qt::red;
+const QColor WarnedQCl=Qt::darkGreen;
+
 const int cst_IndexNameCol =  0 ;
 const int cst_IndexRootNameCol =  cst_IndexNameCol + 1 ;
 const int cst_KeySizeCol =  cst_IndexRootNameCol + 1  ;
@@ -66,7 +75,9 @@ const int cst_KeyAllocSizeCol =  cst_KeyAllocCol + 1  ;
 const int cst_KeyExtentQuotaCol =  cst_KeyAllocSizeCol + 1  ;
 const int cst_KeyExtentSizeCol =  cst_KeyExtentQuotaCol + 1  ;
 
-class textEditMWn;
+const int cst_updateRate = 3 ;
+
+//class textEditMWn;
 
 using namespace zbs;
 
@@ -106,15 +117,17 @@ FileGenerateMWn::initLayout() {
   QMenuBar* GenMenuBar = menuBar();
   GenMenuBar->addMenu(GenMEn);
 
-  LoadFromZmfQAc=new QAction("Load from existing master file",GenMEn);
-  LoadFromXmlDicQAc=new QAction("Load from xml dictionary",GenMEn);
-  LoadFromXmlDefQAc=new QAction("Load from xml definition file",GenMEn);
+  SetupFromZmfQAc=new QAction("Setup from existing master file",GenMEn);
+  SetupFromXmlDicQAc=new QAction("Setup from xml dictionary",GenMEn);
+  SetupFromDicFileQAc=new QAction("Setup from dictionary file",GenMEn);
+  SetupFromXmlDefQAc=new QAction("Setup from xml definition file",GenMEn);
 
   QuitQAc=new QAction(QObject::tr( "Quit", "FileGenerateDLg") ,GenMEn);
 
-  GenMEn->addAction(LoadFromZmfQAc);
-  GenMEn->addAction(LoadFromXmlDicQAc);
-  GenMEn->addAction(LoadFromXmlDefQAc);
+  GenMEn->addAction(SetupFromZmfQAc);
+  GenMEn->addAction(SetupFromXmlDicQAc);
+  GenMEn->addAction(SetupFromDicFileQAc);
+  GenMEn->addAction(SetupFromXmlDefQAc);
 
   GenMEn->addSeparator();
   GenMEn->addAction(QuitQAc);
@@ -138,10 +151,15 @@ FileGenerateMWn::initLayout() {
   KeyAppendFromEmbeddedDicQAc = new QAction("Add from embedded dictionary",KeyMEn);
   KeyDeleteQAc = new QAction("Delete current key",KeyMEn);
 
+  indexRebuildQAc = new QAction("Rebuild index key",KeyMEn);
+
   KeyMEn->addAction(KeyAppendRawQAc);
   KeyMEn->addAction(KeyAppendFromLoadedDicQAc);
   KeyMEn->addAction(KeyAppendFromEmbeddedDicQAc);
+  KeyMEn->addSeparator();
   KeyMEn->addAction(KeyDeleteQAc);
+  KeyMEn->addSeparator();
+  KeyMEn->addAction(indexRebuildQAc);
 
   QMenu* ShowHideMEn = new QMenu("Show-Hide");
   GenMenuBar->addMenu(ShowHideMEn);
@@ -165,11 +183,19 @@ FileGenerateMWn::initLayout() {
   QMenu* DictionariesMEn = new QMenu("Dictionaries");
   GenMenuBar->addMenu(DictionariesMEn);
 
+
+  LoadXmlDicQAc=new QAction("Load external dictionary from xml dictionary file",GenMEn);
+  LoadDicFileQAc=new QAction("Load external dictionary from dictionary file",GenMEn);
+
   EmbedDicQAc = new QAction("Embed external dictionary",GenMEn);
   EditLoadedDicQAc = new QAction("Edit external dictionary",GenMEn);
   EditEmbeddedDicQAc = new QAction("Edit embedded dictionary",GenMEn);
 
+  DictionariesMEn->addAction(LoadXmlDicQAc);
+  DictionariesMEn->addAction(LoadDicFileQAc);
+  DictionariesMEn->addSeparator();
   DictionariesMEn->addAction(EmbedDicQAc);
+  DictionariesMEn->addSeparator();
   DictionariesMEn->addAction(EditLoadedDicQAc);
   DictionariesMEn->addAction(EditEmbeddedDicQAc);
 
@@ -205,12 +231,13 @@ FileGenerateMWn::initLayout() {
   GenActionGroup->addAction(ApplyToCurrentQAc);
   GenActionGroup->addAction(ApplyToLoadedQAc);
 
-  GenActionGroup->addAction(LoadFromZmfQAc);
+  GenActionGroup->addAction(SetupFromZmfQAc);
   GenActionGroup->addAction(QuitQAc);
 
-  GenActionGroup->addAction(LoadFromZmfQAc);
-  GenActionGroup->addAction(LoadFromXmlDicQAc);
-  GenActionGroup->addAction(LoadFromXmlDefQAc);
+  GenActionGroup->addAction(SetupFromZmfQAc);
+  GenActionGroup->addAction(SetupFromXmlDicQAc);
+  GenActionGroup->addAction(SetupFromDicFileQAc);
+  GenActionGroup->addAction(SetupFromXmlDefQAc);
 
   GenActionGroup->addAction(ApplyToZmfQAc);
   GenActionGroup->addAction(SaveToXmlQAc);
@@ -218,6 +245,8 @@ FileGenerateMWn::initLayout() {
   GenActionGroup->addAction(KeyAppendRawQAc);
   GenActionGroup->addAction(KeyAppendFromEmbeddedDicQAc);
   GenActionGroup->addAction(KeyDeleteQAc);
+  GenActionGroup->addAction(indexRebuildQAc);
+
 
   GenActionGroup->addAction(ShowGuessValQAc);
   GenActionGroup->addAction(HideGuessValQAc);
@@ -231,6 +260,9 @@ FileGenerateMWn::initLayout() {
   GenActionGroup->addAction(EmbedDicQAc);
   GenActionGroup->addAction(EditLoadedDicQAc);
   GenActionGroup->addAction(EditEmbeddedDicQAc);
+
+  GenActionGroup->addAction(LoadXmlDicQAc);
+  GenActionGroup->addAction(LoadDicFileQAc);
 
 
   /* Definition Source */
@@ -629,13 +661,10 @@ FileGenerateMWn::dataSetupFromDictionary() {
       if (!GuessGBx->isVisible())
         GuessGBx->setVisible(true);
 
-      wStr.sprintf( "%s-Value for field <%s> has not been guessed and remains invalid.",
+      wStr.sprintf( "%s-W-INVSIZ Size value for field <%s> has not been guessed and remains invalid.",
           ZDateFull::currentDateTime().toFormatted().toString(),
           wGuessRow[0]->text().toUtf8().data());
-
-//      plainTextEdit->appendPlainText(wStr.toCChar());
-
-      ComLog->appendText(wStr);
+      ComLog->appendTextColor(WarnedQCl, wStr);
     }
   }// for
 
@@ -656,6 +685,7 @@ FileGenerateMWn::dataSetupFromMasterFile(const uriString& pURIMaster) {
   utf8VaryingString wStr;
   wStr.sprintf("Loading parameters from existing master file <%s>.",pURIMaster.toString());
   ComLog->appendText(wStr);
+
   if (ChangeLog.count()!=0) {
     ZExceptionDLg::adhocMessage("Load master file",Severity_Error,
         nullptr,nullptr,
@@ -675,11 +705,14 @@ FileGenerateMWn::dataSetupFromMasterFile(const uriString& pURIMaster) {
       if (wRet==QDialog::Rejected)
         return false;
 
-    wStr.sprintf("A file has already being loaded/created <%s>.",MasterFile->getURIContent().toString());
-    ComLog->appendText(wStr);
-    if (MasterFile->isOpen())
+    ComLog->appendTextColor(QColor(),WarnedQCl, "%s-W-ALRDYLD A file has already being loaded/created <%s>.",
+        ZDateFull::currentDateTime().toFormatted().toString(),
+        MasterFile->getURIContent().toString());
+
+    if (MasterFile->isOpen()) {
       ComLog->appendText("Closing current file prior of loading new master file.");
       MasterFile->zclose();
+    }
     delete MasterFile;
   }
   MasterFile = new ZMasterFile;
@@ -687,7 +720,8 @@ FileGenerateMWn::dataSetupFromMasterFile(const uriString& pURIMaster) {
   if (wSt < 0) {
     ComLog->appendText("Cannot load requested file.");
     ZExceptionDLg::displayLast("Opening Master file");
-    ComLog->appendText(ZException.last().formatFullUserMessage());
+    ComLog->appendTextColor(ErroredQCl, "%s-E-CANTLD Cannot load requested file.\n%s",
+        ZDateFull::currentDateTime().toFormatted().toString(),ZException.last().formatFullUserMessage().toString());
     delete MasterFile;
     MasterFile = nullptr;
     return false;
@@ -699,7 +733,9 @@ FileGenerateMWn::dataSetupFromMasterFile(const uriString& pURIMaster) {
     wStr.sprintf("Loaded file has an associated dictionary <%s>.",MasterFile->Dictionary->DicName.toString());
     ComLog->appendText(wStr);
     if (MasterFile->getFileType()!= ZFT_ZMasterFile ) {
-      ComLog->appendText("File has a dictionary though its file type is %s",decode_ZFile_type(MasterFile->getFileType()));
+      ComLog->appendTextColor(QColor(),WarnedQCl, "%s-W-BADTYP File has a dictionary, though its file type is %s",
+          ZDateFull::currentDateTime().toFormatted().toString(),
+          decode_ZFile_type(MasterFile->getFileType()));
     }
     if (DictionaryFile!=nullptr) {
       ComLog->appendText("Currently loaded external dictionary %s is made unavailable.",
@@ -763,7 +799,7 @@ FileGenerateMWn::dataSetupFromMasterFile(const uriString& pURIMaster) {
 
 
 
-ZStatus FileGenerateMWn::XmlSave(uriString &pXmlFile, bool pComment) {
+ZStatus FileGenerateMWn::XmlDefinitionSave(uriString &pXmlFile, bool pComment) {
   utf8String wReturn = fmtXMLdeclaration();
   int wLevel=0;
   wReturn += fmtXMLnodeWithAttributes("zicm","version",__ZRF_XMLVERSION_CONTROL__,0);
@@ -891,7 +927,7 @@ ZStatus FileGenerateMWn::XmlSave(uriString &pXmlFile, bool pComment) {
 
 
 ZStatus
-FileGenerateMWn::XmlLoad(const utf8VaryingString& pXmlContent, ZaiErrors* pErrorlog) {
+FileGenerateMWn::XmlDefinitionLoad(const utf8VaryingString& pXmlContent, ZaiErrors* pErrorlog) {
 
   MasterFileValues wZMFVal;
 
@@ -1137,7 +1173,7 @@ FileGenerateMWn::dataSetupFromXmlDefinition(const uriString& pXmlFile) {
 
   ErrorLog.setAutoPrintOn(ZAIES_Info);
 
-  wSt=XmlLoad(wXmlContent,&ErrorLog);
+  wSt=XmlDefinitionLoad(wXmlContent,&ErrorLog);
   if (wSt!=ZS_SUCCESS)
     return false;
 
@@ -1300,7 +1336,6 @@ FileGenerateMWn::GuessItemChanged(QStandardItem* pItem){
       ZDateFull::currentDateTime().toFormatted().toString(),
       wItem->text().toUtf8().data(),
       getValueFromString<size_t>(wStr) );
-//  plainTextEdit->appendPlainText(wStr.toCChar());
   ComLog->appendText(wStr);
 
   Compute();
@@ -1438,6 +1473,11 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
     return ;
   }//cst_KeyHighCol
 
+    /* Changing key size induces or may induce a change on
+     *  KeySize
+     *  Allocation      (if allocation is zero then set to default allocation)
+     *  AllocationSize
+     */
   case cst_KeySizeCol: {
     DoNotChangeKeyValues = false;
       wStr = pItem->text().toUtf8().data();
@@ -1460,11 +1500,34 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
 
       DoNotChangeKeyValues = true;
 
+      if (KeyValues->Tab[pItem->row()].Allocated==0){
+        KeyValues->Tab[pItem->row()].Allocated = cst_ZRF_default_allocation;
+
+        ZChangeRecord wChgRecAll(ZFGC_ChgAlloc);
+        wChgRecAll.setChangeKey(KeyValues->Tab[pItem->row()].IndexName);
+        wChgRecAll.setAnte(size_t(0L));
+        wChgRecAll.setPost(KeyValues->Tab[pItem->row()].Allocated );
+        wChgRecAll.setIndexRank (pItem->row());
+        ChangeLog.push(wChgRecAll);
+        wStr.sprintf( "%s Value <Key Allocated blocks> for key <%s> has been defaulted to <%ld>.Logging change for this value.",
+                      ZDateFull::currentDateTime().toFormatted().toString(),
+                      wMainKeyItem->text().toUtf8().data(),
+                      cst_ZRF_default_allocation);
+        ComLog->appendText(wStr);
+
+      }
+
+      ZChangeRecord wChgRecAllSiz(ZFGC_ChgAlloc);
+      wChgRecAllSiz.setChangeKey(KeyValues->Tab[pItem->row()].IndexName);
+      wChgRecAllSiz.setAnte(KeyValues->Tab[pItem->row()].AllocatedSize);
+      wChgRecAllSiz.setPost(KeyValues->Tab[pItem->row()].Allocated * wValue );
+      wChgRecAllSiz.setIndexRank (pItem->row());
+      ChangeLog.push(wChgRecAllSiz);
+
       KeyValues->Tab[pItem->row()].AllocatedSize =  KeyValues->Tab[pItem->row()].Allocated * wValue;
       wStr.sprintf("%ld",KeyValues->Tab[pItem->row()].AllocatedSize);
       KeyTBv->ItemModel->item(pItem->row(),cst_KeyAllocSizeCol)->setText(wStr.toCChar());
-
-      wStr.sprintf( "%s Value <Key Allocation Size> for key <%s> has been computed to <%ld>.",
+      wStr.sprintf( "%s Value <Key Allocation Size> for key <%s> has been computed to <%ld>.Logging change for this value.",
           ZDateFull::currentDateTime().toFormatted().toString(),
           wMainKeyItem->text().toUtf8().data(),
           KeyValues->Tab[pItem->row()].AllocatedSize );
@@ -1475,7 +1538,7 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
       wStr.sprintf("%ld",KeyValues->Tab[pItem->row()].ExtentSize);
       KeyTBv->ItemModel->item(pItem->row(),cst_KeyExtentSizeCol)->setText(wStr.toCChar());
 
-      wStr.sprintf( "%s Value <Key Extent Size> for key <%s> has been computed to <%ld>.",
+      wStr.sprintf( "%s Value <Key Extent Size> for key <%s> has been computed to <%ld>. Logging change for this value.",
           ZDateFull::currentDateTime().toFormatted().toString(),
           wMainKeyItem->text().toUtf8().data(),
           KeyValues->Tab[pItem->row()].ExtentSize );
@@ -1608,12 +1671,10 @@ FileGenerateMWn::Compute() {
     }
     else {
       QStandardItem* wItem = GuessTBv->ItemModel->item(wi,0);
-      wStr.sprintf( "%s-Value for field <%s> has not been guessed and remains invalid.",
+
+      ComLog->appendTextColor(QColor(),WarnedQCl, "%s-W-INVSIZ Size value for field <%s> has not been guessed and remains invalid.",
           ZDateFull::currentDateTime().toFormatted().toString(),
           wItem->text().toUtf8().data());
-//      plainTextEdit->appendPlainText(wStr.toCChar());
-      ComLog->appendText(wStr);
-
     }
 
   }// for
@@ -1660,6 +1721,40 @@ FileGenerateMWn::MenuAction(QAction* pAction){
     changeChosenZmf();
     return;
   }
+
+  if (pAction==LoadXmlDicQAc){
+
+    if (DicEdit==nullptr) {
+      DicEdit = new DicEditMWn(std::bind(&FileGenerateMWn::DicEditQuitCallback, this),this);
+    }
+
+    if (DictionaryFile==nullptr) {
+      ZExceptionDLg::adhocMessage("External dictionary",Severity_Error,nullptr,nullptr,
+          "No external dictionary has been loaded yet.\n"
+          "Please load one before trying to edit it.");
+      return;
+    }
+    DicEdit->displayZMFDictionary(DictionaryFile->getDictionary());
+    DicEdit->show();
+    return;
+  }//if (pAction==LoadXmlDicQAc)
+
+  if (pAction==LoadDicFileQAc){
+
+    if (DicEdit==nullptr) {
+      DicEdit = new DicEditMWn(std::bind(&FileGenerateMWn::DicEditQuitCallback, this),this);
+    }
+
+    if (DictionaryFile==nullptr) {
+      ZExceptionDLg::adhocMessage("External dictionary",Severity_Error,nullptr,nullptr,
+          "No external dictionary has been loaded yet.\n"
+          "Please load one before trying to edit it.");
+      return;
+    }
+    DicEdit->displayZMFDictionary(DictionaryFile->getDictionary());
+    DicEdit->show();
+    return;
+  }//if (pAction==LoadDicFileQAc)
 
 
   if (pAction==EditLoadedDicQAc){
@@ -1733,9 +1828,10 @@ FileGenerateMWn::MenuAction(QAction* pAction){
           "See ZException stack for more information.",
           DictionaryFile->DicName.toString(),
           DictionaryFile->URIDictionary.toString());
-      ComLog->appendText("Cannot create dictionary to embed.\n"
+      ComLog->appendTextColor(ErroredQCl, "%s-E-CREDIC Cannot create dictionary to embed.\n"
                          "Exception follows :\n"
-                         "%s",ZException.last().formatFullUserMessage().toString());
+                         "%s",
+          ZDateFull::currentDateTime().toFormatted().toString(),ZException.last().formatFullUserMessage().toString());
       return;
     }
 
@@ -1784,9 +1880,10 @@ FileGenerateMWn::MenuAction(QAction* pAction){
         ZExceptionDLg::adhocMessage("Embedded dictionary",Severity_Error,
             "Cannot create dictionary to embed.\n"
             "See ZException stack for more information.");
-        ComLog->appendText("Cannot create dictionary to embed.\n"
-            "Exception follows :\n"
-            "%s",ZException.last().formatFullUserMessage().toString());
+        ComLog->appendTextColor(ErroredQCl, "%s-E-CREDIC Cannot create dictionary to embed.\n"
+                                            "Exception follows :\n"
+                                            "%s",
+            ZDateFull::currentDateTime().toFormatted().toString(),ZException.last().formatFullUserMessage().toString());
         return;
       }
       ComLog->appendText("Dictionary embedded into master file with file name <%s>.",MasterFile->getURIDictionary().toString());
@@ -1801,17 +1898,21 @@ FileGenerateMWn::MenuAction(QAction* pAction){
     return;
   }
 
-  if (pAction==LoadFromZmfQAc){
-    LoadFromZmfFile();
+  if (pAction==SetupFromZmfQAc){
+    setupFromZmfFile();
     return;
   }
-  if (pAction==LoadFromXmlDicQAc){
-    LoadFromXmlDic();
+  if (pAction==SetupFromXmlDicQAc){
+    setupFromXmlDic();
     return;
   }
-  if (pAction==LoadFromXmlDefQAc){
+  if (pAction==SetupFromDicFileQAc){
+    setupFromDicFile();
+    return;
+  }
+  if (pAction==SetupFromXmlDefQAc){
 
-    LoadFromXmlDef();
+    setupFromXmlDef();
     return;
   }
 
@@ -1828,7 +1929,7 @@ FileGenerateMWn::MenuAction(QAction* pAction){
     uriString wXmlFile = wFileName.toUtf8().data();
     _refresh(); /* update booleans like GrabFreeSpace */
 
-    if (XmlSave(wXmlFile)==ZS_SUCCESS) {
+    if (XmlDefinitionSave(wXmlFile)==ZS_SUCCESS) {
       ZExceptionDLg::adhocMessage("Xml definition file",Severity_Information,nullptr,nullptr,"Definition file <%s> \n" "has been successfully written.",wXmlFile.toString());
       return;
     }
@@ -1874,6 +1975,12 @@ FileGenerateMWn::MenuAction(QAction* pAction){
     KeyAppendFromLoadedDic();
     return;
   }
+
+  if (pAction==indexRebuildQAc){
+    indexRebuildFromMenu();
+    return;
+  }
+
   if (pAction==ShowGuessValQAc){
     GuessGBx->setVisible(true);
     return;
@@ -1900,7 +2007,6 @@ FileGenerateMWn::MenuAction(QAction* pAction){
     ChangeLogMWn->hide();
     return;
   }
-
 
   if (pAction==QuitQAc){
     Quit();
@@ -1994,20 +2100,23 @@ FileGenerateMWn::KeyAppendFromEmbeddedDic() {
   if (MasterFile==nullptr) {
 
     ZExceptionDLg::adhocMessage("Append key",Severity_Error,nullptr,nullptr,"No Master file has currently being loaded.");
-    ComLog->appendText("No Master file has currently being loaded.");
+    ComLog->appendTextColor(QColor(),ErroredQCl,"%s-E-NOZMF No Master file has currently being loaded.",
+        ZDateFull::currentDateTime().toFormatted().toString());
     return ZS_NULLPTR;
   }
   if (!MasterFile->isOpen()) {
     ZExceptionDLg::adhocMessage("Append key",Severity_Error,nullptr,nullptr,"Master file <%s> containing dictionary is not open.",
         MasterFile->getURIContent().toString());
-    ComLog->appendText("Master file <%s> containing dictionary is not open.",
+    ComLog->appendTextColor(QColor(),ErroredQCl,"%s-E-NOTOPEN Master file <%s> containing dictionary is not open.",
+        ZDateFull::currentDateTime().toFormatted().toString(),
         MasterFile->getURIContent().toString());
     return ZS_FILENOTOPEN ;
   }
   if (MasterFile->Dictionary==nullptr) {
     ZExceptionDLg::adhocMessage("Append key",Severity_Error,nullptr,nullptr,"Master file <%s> has no valid dictionary.",
         MasterFile->getURIContent().toString());
-    ComLog->appendText("Master file <%s> has no valid dictionary.",
+    ComLog->appendTextColor(QColor(),ErroredQCl,"%s-E-NODIC Master file <%s> has no valid dictionary.",
+        ZDateFull::currentDateTime().toFormatted().toString(),
         MasterFile->getURIContent().toString());
     return ZS_NULLPTR;
   }
@@ -2020,7 +2129,7 @@ FileGenerateMWn::KeyAppendFromLoadedDic() {
 
   if (DictionaryFile==nullptr) {
       ZExceptionDLg::adhocMessage("Append key",Severity_Error,nullptr,nullptr,"Neither master file nor dictionary have been loaded.");
-      ComLog->appendText("Neither master file nor dictionary have been loaded.");
+      ComLog->appendTextColor(QColor(),ErroredQCl,"%s-E-NOLDED Neither master file nor dictionary have been loaded.",ZDateFull::currentDateTime().toFormatted().toString());
 
       return ZS_NULLPTR;
   }
@@ -2046,11 +2155,27 @@ FileGenerateMWn::KeyAppendFromZMFDic(const ZMFDictionary* pDic) {
     }
     /*  generate index file root name */
     wKD.IndexRootName = generateIndexRootName(RootName,wKD.IndexName);
+
+    if (wKD.KeySize==0) {
+      ComLog->appendTextColor(QColor(),WarnedQCl, "%s-W-KEYZERSZ Appended Key <%s> has KeySize equal to Zero and must be guessed.\n"
+          "All size values are computed from this single value and will be set to zero.",
+          ZDateFull::currentDateTime().toFormatted().toString(),
+          wKD.IndexName.toString());
+    }
+
     /* compute size values */
     wKD.Allocated = cst_ZRF_default_allocation;
     wKD.ExtentQuota = cst_ZRF_default_extentquota;
     wKD.AllocatedSize = wKD.Allocated * wKD.KeySize;
+    if (wKD.AllocatedSize==0) {
+      wKD.AllocatedSize = 150; /* a default value as another */
+      ComLog->appendText("Key creation: Defaulting AllocatedSize to 150 ");
+    }
     wKD.ExtentSize = wKD.ExtentQuota * wKD.KeySize;
+    if (wKD.ExtentSize==0) {
+      wKD.ExtentSize = 150; /* a default value as another */
+      ComLog->appendText("Key creation: Defaulting ExtentQuota to 150 ");
+    }
     /* then store new key from dic */
     long wR=KeyValues->push(wKD);
     /* first setup change log with values ex-ante and ex-post */
@@ -2077,7 +2202,7 @@ FileGenerateMWn::KeyAppendFromZMFDic(const ZMFDictionary* pDic) {
   return ZS_SUCCESS;
 }
 
-bool FileGenerateMWn::LoadFromZmfFile() {
+bool FileGenerateMWn::setupFromZmfFile() {
   utf8VaryingString wStr;
 
   QFileDialog wFDLg((QWidget*)this,QObject::tr("Search master file","FileGenerateDLg"),getParserWorkDirectory(),
@@ -2102,69 +2227,29 @@ bool FileGenerateMWn::LoadFromZmfFile() {
   return dataSetupFromMasterFile(wURIMaster);
 }
 
-bool FileGenerateMWn::LoadFromXmlDic() {
-  utf8VaryingString wStr;
-
-  const char* wWD = getParserWorkDirectory();
-  QString wFileName = QFileDialog::getOpenFileName(this, tr("Xml Dictionary"),
-      wWD,
-      "Xml files (*.xml);;All (*.*)");
-  if (wFileName.isEmpty()) {
-    ZExceptionDLg::adhocMessage("Xml file",Severity_Information,nullptr,nullptr,"No file selected. Please select a valid file");
+bool FileGenerateMWn::setupFromXmlDic() {
+  ZStatus wSt=loadExternalXmlDic();
+  if (wSt!=ZS_SUCCESS)
     return false;
-  }
-  uriString wXmlURI = wFileName.toUtf8().data();
-
-  wStr.sprintf("loading xml dictionary file <%s>",wXmlURI.toString());
-  ComLog->appendText(wStr);
-
-  utf8VaryingString wXmlContent;
-  ZStatus wSt=wXmlURI.loadUtf8(wXmlContent);
-  if (wSt!=ZS_SUCCESS) {
-
-    ComLog->appendText(ZException.last().formatFullUserMessage());
-
-    ZExceptionDLg::displayLast("Xml Dictionary");
-    return false;
-  }
-
-  SourceLBl->setText("Loaded Xml dictionary file");
-  SourceContentLBl->setText(wXmlURI.toCChar());
-
-
-
-
-  DictionaryFile = new ZDictionaryFile;
-  DictionaryFile->setDicFilename(wXmlURI);
-
-  ErrorLog.setAutoPrintOn(ZAIES_Info);
-  wSt=DictionaryFile->ZMFDictionary::XmlLoadFromString(wXmlContent,false,&ErrorLog);
-  if (wSt!=ZS_SUCCESS) {
-    ZExceptionDLg::adhocMessage("Xml Dictionary",Severity_Error,&ErrorLog,nullptr,
-        "Cannot load xml dictionary from file <%s>\n"
-        "Status is <%s>",wXmlURI.toString(),decode_ZStatus(wSt));
-
-    wStr.sprintf("Cannot load xml dictionary from file <%s>\n"
-                 "Status is <%s>",wXmlURI.toString(),decode_ZStatus(wSt));
-    ComLog->appendText(wStr);
-
-    return false;
-  }
-
-  SourceLBl->setText("Xml  Dictionary File");
-  SourceContentLBl->setText(wXmlURI.toCChar());
-  wStr.sprintf("Loaded <%s>",DictionaryFile->DicName.toString());
-  DicLoadLBl->setText(wStr.toCChar());
 
   dataSetupFromDictionary();
   return true;
-}
+} //setupFromXmlDic
+
+bool FileGenerateMWn::setupFromDicFile() {
+  ZStatus wSt=loadExternalDicFile();
+  if (wSt!=ZS_SUCCESS)
+    return false;
+
+  dataSetupFromDictionary();
+  return true;
+} //setupFromXmlDic
 
 
-bool FileGenerateMWn::LoadFromXmlDef() {
+bool FileGenerateMWn::setupFromXmlDef() {
   utf8VaryingString wStr;
   const char* wWD = getParserWorkDirectory();
-  QString wFileName = QFileDialog::getOpenFileName(this, tr("Xml definition file"),
+  QString wFileName = QFileDialog::getOpenFileName((QWidget*)this, tr("Xml definition file"),
       wWD,
       "Xml files (*.xml);;All (*.*)");
   if (wFileName.isEmpty()) {
@@ -2185,7 +2270,7 @@ bool FileGenerateMWn::LoadFromXmlDef() {
   }
 
  ErrorLog.setAutoPrintOn(ZAIES_Info);
- wSt=XmlLoad(wXmlContent, &ErrorLog);
+ wSt=XmlDefinitionLoad(wXmlContent, &ErrorLog);
  if (wSt!=ZS_SUCCESS) {
    ZExceptionDLg::adhocMessage("Xml definition",Severity_Error,&ErrorLog,nullptr,"Error while parsing Xml string");
    return false;
@@ -2193,6 +2278,93 @@ bool FileGenerateMWn::LoadFromXmlDef() {
   _dataSetup();
   return true;
 }
+
+
+
+ZStatus FileGenerateMWn::loadExternalXmlDic() {
+  utf8VaryingString wStr;
+
+  const char* wWD = getParserWorkDirectory();
+  QString wFileName = QFileDialog::getOpenFileName((QWidget*)this, tr("Xml Dictionary"),
+      wWD,
+      "Xml files (*.xml);;All (*.*)");
+  if (wFileName.isEmpty()) {
+    ZExceptionDLg::adhocMessage("Xml file",Severity_Information,nullptr,nullptr,"No file selected. Please select a valid file");
+    return ZS_EMPTY ;
+  }
+  uriString wXmlURI = wFileName.toUtf8().data();
+
+  wStr.sprintf("loading xml dictionary file <%s>",wXmlURI.toString());
+  ComLog->appendText(wStr);
+
+  utf8VaryingString wXmlContent;
+  ZStatus wSt=wXmlURI.loadUtf8(wXmlContent);
+  if (wSt!=ZS_SUCCESS) {
+
+    ComLog->appendText(ZException.last().formatFullUserMessage());
+
+    ZExceptionDLg::displayLast("Xml Dictionary");
+    return wSt;
+  }
+
+  SourceLBl->setText("Loaded Xml dictionary file");
+  SourceContentLBl->setText(wXmlURI.toCChar());
+
+
+  DictionaryFile = new ZDictionaryFile;
+  DictionaryFile->setDicFilename(wXmlURI);
+
+  ErrorLog.setAutoPrintOn(ZAIES_Info);
+  wSt=DictionaryFile->ZMFDictionary::XmlLoadFromString(wXmlContent,false,&ErrorLog);
+  if (wSt!=ZS_SUCCESS) {
+    ZExceptionDLg::adhocMessage("Xml Dictionary",Severity_Error,&ErrorLog,nullptr,
+        "Cannot load xml dictionary from file <%s>\n"
+        "Status is <%s>",wXmlURI.toString(),decode_ZStatus(wSt));
+
+    wStr.sprintf("Cannot load xml dictionary from file <%s>\n"
+                 "Status is <%s>",wXmlURI.toString(),decode_ZStatus(wSt));
+    ComLog->appendText(wStr);
+
+    return wSt;
+  }
+
+  SourceLBl->setText("Xml  Dictionary File");
+  SourceContentLBl->setText(wXmlURI.toCChar());
+  wStr.sprintf("Loaded <%s>",DictionaryFile->DicName.toString());
+  DicLoadLBl->setText(wStr.toCChar());
+
+  return ZS_SUCCESS ;
+} //loadExternalXmlDic
+
+ZStatus FileGenerateMWn::loadExternalDicFile() {
+  utf8VaryingString wStr;
+
+  const char* wWD = getParserWorkDirectory();
+  QString wFileName = QFileDialog::getOpenFileName((QWidget*)this, tr("Dictionary file"),
+      wWD,
+      "Dic files (*.dic);;All (*.*)");
+  if (wFileName.isEmpty()) {
+    ZExceptionDLg::adhocMessage("Xml file",Severity_Information,nullptr,nullptr,"No file selected. Please select a valid file");
+    return ZS_EMPTY ;
+  }
+  uriString wURIDic = wFileName.toUtf8().data();
+
+  ComLog->appendText("loading dictionary file <%s>",wURIDic.toString());
+
+  DictionaryFile = new ZDictionaryFile;
+  ZStatus wSt = DictionaryFile->loadDictionary(wURIDic);
+  if (wSt!=ZS_SUCCESS) {
+    ZExceptionDLg::adhocMessage("Dictionary load",Severity_Error,"Error while loading dictionary file <%s>.",wURIDic.toString());
+    return wSt;
+  }
+  SourceLBl->setText("Dictionary File");
+  SourceContentLBl->setText(wURIDic.toCChar());
+  wStr.sprintf("Loaded <%s>",DictionaryFile->DicName.toString());
+  DicLoadLBl->setText(wStr.toCChar());
+  return ZS_SUCCESS ;
+} //loadExternalDicFile
+
+
 bool FileGenerateMWn::applyToCurrentZmf() {
 
   if (ValuesControl()) {
@@ -2211,7 +2383,7 @@ bool FileGenerateMWn::applyToCurrentZmf() {
   }
 //  ZStatus wSt=MasterFile->zopen(ZRF_All);
 
-  return processZmf(MasterFile->getURIContent(),TestRunQAc->isChecked());
+  return applyChangesZmf(MasterFile->getURIContent(),TestRunQAc->isChecked());
 }
 
 bool FileGenerateMWn::changeChosenZmf() {
@@ -2235,11 +2407,11 @@ bool FileGenerateMWn::changeChosenZmf() {
     return false;
   }
 
-  return processZmf(wURIFile,TestRunQAc->isChecked());
+  return applyChangesZmf(wURIFile,TestRunQAc->isChecked());
 } // changeChosenZmf
 
 ZStatus
-FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
+FileGenerateMWn::applyChangesZmf(const uriString& pURIMaster,bool pBackup) {
   ZStatus wSt;
   zbs::ZArray<utf8VaryingString> wIndexToRebuild;
 
@@ -2248,6 +2420,8 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
   if (ValuesControl()) {
     return ZS_INVPARAMS;
   }
+
+  int wModif=0,wKeyModif=0;
 
   utf8VaryingString wStr;
 
@@ -2292,16 +2466,18 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
     wStr.sprintf("Changing BlockTargetSize from %ld to %ld.",
         pMasterFile.getFCB()->BlockTargetSize,MeanRecordSize );
     ComLog->appendText(wStr);
-    if (!pBackup)
-      pMasterFile.getFCB()->BlockTargetSize = MeanRecordSize ;
+
+    pMasterFile.getFCB()->BlockTargetSize = MeanRecordSize ;
+    wModif ++;
   }
 
   if (pMasterFile.getFCB()->BlockExtentQuota != ExtentQuota) {
     wStr.sprintf("Changing BlockExtentQuota from %ld to %ld.",
         pMasterFile.getFCB()->BlockExtentQuota,ExtentQuota );
     ComLog->appendText(wStr);
-    if (!pBackup)
-      pMasterFile.getFCB()->BlockExtentQuota = ExtentQuota ;
+
+    pMasterFile.getFCB()->BlockExtentQuota = ExtentQuota ;
+    wModif ++;
   }
 
   if (pMasterFile.getFCB()->GrabFreeSpace != GrabFreeSpace) {
@@ -2316,41 +2492,42 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
     wStr.sprintf("Changing HighwaterMarking from %s to %s.",
         pMasterFile.getFCB()->HighwaterMarking?"true":"false",HighWaterMarking?"true":"false" );
     ComLog->appendText(wStr);
-    if (!pBackup)
-      pMasterFile.getFCB()->HighwaterMarking = HighWaterMarking ;
+
+    pMasterFile.getFCB()->HighwaterMarking = HighWaterMarking ;
+    wModif ++;
   }
 
   if (pMasterFile.hasJournal() != Journaling) {
     wStr.sprintf("Changing Journaling from %s to %s.",
         pMasterFile.hasJournal()?"true":"false",Journaling?"true":"false" );
     ComLog->appendText(wStr);
-    if (!pBackup) {
       /* put journaling on or off according Journaling */
-      if (Journaling) {
-        pMasterFile.setJournalingOn();
-        ComLog->appendText("Journaling started.");
-      }
-      else {
-        pMasterFile.setJournalingOff();
-        ComLog->appendText("Journaling stopped.");
-      }
+    if (Journaling) {
+      pMasterFile.setJournalingOn();
+      ComLog->appendText("Journaling started.");
     }
+    else {
+      pMasterFile.setJournalingOff();
+      ComLog->appendText("Journaling stopped.");
+    }
+
+    wModif ++;
   } // Journaling
 
 
   ComLog->appendText("Processing key modifications.");
 
-  for (long wi=0; wi < ChangeLog.count();wi++) {
-    ZChangeRecord wChgRec = ChangeLog[wi];
+  for (long wChgIdx=0; wChgIdx < ChangeLog.count();wChgIdx++) {
+    ZChangeRecord wChgRec = ChangeLog[wChgIdx];
     const char* wName="<no field>";
-    long wKeyRow = ChangeLog[wi].getIndexRank();
+    long wKeyRow = ChangeLog[wChgIdx].getIndexRank();
     ComLog->appendText("Found change log code <%s> index key rank <%ld>",
-                        decode_ZFGC(ChangeLog[wi].getChangeCode()),
-                        ChangeLog[wi].getIndexRank() );
-    switch(ChangeLog[wi].getChangeCode()) {
+                        decode_ZFGC(ChangeLog[wChgIdx].getChangeCode()),
+                        ChangeLog[wChgIdx].getIndexRank() );
+    switch(ChangeLog[wChgIdx].getChangeCode()) {
 
     case ZFGC_ChgKeySize : {
-      size_t wNewKeySize = ChangeLog[wi].getPostU64();
+      size_t wNewKeySize = ChangeLog[wChgIdx].getPostU64();
         wName="KeyUniversalSize";
         wStr.sprintf("%s changed %s field from <%ld> to <%ld>.",
             wName,
@@ -2358,11 +2535,13 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
             pMasterFile.IndexTable[wKeyRow]->KeyUniversalSize,
             wNewKeySize);
         ComLog->appendText(wStr);
-        pMasterFile.IndexTable[wi]->KeyUniversalSize = wNewKeySize ;
+        pMasterFile.IndexTable[wKeyRow]->KeyUniversalSize = wNewKeySize ;
+
+        wKeyModif++;
         break;
     }
     case ZFGC_ChgExtent : {
-      size_t wNewExtent = ChangeLog[wi].getPostU64();
+      size_t wNewExtent = ChangeLog[wChgIdx].getPostU64();
       wName="Extent quota";
       wStr.sprintf("%s changed %s field from <%ld> to <%ld>.",
           wName,
@@ -2371,10 +2550,11 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
           wNewExtent);
       ComLog->appendText(wStr);
       pMasterFile.IndexTable[wKeyRow]->getFCB()->BlockExtentQuota = wNewExtent ;
+      wKeyModif++;
       break;
     }
     case ZFGC_ChgAlloc : {
-      size_t wNewAlloc = ChangeLog[wi].getPostU64();
+      size_t wNewAlloc = ChangeLog[wChgIdx].getPostU64();
       wName="Allocated blocks";
       wStr.sprintf("%s changed %s field from <%ld> to <%ld>.",
           wName,
@@ -2383,11 +2563,12 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
           wNewAlloc);
       ComLog->appendText(wStr);
       pMasterFile.IndexTable[wKeyRow]->getFCB()->AllocatedBlocks = wNewAlloc ;
+      wKeyModif++;
       break;
     }
 
     case ZFGC_ChgDuplicate : {
-      bool wNewDup = ChangeLog[wi].getPostBool();
+      bool wNewDup = ChangeLog[wChgIdx].getPostBool();
       wName="Duplicates";
       wStr.sprintf("%s changed %s field from <%ld> to <%ld>.",
           wName,
@@ -2396,10 +2577,11 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
           wNewDup?"true":"false");
       ComLog->appendText(wStr);
       pMasterFile.IndexTable[wKeyRow]->Duplicates = wNewDup?ZST_DUPLICATES:ZST_NODUPLICATES ;
+      wKeyModif++;
       break;
     }
     case ZFGC_ChgGrab: {
-      bool wNewGrab = ChangeLog[wi].getPostBool();
+      bool wNewGrab = ChangeLog[wChgIdx].getPostBool();
       wName="GrabFreeSpace";
       wStr.sprintf("%s changed %s field from <%ld> to <%ld>.",
           wName,
@@ -2408,10 +2590,11 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
           wNewGrab?"true":"false");
       ComLog->appendText(wStr);
       pMasterFile.IndexTable[wKeyRow]->getFCB()->GrabFreeSpace = wNewGrab;
+      wKeyModif++;
       break;
     }
     case ZFGC_ChgHigh: {
-      bool wNewHigh = ChangeLog[wi].getPostBool();
+      bool wNewHigh = ChangeLog[wChgIdx].getPostBool();
       wName="Highwater marking";
       wStr.sprintf("%s changed %s field from <%ld> to <%ld>.",
           wName,
@@ -2420,17 +2603,18 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
           wNewHigh?"true":"false");
       ComLog->appendText(wStr);
       pMasterFile.IndexTable[wKeyRow]->getFCB()->HighwaterMarking = wNewHigh;
+      wKeyModif++;
       break;
     }
 
     case ZFGC_INameChange: {
 
-      long wIndexRank=ChangeLog[wi].getIndexRank();
+      long wIndexRank=ChangeLog[wChgIdx].getIndexRank();
 
       utf8VaryingString wZMFRootName,wIndexRootName,wComplement,wOldKeyName,wNewKeyName;
       uriString wNewIndexURI;
-      wOldKeyName = ChangeLog[wi].getAnteString();
-      wNewKeyName = ChangeLog[wi].getPostString();
+      wOldKeyName = ChangeLog[wChgIdx].getAnteString();
+      wNewKeyName = ChangeLog[wChgIdx].getPostString();
 
       wComplement = "Changing index name induces a change in index file name accordingly.";
 //      ZExceptionDLg::setFixedFont();
@@ -2497,12 +2681,13 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
       if (wMode!=ZRF_NotOpen) {
         pMasterFile.zopenIndexFile(wIndexRank,wMode);
       }
+      wKeyModif++;
       break;
     } //ZFGC_INameChange
 
     case ZFGC_KeyDelete: {
-      utf8VaryingString wKeyName = ChangeLog[wi].getChangeKey();
-      long wIndexRank=ChangeLog[wi].getIndexRank();
+      utf8VaryingString wKeyName = ChangeLog[wChgIdx].getChangeKey();
+      long wIndexRank=ChangeLog[wChgIdx].getIndexRank();
  /*
       long wIndexRank= pMasterFile.IndexTable.searchIndexByName(wKeyName);
       if (wIndexRank < 0) {
@@ -2521,6 +2706,7 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
       pMasterFile.IndexTable.erase(wIndexRank);
       ComLog->appendText("Removing index file %s.", wURIIndex.toString() );
       return removeFile(wURIIndex.toCChar());
+      wKeyModif++;
     } // ZFGC_KeyDelete
 
     case ZFGC_KeyDicAppend:
@@ -2528,9 +2714,20 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
 
       /* A created key has mandatorily a name (unique name) whatever its data has been set to  */
 
-      KeyData wKD = ChangeLog[wi].getPostKeyData();
+      KeyData wKD = ChangeLog[wChgIdx].getPostKeyData();
+      bool wSkip=false;
+      for (long wj=0; wj < pMasterFile.IndexTable.count(); wj++) {
+        if (wKD.IndexName == pMasterFile.IndexTable[wj]->IndexName) {
+          ComLog->appendText("Index key <%s> already exists in file <%s>.Skipping index key creation.",
+              wKD.IndexName.toString(),
+              pMasterFile.getURIContent().toString());
+          wSkip=true;
+        }
+      }// for
+      if (wSkip)
+        continue;
 
-      KeyValues->push(wKD);
+//     KeyValues->push(wKD);
 
       long wOutRank;
       wSt = pMasterFile._createRawIndexDet(wOutRank,
@@ -2554,7 +2751,7 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
       }
       else
         wIndexToRebuild.push(wKD.IndexName);
-
+      wKeyModif++;
       break;
     }
     default:
@@ -2603,14 +2800,18 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
           continue;
         }
         ComLog->appendText("Rebuilding index key <%s> using embedded dictionary",pMasterFile.IndexTable[wIRank]->IndexName.toString());
-        wSt=pMasterFile.rebuildIndex(wIRank);
+        wSt=rebuildIndex(pMasterFile,wIRank);
         if (wSt!=ZS_SUCCESS){
           wStr=ZException.last().formatFullUserMessage();
           ZExceptionDLg::adhocMessage("Index key rebuild",Severity_Error,nullptr,&wStr,
               "Index key rebuilt process has been errored.\n"
               "Index key name <%s>",pMasterFile.IndexTable[wIRank]->IndexName.toString());
-          ComLog->appendText("Index key rebuilt process has been errored.\n"
-              "Index key name <%s>",pMasterFile.IndexTable[wIRank]->IndexName.toString());
+
+          ComLog->appendTextColor(ErroredQCl,"%s-E-ERRBLD Index key name <%s> rebuilt process has been errored.\n"
+              "Exception follows:\n%s",
+              ZDateFull::currentDateTime().toFormatted().toString(),
+              pMasterFile.IndexTable[wIRank]->IndexName.toString(),
+              wStr.toString());
           continue;
         }
         ComLog->appendText("Index key rebuilt process has successfully completed.\n"
@@ -2635,6 +2836,209 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
   ComLog->appendText("End of change log processing.");
   return wSt;
 }
+
+ZStatus
+FileGenerateMWn::indexRebuildFromMenu(){
+  ZKeyListDLg* wKLDLg=new ZKeyListDLg(this);
+  wKLDLg->initLayout();
+  ZStatus wSt=wKLDLg->displayKeyDictionaries(MasterFile->Dictionary);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+
+  wKLDLg->show();
+  int wRet=wKLDLg->exec();
+  if (wRet==QDialog::Rejected)
+    return ZS_REJECTED;
+
+  KeyData wKD;
+  wKD = wKLDLg->getKeyData();
+  long wIdx=-1;
+  for (long wi=0;wi < MasterFile->Dictionary->KeyDic.count();wi++) {
+    if (MasterFile->Dictionary->KeyDic[wi]->DicKeyName==wKD.IndexName){
+      wIdx=wi;
+      break;
+    }
+  }
+  if (wIdx<0) {
+    ZExceptionDLg::adhocMessage("Rebuild index key",Severity_Error,"Selected index key named <%s> cannot be found.\n"
+        "It must have been deleted meanwhile by another thread.",wKD.IndexName.toString());
+    return ZS_NOTFOUND;
+  }
+
+  wSt=rebuildIndex(*MasterFile,wIdx);
+  if (wSt!=ZS_SUCCESS) {
+    ZExceptionDLg::adhocMessage("Rebuild index key",Severity_Error,"Errors were encountered while rebuilding index key <%s>.\n",
+        wKD.IndexName.toString());
+    return wSt;
+  }
+
+  return ZS_SUCCESS;
+}
+
+
+ZStatus
+FileGenerateMWn::rebuildIndex(ZMasterFile& pMasterFile,long pIndexRankToRebuild) {
+
+/* index rebuild progress window setup */
+
+  QMainWindow* IndexRebuildMWn=new QMainWindow(this);
+  QWidget* wCentralWDg = new QWidget(IndexRebuildMWn);
+  IndexRebuildMWn->setCentralWidget(wCentralWDg);
+  IndexRebuildMWn->resize(900,361);
+  QVBoxLayout* wVB1 = new QVBoxLayout (IndexRebuildMWn->centralWidget());
+  wCentralWDg->setLayout(wVB1);
+
+  QHBoxLayout* wHB1=new QHBoxLayout;
+  wVB1->addLayout(wHB1);
+
+  QLabel* wlb1LBl=new QLabel("Index key name");
+  wHB1->addWidget(wlb1LBl);
+
+  QLabel* IndexNameLBl=new QLabel(pMasterFile.IndexTable[pIndexRankToRebuild]->IndexName.toCChar());
+
+  wHB1->addWidget(IndexNameLBl);
+  wVB1->addWidget(IndexNameLBl);
+
+  QHBoxLayout* wHB2=new QHBoxLayout;
+  wVB1->addLayout(wHB2);
+
+  QLabel* wlb2LBl=new QLabel("Records processed");
+  wHB2->addWidget(wlb2LBl);
+
+  QLabel* RecordsProcessedLBl=new QLabel("0");
+  wHB2->addWidget(RecordsProcessedLBl);
+
+
+  QHBoxLayout* wHB3=new QHBoxLayout;
+  wVB1->addLayout(wHB3);
+
+  QLabel* wlb3LBl=new QLabel("Estimated finish time");
+  wHB3->addWidget(wlb3LBl);
+  QLabel* TargetTimeLBl=new QLabel("unknown");
+  wHB3->addWidget(TargetTimeLBl);
+
+  QProgressBar* AdvancePGb=new QProgressBar;
+  AdvancePGb->setMinimum(0);
+  AdvancePGb->setMaximum(int(pMasterFile.getRecordCount()));
+  AdvancePGb->setValue(0);
+
+  wVB1->addWidget(AdvancePGb);
+
+  IndexRebuildMWn->show();
+
+  /* rebuild process*/
+
+  ZStatus wSt=ZS_SUCCESS;
+  ZDataBuffer wRecord, wKeyRecord;
+  zaddress_type wZMFAddress;
+  ZIndexItem* wIndexItem=nullptr;
+  long wCurrentRank=0L;
+  int wUpdateRate=cst_updateRate;
+  if (pMasterFile.getMode()!=ZRF_All) {
+    ZException.setMessage("ZMasterFile::rebuildIndex",ZS_FILENOTOPEN,Severity_Error,
+        "File is open in mode %s. It must be open with access mode ZRF_All.",decode_ZRFMode(pMasterFile.getMode()));
+    return ZS_MODEINVALID;
+  }
+
+  if (pIndexRankToRebuild >= pMasterFile.IndexTable.count()) {
+    ZException.setMessage("ZMasterFile::rebuildIndex",ZS_OUTBOUND,Severity_Error,
+        "Invalid index rank <%ld> while expecting one of [0,%ld[.",pIndexRankToRebuild,pMasterFile.IndexTable.count());
+    return ZS_INVTYPE;
+  }
+
+  ComLog->appendText("%s- rebuilding index key <%s> - clearing index file.",
+      ZDateFull::currentDateTime().toFormatted().toString(),
+      pMasterFile.IndexTable[pIndexRankToRebuild]->IndexName.toString());
+
+  IndexNameLBl=new QLabel(pMasterFile.IndexTable[pIndexRankToRebuild]->IndexName.toCChar());
+
+  ComLog->appendText("%s- rebuilding index key <%s> - clearing index file.",
+      ZDateFull::currentDateTime().toFormatted().toString(),
+      pMasterFile.IndexTable[pIndexRankToRebuild]->IndexName.toString());
+
+  wSt=pMasterFile.IndexTable[pIndexRankToRebuild]->zclearFile(-1);
+  if (wSt!=ZS_SUCCESS){
+    delete IndexRebuildMWn;
+    return wSt;
+  }
+
+  ComLog->appendText("%s- rebuilding index key <%s> - populating index file.",
+      ZDateFull::currentDateTime().toFormatted().toString(),
+      pMasterFile.IndexTable[pIndexRankToRebuild]->IndexName.toString());
+
+  ZTime wStartTime=ZTime::getCurrentTime();
+  /* browse all master file records, extract key and feed index file */
+  wSt=pMasterFile.zgetWAddress(wRecord,0L,wZMFAddress);
+  if (wSt!=ZS_SUCCESS){
+    return wSt;
+  }
+  while (wSt==ZS_SUCCESS) {
+    wSt=pMasterFile.extractKeyValues(wRecord,wKeyRecord,pIndexRankToRebuild);
+    if (wSt!=ZS_SUCCESS)
+      goto rebuildIndexError;
+    wSt=pMasterFile.IndexTable[pIndexRankToRebuild]->_addRawKeyValue_Prepare(wIndexItem,wKeyRecord,wZMFAddress);
+    if (wSt!=ZS_SUCCESS)
+      goto rebuildIndexError;
+    wSt=pMasterFile.IndexTable[pIndexRankToRebuild]->_rawKeyValue_Commit(wIndexItem);
+    if (wSt!=ZS_SUCCESS)
+      goto rebuildIndexError;
+
+    sleep(20);
+
+    wSt=pMasterFile.zgetNextWAddress(wRecord,wCurrentRank,wZMFAddress);
+    if ((wSt==ZS_SUCCESS)&&(!--wUpdateRate)){
+        wUpdateRate=cst_updateRate;
+        /* compute predicted target time */
+        ZTime wElapsed = ZTime::getCurrentTime() - wStartTime ;
+        /* how many times elapsed time should be multiplied to get achievement time */
+        double wRemainTimes = double(pMasterFile.getRecordCount()) / double(wCurrentRank);
+        wElapsed = wElapsed * wRemainTimes ;
+        ZTime wTargetTime = wStartTime + wElapsed;
+
+        TargetTimeLBl->setText(wTargetTime.toString("%d-%m-%y %T").toChar());
+        AdvancePGb->setValue(int(wCurrentRank));
+    } //if ((wSt==ZS_SUCCESS)&&(!--wUpdateRate))
+  } // while (wSt==ZS_SUCCESS)
+
+  pMasterFile.IndexTable[pIndexRankToRebuild]->zclose();
+  if (wSt==ZS_EOF)
+    wSt=ZS_SUCCESS;
+
+  if (wSt==ZS_SUCCESS){
+    TargetTimeLBl->setText("Done");
+    AdvancePGb->setValue(int(wCurrentRank));
+    ComLog->appendText("%s- rebuilding index key <%s> - rebuild process done successfully.",
+        ZDateFull::currentDateTime().toFormatted().toString(),
+        pMasterFile.IndexTable[pIndexRankToRebuild]->IndexName.toString());
+  }
+  ComLog->appendTextColor( ErroredQCl, "%s-E rebuilding index key <%s> - rebuild process ended with error <%s>.\n"
+      "Exception follows:\n%s",
+      ZDateFull::currentDateTime().toFormatted().toString(),
+      pMasterFile.IndexTable[pIndexRankToRebuild]->IndexName.toString(),
+      decode_ZStatus(wSt),
+      ZException.last().formatFullUserMessage().toString());
+
+  return wSt;
+rebuildIndexError:
+  if (ZException.count()==0){
+    ZException.setMessage("ZMasterFile::rebuildIndex",wSt,Severity_Error,"Error while rebuilding index");
+  }
+  else {
+    ZException.addToLast(" calling module <ZMasterFile::rebuildIndex>");
+  }
+  return wSt;
+} //rebuildIndex
+
+
+void
+FileGenerateMWn::changeKeySize(KeyData& pKeyData,size_t pNewKeySize) {
+  pKeyData.KeySize = pNewKeySize;
+  if (pKeyData.Allocated==0){
+    pKeyData.Allocated = cst_ZRF_default_allocation;
+  }
+  pKeyData.AllocatedSize =  pKeyData.Allocated * pNewKeySize;
+}
+
 
 
 bool
@@ -2782,13 +3186,15 @@ void FileGenerateMWn::GenFile() {
     uriStat wStat;
     wURIFile.getStatR(wStat);
 
-    int wRet = ZExceptionDLg::adhocMessage3B("Master file creation",Severity_Warning,"Backup","Cancel","Replace",
+    int wRet = ZExceptionDLg::adhocMessage3BHtml("Master file creation",Severity_Warning,"Backup","Cancel","Replace",
         nullptr,nullptr,
         " Found existing file <%s> \n"
         " It has been created <%s> and last modified <%s>\n"
-        " <Backup> creates the file but backs up existing.\n"
-        " <Replace> replaces file without backup.\n"
-        " <Cancel> give up action.",
+        "<table>"
+        "<tr><td>creates the file but backs up existing file</td>      <td><b>Backup</b></td> </tr>"
+        "<tr><td>replaces existing file without backup</td>    <td><b>Replace</b></td> </tr>"
+        "<tr><td>give up action</td>    <td><b>Cancel</b></td> </tr>"
+        "</table>",
         wURIFile.toString(),
         wStat.Created.toFormatted().toString(),
         wStat.LastModified.toFormatted().toString());
@@ -2858,7 +3264,8 @@ void FileGenerateMWn::GenFile() {
 
 
   if (KeyValues->count() == 0) {
-    ComLog->appendText("%s - set no index key has been defined.");
+    ComLog->appendText("%s - No index key has been defined.",
+        ZDateFull::currentDateTime().toFormatted().toString());
   }
   else {
     for (long wi=0;wi < KeyValues->count(); wi ++) {
@@ -2882,7 +3289,13 @@ void FileGenerateMWn::GenFile() {
          ZExceptionDLg::adhocMessage("Raw index creation",Severity_Severe,nullptr,&wErrContent,"Error while creating index rank <%ld> name <%s> file <%s>",
              wi,DictionaryFile->KeyDic[wi]->DicKeyName.toString(),wMasterFile->getURIContent().toString());
 
-         ComLog->appendText(wErrContent);
+         ComLog->appendTextColor(ErroredQCl,"%s-E-CREIDX Error while creating index rank <%ld> name <%s> for file <%s>\n"
+             "Exception follows.\n%s",
+             ZDateFull::currentDateTime().toFormatted().toString(),
+             wi,DictionaryFile->KeyDic[wi]->DicKeyName.toString(),
+             wMasterFile->getURIContent().toString(),
+             wErrContent.toString());
+
 
          wMasterFile->zclose();
          ComLog->appendText("Master file closed.");
@@ -2969,8 +3382,9 @@ void FileGenerateMWn::GenFile() {
             "A dictionary is loaded <%s>.\n"
             "A master file is loaded <%s>.\n"
             "Master file has its own dictionary <%s>.\n"
-            "Create file \n"
+            " \n"
             "<table>"
+            "<th><td>Create file</td></th>"
             "<tr><td>as raw master file without dictionary</td>      <td><b>Raw</b></td></tr>"
             "<tr><td>using loaded file dictionary </td>    <td><b>Loaded</b></td></tr>"
             "<tr><td>using embedded file dictionary  </td>    <td><b>Embedded</b></td></tr>"
@@ -3045,10 +3459,10 @@ void FileGenerateMWn::GenFile() {
       int wRet=ZExceptionDLg::adhocMessage2BHtml("Generate file",Severity_Information,
           "Raw","Loaded",
           nullptr,nullptr,
-          "A dictionary is loaded <%s>.\n"
-          "No master file loaded.\n"
-          "Create file \n"
+          "A dictionary is loaded <%s>.\n\n"
+          "No master file has been loaded.\n"
           "<table>"
+          "<th><td>Create file</td></th>"
           "<tr><td>as raw master file without dictionary</td>      <td><b>Raw</b></td></tr>"
           "<tr><td>using loaded file dictionary </td>    <td><b>Loaded</b></td></tr>"
           "</table>",
@@ -3064,11 +3478,14 @@ void FileGenerateMWn::GenFile() {
         utf8VaryingString wErrComp = ZException.last().formatFullUserMessage();
         ZExceptionDLg::adhocMessage("Embedding dictionary",Severity_Error,&ErrorLog,&wErrComp,
               "Cannot embed dictionary in master file.\n"
-              "A raw master file with no dictionary is created and available.\n");
+              "However a raw master file with no dictionary is created and remains available.");
 
-        ComLog->appendText(ZException.last().formatFullUserMessage());
-        ComLog->appendText("Cannot embed dictionary in master file.\n"
-                             "A raw master file with no dictionary is created and available.\n");
+        ComLog->appendTextColor(ErroredQCl,"%s-E-EMBEDDIC  Cannot embed dictionary in master file.\n"
+                                            "However a raw master file with no dictionary is created and available.\n"
+                                            "Exception follows:\n"
+                                            "%s",
+            ZDateFull::currentDateTime().toFormatted().toString(),wErrComp.toString());
+
         goto GenFileNoDic;
       } // ZEDLG_Accepted
       case ZEDLG_Rejected: /* Raw requested */
@@ -3088,6 +3505,18 @@ GenFileEnd:
   uriString wURIMaster = wMasterFile->getURIContent().toString();
   wMasterFile->zclose();
   ComLog->appendText("Master file closed.");
+
+  ComLog->appendText("Deleting change log content");
+  int wi=0;
+  while (ChangeLog.count() > 0) {
+    ChangeLog.pop();
+    wi++;
+  }
+
+  ComLog->appendText("Change log content deleted\n"
+                     "%d elements deleted.",wi);
+
+
 
 //  ZExceptionDLg::setFixedFont(true);
   int wRet=ZExceptionDLg::adhocMessage2BHtml("Generate file",Severity_Information,

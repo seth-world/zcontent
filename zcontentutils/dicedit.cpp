@@ -79,6 +79,8 @@
 
 #include <texteditmwn.h>
 
+#include <zcontent/zindexedfile/zmasterfile.h>
+
 using namespace zbs;
 
 const int cst_MessageDuration = 20000;  /* milliseconds */

@@ -55,7 +55,16 @@ public:
   void setText(const utf8VaryingString& pText, const utf8VaryingString &pTitle);
   void appendText(const utf8VaryingString& pText);
   void appendText(const char *pText,...);
-//  void _appendText(const utf8VaryingString& pText,va_list arglist);
+
+  void appendTextColor(QColor pBkgndColor,QColor pTextColor,const utf8VaryingString& pText);
+  void appendTextColor(QColor pBkgndColor,QColor pTextColor,const char *pText,...);
+  void appendTextColor(QColor pTextColor,const utf8VaryingString& pText) {
+    appendTextColor(QColor(),pTextColor,pText);
+  }
+  void appendTextColor(QColor pTextColor,const char *pText,...);
+
+
+
 
   void setPositionOrigin ();
 
@@ -112,6 +121,10 @@ private:
   QAction*      lineNbQAc=nullptr;
   QAction*      wrapQAc=nullptr;
   QAction*      quitQAc=nullptr;
+
+  QAction*      zoomInQAc=nullptr;
+  QAction*      zoomOutQAc=nullptr;
+
   QActionGroup* menuActionQAg=nullptr;
 
 private:

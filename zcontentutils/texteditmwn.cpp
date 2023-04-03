@@ -45,8 +45,6 @@ textEditMWn::_init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)) {
 
   clearQAc = new QAction("clear",genMEn);
 
-
-
   genMEn->addAction(lineNbQAc);
   genMEn->addAction(wrapQAc);
 
@@ -62,6 +60,16 @@ textEditMWn::_init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)) {
   menuActionQAg->addAction(writeQAc);
   menuActionQAg->addAction(clearQAc);
 
+  genMEn->addSeparator();
+
+  zoomInQAc = new QAction("Zoom in",genMEn);
+  zoomOutQAc = new QAction("Zoom out",genMEn);
+
+  genMEn->addAction(zoomInQAc);
+  genMEn->addAction(zoomOutQAc);
+
+  menuActionQAg->addAction(zoomInQAc);
+  menuActionQAg->addAction(zoomOutQAc);
 
   Text= ui->textPTe;
   Text->setUseLineNumbers(Options & TEOP_ShowLineNumbers);
@@ -186,6 +194,24 @@ textEditMWn::MenuAction(QAction* pAction) {
   if (pAction==clearQAc) {
     Text->clear();
   } //clearQAc
+
+
+  if (pAction==zoomInQAc) {
+    QFont wF=ui->textPTe->font();
+    qreal wFwght = wF.pointSizeF();
+    wF.setPointSizeF(++wFwght);
+    ui->textPTe->setFont(wF);
+    return;
+  }//zoomInQAc
+
+  if (pAction==zoomOutQAc) {
+    QFont wF=ui->textPTe->font();
+    qreal wFwght = wF.pointSizeF();
+    wF.setPointSizeF(--wFwght);
+    ui->textPTe->setFont(wF);
+    return;
+  }//zoomInQAc
+
 } //MenuAction
 
 
@@ -391,7 +417,10 @@ void
 textEditMWn::appendText(const utf8VaryingString& pText) {
   Text->appendPlainText(pText.toCChar());
 }
-
+void
+textEditMWn::appendTextColor(QColor pBkgndColor,QColor pTextColor,const utf8VaryingString& pText) {
+  Text->appendTextColor(pBkgndColor,pTextColor,pText.toCChar());
+}
 void
 textEditMWn::appendText(const char* pText,...) {
   utf8VaryingString wT;
@@ -401,6 +430,28 @@ textEditMWn::appendText(const char* pText,...) {
   va_end(args);
 
   Text->appendPlainText(wT.toCChar());
+}
+
+void
+textEditMWn::appendTextColor(QColor pBkgndColor,QColor pTextColor,const char* pText,...) {
+  utf8VaryingString wT;
+  va_list args;
+  va_start (args, pText);
+  wT.vsnprintf(cst_messagelen,pText, args);
+  va_end(args);
+
+  appendTextColor(pBkgndColor,pTextColor,wT);
+}
+
+void
+textEditMWn::appendTextColor(QColor pTextColor,const char* pText,...) {
+  utf8VaryingString wT;
+  va_list args;
+  va_start (args, pText);
+  wT.vsnprintf(cst_messagelen,pText, args);
+  va_end(args);
+
+  appendTextColor(QColor(),pTextColor,wT);
 }
 void
 textEditMWn::clear() {

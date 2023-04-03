@@ -475,11 +475,43 @@ public:
                         const zaddress_type pTo,
                         bool pCreateZFBTEntry=true);
     /**
-     * @brief zremoveAll delete all active records without changing any record structure.
+     * @brief zremoveAll delete all active records one by one without changing any record structure.
      * Records are moved to free block pool with a deleted state.
      */
     ZStatus zremoveAll();
+/**
+ * @brief zclearFile Clearing file content for the current opened ZRandomFile
+ *
+ * zclear will consider any block and user record within the ZRandomFile as deleted and unexisting anymore (even in the ZDeletedBlockPool).
+ *
+ * For doing this, it will
+ *  - reset ZBlockAccessTable pool (no more used blocks)
+ *  - create one unique free block in ZFreeBlockPool  with a size corresponding to
+ * Size of the Content File - size of a BlockHeader - start of data
+ *  - this block will be written as the first block of the content file (address start of data).
+ *
+ *  If highwater marking option has been selected, the freed space (size of free block as computed before) will be binary zeroed according highwater marking algorithm.
+ * @see ZRandomFile::_highwaterMark_Block
+ *
+ *    If ZRandomFile contains records these records will be lost.
+ * Current Logical address will be 0L, meaning start of the file.
+   If highWaterMarking option has been selected and is on, the existing used file space will be marked to binary zero.
+   File space remains allocated and is fully available as one free block with all available space to be used.
 
+   File must be correctly setup (with appropriate path in various uriStrings ).
+   If file is open then it will be closed before engaging the process.
+   Once the process and been finished, will be re-opened for a later use with its previous open mode, if it was open, or left close if it was close while calling the method.
+
+   @note The whole file space remains allocated to ZRandomFile content file.
+   If pSize mentions a value less than current file space, the file is not truncated and file space remains unchanged.
+   if pSize is -1, then the existing space is kept.
+   if pSize mentions a value greater than actual file space, then file is extended using posix_fallocate and file size is adjusted to the given size.
+
+   In order to reduce the amount of allocated disk space, it is required to use, after having used zclearFile, ZRandomFile::ztruncateFile.
+
+ * @param[in] pSize      number of bytes to be allocated to file. If -1, then existing size is kept.
+ * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
+ */
     ZStatus zclearFile(const zsize_type pSize=-1) ;
 
 
@@ -542,8 +574,7 @@ public:
     /**
      * @brief zgetAllocatedSize returns the total physical space taken by the ZRandomFile content file.
      * @return
-     */
-
+     */  
     zsize_type zgetAllocatedSize(void)  {return (getAllocatedSize());}
     /**
      * @brief zgetCurrentRank returns the current rank in ZBlockAccessTable

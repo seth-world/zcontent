@@ -2,7 +2,7 @@
 #define KEYDATA_H
 
 #include <stddef.h>
-#include <ztoolset/zutfstrings.h>
+#include <ztoolset/utfvaryingstring.h>
 
 
 class KeyData {

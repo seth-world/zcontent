@@ -88,21 +88,18 @@ LIBS +=  -licuuc -licudata -licui18n -licuio -licutu -licutest
 #LIBS += $$ICU_BASE/lib/libicutu.a
 #LIBS += $$ICU_BASE/lib/libicutest.a
 
-
-
-INCLUDEPATH += $${TOOLSET_ROOT} \
+INCLUDEPATH +=  $${OPENSSL_BASE} \
+                $${OPENSSL_INCLUDEPATH} \
+                $${TOOLSET_ROOT} \
                 $${TOOLSET_INCLUDE}  \
                 $${TOOLSET_INC_ZBASE} \
                 $${TOOLSET_INC_ZNET} \
                 $${TOOLSET_INC_ZCONTENT} \
                 $${TOOLSET_INC_ZAM} \
                 $${TOOLSET_INC_ZCPPPARSER} \
-                $${OPENSSL_ROOT} \
                 $${ZQT_ROOT} \
                 $${ZQT_WIDGET} \
-                $${ZCONTENT_ROOT}/zcontentutils \
-                $${DEVELOPMENT_BASE}/zflow
-
+                $${ZCONTENT_ROOT}/zcontentutils
 
 #if using ICU
 INCLUDEPATH +=  $${ICU_COMMON} \
@@ -162,6 +159,7 @@ SOURCES += \
     filegeneratedlg.cpp \
     keydata.cpp \
     main.cpp \
+    masterfilevalues.cpp \
     poolvisu.cpp \
     visulinecol.cpp \
     zchangerecord.cpp \
@@ -218,6 +216,7 @@ HEADERS += \
     $${TOOLSET_ROOT}/zcppparser/zcppparserutils/rawfields.h \
     filegeneratedlg.h \
     keydata.h \
+    masterfilevalues.h \
     poolvisu.h \
     visulinecol.h \
     zchangerecord.h \
