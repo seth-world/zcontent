@@ -704,7 +704,7 @@ int main(int argc, char *argv[])
 
   uriString wDocFile = wWD ;
   wDocFile.addConditionalDirectoryDelimiter();
-  wDocFile += "zdocphyonekey.zmf";
+  wDocFile += "zdocphysical.zmf";
 
 // uriString wPictureDir;
 
@@ -746,7 +746,7 @@ ZStatus populateOneKey(const uriString& pZMF) {
     ZException.exit_abort();
 
 
-  ZDocPhyOneKey wDocPhy;
+  ZDocPhysical wDocPhy;
 
 
   ZArray<ZDataBuffer> wKeys;

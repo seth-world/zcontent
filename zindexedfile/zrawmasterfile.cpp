@@ -1877,14 +1877,28 @@ ZRawMasterFile::zremoveAll() {
 
   /* first delete all index key files records */
 
+  if (ZVerbose & ZVB_FileEngine) {
+    _DBGPRINT("ZRawMasterFile::zremoveAll-I- Removing all content of file <%s>.\n",getURIContent().toString())
+    _DBGPRINT("ZRawMasterFile::zremoveAll-I- Removing content for indexes.\n")
+  }
+
+
   for (long wi=0; wi < IndexTable.count(); wi++) {
+    if (ZVerbose & ZVB_FileEngine) {
+    _DBGPRINT("ZRawMasterFile::zremoveAll-I- Removing all content for index file <%s>\n",IndexTable[wi]->getURIContent().toString())
+    }
     wSt=IndexTable[wi]->zremoveAll();
     if (wSt!=ZS_SUCCESS) {
       ZException.addToLast(" While deleting index key");
+      if (ZVerbose & ZVB_FileEngine) {
+        _DBGPRINT("ZRawMasterFile::zremoveAll-E Error while removing index file's content\n%s\n",ZException.last().formatFullUserMessage().toString())
+      }
       return wSt;
     }
   }// for
-
+  if (ZVerbose & ZVB_FileEngine) {
+    _DBGPRINT("ZRawMasterFile::zremoveAll-I- Removing all content for master file itself.\n")
+  }
   return ZRandomFile::zremoveAll();
 }// zremoveAll
 

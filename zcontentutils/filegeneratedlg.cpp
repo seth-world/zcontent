@@ -2050,7 +2050,15 @@ FileGenerateMWn::KeyAppendFromZMFDic(const ZMFDictionary* pDic) {
     wKD.Allocated = cst_ZRF_default_allocation;
     wKD.ExtentQuota = cst_ZRF_default_extentquota;
     wKD.AllocatedSize = wKD.Allocated * wKD.KeySize;
+    if (wKD.AllocatedSize==0) {
+      wKD.AllocatedSize = 150; /* a default value as another */
+      ComLog->appendText("Key creation: Defaulting AllocatedSize to 150 ");
+    }
     wKD.ExtentSize = wKD.ExtentQuota * wKD.KeySize;
+    if (wKD.ExtentSize==0) {
+      wKD.ExtentSize = 150; /* a default value as another */
+      ComLog->appendText("Key creation: Defaulting ExtentQuota to 150 ");
+    }
     /* then store new key from dic */
     long wR=KeyValues->push(wKD);
     /* first setup change log with values ex-ante and ex-post */
@@ -2358,7 +2366,7 @@ FileGenerateMWn::processZmf(const uriString& pURIMaster,bool pBackup) {
             pMasterFile.IndexTable[wKeyRow]->KeyUniversalSize,
             wNewKeySize);
         ComLog->appendText(wStr);
-        pMasterFile.IndexTable[wi]->KeyUniversalSize = wNewKeySize ;
+        pMasterFile.IndexTable[wKeyRow]->KeyUniversalSize = wNewKeySize ;
         break;
     }
     case ZFGC_ChgExtent : {
