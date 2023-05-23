@@ -18,15 +18,13 @@ ZIndexResult::ZIndexResult(const ZIndexResult &pIn) {
   _copyFrom(pIn);
 }
 
-ZIndexResult::ZIndexResult(zaddress_type pZMFAddress,zrank_type pIndexRank) {
-  memset(this,0,sizeof(ZIndexResult));
-  IndexRank=pIndexRank;
+ZIndexResult::ZIndexResult(zaddress_type pZMFAddress,zaddress_type pIndexAddress) {
+  IndexAddress=pIndexAddress;
   ZMFAddress=pZMFAddress;
 }
 
 ZIndexResult&  ZIndexResult::_copyFrom(const ZIndexResult &pIn) {
-  memset(this,0,sizeof(ZIndexResult));
-  IndexRank=pIn.IndexRank;
+  IndexAddress=pIn.IndexAddress;
   ZMFAddress=pIn.ZMFAddress;
   return *this;
 }
@@ -36,7 +34,7 @@ ZIndexResult ZIndexResult::create(zaddress_type pZMFAddress,zrank_type pIndexRan
 {
   ZIndexResult wIR;
   wIR.ZMFAddress = pZMFAddress;
-  wIR.IndexRank = pIndexRank;
+  wIR.IndexAddress = pIndexRank;
   return wIR;
 }
 
@@ -239,7 +237,7 @@ ZIndexItem wIndexItem ;
         }
 
     wIndexItem.fromFileKey(wIndexRecord);
-    Context.ZIFLast.IndexRank = pIndexRank;
+    Context.ZIFLast.IndexAddress = pIndexRank;
     Context.ZIFLast.ZMFAddress = wIndexItem.ZMFAddress ;
     pZIR=Context.ZIFLast;
     return Context.ZSt;
@@ -611,7 +609,7 @@ ZRawMasterFile *wMasterFile ;
     setStatus(ZS_NOTFOUND);
     while (getStatus()==ZS_NOTFOUND)
         {
-        wSt=wMasterFile->zget(pRecordContent,pZIR.IndexRank);
+        wSt=wMasterFile->zget(pRecordContent,pZIR.IndexAddress);
         if (wSt!=ZS_SUCCESS)
             {
     // here case of locked record

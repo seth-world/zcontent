@@ -32,7 +32,7 @@ ZKeyListDLg::initLayout()
   resize(900,361);
 
   AcceptBTn = new QPushButton(this);
-  AcceptBTn->setText("Accept");
+  AcceptBTn->setText("Select");
   AcceptBTn->setSizePolicy(QSizePolicy ::Fixed , QSizePolicy ::Fixed );
 
   RejectBTn = new QPushButton(this);

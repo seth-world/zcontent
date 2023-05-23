@@ -10,25 +10,8 @@
 #include <ztoolset/charfixedstring.h>
 #include <ztoolset/utffixedstring.h>
 #ifdef __DEPRECATED__
-/**
- * @brief setFieldURFfZString exports a
- * @param pSourceNaturalPtr natural data to export from
- * @param pTargetURFData    ZDataBuffer to received URF data
- * @param pTargetType      ZType of target string
- * @param pTargetCapacity  Capacity of a fixed string expressed in number of character units
- * @return
- */
-ZStatus
-setFieldURFfZString(void* pSourceNaturalPtr,
-                   ZDataBuffer* pTargetURFData,
-                    ZTypeBase pTargetType,
-                    URF_Capacity_type pTargetCapacity)
-{
 
-           utfStringHeader *wString=static_cast<utfStringHeader*>(pSourceNaturalPtr);
-            return  wString->_exportURFAnyGeneric(pTargetURFData,pTargetType,pTargetCapacity);
-}
-#endif // __DEPRECATED__
+
 
 ZStatus
 setFieldURFfZDate(void* pSourceNatural,
@@ -51,6 +34,7 @@ setFieldURFfZDate(void* pSourceNatural,
     return ZS_SUCCESS;
 
 }// setFieldURFfZDate
+#endif // __DEPRECATED__
 
 ZStatus
 setFieldURFfZDateFull(void* pSourceNatural,

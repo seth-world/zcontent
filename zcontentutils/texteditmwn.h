@@ -64,6 +64,8 @@ public:
   void appendTextColor(QColor pTextColor,const char *pText,...);
 
 
+  void appendHtml(const char *pText,...);
+
 
 
   void setPositionOrigin ();

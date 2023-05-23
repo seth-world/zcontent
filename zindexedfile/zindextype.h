@@ -1,6 +1,6 @@
 #ifndef ZSINDEXTYPE_H
 #define ZSINDEXTYPE_H
-#include <zconfig.h>
+#include <config/zconfig.h>
 #include <cstdint>
 
 #include <ztoolset/zerror.h>

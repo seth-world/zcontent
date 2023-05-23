@@ -791,4 +791,15 @@ ZMasterControlBlock::loadDictionary(){
   return Dictionary->load();
 }
 
+
+void ZMasterControlBlock::setEngineMode (uint8_t pSE)
+{
+  EngineMode = pSE;
+/*  for (long wi=0;wi < IndexTable.count();wi++)
+    if (IndexTable[wi]->isOpen()){
+      IndexTable[wi]->setEngineMode(EngineMode);
+    }
+*/
+}
+
 #endif // ZSMASTERCONTROLBLOCK_CPP

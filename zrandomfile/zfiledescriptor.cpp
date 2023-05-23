@@ -1,7 +1,10 @@
 #include "zfiledescriptor.h"
 #include <zcontentcommon/zcontentconstants.h>
-#include <zrandomfile/zrandomfiletypes.h>
+#include "zrandomfiletypes.h"
+#include "zrandomfile.h"
 #include <zxml/zxmlprimitives.h>
+
+#include <zio/zioutils.h>
 
 using namespace zbs;
 
@@ -106,7 +109,7 @@ ZFDOwnData& ZFDOwnData::_copyFrom(const ZFDOwnData& pIn)
 {
   FContent=pIn.FContent;
   ContentFd=pIn.ContentFd;
-  FHeader=pIn.FHeader;
+//  FHeader=pIn.FHeader;
   HeaderFd=pIn.HeaderFd;
   Pid=pIn.Pid;
   Uid=pIn.Uid;
@@ -178,13 +181,13 @@ int ZFDOwnData::fromXml(zxmlNode* pFDBRootNode,ZaiErrors* pErrorlog)
   if (ZFCB.fromXml(wRootNode,pErrorlog)!=0)
     return -1;
   /* see if it is really required */
-  if (XMLgetChildInt64(wRootNode, "physicalposition", PhysicalPosition, pErrorlog) < 0) {
+  if (XMLgetChildInt64(wRootNode, "physicalposition", PhysicalPosition, pErrorlog,ZAIES_Warning) < 0) {
     fprintf(stderr,
         "ZFDOwnData::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
         "default.",
         "physicalposition");
   }
-  if (XMLgetChildInt64(wRootNode, "logicalposition", LogicalPosition, pErrorlog) < 0) {
+  if (XMLgetChildInt64(wRootNode, "logicalposition", LogicalPosition, pErrorlog,ZAIES_Warning) < 0) {
     fprintf(stderr,
         "ZFDOwnData::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
         "default.",
@@ -365,8 +368,8 @@ ZStatus wSt=ZS_SUCCESS;
 void
 ZFileDescriptor::_forceClose()
 {
-  close (ContentFd);
-  close (HeaderFd);
+  rawClose (ContentFd);
+  rawClose (HeaderFd);
   _isOpen=false;
   HeaderAccessed = ZHAC_Nothing;
   ZRFPool->removeFileByFd(ContentFd);
@@ -401,23 +404,7 @@ ZFileDescriptor::setPath (const uriString &pURIPath)
     return ZS_INVOP;
   }
   Pid = getpid();
-  //    utfdescString wDInfo;
-/*  const utf8_t* wExtension=(const utf8_t*)__HEADER_FILEEXTENSION__;
-  if (wExtension[0]=='.')
-    wExtension++;       // +1 because we should miss the '.' char
-  //    if (!strcmp(wExtension,(char*)pURIPath.getFileExtension().toString()))
-  if (pURIPath.getFileExtension()==wExtension)
 
-  {
-    ZException.setMessage(_GET_FUNCTION_NAME_,
-        ZS_INVNAME,
-        Severity_Error,
-        "File name is malformed. Extension <%s> is reserved while given file name is <%s>",
-        __HEADER_FILEEXTENSION__,
-        pURIPath.toCChar());
-    return ZS_INVNAME;
-  }
-*/
   URIContent = pURIPath;
 
   URIDirectoryPath = URIContent.getDirectoryPath();

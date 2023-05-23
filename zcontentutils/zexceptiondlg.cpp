@@ -25,6 +25,7 @@
 bool FixedFont = false;
 #define __ICON_PATH__ "/home/gerard/Development/zbasetools/zqt/icons/"
 #define __INFO_ICON__ "info.png"
+#define __QUESTION_ICON__ "question.png"
 #define __WARNING_ICON__ "warning.png"
 #define __ERROR_ICON__ "error.png"
 #define __SEVERE_ICON__ "errorcross.png"
@@ -192,6 +193,10 @@ ZExceptionDLg::layoutSetup( const utf8VaryingString& pTitle,
   ZExceptionBTn->setText("Except stack");
   wButtonBoxHLy->addWidget(ZExceptionBTn);
 
+  ZExceptionPurgeBTn = new QPushButton(verticalLayoutWidget);
+  ZExceptionPurgeBTn->setText("Purge Except");
+  wButtonBoxHLy->addWidget(ZExceptionPurgeBTn);
+
   MoreBTn = new QPushButton(verticalLayoutWidget);
   MoreBTn->setText("More");
 
@@ -274,6 +279,7 @@ ZExceptionDLg::layoutSetup( const utf8VaryingString& pTitle,
   QObject::connect (MoreBTn,&QAbstractButton::pressed,this,[this]{ MoreClicked(); });
   QObject::connect (ErrlogBTn,&QAbstractButton::pressed,this,[this]{ ErrlogClicked(); });
   QObject::connect (ZExceptionBTn,&QAbstractButton::pressed,this,[this]{ ZExceptionClicked(); });
+  QObject::connect (ZExceptionPurgeBTn,&QAbstractButton::pressed,this,[this]{ ZExceptionPurgeClicked(); });
 }
 
 
@@ -369,10 +375,14 @@ void ZExceptionDLg::setErrorLogBTn(ZaiErrors* pErrorLog) {
     else
       ErrlogBTn->setVisible(true);
   }
-  if (ZException.count()==0)
+  if (ZException.count()==0) {
     ZExceptionBTn->setVisible(false);
-  else
+    ZExceptionPurgeBTn->setVisible(false);
+  }
+  else {
     ZExceptionBTn->setVisible(true);
+    ZExceptionPurgeBTn->setVisible(false);
+  }
 }
 
 void ZExceptionDLg::ErrlogClicked()
@@ -402,6 +412,8 @@ void ZExceptionDLg::ErrlogClicked()
 }
 void ZExceptionDLg::ZExceptionClicked()
 {
+  if (ZException.count()==0)
+    return;
   utf8VaryingString wStr;
   textEditMWn* wTE=new textEditMWn(this,TEOP_ShowLineNumbers | TEOP_NoFileLab);
   wTE->setWindowTitle("ZException stack");
@@ -410,9 +422,20 @@ void ZExceptionDLg::ZExceptionClicked()
     }
 
   wTE->show();
+  ZExceptionPurgeBTn->setVisible(true);
   return;
 }
+void ZExceptionDLg::ZExceptionPurgeClicked()
+{
+  if (ZException.count()==0)
+    return;
+  while (ZException.count())
+    ZException.pop();
 
+  ZExceptionBTn->setVisible(false);
+  ZExceptionPurgeBTn->setVisible(false);
+  return;
+}
 void ZExceptionDLg::setAdditionalInfo(const utf8VaryingString& pComp,bool pHtml)
 {
   if (pHtml)
@@ -427,11 +450,15 @@ ZExceptionDLg::~ZExceptionDLg()
 {
   //delete ui;
 }
+
 void ZExceptionDLg::applySeverity(Severity_type pSeverity,const utf8VaryingString& pTitle) {
   switch(pSeverity)
   {
   case Severity_Information:
     setInfo(pTitle);
+    break;
+  case Severity_Question:
+    setQuestion(pTitle);
     break;
   case Severity_Warning:
     setWarning(pTitle);
@@ -465,6 +492,20 @@ void ZExceptionDLg::setInfo(const utf8VaryingString& pTitle)
   LogoLBl->setPixmap(wPxMp);
   if (pTitle.isEmpty())
     setWindowTitle("Information");
+  else
+    setWindowTitle(pTitle.toCChar());
+}
+void ZExceptionDLg::setQuestion(const utf8VaryingString& pTitle)
+{
+  uriString wImgFile = __ICON_PATH__;
+  wImgFile += __QUESTION_ICON__;
+
+  QPixmap wPxMp;
+  wPxMp.load(wImgFile.toCChar());
+  LogoLBl->setScaledContents(true);
+  LogoLBl->setPixmap(wPxMp);
+  if (pTitle.isEmpty())
+    setWindowTitle("Question");
   else
     setWindowTitle(pTitle.toCChar());
 }
@@ -1106,6 +1147,19 @@ ZExceptionDLg::display3B(const utf8VaryingString& pTitle,const ZExceptionBase pE
 }
 
 utf8VaryingString escapeHtmlSeq(const char* pString) {
+  utf8VaryingString wStr=pString;
+
+
+  wStr.replace("<%s>","&lt;%s&gt;");
+  wStr.replace("<%d>","&lt;%d&gt;");
+  wStr.replace("<%ld>","&lt;%ld&gt;");
+
+  wStr.replace("\n","<br>");
+
+  return wStr;
+}
+
+utf8VaryingString escapeHtmlSeq(const utf8VaryingString& pString) {
   utf8VaryingString wStr=pString;
 
 

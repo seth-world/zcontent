@@ -32,6 +32,12 @@
 #include <QLineEdit>
 #include <QMenu>
 
+#include <zcontent/zcontentcommon/urfparser.h>
+#include <zcontent/zcontentcommon/urffield.h>
+
+
+#include "visuraw.h"
+
 const long StringDiplayMax = 64;
 extern const int cst_maxraisonablevalue;
 
@@ -106,6 +112,9 @@ ZRawMasterFileVisu::ZRawMasterFileVisu( QWidget *parent) :
 }
 ZRawMasterFileVisu::~ZRawMasterFileVisu()
 {
+  if (VizuRaw!=nullptr)
+    delete VizuRaw;
+
   delete ui;
 }
 
@@ -178,7 +187,12 @@ ZRawMasterFileVisu::setup(const uriString& pURI , int pFd) {
 
 
 //  BlockDumpTBv->setMouseClickCallback(std::bind(&ZRawMasterFileVisu::VisuMouseCallback, this,placeholders::_1,placeholders::_2)  );
-  BlockDumpTBv->setContextMenuCallback(std::bind(&ZRawMasterFileVisu::VisuBvFlexMenuCallback, this,placeholders::_1));
+// Deprecated
+//  BlockDumpTBv->setContextMenuCallback(std::bind(&ZRawMasterFileVisu::VisuBvFlexMenuCallback, this,placeholders::_1));
+
+  VizuRaw = new VisuRaw(BlockDumpTBv,&RawRecord);
+  BlockDumpTBv->setContextMenuCallback(std::bind(&VisuRaw::VisuBvFlexMenuCallback, VizuRaw,placeholders::_1));
+
 
   int wj=0;
   int wk=0;
@@ -711,7 +725,7 @@ ZRawMasterFileVisu::ToBegin(){
   return;
 }
 
-
+/*  defined within urffield.h
 template <class _Tp>
 _Tp
 convertAtomicBack(ZType_type pType,const unsigned char* &pPtrIn) {
@@ -730,7 +744,7 @@ convertAtomicBack(ZType_type pType,const unsigned char* &pPtrIn) {
   }
   return wValue;
 } // convertAtomicBack
-
+*/
 void
 ZRawMasterFileVisu::ViewModeChange(int pIndex) {
 
@@ -942,10 +956,10 @@ ZRawMasterFileVisu::displayURFBlock(ZDataBuffer & pData)
   wPtr += sizeof(ZBlockHeader_Export); /* NB: stored on file is ZBlockHeader and not ZBlockDescriptor (address is missing on file) */
 
   ZTypeBase wZType;
-  size_t    wURFHeaderSize=0;
+//  size_t    wURFHeaderSize=0;
   uint64_t  wURFDataSize = 0;
-  uint32_t  wKeyNb=0;
-  zaddress_type wKeyAddress=0;
+//  uint32_t  wKeyNb=0;
+//  zaddress_type wKeyAddress=0;
 
   /* leading user record size */
 /*  _importAtomic<uint64_t>(wURFDataSize,wPtr);
@@ -1016,7 +1030,6 @@ ZRawMasterFileVisu::displayURFBlock(ZDataBuffer & pData)
   const unsigned char* wPtrEnd = pData.Data + pData.Size;
   while ((wPtr < wPtrEnd )&&(wErrored < 10)) {
 
-
     wZTypeErrored=displayOneURFField(wOffset,wPtr,wPtrEnd);
 
     if (wZTypeErrored && (wErrored < 10) ) {
@@ -1043,6 +1056,7 @@ ZRawMasterFileVisu::displayURFBlock(ZDataBuffer & pData)
     BlockTBv->ItemModel->setVerticalHeaderItem(BlockTBv->ItemModel->rowCount()-1,new QStandardItem("-error-"));
   }
 
+#ifdef __COMMENT__
   /* processing keys data */
   wPtr = pData.Data + size_t(wURFDataSize);
   wPtrEnd = pData.Data + pData.Size;
@@ -1102,7 +1116,7 @@ ZRawMasterFileVisu::displayURFBlock(ZDataBuffer & pData)
     wRow << new QStandardItem("--No key defined--");
     BlockTBv->ItemModel->appendRow(wRow);
   }
-
+#endif
   for (int wi=0; wi < BlockTBv->ItemModel->columnCount(); wi ++ )
     BlockTBv->resizeColumnToContents(wi);
   for (int wi=0; wi < BlockTBv->ItemModel->rowCount(); wi ++ )
@@ -1198,7 +1212,7 @@ bool
 ZRawMasterFileVisu::displayOneURFField(zaddress_type &wOffset,const unsigned char* &wPtr,const unsigned char* wPtrEnd) {
   ZTypeBase wZType;
   size_t    wURFHeaderSize=0;
-  uint64_t  wURFDataSize = 0;
+//  uint64_t  wURFDataSize = 0;
 
   ZStatus wSt=ZS_SUCCESS;
 
@@ -1231,7 +1245,7 @@ ZRawMasterFileVisu::displayOneURFField(zaddress_type &wOffset,const unsigned cha
 
     wRow << createItem(sizeof(uint8_t));
 
-    wStr.sprintf("%d 0x%X",wValue,wValue);
+    wStr.sprintf("%u 0x%X",wValue,wValue);
     wRow << createItem(wStr);
     wOffset += sizeof(uint8_t);
     break;
@@ -1252,7 +1266,7 @@ ZRawMasterFileVisu::displayOneURFField(zaddress_type &wOffset,const unsigned cha
     wValue=convertAtomicBack<uint16_t> (ZType_U16,wPtr);
 
     wRow << createItem(sizeof(uint16_t));
-    wStr.sprintf("%d 0x%X",wValue,wValue);
+    wStr.sprintf("%u 0x%X",wValue,wValue);
     wRow << createItem(wStr);
     wOffset += sizeof(uint16_t);
     break;
@@ -1274,7 +1288,7 @@ ZRawMasterFileVisu::displayOneURFField(zaddress_type &wOffset,const unsigned cha
 
     wRow << createItem(sizeof(uint32_t));
 
-    wStr.sprintf("%d 0x%X",wValue,wValue);
+    wStr.sprintf("%u 0x%X",wValue,wValue);
     wRow << createItem(wStr);
     wOffset += sizeof(uint32_t);
     break;
@@ -1344,7 +1358,7 @@ ZRawMasterFileVisu::displayOneURFField(zaddress_type &wOffset,const unsigned cha
   }
 
     /* from here <wPtr -= sizeof(ZTypeBase);>  has been made and wPtr points on ZType */
-
+#ifdef __DEPRECATED__
   case ZType_ZDate: {
     ssize_t wSize;
     ZDate wZDate;
@@ -1358,6 +1372,8 @@ ZRawMasterFileVisu::displayOneURFField(zaddress_type &wOffset,const unsigned cha
     wOffset += wSize ;
     break;
   }
+#endif// __DEPRECATED__
+
   case ZType_ZDateFull: {
     ssize_t wSize;
     ZDateFull wZDateFull;
@@ -1726,7 +1742,7 @@ ZRawMasterFileVisu::colorizeURFBlock(ZDataBuffer & pData)
     return;
   }
   setSelectionBackGround(PresenceBackGround,PresenceBackGround_first,wColorOffset,wSize,"Presence bit field (ZBitset)",false);
-
+#ifdef __DEPRECATED__
   /* colorize urf data size */
 
   wColorOffset += size_t(wSize);
@@ -1735,6 +1751,7 @@ ZRawMasterFileVisu::colorizeURFBlock(ZDataBuffer & pData)
   wColorOffset += sizeof(uint64_t);
 
   wPtr += sizeof(uint64_t);
+#endif // __DEPRECATED__
 
   while (wPtr < wPtrEnd ) {
     colorizeOneURFFields(pData,wPtr,wPtrEnd,wColorOffset);
@@ -2076,9 +2093,354 @@ void ZRawMasterFileVisu::resizeEvent(QResizeEvent* pEvent)
 */
 }//ZRawMasterFileVisu::resizeEvent
 
+#ifdef __COMMENT__
+
+void ZRawMasterFileVisu::visuBlockHeader(){
+  utf8VaryingString wStr;
+
+  size_t wValueSize=0;
+  QModelIndex wIdx=BlockDumpTBv->currentIndex();
+  if (!wIdx.isValid())
+    return;
+  ssize_t wOffset=computeOffsetFromCoord(wIdx.row(),wIdx.column());
+  if (wOffset+sizeof(ZBlockHeader_Export) > RawRecord.Size ) {
+    ZExceptionDLg::adhocMessage("Block header",Severity_Error,"Out of file's boundaries.\nThere is no enough room for a block header data structure");
+    return;
+  }
+
+  ZBlockHeader_Export wBHExp ;
+  memmove(&wBHExp,RawRecord.Data + wOffset,sizeof(ZBlockHeader_Export)) ;
+
+  if (wBHExp.StartSign != cst_ZFILEBLOCKSTART) {
+    ZExceptionDLg::adhocMessage("Block header",Severity_Error,"This is not a valid block header (wrong start sign)");
+    return;
+
+  }
+
+  /* Visu dialog common setup */
+
+  QDialog wVisuDLg (nullptr);
+  wVisuDLg.setWindowTitle(QObject::tr("Evaluate block header","ZContentVisuMain"));
+
+  wVisuDLg.resize(450,150);
+
+  QVBoxLayout* QVL=new QVBoxLayout(&wVisuDLg);
+  wVisuDLg.setLayout(QVL);
+
+  QGridLayout* QGLyt=new QGridLayout(&wVisuDLg);
+  QVL->insertLayout(0,QGLyt);
+
+
+
+
+/* dialog setup */
+
+  QLabel* LBlStart=new QLabel("Start sign",&wVisuDLg);
+  QGLyt->addWidget(LBlStart,0,0);
+//  QHL->addWidget(LBlStart);
+  QLabel* wStartLBl=new QLabel(&wVisuDLg);
+  QGLyt->addWidget(wStartLBl,0,1);
+//  QHL->addWidget(wStartLBl);
+
+  wStr.sprintf("%08X",wBHExp.StartSign);
+  wStartLBl->setText(wStr.toCChar());
+
+  QLabel* wLbEndianLBl=new QLabel("Endian check",&wVisuDLg);
+  QGLyt->addWidget(wLbEndianLBl,1,0);
+
+  QLabel* wEndianRawLBl=new QLabel(&wVisuDLg);
+  QGLyt->addWidget(wEndianRawLBl,1,1);
+  wStr.sprintf("0x%08X",wBHExp.EndianCheck);
+  wEndianRawLBl->setText(wStr.toCChar());
+
+  QLabel* wEndianRevLBl=new QLabel(&wVisuDLg);
+  QGLyt->addWidget(wEndianRevLBl,1,2);
+  wEndianRevLBl->setText(wBHExp.isReversed()?"Reversed":"Not reversed");
+
+
+  QLabel* wLbBlockSizeLBl=new QLabel("Block size",&wVisuDLg);
+  QGLyt->addWidget(wLbBlockSizeLBl,2,0);
+
+  QLabel* wBlockSizeRawLBl=new QLabel(&wVisuDLg);
+  QGLyt->addWidget(wBlockSizeRawLBl,2,1);
+  wStr.sprintf("0x%08X",wBHExp.BlockSize);
+  wBlockSizeRawLBl->setText(wStr.toCChar());
+
+  QLabel* wBlockSizeLBl=new QLabel(&wVisuDLg);
+  QGLyt->addWidget(wBlockSizeLBl,2,2);
+  uint64_t  wValue = reverseByteOrder_Conditional<uint64_t>(wBHExp.BlockSize);
+  wStr.sprintf("%lld",wValue);
+  wBlockSizeLBl->setText(wStr.toCChar());
+
+
+  QLabel* wLbStateLBl=new QLabel("State",&wVisuDLg);
+  QGLyt->addWidget(wLbStateLBl,3,0);
+
+  QLabel* wStateRawLBl=new QLabel(&wVisuDLg);
+  QGLyt->addWidget(wStateRawLBl,3,1);
+  wStr.sprintf("0x%02X",wBHExp.State);
+  wStateRawLBl->setText(wStr.toCChar());
+
+  QLabel* wStateLBl=new QLabel(&wVisuDLg);
+  QGLyt->addWidget(wStateLBl,3,2);
+  wStateLBl->setText(decode_ZBS(wBHExp.State));
+
+
+  QLabel* wLbLockLBl=new QLabel("Lock mask",&wVisuDLg);
+  QGLyt->addWidget(wLbLockLBl,4,0);
+
+  QLabel* wLbLockRawLBl=new QLabel(&wVisuDLg);
+  QGLyt->addWidget(wLbLockRawLBl,4,1);
+  wStr.sprintf("0x%02X",wBHExp.Lock);
+  wLbLockRawLBl->setText(wStr.toCChar());
+
+  QLabel* wLockLBl=new QLabel(&wVisuDLg);
+  QGLyt->addWidget(wLockLBl,4,2);
+  wLockLBl->setText(decode_ZLockMask(wBHExp.Lock).toChar());
+
+
+  QLabel* wLbPidLBl=new QLabel("Pid",&wVisuDLg);
+  QGLyt->addWidget(wLbPidLBl,5,0);
+
+  QLabel* wPidRawLBl=new QLabel(&wVisuDLg);
+  QGLyt->addWidget(wPidRawLBl,5,1);
+  wStr.sprintf("%d",wBHExp.Pid);
+  wPidRawLBl->setText(wStr.toCChar());
+
+  QLabel* wPidLBl=new QLabel(&wVisuDLg);
+  QGLyt->addWidget(wPidLBl,5,2);
+  pid_t wPid = reverseByteOrder_Conditional<pid_t>(wBHExp.Pid);
+  wStr.sprintf("%d",wPid);
+  wPidLBl->setText(wStr.toCChar());
+
+  QHBoxLayout* QHLBtn=new QHBoxLayout;
+  QHLBtn->setObjectName("QHLBtn");
+  QVL->insertLayout(1,QHLBtn);
+
+
+  QPushButton* wNext=new QPushButton(QObject::tr("Next","ZContentVisuMain"),&wVisuDLg);
+  QPushButton* wClose=new QPushButton(QObject::tr("Close","ZContentVisuMain"),&wVisuDLg);
+  QSpacerItem* wSpacer= new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+  QHLBtn->addItem(wSpacer);
+
+  QHLBtn->addWidget(wNext);
+  QHLBtn->addWidget(wClose);
+
+
+  QObject::connect(wNext, &QPushButton::clicked, &wVisuDLg, &QDialog::accept);
+  QObject::connect(wClose, &QPushButton::clicked, &wVisuDLg, &QDialog::reject);
+
+  int wRet=wVisuDLg.exec();
+
+  if (wRet==QDialog::Rejected) {
+    return;
+  }
+
+  /* skip value in offset */
+  if ( (wOffset + wValueSize) > RawRecord.Size )
+    return;
+  //  setSearchOffset(wOffset+wValueSize);
+  VisuLineCol wNewPosition;
+  wOffset+=sizeof(ZBlockHeader_Export);
+  wNewPosition.compute (wOffset);
+  QModelIndex wNewIdx = wIdx.sibling(wNewPosition.line,wNewPosition.col);
+  if (!wNewIdx.isValid())
+    return ;
+
+  BlockDumpTBv->setFocus();
+  BlockDumpTBv->setCurrentIndex(wNewIdx);
+
+  return;
+} // visuBlockHeader
+
+void ZRawMasterFileVisu::visuURFField(){
+  utf8VaryingString wStr;
+  URFParser wURFParser;
+  QModelIndex wIdx=BlockDumpTBv->currentIndex();
+  if (!wIdx.isValid())
+    return;
+  ssize_t wOffset=computeOffsetFromCoord(wIdx.row(),wIdx.column());
+
+  const unsigned char* wPtr = RawRecord.Data + wOffset;
+
+  ssize_t wFieldSize = wURFParser.getURFFieldSize(wPtr);
+  if (wFieldSize < 0) {
+    ZExceptionDLg::adhocMessage("URF field",Severity_Error,"Invalid URF field ZType.");
+    return;
+  }
+
+
+  if (wOffset+sizeof(ZBlockHeader_Export) > RawRecord.Size )
+    return;
+
+  /* Visu dialog common setup */
+
+  QDialog wVisuDLg (nullptr);
+  wVisuDLg.setWindowTitle(QObject::tr("Evaluate URF field","ZContentVisuMain"));
+
+  wVisuDLg.resize(450,150);
+
+  QVBoxLayout* QVL=new QVBoxLayout(&wVisuDLg);
+  wVisuDLg.setLayout(QVL);
+
+  QGridLayout* QGLyt=new QGridLayout(&wVisuDLg);
+  QVL->insertLayout(0,QGLyt);
+
+
+  /* dialog setup */
+
+  QLabel* LBlZType=new QLabel("ZType",&wVisuDLg);
+  QGLyt->addWidget(LBlZType,0,0);
+
+  QLabel* wZTypeNumLBl=new QLabel(&wVisuDLg);
+  QGLyt->addWidget(wZTypeNumLBl,0,1);
+
+  ZTypeBase wZType= reverseByteOrder_Ptr<ZTypeBase>(wPtr);
+  wStr.sprintf("%08X",wZType);
+  wZTypeNumLBl->setText(wStr.toCChar());
+
+  QLabel* wZTypeLBl=new QLabel(&wVisuDLg);
+  QGLyt->addWidget(wZTypeLBl,0,2);
+  wZTypeLBl->setText(decode_ZType(wZType));
+
+  QVBoxLayout* QVLVal=new QVBoxLayout;
+  QVL->insertLayout(2,QVLVal);
+
+  QLabel* wLbValueLBl=new QLabel("Field content",&wVisuDLg);
+  QVL->addWidget(wLbValueLBl);
+
+  QTextEdit* wTL = new QTextEdit(&wVisuDLg);
+  wTL->setText(URFParser::displayOneURFField(wPtr).toCChar());
+  QVL->addWidget(wTL);
+
+  QHBoxLayout* QHLBtn=new QHBoxLayout;
+  QHLBtn->setObjectName("QHLBtn");
+  QVL->insertLayout(3,QHLBtn);
+
+  QPushButton* wNext=new QPushButton(QObject::tr("Next","ZContentVisuMain"),&wVisuDLg);
+  QPushButton* wClose=new QPushButton(QObject::tr("Close","ZContentVisuMain"),&wVisuDLg);
+  QSpacerItem* wSpacer= new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+  QHLBtn->addItem(wSpacer);
+
+  QHLBtn->addWidget(wNext);
+  QHLBtn->addWidget(wClose);
+
+  QObject::connect(wNext, &QPushButton::clicked, &wVisuDLg, &QDialog::accept);
+  QObject::connect(wClose, &QPushButton::clicked, &wVisuDLg, &QDialog::reject);
+
+  int wRet=wVisuDLg.exec();
+
+  if (wRet==QDialog::Rejected) {
+    return;
+  }
+
+  /* skip value in offset */
+  if ( (wOffset + wFieldSize) > RawRecord.Size )
+    return;
+  //  setSearchOffset(wOffset+wValueSize);
+  VisuLineCol wNewPosition;
+  wOffset += wFieldSize;
+  wNewPosition.compute (wOffset);
+  QModelIndex wNewIdx = wIdx.sibling(wNewPosition.line,wNewPosition.col);
+  if (!wNewIdx.isValid())
+    return ;
+
+  BlockDumpTBv->setFocus();
+  BlockDumpTBv->setCurrentIndex(wNewIdx);
+
+  return;
+} // visuURFField
 
 
 void ZRawMasterFileVisu::visuActionEvent(QAction* pAction) {
+
+  if (pAction==ZBlockHeaderQAc) {
+    VisuRaw::visuBlockHeader(BlockDumpTBv,&RawRecord);
+    return;
+  } // if (pAction==ZBlockHeaderQAc)
+
+  if (pAction==URFFieldQAc) {
+    VisuRaw::visuURFField(BlockDumpTBv,&RawRecord);
+    return;
+  } // if (pAction==ZBlockHeaderQAc)
+
+  if (pAction==ZTypeQAc) {
+    VisuRaw::visuAtomic(BlockDumpTBv,&RawRecord,VRTP_ZType);
+    return;
+  } // ZTypeQAc
+  if (pAction==uint16QAc) {
+    VisuRaw::visuAtomic(BlockDumpTBv,&RawRecord,VRTP_uint16);
+    return;
+  } // uint16QAc
+  if (pAction==int16QAc) {
+    VisuRaw::visuAtomic(BlockDumpTBv,&RawRecord,VRTP_int16);
+    return;
+  } // int16QAc
+  if (pAction==uint32QAc) {
+    VisuRaw::visuAtomic(BlockDumpTBv,&RawRecord,VRTP_uint32);
+    return;
+  }
+  if (pAction==int32QAc) {
+    VisuRaw::visuAtomic(BlockDumpTBv,&RawRecord,VRTP_int32);
+    return;
+  }
+  if (pAction==uint64QAc) {
+    VisuRaw::visuAtomic(BlockDumpTBv,&RawRecord,VRTP_uint64);
+    return;
+  }
+  if (pAction==int64QAc) {
+    VisuRaw::visuAtomic(BlockDumpTBv,&RawRecord,VRTP_int64);
+    return;
+  }
+  if (pAction==sizetQAc) {
+    VisuRaw::visuAtomic(BlockDumpTBv,&RawRecord,VRTP_sizet);
+    return;
+  }
+
+  if (pAction==floatQAc) {
+    VisuRaw::visuAtomic(BlockDumpTBv,&RawRecord,VRTP_float);
+    return;
+  }
+  if (pAction==doubleQAc) {
+    VisuRaw::visuAtomic(BlockDumpTBv,&RawRecord,VRTP_double);
+    return;
+  }
+  if (pAction==longdoubleQAc) {
+    VisuRaw::visuAtomic(BlockDumpTBv,&RawRecord,VRTP_longdouble);
+    return;
+  }
+
+  return;
+}//visuActionEvent
+#endif // __DEPRECATED__
+
+#ifdef __COMMENT__
+void ZRawMasterFileVisu::visuActionEventOld(QAction* pAction) {
+
+  if (pAction==ZBlockHeaderQAc) {
+    visuBlockHeader();
+    return;
+
+  } // if (pAction==ZBlockHeaderQAc)
+
+  if (pAction==URFFieldQAc) {
+    visuURFField();
+    return;
+
+  } // if (pAction==ZBlockHeaderQAc)
+
+
+  /* Visu dialog common setup */
+
+  utf8VaryingString wStr;
+
+  size_t wValueSize=0;
+  QModelIndex wIdx=BlockDumpTBv->currentIndex();
+  if (!wIdx.isValid())
+    return;
+
+  ssize_t wOffset=computeOffsetFromCoord(wIdx.row(),wIdx.column());
+
   QDialog wVisuDLg (nullptr);
   wVisuDLg.setWindowTitle(QObject::tr("Evaluate values","ZContentVisuMain"));
 
@@ -2094,11 +2456,12 @@ void ZRawMasterFileVisu::visuActionEvent(QAction* pAction) {
   QGLyt->addLayout(QHL,0,4);
   QHL->setAlignment(Qt::AlignCenter);
 
+  /* for any atomic data view */
+
   QLabel* LBlType=new QLabel("Type",&wVisuDLg);
   QHL->addWidget(LBlType);
   QLabel* wTypeLBl=new QLabel(&wVisuDLg);
   QHL->addWidget(wTypeLBl);
-
 
   QLabel* wLbDec=new QLabel(QObject::tr("Decimal","ZContentVisuMain"),&wVisuDLg);
   QGLyt->addWidget(wLbDec,1,1);
@@ -2145,21 +2508,9 @@ void ZRawMasterFileVisu::visuActionEvent(QAction* pAction) {
   QHLBtn->addWidget(wNext);
   QHLBtn->addWidget(wClose);
 
-
-
-
   QObject::connect(wNext, &QPushButton::clicked, &wVisuDLg, &QDialog::accept);
   QObject::connect(wClose, &QPushButton::clicked, &wVisuDLg, &QDialog::reject);
 
-  size_t wValueSize=0;
-  QModelIndex wIdx=BlockDumpTBv->currentIndex();
-  if (!wIdx.isValid())
-    return;
-
-  ssize_t wOffset=computeOffsetFromCoord(wIdx.row(),wIdx.column());
-
-
-  utf8VaryingString wStr;
 
   if (pAction==ZTypeQAc) {
     wValueSize=sizeof(ZTypeBase);
@@ -2179,8 +2530,7 @@ void ZRawMasterFileVisu::visuActionEvent(QAction* pAction) {
     wDeserializedHexaLEd->setText(wStr.toCChar());
     wAlphaLEd->setText(decode_ZType(wDeSerialized));
 
-  }
-
+  } // ZTypeQAc
   if (pAction==uint16QAc) {
     wValueSize=sizeof(uint16_t);
     if (wOffset+sizeof(uint16_t) > RawRecord.Size )
@@ -2197,7 +2547,7 @@ void ZRawMasterFileVisu::visuActionEvent(QAction* pAction) {
     wDeserializedLEd->setText(wStr.toCChar());
     wStr.sprintf("%04X",wDeSerialized);
     wDeserializedHexaLEd->setText(wStr.toCChar());
-  }
+  } // uint16QAc
   if (pAction==int16QAc) {
     wValueSize=sizeof(int16_t);
     if (wOffset+sizeof(int16_t) > RawRecord.Size )
@@ -2214,7 +2564,7 @@ void ZRawMasterFileVisu::visuActionEvent(QAction* pAction) {
     wDeserializedLEd->setText(wStr.toCChar());
     wStr.sprintf("%04X",wDeSerialized);
     wDeserializedHexaLEd->setText(wStr.toCChar());
-  }
+  } // int16QAc
   if (pAction==uint32QAc) {
     wValueSize=sizeof(uint32_t);
     if (wOffset+sizeof(uint32_t) > RawRecord.Size )
@@ -2330,18 +2680,19 @@ void ZRawMasterFileVisu::visuActionEvent(QAction* pAction) {
   QModelIndex wNewIdx = wIdx.sibling(wNewPosition.line,wNewPosition.col);
   if (!wNewIdx.isValid())
     abort();
-/*
+  /*
   wStr.sprintf("%ld",wOffset);
   ui->CurAddressLBl->setText(wStr.toCChar());
 */
   BlockDumpTBv->setFocus();
   BlockDumpTBv->setCurrentIndex(wNewIdx);
-//  BlockDumpTBv->scrollTo(wNewIdx);
+  //  BlockDumpTBv->scrollTo(wNewIdx);
 
   return;
-}
+} //visuActionEventOld
+#endif // __COMMENT__
 
-
+#ifdef __DEPRECATED__
 void ZRawMasterFileVisu::VisuBvFlexMenuCallback(QContextMenuEvent *event)
 {
   QMenu* visuFlexMEn=new QMenu;
@@ -2350,6 +2701,16 @@ void ZRawMasterFileVisu::VisuBvFlexMenuCallback(QContextMenuEvent *event)
   QActionGroup* visuActionGroup=new QActionGroup(visuFlexMEn) ;
   //  QObject::connect(visuActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(visuActionEvent(QAction*)));
   QObject::connect(visuActionGroup, &QActionGroup::triggered,  this, &ZRawMasterFileVisu::visuActionEvent);
+
+  ZBlockHeaderQAc = new QAction("ZBlockHeader",visuFlexMEn);
+  visuFlexMEn->addAction(ZBlockHeaderQAc);
+  visuActionGroup->addAction(ZBlockHeaderQAc);
+
+  URFFieldQAc = new QAction("URF Field",visuFlexMEn);
+  visuFlexMEn->addAction(URFFieldQAc);
+  visuActionGroup->addAction(URFFieldQAc);
+
+  visuFlexMEn->addSeparator();
 
   ZTypeQAc = new QAction("ZType",visuFlexMEn);
   visuFlexMEn->addAction(ZTypeQAc);
@@ -2383,9 +2744,22 @@ void ZRawMasterFileVisu::VisuBvFlexMenuCallback(QContextMenuEvent *event)
   visuFlexMEn->addAction(sizetQAc);
   visuActionGroup->addAction(sizetQAc);
 
+  floatQAc= new QAction("float",visuFlexMEn);
+  visuFlexMEn->addAction(floatQAc);
+  visuActionGroup->addAction(floatQAc);
+
+  doubleQAc= new QAction("double",visuFlexMEn);
+  visuFlexMEn->addAction(doubleQAc);
+  visuActionGroup->addAction(doubleQAc);
+
+  longdoubleQAc= new QAction("long double",visuFlexMEn);
+  visuFlexMEn->addAction(longdoubleQAc);
+  visuActionGroup->addAction(longdoubleQAc);
+
   visuFlexMEn->exec(event->globalPos());
   visuFlexMEn->deleteLater();
 }//VisuBvFlexMenu
+#endif // __DEPRECATED__
 
 void ZRawMasterFileVisu::setVisuIndexFile() {
   ui->ColorModeCBx->setCurrentIndex(2);

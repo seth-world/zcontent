@@ -38,29 +38,8 @@ typedef uint8_t   zlockmask_type ;    //!< refers to ZLockMask_type
 typedef uint32_t  zmode_type ;        //!< refers to ZRFMode_type
 
 
-#ifndef __ZOPENZRFPOOL__
-#define __ZOPENZRFPOOL__
-namespace zbs {
-class ZRandomFile; }
-
-class ZOpenZRFPool: public zbs::ZArray <zbs::ZRandomFile*>
-{
-public:
-  void addOpenFile(zbs::ZRandomFile* pFileData)
-  { push(pFileData);}
-  ZStatus removeFileByObject(zbs::ZRandomFile*pZRF);
-  ZStatus removeFileByFd(int pFd);
-  void closeAll();
-
-}; //ZOpenZRFPool
-
-#ifndef ZRANDOMFILE_CPP
-extern ZOpenZRFPool* ZRFPool;
-#endif //ZRANDOMFILE_CPP*/
-#endif  // __ZOPENZRFPOOL__
-
 /** @cond Development
- * @brief The ZPMSCounterextern ZOpenZRFPool* ZRFPool;_type enum
+ * @brief The ZPMSCounter_type enum
  */
 enum ZPMSCounter_type {
     ZPMS_Nothing =          0,

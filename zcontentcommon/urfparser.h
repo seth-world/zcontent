@@ -9,7 +9,11 @@
 #include <ztoolset/zbitset.h>
 #include <ztoolset/zexceptionmin.h>
 
+#include <zcontentcommon/urffield.h>
 
+#include <ztoolset/zarray.h>
+
+/*
 class URFField {
 public:
   URFField() =default;
@@ -24,7 +28,7 @@ public:
   const unsigned char*  Ptr=nullptr;
   size_t                Size=0;
 };
-
+*/
 
 enum CompareOptions : uint8_t {
   COPT_Nothing = 0,
@@ -41,6 +45,9 @@ public:
   URFParser& operator= (const URFParser&) = delete;
 
   ZStatus set(const ZDataBuffer * pRecord);
+
+  static ZStatus parse(const ZDataBuffer& pRecord,ZArray<URFField>& pFieldList);
+
   /**
    * @brief appendURFFieldByRank parse record surface for urf fields and append to pBuffer found field as an URF field definition.
    * @param pRank
@@ -68,10 +75,10 @@ public:
 
 
   static ZStatus getURFTypeAndSize (const unsigned char *&pPtrIn, ZTypeBase& pType, ssize_t & pSize); /* pPtrIn is NOT updated */
-  ZStatus getURFFieldValue (const unsigned char* &wPtr, ZDataBuffer& pValue);
-  ZStatus getKeyFieldValue (const unsigned char* &wPtr, ZDataBuffer& pValue);
+  ZStatus getURFFieldValue (const unsigned char* &Ptr, ZDataBuffer& pValue);
+  ZStatus getKeyFieldValue (const unsigned char* &Ptr, ZDataBuffer& pValue);
 
-  static utf8VaryingString displayOneURFField(const unsigned char* &wPtr);
+  static utf8VaryingString displayOneURFField(const unsigned char* &Ptr, bool pShowZType=true);
 
 
 
@@ -80,8 +87,8 @@ public:
   ZArray<URFField>      URFFieldList;
   ZBitset               Presence;
   uint64_t              URFDataSize=0;
-  const unsigned char*  wPtr=nullptr;
-  const unsigned char*  wPtrEnd=nullptr;
+  const unsigned char*  Ptr=nullptr;
+  const unsigned char*  PtrEnd=nullptr;
 };
 
 /** @brief URFCompare  Compare two buffers composed each of one or many URF fields, each field potentially of variable length.
@@ -112,25 +119,6 @@ int URFCompareValues( const unsigned char* &pURF1,size_t pSize1,
 int UTF8Compare(const unsigned char *&pKey1, size_t pSize1, const unsigned char *&pKey2, size_t pSize2) ;
 int UTF16Compare(const unsigned char *&pKey1, size_t pSize1, const unsigned char *&pKey2, size_t pSize2)  ;
 int UTF32Compare(const unsigned char* &pKey1,size_t pSize1,const unsigned char* &pKey2,size_t pSize2) ;
-
-template <class _Tp>
-_Tp
-convertAtomicBack(ZType_type pType,const unsigned char* &pPtrIn) {
-  _Tp wValue;
-  uint8_t wSign=1;
-  if (pType & ZType_Signed) {
-    wSign = *pPtrIn;
-    pPtrIn += sizeof(uint8_t);
-  }
-  memmove(&wValue,pPtrIn,sizeof(_Tp));
-  pPtrIn += sizeof(_Tp);
-  wValue = reverseByteOrder_Conditional(wValue);
-  if (!wSign) {
-    wValue = _negate(wValue);
-    wValue = -wValue;
-  }
-  return wValue;
-} // convertAtomicBack
 
 bool ZTypeExists(ZTypeBase pType);
 ZStatus searchNextValidZType( const unsigned char* &pPtr,const unsigned char* wPtrEnd);

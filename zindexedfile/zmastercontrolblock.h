@@ -20,7 +20,14 @@
 
 #include <zcontent/zindexedfile/zindextable.h>
 
+enum SearchEngine_type : uint8_t {
+  SENG_Sequential = 0,
+  SENG_Dycho      = 1
+};
+
 namespace zbs {
+
+
 /*
 
   Header Reserved components for Master file  (Master Control Block export)
@@ -114,6 +121,8 @@ public:
 
   void report(FILE *pOutput=stdout);
 
+  void setEngineMode (uint8_t pSE) ;
+  uint8_t getEngineMode () {return EngineMode;}
 
   uriString getURIDictionary();
 
@@ -127,11 +136,12 @@ public:
 
   ZDictionaryFile*        Dictionary=nullptr;
 
-
   ZIndexTable             IndexTable;     // List of effective index objects that will manage physical ZIndexFile
   ZJournalControlBlock*   ZJCB=nullptr;
 
   ZRawMasterFile* RawMasterFile=nullptr;
+
+  uint8_t EngineMode = 0;
 
   bool hasDictionary() {return Dictionary != nullptr;}
 

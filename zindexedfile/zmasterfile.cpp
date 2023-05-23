@@ -22,7 +22,7 @@ ZMasterFile::zopen  (const uriString &pURI, zmode_type pMode)
   if (getFileType() == ZFT_ZRawMasterFile)
     return ZS_FILETYPEWARN ;
   return loadDictionary();
-}// zFullOpen
+}// zopen
 
 utf8VaryingString
 ZMasterFile::getDictionaryName() {
@@ -163,7 +163,10 @@ ZMasterFile::extractKeyValues(const ZDataBuffer& pRecord,ZDataBuffer& pKeyConten
   ZKeyDictionary* wKeyDic=wZMFDic.KeyDic[pIndexRank];
 
   const unsigned char* wPtrIn=pRecord.Data;
-
+/*
+  ZBitset wFieldPresence ;
+  wFieldPresence._importURF(wPtrIn);
+*/
   _importAtomic<ZTypeBase>(wZType,wPtrIn);
 
   if ((wZType != ZType_bitset) && (wZType != ZType_bitsetFull)) {
@@ -181,28 +184,31 @@ ZMasterFile::extractKeyValues(const ZDataBuffer& pRecord,ZDataBuffer& pKeyConten
   } // if (wZType==ZType_bitsetFull)
 
   /* second get user URF data size */
-  _importAtomic<uint64_t>(wURFDataSize,wPtrIn);
+//  _importAtomic<uint64_t>(wURFDataSize,wPtrIn);  // Deprecated
 
   const unsigned char* wFldBegPtr=wPtrIn;
-  const unsigned char* wFldPtr=wPtrIn;
+//  const unsigned char* wFldPtr=wPtrIn;
   const unsigned char* wPtrEnd=wPtrIn + pRecord.Size;
   long wR=0;
 
   long wFldRank=-1;
   for (long wi=0;wi < wKeyDic->count();wi++) {
-    if (wKeyDic->Tab[wi].MDicRank < wFldRank)  { /* if next field has a greater rank : do not reset pointer */
-      wR=0;
-      wPtrIn=wFldBegPtr;
-    }
+//    if (wKeyDic->Tab[wi].MDicRank < wFldRank)  { /* if next field has a greater rank : do not reset pointer */
+//      wR=0;
+//      wPtrIn=wFldBegPtr;
+//    }
+
     wFldRank=wKeyDic->Tab[wi].MDicRank;
 
     /* find sequentially field of rank MDicRank */
-
+    wR=0;
     while ((wR < wFldRank)&&(wPtrIn < wPtrEnd)) {
       if ((!wBitSetFull) && (!wBitset.test(wR)))  {
         wR++;
+        continue;
       }
-      URFField wF=getURFField(wFldPtr);
+
+      URFField wF=getURFField(wPtrIn);
       wR++;
     }//while
 
@@ -214,7 +220,7 @@ ZMasterFile::extractKeyValues(const ZDataBuffer& pRecord,ZDataBuffer& pKeyConten
       ZException.setMessage("ZMasterFile::extractKey",ZS_OMITTED,Severity_Error,"Requested field - position <%ld> name <%s> is omitted. Cannot build an index key with omitted field.",wFldRank);
       return ZS_OUTBOUNDHIGH;
     }
-    URFField wF=getURFField(wFldPtr);
+    URFField wF=getURFField(wPtrIn);
     if (wF.Ptr==nullptr) {
       return ZException.last().Status;
     }
@@ -223,194 +229,3 @@ ZMasterFile::extractKeyValues(const ZDataBuffer& pRecord,ZDataBuffer& pKeyConten
   return ZS_SUCCESS;
 } // extractKey
 
-URFField
-getURFField(const unsigned char* &pPtrIn) {
-  URFField wF;
-
-  wF.Ptr=pPtrIn;
-  wF.Size = sizeof(ZTypeBase);
-  ZTypeBase wType;
-
-  _importAtomic<ZTypeBase>(wType,pPtrIn);
-
-  switch (wType){
-  case ZType_UChar:
-  case ZType_U8: {
-    wF.Size += sizeof(uint8_t);
-    pPtrIn += sizeof(uint8_t);
-    break;
-  }
-  case ZType_Char:
-  case ZType_S8: {
-    wF.Size += sizeof(int8_t)+1;
-    pPtrIn += sizeof(int8_t)+1;
-    break;
-  }
-  case ZType_U16:{
-    wF.Size += sizeof(uint16_t);
-    pPtrIn += sizeof(uint16_t);
-    break;
-  }
-  case ZType_S16: {
-    wF.Size += sizeof(int16_t)+1;
-    pPtrIn += sizeof(int16_t)+1;
-    break;
-  }
-
-  case ZType_U32:{
-    wF.Size += sizeof(uint32_t);
-    pPtrIn += sizeof(uint32_t);
-    break;
-  }
-  case ZType_S32: {
-    wF.Size += sizeof(int32_t)+1;
-    pPtrIn += sizeof(int32_t)+1;
-    break;
-  }
-  case ZType_U64: {
-    wF.Size += sizeof(uint64_t);
-    pPtrIn += sizeof(uint64_t);
-    break;
-  }
-  case ZType_S64: {
-    wF.Size += sizeof(int64_t)+1;
-    pPtrIn += sizeof(int64_t)+1;
-    break;
-  }
-  case ZType_Float: {
-    wF.Size += sizeof(float)+1;
-    pPtrIn += sizeof(float)+1;
-    break;
-  }
-
-  case ZType_Double: {
-    wF.Size += sizeof(double)+1;
-    pPtrIn += sizeof(double)+1;
-    break;
-  }
-
-  case ZType_LDouble: {
-    wF.Size += sizeof(long double)+1;
-    pPtrIn += sizeof(long double)+1;
-    break;
-  }
-
-    /* from here <wPtr -= sizeof(ZTypeBase);>  has been made and wPtr points on ZType */
-
-  case ZType_ZDate: {
-    wF.Size += sizeof(uint32_t);
-    pPtrIn += sizeof(uint32_t);
-    break;
-  }
-  case ZType_ZDateFull: {
-    wF.Size += sizeof(uint64_t);
-    pPtrIn += sizeof(uint64_t);
-    break;
-  }
-
-  case ZType_URIString:{
-    URF_UnitCount_type wUnitCount;
-    wF.Size += _importAtomic<URF_UnitCount_type>(wUnitCount,pPtrIn);
-    wF.Size += wUnitCount * sizeof(utf8_t);
-    break;
-  }
-  case ZType_Utf8VaryingString: {
-    URF_UnitCount_type wUnitCount;
-    wF.Size += _importAtomic<URF_UnitCount_type>(wUnitCount,pPtrIn);
-    wF.Size += wUnitCount * sizeof(utf8_t);
-    break;
-  }
-
-  case ZType_Utf16VaryingString:{
-    URF_UnitCount_type wUnitCount;
-    wF.Size += _importAtomic<URF_UnitCount_type>(wUnitCount,pPtrIn);
-    wF.Size += wUnitCount * sizeof(utf16_t);
-    break;
-  }
-  case ZType_Utf32VaryingString:{
-    URF_UnitCount_type wUnitCount;
-    wF.Size += _importAtomic<URF_UnitCount_type>(wUnitCount,pPtrIn);
-    wF.Size += wUnitCount * sizeof(utf32_t);
-    break;
-  }
-
-  case ZType_Utf8FixedString:{
-    URF_Capacity_type   wCapacity;
-    URF_UnitCount_type  wUnitsCount;
-
-    wF.Size +=_importAtomic<URF_Capacity_type>(wCapacity,pPtrIn);
-    wF.Size +=_importAtomic<URF_UnitCount_type>(wUnitsCount,pPtrIn);
-
-    wF.Size += size_t (wUnitsCount) * sizeof(utf8_t);
-    break;
-  }
-
-    /* for fixed string URF header is different */
-
-  case ZType_Utf16FixedString:{
-    URF_Capacity_type   wCapacity;
-    URF_UnitCount_type  wUnitsCount;
-
-    wF.Size +=_importAtomic<URF_Capacity_type>(wCapacity,pPtrIn);
-    wF.Size +=_importAtomic<URF_UnitCount_type>(wUnitsCount,pPtrIn);
-
-    wF.Size += size_t (wUnitsCount) * sizeof(utf16_t);
-    break;
-  }
-
-  case ZType_Utf32FixedString:{
-    URF_Capacity_type   wCapacity;
-    URF_UnitCount_type  wUnitsCount;
-
-    wF.Size +=_importAtomic<URF_Capacity_type>(wCapacity,pPtrIn);
-    wF.Size +=_importAtomic<URF_UnitCount_type>(wUnitsCount,pPtrIn);
-
-    wF.Size += size_t (wUnitsCount) * sizeof(utf32_t);
-    break;
-  }
-
-  case ZType_CheckSum: {
-    wF.Size += cst_checksum ;
-    break;
-  }
-
-  case ZType_MD5: {
-    wF.Size += cst_md5 ;
-    break;
-  }
-
-  case ZType_Blob: {
-    uint64_t wDataSize;
-    wF.Size += _importAtomic(wDataSize,pPtrIn);
-    wF.Size += wDataSize;
-    break;
-  }
-
-  case ZType_bitset: {
-    uint16_t    wByteSize,wEffectiveBitSize;
-    wF.Size += _importAtomic<uint16_t>(wByteSize,pPtrIn);
-    wF.Size += _importAtomic<uint16_t>(wEffectiveBitSize,pPtrIn);
-    wF.Size += size_t(wByteSize);
-    break;
-  }
-
-  case ZType_bitsetFull: {
-    break;
-  }
-
-  case ZType_Resource: {
-    wF.Size += sizeof(ZEntity_type)+sizeof(Resourceid_type);
-    break;
-  }
-
-  default: {
-    ZException.setMessage("getURFField",ZS_INVTYPE,Severity_Error,"Invalid ZType found %X ",wType);
-    wF.Size=0;
-    wF.Ptr=nullptr;
-    wF.Present = false;
-    return wF;
-  }
-  } // switch
-  wF.Present = true;
-  return wF;
-} //getURFField

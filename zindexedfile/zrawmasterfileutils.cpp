@@ -81,8 +81,9 @@ generateIndexURI( uriString &pIndexFileUri,
   else
     wPath_Uri = pDirectory;
 
-  QUrl wUrl(wPath_Uri.toCChar());
-  pIndexFileUri.fromQString(wUrl.toString(QUrl::PreferLocalFile));
+//  QUrl wUrl(wPath_Uri.toCChar());
+//  pIndexFileUri.fromQString(wUrl.toString(QUrl::PreferLocalFile));
+  pIndexFileUri = wPath_Uri;
   pIndexFileUri.addConditionalDirectoryDelimiter() ;
 
   wMasterRoot = pMasterFileUri.getRootname();
@@ -659,7 +660,7 @@ void zdowngradeZMFtoZRF (const uriString &pZMFPath, FILE* pOutput)
     //       utfdescString wDInfo;
     wBase=wURIContent.getBasename().toCChar();
     wBase+=(const utf8_t*)".downgradelog";
-    wOutput=fopen(wBase.toCString_Strait(),"w");
+    wOutput=fopen(wBase.toCChar(),"w");
     if (wOutput==nullptr)
     {
       wOutput=stdout;
@@ -776,7 +777,7 @@ void zupgradeZRFtoZMF (const uriString& pZRFPath,FILE* pOutput)
     //       utfdescString wDInfo;
     wBase=wURIContent.getBasename().toCChar();
     wBase+=".upgradelog";
-    wOutput=fopen(wBase.toCString_Strait(),"w");
+    wOutput=fopen(wBase.toCChar(),"w");
     if (wOutput==nullptr)
     {
       wOutput=stdout;

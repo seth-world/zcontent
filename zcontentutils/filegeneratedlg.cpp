@@ -75,7 +75,7 @@ const int cst_KeyAllocSizeCol =  cst_KeyAllocCol + 1  ;
 const int cst_KeyExtentQuotaCol =  cst_KeyAllocSizeCol + 1  ;
 const int cst_KeyExtentSizeCol =  cst_KeyExtentQuotaCol + 1  ;
 
-const int cst_updateRate = 3 ;
+const int cst_updateRate = 1 ;
 
 //class textEditMWn;
 
@@ -210,15 +210,15 @@ FileGenerateMWn::initLayout() {
   TestRunQAc->setChecked(false);
 
   ApplyToCurrentQAc=new QAction("Apply to current master file" ,GenMEn);
-  ApplyToZmfQAc=new QAction("Apply to existing master file",GenMEn);
-  ApplyToLoadedQAc=new QAction("Choose master file to apply" ,GenMEn);
+//  ApplyToZmfQAc=new QAction("Apply to existing master file",GenMEn);
+//  ApplyToLoadedQAc=new QAction("Choose master file to apply" ,GenMEn);
 
   SaveToXmlQAc=new QAction("Save definition to xml file",GenMEn);
 
   ApplySaveMEn->addAction(GenFileQAc);
   ApplySaveMEn->addAction(ApplyToCurrentQAc);
-  ApplySaveMEn->addAction(ApplyToZmfQAc);
-  ApplySaveMEn->addAction(ApplyToLoadedQAc);
+//  ApplySaveMEn->addAction(ApplyToZmfQAc);
+//  ApplySaveMEn->addAction(ApplyToLoadedQAc);
   ApplySaveMEn->addAction(TestRunQAc);
   ApplySaveMEn->addAction(SaveToXmlQAc);
 
@@ -229,7 +229,7 @@ FileGenerateMWn::initLayout() {
 
   GenActionGroup->addAction(GenFileQAc);
   GenActionGroup->addAction(ApplyToCurrentQAc);
-  GenActionGroup->addAction(ApplyToLoadedQAc);
+//  GenActionGroup->addAction(ApplyToLoadedQAc);
 
   GenActionGroup->addAction(SetupFromZmfQAc);
   GenActionGroup->addAction(QuitQAc);
@@ -239,7 +239,7 @@ FileGenerateMWn::initLayout() {
   GenActionGroup->addAction(SetupFromDicFileQAc);
   GenActionGroup->addAction(SetupFromXmlDefQAc);
 
-  GenActionGroup->addAction(ApplyToZmfQAc);
+//  GenActionGroup->addAction(ApplyToZmfQAc);
   GenActionGroup->addAction(SaveToXmlQAc);
 
   GenActionGroup->addAction(KeyAppendRawQAc);
@@ -716,9 +716,9 @@ FileGenerateMWn::dataSetupFromMasterFile(const uriString& pURIMaster) {
     delete MasterFile;
   }
   MasterFile = new ZMasterFile;
-  ZStatus wSt=MasterFile->zopen(pURIMaster,ZRF_Read_Only | ZRF_TypeRegardless);
+  ZStatus wSt=MasterFile->zopen(pURIMaster,ZRF_All | ZRF_TypeRegardless);
   if (wSt < 0) {
-    ComLog->appendText("Cannot load requested file.");
+    ComLog->appendText("Cannot open requested file.");
     ZExceptionDLg::displayLast("Opening Master file");
     ComLog->appendTextColor(ErroredQCl, "%s-E-CANTLD Cannot load requested file.\n%s",
         ZDateFull::currentDateTime().toFormatted().toString(),ZException.last().formatFullUserMessage().toString());
@@ -959,7 +959,7 @@ FileGenerateMWn::XmlDefinitionLoad(const utf8VaryingString& pXmlContent, ZaiErro
   }
   if (!(wRoot->getName() == "zicm")) {
     pErrorlog->errorLog(
-        "FileGenerateDLg::XmlLoad-E-INVROOT Invalid root node name <%s> expected <zmfdictionary>",
+        "FileGenerateDLg::XmlLoad-E-INVROOT Invalid root node name <%s> expected <zicm>",
         wRoot->getName().toCChar());
     return ZS_XMLINVROOTNAME;
   }
@@ -1717,11 +1717,11 @@ FileGenerateMWn::MenuAction(QAction* pAction){
     applyToCurrentZmf();
     return;
   }
-  if (pAction==ApplyToLoadedQAc){
+/*  if (pAction==ApplyToLoadedQAc){
     changeChosenZmf();
     return;
   }
-
+*/
   if (pAction==LoadXmlDicQAc){
 
     if (DicEdit==nullptr) {
@@ -1937,12 +1937,12 @@ FileGenerateMWn::MenuAction(QAction* pAction){
     ZExceptionDLg::displayLast("Xml definition file");
     return;
   }
-
+/*
   if (pAction==ApplyToZmfQAc){
     changeChosenZmf();
     return;
   }
-
+*/
   if (pAction==SearchDirQAc){
     SearchDir();
     return;
@@ -2369,23 +2369,28 @@ bool FileGenerateMWn::applyToCurrentZmf() {
 
   if (ValuesControl()) {
         return false;
-      }
-
+      }    
   if (MasterFile==nullptr) {
     ZExceptionDLg::adhocMessage("FileGenerateDLg::applyToZmf",Severity_Error,nullptr,nullptr,
         "No master file loaded. Please load one.");
     return false;
   }
+/*
   zmode_type wMode=ZRF_NotOpen;
   if (MasterFile->isOpen()){
     wMode = MasterFile->getMode();
     MasterFile->zclose();
   }
-//  ZStatus wSt=MasterFile->zopen(ZRF_All);
+*/
+  int wRet=ZExceptionDLg::adhocMessage2B("Backup files before",Severity_Question,"Do not backup","Backup",
+      "Do you want to backup files before change ?");
 
-  return applyChangesZmf(MasterFile->getURIContent(),TestRunQAc->isChecked());
+  if (wRet==QDialog::Accepted)
+    return applyChangesZmf(true);
+
+  return applyChangesZmf(false);
 }
-
+/* Deprecated
 bool FileGenerateMWn::changeChosenZmf() {
 
   if (ValuesControl()) {
@@ -2409,9 +2414,10 @@ bool FileGenerateMWn::changeChosenZmf() {
 
   return applyChangesZmf(wURIFile,TestRunQAc->isChecked());
 } // changeChosenZmf
+*/
 
 ZStatus
-FileGenerateMWn::applyChangesZmf(const uriString& pURIMaster,bool pBackup) {
+FileGenerateMWn::applyChangesZmf(bool pBackup) {
   ZStatus wSt;
   zbs::ZArray<utf8VaryingString> wIndexToRebuild;
 
@@ -2421,93 +2427,108 @@ FileGenerateMWn::applyChangesZmf(const uriString& pURIMaster,bool pBackup) {
     return ZS_INVPARAMS;
   }
 
-  int wModif=0,wKeyModif=0;
+  int wModif=0,wKeyModif=0,wKeyCreated=0,wKeyDeleted=0,wKeyErrored=0,wRebuildErrored=0;
 
   utf8VaryingString wStr;
 
-  ComLog->appendText("Applying changes to file <%s>.", pURIMaster.toString());
+  ComLog->appendText("Applying changes to file <%s>.", MasterFile->getURIContent().toString());
 
-  ZMasterFile pMasterFile;
+  if (MasterFile->getOpenMode()!=ZRF_All)  {
+    if (MasterFile->getOpenMode()!=ZRF_NotOpen) {
+      ComLog->appendText(" File is open in mode <%s>. Closing file then reopenning it.\n",
+          decode_ZRFMode(MasterFile->getOpenMode()));
+      MasterFile->zclose();
+    }
 
-  wSt=pMasterFile.zopen(pURIMaster,ZRF_All| ZRF_TypeRegardless);
-  if (wSt!=ZS_SUCCESS) {
-    ZExceptionDLg::adhocMessage("Master file change",Severity_Error,nullptr,nullptr,
-        " Error while opening master file <%s> \n"
-        " status <%s>",
-        pURIMaster.toString(),
-        decode_ZStatus(wSt));
-    ComLog->appendText(" Error while opening master file <%s> \n"
-                       " status <%s>",
-                        pURIMaster.toString(),
-                        decode_ZStatus(wSt));
-    return wSt;
+    ComLog->appendText("Openning file <%s> with mode ZRF_All | ZRF_TypeRegardless.", MasterFile->getURIContent().toString());
+
+    wSt=MasterFile->zopen(ZRF_All| ZRF_TypeRegardless);
+    if (wSt!=ZS_SUCCESS) {
+      ZExceptionDLg::adhocMessage("Master file change",Severity_Error,nullptr,nullptr,
+          " Error while opening master file <%s> \n"
+          " status <%s>",
+          MasterFile->getURIContent().toString(),
+          decode_ZStatus(wSt));
+
+      ComLog->appendTextColor( ErroredQCl," Error while opening master file <%s> \nException content follows:\n%s",
+          MasterFile->getURIContent().toString(),
+          ZException.last().formatFullUserMessage().toString());
+      return wSt;
+    }
   }
+
 
   /* backup of files */
   if (pBackup) {
-    ComLog->appendText("Backup of components for file %s",pMasterFile.getURIContent().toString());
+    ComLog->appendText("Backing up of components for file %s",MasterFile->getURIContent().toString());
 
-    wSt=pMasterFile.backupAll("bck");
+    utf8VaryingString wBckset = MasterFile->getURIContent().getRootname() + utf8VaryingString("_bck");
+    uriString wBckDir = MasterFile->getURIContent().getDirectoryPath();
+    wBckDir.addConditionalDirectoryDelimiter();
+    wSt=MasterFile->backupAll(wBckDir,wBckset);
     if (wSt!=ZS_SUCCESS) {
       ComLog->appendText("Cannot backup files ");
       ComLog->appendText(ZException.last().formatFullUserMessage());
       ZExceptionDLg::adhocMessage("Backup files",Severity_Error,nullptr,nullptr,
           ZException.last().formatFullUserMessage().toCChar());
+      ComLog->appendTextColor(QColor(), ErroredQCl,"Cannot backup files.\nException content follows:\n%s",
+          ZException.last().formatFullUserMessage().toString());
       return wSt;
     }
 
-    ComLog->appendText("Backed up all files of <%s> ",pMasterFile.getURIContent().toString());
+    ComLog->appendText("Backed up all files of <%s> ",MasterFile->getURIContent().toString());
   }
 
-  wStr.sprintf("Applying changes to file <%s>",pMasterFile.getURIContent().toString());
-  ComLog->appendText(wStr);
+  /* effective apply changes */
 
-  if (pMasterFile.getFCB()->BlockTargetSize != MeanRecordSize) {
+  ComLog->appendText("Applying changes to file <%s>",MasterFile->getURIContent().toString());
+
+  if (MasterFile->getFCB()->BlockTargetSize != MeanRecordSize) {
     wStr.sprintf("Changing BlockTargetSize from %ld to %ld.",
-        pMasterFile.getFCB()->BlockTargetSize,MeanRecordSize );
+        MasterFile->getFCB()->BlockTargetSize,MeanRecordSize );
     ComLog->appendText(wStr);
 
-    pMasterFile.getFCB()->BlockTargetSize = MeanRecordSize ;
+    MasterFile->getFCB()->BlockTargetSize = MeanRecordSize ;
     wModif ++;
   }
 
-  if (pMasterFile.getFCB()->BlockExtentQuota != ExtentQuota) {
+  if (MasterFile->getFCB()->BlockExtentQuota != ExtentQuota) {
     wStr.sprintf("Changing BlockExtentQuota from %ld to %ld.",
-        pMasterFile.getFCB()->BlockExtentQuota,ExtentQuota );
+        MasterFile->getFCB()->BlockExtentQuota,ExtentQuota );
     ComLog->appendText(wStr);
 
-    pMasterFile.getFCB()->BlockExtentQuota = ExtentQuota ;
+    MasterFile->getFCB()->BlockExtentQuota = ExtentQuota ;
     wModif ++;
   }
 
-  if (pMasterFile.getFCB()->GrabFreeSpace != GrabFreeSpace) {
+  if (MasterFile->getFCB()->GrabFreeSpace != GrabFreeSpace) {
     wStr.sprintf("Changing GrabFreeSpace from %s to %s.",
-        pMasterFile.getFCB()->GrabFreeSpace?"true":"false",GrabFreeSpace?"true":"false" );
+        MasterFile->getFCB()->GrabFreeSpace?"true":"false",GrabFreeSpace?"true":"false" );
     ComLog->appendText(wStr);
     if (!pBackup)
-      pMasterFile.getFCB()->GrabFreeSpace = GrabFreeSpace ;
+      MasterFile->getFCB()->GrabFreeSpace = GrabFreeSpace ;
   }
 
-  if (pMasterFile.getFCB()->HighwaterMarking != HighWaterMarking) {
+  if (MasterFile->getFCB()->HighwaterMarking != HighWaterMarking) {
     wStr.sprintf("Changing HighwaterMarking from %s to %s.",
-        pMasterFile.getFCB()->HighwaterMarking?"true":"false",HighWaterMarking?"true":"false" );
+        MasterFile->getFCB()->HighwaterMarking?"true":"false",HighWaterMarking?"true":"false" );
     ComLog->appendText(wStr);
 
-    pMasterFile.getFCB()->HighwaterMarking = HighWaterMarking ;
+    MasterFile->getFCB()->HighwaterMarking = HighWaterMarking ;
     wModif ++;
   }
 
-  if (pMasterFile.hasJournal() != Journaling) {
+  if (MasterFile->hasJournal() != Journaling) {
     wStr.sprintf("Changing Journaling from %s to %s.",
-        pMasterFile.hasJournal()?"true":"false",Journaling?"true":"false" );
+        MasterFile->hasJournal()?"true":"false",Journaling?"true":"false" );
     ComLog->appendText(wStr);
-      /* put journaling on or off according Journaling */
+    /* put journaling on or off according Journaling */
     if (Journaling) {
-      pMasterFile.setJournalingOn();
+      MasterFile->setJournalingOn();
       ComLog->appendText("Journaling started.");
     }
     else {
-      pMasterFile.setJournalingOff();
+      MasterFile->setJournalingOff();
       ComLog->appendText("Journaling stopped.");
     }
 
@@ -2522,34 +2543,32 @@ FileGenerateMWn::applyChangesZmf(const uriString& pURIMaster,bool pBackup) {
     const char* wName="<no field>";
     long wKeyRow = ChangeLog[wChgIdx].getIndexRank();
     ComLog->appendText("Found change log code <%s> index key rank <%ld>",
-                        decode_ZFGC(ChangeLog[wChgIdx].getChangeCode()),
-                        ChangeLog[wChgIdx].getIndexRank() );
+        decode_ZFGC(ChangeLog[wChgIdx].getChangeCode()),
+        ChangeLog[wChgIdx].getIndexRank() );
     switch(ChangeLog[wChgIdx].getChangeCode()) {
 
     case ZFGC_ChgKeySize : {
       size_t wNewKeySize = ChangeLog[wChgIdx].getPostU64();
-        wName="KeyUniversalSize";
-        wStr.sprintf("%s changed %s field from <%ld> to <%ld>.",
-            wName,
-            pMasterFile.IndexTable[wKeyRow]->getURIContent().toString(),
-            pMasterFile.IndexTable[wKeyRow]->KeyUniversalSize,
-            wNewKeySize);
-        ComLog->appendText(wStr);
-        pMasterFile.IndexTable[wKeyRow]->KeyUniversalSize = wNewKeySize ;
+      wName="KeyUniversalSize";
+      ComLog->appendText("%s changed %s field from <%ld> to <%ld>.",
+          wName,
+          MasterFile->IndexTable[wKeyRow]->getURIContent().toString(),
+          MasterFile->IndexTable[wKeyRow]->KeyUniversalSize,
+          wNewKeySize);
+      MasterFile->IndexTable[wKeyRow]->KeyUniversalSize = wNewKeySize ;
 
-        wKeyModif++;
-        break;
+      wKeyModif++;
+      break;
     }
     case ZFGC_ChgExtent : {
       size_t wNewExtent = ChangeLog[wChgIdx].getPostU64();
       wName="Extent quota";
-      wStr.sprintf("%s changed %s field from <%ld> to <%ld>.",
+      ComLog->appendText("%s changed %s field from <%ld> to <%ld>.",
           wName,
-          pMasterFile.IndexTable[wKeyRow]->getURIContent().toString(),
-          pMasterFile.IndexTable[wKeyRow]->getFCB()->BlockExtentQuota,
+          MasterFile->IndexTable[wKeyRow]->getURIContent().toString(),
+          MasterFile->IndexTable[wKeyRow]->getFCB()->BlockExtentQuota,
           wNewExtent);
-      ComLog->appendText(wStr);
-      pMasterFile.IndexTable[wKeyRow]->getFCB()->BlockExtentQuota = wNewExtent ;
+      MasterFile->IndexTable[wKeyRow]->getFCB()->BlockExtentQuota = wNewExtent ;
       wKeyModif++;
       break;
     }
@@ -2558,11 +2577,11 @@ FileGenerateMWn::applyChangesZmf(const uriString& pURIMaster,bool pBackup) {
       wName="Allocated blocks";
       wStr.sprintf("%s changed %s field from <%ld> to <%ld>.",
           wName,
-          pMasterFile.IndexTable[wKeyRow]->getURIContent().toString(),
-          pMasterFile.IndexTable[wKeyRow]->getFCB()->AllocatedBlocks,
+          MasterFile->IndexTable[wKeyRow]->getURIContent().toString(),
+          MasterFile->IndexTable[wKeyRow]->getFCB()->AllocatedBlocks,
           wNewAlloc);
       ComLog->appendText(wStr);
-      pMasterFile.IndexTable[wKeyRow]->getFCB()->AllocatedBlocks = wNewAlloc ;
+      MasterFile->IndexTable[wKeyRow]->getFCB()->AllocatedBlocks = wNewAlloc ;
       wKeyModif++;
       break;
     }
@@ -2572,11 +2591,11 @@ FileGenerateMWn::applyChangesZmf(const uriString& pURIMaster,bool pBackup) {
       wName="Duplicates";
       wStr.sprintf("%s changed %s field from <%ld> to <%ld>.",
           wName,
-          pMasterFile.IndexTable[wKeyRow]->getURIContent().toString(),
-          pMasterFile.IndexTable[wKeyRow]->Duplicates?"true":"false",
+          MasterFile->IndexTable[wKeyRow]->getURIContent().toString(),
+          MasterFile->IndexTable[wKeyRow]->Duplicates?"true":"false",
           wNewDup?"true":"false");
       ComLog->appendText(wStr);
-      pMasterFile.IndexTable[wKeyRow]->Duplicates = wNewDup?ZST_DUPLICATES:ZST_NODUPLICATES ;
+      MasterFile->IndexTable[wKeyRow]->Duplicates = wNewDup?ZST_DUPLICATES:ZST_NODUPLICATES ;
       wKeyModif++;
       break;
     }
@@ -2585,11 +2604,11 @@ FileGenerateMWn::applyChangesZmf(const uriString& pURIMaster,bool pBackup) {
       wName="GrabFreeSpace";
       wStr.sprintf("%s changed %s field from <%ld> to <%ld>.",
           wName,
-          pMasterFile.IndexTable[wKeyRow]->getURIContent().toString(),
-          pMasterFile.IndexTable[wKeyRow]->getFCB()->GrabFreeSpace?"true":"false",
+          MasterFile->IndexTable[wKeyRow]->getURIContent().toString(),
+          MasterFile->IndexTable[wKeyRow]->getFCB()->GrabFreeSpace?"true":"false",
           wNewGrab?"true":"false");
       ComLog->appendText(wStr);
-      pMasterFile.IndexTable[wKeyRow]->getFCB()->GrabFreeSpace = wNewGrab;
+      MasterFile->IndexTable[wKeyRow]->getFCB()->GrabFreeSpace = wNewGrab;
       wKeyModif++;
       break;
     }
@@ -2598,11 +2617,11 @@ FileGenerateMWn::applyChangesZmf(const uriString& pURIMaster,bool pBackup) {
       wName="Highwater marking";
       wStr.sprintf("%s changed %s field from <%ld> to <%ld>.",
           wName,
-          pMasterFile.IndexTable[wKeyRow]->getURIContent().toString(),
-          pMasterFile.IndexTable[wKeyRow]->getFCB()->HighwaterMarking?"true":"false",
+          MasterFile->IndexTable[wKeyRow]->getURIContent().toString(),
+          MasterFile->IndexTable[wKeyRow]->getFCB()->HighwaterMarking?"true":"false",
           wNewHigh?"true":"false");
       ComLog->appendText(wStr);
-      pMasterFile.IndexTable[wKeyRow]->getFCB()->HighwaterMarking = wNewHigh;
+      MasterFile->IndexTable[wKeyRow]->getFCB()->HighwaterMarking = wNewHigh;
       wKeyModif++;
       break;
     }
@@ -2616,9 +2635,9 @@ FileGenerateMWn::applyChangesZmf(const uriString& pURIMaster,bool pBackup) {
       wOldKeyName = ChangeLog[wChgIdx].getAnteString();
       wNewKeyName = ChangeLog[wChgIdx].getPostString();
 
-      wComplement = "Changing index name induces a change in index file name accordingly.";
-//      ZExceptionDLg::setFixedFont();
-      int wRet=ZExceptionDLg::adhocMessage2BHtml("Change index name",Severity_Information,
+      wComplement = "Changing index name induces a change in related index file name accordingly.";
+
+      int wRet=ZExceptionDLg::adhocMessage2BHtml("Change index name",Severity_Question,
           "Do not change","Change",
           nullptr,&wComplement,
           "Index file <%s>\n"
@@ -2628,58 +2647,54 @@ FileGenerateMWn::applyChangesZmf(const uriString& pURIMaster,bool pBackup) {
           "<tr><td> Abandon operation and keep index name</td>      <td><b>Do not Change</b></td> </tr>"
           "<tr><td> Change index name and rename index file</td>    <td><b>Change</b></td> </tr>"
           "</table>",
-          pMasterFile.IndexTable[wIndexRank]->getURIContent().toString(),
+          MasterFile->IndexTable[wIndexRank]->getURIContent().toString(),
           wOldKeyName.toString(),
           wNewKeyName.toString());
       if (wRet==QDialog::Rejected) {
-        wStr.sprintf("%s index name change from <%s> to <%s> has been rejected.",
-            pMasterFile.IndexTable[wIndexRank]->getURIContent().toString(),
+        ComLog->appendText("%s index name change from <%s> to <%s> has been rejected.",
+            MasterFile->IndexTable[wIndexRank]->getURIContent().toString(),
             wOldKeyName.toString(),
             wNewKeyName.toString());
-        ComLog->appendText("%s index name change from <%s> to <%s> has been rejected.",
-                           pMasterFile.IndexTable[wIndexRank]->getURIContent().toString(),
-                           wOldKeyName.toString(),
-                           wNewKeyName.toString());
         continue;
       }
       uriString wFormerIndexURI,wNewIndex;
       zmode_type wMode=ZRF_NotOpen;
-      if (pMasterFile.IndexTable[wIndexRank]->isOpen()) {
-        wMode = pMasterFile.IndexTable[wIndexRank]->getMode();
+      if (MasterFile->IndexTable[wIndexRank]->isOpen()) {
+        wMode = MasterFile->IndexTable[wIndexRank]->getMode();
       }
       else {
-        wSt=pMasterFile.zopenIndexFile(wIndexRank,ZRF_All);
+        wSt=MasterFile->zopenIndexFile(wIndexRank,ZRF_All);
       }
 
 
-      wFormerIndexURI = pMasterFile.IndexTable[wIndexRank]->getURIContent();
+      wFormerIndexURI = MasterFile->IndexTable[wIndexRank]->getURIContent();
 
-      wZMFRootName=pMasterFile.getURIContent().getRootname();
+      wZMFRootName=MasterFile->getURIContent().getRootname();
 
-      wSt=generateIndexURI(wNewIndexURI,pMasterFile.getURIContent(),pMasterFile.IndexFilePath,wNewIndex);
+      wSt=generateIndexURI(wNewIndexURI,MasterFile->getURIContent(),MasterFile->IndexFilePath,wNewIndex);
 
-
-      wSt=renameFile(wFormerIndexURI,wNewIndexURI);
+      wSt=wFormerIndexURI.rename(wNewIndexURI);
+//      wSt=renameFile(wFormerIndexURI,wNewIndexURI);
       if (wSt!=ZS_SUCCESS) {
-         ComLog->appendText(ZException.last().formatFullUserMessage());
-         return ZException.last().Status;
-       }
-       wStr.sprintf("%s renamed index file from <%ld> to <%ld>.",
-           pMasterFile.getURIContent().toString(),
-           wFormerIndexURI.toString(),
-           wNewIndexURI.toString());
-       ComLog->appendText(wStr);
 
-      wStr.sprintf("%s changed index name from <%ld> to <%ld>.",
+        ComLog->appendText(ZException.last().formatFullUserMessage());
+        return ZException.last().Status;
+      }
+
+      ComLog->appendText("%s renamed index file from <%ld> to <%ld>.",
+          MasterFile->getURIContent().toString(),
+          wFormerIndexURI.toString(),
+          wNewIndexURI.toString());
+
+      ComLog->appendText("%s changed index name from <%ld> to <%ld>.",
           wName,
-          pMasterFile.IndexTable[wIndexRank]->getURIContent().toString(),
+          MasterFile->IndexTable[wIndexRank]->getURIContent().toString(),
           wOldKeyName.toString(),
           wNewKeyName.toString());
-      ComLog->appendText(wStr);
-      pMasterFile.IndexTable[wIndexRank]->IndexName = wNewKeyName;
+      MasterFile->IndexTable[wIndexRank]->IndexName = wNewKeyName;
 
       if (wMode!=ZRF_NotOpen) {
-        pMasterFile.zopenIndexFile(wIndexRank,wMode);
+        MasterFile->zopenIndexFile(wIndexRank,wMode);
       }
       wKeyModif++;
       break;
@@ -2688,25 +2703,35 @@ FileGenerateMWn::applyChangesZmf(const uriString& pURIMaster,bool pBackup) {
     case ZFGC_KeyDelete: {
       utf8VaryingString wKeyName = ChangeLog[wChgIdx].getChangeKey();
       long wIndexRank=ChangeLog[wChgIdx].getIndexRank();
- /*
-      long wIndexRank= pMasterFile.IndexTable.searchIndexByName(wKeyName);
-      if (wIndexRank < 0) {
-        ZExceptionDLg::adhocMessage("Delete key",Severity_Severe,nullptr,nullptr,
-            "Cannot find index name <%s> within index table.",ChangeLog[wi].IndexName.toString());
-        continue;
+
+      if (MasterFile->IndexTable[wIndexRank]->isOpen()){
+        MasterFile->IndexTable[wIndexRank]->zclose();
       }
-  */
-      if (pMasterFile.IndexTable[wIndexRank]->isOpen()){
-        pMasterFile.IndexTable[wIndexRank]->zclose();
-      }
-      uriString wURIIndex = pMasterFile.getURIIndex(wIndexRank);
+      uriString wURIIndex = MasterFile->getURIIndex(wIndexRank);
 
       ComLog->appendText("Removing index key named %s.",
-          pMasterFile.IndexTable[wIndexRank]->IndexName.toString() );
-      pMasterFile.IndexTable.erase(wIndexRank);
+          MasterFile->IndexTable[wIndexRank]->IndexName.toString() );
+      MasterFile->IndexTable.erase(wIndexRank);
       ComLog->appendText("Removing index file %s.", wURIIndex.toString() );
-      return removeFile(wURIIndex.toCChar());
       wKeyModif++;
+
+      wKeyDeleted ++;
+      wSt=wURIIndex.remove();
+//      wSt =removeFile(wURIIndex.toCChar());
+      if (wSt!=ZS_SUCCESS) {
+        utf8VaryingString wComplement = ZException.last().formatFullUserMessage();
+        int wRet = ZExceptionDLg::adhocMessage2BHtml("Index file deletion",Severity_Error,"Abort","Continue",
+            &ErrorLog,&wComplement,
+            "Cannot remove index file <%s>\n\n"
+            "<table>"
+            "<tr><td> terminate processing of changes</td>      <td><b>Abort</b></td></tr>"
+            "<tr><td> continue anyway</td>    <td><b>Continue</b></td></tr>"
+            "</table>"
+            ,wURIIndex.toString());
+        if (wRet==QDialog::Rejected)
+          return wSt;
+      }
+      break;
     } // ZFGC_KeyDelete
 
     case ZFGC_KeyDicAppend:
@@ -2716,27 +2741,27 @@ FileGenerateMWn::applyChangesZmf(const uriString& pURIMaster,bool pBackup) {
 
       KeyData wKD = ChangeLog[wChgIdx].getPostKeyData();
       bool wSkip=false;
-      for (long wj=0; wj < pMasterFile.IndexTable.count(); wj++) {
-        if (wKD.IndexName == pMasterFile.IndexTable[wj]->IndexName) {
+      for (long wj=0; wj < MasterFile->IndexTable.count(); wj++) {
+        if (wKD.IndexName == MasterFile->IndexTable[wj]->IndexName) {
           ComLog->appendText("Index key <%s> already exists in file <%s>.Skipping index key creation.",
               wKD.IndexName.toString(),
-              pMasterFile.getURIContent().toString());
+              MasterFile->getURIContent().toString());
           wSkip=true;
+          wKeyErrored ++;
         }
       }// for
       if (wSkip)
         continue;
 
-//     KeyValues->push(wKD);
+      //     KeyValues->push(wKD);
 
       long wOutRank;
-      wSt = pMasterFile._createRawIndexDet(wOutRank,
+      wSt = MasterFile->_createRawIndexDet(wOutRank,
           wKD.IndexName,uint32_t(wKD.KeySize),
           wKD.Duplicates?ZST_DUPLICATES:ZST_NODUPLICATES,long(wKD.Allocated),long(wKD.ExtentQuota),zsize_type(wKD.AllocatedSize),wKD.HighwaterMarking,wKD.GrabFreeSpace,
           true,&ErrorLog);
 
       if (wSt!=ZS_SUCCESS) {
-//        ZExceptionDLg::setFixedFont();
         utf8VaryingString wComplement = ZException.last().formatFullUserMessage();
         int wRet = ZExceptionDLg::adhocMessage2BHtml("Index file creation",Severity_Error,"Abort","Continue",
             &ErrorLog,&wComplement,
@@ -2759,63 +2784,69 @@ FileGenerateMWn::applyChangesZmf(const uriString& pURIMaster,bool pBackup) {
     }// switch
   } // for
 
-
+  ComLog->appendText("%s Writting changes to files.",ZDateFull::currentDateTime().toFormatted().toString());
+  wSt=MasterFile->_writeAllHeaders();
+  ComLog->appendText("%s Done.",ZDateFull::currentDateTime().toFormatted().toString());
 
   if (wIndexToRebuild.count()!=0){
-    if (pMasterFile.Dictionary==nullptr) {
+    if (MasterFile->Dictionary==nullptr) {
       utf8VaryingString wStr;
       for (long wi=0 ; wi < wIndexToRebuild.count() ; wi++) {
-          wStr += wIndexToRebuild[wi].toString() ;
-          wStr += "\n";
-        }
+        wStr += wIndexToRebuild[wi].toString() ;
+        wStr += "\n";
+      }
       ZExceptionDLg::adhocMessage("Index rebuild",Severity_Information,nullptr,nullptr,
-                                  "Some index keys require to be rebuilt.\n"
-                                  "Following index keys have to be rebuilt.\n"
-                                  "%s",wStr.toString());
+          "Some index keys require to be rebuilt.\n"
+          "Following index keys have to be rebuilt.\n"
+          "%s",wStr.toString());
       ComLog->appendText("Some index keys require to be rebuilt.\n"
                          "Following index keys have to be rebuilt.\n"
                          "%s",wStr.toString());
-      return ZS_SUCCESS;
-    }
+
+      return MasterFile->_writeAllHeaders();
+    }// if (MasterFile->Dictionary==nullptr)
+
     utf8VaryingString wStr;
     for (long wi=0 ; wi < wIndexToRebuild.count() ; wi++) {
-        int wRet= ZExceptionDLg::adhocMessage2B(  "Index rebuild",Severity_Information,
-                                                  "Skip","Rebuild",
-                                                  nullptr,nullptr,
-                                                  "Index key <%s> has to be rebuilt.\n",wIndexToRebuild[wi].toString());
-        if (wRet==QDialog::Rejected) {
-          ComLog->appendText("Index key <%s> needs to be rebuilt.\n",wIndexToRebuild[wi].toString());
-          continue;
+      int wRet= ZExceptionDLg::adhocMessage2B(  "Index rebuild",Severity_Question,
+          "Skip","Rebuild",
+          nullptr,nullptr,
+          "Index key <%s> has to be rebuilt.\n",wIndexToRebuild[wi].toString());
+      if (wRet==QDialog::Rejected) {
+        ComLog->appendText("Index key <%s> needs to be rebuilt.\n",wIndexToRebuild[wi].toString());
+        continue;
+      }
+      long wIRank =-1;
+      for (long wj=0 ; wj < MasterFile->IndexTable.count();wj++ )
+        if (MasterFile->IndexTable[wj]->IndexName==wIndexToRebuild[wi]){
+          wIRank=wj;
+          break;
         }
-        long wIRank =-1;
-        for (long wj=0 ; wj < pMasterFile.IndexTable.count();wj++ )
-          if (pMasterFile.IndexTable[wj]->IndexName==wIndexToRebuild[wi]){
-            wIRank=wj;
-            break;
-          }
-        if (wIRank<0) {
-          ZExceptionDLg::adhocMessage("Index key rebuild",Severity_Error,nullptr,nullptr,
-              "Index key to be rebuilt <%s> cannot be found.\n"
-              "Rebuild action is skipped.",pMasterFile.IndexTable[wi]->IndexName.toString());
-          continue;
-        }
-        ComLog->appendText("Rebuilding index key <%s> using embedded dictionary",pMasterFile.IndexTable[wIRank]->IndexName.toString());
-        wSt=rebuildIndex(pMasterFile,wIRank);
-        if (wSt!=ZS_SUCCESS){
-          wStr=ZException.last().formatFullUserMessage();
-          ZExceptionDLg::adhocMessage("Index key rebuild",Severity_Error,nullptr,&wStr,
-              "Index key rebuilt process has been errored.\n"
-              "Index key name <%s>",pMasterFile.IndexTable[wIRank]->IndexName.toString());
+      if (wIRank<0) {
+        ZExceptionDLg::adhocMessage("Index key rebuild",Severity_Error,nullptr,nullptr,
+            "Index key to be rebuilt <%s> cannot be found.\n"
+            "Rebuild action is skipped.",MasterFile->IndexTable[wi]->IndexName.toString());
+        wRebuildErrored ++;
+        continue;
+      }
+      ComLog->appendText("Rebuilding index key <%s> using embedded dictionary",MasterFile->IndexTable[wIRank]->IndexName.toString());
+      wSt=rebuildIndex(wIRank);
+      if (wSt!=ZS_SUCCESS){
+        wStr=ZException.last().formatFullUserMessage();
+        ZExceptionDLg::adhocMessage("Index key rebuild",Severity_Error,nullptr,&wStr,
+            "Index key rebuilt process has been errored.\n"
+            "Index key name <%s>",MasterFile->IndexTable[wIRank]->IndexName.toString());
 
-          ComLog->appendTextColor(ErroredQCl,"%s-E-ERRBLD Index key name <%s> rebuilt process has been errored.\n"
-              "Exception follows:\n%s",
-              ZDateFull::currentDateTime().toFormatted().toString(),
-              pMasterFile.IndexTable[wIRank]->IndexName.toString(),
-              wStr.toString());
-          continue;
-        }
-        ComLog->appendText("Index key rebuilt process has successfully completed.\n"
-                           "Index key name <%s>",pMasterFile.IndexTable[wIRank]->IndexName.toString());
+        ComLog->appendTextColor(ErroredQCl,"%s-E-ERRBLD Index key name <%s> rebuilt process has been errored.\n"
+                                            "Exception follows:\n%s",
+            ZDateFull::currentDateTime().toFormatted().toString(),
+            MasterFile->IndexTable[wIRank]->IndexName.toString(),
+            wStr.toString());
+        wRebuildErrored++;
+        continue;
+      }
+      ComLog->appendText("Index key rebuilt process has successfully completed.\n"
+                         "Index key name <%s>",MasterFile->IndexTable[wIRank]->IndexName.toString());
     }//for (long wi=0 ; wi < wIndexToRebuild.count() ; wi++)
   } //if (wIndexToRebuild.count()!=0)
   else
@@ -2828,14 +2859,25 @@ FileGenerateMWn::applyChangesZmf(const uriString& pURIMaster,bool pBackup) {
     wi++;
   }
 
-  ComLog->appendText("Change log content deleted\n"
-                     "%d elements deleted.",wi);
 
-  wSt=pMasterFile.zclose();
+  ComLog->appendHtml("<br>"
+                      "Changed file <%s><br>"
+                      "<table border=\"1\""
+                      "<tr><td>Master file parameter changes</td>     <td>%d</td> </tr>"
+                      "<tr><td>Index key changes</td>                 <td>%d</td> </tr>"
+                      "<tr><td>Created index keys</td>                <td>%d</td> </tr>"
+                      "<tr><td>Suppressed index keys</td>             <td>%d</td> </tr>"
+                      "<tr><td>Errors on key change </td>             <td>%d</td> </tr>"
+                      "<tr><td>Errors on key rebuild process</td>     <td>%d</td> </tr>"
+                      "</table>",
+                      wModif,wKeyModif,
+                      wKeyCreated, wKeyDeleted,
+                      wKeyErrored, wRebuildErrored);
 
-  ComLog->appendText("End of change log processing.");
+
+  ComLog->appendText("\nEnd of change log processing.");
   return wSt;
-}
+} // applyChangesZmf
 
 ZStatus
 FileGenerateMWn::indexRebuildFromMenu(){
@@ -2865,7 +2907,7 @@ FileGenerateMWn::indexRebuildFromMenu(){
     return ZS_NOTFOUND;
   }
 
-  wSt=rebuildIndex(*MasterFile,wIdx);
+  wSt=rebuildIndex(wIdx);
   if (wSt!=ZS_SUCCESS) {
     ZExceptionDLg::adhocMessage("Rebuild index key",Severity_Error,"Errors were encountered while rebuilding index key <%s>.\n",
         wKD.IndexName.toString());
@@ -2877,14 +2919,15 @@ FileGenerateMWn::indexRebuildFromMenu(){
 
 
 ZStatus
-FileGenerateMWn::rebuildIndex(ZMasterFile& pMasterFile,long pIndexRankToRebuild) {
+FileGenerateMWn::rebuildIndex(long pIndexRankToRebuild) {
 
 /* index rebuild progress window setup */
 
   QMainWindow* IndexRebuildMWn=new QMainWindow(this);
+  IndexRebuildMWn->setWindowTitle("Index key rebuild");
   QWidget* wCentralWDg = new QWidget(IndexRebuildMWn);
   IndexRebuildMWn->setCentralWidget(wCentralWDg);
-  IndexRebuildMWn->resize(900,361);
+  IndexRebuildMWn->resize(300,200);
   QVBoxLayout* wVB1 = new QVBoxLayout (IndexRebuildMWn->centralWidget());
   wCentralWDg->setLayout(wVB1);
 
@@ -2894,10 +2937,9 @@ FileGenerateMWn::rebuildIndex(ZMasterFile& pMasterFile,long pIndexRankToRebuild)
   QLabel* wlb1LBl=new QLabel("Index key name");
   wHB1->addWidget(wlb1LBl);
 
-  QLabel* IndexNameLBl=new QLabel(pMasterFile.IndexTable[pIndexRankToRebuild]->IndexName.toCChar());
-
+  QLabel* IndexNameLBl=new QLabel(" ");
   wHB1->addWidget(IndexNameLBl);
-  wVB1->addWidget(IndexNameLBl);
+
 
   QHBoxLayout* wHB2=new QHBoxLayout;
   wVB1->addLayout(wHB2);
@@ -2919,7 +2961,7 @@ FileGenerateMWn::rebuildIndex(ZMasterFile& pMasterFile,long pIndexRankToRebuild)
 
   QProgressBar* AdvancePGb=new QProgressBar;
   AdvancePGb->setMinimum(0);
-  AdvancePGb->setMaximum(int(pMasterFile.getRecordCount()));
+  AdvancePGb->setMaximum(int(MasterFile->getRecordCount()));
   AdvancePGb->setValue(0);
 
   wVB1->addWidget(AdvancePGb);
@@ -2929,34 +2971,58 @@ FileGenerateMWn::rebuildIndex(ZMasterFile& pMasterFile,long pIndexRankToRebuild)
   /* rebuild process*/
 
   ZStatus wSt=ZS_SUCCESS;
+  utf8VaryingString wStr;
   ZDataBuffer wRecord, wKeyRecord;
   zaddress_type wZMFAddress;
   ZIndexItem* wIndexItem=nullptr;
-  long wCurrentRank=0L;
+  long wCurrentRank=0L,wRecordCount=0L;
   int wUpdateRate=cst_updateRate;
-  if (pMasterFile.getMode()!=ZRF_All) {
+  zmode_type wMasterOpenMode, wIndexOpenMode;
+
+  wMasterOpenMode = MasterFile->getMode();
+  if ((MasterFile->getMode()&ZRF_All)!=ZRF_All) {
     ZException.setMessage("ZMasterFile::rebuildIndex",ZS_FILENOTOPEN,Severity_Error,
-        "File is open in mode %s. It must be open with access mode ZRF_All.",decode_ZRFMode(pMasterFile.getMode()));
+        "File is open in mode %s. It must be open with access mode ZRF_All.",decode_ZRFMode(MasterFile->getMode()));
+    ComLog->appendText("ZMasterFile::rebuildIndex-E-INVMOD File is open in mode %s. It must be open with access mode ZRF_All.",decode_ZRFMode(MasterFile->getMode()));
+    IndexRebuildMWn->deleteLater();
     return ZS_MODEINVALID;
   }
+  wRecordCount = MasterFile->getRecordCount();
+  if (MasterFile->getRecordCount()==0) {
+    ZException.setMessage("ZMasterFile::rebuildIndex",ZS_FILENOTOPEN,Severity_Error,
+        "rebuilding index key <%s> - Master file is empty.\n",
+        ZDateFull::currentDateTime().toFormatted().toString(),
+        MasterFile->IndexTable[pIndexRankToRebuild]->IndexName.toString());
 
-  if (pIndexRankToRebuild >= pMasterFile.IndexTable.count()) {
+    ComLog->appendTextColor( WarnedQCl, "%s-W rebuilding index key <%s> - Master file is empty.\n",
+        ZDateFull::currentDateTime().toFormatted().toString(),
+        MasterFile->IndexTable[pIndexRankToRebuild]->IndexName.toString());
+    IndexRebuildMWn->deleteLater();
+    return ZS_EMPTY;
+
+  }
+
+  if (pIndexRankToRebuild >= MasterFile->IndexTable.count()) {
     ZException.setMessage("ZMasterFile::rebuildIndex",ZS_OUTBOUND,Severity_Error,
-        "Invalid index rank <%ld> while expecting one of [0,%ld[.",pIndexRankToRebuild,pMasterFile.IndexTable.count());
+        "Invalid index rank <%ld> while expecting one of [0,%ld[.",pIndexRankToRebuild,MasterFile->IndexTable.count());
+    ComLog->appendText("ZMasterFile::rebuildIndex-E-INVRANK Invalid index rank <%ld> while expecting one of [0,%ld[.",pIndexRankToRebuild,MasterFile->IndexTable.count());
+
+    IndexRebuildMWn->deleteLater();
     return ZS_INVTYPE;
   }
 
-  ComLog->appendText("%s- rebuilding index key <%s> - clearing index file.",
-      ZDateFull::currentDateTime().toFormatted().toString(),
-      pMasterFile.IndexTable[pIndexRankToRebuild]->IndexName.toString());
-
-  IndexNameLBl=new QLabel(pMasterFile.IndexTable[pIndexRankToRebuild]->IndexName.toCChar());
 
   ComLog->appendText("%s- rebuilding index key <%s> - clearing index file.",
       ZDateFull::currentDateTime().toFormatted().toString(),
-      pMasterFile.IndexTable[pIndexRankToRebuild]->IndexName.toString());
+      MasterFile->IndexTable[pIndexRankToRebuild]->IndexName.toString());
 
-  wSt=pMasterFile.IndexTable[pIndexRankToRebuild]->zclearFile(-1);
+  IndexNameLBl->setText(MasterFile->IndexTable[pIndexRankToRebuild]->IndexName.toCChar());
+
+  ComLog->appendText("%s- rebuilding index key <%s> - clearing index file.",
+      ZDateFull::currentDateTime().toFormatted().toString(),
+      MasterFile->IndexTable[pIndexRankToRebuild]->IndexName.toString());
+
+  wSt=MasterFile->IndexTable[pIndexRankToRebuild]->zclearFile();
   if (wSt!=ZS_SUCCESS){
     delete IndexRebuildMWn;
     return wSt;
@@ -2964,70 +3030,103 @@ FileGenerateMWn::rebuildIndex(ZMasterFile& pMasterFile,long pIndexRankToRebuild)
 
   ComLog->appendText("%s- rebuilding index key <%s> - populating index file.",
       ZDateFull::currentDateTime().toFormatted().toString(),
-      pMasterFile.IndexTable[pIndexRankToRebuild]->IndexName.toString());
+      MasterFile->IndexTable[pIndexRankToRebuild]->IndexName.toString());
+
+
+
 
   ZTime wStartTime=ZTime::getCurrentTime();
   /* browse all master file records, extract key and feed index file */
-  wSt=pMasterFile.zgetWAddress(wRecord,0L,wZMFAddress);
+  wSt=MasterFile->zgetWAddress(wRecord,0L,wZMFAddress);
   if (wSt!=ZS_SUCCESS){
-    return wSt;
+    goto rebuildIndexError;
   }
   while (wSt==ZS_SUCCESS) {
-    wSt=pMasterFile.extractKeyValues(wRecord,wKeyRecord,pIndexRankToRebuild);
+    wSt=MasterFile->extractKeyValues(wRecord,wKeyRecord,pIndexRankToRebuild);
     if (wSt!=ZS_SUCCESS)
       goto rebuildIndexError;
-    wSt=pMasterFile.IndexTable[pIndexRankToRebuild]->_addRawKeyValue_Prepare(wIndexItem,wKeyRecord,wZMFAddress);
+    wSt=MasterFile->IndexTable[pIndexRankToRebuild]->_addRawKeyValue_Prepare(wIndexItem,wKeyRecord,wZMFAddress);
     if (wSt!=ZS_SUCCESS)
       goto rebuildIndexError;
-    wSt=pMasterFile.IndexTable[pIndexRankToRebuild]->_rawKeyValue_Commit(wIndexItem);
+    wSt=MasterFile->IndexTable[pIndexRankToRebuild]->_rawKeyValue_Commit(wIndexItem);
     if (wSt!=ZS_SUCCESS)
       goto rebuildIndexError;
 
-    sleep(20);
-
-    wSt=pMasterFile.zgetNextWAddress(wRecord,wCurrentRank,wZMFAddress);
+    wSt=MasterFile->zgetNextWAddress(wRecord,wCurrentRank,wZMFAddress);
     if ((wSt==ZS_SUCCESS)&&(!--wUpdateRate)){
+        sleepWithLoop(1);
         wUpdateRate=cst_updateRate;
         /* compute predicted target time */
         ZTime wElapsed = ZTime::getCurrentTime() - wStartTime ;
         /* how many times elapsed time should be multiplied to get achievement time */
-        double wRemainTimes = double(pMasterFile.getRecordCount()) / double(wCurrentRank);
+        double wRemainTimes = double(MasterFile->getRecordCount()) / double(wCurrentRank);
         wElapsed = wElapsed * wRemainTimes ;
         ZTime wTargetTime = wStartTime + wElapsed;
 
         TargetTimeLBl->setText(wTargetTime.toString("%d-%m-%y %T").toChar());
         AdvancePGb->setValue(int(wCurrentRank));
+        wStr.sprintf("%ld / %ld",wCurrentRank,wRecordCount);
+        RecordsProcessedLBl->setText(wStr.toCChar());
+
+        QApplication::processEvents();
     } //if ((wSt==ZS_SUCCESS)&&(!--wUpdateRate))
   } // while (wSt==ZS_SUCCESS)
 
-  pMasterFile.IndexTable[pIndexRankToRebuild]->zclose();
   if (wSt==ZS_EOF)
     wSt=ZS_SUCCESS;
 
-  if (wSt==ZS_SUCCESS){
-    TargetTimeLBl->setText("Done");
-    AdvancePGb->setValue(int(wCurrentRank));
-    ComLog->appendText("%s- rebuilding index key <%s> - rebuild process done successfully.",
-        ZDateFull::currentDateTime().toFormatted().toString(),
-        pMasterFile.IndexTable[pIndexRankToRebuild]->IndexName.toString());
-  }
-  ComLog->appendTextColor( ErroredQCl, "%s-E rebuilding index key <%s> - rebuild process ended with error <%s>.\n"
-      "Exception follows:\n%s",
-      ZDateFull::currentDateTime().toFormatted().toString(),
-      pMasterFile.IndexTable[pIndexRankToRebuild]->IndexName.toString(),
-      decode_ZStatus(wSt),
-      ZException.last().formatFullUserMessage().toString());
+  if (wSt==ZS_SUCCESS) {
 
-  return wSt;
+    AdvancePGb->setValue(int(wRecordCount));
+    wStr.sprintf("%ld / %ld",wRecordCount,wRecordCount);
+    RecordsProcessedLBl->setText(wStr.toCChar());
+
+    TargetTimeLBl->setText("Done");
+
+    ComLog->appendText("%s- rebuilding index key <%s> - rebuild process done successfully.\n"
+                       "                writting all headers to files.",
+        ZDateFull::currentDateTime().toFormatted().toString(),
+        MasterFile->IndexTable[pIndexRankToRebuild]->IndexName.toString());
+
+    QApplication::processEvents();
+
+    wSt = MasterFile->_writeAllHeaders();
+  }
+  if (wSt==ZS_SUCCESS)
+    return wSt;
+
+//  IndexRebuildMWn->deleteLater();
+
 rebuildIndexError:
+
+  TargetTimeLBl->setText("Errored");
   if (ZException.count()==0){
     ZException.setMessage("ZMasterFile::rebuildIndex",wSt,Severity_Error,"Error while rebuilding index");
   }
   else {
     ZException.addToLast(" calling module <ZMasterFile::rebuildIndex>");
   }
+  ComLog->appendTextColor( ErroredQCl, "%s-E rebuilding index key <%s> - rebuild process ended with error <%s>.\n"
+                                      "Exception follows:\n%s",
+      ZDateFull::currentDateTime().toFormatted().toString(),
+      MasterFile->IndexTable[pIndexRankToRebuild]->IndexName.toString(),
+      decode_ZStatus(wSt),
+      ZException.last().formatFullUserMessage().toString());
+
+  QApplication::processEvents();
+
+//  IndexRebuildMWn->deleteLater();
   return wSt;
 } //rebuildIndex
+
+void
+FileGenerateMWn::sleepWithLoop(int pTimes) {
+  while (pTimes--) {
+  sleep(1);
+  QApplication::processEvents();
+  }
+  QApplication::processEvents();
+}
 
 
 void

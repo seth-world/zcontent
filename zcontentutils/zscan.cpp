@@ -2,9 +2,11 @@
 #include "ui_zscan.h"
 #include <stdio.h>
 #include <fcntl.h>
-#include <ztoolset/zexceptionmin.h>
 
-#include <qmessagebox.h>
+#include <ztoolset/zexceptionmin.h>
+#include <zio/zioutils.h>
+
+#include "zexceptiondlg.h"
 
 ZScan::ZScan(QWidget *parent) :
                                 QMainWindow(parent),
@@ -36,21 +38,17 @@ ZScan::~ZScan()
 void
 ZScan::setFile(const uriString& pFile)
 {
-  close();
+  if (FileDescriptor>=0)
+    rawClose(FileDescriptor);
   Currentfile=pFile;
   FileSize=Currentfile.getFileSize();
 
-
-  FileDescriptor=open(Currentfile.toCChar(),O_RDONLY);
-  if (FileDescriptor < 0)
-  {
-    ZException.getErrno(errno,"ZScan::setFile",ZS_FILEERROR,Severity_Error,
-                              "Cannot open file <%s>",Currentfile.toCChar());
-    QMessageBox::critical(this,tr("open file error"),ZException.formatFullUserMessage().toCChar());
-
-
+  ZStatus wSt=rawOpen(FileDescriptor,Currentfile.toCChar(),O_RDONLY);
+  if (wSt!=ZS_SUCCESS) {
+    ZExceptionDLg::displayLast("Open file error");
     return;
   }
+
   removeAllRows();
 }
 
@@ -59,7 +57,7 @@ ZScan::close()
 {
   if (FileDescriptor>-1)
   {
-    ::close(FileDescriptor);
+    rawClose(FileDescriptor);
     FileDescriptor=-1;
   }
 }
@@ -244,13 +242,13 @@ ZScan::displayOneBlock(zaddress_type pAddress,ZBlockHeader& pBlockHeader)
 
 
 ZStatus
-ZScan::searchFirstStartMark(int pFd,ZBlockHeader& pBlockHeader,zaddress_type &pNextAddress)
+ZScan::searchFirstStartMark(__FILEHANDLE__ pFd, ZBlockHeader& pBlockHeader, zaddress_type &pNextAddress)
 {
   return searchNextStartMark(pFd,0,pBlockHeader,pNextAddress);
 }
 
 ZStatus
-ZScan::searchNextStartMark(int pFd,
+ZScan::searchNextStartMark(__FILEHANDLE__ pFd,
                           const zaddress_type pAddress,
                           ZBlockHeader& pBlockHeader,
                           zaddress_type &pNextAddress)
@@ -276,35 +274,34 @@ ZScan::searchNextStartMark(int pFd,
 
   if (wAddress > 3)/* assume that wStartSign is just truncated at the end of wBuffer (max will be 3 bytes) */
   {
-    wSeekRet=lseek(pFd,off_t(-3),SEEK_CUR);
-    wAddress -= 3;
+    wSt=rawSeekToRelative(pFd,-3,(size_t&)wAddress);
   }
-  else
-    wSeekRet=lseek(pFd,off_t(0),SEEK_SET);
+  else {
+    wSt=rawSeekBegin(pFd);
+    wAddress = 0;
+  }
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
 
-  wSizeRead=read(pFd,wBuffer.Data,wSizeToRead);
+  wSt=rawRead(pFd,wBuffer,wSizeToRead);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
   wOffset=wBuffer.bsearch(wStartSign,4L,0L);
-
-  while ((wSizeRead>0)&&(wOffset==-1))
-    {
-      wAddress += wSizeRead;
-      wSizeRead=read(pFd,wBuffer.Data,wBuffer.Size);
-      if (wSizeRead < wSizeToRead)
+  while ((wSt==ZS_SUCCESS)&&(wBuffer.Size>0)&&(wOffset==-1)) {
+      wAddress += wBuffer.Size;
+      wSt=rawRead(pFd,wBuffer,wSizeToRead);
+      if ((wSt!=ZS_SUCCESS)||(wBuffer.Size < size_t(wSizeToRead)))
         break;
       wOffset=wBuffer.bsearch(wStartSign,4L,0L);
     }// while
 
-  if (wSizeRead==0)
-    {
+  if (wSt==ZS_EOF) {
       pNextAddress = -1;
       return  (ZS_EOF);
     }
-  if (wSizeRead < 0)
+  if (wSt != ZS_SUCCESS)
     {
-      ZException.getErrno(errno,"ZContentVisuMain::searchNextStartMark",
-          ZS_FILEERROR,Severity_Severe,
-          "Error while reading file <%s>",Currentfile.toCChar());
-      return ZS_FILEERROR;
+    return wSt;
     }
   if (wSizeRead < wSizeToRead)  /* read is partial till end of file */
   {
@@ -329,22 +326,15 @@ ZScan::searchNextStartMark(int pFd,
 
 
   /* loaded enough for getting block ? */
-  if((wBuffer.Size-wOffset)< sizeof(ZBlockHeader_Export))
-  {
+  if((wBuffer.Size-wOffset)< sizeof(ZBlockHeader_Export)) {
     /* no : get complementary data */
     size_t wAddSize = sizeof(ZBlockHeader_Export)+wBuffer.Size+1-wOffset;
     ZDataBuffer wAdd ;
     wAdd.allocateBZero(wAddSize);
-    wSizeRead=read(pFd,wAdd.Data,wAdd.Size);
-    if (wSizeRead < wAdd.Size)
-    {
-      if (wSizeRead < 0)
-      {
-        ZException.getErrno(errno,"ZContentVisuMain::searchNextStartMark",
-            ZS_FILEERROR,Severity_Severe,
-            "Error while reading file <%s>",Currentfile.toCChar());
-        return ZS_FILEERROR;
-      }
+    wSt=rawRead(pFd,wAdd,wAddSize);
+    if (wSt!=ZS_SUCCESS)
+      return wSt;
+    if (wAdd.Size < wAdd.Size) {
       /* in this case block header is truncated by EOF mark : this is an error */
       ZException.getErrno(errno,"ZContentVisuMain::searchNextStartMark",
           ZS_CORRUPTED,Severity_Severe,

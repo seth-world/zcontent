@@ -87,16 +87,18 @@ public:
   ZStatus XmlDefinitionSave(uriString& pXmlFile,bool pComment=true); /* save definition to an xml formatted text file */
   ZStatus XmlDefinitionLoad(const utf8VaryingString&pXmlContent, ZaiErrors* pErrorlog);
 
-  bool changeChosenZmf(); /* apply to a zmf file current definition */
+//  bool changeChosenZmf(); /* apply to a zmf file current definition  deprecated */
   bool applyToCurrentZmf(); /* apply to currently loaded ZMF */
 
   /* no test run possible */
-  ZStatus applyChangesZmf(const uriString &pURIMaster, bool pBackup=true);
+//  ZStatus applyChangesZmf(const uriString &pURIMaster, bool pBackup=true);
+
+  ZStatus applyChangesZmf(bool pBackup=true);
 
   ZStatus createDic(ZMFDictionary& pDic, const uriString &pURIMaster);
 
 
-  ZStatus rebuildIndex(ZMasterFile &pMasterFile, long pIndexRankToRebuild);
+  ZStatus rebuildIndex(long pIndexRankToRebuild);
 
 
   void resizeEvent(QResizeEvent*) override;
@@ -118,12 +120,14 @@ public:
   void changeKeySize(KeyData& pKeyData,size_t pNewKeySize);
 
   /* controls master file and its index keys values before creation or applying changes
-   * returns true if errors have been detected
+   * returns true if error(s) has(have) been detected
    * returns false if no error has been detected
    */
   bool ValuesControl();
 
   ZStatus indexRebuildFromMenu();
+
+  void sleepWithLoop(int pTimes);
 
 Q_SLOT
   void Quit();
@@ -138,7 +142,6 @@ Q_SLOT
   void AllocatedEdit();
   void ExtentQuotaEdit();
   void MeanSizeEdit();
-
   void GenFile(); /* generates a new master file using current definition */
 
   void MenuAction(QAction* pAction);
@@ -205,7 +208,7 @@ private:
   QAction* LoadXmlDicQAc=nullptr;   /* load external dictionary from xml dictionary definition */
   QAction* LoadDicFileQAc=nullptr;  /* load external dictionary from dictionary file */
 
-  QAction* ApplyToZmfQAc=nullptr;
+//  QAction* ApplyToZmfQAc=nullptr;
   QAction* SaveToXmlQAc=nullptr;
 
   QAction* KeyAppendRawQAc=nullptr;
@@ -226,7 +229,7 @@ private:
 
   QAction* GenFileQAc=nullptr;
   QAction* ApplyToCurrentQAc=nullptr;
-  QAction* ApplyToLoadedQAc=nullptr;
+//  QAction* ApplyToLoadedQAc=nullptr;
   QAction* indexRebuildQAc=nullptr;
   QAction* TestRunQAc=nullptr;
   QAction* QuitQAc=nullptr;

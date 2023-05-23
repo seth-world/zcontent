@@ -13,6 +13,7 @@ const long cst_FileNudge = 100;
 
 class ZQTableView;
 class QLabel;
+class   VisuRaw;
 
 namespace Ui {
 class ZRawMasterFileVisu;
@@ -108,6 +109,8 @@ public:
   void setNudge(long pNudge) { if (pNudge > 0) FileNudge=pNudge; }
 
   /* evaluate actions */
+  QAction* ZBlockHeaderQAc = nullptr;
+  QAction* URFFieldQAc = nullptr;
 
   QAction* ZTypeQAc = nullptr;
   QAction* uint16QAc = nullptr;
@@ -117,6 +120,9 @@ public:
   QAction* uint64QAc = nullptr;
   QAction* int64QAc = nullptr;
   QAction* sizetQAc = nullptr;
+  QAction* floatQAc = nullptr;
+  QAction* doubleQAc = nullptr;
+  QAction* longdoubleQAc = nullptr;
 
 
 
@@ -137,7 +143,10 @@ public:
   void firstIterate() { Forward();}
 
   void getPrevAddrVal(zaddress_type &pAddress, long &pNudge, long &pBucket);
-
+/*
+  void visuBlockHeader();
+  void visuURFField();
+*/
 private slots:
   void Forward();
   void Backward();
@@ -146,10 +155,13 @@ private slots:
   void ViewModeChange(int pIndex);
 
   void RecStructChange(int pIndex);
+// Deprecated  replaced with class VisuRaw
+//  void visuActionEvent(QAction* pAction);
 
+//  void visuActionEventOld(QAction* pAction);   // Deprecated
+// Deprecated  replaced with class VisuRaw
+//  void VisuBvFlexMenuCallback(QContextMenuEvent *event);
 
-  void visuActionEvent(QAction* pAction);
-  void VisuBvFlexMenuCallback(QContextMenuEvent *event);
 //  void VisuMouseCallback(int pZEF, QMouseEvent *pEvent);
 
 private:
@@ -177,6 +189,9 @@ private:
   off_t         FileOffset=0;
   ZQTableView*  BlockTBv=nullptr;
   ZQTableView*  BlockDumpTBv=nullptr;
+
+  VisuRaw*      VizuRaw=nullptr;
+
   int           Fd=-1;
 //  long          BlockRank=-1;
   uriString     URICurrent;

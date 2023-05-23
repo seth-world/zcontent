@@ -16,18 +16,19 @@
 
 #include <stdio.h>
 #include <unistd.h>
-
+#include <stdlib.h>  // for atexit
 #include <zxml/zxmlprimitives.h>
 
 #include <limits.h>
+#include <zio/zioutils.h>
 
 
+namespace zbs {
 ZOpenZRFPool GZRFPool;
 ZOpenZRFPool* ZRFPool=&GZRFPool;
+}
 
 using namespace  zbs;
-
-
 ZStatus
 ZOpenZRFPool::removeFileByFd(int pFd)
 {
@@ -790,7 +791,7 @@ ZRandomFile::setCreateMaximum (const zsize_type pInitialSize,
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
  ZStatus
-ZRandomFile::zcreate (const zsize_type pInitialSize, bool pBackup, bool pLeaveOpen)
+ZRandomFile::zcreate (const zsize_type pInitialSize, bool pBackup, bool pLeaveOpen,__FILEACCESSRIGHTS__ pPermissions)
 {
     setCreateMinimum(pInitialSize);
     return (_create(pInitialSize,ZFT_ZRandomFile,pBackup, pLeaveOpen));
@@ -812,39 +813,14 @@ ZStatus
 ZRandomFile::zcreate (const uriString & pFilename,
                       const zsize_type pInitialSize,
                       bool pBackup,
-                      bool pLeaveOpen)
+                      bool pLeaveOpen,
+                      __FILEACCESSRIGHTS__ pPermissions)
 {
 ZStatus wSt;
         wSt=setPath (pFilename);
         if (wSt!=ZS_SUCCESS)
                     return wSt;
-        return zcreate(pInitialSize,pBackup, pLeaveOpen);
-}
-/**
- * @brief ZRandomFile::zcreate ZRandomFile creation with a very simplified definition. The given file path that will name main content file.
- *
- * Main file content and file header are created with default parameters.
- *
- * @param[in] pFilename  a C string (char *) containing the path of the future ZMasterFile main content file.
- *          Other file names will be deduced from this main name.
- * @param[in] pInitialSize      Initial file space in byte that is allocated at creation time. This space is placed in Free block pool as one block.
- * @param[in] pBackup      decides wether existing found files have to replaced or backuped with a version number.
- * @param[in] pLeaveOpen   if set to true file is left open after its creation with open mode mask (ZRF_Exclusive | ZRF_All ). If false, file is closed.
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
-ZStatus
-ZRandomFile::zcreate (const char * pFilename,
-                      const zsize_type pInitialSize,
-                      bool pBackup,
-                      bool pLeaveOpen)
-{
-ZStatus wSt;
-//    uriString wFilename;
-//        wFilename = pFilename;
-        wSt=setPath (pFilename);
-        if (wSt!=ZS_SUCCESS)
-                    return wSt;
-        return zcreate(pInitialSize,pBackup,pLeaveOpen);
+        return zcreate(pInitialSize,pBackup, pLeaveOpen,pPermissions);
 }
 
 /**
@@ -875,7 +851,8 @@ ZRandomFile::zcreate(const uriString &pFilename,
                      bool pHighwaterMarking,
                      bool pGrabFreeSpace,
                      bool pBackup,
-                     bool pLeaveOpen)
+                     bool pLeaveOpen,
+                     __FILEACCESSRIGHTS__ pPermissions)
 {
 ZStatus wSt;
 
@@ -891,49 +868,6 @@ ZStatus wSt;
                     pBackup,
                     pLeaveOpen));
 }// zcreate with filename as uriString
-
-/**
- * @brief ZRandomFile::zcreate ZRandomFile creation with a full definition with a file path that will name main content file.
- * Main file content and file header are created with appropriate parameters as given in parameters.
- *
- * @param[in] pFilename  a C string (char *) containing the path of the future ZMasterFile main contentfile.
- *          Other file names will be deduced from this main name.
- * @param[in] pAllocatedBlocks  number of initial elements in ZBAT pool and other pools(pInitialAlloc) see: @ref ZArrayParameters
- * @param[in] pBlockExtentQuota extension quota for pools (pReallocQuota) see: @ref ZArrayParameters
- * @param[in] pBlockTargetSize  approximation of best record size. see: @ref ZRFBlockTargetSize
- * @param[in] pInitialSize      Initial file space in byte that is allocated at creation time. This space is placed in Free block pool as one block.
- * @param[in] pHistory          RFFU History option true : on ; false : off
- * @param[in] pAutocommit       RFFU Autocommit option true : on ; false : off
- * @param[in] pJournaling       RFFU Journaling option true : on ; false : off
- * @param[in] pHighwaterMarking HighWaterMarking option true : on ; false : off  see: @ref ZRFHighWaterMarking
- * @param[in] pGrabFreeSpace    GrabFreespace option true : on ; false : off see: @ref ZRFGrabFreeSpace
- * @param[in] pBackup      decides wether existing found files have to replaced or backuped with a version number.
- * @param[in] pLeaveOpen   if set to true file is left open after its creation with open mode mask (ZRF_Exclusive | ZRF_All ). If false, file is closed.
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
-ZStatus
-ZRandomFile::zcreate(const char* pFilename,
-                     const zsize_type pInitialSize,
-                     long pAllocatedBlocks,
-                     long pBlockExtentQuota,
-                     long pBlockTargetSize,
-                     bool pHighwaterMarking,
-                     bool pGrabFreeSpace,
-                     bool pBackup,
-                     bool pLeaveOpen)
-{
-uriString wFilename;
-    wFilename=pFilename;
-    return (zcreate(wFilename,
-                    pInitialSize,
-                    pAllocatedBlocks,
-                    pBlockExtentQuota,
-                    pBlockTargetSize,
-                    pHighwaterMarking,
-                    pGrabFreeSpace,
-                    pBackup,
-                    pLeaveOpen));
-}// zcreate with filename as const char*
 
 /**
  * @brief ZRandomFile::zcreate ZRandomFile creation with a full definition without a file path that should have been set before.
@@ -962,7 +896,8 @@ ZRandomFile::zcreate(const zsize_type pInitialSize,
                      bool pHighwaterMarking,
                      bool pGrabFreeSpace,
                      bool pBackup,
-                     bool pLeaveOpen)
+                     bool pLeaveOpen,
+                    __FILEACCESSRIGHTS__ pPermissions)
 {
 ZStatus wSt;
     setCreateMaximum (pInitialSize,
@@ -971,7 +906,7 @@ ZStatus wSt;
                       pBlockTargetSize,
                       pHighwaterMarking,
                       pGrabFreeSpace);
-    wSt=_create(pInitialSize,ZFT_ZRandomFile,pBackup,pLeaveOpen);
+    wSt=_create(pInitialSize,ZFT_ZRandomFile,pBackup,pLeaveOpen,pPermissions);
     if (wSt!=ZS_SUCCESS)
                 return wSt;
 
@@ -1011,7 +946,7 @@ ZStatus wSt;
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZRandomFile::_create(const zsize_type pInitialSize,ZFile_type pFileType,bool pBackup,bool pLeaveOpen)
+ZRandomFile::_create(const zsize_type pInitialSize,ZFile_type pFileType,bool pBackup,bool pLeaveOpen,__FILEACCESSRIGHTS__ pPermissions)
 {
 ZStatus wSt;
 ZBlockDescriptor wFreeBlock;
@@ -1032,47 +967,29 @@ uriString wFormerHeaderURI;
         return (ZS_INVSIZE);
         }
 
-  if (URIContent.exists())
-    {
+  if (URIContent.exists()) {
     if (pBackup)
         URIContent.renameBck("bck");
       else
         remove(URIContent.toCChar());
     }
-  if (URIHeader.exists())
-    {
+  if (URIHeader.exists()) {
       if (pBackup)
         URIHeader.renameBck("bck");
       else
         remove(URIHeader.toCChar());
-    }
-  mode_t wPosixMode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-  ContentFd = open(URIContent.toCChar(),O_WRONLY|O_CREAT|O_TRUNC,wPosixMode);  // create or reset the file if exists
-  if (ContentFd < 0)
-            {
-            ZException.getErrno(errno,
-                            _GET_FUNCTION_NAME_,
-                            ZS_ERROPEN,
-                            Severity_Severe,
-                            "Error opening file for creation <%s> ",
-                            URIContent.toString());
-            if (ZVerbose & ZVB_FileEngine)
-              ZException.printLastUserMessage();
-            }
+  }
 
 
-  HeaderFd = open(URIHeader.toCChar(),O_WRONLY|O_CREAT|O_TRUNC,wPosixMode);
-  if (HeaderFd<0)
-            {
-            ZException.getErrno(errno,
-                            _GET_FUNCTION_NAME_,
-                            ZS_ERROPEN,
-                            Severity_Severe,
-                            "Error opening header file for creation <%s> ",
-                            URIHeader.toString());
-            close(ContentFd);
-            return(ZS_ERROPEN);
-            }
+  __FILEACCESSRIGHTS__ wPermissions=S_IRUSR |S_IRWXU|S_IRWXG|S_IROTH;
+  wSt= rawOpen(ContentFd,URIContent,O_WRONLY|O_CREAT|O_TRUNC,pPermissions);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+  wSt= rawOpen(ContentFd,URIContent,O_WRONLY|O_CREAT|O_TRUNC,pPermissions);
+  if (wSt!=ZS_SUCCESS) {
+    rawClose(ContentFd);
+    return wSt;
+  }
 
   _isOpen=true;
   ZRFPool->addOpenFile(this);
@@ -1363,101 +1280,6 @@ ZRandomFile::_writeFileLock(lockPack &pLockPack)
      return  ZS_SUCCESS;
 }//_writeFileLock
 
-
-ZStatus
-ZRandomFile::_readFileLockOld( lockPack &pLockPack)
-{
-
-  printf ("ZRandomFile::_readFileLock\n");
-  ZHeaderControlBlock_Export wHCB_Export;
-
-  ZStatus wSt=_getFileHeader_Export(&wHCB_Export);
-  if (wSt != ZS_SUCCESS)
-    return wSt;
-
-  wHCB_Export._convert();
-
-  pLockPack.Lock=wHCB_Export.Lock;
-  pLockPack.LockOwner=wHCB_Export.LockOwner;
-  return ZS_SUCCESS;
-
-  pLockPack.Lock=reverseByteOrder_Conditional<zlockmask_type>(pLockPack.Lock);
-  pLockPack.LockOwner=reverseByteOrder_Conditional<pid_t>(pLockPack.LockOwner);
-
-  size_t wLockInfoOffset = offsetof(ZHeaderControlBlock_Export, Lock);
-
-  if (lseek(HeaderFd,wLockInfoOffset,SEEK_SET) < 0)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_FILEPOSERR,
-        Severity_Severe,
-        "Error positionning at Header address <%lld> of header file  <%s>",
-        wLockInfoOffset,
-        URIHeader.toString());
-    return  (ZS_FILEPOSERR);
-  }
-
-  ssize_t wSRead =read(HeaderFd,(char *)&pLockPack,sizeof(lockPack));  // read lock infos with packed structure
-
-  if (wSRead<0)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_BADFILEHEADER,
-        Severity_Error,
-        "Error reading  Header control block address <%lld> file  <%s>",
-        0L,
-        URIHeader.toString());
-    return  (ZS_BADFILEHEADER);
-  }
-
-  pLockPack.Lock=reverseByteOrder_Conditional<zlockmask_type>(pLockPack.Lock);
-  pLockPack.LockOwner=reverseByteOrder_Conditional<pid_t>(pLockPack.LockOwner);
-  return  ZS_SUCCESS;
-
-}//_readFileLock
-
-ZStatus
-ZRandomFile::_writeFileLockOld(lockPack &pLockPack)
-{
-  printf ("ZRandomFile::_writeFileLock\n");
-  ZHeader.Lock = pLockPack.Lock;
-  ZHeader.LockOwner = pLockPack.LockOwner;
-
-  return _writeFileHeader(true);
-
-  lockPack wLockPack;
-  wLockPack.Lock = reverseByteOrder_Conditional<zlockmask_type>(pLockPack.Lock);
-  wLockPack.LockOwner = reverseByteOrder_Conditional<pid_t>(pLockPack.LockOwner);
-
-  size_t wLockInfoOffset = offsetof(ZHeaderControlBlock_Export, Lock);
-
-  if (lseek(HeaderFd,(off_t)wLockInfoOffset,SEEK_SET) < 0)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_FILEPOSERR,
-        Severity_Severe,
-        "Error positionning at Header address <%lld> of header file  <%s>",
-        wLockInfoOffset,
-        URIHeader.toString());
-    return  (ZS_FILEPOSERR);
-  }
-  ssize_t wSWrite =write(HeaderFd,(char *)&wLockPack,sizeof(lockPack)); // write lock infos to file header s
-  if (wSWrite<0)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_WRITEERROR,
-        Severity_Error,
-        "Error while writing File Header block at address <%ld> to file header %s",
-        wLockInfoOffset,
-        URIHeader.toString());
-    return  (ZS_WRITEERROR);
-  }
-  return  ZS_SUCCESS;
-}//_writeFileLock
 
 /**
  * @brief ZRandomFile::_writeReservedHeader  writes the entire file header to disk. This method is the only way to update reserved infradata when its size has changed.
@@ -1833,67 +1655,32 @@ ZRandomFile::_importAllFileHeader()
 {
   ZDataBuffer wZDB;
 
-  if (ZVerbose & ZVB_FileEngine)
-    _DBGPRINT("ZRandomFile::_importAllFileHeader \n") // debug
-  /*
-      Upon successful completion, lseek() returns the resulting offset
-       location as measured in bytes from the beginning of the file.  On
-       error, the value (off_t) -1 is returned and errno is set to
-       indicate the error.
-  */
   /* get the size of the file */
-  off_t wOff = lseek(HeaderFd,(off_t)0L,SEEK_END);
-  if (wOff<0)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_FILEPOSERR,
-        Severity_Fatal,
-        "lseek error positionning header file  at end of file file <%s>",
-        URIHeader.toCChar()
-        );
-    return (ZS_FILEPOSERR);
+  off_t wOff;
+  ZStatus wSt=rawSeekEnd(HeaderFd,wOff);
+  if (wSt!=ZS_SUCCESS) {
+    return wSt;
   }
-
   wZDB.allocate((size_t)wOff);
-  wOff = lseek(HeaderFd,(off_t)0L,SEEK_SET);
-  if (wOff<0)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_FILEPOSERR,
-        Severity_Fatal,
-        "Error positionning header at beginning of file <%s>",
-        URIHeader.toCChar()
-        );
-    return (ZS_FILEPOSERR);
-  }
+  wSt=rawSeekBegin(HeaderFd);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
 
   ZPMS.HFHReads ++;
 
-  //    ssize_t wSRead =read(HeaderFd,(char *)&ZHeader,sizeof(ZHeaderControlBlock));  //! read at first Header control block
+  /* read whole content of header file */
+  wSt=rawRead(HeaderFd,wZDB,(size_t)wOff);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
 
-  //    ssize_t wSRead =read(HeaderFd,(char *)&wZHeaderExport,sizeof(ZHeaderControlBlock_Export));  // read at first Header control block
-  ssize_t wSRead =read(HeaderFd,wZDB.DataChar,wZDB.Size);  // load the whole file in wZDB
-  if (wSRead<0)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_BADFILEHEADER,
-        Severity_Fatal,
-        "Error loading  header file  <%s>",
-        URIHeader.toCChar());
-    return  (ZS_BADFILEHEADER);
-  }
-
-  if (wSRead < sizeof(ZHeaderControlBlock_Export))
+  if (wZDB.Size < sizeof(ZHeaderControlBlock_Export))
   {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_BADFILEHEADER,
         Severity_Fatal,
         "Invalid/corrupted header file  <%s> size read %ld while expected at least %ld",
         URIHeader.toCChar(),
-        wSRead, sizeof(ZHeaderControlBlock_Export));
+        wZDB.Size, sizeof(ZHeaderControlBlock_Export));
     return  (ZS_BADFILEHEADER);
   }
   const unsigned char* wPtr=wZDB.Data ;
@@ -1903,7 +1690,6 @@ ZRandomFile::_importAllFileHeader()
   wZHCBe.deserialize();
 
   wZHCBe.toHCB(ZHeader);
-
 
   ZReserved.setData(wPtr,wZHCBe.SizeReserved);
 
@@ -1919,7 +1705,6 @@ ZRandomFile::_importAllFileHeader()
   ZBAT._importPool(wPtr);
   ZFBT._importPool(wPtr);
   ZHOT._importPool(wPtr);
-//  ZDBT._importPool(wPtr); // Deprecated
 
   HeaderAccessed |= ZHAC_HCB | ZHAC_FCB | ZHAC_RESERVED ;
   return ZS_SUCCESS;
@@ -2004,58 +1789,31 @@ ZRandomFile::_loadHeaderFile(ZDataBuffer &pHeader)
   ZStatus wSt=ZS_SUCCESS;
 
   /* get the size of the file */
-  off_t wOff = lseek(HeaderFd,(off_t)0L,SEEK_END);
-  if (wOff<0)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_FILEPOSERR,
-        Severity_Fatal,
-        "lseek error positionning header file  at end of file file <%s>",
-        URIHeader.toCChar()
-        );
-    return (ZS_FILEPOSERR);
+  off_t wOff;
+  wSt=rawSeekEnd(HeaderFd,wOff);
+  if (wSt!=ZS_SUCCESS) {
+    return wSt;
   }
-
   pHeader.allocate((size_t)wOff);
-  wOff = lseek(HeaderFd,(off_t)0L,SEEK_SET);
-  if (wOff<0)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_FILEPOSERR,
-        Severity_Fatal,
-        "Error positionning header at beginning of file <%s>",
-        URIHeader.toCChar()
-        );
-    return (ZS_FILEPOSERR);
+  wSt=rawSeekBegin(HeaderFd);
+  if (wSt!=ZS_SUCCESS) {
+    return wSt;
   }
-
   ZPMS.HFHReads ++;
 
-  //    ssize_t wSRead =read(HeaderFd,(char *)&ZHeader,sizeof(ZHeaderControlBlock));  //! read at first Header control block
+  /* read whole content of header file */
+  wSt=rawRead(HeaderFd,pHeader,(size_t)wOff);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
 
-  //    ssize_t wSRead =read(HeaderFd,(char *)&wZHeaderExport,sizeof(ZHeaderControlBlock_Export));  // read at first Header control block
-  ssize_t wSRead =read(HeaderFd,pHeader.DataChar,pHeader.Size);  // load the whole file in wZDB
-  if (wSRead<0)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_BADFILEHEADER,
-        Severity_Fatal,
-        "Error loading  header file  <%s>",
-        URIHeader.toCChar());
-    return  (ZS_BADFILEHEADER);
-  }
-
-  if (wSRead < sizeof(ZHeaderControlBlock_Export))
+  if (pHeader.Size < sizeof(ZHeaderControlBlock_Export))
   {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_BADFILEHEADER,
         Severity_Fatal,
         "Invalid/corrupted header file  <%s> size read %ld while expected at least %ld",
         URIHeader.toCChar(),
-        wSRead, sizeof(ZHeaderControlBlock_Export));
+        pHeader.Size, sizeof(ZHeaderControlBlock_Export));
     return  (ZS_BADFILEHEADER);
   }
   return  wSt;
@@ -2073,98 +1831,41 @@ ZRandomFile::_getHeaderControlBlock(bool pForceRead)
 ZStatus wSt=ZS_SUCCESS;
 ZDataBuffer wZDB;
 
-  if (Mode & ZRF_Exclusive)
-     {
-     if (!pForceRead)
-             {return  ZS_SUCCESS;}
-     }
+  if (Mode & ZRF_Exclusive) {
+    if (!pForceRead) {
+      return  ZS_SUCCESS;
+    }
+  }
 
+  wSt=rawSeekBegin(HeaderFd);
+  if (wSt!=ZS_SUCCESS) {
+    return wSt;
+  }
 
-  off_t wOff = lseek(HeaderFd,(off_t)0L,SEEK_SET);
-  if (wOff<0)
-        {
-        ZException.getErrno(errno,
-                         _GET_FUNCTION_NAME_,
-                         ZS_FILEPOSERR,
-                         Severity_Fatal,
-                         "Error positionning header at beginning of file <%s>",
-                         URIHeader.toCChar()
-                         );
-        return (ZS_FILEPOSERR);
-        }
+  ZPMS.HFHReads ++;
+  ZHeaderControlBlock_Export wZHeaderExport;
+  wSt=rawRead(HeaderFd,wZDB,sizeof(ZHeaderControlBlock_Export));
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
 
-    ZPMS.HFHReads ++;
-    ZHeaderControlBlock_Export wZHeaderExport;
-//    ssize_t wSRead =read(HeaderFd,(char *)&ZHeader,sizeof(ZHeaderControlBlock));  //! read at first Header control block
+  if (wZDB.Size < sizeof(ZHeaderControlBlock_Export)) {
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        ZS_BADFILEHEADER,
+        Severity_Fatal,
+        "Invalid/corrupted header file  <%s> size read %ld while expected at least %ld",
+        URIHeader.toCChar(),
+        wZDB.Size, sizeof(ZHeaderControlBlock_Export));
+    return  (ZS_BADFILEHEADER);
+  }
 
-    ssize_t wSRead =read(HeaderFd,(char *)&wZHeaderExport,sizeof(ZHeaderControlBlock_Export));  // read at first Header control block
-//    ssize_t wSRead =read(HeaderFd,wZDB.DataChar,wZDB.Size);  // load the whole file in wZDB
-    if (wSRead<0)
-        {
-        ZException.getErrno(errno,
-                         _GET_FUNCTION_NAME_,
-                         ZS_BADFILEHEADER,
-                         Severity_Fatal,
-                         "Error loading  header file  <%s>",
-                         URIHeader.toCChar());
-        return  (ZS_BADFILEHEADER);
-        }
-
-  if (wSRead < sizeof(ZHeaderControlBlock_Export))
-        {
-          ZException.setMessage(_GET_FUNCTION_NAME_,
-              ZS_BADFILEHEADER,
-              Severity_Fatal,
-              "Invalid/corrupted header file  <%s> size read %ld while expected at least %ld",
-              URIHeader.toCChar(),
-              wSRead, sizeof(ZHeaderControlBlock_Export));
-          return  (ZS_BADFILEHEADER);
-        }
-
-    // converts and controls about ZHeader integrity
-  const unsigned char *wPtrIn=(unsigned char *)&wZHeaderExport;
+  // converts and controls about ZHeader integrity
+  const unsigned char *wPtrIn=wZDB.Data ;
   wSt=ZHeader._import(wPtrIn);
 
-   return  wSt;
+  return  wSt;
 }//_getFileHeader
-ZStatus
-ZRandomFile::_getFileHeader_Export(ZHeaderControlBlock_Export* pHCB_Export)
-{
-ZStatus wSt=ZS_SUCCESS;
-ZDataBuffer wZDB;
 
 
-    off_t wOff = lseek(HeaderFd,(off_t)0L,SEEK_SET);
-    if (wOff<0)
-        {
-        ZException.getErrno(errno,
-                         _GET_FUNCTION_NAME_,
-                         ZS_FILEPOSERR,
-                         Severity_Fatal,
-                         "Error positionning header at offset <%lld> file <%s>",
-                         0L,
-                         URIHeader.toCChar()
-                         );
-        return (ZS_FILEPOSERR);
-        }
-    ZPMS.HFHReads ++;
-    ssize_t wSRead =read(HeaderFd,(char *)pHCB_Export,sizeof(ZHeaderControlBlock_Export));  // read at first Header control block
-
-    if (wSRead<0)
-        {
-        ZException.getErrno(errno,
-                         _GET_FUNCTION_NAME_,
-                         ZS_BADFILEHEADER,
-                         Severity_Fatal,
-                         "Error reading  Header control block address <%lld> file  <%s>",
-                         0L,
-                         URIHeader.toCChar());
-        return  (ZS_BADFILEHEADER);
-        }
-
-    // Controls about ZHeader integrity
-    return  wSt;
-}//_getFileHeader_Export
 /**
  * @brief ZRandomFile::_getFullFileHeader gets/refreshes the whole file header content into memory_order
  * File header is composed of
@@ -2250,48 +1951,30 @@ ZStatus wSt;
 ZStatus
 ZRandomFile::_getReservedHeader( bool pForceRead)
 {
-/*    if (getOpenMode() & ZRF_Exclusive)
-           {
-            if (!pForceRead  &&  (HeaderAccessed & ZHAC_RESERVED))
-                    { return  ZS_SUCCESS;}
-           }
-*/
-    if (ZHeader.SizeReserved==0) {
-      ZException.getErrno(errno,
-          _GET_FUNCTION_NAME_,
-          ZS_BADFILERESERVED,
-          Severity_Error,
-          "Missing reserved header for index file  <%s>",
-          URIHeader.toString());
-      return  (ZS_BADFILERESERVED);
-    }
-    off_t wOff = lseek(HeaderFd,(off_t)ZHeader.OffsetReserved,SEEK_SET);
-    if (wOff<0)
-          {
-          ZException.getErrno(errno,
-                           _GET_FUNCTION_NAME_,
-                           ZS_FILEPOSERR,
-                           Severity_Severe,
-                           "Error positionning header at offset <%lld> file <%s>",
-                           ZHeader.OffsetReserved,
-                           URIHeader.toString()
-                           );
-          return  (ZS_FILEPOSERR);
-          }
-    ZPMS.HReservedReads += 1;
-    ZReserved.allocateBZero(ZHeader.SizeReserved);
-    ssize_t wSRead =read(HeaderFd,ZReserved.DataChar,ZHeader.SizeReserved);  //! then read reserved infradata
-    if (wSRead<0) {
-          ZException.getErrno(errno,
-                           _GET_FUNCTION_NAME_,
-                           ZS_BADFILERESERVED,
-                           Severity_Error,
-                           "Error reading  Header reserved infradata file  <%s>",
-                           URIHeader.toString());
-          return  (ZS_BADFILERESERVED);
-          }
-    HeaderAccessed|=ZHAC_RESERVED;
-    return  ZS_SUCCESS;
+
+  if (ZHeader.SizeReserved==0) {
+    ZException.getErrno(errno,
+        _GET_FUNCTION_NAME_,
+        ZS_BADFILERESERVED,
+        Severity_Error,
+        "Missing reserved header for file  <%s>",
+        URIHeader.toString());
+    return  (ZS_BADFILERESERVED);
+  }
+
+  ZStatus wSt=rawSeekToPosition(HeaderFd,ZHeader.OffsetReserved);
+  if (wSt!=ZS_SUCCESS) {
+    return wSt;
+  }
+  ZPMS.HReservedReads += 1;
+
+  wSt=rawRead(HeaderFd,ZReserved,ZHeader.SizeReserved);
+  if (wSt!=ZS_SUCCESS) {
+    return wSt;
+  }
+
+  HeaderAccessed|=ZHAC_RESERVED;
+  return  ZS_SUCCESS;
 } //_getReservedHeader
 
 /**
@@ -2308,86 +1991,42 @@ ZRandomFile::_getReservedHeader( bool pForceRead)
 ZStatus
 ZRandomFile::_getFileControlBlock ( bool pForceRead)
 {
-  if (getOpenMode() & ZRF_Exclusive)
-           {
-             if (!pForceRead  &&  (HeaderAccessed & ZHAC_FCB))
-             { return  ZS_SUCCESS;}
-           }
-    off_t wOff = lseek(HeaderFd,ZHeader.OffsetFCB,SEEK_SET);
-    if (wOff<0)
-        {
-        ZException.getErrno(errno,
-                         _GET_FUNCTION_NAME_,
-                         ZS_FILEPOSERR,
-                         Severity_Severe,
-                         "Error positionning header at offset <%lld> file <%s>",
-                         0L,
-                         URIHeader.toString()
-                         );
-        return (ZS_FILEPOSERR);
-        }
+  if (getOpenMode() & ZRF_Exclusive) {
+    if (!pForceRead  &&  (HeaderAccessed & ZHAC_FCB)) {
+      return  ZS_SUCCESS;
+    }
+  }
+  ZStatus wSt=rawSeekToPosition(HeaderFd,ZHeader.OffsetFCB);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
 
-//    setupFCB();
-    // get file control block
-    //
+  ZPMS.HFCBReads ++;
+  ZDataBuffer wZDB;
+  wSt=rawRead(HeaderFd,wZDB,sizeof(ZFCB_Export));
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
 
-    ZDataBuffer wZDB;
-    wZDB.allocateBZero(sizeof(ZFCB_Export));
-    ZPMS.HFCBReads ++;
-    ssize_t wSRead =read(HeaderFd,wZDB.DataChar,sizeof(ZFCB_Export));  //! read at first Header control block
-    if (wSRead<0)
-        {
-        ZException.getErrno(errno,
-                         _GET_FUNCTION_NAME_,
-                         ZS_BADFILEHEADER,
-                         Severity_Error,
-                         "Error reading  Header control block address <%lld> file  <%s>",
-                         0L,
-                         URIHeader.toString());
-        return  (ZS_BADFILEHEADER);
-        }
+  const unsigned char* wPtr=wZDB.Data;
+  ZFCB._import(wPtr);/* beware wPtr is updated by _import */
 
-    const unsigned char* wPtr=wZDB.Data;
-    ZFCB._import(wPtr);/* beware wPtr is updated by _import */
-
-    // Deprecated
-//    size_t wPoolSize = ZFCB.ZBAT_ExportSize + ZFCB.ZFBT_ExportSize + ZFCB.ZDBT_ExportSize;
-    size_t wPoolSize = ZFCB.ZBAT_ExportSize + ZFCB.ZFBT_ExportSize ;
-    ZDataBuffer wBuffer;
-    wBuffer.allocateBZero( wPoolSize+1);
+  size_t wPoolSize = ZFCB.ZBAT_ExportSize + ZFCB.ZFBT_ExportSize ;
+  ZDataBuffer wBuffer;
+  wBuffer.allocateBZero( wPoolSize+1);
 /*
  * file is positioned to first byte after  ZFCB_Export
- *
-   wOff = lseek(HeaderFd,(off_t)( ZFCB.ZBAT_DataOffset+ZHeader.OffsetFCB),SEEK_SET);
-    if (wOff<0)
-          {
-          ZException.getErrno(errno,
-                           _GET_FUNCTION_NAME_,
-                           ZS_FILEPOSERR,
-                           Severity_Severe,
-                           "Error positionning file header at offset <%lld> file <%s>",
-                           ZFCB.ZBAT_DataOffset,
-                           URIHeader.toString()
-                           );
-          return  (ZS_FILEPOSERR);
-          }
 */
-    wSRead =read(HeaderFd,wBuffer.DataChar,wPoolSize);
-//    if ((wSRead<64)||(wSRead !=ZFCB.ZBAT_ExportSize))
-    if (wSRead != wPoolSize)
-          {
-          ZException.getErrno(errno,
-                              _GET_FUNCTION_NAME_,
-                              ZS_BADFILEHEADER,
-                              Severity_Error,
-                              "Error reading Block Access Table offset <%lld> file  <%s>. Pool size <%ld> has not been read in totality (<%ld> read).",
-                              ZFCB.ZBAT_DataOffset,
-                              URIHeader.toString(),
-                              wPoolSize,
-                              wSRead);
-          return  (ZS_BADFILEHEADER);
-          }
-
+  wSt=rawRead(HeaderFd,wBuffer,wPoolSize);
+  if (wBuffer.Size != wPoolSize) {
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+                          ZS_BADFILEHEADER,
+                          Severity_Error,
+                          "Error reading Block Access Table offset <%lld> file  <%s>. Pool size <%ld> has not been read in totality (<%ld> read).",
+                          ZFCB.ZBAT_DataOffset,
+                          URIHeader.toString(),
+                          wPoolSize,
+                          wBuffer.Size);
+    return  (ZS_BADFILEHEADER);
+  }
 
 #ifdef __REPORT_POOLS__
           fprintf (stdout," import ZBAT pool \n");
@@ -2429,58 +2068,43 @@ ZRandomFile::_getBlockHeader(  zaddress_type pPhysicalAddress, ZBlockHeader &pBl
 {
 ssize_t wSRead;
 ZBlockHeader_Export wBlockHeadExp;
-// get position to block : block header is the first block element
+ZDataBuffer wRecord;
+// get position to block : block header is leading the block
 
-    off_t wOff = lseek(ContentFd,(off_t)( pPhysicalAddress),SEEK_SET);
-    if (wOff<0)
-                {
+  ZStatus wSt=rawSeekToPosition(ContentFd,pPhysicalAddress);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+  setPhysicalPosition(pPhysicalAddress);
 
-                ZException.getErrno(errno,
-                                 _GET_FUNCTION_NAME_,
-                                 ZS_FILEPOSERR,
-                                 Severity_Severe,
-                                 "Error positionning file  at logical address <%lld> file <%s>",
-                                 pPhysicalAddress,
-                                 URIContent.toString()
-                                 );
-                return  (ZS_FILEPOSERR);
-                }
+  ZPMS.CBHReads ++;
 
-    setPhysicalPosition((zaddress_type)wOff);
+  wSt=rawRead(ContentFd,wRecord,sizeof(ZBlockHeader_Export));
+  if (wSt!=ZS_SUCCESS) {
+    ZException.prependToLast("Error reading block header :  address <%lld> for file <%s>\n",
+        pPhysicalAddress,
+        URIContent.toString());
+    return wSt;
+  }
 
-    ZPMS.CBHReads ++;
+  ZPMS.CBHReadBytesSize += wRecord.Size ;
 
-    if ((wSRead=read(ContentFd,&wBlockHeadExp,sizeof(ZBlockHeader_Export)))<0)
-            {
-            ZException.getErrno(errno,
-                             _GET_FUNCTION_NAME_,
-                             ZS_READERROR,
-                             Severity_Error,
-                             "Error reading block header :  address <%lld> for file <%s>\n",
-                             pPhysicalAddress,
-                             URIContent.toString());
-            return  (ZS_READERROR);
-            }
-    ZPMS.CBHReadBytesSize += wSRead ;
+  ZBlockHeader::_importConvert(pBlockHeader,&wBlockHeadExp);
 
-    ZBlockHeader::_importConvert(pBlockHeader,&wBlockHeadExp);
+  incrementPosition(wRecord.Size);
 
-    incrementPosition(wSRead);
+  if (wRecord.Size!=sizeof(ZBlockHeader_Export)) {
+      ZException.setMessage(
+                       _GET_FUNCTION_NAME_,
+                       ZS_READPARTIAL,
+                       Severity_Error,
+                       "Error reading block header :  address <%lld> for file <%s>\n"
+                       "Block header has not been entirely read and has been truncated.",
+                       pPhysicalAddress,
+                       URIContent.toString());
+      return  (ZS_READPARTIAL);
+  }
 
-    if (wSRead!=sizeof(ZBlockHeader_Export))
-            {
-            ZException.setMessage(
-                             _GET_FUNCTION_NAME_,
-                             ZS_READPARTIAL,
-                             Severity_Error,
-                             "Error reading block header :  address <%lld> for file <%s>\n"
-                             "Block header has not been entirely read and has been truncated.",
-                             pPhysicalAddress,
-                             URIContent.toString());
-            return  (ZS_READPARTIAL);
-            }
-
-    return  (ZS_SUCCESS);
+  return  (ZS_SUCCESS);
 } // _getBlockHeader
 
 
@@ -2549,6 +2173,7 @@ ZStatus wSt;
  * @param[in] pModule       calling module reference
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
+/*
 ZStatus
 ZRandomFile::_seek(zaddress_type pAddress)
 {
@@ -2566,7 +2191,7 @@ ZRandomFile::_seek(zaddress_type pAddress)
     setPhysicalPosition((zaddress_type)wOff);
     return  ZS_SUCCESS;
 }//_seek
-
+*/
 /**
   @brief ZRandomFile::_read
     reads at current physical position a file given by it ZFileDescriptor
@@ -2591,14 +2216,13 @@ If End of file is reached, ZStatus is positionned as :
  *  - ZS_READPARTIAL if returned buffer has not the requested size
  *  - ZS_READERROR if an error occurred
  */
+/*
 ZStatus
 ZRandomFile::_read(void* pBuffer,
                    const size_t pSize,
                    ssize_t &pSizeRead,
                    ZPMSCounter_type pZPMSType)
 {
-
-
 //    ZPMS.UserReads += 1;
 
     pSizeRead= read(ContentFd,pBuffer,pSize);
@@ -2629,7 +2253,7 @@ ZRandomFile::_read(void* pBuffer,
 
 return  ZS_SUCCESS;
 }//_read
-
+*/
 /**
  * @brief ZRandomFile::_read
        Reads at the current physical position a file given by its pDescriptor ZFileDescriptor in pBuffer for reading at maximum pSizeRead bytes.
@@ -2659,45 +2283,30 @@ ZRandomFile::_read(ZDataBuffer& pBuffer,
                    ZPMSCounter_type pZPMSType)
 {
 
-ssize_t wSRead=0;
+//ssize_t wSRead=0;
 
 //    ZPMS.UserReads += 1;
 
-    pBuffer.allocate(pSizeToRead);                                    // allocate the maximum size to read from file
-    wSRead= read(ContentFd,pBuffer.Data,pBuffer.Size);
-
-
-    if (wSRead<0)
-            {
-            ZPMS.PMSCounterRead(pZPMSType,0);
-            ZException.getErrno(errno,
-                                _GET_FUNCTION_NAME_,
-                                ZS_READERROR,
-                                Severity_Severe,
-                                "Error while reading file <%s>",
-                                URIContent.toString());
-            return(ZS_READERROR);
-            }
+  ZStatus wSt=rawRead(ContentFd,pBuffer,pSizeToRead);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
 
 //    ZPMS.UserReadSize += wSRead;
-    ZPMS.PMSCounterRead(pZPMSType,wSRead);
-    if (wSRead==0)
-            {
-            ZException.getErrno(errno,
-                         _GET_FUNCTION_NAME_,
-                         ZS_EOF,
-                         Severity_Severe,
-                         "Read size is zero length. Either EOF has been encountered or User content record is empty.On file <%s>",
-                         URIContent.toString());
+  ZPMS.PMSCounterRead(pZPMSType,pBuffer.Size);
+  if (pBuffer.Size==0) {
+        ZException.getErrno(errno,
+                     _GET_FUNCTION_NAME_,
+                     ZS_EOF,
+                     Severity_Severe,
+                     "Read size is zero length. Either EOF has been encountered or User content record is empty.On file <%s>",
+                     URIContent.toString());
 //             pBuffer.clear();  // pBuffer remains unchanged
-            return ZS_EOF;
-            }
-    if (wSRead<pSizeToRead)
-            {
-            pBuffer.allocate(wSRead); // reallocate appropriate size
+        return ZS_EOF;
+  }
+  if (pBuffer.Size<pSizeToRead) {
             return ZS_READPARTIAL; //! not an error : expected size is not returned. EOF may have been found
-            }
-    incrementPosition( wSRead );
+  }
+  incrementPosition( pBuffer.Size );
 return ZS_SUCCESS;
 }//_read
 
@@ -2725,7 +2334,7 @@ return ZS_SUCCESS;
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  *  see @ref ZRandomFile::_read() for returned status
  */
-
+/*
 ZStatus
 ZRandomFile::_readAt(void *pBuffer,
                      size_t pSize,
@@ -2740,7 +2349,7 @@ ZRandomFile::_readAt(void *pBuffer,
                 {   return  wSt;   }
     return  _read(pBuffer,pSize,pSizeRead,pZPMSType);
 }//_readAt
-
+*/
 
 /**
  * @brief ZRandomFile::_readAt Reads raw data at address pAddress and returns a ZDataBuffer containing this data
@@ -2768,10 +2377,14 @@ ZRandomFile::_readAt(ZDataBuffer& pBuffer,
                      zaddress_type pAddress,
                      ZPMSCounter_type pZPMSType)
 {
-    ZStatus wSt = _seek(pAddress);
-    if (wSt!=ZS_SUCCESS)
-                return wSt;
-    return _read(pBuffer,pSizeToRead,pZPMSType);
+  ZStatus wSt=rawReadAt(ContentFd,pBuffer,pSizeToRead,pAddress);
+  if (wSt!=ZS_SUCCESS) {
+    return  wSt;
+  }
+  pSizeToRead = pBuffer.Size;
+  setPhysicalPosition(pAddress+pBuffer.Size);
+
+  return wSt;
 }//_readAt
 
 /**
@@ -2797,40 +2410,43 @@ ZRandomFile::_readBlockAt(ZBlock &pBlock,
                      const zaddress_type pAddress) {
 
 ZStatus wSt;
-ssize_t wSizeRead;
 ssize_t wUserRecordSize;
 
 ZBlockHeader_Export wBlockHeadExp;
+ZDataBuffer wZDB;
 
 //    ZPMS.CBHReads ++;
 
-    wSt= _readAt(&wBlockHeadExp,sizeof(ZBlockHeader_Export),wSizeRead,pAddress,ZPMS_BlockHeader);
-    if (wSt!=ZS_SUCCESS)
-                {   return  wSt;   }
+  wSt=rawReadAt(ContentFd,wZDB,sizeof(ZBlockHeader_Export),pAddress);
+  if (wSt!=ZS_SUCCESS) {
+    return  wSt;
+  }
+  if (wZDB.Size < sizeof(ZBlockHeader_Export)) {
+    ZException.setMessage("ZRandomFile::_readBlockAt",ZS_INVSIZE,Severity_Error,
+        "ZRandomFile::_readBlockAt-E-INVSIZE invalid read block size %ld address %ld for file <%s> \n",
+        pBlock.BlockSize,pAddress,URIContent.toCChar());
+    return ZS_INVSIZE;
+  }
 
-    wSt=ZBlockHeader::_importConvert(pBlock,&wBlockHeadExp);
-
-    if ((pBlock.BlockSize<1)||(pBlock.BlockSize>UINT_MAX)) {
+  wSt=ZBlockHeader::_importConvert(pBlock,(ZBlockHeader_Export*)wZDB.Data);
+  if (wSt!=ZS_SUCCESS) {
+    return  wSt;
+  }
+  if ((pBlock.BlockSize<1)||(pBlock.BlockSize>UINT_MAX)) {
       ZException.setMessage("ZRandomFile::_readBlockAt",ZS_INVSIZE,Severity_Error,
           "ZRandomFile::_readBlockAt-E-OUTBOUND invalid read block size %ld address %ld for file <%s> \n",
           pBlock.BlockSize,pAddress,URIContent.toCChar());
       fprintf(stderr,"ZRandomFile::_readBlockAt-E-OUTBOUND invalid read block size %ld address %ld for file <%s>.\n",
           pBlock.BlockSize,pAddress,URIContent.toCChar());
       return ZS_INVSIZE;
-    }
+  }
 
 // Test wether given address correspond to effective beginning of a block with correct identification (Data block)
 
-    if (wSt!=ZS_SUCCESS)
-                    {   return  wSt;   }
-
-
-//    ZPMS.CBHReadBytesSize +=wSizeRead ;
 
     wUserRecordSize = pBlock.BlockSize - sizeof(ZBlockHeader_Export);
-    pBlock.allocate(wUserRecordSize);
-    return  _read(pBlock.Content,wUserRecordSize,ZPMS_User); // PMS counter are NOT updated within _read for user content values
-
+ //   pBlock.allocate(wUserRecordSize);
+  return  _read(pBlock.Content,wUserRecordSize,ZPMS_User); // PMS counter are NOT updated within _read for user content values
 }//_readBlockAt
 
 /**
@@ -5269,16 +4885,24 @@ ZStatus
 ZRandomFile::_writeBlockHeader(ZBlockHeader &pBlockHeader,
                                const zaddress_type pAddress)
 {
+  ZDataBuffer wZDB;
+  size_t wSizeWritten=0;
+  ZStatus wSt=rawSeekToPosition(ContentFd,pAddress);
+  if (wSt!=ZS_SUCCESS) {
+    return  wSt;
+  }
+  setPhysicalPosition(pAddress);
 
-    ZStatus wSt = _seek(pAddress);
-    if (wSt!=ZS_SUCCESS)
-                {return  wSt;}
+  ZBlockHeader_Export wBlockExp;
 
-    ZBlockHeader_Export wBlockExp;
-
-    ZBlockHeader::_exportConvert(pBlockHeader,&wBlockExp);
-
-    ssize_t wSWrite= write(ContentFd,&wBlockExp,sizeof(ZBlockHeader_Export));
+  ZBlockHeader::_exportConvert(pBlockHeader,&wBlockExp);
+  wZDB.setData(&wBlockExp,sizeof(ZBlockHeader_Export));
+  wSt=rawWrite(ContentFd,wZDB,wSizeWritten);
+  if (wSt!=ZS_SUCCESS) {
+    return  wSt;
+  }
+/*
+  ssize_t wSWrite= write(ContentFd,&wBlockExp,sizeof(ZBlockHeader_Export));
 
     if (wSWrite <0 )
         {
@@ -5292,12 +4916,16 @@ ZRandomFile::_writeBlockHeader(ZBlockHeader &pBlockHeader,
                          URIContent.toString());
          return  ZS_WRITEERROR;
         }
+*/
+    ZPMS.PMSCounterWrite(ZPMS_BlockHeader,wZDB.Size);
 
-    ZPMS.PMSCounterWrite(ZPMS_BlockHeader,wSWrite);
+    PhysicalPosition += wZDB.Size;
+    LogicalPosition += wZDB.Size;
 
-    PhysicalPosition += wSWrite;
-    LogicalPosition += wSWrite;
-
+    wSt=rawFlush(ContentFd);
+    if (wSt!=ZS_SUCCESS)
+      return wSt;
+    /*
     fdatasync(ContentFd); //! better than flush
     if (wSWrite<sizeof(ZBlockHeader_Export))
         {
@@ -5312,7 +4940,7 @@ ZRandomFile::_writeBlockHeader(ZBlockHeader &pBlockHeader,
                              URIContent.toString());
         return  ZS_WRITEPARTIAL;
         }
-
+  */
     return  ZS_SUCCESS;
 }//_writeBlockHeader
 
@@ -6344,8 +5972,10 @@ ZRandomFile::_baseOpen(const zmode_type pMode, const ZFile_type pFileType, bool 
     return  (ZS_FILENOTEXIST);
   }
 
-  ContentFd = open(URIContent.toCChar(),O_RDWR);
-
+  wSt=rawOpen(ContentFd,URIContent,O_RDWR);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+/*  ContentFd = open(URIContent.toCChar(),O_RDWR);
   if (ContentFd<0)
   {
     ZException.getErrno(errno,
@@ -6356,10 +5986,18 @@ ZRandomFile::_baseOpen(const zmode_type pMode, const ZFile_type pFileType, bool 
         URIContent.toCChar());
     return  (ZS_ERROPEN);
   }
-
+*/
   wSt = generateURIHeader (URIContent,URIHeader);
-  if (wSt!=ZS_SUCCESS)
-  {return  wSt;}
+  if (wSt!=ZS_SUCCESS) {
+    return  wSt;
+  }
+  wSt=rawOpen(HeaderFd,URIHeader,O_RDWR);
+  if (wSt!=ZS_SUCCESS) {
+    rawClose(ContentFd);
+    return wSt;
+  }
+ /*
+
   HeaderFd = open(URIHeader.toCChar(),O_RDWR);
   if (HeaderFd < 0)
   {
@@ -6375,7 +6013,7 @@ ZRandomFile::_baseOpen(const zmode_type pMode, const ZFile_type pFileType, bool 
 
     return  (ZS_ERROPEN);
   }
-
+*/
   //    setupFCB();  // update pDescriptor
   wSt=_importAllFileHeader();  // get header and force read pForceRead = true, whatever the open mode is
   if (wSt!=ZS_SUCCESS)
@@ -6463,22 +6101,24 @@ ZFileDescriptor::testRank(zrank_type pRank, const char* pModule)
 {
     if (pRank<0)
         {
-        ZException.setMessage(pModule,
+/*        ZException.setMessage(pModule,
                                 ZS_OUTBOUNDLOW,
                                 Severity_Error,
                                 " invalid block rank number <%d> . Boundaries are [0,<%ld>]",
                                 pRank,
                                 ZBAT.lastIdx());
+*/
          return ZS_OUTBOUNDLOW;
          }
     if (pRank>ZBAT.lastIdx())
         {
-        ZException.setMessage(pModule,
+/*        ZException.setMessage(pModule,
                                 ZS_OUTBOUNDHIGH,
                                 Severity_Error,
                                 " invalid block rank number <%d> . Boundaries are [0,<%ld>]",
                                 pRank,
                                 ZBAT.lastIdx());
+*/
          return ZS_OUTBOUNDHIGH;
          }
    if (ZBAT.Tab[pRank].State==ZBS_Allocated)
@@ -6486,7 +6126,7 @@ ZFileDescriptor::testRank(zrank_type pRank, const char* pModule)
           ZException.setMessage(pModule,
                                   ZS_LOCKCREATE,
                                   Severity_Error,
-                                  " Block record is currently being locked for creation by another stream");
+                                  "Block state is <ZBS_Allocated> : Block record is currently being locked for creation by another stream");
           return ZS_LOCKCREATE ;
          }
 
@@ -6571,67 +6211,52 @@ ZRandomFile::zutilityUnlockHeaderFile (const uriString& pHeaderFile)
   if (!pHeaderFile.getFileExtension().compareV<char>(__HEADER_FILEEXTENSION__))
       fprintf (stderr,"ZRandomFile::zutilityUnlockHeaderFile-W-FILEXT Warning file <%s> has not header file extension <%s>. Proceeding anyway.",pHeaderFile.toCChar(),__HEADER_FILEEXTENSION__);
 
-//  ZDataBuffer wHeaderContent;
-//  pHeaderFile.loadContent(wHeaderContent);
+  __FILEHANDLE__ wHeaderFd=0;
+  ZStatus wSt=rawOpen(wHeaderFd,pHeaderFile,O_RDWR);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
 
-  int wHeaderFd = open(pHeaderFile.toCChar(),O_RDWR);
-  if (wHeaderFd < 0)
-    {
-      ZException.getErrno(errno,"ZRandomFile::zutilityUnlockHeaderFile",
-          ZS_ERROPEN,
-          Severity_Severe,
-          "Error opening header file <%s>. ZRF file has not been opened.",
-          pHeaderFile.toCChar());
-
-      return  (ZS_ERROPEN);
-    }
-  off_t wOff = lseek(wHeaderFd,(off_t)cst_HeaderOffset,SEEK_SET);
-  if (wOff<0)
-    {
-      ZException.getErrno(errno,
-          _GET_FUNCTION_NAME_,
-          ZS_FILEPOSERR,
-          Severity_Severe,
-          "lseek error positionning header file  at beginning of header address <%ld> for file <%s>",
-          cst_HeaderOffset,
-          pHeaderFile.toCChar()
-          );
-      return (ZS_FILEPOSERR);
-    }
     /* get header control block */
-  ZHeaderControlBlock_Export wHCB;
-  ssize_t wSRead =read(wHeaderFd,&wHCB,sizeof(ZHeaderControlBlock_Export));
-  if ((wSRead<0) || (wSRead != sizeof(ZHeaderControlBlock_Export)))
-    {
-      ZException.getErrno(errno,
+  ZHeaderControlBlock_Export* wHCB=nullptr;
+  ZDataBuffer wZDB;
+  wSt=rawReadAt(wHeaderFd,wZDB,sizeof(ZHeaderControlBlock_Export),size_t(cst_HeaderOffset));
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+  if (wZDB.Size != sizeof(ZHeaderControlBlock_Export)) {
+    ZException.setMessage(
           _GET_FUNCTION_NAME_,
           ZS_BADFILEHEADER,
           Severity_Severe,
-          "Error loading  header control block for file  <%s>",
-          pHeaderFile.toCChar());
+          "Error loading  header control block for file  <%s> size read is %ld while expected %ld",
+          pHeaderFile.toCChar(),
+        wZDB.Size,
+        sizeof(ZHeaderControlBlock_Export));
       return  (ZS_BADFILEHEADER);
     }
+
+  wHCB = (ZHeaderControlBlock_Export*) wZDB.Data;
   /* check this is a true Header file : start sign is a palyndroma and block id is one byte : no need of endian conversion */
-  if (( wHCB.StartSign != cst_ZBLOCKSTART)||(wHCB.BlockId != ZBID_HCB))
+  if (( wHCB->StartSign != cst_ZBLOCKSTART)||(wHCB->BlockId != ZBID_HCB))
     {
       ZException.setMessage("ZRandomFile::zutilityUnlockHeaderFile",ZS_BADFILEHEADER,Severity_Error,
           "Invalid or corruped header content : start sign read <%X> expected <%X> block id read <%2X> expected <%2X> for file <%s>",
-          wHCB.StartSign,cst_ZBLOCKSTART,
-          wHCB.BlockId, wHCB.BlockId,
+          wHCB->StartSign,cst_ZBLOCKSTART,
+          wHCB->BlockId, ZBID_HCB,
           pHeaderFile.toCChar()
           );
       return (ZS_BADFILEHEADER);
     }
   /* reset values : no need to convert */
-  wHCB.Lock = ZLock_Nothing;  /* this is 0 */
-  wHCB.LockOwner=0L;
+  wHCB->Lock = ZLock_Nothing;  /* this is 0 */
+  wHCB->LockOwner=0L;
 
   /* rewrite header block  */
-  wOff = lseek(wHeaderFd,(off_t)cst_HeaderOffset,SEEK_SET);
-  wOff= write(wHeaderFd,&wHCB,sizeof(ZHeaderControlBlock_Export));
+  size_t wSize=0;
+  wSt=rawWriteAt(wHeaderFd,wZDB,wSize,size_t(cst_HeaderOffset));
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
 
-
-  ::close(wHeaderFd);
+  rawClose(wHeaderFd);
   return ZS_SUCCESS;
 }
 
@@ -6837,7 +6462,7 @@ ZRandomFile::XmlWriteFileDefinition (FILE *pOutput)
             OutPath = uriOutput.getDirectoryPath();
             OutPath += OutBase;
             OutPath += ".xml";
-            wOutput = fopen(OutPath.toCString_Strait(),"w");
+            wOutput = fopen(OutPath.toCChar(),"w");
             if (wOutput==nullptr)
                     {
                     ZException.getErrno(errno,
@@ -7188,7 +6813,9 @@ zaddress_type wTheoricAddress = 0;
              "____________________|_______________|____________________|____________________|____________________"
              );
 
-    wSt=_seek(0L);
+    wSt=rawSeekBegin(ContentFd);
+    if (wSt!=ZS_SUCCESS)
+      return wSt;
     while (true)
         {
         wSt=_searchNextPhysicalBlock(wAddressNext,wAddressNext,wBlockHeader);     // get first physical block of the file
@@ -7567,17 +7194,28 @@ ZRandomFile::_headerDump()
 {
 ZStatus wSt;
 ZHeaderControlBlock_Export wHeaderExp;
+ZDataBuffer wZDB;
 
-  if ((wSt=_getFullFileHeader(true))!=ZS_SUCCESS) {
-    ZException.addToLast("Error while getting header %s for ZRandom file %s",
-        getURIHeader().toUtf(),
-        getURIContent().toUtf());
-    ZException.exit_abort();
+  wSt=rawSeekBegin(HeaderFd);
+  if (wSt!=ZS_SUCCESS) {
+    return ;
+  }
+  ZPMS.HFHReads ++;
+  wSt=rawRead(HeaderFd,wZDB,sizeof(ZHeaderControlBlock_Export));
+  if (wSt!=ZS_SUCCESS)
+    return ;
+  if (wZDB.Size < sizeof(ZHeaderControlBlock_Export)) {
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        ZS_BADFILEHEADER,
+        Severity_Fatal,
+        "Invalid/corrupted header file  <%s> size read %ld while expected at least %ld",
+        URIHeader.toCChar(),
+        wZDB.Size, sizeof(ZHeaderControlBlock_Export));
+    return  ;
   }
 
-  wSt=_getFileHeader_Export(&wHeaderExp);
-  if (wSt!=ZS_SUCCESS)
-    ZException.exit_abort();
+  memmove(&wHeaderExp,wZDB.Data,sizeof(ZHeaderControlBlock_Export));
+
   wHeaderExp.deserialize();
 
 
@@ -7587,19 +7225,6 @@ ZHeaderControlBlock_Export wHeaderExp;
       "        +-----------------------------------------------------+",
       getURIContent().toUtf());
 
-/*  _print(
-    " Header file name     <%s>\n"
-    " Header file block \n"
-    " Identification       %s\n"
-    " Offset to FCB        %10ld\n"
-    " Reserved block size  %10ld\n"
-    " Version              %10ld",
-        getURIHeader().toString(),
-    decode_ZBID(  wHeaderExp.BlockId),
-    reverseByteOrder_Conditional<zaddress_type>(wHeaderExp.OffsetFCB),
-    reverseByteOrder_Conditional<zsize_type>(wHeaderExp.SizeReserved),
-    reverseByteOrder_Conditional<unsigned long>( wHeaderExp.ZRFVersion));
-*/
   _print(
       " Header file name     <%s>\n"
       " Header file block \n"
@@ -7819,6 +7444,10 @@ zsize_type wOldSize;
             ZException.printUserMessage(pOutput);
             return  (ZS_FILENOTEXIST);
             }
+  wSt=rawOpen(wZRF.ContentFd,wZRF.URIContent,O_RDONLY); // open content file for read only
+  if (wSt != ZS_SUCCESS)
+    return wSt;
+   /*
     wZRF.ContentFd = open(wZRF.URIContent.toCChar(),O_RDONLY);       // open content file for read only
     if (wZRF.ContentFd<0)
             {
@@ -7830,16 +7459,30 @@ zsize_type wOldSize;
                              wZRF.URIContent.toString());
             return  ZS_ERROPEN;
             }
-    if (pDump)
-        _surfaceScan();
+  */
+  if (pDump)
+    _surfaceScan();
 
-    mode_t wPosixMode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-    wZRF.HeaderFd = open(wZRF.URIHeader.toCChar(),O_RDWR|O_CREAT|O_TRUNC,wPosixMode); // open header file read write
+  mode_t wPosixMode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+  wSt=rawOpen(wZRF.HeaderFd,wZRF.URIHeader,O_RDWR|O_CREAT|O_TRUNC,wPosixMode);
+  if (wSt != ZS_SUCCESS)
+    return wSt;
+/*
+  mode_t wPosixMode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+  wZRF.HeaderFd = open(wZRF.URIHeader.toCChar(),O_RDWR|O_CREAT|O_TRUNC,wPosixMode); // open header file read write
+*/
+  ssize_t wHeaderSize = sizeof (ZHeaderControlBlock_Export) + sizeof (ZFCB_Export) ;
 
-    ssize_t wHeaderSize = sizeof (ZHeaderControlBlock_Export) + sizeof (ZFCB_Export) ;
-
-    wS=    posix_fallocate(wZRF.HeaderFd,0L,(off_t)wHeaderSize);
-    if (wS!=0)
+  wSt=rawAllocate(wZRF.HeaderFd,0,size_t(wHeaderSize));
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+  wSt=rawSeekBegin(wZRF.HeaderFd);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+  wAddress=0L;
+  /*
+  wS=    posix_fallocate(wZRF.HeaderFd,0L,(off_t)wHeaderSize);
+  if (wS!=0)
             {
             ZException.getErrno(wS,  // no errno is set by posix_fallocate : returned value is the status : ENOSPC means no space
                              _GET_FUNCTION_NAME_,
@@ -7850,6 +7493,7 @@ zsize_type wOldSize;
             wSt=ZS_WRITEERROR;
             goto end_zheaderRebuild;
             }
+
     wAddress=0L;
     wS=lseek(wZRF.ContentFd,wAddress,SEEK_SET);
     if (wS<0)
@@ -7863,26 +7507,25 @@ zsize_type wOldSize;
                         wAddress);
         return  (ZS_FILEPOSERR);
         }
-    while (true)
-        {
-        wSt=_searchNextPhysicalBlock(wAddress,wAddressNext,wBlockDescriptor);     //! get first physical block of the file
-        if (wSt!=ZS_FOUND)
-                {
+    */
+  while (true) {
+    wSt=_searchNextPhysicalBlock(wAddress,wAddressNext,wBlockDescriptor);     //! get first physical block of the file
+    if (wSt!=ZS_FOUND) {
                 ZException.setMessage(_GET_FUNCTION_NAME_,
                                         ZS_EMPTYFILE,
                                         Severity_Severe,
                                         " No valid block has been found in content file %s",
                                         wZRF.URIContent.toCChar());
                 goto error_zheaderRebuild;
-                }
-        wBlockDescriptor.Address = wAddressNext;
+    }
+    wBlockDescriptor.Address = wAddressNext;
 
 
-        // first block
-        wZRF.ZFCB.StartOfData = wBlockDescriptor.Address;
-        if (wBlockDescriptor.State==ZBS_Deleted) {
-            if (__ZRFVERBOSE__)
-                    fprintf(pOutput,
+    // first block
+    wZRF.ZFCB.StartOfData = wBlockDescriptor.Address;
+    if (wBlockDescriptor.State==ZBS_Deleted) {
+      if (__ZRFVERBOSE__)
+        fprintf(pOutput,
                             "--%18ld|%15s|%20ld|%20ld|%20s\n",
                             wAddressNext,
                             decode_ZBS( wBlockDescriptor.State),
@@ -7890,14 +7533,14 @@ zsize_type wOldSize;
                             (wBlockDescriptor.BlockSize-(zsize_type)sizeof(ZBlockHeader_Export)),
                             "--deleted block--");
 
-        wAddressNext += sizeof(ZBlockHeader_Export);
+    wAddressNext += sizeof(ZBlockHeader_Export);
 
-        zrank_type wi=wZRF.ZFBT._addSorted(wBlockDescriptor);
+    zrank_type wi=wZRF.ZFBT._addSorted(wBlockDescriptor);
 
-        }
-        else
-          break;
-    }// while true
+    }
+    else
+      break;
+  }// while true
 
     while (wSt==ZS_FOUND)
         {
@@ -8384,7 +8027,7 @@ ZRandomFile::zremoveAll() {
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZRandomFile::zclearFile(const zsize_type pSize)
+ZRandomFile::zclearFile(const ssize_t pSize)
 {
 ZStatus wSt;
 long wi;
@@ -8428,12 +8071,12 @@ bool FOpen = false;
 // Computing size of user content for mega free block
 //          computed size for mega free block - sizeof(ZBlockHeader_Export)
 
-    zsize_type wFreeBlockSize = 0;
-    zsize_type wFreeUserSize = 0;
+    ssize_t wFreeBlockSize = 0;
+    ssize_t wFreeUserSize = 0;
 
     // get file size
 
-    if ((wFreeBlockSize=(zsize_type)lseek(ContentFd,0L,SEEK_END))<0)// get the physical file size
+    if ((wFreeBlockSize=(ssize_t)lseek(ContentFd,0L,SEEK_END))<0)// get the physical file size
             {
             ZException.getErrno(errno,
                             _GET_FUNCTION_NAME_,

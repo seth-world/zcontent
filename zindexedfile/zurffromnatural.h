@@ -23,11 +23,13 @@ setFieldURFfBlob(void* pSourceNatural,
                  ZDataBuffer &pTargetURFData,
                  ZTypeBase &pSourceType,
                  ZTypeBase &pTargetType);
+/* Deprecated
 ZStatus
 setFieldURFfZDate(void* pSourceNatural,
                   ZDataBuffer& pTargetURFData,
                   ZTypeBase &pSourceType,
                   ZTypeBase &pTargetType);
+*/
 ZStatus
 setFieldURFfZDateFull(void* pSourceNatural,
                       ZDataBuffer &pTargetURFData,

@@ -2,6 +2,8 @@
 #define ZRFUTILITIES_H
 
 #include <zcontent/zrandomfile/zrandomfile.h>
+#include <config/zconfig.h>
+
 
 extern const long cst_FileNudge;
 
@@ -10,7 +12,7 @@ public:
   ZFileUtils() = default;
   ZFileUtils(uriString & pURI) {setUri(pURI);}
 
-  ~ZFileUtils() {if (_isOpen) _close();}
+  ~ZFileUtils() ;
 
   void setUri(uriString& pURI) {URI=pURI;}
 
@@ -37,7 +39,6 @@ public:
   ZStatus _openContent(uriString& pURIContent) ;
   ZStatus _openContent() {return _openContent(URI);}
   ZStatus _openHeader(uriString* pURIHeader=nullptr) ;
-  ZStatus _close();
 
   ZStatus writeHeaderFromPool(const uriString& pURIHeader,
               ZHeaderControlBlock &pHCB, ZFileControlBlock &pFCB, ZDataBuffer &pReserved,
@@ -53,8 +54,8 @@ public:
   void set_displayCallBack(__DISPLAYCALLBACK__(pDCB)) {_displayCallback=pDCB;}
   __DISPLAYCALLBACK__(_displayCallback)=nullptr;
 
-  int Fd=-1;
-  int FdHeader=-1;
+  __FILEHANDLE__ Fd=-1;
+  __FILEHANDLE__ FdHeader=-1;
   off_t FileOffset=0;
   size_t FileSize=0;
   uriString URI;
@@ -69,16 +70,6 @@ public:
   FILE* Output;
 };
 
-/**
- * @brief renameFile renames pFormerName to pNewName.  Returns ZS_SUCCESS is OK.
- * Returns ZS_FILEERR if any error occurred. In this case, ZException is set with appropriate error info.
- */
-ZStatus renameFile(const uriString& pFormerName,const utf8VaryingString& pNewName);
-/**
- * @brief removeFile removes pFormerName from file system.  Returns ZS_SUCCESS is OK.
- * Returns ZS_FILEERR if any error occurred. In this case, ZException is set with appropriate error info.
- */
-ZStatus removeFile(const uriString& pFormerName);
 
 ZStatus rebuildZRFHeader(uriString& pURIContent);
 

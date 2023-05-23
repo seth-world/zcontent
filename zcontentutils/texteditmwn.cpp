@@ -433,6 +433,17 @@ textEditMWn::appendText(const char* pText,...) {
 }
 
 void
+textEditMWn::appendHtml(const char* pText,...) {
+  utf8VaryingString wT = escapeHtmlSeq(pText);
+  va_list args;
+  va_start (args, pText);
+  wT.vsnprintf(cst_messagelen,pText, args);
+  va_end(args);
+
+  Text->appendHtml(wT.toCChar());
+}
+
+void
 textEditMWn::appendTextColor(QColor pBkgndColor,QColor pTextColor,const char* pText,...) {
   utf8VaryingString wT;
   va_list args;

@@ -1,6 +1,8 @@
 ﻿#include "zcontentvisumain.h"
 #include "ui_zcontentvisumain.h"
 
+#include <zio/zioutils.h>
+
 #include <QStandardItemModel>
 #include <qaction.h>
 #include <qactiongroup.h>
@@ -43,6 +45,11 @@
 
 #include "zrawkeylistdlg.h"
 
+#include "visuraw.h"
+
+#include "zbackupdlg.h"
+#include "zrestoredlg.h"
+
 #define __FIXED_FONT__ "courrier"
 
 const int cst_maxraisonablevalue = 100000;
@@ -84,9 +91,13 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
 */
   VisuTBv = new ZQTableView(this);
 
+  VizuRaw = new VisuRaw(VisuTBv,&RawData);
+
   VisuTBv->newModel(21);
 
-  VisuTBv->setContextMenuCallback(std::bind(&ZContentVisuMain::VisuBvFlexMenuCallback, this,placeholders::_1));
+  VisuTBv->setContextMenuCallback(std::bind(&VisuRaw::VisuBvFlexMenuCallback, VizuRaw,placeholders::_1));
+
+//  VisuTBv->setContextMenuCallback(std::bind(&ZContentVisuMain::VisuBvFlexMenuCallback, this,placeholders::_1));
 
 //  VisuTBv->setMouseClickCallback(std::bind(&ZContentVisuMain::VisuMouseCallback, this,placeholders::_1,placeholders::_2)  );
 
@@ -129,6 +140,12 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
 
   IndexRebuildQAc = new QAction("Rebuild index");
   MasterFileMEn->addAction(IndexRebuildQAc);
+
+  ZMFBackupQAc = new QAction("Backup file and all indexes");
+  MasterFileMEn->addAction(ZMFBackupQAc);
+
+  ZMFRestoreQAc = new QAction("Restore file and all indexes");
+  MasterFileMEn->addAction(ZMFRestoreQAc);
 
   mainQAg = new QActionGroup(this);
 
@@ -178,6 +195,8 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
   /* get definition from ZMF */
   mainQAg->addAction(ZmfDefQAc);
   mainQAg->addAction(IndexRebuildQAc);
+  mainQAg->addAction(ZMFBackupQAc);
+  mainQAg->addAction(ZMFRestoreQAc);
 
   /* display pool choices */
 
@@ -274,6 +293,9 @@ const uint32_t     cst_ZBUFFEREND   = 0xFBFBFBFB;  //!< End marker of a ZDataBuf
 
 ZContentVisuMain::~ZContentVisuMain()
 {
+  if (VizuRaw!=nullptr)
+    delete VizuRaw;
+
   if (entityWnd)
     delete entityWnd;
 
@@ -307,14 +329,30 @@ void ZContentVisuMain::VisuMouseCallback(int pZEF, QMouseEvent *pEvent)
   ui->CurAddressLBl->setText(wStr.toCChar());
 }//VisuMouseCallback
 
+#ifdef __DEPRECATED__
+
 void ZContentVisuMain::VisuBvFlexMenuCallback(QContextMenuEvent *event)
 {
   QMenu* visuFlexMEn=new QMenu;
   visuFlexMEn->setTitle(QObject::tr("Evaluate","ZContentVisuMain"));
 
   QActionGroup* visuActionGroup=new QActionGroup(visuFlexMEn) ;
-//  QObject::connect(visuActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(visuActionEvent(QAction*)));
   QObject::connect(visuActionGroup, &QActionGroup::triggered,this,  &ZContentVisuMain::visuActionEvent);
+
+  ZBlockHeaderQAc= new QAction("ZBLockHeader",visuFlexMEn);
+  visuFlexMEn->addAction(ZBlockHeaderQAc);
+  visuActionGroup->addAction(ZBlockHeaderQAc);
+
+  URFFieldQAc= new QAction("URF field",visuFlexMEn);
+  visuFlexMEn->addAction(URFFieldQAc);
+  visuActionGroup->addAction(URFFieldQAc);
+
+  visuFlexMEn->addSeparator();
+
+  ZTypeQAc= new QAction("ZType",visuFlexMEn);
+  visuFlexMEn->addAction(ZTypeQAc);
+  visuActionGroup->addAction(ZTypeQAc);
+
   uint16QAc= new QAction("uint16",visuFlexMEn);
   visuFlexMEn->addAction(uint16QAc);
   visuActionGroup->addAction(uint16QAc);
@@ -343,11 +381,87 @@ void ZContentVisuMain::VisuBvFlexMenuCallback(QContextMenuEvent *event)
   visuFlexMEn->addAction(sizetQAc);
   visuActionGroup->addAction(sizetQAc);
 
+  floatQAc= new QAction("float",visuFlexMEn);
+  visuFlexMEn->addAction(floatQAc);
+  visuActionGroup->addAction(floatQAc);
+
+  doubleQAc= new QAction("double",visuFlexMEn);
+  visuFlexMEn->addAction(doubleQAc);
+  visuActionGroup->addAction(doubleQAc);
+
+  longdoubleQAc= new QAction("long double",visuFlexMEn);
+  visuFlexMEn->addAction(longdoubleQAc);
+  visuActionGroup->addAction(longdoubleQAc);
+
   visuFlexMEn->exec(event->globalPos());
   visuFlexMEn->deleteLater();
 }//VisuBvFlexMenu
 
+
 void ZContentVisuMain::visuActionEvent(QAction* pAction) {
+
+  if (pAction==ZBlockHeaderQAc) {
+    VisuRaw::visuBlockHeader(VisuTBv,&RawData);
+    return;
+  } // if (pAction==ZBlockHeaderQAc)
+
+  if (pAction==URFFieldQAc) {
+    VisuRaw::visuURFField(VisuTBv,&RawData);
+    return;
+  } // if (pAction==ZBlockHeaderQAc)
+
+  if (pAction==ZTypeQAc) {
+    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_ZType);
+    return;
+  } // ZTypeQAc
+  if (pAction==uint16QAc) {
+    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_uint16);
+    return;
+  } // uint16QAc
+  if (pAction==int16QAc) {
+    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_int16);
+    return;
+  } // int16QAc
+  if (pAction==uint32QAc) {
+    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_uint32);
+    return;
+  }
+  if (pAction==int32QAc) {
+    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_int32);
+    return;
+  }
+  if (pAction==uint64QAc) {
+    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_uint64);
+    return;
+  }
+  if (pAction==int64QAc) {
+    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_int64);
+    return;
+  }
+  if (pAction==sizetQAc) {
+    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_sizet);
+    return;
+  }
+
+  if (pAction==floatQAc) {
+    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_float);
+    return;
+  }
+  if (pAction==doubleQAc) {
+    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_double);
+    return;
+  }
+  if (pAction==longdoubleQAc) {
+    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_longdouble);
+    return;
+  }
+
+  return;
+}//visuActionEvent
+#endif // __DEPRECATED__
+#ifdef __DEPRECATED__
+void ZContentVisuMain::visuActionEventOld(QAction* pAction) {
+
   QDialog wVisuDLg (this);
   wVisuDLg.setWindowTitle(QObject::tr("Evaluate values","ZContentVisuMain"));
 
@@ -582,7 +696,7 @@ void ZContentVisuMain::visuActionEvent(QAction* pAction) {
 
   return;
 }
-
+#endif // __DEPRECATED__
 
 
 void ZContentVisuMain::VisuClicked(QModelIndex pIdx) {
@@ -1145,7 +1259,24 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
       return;
     }
 
-  }
+  }//IndexRebuildQAc
+
+
+  if (pAction==ZMFBackupQAc) {
+    ZBackupDLg wBckDLg(this);
+
+    int wRet=wBckDLg.exec();
+
+  } //ZMFBackupQAc
+
+  if (pAction==ZMFRestoreQAc) {
+    ZRestoreDLg RestoreDLg(this);
+
+    int wRet=RestoreDLg.exec();
+
+  } //ZMFRestoreQAc
+
+
 
   if (pAction==ui->surfaceScanZRFQAc) {
     surfaceScanZRF(URICurrent);
@@ -2393,21 +2524,14 @@ ZContentVisuMain::displayFdNextRawBlock(ssize_t pBlockSize,size_t pWidth)
 {
   ZDataBuffer wRecord;
   wRecord.allocate(pBlockSize);
-  int wS=read(Fd,wRecord.Data,pBlockSize);
-  if (wS < 0)
-    {
-    ZException.getErrno(errno,"displayFdOneRawBlock",ZS_FILEERROR,Severity_Error,
-        "Error reading file <%s>",URICurrent.toCChar());
-    return ZS_FILEERROR;
-    }
-  if (wS==0)
-    {
-      return ZS_EOF;
-      AllFileLoaded=true;
-      ui->ForwardBTn->setVisible(false);
-    }
-  if (wS < pBlockSize)
-    wRecord.truncate(wS);
+  ZStatus wSt=rawRead(Fd,wRecord,pBlockSize);
+  if (wSt==ZS_EOF) {
+    AllFileLoaded=true;
+    ui->ForwardBTn->setVisible(false);
+    return wSt;
+  }
+  if (wSt!=ZS_SUCCESS)
+  return wSt;
 
   RawData.appendData(wRecord);
 
@@ -3057,7 +3181,7 @@ ssize_t LoadMax=100000;
 void setLoadMax (ssize_t pLoadMax) {LoadMax=pLoadMax;}
 
 ZStatus
-_searchBlockStart  (int pContentFd,
+_searchBlockStart  (__FILEHANDLE__ pContentFd,
                     zaddress_type pBeginAddress,      // Address to start searching for for next block
                     zaddress_type &pNextAddress,
                     ZDataBuffer &pBlockContent,
@@ -3076,36 +3200,15 @@ _searchBlockStart  (int pContentFd,
   if (off_t (pBeginAddress + pPayload) > pFileSize ) {
     pPayload = pFileSize - pBeginAddress  ;
   }
- // wBuffer.allocate(pPayload);
-
-
-
-
   unsigned char wStartSign [5]={cst_ZFILESTART_BYTE,cst_ZFILESTART_BYTE,cst_ZFILESTART_BYTE,cst_ZFILESTART_BYTE , 0 };
 
   ssize_t wOffset= -1;
 
   wBuffer.allocate(pPayload);
 
-  off_t wOf=lseek(pContentFd,pBeginAddress,SEEK_SET);
-  if ( wOf< 0) {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_FILEERROR,
-        Severity_Severe,
-        "Error lseek finding beginning of file.");
-    return ZS_FILEERROR;
-  }
-
-  ssize_t wSRead= read(pContentFd,wBuffer.Data,pPayload);
-  if (wSRead < 0) {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_READERROR,
-        Severity_Severe,
-        "Error while reading file.");
-    return(ZS_READERROR);
-  }
+  ZStatus wSt=rawReadAt(pContentFd,wBuffer,pPayload,pBeginAddress);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
 
   /*if cst_ZBLOCKSTART if at first position, skip it */
   if (pPayload > sizeof(uint32_t)){
@@ -3117,7 +3220,7 @@ _searchBlockStart  (int pContentFd,
   }
 
   /* search for cst_ZBLOCKSTART. If cst_ZBLOCKSTART if at first position, skip it */
-    wOffset=wBuffer.bsearch(wStartSign,sizeof(cst_ZFILEBLOCKSTART),wOffset);
+  wOffset=wBuffer.bsearch(wStartSign,sizeof(cst_ZFILEBLOCKSTART),wOffset);
 
 /* if not found in first payload, try one or more times until found or EOF */
   size_t wOff;
@@ -3125,98 +3228,36 @@ _searchBlockStart  (int pContentFd,
     wOff = wBuffer.Size - sizeof(cst_ZFILEBLOCKSTART);
     pBlockContent.appendData(wBuffer.Data,wBuffer.Size - sizeof(cst_ZFILEBLOCKSTART));
 
-    pNextAddress += wSRead - sizeof(cst_ZFILEBLOCKSTART) ;
-
-    if (pBeginAddress >= pFileSize) {
+    if ((pNextAddress + wBuffer.Size) >= pFileSize) {
       pNextAddress = pFileSize;
       return ZS_EOF;
     }
-    wBuffer.allocate(pPayload);
-    off_t wOf=lseek(pContentFd,pNextAddress,SEEK_SET);
-    if ( wOf< 0) {
-      ZException.getErrno(errno,
-          _GET_FUNCTION_NAME_,
-          ZS_FILEERROR,
-          Severity_Severe,
-          "Error lseek finding address %ld.",pNextAddress);
-      return ZS_FILEERROR;
-    }
 
-    wSRead= read(pContentFd,wBuffer.Data,pPayload);
-    if (wSRead<0) {
-      ZException.getErrno(errno,
-                          _GET_FUNCTION_NAME_,
-                          ZS_READERROR,
-                          Severity_Severe,
-                          "Error while reading file.");
-      return(ZS_READERROR);
-    }
-    if (wSRead==0) {  /* EOF encountered */
-      pNextAddress = pFileSize;
-      return(ZS_EOF);
-    }
-    if (wSRead < pPayload) { /* we have a partial read, so EOF has been encountered (hopefully-to be verified)*/
-      wBuffer.truncate(wSRead);
-      wOffset=wBuffer.bsearch(wStartSign,sizeof(cst_ZFILEBLOCKSTART),0L);
-      if (wOffset < 0) {
-          /* assume that wStartSign is truncated at the end of wBuffer (max will be 3 bytes) */
-          pBlockContent.appendData(wBuffer.Data,wSRead);
-          pNextAddress += wSRead ;
-          return  (ZS_EOF);
-      }
-      pBlockContent.appendData(wBuffer.Data,wOffset);
-      pNextAddress += wOffset;
+    pNextAddress += wBuffer.Size - sizeof(cst_ZFILEBLOCKSTART) ;
 
-      /* for stats purpose */
-      double wT = double(pPayload * pCount);
-      wT += double(pBlockContent.Size);
-      pCount++;
-      wT = wT / double(pCount);
-      pPayload = ssize_t(wT);
-
-/*        wSt=pBlockHeader._importConvert(pBlockHeader,(ZBlockHeader_Export*)&wBuffer.DataChar[wOffset]);
-        if (wSt!=ZS_SUCCESS)
-          { return (wSt); }
-*/
-      return  (ZS_FOUND) ;
-    }// if (wSRead < pPayload)  partial read
-
+    wSt=rawReadAt(pContentFd,wBuffer,pPayload,(size_t&)pNextAddress);
+    if ((wSt!=ZS_READPARTIAL)&& (wSt!=ZS_SUCCESS))
+      return wSt;
     wOffset=wBuffer.bsearch(wStartSign,sizeof(cst_ZFILEBLOCKSTART),0L);
-    /* if not found in current payload read another payload*/
-#ifdef __COMMENT__
-    if (wOffset < 0) {
-      /* assume that wStartSign is truncated at the end of wBuffer (max will be 3 bytes) */
-      pBeginAddress = pBeginAddress + pPayload - 3 ;
-      pBlockContent.appendData(wBuffer.Data,pPayload-3);
-      off_t wFSoff = lseek(pContentFd,-3,SEEK_CUR);  /* position 3 bytes before  */
-      if (wFSoff < 0) {
-        ZException.getErrno(errno,
-            _GET_FUNCTION_NAME_,
-            ZS_FILEERROR,
-            Severity_Severe,
-            "Error lseek finding end of file.");
-//        pNextAddress=-1;
-        return ZS_FILEERROR;
-      }// if (wFSoff < 0)
-    }// if (wOffset<0)
-#endif // __COMMENT__
+    if (wOffset >= 0) {
+      pNextAddress += wOffset;
+      return ZS_FOUND;
+    }
 
-  }// while (wOffset<0)
+    pBlockContent.appendData(wBuffer);
+    pNextAddress += wBuffer.Size;
 
-  pNextAddress += wOffset;
-  pBlockContent.appendData(wBuffer.Data,wOffset);
-
-  double wT = double(pPayload * pCount);
-  wT += double(pBlockContent.Size);
-  pCount++;
-  wT = wT / double(pCount);
-  pPayload = ssize_t(wT);
- /*
-  wSt=pBlockHeader._importConvert(pBlockHeader,(ZBlockHeader_Export*)&wBuffer.DataChar[wOffset]);
-  if (wSt!=ZS_SUCCESS)
-      { return (wSt); }
+    /* for stats purpose */
+    double wT = double(pPayload * pCount);
+    wT += double(pBlockContent.Size);
+    pCount++;
+    wT = wT / double(pCount);
+    pPayload = ssize_t(wT);
+/*
+    return  (ZS_FOUND) ;
 */
-  return  (ZS_FOUND) ;
+    }// while (wOffset < 0)
+    return ZS_EOF;
 }//_searchNextPhysicalBlock
 
 void ZContentVisuMain::displayRawSurfaceScan(const uriString& pFileToScan)

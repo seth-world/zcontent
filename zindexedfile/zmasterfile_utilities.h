@@ -25,7 +25,6 @@ class ZMasterFile;
 }
 
 utf8String generateIndexRootName(const utf8String &pMasterRootName,
-                                 const long pRank,
                                  const utf8String &pIndexName);
 /* see zrawmasterfileutils.h
 ZStatus

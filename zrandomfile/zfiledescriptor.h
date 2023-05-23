@@ -1,6 +1,8 @@
 #ifndef ZFILEDESCRIPTOR_H
 #define ZFILEDESCRIPTOR_H
 
+#include <config/zconfig.h>
+
 #include <ztoolset/zdatabuffer.h>
 #include <ztoolset/zutfstrings.h>
 #include <ztoolset/zsystemuser.h>
@@ -98,11 +100,11 @@ enum ZHeaderAccess_type : uint8_t
 class ZFDOwnData  // following is not saved on file and therefore doesn't need to be exported
 {
 public:
-  FILE*   FContent=nullptr;
-  int     ContentFd=0;
-  FILE*   FHeader=nullptr;
-  int     HeaderFd=0;
-  pid_t   Pid=0;                    /* pid of current process owning ZFileDescriptor instance (set at object instantiation )  : other processes are collaborative processes sharing info with it */
+  FILE*             FContent=nullptr;
+  __FILEHANDLE__    ContentFd=0;
+//  FILE*             FHeader=nullptr;
+  __FILEHANDLE__    HeaderFd=0;
+  pid_t             Pid=0;            /* pid of current process owning ZFileDescriptor instance (set at object instantiation )  : other processes are collaborative processes sharing info with it */
   ZSystemUser       Uid;              /* uid of current process owning ZFileDescriptor instance (set at object instantiation ) */
   bool              _isOpen = false;  /* True when file is open , false if closed */
   uint8_t           HeaderAccessed=ZHAC_Nothing;  /*  has not been accessed : set to false by close operation - set to true at first access to header data */
@@ -360,7 +362,7 @@ protected:
       {
       clearFCB();
 //      memset (this,0,sizeof(ZFDOwnData));
-      FHeader=nullptr;
+//      FHeader=nullptr;
       HeaderFd=0;
       FContent=nullptr;
       ContentFd=0;

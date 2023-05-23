@@ -65,7 +65,7 @@ ZDictionaryFile::save(bool pBackup){
   if (pBackup && URIDictionary.exists())
     URIDictionary.renameBck("bck");
   else
-    removeFile(URIDictionary);
+    URIDictionary.remove();
 
   return URIDictionary.writeContent(wDicExport);
 }//save

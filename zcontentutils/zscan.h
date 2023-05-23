@@ -1,6 +1,8 @@
 #ifndef ZSCAN_H
 #define ZSCAN_H
 
+#include <config/zconfig.h>
+
 #include <QMainWindow>
 #include <ztoolset/uristring.h>
 #include <zcontent/zrandomfile/zrandomfiletypes.h>
@@ -22,8 +24,8 @@ public:
   void setFile(const uriString& pFile);
   void close();
 
-  ZStatus searchFirstStartMark(int pFd, ZBlockHeader &pBlockHeader, zaddress_type &pNextAddress);
-  ZStatus searchNextStartMark(int pFd,
+  ZStatus searchFirstStartMark(__FILEHANDLE__ pFd, ZBlockHeader &pBlockHeader, zaddress_type &pNextAddress);
+  ZStatus searchNextStartMark(__FILEHANDLE__ pFd,
       const zaddress_type pAddress,
       ZBlockHeader &pBlockHeader,
       zaddress_type &pNextAddress);
@@ -34,7 +36,7 @@ public:
 
   void removeAllRows();
 private:
-  int FileDescriptor=-1;
+  __FILEHANDLE__ FileDescriptor=-1;
   uriString Currentfile;
 
   size_t FileSize=0;

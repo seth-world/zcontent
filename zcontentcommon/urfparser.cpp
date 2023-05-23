@@ -1,11 +1,12 @@
 #include "urfparser.h"
 #include <zcontentcommon/zresource.h>
 #include <zcontentutils/zentity.h>
-#include <ztoolset/zdate.h>
+//#include <ztoolset/zdate.h>
 #include <ztoolset/zdatefull.h>
 #include <ztoolset/zdatabuffer.h>
 
 #include <ztoolset/zcharset.h>
+#include <zcontent/zcontentcommon/zresource.h>
 
 ZStatus URFParser::set(const ZDataBuffer* pRecord) {
   Record = pRecord;
@@ -16,14 +17,14 @@ ZStatus URFParser::set(const ZDataBuffer* pRecord) {
   AllFieldsPresent=false;
   URFDataSize=0;
 
-  wPtr=Record->Data;
-  wPtrEnd = Record->Data + Record->Size;
+  Ptr=Record->Data;
+  PtrEnd = Record->Data + Record->Size;
 
-  _importAtomic<ZTypeBase>(wZType,wPtr);
+  _importAtomic<ZTypeBase>(wZType,Ptr);
   while (true) {
     if (wZType==ZType_bitset) {
-      wPtr -= sizeof(ZTypeBase);
-      ssize_t wS = Presence._importURF(wPtr);
+      Ptr -= sizeof(ZTypeBase);
+      ssize_t wS = Presence._importURF(Ptr);
       if (wS < 0) {
         ZException.setMessage (_GET_FUNCTION_NAME_,
             ZS_CORRUPTED,
@@ -48,9 +49,72 @@ ZStatus URFParser::set(const ZDataBuffer* pRecord) {
   }// while true
 
   /* second get user URF data size */
-  _importAtomic<uint64_t>(URFDataSize,wPtr);
+ // _importAtomic<uint64_t>(URFDataSize,wPtr); // Deprecated
+
   return ZS_SUCCESS;  /* done */
 }// set
+
+
+ZStatus URFParser::parse(const ZDataBuffer &pRecord, ZArray<URFField> &pFieldList) {
+
+  pFieldList.clear();
+
+  ZTypeBase wZType;
+  int wRank=0;
+  bool    wAllFieldsPresent=false;
+  ZBitset wPresence;
+
+
+  const unsigned char* wPtr=pRecord.Data;
+  const unsigned char* wPtrEnd = pRecord.Data + pRecord.Size;
+
+  _importAtomic<ZTypeBase>(wZType,wPtr);
+  while (true) {
+    if (wZType==ZType_bitset) {
+      wPtr -= sizeof(ZTypeBase);
+      ssize_t wS = wPresence._importURF(wPtr);
+      if (wS < 0) {
+        ZException.setMessage (_GET_FUNCTION_NAME_,
+            ZS_CORRUPTED,
+            Severity_Severe,
+            "Record appears to be malformed.");
+        return  ZS_CORRUPTED;
+      }
+      break;
+    } // if (wZType==ZType_bitset)
+
+    /* bitset full is ok : nothing to do */
+    if (wZType==ZType_bitsetFull) {
+      wAllFieldsPresent=true;
+      break;
+    } // if (wZType!=ZType_bitsetFull)
+    /* if neither bitset nor bitsetfull is found then record is not properly formed */
+    ZException.setMessage (_GET_FUNCTION_NAME_,
+        ZS_CORRUPTED,
+        Severity_Severe,
+        "Record appears to be malformed : neither ZBitset nor ZBitsetFull has been found.");
+    return  ZS_CORRUPTED;
+  }// while true
+
+
+  URFField wField;
+  while (wPtr < wPtrEnd) {
+    wField.Ptr = wPtr ;
+    if (!wPresence.test(wRank)) {
+      wField.Present = false;
+      wField.Size = 0 ;
+    }
+    else {
+    wField.Present = true;
+    wField.setFromPtr(wPtr);
+    }
+    pFieldList.push(wField);
+    wRank++;
+  } // while
+
+  return ZS_SUCCESS;  /* done */
+}// parse
+
 
 ZStatus
 URFParser::appendURFFieldByRank (long pRank,ZDataBuffer pBuffer){
@@ -68,10 +132,10 @@ URFParser::appendURFFieldByRank (long pRank,ZDataBuffer pBuffer){
     return ZS_FIELDMISSING;
   }// if (wRank < URFFieldList.count())
 
-  while ((wPtr < wPtrEnd )&&(wRank <= pRank)) {
+  while ((Ptr < PtrEnd )&&(wRank <= pRank)) {
 
     if ( (!AllFieldsPresent) && !(Presence.test(size_t(wRank)) ) ) {
-      wField.Ptr = wPtr ;
+      wField.Ptr = Ptr ;
       wField.Size = 0 ;
       wField.Present = false;
 
@@ -84,9 +148,9 @@ URFParser::appendURFFieldByRank (long pRank,ZDataBuffer pBuffer){
     } // field not present
 
     /* here field is present or all fields are declared to be present (ZBitsetFull) */
-    wField.Ptr = wPtr;
+    wField.Ptr = Ptr;
     wField.Present = true;
-    wField.Size = getURFFieldSize(wPtr);
+    wField.Size = getURFFieldSize(Ptr);
     URFFieldList << wField;
     if (wRank == pRank){
       pBuffer.appendData(URFFieldList[wRank].Ptr,URFFieldList[wRank].Size);
@@ -97,12 +161,12 @@ URFParser::appendURFFieldByRank (long pRank,ZDataBuffer pBuffer){
       /* if ZType is unknown, then field is stored with size = -1, pointer as it is.
        * pointer is then searched for next known ZType (Found) or until the end of record (not Found).
        */
-      wSt=searchNextValidZType(wPtr,wPtrEnd);
+      wSt=searchNextValidZType(Ptr,PtrEnd);
       if (wSt==ZS_NOTFOUND)
         break;
       continue;
     }
-    wPtr += wField.Size;
+    Ptr += wField.Size;
     continue;
   } // while
 
@@ -129,10 +193,10 @@ URFParser::getURFFieldByRank (long pRank){
     return wFieldValue;
   }// if (wRank < URFFieldList.count())
 
-  while ((wPtr < wPtrEnd )&&(wRank <= pRank)) {
+  while ((Ptr < PtrEnd )&&(wRank <= pRank)) {
 
     if ( (!AllFieldsPresent) && !(Presence.test(size_t(wRank)) ) ) {
-        wField.Ptr = wPtr ;
+        wField.Ptr = Ptr ;
         wField.Size = 0 ;
         wField.Present = false;
         URFFieldList << wField;
@@ -143,9 +207,9 @@ URFParser::getURFFieldByRank (long pRank){
     }
 
     /* here field is present or all fields are declared to be present */
-    wField.Ptr = wPtr;
+    wField.Ptr = Ptr;
     wField.Present = true;
-    size_t wS=getURFFieldSize(wPtr);
+    size_t wS=getURFFieldSize(Ptr);
 
  /*   wSt=getURFFieldValue(wPtr,wFieldValue);
     if (wSt == ZS_SUCCESS) {
@@ -163,14 +227,14 @@ URFParser::getURFFieldByRank (long pRank){
 
     wField.Size = 0;
     URFFieldList << wField;
-    wSt=searchNextValidZType(wPtr,wPtrEnd);
+    wSt=searchNextValidZType(Ptr,PtrEnd);
     if (wRank == pRank)
       break;
     wRank++;
   } // while
 
   if (wRank == pRank) {
-      wSt=getKeyFieldValue(wPtr,wFieldValue);
+      wSt=getKeyFieldValue(Ptr,wFieldValue);
 
       return wFieldValue;
   }
@@ -248,7 +312,7 @@ ZTypeExists(ZTypeBase pType) {
 
   }// switch
 
-} // ZTypeExists
+} // ZTypeExists /home/gerard/Development/zbasetools/zcontent/zcontentcommon/urfparser.cpp
 
 ZStatus URFParser::getURFTypeAndSize (const unsigned char *& pPtrIn,ZTypeBase& pType,ssize_t & pSize) {
   pSize = getURFFieldSize (pPtrIn);
@@ -1043,7 +1107,7 @@ URFParser::getKeyFieldValue (const unsigned char* &pPtrIn,ZDataBuffer& pValue){
 
 
 utf8VaryingString
-URFParser::displayOneURFField(const unsigned char* &wPtr) {
+URFParser::displayOneURFField(const unsigned char* &wPtr,bool pShowZType) {
   utf8VaryingString wReturn;
   ZTypeBase wZType;
 
@@ -1065,94 +1129,138 @@ URFParser::displayOneURFField(const unsigned char* &wPtr) {
     uint8_t wValue;
 
     wValue=convertAtomicBack<uint8_t> (ZType_U8,wPtr);
-    wReturn.sprintf("uint8_t[%d]",wValue);
+    if (pShowZType)
+      wReturn.sprintf("uint8_t[%d]",wValue);
+    else
+      wReturn.sprintf("%d",wValue);
     return wReturn;
   }
   case ZType_Char:
   case ZType_S8: {
     int8_t wValue;
     wValue=convertAtomicBack<int8_t> (ZType_S8,wPtr);
-    wReturn.sprintf("int8_t[%d]",wValue);
+    if (pShowZType)
+      wReturn.sprintf("int8_t[%d]",wValue);
+    else
+      wReturn.sprintf("%d",wValue);
     return wReturn;
   }
   case ZType_U16:{
     uint16_t wValue;
     wValue=convertAtomicBack<uint16_t> (ZType_U16,wPtr);
-    wReturn.sprintf("uint16_t[%d]",wValue);
+    if (pShowZType)
+      wReturn.sprintf("uint16_t[%d]",wValue);
+    else
+      wReturn.sprintf("%d",wValue);
     return wReturn;
   }
   case ZType_S16: {
     int16_t wValue;
     wValue=convertAtomicBack<int16_t> (ZType_S16,wPtr);
-    wReturn.sprintf("int16_t[%d]",wValue);
+    if (pShowZType)
+      wReturn.sprintf("int16_t[%d]",wValue);
+    else
+      wReturn.sprintf("%d",wValue);
     return wReturn;
   }
 
   case ZType_U32:{
     uint32_t wValue;
     wValue=convertAtomicBack<uint32_t> (ZType_U32,wPtr);
-    wReturn.sprintf("uint32_t[%d]",wValue);
+    if (pShowZType)
+      wReturn.sprintf("uint32_t[%d]",wValue);
+    else
+      wReturn.sprintf("%d",wValue);
     return wReturn;
   }
   case ZType_S32: {
     int32_t wValue;
     wValue=convertAtomicBack<int32_t> (ZType_S32,wPtr);
-    wReturn.sprintf("int32_t[%d]",wValue);
+    if (pShowZType)
+      wReturn.sprintf("int32_t[%d]",wValue);
+    else
+      wReturn.sprintf("%d",wValue);
     return wReturn;
   }
   case ZType_U64: {
     uint64_t wValue;
     wValue=convertAtomicBack<uint64_t> (ZType_U64,wPtr);
-    wReturn.sprintf("uint64_t[%ld]",wValue);
+    if (pShowZType)
+      wReturn.sprintf("uint64_t[%ld]",wValue);
+    else
+      wReturn.sprintf("%ld",wValue);
     return wReturn;
   }
   case ZType_S64: {
     int64_t wValue;
     wValue=convertAtomicBack<int64_t> (ZType_S64,wPtr);
-    wReturn.sprintf("int64_t[%ld]",wValue);
+    if (pShowZType)
+      wReturn.sprintf("int64_t[%ld]",wValue);
+    else
+      wReturn.sprintf("%ld",wValue);
     return wReturn;
   }
   case ZType_Float: {
     float wValue;
     wValue=convertAtomicBack<float> (ZType_Float,wPtr);
-    wReturn.sprintf("float[%g]",double(wValue));
+    if (pShowZType)
+      wReturn.sprintf("float[%g]",double(wValue));
+    else
+      wReturn.sprintf("%g",double(wValue));
     return wReturn;
   }
 
   case ZType_Double: {
     double wValue;
     wValue=convertAtomicBack<double> (ZType_Double,wPtr);
-    wReturn.sprintf("double[%g]",wValue);
+    if (pShowZType)
+      wReturn.sprintf("double[%g]",wValue);
+    else
+      wReturn.sprintf("%g",wValue);
     return wReturn;
   }
 
   case ZType_LDouble: {
     long double wValue;
     wValue=convertAtomicBack<long double> (ZType_LDouble,wPtr);
-    wReturn.sprintf("double[%g]",wValue);
+    if (pShowZType)
+      wReturn.sprintf("long double[%lf]",wValue);
+    else
+      wReturn.sprintf("%lf",wValue);
     return wReturn;
   }
 
     /* from here <wPtr -= sizeof(ZTypeBase);>  has been made and wPtr points on ZType */
-
+/* Deprecated
   case ZType_ZDate: {
     ssize_t wSize;
     ZDate wZDate;
     if ((wSize = wZDate._importURF(wPtr)) < 0) {
-      wReturn = "ZDate[**Invalid value**]" ;
+      if (pShowZType)
+        wReturn = "ZDate[**Invalid value**]" ;
+      else
+        wReturn = "**Invalid value**" ;
       return wReturn;
     }
+    if (!pShowZType)
+      return wZDate.toLocale();
     wReturn.sprintf("ZDate[%s]",wZDate.toLocale().toCChar());
     return wReturn;
   }
+*/
   case ZType_ZDateFull: {
     ssize_t wSize;
     ZDateFull wZDateFull;
 
     if ((wSize = wZDateFull._importURF(wPtr)) < 0) {
-      wReturn = "ZDateFull[**Invalid value**]" ;
+      if (pShowZType)
+        wReturn = "ZDateFull[**Invalid value**]" ;
+      else
+        wReturn = "**Invalid value**" ;
       return wReturn;
     }
+    if (!pShowZType)
+      return wZDateFull.toLocale();
     wReturn.sprintf("ZDateFull[%s]",wZDateFull.toLocale().toCChar());
     return wReturn;
   }
@@ -1160,12 +1268,16 @@ URFParser::displayOneURFField(const unsigned char* &wPtr) {
   case ZType_URIString:{
     uriString wString;
     ssize_t wSize = wString._importURF(wPtr);
+    if (!pShowZType)
+      return wString.toCChar();
     wReturn.sprintf("uriString[%s]",wString.toCChar());
     return wReturn;
   }
   case ZType_Utf8VaryingString: {
     utf8VaryingString wString;
     ssize_t wSize = wString._importURF(wPtr);
+    if (!pShowZType)
+      return wString.toCChar();
     wReturn.sprintf("utf8VaryingString[%s]",wString.toCChar());
     return wReturn;
   }
@@ -1175,6 +1287,9 @@ URFParser::displayOneURFField(const unsigned char* &wPtr) {
     utf16VaryingString wString;
 
     ssize_t wSize = wString._importURF(wPtr);
+    if (!pShowZType)
+      return wString.toUtf8().toCChar();
+
     wReturn.sprintf("utf16VaryingString[%s]",wString.toUtf8().toCChar());
     return wReturn;
   }
@@ -1183,6 +1298,8 @@ URFParser::displayOneURFField(const unsigned char* &wPtr) {
     utf16VaryingString wAdd;
 
     ssize_t wSize = wString._importURF(wPtr);
+    if (!pShowZType)
+      return wString.toUtf8().toCChar();
     wReturn.sprintf("utf32VaryingString[%s]",wString.toUtf8().toCChar());
     return wReturn;
   }
@@ -1211,7 +1328,8 @@ URFParser::displayOneURFField(const unsigned char* &wPtr) {
       *wPtrOut++ = *wPtrIn++;
 
     wPtr = (unsigned char*) wPtrIn;
-
+    if (!pShowZType)
+      return wString.toCChar();
     wReturn.sprintf("utf8FixedString[%s]",wString.toCChar());
     return wReturn;
   }
@@ -1244,6 +1362,8 @@ URFParser::displayOneURFField(const unsigned char* &wPtr) {
       *wPtrOut++ = *wPtrIn++;
 
     wPtr = (unsigned char*) wPtrIn;
+    if (!pShowZType)
+      return wString.toUtf8().toCChar();
 
     wReturn.sprintf("utf16FixedString[%s]",wString.toUtf8().toCChar());
     return wReturn;
@@ -1273,6 +1393,8 @@ URFParser::displayOneURFField(const unsigned char* &wPtr) {
 
     wPtr = (unsigned char*) wPtrIn;
 
+    if (!pShowZType)
+      return wString.toUtf8().toCChar();
     wReturn.sprintf("utf32FixedString[%s]",wString.toUtf8().toCChar());
     return wReturn;
   }
@@ -1282,6 +1404,8 @@ URFParser::displayOneURFField(const unsigned char* &wPtr) {
 
     wCheckSum._importURF(wPtr);
 
+    if (!pShowZType)
+      return wCheckSum.toHexa().toCChar();
     wReturn.sprintf("checksum[%s]",wCheckSum.toHexa().toCChar());
     return wReturn;
   }
@@ -1290,6 +1414,9 @@ URFParser::displayOneURFField(const unsigned char* &wPtr) {
     md5 wCheckSum;
 
     wCheckSum._importURF(wPtr);
+
+    if (!pShowZType)
+      return wCheckSum.toHexa().toCChar();
 
     wReturn.sprintf("md5[%s]",wCheckSum.toHexa().toCChar());
     return wReturn;
@@ -1307,6 +1434,9 @@ URFParser::displayOneURFField(const unsigned char* &wPtr) {
     ZBitset wBitset;
 
     ssize_t wSize=wBitset._importURF(wPtr);
+    if (!pShowZType)
+      return wBitset.toString();
+
     wReturn.sprintf("ZBitset[%s]",wBitset.toString().toCChar());
     return wReturn;
   }
@@ -1319,8 +1449,10 @@ URFParser::displayOneURFField(const unsigned char* &wPtr) {
   case ZType_Resource: {
     ZResource wValue;
     ssize_t wSize=wValue._importURF(wPtr);
-
-    wReturn.sprintf("ZResource[<%s>-<%ld>]",decode_ZEntity(wValue.Entity).toChar(),wValue.id);
+    if (pShowZType)
+      wReturn.sprintf("ZResource[<%s>-<%ld>]",decode_ZEntity(wValue.Entity).toChar(),wValue.id);
+    else
+      wReturn.sprintf("<%s>-<%ld>",decode_ZEntity(wValue.Entity).toChar(),wValue.id);
     return wReturn;
   }
 
@@ -1444,8 +1576,10 @@ int URFCompareValues( const unsigned char* &pURF1,size_t pSize1,
   }
 
   wRet=0;
-  while ((wRet==0) && wSize1-- && wSize2--){
+  while ((wRet==0) && (wSize1 > 0) && (wSize2 > 0)){
     wRet = (*wURF1++) - (*wURF2++);
+    wSize1--;
+    wSize2--;
   }
   pURF1 += pSize1;
   pURF2 += pSize2;

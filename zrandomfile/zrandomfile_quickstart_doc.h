@@ -31,7 +31,7 @@ namespace zbs {
 @code
 //------- for ZBaseSytem-------------
 
-#include <zconfig.h>
+#include <config/zconfig.h>
 #include <ztoolset/zarray.h>
 #include <ztoolset/zerror.h>
 #include <zrandomfile/zrandomfile.h>

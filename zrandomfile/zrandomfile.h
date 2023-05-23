@@ -1,7 +1,7 @@
 #ifndef ZRANDOMFILE_H
 #define ZRANDOMFILE_H
 
-#include <zrandomfile/zrfconfig.h>
+#include <config/zconfig_zrf.h>
 
 #ifdef __USE_WINDOWS__
 #include <io.h>
@@ -110,6 +110,7 @@ class ZRawMasterFile;
 class ZIndexTable;
 class ZRawIndexFile;
 class ZMasterFile;
+class ZOpenZRFPool;
 
 /**
  * @brief The ZRandomFile class This class holds the tools to manage the whole ZRandomFile structure
@@ -129,7 +130,7 @@ class ZRandomFile : protected ZFileDescriptor
 
  friend class zbs::ZRawMasterFile;
 
- friend class ::ZOpenZRFPool;
+ friend class zbs::ZOpenZRFPool;
 
  friend class zbs::ZIndexTable;
 
@@ -273,17 +274,8 @@ public:
                  bool pHighwaterMarking=false,
                  bool pGrabFreeSpace=true,
                  bool pBackup=false,
-                 bool pLeaveOpen=false);
-
- ZStatus zcreate(const char* pFilename,
-                 const zsize_type pInitialSize,
-                 long pAllocatedBlocks,
-                 long pBlockExtentQuota,
-                 long pBlockTargetSize,
-                 bool pHighwaterMarking=false,
-                 bool pGrabFreeSpace=true,
-                 bool pBackup=false,
-                 bool pLeaveOpen=false);
+                 bool pLeaveOpen=false,
+                 __FILEACCESSRIGHTS__ pPermissions=S_IRUSR |S_IRWXU|S_IRWXG|S_IROTH);
 
     ZStatus zcreate(const zsize_type pInitialSize,
                     long pAllocatedBlocks,
@@ -292,23 +284,21 @@ public:
                     bool pHighwaterMarking=false,
                     bool pGrabFreeSpace=true,
                     bool pBackup=false,
-                    bool pLeaveOpen=false);
+                    bool pLeaveOpen=false,
+                  __FILEACCESSRIGHTS__ pPermissions=S_IRUSR |S_IRWXU|S_IRWXG|S_IROTH);
 
 
 
     ZStatus zcreate (const uriString & pFilename,
                      const zsize_type pInitialSize,
                      bool pBackup=false,
-                     bool pLeaveOpen=false);
-
-    ZStatus zcreate (const char * pFilename,
-                     const zsize_type pInitialSize,
-                     bool pBackup=false,
-                     bool pLeaveOpen=false);
+                     bool pLeaveOpen=false,
+                    __FILEACCESSRIGHTS__ pPermissions=S_IRUSR |S_IRWXU|S_IRWXG|S_IROTH);
 
     ZStatus zcreate (const zsize_type pInitialSize,
                      bool pBackup=false,
-                     bool pLeaveOpen=false) ;
+                     bool pLeaveOpen=false,
+                    __FILEACCESSRIGHTS__ pPermissions=S_IRUSR |S_IRWXU|S_IRWXG|S_IROTH) ;
 
     /** @brief zremoveFile removes files (content file and header file) for currently openned ZRandomFile  */
     ZStatus _removeFile (bool pBackup,ZaiErrors *pErrorLog=nullptr) ;
@@ -512,7 +502,7 @@ public:
  * @param[in] pSize      number of bytes to be allocated to file. If -1, then existing size is kept.
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
-    ZStatus zclearFile(const zsize_type pSize=-1) ;
+    ZStatus zclearFile(const ssize_t pSize=-1) ;
 
 
     ZStatus zcloneFile (const zsize_type pFreeSpace=-1, FILE*pOutput=stdout) ; // will clone the whole ZRandomFile and leave pFreeSpace free byte allocation
@@ -940,7 +930,8 @@ public:
     ZStatus _create (const zsize_type pInitialSize,
                      ZFile_type pFileType,
                      bool pBackup,
-                     bool pLeaveOpen) ;
+                     bool pLeaveOpen,
+                    __FILEACCESSRIGHTS__ pPermissions=S_IRUSR |S_IRWXU|S_IRWXG|S_IROTH) ;
  //   ZStatus _extend (zoffset_type pSize) ;
 
 
@@ -1053,9 +1044,6 @@ public:
     ZStatus _getHeaderControlBlock(bool pForceRead);
 
 
-    ZStatus _getFileHeader_Export(ZHeaderControlBlock_Export* pHCB_Export);
-
-
 public:    ZStatus _getReservedHeader(bool pForceRead);
 
 protected:
@@ -1098,7 +1086,7 @@ protected:
 
 
 
-
+/*
     ZStatus _seek(zaddress_type pAddress);
 
 
@@ -1106,18 +1094,18 @@ protected:
                   const size_t pSize,
                   ssize_t& pSizeToRead,
                   ZPMSCounter_type pZPMSType);
-
+*/
     ZStatus _read(ZDataBuffer& pBuffer,
                   const ssize_t pSizeToRead,
                   ZPMSCounter_type pZPMSType);
 
-
+/*
     ZStatus _readAt(void* pBuffer,
                     size_t pSize,
                     ssize_t& pSizeRead,
                     zaddress_type pAddress,
                     ZPMSCounter_type pZPMSType);
-
+*/
     ZStatus _readAt(ZDataBuffer& pBuffer,
                     ssize_t &pSizeRead,
                     zaddress_type pAddress,
@@ -1147,6 +1135,24 @@ private:
 
 
 /** @}*/ //addtogroup ZRandomFileGroup
+
+
+class ZOpenZRFPool: public zbs::ZArray <zbs::ZRandomFile*>
+{
+public:
+  ZOpenZRFPool() {}
+  ~ZOpenZRFPool() {closeAll();}
+
+  void addOpenFile(zbs::ZRandomFile* pFileData)
+  { push(pFileData);}
+  ZStatus removeFileByObject(zbs::ZRandomFile*pZRF);
+  ZStatus removeFileByFd(int pFd);
+  void closeAll();
+
+}; //ZOpenZRFPool
+
+extern ZOpenZRFPool* ZRFPool;
+
 
 } // namespace zbs
 

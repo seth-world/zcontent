@@ -25,6 +25,11 @@ public:
   ZStatus setExternDictionary(const uriString& pDicPath);
 
   utf8VaryingString getDictionaryName() ;
+
+//  int _getAvailableBckNum(const uriString& pBackupPath,const utf8VaryingString &pBckExt);
+
+//  ZStatus backupAll (const uriString &pBackupPath=uriString(), const utf8VaryingString &pBckExt="bck") ;
+
   /**
    * @brief rebuildIndex  For index key of rank pIndexRank:<br>
    * Clears index file. Re-create sequentially from master file content, record per record, index key records using extractKeyValues() routine.

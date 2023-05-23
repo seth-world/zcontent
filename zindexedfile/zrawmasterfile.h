@@ -16,6 +16,8 @@
 #include <zindexedfile/zmastercontrolblock.h>
 #include <zindexedfile/zindexcontrolblock.h>
 
+#include <zindexedfile/bckelement.h>
+
 //#include <zindexedfile/zindexitem.h>
 
 /** @brief RawDataDescription Raw data storage detailed description
@@ -65,6 +67,17 @@ RawMasterFile                   Master File
 
 typedef ZStatus (*extractRawKey_type) (ZDataBuffer &pRawRecord,ZRawIndexFile* pZIF,ZDataBuffer* pKeyContent);
 
+/*
+ * Behavior mode for index key search
+ */
+enum ZIXMode : uint8_t {
+  ZIXM_Nothing      = 0,
+  ZIXM_SearchDycho  = 1,  /* use dychotomic search engine for key searches. By default, search is sequential. */
+  ZIXM_Debug        = 2,  /* allows an index file not to have a father master file (only for debug purpose) */
+  ZIXM_UpdateHeader = 4   /* systematically update header files after each operation */
+};
+
+
 
 namespace zbs //========================================================================
 {
@@ -99,6 +112,8 @@ public:
   using ZRandomFile::getSize;
   using ZRandomFile::isEmpty;
   using ZRandomFile::getURIContent;
+  using ZRandomFile::getURIHeader;
+  using ZRandomFile::zgetByAddress;
   using ZRandomFile::zgetWAddress;
   using ZRandomFile::zgetNextWAddress;
   
@@ -122,30 +137,28 @@ public:
   void setTypeRaw() { ZRandomFile::setFileType(ZFT_ZRawMasterFile); }
   void setTypeMasterFile() { ZRandomFile::setFileType(ZFT_ZMasterFile); }
 
+  void setEngineMode(uint8_t pMode) {EngineMode=pMode;}
 
-  ZStatus createDictionary(const ZMFDictionary& pDic) {
-    setTypeMasterFile();
-    uriString wURIdic = ZDictionaryFile::generateDicFileName(getURIContent());
-    Dictionary = new ZDictionaryFile;
-    Dictionary->setDictionary(pDic);
-    return Dictionary->saveToDicFile(wURIdic);
-  }
+  /**
+   * @brief createDictionary  generates an embedded dictionary file and stores pDic (ZMFDictionary) into it.
+   * File type is changed to be ZFT_ZMasterFile
+   * After successfull completion, pDic is loaded as valid, active dictionary for the file.
+   * @return a ZStatus see Errors from ZDictionaryFile::saveToDicFile()
+   */
+  ZStatus createDictionary(const ZMFDictionary& pDic) ;
+  /**
+   * @brief createExternalDictionary set pDicPath as dictionary for master file.
+   * File type is changed to be ZFT_ZMasterFile
+   * After successfull completion, dictionary contained in pDicPath is loaded as valid, active dictionary for the file.
+   * @return a ZStatus see Errors from ZDictionaryFile::Dictionary->load()
+   */
+  ZStatus createExternalDictionary(const uriString& pDicPath) ;
 
-  ZStatus createExternalDictionary(const uriString& pDicPath) {
-    if (!pDicPath.exists()) {
-      ZException.setMessage("ZRawMasterFile::createExternalDictionary",ZS_FILENOTEXIST,Severity_Error,"Dictionary file %s does not exist.",pDicPath.toString());
-      return ZS_FILENOTEXIST;
-    }
-    setTypeMasterFile();
-    Dictionary = new ZDictionaryFile;
-    DictionaryPath=pDicPath;
-    Dictionary->URIDictionary = pDicPath;
-    ZStatus wSt=Dictionary->load();
-
-    DictionaryPath = pDicPath;
-    return wSt;
-  }
-
+  /**
+   * @brief zclearAll clears content of master file and of all defined indexes of master file.
+   * @return a ZStatus
+   */
+  ZStatus zclearAll();
 
 
 //    using _Base::zclearFile;  // for tests only : must be suppressed imperatively
@@ -293,7 +306,52 @@ public:
                               bool pReplace,
                               ZaiErrors* pErrorLog);
 
-  ZStatus backupAll(const char* pBckExt="bck");
+  int _getAvailableBckNum(const uriString& pBackupPath,const utf8VaryingString &pBckExt);
+/**
+ * @brief ZRawMasterFile::backupAll backs up all files, dictionary file (if any) and index files, composing master file
+ *
+ *
+ * <pBackupPath><master root name>.<actual master file extension>_<bck ext>99
+ * <pBackupPath><master root name>.<__HEADER_FILEEXTENSION__>_<bck ext>99
+ *
+ * for indexes :
+ *   <pBackupPath><master root name><index name>.<__ZINDEX_FILEEXTENSION__>_<bck ext>99
+ *   <pBackupPath><master root name><index name>.<__HEADER_FILEEXTENSION__>_<bck ext>99
+ *
+ *  where 99 means a 2 digits with leading zero backup version value [ 01 up to 99 ]
+ *
+ * @param pBackupPath if omitted then master file directory path is used
+ * @param pBckExt defaulted to "bck"
+ * @return
+ */
+  ZStatus backupAll(const uriString& pBackupPath,const utf8VaryingString &pBackupSetName);
+
+  void getBackupSet(ZArray<BckElement>& pFileList);
+
+  ZStatus XmlSaveBackupset(uriString& pXmlFile, ZArray<BckElement>& pFileList, bool pComment);
+  ZStatus XmlLoadBackupset(const uriString& pXmlFile, ZArray<BckElement>& pFileList, ZDateFull& pBackupDate);
+
+  /* Deprecated */
+  /**
+ * @brief ZRawMasterFile::backupAll DEPRECATED backs up all files dictionary file and index files composing master file
+ *
+ *
+ * <pBackupPath><master root name>.<actual master file extension>_<bck ext>99
+ * <pBackupPath><master root name>.<__HEADER_FILEEXTENSION__>_<bck ext>99
+ *
+ * for indexes :
+ *   <pBackupPath><master root name><index name>.<__ZINDEX_FILEEXTENSION__>_<bck ext>99
+ *   <pBackupPath><master root name><index name>.<__HEADER_FILEEXTENSION__>_<bck ext>99
+ *
+ *  where 99 means a 2 digits with leading zero backup version value [ 01 up to 99 ]
+ *
+ * @param pBackupPath if omitted then master file directory path is used
+ * @param pBckExt defaulted to "bck"
+ * @return
+ */
+  ZStatus backupAll_old(const uriString& pBackupPath,const utf8VaryingString &pBckExt="bck");
+
+  ZStatus extractBasenameBack(const uriString& pBckFile, utf8VaryingString &pBasename, utf8VaryingString &pBckExt, int &pNum);
   /**
    * @brief zremoveAll removes all records from master file as well as from all index files.
    */
@@ -364,6 +422,10 @@ public:
 
   ZStatus zget      (ZDataBuffer &pRecordContent, const zrank_type pZMFRank);
 
+  ZStatus zgetPerIndex (ZDataBuffer &pRecordContent, const long pIndexRank,long pKeyRank);
+  ZStatus zgetFirstPerIndex (ZDataBuffer &pRecordContent, const long pIndexRank);
+  ZStatus zgetNextPerIndex (ZDataBuffer &pRecordContent, const long pIndexRank);
+
   /** @brief zremoveByRank Remove by rank : removes record at position pZMFRank */
   ZStatus zremoveByRank     (const zrank_type pZMFRank) ;
 
@@ -395,6 +457,11 @@ protected:
   ZStatus _addRaw   (ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeysContent);
   ZStatus _insertRaw (const ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeys, const zrank_type pZMFRank);
   ZStatus _removeByRankR  (ZDataBuffer &pRecord, const zrank_type pZMFRank);
+
+  /* Deprecated
+  ZStatus _addRawOld   (ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeysContent);
+  ZStatus _insertRawOld (const ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeys, const zrank_type pZMFRank);
+*/
 
 
   ZStatus _commitIndexes(ZArray <ZIndexItem*>  &pIndexItemList);

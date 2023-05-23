@@ -1,6 +1,8 @@
 #ifndef ZCONTENTVISUMAIN_H
 #define ZCONTENTVISUMAIN_H
 
+#include <config/zconfig.h>
+
 #include <QMainWindow>
 #include <ztoolset/zstatus.h>
 #include <ztoolset/uristring.h>
@@ -16,6 +18,7 @@
 extern const int cst_maxraisonablevalue;
 
 class ZQTableView;
+class VisuRaw;
 
 #define __DISPLAYCALLBACK__(__NAME__)  std::function<void (const utf8VaryingString&)> __NAME__
 #define __PROGRESSCALLBACK__(__NAME__)  std::function<void (int)> __NAME__
@@ -143,13 +146,10 @@ public:
   void displayZFBT();
 //  void displayZDBT();  // Deprecated
 
-//  void Dictionary();
-
   void surfaceScanZRF(const uriString &pFileToScan);
   void displayRawSurfaceScan(const uriString& pFile);
 
   ZStatus surfaceScanRaw(const uriString & pURIContent, FILE *pOutput=stdout);
-
 
   void repairIndexes(bool pTestRun, bool pRebuildAll);
   void removeIndex();
@@ -187,13 +187,13 @@ public:
   zbs::ZRandomFile* RandomFile=nullptr;
   zbs::ZRawMasterFile* MasterFile=nullptr;
 
-  int   Fd=-1;
-  long  FileOffset=0;
-  long  BlockSize=64;
-  const int Width=16;
+  __FILEHANDLE__    Fd=-1;
+  long              FileOffset=0;
+  long              BlockSize=64;
+  const int         Width=16;
 
-  bool AllFileLoaded=false;
-  bool HeaderFile = false;
+  bool              AllFileLoaded=false;
+  bool              HeaderFile = false;
 
   long RecordNumber=0;
   zaddress_type Address=0;
@@ -216,12 +216,19 @@ public:
   QMenu *       MasterFileMEn=nullptr;
   QAction*      ZmfDefQAc = nullptr;
   QAction*      IndexRebuildQAc = nullptr;
-
+  QAction*      ZMFBackupQAc=nullptr;
+  QAction*      ZMFRestoreQAc=nullptr;
 
   QAction*      openZRFQAc=nullptr;
 
-  /* evaluate actions */
 
+  VisuRaw*      VizuRaw=nullptr;
+
+  /* evaluate actions */
+  QAction* ZBlockHeaderQAc = nullptr;
+  QAction* URFFieldQAc = nullptr;
+
+  QAction* ZTypeQAc = nullptr;
   QAction* uint16QAc = nullptr;
   QAction* int16QAc = nullptr;
   QAction* uint32QAc = nullptr;
@@ -229,6 +236,9 @@ public:
   QAction* uint64QAc = nullptr;
   QAction* int64QAc = nullptr;
   QAction* sizetQAc = nullptr;
+  QAction* floatQAc = nullptr;
+  QAction* doubleQAc = nullptr;
+  QAction* longdoubleQAc = nullptr;
 
 
   bool searchHexa(bool pReverse=false);
@@ -257,9 +267,11 @@ private slots:
   void backward();
   void forward();
   void loadAll();
-
-  void visuActionEvent(QAction* pAction);
-  void VisuBvFlexMenuCallback(QContextMenuEvent *event);
+// Deprecated
+//  void visuActionEvent(QAction* pAction);
+//  void visuActionEventOld(QAction* pAction);  // Deprecated
+// Deprecated
+//  void VisuBvFlexMenuCallback(QContextMenuEvent *event);
   void VisuMouseCallback(int pZEF, QMouseEvent *pEvent);
 
 private:
@@ -311,7 +323,7 @@ utf8String formatSize(long long wSize);
  *                pNextAddress is set to the last address processed.
  */
 ZStatus
-_searchBlockStart (int pContentFd,
+_searchBlockStart (__FILEHANDLE__ pContentFd,
                     zaddress_type pBeginAddress,      // Address to start searching for start mark
                     zaddress_type &pNextAddress,
                     ZDataBuffer &pBlockContent,

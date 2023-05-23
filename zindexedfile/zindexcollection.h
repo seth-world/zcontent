@@ -66,11 +66,11 @@ const char *decode_ZCOP (uint16_t pZCOP);
 class ZIndexResult
 {
 public:
-  zrank_type      IndexRank=-1; //!< ZIndexFile rank
+  zaddress_type   IndexAddress=-1; //!< ZIndexFile address
   zaddress_type   ZMFAddress=-1;//!< Corresponding ZMasterFile address
 
-  ZIndexResult(void)  {memset(this,0,sizeof(ZIndexResult)); IndexRank=-1;ZMFAddress=-1;};
-  ZIndexResult(zaddress_type pZMFAddress,zrank_type pIndexRank) ;
+  ZIndexResult(void)  {memset(this,0,sizeof(ZIndexResult)); IndexAddress=-1;ZMFAddress=-1;};
+  ZIndexResult(zaddress_type pZMFAddress, zaddress_type pIndexAddress) ;
   ZIndexResult(const ZIndexResult &pIn) ;
   ~ZIndexResult(void) {}
 
@@ -80,8 +80,8 @@ public:
   /**
    * @brief reset resets ZSIndexResult to is 'null' value {-1 ; -1 }
    */
-  void reset (void) {ZMFAddress=-1; IndexRank=-1;}
-  bool isNull (void) const {return IndexRank<0;}
+  void reset (void) {ZMFAddress=-1; IndexAddress=-1;}
+  bool isNull (void) const {return IndexAddress<0;}
   bool isInvalid(void) const {return ZMFAddress<0;}
 
   ZIndexResult& operator = (ZIndexResult &pZIR) { return _copyFrom(pZIR);}

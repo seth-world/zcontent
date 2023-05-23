@@ -131,6 +131,7 @@ SOURCES += \
     ../../zcppparser/zcppparsertype.cpp \
     ../../zqt/zqtwidget/zqgraphicscene.cpp \
     ../../zqt/zqtwidget/zqrectangle.cpp \
+    ../zcontentcommon/urffield.cpp \
     ../zcontentcommon/urfparser.cpp \
 \
     $${ZCONTENT_ROOT}/zcontentcommon/zresource.cpp \
@@ -156,18 +157,22 @@ SOURCES += \
     $${ZCONTENT_ROOT}/zcontentutils/zkeydlg.cpp \
     $${ZCONTENT_ROOT}/zcontentutils/zlayout.cpp \
     $${ZCONTENT_ROOT}/zcontentutils/zscan.cpp \
+    bckelement.cpp \
     filegeneratedlg.cpp \
     keydata.cpp \
     main.cpp \
     masterfilevalues.cpp \
     poolvisu.cpp \
     visulinecol.cpp \
+    visuraw.cpp \
+    zbackupdlg.cpp \
     zchangerecord.cpp \
     zcppgenerate.cpp \
     zfilegenerate.cpp \
     zkeylistdlg.cpp \
     zrawkeylistdlg.cpp \
-    zrawmasterfilevisu.cpp
+    zrawmasterfilevisu.cpp \
+    zrestoredlg.cpp
 
 
 
@@ -190,6 +195,7 @@ HEADERS += \
     ../../zqt/zqtwidget/zqrectangle.h \
     ../../zqt/zqtwidget/zqtutils.h \
     ../../zqt/zqtwidget/zqtwidgets_release.h \
+    ../zcontentcommon/urffield.h \
     ../zcontentcommon/urfparser.h \
 \
     $${ZCONTENT_ROOT}/zcontentcommon/zresource.h \
@@ -214,18 +220,22 @@ HEADERS += \
     $${ZCONTENT_ROOT}/zcontentutils/zscan.h \
 \
     $${TOOLSET_ROOT}/zcppparser/zcppparserutils/rawfields.h \
+    bckelement.h \
     filegeneratedlg.h \
     keydata.h \
     masterfilevalues.h \
     poolvisu.h \
     visulinecol.h \
+    visuraw.h \
+    zbackupdlg.h \
     zchangerecord.h \
     zcontentutils_release.h \
     zcppgenerate.h \
     zfilegenerate.h \
     zkeylistdlg.h \
     zrawkeylistdlg.h \
-    zrawmasterfilevisu.h
+    zrawmasterfilevisu.h \
+    zrestoredlg.h
 
 
 #    ztypelistbutton.h \

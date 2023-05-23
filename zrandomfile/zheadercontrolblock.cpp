@@ -242,13 +242,13 @@ int ZHeaderControlBlock::fromXml(zxmlNode* pHCBRootNode, ZaiErrors* pErrorlog)
     return -1;
   }
 
-  if (XMLgetChildInt64(wRootNode, "offsetfcb", OffsetFCB, pErrorlog)< 0) {
+  if (XMLgetChildInt64(wRootNode, "offsetfcb", OffsetFCB, pErrorlog,ZAIES_Warning)< 0) {
     fprintf(stderr,
         "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
         "default.",
         "offsetfcb");
     }
-  if (XMLgetChildInt64(wRootNode, "offsetreserved", OffsetReserved, pErrorlog)< 0) {
+  if (XMLgetChildInt64(wRootNode, "offsetreserved", OffsetReserved, pErrorlog,ZAIES_Warning)< 0) {
       fprintf(stderr,
         "ZHeaderControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to its "
         "default.",

@@ -25,6 +25,9 @@
 #include <zindexedfile/zmfdictionary.h>  // for addDictionary()
 
 #include <zindexedfile/zrawmasterfileutils.h>
+
+#include <zindexedfile/bckelement.h>
+
 using namespace  zbs;
 
 ZRawMasterFile::ZRawMasterFile(ZFile_type pType) : ZRandomFile(pType),ZMasterControlBlock(this)
@@ -1903,26 +1906,452 @@ ZRawMasterFile::zremoveAll() {
 }// zremoveAll
 
 
+int
+ZRawMasterFile::_getAvailableBckNum(const uriString& pBackupPath,const utf8VaryingString &pBckExt){
+  uriString wBackupPath=pBackupPath;
+  if (pBackupPath.isEmpty())
+    wBackupPath = getURIContent().getDirectoryPath();
+  wBackupPath.addConditionalDirectoryDelimiter();
+
+  utf8VaryingString wMasterRootName = getURIContent().getRootname();
+  utf8VaryingString wMasterBaseName = getURIContent().getBasename();
+
+  utf8VaryingString wDicBaseName = getURIDictionary().getBasename();
+  utf8VaryingString wDicPath = getURIDictionary().getDirectoryPath();
+  uriString wURI ;
+  int wBckNumber=1;
+  if (Dictionary!=nullptr){
+    wURI.sprintf("%s%s_%s%d", wBackupPath.toString(),wDicBaseName.toString(),pBckExt.toString(),wBckNumber);
+
+    while (wURI.exists()) {
+      wBckNumber++;
+      wURI.sprintf("%s%s_%s%d", wBackupPath.toString(),wDicBaseName.toString(), pBckExt.toString(),wBckNumber);
+    } // while
+  }// if (Dictionary!=nullptr)
+
+  while (true) {
+    while (true) {
+      wURI.sprintf("%s%s_%s%d",wBackupPath.toString(),wMasterBaseName.toString(),pBckExt.toString(),wBckNumber);
+      if (wURI.exists())
+        break;
+      wURI.sprintf("%s%s_%s%d",wBackupPath.toString(),getURIHeader().getBasename().toString(),pBckExt.toString(),wBckNumber);
+      if (wURI.exists())
+        break;
+      for (long wi=0; wi < IndexTable.count() ; wi++ ) {
+        utf8VaryingString wIR = generateIndexRootName(wMasterRootName,IndexTable[wi]->IndexName);
+
+        wURI.sprintf("%s%s.%s_%s%d",wBackupPath.toString(),wIR.toString(),__ZINDEX_FILEEXTENSION__,pBckExt.toString(),wBckNumber);
+        if (wURI.exists())
+          break;
+        wURI.sprintf("%s%s.%s_%s%d",wBackupPath.toString(),wIR.toString(),__HEADER_FILEEXTENSION__,pBckExt.toString(),wBckNumber);
+        if (wURI.exists())
+          break;
+      }
+      /* no file with that wFormerNumber already exist */
+      return wBckNumber;
+    } // while true
+    wBckNumber++;
+  }// while true
+} //_getAvailableBckNum
+
+
 ZStatus
-ZRawMasterFile::backupAll(const char* pBckExt) {
+ZRawMasterFile::extractBasenameBack(const uriString& pBckFile,utf8VaryingString& pBasename,utf8VaryingString& pBckExt,int &pNum){
 
-  ZStatus wSt= getURIContent().backupFile(pBckExt);
-  if (wSt!=ZS_SUCCESS)
-    return wSt;
-  wSt= getURIHeader().backupFile(pBckExt);
-  if (wSt!=ZS_SUCCESS)
-    return wSt;
+  utf8VaryingString wBasename=pBckFile.getBasename();
 
-  for (long wi=0; wi < IndexTable.count() ; wi++ ) {
-    wSt= IndexTable[wi]->getURIContent().backupFile(pBckExt);
-    if (wSt!=ZS_SUCCESS)
-      return wSt;
-    wSt= IndexTable[wi]->getURIHeader().backupFile(pBckExt);
-    if (wSt!=ZS_SUCCESS)
-      return wSt;
+  utf8_t* wPtr=wBasename.Data;
+
+  /* get till the end of full name string */
+  while (*wPtr){
+    wPtr++;
   }
+
+  utf8_t* wPtrEnd = wPtr;
+
+  /* capture initial base name  (root name + extension) */
+
+  while (wPtr > wBasename.Data) {
+    if (*wPtr == '_') {
+      break;
+    }
+    if (*wPtr == '.')
+      break;
+    wPtr--;
+  }
+  if (wPtr==wBasename.Data)
+    return ZS_INVNAME;
+  if (*wPtr == '.') {  /* not a bck extension */
+    ZException.setMessage("ZRawMasterFile::extractBasenameBack",ZS_INVTYPE,Severity_Error,"%s is not a backup file. Cannot find a valid bck extension (missing \'_\' character).",pBckFile.toString());
+    return ZS_INVTYPE;
+  }
+
+  *wPtr=0;
+  pBasename = wBasename;
+  /* capture 2 last digits */
+
+  pNum=0;
+  int wPow = 1 ;
+  bool wHasDigit=false;
+  while (wPtrEnd > wPtr) {
+    if ((*wPtrEnd < '0') || (*wPtrEnd > '9'))
+      break;
+    pNum += (int(*wPtrEnd)-int('0')) * wPow ;
+    wPow *= 10 ;
+    wHasDigit = true;
+    wPtrEnd--;
+  } // while
+
+  if (!wHasDigit) {  /* not a bck extension */
+    ZException.setMessage("ZRawMasterFile::extractBasenameBack",ZS_INVTYPE,Severity_Error,"%s is not a backup file. Cannot find a valid bck extension (missing trailing 2 digits).",pBckFile.toString());
+    return ZS_INVTYPE;
+  }
+
+  /* capture bck extension : characters between wPtr and wPtrEnd */
+
+  wPtrEnd++;
+  *wPtrEnd = 0;
+
+  wPtr++; /* skip 0 mark */
+
+  pBckExt = wPtr;
+  return ZS_SUCCESS ;
+}// extractRootBack
+
+
+
+ZStatus
+ZRawMasterFile::backupAll_old(const uriString& pBackupPath,const utf8VaryingString &pBckExt) {
+  ZStatus wSt=ZS_SUCCESS;
+
+  uriString wBackupPath=pBackupPath;
+  if (pBackupPath.isEmpty())
+    wBackupPath = getURIContent().getDirectoryPath();
+  wBackupPath.addConditionalDirectoryDelimiter();
+
+
+  utf8VaryingString wMasterRootName = getURIContent().getRootname();
+  utf8VaryingString wMasterBaseName = getURIContent().getBasename();
+
+  utf8VaryingString wDicBaseName = getURIDictionary().getBasename();
+  utf8VaryingString wDicPath = getURIDictionary().getDirectoryPath();
+
+
+  uriString wURI ;
+
+  int wBckNumber=_getAvailableBckNum(pBackupPath,pBckExt);
+
+  if (Dictionary!=nullptr){
+    wURI.sprintf("%s%s_%s%d", wBackupPath.toString(),wDicBaseName.toString(),pBckExt.toString(),wBckNumber);
+    wSt=uriString::copyFile(wURI,Dictionary->URIDictionary);
+    if (wSt!=ZS_SUCCESS) {
+      ZException.addToLast(" from ZRawMasterFile::backupAll()");
+      return wSt;
+    }
+  }// if (Dictionary!=nullptr)
+
+
+  wURI.sprintf("%s%s%s_%s%d",wBackupPath.toString(),wMasterBaseName.toString(),pBckExt.toString(),wBckNumber);
+
+  wSt=uriString::copyFile(wURI,getURIContent());
+  if (wSt!=ZS_SUCCESS) {
+    ZException.addToLast(" from ZRawMasterFile::backupAll()");
+    return wSt;
+  }
+  wURI.sprintf("%s%s_%s%d",wBackupPath.toString(),getURIHeader().getBasename().toString(),pBckExt.toString(),wBckNumber);
+  wSt=uriString::copyFile(wURI,getURIHeader());
+  if (wSt!=ZS_SUCCESS) {
+    ZException.addToLast(" from ZRawMasterFile::backupAll()");
+    return wSt;
+  }
+  for (long wi=0; wi < IndexTable.count() ; wi++ ) {
+    uriString wIdxSourcePath,wIdxSource;
+    utf8VaryingString wIRoot = generateIndexRootName(wMasterRootName,IndexTable[wi]->IndexName);
+    if(!IndexFilePath.isEmpty())
+      wIdxSourcePath = IndexFilePath;
+    else
+      wIdxSourcePath = getURIContent().getDirectoryPath();
+
+    wIdxSourcePath.addConditionalDirectoryDelimiter();
+
+    wIdxSource = wIdxSourcePath;
+    wIdxSource += wIRoot;
+    wIdxSource += __ZINDEX_FILEEXTENSION__;
+
+    wURI.sprintf("%s%s%s_%s%d.%s",wBackupPath.toString(),wIRoot.toString(),pBckExt.toString(),wBckNumber,__ZINDEX_FILEEXTENSION__);
+    wSt=uriString::copyFile(wURI,wIdxSource);
+    if (wSt!=ZS_SUCCESS) {
+      ZException.addToLast(" from ZRawMasterFile::backupAll()");
+      return wSt;
+    }
+
+    wIdxSource = wIdxSourcePath;
+    wIdxSource += wIRoot;
+    wIdxSource += __HEADER_FILEEXTENSION__;
+    wURI.sprintf("%s%s%s_%s%d.%s",wBackupPath.toString(),wIRoot.toString(),pBckExt.toString(),wBckNumber,__HEADER_FILEEXTENSION__);
+
+    wSt=uriString::copyFile(wURI,wIdxSource);
+    if (wSt!=ZS_SUCCESS) {
+      ZException.addToLast(" from ZRawMasterFile::backupAll()");
+      return wSt;
+    }
+  } //for (long wi=0; wi < IndexTable.count() ; wi++ )
   return ZS_SUCCESS;
+} // backupAll
+
+ZStatus
+ZRawMasterFile::backupAll(const uriString& pBackupPath,const utf8VaryingString& pBackupSetName) {
+  ZStatus wSt=ZS_SUCCESS;
+  /* --- New ---*/
+
+
+  ZArray<BckElement> Files;
+  if (pBackupSetName.isEmpty()){
+    ZException.setMessage("ZRawMasterFile::backupAll",ZS_EMPTY,Severity_Error,
+        "Backup set name is empty");
+    return ZS_EMPTY;
+  }
+  if (pBackupPath.isEmpty()){
+    ZException.setMessage("ZRawMasterFile::backupAll",ZS_EMPTY,Severity_Error,
+        "Backup path is empty");
+    return ZS_EMPTY;
+  }
+/*
+  utf8VaryingString wBackupSetName = BckName;
+  wBackupSetName += ZDateFull::currentDateTime().toUTCGMT() ;
+*/
+  uriString wTargetDir = pBackupPath;
+  wTargetDir.addConditionalDirectoryDelimiter();
+
+  if (!wTargetDir.exists()) {
+    wSt = uriString::createDirectory(wTargetDir);
+    if (wSt!=ZS_SUCCESS) {
+      ZException.setMessage("ZRawMasterFile::backupAll",ZS_EMPTY,Severity_Error,
+          "Cannot create directory <%s>",wTargetDir.toString());
+      wTargetDir.addDirectoryDelimiter();
+      return wSt;
+    }
+  }
+
+  getBackupSet(Files);
+
+  uriString wTargetFile ;
+
+  int wSizeCur=0;
+  for (long wi=0; wi < Files.count(); wi++) {
+
+    wTargetFile = wTargetDir;
+    wTargetFile += Files[wi].Target;
+
+    Files[wi].Status=uriString::copyFile(wTargetFile,Files[wi].Source);
+
+    wSizeCur += int(Files[wi].Size);
+  }// for
+
+  /* writing backup set xml file */
+
+  uriString wURIBckset = utf8VaryingString(wTargetDir) + pBackupSetName;
+
+  wSt = XmlSaveBackupset(wURIBckset,Files,true);
+  if (wSt!=ZS_SUCCESS) {
+    ZException.prependToLast("Problem while writing backup set xml description file <%s> \n",wURIBckset.toString());
+  }
+
+  return wSt;
+
+} // backupAll
+
+
+void
+ZRawMasterFile::getBackupSet(ZArray<BckElement>& pFileList) {
+  uriStat wStat;
+  BckElement wElt;
+  /* prepare files to copy and compute all file sizes */
+  size_t wSize=0;
+  /* master content file */
+  wElt.Source = getURIContent();
+
+  wStat=wElt.Source.getStatR();
+  wElt.Created = wStat.Created;
+  wElt.LastModified = wStat.LastModified;
+
+  wSize += wElt.Size = wStat.Size ;
+
+  wElt.Target = getURIContent().getBasename();
+  pFileList.push(wElt) ;
+
+  /* master header file */
+  wElt.Source = getURIHeader();
+
+  wStat=wElt.Source.getStatR();
+  wElt.Created = wStat.Created;
+  wElt.LastModified = wStat.LastModified;
+
+  wSize += wElt.Size = wStat.Size ;
+
+  wElt.Target = getURIHeader().getBasename();
+
+  //  wElt.Target = wTargetDir;
+  //  wElt.Target += MasterFile.getURIHeader().getBasename();
+  pFileList.push(wElt) ;
+
+  /* dictionary file if any */
+  if (Dictionary!=nullptr) {
+    wElt.Source = Dictionary->URIDictionary ;
+
+    wStat=wElt.Source.getStatR();
+    wElt.Created = wStat.Created;
+    wElt.LastModified = wStat.LastModified;
+
+    wSize += wElt.Size = wStat.Size ;
+
+    wElt.Target = Dictionary->URIDictionary.getBasename();
+    pFileList.push(wElt);
+  }
+
+  for (long wi=0; wi < IndexTable.count(); wi++) {
+
+    wElt.Source = IndexTable[wi]->getURIContent() ;
+    wElt.Size = wElt.Source.getFileSize();
+
+    wStat=wElt.Source.getStatR();
+    wElt.Created = wStat.Created;
+    wElt.LastModified = wStat.LastModified;
+
+    wSize += wElt.Size = wStat.Size ;
+
+    wElt.Target = IndexTable[wi]->getURIContent().getBasename();
+    pFileList.push(wElt);
+
+    wElt.Source = IndexTable[wi]->getURIHeader() ;
+    wElt.Size = wElt.Source.getFileSize();
+
+    wStat=wElt.Source.getStatR();
+
+    wElt.Created = wStat.Created;
+    wElt.LastModified = wStat.LastModified;
+    wSize += wElt.Size = wStat.Size ;
+
+    wElt.Target = IndexTable[wi]->getURIHeader().getBasename();
+    pFileList.push(wElt);
+  } // for
 }
+
+
+ZStatus
+ZRawMasterFile::XmlSaveBackupset(uriString& pXmlFile,ZArray<BckElement>& pFileList, bool pComment) {
+  utf8String wReturn = fmtXMLdeclaration();
+  int wLevel=0;
+  wReturn += fmtXMLnodeWithAttributes("zbackupset","version",__ZRF_XMLVERSION_CONTROL__,0);
+
+  wReturn+=fmtXMLdatefull("date",ZDateFull::currentDateTime(),wLevel);
+
+  wReturn += fmtXMLnode("filelist",wLevel);
+  wLevel++;
+
+  for (long wi=0; wi < pFileList.count();wi++) {
+    wReturn += fmtXMLnode("file",wLevel);
+    wLevel++;
+    wReturn+=fmtXMLchar("source",pFileList[wi].Source.toString(),wLevel);
+    wReturn+=fmtXMLchar("target",pFileList[wi].Target.toString(),wLevel);
+    wReturn+=fmtXMLulong("size",pFileList[wi].Size,wLevel);
+    wReturn+=fmtXMLZStatus("status",pFileList[wi].Status,wLevel);
+    wReturn+=fmtXMLdatefull("creationdate",pFileList[wi].Created,wLevel);
+    wReturn+=fmtXMLdatefull("modificationdate",pFileList[wi].LastModified,wLevel);
+    wLevel--;
+    wReturn += fmtXMLendnode("file",wLevel);
+  }
+
+  wLevel--;
+  wReturn += fmtXMLendnode("filelist",wLevel);
+  wLevel--;
+
+  wReturn += fmtXMLendnode("zbackupset",0);
+
+  return pXmlFile.writeContent(wReturn);
+}
+
+ZStatus
+ZRawMasterFile::XmlLoadBackupset(const uriString& pXmlFile,ZArray<BckElement>& pFileList,ZDateFull& pBackupDate)
+{
+  ZStatus wSt;
+
+  utf8VaryingString wXmlContent;
+
+  zxmlDoc *wDoc = nullptr;
+  zxmlElement *wRoot = nullptr;
+  zxmlElement *wFileRootNode=nullptr;
+  zxmlElement *wSingleFileNode=nullptr;
+  zxmlElement *wSwapNode=nullptr;
+
+  wSt = pXmlFile.loadUtf8(wXmlContent);
+  if (wSt!=ZS_SUCCESS) {
+    ZException.prependToLast("Problem while loading backup set xml description file <%s> \n",pXmlFile.toString());
+    return wSt;
+  }
+
+  wDoc = new zxmlDoc;
+  wSt = wDoc->ParseXMLDocFromMemory(wXmlContent.toCChar(), wXmlContent.getUnitCount(), nullptr, 0);
+  if (wSt != ZS_SUCCESS) {
+    ZException.setMessage("ZRawMasterFile::XmlLoadBackupset",wSt,Severity_Error,"Xml parsing error for xml document <%s>",
+        wXmlContent.subString(0, 25).toUtf());
+    return wSt;
+  }
+  wSt = wDoc->getRootElement(wRoot);
+  if (wSt != ZS_SUCCESS) {
+    return wSt;
+  }
+  if (!(wRoot->getName() == "zbackupset")) {
+    ZException.setMessage("ZRawMasterFile::XmlLoadBackupset",ZS_XMLINVROOTNAME,Severity_Error,
+        "Invalid root node name <%s> expected <zbackupset>",
+        wRoot->getName().toCChar());
+    return ZS_XMLINVROOTNAME;
+  }
+
+  wSt=XMLgetChildZDateFull(wSingleFileNode,"date",pBackupDate);
+
+  wSt=wRoot->getChildByName((zxmlNode*&)wFileRootNode,"filelist");
+  if (wSt!=ZS_SUCCESS) {
+    ZException.setMessage("ZRawMasterFile::XmlLoadBackupset",ZS_XMLMISSREQ,Severity_Error,
+        "Cannot find node name <filelist>");
+    return ZS_XMLMISSREQ;
+  }
+
+  wSt=wFileRootNode->getFirstChild((zxmlNode*&)wSingleFileNode);
+  if (wSt!=ZS_SUCCESS) {
+    ZException.setMessage("ZRawMasterFile::XmlLoadBackupset",ZS_XMLCORRUPTED,Severity_Error,
+        "Cannot find child node name under node <filelist>. Xml document is incomplete or corrupted.");
+    return ZS_XMLCORRUPTED;
+  }
+  if (wSingleFileNode->getName()!="file") {
+    ZException.setMessage("ZRawMasterFile::XmlLoadBackupset",ZS_XMLINVNODENAME,Severity_Error,
+        "Got node name <%s> while expecting node <file>",wSingleFileNode->getName().toString());
+    return ZS_XMLINVNODENAME;
+  }
+
+  pFileList.clear();  /* clear files definitions */
+  while (wSt==ZS_SUCCESS)
+  {
+    BckElement wElt;
+    wSt=XMLgetChildText(wSingleFileNode,"source",wElt.Source);
+    wSt=XMLgetChildText(wSingleFileNode,"target",wElt.Target);
+    wSt=XMLgetChildULong(wSingleFileNode,"size",wElt.Size);
+    wSt=XMLgetChildZStatus(wSingleFileNode,"status",(int64_t&)wElt.Status);
+    wSt=XMLgetChildZDateFull(wSingleFileNode,"creationdate",wElt.Created);
+    wSt=XMLgetChildZDateFull(wSingleFileNode,"modificationdate",wElt.LastModified);
+
+    wSt=wSingleFileNode->getNextNode((zxmlNode*&)wSwapNode);
+    XMLderegister(wSingleFileNode);
+    wSingleFileNode=wSwapNode;
+  } // while
+
+  XMLderegister(wSingleFileNode);
+  XMLderegister(wFileRootNode);
+  XMLderegister(wRoot);
+
+  return ZS_SUCCESS;
+} // ZMFBckDLg::XmlLoadBackupset
+
 
 
 //---------------------------------Utilities-----------------------------------------------------
@@ -2296,8 +2725,7 @@ long wi;
 //            IndexTable.push(wIndex);
             wIndexUri.clear();
 
-//            wSt=generateIndexURI(wIndexUri,getURIContent(),IndexFilePath,wi,IndexTable[wi]->IndexName);
-            wSt=generateIndexURI(wIndexUri,getURIContent(),IndexFilePath,IndexTable[wi]->IndexName);
+            wSt=generateIndexURI(wIndexUri,pURI,IndexFilePath,IndexTable[wi]->IndexName);
             if (wSt!=ZS_SUCCESS)
                     {
                     return  wSt;// Beware return  is multiple instructions in debug mode
@@ -2717,6 +3145,116 @@ ZStatus ZRawMasterFile::zadd (ZDataBuffer& pRecordContent,ZArray<ZDataBuffer>& p
 ZStatus
 ZRawMasterFile::_addRaw(ZDataBuffer& pRecord, ZArray<ZDataBuffer> &pKeysContent)
 {
+  ZStatus wSt=ZS_SUCCESS;
+
+  zrank_type      wZMFZBATIndex ;
+  zaddress_type   wZMFAddress;
+
+  ZIndexItemList        IndexItemList;      // stores keys description per index processed
+
+  ZIndexItem     *wIndexItem=nullptr;
+  zrank_type      wIndex_Rank;
+
+  if (pKeysContent.count() != IndexTable.count()) {
+    ZException.setMessage("ZRawMasterFile::zaddRaw",
+        ZS_CORRUPTED,
+        Severity_Severe,
+        "Master file number of indexes <%ld> does not correspond to given keys <%ld>. File <%s> cannot be accessed.",
+        IndexTable.count(),pKeysContent.count() ,
+        getURIContent().toString());
+    return  ZS_CORRUPTED;
+  }
+
+  if (!isOpen())
+    {
+    ZException.setMessage("ZRawMasterFile::zaddRaw",
+                          ZS_FILENOTOPEN,
+                          Severity_Severe,
+                          " File <%s> is not open while trying to access it",
+                          getURIContent().toString());
+    return  ZS_FILENOTOPEN;
+    }
+
+// prepare the add on Master File, reserve appropriate space, get entry in pool, lock it
+
+
+  wSt=_Base::_add2Phases_Prepare( pRecord,  wZMFZBATIndex,   // get internal ZBAT pool allocated rank
+                                            wZMFAddress);       // get also zmf record address
+  if (wSt!=ZS_SUCCESS)
+    {
+    _Base::_add2Phases_Rollback(wZMFZBATIndex);
+    goto zaddRaw_end;
+    }
+
+  // =========== update all defined Indexes ======================
+
+
+  for (wIndex_Rank=0;wIndex_Rank< IndexTable.size();wIndex_Rank++)
+  {
+    if (ZVerbose & ZVB_FileEngine)
+      _DBGPRINT( "ZRawMasterFile::_addRaw  processing key rank <%ld>\n",wIndex_Rank)
+
+
+    wSt=IndexTable[wIndex_Rank]->_addRawKeyValue_Prepare(wIndexItem,pKeysContent[wIndex_Rank], wZMFAddress);
+    if (wSt!=ZS_SUCCESS)
+      {
+      ZException.addToLast(" During _addRawKeyValue_Prepare operation on key rank <%ld>",wIndex_Rank);
+      delete wIndexItem;
+      // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
+      _rollbackIndexes ( IndexItemList); // An additional error during index rollback will pushed on exception stack
+      // on error reset ZMF in its original state
+      _Base::_add2Phases_Rollback(wZMFZBATIndex); // do not accept update on Master File and free resources
+      goto zaddRaw_end;
+      }
+
+    IndexItemList.push(wIndexItem);            // with that key content
+
+    //        ZMFJournaling.push (ZO_Add,wi,pRecord,wAddress);
+
+  }// main for - IndexTableObjects.size()
+
+  // so far everything when well
+  //     commit Indexes changes
+  //      if an error occurs during index commit :
+  //          indexes are rolled back (soft or hard) appropriately within _add_CommitIndexes
+  // Nb: Exception(s) is(are) pushed on stack
+
+  wSt=_commitIndexes (IndexItemList) ;
+  if (wSt!=ZS_SUCCESS)
+  {
+    _rollbackIndexes ( IndexItemList); // An additional error during index rollback will pushed on exception stack
+
+    // Soft rollback master update regardless returned ZStatus
+    // Nb: Exception is pushed on stack. ZException keeps the last status.
+    _Base::_add2Phases_Rollback(wZMFZBATIndex);
+
+    goto zaddRaw_end;
+  }
+  // at this stage all indexes have been committed
+  //         commit for Master file data must be done now
+  //
+  wSt = _Base::_add2Phases_Commit(pRecord,wZMFZBATIndex,wZMFAddress);// accept update on Master File
+
+// Then: if then an error occurs at this stage : hard rollback all indexes since begin till processed index
+  if (wSt!=ZS_SUCCESS) {
+    _rollbackIndexes ( IndexItemList); // An additional error during index rollback will pushed on exception stack
+  }                                              // we don't care about the status . In case of error exception stack will trace it
+
+  if ((wSt==ZS_SUCCESS) && getJournalingStatus())
+    {
+//    IndexItemList._exportAppend(wEffectiveRecord);
+    ZJCB->Journal->enqueue(ZJOP_Add,pRecord);
+    }
+zaddRaw_end:
+//  _Base::_unlockFile () ; // set Master file unlocked
+  return  wSt;
+
+}// _addRaw
+
+#ifdef __DEPRECATED__
+ZStatus
+ZRawMasterFile::_addRawOld(ZDataBuffer& pRecord, ZArray<ZDataBuffer> &pKeysContent)
+{
   ZDataBuffer wEffectiveRecord;
   ZStatus wSt=ZS_SUCCESS;
 
@@ -2850,12 +3388,98 @@ IMPORTANT : wEffectiveRecord must not be modified until its final setup
 zaddRaw_end:
 //  _Base::_unlockFile () ; // set Master file unlocked
   return  wSt;
-zaddRaw_error:
-  goto zaddRaw_end;
-}// _addRaw
+}// _addRawOld
+#endif // __DEPRECATED__
+
 
 ZStatus
 ZRawMasterFile::_insertRaw (const ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeys, const zrank_type pZMFRank)
+{
+  ZStatus wSt;
+
+  //  zrank_type      wZMFIdxCommit;
+  zaddress_type   wZMFAddress=0;
+
+  //  ZArray <zrank_type> IndexRankProcessed; // stores ranks of already processed indexes (rollback purpose)
+  ZIndexItemList      IndexItemList;          // stores keys description per index processed
+
+  ZIndexItem*     wIndexItem=nullptr;
+  zrank_type      wIndex_Rank;
+
+
+  wSt=_Base::_insert2Phases_Prepare(pRecord,pZMFRank,wZMFAddress);
+  if (wSt!=ZS_SUCCESS)
+    goto _insertRaw_error;
+  //
+  // update all Indexes
+  //
+
+  for (wIndex_Rank=0;wIndex_Rank< IndexTable.size();wIndex_Rank++)
+  {
+    wSt=IndexTable[wIndex_Rank]->_addRawKeyValue_Prepare(wIndexItem,pKeys[wIndex_Rank], wZMFAddress);// for indexes don't care about insert, this is an add key value
+
+    if (wSt!=ZS_SUCCESS)
+    {
+      ZException.addToLast("During zinsert operation on index number <%ld>",wIndex_Rank);
+      delete wIndexItem;
+      // on error Soft rollback all already processed indexes in their original state (IndexRankProcessed heap contains the Index ranks added to Indexes that have been processed)
+      _rollbackIndexes ( IndexItemList); // An additional error during index rollback will pushed on exception stack
+      // on error reset ZMF in its original state
+      _Base::_add2Phases_Rollback(pZMFRank); // do not accept update on Master File and free resources
+      goto _insertRaw_error;
+    }
+
+    //    IndexRankProcessed.push(wIndex_Rank) ;     // this index has been added to this rank
+    IndexItemList.push(wIndexItem);          // with that key content
+
+    //        ZMFJournaling.push (ZO_Add,wi,pRecord,wAddress);
+  }// main for
+
+  // so far everything when well
+  //     commit Indexes changes
+  //      if an error occurs during index commit :
+  //          indexes are rolled back (soft or hard) appropriately within _add_CommitIndexes
+  // Nb: Exception(s) is(are) pushed on stack
+  wSt=_commitIndexes (IndexItemList) ;
+  if (wSt!=ZS_SUCCESS)
+  {
+    // Soft rollback master update regardless returned ZStatus
+    // Nb: Exception is pushed on stack. ZException keeps the last status.
+    _Base::_add2Phases_Rollback(pZMFRank);
+    _rollbackIndexes ( IndexItemList);
+    goto _insertRaw_error;
+  }
+
+  // at this stage all indexes have been committed
+  //
+  /* Before committing Raw Master File (writting record)
+          set all index record addresses to ZMF record
+   */
+
+  wSt = _Base::_insert2Phases_Commit(pRecord,pZMFRank,wZMFAddress);// accept insert update on Master File
+  if (wSt!=ZS_SUCCESS)    //! and if then an error occur : hard rollback all indexes and signal exception
+  {
+    _rollbackIndexes (IndexItemList); // indexes are already committed so use hardRollback to counter pass
+        // nb: roll back routine manages soft and hard rollback
+  }                                 // don't care about the status . In case of error exception stack will trace it
+
+
+  if (getJournalingStatus())
+  {
+//    IndexItemList._exportAppend(wEffectiveRecord);
+    ZJCB->Journal->enqueue(ZJOP_Insert,pRecord);
+  }
+
+_insertRaw_error:
+  //  _Base::_unlockFile () ; // set Master file unlocked
+  IndexItemList.clear();
+  return  wSt;
+}// _insertRaw
+
+#ifdef __DEPRECATED__
+
+ZStatus
+ZRawMasterFile::_insertRawOld (const ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeys, const zrank_type pZMFRank)
 {
   ZDataBuffer wEffectiveRecord;
   ZStatus wSt;
@@ -2961,7 +3585,8 @@ _insertRaw_error:
   //  _Base::_unlockFile () ; // set Master file unlocked
   IndexItemList.clear();
   return  wSt;
-}// _insertRaw
+}// _insertRawOld
+#endif // __DEPRECATED__
 
 
 /**
@@ -3337,20 +3962,17 @@ ZStatus wSt;
 //long wIndexRank;
 ZIndexItemList  IndexItemList;      // stores keys description per index processed
 ZIndexItem      wIndexItem;
-ZDataBuffer     wRawRecord;
 
-//    wSt = IndexTable[pIndexNumber]->_URFsearchDychoUnique(pKeyValue,wIndexItem.IndexRank,wIndexItem.IndexAddress,wIndexItem.ZMFaddress,ZLock_Nolock);
+  if (EngineMode==SENG_Dycho)
+    wSt = IndexTable[pIndexNumber]->_URFsearchDychoUnique(pKeyValue,wIndexItem,ZLock_Nolock);
+  else
     wSt = IndexTable[pIndexNumber]->_URFsearchUnique(pKeyValue,wIndexItem,ZLock_Nolock);
-    if (wSt!=ZS_FOUND)
-            { return  wSt;}
+  if (wSt!=ZS_FOUND) { return  wSt;}
 
-
-    wSt =   zgetByAddress(wRawRecord,wIndexItem.ZMFAddress);
-    if (wSt!=ZS_SUCCESS)
-      return wSt;
-
-
-
+  wSt =   zgetByAddress(pRecord,wIndexItem.ZMFAddress);
+  if (wSt==ZS_SUCCESS)
+      return ZS_FOUND;
+  return wSt;
 }
 
 ZStatus
@@ -3802,113 +4424,75 @@ ZRawMasterFile::zreportIndexPMSMonitoring (const long pIndex, FILE* pOutput)
 }// zreportIndexPMSMonitoring
 
 
+ZStatus ZRawMasterFile::createDictionary(const ZMFDictionary& pDic) {
+  setTypeMasterFile();
+  uriString wURIdic = ZDictionaryFile::generateDicFileName(getURIContent());
+  Dictionary = new ZDictionaryFile;
+  Dictionary->setDictionary(pDic);
+  return Dictionary->saveToDicFile(wURIdic);
+}
 
 
-#ifdef __FROMZMASTERFILE__
-    /**
- * @brief ZSMasterFile::zclearMCB Sets the current ZSMasterFile's ZMCB to its minimum value. Destroys all existing indexes, and their related files.
- * @param[in] pOutput defaulted to nullptr. Could be stdout or stderr.
- *                    If set to its default value (nullptr), then an xml file is generated with name <directory path><base name>.upgradelog
- * @return
- */
-    ZStatus
-    ZMasterFile::zclearMCB (FILE* pOutput)
-    {
-  ZStatus wSt;
-  ZDataBuffer wMCBContent;
+ZStatus ZRawMasterFile::createExternalDictionary(const uriString& pDicPath)
+{
+  if (!pDicPath.exists()) {
+    ZException.setMessage("ZRawMasterFile::createExternalDictionary",ZS_FILENOTEXIST,Severity_Error,"Dictionary file %s does not exist.",pDicPath.toString());
+    return ZS_FILENOTEXIST;
+  }
+  setTypeMasterFile();
+  Dictionary = new ZDictionaryFile;
+  DictionaryPath=pDicPath;
+  Dictionary->URIDictionary = pDicPath;
+  ZStatus wSt=Dictionary->load();
 
-      FILE* wOutput=nullptr;
-  bool FOutput=false;
-  utfdescString wBase;
+  DictionaryPath = pDicPath;
+  return wSt;
+}
 
+ZStatus ZRawMasterFile::zclearAll() {
+  ZStatus wSt=zclearFile();
 
-         wOutput=pOutput;
-     if (pOutput==nullptr)
-             {
-    //       utfdescString wDInfo;
-               wBase=URIContent.getBasename().toCChar();
-           wBase+=".downgradelog";
-           wOutput=fopen(wBase.toCString_Strait(),"w");
-           if (wOutput==nullptr)
-                           {
-                 wOutput=stdout;
-                 fprintf(wOutput,
-                             "%s>>  cannot open file <%s> redirected to stdout\n",
-                             _GET_FUNCTION_NAME_,
-                             wBase.toString());
-                         }
-           else
-                   {
-                 FOutput=true;
-                 }
-           } // if nullptr
-
-          if ((getOpenMode()&(ZRF_Exclusive|ZRF_All))!=(ZRF_Exclusive|ZRF_All))
-                  {
-                fprintf(wOutput,
-                            "%s>>  ZSMasterFile <%s> is open in bad mode for zcreateIndex. Must be (ZRF_Exclusive|ZRF_All) or closed",
-                             _GET_FUNCTION_NAME_,
-                            getURIContent().toString());
-
-                    ZException.setMessage (_GET_FUNCTION_NAME_,
-                                                 ZS_MODEINVALID,
-                                                 Severity_Error,
-                                                 " ZSMasterFile <%s> is open in bad mode. Must be (ZRF_Exclusive|ZRF_All) or closed",
-                                                 URIContent.toString());
-                return  ZS_MODEINVALID;
-                }
+  for (long wi=0; wi < IndexTable.count();wi++) {
+    wSt=IndexTable[wi]->zclearFile();
+  }
+  return wSt;
+}
 
 
-          if (ZVerbose)
-              {
-            fprintf (wOutput,
-                         "%s>>      Clearing ZMasterControlBlock of file <%s>\n"
-                             "              Actual content\n",
-                         _GET_FUNCTION_NAME_,
-                         URIContent.toString());
-            report(pOutput);
-            }
+ZStatus ZRawMasterFile::zgetPerIndex (ZDataBuffer &pRecordContent, const long pIndexRank,long pKeyRank) {
+  ZIndexItem wItem;
+  ZDataBuffer wKeyRecord;
+  if ((pIndexRank < 0) || (pIndexRank > IndexTable.count()))
+    return ZS_OUTBOUND;
+  ZStatus wSt= IndexTable[pIndexRank]->zget(wKeyRecord,pKeyRank);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+  wItem.fromFileKey(wKeyRecord);
+  return zgetByAddress(pRecordContent,wItem.ZMFAddress);
+}
 
-          while (IndexTable.size()>0)
-                  {
-                wSt=zremoveIndex(IndexTable.lastIdx());
-                if (wSt!=ZS_SUCCESS)
-                        {
-                      if (ZVerbose)
-                              {
-                            fprintf (wOutput,
-                                         "%s>> ****Error: removing index rank <%ld> status <%s> clearing ZMasterControlBlock of file <%s>\n"
-                                             "              Actual content\n",
-                                         _GET_FUNCTION_NAME_,
-                                         IndexTable.lastIdx(),
-                                         decode_ZStatus(wSt),
-                                         URIContent.toString());
-                            }
-                      ZException.addToLast(" removing index rank <%ld>. While clearing ZMasterControlBlock of file <%s>.",
-                                                 IndexTable.lastIdx(),
-                                                 URIContent.toString());
-                      return  wSt;
-                      }// not ZS_SUCCESS
-                if (ZVerbose)
-                        {
-                      fprintf (pOutput,
-                                   "%s>>      Index successfully removed\n",
-                                   _GET_FUNCTION_NAME_);
-                      report(wOutput);
-                      }
-                }//while
+ZStatus ZRawMasterFile::zgetFirstPerIndex (ZDataBuffer &pRecordContent, const long pIndexRank){
+  ZIndexItem wItem;
+  ZDataBuffer wKeyRecord;
+  if ((pIndexRank < 0) || (pIndexRank > IndexTable.count()))
+    return ZS_OUTBOUND;
+  ZStatus wSt= IndexTable[pIndexRank]->zgetFirst(wKeyRecord);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+  wItem.fromFileKey(wKeyRecord);
+  return zgetByAddress(pRecordContent,wItem.ZMFAddress);
+}
 
-          if (FOutput)
-                  fclose(wOutput);
-      ZMasterControlBlock::clear();
-      size_t wRet=_exportAppend(wMCBContent);
-      return   _Base::updateReservedBlock(wMCBContent,true);
-  }//zclearMCB
-#endif // __FROMZMASTERFILE__
-
-
-
-
-
+ZStatus ZRawMasterFile::zgetNextPerIndex (ZDataBuffer &pRecordContent, const long pIndexRank){
+  ZIndexItem wItem;
+  ZDataBuffer wKeyRecord;
+  if ((pIndexRank < 0) || (pIndexRank > IndexTable.count()))
+    return ZS_OUTBOUND;
+  ZStatus wSt= IndexTable[pIndexRank]->zgetNext(wKeyRecord);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
+  wItem.fromFileKey(wKeyRecord);
+  return zgetByAddress(pRecordContent,wItem.ZMFAddress);
+}
 
 #endif // ZRAWMASTERFILE_CPP

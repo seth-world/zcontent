@@ -485,16 +485,37 @@ ZStatus ZMFDicExportHeader::_import(const unsigned char* &pPtrIn)
   _importAtomic(wStartSign,pPtrIn);
   uint8_t wBlockId = *pPtrIn++;
 
-  if ((wBlockId!=ZBID_MDIC)||(wStartSign!=cst_ZBLOCKSTART))
+  if (wStartSign==cst_ZBUFFEREND)
   {
     ZException.setMessage("ZMFDicExportHeader::_import",
         ZS_BADDIC,
         Severity_Severe,
-        "Invalid Dictionary Header : found Start marker <%X> ZBlockId <%X>. One of these is invalid (or both are).",
+        "Invalid Empty Dictionary Header : found invalid start marker <%X> while expecting <%X>.\n"
+        "End of buffer has been reached.",
         wStartSign,
-        wBlockId);
+        cst_ZBLOCKSTART);
     return  ZS_BADDIC;
   }
+
+  if (wStartSign!=cst_ZBLOCKSTART)
+  {
+    ZException.setMessage("ZMFDicExportHeader::_import",
+        ZS_BADDIC,
+        Severity_Severe,
+        "Invalid Dictionary Header : found invalid start marker <%X> while expecting <%X>.",
+        wStartSign,
+        cst_ZBLOCKSTART);
+    return  ZS_BADDIC;
+  }
+  if (wBlockId!=ZBID_MDIC) {
+    ZException.setMessage("ZMFDicExportHeader::_import",
+        ZS_BADDIC,
+        Severity_Severe,
+        "Invalid Dictionary Header : found invalid ZBlockId <%X> while expecting <%X ZBIC_MDIC>.",
+        wBlockId,ZBID_MDIC);
+    return  ZS_BADDIC;
+  }
+
   Active = *pPtrIn++;
   _importAtomic(DicKeyCount,pPtrIn);
   _importAtomic(Version,pPtrIn);

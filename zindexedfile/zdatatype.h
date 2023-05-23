@@ -1,7 +1,7 @@
 #ifndef ZDATATYPE_H
 #define ZDATATYPE_H
 
-#include <zconfig.h>
+#include <config/zconfig.h>
 #include <cstdint>
 #include <type_traits>
 #include <ztoolset/zerror.h>
@@ -19,7 +19,7 @@
 #include <zcrypt/checksum.h>
 
 #include <ztoolset/charman.h>
-#include <ztoolset/zdate.h>
+//#include <ztoolset/zdate.h>
 #include <ztoolset/zdatefull.h>
 
 namespace zbs
@@ -227,8 +227,9 @@ static const size_t zdatabufferType= typeid(ZDataBuffer).hash_code();
 
 static const size_t stdStringType= typeid(std::string).hash_code();
 static const size_t stdWStringType= typeid(std::wstring).hash_code();
-
+/* Deprecated
 static const size_t zdateType= typeid(ZDate).hash_code();
+*/
 static const size_t zdateFullType= typeid(ZDateFull).hash_code();
 
 //---------- Data type acquisition ----------------------------
@@ -961,9 +962,10 @@ _getClassZType(size_t pTypeHashCode)
 
   if (pTypeHashCode==zdatabufferType)
     return ZType_Blob;
-
+/* Deprecated
   if (pTypeHashCode==zdateType)
     return ZType_ZDate;
+*/
   if (pTypeHashCode==zdateFullType)
     return ZType_ZDateFull;
 
@@ -1034,7 +1036,7 @@ _getClassZTypeFull( _Tp*  pValue,               /* value is required to get much
   }
 
   //============= dates =======================
-
+/* Deprecated
   if (wTypeHashCode==zdateType)
   {
     pType=ZType_ZDate;
@@ -1042,6 +1044,7 @@ _getClassZTypeFull( _Tp*  pValue,               /* value is required to get much
     pUnitCount =1;
     return pType;
   }
+*/
   if (wTypeHashCode==zdateFullType)
   {
     pType=ZType_ZDateFull;

@@ -22,12 +22,6 @@
 #include <zindexedfile/zindexitem.h>
 
 
-enum ZIXMode : uint8_t {
-  ZIXM_Nothing      = 0,
-  ZIXM_Dycho        = 1,
-  ZIXM_Debug        = 2,
-  ZIXM_UpdateHeader = 4
-};
 
 /*
 #ifdef ZVerbose
@@ -120,7 +114,7 @@ public:
 //    ZSIndexControlBlock   *ZICB=nullptr;    //!< ZICB pointer to ZMF father's ZICB content
 //    ZSIndexControlBlock   ZICB ;    //!< ZICB content
 
-    ZMFStats              ZPMSStats;        //!< statistical structure
+    ZMFStats              ZPMSStats;        // statistical structure (io time)
 /**
  * @brief ZIndexFile first constructor version : the common one.
  *          It sets up the ZIndexFile parameters AND rebuild the index if pAutoRebuild is set to true (default value is true).
@@ -133,7 +127,7 @@ public:
  * @param[in] pFather mandatory ZMF to which the ZIX refers or may be nullptr if debug mode is set
  * @param[in] pDebugMode optional switch to authorize using ZRawIndexFile as a standalone object withous its ZMF father
  */
-    ZRawIndexFile  (ZRawMasterFile *pFather, uint8_t pRunMode=ZIXM_Nothing);
+    ZRawIndexFile  (ZRawMasterFile *pFather);
     ZRawIndexFile  (ZRawMasterFile *pFather,ZIndexControlBlock& pZICB);
     ZRawIndexFile  (ZRawMasterFile *pFather,int pKeyUniversalsize,const utf8String &pIndexName ,ZSort_Type pDuplicates=ZST_NODUPLICATES);
 
@@ -177,6 +171,8 @@ public:
     using ZRandomFile::getMode;
     using ZRandomFile::zremoveAll;
 
+    using ZRandomFile::zgetFirst;
+    using ZRandomFile::zgetNext;
 
     IndexData_st getIndexData()
     {
@@ -247,8 +243,7 @@ public:
                             bool pHighwaterMarking=false,
                             bool pGrabFreeSpace=false,
                             bool pBackup=false,
-                            bool pLeaveOpen=true,
-                            uint8_t pRunMode=ZIXM_Nothing);
+                            bool pLeaveOpen=true);
   /**
    * @brief ZIndexFile::zcreateIndex creates a new index file corresponding to the given specification ICB and ZRF parameters
    *      same as previous but with explicit pBlockTargetSize
@@ -262,8 +257,7 @@ public:
                           bool pHighwaterMarking=false,
                           bool pGrabFreeSpace=false,
                           bool pBackup=false,
-                          bool pLeaveOpen=true,
-                          uint8_t pRunMode=ZIXM_Nothing);
+                          bool pLeaveOpen=true);
 
 
 #ifdef __DEPRECATED__
@@ -361,6 +355,9 @@ public:
                               ZIndexItem &pIndexItem,
                               const zlockmask_type pLock=ZLock_Nolock);
 
+    ZStatus _URFsearchAll(const ZDataBuffer &pKeyToSearch,
+                              ZIndexCollection &pIndexCollection,
+                              const zlockmask_type pLock=ZLock_Nolock);
 
     ZStatus _URFsearchAll(const ZDataBuffer &pKey,
                           ZIndexCollection &pCollection,
@@ -462,16 +459,20 @@ public: utf8String toXml(int pLevel,bool pComment);
 
 public: ZStatus  fromXml(zxmlNode* pIndexNode, ZaiErrors* pErrorlog);
 
-  void setRunMode(uint8_t pOnOff) ;
+//  void setEngineMode(uint8_t pOnOff) ;
   void showRunMode() ;
+  uint8_t getRunMode() ;
 
+  bool isSearchDycho() ;
+  bool isDebug() ;
+  bool isUpdateHeader() ;
 
 
 private:
     long                  IndexCommitRank;
     zaddress_type         ZMFAddress;
     ZDataBuffer           CurrentKeyContent;
-    uint8_t               RunMode=false;
+//    uint8_t               EngineMode=false;
 };// class ZIndexFile
 
 

@@ -1,6 +1,6 @@
 #ifndef ZDATACONVERSION_H
 #define ZDATACONVERSION_H
-#include <zconfig.h>
+#include <config/zconfig.h>
 #include <cstdint>
 #include <type_traits>
 #include <ztoolset/zerror.h>

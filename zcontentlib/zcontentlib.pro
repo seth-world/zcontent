@@ -76,7 +76,8 @@ unix:{
  INCLUDEPATH += $$TOOLSET_ROOT/include  \
                 $$TOOLSET_INCLUDE/zbase \
                 $$TOOLSET_INCLUDE/znet \
-                $$ZTOOLSET_ROOT \
+                $$TOOLSET_ROOT \
+                $$TOOLSET_BASE \
                 $$DEVELOPMENT_ROOT \
                 $$OPENSSL_ROOT \
                 $$TOOLSET_CONTENT
@@ -91,122 +92,128 @@ unix:{
 #                $$TOOLSET_ROOT
 
 HEADERS += \
-    ../zcontentcommon/urfparser.h \
-    ../zcontentcommon/zcontentconstants.h \
-    ../zcontentcommon/zidentity.h \
-    ../zcontentcommon/zlock.h \
-    ../zcontentcommon/zoperation.h \
-    ../zcontentcommon/zresource.h \
-    ../zcontentcommon/zresult.h \
-    ../zcontentcommon/zresult.h \
-    ../zcontentutils/zentity.h \
-    ../zindexedfile/zdataconversion.h \
-    ../zindexedfile/zdatatype.h \
-    ../zindexedfile/zdictionaryfile.h \
-    ../zindexedfile/zfielddescription.h \
-    ../zindexedfile/zindexcollection.h \
-    ../zindexedfile/zindexcontrolblock.h \
-    ../zindexedfile/zindexdata.h \
-    ../zindexedfile/zindexedfile_release.h \
-    ../zindexedfile/zindexfield.h \
-    ../zindexedfile/zindexitem.h \
-    ../zindexedfile/zindextable.h \
-    ../zindexedfile/zindextype.h \
-    ../zindexedfile/zjournal.h \
-    ../zindexedfile/zkeydictionary.h \
-    ../zindexedfile/zmastercontrolblock.h \
-    ../zindexedfile/zmasterfile.h \
-    ../zindexedfile/zmasterfile_utilities.h \
-    ../zindexedfile/zmasterfiletype.h \
-    ../zindexedfile/zmetadic.h \
-    ../zindexedfile/zmf_limits.h \
-    ../zindexedfile/zmfdictionary.h \
-    ../zindexedfile/zmfstats.h \
-    ../zindexedfile/znaturalfromurf.h \
-    ../zindexedfile/zrawindexfile.h \
-    ../zindexedfile/zrawmasterfile.h \
-    ../zindexedfile/zrawmasterfileutils.h \
-    ../zindexedfile/zrawrecord.h \
+    $$TOOLSET_CONTENT/zcontentcommon/urffield.h \
+    $$TOOLSET_CONTENT/zcontentcommon/urfparser.h \
+    $$TOOLSET_CONTENT/zcontentcommon/zcontentconstants.h \
+    $$TOOLSET_CONTENT/zcontentcommon/zidentity.h \
+    $$TOOLSET_CONTENT/zcontentcommon/zlock.h \
+    $$TOOLSET_CONTENT/zcontentcommon/zoperation.h \
+    $$TOOLSET_CONTENT/zcontentcommon/zresource.h \
+    $$TOOLSET_CONTENT/zcontentcommon/zresult.h \
+    $$TOOLSET_CONTENT/zcontentcommon/zresult.h \
+    $$TOOLSET_CONTENT/zcontentutils/zentity.h \
+    $$TOOLSET_CONTENT/zindexedfile/bckelement.h \
+    $$TOOLSET_CONTENT/zindexedfile/zdataconversion.h \
+    $$TOOLSET_CONTENT/zindexedfile/zdatatype.h \
+    $$TOOLSET_CONTENT/zindexedfile/zdictionaryfile.h \
+    $$TOOLSET_CONTENT/zindexedfile/zfielddescription.h \
+    $$TOOLSET_CONTENT/zindexedfile/zindexcollection.h \
+    $$TOOLSET_CONTENT/zindexedfile/zindexcontrolblock.h \
+    $$TOOLSET_CONTENT/zindexedfile/zindexdata.h \
+    $$TOOLSET_CONTENT/zindexedfile/zindexedfile_release.h \
+    $$TOOLSET_CONTENT/zindexedfile/zindexfield.h \
+    $$TOOLSET_CONTENT/zindexedfile/zindexitem.h \
+    $$TOOLSET_CONTENT/zindexedfile/zindextable.h \
+    $$TOOLSET_CONTENT/zindexedfile/zindextype.h \
+    $$TOOLSET_CONTENT/zindexedfile/zjournal.h \
+    $$TOOLSET_CONTENT/zindexedfile/zkeydictionary.h \
+    $$TOOLSET_CONTENT/zindexedfile/zmastercontrolblock.h \
+    $$TOOLSET_CONTENT/zindexedfile/zmasterfile.h \
+    $$TOOLSET_CONTENT/zindexedfile/zmasterfile_utilities.h \
+    $$TOOLSET_CONTENT/zindexedfile/zmasterfiletype.h \
+    $$TOOLSET_CONTENT/zindexedfile/zmetadic.h \
+    $$TOOLSET_CONTENT/zindexedfile/zmf_limits.h \
+    $$TOOLSET_CONTENT/zindexedfile/zmfdictionary.h \
+    $$TOOLSET_CONTENT/zindexedfile/zmfstats.h \
+    $$TOOLSET_CONTENT/zindexedfile/znaturalfromurf.h \
+    $$TOOLSET_CONTENT/zindexedfile/zrawindexfile.h \
+    $$TOOLSET_CONTENT/zindexedfile/zrawmasterfile.h \
+    $$TOOLSET_CONTENT/zindexedfile/zrawmasterfileutils.h \
+    $$TOOLSET_CONTENT/zindexedfile/zrawrecord.h \
 #    ../zindexedfile/zsifgeneric.h \
-    ../zindexedfile/zsjournalcontrolblock.h \
-    ../zindexedfile/zurffromnatural.h \
-    ../zrandomfile/zblock.h \
-    ../zrandomfile/zblockpool.h \
-    ../zrandomfile/zfilecontrolblock.h \
-    ../zrandomfile/zfiledescriptor.h \
-    ../zrandomfile/zheadercontrolblock.h \
-    ../zrandomfile/zrandomlockfile.h \
-    ../zrandomfile/zrfcollection.h \
-    ../zrandomfile/zrfpms.h \
-    ../zrandomfile/zrfutilities.h \
-    ../zrandomfile/zsearchargument.h \
-    ../zrandomfile/zrandomfile.h \
-    ../zrandomfile/zrandomfiletypes.h \
-    ../zrandomfile/zrecordaccesstable.h \
-    ../zrandomfile/zrfcollection.h \
-    ../zrandomfile/zrfconfig.h \
-    ../zindexedfile/zicm_todo_test.h \
+    $$TOOLSET_CONTENT/zindexedfile/zsjournalcontrolblock.h \
+    $$TOOLSET_CONTENT/zindexedfile/zurffromnatural.h \
+    $$TOOLSET_CONTENT/zrandomfile/zblock.h \
+    $$TOOLSET_CONTENT/zrandomfile/zblockpool.h \
+    $$TOOLSET_CONTENT/zrandomfile/zfilecontrolblock.h \
+    $$TOOLSET_CONTENT/zrandomfile/zfiledescriptor.h \
+    $$TOOLSET_CONTENT/zrandomfile/zheadercontrolblock.h \
+    $$TOOLSET_CONTENT/zrandomfile/zrandomlockfile.h \
+    $$TOOLSET_CONTENT/zrandomfile/zrfcollection.h \
+    $$TOOLSET_CONTENT/zrandomfile/zrfpms.h \
+    $$TOOLSET_CONTENT/zrandomfile/zrfutilities.h \
+    $$TOOLSET_CONTENT/zrandomfile/zsearchargument.h \
+    $$TOOLSET_CONTENT/zrandomfile/zrandomfile.h \
+    $$TOOLSET_CONTENT/zrandomfile/zrandomfiletypes.h \
+    $$TOOLSET_CONTENT/zrandomfile/zrecordaccesstable.h \
+    $$TOOLSET_CONTENT/zrandomfile/zrfcollection.h \
+    $$TOOLSET_CONTENT/zindexedfile/zicm_todo_test.h \
 # documentation
 # Random file documentation
-    ../zrandomfile/zrandomfile_doc.h \
-    ../zrandomfile/zrandomfile_quickstart_doc.h \
+    $$TOOLSET_CONTENT/zrandomfile/zrandomfile_doc.h \
+    $$TOOLSET_CONTENT/zrandomfile/zrandomfile_quickstart_doc.h \
 # Master file and index file documentation
-    ../zindexedfile/zmasterfile_quickstart_doc.h \
-    ../zindexedfile/zmasterfile_doc.h \
-    ../zindexedfile/zicmmain_doc.h \
-    ../zindexedfile/zindexfile_doc.h \
-    ../zindexedfile/zjournal_doc.h \                # Journalling
+    $$TOOLSET_CONTENT/zindexedfile/zmasterfile_quickstart_doc.h \
+    $$TOOLSET_CONTENT/zindexedfile/zmasterfile_doc.h \
+    $$TOOLSET_CONTENT/zindexedfile/zicmmain_doc.h \
+    $$TOOLSET_CONTENT/zindexedfile/zindexfile_doc.h \
+    $$TOOLSET_CONTENT/zindexedfile/zjournal_doc.h \                # Journalling
 # configuration files
-    zconfig.h \
-    ../zindexedfile/zmfconfig.h
+    $$TOOLSET_CONTENT/zindexedfile/zmfconfig.h \
+    $$TOOLSET_BASE/config/zconfig.h \
+    ../../config/zconfig.h \
+    ../../config/zconfig_general.h \
+    ../../config/zconfig_zrf.h
 
-FURTHER_H =     ../zrandomfile/zrandomlockfile.h
+FURTHER_H =    $$TOOLSET_CONTENT/zrandomfile/zrandomlockfile.h
 
 SOURCES += \
-    ../zcontentcommon/urfparser.cpp \
-    ../zcontentcommon/zidentity.cpp \
-    ../zcontentcommon/zlock.cpp \
-    ../zcontentcommon/zoperation.cpp \
-    ../zcontentcommon/zresource.cpp \
-    ../zcontentcommon/zresult.cpp \
-    ../zcontentutils/zentity.cpp \
-    ../zindexedfile/zdataconversion.cpp \
-    ../zindexedfile/zdatatype.cpp \
-    ../zindexedfile/zdictionaryfile.cpp \
-    ../zindexedfile/zfielddescription.cpp \
-    ../zindexedfile/zindexcollection.cpp \
-    ../zindexedfile/zindexcontrolblock.cpp \
-    ../zindexedfile/zindexfield.cpp \
-    ../zindexedfile/zindexitem.cpp \
-    ../zindexedfile/zindextable.cpp \
-    ../zindexedfile/zindextype.cpp \
-    ../zindexedfile/zjournal.cpp \
-    ../zindexedfile/zkeydictionary.cpp \
-    ../zindexedfile/zmastercontrolblock.cpp \
-    ../zindexedfile/zmasterfile.cpp \
-    ../zindexedfile/zmetadic.cpp \
-    ../zindexedfile/zmfdictionary.cpp \
-    ../zindexedfile/zmfstats.cpp \
-    ../zindexedfile/znaturalfromurf.cpp \
-    ../zindexedfile/zrawindexfile.cpp \
-    ../zindexedfile/zrawmasterfile.cpp \
-    ../zindexedfile/zrawmasterfileutils.cpp \
-    ../zindexedfile/zrawrecord.cpp \
-    ../zindexedfile/zsjournalcontrolblock.cpp \
-    ../zindexedfile/zurffromnatural.cpp \
-    ../zrandomfile/zblock.cpp \
-    ../zrandomfile/zblockpool.cpp \
-    ../zrandomfile/zfilecontrolblock.cpp \
-    ../zrandomfile/zfiledescriptor.cpp \
-    ../zrandomfile/zheadercontrolblock.cpp \
-    ../zrandomfile/zrandomfile.cpp \
-    ../zrandomfile/zrandomlockfile.cpp \
-    ../zrandomfile/zrfcollection.cpp \
-    ../zrandomfile/zrfpms.cpp \
-    ../zrandomfile/zrfutilities.cpp \
-    ../zrandomfile/zsearchargument.cpp
+    $$TOOLSET_CONTENT/zcontentcommon/urffield.cpp \
+    $$TOOLSET_CONTENT/zcontentcommon/urfparser.cpp \
+    $$TOOLSET_CONTENT/zcontentcommon/zidentity.cpp \
+    $$TOOLSET_CONTENT/zcontentcommon/zlock.cpp \
+    $$TOOLSET_CONTENT/zcontentcommon/zoperation.cpp \
+    $$TOOLSET_CONTENT/zcontentcommon/zresource.cpp \
+    $$TOOLSET_CONTENT/zcontentcommon/zresult.cpp \
+    $$TOOLSET_CONTENT/zcontentutils/zentity.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/bckelement.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zdataconversion.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zdatatype.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zdictionaryfile.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zfielddescription.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zindexcollection.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zindexcontrolblock.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zindexfield.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zindexitem.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zindextable.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zindextype.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zjournal.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zkeydictionary.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zmastercontrolblock.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zmasterfile.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zmetadic.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zmfdictionary.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zmfstats.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/znaturalfromurf.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zrawindexfile.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zrawmasterfile.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zrawmasterfileutils.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zrawrecord.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zsjournalcontrolblock.cpp \
+    $$TOOLSET_CONTENT/zindexedfile/zurffromnatural.cpp \
+    $$TOOLSET_CONTENT/zrandomfile/zblock.cpp \
+    $$TOOLSET_CONTENT/zrandomfile/zblockpool.cpp \
+    $$TOOLSET_CONTENT/zrandomfile/zfilecontrolblock.cpp \
+    $$TOOLSET_CONTENT/zrandomfile/zfiledescriptor.cpp \
+    $$TOOLSET_CONTENT/zrandomfile/zheadercontrolblock.cpp \
+    $$TOOLSET_CONTENT/zrandomfile/zrandomfile.cpp \
+    $$TOOLSET_CONTENT/zrandomfile/zrandomlockfile.cpp \
+    $$TOOLSET_CONTENT/zrandomfile/zrfcollection.cpp \
+    $$TOOLSET_CONTENT/zrandomfile/zrfpms.cpp \
+    $$TOOLSET_CONTENT/zrandomfile/zrfutilities.cpp \
+    $$TOOLSET_CONTENT/zrandomfile/zsearchargument.cpp
 
-FURTHER_CPP=         ../zrandomfile/zrandomlockfile.cpp
+FURTHER_CPP=         $$TOOLSET_CONTENT/zrandomfile/zrandomlockfile.cpp
 
 # ---------------Manage copy files to target ------------------
 

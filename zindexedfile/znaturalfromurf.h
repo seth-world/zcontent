@@ -19,7 +19,7 @@ setBlobfURF(_Tp* pNatural,
                 int32_t &pSourceArrayCount,
                 ZType_type &pTargetType,
                 int32_t &pTargetArrayCount);
-
+/* Deprecated
 ZStatus
 setZDateNfURF (void* pNatural,
                 ZDataBuffer *pURFData,
@@ -27,11 +27,14 @@ setZDateNfURF (void* pNatural,
                 int32_t &pSourceArrayCount,
                 ZType_type &pTargetType,
                 int32_t &pTargetArrayCount);
+ssize_t get_121_ZDateNfURF(void* pValue, ZDataBuffer *pURFData);
+*/
 
 ssize_t get_121_BlobNfURF(void* pValue,const unsigned char * pURFData);
 
 ssize_t get_121_ZDateFullNfURF(void* pValue, ZDataBuffer * pURFData);
-ssize_t get_121_ZDateNfURF(void* pValue, ZDataBuffer *pURFData);
+
+
 
 
 ssize_t get_121_CheckSumNfURF(void* pValue,ZDataBuffer * pURFData);

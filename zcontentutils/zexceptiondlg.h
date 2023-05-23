@@ -91,6 +91,7 @@ public:
   void applySeverity(Severity_type pSeverity, const utf8VaryingString &pTitle);
 
   void setInfo(const utf8VaryingString &pTitle);
+  void setQuestion(const utf8VaryingString &pTitle);
   void setWarning(const utf8VaryingString &pTitle);
   void setError(const utf8VaryingString &pTitle);
   void setSevere(const utf8VaryingString &pTitle);
@@ -212,6 +213,7 @@ public Q_SLOTS:
   void MoreClicked();
   void ErrlogClicked();
   void ZExceptionClicked();
+  void ZExceptionPurgeClicked();
 
   void layoutSetup(const utf8VaryingString &pTitle, bool pDontShow);
 
@@ -236,6 +238,7 @@ private:
 
   QPushButton *ErrlogBTn=nullptr;
   QPushButton *ZExceptionBTn=nullptr;
+  QPushButton *ZExceptionPurgeBTn=nullptr;
   QPushButton *MoreBTn=nullptr;
   QPushButton *OtherBTn=nullptr;
   QPushButton *OKBTn=nullptr;
@@ -256,5 +259,6 @@ private:
 };
 
 utf8VaryingString escapeHtmlSeq(const char* pString);
+utf8VaryingString escapeHtmlSeq(const utf8VaryingString& pString);
 
 #endif // ZEXCEPTIONDLG_H

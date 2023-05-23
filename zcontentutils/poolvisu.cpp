@@ -1367,7 +1367,7 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
 
       wSt = grabFreeForward(URIContent,FdContent,ContentFileSize , StartOfData,ZFBT,widx,nullptr);
 
-      ContentTBv->ItemModel->removeRow(int(wi));
+      ContentTBv->ItemModel->removeRow(wIdx.row());
       PoolChanged=true;
       break;
     } // moveFreeQAc
@@ -1405,7 +1405,7 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
       }
 
       ZBAT.erase(wi);
-      ContentTBv->ItemModel->removeRow(int(wi));
+      ContentTBv->ItemModel->removeRow(wIdx.row());
 
       PoolChanged=true;
       break;
@@ -1427,7 +1427,7 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
       }
 
       ZFBT.erase(wi);
-      ContentTBv->ItemModel->removeRow(int(wi));
+      ContentTBv->ItemModel->removeRow(wIdx.row());
 
       PoolChanged=true;
       break;
@@ -1478,7 +1478,7 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
       ZFBT[wi].State = ZBS_Used;
       ZBAT.push(ZFBT[wi]);
       ZFBT.erase(wi);
-      ContentTBv->ItemModel->removeRow(int(wi));
+      ContentTBv->ItemModel->removeRow(wIdx.row());
 
       PoolChanged=true;
       break;

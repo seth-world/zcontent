@@ -2,8 +2,18 @@
 #include "zrfutilities.h"
 #include <fcntl.h>
 #include <ztoolset/zexceptionmin.h>
+#include <zio/zioutils.h>
 
 const long cst_FileNudge = 100;
+
+
+ZFileUtils::~ZFileUtils()
+{
+  if (_isOpen) {
+    rawClose(Fd);
+    rawClose(FdHeader);
+  }
+}
 
 ZStatus
 ZFileUtils::rebuildHeader(uriString * pURIHeader) {
@@ -164,16 +174,9 @@ ZFileUtils::rebuildHeader(uriString * pURIHeader) {
 
 ZStatus
 ZFileUtils::_openContent(uriString& pURIContent) {
-  Fd= open(pURIContent.toCChar(),O_RDWR);
-  if (Fd<0) {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_ERROPEN,
-        Severity_Severe,
-        "Error opening file <%s> ",
-        pURIContent.toCChar());
-    return  (ZS_ERROPEN);
-  }
+  ZStatus wSt=rawOpen(Fd,pURIContent.toCChar(),O_RDWR);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
   URI=pURIContent;
   return ZS_SUCCESS;
 }
@@ -190,32 +193,19 @@ ZFileUtils::_openHeader(uriString *pURIHeader) {
   else
     URIHeader=pURIHeader->toString();
 
-  FdHeader= open(URIHeader.toCChar(),O_RDWR);
-  if (FdHeader<0) {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_ERROPEN,
-        Severity_Severe,
-        "Error opening file <%s> ",
-        URIHeader.toCChar());
-    return  (ZS_ERROPEN);
-  }
-  return ZS_SUCCESS;
+  wSt=rawOpen(FdHeader,URIHeader.toCChar(),O_RDWR);
+  if (wSt!=ZS_SUCCESS)
+    rawClose(Fd);
+
+  return wSt;
 }
 
 ZStatus
 ZFileUtils::seekAndGet(ZDataBuffer& pOut, ssize_t &pSize, size_t pAddress) {
-  FileOffset=lseek(Fd,off_t(pAddress),SEEK_SET);
-  if (FileOffset < 0) {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_FILEPOSERR,
-        Severity_Severe,
-        "Error positionning at address <%ld> for file <%s> ",
-        pAddress,
-        URI.toCChar());
-    return  ZS_FILEPOSERR ;
-  }
+
+  ZStatus wSt=rawSeek(Fd,(off_t &)pAddress,SEEK_SET);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
 
   if ((pSize + FileOffset) > FileSize) {
     pSize= FileSize -  FileOffset;
@@ -223,26 +213,14 @@ ZFileUtils::seekAndGet(ZDataBuffer& pOut, ssize_t &pSize, size_t pAddress) {
       return ZS_EOF;
     }
   }
-  pOut.allocateBZero(pSize);
-  pSize=::read(Fd,pOut.DataChar,pSize);
-  if (pSize < 0) {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_READERROR,
-        Severity_Severe,
-        "While reading size <%ld> from file <%s>.",pSize,URI.toCChar());
-    return ZS_READERROR;
-  }
+
+  wSt=rawRead(Fd,pOut,pSize);
+  if (wSt!=ZS_SUCCESS)
+    return wSt;
 
   return ZS_SUCCESS;
 } //seekAndGet
 
-ZStatus
-ZFileUtils::_close(){
-  close(Fd);
-  _isOpen=false;
-  Fd=-1;
-}
 
 ZStatus
 ZFileUtils::searchNextStartSign(zaddress_type pStartAddress, zaddress_type & pOutAddress) {
@@ -521,21 +499,4 @@ ZFileUtils::writeHeaderFromPool(const uriString& pURIHeader,
   return pURIHeader.writeContent(wHeaderContent);
 } //updateHeaderFromPool
 
-ZStatus renameFile(const uriString& pFormerName,const utf8VaryingString& pNewName) {
-  int wRet=::rename(pFormerName.toCChar(),pNewName.toCChar());
-  if (wRet!=0) {
-    ZException.getErrno(errno,"renameFile",ZS_FILEERROR,Severity_Severe,
-        "Error renaming file %s to %s",pFormerName.toString(),pNewName.toString());
-    return ZS_FILEERROR;
-  }
-  return ZS_SUCCESS;
-}
-ZStatus removeFile(const uriString& pFormerName) {
-  int wRet=::remove(pFormerName.toCChar());
-  if (wRet!=0) {
-    ZException.getErrno(errno,"removeFile",ZS_FILEERROR,Severity_Severe,
-        "Error removing file %s.",pFormerName.toString());
-    return ZS_FILEERROR;
-  }
-  return ZS_SUCCESS;
-}
+

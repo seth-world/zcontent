@@ -50,8 +50,8 @@ public:
     void reportShort(FILE* pOutput=stdout);
     void reportFull(FILE* pOutput=stdout);
 
-    ZMFStats & operator = (const ZRFPMS& pPMSIn) { memmove (this,&pPMSIn,sizeof(ZRFPMS)); return *this;}
-    ZMFStats & operator = (ZMFStats pStatIn) { memmove (this,&pStatIn,sizeof(ZMFStats)); return *this;}
+    ZMFStats & operator = (const ZRFPMS& pPMSIn) { ZRFPMS::_copyFrom(pPMSIn); return *this;}
+    ZMFStats & operator = (ZMFStats pStatIn) {  return _copyFrom(pStatIn);}
 
     ZMFStats operator - (const ZMFStats &pIn);
     ZMFStats  operator + (const ZMFStats &pStatIn);
