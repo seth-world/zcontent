@@ -14,6 +14,7 @@ enum EdBlk : uint8_t {
 #include <zcontent/zrandomfile/zblock.h>
 
 class QLabel;
+class QLineEdit;
 
 class editBlockDLg : public QDialog
 {
@@ -29,21 +30,22 @@ private slots:
   void CommitChanges();
   void Quit();
 private:
-  QLabel* BlockSize=nullptr;
-  QLabel* BlockSizeF=nullptr;
+  QLineEdit* BlockSize=nullptr;
+  QLineEdit* BlockSizeF=nullptr;
 
-  QLabel* State=nullptr;
-  QLabel* StateF=nullptr;
+  QLineEdit* State=nullptr;
+  QLineEdit* StateF=nullptr;
 
-  QLabel* Lock=nullptr;
-  QLabel* LockF=nullptr;
+  QLineEdit* Lock=nullptr;
+  QLineEdit* LockF=nullptr;
 
-  QLabel* Pid=nullptr;
-  QLabel* PidF=nullptr;
+  QLineEdit* Pid=nullptr;
+  QLineEdit* PidF=nullptr;
 
   QPushButton* CommitBTn=nullptr;
   QPushButton* PoolToFileBTn=nullptr;
   QPushButton* FileToPoolBTn=nullptr;
+  QPushButton* UnlockBTn=nullptr;
 
   QPalette ErrorPalette;
   QPalette NormalPalette;
@@ -58,6 +60,8 @@ private:
 
   int8_t          HasChanged=0;
   size_t          FileSize=0;
+  int             PoolId=-1;
+  long            DataRank=-1;
   __FILEHANDLE__  ContentFd=-1;
   __FILEHANDLE__  HeaderFd=-1;
 };

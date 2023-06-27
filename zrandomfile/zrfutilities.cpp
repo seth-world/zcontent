@@ -444,7 +444,6 @@ ZFileUtils::writeHeaderFromPool(const uriString& pURIHeader,
 {
   ZDataBuffer wHeaderContent,wNewHeaderContent;
 
-
   pHCB.OffsetReserved = sizeof(ZHeaderControlBlock_Export) ;
   pHCB.SizeReserved = pReserved.Size ;
   pHCB.OffsetFCB =    pHCB.OffsetReserved + pReserved.Size ;
@@ -500,6 +499,19 @@ ZFileUtils::writeHeaderFromPool(const uriString& pURIHeader,
 } //updateHeaderFromPool
 
 
+bool testSequence (const unsigned char* pSequence,size_t pSeqLen,
+    const unsigned char* pToCompare)
+{
+  while (pSeqLen) {
+    if (*pSequence != *pToCompare)
+      return false;
+    pSequence++;
+    pToCompare++;
+    pSeqLen--;
+  }
+  return true;
+}
+
 
 ZStatus
 rawSearchNextStartSign(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,zaddress_type pStartAddress, zaddress_type & pOutAddress) {
@@ -527,58 +539,56 @@ rawSearchNextStartSign(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,zaddress_
         Severity_Severe,
         "Error positionning at address <%ld> for file <%s> ",
         pStartAddress,
-        getNameFromFd(pFd).toCChar());
+        rawGetNameFromFd(pFd).toCChar());
     return wSt;
   }
 
   const unsigned char* wPtr = wRecord.Data ;
   const unsigned char* wPtrEnd = wRecord.Data + wRecord.Size;
 
+  const unsigned char* wSignPtr=(const unsigned char*)&cst_ZFILEBLOCKSTART;
+
   uint32_t* wStartSign = (uint32_t*)wPtr;
-  if (*wStartSign == cst_ZFILEBLOCKSTART) {
+  if (testSequence(wSignPtr,sizeof(uint32_t),wPtr)) {
     pOutAddress = pStartAddress;
     return ZS_SUCCESS;
   }
 
+
+
   while ((pStartAddress < zaddress_type(pFileSize)) && (wSt==ZS_SUCCESS)) {
 
-    while ((*wStartSign!=cst_ZFILEBLOCKSTART) && (wPtr < wPtrEnd)) {
-      wStartSign = (uint32_t*)wPtr;
+    while ((!testSequence(wSignPtr,sizeof(uint32_t),wPtr)) && (wPtr < wPtrEnd)) {
       pStartAddress ++;
       wPtr++;
     }
-    if (*wStartSign==cst_ZFILEBLOCKSTART)
-      break;
+    if (testSequence(wSignPtr,sizeof(uint32_t),wPtr)) {
+      pOutAddress = pStartAddress;
+      return ZS_SUCCESS;
+    }
 
     if (pStartAddress >= zaddress_type(pFileSize)) {
-      return ZS_OUTBOUNDHIGH;
+      break;
     }
-    pStartAddress -= 3;
+    pStartAddress -= (sizeof(cst_ZFILEBLOCKSTART)-1);
 
     wSt=rawReadAt(pFd,wRecord,wNudge,pStartAddress);
     if (wSt!=ZS_SUCCESS)
-      return wSt;
+      break;
     wPtr = wRecord.Data;
     wPtrEnd = wRecord.Data + wRecord.Size ;
   } // while wAddress
 
+  if ((wSt==ZS_EOF)||(pStartAddress >= zaddress_type(pFileSize))) {
+    wSt=ZS_EOF;
+    pOutAddress = zaddress_type(pFileSize);
+    return ZS_EOF;
+  }
 
-  pOutAddress = pStartAddress;
-  return ZS_SUCCESS;
+  return wSt;
 }// searchNextStartSign
 
-bool testSequence (const unsigned char* pSequence,size_t pSeqLen,
-    const unsigned char* pToCompare)
-{
-  while (pSeqLen) {
-    if (*pSequence != *pToCompare)
-      return false;
-    pSequence++;
-    pToCompare++;
-    pSeqLen--;
-  }
-  return true;
-}
+
 
 ZStatus
 searchNextSequence(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,
@@ -609,7 +619,7 @@ searchNextSequence(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,
         Severity_Severe,
         "Error positionning at address <%ld> for file <%s> ",
         pStartAddress,
-        getNameFromFd(pFd).toCChar());
+        rawGetNameFromFd(pFd).toCChar());
     return wSt;
   }
 

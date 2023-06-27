@@ -132,9 +132,12 @@ private slots:
 
   void generalActionEvent(QAction* pAction);
 
-  void displayZBAT();
-  void displayZFBT();
-  void displayPool(ZDataBuffer &pRawData, const unsigned char* pPtr, zaddress_type pOffset, const char* pTitle);
+  void rawListZBAT();
+  void rawListZFBT();
+  void rawListZHOT();
+  void rawListPool(ZDataBuffer &pRawData, const unsigned char* pPtr, zaddress_type pOffset, const char* pTitle);
+
+  void rawSurfaceScan();
 
   void viewBlock(zaddress_type pAddress, zrank_type pRank);
 private:
@@ -143,7 +146,9 @@ private:
   long BlockTargetSize=100;
 
   /* flex menu */
-  QAction*  blockVisuQAc=nullptr;
+  QAction*  blockVisuRawQAc=nullptr;
+  QAction*  blockVisuURFQAc=nullptr;
+  QAction*  blockEditQAc=nullptr;
   QAction*  moveFreeQAc =nullptr;
   QAction*  moveDeleteQAc =nullptr;
   QAction*  changeToUsedQAc =nullptr;
@@ -172,6 +177,9 @@ private:
 
   QAction* displayZBATQAc = nullptr;
   QAction* displayZFBTQAc = nullptr;
+  QAction* displayZHOTQAc = nullptr;
+
+  QAction* surfaceScanQAc = nullptr;
 
   QAction* unlockHeaderQAc = nullptr;
 

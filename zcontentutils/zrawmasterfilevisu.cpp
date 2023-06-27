@@ -566,7 +566,7 @@ ZRawMasterFileVisu::searchNextStartSign_S(__FILEHANDLE__ pFd,size_t pFileSize,lo
         Severity_Severe,
         "Error positionning at address <%ld> for file <%s> ",
         pStartAddress,
-        getNameFromFd(pFd).toCChar());
+        rawGetNameFromFd(pFd).toCChar());
     return wSt;
   }
 

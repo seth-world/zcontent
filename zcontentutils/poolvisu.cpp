@@ -104,6 +104,7 @@ poolVisu::poolVisu(QWidget *parent) :
 
   ui->PoolCBx->addItem("ZBAT");
   ui->PoolCBx->addItem("ZFBT");
+  ui->PoolCBx->addItem("ZHOT");
 //  ui->PoolCBx->addItem("ZDBT");  // Deprecated
 
   QMenu*  generalMEn=new QMenu("General",this);
@@ -181,6 +182,15 @@ poolVisu::poolVisu(QWidget *parent) :
   displayZFBTQAc = new QAction("ZFBT raw list",this);
   listMEn->addAction(displayZFBTQAc);
   actionAGp->addAction(displayZFBTQAc);
+
+  displayZHOTQAc = new QAction("ZHOT raw list",this);
+  listMEn->addAction(displayZHOTQAc);
+  actionAGp->addAction(displayZHOTQAc);
+
+  surfaceScanQAc = new QAction("Content surface scan",this);
+  listMEn->addAction(surfaceScanQAc);
+  actionAGp->addAction(surfaceScanQAc);
+
 
   listMEn->addSeparator();
 
@@ -349,18 +359,26 @@ poolVisu::generalActionEvent(QAction* pAction) {
   }
 
   if (pAction == displayZBATQAc) {
-    displayZBAT();
+    rawListZBAT();
     return;
   }
   if (pAction == displayZFBTQAc) {
-    displayZFBT();
+    rawListZFBT();
+    return;
+  }
+  if (pAction == displayZHOTQAc) {
+    rawListZHOT();
+    return;
+  }
+  if (pAction == surfaceScanQAc) {
+    rawSurfaceScan();
     return;
   }
   return;
 }
 
 void
-poolVisu::displayZBAT()
+poolVisu::rawListZBAT()
 {
   ZDataBuffer wRawData;
   URIHeader.loadContent(wRawData);
@@ -383,12 +401,12 @@ poolVisu::displayZBAT()
   wOffset= reverseByteOrder_Conditional<size_t>(wFCBe->ZBAT_DataOffset);
   wPtr += wOffset;
 
-  displayPool(wRawData,wPtr,wOffset,"ZBAT Block Access Table");
+  rawListPool(wRawData,wPtr,wOffset,"ZBAT Block Access Table");
   return;
 }
 
 void
-poolVisu::displayZFBT()
+poolVisu::rawListZFBT()
 {
   ZDataBuffer wRawData;
   URIHeader.loadContent(wRawData);
@@ -411,11 +429,38 @@ poolVisu::displayZFBT()
   wOffset= reverseByteOrder_Conditional<size_t>(wFCBe->ZFBT_DataOffset);
   wPtr += wOffset;
 
-  displayPool(wRawData,wPtr,wOffset,"FBT Free blocks table");
+  rawListPool(wRawData,wPtr,wOffset,"FBT Free blocks table");
   return;
 }
 void
-poolVisu::displayPool(ZDataBuffer& pRawData,const unsigned char* pPtr,zaddress_type pOffset,const char* pTitle)
+poolVisu::rawListZHOT()
+{
+  ZDataBuffer wRawData;
+  URIHeader.loadContent(wRawData);
+  if (!ZContentVisuMain::testRequestedSize(URIHeader,wRawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
+    return ;
+
+  unsigned char* wPtr=wRawData.Data;
+  ZHeaderControlBlock_Export* wHe = (ZHeaderControlBlock_Export*)wRawData.Data;
+  if (wHe->isNotReversed())
+  {
+    _ABORT_
+  }
+  zaddress_type wOffset= reverseByteOrder_Conditional<zaddress_type>(wHe->OffsetFCB);
+  wPtr += wOffset;
+  ZFCB_Export* wFCBe = (ZFCB_Export*)(wPtr);
+  if (wFCBe->isNotReversed())
+  {
+    _ABORT_
+  }
+  wOffset= reverseByteOrder_Conditional<size_t>(wFCBe->ZHOT_DataOffset);
+  wPtr += wOffset;
+
+  rawListPool(wRawData,wPtr,wOffset,"Holes table");
+  return;
+}
+void
+poolVisu::rawListPool(ZDataBuffer& pRawData,const unsigned char* pPtr,zaddress_type pOffset,const char* pTitle)
 {
   ZAExport* wZAEe=(ZAExport*) pPtr;
   utf8VaryingString wOut;
@@ -448,7 +493,7 @@ poolVisu::displayPool(ZDataBuffer& pRawData,const unsigned char* pPtr,zaddress_t
       wZAEe->NbElements,reverseByteOrder_Conditional (wZAEe->NbElements));
 
 
-  //  textEditMWn* wTEx=openGenLogWin();
+
   textEditMWn* wTEx= new textEditMWn(this);
   wTEx->setText(wOut,pTitle);
 
@@ -500,7 +545,138 @@ poolVisu::displayPool(ZDataBuffer& pRawData,const unsigned char* pPtr,zaddress_t
 
 }// displayPool
 
+void
+poolVisu::rawSurfaceScan()
+{
+  ZDataBuffer wRawData;
+  URIHeader.loadContent(wRawData);
+  if (!ZContentVisuMain::testRequestedSize(URIHeader,wRawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
+    return ;
+  utf8VaryingString wOut;
+  utf8VaryingString wStr;
 
+  wOut.sprintf("Content file <%s>",URIContent.toString());
+
+  textEditMWn* wTEx= new textEditMWn(this);
+  wTEx->setText(wOut,"Raw file surface scan");
+
+
+
+  ZStatus wSt;
+
+  wSt=ZS_SUCCESS;
+
+  ZBlockHeader wBlockHeader;
+
+  ZDataBuffer wZDB;
+
+  zaddress_type wOldAddress = 0;
+  zsize_type    wOldSize = 0;
+  zaddress_type wAddressNext = 0;
+  zaddress_type wTheoricAddress = 0;
+
+  wTEx->appendText("\n________________________________________Content Data blocks in physical order__________________________________________________");
+
+  wTEx->appendText(
+      "Physical address    | Block size         | User content size  |  Theorical next    |   State       |    Lock       |  Pid     |\n"
+      "____________________|____________________|____________________|____________________|_______________|_______________|__________|"
+      );
+
+  size_t wSize;
+  wSt=rawSeekEnd(FdContent,wSize);
+
+  wSt=rawSeekBegin(FdContent);
+  if (wSt!=ZS_SUCCESS)
+    return ;
+
+  wSt=rawSearchNextStartSign(FdContent,wSize,2000L,zaddress_type(0L),wAddressNext);
+
+  bool wNotFirst=false;
+
+  while (wSt==ZS_SUCCESS) {
+    wTheoricAddress = wOldAddress+wOldSize;
+
+    if ( wNotFirst &&(wAddressNext != wTheoricAddress)) {
+      wTEx->appendTextColor(Qt::magenta, "%20ld|%20ld|%20s|%20s|%15s|%15s|%10s|",
+          wTheoricAddress,
+          wAddressNext-wTheoricAddress,
+          " "," ",
+          "--- <Hole> ---",
+          " ", " "
+          );
+    }
+
+    wSt = rawReadAt(FdContent,wZDB,sizeof(ZBlockHeader_Export),wAddressNext);
+    if (wSt!=ZS_SUCCESS)
+      break;
+    ZBlockHeader_Export* wZDBE=(ZBlockHeader_Export*)wZDB.Data;
+    utf8VaryingString wLock = " ";
+    if (wZDBE->Lock != ZLock_Nolock) {
+      wLock = decode_ZLockMask(wZDBE->Lock);
+    }
+    wZDBE->deserialize();
+    switch (wZDBE->State) {
+    case ZBS_Deleted:
+      wTEx->appendTextColor(Qt::red, "%20ld|%20ld|%20ld|%20ld|%15s|%15s|%10ld|",
+          wAddressNext,
+          wZDBE->BlockSize,
+          (wZDBE->BlockSize-(zsize_type)sizeof(ZBlockHeader_Export)),
+          wAddressNext+wZDBE->BlockSize,
+          decode_ZBS( wZDBE->State),wLock.toString(),wZDBE->Pid);
+      break;
+    case ZBS_Free:
+      wTEx->appendTextColor(Qt::blue, "%20ld|%20ld|%20ld|%20ld|%15s|%15s|%10ld|",
+          wAddressNext,
+          wZDBE->BlockSize,
+          (wZDBE->BlockSize-(zsize_type)sizeof(ZBlockHeader_Export)),
+          wAddressNext+wZDBE->BlockSize,
+          decode_ZBS( wZDBE->State),wLock.toString(),wZDBE->Pid);
+      break;
+    case ZBS_Used:
+      wTEx->appendText( "%20ld|%20ld|%20ld|%20ld|%15s|%15s|%10ld|",
+          wAddressNext,
+          wZDBE->BlockSize,
+          (wZDBE->BlockSize-(zsize_type)sizeof(ZBlockHeader_Export)),
+          wAddressNext+wZDBE->BlockSize,
+          decode_ZBS( wZDBE->State),wLock.toString(),wZDBE->Pid);
+      break;
+      default:
+        wTEx->appendTextColor(Qt::magenta, "%20ld|%20ld|%20ld|%20ld|%15s|%15s|%10ld|",
+            wAddressNext,
+            wZDBE->BlockSize,
+            (wZDBE->BlockSize-(zsize_type)sizeof(ZBlockHeader_Export)),
+            wAddressNext+wZDBE->BlockSize,
+            decode_ZBS( wZDBE->State),wLock.toString(),wZDBE->Pid);
+        break;
+
+    }
+
+    wOldAddress=wAddressNext;
+    wOldSize = wZDBE->BlockSize ;
+/*    if (wZDBE->State == ZBS_Used)
+      wAddressNext += wZDBE->BlockSize;
+    else
+*/
+    wAddressNext += sizeof(ZBlockHeader_Export);   // just to grab deleted Blocks
+
+    wNotFirst=true;
+    wSt=rawSearchNextStartSign(FdContent,wSize,2000L,wAddressNext,wAddressNext);
+  }// while ZS_SUCCESS
+
+  wTEx->appendText("____________________|____________________|____________________|____________________|_______________|_______________|__________|\n");
+
+  if ((wSt==ZS_READPARTIAL)||(wSt==ZS_EOF)||(wAddressNext >= wSize)) {
+    wTEx->appendText("\n       **** End of report at address <%ld> *****\n"
+                       "            End of report status is <%s>",
+                      wAddressNext,decode_ZStatus(wSt));
+  }
+
+  if (ZException.count() > 0)
+    wTEx->appendText(ZException.last().formatFullUserMessage(false));
+
+  wTEx->show();
+  return ;
+}
 
 ZStatus
 poolVisu::set(const uriString& pContentUri,const uriString& pHeaderUri)
@@ -545,34 +721,25 @@ poolVisu::set(const uriString& pContentUri,const uriString& pHeaderUri)
 
 void poolVisu::refresh() {
 
-  ::close(FdHeader);
-  FdHeader = ::open(URIHeader.toCChar(),O_RDWR);
-  if (FdHeader<0) {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_ERROPEN,
-        Severity_Severe,
-        "Error opening file <%s> ",
+  rawClose(FdHeader);
+  rawClose(FdContent);
+  ZStatus wSt=rawOpen(FdHeader,URIHeader,O_RDWR);
+  if (wSt!=ZS_SUCCESS) {
+    ZExceptionDLg::adhocMessage("Open header",Severity_Error,"Error opening file <%s> ",
         URIHeader.toCChar());
-    ZExceptionDLg::displayLast("Refresh");
     return;
   }
-  ::close(FdContent);
-  FdContent = ::open(URIContent.toCChar(),O_RDWR);
-  if (FdHeader<0) {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_ERROPEN,
-        Severity_Severe,
-        "Error opening file <%s> ",
+  wSt=rawOpen(FdContent,URIContent,O_RDWR);
+  if (wSt!=ZS_SUCCESS) {
+    ZExceptionDLg::adhocMessage("Open content",Severity_Error,"Error opening file <%s> ",
         URIContent.toCChar());
-    ZExceptionDLg::displayLast("Refresh");
     return;
   }
-
-  off_t wS=lseek(FdContent,0L,SEEK_END);
+  size_t wS=0;
+  wSt=rawSeekEnd(FdContent,wS);
+/*  off_t wS=lseek(FdContent,0L,SEEK_END);
+ */
   setQLabelNum<off_t>(ui->ContentSizeLBl, wS);
-
 
   URIHeader.loadContent(HeaderContent);
   dataSetup(ui->PoolCBx->currentIndex());
@@ -683,6 +850,10 @@ void poolVisu::dataSetup(int pPoolid) {
   case 1:
     wOffset= reverseByteOrder_Conditional<size_t>(wFCBe->ZFBT_DataOffset);
     ui->PoolNameLBl->setText("Free blocks table");
+    break;
+  case 2:
+    wOffset= reverseByteOrder_Conditional<size_t>(wFCBe->ZHOT_DataOffset);
+    ui->PoolNameLBl->setText("Holes table");
     break;
 /*
   case 2:
@@ -995,7 +1166,6 @@ for (long wi=0; wi < ContentTBv->ItemModel->rowCount();wi++)
     ZResource wRes ;
     wRes = ZResource::getNew(ZEntity_ZFBT);
     ZDataReference wDRef (ZLayout_FileBlock,wRes,-1);
-//    wDRef.ResourceReference.Entity=ZEntity_ZFBT;
     wDRef.setPtr(&ZFBT[wi]);
     wDRef.DataRank = wi;
 
@@ -1120,8 +1290,15 @@ void poolVisu::showBlockDetail(int pPoolId,long pDataRank,ZBlockDescriptor* pBD)
 
   int wRet=wEdBlk->exec();
 
+  wEdBlk->deleteLater();
+
   if (wRet==QDialog::Accepted) {
     viewBlock(pBD->Address, pDataRank);
+    return;
+  }
+  if (wRet==3) { /* there was a modification in pool or in file and errors should have been cleared */
+    refresh();
+    return;
   }
 }
 
@@ -1131,10 +1308,8 @@ void poolVisu::viewBlock(zaddress_type pAddress, zrank_type pRank) {
     ContentVisu= new ZRawMasterFileVisu(this);
   ContentVisu->setup(URIContent, FdContent);
   ContentVisu->setModal(false);
-//  ContentVisu->setViewModeRaw();
   ContentVisu->goToAddress(pAddress,pRank);
-
-
+  ContentVisu->setViewModeRaw();
 
   ContentVisu->show();
 }
@@ -1176,12 +1351,24 @@ poolVisu::menuFlex(QContextMenuEvent *event) {
   //  QObject::connect(visuActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(visuActionEvent(QAction*)));
     QObject::connect(flexAGp, &QActionGroup::triggered,this,  &poolVisu::flexMenActionEvent);
   }
-  if (blockVisuQAc==nullptr) {
-    blockVisuQAc=new QAction("view content");
-    flexAGp->addAction(blockVisuQAc);
+  if (blockVisuRawQAc==nullptr) {
+    blockVisuRawQAc=new QAction("view raw content");
+    flexAGp->addAction(blockVisuRawQAc);
   }
+  flexMEn->addAction(blockVisuRawQAc);
 
-  flexMEn->addAction(blockVisuQAc);
+  if (blockVisuURFQAc==nullptr) {
+    blockVisuURFQAc=new QAction("view URF content");
+    flexAGp->addAction(blockVisuURFQAc);
+  }
+  flexMEn->addAction(blockVisuURFQAc);
+
+  if (blockEditQAc==nullptr) {
+    blockEditQAc=new QAction("Edit block");
+    flexAGp->addAction(blockEditQAc);
+  }
+  flexMEn->addAction(blockEditQAc);
+
 
   switch (uint8_t(PoolId)) {
   case ZPTP_ZBAT:
@@ -1216,7 +1403,9 @@ poolVisu::menuFlex(QContextMenuEvent *event) {
       changeToUsedQAc->setEnabled((false));
       changeToUsedQAc->setEnabled((false));
       removeNullQAc->setEnabled((false));
-      blockVisuQAc->setEnabled(false);
+      blockVisuRawQAc->setEnabled(false);
+      blockVisuURFQAc->setEnabled(false);
+      blockEditQAc->setEnabled(false);
       moveDeleteQAc->setEnabled(false);
     }
 
@@ -1238,7 +1427,9 @@ poolVisu::menuFlex(QContextMenuEvent *event) {
     if ((PoolNotLoaded) ||(ZFBT.count()==0)){
       changeToFreeQAc->setEnabled(false);
       removeNullQAc->setEnabled((false));
-      blockVisuQAc->setEnabled(false);
+      blockVisuRawQAc->setEnabled(false);
+      blockVisuURFQAc->setEnabled(false);
+      blockEditQAc->setEnabled(false);
     }
 
     break;
@@ -1273,7 +1464,7 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
   if (!wIdx.isValid())
     return;
 
-  if (pAction==blockVisuQAc) {
+  if (pAction==blockVisuRawQAc) {
     QVariant wV;
     wV=ContentTBv->ItemModel->item(wIdx.row(),0)->data(Qt::UserRole);
     zaddress_type wAddress = wV.value<zaddress_type>();
@@ -1289,6 +1480,48 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
     if (isIndexFile) {
       ContentVisu->setVisuIndexFile();
     }
+    return;
+  }
+  if (pAction==blockVisuURFQAc) {
+    QVariant wV;
+    wV=ContentTBv->ItemModel->item(wIdx.row(),0)->data(Qt::UserRole);
+    zaddress_type wAddress = wV.value<zaddress_type>();
+    if (ContentVisu==nullptr)
+      ContentVisu= new ZRawMasterFileVisu(this);
+    ContentVisu->setup(URIContent, FdContent);
+    ContentVisu->setModal(false);
+
+    ContentVisu->_goToAddress(wAddress,zrank_type(wIdx.row()));
+    ContentVisu->setViewModeURF();
+    ContentVisu->show();
+
+    if (isIndexFile) {
+      ContentVisu->setVisuIndexFile();
+    }
+    return;
+  }
+  if (pAction==blockEditQAc) {
+    QVariant wV;
+    wV=ContentTBv->ItemModel->item(wIdx.row(),0)->data(Qt::UserRole);
+    zaddress_type wAddress = wV.value<zaddress_type>();
+
+
+    //void poolVisu::showBlockDetail(int pPoolId,long pDataRank,ZBlockDescriptor* pBD)
+    ZBlockDescriptor* wBD=nullptr;
+    int wDataRank=wIdx.row();
+    switch (PoolId) {
+    case ZPTP_ZBAT :
+      wBD=&ZBAT[wDataRank];
+      break;
+    case ZPTP_ZFBT :
+      wBD=&ZFBT[wDataRank];
+      break;
+    case ZPTP_ZHOT :
+      wBD=&ZHOT[wDataRank];
+      break;
+
+    }
+    showBlockDetail(PoolId,wDataRank,wBD);
     return;
   }
 

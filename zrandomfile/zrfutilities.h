@@ -146,7 +146,6 @@ rawCheckContentBlock(int pPoolId,int pFdContent,ZBlockDescriptor& pBlockDesc);
 
 ZStatus rebuildZRFHeader(uriString& pURIContent);
 
-
 utf8VaryingString decode_ZBEx(uint16_t pBEx);
 
 #endif // ZRFUTILITIES_H

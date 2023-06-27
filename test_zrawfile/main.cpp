@@ -189,7 +189,7 @@ return 0;
 utf8String displayResource(ZResource& pRes) {
   utf8String wReturn;
   wReturn.sprintf("%s-%ld",
-      decode_ZEntity(pRes.Entity).toChar(),pRes.id);
+      decode_ZEntity(pRes.Entity).toCChar(),pRes.id);
   return wReturn;
 }
 
@@ -375,7 +375,7 @@ ZStatus populate(const uriString& pZMF) {
     ZException.exit_abort();
   }
 
-  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
+  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toCChar(),wDocPhy.Documentid.id)
   displayKeys(wMasterFile);
 
   /* second record */
@@ -415,7 +415,7 @@ ZStatus populate(const uriString& pZMF) {
   }
 
 
-  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
+  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toCChar(),wDocPhy.Documentid.id)
   displayKeys(wMasterFile);
 
   _DBGPRINT("                   Record #3\n")
@@ -457,7 +457,7 @@ ZStatus populate(const uriString& pZMF) {
   }
 
 
-  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
+  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toCChar(),wDocPhy.Documentid.id)
   displayKeys(wMasterFile);
 
   _DBGPRINT("                   Record #4\n")
@@ -498,7 +498,7 @@ ZStatus populate(const uriString& pZMF) {
     ZException.exit_abort();
   }
 
-  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
+  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toCChar(),wDocPhy.Documentid.id)
   displayKeys(wMasterFile);
 
   _DBGPRINT("                   Record #5\n")
@@ -538,7 +538,7 @@ ZStatus populate(const uriString& pZMF) {
     ZException.exit_abort();
   }
 
-  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
+  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toCChar(),wDocPhy.Documentid.id)
   displayKeys(wMasterFile);
 
   _DBGPRINT("                   Record #6\n")
@@ -575,7 +575,7 @@ ZStatus populate(const uriString& pZMF) {
   if (wSt!=ZS_SUCCESS) {
     ZException.exit_abort();
   }
-  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
+  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toCChar(),wDocPhy.Documentid.id)
   displayKeys(wMasterFile);
 
   _DBGPRINT("\n                   Record #7\n")
@@ -615,7 +615,7 @@ ZStatus populate(const uriString& pZMF) {
     ZException.exit_abort();
   }
 
-  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toChar(),wDocPhy.Documentid.id)
+  _DBGPRINT("            %s-<%ld>\n",decode_ZEntity( wDocPhy.Documentid.Entity).toCChar(),wDocPhy.Documentid.id)
   displayKeys(wMasterFile);
 
 
@@ -1885,7 +1885,7 @@ displayKeys (ZRawMasterFile& pMasterFile) {
           wi,
           wIndexAddress,
           wII.ZMFAddress,
-          decode_ZEntity( wResource.Entity).toChar(),
+          decode_ZEntity( wResource.Entity).toCChar(),
           wResource.id)
       wi++;
       wSt=pMasterFile.IndexTable[wIdx]->zgetWAddress(wKey,wi,wIndexAddress);

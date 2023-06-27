@@ -10,6 +10,7 @@
 #include <QGridLayout>
 
 #include <QLabel>
+#include <QLineEdit>
 #include <QPushButton>
 
 editBlockDLg::editBlockDLg(QWidget *pParent) : QDialog(pParent)
@@ -22,15 +23,16 @@ void editBlockDLg::setup(__FILEHANDLE__ pContentFd,__FILEHANDLE__ pHeaderFd, int
   ContentFd=pContentFd;
   HeaderFd =  pHeaderFd;
   BD = pBD;
-
+  PoolId = pPoolId;
+  DataRank = pDataRank;
 
   utf8VaryingString wStr;
-  off_t wFileSize=0;
+  size_t wFileSize=0;
 
   ZStatus wSt = rawSeekEnd(pContentFd,wFileSize);
   if (wSt!=ZS_SUCCESS) {
     ZExceptionDLg::adhocMessage("Seeking content file",Severity_Error,
-        "Cannot access content file <%s>.",getNameFromFd(pContentFd).toString());
+        "Cannot access content file <%s>.",rawGetNameFromFd(pContentFd).toString());
     return;
   }
 
@@ -90,7 +92,7 @@ void editBlockDLg::setup(__FILEHANDLE__ pContentFd,__FILEHANDLE__ pHeaderFd, int
   QVL->insertLayout(0,QHL);
 
   QLabel* wPoolLBl ;
-  switch (pPoolId) {
+  switch (PoolId) {
   case 0:
     wPoolLBl = new QLabel("Block access table",this);
     break;
@@ -105,9 +107,7 @@ void editBlockDLg::setup(__FILEHANDLE__ pContentFd,__FILEHANDLE__ pHeaderFd, int
     break;
   }
 
-
   QHL->addWidget(wPoolLBl,0,Qt::AlignCenter);
-
 
   QGridLayout* QGLyt=new QGridLayout;
   QVL->insertLayout(-1,QGLyt);
@@ -116,12 +116,9 @@ void editBlockDLg::setup(__FILEHANDLE__ pContentFd,__FILEHANDLE__ pHeaderFd, int
 
   QLabel* wLb0=new QLabel("Pool rank",this);
 
-  ErrorPalette = NormalPalette = wLb0->palette();
-  ErrorPalette.setColor(wLb0->foregroundRole(), Qt::red);
-
   QGLyt->addWidget(wLb0,wLine,0);
 
-  wStr.sprintf("%ld",pDataRank);
+  wStr.sprintf("%ld",DataRank);
   QLabel* wRank = new QLabel(wStr.toCChar());
   QGLyt->addWidget(wRank,wLine,1);
 
@@ -206,13 +203,16 @@ void editBlockDLg::setup(__FILEHANDLE__ pContentFd,__FILEHANDLE__ pHeaderFd, int
   QGLyt1->addWidget(new QLabel("Block size"),wLine,0);
 
   wStr.sprintf("%ld",pBD->BlockSize);
-  BlockSize = new QLabel(wStr.toCChar());
+  BlockSize = new QLineEdit(wStr.toCChar());
+
+  ErrorPalette = NormalPalette = BlockSize->palette();
+  ErrorPalette.setColor(BlockSize->foregroundRole(), Qt::red);
 
   if (FileIsAccessible)
     wStr.sprintf("%ld",FBD.BlockSize);
   else
     wStr="invalid";
-  BlockSizeF = new QLabel(wStr.toCChar());
+  BlockSizeF = new QLineEdit(wStr.toCChar());
 
   if (pBD->BlockSize!=FBD.BlockSize){
     BlockSize->setPalette(ErrorPalette);
@@ -229,11 +229,11 @@ void editBlockDLg::setup(__FILEHANDLE__ pContentFd,__FILEHANDLE__ pHeaderFd, int
 
   QGLyt1->addWidget(new QLabel("State"),wLine,0);
 
-  State = new QLabel(decode_ZBS(pBD->State));
+  State = new QLineEdit(decode_ZBS(pBD->State));
   if (FileIsAccessible)
-    StateF = new QLabel(decode_ZBS(FBD.State));
+    StateF = new QLineEdit(decode_ZBS(FBD.State));
   else
-    StateF = new QLabel("invalid");
+    StateF = new QLineEdit("invalid");
 
 
   if (pBD->State!=FBD.State){
@@ -245,16 +245,19 @@ void editBlockDLg::setup(__FILEHANDLE__ pContentFd,__FILEHANDLE__ pHeaderFd, int
   QGLyt1->addWidget(State,wLine,1);
   QGLyt1->addWidget(StateF,wLine,2);
 
+  State->setEnabled(false);
+  StateF->setEnabled(false);
+
   wLine++;
 
   QGLyt1->addWidget(new QLabel("Lock"),wLine,0);
 
-  Lock = new QLabel(decode_ZLockMask(pBD->Lock).toCChar());
+  Lock = new QLineEdit(decode_ZLockMask(pBD->Lock).toCChar());
 
   if (FileIsAccessible)
-    LockF = new QLabel(decode_ZLockMask(FBD.Lock).toCChar());
+    LockF = new QLineEdit(decode_ZLockMask(FBD.Lock).toCChar());
   else
-    LockF = new QLabel("invalid");
+    LockF = new QLineEdit("invalid");
 
   if (pBD->Lock!=FBD.Lock){
     Lock->setPalette(ErrorPalette);
@@ -262,23 +265,31 @@ void editBlockDLg::setup(__FILEHANDLE__ pContentFd,__FILEHANDLE__ pHeaderFd, int
     FileDiffersFromPool=true;
   }
 
+  Lock->setEnabled(false);
+  LockF->setEnabled(false);
+
   QGLyt1->addWidget(Lock,wLine,1);
   QGLyt1->addWidget(LockF,wLine,2);
+  UnlockBTn=new QPushButton("Unlock");
+  QObject::connect(UnlockBTn, &QPushButton::clicked, this, &editBlockDLg::Unlock);
+  QGLyt1->addWidget(UnlockBTn,wLine,2);
+  if (BD->Lock == ZLock_Nolock){
+    UnlockBTn->setVisible(false);
+  }
 
   wLine++;
 
   QGLyt1->addWidget(new QLabel("pid"),wLine,0);
 
   wStr.sprintf("%8X",pBD->Pid);
-  Pid = new QLabel(wStr.toCChar());
+  Pid = new QLineEdit(wStr.toCChar());
 
   if (FileIsAccessible) {
     wStr.sprintf("%8X",FBD.Pid);
-    PidF = new QLabel(wStr.toCChar());
+    PidF = new QLineEdit(wStr.toCChar());
   }
   else
-    PidF = new QLabel("invalid");
-
+    PidF = new QLineEdit("invalid");
 
 
   if (pBD->Pid!=FBD.Pid){
@@ -290,6 +301,8 @@ void editBlockDLg::setup(__FILEHANDLE__ pContentFd,__FILEHANDLE__ pHeaderFd, int
   QGLyt1->addWidget(Pid,wLine,1);
   QGLyt1->addWidget(PidF,wLine,2);
 
+  Pid->setEnabled(false);
+  PidF->setEnabled(false);
 
   QGridLayout* QGLyt2=new QGridLayout;
   QVL->insertLayout(-1,QGLyt2);
@@ -389,6 +402,12 @@ void editBlockDLg::Unlock() {
     return;
   }
 
+  BD->Lock=FBD.Lock=ZLock_Nolock;
+
+  Lock->setPalette(NormalPalette);
+  LockF->setPalette(NormalPalette);
+  Lock->setText(decode_ZLockMask(BD->Lock).toCChar());
+  LockF->setText(decode_ZLockMask(FBD.Lock).toCChar());
 
   HasChanged|=EBK_PoolChanged|EBK_FileChanged;
 }
@@ -398,9 +417,102 @@ void editBlockDLg::CommitChanges() {
     ZExceptionDLg::adhocMessage("Commit changes",Severity_Error,"There is nothing to change");
     return;
   }
+  utf8VaryingString wMessage;
+  ZStatus wSt=ZS_SUCCESS;
+  if (HasChanged & EBK_FileChanged) {
+    ZBlockDescriptor_Export wBDE;
+    wBDE.set(FBD);
+    wBDE.serialize();
+    ZDataBuffer wR;
+    size_t wSz=0;
+    wR.setData(&wBDE,sizeof(ZBlockHeader_Export));
 
+    wSt=rawWriteAt(ContentFd,wR,wSz,FBD.Address);
+    if (wSt!=ZS_SUCCESS) {
+      ZExceptionDLg::adhocMessage("Content file update",Severity_Error,"Unable to update block descriptor at address %ld on file %s\n"
+          "Commit operation is not done.",
+          FBD.Address,rawGetNameFromFd(ContentFd).toString()
+          );
+      return;
+    }
+    wMessage.sprintf("Successfully update of Block descriptor address %ld file %s",FBD.Address,rawGetNameFromFd(ContentFd).toString());
+  }//if (HasChanged & EBK_FileChanged)
+  if (HasChanged & EBK_PoolChanged) {
 
+    ZDataBuffer wZDB;
+    size_t wHdSize=0;
+    wSt=rawSeekEnd(HeaderFd,wHdSize);
+    if (wSt!=ZS_SUCCESS) {
+      ZExceptionDLg::adhocMessage("Header file update",Severity_Error,"Unable to update pool at address %ld on header file %s\n"
+                                                                         "Commit operation is partially done.",
+          FBD.Address,rawGetNameFromFd(HeaderFd).toString()
+          );
+      return;
+    }
 
+    wSt=rawReadAt(HeaderFd,wZDB,wHdSize,0L);
+    if (wSt!=ZS_SUCCESS) {
+      ZExceptionDLg::adhocMessage("Header file update",Severity_Error,"Unable to update pool at address %ld on header file %s\n"
+                                                                        "Commit operation is partially done.",
+          FBD.Address,rawGetNameFromFd(HeaderFd).toString()
+          );
+      return;
+    }
+    ZBlockPool        ZBAT; /** Blocks access table pool : contains references to any used block in file (Primary pool)*/
+    ZBlockPool        ZFBT; /** Free blocks pool : contains references to any free space in file  (Primary pool)*/
+    ZBlockPool        ZHOT; /** Holes Table : gathers segments of file with no ZBlockHeader_Export (not enough room) */
+
+    ZDataBuffer wZDBOut;
+
+    ZHeaderControlBlock_Export* wZHCBE=(ZHeaderControlBlock_Export*)wZDB.Data;
+    wZHCBE->deserialize();
+
+    wZDBOut.setData(wZDB.Data,sizeof(ZHeaderControlBlock_Export)+wZHCBE->SizeReserved);
+
+    const unsigned char* wPtr=wZDB.Data+wZHCBE->OffsetFCB;
+    ZFileControlBlock wFCB;
+    wFCB._import(wPtr);
+    ZBAT._importPool(wPtr);  /* beware wPtr is updated by _importPool */
+    ZFBT._importPool(wPtr);  /* beware wPtr is updated by _importPool */
+    ZHOT._importPool(wPtr);  /* beware wPtr is updated by _importPool */
+
+    const char* wPoolName=nullptr;
+
+    switch (PoolId) {
+    case 0:
+      ZBAT[DataRank] = *BD;
+      wPoolName="ZBAT";
+      break;
+    case 1:
+      ZFBT[DataRank] = *BD;
+      wPoolName="ZFBT";
+      break;
+    case 2:
+      ZHOT[DataRank] = *BD;
+      wPoolName="ZHOT";
+      break;
+    }
+    /* NB: no offset no size is modified */
+    ZBAT._exportAppendPool(wZDBOut);
+    ZFBT._exportAppendPool(wZDBOut);
+    ZHOT._exportAppendPool(wZDBOut);
+
+    uriString wHeaderURI = rawGetNameFromFd(HeaderFd);
+
+    rawClose(HeaderFd);
+
+    wHeaderURI.writeContent(wZDBOut);
+
+    wSt=rawOpen(HeaderFd,wHeaderURI,O_RDWR) ;
+
+    if (!wMessage.isEmpty())
+      wMessage += "\n";
+    wMessage.addsprintf("Successfully update of header file Pool <%s> rank <%ld> file %s",
+        wPoolName, DataRank,wHeaderURI.toString());
+
+  }
+
+  ZExceptionDLg::adhocMessage("Commit changes",Severity_Information,wMessage.toCChar());
 
   HasChanged=false;
   QDialog::done(3);
@@ -408,14 +520,18 @@ void editBlockDLg::CommitChanges() {
 
 void editBlockDLg::Quit() {
   if (HasChanged) {
-
     int wRet= ZExceptionDLg::adhocMessage2B("Quitting",Severity_Warning,
-        "Ooops","Confirm",
+        "Do not commit","Commit and quit",
         "There are pending changes. Confirm that you do not want to commit");
-    if (wRet==QDialog::Rejected)
-      return;
+    if (wRet==QDialog::Accepted) {
+      CommitChanges();
+      QDialog::done(3);
+    }
+    else
+      QDialog::reject();
   }
-  QDialog::reject();
+  else
+    QDialog::reject();
 }
 
 void editBlockDLg::ShowDetails() {
@@ -429,3 +545,6 @@ void editBlockDLg::ShowDetails() {
   }
   QDialog::accept();
 }
+
+
+

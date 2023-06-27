@@ -1670,7 +1670,7 @@ ZRandomFile::_importAllFileHeader()
   ZDataBuffer wZDB;
 
   /* get the size of the file */
-  off_t wOff;
+  size_t wOff;
   ZStatus wSt=rawSeekEnd(HeaderFd,wOff);
   if (wSt!=ZS_SUCCESS) {
     return wSt;
@@ -1803,7 +1803,7 @@ ZRandomFile::_loadHeaderFile(ZDataBuffer &pHeader)
   ZStatus wSt=ZS_SUCCESS;
 
   /* get the size of the file */
-  off_t wOff;
+  size_t wOff;
   wSt=rawSeekEnd(HeaderFd,wOff);
   if (wSt!=ZS_SUCCESS) {
     return wSt;
