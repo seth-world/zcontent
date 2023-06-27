@@ -351,6 +351,8 @@ public:
      */
     static ZStatus renameBck(const char* pContentPath, ZaiErrors *pErrorLog=nullptr, const char *pBckExt="bck");
 
+    ZStatus setPermissions(__FILEACCESSRIGHTS__ pPermissions);
+
 
     /**
      * @brief isOpen test whether file is open or not
@@ -601,7 +603,7 @@ public:
      * @return      the physical address of the record (beginning of block)
      */
 
-//    zaddress_type getAddressFromRank(const zrank_type pRank) {return (ZBAT.Tab[pRank].Address) ;}
+//    zaddress_type getAddressFromRank(const zrank_type pRank) {return (ZBAT[pRank].Address) ;}
     /**
      * @brief getRankFromAddress  returns the relative position of record (rank) coresponding to the given physical address within ZRandomFile file
      * @param pAddress    the physical address of the record (beginning of block)
@@ -1137,7 +1139,7 @@ private:
 /** @}*/ //addtogroup ZRandomFileGroup
 
 
-class ZOpenZRFPool: public zbs::ZArray <zbs::ZRandomFile*>
+class ZOpenZRFPool: public ZArray <zbs::ZRandomFile*>
 {
 public:
   ZOpenZRFPool() {}

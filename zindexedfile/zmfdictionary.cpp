@@ -59,8 +59,8 @@ ZMFDictionary::addKey(ZKeyDictionary*pIn, long &pOutKeyRank)
   long wDI=KeyDic.push(new ZKeyDictionary(pIn->DicKeyName,this));
   for (long wi=0; wi < pIn->size();wi++)
     {
-    ZIndexField wF=pIn->Tab[wi];  /* debug */
-    KeyDic[wDI]->push(pIn->Tab[wi]);
+    ZIndexField wF=pIn->Tab(wi);  /* debug */
+    KeyDic[wDI]->push(pIn->Tab(wi));
     }
 //  KeyDic[wDI]->setName (pIn->DicKeyName);
   fprintf (stdout,"Key <%s> added within master dictionary at rank <%ld>.\n",KeyDic[wDI]->DicKeyName.toCChar(),wDI);
@@ -100,8 +100,8 @@ ZMFDictionary::addKey(ZKeyDictionary*pIn,const utf8String& pKeyName, long &pOutK
   long wDI=KeyDic.push(new ZKeyDictionary(this));
   for (long wi=0; wi < pIn->size();wi++)
   {
-    ZIndexField wF=pIn->Tab[wi];  /* debug */
-    KeyDic[wDI]->push(pIn->Tab[wi]);
+    ZIndexField wF=pIn->Tab(wi);  /* debug */
+    KeyDic[wDI]->push(pIn->Tab(wi));
   }
   KeyDic[wDI]->setName(pKeyName);
   pOutKeyRank=wDI;
@@ -430,11 +430,15 @@ ZMFDictionary::fromXml(zxmlNode* pDicNode, bool pCheckHash, ZaiErrors* pErrorlog
 
 
 
-void ZMFDicExportHeader::set(const ZMFDictionary* pDic)
+void ZMFDicExportHeader::set(ZMFDictionary* pDic)
 {
   Active = pDic->Active ;
   Version = pDic->Version ;
+  if (pDic->CreationDate.isInvalid())
+    pDic->CreationDate = ZDateFull::currentDateTime();
   CreationDate = pDic->CreationDate;
+  if (pDic->ModificationDate.isInvalid())
+    pDic->ModificationDate = ZDateFull::currentDateTime();
   ModificationDate = pDic->ModificationDate;
   DicKeyCount=uint32_t(pDic->KeyDic.count());
   DicName = pDic->DicName;

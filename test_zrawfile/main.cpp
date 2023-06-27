@@ -125,8 +125,9 @@ ZStatus populate(const uriString& pZMF);
 ZStatus testSequentialKey(const uriString& pZMF);
 ZStatus testRandomSearchUnique(const uriString& pZMF);
 
-ZStatus testRandomSearchAll(const uriString& pZMF);
+ZStatus testRandomSearchAllExact(const uriString& pZMF);
 
+ZStatus testRandomSearchAllPartial(const uriString& pZMF);
 
 
 int main(int argc, char *argv[])
@@ -142,7 +143,7 @@ int main(int argc, char *argv[])
 
   ZStatus wSt;
   //  ZVerbose |= ZVB_FileEngine | ZVB_SearchEngine | ZVB_MemEngine ;
-  ZVerbose |= ZVB_FileEngine | ZVB_SearchEngine ;
+ // ZVerbose |= ZVB_FileEngine | ZVB_SearchEngine ;
 
   QApplication a(argc, argv);
 
@@ -153,17 +154,30 @@ int main(int argc, char *argv[])
 
 uriString wDocFile = wWD ;
 wDocFile.addConditionalDirectoryDelimiter();
-wDocFile += "docphy.zmf";
+wDocFile += "zdocphysical.zmf";
 
 // uriString wPictureDir;
+/*
+uriString wIncludeFile = "/home/gerard/Development/zbasetools/zcontent/test_zrawfile/zdocphysical.cpp";
+uriString wOutFile="/home/gerard/Development/zbasetools/zcontent/test_zrawfile/zdocphysical1.cpp";
+  wSt=wIncludeFile.loadUtf8(wStr);
+  if (wSt!=ZS_SUCCESS)
+    ZException.exit_abort();
+  wSt=wOutFile.writeContent(wStr);
+  if (wSt!=ZS_SUCCESS)
+    ZException.exit_abort();
 
+  wSt=wOutFile.appendContent(wStr);
+  if (wSt!=ZS_SUCCESS)
+    ZException.exit_abort();
+*/
   wSt=populate(wDocFile);
 
-/*  wSt=testSequentialKey(wDocFile);
+  wSt=testSequentialKey(wDocFile);
 
   wSt=testRandomSearchUnique(wDocFile);
 
-
+/*
    wSt=testRandomSearchAll(wDocFile);
 
 */
@@ -249,554 +263,6 @@ void addKeyValue (ZRawIndexFile& wZIX,ZIndexItem* wIndexItem,ZDataBuffer& pRecor
   }
 }
 
-#ifdef __OLD_MAIN__
-int main(int argc, char *argv[])
-{
-
-  ZDataBuffer wS1,wKey;
-  ZDataBuffer wRecord;
-  ZResource wResource;
-  ZIndexItem wII;
-  utf8VaryingString wStr;
-
-  zaddress_type wAddress=0;
-
-  ZStatus wSt;
-//  ZVerbose |= ZVB_FileEngine | ZVB_SearchEngine | ZVB_MemEngine ;
-  ZVerbose |= ZVB_FileEngine | ZVB_SearchEngine | ZVB_MemEngine ;
-
-  QApplication a(argc, argv);
-
-
-  const char* wWD=getenv(__PARSER_WORK_DIRECTORY__);
-  if (!wWD)
-    wWD="";
-
-  ZResource wUserId=ZResource::getNew(ZEntity_User);
-
-  ZResource wR1 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR2 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR3 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR4 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR5 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR6 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR7 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR8 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR9 = ZResource::getNew(ZEntity_DocPhysical);
-  ZResource wR10 = ZResource::getNew(ZEntity_DocPhysical);
-
-  ZResource wRes;
-
-  ZIndexItem wItem;
-#ifdef __TESTRUN_1__
-  long wRank=0;
-  uriString wUriZRF = wWD;
-
-  wUriZRF.addConditionalDirectoryDelimiter();
-  wUriZRF += "zrftest.zrf";
-
-  ZRandomFile wZRF;
-
-  wSt=wZRF.zcreate(wUriZRF,1000,10,5,49,false,true,false,false);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  wSt=wZRF.zopen(wUriZRF,ZRF_All);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  wZRF.setUpdateHeader(true);
-
-  wRecord.clear();
-  wR1._exportURF(wRecord);
-  wRecord.setData(wRecord);
-
-  wItem.setBuffer(wRecord);
-  wItem.ZMFAddress = 1;
-  wRecord=wItem.toFileKey();
-
-  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR1).toString())
-  wRank++;
-  wSt=wZRF.zadd(wRecord);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  wRecord.clear();
-  wR2._exportURF(wRecord);
-  wRecord.setData(wRecord);
-  wItem.setBuffer(wRecord);
-  wItem.ZMFAddress = 2;
-  wRecord=wItem.toFileKey();
-
-  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR2).toString())
-  wRank++;
-  wSt=wZRF.zadd(wRecord);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  displayAll(wZRF);
-
-  wRecord.clear();
-  wR3._exportURF(wRecord);
-  wRecord.setData(wRecord);
-  wItem.setBuffer(wRecord);
-  wItem.ZMFAddress = 3;
-  wRecord=wItem.toFileKey();
-
-  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR3).toString())
-  wRank++;
-
-  wSt=wZRF.zadd(wRecord);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  displayAll(wZRF);
-
-  wRank=2;
-  _DBGPRINT("insert at %d resource %s\n",2,displayResource(wR4).toString())
-
-  wRecord.clear();
-  wR4._exportURF(wRecord);
-  wRecord.setData(wRecord);
-  wItem.setBuffer(wRecord);
-  wItem.ZMFAddress = 4;
-  wRecord=wItem.toFileKey();
-
-  wSt=wZRF._insert2Phases_Prepare(wRecord,2,wAddress);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  wSt=wZRF._insert2Phases_Commit(wRecord,2,wAddress);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  displayAll(wZRF);
-
-  wRank = wZRF.getRecordCount();
-
-  wRecord.clear();
-  wR5._exportURF(wRecord);
-  wRecord.setData(wRecord);
-  wItem.setBuffer(wRecord);
-  wItem.ZMFAddress = 5;
-  wRecord=wItem.toFileKey();
-
-  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR5).toString())
-  wRank++;
-
-  wSt=wZRF.zadd(wRecord);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  displayAll(wZRF);
-
-  wRecord.clear();
-  wR6._exportURF(wRecord);
-  wRecord.setData(wRecord);
-  wItem.setBuffer(wRecord);
-  wItem.ZMFAddress = 6;
-  wRecord=wItem.toFileKey();
-
-  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR6).toString())
-  wRank++;
-
-  wSt=wZRF.zadd(wRecord);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  displayAll(wZRF);
-
-  wRecord.clear();
-  wR7._exportURF(wRecord);
-  wRecord.setData(wRecord);
-  wItem.setBuffer(wRecord);
-  wItem.ZMFAddress = 7;
-  wRecord=wItem.toFileKey();
-
-  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR7).toString())
-  wRank++;
-
-  wSt=wZRF.zadd(wRecord);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  displayAll(wZRF);
-
-  long wEraseRank = 2L;
-  _DBGPRINT(" Erase %ld\n",wEraseRank)
-
-  wSt=wZRF._remove_Prepare(wEraseRank,wAddress);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  wSt=wZRF._remove_Commit(wEraseRank);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  wEraseRank = 5L ;
-  _DBGPRINT(" Erase %ld\n",wEraseRank)
-
-  wSt=wZRF._remove_Prepare(wEraseRank,wAddress);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  wSt=wZRF._remove_Commit(wEraseRank);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  displayAll(wZRF);
-
-  wRank = 2L ;
-  _DBGPRINT(" Replace rank %ld with R9 %s\nContent before replace is :\n",wRank, displayResource( wR9).toString() )
-  displayRank(wZRF,wRank);
-
-  wRecord.clear();
-  wR9._exportURF(wRecord);
-  wRecord.setData(wRecord);
-  wItem.setBuffer(wRecord);
-  wItem.ZMFAddress = 9;
-  wRecord=wItem.toFileKey();
-
-  wSt = wZRF._replace(wRecord,wRank,wAddress);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-  _DBGPRINT("Content after replace is :\n")
-  displayRank(wZRF,wRank);
-
-
-  wRank = wZRF.getRecordCount();
-  _DBGPRINT(" Add rank %ld with R10 %s\n",wRank, displayResource( wR10).toString() )
-
-  wRecord.clear();
-  wR10._exportURF(wRecord);
-  wRecord.setData(wRecord);
-  wItem.setBuffer(wRecord);
-  wItem.ZMFAddress = 10;
-  wRecord=wItem.toFileKey();
-
-   wSt=wZRF.zadd(wRecord);
-
-  _DBGPRINT("Content after add is :\n")
-  displayRank(wZRF,wRank);
-  wZRF.zclose();
-
-  wSt=wZRF.zopen(ZRF_Read_Only);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-
-  displayAll(wZRF);
-
-  wZRF.zclose();
-  return 0;
-#endif // __TESTRUN_1__
-
-  /* test run 2 */
-#ifdef __TESTRUN_2__
-  long wRank=0;
-  uriString wUriZix = wWD;
-
-  wUriZix.addConditionalDirectoryDelimiter();
-  wUriZix += "zixtest.zix";
-
-
-  ZRawIndexFile wZRF(nullptr,ZIXM_Debug | ZIXM_Dycho | ZIXM_UpdateHeader);
-  ZIndexControlBlock wICB;
-
-  wICB.IndexName= "Test index";
-  wICB.URIIndex = wUriZix;
-  wICB.KeyUniversalSize = 49 ;
-  wICB.Duplicates=ZST_NODUPLICATES;
-
-  wSt=wZRF.zcreateIndexFile(wICB,wUriZix,10,5,49,false,true,false,false,
-      ZIXM_Debug | ZIXM_Dycho | ZIXM_UpdateHeader); /*run mode*/
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  wZRF.setRunMode(ZIXM_Debug | ZIXM_Dycho | ZIXM_UpdateHeader);
-
-  wSt=wZRF.openIndexFile(wUriZix,0,ZRF_All);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  //  wZRF.setUpdateHeader(true);
-
-
-  wZRF.showRunMode();
-
-  ZIndexItem* wIndexItem=nullptr;
-
-  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR1).toString())
-  wRecord.clear();
-  wR1._exportURF(wRecord);
-  wRecord.setData(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,1L);
-  displayAll((ZRandomFile&)wZRF);
-
-  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR2).toString())
-  wRecord.clear();
-  wR2._exportURF(wRecord);
-  wRecord.setData(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,2L);
-  displayAll((ZRandomFile&)wZRF);
-
-  _DBGPRINT("                   Record #3\n")
-  /* record #3 */
-  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR10).toString())
-  wRecord.clear();
-  wR10._exportURF(wRecord);
-  wRecord.setData(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,10L);
-  displayAll((ZRandomFile&)wZRF);
-
-  _DBGPRINT("                   Record #4\n")
-  /* record #4 */
-  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR9).toString())
-  wRecord.clear();
-  wR9._exportURF(wRecord);
-  wRecord.setData(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,9L);
-  displayAll((ZRandomFile&)wZRF);
-
-  _DBGPRINT("                   Record #5\n")
-  /* record #5 */
-  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR8).toString())
-  wRecord.clear();
-  wR8._exportURF(wRecord);
-  wRecord.setData(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,8L);
-  displayAll((ZRandomFile&)wZRF);
-
-  _DBGPRINT("                   Record #6\n")
-  /* record #6 */
-  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR5).toString())
-  wRecord.clear();
-  wR5._exportURF(wRecord);
-  wRecord.setData(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,5L);
-  displayAll((ZRandomFile&)wZRF);
-
-  _DBGPRINT("\n                   Record #7\n")
-  /* record #7 */
-  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR6).toString())
-  wRecord.clear();
-  wR6._exportURF(wRecord);
-  wRecord.setData(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,6L);
-  displayAll((ZRandomFile&)wZRF);
-
-  _DBGPRINT("                   Record #8\n")
-  /* record #8 */
-  _DBGPRINT("add %ld resource %s\n",wRank,displayResource(wR7).toString())
-  wRecord.clear();
-  wR7._exportURF(wRecord);
-  wRecord.setData(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,7L);
-  displayAll((ZRandomFile&)wZRF);
-
-  wZRF.zclose();
-  return 0;
-
-  /* End test run 2 */
-
-#endif // __TESTRUN_2__
-#ifdef __TESTRUN_3__
-  long wRank=0;
-  uriString wUriZix = wWD;
-
-  wUriZix.addConditionalDirectoryDelimiter();
-  wUriZix += "zixtestAlpha.zix";
-
-
-  ZRawIndexFile wZRF(nullptr,ZIXM_Debug | ZIXM_Dycho | ZIXM_UpdateHeader);
-  ZIndexControlBlock wICB;
-
-  wICB.IndexName= "Test index";
-  wICB.URIIndex = wUriZix;
-  wICB.KeyUniversalSize = 150 ;
-  wICB.Duplicates=ZST_NODUPLICATES;
-
-  wSt=wZRF.zcreateIndexFile(wICB,wUriZix,10,5,150,false,true,false,false,
-                            ZIXM_Debug | ZIXM_Dycho | ZIXM_UpdateHeader); /*run mode*/
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-  wZRF.setRunMode(ZIXM_Dycho | ZIXM_Debug | ZIXM_UpdateHeader);
-
-  wSt=wZRF.openIndexFile(wUriZix,0,ZRF_All);
-  if (wSt!=ZS_SUCCESS){
-    ZException.exit_abort();
-  }
-
-//  wZRF.setUpdateHeader(true);
-
-
-  wZRF.showRunMode();
-
-  ZIndexItem* wIndexItem=nullptr;
-
-  utf8VaryingString  wDesc;
-  wDesc="Picture used for figuring an email connection.record #1";
-  _DBGPRINT("add desc <%s>\n",wDesc.toString())
-  wRecord.clear();
-  wDesc._exportURF(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,1L);
-  displayAllUtf8((ZRandomFile&)wZRF);
-
-  wDesc="a simple grave for resting in peace zmf record #2";
-  _DBGPRINT("add desc <%s>\n",wDesc.toString())
-  wRecord.clear();
-  wDesc._exportURF(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,2L);
-  displayAllUtf8((ZRandomFile&)wZRF);
-
-  _DBGPRINT("                   Record #3\n")
-  /* record #3 */
-  wDesc="This is iceberg zmf record #3";
-  _DBGPRINT("add desc <%s>\n",wDesc.toString())
-  wRecord.clear();
-  wDesc._exportURF(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,3L);
-  displayAllUtf8((ZRandomFile&)wZRF);
-
-  _DBGPRINT("                   Record #4\n")
-  /* record #4 */
-  wDesc="No more than a skull head record #4";
-  _DBGPRINT("add desc <%s>\n",wDesc.toString())
-  wRecord.clear();
-  wDesc._exportURF(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,4L);
-  displayAllUtf8((ZRandomFile&)wZRF);
-
-
-  /* hole test */
-
-  wDesc="a simple grave for resting in peace zmf record #2";
-  _DBGPRINT("**** remove desc <%s>\n",wDesc.toString())
-  wRecord.clear();
-  wDesc._exportURF(wRecord);
-
-  wSt=wZRF._removeRawKeyValue_Prepare(wIndexItem,wRank,wRecord,wAddress);
-
-  wSt=wZRF._rawKeyValue_Commit(wIndexItem);
-
-  displayAllUtf8((ZRandomFile&)wZRF);
-
-  _DBGPRINT("                   Record #5\n")
-  /* record #5 */
-  wDesc="A smashed paper bowl record #5";
-  _DBGPRINT("add desc <%s>\n",wDesc.toString())
-  wRecord.clear();
-  wDesc._exportURF(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,5L);
-  displayAllUtf8((ZRandomFile&)wZRF);
-
-  _DBGPRINT("                   Record #6\n")
-  /* record #6 */
-  wDesc="Simple ink pen record #6";
-  _DBGPRINT("add desc <%s>\n",wDesc.toString())
-  wRecord.clear();
-  wDesc._exportURF(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,6L);
-  displayAllUtf8((ZRandomFile&)wZRF);
-
-
-  // hole grabbing test
-
-  wDesc="This is iceberg zmf record #3";
-  _DBGPRINT("**** remove desc <%s>\n",wDesc.toString())
-  wRecord.clear();
-  wDesc._exportURF(wRecord);
-
-  wSt=wZRF._removeRawKeyValue_Prepare(wIndexItem,wRank,wRecord,wAddress);
-
-  wSt=wZRF._rawKeyValue_Commit(wIndexItem);
-
-  displayAllUtf8((ZRandomFile&)wZRF);
-
-
-  _DBGPRINT("\n                   Record #7\n")
-  /* record #7 */
-  wDesc="closed trash bin #7";
-  _DBGPRINT("add desc <%s>\n",wDesc.toString())
-  wRecord.clear();
-  wDesc._exportURF(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,7L);
-  displayAllUtf8((ZRandomFile&)wZRF);
-
-  _DBGPRINT("                   Record #8\n")
-  /* record #8 */
-  _DBGPRINT("add desc <%s>\n",wDesc.toString())
-  wDesc="image of key #8";
-  _DBGPRINT("add desc <%s>\n",wDesc.toString())
-  wRecord.clear();
-  wDesc._exportURF(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,8L);
-  displayAllUtf8((ZRandomFile&)wZRF);
-
-  _DBGPRINT("                   Record #9\n")
-  /* record #9 */
-  _DBGPRINT("add desc <%s>\n",wDesc.toString())
-  wDesc="Nothing more than 9 #9";
-  _DBGPRINT("add desc <%s>\n",wDesc.toString())
-  wRecord.clear();
-  wDesc._exportURF(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,9L);
-  displayAllUtf8((ZRandomFile&)wZRF);
-
-
-
-  _DBGPRINT("                   Record #10\n")
-  /* record #10 */
-  _DBGPRINT("add desc <%s>\n",wDesc.toString())
-  wDesc="THIS is number 10 #10";
-  _DBGPRINT("add desc <%s>\n",wDesc.toString())
-  wRecord.clear();
-  wDesc._exportURF(wRecord);
-  addKeyValue(wZRF,wIndexItem,wRecord,10L);
-  displayAllUtf8((ZRandomFile&)wZRF);
-
-
-
-
-  wZRF.zclose();
-  return 0;
-
-  /* End test run 3 */
-#endif //__TESTRUN_3__
-
-
-  uriString wDocFile = wWD ;
-  wDocFile.addConditionalDirectoryDelimiter();
-  wDocFile += "zdocphynokey.zmf";
-
-// uriString wPictureDir;
-
-//  populateOneKey(wDocFile);
-
-  testSearch(wDocFile);
-  return 0;
-}//main
-#endif // __OLD_MAIN__
 
 ZStatus populate(const uriString& pZMF) {
   ZStatus wSt=ZS_SUCCESS;
@@ -872,6 +338,7 @@ ZStatus populate(const uriString& pZMF) {
 
 
   ZArray<ZDataBuffer> wKeys;
+//  QList<ZDataBuffer> wKeys;
 
   wDocPhy.Documentid  = wR1;
 
@@ -1501,38 +968,6 @@ ZStatus populate(const uriString& pZMF) {
   }
 
 
-  wDocPhy.Documentid  = wR17;
-  _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
-
-  wDocPhy.DataRank = 0;
-  wDocPhy.DocMetaType = ZDMT_picture ;
-  wDocPhy.Short = "Author";
-  wDocPhy.Desc="Author of spread sheet";
-  wDocPhy.Storage = Storage_External ;  // not in vault
-  wDocPhy.URI = wPictureDir ;      // not in vault
-  wDocPhy.URI.addConditionalDirectoryDelimiter();
-  wDocPhy.URI += "calligrasheets.png";
-  wDocPhy.DocSize= wDocPhy.URI.getFileSize();
-
-
-  wDocPhy.Registrated = ZDateFull::fromDMY("15/04");
-  wDocPhy.Created = ZDateFull::fromDMY("06/09");
-  wDocPhy.LastModified = ZDateFull::currentDateTime();
-
-  wDocPhy.OwnerOrigin = wUserId;
-
-  wDocPhy.AccessRights = 00001;
-
-  wDocPhy.CheckSum  = wDocPhy.URI.getChecksum();
-
-  wDocPhy.Temporary=0;
-  wDocPhy.Ownerid=wUserId;
-  wDocPhy.Vaultid=ZResource();
-
-  wSt=wMasterFile.zadd_T(wDocPhy);
-  if (wSt!=ZS_SUCCESS) {
-    ZException.exit_abort();
-  }
 
   wDocPhy.Documentid  = wR18;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
@@ -1675,6 +1110,43 @@ ZStatus populate(const uriString& pZMF) {
   }
 
 
+  _DBGPRINT("_______________________________________\n"
+            "   Duplicate key on secondary key test \n"
+            "_______________________________________\n")
+
+  wDocPhy.Documentid  = wR17;
+  _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
+
+  wDocPhy.DataRank = 0;
+  wDocPhy.DocMetaType = ZDMT_picture ;
+  wDocPhy.Short = "Author";
+  wDocPhy.Desc="Author of spread sheet";
+  wDocPhy.Storage = Storage_External ;  // not in vault
+  wDocPhy.URI = wPictureDir ;      // not in vault
+  wDocPhy.URI.addConditionalDirectoryDelimiter();
+  wDocPhy.URI += "calligrasheets.png";
+  wDocPhy.DocSize= wDocPhy.URI.getFileSize();
+
+
+  wDocPhy.Registrated = ZDateFull::fromDMY("15/04");
+  wDocPhy.Created = ZDateFull::fromDMY("06/09");
+  wDocPhy.LastModified = ZDateFull::currentDateTime();
+
+  wDocPhy.OwnerOrigin = wUserId;
+
+  wDocPhy.AccessRights = 00001;
+
+  wDocPhy.CheckSum  = wDocPhy.URI.getChecksum();
+
+  wDocPhy.Temporary=0;
+  wDocPhy.Ownerid=wUserId;
+  wDocPhy.Vaultid=ZResource();
+
+  wSt=wMasterFile.zadd_T(wDocPhy);
+  if (wSt!=ZS_SUCCESS) {
+    ZException.exit_abort();
+  }
+
   wDocPhy.Documentid  = wR22;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -1708,6 +1180,38 @@ ZStatus populate(const uriString& pZMF) {
     ZException.exit_abort();
   }
 
+  wDocPhy.Documentid  = wR24;
+  _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
+
+  wDocPhy.DataRank = 0;
+  wDocPhy.DocMetaType = ZDMT_picture ;
+  wDocPhy.Short = "Author duplicate #2";
+  wDocPhy.Desc="Author of spread sheet";
+  wDocPhy.Storage = Storage_External ;  // not in vault
+  wDocPhy.URI = wPictureDir ;      // not in vault
+  wDocPhy.URI.addConditionalDirectoryDelimiter();
+  wDocPhy.URI += "calligrasheets.png";
+  wDocPhy.DocSize= wDocPhy.URI.getFileSize();
+
+
+  wDocPhy.Registrated = ZDateFull::fromDMY("15/04");
+  wDocPhy.Created = ZDateFull::fromDMY("06/09");
+  wDocPhy.LastModified = ZDateFull::currentDateTime();
+
+  wDocPhy.OwnerOrigin = wUserId;
+
+  wDocPhy.AccessRights = 00001;
+
+  wDocPhy.CheckSum  = wDocPhy.URI.getChecksum();
+
+  wDocPhy.Temporary=0;
+  wDocPhy.Ownerid=wUserId;
+  wDocPhy.Vaultid=ZResource();
+
+  wSt=wMasterFile.zadd_T(wDocPhy);
+  if (wSt!=ZS_SUCCESS) {
+    ZException.exit_abort();
+  }
 
   wDocPhy.Documentid  = wR23;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
@@ -1853,6 +1357,7 @@ ZStatus populate(const uriString& pZMF) {
             "_______________________________________\n")
 
 
+
   displayKeys(wMasterFile);
 
   wSt = wMasterFile.zclose();
@@ -1887,8 +1392,12 @@ ZStatus testRandomSearchUnique(const uriString& pZMF) {
   }
 
 
-
-  fprintf (stdout,"randomSearch Key random search index key <%s>\n",wMasterFile.IndexTable[1]->IndexName.toString());
+  fprintf (stdout,
+      "\n______________________________________________________________________________________\n"
+      "testRandomSearchUnique  Key random search unique value of a key - index key <%s> <%s>\n"
+      "______________________________________________________________________________________\n"
+      ,wMasterFile.IndexTable[1]->IndexName.toString()
+          ,wMasterFile.IndexTable[1]->Duplicates?"Allow Duplicates":"No duplicates");
   ZDataBuffer wKeyContent;
   utf8VaryingString wKeyStr ;
   ZArray<URFField> wFieldList;
@@ -1910,7 +1419,7 @@ ZStatus testRandomSearchUnique(const uriString& pZMF) {
     ZException.exit_abort();
 
   for (long wi=0; wi < wFieldList.count();wi++){
-    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab[wi].getName().toString(),
+    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab(wi).getName().toString(),
         wFieldList[wi].display().toString());
   }
 
@@ -1932,7 +1441,7 @@ ZStatus testRandomSearchUnique(const uriString& pZMF) {
     ZException.exit_abort();
 
   for (long wi=0; wi < wFieldList.count();wi++){
-    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab[wi].getName().toString(),
+    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab(wi).getName().toString(),
         wFieldList[wi].display().toString());
   }
 
@@ -1953,7 +1462,7 @@ ZStatus testRandomSearchUnique(const uriString& pZMF) {
     ZException.exit_abort();
 
   for (long wi=0; wi < wFieldList.count();wi++){
-    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab[wi].getName().toString(),
+    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab(wi).getName().toString(),
         wFieldList[wi].display().toString());
   }
 
@@ -1974,7 +1483,7 @@ ZStatus testRandomSearchUnique(const uriString& pZMF) {
     ZException.exit_abort();
 
   for (long wi=0; wi < wFieldList.count();wi++){
-    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab[wi].getName().toString(),
+    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab(wi).getName().toString(),
         wFieldList[wi].display().toString());
   }
 
@@ -1988,16 +1497,21 @@ ZStatus testRandomSearchUnique(const uriString& pZMF) {
   if (wSt!=ZS_NOTFOUND)
     ZException.exit_abort();
 
+  _DBGPRINT("\n__________________________________________________\n" \
+            "testRandomSearchUnique Test passed. Key index name <%s> <%s>\n"\
+            "___________________________________________________\n" \
+            ,wMasterFile.IndexTable[1]->IndexName.toString() \
+            ,wMasterFile.IndexTable[1]->Duplicates?"Allow duplicates":"No duplicates" )
 
   wSt = wMasterFile.zclose();
   if (wSt!=ZS_SUCCESS) {
     ZException.exit_abort();
   }
-  _DBGPRINT("testRandomKey Test passed.\n")
-  return wSt;
-} // testRandomKey
 
-ZStatus testRandomSearchAll(const uriString& pZMF) {
+  return wSt;
+} // testRandomSearchUnique
+
+ZStatus testRandomSearchAllExact(const uriString& pZMF) {
   ZStatus wSt=ZS_SUCCESS;
   ZDataBuffer wKeyRecord;
   ZDataBuffer wMasterRecord;
@@ -2014,7 +1528,12 @@ ZStatus testRandomSearchAll(const uriString& pZMF) {
 
 
 
-  fprintf (stdout,"randomSearch Key random search index key <%s>\n",wMasterFile.IndexTable[1]->IndexName.toString());
+  fprintf (stdout,
+      "\n______________________________________________________________________________________\n"
+      "testRandomSearchAllExact  Key random search for all exact values of a key - index key <%s> <%s>\n"
+      "_______________________________________________________________________________________\n"
+      ,wMasterFile.IndexTable[1]->IndexName.toString()
+      ,wMasterFile.IndexTable[1]->Duplicates?"Allow Duplicates":"No duplicates");
   ZDataBuffer wKeyContent;
   utf8VaryingString wKeyStr ;
   ZArray<URFField> wFieldList;
@@ -2036,7 +1555,7 @@ ZStatus testRandomSearchAll(const uriString& pZMF) {
     ZException.exit_abort();
 
   for (long wi=0; wi < wFieldList.count();wi++){
-    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab[wi].getName().toString(),
+    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab(wi).getName().toString(),
         wFieldList[wi].display().toString());
   }
 
@@ -2058,7 +1577,7 @@ ZStatus testRandomSearchAll(const uriString& pZMF) {
     ZException.exit_abort();
 
   for (long wi=0; wi < wFieldList.count();wi++){
-    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab[wi].getName().toString(),
+    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab(wi).getName().toString(),
         wFieldList[wi].display().toString());
   }
 
@@ -2079,7 +1598,7 @@ ZStatus testRandomSearchAll(const uriString& pZMF) {
     ZException.exit_abort();
 
   for (long wi=0; wi < wFieldList.count();wi++){
-    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab[wi].getName().toString(),
+    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab(wi).getName().toString(),
         wFieldList[wi].display().toString());
   }
 
@@ -2100,7 +1619,7 @@ ZStatus testRandomSearchAll(const uriString& pZMF) {
     ZException.exit_abort();
 
   for (long wi=0; wi < wFieldList.count();wi++){
-    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab[wi].getName().toString(),
+    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab(wi).getName().toString(),
         wFieldList[wi].display().toString());
   }
 
@@ -2114,15 +1633,160 @@ ZStatus testRandomSearchAll(const uriString& pZMF) {
   if (wSt!=ZS_NOTFOUND)
     ZException.exit_abort();
 
+  _DBGPRINT("\n__________________________________________________\n" \
+            "testRandomSearchAllExact Test passed. Key index name <%s> <%s>\n"\
+            "___________________________________________________\n" \
+            ,wMasterFile.IndexTable[1]->IndexName.toString() \
+            ,wMasterFile.IndexTable[1]->Duplicates?"Allow duplicates":"No duplicates" )
+
 
   wSt = wMasterFile.zclose();
   if (wSt!=ZS_SUCCESS) {
     ZException.exit_abort();
   }
-  _DBGPRINT("testRandomKey Test passed.\n")
-  return wSt;
-} // testRandomKey
 
+  return wSt;
+} // testRandomSearchAllExact
+
+
+
+ZStatus testRandomSearchAllPartial(const uriString& pZMF) {
+  ZStatus wSt=ZS_SUCCESS;
+  ZDataBuffer wKeyRecord;
+  ZDataBuffer wMasterRecord;
+  ZIndexItem wIdxItem;
+
+  ZMasterFile wMasterFile;
+
+  wMasterFile.setEngineMode(ZIXM_SearchDycho);
+
+  wSt=wMasterFile.zopen(pZMF,ZRF_All);
+  if (wSt!=ZS_SUCCESS) {
+    ZException.exit_abort();
+  }
+
+  fprintf (stdout,
+      "\n______________________________________________________________________________________\n"
+      "testRandomSearchAllPartial  Key random search for all partial values of a key - index key <%s> <%s>\n"
+      "______________________________________________________________________________________\n"
+      ,wMasterFile.IndexTable[1]->IndexName.toString()
+      ,wMasterFile.IndexTable[1]->Duplicates?"Allow Duplicates":"No duplicates");
+
+  ZDataBuffer wKeyContent;
+  utf8VaryingString wKeyStr ;
+  ZArray<URFField> wFieldList;
+
+
+
+  wKeyStr = "No more than a skull head record";
+  wKeyStr._exportURF(wKeyContent);
+
+  _DBGPRINT("\n\nSearching key <%s>\n",wKeyStr.toString())
+
+  wSt=wMasterFile.zsearch(wMasterRecord,wKeyContent,1L);
+  if (wSt!=ZS_FOUND)
+    ZException.exit_abort();
+
+
+  wSt=URFParser::parse(wMasterRecord,wFieldList);
+  if (wSt!=ZS_SUCCESS)
+    ZException.exit_abort();
+
+  for (long wi=0; wi < wFieldList.count();wi++){
+    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab(wi).getName().toString(),
+        wFieldList[wi].display().toString());
+  }
+
+
+
+  wKeyContent.clear();
+  wKeyStr = "image of key";
+  wKeyStr._exportURF(wKeyContent);
+
+  _DBGPRINT("Searching key <%s>\n",wKeyStr.toString())
+
+  wSt=wMasterFile.zsearch(wMasterRecord,wKeyContent,1L);
+  if (wSt!=ZS_FOUND)
+    ZException.exit_abort();
+
+
+  wSt=URFParser::parse(wMasterRecord,wFieldList);
+  if (wSt!=ZS_SUCCESS)
+    ZException.exit_abort();
+
+  for (long wi=0; wi < wFieldList.count();wi++){
+    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab(wi).getName().toString(),
+        wFieldList[wi].display().toString());
+  }
+
+
+  wKeyContent.clear();
+  wKeyStr = "Picture used for figuring an email connection.record";
+  wKeyStr._exportURF(wKeyContent);
+
+  _DBGPRINT("\n\nSearching key <%s>\n",wKeyStr.toString())
+
+  wSt=wMasterFile.zsearch(wMasterRecord,wKeyContent,1L);
+  if (wSt!=ZS_FOUND)
+    ZException.exit_abort();
+
+
+  wSt=URFParser::parse(wMasterRecord,wFieldList);
+  if (wSt!=ZS_SUCCESS)
+    ZException.exit_abort();
+
+  for (long wi=0; wi < wFieldList.count();wi++){
+    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab(wi).getName().toString(),
+        wFieldList[wi].display().toString());
+  }
+
+
+  wKeyContent.clear();
+  wKeyStr = "a simple grave for resting in peace zmf record";
+  wKeyStr._exportURF(wKeyContent);
+
+  _DBGPRINT("\n\nSearching key <%s>\n",wKeyStr.toString())
+
+  wSt=wMasterFile.zsearch(wMasterRecord,wKeyContent,1L);
+  if (wSt!=ZS_FOUND)
+    ZException.exit_abort();
+
+
+  wSt=URFParser::parse(wMasterRecord,wFieldList);
+  if (wSt!=ZS_SUCCESS)
+    ZException.exit_abort();
+
+  for (long wi=0; wi < wFieldList.count();wi++){
+    fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab(wi).getName().toString(),
+        wFieldList[wi].display().toString());
+  }
+
+  wKeyContent.clear();
+  wKeyStr = "gabu not to be found";
+  wKeyStr._exportURF(wKeyContent);
+
+  _DBGPRINT("\n\nSearching key <%s>\n",wKeyStr.toString())
+
+  wSt=wMasterFile.zsearch(wMasterRecord,wKeyContent,1L);
+  if (wSt!=ZS_NOTFOUND)
+    ZException.exit_abort();
+
+  _DBGPRINT("\n______________________________________________________\n" \
+            "testRandomSearchAllPartial Test passed. Key index name <%s> <%s>\n"\
+            "_______________________________________________________\n" \
+            ,wMasterFile.IndexTable[1]->IndexName.toString() \
+            ,wMasterFile.IndexTable[1]->Duplicates?"Allow duplicates":"No duplicates" )
+
+
+
+  wSt = wMasterFile.zclose();
+  if (wSt!=ZS_SUCCESS) {
+    ZException.exit_abort();
+  }
+
+
+  return wSt;
+} // testRandomSearchAllPartial
 
 
 ZStatus testSequentialKey(const uriString& pZMF) {
@@ -2166,22 +1830,32 @@ ZStatus testSequentialKey(const uriString& pZMF) {
 
 
     for (long wi=0; wi < wFieldList.count();wi++){
-      //      utf8VaryingString wName = wMasterFile.Dictionary->Tab[wi].getName();
+      //      utf8VaryingString wName = wMasterFile.Dictionary->Tab(wi).getName();
       //      utf8VaryingString wValue = wFieldList[wi].display().toString();
-      fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab[wi].getName().toString(),
+      fprintf (stdout,"   %s %s\n",wMasterFile.Dictionary->Tab(wi).getName().toString(),
           wFieldList[wi].display().toString());
       //      fprintf (stdout,"   %s\n",wFieldList[wi].display().toString());
     }
     wSt=wMasterFile.zgetNextPerIndex(wMasterRecord,1L);
   }
 
-  if (wSt!=ZS_SUCCESS)
+  if (wSt!=ZS_EOF)
     ZException.exit_abort();
+
+  _DBGPRINT("\n_____________________________________________\n" \
+            "testSequentialKey Test passed. Key index name <%s> <%s>\n"\
+            "_______________________________________________\n" \
+            ,wMasterFile.IndexTable[1]->IndexName.toString() \
+            ,wMasterFile.IndexTable[1]->Duplicates?"Allow duplicates":"No duplicates" )
 
   wSt = wMasterFile.zclose();
   if (wSt!=ZS_SUCCESS) {
     ZException.exit_abort();
   }
+
+
+
+
   return wSt;
 } // testSequentialKey
 

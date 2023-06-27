@@ -128,7 +128,7 @@ void VisuRaw::visuBlockHeader(ZQTableView* pBlockDumpTBv,const ZDataBuffer *pRaw
 
   QLabel* wLockLBl=new QLabel(&wVisuDLg);
   QGLyt->addWidget(wLockLBl,4,2);
-  wLockLBl->setText(decode_ZLockMask(wBHExp.Lock).toChar());
+  wLockLBl->setText(decode_ZLockMask(wBHExp.Lock).toCChar());
 
 
   QLabel* wLbPidLBl=new QLabel("Pid",&wVisuDLg);

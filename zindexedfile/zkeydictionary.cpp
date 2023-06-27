@@ -16,7 +16,7 @@ KeyDic_Pack& KeyDic_Pack::_copyFrom(const KeyDic_Pack& pIn)
   return *this;
 }
 
-KeyDic_Pack& KeyDic_Pack::set(const ZKeyDictionary &pIn)
+KeyDic_Pack& KeyDic_Pack::set(ZKeyDictionary &pIn)
 {
   memset(this,0,sizeof(KeyDic_Pack));
   pIn.DicKeyName._exportUVFPtr(Name,cst_fieldnamelen);
@@ -54,20 +54,20 @@ ZKeyDictionary::ZKeyDictionary(const ZKeyDictionary& pIn)
   _copyFrom(pIn);
 }
 
-ZTypeBase ZKeyDictionary::getType(const long pKFieldRank) const
+ZTypeBase ZKeyDictionary::getType(long pKFieldRank) const
 {
-  long wRank =Tab[pKFieldRank].MDicRank;
-  return (Dictionary->Tab[wRank].ZType);
+  long wRank =at(pKFieldRank).MDicRank;
+  return (Dictionary->Tab(wRank).ZType);
 }
 uint64_t ZKeyDictionary::getUniversalSize(const long pKFieldRank) const
 {
-  long wRank =Tab[pKFieldRank].MDicRank;
-  return (Dictionary->Tab[wRank].UniversalSize);
+  long wRank =at(pKFieldRank).MDicRank;
+  return (Dictionary->Tab(wRank).UniversalSize);
 }
 uint64_t ZKeyDictionary::getNaturalSize(const long pKFieldRank) const
 {
-  long wRank =Tab[pKFieldRank].MDicRank;
-  return (Dictionary->Tab[wRank].NaturalSize);
+  long wRank =at(pKFieldRank).MDicRank;
+  return (Dictionary->Tab(wRank).NaturalSize);
 }
 uint32_t ZKeyDictionary::computeKeyUniversalSize() const
 {
@@ -81,20 +81,21 @@ uint32_t ZKeyDictionary::computeKeyUniversalSize() const
  * @brief ZSKeyDictionary::_reComputeSize computes Universal key size for the index key. Returns computed size.
  */
 uint32_t
-ZKeyDictionary::_reComputeKeySize (void) const
+ZKeyDictionary::_reComputeKeySize (void)
 {
 //  KeyNaturalSize=0;
   uint32_t wKeyUniversalSize=0;
 
   for (long wi=0;wi<size(); wi++)
   { // only ZKDic at record level may be a certain value for field sizes
-    Tab[wi].KeyOffset= wKeyUniversalSize;
+
+    _Base::Tab(wi).KeyOffset= wKeyUniversalSize;
 
 //    KeyNaturalSize +=(size_t) getNaturalSize(wi) ; don't care about natural size
     wKeyUniversalSize += (uint32_t)getUniversalSize(wi) ;
 
-    /*KeyNaturalSize += Tab[wi].NaturalSize;
-                KeyUniversalSize += Tab[wi].UniversalSize;*/
+    /*KeyNaturalSize += Tab(wi).NaturalSize;
+                KeyUniversalSize += Tab(wi).UniversalSize;*/
   }
   return wKeyUniversalSize;
 }// _reComputeSize
@@ -235,7 +236,7 @@ ZKeyDictionary_Exp::set(const ZKeyDictionary& pIn)
   ZAE.FullSize = sizeof(ZAE)+ZAE.DataSize;
 
   FieldNb=(uint32_t)pIn.count();
-
+  Duplicates = pIn.Duplicates;
   KeyDicSize=(uint32_t)(sizeof(ZKeyDictionary_Exp)+pIn.DicKeyName._getexportUVFSize()+(sizeof(ZIndexField_Exp)*pIn.count()));
 }
 
@@ -300,7 +301,7 @@ ZKeyDictionary::_exportAppendFlat(ZDataBuffer& pZDBExport)
   ZIndexField_Exp* wIFExp=(ZIndexField_Exp*)wPtrOut;
   for (long wi=0;wi < count();wi++)
     {
-      wIFExp[wi].set(Tab[wi]);
+      wIFExp[wi].set(Tab(wi));
       wIFExp[wi].serialize();
     }
 
@@ -323,6 +324,8 @@ ZKeyDictionary::_importFlat(const unsigned char* &pPtrIn)
   }
 
   wKDExp.deserialize();
+
+  Duplicates = wKDExp.Duplicates;
 
 
   if (wKDExp.FieldNb > __INVALID_INDEX__)
@@ -446,20 +449,20 @@ utf8VaryingString ZKeyDictionary::toXml(int pLevel,int pRank, bool pComment)
     {
     wReturn += fmtXMLnode("field",wLevel+1);
     /* dump values from ZIndexField */
-    wReturn +=fmtXMLlong("mdicrank",Tab[wi].MDicRank,wLevel+2);
-    wReturn +=fmtXMLmd5("hash",Tab[wi].Hash,wLevel+2);
-    wReturn +=fmtXMLuint32("keyoffset",Tab[wi].KeyOffset,wLevel+2);
+    wReturn +=fmtXMLlong("mdicrank",Tab(wi).MDicRank,wLevel+2);
+    wReturn +=fmtXMLmd5("hash",Tab(wi).Hash,wLevel+2);
+    wReturn +=fmtXMLuint32("keyoffset",Tab(wi).KeyOffset,wLevel+2);
 
     /* get infos from mdic concerning this field (not required) */
     if (pComment)
       wReturn += fmtXMLcomment(" hereafter optional fields from MetaDic describing key field ",wLevel+2);
-    long wI = Tab[wi].MDicRank;
-    wReturn +=fmtXMLchar("name",Dictionary->Tab[wI].getName().toCChar(),wLevel+2);
-    wReturn +=fmtXMLuint32("ztype",Dictionary->Tab[wI].ZType,wLevel+2);    /* ZTypeBase = uint32_t*/
+    long wI = Tab(wi).MDicRank;
+    wReturn +=fmtXMLchar("name",Dictionary->Tab(wi).getName().toCChar(),wLevel+2);
+    wReturn +=fmtXMLuint32("ztype",Dictionary->Tab(wi).ZType,wLevel+2);    /* ZTypeBase = uint32_t*/
     utf8String wZTStr;
-    wZTStr.sprintf(" ZType_type <%s> converted to its value number",decode_ZType(Dictionary->Tab[wI].ZType));
+    wZTStr.sprintf(" ZType_type <%s> converted to its value number",decode_ZType(Dictionary->Tab(wi).ZType));
     fmtXMLaddInlineComment(wReturn,wZTStr.toCChar());
-    wReturn +=fmtXMLuint64("universalsize",Dictionary->Tab[wI].UniversalSize,wLevel+2);
+    wReturn +=fmtXMLuint64("universalsize",Dictionary->Tab(wi).UniversalSize,wLevel+2);
 
     wReturn += fmtXMLendnode("field",wLevel+1);
     }
@@ -545,7 +548,7 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
         bool wF=false;
         for (long wi=0;wi < Dictionary->count();wi++)
           {
-          if (Dictionary->Tab[wi].Hash==wIFld.Hash)
+          if (Dictionary->Tab(wi).Hash==wIFld.Hash)
             {
             wF=true;
             wIFld.MDicRank=uint32_t(wi);
@@ -559,7 +562,7 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
               wErroredFields ++;
             for (long wi=0;wi < Dictionary->count();wi++)
             {
-              if (Dictionary->Tab[wi].getName()==wName)
+              if (Dictionary->Tab(wi).getName()==wName)
               {
                 wF=true;
                 wIFld.MDicRank=uint32_t(wi);
@@ -617,8 +620,8 @@ ZKeyDictionary::zsearchFieldByName(const utf8_t *pFieldName) const
   long wMDicRank=0;
   for (long wi=0;wi<size();wi++)
   {
-    wMDicRank= Tab[wi].MDicRank;
-    if (Dictionary->Tab[wMDicRank].getName()==pFieldName)
+    wMDicRank= TabConst(wi).MDicRank;
+    if (Dictionary->Tab(wMDicRank).getName()==pFieldName)
       return wi;
   }
   return -1;
@@ -635,8 +638,8 @@ ZKeyDictionary::zsearchFieldByName(const utf8String &pFieldName) const
   long wMDicRank=0;
   for (long wi=0;wi<size();wi++)
   {
-    wMDicRank= Tab[wi].MDicRank;
-    if (Dictionary->Tab[wMDicRank].getName()==pFieldName)
+    wMDicRank= TabConst(wi).MDicRank;
+    if (Dictionary->Tab(wMDicRank).getName()==pFieldName)
       return wi;
   }
   return -1;
@@ -660,12 +663,12 @@ void ZKeyDictionary::report (FILE* pOutput)
       "ZType");
   for (long wi=0;wi<size();wi++)
   {
-    ZFieldDescription& wFD = Dictionary->Tab[Tab[wi].MDicRank];
+    ZFieldDescription& wFD = Dictionary->Tab(Tab(wi).MDicRank);
 
     fprintf (pOutput,
         " <%2ld> %8d %8ld %8ld %8d <%15s> <%s>\n",
         wi,
-        Tab[wi].KeyOffset,
+        Tab(wi).KeyOffset,
         wFD.NaturalSize,
         wFD.UniversalSize,
         wFD.Capacity,
@@ -691,7 +694,7 @@ ZKeyDictionary& ZKeyDictionary ::_copyFrom(const ZKeyDictionary &pIn)
   _Base::allocate(pIn.ZAllocation);
   _Base::clear();
   for (long wi=0; wi<pIn.count();wi++)
-    _Base::push(pIn.Tab[wi]);
+    _Base::push(pIn.TabConst(wi));
   ToolTip = pIn.ToolTip;
   DicKeyName = pIn.DicKeyName;
   Duplicates = pIn.Duplicates;
@@ -700,7 +703,7 @@ ZKeyDictionary& ZKeyDictionary ::_copyFrom(const ZKeyDictionary &pIn)
 
 long ZKeyDictionary ::hasFieldNameCase(const utf8VaryingString& pName) {
   for (long wi=0;wi < count();wi++) {
-    if (Dictionary->Tab[Tab[wi].MDicRank].getName().isEqualCase(pName))
+    if (Dictionary->Tab(Tab(wi).MDicRank).getName().isEqualCase(pName))
       return wi;
   }
   return -1;
@@ -714,15 +717,15 @@ bool ZKeyDictionary ::hasSameContentAs(ZKeyDictionary*pKey)
 
   for (long wi=0;wi<count();wi++)
     {
-    long wMDicRank= Tab[wi].MDicRank;
-    long wMDicRankIn= pKey->Tab[wi].MDicRank;
-    if (Dictionary->Tab[wMDicRank].ZType!=pKey->Dictionary->Tab[wMDicRankIn].ZType)
+    long wMDicRank= Tab(wi).MDicRank;
+    long wMDicRankIn= pKey->Tab(wi).MDicRank;
+    if (Dictionary->Tab(wMDicRank).ZType!=pKey->Dictionary->Tab(wMDicRankIn).ZType)
       return false;
-    if (Dictionary->Tab[wMDicRank].UniversalSize!=pKey->Dictionary->Tab[wMDicRankIn].UniversalSize)
+    if (Dictionary->Tab(wMDicRank).UniversalSize!=pKey->Dictionary->Tab(wMDicRankIn).UniversalSize)
       return false;
-    if (Dictionary->Tab[wMDicRank].Capacity!=pKey->Dictionary->Tab[wMDicRankIn].Capacity)
+    if (Dictionary->Tab(wMDicRank).Capacity!=pKey->Dictionary->Tab(wMDicRankIn).Capacity)
       return false;
-    if (Tab[wi].KeyOffset!=pKey->Tab[wi].KeyOffset)
+    if (Tab(wi).KeyOffset!=pKey->Tab(wi).KeyOffset)
       return false;
     }
   return true;
@@ -738,8 +741,8 @@ uint32_t ZKeyDictionary::computeKeyOffsets()
 
   while (wi < count())
     {
-    Tab[wi].KeyOffset=wKeyOffset;
-    wKeyOffset += Dictionary->Tab[Tab[wi].MDicRank].UniversalSize;
+    Tab(wi).KeyOffset=wKeyOffset;
+    wKeyOffset += Dictionary->Tab(Tab(wi).MDicRank).UniversalSize;
     wi++;
     }
   return wKeyOffset;  // computed key size
@@ -779,15 +782,15 @@ ZKeyDictionary::addFieldToZKeyByRank (const zrank_type pMDicRank)
     return ZS_OUTBOUND;
   }
 
-  if (!Dictionary->Tab[pMDicRank].KeyEligible)
-    if (!isKeyEligible( Dictionary->Tab[pMDicRank].ZType))
+  if (!Dictionary->Tab(pMDicRank).KeyEligible)
+    if (!isKeyEligible( Dictionary->Tab(pMDicRank).ZType))
     {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_INVINDEX,
         Severity_Error,
         "Field rank <%ld> <%s> is not eligible to be a key field",
         pMDicRank,
-        Dictionary->Tab[pMDicRank].getName().toCChar());
+          Dictionary->Tab(pMDicRank).getName().toCChar());
     return ZS_INVTYPE;
     }
 /*  wField.ZType=MetaDic->Tab[pMDicRank].ZType;
@@ -795,7 +798,7 @@ ZKeyDictionary::addFieldToZKeyByRank (const zrank_type pMDicRank)
   wField.NaturalSize=MetaDic->Tab[pMDicRank].NaturalSize;
   wField.ArrayCount=MetaDic->Tab[pMDicRank].Capacity;*/
   wField.MDicRank = pMDicRank;
-  wField.Hash = Dictionary->Tab[pMDicRank].Hash ;
+  wField.Hash = Dictionary->Tab(pMDicRank).Hash ;
   /* KeyOffset is left to Zero */
   push(wField);
   computeKeyOffsets();

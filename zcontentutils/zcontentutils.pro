@@ -158,6 +158,7 @@ SOURCES += \
     $${ZCONTENT_ROOT}/zcontentutils/zlayout.cpp \
     $${ZCONTENT_ROOT}/zcontentutils/zscan.cpp \
     bckelement.cpp \
+    editblockdlg.cpp \
     filegeneratedlg.cpp \
     keydata.cpp \
     main.cpp \
@@ -221,6 +222,7 @@ HEADERS += \
 \
     $${TOOLSET_ROOT}/zcppparser/zcppparserutils/rawfields.h \
     bckelement.h \
+    editblockdlg.h \
     filegeneratedlg.h \
     keydata.h \
     masterfilevalues.h \

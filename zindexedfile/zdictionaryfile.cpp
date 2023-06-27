@@ -60,6 +60,9 @@ ZDictionaryFile::create(const uriString& pDicFilename,bool pBackup){
 ZStatus
 ZDictionaryFile::save(bool pBackup){
   ZDataBuffer wDicExport;
+
+  setModified();
+
   _exportAppend(wDicExport);
 
   if (pBackup && URIDictionary.exists())

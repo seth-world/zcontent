@@ -10,6 +10,7 @@
 
 
 const long cst_FileNudge = 100;
+const size_t cst_BlockMax = 20000;
 
 class ZQTableView;
 class QLabel;
@@ -28,12 +29,11 @@ public:
   ~ZRawMasterFileVisu();
 
   ZStatus setup(const uriString& pURI, int pFd);
-  ZStatus displayBlock(ZBlockDescriptor_Export &pBlock);
+  ZStatus displayBlock(ZBlockDescriptor_Export pBlock);
 
-  ZStatus displayURFBlock(ZDataBuffer& pData);
+  ZStatus displayURFBlock(ZDataBuffer& pData, bool pTruncated);
 
-
-  ZStatus displayRawBlock(ZDataBuffer& pData);
+  ZStatus displayRawBlock(ZDataBuffer& pData, bool pTruncated);
   void    colorizeURFBlock(ZDataBuffer & pData);
   void    colorizeURFKeyBlock(ZDataBuffer & pData);
   void    colorizeOneURFFields(const ZDataBuffer& pData,const unsigned char* &pPtr, const unsigned char* pPtrEnd, size_t &pColorOffset);
@@ -59,7 +59,6 @@ public:
 
   ZStatus seekAndGet(ZDataBuffer& pOut, ssize_t &pSize, size_t pAddress);
 
-
   /** @brief searchNextStartSign Searches file surface for start sign beginning at pStartAddress up to end of file
    *                                and return its file address in pOutAddress with a status set to ZS_SUCCESS.
    *  if pStartAddress points to a valid start sign then pStartAddress is returned
@@ -72,6 +71,8 @@ public:
    *  Any other status that may be emitted by low level routines.
    */
   ZStatus searchNextStartSign(zaddress_type pStartAddress, zaddress_type &pOutAddress);
+
+  static ZStatus searchNextStartSign_S(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,zaddress_type pStartAddress, zaddress_type &pOutAddress);
 
 
   /** @brief searchPreviousStartSign Searches file surface for start sign beginning at pStartAddress down to beginning of file
@@ -125,11 +126,11 @@ public:
   QAction* longdoubleQAc = nullptr;
 
 
-
-
   long FileNudge=cst_FileNudge;
 
   void goToAddress(zaddress_type pAddress, zrank_type pRank=0);
+  void _goToAddress(zaddress_type pAddress, zrank_type pRank=0);
+
   void setViewModeRaw();
   void setViewModeURF();
 
@@ -192,7 +193,7 @@ private:
 
   VisuRaw*      VizuRaw=nullptr;
 
-  int           Fd=-1;
+  __FILEHANDLE__  Fd=-1;
 //  long          BlockRank=-1;
   uriString     URICurrent;
   bool          AllFileLoaded=false;

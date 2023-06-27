@@ -52,32 +52,32 @@ size_t     ZLockid::_import(const unsigned char *&pUniversalPtr)
 }
 
 
-CharMan decode_ZLockMask(zlockmask_type pLock)
+utf8VaryingString decode_ZLockMask(zlockmask_type pLock)
 {
-    CharMan wCh;
+    utf8VaryingString wCh;
     if (pLock == ZLock_Nolock)
-        return CharMan("ZLock_Nolock");
+        return utf8VaryingString("ZLock_Nolock");
     if (pLock == ZLock_All)
         return "ZLock_All";
 
     if (pLock & ZLock_Exclusive) {
-        wCh.strcat("ZLock_Exclusive ");
+        wCh.addConditionalOR("ZLock_Exclusive ");
     }
     if (pLock & ZLock_Delete) {
-        wCh.strcat( "ZLock_Delete ");
+        wCh.addConditionalOR( "ZLock_Delete ");
     }
     if (pLock & ZLock_Read) {
-        wCh.strcat( "ZLock_Read ");
+        wCh.addConditionalOR( "ZLock_Read ");
     }
     if (pLock & ZLock_Modify) {
-        wCh.strcat("ZLock_Modify ");
+        wCh.addConditionalOR("ZLock_Modify ");
     }
     if (pLock & ZLock_Read) {
-        wCh.strcat( "ZLock_Read ");
+        wCh.addConditionalOR("ZLock_Read ");
     }
     if (wCh[0] == 0) {
-        wCh.strcat( "No lock found");
-        }
+        return utf8VaryingString("Unknown lock code");
+    }
     return wCh;
 } //decode_ZLockMask
 

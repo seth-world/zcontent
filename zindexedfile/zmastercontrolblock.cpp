@@ -735,11 +735,11 @@ ZMasterControlBlock::report(FILE*pOutput)
       fprintf (pOutput,
           "    <%2ld> <%15s> %10ld %10ld %8s %s\n",
           wi,
-          Dictionary->Tab[wi].getName().toCChar(),
-          Dictionary->Tab[wi].NaturalSize,
-          Dictionary->Tab[wi].UniversalSize,
-          Dictionary->Tab[wi].KeyEligible?"Yes":"No",
-          decode_ZType(Dictionary->Tab[wi].ZType));
+          Dictionary->Tab(wi).getName().toCChar(),
+          Dictionary->Tab(wi).NaturalSize,
+          Dictionary->Tab(wi).UniversalSize,
+          Dictionary->Tab(wi).KeyEligible?"Yes":"No",
+          decode_ZType(Dictionary->Tab(wi).ZType));
     }
     fprintf (pOutput,
         "___________________________________________________________________________\n");
@@ -772,11 +772,11 @@ ZMasterControlBlock::report(FILE*pOutput)
       fprintf (pOutput,
           "    <%ld> <%15s> %5ld %5ld %12d %s\n",
           wj,
-          Dictionary->Tab[Dictionary->KeyDic[wi]->Tab[wj].MDicRank].getName().toCChar(),
-          Dictionary->Tab[Dictionary->KeyDic[wi]->Tab[wj].MDicRank].NaturalSize,
-          Dictionary->Tab[Dictionary->KeyDic[wi]->Tab[wj].MDicRank].UniversalSize,
-          Dictionary->KeyDic[wi]->Tab[wj].KeyOffset,
-          decode_ZType(Dictionary->Tab[Dictionary->KeyDic[wi]->Tab[wj].MDicRank].ZType));
+          Dictionary->Tab(Dictionary->KeyDic[wi]->Tab(wj).MDicRank).getName().toCChar(),
+          Dictionary->Tab(Dictionary->KeyDic[wi]->Tab(wj).MDicRank).NaturalSize,
+          Dictionary->Tab(Dictionary->KeyDic[wi]->Tab(wj).MDicRank).UniversalSize,
+          Dictionary->KeyDic[wi]->Tab(wj).KeyOffset,
+          decode_ZType(Dictionary->Tab(Dictionary->KeyDic[wi]->Tab(wj).MDicRank).ZType));
     }// for
     }// if (Dictionary!=nullptr)
   }// for (long wi=0;wi < IndexTable.size();wi++)

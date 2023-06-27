@@ -109,7 +109,7 @@ public:
 
   void set(const utf8VaryingString& pCell, int pCol) {
     for (long wi=0;wi < Content->count();wi++) {
-      if (*Content->Tab[wi].Tab[pCol]== pCell.toCChar() ) {
+      if (*Content->TabConst(wi).TabConst(pCol)== pCell.toCChar() ) {
         QModelIndex wI = TableView->ItemModel->index(wi,pCol);
         TableView->setCurrentIndex(wI);
         return;

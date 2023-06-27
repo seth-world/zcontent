@@ -23,7 +23,7 @@ public:
   using _Base::count;
   using _Base::last;
   using _Base::lastIdx;
-  using _Base::newBlankElement;
+//  using _Base::newBlankElement;
   using _Base::operator [];
 
   long pop (void);

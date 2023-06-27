@@ -19,9 +19,9 @@ public:
   ZIndexItem();
   ~ZIndexItem() {}
 
-  ZIndexItem(const ZIndexItem& pIn): ZDataBuffer(pIn) {_copyFrom(pIn);}
+  ZIndexItem( ZIndexItem& pIn): ZDataBuffer(pIn) {_copyFrom(pIn);}
   ZIndexItem(const ZDataBuffer& pKeyValue):ZDataBuffer(pKeyValue) {}
-  ZIndexItem& _copyFrom(const ZIndexItem& pIn)
+  ZIndexItem& _copyFrom(ZIndexItem& pIn)
   {
     ZMFAddress=pIn.ZMFAddress;
     Operation=pIn.Operation;
@@ -29,11 +29,12 @@ public:
     IndexAddress = pIn.IndexAddress ;
     this->ZDataBuffer::_copyFrom(pIn);
     URFFields.clear();
-    for (long wi=0;wi < pIn.URFFields.count();wi++)
-      URFFields.push(ZDataBuffer(pIn.URFFields[wi]));
+    for (long wi=0;wi < pIn.URFFields.count();wi++) {
+      URFFields.push(pIn.URFFields.Tab(wi));
+    }
     return *this;
   }
-  ZIndexItem& operator = (const ZIndexItem& pIn) { return _copyFrom(pIn); }
+  ZIndexItem& operator = (ZIndexItem& pIn) { return _copyFrom(pIn); }
 
   zaddress_type ZMFAddress;     //!< Master file block record address to link index key with
   zaddress_type IndexAddress;   //!< Index record address : to be stored in ZMF record

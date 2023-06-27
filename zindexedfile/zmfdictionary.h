@@ -67,7 +67,7 @@ public:
     long wR=-1;
     for (long wi=0;wi<KeyDic.count();wi++)
       if ((wR=KeyDic[wi]->hasFieldNameCase(pKeyFieldName)) > -1 ) {
-        return &KeyDic[wi]->Tab[wR];
+        return &KeyDic[wi]->Tab(wR);
       }
     return nullptr;
   }
@@ -193,7 +193,7 @@ class ZMFDicExportHeader
 {
 public:
   ZMFDicExportHeader() {}
-  void set(const ZMFDictionary *pDic);
+  void set(ZMFDictionary *pDic);
 
   /** updates pDic with header data */
   void get(ZMFDictionary& pDic);

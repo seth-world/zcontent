@@ -21,6 +21,7 @@
 #include <zqt/zqtwidget/zqtwidgettools.h>
 
 #include <zexceptiondlg.h>
+#include <zio/zioutils.h>
 
 #include <ztoolset/utfstringcommon.h>
 
@@ -35,6 +36,7 @@
 #include <zcontent/zcontentcommon/urfparser.h>
 #include <zcontent/zcontentcommon/urffield.h>
 
+#include <zio/zioutils.h>
 
 #include "visuraw.h"
 
@@ -218,7 +220,7 @@ ZRawMasterFileVisu::setup(const uriString& pURI , int pFd) {
 
 
 ZStatus
-ZRawMasterFileVisu::displayRawBlock(ZDataBuffer& pData) {
+ZRawMasterFileVisu::displayRawBlock(ZDataBuffer& pData, bool pTruncated) {
 
   ui->ColorsGBx->setVisible(true);
   ui->StartColorLBl->setVisible(true);
@@ -267,6 +269,25 @@ ZRawMasterFileVisu::displayRawBlock(ZDataBuffer& pData) {
 
   if (wRemain > 0) {
     displayOneLine(wCurLine,wPtr,wPtrEnd);
+  }
+
+  if (pTruncated) {
+    QList<QStandardItem*> wRow;
+    utf8VaryingString wStr;
+
+    for (int wi=0;(wi < 20 ) ;wi++) {
+      wRow << new QStandardItem("-");
+    }
+    wStr.sprintf("<truncated to %ld bytes>",cst_BlockMax);
+    wRow << new QStandardItem(wStr.toCChar());
+    BlockDumpTBv->ItemModel->appendRow(wRow);
+    int wRowNum = BlockDumpTBv->ItemModel->rowCount()-1;
+
+    wlineOffset.sprintf("%6d-%6X",cst_BlockMax,cst_BlockMax);
+    BlockDumpTBv->ItemModel->setVerticalHeaderItem (wRowNum,new QStandardItem(wlineOffset.toCChar()));
+
+    wStr.sprintf("Block has been truncated to %ld bytes",cst_BlockMax);
+    ui->MessagePTe->appendPlainText(wStr.toCChar());
   }
 
   for (int wi=0;wi < BlockDumpTBv->ItemModel->columnCount();wi++)
@@ -352,7 +373,7 @@ ZRawMasterFileVisu::seekAndGet(ZDataBuffer& pOut, ssize_t &pSize, size_t pAddres
     }
   }
   pOut.allocateBZero(pSize);
-  pSize=::read(Fd,pOut.DataChar,pSize);
+  pSize=::read(Fd,pOut.Data,pSize);
   if (pSize < 0) {
     ZException.getErrno(errno,
         _GET_FUNCTION_NAME_,
@@ -366,6 +387,7 @@ ZRawMasterFileVisu::seekAndGet(ZDataBuffer& pOut, ssize_t &pSize, size_t pAddres
 
   return ZS_SUCCESS;
 } //seekAndGet
+
 
 /** pAddress is the file offset that corresponds to wRecord.Data */
 
@@ -518,6 +540,72 @@ ZRawMasterFileVisu::searchNextStartSign(zaddress_type pStartAddress, zaddress_ty
   return ZS_SUCCESS;
 }// searchNextStartSign
 
+ZStatus
+ZRawMasterFileVisu::searchNextStartSign_S(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,zaddress_type pStartAddress, zaddress_type & pOutAddress) {
+
+  if ((pStartAddress < 0)||(pStartAddress>pFileSize)) {
+    return ZS_OUTBOUND;
+  }
+
+  ZStatus wSt=ZS_SUCCESS;
+  long wNudge = pNudge;
+
+  ZDataBuffer wRecord;
+
+  if ((wNudge + pStartAddress) > pFileSize) {
+    wNudge = pFileSize -  pStartAddress;
+    if (wNudge <= 0) {
+      return ZS_EOF;
+    }
+  }
+
+  wSt=rawReadAt(pFd,wRecord,wNudge,pStartAddress);
+  if (wSt!=ZS_SUCCESS) {
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        wSt,
+        Severity_Severe,
+        "Error positionning at address <%ld> for file <%s> ",
+        pStartAddress,
+        getNameFromFd(pFd).toCChar());
+    return wSt;
+  }
+
+  unsigned char* wPtr = wRecord.Data ;
+  unsigned char* wPtrEnd = wRecord.Data + wRecord.Size;
+
+  uint32_t* wStartSign = (uint32_t*)wPtr;
+  if (*wStartSign == cst_ZFILEBLOCKSTART) {
+    pOutAddress = pStartAddress;
+    return ZS_SUCCESS;
+  }
+
+  while ((pStartAddress < zaddress_type(pFileSize)) && (wSt==ZS_SUCCESS)) {
+
+    while ((*wStartSign!=cst_ZFILEBLOCKSTART) && (wPtr < wPtrEnd)) {
+      wStartSign = (uint32_t*)wPtr;
+      pStartAddress ++;
+      wPtr++;
+    }
+    if (*wStartSign==cst_ZFILEBLOCKSTART)
+      break;
+
+    if (pStartAddress >= zaddress_type(pFileSize)) {
+      return ZS_OUTBOUNDHIGH;
+    }
+    pStartAddress -= 3;
+
+    wSt=rawReadAt(pFd,wRecord,wNudge,pStartAddress);
+    if (wSt!=ZS_SUCCESS)
+      return wSt;
+    wPtr = wRecord.Data;
+    wPtrEnd = wRecord.Data + wRecord.Size ;
+  } // while wAddress
+
+
+  pOutAddress = pStartAddress;
+  return ZS_SUCCESS;
+}// searchNextStartSign
+
 
 void ZRawMasterFileVisu::getPrevAddrVal(zaddress_type &pAddress, long &pNudge, long &pBucket){
   pNudge = FileNudge ;
@@ -648,19 +736,17 @@ ZRawMasterFileVisu::setViewModeURF() {
 }
 void
 ZRawMasterFileVisu::goToAddress(zaddress_type pAddress, zrank_type pRank) {
+
+  _goToAddress(pAddress,pRank);
+  displayBlock(BlockCur);
+  return;
+} // goToAddress
+
+void
+ZRawMasterFileVisu::_goToAddress(zaddress_type pAddress, zrank_type pRank) {
   ZStatus wSt;
   ssize_t wSize = sizeof(ZBlockHeader_Export);
   ZDataBuffer wRecord;
-
-/*
-  ui->ForwardBTn->setEnabled(false);
-  ui->BackwardBTn->setEnabled(false);
-  ui->BeginBTn->setEnabled(false);
-  ui->EndBTn->setEnabled(false);
-*/
-//  BlockRank = pRank;
-
-
 
   wSt = seekAndGet(wRecord,wSize,pAddress);
   if (wSt!=ZS_SUCCESS) {
@@ -680,14 +766,10 @@ ZRawMasterFileVisu::goToAddress(zaddress_type pAddress, zrank_type pRank) {
   BlockCur.deserialize();
   BlockCur.Address = pAddress;
 
-//  BlockList.push(BlockCur);
-//  BlockRank = BlockList.lastIdx();
-
   ui->TopLBl->setVisible(false);
 
-  displayBlock(BlockCur);
   return;
-} // goToAddress
+} // _goToAddress
 
 void
 ZRawMasterFileVisu::ToEnd(){
@@ -807,7 +889,7 @@ ZRawMasterFileVisu::seekAndRead(ZDataBuffer& pRecord,ZBlockDescriptor_Export & p
     return  ZS_FILEPOSERR ;
   }
   pRecord.allocate(pBlock.BlockSize);
-  ssize_t wSize=::read(Fd,pRecord.DataChar,pBlock.BlockSize);
+  ssize_t wSize=::read(Fd,pRecord.Data,pBlock.BlockSize);
   if (wSize < 0) {
     ZException.getErrno(errno,
         _GET_FUNCTION_NAME_,
@@ -822,12 +904,23 @@ ZRawMasterFileVisu::seekAndRead(ZDataBuffer& pRecord,ZBlockDescriptor_Export & p
 }//seekAndRead
 
 
+/* pBlock is passed by value because possibly modified if size is huge */
+
 ZStatus
-ZRawMasterFileVisu::displayBlock(ZBlockDescriptor_Export & pBlock)
+ZRawMasterFileVisu::displayBlock(ZBlockDescriptor_Export  pBlock)
 {
 
   utf8VaryingString wStr;
   QList<QStandardItem*> wRow;
+  bool wTruncated=false;
+
+  if (pBlock.BlockSize==0) {
+
+  }
+  if (pBlock.BlockSize > cst_BlockMax) {
+    pBlock.BlockSize = cst_BlockMax;
+    wTruncated=true;
+  }
   RawRecord.allocate(pBlock.BlockSize);
 
   setQLabelNum<zsize_type>(ui->FileSizeLBl,pBlock.BlockSize);
@@ -849,7 +942,7 @@ ZRawMasterFileVisu::displayBlock(ZBlockDescriptor_Export & pBlock)
       BlockDumpTBv->setVisible(true);
     }
 
-    return displayRawBlock(RawRecord);
+    return displayRawBlock(RawRecord,wTruncated);
   }
   else {
     if (!BlockTBv->isVisible()) {
@@ -858,7 +951,7 @@ ZRawMasterFileVisu::displayBlock(ZBlockDescriptor_Export & pBlock)
     }
     if (ui->ColorModeCBx->currentIndex()==2)
         return displayURFKeyBlock(RawRecord);
-    return displayURFBlock(RawRecord);
+    return displayURFBlock(RawRecord,wTruncated);
   }
 }//displayBlock
 
@@ -935,7 +1028,7 @@ ZRawMasterFileVisu::setSelectionBackGround( QVariant& pBackground,
 
 
 ZStatus
-ZRawMasterFileVisu::displayURFBlock(ZDataBuffer & pData)
+ZRawMasterFileVisu::displayURFBlock(ZDataBuffer & pData, bool pTruncated)
 {
   ui->ColorsGBx->setVisible(false);
 
@@ -957,7 +1050,7 @@ ZRawMasterFileVisu::displayURFBlock(ZDataBuffer & pData)
 
   ZTypeBase wZType;
 //  size_t    wURFHeaderSize=0;
-  uint64_t  wURFDataSize = 0;
+//  uint64_t  wURFDataSize = 0;
 //  uint32_t  wKeyNb=0;
 //  zaddress_type wKeyAddress=0;
 
@@ -972,7 +1065,7 @@ ZRawMasterFileVisu::displayURFBlock(ZDataBuffer & pData)
 
   int wErrored=0;
   bool wZTypeErrored=false;
-//#ifdef __COMMENT__
+
   _importAtomic<ZTypeBase>(wZType,wPtr);
   while (true) {
     if ((wZType != ZType_bitset) && (wZType != ZType_bitsetFull)) {
@@ -1026,7 +1119,7 @@ ZRawMasterFileVisu::displayURFBlock(ZDataBuffer & pData)
 */
     break;
   }// while true
-//#endif // __COMMENT__
+
   const unsigned char* wPtrEnd = pData.Data + pData.Size;
   while ((wPtr < wPtrEnd )&&(wErrored < 10)) {
 
@@ -1042,6 +1135,21 @@ ZRawMasterFileVisu::displayURFBlock(ZDataBuffer & pData)
 
   } // while (wPtr < wPtrEnd )
 
+  if (pTruncated) {
+    wRow.clear();
+    wRow  <<  new QStandardItem(" ");
+    wRow  <<  new QStandardItem(" ");
+    wRow  <<  new QStandardItem(" ");
+    wRow  <<  new QStandardItem(" ");
+    wStr.sprintf("Block has been truncated to %ld bytes",cst_BlockMax);
+    wRow  <<  new QStandardItem(wStr.toCChar());
+
+    ui->MessagePTe->appendPlainText(wStr.toCChar());
+
+    BlockTBv->ItemModel->appendRow(wRow);
+    BlockTBv->ItemModel->setVerticalHeaderItem(BlockTBv->ItemModel->rowCount()-1,new QStandardItem("-error-"));
+  }
+
   if (wErrored >= 10) {
     wRow.clear();
     wRow  <<  new QStandardItem(" ");
@@ -1055,6 +1163,8 @@ ZRawMasterFileVisu::displayURFBlock(ZDataBuffer & pData)
     BlockTBv->ItemModel->appendRow(wRow);
     BlockTBv->ItemModel->setVerticalHeaderItem(BlockTBv->ItemModel->rowCount()-1,new QStandardItem("-error-"));
   }
+
+
 
 #ifdef __COMMENT__
   /* processing keys data */
@@ -1681,7 +1791,7 @@ ZRawMasterFileVisu::displayOneURFField(zaddress_type &wOffset,const unsigned cha
       wRow << new QStandardItem("<Invalid resource>");
     }
     else {
-      wStr.sprintf("entity<%s> id<%ld>",decode_ZEntity(wValue.Entity).toChar(),wValue.id);
+      wStr.sprintf("entity<%s> id<%ld>",decode_ZEntity(wValue.Entity).toCChar(),wValue.id);
       wRow << new QStandardItem(wStr.toCChar());
     }
 
@@ -2196,7 +2306,7 @@ void ZRawMasterFileVisu::visuBlockHeader(){
 
   QLabel* wLockLBl=new QLabel(&wVisuDLg);
   QGLyt->addWidget(wLockLBl,4,2);
-  wLockLBl->setText(decode_ZLockMask(wBHExp.Lock).toChar());
+  wLockLBl->setText(decode_ZLockMask(wBHExp.Lock).toCChar());
 
 
   QLabel* wLbPidLBl=new QLabel("Pid",&wVisuDLg);

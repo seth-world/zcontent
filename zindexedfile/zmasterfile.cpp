@@ -193,12 +193,12 @@ ZMasterFile::extractKeyValues(const ZDataBuffer& pRecord,ZDataBuffer& pKeyConten
 
   long wFldRank=-1;
   for (long wi=0;wi < wKeyDic->count();wi++) {
-//    if (wKeyDic->Tab[wi].MDicRank < wFldRank)  { /* if next field has a greater rank : do not reset pointer */
+//    if (wKeyDic->Tab(wi).MDicRank < wFldRank)  { /* if next field has a greater rank : do not reset pointer */
 //      wR=0;
 //      wPtrIn=wFldBegPtr;
 //    }
 
-    wFldRank=wKeyDic->Tab[wi].MDicRank;
+    wFldRank=wKeyDic->Tab(wi).MDicRank;
 
     /* find sequentially field of rank MDicRank */
     wR=0;

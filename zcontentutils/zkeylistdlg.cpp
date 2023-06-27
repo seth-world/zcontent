@@ -95,25 +95,26 @@ ZKeyListDLg::displayKeyDictionaries(const ZMFDictionary* pDic)
 
     wKHR.KeySize = 0;
     for (long wj=0;wj < pDic->KeyDic[wi]->count(); wj++)
-      wKHR.KeySize += pDic->Tab[pDic->KeyDic[wi]->Tab[wj].MDicRank].UniversalSize;
+      wKHR.KeySize += pDic->TabConst(pDic->KeyDic[wi]->Tab(wj).MDicRank).UniversalSize;
 
 
     wKeyRow=createKeyDicRow_KD(wKHR); /* create item row with appropriate infra data linked to it */
 
     for (long wj=0;wj < pDic->KeyDic[wi]->count(); wj++) {
+      long wMDicRank=pDic->KeyDic[wi]->Tab(wj).MDicRank;
       wKeyFieldRow.clear();
 
-      wKeyFieldRow << createItem(pDic->Tab[pDic->KeyDic[wi]->Tab[wj].MDicRank].getName());
+      wKeyFieldRow << createItem(pDic->TabConst(wMDicRank).getName());
 
-      wKeyFieldRow << createItem( decode_ZType (pDic->Tab[pDic->KeyDic[wi]->Tab[wj].MDicRank].ZType));
-      wKeyFieldRow << createItem( pDic->KeyDic[wi]->Tab[wj].KeyOffset,"%d");
+      wKeyFieldRow << createItem( decode_ZType (pDic->TabConst(wMDicRank).ZType));
+      wKeyFieldRow << createItem( pDic->KeyDic[wi]->Tab(wj).KeyOffset,"%d");
 
-      wKeyFieldRow << createItem( pDic->Tab[pDic->KeyDic[wi]->Tab[wj].MDicRank].UniversalSize,"%ld");
-      wKeyFieldRow << createItem( pDic->KeyDic[wi]->Tab[wj].Hash);
+      wKeyFieldRow << createItem( pDic->TabConst(wMDicRank).UniversalSize,"%ld");
+      wKeyFieldRow << createItem( pDic->KeyDic[wi]->Tab(wj).Hash);
 
       wKeyRow[0]->appendRow(wKeyFieldRow);
 
-      wKHR.KeySize += pDic->Tab[pDic->KeyDic[wi]->Tab[wj].MDicRank].UniversalSize;
+      wKHR.KeySize += pDic->TabConst(wMDicRank).UniversalSize;
 
     }// for wj
 
@@ -131,8 +132,8 @@ ZKeyListDLg::displayKeyDictionaries(const ZMFDictionary* pDic)
 int
 ZKeyListDLg::searchForFieldName(const utf8VaryingString& pName) {
   for (long wi=0; wi < ZMFDic->ZMetaDic::count();wi++) {
-    if (ZMFDic->Tab[wi].getName()==pName)
-      return wi;
+    if (ZMFDic->TabConst(wi).getName()==pName)
+      return int(wi);
   }
   return -1;
 }

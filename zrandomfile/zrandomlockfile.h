@@ -162,9 +162,9 @@ public:
         ZException.addToLast("While unlocking ZBAT (%s)",_GET_FUNCTION_NAME_);
         ZException.exit_abort();
         }
-    ZBAT.Tab[wRank].Lock = ZLock_Nothing;
-    ZBAT.Tab[wRank].Pid = 0L;
-    return _writeBlockHeader(ZBAT.Tab[wRank],ZBAT.Tab[wRank].Address);
+    ZBAT[wRank].Lock = ZLock_Nothing;
+    ZBAT[wRank].Pid = 0L;
+    return _writeBlockHeader(ZBAT[wRank],ZBAT[wRank].Address);
   }
 
 inline
@@ -205,8 +205,8 @@ ZStatusBase wSt;
  static inline
   ZStatus _getlock(ZFileDescriptor &pDescriptor,const long pRank ,zlockmask_type &pLock)
   {
-    if ((pLock= pDescriptor.ZBAT.Tab[pRank].Lock)!=ZLock_Nolock)
-            if (pDescriptor.ZBAT.Tab[pRank].Pid!=pDescriptor.Pid)
+    if ((pLock= pDescriptor.ZBAT[pRank].Lock)!=ZLock_Nolock)
+            if (pDescriptor.ZBAT[pRank].Pid!=pDescriptor.Pid)
                                                     return (ZS_LOCKED); // locked by another process
     return (ZS_SUCCESS); // no lock or locked by this pid
   }
@@ -236,7 +236,7 @@ inline
                                     }
                     }
 
-    wSt= _getBlockHeader(pDescriptor,pDescriptor.ZBAT.Tab[pRank].Address,wBlockHeader);
+    wSt= _getBlockHeader(pDescriptor,pDescriptor.ZBAT[pRank].Address,wBlockHeader);
     if (wSt!=ZS_SUCCESS)
         {
         return (ZStatus)wSt;
@@ -262,7 +262,7 @@ inline
     wBlockHeader.Lock = pLock;
     wBlockHeader.Pid = pDescriptor.Pid;
 
-    wSt=_writeBlockHeader(pDescriptor,wBlockHeader,pDescriptor.ZBAT.Tab[pRank].Address,_GET_FUNCTION_NAME_);
+    wSt=_writeBlockHeader(pDescriptor,wBlockHeader,pDescriptor.ZBAT[pRank].Address,_GET_FUNCTION_NAME_);
                     return (ZStatus)wSt;
     if (wSt!=ZS_SUCCESS)
 

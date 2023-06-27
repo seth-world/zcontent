@@ -6,7 +6,7 @@
 
 #include <zcontent/zcontentutils/zparsingrulesdlg.h>
 
-using namespace zparsernmsp;
+using namespace zbs;
 
 //ZParsingRulesList::~ZParsingRulesList() {}
 

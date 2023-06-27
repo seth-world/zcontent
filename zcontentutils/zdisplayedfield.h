@@ -30,8 +30,8 @@ public:
 
   ZKeyHeaderRow& operator = (const ZKeyHeaderRow& pIn) {return _copyFrom(pIn); }
 
-  void set(const ZKeyDictionary& pKeyDic) ;
-  void set(const ZKeyDictionary* pKeyDic) ;
+  void set(ZKeyDictionary &pKeyDic) ;
+  void set( ZKeyDictionary* pKeyDic) ;
   ZKeyDictionary get(ZMFDictionary *pDic) ;
 
   uint32_t          KeyUniversalSize=0;

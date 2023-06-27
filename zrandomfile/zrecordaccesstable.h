@@ -1,6 +1,6 @@
 #ifndef ZRECORDACCESSTABLE_H
 #define ZRECORDACCESSTABLE_H
-#include <ztoolset/zarray.h>
+#include <ztoolset/ZArray.h>
 #include <zrandomfile/zrandomfiletypes.h>
 #include <ztoolset/zbasedatatypes.h>
 #include <zrandomfile/zblock.h>

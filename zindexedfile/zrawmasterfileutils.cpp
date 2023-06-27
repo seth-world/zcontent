@@ -285,8 +285,11 @@ ZStatus zrepairIndexes (const char *pZMFPath,
   /*
  *  for each index
 */
-  IndexPresence.allocateCurrentElements(wMasterFile.IndexTable.size());
-  IndexPresence.bzero();
+  IndexPresence.setAllocation(wMasterFile.IndexTable.size());
+  for (long wi=0; wi < wMasterFile.IndexTable.size();wi++) {
+    IndexPresence[wi]=0;
+  }
+//  IndexPresence.bzero();
   IndexRank=0;
   for (IndexRank=0;IndexRank<wMasterFile.IndexTable.size();IndexRank++)
   {

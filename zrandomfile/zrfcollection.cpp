@@ -155,8 +155,8 @@ ZRFCollection::initSearch(ZRandomFile* pZRFFile,const  zlockmask_type pLock,ZRFC
             return ZS_EOF;
             }
         ZSt = ZS_SUCCESS;
-        pZRFRank=InputCollection->Tab[InputCollectionIndex];
-        ZRFRank=InputCollection->Tab[InputCollectionIndex];
+        pZRFRank=InputCollection->Tab(InputCollectionIndex);
+        ZRFRank=InputCollection->Tab(InputCollectionIndex);
         return ZS_SUCCESS ;
         }
 // direct access to ZRandomFile : no collection to refine, first record rank is 0L
@@ -201,7 +201,7 @@ ZRFCollection::initSearch(ZRandomFile* pZRFFile,const  zlockmask_type pLock,ZRFC
             return ZS_EOF;
             }
 
-        ZRFRank=InputCollection->Tab[InputCollectionIndex];
+            ZRFRank=InputCollection->Tab(InputCollectionIndex);
         return setStatus(ZS_SUCCESS);
         }
 // direct access to ZRandomFile : no collection to refine
@@ -243,7 +243,7 @@ ZRFCollection::getPreviousRawRank (zrank_type& pZRFRank)
                 ZSt=ZS_OUTBOUNDLOW;
                 return ZS_OUTBOUNDLOW;
                 }
-        ZRFRank = InputCollection->Tab[InputCollectionIndex];
+                ZRFRank = InputCollection->Tab(InputCollectionIndex);
         pZRFRank=ZRFRank;
         ZSt = ZS_SUCCESS;
         return ZS_SUCCESS;
@@ -289,7 +289,7 @@ ZRFCollection::getCurrentRawRank(zrank_type &pZRFRank)
                 return ZS_OUTBOUNDHIGH;
                 }
 
-        pZRFRank=InputCollection->Tab[InputCollectionIndex];
+                pZRFRank=InputCollection->Tab(InputCollectionIndex);
         return setStatus(ZS_SUCCESS);
         }
     if (InputCollectionIndex>ZRFFile->getSize())
@@ -480,7 +480,7 @@ ZRFCollection::getPreviousSelectedRank (ZDataBuffer &pRecordContent,zrank_type& 
             return ZS_OUTBOUNDLOW;
             }
     ZSt=ZS_FOUND;
-    ZRFRank= Tab[BaseCollectionIndex];
+    ZRFRank= Tab(BaseCollectionIndex);
     pZRFRank=ZRFRank;
     setStatus(ZRFFile->zget(pRecordContent,ZRFRank));
     if (getStatus()==ZS_SUCCESS)
@@ -533,7 +533,7 @@ ZStatus ZRFCollection::getCurrentSelectedRank(zrank_type &pZRFRank)
         return ZS_OUTBOUNDHIGH;
         }
 
-    pZRFRank=Tab[BaseCollectionIndex];
+    pZRFRank=Tab(BaseCollectionIndex);
     return setStatus(ZS_FOUND);
 }//getCurrentSelectedRank
 

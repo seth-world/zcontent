@@ -4,10 +4,10 @@
 
 
 
-CharMan
+utf8VaryingString
 decode_ZEntity (ZEntity_type pEntity)
 {
-    CharMan wMimeContent;
+    utf8VaryingString wMimeContent;
     if (pEntity & ZEntity_MimeData)
     {
         pEntity &= ~ ZEntity_MimeData ; // clear this mask because all of these have it and will return true
@@ -129,9 +129,9 @@ decode_ZEntity (ZEntity_type pEntity)
 }//decode_ZEntity
 
 
-CharMan decode_ZEntityL(ZEntity_type pEntity)
+utf8VaryingString decode_ZEntityL(ZEntity_type pEntity)
 {
-    CharMan wMimeContent;
+    utf8VaryingString wMimeContent;
     if (pEntity & ZEntity_MimeData) {
         pEntity
             &= ~ZEntity_MimeData; // clear this mask because all of these have it and will return true
@@ -227,7 +227,7 @@ CharMan decode_ZEntityL(ZEntity_type pEntity)
     } // switch
 } //decode_ZEntity
 
-ZEntity_type encode_ZEntity(const utf8String &pEntity)
+ZEntity_type encode_ZEntity(const utf8VaryingString &pEntity)
 {
   if (pEntity.strcasestr((const utf8_t *) "ZEntity_KeyDic"))
     return ZEntity_KeyDic;

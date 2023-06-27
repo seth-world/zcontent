@@ -6,6 +6,7 @@
 #include <ztoolset/zstatus.h>
 #include <ztoolset/zdatabuffer.h>
 #include <zcontent/zrandomfile/zfiledescriptor.h>
+#include <zio/zioutils.h>
 
 #include <QVariant>
 #include <QBrush>
@@ -36,7 +37,8 @@ enum ZPoolRepair : uint8_t {
   ZPOR_Unknown
 };
 
-
+/* moved to zrfutilities.h */
+#ifdef __COMMENT__
 enum ZPoolType : uint8_t {
   ZPTP_ZBAT     = 0 ,
   ZPTP_ZFBT     = 1 ,
@@ -58,6 +60,7 @@ enum ZBlockExistence : uint16_t {
   ZBEX_MustBeFreeOrDeleted       = 0x0100,  /* invalid block state : must be ZBS_Free Or ZBS_Deleted*/
 //  ZBEX_MustBeDeleted    = 0x0200,  /* invalid block state : must be ZBS_Deleted */
 };
+#endif// __COMMENT__
 
 class poolVisu : public QMainWindow
 {
@@ -75,13 +78,13 @@ public:
 
   /* updates the block header on content file with state pState */
   static ZStatus updateBlockHeaderState(const utf8VaryingString &pURIContent,
-                                        int pFdContent, zaddress_type &pAddress, ZBlockState_type pState);
+                                        __FILEHANDLE__ pFdContent, zaddress_type &pAddress, ZBlockState_type pState);
 
 //  static ZStatus updateHeaderFromPool(const uriString &pURIHeader, ZBlockPool* pZBAT, ZBlockPool* pZFBT, ZBlockPool* pZDBT);
   static ZStatus updateHeaderFromPool(const uriString &pURIHeader, ZBlockPool* pZBAT, ZBlockPool* pZFBT, ZBlockPool *pZHOT);
 
-  static uint16_t checkContentBlock(int pPoolId, int pFdContent, ZBlockDescriptor &pBlockDesc);
-
+  static uint16_t checkContentBlock(int pPoolId, __FILEHANDLE__ pFdContent, ZBlockDescriptor &pBlockDesc);
+  static ZStatus getFileBlockDescriptor(__FILEHANDLE__ pFdContent, ZBlockDescriptor &pBlockDescOut, zaddress_type pAddress);
   static ZStatus repair(const uriString &pURIContent, const uriString &pURIHeader, uint8_t pFlag, std::function<void (utf8VaryingString&)> pDisplay=nullptr);
 
   void statusBarMessage(const char* pFormat,...);
@@ -94,8 +97,8 @@ public:
 
   ZDataBuffer HeaderContent;
 
-  int       FdHeader=-1;
-  int       FdContent=-1;
+  __FILEHANDLE__       FdHeader=-1;
+  __FILEHANDLE__       FdContent=-1;
 
   int       PoolId=0;
 
@@ -175,6 +178,8 @@ private:
   ZQGraphicScene* GScene=nullptr;
 
   void GSceneDoubleClick(QGraphicsSceneMouseEvent *pEvent);
+
+  void showBlockDetail(int pPoolId, long pDataRank, ZBlockDescriptor* pBD);
 
   const ZBlockDescriptor_Export* BDe=nullptr;
 

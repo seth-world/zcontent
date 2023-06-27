@@ -240,13 +240,6 @@ fieldTBv
   void displayZMFDictionary(ZMFDictionary &pDic);
   void displayKeyDictionaries(ZMFDictionary &pDic);
 
-#ifdef __DEPRECATED__
-  bool saveOrCreateDictionaryFile();
-  bool loadDictionaryFile();
-  ZStatus saveCurrentDictionary (unsigned long &pVersion, bool &pActive, utf8VaryingString &pDicName);
-  ZStatus loadDictionaryFile(const uriString& pDicPath);
-  void manageDictionaryFiles();
-#endif // __DEPRECATED__
   /* new version (simplyfied) of managedDictionaryFiles() */
     void manageDictionaryFiles();
     /* new version (simplyfied) of saveOrCreateDictionaryFile() */

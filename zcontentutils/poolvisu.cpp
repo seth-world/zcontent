@@ -31,6 +31,7 @@ using namespace std::placeholders ; // for std::bind
 #include <zcontent/zindexedfile/zindexcontrolblock.h>
 
 #include <zexceptiondlg.h>
+#include <zcontent/zrandomfile/zrfutilities.h>
 
 #include <zentity.h>
 
@@ -49,6 +50,8 @@ using namespace std::placeholders ; // for std::bind
 #include <QGraphicsRectItem>
 
 #include <QGraphicsSceneMouseEvent>
+
+#include "editblockdlg.h"
 
 extern const int cst_maxraisonablevalue;
 
@@ -1070,6 +1073,8 @@ void poolVisu::zoomFit() {
   ui->FileGraphicGVw->fitInView(wR,Qt::KeepAspectRatio);
 }
 
+
+
 void poolVisu::GSceneDoubleClick(QGraphicsSceneMouseEvent *pEvent) {
   utf8VaryingString wStr;
   int   wPoolId = 0;
@@ -1089,108 +1094,44 @@ void poolVisu::GSceneDoubleClick(QGraphicsSceneMouseEvent *pEvent) {
   }
   wDRef = wV.value<ZDataReference>();
 
+  /* get block descriptor from pool stored as item data */
   ZBlockDescriptor* wBD=(ZBlockDescriptor*)wDRef.getPtr<ZBlockDescriptor*>();
-
-  QDialog wBlockViewDLg (this);
-  wBlockViewDLg.setWindowTitle(QObject::tr("file block","poolVisu"));
-  wBlockViewDLg.resize(400,150);
-
-  QVBoxLayout* QVL=new QVBoxLayout(&wBlockViewDLg);
-  wBlockViewDLg.setLayout(QVL);
-
-  QHBoxLayout* QHL=new QHBoxLayout;
-  QVL->insertLayout(0,QHL);
-
-  QLabel* wPoolLBl ;
   if (wDRef.ResourceReference.Entity == ZEntity_ZBAT) {
     wPoolId = 0;
-    wPoolLBl = new QLabel("Block access table",this);
   }
   else if (wDRef.ResourceReference.Entity == ZEntity_ZFBT) {
     wPoolId = 1;
-    wPoolLBl = new QLabel("Free blocks table",this);
   }
   else if (wDRef.ResourceReference.Entity == ZEntity_ZHOT) {
     wPoolId = 2;
-    wPoolLBl = new QLabel("Hole table",this);
   } else {
-    wPoolLBl = new QLabel("Unknown pool",this);
+    wPoolId = -1;
   }
 
-  QHL->addWidget(wPoolLBl,0,Qt::AlignCenter);
 
-  QGridLayout* QGLyt=new QGridLayout();
-  QVL->insertLayout(1,QGLyt);
+  showBlockDetail(wPoolId,wDRef.DataRank, wBD);
+}
 
-  int wLine=0;
+void poolVisu::showBlockDetail(int pPoolId,long pDataRank,ZBlockDescriptor* pBD)
+{
 
-  QLabel* wLb0=new QLabel(QObject::tr("Pool rank","poolVisu"),&wBlockViewDLg);
-  QGLyt->addWidget(wLb0,wLine,0);
+  editBlockDLg* wEdBlk=new editBlockDLg(this);
+  wEdBlk->setup(FdContent,FdHeader,pPoolId,pDataRank,pBD);
 
-  wStr.sprintf("%ld",wDRef.DataRank);
-  QLabel* wRank = new QLabel(wStr.toCChar());
-  QGLyt->addWidget(wRank,wLine,1);
+  int wRet=wEdBlk->exec();
 
-  wLine++;
-
-  QLabel* wLb1=new QLabel(QObject::tr("Address","poolVisu"),&wBlockViewDLg);
-  QGLyt->addWidget(wLb1,wLine,0);
-
-  wStr.sprintf("%ld",wBD->Address);
-  QLabel* wAddress = new QLabel(wStr.toCChar());
-  QGLyt->addWidget(wAddress,wLine,1);
-
-  wLine++;
-
-  QLabel* wLb2=new QLabel(QObject::tr("Block size","poolVisu"),&wBlockViewDLg);
-  QGLyt->addWidget(wLb2,wLine,0);
-
-  wStr.sprintf("%ld",wBD->BlockSize);
-  QLabel* wSize = new QLabel(wStr.toCChar());
-  QGLyt->addWidget(wSize,wLine,1);
-
-  wLine++;
-
-  QLabel* wLb3=new QLabel(QObject::tr("State","poolVisu"),&wBlockViewDLg);
-  QGLyt->addWidget(wLb3,wLine,0);
-
-  QLabel* wState = new QLabel(decode_ZBS(wBD->State));
-  QGLyt->addWidget(wState,wLine,1);
-
-  wLine++;
-
-  QLabel* wLb4=new QLabel(QObject::tr("Status","poolVisu"),&wBlockViewDLg);
-  QGLyt->addWidget(wLb4,wLine,0);
-
-  QLabel* wStatus= new QLabel(decode_ZBEx(checkContentBlock(wPoolId,FdContent,*wBD)).toCChar());
-  QGLyt->addWidget(wStatus,wLine,1);
-
-  QHBoxLayout* QHLBtn=new QHBoxLayout;
-  QVL->insertLayout(2,QHLBtn);
-
-  QPushButton* wCloseBTn = new QPushButton(QObject::tr("Close","poolVisu"),&wBlockViewDLg);
-  QPushButton* wViewBTn = new QPushButton(QObject::tr("Content","poolVisu"),&wBlockViewDLg);
-  QSpacerItem* wSpacer= new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-  QHLBtn->addItem(wSpacer);
-
-  QHLBtn->addWidget(wViewBTn);
-  QHLBtn->addWidget(wCloseBTn);
-
-  QObject::connect(wCloseBTn, &QPushButton::clicked, &wBlockViewDLg, &QDialog::close);
-  QObject::connect(wViewBTn, &QPushButton::clicked, &wBlockViewDLg, &QDialog::accept);
-
-  int wRet=wBlockViewDLg.exec();
   if (wRet==QDialog::Accepted) {
-    viewBlock(wBD->Address, wDRef.DataRank);
+    viewBlock(pBD->Address, pDataRank);
   }
 }
+
 
 void poolVisu::viewBlock(zaddress_type pAddress, zrank_type pRank) {
   if (ContentVisu==nullptr)
     ContentVisu= new ZRawMasterFileVisu(this);
   ContentVisu->setup(URIContent, FdContent);
   ContentVisu->setModal(false);
-  ContentVisu->setViewModeRaw();
+//  ContentVisu->setViewModeRaw();
   ContentVisu->goToAddress(pAddress,pRank);
 
 
@@ -1216,9 +1157,10 @@ void poolVisu::poolMouseCallback(int pZEF, QMouseEvent *pEvent)
   if (ContentVisu==nullptr)
     ContentVisu= new ZRawMasterFileVisu(this);
   ContentVisu->setup(URIContent, FdContent);
-  ContentVisu->setViewModeRaw();
+
   ContentVisu->setModal(false);
-  ContentVisu->goToAddress(wAddress,zrank_type(wIdx.row()));
+  ContentVisu->_goToAddress(wAddress,zrank_type(wIdx.row()));
+  ContentVisu->setViewModeRaw();
 
   ContentVisu->show();
 
@@ -1339,8 +1281,9 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
       ContentVisu= new ZRawMasterFileVisu(this);
     ContentVisu->setup(URIContent, FdContent);
     ContentVisu->setModal(false);
+
+    ContentVisu->_goToAddress(wAddress,zrank_type(wIdx.row()));
     ContentVisu->setViewModeRaw();
-    ContentVisu->goToAddress(wAddress,zrank_type(wIdx.row()));
     ContentVisu->show();
 
     if (isIndexFile) {
@@ -1600,7 +1543,7 @@ poolVisu::updateBlockHeaderState(const utf8VaryingString& pURIContent,int pFdCon
     return  (ZS_FILEPOSERR);
   }
   wRec.allocate(sizeof(ZBlockHeader_Export));
-  ssize_t wSize = ::read(pFdContent,wRec.DataChar,sizeof(ZBlockHeader_Export));
+  ssize_t wSize = ::read(pFdContent,wRec.Data,sizeof(ZBlockHeader_Export));
   if (wSize<0)
   {
     ZException.getErrno(errno,
@@ -1624,7 +1567,7 @@ poolVisu::updateBlockHeaderState(const utf8VaryingString& pURIContent,int pFdCon
     return  (ZS_FILEPOSERR);
   }
 
-  wSize = ::write(pFdContent,wRec.DataChar,sizeof(ZBlockHeader_Export));
+  wSize = ::write(pFdContent,wRec.Data,sizeof(ZBlockHeader_Export));
   if (wSize <0 ) {
     ZException.getErrno (errno,             // NB: write function sets errno in case of error
         "updateBlockHeaderState",
@@ -1649,7 +1592,7 @@ poolVisu::checkContentBlock(int pPoolId,int pFdContent,ZBlockDescriptor& pBlockD
     return wRet;
   }
   wBlock.allocate(sizeof(ZBlockHeader_Export));
-  ssize_t wSize=::read(pFdContent,wBlock.DataChar,sizeof(ZBlockHeader_Export));
+  ssize_t wSize=::read(pFdContent,wBlock.Data,sizeof(ZBlockHeader_Export));
   if (wSize < 0) {
     wRet |= ZBEX_SysBadAddress;
     return wRet;
@@ -1682,42 +1625,33 @@ poolVisu::checkContentBlock(int pPoolId,int pFdContent,ZBlockDescriptor& pBlockD
   return wRet;
 } // checkContentBlock
 
+ZStatus
+poolVisu::getFileBlockDescriptor(__FILEHANDLE__ pFdContent,ZBlockDescriptor& pBDOut,zaddress_type pAddress) {
+  ZDataBuffer wBlock;
 
-utf8VaryingString
-decode_ZBEx(uint16_t pBEx) {
+  ZStatus wSt=rawReadAt(pFdContent,wBlock,sizeof(ZBlockHeader_Export),pAddress);
+  if (wSt!=ZS_SUCCESS) {
+    return wSt;
+  }
 
-  /* first preemptive statuses : one of these two cannot be combined with others */
-  if (pBEx==ZBEX_Correct)
-    return "<ZBEX_Correct> Pool block is correct";
+  ZBlockHeader_Export* wBlockE=(ZBlockHeader_Export* )wBlock.Data;
+  if (wBlockE->StartSign != cst_ZFILEBLOCKSTART) {
+    return ZS_INVBLOCKADDR;
+  }
 
-  if (pBEx==ZBEX_SysBadAddress)
-    return "<ZBEX_SysBadAddress> Cannot seed/read at given address on content file";
+  wBlockE->deserialize();
 
-  /* then cumulative statuses : check following priority */
+  pBDOut.Address = pAddress;
+  pBDOut.BlockSize = wBlockE->BlockSize ;
+  pBDOut.State = wBlockE->State  ;
+  pBDOut.Lock = wBlockE->Lock  ;
+  pBDOut.Pid = wBlockE->Pid   ;
 
-  if (pBEx & ZBEX_Orphan)
-    return "<ZBEX_Orphan> Orphan block:<cst_ZFILEBLOCKSTART> missing";
+  return ZS_SUCCESS;
+} // getFileBlockDescriptor
 
-  if (pBEx & ZBEX_PoolZeroSize)
-    return "<ZBEX_PoolZeroSize> Block size in pool has zero value";
 
-  if (pBEx & ZBEX_ContentZeroSize)
-    return "<ZBEX_ContentZeroSize> Block size on content file has zero value ";
 
-  /* these following are mutually exclusive */
-  if (pBEx & ZBEX_MustBeUsed)
-    return "<ZBEX_MustBeUsed> Block state must be ZBS_Used";
-  if (pBEx & ZBEX_MustBeFreeOrDeleted)
-    return "<ZBEX_MustBeFree> Block state must be ZBS_Free or ZBS_Deleted";
-//  if (pBEx & ZBEX_MustBeDeleted)
-//    return "<ZBEX_MustBeDeleted> Block state must be ZBS_Deleted";
-
-  if (pBEx & ZBEX_Size)
-    return "<ZBEX_Size> Block size in pool differs with block size on content file.";
-
-  return "<?????> Unknown block check error ";
-
-}
 
 
 void displayOut(utf8VaryingString& pOut) {
@@ -1751,7 +1685,7 @@ fixPool(const utf8VaryingString& pURIContent, int pFdContent,uint8_t pPoolType,Z
   pDisplay(wStr);
 
   for (long wi=0; wi < pPool->count(); wi++) {
-    wBE=poolVisu::checkContentBlock(pPoolType,pFdContent, pPool->Tab[wi]);
+    wBE=poolVisu::checkContentBlock(pPoolType,pFdContent, pPool->Tab(wi));
     if (wBE == ZBEX_Correct)
       continue;
     wStr.sprintf("%ld > %s",wi,decode_ZBEx(wBE).toString());
@@ -1767,7 +1701,7 @@ fixPool(const utf8VaryingString& pURIContent, int pFdContent,uint8_t pPoolType,Z
 
     if ((wBE & ZBEX_Orphan)&&(pFlag & ZPOR_FixOrphan)) {
       wStr.sprintf("Removing Orphan block in %s pool rank %ld address %lld",
-          getPoolName(pPoolType),wi,pPool->Tab[wi].Address);
+          getPoolName(pPoolType),wi,pPool->Tab(wi).Address);
       pPool->erase(wi);
       wi--;
       continue;
@@ -1775,16 +1709,16 @@ fixPool(const utf8VaryingString& pURIContent, int pFdContent,uint8_t pPoolType,Z
     if (pFlag & ZPOR_FixSize) {
       if (wBE & ZBEX_PoolZeroSize) {
         wStr.sprintf("<ZBEX_PoolZeroSize> Removing zero sized block from %s pool rank %ld address %lld",
-            getPoolName(pPoolType),wi,pPool->Tab[wi].Address);
+            getPoolName(pPoolType),wi,pPool->Tab(wi).Address);
         pPool->erase(wi);
         wi--;
         continue;
       }
       if (wBE & ZBEX_Size) {
         wStr.sprintf("<ZBEX_PoolZeroSize> Adapting pool block size to content block size from %s pool rank %ld address %lld",
-            getPoolName(pPoolType),wi,pPool->Tab[wi].Address);
+            getPoolName(pPoolType),wi,pPool->Tab(wi).Address);
         ZDataBuffer wBlock;
-        off_t wFileOffset = lseek(pFdContent,off_t(pPool->Tab[wi].Address),SEEK_SET);
+        off_t wFileOffset = lseek(pFdContent,off_t(pPool->Tab(wi).Address),SEEK_SET);
         if (wFileOffset < 0){
           ZException.getErrno(errno,
               _GET_FUNCTION_NAME_,
@@ -1796,7 +1730,7 @@ fixPool(const utf8VaryingString& pURIContent, int pFdContent,uint8_t pPoolType,Z
           return ZS_FILEPOSERR;
         }
         wBlock.allocate(sizeof(ZBlockHeader_Export));
-        ssize_t wSize=::read(pFdContent,wBlock.DataChar,sizeof(ZBlockHeader_Export));
+        ssize_t wSize=::read(pFdContent,wBlock.Data,sizeof(ZBlockHeader_Export));
         if (wSize < 0) {
           ZException.getErrno(errno,
               _GET_FUNCTION_NAME_,
@@ -1808,25 +1742,25 @@ fixPool(const utf8VaryingString& pURIContent, int pFdContent,uint8_t pPoolType,Z
           return ZS_READERROR;
         }
         ZBlockHeader_Export* wBlockExp=(ZBlockHeader_Export*)wBlock.Data;
-        pPool->Tab[wi].BlockSize = reverseByteOrder_Conditional<zsize_type>(wBlockExp->BlockSize) ;
+        pPool->Tab(wi).BlockSize = reverseByteOrder_Conditional<zsize_type>(wBlockExp->BlockSize) ;
       } // if (wBE & ZBEX_Size)
     } // if (wBE & ZPOR_FixSize)
     if (pFlag & ZPOR_FixState) {
       if (wBE & ZBEX_MustBeUsed) {
         wStr.sprintf("<ZPOR_FixState> Changing pool block state to ZBS_Used from %s pool rank %ld address %lld",
-            getPoolName(pPoolType),wi,pPool->Tab[wi].Address);
+            getPoolName(pPoolType),wi,pPool->Tab(wi).Address);
 
-        if (pPool->Tab[wi].State==ZBS_Allocated) {
+        if (pPool->Tab(wi).State==ZBS_Allocated) {
           wStr.sprintf("<ZPOR_FixState> Found pool block state <ZBS_Allocated> from %s pool rank %ld address %lld. Marking block <ZBS_BeingDeleted>.",
-              getPoolName(pPoolType),wi,pPool->Tab[wi].Address);
+              getPoolName(pPoolType),wi,pPool->Tab(wi).Address);
           pDisplay(wStr);
 
-          pPool->Tab[wi].State = ZBS_BeingDeleted;
+          pPool->Tab(wi).State = ZBS_BeingDeleted;
           continue;
         }
 
-        pPool->Tab[wi].State = ZBS_Used;
-        ZStatus wSt=poolVisu::updateBlockHeaderState(pURIContent,pFdContent,pPool->Tab[wi].Address,ZBS_Used);
+        pPool->Tab(wi).State = ZBS_Used;
+        ZStatus wSt=poolVisu::updateBlockHeaderState(pURIContent,pFdContent,pPool->Tab(wi).Address,ZBS_Used);
         if (wSt!=ZS_SUCCESS) {
           wStr = ZException.last().formatFullUserMessage();
           pDisplay(wStr);
@@ -1835,10 +1769,10 @@ fixPool(const utf8VaryingString& pURIContent, int pFdContent,uint8_t pPoolType,Z
       } // if (wBE & ZBEX_MustBeUsed)
       if (wBE & ZBEX_MustBeFreeOrDeleted) {
         wStr.sprintf("<ZPOR_FixState> Changing pool block state to ZBS_Free from %s pool rank %ld address %lld",
-            getPoolName(pPoolType),wi,pPool->Tab[wi].Address);
+            getPoolName(pPoolType),wi,pPool->Tab(wi).Address);
 
-        pPool->Tab[wi].State = ZBS_Free;
-        ZStatus wSt=poolVisu::updateBlockHeaderState(pURIContent,pFdContent,pPool->Tab[wi].Address,ZBS_Free);
+        pPool->Tab(wi).State = ZBS_Free;
+        ZStatus wSt=poolVisu::updateBlockHeaderState(pURIContent,pFdContent,pPool->Tab(wi).Address,ZBS_Free);
         if (wSt!=ZS_SUCCESS) {
           wStr = ZException.last().formatFullUserMessage();
           pDisplay(wStr);
@@ -1847,10 +1781,10 @@ fixPool(const utf8VaryingString& pURIContent, int pFdContent,uint8_t pPoolType,Z
       } // if (wBE & ZBEX_MustBeFree)
 /*      if (wBE & ZBEX_MustBeDeleted) {
         wStr.sprintf("<ZPOR_FixState> Changing pool block state to ZBS_Deleted from %s pool rank %ld address %lld",
-            getPoolName(pPoolType),wi,pPool->Tab[wi].Address);
+            getPoolName(pPoolType),wi,pPool->Tab(wi).Address);
 
-        pPool->Tab[wi].State = ZBS_Deleted;
-        ZStatus wSt=poolVisu::updateBlockHeaderState(pURIContent,pFdContent,pPool->Tab[wi].Address,ZBS_Deleted);
+        pPool->Tab(wi).State = ZBS_Deleted;
+        ZStatus wSt=poolVisu::updateBlockHeaderState(pURIContent,pFdContent,pPool->Tab(wi).Address,ZBS_Deleted);
         if (wSt!=ZS_SUCCESS) {
           wStr = ZException.last().formatFullUserMessage();
           pDisplay(wStr);
@@ -1906,7 +1840,7 @@ grabFreeForward(const utf8VaryingString& pURIContent,
         pURIContent.toString());
     return  ZS_FILEPOSERR ;
   }
-  ssize_t wS = ::read(pFdContent,wRecord.DataChar,wPayload);
+  ssize_t wS = ::read(pFdContent,wRecord.Data,wPayload);
   if (wS==0)
     return ZS_SUCCESS;
   if (wS < 0){
@@ -1938,7 +1872,7 @@ grabFreeForward(const utf8VaryingString& pURIContent,
       wRecord.allocate(wPayload);
       wPtr = wRecord.Data ;
       wEnd = wRecord.Data + wPayload ;
-      wS = ::read(pFdContent,wRecord.DataChar,wPayload);
+      wS = ::read(pFdContent,wRecord.Data,wPayload);
       if (wS==0)
         return ZS_SUCCESS;
       if (wS < 0){

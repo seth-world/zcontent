@@ -94,7 +94,7 @@ size_t ZIndexItemList::_exportAppend(ZDataBuffer& pOut) {
   size_t wSize = sizeof(uint64_t) ;
 
   for (long wi=0;wi < count();wi++) {
-    wSize += sizeof(ZIIExport) +  Tab[wi]->getURFSize() ;
+    wSize += sizeof(ZIIExport) +  Tab(wi)->getURFSize() ;
   }
 
   unsigned char* wPtr=pOut.extend(wSize);
@@ -103,11 +103,11 @@ size_t ZIndexItemList::_exportAppend(ZDataBuffer& pOut) {
 
   for (long wi=0;wi < count();wi++) {
     ZIIExport* wZIIe =  (ZIIExport*) wPtr;
-    wZIIe->set(*Tab[wi]);
+    wZIIe->set(*Tab(wi));
     wZIIe->serialize();
 
     wPtr += sizeof(ZIIExport) ;
-    Tab[wi]->_exportURF_Ptr(wPtr);
+    Tab(wi)->_exportURF_Ptr(wPtr);
   }// for
 
   return wSize;

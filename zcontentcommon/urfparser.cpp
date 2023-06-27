@@ -1450,9 +1450,9 @@ URFParser::displayOneURFField(const unsigned char* &wPtr,bool pShowZType) {
     ZResource wValue;
     ssize_t wSize=wValue._importURF(wPtr);
     if (pShowZType)
-      wReturn.sprintf("ZResource[<%s>-<%ld>]",decode_ZEntity(wValue.Entity).toChar(),wValue.id);
+      wReturn.sprintf("ZResource[<%s>-<%ld>]",decode_ZEntity(wValue.Entity).toCChar(),wValue.id);
     else
-      wReturn.sprintf("<%s>-<%ld>",decode_ZEntity(wValue.Entity).toChar(),wValue.id);
+      wReturn.sprintf("<%s>-<%ld>",decode_ZEntity(wValue.Entity).toCChar(),wValue.id);
     return wReturn;
   }
 

@@ -28,10 +28,10 @@ ZMetaDic::addField (const utf8String& pFieldName,
                    const URF_Array_Count_type pArrayCount)
 {
     ZFieldDescription wField;
-    if (pFieldName==nullptr)
+    if (pFieldName.isEmpty())
       {
-      fprintf (stderr,"ZMetaDic::addField-S-NULNAM Severe error field name is null.\n");
-      return ZS_NULLPTR;
+      fprintf (stderr,"ZMetaDic::addField-S-NULNAM Severe error field name is empty.\n");
+      return ZS_EMPTY;
       }
 
   wField.setFieldName(pFieldName);
@@ -218,7 +218,7 @@ ZMetaDic::searchFieldByName(const utf8String& pFieldName)
 
     for (long wi=0;wi<size();wi++)
         {
-        if (Tab[wi].getName()==pFieldName)
+        if (Tab(wi).getName()==pFieldName)
             return (zrank_type)wi;
         }
     ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -235,7 +235,7 @@ ZMetaDic::searchFieldByHash(const md5& pHash)
 {
   for (long wi=0;wi<size();wi++)
     {
-    if (Tab[wi].Hash==pHash)
+    if (Tab(wi).Hash==pHash)
       return wi;
     }
   ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -245,6 +245,14 @@ ZMetaDic::searchFieldByHash(const md5& pHash)
       pHash.toHexa().toCChar(), DicName.toCChar());
   return (zrank_type)-1;
 }
+
+void ZMetaDic ::setModified ()
+{
+  if (CreationDate.isInvalid())
+    CreationDate = ZDateFull::currentDateTime();
+  ModificationDate = ZDateFull::currentDateTime();
+}
+
 
 /**
  * @brief ZMetaDic::print Reports the content of ZMetaDic for all fields
@@ -266,30 +274,30 @@ void ZMetaDic ::print (FILE* pOutput)
              "ZType");
     for (long wi=0;wi<size();wi++)
     {
-/*    if (Tab[wi].ZType & ZType_Array) */
-/*        const char* wName=(const char*)Tab[wi].Name.toCChar();
-        printf ("%s 0x%X \n",wName,Tab[wi].ZType);
+/*    if (Tab(wi).ZType & ZType_Array) */
+/*        const char* wName=(const char*)Tab(wi).Name.toCChar();
+        printf ("%s 0x%X \n",wName,Tab(wi).ZType);
 */
         fprintf (pOutput,
                  " <%2ld> %25s %12s"
                  " %9ld %9d %9ld %9ld <%s>\n",
                  wi,
-                 Tab[wi].getName().toCChar(),
-                 Tab[wi].KeyEligible==true?"Yes":"No",
-                 Tab[wi].HeaderSize,
-                 Tab[wi].Capacity,
-                 Tab[wi].NaturalSize,
-                 Tab[wi].UniversalSize,
-                 decode_ZType( Tab[wi].ZType));
+                 Tab(wi).getName().toCChar(),
+                 Tab(wi).KeyEligible==true?"Yes":"No",
+                 Tab(wi).HeaderSize,
+                 Tab(wi).Capacity,
+                 Tab(wi).NaturalSize,
+                 Tab(wi).UniversalSize,
+                 decode_ZType( Tab(wi).ZType));
 /*    else
         fprintf (pOutput,
              " <%2ld> %8ld %8ld %8s <%15s> <%s>\n",
              wi,
-             Tab[wi].Offset,
-             Tab[wi].Length,
+             Tab(wi).Offset,
+             Tab(wi).Length,
              "--",
-             Tab[wi].Name.toCChar(),
-             decode_ZType( Tab[wi].ZType));*/
+             Tab(wi).Name.toCChar(),
+             decode_ZType( Tab(wi).ZType));*/
     }// for
     fprintf (pOutput,
              "----------------------------------------------------------------------------------------------\n");
@@ -337,11 +345,11 @@ ZMetaDic::_exportAppendMetaDicFlat(ZDataBuffer& pZDBExport)
 
   for (long wi=0;wi < count(); wi++)
   {
-    wKDExp.set(Tab[wi]);            /* export field data  */
+    wKDExp.set(Tab(wi));            /* export field data  */
     wKDExp.serialize();
     pZDBExport.append_T<FieldDesc_Export>(wKDExp);
-    Tab[wi].getName()._exportAppendUVF(pZDBExport);  /* then append field name */
-    Tab[wi].ToolTip._exportAppendUVF(pZDBExport);  /* then append Tooltip (if exists) */
+    Tab(wi).getName()._exportAppendUVF(pZDBExport);  /* then append field name */
+    Tab(wi).ToolTip._exportAppendUVF(pZDBExport);  /* then append Tooltip (if exists) */
   }
 
   pZDBExport.append_T<uint32_t>(cst_ZBUFFEREND);
@@ -365,8 +373,8 @@ ZMetaDic::_importMetaDicFlat(const unsigned char* &pPtrIn)
 
   clear();
   uint32_t wCheckEnd=0;
-  setAllocation(wZAE.AllocatedElements,false);  // no lock
-  bzero(0,-1,false);// no lock
+  setAllocation(wZAE.AllocatedElements,false);  // no lock/
+//  bzero(0,-1,false);// no lock
   setQuota(wZAE.ExtentQuota);
   setInitialAllocation(wZAE.InitialAllocation,false); // no lock
   if (wZAE.NbElements>(ssize_t)wZAE.AllocatedElements)
@@ -420,13 +428,13 @@ ZMetaDic::writeXML(FILE* pOutput)
              "              </Field>\n"
              ,
              wd,
-             Tab[wd].getName().toCChar() ,
-             Tab[wd].Capacity,
-             Tab[wd].HeaderSize,
-             Tab[wd].UniversalSize,
-             Tab[wd].NaturalSize,
-             Tab[wd].KeyEligible?"Yes":"No",
-             decode_ZType( Tab[wd].ZType)
+             Tab(wd).getName().toCChar() ,
+             Tab(wd).Capacity,
+             Tab(wd).HeaderSize,
+             Tab(wd).UniversalSize,
+             Tab(wd).NaturalSize,
+             Tab(wd).KeyEligible?"Yes":"No",
+             decode_ZType( Tab(wd).ZType)
              );
              }// for
     fprintf (pOutput,
@@ -451,7 +459,7 @@ ZMetaDic::_copyFrom( const ZMetaDic& pIn)
 
   _Base::clear();
   for (long wi=0;wi<pIn.count();wi++)
-    push(ZFieldDescription(pIn.Tab[wi]));
+    push(ZFieldDescription(pIn.TabConst(wi)));
   DicName = pIn.DicName;
   Version = pIn.Version;
   CreationDate=pIn.CreationDate;
@@ -560,7 +568,7 @@ utf8VaryingString ZMetaDic::toXml(int pLevel,bool pComment)
   /* key fields */
   wLevel++;
   for (long wi=0;wi < count();wi++)
-    wReturn += Tab[wi].toXml(wLevel,pComment);
+    wReturn += Tab(wi).toXml(wLevel,pComment);
   wLevel--;
   wReturn += fmtXMLendnode("dicfields",wLevel);
   wReturn += fmtXMLendnode("metadictionary",pLevel);

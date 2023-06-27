@@ -170,7 +170,7 @@ public:
     void dequeue(ZJEvent &pEvent);
 
     // operator overload : return a reference to a const journal event content
-    const ZJEvent& operator [](const zrank_type pRank) {return *Tab[pRank];}
+    const ZJEvent& operator [](const zrank_type pRank) {return *Tab(pRank);}
 
     ZStatus erase (const zrank_type pRank);
 

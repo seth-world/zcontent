@@ -194,9 +194,9 @@ public:
   static int createAddrinfo(int pError, const char *pModule, ZStatus pStatus, Severity_type pSeverity, const char *pFormat,...);
 
 
-  static int displayLast(const utf8VaryingString &pTitle="", bool pDontShow = false);
+  static int displayLast(const utf8VaryingString &pTitle=utf8VaryingString());
 
-  static int display(const utf8VaryingString& pTitle,const ZExceptionBase pException, bool pDontShow = false);
+  static int display(const utf8VaryingString& pTitle, const ZExceptionBase pException);
   static int display2B(const utf8VaryingString& pTitle,const ZExceptionBase pException, const char *pCancelText=nullptr, const char *pOKText=nullptr);
   static int display3B(const utf8VaryingString &pTitle, const ZExceptionBase pException, const utf8String& pButtonText, const char *pCancelText=nullptr, const char *pOKText=nullptr);
 

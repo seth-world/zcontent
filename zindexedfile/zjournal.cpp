@@ -59,7 +59,7 @@ ZJEventQueue::pop()
     if (isEmpty())
             return ZS_EMPTY;
     Mtx.lock();
-    delete Tab[lastIdx()] ;
+    delete last() ;
     _Base::pop();
     Mtx.unlock();
     return ZS_SUCCESS;
@@ -70,7 +70,7 @@ ZJEventQueue::erase (const zrank_type pRank)
 {
     if ((pRank<0)||(pRank>lastIdx()))
                         return ZS_OUTBOUND;
-    delete Tab[pRank];
+    delete Tab(pRank);
     _Base::erase(pRank);
     return ZS_SUCCESS;
 }// erase
@@ -102,15 +102,15 @@ ZJEventQueue::dequeue(ZJEvent &pEvent)
     if (isEmpty())
             return ;
     Mtx.lock();
-    pEvent.setData(*Tab[0]);
-    pEvent.Header.Pid = Tab[0]->Header.Pid;
-    pEvent.Header.DateTime = Tab[0]->Header.DateTime;
-    pEvent.Header.Uid = Tab[0]->Header.Uid;
+    pEvent.setData(*Tab(0));
+    pEvent.Header.Pid = Tab(0)->Header.Pid;
+    pEvent.Header.DateTime = Tab(0)->Header.DateTime;
+    pEvent.Header.Uid = Tab(0)->Header.Uid;
 //    pEvent.Header.Username = Tab[0]->Header.Username;
-    pEvent.Header.Rank= Tab[0]->Header.Rank;
-    pEvent.Header.Address= Tab[0]->Header.Address;
+    pEvent.Header.Rank= Tab(0)->Header.Rank;
+    pEvent.Header.Address= Tab(0)->Header.Address;
 
-    delete Tab[0];
+    delete Tab(0);
     _Base::pop_front();
     Mtx.unlock();
     return ;
@@ -542,8 +542,8 @@ ZDataBuffer wFieldAfter;
                      wEvent.Header.Rank,
                      wEvent.Header.Address,
                      wEvent.Header.Offset,
-                     wLineHexa.DataChar,
-                     wLineChar.DataChar
+                     wLineHexa.Data,
+                     wLineChar.Data
                      );
             }
         else
@@ -561,8 +561,8 @@ ZDataBuffer wFieldAfter;
              wEvent.Header.Rank,
              wEvent.Header.Address,
              wEvent.Header.Offset,
-             wLineHexa.DataChar,
-             wLineChar.DataChar
+             wLineHexa.Data,
+             wLineChar.Data
              );
     }
 }// report

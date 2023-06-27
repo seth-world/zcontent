@@ -12,6 +12,8 @@
 
 #include <stdint.h>
 
+#include <ztoolset/utfvaryingstring.h>
+
 typedef uint64_t ZEntity_type;
 const ZEntity_type cst_InvalidEntity = 0;
 
@@ -34,9 +36,9 @@ enum ZEntity : ZEntity_type  /* application defined ZEntity */
     ZEntity_DicField    =          0x0000031,
     ZEntity_DicFieldItem=          0x0000032,
     ZEntity_DicFieldRow=           0x0000034,
-    ZEntity_KeyDicRow   =          0x0000041, /* QList with key field items row  */
-    ZEntity_KeyDicRowsSet =        0x0000051, /* QList of Qlist with key field rows - with row[0] as key dictionary row */
-    ZEntity_KeyFieldRow =          0x0000061, /* QList with key field items row  */
+    ZEntity_KeyDicRow   =          0x0000041, /* ZArray with key field items row  */
+    ZEntity_KeyDicRowsSet =        0x0000051, /* ZArray of ZArray with key field rows - with row[0] as key dictionary row */
+    ZEntity_KeyFieldRow =          0x0000061, /* ZArray with key field items row  */
 
     ZEntity_CppField    =          0x0000101,   /* ZCppParser field */
     ZEntity_CppClass    =          0x0000201,   /* ZCppParser class */
@@ -79,7 +81,7 @@ enum ZEntity : ZEntity_type  /* application defined ZEntity */
 
     ZEntity_MimeData    =         0x01000000,     // generic : e. g. pinboard will contain MIME data and not a data structure nor a URI or QImage
     ZEntity_Mime_Image =          0x03000000,     //  Stores a mimedata with a QImage  - size is 0
-    ZEntity_Mime_URI    =         0x05000000,     //  Stores a pointer to a QList<QUrl> - size is O
+    ZEntity_Mime_URI    =         0x05000000,     //  Stores a pointer to a ZArray<QUrl> - size is O
     ZEntity_Mime_Html   =         0x09000000,     //  Stores a pointer to a QString containing html text  : has later to be set to /setTextFormat(Qt::RichText)/
     ZEntity_Mime_PlainText =      0x11000000,     // Stores a pointer to a QString containing Plain text : has later to be set to /setTextFormat(Qt::PlainText)/
     ZEntity_Mime_OtherText  =     0x21000000,     // Stores a pointer to a QString containing Plain text : has later to be set to /setTextFormat(Qt::PlainText)/
@@ -113,10 +115,10 @@ enum ZEntity : ZEntity_type  /* application defined ZEntity */
 
 
 
-class CharMan;
-CharMan decode_ZEntity(ZEntity_type pEntity);
+
+utf8VaryingString decode_ZEntity(ZEntity_type pEntity);
 //#include <ztoolset/utfvtemplatestring.h>
 //#include <ztoolset/utfvaryingstring.h>
-#include <ztoolset/zutfstrings.h>
-ZEntity_type encode_ZEntity(const utf8String &pEntity);
+
+ZEntity_type encode_ZEntity(const utf8VaryingString &pEntity);
 #endif // ZENTITY_H

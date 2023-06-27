@@ -2,7 +2,7 @@
 #include <zdatareference.h>
 
 
-void ZKeyHeaderRow::set(const ZKeyDictionary& pKeyDic) {
+void ZKeyHeaderRow::set(ZKeyDictionary& pKeyDic) {
 //  ZKeyDictionary::_copyFrom(pKeyDic);
   DicKeyName=pKeyDic.DicKeyName;
   ToolTip=pKeyDic.ToolTip;
@@ -10,7 +10,7 @@ void ZKeyHeaderRow::set(const ZKeyDictionary& pKeyDic) {
   Duplicates=pKeyDic.Duplicates;
   KeyUniversalSize=pKeyDic._reComputeKeySize();
 }
-void ZKeyHeaderRow::set(const ZKeyDictionary* pKeyDic) {
+void ZKeyHeaderRow::set(ZKeyDictionary* pKeyDic) {
 //  ZKeyDictionary::_copyFrom(pKeyDic);
   DicKeyName=pKeyDic->DicKeyName;
   ToolTip=pKeyDic->ToolTip;
@@ -68,7 +68,7 @@ void ZKeyFieldRow::setFromKeyDic(ZIndexField *pField) {
 
   KeyOffset=pField->KeyOffset;
   Hash=pField->Hash;
-  Name = pField->KeyDic->Dictionary->Tab[pField->MDicRank].getName().toCChar();
+  Name = pField->KeyDic->Dictionary->Tab(pField->MDicRank).getName().toCChar();
 
   return;
 }

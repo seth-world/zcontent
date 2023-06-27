@@ -31,7 +31,7 @@ MasterFileValues& MasterFileValues::_copyFrom(MasterFileValues& pIn) {
   else
     KeyValues->clear();
   for (long wi=0;wi < pIn.KeyValues->count();wi++) {
-    KeyValues->push(pIn.KeyValues->Tab[wi]);
+    KeyValues->push(pIn.KeyValues->Tab(wi));
   } // for
   return *this;
 } // _copyFrom

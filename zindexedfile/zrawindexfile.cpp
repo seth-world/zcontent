@@ -1955,7 +1955,7 @@ ZDataBuffer wFieldUValue;
         {
 // here put extraction rules. RFFU : Extraction could be complex. To be investigated and implemented
 
-        wRDicRank=pZIF->IdxKeyDic->Tab[wi].MDicRank;
+        wRDicRank=pZIF->IdxKeyDic->Tab(wi).MDicRank;
         pRecord.getUniversalbyRank(wFieldUValue,wRDicRank);
         pKeyOut.changeData(wFieldUValue,wKeyOffset);
 
@@ -2004,7 +2004,7 @@ ZKeyCompareAlpha (const ZDataBuffer &pKey1, ZDataBuffer &pKey2, ssize_t pSize)
 ssize_t wSize = pSize;
     if (wSize<0)
             wSize=pKey1.Size;
-    return (strncmp(pKey1.DataChar,pKey2.DataChar,wSize));
+    return (strncmp((char*)pKey1.Data,(char*)pKey2.Data,wSize));
 }// ZKeyCompareAlpha
 
 

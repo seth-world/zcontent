@@ -424,7 +424,7 @@ ZCppGenerate::genCopyFrom(utf8VaryingString& pClassName) {
 
   for (long wi=0 ; wi < DictionaryFile->count(); wi++) {
     wReturn.addsprintf(wSCopyFromLine,
-        DictionaryFile->Tab[wi].getName().toString(),DictionaryFile->Tab[wi].getName().toString());
+        DictionaryFile->Tab(wi).getName().toString(),DictionaryFile->Tab(wi).getName().toString());
   }
   wReturn += "  return *this;\n";
   wReturn += wSMethodEnd ;
@@ -463,7 +463,7 @@ ZCppGenerate::genIncludes(ZTypeBase pType) {
         return wFileInclude;
       }
     }// for (long wR=0; wR < pGenObjList.count();wi++)
-  } // if (DictionaryFile->Tab[wi].ZType & ZType_Class)
+  } // if (DictionaryFile->Tab(wi).ZType & ZType_Class)
 
   return utf8VaryingString("");
 } //genIncludes
@@ -477,9 +477,9 @@ ZCppGenerate::genHeaderFields(utf8VaryingString& pFileIncludeList) {
   ZStatus wSt;
 
   for (long wi=0 ; wi < DictionaryFile->count(); wi++) {
-     wSt= ZTypeToCTypeDefinition( DictionaryFile->Tab[wi].ZType,
-                                  DictionaryFile->Tab[wi].Capacity,
-                                  DictionaryFile->Tab[wi].getName(),
+     wSt= ZTypeToCTypeDefinition( DictionaryFile->Tab(wi).ZType,
+                                  DictionaryFile->Tab(wi).Capacity,
+                                  DictionaryFile->Tab(wi).getName(),
                                   wSingleVar,
                                   &ErrorLog);
 
@@ -490,14 +490,14 @@ ZCppGenerate::genHeaderFields(utf8VaryingString& pFileIncludeList) {
         wReturn += "\n";
       }
       else {
-        if (!DictionaryFile->Tab[wi].ToolTip.isEmpty()) {
-          wReturn.addsprintf(" /*!< %s */" ,  DictionaryFile->Tab[wi].ToolTip.toString());
+        if (!DictionaryFile->Tab(wi).ToolTip.isEmpty()) {
+          wReturn.addsprintf(" /*!< %s */" ,  DictionaryFile->Tab(wi).ToolTip.toString());
         }
       wReturn += ";\n";
       }
     /* search for include files when classes */
 
-      pFileIncludeList += genIncludes(DictionaryFile->Tab[wi].ZType);
+      pFileIncludeList += genIncludes(DictionaryFile->Tab(wi).ZType);
   } // for
 
   return wReturn;
@@ -538,7 +538,7 @@ ZCppGenerate::loadGenerateParameters(const uriString& pXmlFile,ZaiErrors *pError
   wSt=loadXmlParameters(XmlGenParamsFile,GenObjList,GenIncludeList,pErrorLog);
   if (wSt!=ZS_SUCCESS) {
     std::cout.flush();
-    ZExceptionDLg::displayLast("Load parameters file",false);
+    ZExceptionDLg::displayLast("Load parameters file");
   }
   return wSt;
 }//loadGenerateParameters
@@ -643,12 +643,12 @@ ZCppGenerate::genHeader(const utf8VaryingString& pClassName,
   }
   wSt=pHeaderFile.writeContent(wHBanner);
   if (wSt!=ZS_SUCCESS) {
-    ZExceptionDLg::displayLast("Write header file",false);
+    ZExceptionDLg::displayLast("Write header file");
     return wSt;
   }
   wSt=pHeaderFile.appendContent(wHContent);
   if (wSt!=ZS_SUCCESS) {
-    ZExceptionDLg::displayLast("Append header file",false);
+    ZExceptionDLg::displayLast("Append header file");
     return wSt;
   }
   return ZS_SUCCESS;
@@ -766,7 +766,7 @@ ZCppGenerate::genCppKeys(const utf8VaryingString& pClassName) {
     /* generate universal size computation */
     for (long wj=0;wj < wKeydic->count(); wj++) {
 
-      long wDicRank = wKeydic->Tab[wj].MDicRank;
+      long wDicRank = wKeydic->Tab(wj).MDicRank;
 
       if (DictionaryFile->Tab[wDicRank].ZType & ZType_Atomic) {
         wReturn.addsprintf(cst_CppKeyAtomicSize,
@@ -785,17 +785,17 @@ ZCppGenerate::genCppKeys(const utf8VaryingString& pClassName) {
 
     /* generate URF data move */
     for (long wj=0;wj < wKeydic->count(); wj++) {
-      long wDicRank = wKeydic->Tab[wj].MDicRank;
+      long wDicRank = wKeydic->Tab(wj).MDicRank;
 
-      if (DictionaryFile->Tab[wDicRank].ZType & ZType_Atomic) {
+      if (DictionaryFile->Tab(wDicRank).ZType & ZType_Atomic) {
         wReturn.addsprintf(cst_CppKeyAtomicURFMove,
-            decode_ZType(DictionaryFile->Tab[wDicRank].ZType),
-            ZTypeToCType(DictionaryFile->Tab[wDicRank].ZType,1),
-            DictionaryFile->Tab[wDicRank].getName().toString());
+            decode_ZType(DictionaryFile->Tab(wDicRank).ZType),
+            ZTypeToCType(DictionaryFile->Tab(wDicRank).ZType,1),
+            DictionaryFile->Tab(wDicRank).getName().toString());
       }
       else {
         wReturn.addsprintf(cst_CppKeyClassURFMove,
-            DictionaryFile->Tab[wDicRank].getName().toString());
+            DictionaryFile->Tab(wDicRank).getName().toString());
       }
 
     } // for each field to move
@@ -844,38 +844,38 @@ ZCppGenerate::genCppClear(  const utf8VaryingString& pClassName) {
   for (long wi=0; wi < DictionaryFile->count() ; wi ++) {
 
 
-    wZType = DictionaryFile->Tab[wi].ZType ;
+    wZType = DictionaryFile->Tab(wi).ZType ;
     if (wZType & ZType_Atomic) {
       wZType &= ~ZType_Atomic ;
 
-      if ((DictionaryFile->Tab[wi].ZType & ZType_Float) == ZType_Float) {
-        wReturn.addsprintf("      %s=0.0f ;\n",DictionaryFile->Tab[wi].getName().toString());
+      if ((DictionaryFile->Tab(wi).ZType & ZType_Float) == ZType_Float) {
+        wReturn.addsprintf("      %s=0.0f ;\n",DictionaryFile->Tab(wi).getName().toString());
         continue;
       }
-      if ((DictionaryFile->Tab[wi].ZType & ZType_Double) == ZType_Double) {
-        wReturn.addsprintf("      %s=0.0 ;\n",DictionaryFile->Tab[wi].getName().toString());
+      if ((DictionaryFile->Tab(wi).ZType & ZType_Double) == ZType_Double) {
+        wReturn.addsprintf("      %s=0.0 ;\n",DictionaryFile->Tab(wi).getName().toString());
         continue;
       }
-      if ((DictionaryFile->Tab[wi].ZType & ZType_LDouble) == ZType_LDouble) {
-        wReturn.addsprintf("      %s=0.0L ;\n",DictionaryFile->Tab[wi].getName().toString());
+      if ((DictionaryFile->Tab(wi).ZType & ZType_LDouble) == ZType_LDouble) {
+        wReturn.addsprintf("      %s=0.0L ;\n",DictionaryFile->Tab(wi).getName().toString());
         continue;
       }
-      if ((DictionaryFile->Tab[wi].ZType & ZType_U64) == ZType_U64) {
-        wReturn.addsprintf("      %s=0L ;\n",DictionaryFile->Tab[wi].getName().toString());
+      if ((DictionaryFile->Tab(wi).ZType & ZType_U64) == ZType_U64) {
+        wReturn.addsprintf("      %s=0L ;\n",DictionaryFile->Tab(wi).getName().toString());
         continue;
       }
-      if ((DictionaryFile->Tab[wi].ZType & ZType_S64) == ZType_S64) {
-        wReturn.addsprintf("      %s=0L ;\n",DictionaryFile->Tab[wi].getName().toString());
+      if ((DictionaryFile->Tab(wi).ZType & ZType_S64) == ZType_S64) {
+        wReturn.addsprintf("      %s=0L ;\n",DictionaryFile->Tab(wi).getName().toString());
         continue;
       }
 
       /* other atomic are set to zero */
-      wReturn.addsprintf("      %s=0 ;\n",DictionaryFile->Tab[wi].getName().toString());
+      wReturn.addsprintf("      %s=0 ;\n",DictionaryFile->Tab(wi).getName().toString());
       continue;
     } // if (wZType & ZType_Atomic)
 
     /* class structures */
-    wReturn.addsprintf("      %s.clear() ;\n",DictionaryFile->Tab[wi].getName().toString());
+    wReturn.addsprintf("      %s.clear() ;\n",DictionaryFile->Tab(wi).getName().toString());
 
   }// for
   wReturn += "      return; \n"
@@ -953,11 +953,11 @@ ZCppGenerate::genCpp( const utf8VaryingString& pClassName,
   wCppContent.addsprintf(wSCopyFromBegin,pClassName.toCChar(),pClassName.toCChar(),pClassName.toCChar());
   for (long wi=0 ; wi < DictionaryFile->count(); wi++) {
     if (testErrored(wi)) {
-      wCppContent.addsprintf(wSCopyFromLineErrored, DictionaryFile->Tab[wi].getName().toString());
+      wCppContent.addsprintf(wSCopyFromLineErrored, DictionaryFile->Tab(wi).getName().toString());
       wErroredInstructions ++;
     }
     else
-      wCppContent.addsprintf(wSCopyFromLine, DictionaryFile->Tab[wi].getName().toString(),DictionaryFile->Tab[wi].getName().toString());
+      wCppContent.addsprintf(wSCopyFromLine, DictionaryFile->Tab(wi).getName().toString(),DictionaryFile->Tab(wi).getName().toString());
   }// for
   wCppContent += "    return *this;\n";
   wCppContent.addsprintf(wSMethodEnd,"_copyFrom");
@@ -975,16 +975,16 @@ ZCppGenerate::genCpp( const utf8VaryingString& pClassName,
   for (long wi=0; wi < DictionaryFile->count() ; wi ++) {
 
     if (testErrored(wi)) {
-      wCppContent.addsprintf(wCppToRSizeClassErrored, DictionaryFile->Tab[wi].getName().toString());
+      wCppContent.addsprintf(wCppToRSizeClassErrored, DictionaryFile->Tab(wi).getName().toString());
       wErroredInstructions ++;
     }
     else {
-      if (DictionaryFile->Tab[wi].ZType & ZType_Atomic) {
+      if (DictionaryFile->Tab(wi).ZType & ZType_Atomic) {
         wCppContent.addsprintf(wCppToRSizeAtomic,
-            ZTypeToCType(DictionaryFile->Tab[wi].ZType,DictionaryFile->Tab[wi].Capacity),
-            DictionaryFile->Tab[wi].getName().toCChar());
+            ZTypeToCType(DictionaryFile->Tab(wi).ZType,DictionaryFile->Tab(wi).Capacity),
+            DictionaryFile->Tab(wi).getName().toCChar());
       } else {
-        wCppContent.addsprintf(wCppToRSizeClass,DictionaryFile->Tab[wi].getName().toCChar());
+        wCppContent.addsprintf(wCppToRSizeClass,DictionaryFile->Tab(wi).getName().toCChar());
       }
     }
 
@@ -996,16 +996,16 @@ ZCppGenerate::genCpp( const utf8VaryingString& pClassName,
   for (long wi=0; wi < DictionaryFile->count() ; wi ++) {
 
     if (testErrored(wi)) {
-      wCppContent.addsprintf(wCppToRecordMoveErrored, DictionaryFile->Tab[wi].getName().toString());
+      wCppContent.addsprintf(wCppToRecordMoveErrored, DictionaryFile->Tab(wi).getName().toString());
       wErroredInstructions ++;
     }
     else {
-      if (DictionaryFile->Tab[wi].ZType & ZType_Atomic) {
+      if (DictionaryFile->Tab(wi).ZType & ZType_Atomic) {
         wCppContent.addsprintf(wCppToRecordMoveAtomic,
-            ZTypeToCType(DictionaryFile->Tab[wi].ZType,DictionaryFile->Tab[wi].Capacity),
-            DictionaryFile->Tab[wi].getName().toCChar());
+            ZTypeToCType(DictionaryFile->Tab(wi).ZType,DictionaryFile->Tab(wi).Capacity),
+            DictionaryFile->Tab(wi).getName().toCChar());
       } else {
-        wCppContent.addsprintf(wCppToRecordMoveClass,DictionaryFile->Tab[wi].getName().toCChar());
+        wCppContent.addsprintf(wCppToRecordMoveClass,DictionaryFile->Tab(wi).getName().toCChar());
       }
     }
 
@@ -1020,26 +1020,26 @@ ZCppGenerate::genCpp( const utf8VaryingString& pClassName,
   for (long wi=0; wi < DictionaryFile->count() ; wi ++) {
 
     if (testErrored(wi)) {
-      wCppContent.addsprintf(wCppFromMoveErrored, DictionaryFile->Tab[wi].getName().toString());
+      wCppContent.addsprintf(wCppFromMoveErrored, DictionaryFile->Tab(wi).getName().toString());
       wErroredInstructions ++;
     }
     else {
-      if (DictionaryFile->Tab[wi].ZType & ZType_Atomic) {
+      if (DictionaryFile->Tab(wi).ZType & ZType_Atomic) {
         wCppContent.addsprintf(wCppFromMoveAtomic,
-            ZTypeToCType(DictionaryFile->Tab[wi].ZType,DictionaryFile->Tab[wi].Capacity),
-            DictionaryFile->Tab[wi].getName().toString(),
+            ZTypeToCType(DictionaryFile->Tab(wi).ZType,DictionaryFile->Tab(wi).Capacity),
+            DictionaryFile->Tab(wi).getName().toString(),
             pClassName.toString(),
-            DictionaryFile->Tab[wi].getName().toString(),
+            DictionaryFile->Tab(wi).getName().toString(),
 
-            ZTypeToCType(DictionaryFile->Tab[wi].ZType,DictionaryFile->Tab[wi].Capacity),
-            DictionaryFile->Tab[wi].getName().toCChar());
+            ZTypeToCType(DictionaryFile->Tab(wi).ZType,DictionaryFile->Tab(wi).Capacity),
+            DictionaryFile->Tab(wi).getName().toCChar());
       } else {
         wCppContent.addsprintf(wCppFromMoveClass,
-            DictionaryFile->Tab[wi].getName().toString(),
+            DictionaryFile->Tab(wi).getName().toString(),
             pClassName.toString(),
-            DictionaryFile->Tab[wi].getName().toString(),
+            DictionaryFile->Tab(wi).getName().toString(),
 
-            DictionaryFile->Tab[wi].getName().toString());
+            DictionaryFile->Tab(wi).getName().toString());
       }
     }
 
@@ -1073,12 +1073,12 @@ ZCppGenerate::genCpp( const utf8VaryingString& pClassName,
   }
   wSt=pCppFile.writeContent(wCppBanner);
   if (wSt!=ZS_SUCCESS) {
-    ZExceptionDLg::displayLast("Write header file",false);
+    ZExceptionDLg::displayLast("Write header file");
     return wSt;
   }
   wSt=pCppFile.appendContent(wCppContent);
   if (wSt!=ZS_SUCCESS) {
-    ZExceptionDLg::displayLast("Append header file",false);
+    ZExceptionDLg::displayLast("Append header file");
     return wSt;
   }
 

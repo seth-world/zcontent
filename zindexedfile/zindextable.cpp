@@ -36,11 +36,11 @@ long ZIndexTable::erase (long pRank)
   if (pRank>lastIdx()) {
     return  -1;
   }
-  Tab[pRank]->~ZRawIndexFile();
+  Tab(pRank)->~ZRawIndexFile();
 
-  if (Tab[pRank]!=nullptr)
-    delete Tab[pRank];   // appearingly it puts the mess
-  Tab[pRank]=nullptr; // just in case for avoiding double free
+  if (Tab(pRank)!=nullptr)
+    delete Tab(pRank);   // appearingly it puts the mess
+  Tab(pRank)=nullptr; // just in case for avoiding double free
   return  _Base::erase(pRank);
 } // erase
 
@@ -58,7 +58,7 @@ long ZIndexTable::searchIndexByName (const char* pName)
 {
   for (long wi =0;wi<size();wi++)
   {
-    if (Tab[wi]->IndexName==pName)
+    if (Tab(wi)->IndexName==pName)
       return  wi;
   }
 
@@ -69,7 +69,7 @@ long ZIndexTable::searchCaseIndexByName (const char* pName)
 {
   for (long wi =0;wi<size();wi++)
   {
-    if (Tab[wi]->IndexName.isEqualCase((const utf8_t*)pName))
+    if (Tab(wi)->IndexName.isEqualCase((const utf8_t*)pName))
     {
       return  wi;
     }
@@ -82,7 +82,7 @@ long ZIndexTable::searchIndexByName (const utf8String& pName)
 {
   for (long wi =0;wi<size();wi++)
   {
-    if (Tab[wi]->IndexName==pName)
+    if (Tab(wi)->IndexName==pName)
       return  wi;
   }
 
@@ -93,7 +93,7 @@ long ZIndexTable::searchCaseIndexByName (const utf8String& pName)
 {
   for (long wi =0;wi<size();wi++)
   {
-    if (Tab[wi]->IndexName.isEqualCase(pName))
+    if (Tab(wi)->IndexName.isEqualCase(pName))
     {
       return  wi;
     }
@@ -174,7 +174,7 @@ utf8String ZIndexTable::toXml(int pLevel,bool pComment)
 
   for (long wi=0;wi<count();wi++)
   {
-    Tab[wi]->toXml(wLevel+1,pComment);
+    Tab(wi)->toXml(wLevel+1,pComment);
   }
   wReturn += fmtXMLendnode("indextable",pLevel);
   return wReturn;

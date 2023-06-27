@@ -11,7 +11,7 @@
 
 #include <zcontentcommon/urffield.h>
 
-#include <ztoolset/zarray.h>
+//#include <ztoolset/zarray.h>
 
 /*
 class URFField {
@@ -46,7 +46,7 @@ public:
 
   ZStatus set(const ZDataBuffer * pRecord);
 
-  static ZStatus parse(const ZDataBuffer& pRecord,ZArray<URFField>& pFieldList);
+  static ZStatus parse(const ZDataBuffer& pRecord, ZArray<URFField> &pFieldList);
 
   /**
    * @brief appendURFFieldByRank parse record surface for urf fields and append to pBuffer found field as an URF field definition.

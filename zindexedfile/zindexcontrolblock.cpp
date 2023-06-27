@@ -497,7 +497,7 @@ long ZSIndexControlTable::zsearchIndexByName (const char* pName)
 {
   for (long wi =0;wi<size();wi++)
   {
-    if (Tab[wi]->IndexName==pName)
+    if (Tab(wi)->IndexName==pName)
       return  wi;
 
   }
@@ -508,7 +508,7 @@ long ZSIndexControlTable::zsearchCaseIndexByName (const char* pName)
 {
   for (long wi =0;wi<size();wi++)
   {
-    if (Tab[wi]->IndexName.isEqualCase((const utf8_t*)pName))
+    if (Tab(wi)->IndexName.isEqualCase((const utf8_t*)pName))
     {
       return  wi;
     }
@@ -542,7 +542,7 @@ utf8String ZSIndexControlTable::toXml(int pLevel)
   wLevel++;
 
   for (long wi=0;wi<count();wi++)
-    wReturn+=Tab[wi]->toXml(wLevel);
+    wReturn+=Tab(wi)->toXml(wLevel);
 
   wReturn += fmtXMLendnode("indexcontroltable",pLevel);
   return wReturn;

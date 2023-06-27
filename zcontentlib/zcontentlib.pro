@@ -161,9 +161,8 @@ HEADERS += \
 # configuration files
     $$TOOLSET_CONTENT/zindexedfile/zmfconfig.h \
     $$TOOLSET_BASE/config/zconfig.h \
-    ../../config/zconfig.h \
-    ../../config/zconfig_general.h \
-    ../../config/zconfig_zrf.h
+    $$TOOLSET_BASE/config/zconfig_general.h \
+    $$TOOLSET_BASE/config/zconfig_zrf.h
 
 FURTHER_H =    $$TOOLSET_CONTENT/zrandomfile/zrandomlockfile.h
 

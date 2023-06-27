@@ -174,7 +174,7 @@ public:
   unsigned char* allocateBZero (size_t pSize) {return(Content.allocateBZero(pSize));}
 
   size_t DataSize(void) {return(Content.Size);}
-  char * DataChar(void) {return(Content.DataChar);}
+  char * DataChar(void) {return((char*)Content.Data);}
 
   ZBlock& operator = (const ZBlockHeader &pHeader) {memmove(this,&pHeader,sizeof(ZBlockHeader)); return *this;}
   ZBlock& operator = (const ZBlock& pBlock) {memmove(this,&pBlock,sizeof(ZBlock)); return *this;}

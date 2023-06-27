@@ -454,7 +454,9 @@ public:
 
 protected:
 
-  ZStatus _addRaw   (ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeysContent);
+//  ZStatus _addRaw   (ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeysContent);
+  ZStatus _addRaw   (ZDataBuffer& pRecord, ZArray<ZDataBuffer> &pKeysContent);
+
   ZStatus _insertRaw (const ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeys, const zrank_type pZMFRank);
   ZStatus _removeByRankR  (ZDataBuffer &pRecord, const zrank_type pZMFRank);
 
@@ -620,6 +622,14 @@ public:
   //------------------end operators------------------------
 
    /* ------------following routines are to be used with a generated class----------------*/
+/*
+  template <class _Tp>
+  ZStatus zadd_T(_Tp& pClass) {
+    ZDataBuffer wRecordContent=pClass.toRecord();
+    ZArray<ZDataBuffer> wKeys = pClass.getAllKeys();
+    return _addRaw(wRecordContent,wKeys);
+  }
+  */
 
   template <class _Tp>
   ZStatus zadd_T(_Tp& pClass) {
@@ -627,8 +637,6 @@ public:
     ZArray<ZDataBuffer> wKeys = pClass.getAllKeys();
     return _addRaw(wRecordContent,wKeys);
   }
-
-
   template <class _Tp>
   ZStatus zinsert_T(_Tp& pClass, const zrank_type pZMFRank) {
     ZDataBuffer wRecordContent=pClass.toRecord();

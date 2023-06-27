@@ -609,7 +609,7 @@ FileGenerateMWn::dataSetupFromDictionary() {
   }
   for (long wi=0; wi < DictionaryFile->KeyDic.count() ; wi++) {
 
-    ZKeyDictionary* wKeyDic=DictionaryFile->KeyDic.Tab[wi];
+    ZKeyDictionary* wKeyDic=DictionaryFile->KeyDic.Tab(wi);
 
     KeyData wKeyData;
     wKeyData.IndexName = wKeyDic->DicKeyName;
@@ -619,7 +619,7 @@ FileGenerateMWn::dataSetupFromDictionary() {
     wKeyData.ExtentQuota = ExtentQuota;
     wKeyData.ExtentSize = wKeyData.KeySize * wKeyData.ExtentQuota;
     wKeyData.IndexRootName = generateIndexRootName(RootName,wKeyDic->DicKeyName);
-    wKeyData.Duplicates   = DictionaryFile->KeyDic.Tab[wi]->Duplicates;
+    wKeyData.Duplicates   = DictionaryFile->KeyDic.Tab(wi)->Duplicates;
 
     wKeyData.GrabFreeSpace = GrabFreeSpace ;
     wKeyData.HighwaterMarking = false ;
@@ -646,15 +646,15 @@ FileGenerateMWn::dataSetupFromDictionary() {
   QVariant wV;
 
   for (long wi=0;wi < DictionaryFile->count();wi++) {
-    if (DictionaryFile->Tab[wi].UniversalSize==0) {
+    if (DictionaryFile->Tab(wi).UniversalSize==0) {
       QList<QStandardItem*> wGuessRow;
-      wGuessRow << createItem(DictionaryFile->Tab[wi].getName());
+      wGuessRow << createItem(DictionaryFile->Tab(wi).getName());
       wGuessRow[0]->setEditable(false);
-      wGuessRow << createItem(decode_ZType( DictionaryFile->Tab[wi].ZType));
+      wGuessRow << createItem(decode_ZType( DictionaryFile->Tab(wi).ZType));
       wGuessRow.last()->setEditable(false);
-      wGuessRow << createItem(DictionaryFile->Tab[wi].HeaderSize);
+      wGuessRow << createItem(DictionaryFile->Tab(wi).HeaderSize);
       wGuessRow.last()->setEditable(false);
-      wGuessRow << createItem(DictionaryFile->Tab[wi].UniversalSize);
+      wGuessRow << createItem(DictionaryFile->Tab(wi).UniversalSize);
       wGuessRow.last()->setEditable(true);
 
       GuessTBv->ItemModel->appendRow(wGuessRow);
@@ -876,34 +876,34 @@ ZStatus FileGenerateMWn::XmlDefinitionSave(uriString &pXmlFile, bool pComment) {
       wReturn += fmtXMLnode("keyitem",wLevel);
       wLevel++;
 
-      wReturn+=fmtXMLlong("keysize",KeyValues->Tab[wi].KeySize,wLevel);
+      wReturn+=fmtXMLlong("keysize",KeyValues->Tab(wi).KeySize,wLevel);
       if (pComment)
         fmtXMLaddInlineComment(wReturn,"Total size in bytes of the key or guessed key size if key is composed of one or more varying fields.");
-      wReturn+=fmtXMLlong("allocated",KeyValues->Tab[wi].Allocated,wLevel);
+      wReturn+=fmtXMLlong("allocated",KeyValues->Tab(wi).Allocated,wLevel);
       if (pComment)
         fmtXMLaddInlineComment(wReturn,"Number of allocated block in index file.");
-      wReturn+=fmtXMLlong("allocatedsize",KeyValues->Tab[wi].AllocatedSize,wLevel);
+      wReturn+=fmtXMLlong("allocatedsize",KeyValues->Tab(wi).AllocatedSize,wLevel);
       if (pComment)
         fmtXMLaddInlineComment(wReturn,"Total size in bytes of the key or guessed key size if key is composed of one or more varying fields.");
-      wReturn+=fmtXMLlong("extentquota",KeyValues->Tab[wi].ExtentQuota,wLevel);
+      wReturn+=fmtXMLlong("extentquota",KeyValues->Tab(wi).ExtentQuota,wLevel);
       if (pComment)
         fmtXMLaddInlineComment(wReturn,"Total number of blocks index file will be extended at each extent operation.");
-      wReturn+=fmtXMLlong("extentsize",KeyValues->Tab[wi].ExtentSize,wLevel);
+      wReturn+=fmtXMLlong("extentsize",KeyValues->Tab(wi).ExtentSize,wLevel);
       if (pComment)
         fmtXMLaddInlineComment(wReturn,"Total size in bytes index file will be extended at each extent operation.");
-      wReturn+=fmtXMLchar("indexrootname",KeyValues->Tab[wi].IndexRootName.toString(),wLevel);
+      wReturn+=fmtXMLchar("indexrootname",KeyValues->Tab(wi).IndexRootName.toString(),wLevel);
       if (pComment)
         fmtXMLaddInlineComment(wReturn,"Root name for building index file name.It is concatenated with embedded index directory if defined at master file level or with master file's default directory if none.");
-      wReturn+=fmtXMLchar("indexname",KeyValues->Tab[wi].IndexName.toString(),wLevel);
+      wReturn+=fmtXMLchar("indexname",KeyValues->Tab(wi).IndexName.toString(),wLevel);
       if (pComment)
         fmtXMLaddInlineComment(wReturn,"Name for the key - index.");
-      wReturn+=fmtXMLbool("duplicate",bool(KeyValues->Tab[wi].Duplicates),wLevel);
+      wReturn+=fmtXMLbool("duplicate",bool(KeyValues->Tab(wi).Duplicates),wLevel);
       if (pComment)
         fmtXMLaddInlineComment(wReturn,"Defines wether key accepts or not duplicates.");
-      wReturn+=fmtXMLbool("grabfreespace",bool(KeyValues->Tab[wi].GrabFreeSpace),wLevel);
+      wReturn+=fmtXMLbool("grabfreespace",bool(KeyValues->Tab(wi).GrabFreeSpace),wLevel);
       if (pComment)
         fmtXMLaddInlineComment(wReturn,"If set file engine will try to gather free blocks and holes together.Not usefull is key has a fixed size.");
-      wReturn+=fmtXMLbool("highwatermarking",bool(KeyValues->Tab[wi].HighwaterMarking),wLevel);
+      wReturn+=fmtXMLbool("highwatermarking",bool(KeyValues->Tab(wi).HighwaterMarking),wLevel);
       if (pComment)
         fmtXMLaddInlineComment(wReturn,"If set each deleted block from the key will be set to binary zero by file engine.This is not much relevant because of time consummed by operation vs confidentiality.");
 
@@ -1080,7 +1080,7 @@ FileGenerateMWn::_dataSetup() {
 
   if (KeyValues!=nullptr) {
     for (long wi=0; wi < KeyValues->count(); wi++) {
-      wKeyRow=formatKeyRow(KeyValues->Tab[wi]);
+      wKeyRow=formatKeyRow(KeyValues->Tab(wi));
       KeyTBv->ItemModel->appendRow(wKeyRow);
     }
     for (int wi=0; wi < KeyTBv->ItemModel->columnCount(); wi++)
@@ -1368,12 +1368,12 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
     utf8VaryingString wName = pItem->text().toUtf8().data() ;
 
     for (long wi=0; wi < KeyValues->count(); wi++) {
-      if (wName == KeyValues->Tab[wi].IndexName) {
+      if (wName == KeyValues->Tab(wi).IndexName) {
         ZExceptionDLg::adhocMessage("Change index name",Severity_Error,nullptr,nullptr,
             "An index with name <%s> already exists in index table.\n"
             "Cannot add this index to index table.",wName.toString());
         DoNotChangeKeyValues = true;
-        pItem->setText(KeyValues->Tab[pItem->row()].IndexName.toCChar());
+        pItem->setText(KeyValues->Tab(pItem->row()).IndexName.toCChar());
         return;
       }
     }
@@ -1381,12 +1381,12 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
     /* first setup change log with values ex-ante and ex-post */
     ZChangeRecord wChgRec(ZFGC_INameChange);
     wChgRec.setChangeKey(wName);
-    wChgRec.setAnte(KeyValues->Tab[pItem->row()].IndexName);
+    wChgRec.setAnte(KeyValues->Tab(pItem->row()).IndexName);
     wChgRec.setPost(wName);
     wChgRec.setIndexRank (pItem->row());
     ChangeLog.push(wChgRec);
 
-    KeyValues->Tab[pItem->row()].IndexName = wName ;
+    KeyValues->Tab(pItem->row()).IndexName = wName ;
 
     wStr.sprintf( "%s Key rank %d index name has been changed to <%s>. col %d",
           ZDateFull::currentDateTime().toFormatted().toString(),
@@ -1403,20 +1403,20 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
 
     /* first setup change log with values ex-ante and ex-post */
     ZChangeRecord wChgRec(ZFGC_ChgDuplicate);
-    wChgRec.setChangeKey(KeyValues->Tab[pItem->row()].IndexName);
-    wChgRec.setAnte(KeyValues->Tab[pItem->row()].Duplicates);
+    wChgRec.setChangeKey(KeyValues->Tab(pItem->row()).IndexName);
+    wChgRec.setAnte(KeyValues->Tab(pItem->row()).Duplicates);
     wChgRec.setPost(pItem->checkState()==Qt::Checked );
     wChgRec.setIndexRank (pItem->row());
     ChangeLog.push(wChgRec);
 
-      KeyValues->Tab[pItem->row()].Duplicates = pItem->checkState()==Qt::Checked  ;
+      KeyValues->Tab(pItem->row()).Duplicates = pItem->checkState()==Qt::Checked  ;
       wStr.sprintf( "%s Key <%s>  : Duplicates  has been set to <%s>. col %d",
           ZDateFull::currentDateTime().toFormatted().toString(),
           wMainKeyItem->text().toUtf8().data(),
-          KeyValues->Tab[pItem->row()].Duplicates?"Allow duplicates":"No duplicates allowed" ,
+          KeyValues->Tab(pItem->row()).Duplicates?"Allow duplicates":"No duplicates allowed" ,
           wCol );
       ComLog->appendText(wStr);
-      if (KeyValues->Tab[pItem->row()].Duplicates) {
+      if (KeyValues->Tab(pItem->row()).Duplicates) {
         DoNotChangeKeyValues = true;
         pItem->setText("Duplicates");
       }
@@ -1433,17 +1433,17 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
     DoNotChangeKeyValues = false;
     /* first setup change log with values ex-ante and ex-post */
     ZChangeRecord wChgRec(ZFGC_ChgGrab);
-    wChgRec.setChangeKey(KeyValues->Tab[pItem->row()].IndexName);
-    wChgRec.setAnte(KeyValues->Tab[pItem->row()].GrabFreeSpace);
+    wChgRec.setChangeKey(KeyValues->Tab(pItem->row()).IndexName);
+    wChgRec.setAnte(KeyValues->Tab(pItem->row()).GrabFreeSpace);
     wChgRec.setPost(pItem->checkState()==Qt::Checked );
     wChgRec.setIndexRank (pItem->row());
     ChangeLog.push(wChgRec);
 
-    KeyValues->Tab[pItem->row()].GrabFreeSpace = pItem->checkState()==Qt::Checked  ;
+    KeyValues->Tab(pItem->row()).GrabFreeSpace = pItem->checkState()==Qt::Checked  ;
     wStr.sprintf( "%s Key <%s>  : GrabFreeSpace has been set to <%s>. col %d",
         ZDateFull::currentDateTime().toFormatted().toString(),
         wMainKeyItem->text().toUtf8().data(),
-        KeyValues->Tab[pItem->row()].GrabFreeSpace?"true":"false" ,
+        KeyValues->Tab(pItem->row()).GrabFreeSpace?"true":"false" ,
         wCol );
     ComLog->appendText(wStr);
 
@@ -1454,18 +1454,18 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
     DoNotChangeKeyValues = false;
     /* first setup change log with values ex-ante and ex-post */
     ZChangeRecord wChgRec(ZFGC_ChgHigh);
-    wChgRec.setChangeKey(KeyValues->Tab[pItem->row()].IndexName);
-    wChgRec.setAnte(KeyValues->Tab[pItem->row()].HighwaterMarking);
+    wChgRec.setChangeKey(KeyValues->Tab(pItem->row()).IndexName);
+    wChgRec.setAnte(KeyValues->Tab(pItem->row()).HighwaterMarking);
     wChgRec.setPost(pItem->checkState()==Qt::Checked );
     wChgRec.setIndexRank (pItem->row());
     ChangeLog.push(wChgRec);
 
-    KeyValues->Tab[pItem->row()].HighwaterMarking = pItem->checkState()==Qt::Checked  ;
+    KeyValues->Tab(pItem->row()).HighwaterMarking = pItem->checkState()==Qt::Checked  ;
 
     wStr.sprintf( "%s Key <%s>  : HighwaterMarking has been set to <%s>. col %d",
         ZDateFull::currentDateTime().toFormatted().toString(),
         wMainKeyItem->text().toUtf8().data(),
-        KeyValues->Tab[pItem->row()].HighwaterMarking?"true":"false",
+        KeyValues->Tab(pItem->row()).HighwaterMarking?"true":"false",
         wCol);
     ComLog->appendText(wStr);
 
@@ -1485,28 +1485,28 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
 
       /* first setup change log with values ex-ante and ex-post */
       ZChangeRecord wChgRec(ZFGC_ChgKeySize);
-      wChgRec.setChangeKey(KeyValues->Tab[pItem->row()].IndexName);
-      wChgRec.setAnte(KeyValues->Tab[pItem->row()].KeySize);
+      wChgRec.setChangeKey(KeyValues->Tab(pItem->row()).IndexName);
+      wChgRec.setAnte(KeyValues->Tab(pItem->row()).KeySize);
       wChgRec.setPost(wValue);
       wChgRec.setIndexRank (pItem->row());
       ChangeLog.push(wChgRec);
 
-      KeyValues->Tab[pItem->row()].KeySize = wValue;
+      KeyValues->Tab(pItem->row()).KeySize = wValue;
       wStr.sprintf( "%s Value <Guessed key size> for key <%s> has been guessed to <%ld>.",
           ZDateFull::currentDateTime().toFormatted().toString(),
           wMainKeyItem->text().toUtf8().data(),
-          KeyValues->Tab[pItem->row()].KeySize  );
+          KeyValues->Tab(pItem->row()).KeySize  );
       ComLog->appendText(wStr);
 
       DoNotChangeKeyValues = true;
 
-      if (KeyValues->Tab[pItem->row()].Allocated==0){
-        KeyValues->Tab[pItem->row()].Allocated = cst_ZRF_default_allocation;
+      if (KeyValues->Tab(pItem->row()).Allocated==0){
+        KeyValues->Tab(pItem->row()).Allocated = cst_ZRF_default_allocation;
 
         ZChangeRecord wChgRecAll(ZFGC_ChgAlloc);
-        wChgRecAll.setChangeKey(KeyValues->Tab[pItem->row()].IndexName);
+        wChgRecAll.setChangeKey(KeyValues->Tab(pItem->row()).IndexName);
         wChgRecAll.setAnte(size_t(0L));
-        wChgRecAll.setPost(KeyValues->Tab[pItem->row()].Allocated );
+        wChgRecAll.setPost(KeyValues->Tab(pItem->row()).Allocated );
         wChgRecAll.setIndexRank (pItem->row());
         ChangeLog.push(wChgRecAll);
         wStr.sprintf( "%s Value <Key Allocated blocks> for key <%s> has been defaulted to <%ld>.Logging change for this value.",
@@ -1518,30 +1518,30 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
       }
 
       ZChangeRecord wChgRecAllSiz(ZFGC_ChgAlloc);
-      wChgRecAllSiz.setChangeKey(KeyValues->Tab[pItem->row()].IndexName);
-      wChgRecAllSiz.setAnte(KeyValues->Tab[pItem->row()].AllocatedSize);
-      wChgRecAllSiz.setPost(KeyValues->Tab[pItem->row()].Allocated * wValue );
+      wChgRecAllSiz.setChangeKey(KeyValues->Tab(pItem->row()).IndexName);
+      wChgRecAllSiz.setAnte(KeyValues->Tab(pItem->row()).AllocatedSize);
+      wChgRecAllSiz.setPost(KeyValues->Tab(pItem->row()).Allocated * wValue );
       wChgRecAllSiz.setIndexRank (pItem->row());
       ChangeLog.push(wChgRecAllSiz);
 
-      KeyValues->Tab[pItem->row()].AllocatedSize =  KeyValues->Tab[pItem->row()].Allocated * wValue;
-      wStr.sprintf("%ld",KeyValues->Tab[pItem->row()].AllocatedSize);
+      KeyValues->Tab(pItem->row()).AllocatedSize =  KeyValues->Tab(pItem->row()).Allocated * wValue;
+      wStr.sprintf("%ld",KeyValues->Tab(pItem->row()).AllocatedSize);
       KeyTBv->ItemModel->item(pItem->row(),cst_KeyAllocSizeCol)->setText(wStr.toCChar());
       wStr.sprintf( "%s Value <Key Allocation Size> for key <%s> has been computed to <%ld>.Logging change for this value.",
           ZDateFull::currentDateTime().toFormatted().toString(),
           wMainKeyItem->text().toUtf8().data(),
-          KeyValues->Tab[pItem->row()].AllocatedSize );
+          KeyValues->Tab(pItem->row()).AllocatedSize );
 //      plainTextEdit->appendPlainText(wStr.toCChar());
       ComLog->appendText(wStr);
 
-      KeyValues->Tab[pItem->row()].ExtentSize = KeyValues->Tab[pItem->row()].ExtentQuota * wValue;
-      wStr.sprintf("%ld",KeyValues->Tab[pItem->row()].ExtentSize);
+      KeyValues->Tab(pItem->row()).ExtentSize = KeyValues->Tab(pItem->row()).ExtentQuota * wValue;
+      wStr.sprintf("%ld",KeyValues->Tab(pItem->row()).ExtentSize);
       KeyTBv->ItemModel->item(pItem->row(),cst_KeyExtentSizeCol)->setText(wStr.toCChar());
 
       wStr.sprintf( "%s Value <Key Extent Size> for key <%s> has been computed to <%ld>. Logging change for this value.",
           ZDateFull::currentDateTime().toFormatted().toString(),
           wMainKeyItem->text().toUtf8().data(),
-          KeyValues->Tab[pItem->row()].ExtentSize );
+          KeyValues->Tab(pItem->row()).ExtentSize );
       ComLog->appendText(wStr);
 
       DoNotChangeKeyValues = false;
@@ -1555,29 +1555,29 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
 
       /* first setup change log with values ex-ante and ex-post */
       ZChangeRecord wChgRec(ZFGC_ChgAlloc);
-      wChgRec.setChangeKey(KeyValues->Tab[pItem->row()].IndexName);
-      wChgRec.setAnte(KeyValues->Tab[pItem->row()].Allocated);
+      wChgRec.setChangeKey(KeyValues->Tab(pItem->row()).IndexName);
+      wChgRec.setAnte(KeyValues->Tab(pItem->row()).Allocated);
       wChgRec.setPost(wValue);
       wChgRec.setIndexRank (pItem->row());
       ChangeLog.push(wChgRec);
 
-      KeyValues->Tab[pItem->row()].Allocated = wValue;
+      KeyValues->Tab(pItem->row()).Allocated = wValue;
 
       wStr.sprintf( "%s Value <Allocation> for key <%s> has been changed to <%ld>.",
           ZDateFull::currentDateTime().toFormatted().toString(),
           wMainKeyItem->text().toUtf8().data(),
-          KeyValues->Tab[pItem->row()].Allocated );
+          KeyValues->Tab(pItem->row()).Allocated );
 
       DoNotChangeKeyValues = true;
 
-      KeyValues->Tab[pItem->row()].AllocatedSize = KeyValues->Tab[pItem->row()].KeySize * wValue;
-      wStr.sprintf("%ld",KeyValues->Tab[pItem->row()].AllocatedSize);
+      KeyValues->Tab(pItem->row()).AllocatedSize = KeyValues->Tab(pItem->row()).KeySize * wValue;
+      wStr.sprintf("%ld",KeyValues->Tab(pItem->row()).AllocatedSize);
       KeyTBv->ItemModel->item(pItem->row(),cst_KeyAllocSizeCol)->setText(wStr.toCChar());
 
       wStr.sprintf( "%s Value <Key Allocation Size> for key <%s> has been computed to <%ld>.",
           ZDateFull::currentDateTime().toFormatted().toString(),
           wMainKeyItem->text().toUtf8().data(),
-          KeyValues->Tab[pItem->row()].AllocatedSize);
+          KeyValues->Tab(pItem->row()).AllocatedSize);
       ComLog->appendText(wStr);
 
       DoNotChangeKeyValues = false;
@@ -1591,25 +1591,25 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
 
       /* first setup change log with values ex-ante and ex-post */
       ZChangeRecord wChgRec(ZFGC_ChgExtent);
-      wChgRec.setChangeKey(KeyValues->Tab[pItem->row()].IndexName);
-      wChgRec.setAnte(KeyValues->Tab[pItem->row()].ExtentQuota);
+      wChgRec.setChangeKey(KeyValues->Tab(pItem->row()).IndexName);
+      wChgRec.setAnte(KeyValues->Tab(pItem->row()).ExtentQuota);
       wChgRec.setPost(wValue);
       wChgRec.setIndexRank (pItem->row());
       ChangeLog.push(wChgRec);
 
-      KeyValues->Tab[pItem->row()].ExtentQuota = wValue;
+      KeyValues->Tab(pItem->row()).ExtentQuota = wValue;
       wName="Extent quota";
       wStr.sprintf( "%s Value %s for key <%s> has been changed to <%ld>.",
           ZDateFull::currentDateTime().toFormatted().toString(),
           wName,
           wMainKeyItem->text().toUtf8().data(),
-          KeyValues->Tab[pItem->row()].ExtentQuota );
+          KeyValues->Tab(pItem->row()).ExtentQuota );
       ComLog->appendText(wStr);
 
       DoNotChangeKeyValues = true;
 
-      KeyValues->Tab[pItem->row()].ExtentSize = KeyValues->Tab[pItem->row()].KeySize * wValue;
-      wStr.sprintf("%ld",KeyValues->Tab[pItem->row()].ExtentSize);
+      KeyValues->Tab(pItem->row()).ExtentSize = KeyValues->Tab(pItem->row()).KeySize * wValue;
+      wStr.sprintf("%ld",KeyValues->Tab(pItem->row()).ExtentSize);
       KeyTBv->ItemModel->item(pItem->row(),cst_KeyExtentSizeCol)->setText(wStr.toCChar());
 
       wName="Extent quota size";
@@ -1617,7 +1617,7 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
           ZDateFull::currentDateTime().toFormatted().toString(),
           wName,
           wMainKeyItem->text().toUtf8().data(),
-          KeyValues->Tab[pItem->row()].ExtentSize);
+          KeyValues->Tab(pItem->row()).ExtentSize);
 //      plainTextEdit->appendPlainText(wStr.toCChar());
       ComLog->appendText(wStr);
 
@@ -1656,9 +1656,9 @@ FileGenerateMWn::Compute() {
   MeanRecordSize += sizeof(uint64_t);  /* URF Data size */
 
   for (long wi=0 ; wi < DictionaryFile->count() ; wi++) {
-    MeanRecordSize += DictionaryFile->Tab[wi].HeaderSize;
-    MeanRecordSize += DictionaryFile->Tab[wi].UniversalSize;
-    if ((DictionaryFile->Tab[wi].ZType & ZType_VaryingMask) || (DictionaryFile->Tab[wi].UniversalSize==0)) {
+    MeanRecordSize += DictionaryFile->Tab(wi).HeaderSize;
+    MeanRecordSize += DictionaryFile->Tab(wi).UniversalSize;
+    if ((DictionaryFile->Tab(wi).ZType & ZType_VaryingMask) || (DictionaryFile->Tab(wi).UniversalSize==0)) {
     }
   } // for
 
@@ -2024,17 +2024,17 @@ FileGenerateMWn::KeyDelete() {
 
   /* first setup change log with values ex-ante and ex-post */
   ZChangeRecord wChgRec(ZFGC_KeyDelete);
-  wChgRec.setChangeKey(KeyValues->Tab[wIdx.row()].IndexName);
+  wChgRec.setChangeKey(KeyValues->Tab(wI).IndexName);
 
   wChgRec.setIndexRank (wIdx.row());
-  wChgRec.setAnte(KeyValues->Tab[wIdx.row()]);  /* store deleted key data (post remains nullptr) */
+  wChgRec.setAnte(KeyValues->Tab(wI));  /* store deleted key data (post remains nullptr) */
 
   ChangeLog.push(wChgRec);
 
   if (DeletedKeyValues==nullptr)
     DeletedKeyValues = new ZArray<KeyData> ;
-//  KeyValues->Tab[wI].ChangeCode |= ZFGC_KeyDelete ;
-  DeletedKeyValues->push(KeyValues->Tab[wI]);
+//  KeyValues->Tab(wi).ChangeCode |= ZFGC_KeyDelete ;
+  DeletedKeyValues->push(KeyValues->Tab(wI));
   KeyValues->erase(wI);
 
   KeyTBv->ItemModel->removeRow(int(wI));
@@ -2065,7 +2065,7 @@ FileGenerateMWn::KeyAppendRaw() {
     }
     long wKI=-1;
     for (long wi=0;wi < KeyValues->count();wi++) {
-      if (KeyValues->Tab[wi].IndexName==wKHR.DicKeyName) {
+      if (KeyValues->Tab(wi).IndexName==wKHR.DicKeyName) {
         wKI=wi;
         break;
       }
@@ -3063,7 +3063,7 @@ FileGenerateMWn::rebuildIndex(long pIndexRankToRebuild) {
         wElapsed = wElapsed * wRemainTimes ;
         ZTime wTargetTime = wStartTime + wElapsed;
 
-        TargetTimeLBl->setText(wTargetTime.toString("%d-%m-%y %T").toChar());
+        TargetTimeLBl->setText(wTargetTime.toString("%d-%m-%y %T").toCChar());
         AdvancePGb->setValue(int(wCurrentRank));
         wStr.sprintf("%ld / %ld",wCurrentRank,wRecordCount);
         RecordsProcessedLBl->setText(wStr.toCChar());
@@ -3171,28 +3171,28 @@ FileGenerateMWn::ValuesControl() {
 
   if (KeyValues->count() > 0) {
     for (long wi=0;wi < KeyValues->count(); wi ++) {
-      if (KeyValues->Tab[wi].IndexName.isEmpty()) {
+      if (KeyValues->Tab(wi).IndexName.isEmpty()) {
         wErrComp.addsprintf("Index <%ld> : IndexName cannot be empty.\n",wi);
         wErrored++;
       }
-      if (KeyValues->Tab[wi].KeySize==0) {
-        wErrComp.addsprintf("Index <%ld><%s> : KeySize cannot be zero.\n",wi,KeyValues->Tab[wi].IndexName.toString());
+      if (KeyValues->Tab(wi).KeySize==0) {
+        wErrComp.addsprintf("Index <%ld><%s> : KeySize cannot be zero.\n",wi,KeyValues->Tab(wi).IndexName.toString());
         wErrored++;
       }
-      if (KeyValues->Tab[wi].Allocated==0) {
-        wErrComp.addsprintf("Index <%ld><%s> : Allocated blocks cannot be zero.\n",wi,KeyValues->Tab[wi].IndexName.toString());
+      if (KeyValues->Tab(wi).Allocated==0) {
+        wErrComp.addsprintf("Index <%ld><%s> : Allocated blocks cannot be zero.\n",wi,KeyValues->Tab(wi).IndexName.toString());
         wErrored++;
       }
-      if (KeyValues->Tab[wi].ExtentQuota==0) {
-        wErrComp.addsprintf("Index <%ld> : ExtentQuota cannot be zero.\n",wi,KeyValues->Tab[wi].IndexName.toString());
+      if (KeyValues->Tab(wi).ExtentQuota==0) {
+        wErrComp.addsprintf("Index <%ld> : ExtentQuota cannot be zero.\n",wi,KeyValues->Tab(wi).IndexName.toString());
         wErrored++;
       }
-      if (KeyValues->Tab[wi].AllocatedSize==0) {
-        wErrComp.addsprintf("Index <%ld><%s> : AllocatedSize cannot be zero.\n",wi,KeyValues->Tab[wi].IndexName.toString());
+      if (KeyValues->Tab(wi).AllocatedSize==0) {
+        wErrComp.addsprintf("Index <%ld><%s> : AllocatedSize cannot be zero.\n",wi,KeyValues->Tab(wi).IndexName.toString());
         wErrored++;
       }
-      if (KeyValues->Tab[wi].KeySize > KeyValues->Tab[wi].AllocatedSize) {
-        wErrComp.addsprintf("Index <%ld><%s> : KeySize cannot be greater than AllocatedSize.\n",wi,KeyValues->Tab[wi].IndexName.toString());
+      if (KeyValues->Tab(wi).KeySize > KeyValues->Tab(wi).AllocatedSize) {
+        wErrComp.addsprintf("Index <%ld><%s> : KeySize cannot be greater than AllocatedSize.\n",wi,KeyValues->Tab(wi).IndexName.toString());
         wErrored++;
       }
     }// for
@@ -3240,28 +3240,28 @@ void FileGenerateMWn::GenFile() {
 
   utf8VaryingString wMissfields;
   for (long wi=0;wi < KeyValues->count(); wi ++) {
-    if (KeyValues->Tab[wi].KeySize==0){
+    if (KeyValues->Tab(wi).KeySize==0){
       wF="Guessed key size";
       wBadRank=wi;
       wMissfields.addsprintf(" Key <%s> field <%s> value 0 is invalid and must be guessed.\n",
           DictionaryFile->KeyDic[wBadRank]->DicKeyName.toString(),
           wF);
     }
-    if (KeyValues->Tab[wi].Allocated==0){
+    if (KeyValues->Tab(wi).Allocated==0){
       wF="Allocated blocks";
       wBadRank=wi;
       wMissfields.addsprintf(" Key <%s> field <%s> value 0 is invalid and must be guessed.\n",
           DictionaryFile->KeyDic[wBadRank]->DicKeyName.toString(),
           wF);
     }
-    if (KeyValues->Tab[wi].ExtentQuota==0){
+    if (KeyValues->Tab(wi).ExtentQuota==0){
       wF="Extent quota";
       wBadRank=wi;
       wMissfields.addsprintf(" Key <%s> field <%s> value 0 is invalid and must be guessed.\n",
           DictionaryFile->KeyDic[wBadRank]->DicKeyName.toString(),
           wF);
     }
-    if (KeyValues->Tab[wi].AllocatedSize==0){
+    if (KeyValues->Tab(wi).AllocatedSize==0){
       wF="Allocated size";
       wBadRank=wi;
       wMissfields.addsprintf(" Key <%s> field <%s> value 0 is invalid and must be guessed.\n",
@@ -3370,15 +3370,15 @@ void FileGenerateMWn::GenFile() {
     for (long wi=0;wi < KeyValues->count(); wi ++) {
       wIndexUri = IndexDirectory ;
       wIndexUri.addConditionalDirectoryDelimiter();
-      wIndexUri += KeyValues->Tab[wi].IndexRootName;
+      wIndexUri += KeyValues->Tab(wi).IndexRootName;
 
        wSt = wMasterFile->_createRawIndexDet (wIndexRank,                               /* returned key rank */
-                                              KeyValues->Tab[wi].IndexName,   /* Index name */
-                                              KeyValues->Tab[wi].KeySize, /* Key universal total size */
-                                              KeyValues->Tab[wi].Duplicates?ZST_DUPLICATES:ZST_NODUPLICATES,
-                                              KeyValues->Tab[wi].Allocated,      /* ---FCB parameters (for index ZRandomFile)---- */
-                                              KeyValues->Tab[wi].ExtentQuota,
-                                              KeyValues->Tab[wi].AllocatedSize,
+                                              KeyValues->Tab(wi).IndexName,   /* Index name */
+                                              KeyValues->Tab(wi).KeySize, /* Key universal total size */
+                                              KeyValues->Tab(wi).Duplicates?ZST_DUPLICATES:ZST_NODUPLICATES,
+                                              KeyValues->Tab(wi).Allocated,      /* ---FCB parameters (for index ZRandomFile)---- */
+                                              KeyValues->Tab(wi).ExtentQuota,
+                                              KeyValues->Tab(wi).AllocatedSize,
                                               HighWaterMarking,
                                               GrabFreeSpace,
                                               wBackup,

@@ -149,9 +149,9 @@ KeyField_Pack::_copyFrom(const KeyField_Pack &pIn)
 
 KeyField_Pack& KeyField_Pack::set(ZMFDictionary& pDic,long pKeyRank,long pKeyFieldRank)
 {
-  long wMDicRank=pDic.KeyDic[pKeyRank]->Tab[pKeyFieldRank].MDicRank;
+  long wMDicRank=pDic.KeyDic[pKeyRank]->Tab(pKeyFieldRank).MDicRank;
 
-  KeyOffset=pDic.KeyDic[pKeyRank]->Tab[pKeyFieldRank].KeyOffset;
+  KeyOffset=pDic.KeyDic[pKeyRank]->Tab(pKeyFieldRank).KeyOffset;
   KeyFieldRank=pKeyFieldRank;
   KeyNumber=pKeyRank;
 

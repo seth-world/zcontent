@@ -84,7 +84,7 @@ public:
   bool isNull (void) const {return IndexAddress<0;}
   bool isInvalid(void) const {return ZMFAddress<0;}
 
-  ZIndexResult& operator = (ZIndexResult &pZIR) { return _copyFrom(pZIR);}
+  ZIndexResult& operator = (const ZIndexResult &pZIR) { return _copyFrom(pZIR);}
 
     bool operator == (ZIndexResult &pZIR) {  return  memcmp (this,&pZIR,sizeof(ZIndexResult)); }
 
@@ -162,7 +162,7 @@ public:
     ZIndexCollection(void) {
 //      ZIFFile=nullptr;
     }
-    ZIndexCollection(const ZIndexCollection& pIn) { _copyFrom(pIn); }
+    ZIndexCollection(ZIndexCollection& pIn) { _copyFrom(pIn); }
 
     ZIndexCollection(ZRawIndexFile *pZIFFile) ;
     ZIndexCollection(ZRawMasterFile &pZMFFile, const long pIndexRank) ;
@@ -187,7 +187,7 @@ public:
     void reset(void);
     void clear(void);
 
-    ZIndexCollection& _copyFrom(const ZIndexCollection& pIn);
+    ZIndexCollection& _copyFrom(ZIndexCollection &pIn);
 
     ZStatus getZIRfromZIF(ZIndexResult &pZIR, const zrank_type pIndexRank);
 

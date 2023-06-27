@@ -127,8 +127,8 @@ enum ZLockMask : zlockmask_type
     ZLock_Omitted   = 0xFF         //!< Lock is deliberately omitted as an argument
 
 };
-class CharMan;
-CharMan decode_ZLockMask(zlockmask_type pLock);
+
+utf8VaryingString decode_ZLockMask(zlockmask_type pLock);
 
 
 class ZLock

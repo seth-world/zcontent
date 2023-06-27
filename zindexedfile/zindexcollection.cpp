@@ -160,7 +160,9 @@ ZIndexCollection::initSearch(ZArray<ZIndexResult> *pCollection)
         FCollection=true;
         if (InputCollection == nullptr)
                 InputCollection = new ZArray<ZIndexResult>();
-        InputCollection->_copyFrom(*pCollection);
+
+        for (long wi=0;wi < pCollection->count(); wi++)
+          InputCollection->push( pCollection->Tab(wi));
         }
         else
         {
@@ -183,14 +185,14 @@ ZIndexCollection::initSearch(ZArray<ZIndexResult> *pCollection)
  * @param pCollection collection to copy
  */
 ZIndexCollection&
-ZIndexCollection::_copyFrom(const ZIndexCollection &pIn)
+ZIndexCollection::_copyFrom(ZIndexCollection &pIn)
 {
     clear();
-    _Base::_baseAllocate(pIn.ZAllocation);   /* allocate without trimming */
+    _Base::allocate(pIn.ZAllocation);   /* allocate without trimming */
     _Base::ZReallocQuota = pIn.ZReallocQuota;
 //    _Base::_copyFrom(pIn);
     for (long wi=0;wi < pIn.size();wi++) {
-      push((ZIndexResult )pIn[wi]);
+      push(pIn[wi]);
     }
     return *this;
 }// copy
@@ -280,8 +282,8 @@ ZStatus ZIndexCollection::getFirstRawRank(ZIndexResult & pZIR)
             return ZS_EOF;
             }
         Context.ZSt = ZS_SUCCESS;
-        Context.ZIFLast=InputCollection->Tab[Context.InputCollectionIndex];
-        pZIR = InputCollection->Tab[Context.InputCollectionIndex];
+        Context.ZIFLast=InputCollection->Tab(Context.InputCollectionIndex);
+        pZIR = InputCollection->Tab(Context.InputCollectionIndex);
         return ZS_SUCCESS;
         }
 // direct access to ZRandomFile : no collection to refine
@@ -335,7 +337,7 @@ ZIndexCollection::getNextRawRank (ZIndexResult &pZIR)
             return setStatus(ZS_EOF);
             }
         Context.ZSt = ZS_SUCCESS;
-        Context.ZIFLast=InputCollection->Tab[Context.InputCollectionIndex];
+        Context.ZIFLast=InputCollection->Tab(Context.InputCollectionIndex);
         return ZS_SUCCESS;
         }
 // direct access to ZRandomFile : no collection to refine
@@ -380,8 +382,8 @@ ZStatus ZIndexCollection::getPreviousRawRank(ZIndexResult&pZIR)
     if (InputCollection!=nullptr) // if there is a collection to refine
         {
         Context.ZSt = ZS_SUCCESS;
-        pZIR = InputCollection->Tab[Context.InputCollectionIndex];
-        Context.ZIFLast = InputCollection->Tab[Context.InputCollectionIndex];
+        pZIR = InputCollection->Tab(Context.InputCollectionIndex);
+        Context.ZIFLast = InputCollection->Tab(Context.InputCollectionIndex);
         return ZS_SUCCESS;
         }
     // no collection to refine
@@ -422,7 +424,7 @@ ZStatus ZIndexCollection::getCurrentRawRank(ZIndexResult&pZIR)
             return ZS_EOF;
             }
 
-        pZIR= InputCollection->Tab[Context.InputCollectionIndex];
+            pZIR= InputCollection->Tab(Context.InputCollectionIndex);
         return setStatus(ZS_SUCCESS);
         }
     if (Context.InputCollectionIndex>ZIFFile->getSize())
@@ -433,7 +435,7 @@ ZStatus ZIndexCollection::getCurrentRawRank(ZIndexResult&pZIR)
         return ZS_EOF;
         }
     Context.ZSt=ZS_SUCCESS;
-    pZIR=Tab[Context.BaseIndex];
+    pZIR=Tab(Context.BaseIndex);
     return ZS_SUCCESS;
 }// getCurrentRawIndex
 //-------------End Raw indexes-------------------------------------------
@@ -715,7 +717,7 @@ ZIndexCollection::getPreviousSelectedRank (const zlockmask_type pLock)
             return Context.ZIFLast;
             }
     Context.ZSt=ZS_SUCCESS;
-    Context.ZIFLast= Tab[Context.BaseIndex];
+    Context.ZIFLast= Tab(Context.BaseIndex);
     return Context.ZIFLast;
 }//getNextSelectedIndex
 /**
@@ -747,9 +749,9 @@ ZIndexCollection::getCurrentSelectedRank(void)
         Context.ZIFLast.reset();
         return Context.ZIFLast;
         }
-    Context.ZIFLast= Tab[Context.BaseIndex];
+        Context.ZIFLast= Tab(Context.BaseIndex);
     Context.ZSt=ZS_SUCCESS;
-    return (Tab[Context.BaseIndex]);
+    return (Tab(Context.BaseIndex));
 }//getCurrentSelectedIndex
 
 /**
@@ -960,7 +962,7 @@ ZDataBuffer wFormerFieldValue;
 
    for (Context.BaseIndex=0;Context.BaseIndex < size();Context.BaseIndex++)
        {
-       Context.ZSt=wMasterFile->_getByAddress(wBlock,Tab[Context.BaseIndex].ZMFAddress);
+     Context.ZSt=wMasterFile->_getByAddress(wBlock,Tab(Context.BaseIndex).ZMFAddress);
        if (Context.ZSt!=ZS_SUCCESS)
                    {
                    return getStatus();
@@ -975,7 +977,7 @@ ZDataBuffer wFormerFieldValue;
                                                                  wFormerFieldValue,
                                                                  pFieldValue,
                                                                  -1,
-                                                                 Tab[Context.BaseIndex].ZMFAddress,
+                                                                  Tab(Context.BaseIndex).ZMFAddress,
                                                                  pOffset);
            }
 
@@ -985,7 +987,7 @@ ZDataBuffer wFormerFieldValue;
                                     wSize=wBlock.Content.Size-pOffset;
        wBlock.Content.changeData(pFieldValue.Data,wSize,pOffset);
 
-       wSt=wMasterFile->_writeBlockAt(wBlock,Tab[Context.BaseIndex].ZMFAddress);
+       wSt=wMasterFile->_writeBlockAt(wBlock,Tab(Context.BaseIndex).ZMFAddress);
        if (wSt!=ZS_SUCCESS)
                 return wSt;
 
@@ -1005,7 +1007,7 @@ ZIndexCollection::zremoveAll (void)
 
     for (Context.BaseIndex=0;Context.BaseIndex < size();Context.BaseIndex++)// lock corresponding ZSMasterFile address with given lock mask
         {
-        Context.ZSt=static_cast<ZRawMasterFile*>(ZIFFile->ZMFFather)->zremoveByAddress(Tab[Context.BaseIndex].ZMFAddress);
+      Context.ZSt=static_cast<ZRawMasterFile*>(ZIFFile->ZMFFather)->zremoveByAddress(Tab(Context.BaseIndex).ZMFAddress);
         if (Context.ZSt!=ZS_SUCCESS)
                     {
                     return getStatus();
@@ -1021,7 +1023,7 @@ ZIndexCollection::_removeAllRetry (void)
 
     for (long wi=Context.BaseIndex;wi < size();wi++)// lock corresponding ZSMasterFile address with given lock mask
         {
-        setStatus(static_cast<ZRawMasterFile*>(ZIFFile->ZMFFather)->zremoveByAddress(Tab[wi].ZMFAddress));
+      setStatus(static_cast<ZRawMasterFile*>(ZIFFile->ZMFFather)->zremoveByAddress(Tab(wi).ZMFAddress));
         if (Context.ZSt!=ZS_SUCCESS) // if not successfull : unlock what has been done and return status
                     {
                     Context.BaseIndex=wi;

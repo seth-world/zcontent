@@ -70,9 +70,9 @@ public:
         ZSt = pIn.ZSt;
         ZIdx = pIn.ZIdx;
         ZIterations = pIn.ZIterations;
-        zbs::ZArray<size_t>::clear();
+        ZArray<size_t>::clear();
         for (long wi = 0; wi < pIn.count(); wi++)
-            push(pIn.Tab[wi]);
+            push_back(pIn[wi]);
         return *this;
     }
     ZMulti_Result &operator=(ZMulti_Result &pIn) { return _copyFrom(pIn); }
@@ -80,7 +80,7 @@ public:
 
     void clear()
     {
-        zbs::ZArray<size_t>::clear();
+        ZArray<size_t>::clear();
         ZIdx = cst_InvalidRank;
         ZIterations = 0;
         ZSt = ZS_NOTHING;
@@ -89,7 +89,7 @@ public:
     {
         if (isEmpty()) return -1;
         CurrentIndex=0;
-        return Tab[0];
+        return operator[](0);
     }
     long getLast(void)
     {
@@ -104,7 +104,7 @@ public:
                 CurrentIndex = 0;
         if (CurrentIndex>lastIdx()) return -1;
         CurrentIndex++;
-        return(Tab[CurrentIndex]);
+        return(Tab(CurrentIndex));
     }
 
     bool isFound() { return ZSt == ZS_FOUND; }

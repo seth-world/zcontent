@@ -50,11 +50,11 @@ public:
 
   ZLockPool& operator = (const ZLockPool& pIn) {return _copyFrom(pIn);}
 
-  ZLockPool& _copyFrom(const ZLockPool& pIn)
+  ZLockPool& _copyFrom( const ZLockPool& pIn)
   {
     clear();
     for (long wi=0;wi < pIn.count();wi++)
-      push((ZLock_struct)pIn[wi]);
+      ZArray<ZLock_struct>::append(pIn.at(wi));
 
     return *this;
   }
@@ -223,7 +223,7 @@ public:
   {
     if (CurrentRank<0)
       return -1;
-    return (ZBAT.Tab[CurrentRank].Address);
+    return (ZBAT[CurrentRank].Address);
   }
 
   /**
@@ -239,7 +239,7 @@ public:
   {
     if (CurrentRank<0)
       return -1;
-    return (ZBAT.Tab[CurrentRank].Address-ZFCB.StartOfData);
+    return (ZBAT[CurrentRank].Address-ZFCB.StartOfData);
   }
 
   /**
@@ -265,7 +265,7 @@ public:
      * @return      the physical address of the record (beginning of block)
      */
 
-  zaddress_type getAddressFromRank(const zrank_type pRank) {return (ZBAT.Tab[pRank].Address) ;}
+  zaddress_type getAddressFromRank(const zrank_type pRank) {return (ZBAT[pRank].Address) ;}
 
 
   inline
@@ -300,7 +300,7 @@ public:
       zaddress_type resetPosition(void) {PhysicalPosition=ZFCB.StartOfData; setLogicalFromPhysical(PhysicalPosition); return PhysicalPosition;}
 
   inline
-      long    setRank(zrank_type pRank) {CurrentRank=pRank;  setPhysicalPosition(ZBAT.Tab[pRank].Address);  return CurrentRank;}
+      long    setRank(zrank_type pRank) {CurrentRank=pRank;  setPhysicalPosition(ZBAT[pRank].Address);  return CurrentRank;}
 
   inline
       long    resetRank(void) {CurrentRank=0; return CurrentRank;}

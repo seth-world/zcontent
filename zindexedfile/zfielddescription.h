@@ -190,7 +190,9 @@ public:  md5                Hash;        //!< unique hashcode value for the fiel
   void clear() ;
 
   void setFieldName(const utf8VaryingString& pName);
-  utf8String& getName() {return Name;}
+
+  utf8VaryingString& getName()  {return Name;}
+  const utf8VaryingString& getName() const  {return Name;}
 
   bool hasName(const utf8VaryingString& pName) const;
   bool hasHashCode (const md5& pHashcode) const ;

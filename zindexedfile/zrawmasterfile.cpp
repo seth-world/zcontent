@@ -3122,7 +3122,7 @@ _insertRaw_error:
  * @param[in] pKeys           an array of corresponding keys content related to record content.
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
-ZStatus ZRawMasterFile::zadd (ZDataBuffer& pRecordContent,ZArray<ZDataBuffer>& pKeys )
+ZStatus ZRawMasterFile::zadd (ZDataBuffer& pRecordContent, ZArray<ZDataBuffer> &pKeys )
 {
   if (pKeys.count() != IndexTable.count())
     {
@@ -3155,12 +3155,12 @@ ZRawMasterFile::_addRaw(ZDataBuffer& pRecord, ZArray<ZDataBuffer> &pKeysContent)
   ZIndexItem     *wIndexItem=nullptr;
   zrank_type      wIndex_Rank;
 
-  if (pKeysContent.count() != IndexTable.count()) {
+  if (pKeysContent.size() != IndexTable.count()) {
     ZException.setMessage("ZRawMasterFile::zaddRaw",
         ZS_CORRUPTED,
         Severity_Severe,
         "Master file number of indexes <%ld> does not correspond to given keys <%ld>. File <%s> cannot be accessed.",
-        IndexTable.count(),pKeysContent.count() ,
+        IndexTable.count(),pKeysContent.size() ,
         getURIContent().toString());
     return  ZS_CORRUPTED;
   }
@@ -3393,7 +3393,7 @@ zaddRaw_end:
 
 
 ZStatus
-ZRawMasterFile::_insertRaw (const ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeys, const zrank_type pZMFRank)
+ZRawMasterFile::_insertRaw (const ZDataBuffer& pRecord, ZArray<ZDataBuffer> &pKeys, const zrank_type pZMFRank)
 {
   ZStatus wSt;
 

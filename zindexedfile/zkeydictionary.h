@@ -52,6 +52,7 @@ public:
   uint16_t    EndianCheck=cst_EndianCheck_Normal;
   uint32_t    KeyDicSize=0;   // overall size of exported key dictionary
   uint32_t    FieldNb=0;      // number of key fields
+  uint8_t     Duplicates=0;   // Self explainatory
   ZAExport    ZAE;            // base ZArray export data
 
   void setFromPtr(const unsigned char *&pPtrIn);
@@ -89,13 +90,13 @@ public:
   uint8_t Duplicates;
   KeyDic_Pack()=default;
   KeyDic_Pack(const KeyDic_Pack& pIn) {_copyFrom(pIn);}
-  KeyDic_Pack(const ZKeyDictionary* pIn) {set(*pIn);}
+  KeyDic_Pack(ZKeyDictionary* pIn) {set(*pIn);}
   KeyDic_Pack& _copyFrom(const KeyDic_Pack& pIn);
 
   KeyDic_Pack& operator = (const KeyDic_Pack& pIn) {return _copyFrom(pIn);}
   KeyDic_Pack& operator = (const KeyDic_Pack&& pIn) {return _copyFrom(pIn);}
 
-  KeyDic_Pack& set(const ZKeyDictionary& pIn);
+  KeyDic_Pack& set(ZKeyDictionary &pIn);
 
   void setName(const utf8_t* pName);
   utf8String getName();
@@ -158,7 +159,7 @@ public:
     uint32_t computeKeyOffsets();
     uint32_t computeKeyUniversalSize()const;
 
-    ZTypeBase getType(const long pKFieldRank)const ;
+    ZTypeBase getType(long pKFieldRank)const ;
     uint64_t getUniversalSize(const long pKFieldRank) const;
     uint64_t getNaturalSize(const long pKFieldRank)const ;
 
@@ -171,7 +172,7 @@ public:
     void report (FILE* pOutput=stdout);
 
     /* computes the total universal size of the key according its definition and returns this total size */
-    uint32_t _reComputeKeySize(void) const ;
+    uint32_t _reComputeKeySize(void) ;
 
     ZStatus zremoveField (const long pKDicRank);
 

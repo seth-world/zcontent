@@ -32,7 +32,7 @@ namespace zbs {
 //------- for ZBaseSytem-------------
 
 #include <config/zconfig.h>
-#include <ztoolset/zarray.h>
+#include <ztoolset/ZArray.h>
 #include <ztoolset/zerror.h>
 #include <zrandomfile/zrandomfile.h>
 

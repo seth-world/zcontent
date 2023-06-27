@@ -30,7 +30,8 @@ public:
 
   ZDicList& _copyFrom(const ZDicList& pIn) {
     for (long wi=0;wi < count();wi++) {
-      push(new ZMFDictionary(*pIn[wi]));
+      ZMFDictionary* wI=new  ZMFDictionary(*pIn.at(wi));
+      push(wI);
     }
     return *this;
   }
@@ -50,8 +51,11 @@ public:
 
 
   ZDicHeaderList& _copyFrom(const ZDicHeaderList& pIn) {
+    while (count())
+      pop();
+
     for (long wi=0;wi < count();wi++) {
-      push(new ZMFDicExportHeader(*pIn[wi]));
+      push(new ZMFDicExportHeader(*pIn.at(wi)));
     }
     return *this;
   }

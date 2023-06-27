@@ -1400,7 +1400,7 @@ ZContentVisuMain::ZRFUnlock()
   ZStatus wSt=ZRandomFile::zutilityUnlockZRF(URICurrent);
   if (wSt!=ZS_SUCCESS)
   {
-    ZExceptionDLg::displayLast("Unlock file",false);
+    ZExceptionDLg::displayLast("Unlock file");
     ZException.pop();
   }
 }
@@ -1415,7 +1415,7 @@ ZContentVisuMain::ZHeaderRawUnlock()
   ZStatus wSt=ZRandomFile::zutilityUnlockHeaderFile(URICurrent);
   if (wSt!=ZS_SUCCESS)
   {
-    ZExceptionDLg::displayLast("Unlock header file",false);
+    ZExceptionDLg::displayLast("Unlock header file");
     ZException.pop();
   }
 }
@@ -1476,7 +1476,7 @@ ZContentVisuMain::actionOpenFileByType(bool pChecked)
       return;
     }
 
-    ZExceptionDLg::displayLast("Open file",false);
+    ZExceptionDLg::displayLast("Open file");
     ZException.pop();
 
   return;
@@ -1751,12 +1751,12 @@ ZStatus wSt=ZS_SUCCESS;
   if (wSt!=ZS_SUCCESS)
     {
     if (wSt==ZS_FILETYPEWARN)
-      ZExceptionDLg::displayLast("Open file",true);
+      ZExceptionDLg::displayLast("Open file");
     else
       {
       delete RandomFile;
       RandomFile=nullptr;
-      ZExceptionDLg::displayLast("Open file",false);
+      ZExceptionDLg::displayLast("Open file");
       return wSt;
       }
     }
@@ -1830,12 +1830,12 @@ ZStatus wSt=ZS_SUCCESS;
   if (wSt!=ZS_SUCCESS)
   {
     if (wSt==ZS_FILETYPEWARN)
-      ZExceptionDLg::displayLast("Open file",true);
+      ZExceptionDLg::displayLast("Open file");
     else
     {
       delete MasterFile;
       MasterFile=nullptr;
-      ZExceptionDLg::displayLast("Open file",false);
+      ZExceptionDLg::displayLast("Open file");
       return wSt;
     }
   }
@@ -1924,7 +1924,7 @@ ZContentVisuMain::unlockZRFZMF(const char* pFilePath)
   ZStatus wSt=  ZRandomFile::zutilityUnlockZRF(pFilePath);
 
   if (wSt!=ZS_SUCCESS) {
-    ZExceptionDLg::displayLast("Unlock file",false);
+    ZExceptionDLg::displayLast("Unlock file");
     ZException.pop();
   }
   else
@@ -2659,7 +2659,7 @@ ZContentVisuMain::displayBlockData()
 
   ui->StateLBl->setText(decode_ZBS(Block.State));
 
-  wStr.sprintf("%02X %s",Block.Lock,decode_ZLockMask(Block.Lock).toChar());
+  wStr.sprintf("%02X %s",Block.Lock,decode_ZLockMask(Block.Lock).toCChar());
   ui->LockMaskLBl->setText(wStr.toCChar());
 
 }
@@ -2683,7 +2683,7 @@ ZContentVisuMain::displayListZRFNextRecord(size_t pWidth)
   ui->ForwardBTn->setVisible(true);
   if (wSt!=ZS_SUCCESS)
   {
-    ZExceptionDLg::displayLast("Read file",false);
+    ZExceptionDLg::displayLast("Read file");
 //    QMessageBox::critical(this,tr("Random File error"),ZException.formatFullUserMessage().toCChar());
     return wSt;
   }
@@ -2856,7 +2856,7 @@ ZContentVisuMain::surfaceScanZRF(const uriString& pFileToScan)
   fclose(wScan);
   if (wSt!=ZS_SUCCESS)
   {
-    ZExceptionDLg::display("Surface Scan",ZException.last(),false);
+    ZExceptionDLg::display("Surface Scan",ZException.last());
 //    QMessageBox::critical(this,tr("Random file error"),ZException.formatFullUserMessage().toCChar());
     return;
   }
@@ -3094,7 +3094,7 @@ ZContentVisuMain::surfaceScanRaw(const uriString & pURIContent,FILE*pOutput) {
     return wSt;
   } // if (wSt!=ZS_FOUND)
 
-  wSt=wSBlock.BlockHeader._importConvert(wSBlock.BlockHeader,(ZBlockHeader_Export*)wBlockBuffer.DataChar);
+  wSt=wSBlock.BlockHeader._importConvert(wSBlock.BlockHeader,(ZBlockHeader_Export*)wBlockBuffer.Data);
   if (wSt!=ZS_SUCCESS) {
     wSBlock.BlockHeader.clear();
     wSBlock.BlockHeader.State = ZBS_Invalid;
@@ -3111,7 +3111,7 @@ ZContentVisuMain::surfaceScanRaw(const uriString & pURIContent,FILE*pOutput) {
   wSt=_searchBlockStart(wContentFd,wSBlock.Begin,wSBlock.End,wBlockBuffer,wPayload,wCount,wFileSize,nullptr);
 
   while (wSt==ZS_FOUND) {
-    wSt=wSBlock.BlockHeader._importConvert(wSBlock.BlockHeader,(ZBlockHeader_Export*)wBlockBuffer.DataChar);
+    wSt=wSBlock.BlockHeader._importConvert(wSBlock.BlockHeader,(ZBlockHeader_Export*)wBlockBuffer.Data);
     if (wSt!=ZS_SUCCESS) {
       wSBlock.BlockHeader.clear();
       wSBlock.BlockHeader.State = ZBS_Invalid;
@@ -3128,7 +3128,7 @@ ZContentVisuMain::surfaceScanRaw(const uriString & pURIContent,FILE*pOutput) {
 
 
   if (wSt==ZS_EOF){
-    wSt=wSBlock.BlockHeader._importConvert(wSBlock.BlockHeader,(ZBlockHeader_Export*)wBlockBuffer.DataChar);
+    wSt=wSBlock.BlockHeader._importConvert(wSBlock.BlockHeader,(ZBlockHeader_Export*)wBlockBuffer.Data);
     if (wSt!=ZS_SUCCESS) {
       wSBlock.BlockHeader.clear();
       wSBlock.BlockHeader.State = ZBS_Invalid;

@@ -443,7 +443,7 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
   wDumpRow.last()->setToolTip("Lock mask file is currently locked with ");
   wDumpRow << createItem((uint8_t)wHCBExport->Lock,"0x%02X");
   wDumpRow << createItem((uint8_t)wHCBExport->Lock,"0x%02X");
-  wDumpRow << createItem(decode_ZLockMask(wHCBExport->Lock).toChar());
+  wDumpRow << createItem(decode_ZLockMask(wHCBExport->Lock).toCChar());
   displayItemModel->appendRow(wDumpRow);
 
 

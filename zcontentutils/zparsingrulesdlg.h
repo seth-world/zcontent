@@ -6,7 +6,7 @@
 
 //extern utf8VaryingString SyntaxCopy;
 
-using namespace zparsernmsp;
+using namespace zbs;
 
 namespace Ui {
 class ZParsingRulesDLg;

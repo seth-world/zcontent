@@ -308,7 +308,7 @@ ZStdListDLg::insertRow(const ZStdListDLgLine& pContent,int pRow) {
   QList<QStandardItem*> wRow;
   int wCol=0;
   while (wCol < pContent.count()) {
-    wRow.push_back(createItem(pContent.Tab[wCol]->toCChar()));
+    wRow.push_back(createItem(pContent.TabConst(wCol)->toCChar()));
     wCol++;
   }
   TableView->ItemModel->insertRow(pRow,wRow);
@@ -320,7 +320,7 @@ ZStdListDLg::appendRow(const ZStdListDLgLine& pContent) {
   QList<QStandardItem*> wRow;
   int wCol=0;
   while (wCol < pContent.count()) {
-    wRow.push_back(createItem(pContent.Tab[wCol]->toCChar()));
+    wRow.push_back(createItem(pContent.TabConst(wCol)->toCChar()));
     wCol++;
   }
   TableView->ItemModel->appendRow(wRow);

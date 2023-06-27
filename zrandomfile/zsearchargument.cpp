@@ -52,7 +52,7 @@ ZSearchArgument::add(const ssize_t pFieldOffset,
     wNewFFS.FFS |= FFS_String;
     wNewFFS.SearchType =(uint16_t)( wNewFFS.SearchType &  ~ZRFString) ;  // wipe out ZRFString
 
-    while ((wNewFFS.SearchSequence.DataChar[wNewFFS.SequenceSize-1]=='\0')&&(wNewFFS.SequenceSize > 0))
+    while ((wNewFFS.SearchSequence.Data[wNewFFS.SequenceSize-1]=='\0')&&(wNewFFS.SequenceSize > 0))
       wNewFFS.SequenceSize--;
   }
   if (wNewFFS.SearchType & ZRFTrimspace) {
@@ -137,17 +137,17 @@ long wRank = 0;
 ZDataBuffer wFieldContent;
     while (wRank<size())
     {
-        if ((Tab[wRank].FieldOffset+Tab[wRank].FieldLength)>pRecord.Size) // if outside the varying record size : return false
+        if ((Tab(wRank).FieldOffset+Tab(wRank).FieldLength)>pRecord.Size) // if outside the varying record size : return false
                 return false;
     // field extraction
-        wFieldContent.setData(&pRecord.Data[Tab[wRank].FieldOffset],Tab[wRank].FieldLength);
+        wFieldContent.setData(&pRecord.Data[Tab(wRank).FieldOffset],Tab(wRank).FieldLength);
         FCurrent =_testSequence(wFieldContent,
-                          Tab[wRank].SearchSequence,
-                          Tab[wRank].SequenceSize,
-                          Tab[wRank].SearchType,
-                          Tab[wRank].FFS);
+                          Tab(wRank).SearchSequence,
+                          Tab(wRank).SequenceSize,
+                          Tab(wRank).SearchType,
+                          Tab(wRank).FFS);
 
-        if (Tab[wRank].FFS & FFS_OR)
+        if (Tab(wRank).FFS & FFS_OR)
                 FGlobal = FGlobal | FCurrent ;
             else
                 FGlobal = FGlobal & FCurrent ;
@@ -174,19 +174,19 @@ ZSearchArgument::report(FILE*pOutput)
     {
     utf8VaryingString wFlag;
     wFlag.clear();
-    wFlag += Tab[wi].FFS & FFS_String?"ZRFString":"Binary";
-    wFlag += Tab[wi].FFS & FFS_CaseRegardless?"|ZRFCaseRegardless":"";
-    wFlag += Tab[wi].FFS & FFS_TrimSpace?"|ZRFTrimSpaces":"";
+    wFlag += Tab(wi).FFS & FFS_String?"ZRFString":"Binary";
+    wFlag += Tab(wi).FFS & FFS_CaseRegardless?"|ZRFCaseRegardless":"";
+    wFlag += Tab(wi).FFS & FFS_TrimSpace?"|ZRFTrimSpaces":"";
     wFlag += "|";
-    wFlag += decode_ZSearchType(Tab[wi].SearchType);
+    wFlag += decode_ZSearchType(Tab(wi).SearchType);
     fprintf(pOutput,
             "%2ld>> Field Offset <%6ld> Length <%6ld> Flags <%s> <%s>\n",
             wi,
-            Tab[wi].FieldOffset,
-            Tab[wi].FieldLength,
+            Tab(wi).FieldOffset,
+            Tab(wi).FieldLength,
             wFlag.toString(),
-            Tab[wi].FFS & FFS_OR?"OR":"AND");
-            Tab[wi].SearchSequence.Dump(16,-1,pOutput);
+            Tab(wi).FFS & FFS_OR?"OR":"AND");
+            Tab(wi).SearchSequence.Dump(16,-1,pOutput);
     }// for
 
 }// report
@@ -226,7 +226,7 @@ _testSequence(ZDataBuffer &wFieldContent,           // Field  (Record segment) t
   if ((pFFS & FFS_String)&&(wSearchType==ZRFEndsWith))
   {
     wLength=wFieldContent.Size;
-    while ((wFieldContent.DataChar[wLength-1]==0)&&(wLength>0))
+    while ((wFieldContent.Data[wLength-1]==0)&&(wLength>0))
       wLength--;
     if(wLength<wSequenceSize)
       return false;  // not a match next record
@@ -235,7 +235,7 @@ _testSequence(ZDataBuffer &wFieldContent,           // Field  (Record segment) t
   if (pFFS & FFS_TrimSpace)
   {
     wOffset=0;
-    while (((wFieldContent.DataChar[wOffset])==cst_spaceChar)&&(wOffset < wLength))
+    while (((wFieldContent.Data[wOffset])==cst_spaceChar)&&(wOffset < wLength))
       wOffset++;
     if (wOffset==wLength)
       return false;

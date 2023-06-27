@@ -9,7 +9,7 @@
 namespace Ui {
 class ZParsingRulesDLg;
 }
-using namespace zparsernmsp;
+using namespace zbs;
 
 //class ZTypeDLg;
 //class ZTypeListButton;

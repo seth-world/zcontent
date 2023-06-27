@@ -15,7 +15,7 @@
 #include <qmimedatabase.h>
 #include <qmimedata.h>
 
-using namespace zparsernmsp;
+using namespace zbs;
 
 ZParsingRulesDLg::ZParsingRulesDLg(ZCppParser* pParser,QWidget *parent) : QDialog(parent),
                                                                            ui(new Ui::ZParsingRulesDLg)

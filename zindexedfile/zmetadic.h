@@ -57,9 +57,7 @@ public:
     unsigned long     Version = 1000000UL;
     ZDateFull         CreationDate;
     ZDateFull         ModificationDate;
-    checkSum *        CheckSum=nullptr;/* to check if meta dictionary has changed or not */
-//    long        CurrentRank=0;
-
+    checkSum *        CheckSum=nullptr;/* to check if meta dictionary has changed or not */   
 
     ZMetaDic() ;
     ~ZMetaDic() { zdelete (CheckSum) ;}
@@ -95,6 +93,8 @@ public:
 
     void insertField(ZFieldDescription &pFieldDef,const long pRank) {insert(pFieldDef,pRank);}
     void addField(ZFieldDescription &pFieldDef){push(pFieldDef);}
+
+    void setModified();
 
     void print (FILE* pOutput=stdout);
 

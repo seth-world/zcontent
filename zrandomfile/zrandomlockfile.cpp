@@ -31,7 +31,7 @@ inline ZStatus ZRandomLockFile::_lockZBAT(const zaddress_type pAddress,const zlo
 {
     ZStatus wSt;
     ZBlockHeader wBlockHeader;
-    //  wSt= _getBlockHeader(pDescriptor,pDescriptor.ZBAT.Tab[pRank].Address,wBlockHeader);
+    //  wSt= _getBlockHeader(pDescriptor,pDescriptor.ZBAT[pRank].Address,wBlockHeader);
     wSt= _getBlockHeader(pAddress,wBlockHeader);
     if (wSt!=ZS_SUCCESS)
     {
@@ -45,18 +45,18 @@ inline ZStatus ZRandomLockFile::_lockZBAT(const zaddress_type pAddress,const zlo
                                   wSt,
                                   Severity_Error,
                                   "Cannot lock record. Already locked by another process lock mask is <%s>",
-                                  decode_ZLockMask(wBlockHeader.Lock).toChar());
+                                  decode_ZLockMask(wBlockHeader.Lock).toCChar());
             return wSt;
         }
     ZLock_struct wLock;
     wLock.Lock = pLock;
-    //    wLock.Address = pDescriptor.ZBAT.Tab[pRank].Address;
+    //    wLock.Address = pDescriptor.ZBAT[pRank].Address;
     wLock.Address = pAddress;
     ZBlockLock.push(wLock);
 
     long wRank = getRankFromAddress(pAddress);
-    ZBAT.Tab[wRank].Lock = pLock;
-    ZBAT.Tab[wRank].Pid = Pid;
+    ZBAT[wRank].Lock = pLock;
+    ZBAT[wRank].Pid = Pid;
 
     wBlockHeader.Lock = pLock;
     wBlockHeader.Pid = Pid;
@@ -68,7 +68,7 @@ long
 ZRandomLockFile::getRankFromAddress(const zaddress_type pAddress)
 {
   for (long wi=0;wi<ZBAT.size();wi++)
-    if (ZBAT.Tab[wi].Address==pAddress)
+    if (ZBAT.Tab(wi).Address==pAddress)
       return wi;
   ZException.setMessage(_GET_FUNCTION_NAME_,
       ZS_INVADDRESS,
@@ -111,7 +111,7 @@ ZStatus ZRandomLockFile::_lock(const zaddress_type pAddress,
                 (ZStatus) wSt,
                 Severity_Error,
                 "Cannot lock record. Already locked by another process lock mask is <%s>",
-                decode_ZLockMask(wBlockHeader.Lock).toChar());
+                decode_ZLockMask(wBlockHeader.Lock).toCChar());
             return (ZStatus) wSt;
         }
     }

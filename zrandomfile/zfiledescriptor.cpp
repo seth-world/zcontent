@@ -421,7 +421,7 @@ long
 ZFileDescriptor::getRankFromAddress(const zaddress_type pAddress)
 {
   for (long wi=0;wi<ZBAT.size();wi++)
-    if (ZBAT.Tab[wi].Address==pAddress)
+    if (ZBAT.Tab(wi).Address==pAddress)
       return wi;
   ZException.setMessage(_GET_FUNCTION_NAME_,
       ZS_INVADDRESS,

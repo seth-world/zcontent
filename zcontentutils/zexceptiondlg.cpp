@@ -78,6 +78,7 @@ ZExceptionDLg::ZExceptionDLg(const utf8VaryingString& pTitle,const ZExceptionBas
   ExceptionFRm->setVisible(true);
 
   currentStatus=pException.Status;
+
   if (pException.Status==DontShowStatus)
   {
     DoNotShow=true;
@@ -168,16 +169,16 @@ ZExceptionDLg::layoutSetup( const utf8VaryingString& pTitle,
 
   verticalLayoutWidget->setGeometry(wR);
 
-  QVBoxLayout *wMainVLayoutVLy=new QVBoxLayout(verticalLayoutWidget);
+  QVBoxLayout *wMainVLayoutVLy=new QVBoxLayout;
   verticalLayoutWidget->setLayout(wMainVLayoutVLy);
 
-  QVBoxLayout *wVLayoutMsgVLy=new QVBoxLayout(verticalLayoutWidget);
+  QVBoxLayout *wVLayoutMsgVLy=new QVBoxLayout;
 
   wMainVLayoutVLy->addLayout(wVLayoutMsgVLy);
   MessageTEd = new QTextEdit(this);
   wVLayoutMsgVLy->addWidget(MessageTEd);
 
-  wButtonBoxHLy = new QHBoxLayout(verticalLayoutWidget);
+  wButtonBoxHLy = new QHBoxLayout;
   wButtonBoxHLy->setContentsMargins(0, 0, 0, 0);
   dontShowCKb = new QCheckBox(verticalLayoutWidget);
   wButtonBoxHLy->addWidget(dontShowCKb);
@@ -245,7 +246,7 @@ ZExceptionDLg::layoutSetup( const utf8VaryingString& pTitle,
   label_7->setText(QCoreApplication::translate("ZExceptionDLg", "Severity", nullptr));
   label_8->setText(QCoreApplication::translate("ZExceptionDLg", "Status", nullptr));
 
-  QVBoxLayout* wAddHLy=new QVBoxLayout(verticalLayoutWidget);
+  QVBoxLayout* wAddHLy=new QVBoxLayout;
   AdditionalTEd = new QTextEdit(verticalLayoutWidget);
   wAddHLy->addWidget(AdditionalTEd);
 
@@ -393,7 +394,7 @@ void ZExceptionDLg::ErrlogClicked()
 
   if (ErrorLog==nullptr) {
     for (long wi = ZException.count()-1;wi >= 0; wi--) {
-      wTE->appendText(ZException.Tab[wi]->formatFullUserMessage(false));
+      wTE->appendText(ZException.Tab(wi)->formatFullUserMessage(false));
     }
 
     wTE->show();
@@ -401,7 +402,7 @@ void ZExceptionDLg::ErrlogClicked()
   }
 
   for (long wi = 0; wi < ErrorLog->count(); wi++){
-    wStr.sprintf( "<%s> %s",decode_ZAIES(ErrorLog->Tab[wi]->Severity),ErrorLog->Tab[wi]->Message());
+    wStr.sprintf( "<%s> %s",decode_ZAIES(ErrorLog->Tab(wi)->Severity),ErrorLog->Tab(wi)->Message());
     wTE->appendText(wStr);
   }
 
@@ -418,7 +419,7 @@ void ZExceptionDLg::ZExceptionClicked()
   textEditMWn* wTE=new textEditMWn(this,TEOP_ShowLineNumbers | TEOP_NoFileLab);
   wTE->setWindowTitle("ZException stack");
   for (long wi = ZException.count()-1;wi >= 0; wi--) {
-      wTE->appendText(ZException.Tab[wi]->formatFullUserMessage(false));
+      wTE->appendText(ZException.Tab(wi)->formatFullUserMessage(false));
     }
 
   wTE->show();
@@ -711,11 +712,11 @@ ZExceptionDLg::createAddrinfo(int pError,const char *pModule, ZStatus pStatus, S
 }
 
 int
-ZExceptionDLg::displayLast(const utf8VaryingString& pTitle,bool pDontShow)
+ZExceptionDLg::displayLast(const utf8VaryingString& pTitle)
 {
   if (pTitle.isEmpty())
-    return display("Last exception",ZException.last(),pDontShow);
-  return display(pTitle,ZException.last(),pDontShow);
+    return display("Last exception",ZException.last());
+  return display(pTitle,ZException.last());
 }
 
 
@@ -984,15 +985,15 @@ ZExceptionDLg::_adhocMessage3B(const utf8String&pTitle, Severity_type pSeverity,
   return wRet;
 }
 int
-ZExceptionDLg::display(const utf8VaryingString &pTitle, const ZExceptionBase pException, bool pDontShow)
+ZExceptionDLg::display(const utf8VaryingString &pTitle, const ZExceptionBase pException)
 {
-  ZExceptionDLg* wDlg=new ZExceptionDLg(pTitle,pException,pDontShow);
-  if (wDlg->DoNotShow)
+  ZExceptionDLg* wDlg=new ZExceptionDLg(pTitle,pException);
+/*  if (wDlg->DoNotShow)
     {
     wDlg->deleteLater();
     return 0;
     }
-
+*/
   if (!pException.Complement.isEmpty())
     wDlg->setAdditionalInfo(pException.Complement);
 

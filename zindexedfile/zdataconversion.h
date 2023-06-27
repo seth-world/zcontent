@@ -792,7 +792,7 @@ _setUniversalFromCString (const void* pString,ZDataBuffer & pUniversal, const ZT
     wSize = pDesiredSize-1;
 
   pUniversal.setData((void*)wString,wSize);
-  pUniversal.DataChar[wSize]='\0';
+  pUniversal.Data[wSize]='\0';
   return ZS_SUCCESS;
 }
 
@@ -826,7 +826,7 @@ _setUniversalFromWString (const void* pString,ZDataBuffer & pUniversal, const ZT
     wSize = pDesiredSize-1;
 
   pUniversal.setData((void*)wString,wSize);
-  pUniversal.DataChar[wSize]='\0';
+  pUniversal.Data[wSize]='\0';
   return ZS_SUCCESS;
 }
 

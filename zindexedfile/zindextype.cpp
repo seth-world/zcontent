@@ -1591,7 +1591,7 @@ encodeZTypeFromString (long &pZType ,ZDataBuffer &pString)
                             ZS_INVTYPE,
                             Severity_Error,
                             " Given type has an invalid or unknown atomic data type <%s>",
-                            pString.DataChar);
+                            pString.Data);
     return ZS_INVTYPE;
 
 }//getZTypeFromString

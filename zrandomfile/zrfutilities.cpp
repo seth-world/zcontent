@@ -500,3 +500,255 @@ ZFileUtils::writeHeaderFromPool(const uriString& pURIHeader,
 } //updateHeaderFromPool
 
 
+
+ZStatus
+rawSearchNextStartSign(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,zaddress_type pStartAddress, zaddress_type & pOutAddress) {
+
+  if ((pStartAddress < 0)||(pStartAddress>pFileSize)) {
+    return ZS_OUTBOUND;
+  }
+
+  ZStatus wSt=ZS_SUCCESS;
+  long wNudge = pNudge;
+
+  ZDataBuffer wRecord;
+
+  if ((wNudge + pStartAddress) > pFileSize) {
+    wNudge = pFileSize -  pStartAddress;
+    if (wNudge <= 0) {
+      return ZS_EOF;
+    }
+  }
+
+  wSt=rawReadAt(pFd,wRecord,wNudge,pStartAddress);
+  if (wSt!=ZS_SUCCESS) {
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        wSt,
+        Severity_Severe,
+        "Error positionning at address <%ld> for file <%s> ",
+        pStartAddress,
+        getNameFromFd(pFd).toCChar());
+    return wSt;
+  }
+
+  const unsigned char* wPtr = wRecord.Data ;
+  const unsigned char* wPtrEnd = wRecord.Data + wRecord.Size;
+
+  uint32_t* wStartSign = (uint32_t*)wPtr;
+  if (*wStartSign == cst_ZFILEBLOCKSTART) {
+    pOutAddress = pStartAddress;
+    return ZS_SUCCESS;
+  }
+
+  while ((pStartAddress < zaddress_type(pFileSize)) && (wSt==ZS_SUCCESS)) {
+
+    while ((*wStartSign!=cst_ZFILEBLOCKSTART) && (wPtr < wPtrEnd)) {
+      wStartSign = (uint32_t*)wPtr;
+      pStartAddress ++;
+      wPtr++;
+    }
+    if (*wStartSign==cst_ZFILEBLOCKSTART)
+      break;
+
+    if (pStartAddress >= zaddress_type(pFileSize)) {
+      return ZS_OUTBOUNDHIGH;
+    }
+    pStartAddress -= 3;
+
+    wSt=rawReadAt(pFd,wRecord,wNudge,pStartAddress);
+    if (wSt!=ZS_SUCCESS)
+      return wSt;
+    wPtr = wRecord.Data;
+    wPtrEnd = wRecord.Data + wRecord.Size ;
+  } // while wAddress
+
+
+  pOutAddress = pStartAddress;
+  return ZS_SUCCESS;
+}// searchNextStartSign
+
+bool testSequence (const unsigned char* pSequence,size_t pSeqLen,
+    const unsigned char* pToCompare)
+{
+  while (pSeqLen) {
+    if (*pSequence != *pToCompare)
+      return false;
+    pSequence++;
+    pToCompare++;
+    pSeqLen--;
+  }
+  return true;
+}
+
+ZStatus
+searchNextSequence(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,
+                    const unsigned char* pSequence,size_t pSeqLen,
+                    zaddress_type pStartAddress, zaddress_type & pOutAddress)
+{
+
+  if ((pStartAddress < 0)||(pStartAddress>pFileSize)) {
+    return ZS_OUTBOUND;
+  }
+
+  ZStatus wSt=ZS_SUCCESS;
+  long wNudge = pNudge;
+
+  ZDataBuffer wRecord;
+
+  if ((wNudge + pStartAddress) > pFileSize) {
+    wNudge = pFileSize -  pStartAddress;
+    if (wNudge <= 0) {
+      return ZS_EOF;
+    }
+  }
+
+  wSt=rawReadAt(pFd,wRecord,wNudge,pStartAddress);
+  if (wSt!=ZS_SUCCESS) {
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+        wSt,
+        Severity_Severe,
+        "Error positionning at address <%ld> for file <%s> ",
+        pStartAddress,
+        getNameFromFd(pFd).toCChar());
+    return wSt;
+  }
+
+  const unsigned char* wPtr = wRecord.Data ;
+  const unsigned char* wPtrEnd = wRecord.Data + wRecord.Size;
+
+
+  if (testSequence(pSequence,pSeqLen,wPtr)) {
+    pOutAddress = pStartAddress;
+    return ZS_SUCCESS;
+  }
+
+
+  while ((pStartAddress < zaddress_type(pFileSize)) && (wSt==ZS_SUCCESS)) {
+
+    while (!testSequence(pSequence,pSeqLen,wPtr) && (wPtr < wPtrEnd)) {
+      pStartAddress ++;
+      wPtr++;
+    }
+    if (testSequence(pSequence,pSeqLen,wPtr))
+      break;
+
+    if (pStartAddress >= zaddress_type(pFileSize)) {
+      return ZS_OUTBOUNDHIGH;
+    }
+    pStartAddress -= (pSeqLen-1);
+
+    wSt=rawReadAt(pFd,wRecord,wNudge,pStartAddress);
+    if (wSt!=ZS_SUCCESS)
+      return wSt;
+    wPtr = wRecord.Data;
+    wPtrEnd = wRecord.Data + wRecord.Size ;
+  } // while wAddress
+
+
+  pOutAddress = pStartAddress;
+  return ZS_SUCCESS;
+}// searchNextSequence
+
+ZStatus
+rawGetBlockDescriptor(__FILEHANDLE__ pFdContent,ZBlockDescriptor& pBDOut,zaddress_type pAddress) {
+  ZDataBuffer wBlock;
+
+  ZStatus wSt=rawReadAt(pFdContent,wBlock,sizeof(ZBlockHeader_Export),pAddress);
+  if (wSt!=ZS_SUCCESS) {
+    return wSt;
+  }
+
+  ZBlockHeader_Export* wBlockE=(ZBlockHeader_Export* )wBlock.Data;
+  if (wBlockE->StartSign != cst_ZFILEBLOCKSTART) {
+    return ZS_INVBLOCKADDR;
+  }
+
+  wBlockE->deserialize();
+
+  pBDOut.Address = pAddress;
+  pBDOut.BlockSize = wBlockE->BlockSize ;
+  pBDOut.State = wBlockE->State  ;
+  pBDOut.Lock = wBlockE->Lock  ;
+  pBDOut.Pid = wBlockE->Pid   ;
+
+  return ZS_SUCCESS;
+} // rawGetBlockDescriptor
+
+uint16_t
+rawCheckContentBlock(int pPoolId,int pFdContent,ZBlockDescriptor& pBlockDesc) {
+  ZDataBuffer wBlock;
+  uint16_t  wRet = ZBEX_Correct;
+  off_t wFileOffset = lseek(pFdContent,off_t(pBlockDesc.Address),SEEK_SET);
+  if (wFileOffset < 0){
+    wRet |= ZBEX_SysBadAddress;
+    return wRet;
+  }
+  wBlock.allocate(sizeof(ZBlockHeader_Export));
+  ssize_t wSize=::read(pFdContent,wBlock.Data,sizeof(ZBlockHeader_Export));
+  if (wSize < 0) {
+    wRet |= ZBEX_SysBadAddress;
+    return wRet;
+  }
+  if (pBlockDesc.BlockSize==0) {
+    wRet |= ZBEX_PoolZeroSize;
+  }
+  ZBlockHeader_Export* wBlockE=(ZBlockHeader_Export* )wBlock.Data;
+  if (wBlockE->StartSign != cst_ZFILEBLOCKSTART) {
+    wRet |= ZBEX_Orphan;
+  }
+  zsize_type wSize1 = reverseByteOrder_Conditional<zsize_type>(wBlockE->BlockSize);
+  if (wSize1==0) {
+    wRet |= ZBEX_ContentZeroSize;
+  }
+  if (wSize1!=pBlockDesc.BlockSize) {
+    wRet |= ZBEX_Size;
+  }
+
+  if ((pPoolId==ZPTP_ZBAT)&&(pBlockDesc.State!=ZBS_Used)) {
+    wRet |= ZBEX_MustBeUsed ;
+  }
+  if ((pPoolId==ZPTP_ZFBT)&&(pBlockDesc.State!=ZBS_Free) && (pBlockDesc.State!=ZBS_Deleted)) {
+    wRet |= ZBEX_MustBeFreeOrDeleted;
+  }
+  /*  if ((pPoolId==ZPTP_ZDBT)&&(pBlockDesc.State!=ZBS_Deleted)) {
+    wRet |= ZBEX_MustBeDeleted;
+  }
+*/
+  return wRet;
+} // checkContentBlock
+
+utf8VaryingString
+decode_ZBEx(uint16_t pBEx) {
+
+  /* first preemptive statuses : one of these two cannot be combined with others */
+  if (pBEx==ZBEX_Correct)
+    return "<ZBEX_Correct> Pool block is correct";
+
+  if (pBEx==ZBEX_SysBadAddress)
+    return "<ZBEX_SysBadAddress> Cannot seed/read at given address on content file";
+
+  /* then cumulative statuses : check following priority */
+
+  if (pBEx & ZBEX_Orphan)
+    return "<ZBEX_Orphan> Orphan block:<cst_ZFILEBLOCKSTART> missing";
+
+  if (pBEx & ZBEX_PoolZeroSize)
+    return "<ZBEX_PoolZeroSize> Block size in pool has zero value";
+
+  if (pBEx & ZBEX_ContentZeroSize)
+    return "<ZBEX_ContentZeroSize> Block size on content file has zero value ";
+
+  /* these following are mutually exclusive */
+  if (pBEx & ZBEX_MustBeUsed)
+    return "<ZBEX_MustBeUsed> Block state must be ZBS_Used";
+  if (pBEx & ZBEX_MustBeFreeOrDeleted)
+    return "<ZBEX_MustBeFree> Block state must be ZBS_Free or ZBS_Deleted";
+  //  if (pBEx & ZBEX_MustBeDeleted)
+  //    return "<ZBEX_MustBeDeleted> Block state must be ZBS_Deleted";
+
+  if (pBEx & ZBEX_Size)
+    return "<ZBEX_Size> Block size in pool differs with block size on content file.";
+
+  return "<?????> Unknown block check error ";
+
+}

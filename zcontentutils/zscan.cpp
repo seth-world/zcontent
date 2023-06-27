@@ -318,7 +318,7 @@ ZScan::searchNextStartMark(__FILEHANDLE__ pFd,
       ZDataBuffer wAdd (sizeof(ZBlockHeader_Export)+wBuffer.Size+1-wOffset);
       }
 
-    wSt=pBlockHeader._importConvert(pBlockHeader,(ZBlockHeader_Export*)&wBuffer.DataChar[wOffset]);
+    wSt=pBlockHeader._importConvert(pBlockHeader,(ZBlockHeader_Export*)&wBuffer.Data[wOffset]);
     if (wSt!=ZS_SUCCESS)
           { return (wSt); }
     return  (ZS_FOUND) ;
@@ -345,7 +345,7 @@ ZScan::searchNextStartMark(__FILEHANDLE__ pFd,
   }
 
   pNextAddress = wAddress + wOffset;
-  wSt=pBlockHeader._importConvert(pBlockHeader,(ZBlockHeader_Export*)&wBuffer.DataChar[wOffset]);
+  wSt=pBlockHeader._importConvert(pBlockHeader,(ZBlockHeader_Export*)&wBuffer.Data[wOffset]);
   if (wSt!=ZS_SUCCESS)
         { return (wSt); }
   return  (ZS_FOUND) ;
