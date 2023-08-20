@@ -2530,14 +2530,17 @@ ZRandomFile::_freeBlock_Rollback (zrank_type pRank )
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZRandomFile::_freeBlock_Commit(zrank_type pZBATRank) {
+ZRandomFile::_freeBlock_Commit(zrank_type pZBATRank,bool pForceWrite) {
 ZStatus wSt;
 
     zrank_type wZFBTRank= _moveZBAT2ZFBT(pZBATRank);
 
     ZBAT.erase(pZBATRank);
 
-    return _postProcessZFBT(wZFBTRank);
+    wSt = _postProcessZFBT(wZFBTRank);
+    if (pForceWrite)
+      return _writeAllFileHeader();
+    return wSt;
 }//_freeBlock_commit
 
 /**
@@ -8076,59 +8079,62 @@ bool FOpen = false;
             }// else
     if ((wSt=_ZRFopen(ZRF_Exclusive|ZRF_All,wZFT))!=ZS_SUCCESS)
                                                 return wSt;
-    for (wi=0;(wi<ZBAT.size())&&(wSt==ZS_SUCCESS);wi++)
-                    {
-                    wSt=_freeBlock_Commit(wi);
-                    }
-    if (wSt!=ZS_SUCCESS)
-                { return  wSt;}
 
+    while ((ZBAT.count()>0)&&(wSt==ZS_SUCCESS)) {
+      wSt=_freeBlock_Commit(0L);
+    }
+    if (wSt!=ZS_SUCCESS) {
+      return  wSt;
+    }
+
+    while ((ZFBT.count()>0)&&(wSt==ZS_SUCCESS)) {
+      ZFBT.pop();
+    }
+    while ((ZHOT.count()>0)&&(wSt==ZS_SUCCESS)) {
+      ZHOT.pop();
+    }
+    wSt=_writeAllFileHeader();
 //  Computing size of the mega free block
 //          size of content file  - ZFCB.StartOfData
 // Computing size of user content for mega free block
 //          computed size for mega free block - sizeof(ZBlockHeader_Export)
 
-    ssize_t wFreeBlockSize = 0;
+    size_t wFreeBlockSize = 0;
     ssize_t wFreeUserSize = 0;
 
     // get file size
-
-    if ((wFreeBlockSize=(ssize_t)lseek(ContentFd,0L,SEEK_END))<0)// get the physical file size
-            {
-            ZException.getErrno(errno,
-                            _GET_FUNCTION_NAME_,
-                            ZS_FILEPOSERR,
-                            Severity_Severe,
-                            " Severe error while positionning to end of file %s",
-                            URIContent.toString());
-
-
-            wSt=ZS_FILEPOSERR;
-            zclose();
-            return  wSt;
-            }
+    wSt=rawSeekEnd(ContentFd,wFreeBlockSize);
+    if (wSt!=ZS_SUCCESS) {
+      ZException.setMessage(
+          _GET_FUNCTION_NAME_,
+          ZS_FILEPOSERR,
+          Severity_Severe,
+          " Severe error while positionning to end of file %s",
+          URIContent.toString());
+      wSt=ZS_FILEPOSERR;
+      zclose();
+      return  wSt;
+    }
 
     // user requested pSize bytes
 
     wFreeBlockSize -= ZFCB.StartOfData ;
     wFreeUserSize = wFreeBlockSize - sizeof(ZBlockHeader_Export);
-
-    if (wFreeBlockSize < pSize)
-        {
-        int wS=posix_fallocate(ContentFd,(off_t)wFreeBlockSize,(off_t)(pSize-wFreeBlockSize));
-        if (wS!=0)
-                {
-                ZException.getErrno(wS,
-                                _GET_FUNCTION_NAME_,
-                                ZS_WRITEERROR,
-                                Severity_Severe,
-                                " Severe error while extending file space to end of file %s",
-                                URIContent.toString());
-                wSt= ZS_WRITEERROR;
-                zclose();
-                return  wSt;
-                }
-        }
+    if (pSize > 0) {
+      if (wFreeBlockSize < size_t(pSize)) {
+        wSt = rawAllocate(ContentFd,wFreeBlockSize,(pSize-wFreeBlockSize));
+        if (wSt != ZS_SUCCESS) {
+          ZException.setMessage(_GET_FUNCTION_NAME_,
+              ZS_CANTALLOCSPACE,
+              Severity_Severe,
+              " Severe error while extending file space to end of file %s",
+              URIContent.toString());
+          wSt= ZS_CANTALLOCSPACE;
+          zclose();
+          return  wSt;
+        } // if (wSt != ZS_SUCCESS)
+      } // if (wFreeBlockSize < size_t(pSize))
+    } // if (pSize > 0)
 // create one block with all the available space
 // write the block descriptor to content file
 
@@ -8153,8 +8159,8 @@ bool FOpen = false;
 //
 
 //    ZDBT.reset();
-    ZBAT.reset();
-    ZFBT.reset();
+//    ZBAT.reset();
+//    ZFBT.reset();
 // up to here nothing in the file
 
     ZFBT._addSorted(wBS); // put block in free block pool
@@ -8228,7 +8234,7 @@ bool FOpen = false;
  */
 ZStatus
 ZRandomFile::zreorgUriFile (uriString &pURI, bool pDump, FILE *pOutput)
-{
+ {
 
 
 ZStatus wSt;

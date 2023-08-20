@@ -16,7 +16,7 @@ size_t
 ZBlockPool::_exportAppendPool(ZDataBuffer&pZDBExport)
 {
 
-#ifdef __USE_ZTHREAD__
+#ifdef __ZTHREAD_AUTOMATIC__
   _Base::lock();
 #endif
   ZAExport ZAE;
@@ -64,8 +64,6 @@ ZBlockPool::_exportAppendPool(ZDataBuffer&pZDBExport)
   ZAE.serialize();
   memmove(wPtr,&ZAE,sizeof(ZAExport));
 
-
-
   wPtr += sizeof(ZAExport);
 
   ZBlockDescriptor_Export* wBlkExp =(ZBlockDescriptor_Export*) wPtr;
@@ -75,7 +73,7 @@ ZBlockPool::_exportAppendPool(ZDataBuffer&pZDBExport)
     wBlkExp++;
   }
 
-#ifdef __USE_ZTHREAD__
+#ifdef __ZTHREAD_AUTOMATIC__
   _Base::unlock();
 #endif
   return ZAE.FullSize ;
@@ -102,7 +100,7 @@ ZBlockPool::_importPool(const unsigned char *& pPtrIn)
 
 //    return _ZAimport((ZArray<ZBlockDescriptor>*)this,pBuffer,&ZBlockDescriptor::_importConvert);
 
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
   _Base::lock();
 #endif
 
@@ -156,7 +154,7 @@ ZBlockPool::_importPool(const unsigned char *& pPtrIn)
       push(wBDout);
     }// for
   } //(ZAE.NbElements>0)
-#ifdef __USE_ZTHREAD__
+#ifdef __ZTHREAD_AUTOMATIC__
   _Base::unlock();
 #endif
   pPtrIn += wZAE.DataSize;

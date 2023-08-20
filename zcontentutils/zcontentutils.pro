@@ -173,7 +173,8 @@ SOURCES += \
     zkeylistdlg.cpp \
     zrawkeylistdlg.cpp \
     zrawmasterfilevisu.cpp \
-    zrestoredlg.cpp
+    zrestoredlg.cpp \
+    zsearchquerymwd.cpp
 
 
 
@@ -237,7 +238,8 @@ HEADERS += \
     zkeylistdlg.h \
     zrawkeylistdlg.h \
     zrawmasterfilevisu.h \
-    zrestoredlg.h
+    zrestoredlg.h \
+    zsearchquerymwd.h
 
 
 #    ztypelistbutton.h \
@@ -261,7 +263,8 @@ FORMS += \
     filegeneratedlg.ui \
     poolvisu.ui \
     poolvisuDLg.ui \
-    zrawmasterfilevisu.ui
+    zrawmasterfilevisu.ui \
+    zsearchquerymwd.ui
     $${TOOLSET_ROOT}/zcppparser/zcppparserutils/rawfields.ui
 
 

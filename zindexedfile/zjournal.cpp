@@ -58,10 +58,10 @@ ZJEventQueue::pop()
     {
     if (isEmpty())
             return ZS_EMPTY;
-    Mtx.lock();
+    _Base::lock();
     delete last() ;
-    _Base::pop();
-    Mtx.unlock();
+    _Base::_pop_front_nolock();
+    _Base::unlock();
     return ZS_SUCCESS;
     }//pop
 
@@ -90,9 +90,9 @@ ZJEventQueue::enqueue (const ZJOperation &pZJOP,
     wEvent->Pid = pPid;
     wEvent->Operation = pZJOP;
     wEvent->DateTime = ZDateFull::currentDateTime();*/
-    Mtx.lock();
-    _Base::push(wEvent);
-    Mtx.unlock();
+    _Base::lock();
+    _Base::_pushNoLock(wEvent);
+    _Base::unlock();
     return;
 }// enqueue
 
@@ -101,7 +101,7 @@ ZJEventQueue::dequeue(ZJEvent &pEvent)
 {
     if (isEmpty())
             return ;
-    Mtx.lock();
+    _Base::lock();
     pEvent.setData(*Tab(0));
     pEvent.Header.Pid = Tab(0)->Header.Pid;
     pEvent.Header.DateTime = Tab(0)->Header.DateTime;
@@ -111,8 +111,8 @@ ZJEventQueue::dequeue(ZJEvent &pEvent)
     pEvent.Header.Address= Tab(0)->Header.Address;
 
     delete Tab(0);
-    _Base::pop_front();
-    Mtx.unlock();
+    _Base::_pop_front_nolock();
+    _Base::unlock();
     return ;
 } // dequeue (pop_front)
 

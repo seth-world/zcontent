@@ -153,8 +153,8 @@ public:
             utfcodeString &wCode,
             ZaiErrors *pErrorlog);
 
-    virtual utf8String toStr() const;
-    virtual utf8String toHexa() const;
+    utf8String toStr() const;
+    utf8String toHexa() const;
 
     size_t getUniversalSize();
     size_t getUniversal_Ptr(unsigned char*& pPtr);

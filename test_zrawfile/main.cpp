@@ -145,6 +145,9 @@ int main(int argc, char *argv[])
   //  ZVerbose |= ZVB_FileEngine | ZVB_SearchEngine | ZVB_MemEngine ;
  // ZVerbose |= ZVB_FileEngine | ZVB_SearchEngine ;
 
+
+  //ZVerbose |= ZVB_Mutex ;
+
   QApplication a(argc, argv);
 
 

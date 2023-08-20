@@ -1024,7 +1024,7 @@ void poolVisu::dataSetup(int pPoolid) {
     wBD.State=    BDe[wi].State;
     wBD.BlockSize = wBlockSize;
 
-    uint16_t wBE=checkContentBlock(PoolId,FdContent, wBD);
+    uint16_t wBE=rawCheckContentBlock(PoolId,FdContent, wBD);
     if (wBE==ZBEX_Correct) {
       wRow << createItem(" ");
     }
@@ -1117,7 +1117,7 @@ for (long wi=0; wi < ContentTBv->ItemModel->rowCount();wi++)
     wAddressMin = ZBAT[0].Address;
 
   for (long wi=0;wi < ZBAT.count();wi++)  {
-    uint16_t wBE=checkContentBlock(ZPTP_ZBAT,FdContent, ZBAT[wi]);
+    uint16_t wBE=rawCheckContentBlock(ZPTP_ZBAT,FdContent, ZBAT[wi]);
     if (wBE!=ZBEX_Correct){
       wB1=GScene->addRect(qreal(ZBAT[wi].Address),1.0,qreal(ZBAT[wi].BlockSize),cst_GBlockheight,outlinePen,redBrush);
     }
@@ -1147,7 +1147,7 @@ for (long wi=0; wi < ContentTBv->ItemModel->rowCount();wi++)
 
   for (long wi=0;wi < ZFBT.count();wi++)  {
 
-    uint16_t wBE=checkContentBlock(ZPTP_ZFBT,FdContent, ZFBT[wi]);
+    uint16_t wBE=rawCheckContentBlock(ZPTP_ZFBT,FdContent, ZFBT[wi]);
     if (wBE!=ZBEX_Correct){
       wB1=GScene->addRect(qreal(ZFBT[wi].Address),1.0,qreal(ZFBT[wi].BlockSize),cst_GBlockheight,outlinePen,magentaBrush);
     }
@@ -1573,7 +1573,7 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
        *  - address does NOT point to a valid block on content file  (orphan pool block)
        */
       long wi = long(wIdx.row());
-      uint16_t wZBEx=checkContentBlock(PoolId,FdContent,ZBAT[wi]);
+      uint16_t wZBEx=rawCheckContentBlock(PoolId,FdContent,ZBAT[wi]);
       if (wZBEx == ZBEX_Correct) {
         ZExceptionDLg::adhocMessage("Removing block",Severity_Error,nullptr,
             nullptr,"Block rank %ld is correct and cannot be removed as a null sized and/or orphan block",wi);
@@ -1595,7 +1595,7 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
        *  - address does NOT point to a valid block on content file  (orphan pool block)
        */
       long wi = long(wIdx.row());
-      uint16_t wZBEx=checkContentBlock(PoolId,FdContent,ZFBT[wi]);
+      uint16_t wZBEx=rawCheckContentBlock(PoolId,FdContent,ZFBT[wi]);
       if (wZBEx == ZBEX_Correct) {
         ZExceptionDLg::adhocMessage("Removing block",Severity_Error,nullptr,
             nullptr,"Block rank %ld is correct and cannot be removed as a null sized and/or orphan block",wi);
@@ -1635,7 +1635,7 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
        *  - change block state from ZBS_Deleted to ZBS_Used
        */
       long wi = long(wIdx.row());
-      uint16_t wZBEx=checkContentBlock(PoolId,FdContent,ZFBT[wi]);
+      uint16_t wZBEx=rawCheckContentBlock(PoolId,FdContent,ZFBT[wi]);
       if (wZBEx != ZBEX_Correct) {
         ZExceptionDLg::adhocMessage("Undelete block",Severity_Error,nullptr,
             nullptr,"Block rank %ld is not correct and cannot be modified",wi);
@@ -1669,7 +1669,7 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
        *  - address does NOT point to a valid block on content file  (orphan pool block)
        */
       long wi = long(wIdx.row());
-      uint16_t wZBEx=checkContentBlock(PoolId,FdContent,ZDBT[wi]);
+      uint16_t wZBEx=rawCheckContentBlock(PoolId,FdContent,ZDBT[wi]);
       if (wZBEx == ZBEX_Correct) {
         ZExceptionDLg::adhocMessage("Removing null block",Severity_Error,nullptr,
             nullptr,"Block rank %ld is correct and cannot be removed as a null sized and/or orphan block",wi);
@@ -1688,7 +1688,7 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
        *  - change block state from ZBS_Deleted to ZBS_Used
        */
       long wi = long(wIdx.row());
-      uint16_t wZBEx=checkContentBlock(PoolId,FdContent,ZDBT[wi]);
+      uint16_t wZBEx=rawCheckContentBlock(PoolId,FdContent,ZDBT[wi]);
       if (wZBEx != ZBEX_Correct) {
         ZExceptionDLg::adhocMessage("Undelete block",Severity_Error,nullptr,
             nullptr,"Block rank %ld is not correct and cannot be modified",wi);
@@ -1815,49 +1815,6 @@ poolVisu::updateBlockHeaderState(const utf8VaryingString& pURIContent,int pFdCon
   return ZS_SUCCESS;
 } // updateBlockHeaderState
 
-uint16_t
-poolVisu::checkContentBlock(int pPoolId,int pFdContent,ZBlockDescriptor& pBlockDesc) {
-  ZDataBuffer wBlock;
-  uint16_t  wRet = ZBEX_Correct;
-  off_t wFileOffset = lseek(pFdContent,off_t(pBlockDesc.Address),SEEK_SET);
-  if (wFileOffset < 0){
-    wRet |= ZBEX_SysBadAddress;
-    return wRet;
-  }
-  wBlock.allocate(sizeof(ZBlockHeader_Export));
-  ssize_t wSize=::read(pFdContent,wBlock.Data,sizeof(ZBlockHeader_Export));
-  if (wSize < 0) {
-    wRet |= ZBEX_SysBadAddress;
-    return wRet;
-  }
-  if (pBlockDesc.BlockSize==0) {
-    wRet |= ZBEX_PoolZeroSize;
-  }
-  ZBlockHeader_Export* wBlockE=(ZBlockHeader_Export* )wBlock.Data;
-  if (wBlockE->StartSign != cst_ZFILEBLOCKSTART) {
-    wRet |= ZBEX_Orphan;
-  }
-  zsize_type wSize1 = reverseByteOrder_Conditional<zsize_type>(wBlockE->BlockSize);
-  if (wSize1==0) {
-    wRet |= ZBEX_ContentZeroSize;
-  }
-  if (wSize1!=pBlockDesc.BlockSize) {
-    wRet |= ZBEX_Size;
-  }
-
-  if ((pPoolId==ZPTP_ZBAT)&&(pBlockDesc.State!=ZBS_Used)) {
-    wRet |= ZBEX_MustBeUsed ;
-  }
-  if ((pPoolId==ZPTP_ZFBT)&&(pBlockDesc.State!=ZBS_Free) && (pBlockDesc.State!=ZBS_Deleted)) {
-    wRet |= ZBEX_MustBeFreeOrDeleted;
-  }
-/*  if ((pPoolId==ZPTP_ZDBT)&&(pBlockDesc.State!=ZBS_Deleted)) {
-    wRet |= ZBEX_MustBeDeleted;
-  }
-*/
-  return wRet;
-} // checkContentBlock
-
 ZStatus
 poolVisu::getFileBlockDescriptor(__FILEHANDLE__ pFdContent,ZBlockDescriptor& pBDOut,zaddress_type pAddress) {
   ZDataBuffer wBlock;
@@ -1918,7 +1875,7 @@ fixPool(const utf8VaryingString& pURIContent, int pFdContent,uint8_t pPoolType,Z
   pDisplay(wStr);
 
   for (long wi=0; wi < pPool->count(); wi++) {
-    wBE=poolVisu::checkContentBlock(pPoolType,pFdContent, pPool->Tab(wi));
+    wBE=rawCheckContentBlock(pPoolType,pFdContent, pPool->Tab(wi));
     if (wBE == ZBEX_Correct)
       continue;
     wStr.sprintf("%ld > %s",wi,decode_ZBEx(wBE).toString());
@@ -1947,7 +1904,7 @@ fixPool(const utf8VaryingString& pURIContent, int pFdContent,uint8_t pPoolType,Z
         wi--;
         continue;
       }
-      if (wBE & ZBEX_Size) {
+      if (wBE & ZBEX_SizeNotSame) {
         wStr.sprintf("<ZBEX_PoolZeroSize> Adapting pool block size to content block size from %s pool rank %ld address %lld",
             getPoolName(pPoolType),wi,pPool->Tab(wi).Address);
         ZDataBuffer wBlock;
@@ -1976,7 +1933,7 @@ fixPool(const utf8VaryingString& pURIContent, int pFdContent,uint8_t pPoolType,Z
         }
         ZBlockHeader_Export* wBlockExp=(ZBlockHeader_Export*)wBlock.Data;
         pPool->Tab(wi).BlockSize = reverseByteOrder_Conditional<zsize_type>(wBlockExp->BlockSize) ;
-      } // if (wBE & ZBEX_Size)
+      } // if (wBE & ZBEX_SizeNotSame)
     } // if (wBE & ZPOR_FixSize)
     if (pFlag & ZPOR_FixState) {
       if (wBE & ZBEX_MustBeUsed) {

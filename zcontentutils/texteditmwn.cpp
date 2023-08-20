@@ -104,10 +104,7 @@ textEditMWn::_init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)) {
 
   QMainWindow::setWindowTitle("Text");
 
-  if (pOptions & TEOP_NoCloseBtn) {
-    setWindowFlag(Qt::WindowCloseButtonHint,false ); // no close button
-    ui->closeBTn->setVisible(false);
-  }
+
   //  QObject::connect(this, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(resizeWindow(QResizeEvent*)));
   QObject::connect(ui->lineNumbersBTn, SIGNAL(pressed()), this, SLOT(lineNumbersBTnClicked()));
   QObject::connect(ui->closeBTn, SIGNAL(pressed()), this, SLOT(closePressed()));
@@ -123,6 +120,11 @@ textEditMWn::_init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)) {
 
   if (pOptions & TEOP_NoFileLab)
     ui->ClosedLBl->setVisible(false);
+
+  if (pOptions & TEOP_NoCloseBtn) {
+    setWindowFlag(Qt::WindowCloseButtonHint,false ); // no close button
+    ui->closeBTn->setVisible(false);
+  }
 
   setCloseButtonRole();
 }

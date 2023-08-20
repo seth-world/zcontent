@@ -374,7 +374,7 @@ ZRestoreDLg::searchDirClicked() {
 void
 ZRestoreDLg::doRestore() {
   if (ComLog==nullptr) {
-    ComLog = new textEditMWn(this,TEOP_NoFileLab | TEOP_CloseBtnHide);
+    ComLog = new textEditMWn(this,TEOP_NoFileLab | TEOP_NoCloseBtn);
     ComLog->setWindowTitle("Restore log");
   }
   ComLog->show();
@@ -386,7 +386,7 @@ ZRestoreDLg::doRestore() {
   if (RestoreDirectory.isEmpty()){
     if (!wErrMsg.isEmpty())
       wErrMsg+= "\n";
-    wErrMsg = "Restore target directory is empty.";
+    wErrMsg = "Restore target directory has not been defined.";
   }
   if (!wErrMsg.isEmpty()) {
     ZExceptionDLg::adhocMessage("Do restore",Severity_Error,wErrMsg.toCChar());

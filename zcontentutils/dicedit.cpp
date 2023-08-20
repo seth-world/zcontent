@@ -81,6 +81,8 @@
 
 #include <zcontent/zindexedfile/zmasterfile.h>
 
+
+
 using namespace zbs;
 
 const int cst_MessageDuration = 20000;  /* milliseconds */
@@ -89,7 +91,8 @@ int cst_KeyUSizeColumn = 3 ;
 int cst_DuplicateColumn = 4 ;
 
 
-FileGenerateMWn* FileGenerate=nullptr;
+FileGenerateMWn*  FileGenerate=nullptr;
+ZSearchQueryMWd*      QueryMWd=nullptr;
 
 
 extern ZPinboard   Pinboard;

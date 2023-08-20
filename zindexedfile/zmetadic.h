@@ -112,9 +112,9 @@ public:
     }*/
     ZStatus removeFieldByRank (const long pFieldRank);
 
-    zrank_type searchFieldByName(const utf8String &pFieldName) ;
+    zrank_type searchFieldByName(const utf8String &pFieldName) const ;
 
-    zrank_type searchFieldByHash(const md5& pHash);
+    zrank_type searchFieldByHash(const md5& pHash) const ;
 
 #define getFieldByHash searchFieldByHash
 #define getFieldByName searchFieldByName

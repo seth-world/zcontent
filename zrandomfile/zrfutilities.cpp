@@ -498,9 +498,8 @@ ZFileUtils::writeHeaderFromPool(const uriString& pURIHeader,
   return pURIHeader.writeContent(wHeaderContent);
 } //updateHeaderFromPool
 
-
-bool testSequence (const unsigned char* pSequence,size_t pSeqLen,
-    const unsigned char* pToCompare)
+/*
+bool testSequence (const unsigned char* pSequence,size_t pSeqLen, const unsigned char* pToCompare)
 {
   while (pSeqLen) {
     if (*pSequence != *pToCompare)
@@ -511,7 +510,7 @@ bool testSequence (const unsigned char* pSequence,size_t pSeqLen,
   }
   return true;
 }
-
+*/
 
 ZStatus
 rawSearchNextStartSign(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,zaddress_type pStartAddress, zaddress_type & pOutAddress) {
@@ -685,17 +684,13 @@ rawGetBlockDescriptor(__FILEHANDLE__ pFdContent,ZBlockDescriptor& pBDOut,zaddres
 } // rawGetBlockDescriptor
 
 uint16_t
-rawCheckContentBlock(int pPoolId,int pFdContent,ZBlockDescriptor& pBlockDesc) {
+rawCheckContentBlock(int pPoolId,__FILEHANDLE__ pFdContent,ZBlockDescriptor& pBlockDesc) {
   ZDataBuffer wBlock;
   uint16_t  wRet = ZBEX_Correct;
-  off_t wFileOffset = lseek(pFdContent,off_t(pBlockDesc.Address),SEEK_SET);
-  if (wFileOffset < 0){
-    wRet |= ZBEX_SysBadAddress;
-    return wRet;
-  }
-  wBlock.allocate(sizeof(ZBlockHeader_Export));
-  ssize_t wSize=::read(pFdContent,wBlock.Data,sizeof(ZBlockHeader_Export));
-  if (wSize < 0) {
+
+  ZStatus wSt=rawReadAt(pFdContent,wBlock,sizeof(ZBlockHeader_Export),pBlockDesc.Address);
+
+  if (wSt != ZS_SUCCESS) {
     wRet |= ZBEX_SysBadAddress;
     return wRet;
   }
@@ -711,12 +706,25 @@ rawCheckContentBlock(int pPoolId,int pFdContent,ZBlockDescriptor& pBlockDesc) {
     wRet |= ZBEX_ContentZeroSize;
   }
   if (wSize1!=pBlockDesc.BlockSize) {
-    wRet |= ZBEX_Size;
+    wRet |= ZBEX_SizeNotSame;
+  }
+  if (pBlockDesc.State != wBlockE->State) {
+    wRet |= ZBEX_StateNotSame;
+  }
+  if (pBlockDesc.Lock != wBlockE->Lock) {
+    wRet |= ZBEX_LockNotSame;
+  }
+  pid_t wPid = reverseByteOrder_Conditional<pid_t>(wBlockE->Pid);
+  if (pBlockDesc.Pid != wPid) {
+    wRet |= ZBEX_PidNotSame;
   }
 
   if ((pPoolId==ZPTP_ZBAT)&&(pBlockDesc.State!=ZBS_Used)) {
-    wRet |= ZBEX_MustBeUsed ;
+    wRet |= ZBEX_LockNotSame ;
   }
+
+
+
   if ((pPoolId==ZPTP_ZFBT)&&(pBlockDesc.State!=ZBS_Free) && (pBlockDesc.State!=ZBS_Deleted)) {
     wRet |= ZBEX_MustBeFreeOrDeleted;
   }
@@ -756,8 +764,17 @@ decode_ZBEx(uint16_t pBEx) {
   //  if (pBEx & ZBEX_MustBeDeleted)
   //    return "<ZBEX_MustBeDeleted> Block state must be ZBS_Deleted";
 
-  if (pBEx & ZBEX_Size)
-    return "<ZBEX_Size> Block size in pool differs with block size on content file.";
+  if (pBEx & ZBEX_SizeNotSame)
+    return "<ZBEX_SizeNotSame> Block size in pool differs from block size on content file.";
+
+  if (pBEx & ZBEX_StateNotSame)
+    return "<ZBEX_StateNotSame> Block state in pool differs from block state on content file.";
+
+  if (pBEx & ZBEX_LockNotSame)
+    return "<ZBEX_LockNotSame> Lock mask in pool differs from Lock mask on content file.";
+
+  if (pBEx & ZBEX_PidNotSame)
+    return "<ZBEX_PidNotSame> Pid in pool differs from pid on content file.";
 
   return "<?????> Unknown block check error ";
 

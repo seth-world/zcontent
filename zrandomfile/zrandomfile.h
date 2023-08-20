@@ -967,7 +967,7 @@ public:
     /** @brief _freeBlock_Rollback Invalidate freeBlock operation and sets the ZBAT block again to ZBS_Used */
     void _freeBlock_Rollback(zrank_type pRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
     /** @brief _freeBlock_Commit Deletes (Frees) definitively an entry of ZBlockAccessTable pool - updates file */
-    ZStatus _freeBlock_Commit  (zrank_type pZBATRank); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
+    ZStatus _freeBlock_Commit  (zrank_type pZBATRank, bool pForceWrite=true); // remove Block pointed by pRank in ZBAT and move it to ZFBT. Update File Header
 
 
     ZStatus _replace(const ZDataBuffer &pUserBuffer, const zrank_type pRank, zaddress_type &pAddress);

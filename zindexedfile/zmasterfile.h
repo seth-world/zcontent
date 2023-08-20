@@ -8,6 +8,9 @@
 
 #include <cstdarg>
 
+
+
+
 class URFField;
 namespace zbs {
 
@@ -26,9 +29,6 @@ public:
 
   utf8VaryingString getDictionaryName() ;
 
-//  int _getAvailableBckNum(const uriString& pBackupPath,const utf8VaryingString &pBckExt);
-
-//  ZStatus backupAll (const uriString &pBackupPath=uriString(), const utf8VaryingString &pBckExt="bck") ;
 
   /**
    * @brief rebuildIndex  For index key of rank pIndexRank:<br>
@@ -38,7 +38,15 @@ public:
    * @return a ZStatus : ZS_SUCCESS if OK, otherwise the faulty status is returned and ZException is set with appropriate message data.
    */
   ZStatus rebuildIndex(long pIndexRank, long *pRank=nullptr) ;
+
   ZStatus extractKeyValues(const ZDataBuffer& pRecord, ZDataBuffer& pKeyContent, long pIndexRank);
+
+  ZStatus extractFieldValue(const ZDataBuffer& pRecord,ZDataBuffer& pKeyValue,long pRank);
+
+  ZStatus getURFFieldByRank(const ZDataBuffer& pRecord, URFField &pURFField, long pRank);
+
+  ZStatus searchForValue(const utf8VaryingString& pSearchPhrase);
+
 };
 
 }// namespace zbs

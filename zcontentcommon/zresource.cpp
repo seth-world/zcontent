@@ -107,37 +107,30 @@ int ZResource::fromXmltoHexa(zxmlElement *pRootNode,const char* pChildName,utfco
 utf8String ZResource::toStr() const
 {
     utf8String wContent;
-//    wContent.sprintf("%ld#%ld#%ld", id, Entity, DataRank);
-    wContent.sprintf("%ld#%ld", Entity, id);
+    if (Entity==cst_EntityInvalid)
+      wContent = "InvalidEntity#";
+    else
+      wContent.sprintf("%ld#", Entity);
+    if (id==cst_ResourceInvalid)
+      wContent += "InvalidId";
+    else
+      wContent.addsprintf("%ld", id);
     return wContent;
 }
 utf8String ZResource::toHexa() const
 {
     utf8String wContent;
-    //    wContent.sprintf("%ld#%ld#%ld", id, Entity, DataRank);
-    wContent.sprintf("%l08Xu#%l08Xd", Entity, id);
+    if (Entity==cst_EntityInvalid)
+      wContent = "InvalidEntity#";
+    else
+      wContent.sprintf("%08X#", Entity);
+    if (id==cst_ResourceInvalid)
+      wContent += "InvalidId";
+    else
+      wContent.addsprintf("%08X", id);
     return wContent;
 }
-#ifdef __DEPRECATED__   // casting is deprecated
-ZDataBuffer ZResource::toKey()
-{
-    ZDataBuffer wOutValue;
-    _castAtomicValue_T<ZEntity_type>(Entity, ZType_U64, wOutValue);
-    return wOutValue;
-}
 
-
-ZDataBuffer ZResource::toFullKey()
-{
-    ZDataBuffer wOutValue, wZDB;
-    _castAtomicValue_T<ZEntity_type>(Entity, ZType_U64, wOutValue);
-    _castAtomicValue_T<Resourceid_type>(id, ZType_S64, wZDB);
-    wOutValue += wZDB;
-//    _castAtomicValue_T<Identity_type>(DataRank, ZType_S64, wOutValue);
-//    wOutValue += wZDB;
-    return wOutValue;
-}
-#endif // __DEPRECATED__
 
 ZDataBuffer ZResource::_export() const
 {

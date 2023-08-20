@@ -176,7 +176,7 @@ public:
 
     ZStatus pop();
 //----------Queue Data-------------------
-    ZMutex Mtx;
+//    ZMutex Mtx;
 };
 
 class ZRawMasterFile;

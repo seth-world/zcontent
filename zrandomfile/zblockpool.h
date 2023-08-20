@@ -23,6 +23,9 @@ public:
     while ((wi < count()) && (Tab(wi).Address < pBlockDescriptor.Address)) {
       wi++;
     }
+    if (wi==count())
+      return _Base::push(pBlockDescriptor);
+
     /* in the same pool we cannot have 2 blocks with the same address */
     if (Tab(wi).Address==pBlockDescriptor.Address) {
       _DBGPRINT("ZBlockPool::_addSorted-F-IVADDR Address collision in free block pool.\n")
@@ -30,8 +33,6 @@ public:
           "Free block pool : Pool address collision while adding  address %ld",pBlockDescriptor.Address);
       ZException.exit_abort();
     }
-    if (wi==count())
-      return _Base::push(pBlockDescriptor);
     return _Base::insert(pBlockDescriptor,wi);
   }
 

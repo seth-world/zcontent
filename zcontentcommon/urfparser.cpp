@@ -1,4 +1,4 @@
-#include "urfparser.h"
+#include <zcontent/zcontentcommon/urfparser.h>
 #include <zcontentcommon/zresource.h>
 #include <zcontentutils/zentity.h>
 //#include <ztoolset/zdate.h>
@@ -54,6 +54,9 @@ ZStatus URFParser::set(const ZDataBuffer* pRecord) {
   return ZS_SUCCESS;  /* done */
 }// set
 
+ZStatus URFParser::set(const ZDataBuffer& pRecord) {
+  return set(&pRecord);
+}// set
 
 ZStatus URFParser::parse(const ZDataBuffer &pRecord, ZArray<URFField> &pFieldList) {
 
@@ -174,10 +177,9 @@ URFParser::appendURFFieldByRank (long pRank,ZDataBuffer pBuffer){
 }
 
 
-ZDataBuffer
-URFParser::getURFFieldByRank (long pRank){
+URFField
+URFParser::getURFFieldByRankIncremental (long pRank){
   ZStatus   wSt = ZS_NOTFOUND;
-  ZDataBuffer wFieldValue;
 
 //  const unsigned char* wPtr=pData.Data;
 //  const unsigned char* wPtrEnd=pData.Data+pData.Size;
@@ -185,12 +187,7 @@ URFParser::getURFFieldByRank (long pRank){
   URFField wField;
 
   if (wRank < URFFieldList.count()) {
-    if (URFFieldList[wRank].Present) {
-      wFieldValue.setData(URFFieldList[wRank].Ptr,URFFieldList[wRank].Size);
-      return wFieldValue;
-    }
-    wFieldValue.clear();
-    return wFieldValue;
+    return URFFieldList[wRank];
   }// if (wRank < URFFieldList.count())
 
   while ((Ptr < PtrEnd )&&(wRank <= pRank)) {
@@ -208,24 +205,86 @@ URFParser::getURFFieldByRank (long pRank){
 
     /* here field is present or all fields are declared to be present */
     wField.Ptr = Ptr;
-    wField.Present = true;
-    size_t wS=getURFFieldSize(Ptr);
 
- /*   wSt=getURFFieldValue(wPtr,wFieldValue);
-    if (wSt == ZS_SUCCESS) {
-        wField.Size = wFieldValue.Size;
-        URFFieldList << wField;
-        if (wRank == pRank)
-          break;
-        wRank++;
-        continue;
+    const unsigned char* pPtrIn = Ptr;
+    _importAtomic<ZTypeBase>(wField.ZType,pPtrIn);
+
+    ssize_t wS=getURFFieldSize(Ptr);
+
+    if (wS<0) {
+    /* if ZType is unknown, then field is stored with size = 0, pointer as it is.
+     * pointer is then searched for next known ZType (Found) or until the end of record (not Found).
+     */
+    wField.Size = 0;
+    wSt=searchNextValidZType(Ptr,PtrEnd);
+    continue;
     }
-*/
-      /* if ZType is unknown, then field is stored with size = 0, pointer as it is.
+
+    wField.Size=size_t(wS);
+    wField.Present = true;
+
+    URFFieldList << wField;
+    if (wRank == pRank) {
+      break;
+    }
+    wRank++;
+  } // while
+
+  if (wRank == pRank) {
+    return URFFieldList[pRank];
+  }
+
+  return URFField();
+} // getURFFieldByRank
+
+ZDataBuffer
+URFParser::getURFFieldByRank (long pRank){
+  ZStatus   wSt = ZS_NOTFOUND;
+  ZDataBuffer wFieldValue;
+
+  //  const unsigned char* wPtr=pData.Data;
+  //  const unsigned char* wPtrEnd=pData.Data+pData.Size;
+  long wRank=0;
+  URFField wField;
+
+  if (wRank < URFFieldList.count()) {
+    if (URFFieldList[wRank].Present) {
+      wFieldValue.setData(URFFieldList[wRank].Ptr,URFFieldList[wRank].Size);
+      return wFieldValue;
+    }
+    wFieldValue.clear();
+    return wFieldValue;
+  }// if (wRank < URFFieldList.count())
+
+  while ((Ptr < PtrEnd )&&(wRank <= pRank)) {
+
+    if ( (!AllFieldsPresent) && !(Presence.test(size_t(wRank)) ) ) {
+      wField.Ptr = Ptr ;
+      wField.Size = 0 ;
+      wField.Present = false;
+      URFFieldList << wField;
+      if (wRank == pRank)
+        break;
+      wRank++;
+      continue;
+    }
+
+    /* here field is present or all fields are declared to be present */
+    wField.Ptr = Ptr;
+    wField.Present = true;
+
+    ssize_t wS=getURFFieldSize(Ptr);
+
+
+    /* if ZType is unknown (returned size == -1), then field is stored with size = 0, pointer as it is.
        * pointer is then searched for next known ZType (Found) or until the end of record (not Found).
        */
-
-    wField.Size = 0;
+    if (wS<0) {
+      wField.Size = 0;
+    }
+    else {
+      wField.Size = size_t(wS);
+    }
     URFFieldList << wField;
     wSt=searchNextValidZType(Ptr,PtrEnd);
     if (wRank == pRank)
@@ -234,13 +293,14 @@ URFParser::getURFFieldByRank (long pRank){
   } // while
 
   if (wRank == pRank) {
-      wSt=getKeyFieldValue(Ptr,wFieldValue);
+    wSt=getKeyFieldValue(Ptr,wFieldValue);
 
-      return wFieldValue;
+    return wFieldValue;
   }
 
   return ZDataBuffer();
 } // getURFFieldByRank
+
 
 
 ZStatus searchNextValidZType( const unsigned char* &pPtr,const unsigned char* wPtrEnd)
@@ -282,7 +342,7 @@ ZTypeExists(ZTypeBase pType) {
   case ZType_Double:
   case ZType_LDouble:
     return true;
-    /* from here <wPtr -= sizeof(ZTypeBase);>  has been made and wPtr points on ZType */
+
 
   case ZType_ZDate:
   case ZType_ZDateFull:
@@ -321,6 +381,7 @@ ZStatus URFParser::getURFTypeAndSize (const unsigned char *& pPtrIn,ZTypeBase& p
     return ZS_INVTYPE;
   return ZS_SUCCESS;
 }
+
 
 
 ssize_t

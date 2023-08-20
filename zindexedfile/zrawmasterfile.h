@@ -116,6 +116,9 @@ public:
   using ZRandomFile::zgetByAddress;
   using ZRandomFile::zgetWAddress;
   using ZRandomFile::zgetNextWAddress;
+
+  using ZRandomFile::zgetFirst;
+
   
   using ZRandomFile::isOpen;
   using ZRandomFile::getOpenMode;
@@ -693,14 +696,14 @@ private:
                     }
        if (ZHistory!=nullptr)
                     ZHistory->_Mtx.lock();*/
-    _Mtx.lock();
+    _Mutex.lock();
 
     return;
   }
 
   void ZMFunlock(void)
   {
-    _Mtx.unlock();
+    _Mutex.unlock();
     return;
   }
 #endif // __USE_ZTHREAD__
@@ -735,7 +738,7 @@ protected:
   using _Base::operator = ;
 
 #ifdef __USE_ZTHREAD__
-  ZMutex    _Mtx;
+  ZMutex    _Mutex;
 #endif
 
 

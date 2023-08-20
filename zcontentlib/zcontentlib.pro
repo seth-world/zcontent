@@ -162,7 +162,16 @@ HEADERS += \
     $$TOOLSET_CONTENT/zindexedfile/zmfconfig.h \
     $$TOOLSET_BASE/config/zconfig.h \
     $$TOOLSET_BASE/config/zconfig_general.h \
-    $$TOOLSET_BASE/config/zconfig_zrf.h
+    $$TOOLSET_BASE/config/zconfig_zrf.h \
+    ../../config/zconfig.h \
+    ../zindexedfile/zsearch.h \
+    ../zindexedfile/zsearchentity.h \
+    ../zindexedfile/zsearchhistory.h \
+    ../zindexedfile/zsearchoperand.h \
+    ../zindexedfile/zsearchparser.h \
+    ../zindexedfile/zsearchparsertype.h \
+    ../zindexedfile/zsearchtoken.h \
+    ../zindexedfile/zsearchtokenizer.h
 
 FURTHER_H =    $$TOOLSET_CONTENT/zrandomfile/zrandomlockfile.h
 
@@ -210,7 +219,15 @@ SOURCES += \
     $$TOOLSET_CONTENT/zrandomfile/zrfcollection.cpp \
     $$TOOLSET_CONTENT/zrandomfile/zrfpms.cpp \
     $$TOOLSET_CONTENT/zrandomfile/zrfutilities.cpp \
-    $$TOOLSET_CONTENT/zrandomfile/zsearchargument.cpp
+    $$TOOLSET_CONTENT/zrandomfile/zsearchargument.cpp \
+    ../zindexedfile/zsearch.cpp \
+    ../zindexedfile/zsearchentity.cpp \
+    ../zindexedfile/zsearchhistory.cpp \
+    ../zindexedfile/zsearchoperand.cpp \
+    ../zindexedfile/zsearchparser.cpp \
+    ../zindexedfile/zsearchparsertype.cpp \
+    ../zindexedfile/zsearchtoken.cpp \
+    ../zindexedfile/zsearchtokenizer.cpp
 
 FURTHER_CPP=         $$TOOLSET_CONTENT/zrandomfile/zrandomlockfile.cpp
 

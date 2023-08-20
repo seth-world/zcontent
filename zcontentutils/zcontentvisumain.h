@@ -218,6 +218,7 @@ public:
   QAction*      IndexRebuildQAc = nullptr;
   QAction*      ZMFBackupQAc=nullptr;
   QAction*      ZMFRestoreQAc=nullptr;
+  QAction*      ZMFQueryQAc=nullptr;
 
   QAction*      openZRFQAc=nullptr;
 
@@ -277,7 +278,6 @@ private slots:
 private:
 
   QAction* displayICBQAc = nullptr;
-
 
   ZDataBuffer       SearchContent;
   ssize_t           SearchOffset=-1;

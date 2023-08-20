@@ -952,7 +952,7 @@ zaddress_type wAddress;
     _keyValueExtraction(ZICB,pElement,wZI.KeyContent);
 
     wRes= _seekZIFGeneric (wZI.KeyContent,*this,ZICB,ZKeyCompareBinary);
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
         _Mtx.lock();
 #endif
     switch (wRes.ZSt)
@@ -963,7 +963,7 @@ zaddress_type wAddress;
 //                ZJoinIndex=0;
                 if ((wSt=ZRandomFile::_insert(ZRandomFile::ZDescriptor,wZI.toFileKey(),0L,wAddress))!=ZS_SUCCESS)  //! equivalent to push_front
                                         {
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
                                         _Mtx.unlock();
 #endif
                                         return (wSt); // error is managed at ZMF level
@@ -977,7 +977,7 @@ zaddress_type wAddress;
                 if ((wSt=ZRandomFile::_add(ZRandomFile::ZDescriptor,wZI.toFileKey(),wAddress))!=ZS_SUCCESS)  //! equivalent to push
                                         {
 
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
                                         _Mtx.unlock();
 #endif
                                         return (wSt); // error is managed at ZMF level
@@ -989,7 +989,7 @@ zaddress_type wAddress;
                 wZIXOp=ZO_Insert ;
                 if ((wSt=ZRandomFile::_insert(ZRandomFile::ZDescriptor,wZI.toFileKey(),wRes.ZIdx,wAddress))!=ZS_SUCCESS)     // insert at position returned by seekGeneric
                             {
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
                             _Mtx.unlock();
 #endif
                             return (wSt); // error is managed at ZMF level
@@ -1001,7 +1001,7 @@ zaddress_type wAddress;
                 {
                 if (ZICB->Duplicates==ZST_NODUPLICATES)
                             {
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
                             _Mtx.unlock();
 #endif
                             return  (ZS_DUPLICATEKEY);
@@ -1009,7 +1009,7 @@ zaddress_type wAddress;
                 wZIXOp=ZO_Insert ;
                 if ((wSt=ZRandomFile::_insert(ZRandomFile::ZDescriptor,wZI.toFileKey(),wRes.ZIdx,wAddress))!=ZS_SUCCESS)     // insert at position returned by seekGeneric
                             {
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
                              _Mtx.unlock();
 #endif
                             return (wSt); // error is managed at ZAM level
@@ -1019,7 +1019,7 @@ zaddress_type wAddress;
                 }
             default :
                 {
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
                  _Mtx.unlock();
 #endif
                 return (ZS_INVOP);
@@ -1036,7 +1036,7 @@ zaddress_type wAddress;
      }
 
 */
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
     _Mtx.unlock();
 #endif
     return (ZS_SUCCESS);
@@ -1095,7 +1095,7 @@ ZIndexItem wIndexItem;
       wSt = _URFsearchUnique(pKeyContent,wIndexItem, ZLock_Nolock);
 
 
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
   _Mtx.lock();
 #endif
   if (ZVerbose & ZVB_FileEngine)
@@ -1179,7 +1179,7 @@ ZIndexItem wIndexItem;
         if (!ZException.stackIsEmpty())
             ZException.addToLast(" during Index _addKeyValue_Prepare on index <%s> ",
                                                  IndexName.toCChar());
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
     _Mtx.unlock();
 #endif
 
@@ -1479,7 +1479,7 @@ ZRawIndexFile::_addRawKeyValue_Prepare(ZIndexItem *&pIndexItem,
   //    wSt= _Rawsearch (pIndexItem->KeyContent,*this,wZIR,ZMS_MatchIndexSize,wZIFCompare);  // will not use wStats except for special seek mesure on add
   wSt= _Rawsearch (pIndexItem->KeyContent,*this,wZIR,ZLock_Nolock);  // will not use wStats except for special seek mesure on add
 
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
   _Mtx.lock();
 #endif
   if (ZVerbose)
@@ -1569,7 +1569,7 @@ ZRawIndexFile::_addRawKeyValue_Prepare(ZIndexItem *&pIndexItem,
           if (!ZException.stackIsEmpty())
               ZException.addToLast(" during Index _addKeyValue_Prepare on index <%s> ",
                   IndexName.toCChar());
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
   _Mtx.unlock();
 #endif
 
@@ -1721,7 +1721,7 @@ ZIndexItem wIndexItem;
     return  wSt;
   } // wSt!=ZS_FOUND
 
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
     _Mtx.lock();
 #endif
 
@@ -1735,7 +1735,7 @@ ZIndexItem wIndexItem;
 //  pIndexAddress = pOutIndexItem->IndexAddress  ;
 
   wSt=ZRandomFile::_remove_Prepare(pOutIndexItem->IndexRank,pOutIndexItem->IndexAddress);
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
     _Mtx.unlock();
 #endif
 
@@ -1776,7 +1776,7 @@ ZRawIndexFile::_removeIndexItem_Prepare(ZIndexItem &pIndexItem,long & pIndexRank
     return  wSt;
   } // wSt!=ZS_FOUND
 
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
   _Mtx.lock();
 #endif
 
@@ -1786,7 +1786,7 @@ ZRawIndexFile::_removeIndexItem_Prepare(ZIndexItem &pIndexItem,long & pIndexRank
   pIndexItem.ZMFaddress = 0 ; // dont know yet
 
   wSt=ZRandomFile::_remove_Prepare(wZIResult.IndexRank,wZIResult.ZMFAddress);
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
   _Mtx.unlock();
 #endif
 
@@ -1802,14 +1802,14 @@ ZRawIndexFile::_removeKeyValue_Commit(const zrank_type pIndexCommit)
 zrank_type ZJoinIndex;
 ZStatus wSt;
 
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
         _Mtx.lock();
 #endif
 
 
     wSt=ZRandomFile::_remove_Commit(pIndexCommit);
 
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
     _Mtx.unlock();
 #endif
     if (wSt!=ZS_SUCCESS)
@@ -1836,14 +1836,14 @@ ZRawIndexFile::_removeKeyValue_Rollback(const zrank_type pIndexCommit)
 {
 ZStatus wSt;
 
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
         _Mtx.lock();
 #endif
 
 
     wSt=ZRandomFile::_remove_Rollback(pIndexCommit);
 
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
     _Mtx.unlock();
 #endif
     if (wSt!=ZS_SUCCESS)
@@ -1873,13 +1873,13 @@ zaddress_type wAddress;  // not used : only for compatibility purpose
 
 ZStatus wSt;
 
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
         _Mtx.lock();
 #endif
 
     wSt= ZRandomFile::_insert(pIndexItem->toFileKey(),pIndexCommit,wAddress);
 
-#if __USE_ZTHREAD__ & __ZTHREAD_AUTOMATIC__
+#ifdef __ZTHREAD_AUTOMATIC__
      _Mtx.unlock();
 #endif
 

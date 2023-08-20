@@ -14,11 +14,14 @@ enum ZBlockExistence : uint16_t {
   ZBEX_Orphan           =      2,  /* cannot find <cst_ZFILEBLOCKSTART> at given address */
   ZBEX_WrngAddr         =      4,
   ZBEX_Start            =      8,
-  ZBEX_Size             =   0x10,  /* block size in pool is different from block size on content file block header */
-  ZBEX_PoolZeroSize     =   0x20,  /* block size in pool has zero value */
-  ZBEX_ContentZeroSize  =   0x40,  /* block size on content file has zero value */
-  ZBEX_MustBeUsed       =   0x80,  /* invalid block state : must be ZBS_Used */
+  ZBEX_PoolZeroSize     =   0x10,  /* block size in pool has zero value */
+  ZBEX_ContentZeroSize  =   0x20,  /* block size on content file has zero value */
+  ZBEX_MustBeUsed       =   0x40,  /* invalid block state : must be ZBS_Used */
   ZBEX_MustBeFreeOrDeleted       = 0x0100,  /* invalid block state : must be ZBS_Free Or ZBS_Deleted*/
+  ZBEX_SizeNotSame      = 0x0200, /* block size in pool is different from block size on content file block header */
+  ZBEX_StateNotSame     = 0x0400, /* State in pool is different from content file block header */
+  ZBEX_LockNotSame      = 0x0800, /* Lock mask in pool is different from content file block header */
+  ZBEX_PidNotSame       = 0x1000  /* pid in pool is different from content file block header */
   //  ZBEX_MustBeDeleted    = 0x0200,  /* invalid block state : must be ZBS_Deleted */
 };
 
@@ -142,10 +145,13 @@ ZStatus
 rawGetBlockDescriptor(__FILEHANDLE__ pFdContent,ZBlockDescriptor& pBDOut,zaddress_type pAddress);
 
 uint16_t
-rawCheckContentBlock(int pPoolId,int pFdContent,ZBlockDescriptor& pBlockDesc);
+rawCheckContentBlock(int pPoolId,__FILEHANDLE__ pFdContent,ZBlockDescriptor& pBlockDesc);
 
 ZStatus rebuildZRFHeader(uriString& pURIContent);
 
 utf8VaryingString decode_ZBEx(uint16_t pBEx);
+
+
+//bool testSequence (const unsigned char* pSequence,size_t pSeqLen, const unsigned char* pToCompare);
 
 #endif // ZRFUTILITIES_H

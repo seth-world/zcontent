@@ -53,7 +53,7 @@ enum ZBlockExistence : uint16_t {
   ZBEX_Orphan           =      2,  /* cannot find <cst_ZFILEBLOCKSTART> at given address */
   ZBEX_WrngAddr         =      4,
   ZBEX_Start            =      8,
-  ZBEX_Size             =   0x10,  /* block size in pool is different from block size on content file block header */
+  ZBEX_SizeNotSame             =   0x10,  /* block size in pool is different from block size on content file block header */
   ZBEX_PoolZeroSize     =   0x20,  /* block size in pool has zero value */
   ZBEX_ContentZeroSize  =   0x40,  /* block size on content file has zero value */
   ZBEX_MustBeUsed       =   0x80,  /* invalid block state : must be ZBS_Used */
@@ -83,7 +83,6 @@ public:
 //  static ZStatus updateHeaderFromPool(const uriString &pURIHeader, ZBlockPool* pZBAT, ZBlockPool* pZFBT, ZBlockPool* pZDBT);
   static ZStatus updateHeaderFromPool(const uriString &pURIHeader, ZBlockPool* pZBAT, ZBlockPool* pZFBT, ZBlockPool *pZHOT);
 
-  static uint16_t checkContentBlock(int pPoolId, __FILEHANDLE__ pFdContent, ZBlockDescriptor &pBlockDesc);
   static ZStatus getFileBlockDescriptor(__FILEHANDLE__ pFdContent, ZBlockDescriptor &pBlockDescOut, zaddress_type pAddress);
   static ZStatus repair(const uriString &pURIContent, const uriString &pURIHeader, uint8_t pFlag, std::function<void (utf8VaryingString&)> pDisplay=nullptr);
 

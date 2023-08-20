@@ -18,6 +18,7 @@ class FileGenerateMWn;
 
 extern class FileGenerateMWn* FileGenerate;
 extern class DicEditMWn* DicEdit;
+extern class ZSearchQueryMWd* QueryMWd;
 
 class textEditMWn;
 

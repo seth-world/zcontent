@@ -25,8 +25,9 @@ long ZIndexTable::pop (void)
   last()->~ZRawIndexFile();
   if (last()!=nullptr)
   {
-    delete last();
-    last()=nullptr;
+    _Base::pop();
+//    delete last();
+//    last()=nullptr;
   }
   return  _Base::pop();
 } // pop
@@ -49,7 +50,7 @@ long ZIndexTable::erase (long pRank)
 void ZIndexTable::clear(void)
 {
   while (size()>0)
-    pop();
+    delete popR();
   _Base::clear();
 }// clear
 

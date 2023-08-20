@@ -37,14 +37,25 @@ enum CompareOptions : uint8_t {
   COPT_Default    = COPT_DropAccute | COPT_UpCase
 };
 
+class URFParserState
+{
+  URFParserState()=default;
+
+  ZBitset Bitset;
+};
+
+
 class URFParser {
 public:
   URFParser(){  }
+
+  URFParser(const ZDataBuffer& pRecord) {set(pRecord);}
 
   URFParser(const URFParser&) = delete;
   URFParser& operator= (const URFParser&) = delete;
 
   ZStatus set(const ZDataBuffer * pRecord);
+  ZStatus set(const ZDataBuffer& pRecord);
 
   static ZStatus parse(const ZDataBuffer& pRecord, ZArray<URFField> &pFieldList);
 
@@ -56,13 +67,18 @@ public:
    */
   ZStatus appendURFFieldByRank (long pRank,ZDataBuffer pBuffer);
 
+  URFField getURFFieldByRankIncremental (long pRank);
   ZDataBuffer getURFFieldByRank (long pRank);
+
+
 
   /** @brief getURFFieldSize returns size of URF field pointed by pPtrIn.
    * pPtrIn is not modified, and size includes URF header size.
    * Return -1 if URF format is malformed.
    */
   static ssize_t getURFFieldSize (const unsigned char *pPtrIn); /* pPtrIn is NOT updated */
+
+
 
   /**
    *  */
@@ -75,8 +91,8 @@ public:
 
 
   static ZStatus getURFTypeAndSize (const unsigned char *&pPtrIn, ZTypeBase& pType, ssize_t & pSize); /* pPtrIn is NOT updated */
-  ZStatus getURFFieldValue (const unsigned char* &Ptr, ZDataBuffer& pValue);
-  ZStatus getKeyFieldValue (const unsigned char* &Ptr, ZDataBuffer& pValue);
+  static ZStatus getURFFieldValue (const unsigned char* &Ptr, ZDataBuffer& pValue);
+  static ZStatus getKeyFieldValue (const unsigned char* &Ptr, ZDataBuffer& pValue);
 
   static utf8VaryingString displayOneURFField(const unsigned char* &Ptr, bool pShowZType=true);
 
@@ -123,7 +139,7 @@ int UTF32Compare(const unsigned char* &pKey1,size_t pSize1,const unsigned char* 
 bool ZTypeExists(ZTypeBase pType);
 ZStatus searchNextValidZType( const unsigned char* &pPtr,const unsigned char* wPtrEnd);
 
-
+bool TypeExists(ZTypeBase pType);
 
 template <class _Utf>
 _Utf KeyCharConvert(_Utf pChar) {

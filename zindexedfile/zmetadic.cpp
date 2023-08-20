@@ -211,14 +211,13 @@ ZDataBuffer wDBV1;
  * @return the field position (rank) in dictionary. returns -1 if field name has not been found.
  */
 zrank_type
-ZMetaDic::searchFieldByName(const utf8String& pFieldName)
-{
+ZMetaDic::searchFieldByName(const utf8String& pFieldName) const {
     if (pFieldName.isEmpty())
             return (zrank_type)-1;
 
     for (long wi=0;wi<size();wi++)
         {
-        if (Tab(wi).getName()==pFieldName)
+        if (TabConst(wi).getName()==pFieldName)
             return (zrank_type)wi;
         }
     ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -231,11 +230,11 @@ ZMetaDic::searchFieldByName(const utf8String& pFieldName)
 }//zsearchFieldByName
 
 zrank_type
-ZMetaDic::searchFieldByHash(const md5& pHash)
+ZMetaDic::searchFieldByHash(const md5& pHash) const
 {
   for (long wi=0;wi<size();wi++)
     {
-    if (Tab(wi).Hash==pHash)
+    if (TabConst(wi).Hash==pHash)
       return wi;
     }
   ZException.setMessage(_GET_FUNCTION_NAME_,

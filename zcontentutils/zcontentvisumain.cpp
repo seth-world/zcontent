@@ -34,14 +34,14 @@
 
 #include <QGroupBox>
 
-#include <zrawmasterfilevisu.h>
+#include "zrawmasterfilevisu.h"
 
 #include <zcontent/zrandomfile/zrandomfile.h>
 
-#include <visulinecol.h>
+#include "visulinecol.h"
 
-#include <poolvisu.h>
-#include <filegeneratedlg.h>
+#include "poolvisu.h"
+#include "filegeneratedlg.h"
 
 #include "zrawkeylistdlg.h"
 
@@ -49,6 +49,8 @@
 
 #include "zbackupdlg.h"
 #include "zrestoredlg.h"
+
+#include "zsearchquerymwd.h"
 
 #define __FIXED_FONT__ "courrier"
 
@@ -135,6 +137,9 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
   MasterFileMEn = new QMenu("Master file",this);
   ui->menubar->addMenu(MasterFileMEn);
 
+  ZMFQueryQAc = new QAction("Query");
+  MasterFileMEn->addAction(ZMFQueryQAc);
+
   ZmfDefQAc = new QAction("Master file definition");
   MasterFileMEn->addAction(ZmfDefQAc);
 
@@ -151,6 +156,9 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
 
   mainQAg->addAction(DictionaryQAc);
   mainQAg->addAction(openZRFQAc);
+
+  mainQAg->addAction(ZMFQueryQAc);
+
 
   mainQAg->addAction(ui->setfileQAc); /* set the current file to be open */
 
@@ -329,374 +337,6 @@ void ZContentVisuMain::VisuMouseCallback(int pZEF, QMouseEvent *pEvent)
   ui->CurAddressLBl->setText(wStr.toCChar());
 }//VisuMouseCallback
 
-#ifdef __DEPRECATED__
-
-void ZContentVisuMain::VisuBvFlexMenuCallback(QContextMenuEvent *event)
-{
-  QMenu* visuFlexMEn=new QMenu;
-  visuFlexMEn->setTitle(QObject::tr("Evaluate","ZContentVisuMain"));
-
-  QActionGroup* visuActionGroup=new QActionGroup(visuFlexMEn) ;
-  QObject::connect(visuActionGroup, &QActionGroup::triggered,this,  &ZContentVisuMain::visuActionEvent);
-
-  ZBlockHeaderQAc= new QAction("ZBLockHeader",visuFlexMEn);
-  visuFlexMEn->addAction(ZBlockHeaderQAc);
-  visuActionGroup->addAction(ZBlockHeaderQAc);
-
-  URFFieldQAc= new QAction("URF field",visuFlexMEn);
-  visuFlexMEn->addAction(URFFieldQAc);
-  visuActionGroup->addAction(URFFieldQAc);
-
-  visuFlexMEn->addSeparator();
-
-  ZTypeQAc= new QAction("ZType",visuFlexMEn);
-  visuFlexMEn->addAction(ZTypeQAc);
-  visuActionGroup->addAction(ZTypeQAc);
-
-  uint16QAc= new QAction("uint16",visuFlexMEn);
-  visuFlexMEn->addAction(uint16QAc);
-  visuActionGroup->addAction(uint16QAc);
-
-  int16QAc= new QAction("int16",visuFlexMEn);
-  visuFlexMEn->addAction(int16QAc);
-  visuActionGroup->addAction(int16QAc);
-
-  uint32QAc= new QAction("uint32",visuFlexMEn);
-  visuFlexMEn->addAction(uint32QAc);
-  visuActionGroup->addAction(uint32QAc);
-
-  int32QAc= new QAction("int32",visuFlexMEn);
-  visuFlexMEn->addAction(int32QAc);
-  visuActionGroup->addAction(int32QAc);
-
-  uint64QAc= new QAction("uint64",visuFlexMEn);
-  visuFlexMEn->addAction(uint64QAc);
-  visuActionGroup->addAction(uint64QAc);
-
-  int64QAc= new QAction("int64",visuFlexMEn);
-  visuFlexMEn->addAction(int64QAc);
-  visuActionGroup->addAction(int64QAc);
-
-  sizetQAc= new QAction("size_t",visuFlexMEn);
-  visuFlexMEn->addAction(sizetQAc);
-  visuActionGroup->addAction(sizetQAc);
-
-  floatQAc= new QAction("float",visuFlexMEn);
-  visuFlexMEn->addAction(floatQAc);
-  visuActionGroup->addAction(floatQAc);
-
-  doubleQAc= new QAction("double",visuFlexMEn);
-  visuFlexMEn->addAction(doubleQAc);
-  visuActionGroup->addAction(doubleQAc);
-
-  longdoubleQAc= new QAction("long double",visuFlexMEn);
-  visuFlexMEn->addAction(longdoubleQAc);
-  visuActionGroup->addAction(longdoubleQAc);
-
-  visuFlexMEn->exec(event->globalPos());
-  visuFlexMEn->deleteLater();
-}//VisuBvFlexMenu
-
-
-void ZContentVisuMain::visuActionEvent(QAction* pAction) {
-
-  if (pAction==ZBlockHeaderQAc) {
-    VisuRaw::visuBlockHeader(VisuTBv,&RawData);
-    return;
-  } // if (pAction==ZBlockHeaderQAc)
-
-  if (pAction==URFFieldQAc) {
-    VisuRaw::visuURFField(VisuTBv,&RawData);
-    return;
-  } // if (pAction==ZBlockHeaderQAc)
-
-  if (pAction==ZTypeQAc) {
-    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_ZType);
-    return;
-  } // ZTypeQAc
-  if (pAction==uint16QAc) {
-    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_uint16);
-    return;
-  } // uint16QAc
-  if (pAction==int16QAc) {
-    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_int16);
-    return;
-  } // int16QAc
-  if (pAction==uint32QAc) {
-    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_uint32);
-    return;
-  }
-  if (pAction==int32QAc) {
-    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_int32);
-    return;
-  }
-  if (pAction==uint64QAc) {
-    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_uint64);
-    return;
-  }
-  if (pAction==int64QAc) {
-    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_int64);
-    return;
-  }
-  if (pAction==sizetQAc) {
-    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_sizet);
-    return;
-  }
-
-  if (pAction==floatQAc) {
-    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_float);
-    return;
-  }
-  if (pAction==doubleQAc) {
-    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_double);
-    return;
-  }
-  if (pAction==longdoubleQAc) {
-    VisuRaw::visuAtomic(VisuTBv,&RawData,VRTP_longdouble);
-    return;
-  }
-
-  return;
-}//visuActionEvent
-#endif // __DEPRECATED__
-#ifdef __DEPRECATED__
-void ZContentVisuMain::visuActionEventOld(QAction* pAction) {
-
-  QDialog wVisuDLg (this);
-  wVisuDLg.setWindowTitle(QObject::tr("Evaluate values","ZContentVisuMain"));
-
-  wVisuDLg.resize(450,150);
-
-  QVBoxLayout* QVL=new QVBoxLayout(&wVisuDLg);
-  wVisuDLg.setLayout(QVL);
-
-  QGridLayout* QGLyt=new QGridLayout(this);
-  QVL->insertLayout(0,QGLyt);
-
-  QHBoxLayout* QHL=new QHBoxLayout;
-  QGLyt->addLayout(QHL,0,4);
-  QHL->setAlignment(Qt::AlignCenter);
-
-  QLabel* LBlType=new QLabel("Type",this);
-  QHL->addWidget(LBlType);
-  QLabel* wTypeLBl=new QLabel(this);
-  QHL->addWidget(wTypeLBl);
-
-
-  QLabel* wLbDec=new QLabel(QObject::tr("Decimal","ZContentVisuMain"),&wVisuDLg);
-  QGLyt->addWidget(wLbDec,1,1);
-  QLabel* wLbHexa=new QLabel(QObject::tr("Hexa","ZContentVisuMain"),&wVisuDLg);
-  QGLyt->addWidget(wLbHexa,1,4);
-
-  QLabel* wLb=new QLabel(QObject::tr("Raw","ZContentVisuMain"),&wVisuDLg);
-  wLb->setAlignment(Qt::AlignCenter);
-  QGLyt->addWidget(wLb,2,0);
-
-  QLineEdit* wRawValueLEd=new QLineEdit(&wVisuDLg);
-  wRawValueLEd->setAlignment(Qt::AlignRight);
-  QGLyt->addWidget(wRawValueLEd,2,1);
-
-  QLineEdit* wRawHexaLEd=new QLineEdit(&wVisuDLg);
-  wRawHexaLEd->setAlignment(Qt::AlignRight);
-  QGLyt->addWidget(wRawHexaLEd,2,4);
-
-  QLabel* wLb1=new QLabel(QObject::tr("Deserialized","ZContentVisuMain"),&wVisuDLg);
-  QGLyt->addWidget(wLb1,3,0);
-  wLb1->setAlignment(Qt::AlignCenter);
-  QLineEdit* wDeserializedLEd=new QLineEdit(&wVisuDLg);
-  wDeserializedLEd->setAlignment(Qt::AlignRight);
-  QGLyt->addWidget(wDeserializedLEd,3,1);
-
-  QLineEdit* wDeserializedHexaLEd=new QLineEdit(&wVisuDLg);
-  wDeserializedHexaLEd->setAlignment(Qt::AlignRight);
-  QGLyt->addWidget(wDeserializedHexaLEd,3,4);
-
-  QHBoxLayout* QHLBtn=new QHBoxLayout;
-  QHLBtn->setObjectName("QHLBtn");
-  QVL->insertLayout(1,QHLBtn);
-
-  QPushButton* wNext=new QPushButton(QObject::tr("Next","ZContentVisuMain"),&wVisuDLg);
-  QPushButton* wClose=new QPushButton(QObject::tr("Close","ZContentVisuMain"),&wVisuDLg);
-  QSpacerItem* wSpacer= new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-  QHLBtn->addItem(wSpacer);
-
-  QHLBtn->addWidget(wNext);
-  QHLBtn->addWidget(wClose);
-
-
-
-  QObject::connect(wNext, &QPushButton::clicked, &wVisuDLg, &QDialog::accept);
-  QObject::connect(wClose, &QPushButton::clicked, &wVisuDLg, &QDialog::reject);
-
-  size_t wValueSize=0;
-  QModelIndex wIdx=VisuTBv->currentIndex();
-  if (!wIdx.isValid())
-    return;
-  ssize_t wOffset=computeOffsetFromCoord(wIdx.row(),wIdx.column());
-  SearchOffset=wOffset;
-
-  utf8VaryingString wStr;
-  wStr.sprintf("%ld",wOffset);
-  ui->CurAddressLBl->setText(wStr.toCChar());
-
-  if (pAction==uint16QAc) {
-    wValueSize=sizeof(uint16_t);
-    if (wOffset+sizeof(uint16_t) > RawData.Size )
-      return;
-    wTypeLBl->setText("uint16");
-    uint16_t * wValuePtr = (uint16_t *)(RawData.Data + wOffset);
-    uint16_t wValue = *wValuePtr;
-    uint16_t wDeSerialized = reverseByteOrder_Conditional<uint16_t>(wValue);
-    wStr.sprintf("%u",wValue);
-    wRawValueLEd->setText(wStr.toCChar());
-    wStr.sprintf("%04X",wValue);
-    wRawHexaLEd->setText(wStr.toCChar());
-    wStr.sprintf("%d",wDeSerialized);
-    wDeserializedLEd->setText(wStr.toCChar());
-    wStr.sprintf("%04X",wDeSerialized);
-    wDeserializedHexaLEd->setText(wStr.toCChar());
-  }
-  if (pAction==int16QAc) {
-    wValueSize=sizeof(int16_t);
-    if (wOffset+sizeof(int16_t) > RawData.Size )
-      return;
-    wTypeLBl->setText("int16");
-    int16_t * wValuePtr = (int16_t *)(RawData.Data + wOffset);
-    int16_t wValue = *wValuePtr;
-    int16_t wDeSerialized = reverseByteOrder_Conditional<int16_t>(wValue);
-    wStr.sprintf("%|d",wValue);
-    wRawValueLEd->setText(wStr.toCChar());
-    wStr.sprintf("%04X",wValue);
-    wRawHexaLEd->setText(wStr.toCChar());
-    wStr.sprintf("%|d",wDeSerialized);
-    wDeserializedLEd->setText(wStr.toCChar());
-    wStr.sprintf("%04X",wDeSerialized);
-    wDeserializedHexaLEd->setText(wStr.toCChar());
-  }
-  if (pAction==uint32QAc) {
-    wValueSize=sizeof(uint32_t);
-    if (wOffset+sizeof(uint32_t) > RawData.Size )
-      return;
-    wTypeLBl->setText("uint32");
-    uint32_t * wValuePtr = (uint32_t *)(RawData.Data + wOffset);
-    uint32_t wValue = *wValuePtr;
-    uint32_t wDeSerialized = reverseByteOrder_Conditional<uint32_t>(wValue);
-    wStr.sprintf("%|u",wValue);
-    wRawValueLEd->setText(wStr.toCChar());
-    wStr.sprintf("%08X",wValue);
-    wRawHexaLEd->setText(wStr.toCChar());
-    wStr.sprintf("%|u",wDeSerialized);
-    wDeserializedLEd->setText(wStr.toCChar());
-    wStr.sprintf("%08X",wDeSerialized);
-    wDeserializedHexaLEd->setText(wStr.toCChar());
-  }
-  if (pAction==int32QAc) {
-    wValueSize=sizeof(int32_t);
-    if (wOffset+sizeof(int32_t) > RawData.Size )
-      return;
-    wTypeLBl->setText("int32");
-    int32_t * wValuePtr = (int32_t *)(RawData.Data + wOffset);
-    int32_t wValue = *wValuePtr;
-    int32_t wDeSerialized = reverseByteOrder_Conditional<int32_t>(wValue);
-    wStr.sprintf("%|d",wValue);
-    wRawValueLEd->setText(wStr.toCChar());
-    wStr.sprintf("%08X",wValue);
-    wRawHexaLEd->setText(wStr.toCChar());
-    wStr.sprintf("%|d",wDeSerialized);
-    wDeserializedLEd->setText(wStr.toCChar());
-    wStr.sprintf("%08X",wDeSerialized);
-    wDeserializedHexaLEd->setText(wStr.toCChar());
-  }
-  if (pAction==uint64QAc) {
-    wValueSize=sizeof(uint64_t);
-    if (wOffset+sizeof(uint64_t) > RawData.Size )
-      return;
-    wTypeLBl->setText("uint64");
-    uint64_t * wValuePtr = (uint64_t *)(RawData.Data + wOffset);
-    uint64_t wValue = *wValuePtr;
-    uint64_t wDeSerialized = reverseByteOrder_Conditional<uint64_t>(wValue);
-    wStr.sprintf("%|lu",wValue);
-    wRawValueLEd->setText(wStr.toCChar());
-    wStr.sprintf("%016lX",wValue);
-    wRawHexaLEd->setText(wStr.toCChar());
-    wStr.sprintf("%|lu",wDeSerialized);
-    wDeserializedLEd->setText(wStr.toCChar());
-    wStr.sprintf("%016lX",wDeSerialized);
-    wDeserializedHexaLEd->setText(wStr.toCChar());
-  }
-  if (pAction==int64QAc) {
-    wValueSize=sizeof(int64_t);
-    if (wOffset+sizeof(int64_t) > RawData.Size )
-      return;
-    wTypeLBl->setText("int64");
-    int64_t * wValuePtr = (int64_t *)(RawData.Data + wOffset);
-    int64_t wValue = *wValuePtr;
-    int64_t wDeSerialized = reverseByteOrder_Conditional<int64_t>(wValue);
-    wStr.sprintf("%|ld",wValue);
-    wRawValueLEd->setText(wStr.toCChar());
-    wStr.sprintf("%016lX",wValue);
-    wRawHexaLEd->setText(wStr.toCChar());
-    wStr.sprintf("%|ld",wDeSerialized);
-    wDeserializedLEd->setText(wStr.toCChar());
-    wStr.sprintf("%016lX",wDeSerialized);
-    wDeserializedHexaLEd->setText(wStr.toCChar());
-  }
-  if (pAction==sizetQAc) {
-    wValueSize=sizeof(size_t);
-    if (wOffset+sizeof(size_t) > RawData.Size )
-      return;
-    wTypeLBl->setText("size_t");
-    size_t * wValuePtr = (size_t *)(RawData.Data + wOffset);
-    size_t wValue = *wValuePtr;
-    size_t wDeSerialized = reverseByteOrder_Conditional<size_t>(wValue);
-    wStr.sprintf("%|lu",wValue);
-    wRawValueLEd->setText(wStr.toCChar());
-    if (sizeof(size_t) > 4) {
-      wStr.sprintf("%|lu",wValue);
-      wRawValueLEd->setText(wStr.toCChar());
-      wStr.sprintf("%016lX",wValue);
-      wRawHexaLEd->setText(wStr.toCChar());
-      wStr.sprintf("%|lu",wDeSerialized);
-      wDeserializedLEd->setText(wStr.toCChar());
-      wStr.sprintf("%016lX",wDeSerialized);
-      wDeserializedHexaLEd->setText(wStr.toCChar());
-    }
-    else {
-      wStr.sprintf("%u",wValue);
-      wRawValueLEd->setText(wStr.toCChar());
-      wStr.sprintf("%08X",wValue);
-      wRawHexaLEd->setText(wStr.toCChar());
-      wStr.sprintf("%u",wDeSerialized);
-      wDeserializedLEd->setText(wStr.toCChar());
-      wStr.sprintf("%08X",wDeSerialized);
-      wDeserializedHexaLEd->setText(wStr.toCChar());
-    }
-  }
-  int wRet=wVisuDLg.exec();
-
-  if (wRet==QDialog::Rejected)
-    return;
-  /* skip value in offset */
-
-  if ( (wOffset + wValueSize) > RawData.Size )
-    return;
-//  setSearchOffset(wOffset+wValueSize);
-  VisuLineCol wNewPosition;
-  wOffset+=wValueSize;
-  wNewPosition.compute (wOffset);
-  QModelIndex wNewIdx = wIdx.sibling(wNewPosition.line,wNewPosition.col);
-  if (!wNewIdx.isValid())
-    abort();
-  wStr.sprintf("%ld",wOffset);
-  ui->CurAddressLBl->setText(wStr.toCChar());
-  VisuTBv->setFocus();
-  VisuTBv->setCurrentIndex(wNewIdx);
-//  VisuTBv->QTableView::clicked(wNewIdx);
-//  VisuTBv->scrollTo(wNewIdx);
-
-  return;
-}
-#endif // __DEPRECATED__
 
 
 void ZContentVisuMain::VisuClicked(QModelIndex pIdx) {
@@ -862,20 +502,7 @@ int getHexaDigits(uint8_t* &pChar,uint8_t & pHexaValue) {
 }// getHexaDigits
 
 
-/* highlight searched result in table view
-   * start block :
-     offset / 16 -> gives the line
 
-offset - (offset / 16) gives the column
-
-
-    double wOf = SearchOffset;
-int wStartLine = int(wOf / 16.0);
-
-int wStartColumn = int(wOf - (double (wLine)* 16.0));
-
-wStartColumn = wStartColumn + (wStartColumn / 4);
-*/
 void
 ZContentVisuMain::setSelectionBackGround(QVariant& pBackground,ssize_t pOffset,size_t pSize,bool pScrollTo) {
   VisuLineCol wVLC;
@@ -1203,6 +830,12 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
 //    dictionaryWnd->setNewDictionary();
 
     DicEdit->show();
+    return;
+  }
+
+  if (pAction==ZMFQueryQAc) {
+    QueryMWd= new ZSearchQueryMWd(this);
+    QueryMWd->show();
     return;
   }
 

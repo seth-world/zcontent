@@ -15,12 +15,13 @@ public:
     Present=pIn.Present;
     Ptr=pIn.Ptr;
     Size=pIn.Size;
+    ZType=pIn.ZType;
     return *this;
   }
   bool                  Present=false;
   const unsigned char*  Ptr=nullptr;
   size_t                Size=0;
-  ZTypeBase             ZType=0;
+  ZTypeBase             ZType=ZType_Nothing;
 
   ZStatus setFromPtr(const unsigned char* &pPtrIn);
   utf8VaryingString display();
