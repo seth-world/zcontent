@@ -65,6 +65,9 @@ ZSearchHistory::add(const utf8VaryingString& pInst)
 {
   /* remove trailing spaces \t \n characters */
 
+  if (pInst.isEmpty())
+    return ZS_EMPTY;
+
   utf8_t* wInst = pInst.duplicate();
   const utf8_t wSet[] = {'\t','\n','\r','\0'};
   unsigned char* wPtr = wInst + pInst.UnitCount -1;

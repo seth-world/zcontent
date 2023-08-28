@@ -164,9 +164,6 @@ ZSearchTokenizer::parse(const utf8VaryingString &pIn)
         wCurrentToken->setCoords(Line,Column,Offset);
         wCurrentToken->Type = ZSRCH_NUMERIC_LITERAL;
         wCurrentToken->Text.addUtfUnit(wCurrCh);
-        Column++;
-        Offset++;
-        wi++;
         continue;
       } // ZSRCH_SPACE
       wCurrentToken->Text.addUtfUnit(wCurrCh);
@@ -392,8 +389,7 @@ ZSearchTokenizer::parse(const utf8VaryingString &pIn)
         endToken(wCurrentToken);
         continue;
       }
-
-      wCurrentToken->Type = ZSRCH_OPERATOR_EQUAL;
+      wCurrentToken->Type = ZSRCH_OPERATOR_MOVE;
       wCurrentToken->Text.addUtfUnit(wCurrCh);
       endToken(wCurrentToken);
       continue;
@@ -467,19 +463,12 @@ ZSearchTokenizer::parse(const utf8VaryingString &pIn)
         wCurrentToken->Text.addUtfUnit(wCurrCh);
         continue;
       }
-      if (wCurrentToken->Type == ZSRCH_NUMERIC_LITERAL) {
+ /*     if (wCurrentToken->Type == ZSRCH_NUMERIC_LITERAL) {
         wCurrentToken->Type = ZSRCH_MAYBE_DATE_LITERAL;
         wCurrentToken->Text.addUtfUnit(wCurrCh);
         continue;
       }
-      if (wCurrentToken->Type == ZSRCH_MAYBE_IDENTIFIER) {
-        endToken(wCurrentToken);
-        wCurrentToken->setCoords(Line,Column,Offset);
-        wCurrentToken->Type = ZSRCH_OPERATOR_DIVIDEORSLASH;
-        wCurrentToken->Text.addUtfUnit(wCurrCh);
-        endToken(wCurrentToken);
-        continue;
-      }
+*/
 
       if (wCurrentToken->Type == ZSRCH_SPACE) {
         switch (pIn[wi+1]) {
@@ -489,6 +478,7 @@ ZSearchTokenizer::parse(const utf8VaryingString &pIn)
           wCurrentToken->Type = ZSRCH_COMMENT_DOUBLESLASH;
           /* get all comment string till end of line */
           /* skip leading slash */
+          wCurrentToken->Text="//";
           wi++;
           Column++;
           Offset++;
@@ -536,8 +526,15 @@ ZSearchTokenizer::parse(const utf8VaryingString &pIn)
           continue;
         }//switch (pIn[wi+1])
       }//ZSRCH_SPACE
+
+      endToken(wCurrentToken);
+      wCurrentToken->setCoords(Line,Column,Offset);
+      wCurrentToken->Type = ZSRCH_OPERATOR_DIVIDEORSLASH;
+      wCurrentToken->Text.addUtfUnit(wCurrCh);
       endToken(wCurrentToken);
       continue;
+
+
 
     case '%':
       if ((wCurrentToken->Type & ZSRCH_STRING_LITERAL)==ZSRCH_STRING_LITERAL) {

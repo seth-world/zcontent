@@ -388,10 +388,13 @@ ZSearchEntity::_report() {
       wReturn += "***No logical operation***\n";
 */
 
-    if (_CollectionEntity->LogicalTerm!=nullptr)
-      wReturn +=_CollectionEntity->LogicalTerm->_report(0);
+    if (_CollectionEntity->LogicalTerm!=nullptr) {
+      wReturn += "______________________selection clause______________________\n";
+      wReturn +=_CollectionEntity->LogicalTerm->_reportFormula();
+      wReturn += "\n";
+    }
     else
-      wReturn += "***No logical operation***\n";
+      wReturn += "***No selection clause***\n";
     wReturn.addsprintf("__________________Base entity___________________\n"
                        "Name <%s> Type <%s>\n",
         _CollectionEntity->_BaseEntity->getName().toString(),

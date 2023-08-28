@@ -78,6 +78,7 @@ public:
   bool _isStringComparator();
   bool _isArithmeric() ;
   bool _isAndOr();
+  bool _isNothing();
 
   bool _isNot() {return Type == ZSOPV_NOT ;}
 
@@ -89,6 +90,7 @@ public:
   ZSearchOperator_type get() {return Type;}
 
   utf8VaryingString     _report(int pLevel);
+  utf8VaryingString     _reportFormula();
 
   ZSearchOperator_type  Type=ZSOPV_Nothing;
   ZArray<ZSearchToken*> TokenList;
@@ -121,6 +123,8 @@ public:
   }
 
   static void clearOperand(void *&pOp);  /* here because it is common to any derived class */
+
+  bool hasModifier() {return ModifierType!=ZSRCH_NOTHING;}
 
   ZSearchOperandBase& operator = (const ZSearchOperandBase& pIn) {return _copyFrom(pIn); }
 
@@ -181,6 +185,24 @@ public:
   _Tp               Content;
 };
 
+/*
+ *
+Valid ZEntity literals
+
+  ZEntity(ZEntity_DocPhysical,0xAB);
+
+Valid checSum literals
+
+  checkSum(0x22890F5D10ADBOF001288890AFB22C3);
+             <-------32 hexa digits-------->
+
+Valid date literals
+
+  ZDate(10/12/2023)
+  "10/12/2023"
+
+*/
+
 /** operand type is located within ZSearchOperandBase */
 template <class _Tp>
 class ZSearchLiteral : public ZSearchOperandBase {
@@ -230,7 +252,8 @@ public:
   }
 
 
-  utf8VaryingString             _report(int pLevel);
+  utf8VaryingString             _reportDetailed(int pLevel);
+  utf8VaryingString             _reportFormula();
 
   static utf8VaryingString      _evaluateOpLiteral(void *pOp);
 
@@ -263,6 +286,7 @@ public:
   ZSearchLogicalTerm& _copyFrom(const ZSearchLogicalTerm& pIn);
 
   utf8VaryingString             _report(int pLevel);
+  utf8VaryingString             _reportFormula(bool pHasParenthesis=false);
 
   bool            evaluate(URFParser &pURFParser);
 
@@ -289,7 +313,7 @@ public:
   ZSearchArithmeticOperand& _copyFrom(const ZSearchArithmeticOperand& pIn);
 
   utf8VaryingString _report(int pLevel);
-
+  utf8VaryingString _reportFormula();
   /* initializes and copies to current operand pOperand (either Operand or OperandNext) corresponding data from pOpIn */
   void copyOperand(void *&pOperand, const void *pOpIn) ;
   static void _copyOperand(void *&pOperand, const void *pOpIn) ;

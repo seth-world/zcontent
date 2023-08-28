@@ -74,6 +74,7 @@ enum ZSearchTokentype : ZSearchTokentype_type {
   ZSRCH_CHECKSUM_LITERAL         =   0x1E00,
   ZSRCH_MD5_LITERAL              =   0x1E01,
 
+  ZSRCH_ZDATE_LITERAL            =    0x1E10,
 
 
 
@@ -112,6 +113,8 @@ enum ZSearchTokentype : ZSearchTokentype_type {
   ZSRCH_OPERATOR_LESSOREQUAL     =    0x4109, // '<=' or LESS OR EQUAL
   ZSRCH_OPERATOR_GREATEROREQUAL  =    0x410A, // '>=' or GREATER OR EQUAL
 
+  ZSRCH_OPERATOR_MOVE            =    0x410B, // move operator  single '='  EQUAL
+
 
   ZSRCH_OPERATOR_ARITHMETIC      =    0x4200, // mask for arithmetic operators
 
@@ -121,6 +124,8 @@ enum ZSearchTokentype : ZSearchTokentype_type {
   ZSRCH_OPERATOR_MULTIPLY        =    0x4204,
   ZSRCH_OPERATOR_POWER           =    0x4205,
   ZSRCH_OPERATOR_MODULO          =    0x4206,
+
+
 
   /* string operators */
 
@@ -232,8 +237,6 @@ enum ZSearchTokentype : ZSearchTokentype_type {
   /* Resource modifier */
   ZSRCH_ZENTITY                   = 0x00020381,  /* used for resource */
   ZSRCH_ID                        = 0x00020382,
-
-
 
 
   /* uristring modifiers */

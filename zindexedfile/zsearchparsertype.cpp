@@ -63,6 +63,8 @@ ZArray<ZSearchKeyWord> KeywordList = {
     {"ZENTITY",ZSRCH_ZENTITY},
     {"ID",ZSRCH_ID},
 
+    {"ZDATE",ZSRCH_ZDATE_LITERAL},
+
     {"CHECKSUM",ZSRCH_CHECKSUM_LITERAL},
     {"MD5",ZSRCH_MD5_LITERAL},
 
@@ -424,6 +426,9 @@ decode_SearchTokenType(ZSearchTokentype_type pType)
     return "ZSRCH_OPERATOR_POWER";
   case ZSRCH_OPERATOR_MODULO:
     return "ZSRCH_OPERATOR_MODULO";
+
+  case ZSRCH_OPERATOR_MOVE:
+    return "ZSRCH_OPERATOR_MOVE";
 
   case ZSRCH_LITERAL:
     return "ZSRCH_LITERAL";

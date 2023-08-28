@@ -283,6 +283,9 @@ public:
 //  ZaiErrors                               ErrorLog;
 };
 
+
+
+
 class ZSearchFieldOperandOwnData;
 class ZSearchOperandBase;
 class ZSearchArithmeticOperand;
@@ -377,14 +380,16 @@ public:
   bool _parseEntity(void *&pOperand);
   bool _parseSymbol(void *&pOperand);
 
-  ZStatus _parseLogicalOperand(ZSearchLogicalOperand & pOperand, int pBookMark);
+  ZStatus _getZDateOnePiece(int &pValue,int pMaxDigits,ZSearchTokentype pEndSeparator);
 
-  ZStatus _parseLogicalTerm(ZSearchLogicalTerm *&pTerm, int pParenthesisLevel, int pCollateral, int pBookMark);
+  ZStatus _parseLogicalTerm(ZSearchLogicalTerm *&pTerm,
+                            int pParenthesisLevel, int pCollateral, int pBookMark, ZSearchOperandType &pMainType);
 
-  ZStatus _parseArithmetic(ZSearchArithmeticOperand *&pArithOperand, int pParenthesisLevel, int pCollateral, int pBookMark);
+  ZStatus _parseArithmetic(ZSearchArithmeticOperand *&pArithOperand,  int pParenthesisLevel, int pCollateral, int pBookMark,ZSearchOperandType &pMainType);
 //  ZStatus _parseFormula(ZSearchFormula *&pFormula, int pParenthesisLevel);
 
-
+  bool _arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOperandBase* pOB);
+  bool _logicalTypeCheck(ZSearchOperandType& pMainType,ZSearchOperandBase* pOB);
 /*
   ZStatus _parseSelectionClause(ZSearchFormula *&pOutFormula, const utf8VaryingString &pEntityName, const ZMetaDic *pDictionary=nullptr );
 */
@@ -465,6 +470,12 @@ public:
   uriString             URISymbol;
   uriString             URIParams;
 
+  ZArray<ZSearchFileSymbol>                       SymbolList;
+  ZArray<ZSearchFileZEntity>                      ZEntityList;
+  ZSearchEntityList                               EntityList;
+  ZArray<std::shared_ptr<ZSearchMasterFile>>      MasterFileList;
+
+
   /* parser clauses and rules */
 //  class ZConversionRules      ConversionRules;
 
@@ -472,10 +483,7 @@ public:
 
 //  ZArray<ZInstructionItem>        InstructionLog;
 
-  ZArray<ZSearchFileSymbol>       SymbolList;
-  ZArray<ZSearchFileZEntity>      ZEntityList;
-  ZSearchEntityList               EntityList;
-  ZArray<std::shared_ptr<ZSearchMasterFile>>      MasterFileList;
+
 //  ZArray<std::shared_ptr<ZSearchEntity>>          CollectionList;
 
 
