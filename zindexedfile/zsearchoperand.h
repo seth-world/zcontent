@@ -24,6 +24,8 @@ public:
   ZOperandContent& _copyFrom(const ZOperandContent& pIn);
   ZOperandContent& operator = (const ZOperandContent& pIn) {return _copyFrom(pIn);}
 
+  utf8VaryingString display();
+
   ZSearchOperandType Type=ZSTO_Nothing;
   long              Integer;
   utf8VaryingString String;
@@ -116,6 +118,7 @@ public:
     ModifierType = pIn.ModifierType;
     ModVal1 = pIn.ModVal1;
     ModVal2 = pIn.ModVal2;
+    TokenList.clear();
     for (long wi=0; wi < pIn.TokenList.count();wi++)
       TokenList.push(pIn.TokenList[wi]);
 
@@ -277,28 +280,7 @@ public:
 };
 
 
-class ZSearchLogicalTerm
-{
-public:
-  ZSearchLogicalTerm() {}
-  ZSearchLogicalTerm(const ZSearchLogicalTerm& pIn) {_copyFrom(pIn);}
 
-  ZSearchLogicalTerm& _copyFrom(const ZSearchLogicalTerm& pIn);
-
-  utf8VaryingString             _report(int pLevel);
-  utf8VaryingString             _reportFormula(bool pHasParenthesis=false);
-
-  bool            evaluate(URFParser &pURFParser);
-
-  int             ParenthesisLevel=0;
-  int             Collateral=0;
-  ZSearchOperator NotOperator=ZSOPV_Nothing;
-  ZSearchLogicalOperand Operand1;
-  ZSearchOperator CompareOperator;
-  ZSearchLogicalOperand Operand2;
-  ZSearchOperator AndOrOperator=ZSOPV_Nothing;
-  ZSearchLogicalTerm* NextTerm=nullptr;
-};
 
 /* Arithmetic expression as operand */
 class ZSearchArithmeticOperand : public ZSearchOperandBase {
@@ -341,6 +323,12 @@ ZOperandContent getFieldOperandContent (URFField& wField);
 ZOperandContent getLiteralOperandContent (void* pLiteral);
 
 ZStatus evaluateTerm(bool &pOutResult,ZOperandContent& pOp1,ZOperandContent& pOp2,ZSearchOperator& pOperator);
+
+/** extracts and returns one operands content :
+ *  either gets the literal
+ *  or extracts the corresponding fields from record using URFParser
+ *  applies modifier if any
+ */
 
 ZOperandContent gettermOperandContent (void* pOperand, URFParser &pURFParser);
 

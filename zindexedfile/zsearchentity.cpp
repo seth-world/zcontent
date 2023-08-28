@@ -5,6 +5,7 @@
 #include "zsearchparser.h"
 
 #include "zsearchoperand.h"
+#include "zsearchlogicalterm.h"
 
 #include <zcontent/zindexedfile/zmasterfile.h>
 //#include "zsearchcollection.h"
@@ -154,7 +155,7 @@ _BaseCollectionEntity::setLogicalTerm(ZSearchLogicalTerm* pTerm)
 {
   if (LogicalTerm!=nullptr)
     delete LogicalTerm;
-  LogicalTerm = pTerm;
+  LogicalTerm = new ZSearchLogicalTerm(*pTerm);
 }
 
 const ZMetaDic&

@@ -22,6 +22,7 @@
 //#include "zsearchformula.h"
 #include "zsearchparsertype.h"
 #include "zsearchoperand.h"
+#include "zsearchlogicalterm.h"
 
 using namespace zbs;
 
@@ -796,7 +797,6 @@ ZSearchParser::_parseLogicalOperand(void* & pOperand,int pParenthesisLevel, int 
 #endif // __COMMENT__
 
 ZStatus
-//ZSearchParser::_parseFieldIdentifier (int & pEntityListIndex, ZSearchFieldOperandOwnData *pFOD, ZSearchOperandBase *pFOB)
 ZSearchParser::_parseFieldIdentifier (int & pEntityListIndex, ZSearchFieldOperandOwnData *pFOD)
 {
  ZStatus wSt=ZS_SUCCESS;
@@ -823,30 +823,44 @@ ZSearchParser::_parseFieldIdentifier (int & pEntityListIndex, ZSearchFieldOperan
        return ZS_MISS_FIELD;
      }
      /* here this is a valid field description : search it in current entity */
-     int wi=0;
-     for (;wi < CurEntities[0]->getFieldDictionary().count();wi++) {
-       if (CurEntities[0]->getFieldDictionary().TabConst(wi).getName()==Tokenizer->Tab(Index)->Text)
+     pFOD->MDicRank=0;
+     for (;pFOD->MDicRank < CurEntities[0]->getFieldDictionary().count();pFOD->MDicRank++) {
+       if (CurEntities[0]->getFieldDictionary().TabConst(pFOD->MDicRank).getName()==Tokenizer->Tab(Index)->Text)
          break;
      }
-     if (wi==CurEntities[0]->getFieldDictionary().count()) {
-       errorLog("Wrong field name : en multiple entities are selected then fields must be prefixed. Found <%s> at line %d column %d.",
+     if (pFOD->MDicRank==CurEntities[0]->getFieldDictionary().count()) {
+       errorLog("Wrong field name <%s> for single entity <%s> (field not found in dictionary) at line %d column %d.",
            Tokenizer->Tab(Index+2)->Text.toString(),
+           CurEntities[0]->getName().toString(),
            Tokenizer->Tab(Index+2)->TokenLine,Tokenizer->Tab(Index+2)->TokenColumn );
+       pFOD->MDicRank=-1;
        return ZS_MISS_FIELD;
      }
-     pFOD->TokenList.push(Tokenizer->Tab(Index));
+
+     pFOD->MDic = CurEntities[0]->getFieldDictionaryPtr();
+
+     pFOD->FieldDescription = CurEntities[0]->getFieldDictionary()[pFOD->MDicRank];
+     pFOD->FullFieldName = CurEntities[0]->getName();
+     pFOD->FullFieldName.addUtfUnit('.');
+     pFOD->FullFieldName += Tokenizer->Tab(Index)->Text;
+     pFOD->FullFieldName.addUtfUnit('.');
+     pFOD->TokenList.push(Tokenizer->Tab(Index+2)); /* modifier name */
+
+     pFOD->TokenList.push(Tokenizer->Tab(Index)); /* store field identifier token */
      if (!advanceIndex())/* skip field identifier */
        return ZS_SYNTAX_ERROR;
-     pFOD->TokenList.push(Tokenizer->Tab(Index));
+     pFOD->TokenList.push(Tokenizer->Tab(Index)); /* dot token */
      if (!advanceIndex())/* skip dot */
        return ZS_SYNTAX_ERROR;
-     pFOD->TokenList.push(Tokenizer->Tab(Index));
+     pFOD->TokenList.push(Tokenizer->Tab(Index)); /* modifier token */
      if (!advanceIndex())/* skip modifier */
        return ZS_SYNTAX_ERROR;
-     wEntityName = CurEntities[0]->getName();
 
+/*
+     wEntityName = CurEntities[0]->getName();
      wCurEntityIndex =0;
-     goto _parseFieldIdentifier_GetField;
+*/
+     return ZS_SUCCESS;
    } // ZSRCH_MODIFIER
 
    if (Tokenizer->Tab(Index+2)->Type != ZSRCH_IDENTIFIER) {
@@ -905,7 +919,7 @@ ZSearchParser::_parseFieldIdentifier (int & pEntityListIndex, ZSearchFieldOperan
 
   } // dot not found
 
-_parseFieldIdentifier_GetField:
+//_parseFieldIdentifier_GetField:
 
   pFOD->MDicRank=0;
   for (; pFOD->MDicRank < CurEntities[wCurEntityIndex]->getFieldDictionary().count() ; pFOD->MDicRank++)
@@ -913,8 +927,9 @@ _parseFieldIdentifier_GetField:
       break;
 
   if (pFOD->MDicRank==CurEntities[wCurEntityIndex]->getFieldDictionary().count()) {
-    errorLog("Field identifier <%s> is invalid at line %d column %d.",
+    errorLog("Field identifier <%s> is not found (invalid) for entity <%s> at line %d column %d.",
         Tokenizer->Tab(Index)->Text.toString(),
+        CurEntities[wCurEntityIndex]->getName().toString(),
         Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
     return ZS_INV_FIELD;
   }
@@ -1511,8 +1526,6 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
     wD._toInternal(wTm);
     wLit->Content = wD;
 
-    utf8_t* wPtr=Tokenizer->Tab(Index)->Text.Data;
-
     pOperand = wLit;
 
     if (!advanceIndex()) {
@@ -1546,11 +1559,14 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
     utf8VaryingString wDLContent;
 
 /*    [d]d{/|-}[m]m{/|-}[yy]yy[-hh:mm:ss] */
-
-    int wPos=1;
+/*
 
     int wDay=0,wMonth=0,wYear=0, wHour=0, wMin=0, wSec=0;
     while (Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
+
+
+
+
       wSt=_getZDateOnePiece(wDay,2,ZSRCH_OPERATOR_DIVIDEORSLASH);
       if (wSt!=ZS_SUCCESS) {
         delete wLit;
@@ -1589,7 +1605,7 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
       }
     }
 
-
+*/
     while (Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
       if ((Tokenizer->Tab(Index)->Type!=ZSRCH_NUMERIC_LITERAL)
           && (Tokenizer->Tab(Index)->Type!=ZSRCH_OPERATOR_DIVIDEORSLASH)
@@ -1602,38 +1618,6 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
         delete wLit;
         return ZS_SYNTAX_ERROR;
       }
-
-      while (true)
-      {
-        if (Tokenizer->Tab(Index)->Type!=ZSRCH_NUMERIC_LITERAL) {
-          errorLog("ZDate literal : invalid date literal value. Expecting date literal with format [d]d{/|-}[m]m{/|-}[yy]yy[-hh[:mm:[ss]]]. Found <%s> at line %d column %d.",
-              Tokenizer->Tab(Index)->Text.toString(),
-              Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-          delete wLit;
-          return ZS_SYNTAX_ERROR;
-        }
-        wDay = Tokenizer->Tab(Index)->Text.toInt();
-        if (!advanceIndex()) {
-          delete wLit;
-          return ZS_SYNTAX_ERROR;
-        }
-        if (Tokenizer->Tab(Index)->Type!=ZSRCH_OPERATOR_DIVIDEORSLASH) {
-          errorLog("ZDate literal : invalid date literal value. Expecting date literal with format [d]d{/|-}[m]m{/|-}[yy]yy[-hh[:mm:[ss]]]. Found <%s> at line %d column %d.",
-              Tokenizer->Tab(Index)->Text.toString(),
-              Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-          delete wLit;
-          return ZS_SYNTAX_ERROR;
-        }
-        if (!advanceIndex()) {
-          delete wLit;
-          return ZS_SYNTAX_ERROR;
-        }
-
-
-      } // while true
-
-
-
 
       wDLContent += Tokenizer->Tab(Index)->Text;
       if (!advanceIndex()) {
@@ -1823,7 +1807,11 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
 
   return ZS_SUCCESS;
 } //_parseLiteral
-
+/** gets one element of a date either day, month year, hour minute seconds whenever mentionned (will define date precision).
+ * Element must be immediately followed by a valid separator pEndSeparator or not if equals SRCH_Nothing.
+ * Returs ZS_SUCCESS if OK, ZS_EOF if Closing parenthesis has been encountered AFTER the date element or ZS_SYNTAX_ERROR in other cases
+ *
+*/
 ZStatus
 ZSearchParser::_getZDateOnePiece(int &pValue,int pMaxDigits,ZSearchTokentype pEndSeparator)
 {
@@ -1915,11 +1903,6 @@ ZSearchParser::_parseFind(std::shared_ptr<ZSearchEntity> &pCollection)
 
     ZSearchOperandType wMainType=ZSTO_Nothing;
 
-/*
-    ZSearchFormula* wFormula=nullptr;
-
-    wSt=_parseFormula(wFormula,0);
-*/
     wSt=_parseLogicalTerm(wLogicalTerm,0,0,Index,wMainType);
     if (wSt!=ZS_SUCCESS)
       return wSt;
@@ -1956,7 +1939,7 @@ ZSearchParser::_parseFind(std::shared_ptr<ZSearchEntity> &pCollection)
 
     pCollection = ZSearchEntity::constructWithCollectionEntity(Entity,Tokenizer->Tab(Index));
 //    pCollection->setFormula(wFormula);
-    pCollection->setLogicalTerm(wLogicalTerm);
+
 
     if (!advanceIndex()) {
       pCollection.reset();
@@ -1968,6 +1951,8 @@ ZSearchParser::_parseFind(std::shared_ptr<ZSearchEntity> &pCollection)
       delete wLogicalTerm;
       return ZS_MISS_PUNCTSIGN ;
     }
+
+    pCollection->setLogicalTerm(wLogicalTerm);
 
     EntityList.push(pCollection);
     infoLog("Collection <%s> has been created and registered as a new search entity.",

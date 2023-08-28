@@ -167,6 +167,7 @@ HEADERS += \
     ../zindexedfile/zsearch.h \
     ../zindexedfile/zsearchentity.h \
     ../zindexedfile/zsearchhistory.h \
+    ../zindexedfile/zsearchlogicalterm.h \
     ../zindexedfile/zsearchoperand.h \
     ../zindexedfile/zsearchparser.h \
     ../zindexedfile/zsearchparsertype.h \
@@ -223,6 +224,7 @@ SOURCES += \
     ../zindexedfile/zsearch.cpp \
     ../zindexedfile/zsearchentity.cpp \
     ../zindexedfile/zsearchhistory.cpp \
+    ../zindexedfile/zsearchlogicalterm.cpp \
     ../zindexedfile/zsearchoperand.cpp \
     ../zindexedfile/zsearchparser.cpp \
     ../zindexedfile/zsearchparsertype.cpp \

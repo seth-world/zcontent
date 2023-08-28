@@ -4,7 +4,7 @@
 #include <zcontent/zindexedfile/zmetadic.h>
 
 #include "zsearchparser.h"
-
+#include "zsearchlogicalterm.h"
 
 ZOperandContent::ZOperandContent()
 {
@@ -288,23 +288,15 @@ ZSearchLogicalOperand::~ZSearchLogicalOperand()
 void
 ZSearchLogicalOperand::copyOperand(void*& pOperand,const void* pOpIn)
 {
-  if (pOperand!=nullptr)
-    clearOperand(pOperand);
-  copyOperand(pOperand,pOpIn);
+  _DBGPRINT("ZSearchLogicalOperand::copyOperand\n")
+  ZSearchArithmeticOperand::_copyOperand(pOperand,pOpIn);
 }
 
 ZSearchLogicalOperand&
 ZSearchLogicalOperand::_copyFrom(const ZSearchLogicalOperand& pIn)
 {
-/*  ParenthesisLevel = pIn.ParenthesisLevel;
-  Collateral = pIn.Collateral;
-
-  Operator = pIn.Operator;
-  Operator = pIn.Operator;
-*/
-  copyOperand(Operand,pIn.Operand);
-//  copyOperand(OperandNext,pIn.OperandNext);
-
+  ZSearchOperandBase::_copyFrom(pIn);
+  ZSearchArithmeticOperand::_copyOperand(Operand,pIn.Operand);
   return *this;
 } // _copyFrom
 
@@ -387,6 +379,44 @@ ZSearchLogicalOperand::_evaluateOpLiteral(void *pOp)
   }// switch
 }
 
+utf8VaryingString
+ZOperandContent::display()
+{
+  utf8VaryingString wReturn;
+  ZSearchOperandType wT = ZSearchOperandType(Type & ZSTO_BaseMask);
+  switch (wT) {
+  case ZSTO_String:
+    wReturn.sprintf("String <%s> \n",String.toString());
+    break;
+  case ZSTO_UriString:
+    wReturn.sprintf("UriString <%s> \n",URI.toString());
+    break;
+  case ZSTO_Integer:
+    wReturn.sprintf("Integer <%ld> \n",Integer);
+    break;
+
+  case ZSTO_Float:
+    wReturn.sprintf("Float <%g> \n",Float);
+    break;
+
+  case ZSTO_Date:
+    wReturn.sprintf("Date <%g> \n",Date.toLocale().toString());
+    break;
+
+  case ZSTO_Resource:
+    wReturn.sprintf("Resource <%s> \n",Resource.toHexa().toString());
+    break;
+  case ZSTO_Bool:
+    wReturn.sprintf("Resource <%s> \n",Bool?"true":"false");
+    break;
+  case ZSTO_Checksum:
+    wReturn.sprintf("Checksum <%s> \n",CheckSum.toHexa().toString());
+    break;
+  default:
+    wReturn = "unknown operand type";
+  }
+  return wReturn;
+}
 
 
 
@@ -400,21 +430,30 @@ ZOperandContent getOperandContent(void* pOp,URFParser& pURFParser)
        * It returns a boolean
        * Operator is a logical link {AND,OR} to OperandNext */
     wOperandContent.Type = ZSTO_Logical; /* This is a logical expression - type is bool */
+    _DBGPRINT("getOperandContent Operand is a logical expression : evaluation ")
     wOperandContent.Bool = static_cast<ZSearchLogicalOperand*> (pOp)->evaluate(pURFParser);
+    _DBGPRINT(wOperandContent.display().toCChar())
     return wOperandContent;
   }
   /* Operand is an arithmetic expression.
    * result of an arithmetic expression is a qualified literal and must be processed as a literal constant
    */
   if (wType & ZSTO_Arithmetic) {
-    return  static_cast<ZSearchArithmeticOperand*> (pOp)->compute(pURFParser);
+    _DBGPRINT("getOperandContent Operand is an arithmetic expression ")
+ //   return  static_cast<ZSearchArithmeticOperand*> (pOp)->compute(pURFParser);
+    wOperandContent=static_cast<ZSearchArithmeticOperand*> (pOp)->compute(pURFParser);
+    ZSearchOperandType wT = ZSearchOperandType(wOperandContent.Type & ZSTO_BaseMask);
+    _DBGPRINT(wOperandContent.display().toCChar())
+    return wOperandContent;
   }
   /* operand is not an expression
    * It is either a field operand or a literal operand
    *  get Next operand and evaluate expression
   */
-
-  return gettermOperandContent(pOp,pURFParser);
+  _DBGPRINT("getOperandContent Operand is an true operand either field or arithmetic\n")
+  wOperandContent = gettermOperandContent(pOp,pURFParser);
+  _DBGPRINT("getOperandContent resulting value %s\n", wOperandContent.display().toCChar())
+  return wOperandContent;
 }
 
 ZOperandContent
@@ -424,77 +463,6 @@ ZSearchLogicalOperand::getContent(URFParser& pURFParser) {
 
 
 
-ZSearchLogicalTerm&
-ZSearchLogicalTerm::_copyFrom(const ZSearchLogicalTerm& pIn)
-{
-  NotOperator._copyFrom(pIn.NotOperator);
-  CompareOperator._copyFrom(pIn.CompareOperator);
-  AndOrOperator._copyFrom(pIn.AndOrOperator);
-
-  Operand1.clear();
-  if (!pIn.Operand1.isNull())
-  {
-    Operand1._copyFrom(pIn.Operand1);
-  }
-
-  Operand2.clear();
-  if (!pIn.Operand2.isNull())
-  {
-    Operand2._copyFrom(pIn.Operand2);
-  }
-
-  if (NextTerm!=nullptr)
-    NextTerm = new ZSearchLogicalTerm(*pIn.NextTerm);
-
-  return *this;
-}
-
-bool
-ZSearchLogicalTerm::evaluate(  URFParser& pURFParser)
-{
-  bool wResult=true;
-  ZOperandContent wC1 = Operand1.getContent(pURFParser);
-  if ((wC1.Type == ZSTO_Logical) || (wC1.Type & ZSTO_Bool)) {
-
-    wResult = wC1.Bool;
-
-    if (NotOperator._isNot())
-      wResult = !wResult;
-
-    if (!AndOrOperator._isAndOr()) {
-      _DBGPRINT("getOneTerm Expected operator {AND,OR} while getting <%s>\n",
-          decode_ZSOPV(AndOrOperator.Type))
-      abort();
-    }
-
-    if (Operand2.isNull()) {
-      return wResult;
-    }
-  }
-  if (Operand2.isNull())
-    return wResult;
-
-  ZOperandContent wC2 = Operand2.getContent(pURFParser);
-
-  ZStatus wSt=evaluateTerm(wResult,wC1,wC2,CompareOperator);
-  if (wSt!=ZS_SUCCESS)
-    abort();
-
-  if (NotOperator._isNot())
-    wResult = !wResult;
-
-  if (NextTerm!=nullptr) {
-    bool wResult1 = NextTerm->evaluate(pURFParser);
-    if (AndOrOperator._isAnd())
-      wResult = wResult && wResult1;
-    else if (AndOrOperator._isOr())
-      wResult = wResult || wResult1;
-    else
-      _DBGPRINT("Expecting link operator either AND or OR. Found %s\n",decode_ZSOPV(AndOrOperator.Type))
-  }
-
-  return wResult;
-} // ZSearchLogicalTerm::evaluate
 
 
 bool
@@ -617,86 +585,6 @@ ZSearchLogicalOperand::_reportFormula()
 } // ZSearchLogicalOperand::_report
 
 
-utf8VaryingString
-ZSearchLogicalTerm::_reportFormula(bool pHasParenthesis)
-{
-  utf8VaryingString wReturn;
-
-  if (!NotOperator._isNothing()) {
-    wReturn = NotOperator._reportFormula();
-  }
-
-
-  if (pHasParenthesis)
-    wReturn += " ( ";
-  else
-    wReturn += " ";
-
-  wReturn += Operand1._reportFormula();
-
-  wReturn += " ";
-
-  wReturn += CompareOperator._reportFormula();
-
-  wReturn += " ";
-
-  if (Operand2.isNull()) {
-    wReturn.addsprintf("<NULL>");
-    if (pHasParenthesis)
-      wReturn += " ) ";
-    else
-      wReturn += " ";
-    return wReturn;
-  }
-
-  wReturn += Operand2._reportFormula();
-
-  wReturn += AndOrOperator._reportFormula();
-
-  if (NextTerm) {
-    if (ParenthesisLevel != NextTerm->ParenthesisLevel) {
-      wReturn += NextTerm->_reportFormula(true);
-    }
-    else
-      wReturn += NextTerm->_reportFormula();
-  }
-  if (pHasParenthesis)
-    wReturn += " ) ";
-  else
-    wReturn += " ";
-  return wReturn;
-} // ZSearchLogicalTerm::_reportFormula
-
-utf8VaryingString
-ZSearchLogicalTerm::_report(int pLevel)
-{
-  utf8VaryingString wReturn;
-
-  wReturn.addsprintf("%*cLeading Operator\n",pLevel,' ');
-  wReturn += NotOperator._report(pLevel);
-
-  wReturn.sprintf("%*c Logical term Parenthesis level %d collateral %d\n",pLevel,' ',ParenthesisLevel,Collateral);
-
-  wReturn += Operand1._reportDetailed(pLevel);
-
-  wReturn.addsprintf("%*cCompare operator :  ",pLevel,' ');
-  wReturn += CompareOperator._report(pLevel);
-
-  if (Operand2.isNull()) {
-    wReturn.addsprintf("%*cNext logical operand is NULL\n",pLevel,' ');
-    return wReturn;
-  }
-
-  wReturn += Operand2._reportDetailed(pLevel);
-
-  wReturn.addsprintf("%*cCompare operator :  ",pLevel,' ');
-  wReturn += AndOrOperator._report(pLevel);
-
-  if (NextTerm)
-    wReturn += NextTerm->_report(pLevel);
-
-  return wReturn;
-} // ZSearchLogicalTerm::_report
 utf8VaryingString
 ZSearchArithmeticOperand::_report(int pLevel)
 {
@@ -909,6 +797,14 @@ ZSearchArithmeticOperand::copyOperand(void*& pOperand,const void* pOpIn)
 void
 ZSearchArithmeticOperand::_copyOperand(void*& pOperand,const void* pOpIn)
 {
+  _DBGPRINT("ZSearchArithmeticOperand::_copyOperand (static)\n")
+
+  if (pOpIn==nullptr) {
+    _DBGPRINT("ZSearchArithmeticOperand::_copyOperand-E-NULL Input operand is NULL\n")
+
+    clearOperand(pOperand);
+    return;
+  }
   if (static_cast<const ZSearchOperandBase*>(pOpIn)->Type & ZSTO_Arithmetic)
   {
     pOperand = new ZSearchArithmeticOperand(*static_cast<const ZSearchArithmeticOperand*>(pOpIn));
@@ -960,6 +856,9 @@ ZSearchArithmeticOperand::_copyOperand(void*& pOperand,const void* pOpIn)
     break;
   case ZSTO_LiteralBool:
     pOperand = new ZSearchLiteral<bool>(*static_cast<const ZSearchLiteral<bool>*>(pOpIn));
+    break;
+  default:
+    _DBGPRINT("ZSearchArithmeticOperand::_copyOperand-E-INVTYPE Cannot copy operand of type <%s>.\n",decode_OperandType(static_cast<const ZSearchOperandBase*>(pOpIn)->Type))
     break;
   }
 

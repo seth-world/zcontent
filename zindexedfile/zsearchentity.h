@@ -199,7 +199,11 @@ public:
   }
   _BaseCollectionEntity(const _BaseCollectionEntity& pIn) {_copyFrom(pIn);}
 
-  ~_BaseCollectionEntity() { }
+  ~_BaseCollectionEntity()
+  {
+    if (LogicalTerm != nullptr)
+      delete LogicalTerm;
+  }
 
   _BaseCollectionEntity& _copyFrom (const _BaseCollectionEntity& pIn) ;
 
