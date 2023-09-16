@@ -5,6 +5,8 @@
 
 #include "zsearchparser.h"
 #include "zsearchlogicalterm.h"
+#include "zsearcharithmeticterm.h"
+
 
 ZOperandContent::ZOperandContent()
 {
@@ -22,6 +24,7 @@ ZOperandContent::_copyFrom(const ZOperandContent& pIn) {
   Bool = pIn.Bool;
   Date = pIn.Date;
   Resource = pIn.Resource;
+  Valid = pIn.Valid;
   return *this;
 }
 
@@ -30,27 +33,29 @@ ZOperandContent::_copyFrom(const ZOperandContent& pIn) {
 using namespace  zbs;
 ZSearchOperator::~ZSearchOperator()
 {
-  while (TokenList.count())
+/*  while (TokenList.count())
     TokenList.pop();
+*/
 }
 
 ZSearchOperator&
 ZSearchOperator::_copyFrom (const ZSearchOperator& pIn) {
   Type=pIn.Type;
-  for (long wi=0; wi < pIn.TokenList.count();wi++)
+/*  for (long wi=0; wi < pIn.TokenList.count();wi++)
     TokenList.push(pIn.TokenList[wi]);
+*/
   return *this;
 }
 
 
 void
 ZSearchOperator::add(ZSearchToken* pTokenOperator) {
-  TokenList.push(pTokenOperator);
+//  TokenList.push(pTokenOperator);
   Type |= convert_ZSRCH_ZSOPV( pTokenOperator->Type );
 }
 void
 ZSearchOperator::set(ZSearchToken* pTokenOperator) {
-  TokenList.push(pTokenOperator);
+//  TokenList.push(pTokenOperator);
   Type = convert_ZSRCH_ZSOPV( pTokenOperator->Type );
 }
 bool ZSearchOperator::isValid(ZSearchToken* pTokenOperator) {
@@ -125,10 +130,9 @@ bool ZSearchOperator::_isNothing() {
 }
 
 utf8VaryingString
-ZSearchOperator::_reportFormula()
+ZSearchOperator::_reportFormula(bool pDetailed)
 {
   utf8VaryingString wReturn;
-
 
   switch (Type)
   {
@@ -191,10 +195,16 @@ ZSearchOperator::_reportFormula()
     break;
 
   case ZSOPV_Nothing:
+    if (pDetailed)
+      wReturn = "ZSOPV_Nothing";
+    break;
+
+  case ZSOPV_INVALID:
+    wReturn = "ZSOPV_INVALID";
     break;
 
   default:
-    wReturn = "unknown operator";
+    wReturn.sprintf( "unknown operator <0x%X>",Type);
     break;
   }// switch
 
@@ -283,20 +293,23 @@ ZSearchLogicalOperand::~ZSearchLogicalOperand()
   clearOperand(Operand);
 }
 
-
+void ZSearchLogicalOperand::clear()
+{
+  clearOperand(Operand);
+}
 
 void
 ZSearchLogicalOperand::copyOperand(void*& pOperand,const void* pOpIn)
 {
   _DBGPRINT("ZSearchLogicalOperand::copyOperand\n")
-  ZSearchArithmeticOperand::_copyOperand(pOperand,pOpIn);
+  _copyOperand(pOperand,pOpIn);
 }
 
 ZSearchLogicalOperand&
 ZSearchLogicalOperand::_copyFrom(const ZSearchLogicalOperand& pIn)
 {
   ZSearchOperandBase::_copyFrom(pIn);
-  ZSearchArithmeticOperand::_copyOperand(Operand,pIn.Operand);
+ _copyOperand(Operand,pIn.Operand);
   return *this;
 } // _copyFrom
 
@@ -440,8 +453,9 @@ ZOperandContent getOperandContent(void* pOp,URFParser& pURFParser)
    */
   if (wType & ZSTO_Arithmetic) {
     _DBGPRINT("getOperandContent Operand is an arithmetic expression ")
- //   return  static_cast<ZSearchArithmeticOperand*> (pOp)->compute(pURFParser);
-    wOperandContent=static_cast<ZSearchArithmeticOperand*> (pOp)->compute(pURFParser);
+
+//    wOperandContent=static_cast<ZSearchArithmeticTerm*> (pOp)->compute(pURFParser);
+    wOperandContent=computeArithmetic(pOp,pURFParser);
     ZSearchOperandType wT = ZSearchOperandType(wOperandContent.Type & ZSTO_BaseMask);
     _DBGPRINT(wOperandContent.display().toCChar())
     return wOperandContent;
@@ -460,7 +474,6 @@ ZOperandContent
 ZSearchLogicalOperand::getContent(URFParser& pURFParser) {
   return getOperandContent(Operand,pURFParser);
 }
-
 
 
 
@@ -485,7 +498,7 @@ ZSearchLogicalOperand::_reportDetailed(int pLevel)
   wReturn.addsprintf("%*cOperand\n",pLevel,' ');
   while (true) {
     if (static_cast<ZSearchOperandBase*>(Operand)->Type == ZSTO_Arithmetic) {
-      wReturn += static_cast<ZSearchArithmeticOperand*>(Operand)->_report(pLevel+1);
+      wReturn += static_cast<ZSearchArithmeticTerm*>(Operand)->_report(pLevel+1);
       break;
     }
     if (static_cast<ZSearchOperandBase*>(Operand)->Type == ZSTO_Logical) {
@@ -517,17 +530,18 @@ ZSearchLogicalOperand::_reportDetailed(int pLevel)
         );
     break;
   }// while true
-
+/*
   if (static_cast<ZSearchOperandBase*>(Operand)->TokenList.count()>0) {
     wReturn.addsprintf("%*c Tokens <",pLevel,' ');
     for (int wj=0; wj < static_cast<ZSearchOperandBase*>(Operand)->TokenList.count();wj++) {
       wReturn.addsprintf("%s",static_cast<ZSearchOperandBase*>(Operand)->TokenList[wj]->Text.toString());
     }
     wReturn += ">\n";
+
   } else {
     wReturn.addsprintf("%*c No Token for this operand\n",pLevel,' ');
   }
-
+*/
   //    setMaxSprintfBufferCount(4096);
 
   if (static_cast<ZSearchOperandBase*>(Operand)->ModifierType!=ZSRCH_NOTHING){
@@ -549,7 +563,7 @@ ZSearchLogicalOperand::_reportFormula()
 
   while (true) {
     if (static_cast<ZSearchOperandBase*>(Operand)->Type == ZSTO_Arithmetic) {
-      wReturn += static_cast<ZSearchArithmeticOperand*>(Operand)->_reportFormula();
+      wReturn += static_cast<ZSearchArithmeticTerm*>(Operand)->_reportFormula();
       break;
     }
     if (static_cast<ZSearchOperandBase*>(Operand)->Type == ZSTO_Logical) {
@@ -574,9 +588,16 @@ ZSearchLogicalOperand::_reportFormula()
   }// while true
 
   if (static_cast<ZSearchOperandBase*>(Operand)->ModifierType!=ZSRCH_NOTHING){
+    if (static_cast<ZSearchOperandBase*>(Operand)->ModVal1 != 0) {
     wReturn.addsprintf(".%s(%ld,%ld)",decode_SearchTokenType(static_cast<ZSearchOperandBase*>(Operand)->ModifierType).toString(),
         static_cast<ZSearchOperandBase*>(Operand)->ModVal1,
         static_cast<ZSearchOperandBase*>(Operand)->ModVal2 );
+    }
+    else
+      wReturn.addsprintf(".%s",decode_SearchTokenType(static_cast<ZSearchOperandBase*>(Operand)->ModifierType).toString());
+  }
+  if (!static_cast<ZSearchOperandBase*>(Operand)->Comment.isEmpty()) {
+    wReturn.addsprintf("(%s)",static_cast<ZSearchOperandBase*>(Operand)->Comment.toString());
   }
 
   wReturn += " ";
@@ -586,16 +607,16 @@ ZSearchLogicalOperand::_reportFormula()
 
 
 utf8VaryingString
-ZSearchArithmeticOperand::_report(int pLevel)
+ZSearchArithmeticTerm::_report(int pLevel)
 {
   utf8VaryingString wReturn;
 
-  wReturn.sprintf("%*cArithmetic operand Parenthesis level %d collateral %d\n",pLevel,' ',ParenthesisLevel,Collateral);
+  wReturn.sprintf("%*cArithmetic operand Parenthesis level %d collateral %d\n",pLevel,' ',ParenthesisLevel);
 
   wReturn.addsprintf("%*cOperand\n",pLevel,' ');
   while (true) {
     if (static_cast<ZSearchOperandBase*>(Operand)->Type == ZSTO_Arithmetic) {
-      wReturn += static_cast<ZSearchArithmeticOperand*>(Operand)->_report(pLevel+1);
+      wReturn += static_cast<ZSearchArithmeticTerm*>(Operand)->_report(pLevel+1);
       break;
     }
 
@@ -622,7 +643,7 @@ ZSearchArithmeticOperand::_report(int pLevel)
         decode_OperandType(static_cast<ZSearchOperandBase*>(Operand)->Type)
         );
     break;
-
+/*
     if (static_cast<ZSearchOperandBase*>(Operand)->TokenList.count()>0) {
       wReturn.addsprintf("%*c Tokens <",pLevel,' ');
       for (int wj=0; wj < static_cast<ZSearchOperandBase*>(Operand)->TokenList.count();wj++) {
@@ -632,7 +653,7 @@ ZSearchArithmeticOperand::_report(int pLevel)
     } else {
       wReturn.addsprintf("%*c No Token for this operand\n",pLevel,' ');
     }
-
+*/
     //    setMaxSprintfBufferCount(4096);
 
     if (static_cast<ZSearchOperandBase*>(Operand)->ModifierType!=ZSRCH_NOTHING){
@@ -653,23 +674,26 @@ ZSearchArithmeticOperand::_report(int pLevel)
     return wReturn;
   }
 
-  wReturn += static_cast<ZSearchArithmeticOperand*>(OperandNext)->_report(pLevel);
+  wReturn += static_cast<ZSearchArithmeticTerm*>(OperandNext)->_report(pLevel);
   return wReturn;
-} // ZSearchArithmeticOperand::_report
+} // ZSearchArithmeticTerm::_report
 
 utf8VaryingString
-ZSearchArithmeticOperand::_reportFormula()
+ZSearchArithmeticTerm::_reportFormula(bool pDetailed)
 {
   utf8VaryingString wReturn;
 
   while (true) {
     if (static_cast<ZSearchOperandBase*>(Operand)->Type == ZSTO_Arithmetic) {
       wReturn += " ( ";
-      wReturn = static_cast<ZSearchArithmeticOperand*>(Operand)->_reportFormula();
+      wReturn = static_cast<ZSearchArithmeticTerm*>(Operand)->_reportFormula(pDetailed);
       wReturn += " ) ";
       break;
     }
 
+    wReturn += OperandReportFormula(Operand);
+    break;
+/*
     if (static_cast<ZSearchOperandBase*>(Operand)->Type & ZSTO_Field) {
       ZSearchFieldOperandOwnData* wFldOwnData = static_cast<ZSearchFieldOperandOwnData*>( Operand);
       wReturn.addsprintf(" %s", wFldOwnData->FullFieldName.toString() );
@@ -682,6 +706,8 @@ ZSearchArithmeticOperand::_reportFormula()
 
     wReturn.addsprintf("%s <Invalid type> ", decode_OperandType(static_cast<ZSearchOperandBase*>(Operand)->Type) );
     break;
+*/
+
   }// while true
 
   if (static_cast<ZSearchOperandBase*>(Operand)->ModifierType!=ZSRCH_NOTHING){
@@ -696,185 +722,23 @@ ZSearchArithmeticOperand::_reportFormula()
   wReturn += Operator._reportFormula();
 
 
-
   if (OperandNext==nullptr) {
-    wReturn += "<nullptr>";
+    if (pDetailed)
+      wReturn += "<nullptr>";
     return wReturn;
   }
 
-  wReturn += static_cast<ZSearchArithmeticOperand*>(OperandNext)->_reportFormula();
+  wReturn += static_cast<ZSearchArithmeticTerm*>(OperandNext)->_reportFormula(pDetailed);
   return wReturn;
-} // ZSearchArithmeticOperand::_report
+} // ZSearchArithmeticTerm::_report
 
 
 
-ZSearchArithmeticOperand::~ZSearchArithmeticOperand()
+ZSearchArithmeticTerm::~ZSearchArithmeticTerm()
 {
 
   clearOperand(OperandNext);
   clearOperand(Operand);
-}
-
-void
-ZSearchOperandBase::clearOperand(void *&pOp)
-{
-  if (pOp==nullptr)
-    return;
-  if (static_cast<ZSearchOperandBase*>(pOp)->Type & ZSTO_Arithmetic)
-  {
-    delete static_cast<ZSearchArithmeticOperand*>(pOp);
-    pOp=nullptr;
-    return;
-  }
-
-  switch (static_cast<ZSearchOperandBase*>(pOp)->Type)
-  {
-  case ZSTO_Nothing:
-    break;
-  case ZSTO_FieldString:
-    delete static_cast<ZSearchFieldOperand<utf8VaryingString>*>(pOp);
-    break;
-  case ZSTO_FieldInteger:
-    delete static_cast<ZSearchFieldOperand<long>*>(pOp);
-    break;
-  case ZSTO_FieldFloat:
-    delete static_cast<ZSearchFieldOperand<double>*>(pOp);
-    break;
-  case ZSTO_FieldDate:
-    delete static_cast<ZSearchFieldOperand<ZDateFull>*>(pOp);
-    break;
-  case ZSTO_FieldChecksum:
-    delete static_cast<ZSearchFieldOperand<checkSum>*>(pOp);
-    break;
-  case ZSTO_FieldResource:
-    delete static_cast<ZSearchFieldOperand<ZResource>*>(pOp);
-    break;
-  case ZSTO_FieldBool:
-    delete static_cast<ZSearchFieldOperand<bool>*>(pOp);
-    break;
-
-  case ZSTO_LiteralString:
-    delete static_cast<ZSearchLiteral<utf8VaryingString>*>(pOp);
-    break;
-  case ZSTO_LiteralDate:
-    delete static_cast<ZSearchLiteral<ZDateFull>*>(pOp);
-    break;
-  case ZSTO_LiteralChecksum:
-    delete static_cast<ZSearchLiteral<checkSum>*>(pOp);
-    break;
-  case ZSTO_LiteralInteger:
-    delete static_cast<ZSearchLiteral<long>*>(pOp);
-    break;
-  case ZSTO_LiteralFloat:
-    delete static_cast<ZSearchLiteral<double>*>(pOp);
-    break;
-  case ZSTO_LiteralResource:
-    delete static_cast<ZSearchLiteral<ZResource>*>(pOp);
-    break;
-  case ZSTO_LiteralBool:
-    delete static_cast<ZSearchLiteral<bool>*>(pOp);
-    break;
-  }//switch
-  pOp=nullptr;
-  return;
-}
-
-ZOperandContent
-ZSearchArithmeticOperand::compute(URFParser& pURFParser)
-{
-
-}
-
-
-void
-ZSearchArithmeticOperand::copyOperand(void*& pOperand,const void* pOpIn)
-{
-  if (pOperand!=nullptr)
-    clearOperand(pOperand);
-  _copyOperand(pOperand,pOpIn);
-}
-
-void
-ZSearchArithmeticOperand::_copyOperand(void*& pOperand,const void* pOpIn)
-{
-  _DBGPRINT("ZSearchArithmeticOperand::_copyOperand (static)\n")
-
-  if (pOpIn==nullptr) {
-    _DBGPRINT("ZSearchArithmeticOperand::_copyOperand-E-NULL Input operand is NULL\n")
-
-    clearOperand(pOperand);
-    return;
-  }
-  if (static_cast<const ZSearchOperandBase*>(pOpIn)->Type & ZSTO_Arithmetic)
-  {
-    pOperand = new ZSearchArithmeticOperand(*static_cast<const ZSearchArithmeticOperand*>(pOpIn));
-    return;
-  }
-  switch (static_cast<const ZSearchOperandBase*>(pOpIn)->Type)
-  {
-  case ZSTO_Nothing:
-    break;
-  case ZSTO_FieldString:
-    pOperand = new ZSearchFieldOperand<utf8VaryingString>(*static_cast<const ZSearchFieldOperand<utf8VaryingString>*>(pOpIn));
-    break;
-  case ZSTO_FieldInteger:
-    pOperand = new ZSearchFieldOperand<long>(*static_cast<const ZSearchFieldOperand<long>*>(pOpIn));
-    break;
-  case ZSTO_FieldFloat:
-    pOperand = new ZSearchFieldOperand<double>(*static_cast<const ZSearchFieldOperand<double>*>(pOpIn));
-    break;
-  case ZSTO_FieldDate:
-    pOperand = new ZSearchFieldOperand<ZDateFull>(*static_cast<const ZSearchFieldOperand<ZDateFull>*>(pOpIn));
-    break;
-  case ZSTO_FieldChecksum:
-    pOperand = new ZSearchFieldOperand<checkSum>(*static_cast<const ZSearchFieldOperand<checkSum>*>(pOpIn));
-    break;
-  case ZSTO_FieldResource:
-    pOperand = new ZSearchFieldOperand<ZResource>(*static_cast<const ZSearchFieldOperand<ZResource>*>(pOpIn));
-    break;
-  case ZSTO_FieldBool:
-    pOperand = new ZSearchFieldOperand<bool>(*static_cast<const ZSearchFieldOperand<bool>*>(pOpIn));
-    break;
-
-  case ZSTO_LiteralString:
-    pOperand = new ZSearchLiteral<utf8VaryingString>(*static_cast<const ZSearchLiteral<utf8VaryingString>*>(pOpIn));
-    break;
-  case ZSTO_LiteralDate:
-    pOperand = new ZSearchLiteral<ZDateFull>(*static_cast<const ZSearchLiteral<ZDateFull>*>(pOpIn));
-    break;
-  case ZSTO_LiteralChecksum:
-    pOperand = new ZSearchLiteral<checkSum>(*static_cast<const ZSearchLiteral<checkSum>*>(pOpIn));
-    break;
-  case ZSTO_LiteralInteger:
-    pOperand = new ZSearchLiteral<long>(*static_cast<const ZSearchLiteral<long>*>(pOpIn));
-    break;
-  case ZSTO_LiteralFloat:
-    pOperand = new ZSearchLiteral<double>(*static_cast<const ZSearchLiteral<double>*>(pOpIn));
-    break;
-  case ZSTO_LiteralResource:
-    pOperand = new ZSearchLiteral<ZResource>(*static_cast<const ZSearchLiteral<ZResource>*>(pOpIn));
-    break;
-  case ZSTO_LiteralBool:
-    pOperand = new ZSearchLiteral<bool>(*static_cast<const ZSearchLiteral<bool>*>(pOpIn));
-    break;
-  default:
-    _DBGPRINT("ZSearchArithmeticOperand::_copyOperand-E-INVTYPE Cannot copy operand of type <%s>.\n",decode_OperandType(static_cast<const ZSearchOperandBase*>(pOpIn)->Type))
-    break;
-  }
-
-  return;
-}// ZSearchArithmeticOperand::_copyOperand
-
-
-ZSearchArithmeticOperand&
-ZSearchArithmeticOperand::_copyFrom(const ZSearchArithmeticOperand& pIn)
-{
-  ZSearchOperandBase::_copyFrom((ZSearchOperandBase)pIn);
-  ParenthesisLevel = pIn.ParenthesisLevel;
-  copyOperand(Operand,pIn.Operand);
-  copyOperand(OperandNext,pIn.OperandNext);
-  Operator._copyFrom(pIn.Operator);
-  return *this;
 }
 
 
@@ -1090,18 +954,18 @@ ZOperandContent getFieldOperandContent (URFField& wField)
 
 
 
-
-
 ZOperandContent getLiteralOperandContent (void* pLiteral)
 {
   ZOperandContent pOpContent;
 
   ZSearchOperandBase* wOpBase  = static_cast<ZSearchOperandBase*>(pLiteral);
 
-  if (!(wOpBase->Type & ZSTO_Literal) )
-    return ZOperandContent();
+  if (!(wOpBase->Type & ZSTO_Literal) ) {
+    _DBGPRINT("getLiteralOperandContent-E-INVTYP Operand type is not literal.\n")
+    return ZOperandContent(false);
+  }
 
-  int wOpType = wOpBase->Type & ~ZSTO_Literal;
+  int wOpType = wOpBase->Type & ZSTO_BaseMask;
   pOpContent.Type = ZSearchOperandType(wOpType);
   switch (pOpContent.Type) {
   case ZSTO_String: {
@@ -1144,7 +1008,11 @@ ZOperandContent getLiteralOperandContent (void* pLiteral)
     pOpContent.Type = ZSTO_Bool;
     break;
   }
+  default:
+    _DBGPRINT("getLiteralOperandContent-E-INVTYP Invalid literal operand type<%s> <0x%X>\n",
+        decode_OperandType(wOpType),wOpType)
 
+    return ZOperandContent(false);
   }//switch
 
   _DBGPRINT("getLiteralOperandContent literal operand type<%s> value <%s>\n",
@@ -1582,3 +1450,326 @@ evaluateTerm(bool &pOutResult,ZOperandContent& pOp1,ZOperandContent& pOp2,ZSearc
   return ZS_INVOP;
 }
 
+utf8VaryingString
+OperandReportFormula(void * pOperand, bool pDetailed)
+{
+  utf8VaryingString wReturn;
+  if (pOperand==nullptr) {
+    wReturn="<NULL>";
+    return wReturn;
+  }
+
+  while (true) {
+    if (static_cast<ZSearchOperandBase*>(pOperand)->Type & ZSTO_Arithmetic) {
+      wReturn.addsprintf("[%s]", static_cast<ZSearchArithmeticTerm*>(pOperand)->_reportFormula().toString());
+      break;
+    }
+    if (static_cast<ZSearchOperandBase*>(pOperand)->Type == ZSTO_Logical) {
+      wReturn += static_cast<ZSearchLogicalTerm*>(pOperand)->_reportFormula(true);
+      break;
+    }
+
+    if (static_cast<ZSearchOperandBase*>(pOperand)->Type & ZSTO_Field) {
+      ZSearchFieldOperandOwnData* wFldOwnData = static_cast<ZSearchFieldOperandOwnData*>( pOperand);
+
+      wReturn.addsprintf(" %s", wFldOwnData->FullFieldName.toString() );
+      break;
+    }
+    if (static_cast<ZSearchOperandBase*>(pOperand)->Type & ZSTO_Literal) {
+      wReturn.addsprintf(" %s",ZSearchLogicalOperand::_evaluateOpLiteral(pOperand).toString() );
+      break;
+    }
+    wReturn.addsprintf("<Invalid type %s 0x%X >\n",
+        decode_OperandType(static_cast<ZSearchOperandBase*>(pOperand)->Type),
+        static_cast<ZSearchOperandBase*>(pOperand)->Type
+        );
+    break;
+  }// while true
+
+  if (static_cast<ZSearchOperandBase*>(pOperand)->ModifierType!=ZSRCH_NOTHING){
+    if (static_cast<ZSearchOperandBase*>(pOperand)->ModVal1 != 0) {
+      wReturn.addsprintf(".%s(%ld,%ld)",decode_SearchTokenType(static_cast<ZSearchOperandBase*>(pOperand)->ModifierType).toString(),
+          static_cast<ZSearchOperandBase*>(pOperand)->ModVal1,
+          static_cast<ZSearchOperandBase*>(pOperand)->ModVal2 );
+    }
+    else
+      wReturn.addsprintf(".%s",decode_SearchTokenType(static_cast<ZSearchOperandBase*>(pOperand)->ModifierType).toString());
+  }
+  if (pDetailed) {
+    if (!static_cast<ZSearchOperandBase*>(pOperand)->Comment.isEmpty()) {
+      wReturn.addsprintf("(%s)",static_cast<ZSearchOperandBase*>(pOperand)->Comment.toString());
+    }
+  }
+
+  wReturn += " ";
+
+  return wReturn;
+} // OperandReportFormula
+
+utf8VaryingString
+OperandReportDetailed(void* pOperand,int pLevel)
+{
+  utf8VaryingString wReturn;
+
+  wReturn.addsprintf("%*cOperand\n",pLevel,' ');
+  while (true) {
+    if (static_cast<ZSearchOperandBase*>(pOperand)->Type == ZSTO_Arithmetic) {
+      wReturn += static_cast<ZSearchArithmeticTerm*>(pOperand)->_report(pLevel+1);
+      break;
+    }
+    if (static_cast<ZSearchOperandBase*>(pOperand)->Type == ZSTO_Logical) {
+      wReturn += static_cast<ZSearchLogicalTerm*>(pOperand)->_report(pLevel+1);
+      break;
+    }
+
+    if (static_cast<ZSearchOperandBase*>(pOperand)->Type & ZSTO_Field) {
+      ZSearchFieldOperandOwnData* wFldOwnData = static_cast<ZSearchFieldOperandOwnData*>( pOperand);
+      wReturn.addsprintf("%*c type %s full field name <%s> dictionary type <%s>\n",
+          pLevel,' ',
+          decode_OperandType(static_cast<ZSearchOperandBase*>(pOperand)->Type),
+          wFldOwnData->FullFieldName.toString(),
+          decode_ZType(wFldOwnData->FieldDescription.ZType)
+          );
+      break;
+    }
+    if (static_cast<ZSearchOperandBase*>(pOperand)->Type & ZSTO_Literal) {
+      wReturn.addsprintf("%*c type %s value <%s>\n",
+          pLevel,' ',
+          decode_OperandType(static_cast<ZSearchOperandBase*>(pOperand)->Type),
+          OperandReportLiteral(pOperand).toString()
+          );
+      break;
+    }
+    wReturn.addsprintf("%*c type %s <Invalid type>\n",
+        pLevel,' ',
+        decode_OperandType(static_cast<ZSearchOperandBase*>(pOperand)->Type)
+        );
+    break;
+  }// while true
+
+
+  if (static_cast<ZSearchOperandBase*>(pOperand)->ModifierType!=ZSRCH_NOTHING){
+    wReturn.addsprintf("%*c modifier %s\n"
+                       "%*c     value 1 %ld\n"
+                       "%*c     value 2 %ld\n",
+        pLevel,' ',decode_SearchTokenType(static_cast<ZSearchOperandBase*>(pOperand)->ModifierType).toString(),
+        pLevel,' ',static_cast<ZSearchOperandBase*>(pOperand)->ModVal1,
+        pLevel,' ',static_cast<ZSearchOperandBase*>(pOperand)->ModVal2 );
+  }
+
+  return wReturn;
+} // OperandReportDetailed
+
+utf8VaryingString
+OperandReportLiteral(void *pOp)
+{
+  utf8VaryingString wReturn;
+
+  if (!(static_cast<ZSearchOperandBase*>(pOp)->Type & ZSTO_Literal)) {
+    wReturn.sprintf("_evaluateOpLiteral-E-INVTYP Invalid type to evaluate <%s>",
+        decode_OperandType(static_cast<ZSearchOperandBase*>(pOp)->Type));
+    return wReturn;
+  }
+  switch (static_cast<const ZSearchOperandBase*>(pOp)->Type )
+  {
+  case ZSTO_LiteralString:
+  {
+    ZSearchLiteral<utf8VaryingString>* wOp=static_cast<ZSearchLiteral<utf8VaryingString>*>(pOp);
+    wReturn.sprintf("\"%s\"",wOp->Content.toString());
+    //    return wOp->Content;
+    return wReturn;
+  }
+  case ZSTO_LiteralUriString:
+  {
+    ZSearchLiteral<uriString>* wOp=static_cast<ZSearchLiteral<uriString>*>(pOp);
+    return wOp->Content;
+  }
+  case ZSTO_LiteralInteger:
+  {
+    ZSearchLiteral<long>* wOp=static_cast<ZSearchLiteral<long>*>(pOp);
+    wReturn.sprintf("%ld",wOp->Content);
+    return wReturn;
+  }
+  case ZSTO_LiteralFloat:
+  {
+    ZSearchLiteral<double>* wOp=static_cast<ZSearchLiteral<double>*>(pOp);
+    wReturn.sprintf("%g",wOp->Content);
+    return wReturn;
+  }
+  case ZSTO_LiteralDate:
+  {
+    ZSearchLiteral<ZDateFull>* wOp=static_cast<ZSearchLiteral<ZDateFull>*>(pOp);
+    return wOp->Content.toLocale();
+  }
+  case ZSTO_LiteralResource:
+  {
+    ZSearchLiteral<ZResource>* wOp=static_cast<ZSearchLiteral<ZResource>*>(pOp);
+    //    return wOp->Content.toHexa();
+    long wi=0;
+    for (;wi < GParser->ZEntityList.count();wi++) {
+      if (GParser->ZEntityList[wi].Value==wOp->Content.Entity) {
+        break;
+      }
+    }// for
+    if (wi==GParser->ZEntityList.count())
+      wReturn.sprintf("ZResource(%6X,%6X)",wOp->Content.Entity,wOp->Content.id);
+    else
+      wReturn.sprintf("ZResource(%s,%6X)",GParser->ZEntityList[wi].Symbol.toString(),wOp->Content.id);
+    return wReturn;
+  }
+  case ZSTO_LiteralBool:
+  {
+    ZSearchLiteral<bool>* wOp=static_cast<ZSearchLiteral<bool>*>(pOp);
+    return wOp->Content?"TRUE":"FALSE";
+  }
+  case ZSTO_LiteralChecksum:
+  {
+    ZSearchLiteral<checkSum>* wOp=static_cast<ZSearchLiteral<checkSum>*>(pOp);
+    //    return wOp->Content.toHexa();
+    wReturn.sprintf("checkSum(%s)",wOp->Content.toHexa().toString());
+    return wReturn;
+  }
+  default:
+  {
+    wReturn.sprintf("_evaluateOpLiteral-E-INVTYP Invalid type to evaluate <%s>",
+        decode_OperandType(static_cast<ZSearchOperandBase*>(pOp)->Type));
+    return wReturn;
+  }
+
+  }// switch
+  return wReturn;
+} // OperandReportLiteral
+
+void clearOperand(void *&pOp)
+{
+  if (pOp==nullptr)
+    return;
+  if (static_cast<ZSearchOperandBase*>(pOp)->Type & ZSTO_Arithmetic)
+  {
+    delete static_cast<ZSearchArithmeticTerm*>(pOp);
+    pOp=nullptr;
+    return;
+  }
+
+  switch (static_cast<ZSearchOperandBase*>(pOp)->Type)
+  {
+  case ZSTO_Nothing:
+    break;
+  case ZSTO_FieldString:
+    delete static_cast<ZSearchFieldOperand<utf8VaryingString>*>(pOp);
+    break;
+  case ZSTO_FieldInteger:
+    delete static_cast<ZSearchFieldOperand<long>*>(pOp);
+    break;
+  case ZSTO_FieldFloat:
+    delete static_cast<ZSearchFieldOperand<double>*>(pOp);
+    break;
+  case ZSTO_FieldDate:
+    delete static_cast<ZSearchFieldOperand<ZDateFull>*>(pOp);
+    break;
+  case ZSTO_FieldChecksum:
+    delete static_cast<ZSearchFieldOperand<checkSum>*>(pOp);
+    break;
+  case ZSTO_FieldResource:
+    delete static_cast<ZSearchFieldOperand<ZResource>*>(pOp);
+    break;
+  case ZSTO_FieldBool:
+    delete static_cast<ZSearchFieldOperand<bool>*>(pOp);
+    break;
+
+  case ZSTO_LiteralString:
+    delete static_cast<ZSearchLiteral<utf8VaryingString>*>(pOp);
+    break;
+  case ZSTO_LiteralDate:
+    delete static_cast<ZSearchLiteral<ZDateFull>*>(pOp);
+    break;
+  case ZSTO_LiteralChecksum:
+    delete static_cast<ZSearchLiteral<checkSum>*>(pOp);
+    break;
+  case ZSTO_LiteralInteger:
+    delete static_cast<ZSearchLiteral<long>*>(pOp);
+    break;
+  case ZSTO_LiteralFloat:
+    delete static_cast<ZSearchLiteral<double>*>(pOp);
+    break;
+  case ZSTO_LiteralResource:
+    delete static_cast<ZSearchLiteral<ZResource>*>(pOp);
+    break;
+  case ZSTO_LiteralBool:
+    delete static_cast<ZSearchLiteral<bool>*>(pOp);
+    break;
+  }//switch
+  pOp=nullptr;
+  return;
+}
+
+void _copyOperand(void*& pOperand,const void* pOpIn)
+{
+
+  clearOperand(pOperand);
+
+  if (pOpIn==nullptr) {
+    _DBGPRINT("_copyOperand-E-NULL Input operand is NULL\n")
+    return;
+  }
+  if (static_cast<const ZSearchOperandBase*>(pOpIn)->Type & ZSTO_Arithmetic)
+  {
+    _DBGPRINT("_copyOperand-I Arithmetic term\n")
+    pOperand = new ZSearchArithmeticTerm(static_cast<const ZSearchArithmeticTerm*>(pOpIn));
+    return;
+  }
+
+  switch (static_cast<const ZSearchOperandBase*>(pOpIn)->Type)
+  {
+  case ZSTO_Nothing:
+    break;
+  case ZSTO_FieldString:
+    pOperand = new ZSearchFieldOperand<utf8VaryingString>(*static_cast<const ZSearchFieldOperand<utf8VaryingString>*>(pOpIn));
+    break;
+  case ZSTO_FieldInteger:
+    pOperand = new ZSearchFieldOperand<long>(*static_cast<const ZSearchFieldOperand<long>*>(pOpIn));
+    break;
+  case ZSTO_FieldFloat:
+    pOperand = new ZSearchFieldOperand<double>(*static_cast<const ZSearchFieldOperand<double>*>(pOpIn));
+    break;
+  case ZSTO_FieldDate:
+    pOperand = new ZSearchFieldOperand<ZDateFull>(*static_cast<const ZSearchFieldOperand<ZDateFull>*>(pOpIn));
+    break;
+  case ZSTO_FieldChecksum:
+    pOperand = new ZSearchFieldOperand<checkSum>(*static_cast<const ZSearchFieldOperand<checkSum>*>(pOpIn));
+    break;
+  case ZSTO_FieldResource:
+    pOperand = new ZSearchFieldOperand<ZResource>(*static_cast<const ZSearchFieldOperand<ZResource>*>(pOpIn));
+    break;
+  case ZSTO_FieldBool:
+    pOperand = new ZSearchFieldOperand<bool>(*static_cast<const ZSearchFieldOperand<bool>*>(pOpIn));
+    break;
+
+  case ZSTO_LiteralString:
+    pOperand = new ZSearchLiteral<utf8VaryingString>(*static_cast<const ZSearchLiteral<utf8VaryingString>*>(pOpIn));
+    break;
+  case ZSTO_LiteralDate:
+    pOperand = new ZSearchLiteral<ZDateFull>(*static_cast<const ZSearchLiteral<ZDateFull>*>(pOpIn));
+    break;
+  case ZSTO_LiteralChecksum:
+    pOperand = new ZSearchLiteral<checkSum>(*static_cast<const ZSearchLiteral<checkSum>*>(pOpIn));
+    break;
+  case ZSTO_LiteralInteger:
+    pOperand = new ZSearchLiteral<long>(*static_cast<const ZSearchLiteral<long>*>(pOpIn));
+    break;
+  case ZSTO_LiteralFloat:
+    pOperand = new ZSearchLiteral<double>(*static_cast<const ZSearchLiteral<double>*>(pOpIn));
+    break;
+  case ZSTO_LiteralResource:
+    pOperand = new ZSearchLiteral<ZResource>(*static_cast<const ZSearchLiteral<ZResource>*>(pOpIn));
+    break;
+  case ZSTO_LiteralBool:
+    pOperand = new ZSearchLiteral<bool>(*static_cast<const ZSearchLiteral<bool>*>(pOpIn));
+    break;
+  default:
+    _DBGPRINT("ZSearchArithmeticTerm::_copyOperand-E-INVTYPE Cannot copy operand of type <%s>.\n",decode_OperandType(static_cast<const ZSearchOperandBase*>(pOpIn)->Type))
+    return;
+  }
+  _DBGPRINT("_copyOperand-I Single operand of type <%s>\n",decode_OperandType(static_cast<const ZSearchOperandBase*>(pOpIn)->Type))
+  return;
+}// copyOperand

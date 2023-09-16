@@ -167,7 +167,9 @@ SOURCES += \
     visulinecol.cpp \
     visuraw.cpp \
     zbackupdlg.cpp \
+    zcellformatdlg.cpp \
     zchangerecord.cpp \
+    zcollectionlist.cpp \
     zcppgenerate.cpp \
     zfilegenerate.cpp \
     zkeylistdlg.cpp \
@@ -231,7 +233,9 @@ HEADERS += \
     visulinecol.h \
     visuraw.h \
     zbackupdlg.h \
+    zcellformatdlg.h \
     zchangerecord.h \
+    zcollectionlist.h \
     zcontentutils_release.h \
     zcppgenerate.h \
     zfilegenerate.h \
@@ -263,6 +267,8 @@ FORMS += \
     filegeneratedlg.ui \
     poolvisu.ui \
     poolvisuDLg.ui \
+    zcellformatdlg.ui \
+    zcollectionlist.ui \
     zrawmasterfilevisu.ui \
     zsearchquerymwd.ui
     $${TOOLSET_ROOT}/zcppparser/zcppparserutils/rawfields.ui

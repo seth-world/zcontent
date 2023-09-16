@@ -133,29 +133,16 @@ _BaseCollectionEntity::setToken(ZSearchToken *pToken )
   Name = pToken->Text ;
 }
 
-/*
-void
-_BaseCollectionEntity::setFormula(ZSearchFormula* pFormula)
-{
-  if (Formula!=nullptr)
-    delete Formula;
-  Formula = new ZSearchFormula(*pFormula);
-}
 
-void
-_BaseCollectionEntity::setLogicalOperand(ZSearchLogicalOperand* pOperand)
-{
-  if (LogicalOperand!=nullptr)
-    delete LogicalOperand;
-  LogicalOperand = pOperand;
-}
-*/
 void
 _BaseCollectionEntity::setLogicalTerm(ZSearchLogicalTerm* pTerm)
 {
   if (LogicalTerm!=nullptr)
     delete LogicalTerm;
-  LogicalTerm = new ZSearchLogicalTerm(*pTerm);
+  if (pTerm==nullptr)
+    LogicalTerm = nullptr;
+  else
+    LogicalTerm = new ZSearchLogicalTerm(pTerm);
 }
 
 const ZMetaDic&
@@ -188,91 +175,6 @@ _BaseCollectionEntity::get(ZDataBuffer& pRecord,const long pRank,zaddress_type& 
     return _BaseEntity->get(pRecord,pRank,pAddress);
 }
 
-#ifdef __COMMENT__
-
-ZStatus
-_BaseCollectionEntity::evaluateFormula(bool &pOutResult, ZSearchFormula* wFormula, const ZDataBuffer& pRecord,int pDepth)
-{
-  ZStatus wSt=ZS_SUCCESS;
-  ZOperandContent OpContent[2];
-
-  URFField wField;
-  bool wOutResult=true;
-
-  int wColateral=0;
-
-
-  while (wFormula!=nullptr) {
-    _DBGPRINT("_BaseCollectionEntity::evaluateFormula Formula depth %d colateral %d \n",pDepth,wColateral)
-
-    switch (wFormula->FormulaType)
-    {
-    case ZFORT_Formula:
-    {
-      ZSearchFormula* wTermFormula = static_cast<ZSearchFormula*>(wFormula->TermOrFormula);
-      wSt = evaluateFormula(wOutResult,wTermFormula,pRecord,pDepth+1);
-      if (wSt!=ZS_SUCCESS) {
-        return wSt;
-      }
-      break;
-    } //ZFORT_Formula
-
-    case ZFORT_Term:
-    {
-      ZSearchLogicalOperand* wTerm = static_cast<ZSearchLogicalOperand*>(wFormula->TermOrFormula);
-      OpContent[0]=gettermOperandContent(wTerm->Operand,pRecord);
-
-      OpContent[1]=gettermOperandContent(wTerm->OperandNext,pRecord);
-
-      wSt = evaluateTerm(wOutResult,OpContent[0],OpContent[1],wTerm->Operator);
-      break;
-    } //ZFORT_Term
-    default:
-    _DBGPRINT("_BaseCollectionEntity::evaluateFormula Formula depth <%d> colateral rank <%d> : unknown formula type\n",pDepth,wColateral)
-    abort();
-    }// switch
-
-    _DBGPRINT("_BaseCollectionEntity::evaluateFormula Formula depth <%d> collateral rank <%d> raw result is <%s>",
-                pDepth, wColateral , wOutResult?"true":"false")
-
-    while (true) {
-      if (wFormula->LeadingOperator.get()==ZSOPV_Nothing) { /*if first formula */
-        pOutResult = wOutResult;        /* assign logical result */
-        _DBGPRINT(" No leading operator.\n")
-        break;
-      }
-      if (wFormula->LeadingOperator.get() & ZSOPV_NOT) {  /* result is negated, lets continue */
-        wOutResult = ! wOutResult;
-        _DBGPRINT(" negated to %s",  wOutResult?"<true>":"<false>")
-      }
-      if (wFormula->LeadingOperator.get() & ZSOPV_AND) {
-        bool wRes = pOutResult && wOutResult;
-        _DBGPRINT(" Anded to <%s> gives <%s>\n",  pOutResult?"<true>":"<false>",wRes?"<true>":"<false>")
-        pOutResult = wRes;
-        break;
-      } else if (wFormula->LeadingOperator.get() & ZSOPV_OR) {
-        bool wRes = pOutResult || wOutResult;
-        _DBGPRINT(" Ored to <%s> gives <%s>",  pOutResult?"<true>":"<false>",wRes?"<true>":"<false>")
-        pOutResult = wRes;
-        break;
-      } else {  /* this is first formula preceeded by NOT */
-        _DBGPRINT(" First formula with no preceeding link operator excepted NOT.\n")
-        pOutResult = wOutResult;        /* assign logical result */
-      }
-      break;
-    } // while true
-
-    if (wSt!=ZS_SUCCESS)
-      return wSt;
-    wFormula = wFormula->NextFormula;
-    wColateral++;
-  }// while (wFormula!=nullptr)
-
-  return ZS_SUCCESS;
-} //_BaseCollectionEntity::evaluateFormula
-#endif // __COMMENT__
-
-
 
 
 
@@ -280,8 +182,11 @@ ZStatus
 _BaseCollectionEntity::evaluate(bool &pOutResult,const ZDataBuffer& pRecord)
 {
   _URFParser.set(&pRecord);
-  if (LogicalTerm==nullptr)
+  /* if there is no selection clause then all records are selected */
+  if (LogicalTerm==nullptr) {
+    pOutResult = true;
     return ZS_EMPTY;
+  }
   pOutResult = LogicalTerm->evaluate(_URFParser);
   return ZS_SUCCESS;
  // return evaluateFormula(pOutResult,Formula,pRecord,0);
@@ -292,10 +197,25 @@ _BaseCollectionEntity::evaluate(bool &pOutResult,const ZDataBuffer& pRecord)
 
 ZSearchEntity&
 ZSearchEntity::_copyFrom (const ZSearchEntity& pIn) {
-  if (isFile())
+  if (CellFormat!=nullptr)
+    zfree(CellFormat);
+  int wFieldNumber=0;
+  if (isFile()) {
     _FileEntity = pIn._FileEntity->getSharedPtr();
-  if (isCollection())
+    wFieldNumber = pIn._FileEntity->getFieldDictionary().count();
+  }
+  if (isCollection()) {
     _CollectionEntity = pIn._CollectionEntity->getSharedPtr();
+    wFieldNumber = pIn._CollectionEntity->getFieldDictionary().count();
+  }
+  if (CellFormat!=nullptr)
+    zfree(CellFormat);
+
+  CellFormat = (int*)malloc((wFieldNumber+1)*sizeof(int));
+  for (int wi=0;wi < wFieldNumber+1;wi++) {
+    CellFormat[wi]=pIn.CellFormat[wi];
+  }
+
   return *this;
 }
 
@@ -320,32 +240,6 @@ ZSearchEntity::setToken(ZSearchToken *pToken)
   _FileEntity->setToken(pToken);
 }
 
-/*
-void
-ZSearchEntity::setFormula(ZSearchFormula *pFormula)
-{
-  if (!isCollection()) {
-    _DBGPRINT("ZSearchEntity::setFormula Entity <%s> is not a collection while trying to set a formula-",getName().toString())
-    abort();
-  }
-
-  _CollectionEntity->setFormula(pFormula);
-  return;
-}
-*/
-/*
-void
-ZSearchEntity::setLogicalOperand(ZSearchLogicalOperand *pOperand)
-{
-  if (!isCollection()) {
-    _DBGPRINT("ZSearchEntity::setFormula Entity <%s> is not a collection while trying to set a formula-",getName().toString())
-    abort();
-  }
-
-  _CollectionEntity->setLogicalOperand(pOperand);
-  return;
-}
-*/
 void
 ZSearchEntity::setLogicalTerm(ZSearchLogicalTerm*pTerm)
 {
@@ -536,6 +430,22 @@ void ZSearchEntity::_checkCircularReference(std::shared_ptr<ZSearchEntity> pTop)
     wNames.push(wCurEntity->getName());
     wCurEntity = wCurEntity->_CollectionEntity->_BaseEntity;
   } // while true
+}
+
+void
+ZSearchEntity::allocateCellFormat()
+{
+  if (CellFormat!=nullptr) {
+    zfree(CellFormat);
+  }
+  int wNb=getFieldDictionary().count();
+  CellFormat = (int*)calloc(wNb,sizeof(int));
+  memset (CellFormat,0,wNb*sizeof(int));
+}
+void
+ZSearchEntity::reallocateCellFormat()
+{
+  CellFormat = (int*)realloc(CellFormat,getFieldDictionary().count()*sizeof(int));
 }
 
 const ZMetaDic&

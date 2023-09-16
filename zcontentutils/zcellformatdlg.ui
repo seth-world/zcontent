@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ZCellFormatDLg</class>
+ <widget class="QDialog" name="ZCellFormatDLg">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>374</width>
+    <height>468</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QGroupBox" name="NumericGBx">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>90</y>
+     <width>351</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Numeric</string>
+   </property>
+   <widget class="QRadioButton" name="NumStdRBn">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>311</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>standard numeric representation (default)</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="NumHexaRBn">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>251</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Hexadecimal</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="ApplyGBx">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>0</y>
+     <width>361</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string/>
+   </property>
+   <widget class="QLabel" name="ApplianceLBl">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>30</y>
+      <width>351</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="ResourceGBx">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>340</y>
+     <width>361</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Resource</string>
+   </property>
+   <widget class="QCheckBox" name="ResSymbolCKb">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>341</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Show ZEntity symbol (default is numeric value)</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ResStdNumCKb">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>341</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Standard numeric representation (default hexa)</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="OKBTn">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>430</y>
+     <width>80</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Done</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="DateGBx">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>170</y>
+     <width>361</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Date</string>
+   </property>
+   <widget class="QRadioButton" name="DMYRBn">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>261</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>day/month/year (default)</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="MDYRBn">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>221</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>month/day/year </string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="DMYHMSRBn">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>221</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>day/month/year-hh:mm:ss</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="MDYHMSRBn">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>221</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>month/day/year -hh:mm:ss</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="UTCRBn">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>130</y>
+      <width>221</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>UTC</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="LocaleRBn">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>110</y>
+      <width>221</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>locale date format</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

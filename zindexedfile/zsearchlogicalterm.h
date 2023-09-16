@@ -34,14 +34,17 @@
 
 
 #include "zsearchoperand.h"
+
 namespace zbs {
 class ZSearchLogicalTerm
 {
 public:
   ZSearchLogicalTerm() ;
   ZSearchLogicalTerm(const ZSearchLogicalTerm& pIn) {_copyFrom(pIn);}
+  ZSearchLogicalTerm(const ZSearchLogicalTerm* pIn) {_copyFrom(pIn);}
 
   ZSearchLogicalTerm& _copyFrom(const ZSearchLogicalTerm& pIn);
+  ZSearchLogicalTerm& _copyFrom(const ZSearchLogicalTerm* pIn);
 
   void setOperand1(const ZSearchLogicalOperand& pOperand1);
   void setOperand2(const ZSearchLogicalOperand& pOperand2);
@@ -52,12 +55,15 @@ public:
   bool            evaluate(URFParser &pURFParser);
 
   int             ParenthesisLevel=0;
-  int             Collateral=0;
+//  int             Collateral=0;
   ZSearchOperator NotOperator=ZSOPV_Nothing;
-  ZSearchLogicalOperand Operand1;
+//  ZSearchLogicalOperand Operand1;
+  void* Operand1=nullptr;
   ZSearchOperator CompareOperator;
-  ZSearchLogicalOperand Operand2;
-  ZSearchOperator AndOrOperator=ZSOPV_Nothing;
+//  ZSearchLogicalOperand Operand2;
+  void* Operand2=nullptr;
+  ZSearchOperandType  MainType=ZSTO_Nothing;
+  ZSearchOperator     AndOrOperator=ZSOPV_Nothing;
   ZSearchLogicalTerm* NextTerm=nullptr;
 };
 } //namespace zbs

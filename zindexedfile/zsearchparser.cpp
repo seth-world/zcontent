@@ -23,6 +23,7 @@
 #include "zsearchparsertype.h"
 #include "zsearchoperand.h"
 #include "zsearchlogicalterm.h"
+#include "zsearcharithmeticterm.h"
 
 using namespace zbs;
 
@@ -52,8 +53,9 @@ display {<collection name>.<field>, <collection name>.<field>,... | <collection 
   show symbols ;                                  -> list all symbols available : a symbol is a shortcut to a filename
   show {<entity> | <collection name>} fields ;
   show {<entity> | <collection name>} <fieldname> ; // exact field name
-  show {<entity> | <collection name>} fffff* ; // field name truncated
-
+  show {<entity> | <collection name>} sss* ; // field name starting with 'sss'
+  show {<entity> | <collection name>} *sss ; // field name ending with 'sss'
+  show {<entity> | <collection name>} *sss* ; // field name containing 'sss'
 
 
 
@@ -142,7 +144,7 @@ ZSearchParser::setup(uriString& pXmlParserSymbol,
   return ZS_SUCCESS;
 }
 
-ZStatus ZSearchParser::parse(const utf8VaryingString& pContent) {
+ZStatus ZSearchParser::parse(const utf8VaryingString& pContent, std::shared_ptr<ZSearchEntity> &pCollection) {
 
   clear();
 
@@ -163,12 +165,29 @@ ZStatus ZSearchParser::parse(const utf8VaryingString& pContent) {
   if (Tokenizer->Options & ZSRCHO_Report)
     Tokenizer->report();
   bool wStoreInstruction=true;
-  ZStatus wSt = _parse(wStoreInstruction);
+
+  int wInstructionType = ZSITP_Nothing;
+
+  Phrase.clear();
+
+  ZStatus wSt = _parse(pCollection,wStoreInstruction,wInstructionType);
   if (wStoreInstruction)
     History.add(pContent);
+
+  Phrase = pContent.subString(FirstToken->TokenOffset,CurrentToken->TokenOffset + 1 - FirstToken->TokenOffset);
+
+  if ((wSt==ZS_SUCCESS)&&(wInstructionType==ZSITP_Find)) {
+    textLog("Collection report \n %s\n",EntityList.last()->_report().toString());
+
+   wSt= _executeFind(EntityList.last()->_CollectionEntity);
+   if (wSt==ZS_OUTBOUNDHIGH)
+     wSt=ZS_SUCCESS;
+  }
+
 //  InstructionLog.push(ZInstructionItem(pContent,wSt));
   return wSt;
 }//ZSearchParser::parse
+
 
 
 bool  ZSearchParser::_parseComment (ZSearchToken* &pToken) {
@@ -403,7 +422,7 @@ ZSearchParser::_parseSetHistoryMaximum()
 /* set file <path> [mode readonly,modify] as <entity name> ;  // by default mode is read only */
 
 ZStatus
-ZSearchParser::_parseSetFile()
+ZSearchParser::_parseSetFile(std::shared_ptr<ZSearchEntity> &pCollection)
 {
   ZStatus wSt=ZS_SUCCESS;
   uriString wPath;
@@ -691,11 +710,7 @@ ZSearchParser::showEntities () {
       textLog("       is a collection entity  : base entity is <%30s> of type <%s>.",
           EntityList[wi]->_CollectionEntity->_BaseEntity->getName().toString(),wBaseType);
       if (EntityList[wi]->_CollectionEntity->isValid()) {
-    /*
-        ZSearchFormula* wFormula = EntityList[wi]->_CollectionEntity->Formula;
-        textLog("___________________Formula_______________________");
-        textLog(wFormula->_report().toCChar());
-     */
+        textLog("___________________Logical term_______________________");
         if (EntityList[wi]->_CollectionEntity->LogicalTerm!=nullptr) {
           textLog("___________________Logical expression_______________________");
           textLog(EntityList[wi]->_CollectionEntity->LogicalTerm->_report(0).toCChar());
@@ -703,10 +718,17 @@ ZSearchParser::showEntities () {
         else
           textLog("***No logical expression***");
 
+       textLog("___________________ Selected fields _______________________");
+
+       for (long wj=0;wj < EntityList[wi]->_CollectionEntity->getFieldDictionary().count();wj++ ) {
+         textLog(EntityList[wi]->_CollectionEntity->getFieldDictionary().TabConst(wj).getName().toCChar());
+       }
 
       } // is valid
+      else
+        textLog("***Base entity is NULL***");
     }
-  textLog("________________________________________________");
+  textLog("__________________________________________________________________");
 }
 
 void
@@ -731,7 +753,7 @@ ZSearchParser::_finish()
 /* for <entity name> with < selection clause > set  <entity name>.<field name> = <value> , <entity name>.<field name> = <value> ; */
 
 ZStatus
-ZSearchParser::_parseFor()
+ZSearchParser::_parseFor(std::shared_ptr<ZSearchEntity> &pCollection)
 {
   return ZS_SUCCESS;
 }
@@ -778,7 +800,7 @@ ZSearchParser::_parseLogicalOperand(void* & pOperand,int pParenthesisLevel, int 
 
   /*
     if operator following operand is arithmetic, then the whole operand becomes an arithmetic formula that gives a literal result.
-    - Nature of the operand changes : it becomes ZSearchArithmeticOperand in place of ZSearchFieldOperand or ZSearchLiteralOperand
+    - Nature of the operand changes : it becomes ZSearchArithmeticTerm in place of ZSearchFieldOperand or ZSearchLiteralOperand
     - operand parsed so far becomes the first operand of the arithmetic expression
     - Expression type is initialized with first operand type :
         Expression type has two states : literal or field.
@@ -796,6 +818,22 @@ ZSearchParser::_parseLogicalOperand(void* & pOperand,int pParenthesisLevel, int 
 }
 #endif // __COMMENT__
 
+
+/* extracts field identifier either under the form of
+ *
+   <field>
+   <field>.<modifier>
+
+  <entity>.<field>
+
+  <entity>.<field>.<modifier>
+
+
+  <modifer> itself and its possible arguments will be extracted by callee routine (i. e. _parseOperandField())
+
+
+*/
+
 ZStatus
 ZSearchParser::_parseFieldIdentifier (int & pEntityListIndex, ZSearchFieldOperandOwnData *pFOD)
 {
@@ -812,12 +850,12 @@ ZSearchParser::_parseFieldIdentifier (int & pEntityListIndex, ZSearchFieldOperan
    return ZS_MISS_FIELD;
  }
 
- /* if dot, then previous is entity name or modifier */
+ /* if dot, then previous is ZEntity name as literal  or Field and current is modifier */
  if (Tokenizer->Tab(Index+1)->Type == ZSRCH_DOT) {
    if ((Tokenizer->Tab(Index+2)->Type & ZSRCH_MODIFIER)==ZSRCH_MODIFIER) {
      /* there no entity : only one current entity must be selected */
      if (CurEntities.count()>1) {
-       errorLog("Missing entity identifier : when multiple entities are selected then fields must be prefixed. Found <%s> at line %d column %d.",
+       errorLog("Missing entity identifier : when multiple entities are selected then fields must be prefixed by entity name. Found <%s> at line %d column %d.",
            Tokenizer->Tab(Index+2)->Text.toString(),
            Tokenizer->Tab(Index+2)->TokenLine,Tokenizer->Tab(Index+2)->TokenColumn );
        return ZS_MISS_FIELD;
@@ -843,23 +881,21 @@ ZSearchParser::_parseFieldIdentifier (int & pEntityListIndex, ZSearchFieldOperan
      pFOD->FullFieldName = CurEntities[0]->getName();
      pFOD->FullFieldName.addUtfUnit('.');
      pFOD->FullFieldName += Tokenizer->Tab(Index)->Text;
-     pFOD->FullFieldName.addUtfUnit('.');
-     pFOD->TokenList.push(Tokenizer->Tab(Index+2)); /* modifier name */
+//     pFOD->FullFieldName.addUtfUnit('.');
+//     pFOD->TokenList.push(Tokenizer->Tab(Index+2)); /* modifier name */
 
-     pFOD->TokenList.push(Tokenizer->Tab(Index)); /* store field identifier token */
+
+//     pFOD->TokenList.push(Tokenizer->Tab(Index)); /* store field identifier token */
      if (!advanceIndex())/* skip field identifier */
        return ZS_SYNTAX_ERROR;
-     pFOD->TokenList.push(Tokenizer->Tab(Index)); /* dot token */
-     if (!advanceIndex())/* skip dot */
-       return ZS_SYNTAX_ERROR;
-     pFOD->TokenList.push(Tokenizer->Tab(Index)); /* modifier token */
-     if (!advanceIndex())/* skip modifier */
-       return ZS_SYNTAX_ERROR;
+//     pFOD->TokenList.push(Tokenizer->Tab(Index)); /* dot token */
+//     if (!advanceIndex())/* skip dot */
+//       return ZS_SYNTAX_ERROR;
 
-/*
-     wEntityName = CurEntities[0]->getName();
-     wCurEntityIndex =0;
-*/
+//     pFOD->TokenList.push(Tokenizer->Tab(Index)); /* modifier token */
+//     if (!advanceIndex())/* skip modifier */
+//       return ZS_SYNTAX_ERROR;
+
      return ZS_SUCCESS;
    } // ZSRCH_MODIFIER
 
@@ -885,16 +921,16 @@ ZSearchParser::_parseFieldIdentifier (int & pEntityListIndex, ZSearchFieldOperan
    }
 
 
-   pFOD->TokenList.push(Tokenizer->Tab(Index));
+//   pFOD->TokenList.push(Tokenizer->Tab(Index));
    wEntityName = Tokenizer->Tab(Index)->Text;
 
    if (!advanceIndex())/* entity identifier */
      return ZS_SYNTAX_ERROR;
 
-   pFOD->TokenList.push(Tokenizer->Tab(Index));
+//   pFOD->TokenList.push(Tokenizer->Tab(Index));
    if (!advanceIndex())/* dot sign */
      return ZS_SYNTAX_ERROR;
-   pFOD->TokenList.push(Tokenizer->Tab(Index)); /* store field name token */
+//   pFOD->TokenList.push(Tokenizer->Tab(Index)); /* store field name token */
 
 /*  must be positionned to field name token
  *   if (!advanceIndex())
@@ -911,7 +947,7 @@ ZSearchParser::_parseFieldIdentifier (int & pEntityListIndex, ZSearchFieldOperan
    }
    wCurEntityIndex=0; /* get first and only current entity */
 
-   pFOD->TokenList.push(Tokenizer->Tab(Index)); /* store field name token */
+//   pFOD->TokenList.push(Tokenizer->Tab(Index)); /* store field name token */
    /*  must be positionned to field name token
  *   if (!advanceIndex())
      return ZS_SYNTAX_ERROR;
@@ -946,18 +982,155 @@ ZSearchParser::_parseFieldIdentifier (int & pEntityListIndex, ZSearchFieldOperan
 } //_parseFieldIdentifier
 
 
+/**
+ * @brief ZSearchParser::_parseModifier   index must point after ZSRC_DOT token directly to Modifier token
+ */
 ZStatus
-ZSearchParser::_parseOperandField(void* &    pTermOperand)
+ZSearchParser::_parseModifier(ZSearchOperandBase*   pOB)
+{
+  if ((Tokenizer->Tab(Index)->Type & ZSRCH_MODIFIER)!=ZSRCH_MODIFIER) {
+      errorLog("Expecting modifier. Possibly there is a mismatch with entity,field name,modifier. Found <%s> at line %d column %d.",
+          Tokenizer->Tab(Index)->Text.toString(),
+          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+      return ZS_SYNTAX_ERROR;
+  }
+
+  ZSearchOperandType_type wType = pOB->Type & ZSTO_BaseMask;
+
+  switch (Tokenizer->Tab(Index)->Type ) {
+  case ZSRCH_SUBSTRING : {
+    if ((wType != ZSTO_String)&&(wType != ZSTO_UriString)) {
+      errorLog("Modifier SUBSTRING is only possible with a string or an URI string. Possibly there is a mismatch with entity.field name.modifier. Found <%s> at line %d column %d.",
+          Tokenizer->Tab(Index)->Text.toString(),
+          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+      return ZS_INV_MODIFIER;
+    }
+    pOB->ModifierType = Tokenizer->Tab(Index)->Type;
+    if (!advanceIndex()) {
+      return ZS_SYNTAX_ERROR;
+    }
+    if(Tokenizer->Tab(Index)->Type!=ZSRCH_OPENPARENTHESIS) {
+      errorLog("Wrong modifier syntax. Expecting open parenthesis found <%s> at line %d column %d ",
+          Tokenizer->Tab(Index)->Text.toString(),
+          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+      return ZS_MISS_PUNCTSIGN ;
+    }
+    if (!advanceIndex()) {
+      return ZS_SYNTAX_ERROR;
+    }
+    if(Tokenizer->Tab(Index)->Type!=ZSRCH_NUMERIC_LITERAL) {
+      errorLog("Missing numeric literal. Found <%s> at line %d column %d",
+          Tokenizer->Tab(Index)->Text.toString(),
+          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+      return ZS_MISS_LITERAL ;
+    }
+    pOB->ModVal1 = Tokenizer->Tab(Index)->Text.toLong();
+    if (!advanceIndex()) {
+      return ZS_SYNTAX_ERROR;
+    }
+    if(Tokenizer->Tab(Index)->Type!=ZSRCH_COMMA) {
+      errorLog("Wrong modifier syntax. Expecting comma, found <%s> at line %d column %d",
+          Tokenizer->Tab(Index)->Text.toString(),
+          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+      return ZS_MISS_PUNCTSIGN ;
+    }
+    if (!advanceIndex()) {
+      return ZS_SYNTAX_ERROR;
+    }
+    if(Tokenizer->Tab(Index)->Type!=ZSRCH_NUMERIC_LITERAL) {
+      errorLog("Missing numeric literal. Found <%s> at line %d column %d ",
+          Tokenizer->Tab(Index)->Text.toString(),
+          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+      return ZS_MISS_LITERAL ;
+    }
+    pOB->ModVal2 = Tokenizer->Tab(Index)->Text.toLong();
+    if(Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
+      errorLog("Wrong modifier syntax. Expecting close parenthesis found <%s> at line %d column %d ",
+          Tokenizer->Tab(Index)->Text.toString(),
+          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+      return ZS_MISS_PUNCTSIGN ;
+    }
+    /*
+    if (!advanceIndex()) {
+      return ZS_SYNTAX_ERROR;
+    }
+*/
+    return ZS_SUCCESS;
+  }
+  case ZSRCH_PATH:
+  case ZSRCH_EXTENSION:
+  case ZSRCH_BASENAME:
+  case ZSRCH_ROOTNAME: {
+    if (wType != ZSTO_UriString) {
+      errorLog("Modifier <%s> is only possible with an URI string.at line %d column %d.",
+          Tokenizer->Tab(Index)->Text.toString(),
+          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+      return ZS_INV_MODIFIER;
+    }
+
+    pOB->ModifierType = Tokenizer->Tab(Index)->Type;
+    /*
+    if (!advanceIndex()) {
+      return ZS_SYNTAX_ERROR;
+    }
+*/
+    return ZS_SUCCESS;
+  }
+  case ZSRCH_YEAR:
+  case ZSRCH_MONTH:
+  case ZSRCH_DAY:
+  case ZSRCH_HOUR:
+  case ZSRCH_MIN:
+  case ZSRCH_SEC: {
+    if (wType != ZSTO_Date) {
+      errorLog("Modifier <%s> is only possible with an Date.at line %d column %d.",
+          Tokenizer->Tab(Index)->Text.toString(),
+          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+      return ZS_INV_MODIFIER;
+    }
+
+    pOB->ModifierType = Tokenizer->Tab(Index)->Type;
+/*
+    if (!advanceIndex()) {
+      return ZS_SYNTAX_ERROR;
+    }
+*/
+    return ZS_SUCCESS;
+  }
+  case ZSRCH_ZENTITY:
+  case ZSRCH_ID:  {
+      if (wType != ZSTO_Resource) {
+        errorLog("Modifier <%s> is only possible with an Resource.at line %d column %d.",
+            Tokenizer->Tab(Index)->Text.toString(),
+            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+        return ZS_INV_MODIFIER;
+      }
+      pOB->ModifierType = Tokenizer->Tab(Index)->Type;
+      /*
+      if (!advanceIndex()) {
+        return ZS_SYNTAX_ERROR;
+      }
+*/
+      return ZS_SUCCESS;
+  }
+  default:
+      errorLog("Invalid modifier <%s> for field at line %d column %d ",
+          Tokenizer->Tab(Index)->Text.toString(),
+          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+      return ZS_INV_MODIFIER ;
+  }// switch Type
+}// _parseModifier
+
+ZStatus
+ZSearchParser::_parseOperandField(void* &    pTermOperand,ZSearchOperandType& pRequestedType)
 {
   ZStatus wSt=ZS_SUCCESS;
-
-//  ZFieldDescription           wF;
-//  ZSearchOperandBase          wOB;
+  int wSvIndex=Index;
   ZSearchFieldOperandOwnData  wFOD;
 
   int wEntityListIndex=0;
 
-//  wSt=_parseFieldIdentifier(wEntityListIndex,&wFOD,&wOB);
+  pTermOperand=nullptr;
 
   wSt=_parseFieldIdentifier(wEntityListIndex,&wFOD);
   if (wSt!=ZS_SUCCESS) {
@@ -979,33 +1152,62 @@ ZSearchParser::_parseOperandField(void* &    pTermOperand)
     wFOD.Type = ZSTO_FieldInteger;
     ZSearchFieldOperand<long>* wF1=new ZSearchFieldOperand<long>();
 
-//    wF1->setOperandBase(wOB);
     wF1->setOwnData(wFOD);
-    pTermOperand = wF1;
+
     /* no modifiers for numeric field */
-    if (!advanceIndex()) {
-      delete wF1;
-      pTermOperand = nullptr;
+
+    if (Tokenizer->Tab(Index)->Type == ZSRCH_DOT) {
+      errorLog("No modifier allowed to integer data. Found <%s> at line %d column %d.",
+          Tokenizer->Tab(Index)->Text.toString(),
+          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index+2)->TokenColumn );
       return ZS_SYNTAX_ERROR;
     }
+
+
+    if (!OperandTypeCheck(pRequestedType,wF1->getOperandBase(), wSvIndex)) {
+      delete wF1;
+      return ZS_INVTYPE ;
+    }
+    if (!advanceIndex()) {
+      delete wF1;
+      return ZS_SYNTAX_ERROR;
+    }
+
+    pTermOperand = wF1;
     return ZS_SUCCESS;
-  }
+
+  }// ZSTO_FieldInteger
+
   case ZType_Float:
   case ZType_Double:
   case ZType_LDouble: {
     wFOD.Type = ZSTO_FieldFloat;
     ZSearchFieldOperand<double>* wF1=new ZSearchFieldOperand<double>();
     wF1->setOwnData(wFOD);
-//    wF1->setOperandBase(wOB);
-    pTermOperand = wF1;
+
     /* no modifiers for numeric field */
-    if (!advanceIndex()) {
-      delete wF1;
-      pTermOperand = nullptr;
+    if (Tokenizer->Tab(Index)->Type == ZSRCH_DOT) {
+      errorLog("No modifier allowed to floating point data. Found <%s> at line %d column %d.",
+          Tokenizer->Tab(Index)->Text.toString(),
+          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
       return ZS_SYNTAX_ERROR;
     }
+
+    if (!OperandTypeCheck(pRequestedType,wF1->getOperandBase(), wSvIndex)) {
+      delete wF1;
+      return ZS_INVTYPE ;
+    }
+
+    if (!advanceIndex()) {
+      delete wF1;
+      return ZS_SYNTAX_ERROR;
+    }
+
+    pTermOperand = wF1;
     return ZS_SUCCESS;
-  }
+  } //  ZSTO_FieldInteger
+
+
   case ZType_Utf8VaryingString:
   case ZType_Utf16VaryingString:
   case ZType_Utf32VaryingString:
@@ -1015,98 +1217,29 @@ ZSearchParser::_parseOperandField(void* &    pTermOperand)
     wFOD.Type = ZSTO_FieldString;
     ZSearchFieldOperand<utf8VaryingString>* wF1=new ZSearchFieldOperand<utf8VaryingString>();
     wF1->setOwnData(wFOD);
-//    wF1->setOperandBase(wOB);
-    pTermOperand = wF1;
-    if (!advanceIndex())
-      return ZS_SYNTAX_ERROR;
-    if (Tokenizer->Tab(Index)->Type==ZSRCH_SUBSTRING) {
-      wF1->ModifierType = Tokenizer->Tab(Index)->Type;
-      wF1->TokenList.push(Tokenizer->Tab(Index));
-      if (!advanceIndex()) {
-        delete wF1;
-        pTermOperand = nullptr;
-        return ZS_SYNTAX_ERROR;
-      }
-      if(Tokenizer->Tab(Index)->Type!=ZSRCH_OPENPARENTHESIS) {
-        errorLog("Wrong modifier syntax. Expecting open parenthesis found <%s> at line %d column %d field named <%s>.<%s>",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,
-            wF1->TokenList[0]->Text.toString(),wF1->TokenList[1]->Text.toString());
-        delete wF1;
-        pTermOperand = nullptr;
-        return ZS_MISS_PUNCTSIGN ;
-      }
-      if (!advanceIndex()) {
-        delete wF1;
-        pTermOperand = nullptr;
-        return ZS_SYNTAX_ERROR;
-      }
-      if(Tokenizer->Tab(Index)->Type!=ZSRCH_NUMERIC_LITERAL) {
-        errorLog("Missing numeric literal. Found <%s> at line %d column %d field named <%s>.<%s>",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,
-            wF1->FullFieldName.toString());
-        delete wF1;
-        pTermOperand = nullptr;
-        return ZS_MISS_LITERAL ;
-      }
-      wF1->ModVal1 = Tokenizer->Tab(Index)->Text.toLong();
-      if (!advanceIndex()) {
-        delete wF1;
-        pTermOperand = nullptr;
-        return ZS_SYNTAX_ERROR;
-      }
-      if(Tokenizer->Tab(Index)->Type!=ZSRCH_COMMA) {
-        errorLog("Wrong modifier syntax. Expecting comma, found <%s> at line %d column %d field named <%s>.<%s>",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,
-            wF1->TokenList[0]->Text.toString(),wF1->TokenList[1]->Text.toString());
-        delete wF1;
-        pTermOperand = nullptr;
-        return ZS_MISS_PUNCTSIGN ;
-      }
-      if (!advanceIndex()) {
-        delete wF1;
-        pTermOperand = nullptr;
-        return ZS_SYNTAX_ERROR;
-      }
-      if(Tokenizer->Tab(Index)->Type!=ZSRCH_NUMERIC_LITERAL) {
-        errorLog("Missing numeric literal. Found <%s> at line %d column %d field named <%s>.<%s>",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,
-            wF1->TokenList[0]->Text.toString(),wF1->TokenList[1]->Text.toString());
-        delete wF1;
-        pTermOperand = nullptr;
-        return ZS_MISS_LITERAL ;
-      }
-      wF1->ModVal2 = Tokenizer->Tab(Index)->Text.toLong();
-      if(Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
-        errorLog("Wrong modifier syntax. Expecting close parenthesis found <%s> at line %d column %d field named <%s>.<%s>",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,
-            wF1->TokenList[0]->Text.toString(),wF1->TokenList[1]->Text.toString());
-        delete wF1;
-        pTermOperand = nullptr;
-        return ZS_MISS_PUNCTSIGN ;
-      }
-      if (!advanceIndex()) {
-        delete wF1;
-        pTermOperand = nullptr;
-        return ZS_SYNTAX_ERROR;
-      }
-      return ZS_SUCCESS;
-    } //ZSRCH_SUBSTRING
 
-    if ((Tokenizer->Tab(Index)->Type & ZSRCH_MODIFIER)==ZSRCH_MODIFIER) {
-      errorLog("Invalid modifier for field. Found <%s> at line %d column %d field named <%s>.<%s>",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,
-          wF1->FullFieldName.toString());
+    if (Tokenizer->Tab(Index)->Type == ZSRCH_DOT) {
+      if (!advanceIndex()) {  /* position to modifier token */
+        delete wF1;
+        return ZS_SYNTAX_ERROR;
+      }
+
+      if ((wSt=_parseModifier(wF1->getOperandBase()))!=ZS_SUCCESS) {
+        delete wF1;
+        return wSt;
+      }
+
+    } // ZSRCH_DOT
+
+    if (!OperandTypeCheck(pRequestedType,wF1->getOperandBase(), wSvIndex)) {
       delete wF1;
-      pTermOperand = nullptr;
-      return ZS_INV_MODIFIER ;
+      return ZS_INVTYPE ;
     }
-
+    if (!advanceIndex()) {
+      delete wF1;
+      return ZS_SYNTAX_ERROR;
+    }
+    pTermOperand = wF1;
     return ZS_SUCCESS;
   } // case strings
 
@@ -1114,126 +1247,115 @@ ZSearchParser::_parseOperandField(void* &    pTermOperand)
     wFOD.Type = ZSTO_FieldUriString;
     ZSearchFieldOperand<utf8VaryingString>* wF1=new ZSearchFieldOperand<utf8VaryingString>();
     wF1->setOwnData(wFOD);
-//    wF1->setOperandBase(wOB);
-    pTermOperand = wF1;
-    if (!advanceIndex()) {
-      delete wF1;
-      pTermOperand = nullptr;
-      return ZS_SYNTAX_ERROR;
-    }
 
-    switch (Tokenizer->Tab(Index)->Type)
-    {
-    case ZSRCH_PATH:
-    case ZSRCH_EXTENSION:
-    case ZSRCH_BASENAME:
-    case ZSRCH_ROOTNAME:
-      wF1->ModifierType = Tokenizer->Tab(Index)->Type;
-      wF1->TokenList.push(Tokenizer->Tab(Index));
-      if (!advanceIndex()) {
+    if (Tokenizer->Tab(Index)->Type == ZSRCH_DOT) {
+      if (!advanceIndex()) {  /* position to modifier token */
         delete wF1;
-        pTermOperand = nullptr;
         return ZS_SYNTAX_ERROR;
       }
-      break;
-    default:
-      if ((Tokenizer->Tab(Index)->Type & ZSRCH_MODIFIER)==ZSRCH_MODIFIER) {
-        errorLog("Invalid modifier for field. Found <%s> at line %d column %d field named <%s>.<%s>",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,
-            wF1->FullFieldName.toString());
+
+      if ((wSt=_parseModifier(wF1->getOperandBase()))!=ZS_SUCCESS) {
         delete wF1;
-        pTermOperand = nullptr;
-        return ZS_INV_MODIFIER ;
+        return wSt;
       }
-      break;  /* no modifier */
-    } // switch
+
+    } // ZSRCH_DOT
+
+
+    if (!OperandTypeCheck(pRequestedType,wF1->getOperandBase(), wSvIndex)) {
+      delete wF1;
+      pTermOperand = nullptr;
+      return ZS_INVTYPE ;
+    }
+    if (!advanceIndex()) {
+      delete wF1;
+      return ZS_SYNTAX_ERROR;
+    }
+    pTermOperand = wF1;
     return ZS_SUCCESS;
-  }
+  } // ZType_URIString
 
   case ZType_ZDateFull: {
     wFOD.Type = ZSTO_FieldDate;
     ZSearchFieldOperand<ZDateFull>* wF1=new ZSearchFieldOperand<ZDateFull>();
     wF1->setOwnData(wFOD);
-    pTermOperand = wF1;
-    if (!advanceIndex()) {
+
+    if (Tokenizer->Tab(Index)->Type == ZSRCH_DOT) {
+      if (!advanceIndex()) {  /* position to modifier token */
+        delete wF1;
+        return ZS_SYNTAX_ERROR;
+      }
+
+      if ((wSt=_parseModifier(wF1->getOperandBase()))!=ZS_SUCCESS) {
+        delete wF1;
+        return wSt;
+      }
+
+    } // ZSRCH_DOT
+
+    if (!OperandTypeCheck(pRequestedType,wF1->getOperandBase(), wSvIndex)) {
       delete wF1;
       pTermOperand = nullptr;
+      return ZS_INVTYPE ;
+    }
+
+    if (!advanceIndex()) {
+      delete wF1;
       return ZS_SYNTAX_ERROR;
     }
 
-    switch (Tokenizer->Tab(Index)->Type)
-    {
-    case ZSRCH_YEAR:
-    case ZSRCH_MONTH:
-    case ZSRCH_DAY:
-    case ZSRCH_HOUR:
-    case ZSRCH_MIN:
-    case ZSRCH_SEC:
-      wF1->ModifierType = Tokenizer->Tab(Index)->Type;
-      wF1->TokenList.push(Tokenizer->Tab(Index));
-      if (!advanceIndex()) {
-        delete wF1;
-        pTermOperand = nullptr;
-        return ZS_SYNTAX_ERROR;
-      }
-      break;
-    default:
-      if ((Tokenizer->Tab(Index)->Type & ZSRCH_MODIFIER)==ZSRCH_MODIFIER) {
-        errorLog("Invalid modifier for field. Found <%s> at line %d column %d field named <%s>.<%s>",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,
-            wF1->FullFieldName.toString());
-        delete wF1;
-        pTermOperand = nullptr;
-        return ZS_INV_MODIFIER ;
-      }
-      break;  /* no modifier */
-    }
+    pTermOperand = wF1;
     return ZS_SUCCESS;
-  }
+  } // ZType_ZDateFull
 
   case ZType_CheckSum: {
     ZSearchFieldOperand<checkSum>* wF1=new ZSearchFieldOperand<checkSum>();
     wF1->setOwnData(wFOD);
-    pTermOperand = wF1;
-    if (!advanceIndex()) {
+
+
+    if (!OperandTypeCheck(pRequestedType,wF1->getOperandBase(), wSvIndex)) {
       delete wF1;
       pTermOperand = nullptr;
+      return ZS_INVTYPE ;
+    }
+
+    if (!advanceIndex()) {
+      delete wF1;
       return ZS_SYNTAX_ERROR;
     }
-    break;
+
+    pTermOperand = wF1;
+    return ZS_SUCCESS;
   }
   case ZType_Resource: {
     wFOD.Type = ZSTO_FieldResource;
     ZSearchFieldOperand<ZResource>* wF1=new ZSearchFieldOperand<ZResource>();
     wF1->setOwnData(wFOD);
-    pTermOperand = wF1;
-    /* search modifiers */
-    switch (Tokenizer->Tab(Index)->Type)
-    {
-    case ZSRCH_ZENTITY:
-    case ZSRCH_ID:
-      wF1->ModifierType = Tokenizer->Tab(Index)->Type;
-      wF1->TokenList.push(Tokenizer->Tab(Index));
-      if (!advanceIndex()) {
+
+    if (Tokenizer->Tab(Index)->Type == ZSRCH_DOT) {
+      if (!advanceIndex()) {  /* position to modifier token */
         delete wF1;
-        pTermOperand = nullptr;
         return ZS_SYNTAX_ERROR;
       }
-      break;
-    default:
-      if ((Tokenizer->Tab(Index)->Type & ZSRCH_MODIFIER)==ZSRCH_MODIFIER) {
-        errorLog("Invalid modifier for field. Found <%s> at line %d column %d field named <%s>.<%s>",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,
-            wF1->FullFieldName.toString());
+
+      if ((wSt=_parseModifier(wF1->getOperandBase()))!=ZS_SUCCESS) {
         delete wF1;
-        pTermOperand = nullptr;
-        return ZS_INV_MODIFIER ;
+        return wSt;
       }
-      break;  /* no modifier */
+
+    } // ZSRCH_DOT
+
+    if (!OperandTypeCheck(pRequestedType,wF1->getOperandBase(), wSvIndex)) {
+      delete wF1;
+      return ZS_INVTYPE ;
     }
+
+    if (!advanceIndex()) {
+      delete wF1;
+      return ZS_SYNTAX_ERROR;
+    }
+
+    pTermOperand = wF1;
     return ZS_SUCCESS;
   } // ZType_Resource
 
@@ -1245,33 +1367,40 @@ ZSearchParser::_parseOperandField(void* &    pTermOperand)
     return ZS_INVTYPE ;
   }// switch
 
-
-
   return ZS_SUCCESS;
 } //_parseOperandField
 
 
 bool
-ZSearchParser::_parseEntity (void* &    pOperand)
+ZSearchParser::_parseEntity (void* &    pOperand, ZSearchOperandType &pRequestedType)
 {
   if (Tokenizer->Tab(Index)->Type!=ZSRCH_IDENTIFIER)
     return false;
+
+  int wSvIndex=Index;
+  pOperand = nullptr;
 
   /* check if ZEntity */
 
   for (int wi=0 ; wi < CurEntities.count();wi++) {
     if (Tokenizer->Tab(Index)->Text.compare(CurEntities[wi]->getName())==0) {
       ZSearchOperandBase            wOB;
-      wOB.TokenList.push(Tokenizer->Tab(Index));
       wOB.Type = ZSTO_LiteralInteger;
-      ZSearchLiteral<long> *wLit = new ZSearchLiteral<long> ;
+      ZSearchLiteral<long> *wLit = new ZSearchLiteral<long>(wOB) ;
       wLit->Content = ZEntityList[wi].Value;
+      wLit->Comment = ZEntityList[wi].Symbol;
+
+      if (!advanceIndex()) {
+        delete wLit;
+        return false;
+      }
+
+      if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
+        delete wLit;
+        return false ;
+      }
 
       pOperand = wLit;
-
-      if (!advanceIndex())
-        return ZS_SYNTAX_ERROR;
-
       return true;
     }
   }
@@ -1279,26 +1408,33 @@ ZSearchParser::_parseEntity (void* &    pOperand)
 } //_parseZEntity
 
 bool
-ZSearchParser::_parseZEntity (void* &    pOperand)
+ZSearchParser::_parseZEntity (void* &    pOperand, ZSearchOperandType &pRequestedType)
 {
   if (Tokenizer->Tab(Index)->Type!=ZSRCH_IDENTIFIER)
     return false;
 
+  pOperand = nullptr;
   /* check if ZEntity */
 
   for (int wi=0 ; wi < ZEntityList.count();wi++) {
     if (Tokenizer->Tab(Index)->Text.compareCase(ZEntityList[wi].Symbol)==0) {
       ZSearchOperandBase            wOB;
-      wOB.TokenList.push(Tokenizer->Tab(Index));
+//      wOB.TokenList.push(Tokenizer->Tab(Index));
       wOB.Type = ZSTO_LiteralInteger;
-      ZSearchLiteral<long> *wLit = new ZSearchLiteral<long> ;
+      ZSearchLiteral<long> *wLit = new ZSearchLiteral<long> (wOB);
       wLit->Content = ZEntityList[wi].Value;
+      wLit->Comment = ZEntityList[wi].Symbol;
 
-      pOperand = wLit;
+      if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), Index)) {
+        delete wLit;
+        return false ;
+      }
 
-      if (!advanceIndex())
-        return ZS_SYNTAX_ERROR;
-
+      if (!advanceIndex()) {
+        delete wLit;
+        return false;
+      }
+       pOperand = wLit;
       return true;
     }
   }
@@ -1306,7 +1442,7 @@ ZSearchParser::_parseZEntity (void* &    pOperand)
 } //_parseZEntity
 
 bool
-ZSearchParser::_parseSymbol (void* &    pOperand)
+ZSearchParser::_parseSymbol (void* &    pOperand, ZSearchOperandType &pRequestedType)
 {
   if (Tokenizer->Tab(Index)->Type!=ZSRCH_IDENTIFIER)
     return false;
@@ -1316,15 +1452,24 @@ ZSearchParser::_parseSymbol (void* &    pOperand)
   for (int wi=0 ; wi < SymbolList.count();wi++) {
     if (Tokenizer->Tab(Index)->Text.compareCase(SymbolList[wi].Symbol)==0) {
       ZSearchOperandBase            wOB;
-      wOB.TokenList.push(Tokenizer->Tab(Index));
+ //     wOB.TokenList.push(Tokenizer->Tab(Index));
       wOB.Type = ZSTO_LiteralUriString;
-      ZSearchLiteral<uriString> *wLit = new ZSearchLiteral<uriString> ;
+      ZSearchLiteral<uriString> *wLit = new ZSearchLiteral<uriString> (wOB);
       wLit->Content = SymbolList[wi].Path;
+      wLit->Comment = SymbolList[wi].Symbol;
+
+      if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), Index)) {
+        delete wLit;
+        return false ;
+      }
+
+      if (!advanceIndex()) {
+        delete wLit;
+        pOperand = nullptr;
+        return false;
+      }
 
       pOperand = wLit;
-
-      if (!advanceIndex())
-        return ZS_SYNTAX_ERROR;
 
       return true;
     }
@@ -1334,16 +1479,20 @@ ZSearchParser::_parseSymbol (void* &    pOperand)
 
 
 ZStatus
-ZSearchParser::_parseLiteral(void* &    pOperand)
+ZSearchParser::_parseLiteral(void* &    pOperand, ZSearchOperandType &pRequestedType)
 {
   ZStatus wSt;
+
+  pOperand=nullptr;
+  int wSvIndex=Index;
+
   switch (Tokenizer->Tab(Index)->Type ) {
 
   case ZSRCH_STRING_LITERAL: {
     ZSearchLiteral<utf8VaryingString> *wLit=new ZSearchLiteral<utf8VaryingString>;
 
     wLit->Type = ZSTO_LiteralString;
-    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(Tokenizer->Tab(Index));
 
     wLit->Content=Tokenizer->Tab(Index)->Text;
 
@@ -1372,8 +1521,18 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
 
     /* done */
 
-    if (!advanceIndex())
+    if (!advanceIndex()) {
+      pOperand = nullptr;
       return ZS_SYNTAX_ERROR;
+    }
+
+    if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
+      delete wLit;
+      return ZS_INVTYPE ;
+    }
+
+    pOperand = wLit;
+
     return ZS_SUCCESS;
   } //ZSRCH_STRING_LITERAL
 
@@ -1390,7 +1549,7 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
 */
     ZSearchLiteral<long> *wLit=new ZSearchLiteral<long>;
     wLit->Type = ZSTO_LiteralInteger;
-    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(Tokenizer->Tab(Index));
 
     /* getting hexa integer */
 
@@ -1409,28 +1568,38 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
 
     while (*wPtr != 0) {
       if ((*wPtr>='0')&&((*wPtr<='9')))
-        wLit->Content += long(*wPtr - '0') * (w16++*16);
+        wLit->Content += long(*wPtr - '0') * (w16==0?1:w16) ;
+
       else {
           if ((*wPtr>='A')&&((*wPtr<='F')))
-            wLit->Content += long(*wPtr - 'A' + 10)* (w16++*16);
+            wLit->Content += long(*wPtr - 'A' + 10)* (w16==0?1:w16);
         else
          if ((*wPtr>='a')&&((*wPtr<='f')))
-          wLit->Content += long(*wPtr - 'a' + 10)* (w16++*16);
+          wLit->Content += long(*wPtr - 'a' + 10)* (w16==0?1:w16);
       }
       if (*wPtr=='-') { /* trailing sign */
           wSign=-1;
           break;
       }
       wPtr++;
+      w16++;
     }
   /* got it */
 
     wLit->Content *= wSign ;
 
-    pOperand = wLit ;
 
-    if (!advanceIndex())
+    if (!advanceIndex()) {
+      delete wLit;
       return ZS_SYNTAX_ERROR;
+    }
+
+    if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
+      delete wLit;
+      return ZS_INVTYPE ;
+    }
+
+    pOperand = wLit ;
 
     return ZS_SUCCESS;
   } //ZSRCH_HEXA_LITERAL
@@ -1443,7 +1612,7 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
     ZSearchLiteral<long> *wLit=new ZSearchLiteral<long>;
 
     wLit->Type = ZSTO_LiteralInteger;
-    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(Tokenizer->Tab(Index));
 
     wLit->Content =  0;
     long wSign = 1;
@@ -1458,7 +1627,8 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
 
     while (*wPtr != 0) {
       if ((*wPtr>='0')&&((*wPtr<='9'))) {
-        wLit->Content += long(*wPtr - '0') * (w10++*10);
+        wLit->Content += long(*wPtr - '0') * (w10==0?1:w10) ;
+        w10 += 10;
       }
       if (*wPtr=='-') { /* trailing sign */
         wSign = -1;
@@ -1469,13 +1639,19 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
 
     wLit->Content *= wSign ;
 
-    pOperand = wLit;
 
     if (!advanceIndex()) {
       delete wLit;
       pOperand=nullptr;
       return ZS_SYNTAX_ERROR;
     }
+
+    if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
+      delete wLit;
+      return ZS_INVTYPE ;
+    }
+
+    pOperand = wLit ;
     return ZS_SUCCESS;
   } // long integer unsigned long;
 
@@ -1484,9 +1660,21 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
 
     ZSearchLiteral<double> *wLit=new ZSearchLiteral<double>;
     wLit->Type = ZSTO_LiteralFloat;
-    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(Tokenizer->Tab(Index));
 
     wLit->Content = Tokenizer->Tab(Index)->Text.toDouble();
+
+    if (!advanceIndex()) {
+      delete wLit;
+      pOperand=nullptr;
+      return ZS_SYNTAX_ERROR;
+    }
+
+    if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
+      delete wLit;
+      return ZS_INVTYPE ;
+    }
+
     pOperand = wLit;
 
     return ZS_SUCCESS;
@@ -1496,7 +1684,7 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
 
     ZSearchLiteral<ZDateFull> *wLit=new ZSearchLiteral<ZDateFull>;
     wLit->Type = ZSTO_LiteralDate;
-    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(Tokenizer->Tab(Index));
 
     /* allowed date format are
      *  dd/mm/yy
@@ -1526,20 +1714,26 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
     wD._toInternal(wTm);
     wLit->Content = wD;
 
-    pOperand = wLit;
 
     if (!advanceIndex()) {
       delete wLit;
-      pOperand = nullptr;
+      pOperand=nullptr;
       return ZS_SYNTAX_ERROR;
     }
+
+    if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
+      delete wLit;
+      return ZS_INVTYPE ;
+    }
+
+    pOperand = wLit;
     return ZS_SUCCESS;
   } // ZSRCH_DATE_LITERAL
 
   case ZSRCH_ZDATE_LITERAL: {
     ZSearchLiteral<ZDateFull> *wLit=new ZSearchLiteral<ZDateFull>;
     wLit->Type = ZSTO_LiteralDate;
-    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(Tokenizer->Tab(Index));
     if (!advanceIndex()) {
       delete wLit;
       return ZS_SYNTAX_ERROR;
@@ -1559,53 +1753,7 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
     utf8VaryingString wDLContent;
 
 /*    [d]d{/|-}[m]m{/|-}[yy]yy[-hh:mm:ss] */
-/*
 
-    int wDay=0,wMonth=0,wYear=0, wHour=0, wMin=0, wSec=0;
-    while (Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
-
-
-
-
-      wSt=_getZDateOnePiece(wDay,2,ZSRCH_OPERATOR_DIVIDEORSLASH);
-      if (wSt!=ZS_SUCCESS) {
-        delete wLit;
-        return ZS_SYNTAX_ERROR;
-      }
-      wSt=_getZDateOnePiece(wMonth,2,ZSRCH_OPERATOR_DIVIDEORSLASH);
-      if (wSt!=ZS_SUCCESS) {
-        delete wLit;
-        return ZS_SYNTAX_ERROR;
-      }
-      wSt=_getZDateOnePiece(wYear,4,ZSRCH_OPERATOR_MINUS);
-      if (wSt!=ZS_SUCCESS) {
-        if (!ZS_EOF) {
-          delete wLit;
-          return ZS_SYNTAX_ERROR;
-        }
-        
-      }
-      wSt=_getZDateOnePiece(wHour,2,ZSRCH_COLON);
-      if (wSt!=ZS_SUCCESS) {
-        if (!ZS_EOF) {
-          delete wLit;
-          return ZS_SYNTAX_ERROR;
-        }
-
-      }
-      wSt=_getZDateOnePiece(wMin,2,ZSRCH_COLON);
-      if (wSt!=ZS_SUCCESS) {
-        delete wLit;
-        return ZS_SYNTAX_ERROR;
-      }
-      wSt=_getZDateOnePiece(wSec,2,ZSRCH_NOTHING);
-      if (wSt!=ZS_SUCCESS) {
-        delete wLit;
-        return ZS_SYNTAX_ERROR;
-      }
-    }
-
-*/
     while (Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
       if ((Tokenizer->Tab(Index)->Type!=ZSRCH_NUMERIC_LITERAL)
           && (Tokenizer->Tab(Index)->Type!=ZSRCH_OPERATOR_DIVIDEORSLASH)
@@ -1616,12 +1764,14 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
             Tokenizer->Tab(Index)->Text.toString(),
             Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
         delete wLit;
+        pOperand=nullptr;
         return ZS_SYNTAX_ERROR;
       }
 
       wDLContent += Tokenizer->Tab(Index)->Text;
       if (!advanceIndex()) {
         delete wLit;
+        pOperand=nullptr;
         return ZS_SYNTAX_ERROR;
       }
     }// not ZSRCH_CLOSEPARENTHESIS
@@ -1644,8 +1794,16 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
 
     if (!advanceIndex()) {
       delete wLit;
+      pOperand=nullptr;
       return ZS_SYNTAX_ERROR;
     }
+
+    if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
+      delete wLit;
+      return ZS_INVTYPE ;
+    }
+
+    pOperand = wLit ;
     return ZS_SUCCESS;
   } //ZSRCH_ZDATE_LITERAL
 
@@ -1654,10 +1812,11 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
     ZSearchLiteral<ZResource> *wLit=new ZSearchLiteral<ZResource>;
 
     wLit->Type = ZSTO_LiteralResource;
-    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(Tokenizer->Tab(Index));
 
     if (!advanceIndex()) {
       delete wLit;
+      pOperand=nullptr;
       return ZS_SYNTAX_ERROR;
     }
 
@@ -1668,7 +1827,7 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
       delete wLit;
       return ZS_MISS_PUNCTSIGN ;
     }
-    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(Tokenizer->Tab(Index));
     if (!advanceIndex()) {
       delete wLit;
       return ZS_SYNTAX_ERROR;
@@ -1678,6 +1837,7 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
           Tokenizer->Tab(Index)->Text.toString(),
           Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
       delete wLit;
+      pOperand=nullptr;
       return ZS_MISS_LITERAL ;
     }
     int wi=0;
@@ -1692,11 +1852,12 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
           Tokenizer->Tab(Index)->Text.toString(),
           Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
       delete wLit;
+      pOperand=nullptr;
       return ZS_MISS_LITERAL ;
     }
     ZEntity_type    wEntity = ZEntityList.Tab(wi).Value;
 
-    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(Tokenizer->Tab(Index));
     if (!advanceIndex())
       return ZS_SYNTAX_ERROR;
     if(Tokenizer->Tab(Index)->Type!=ZSRCH_COMMA) {
@@ -1704,11 +1865,16 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
           Tokenizer->Tab(Index)->Text.toString(),
           Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
       delete wLit;
+      pOperand=nullptr;
       return ZS_MISS_PUNCTSIGN ;
     }
-    wLit->TokenList.push(Tokenizer->Tab(Index));
-    if (!advanceIndex())
+//    wLit->TokenList.push(Tokenizer->Tab(Index));
+
+    if (!advanceIndex()) {
+      delete wLit;
       return ZS_SYNTAX_ERROR;
+    }
+
     if(Tokenizer->Tab(Index)->Type!=ZSRCH_NUMERIC_LITERAL) {
       errorLog("Wrong ZResource literal syntax. Missing numeric literal. Found <%s> at line %d column %d",
           Tokenizer->Tab(Index)->Text.toString(),
@@ -1720,10 +1886,12 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
     Resourceid_type wId = Tokenizer->Tab(Index)->Text.toLong() ;
     wLit->Content = ZResource(wId,wEntity);
 
-    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(Tokenizer->Tab(Index));
 
-    if (!advanceIndex())
+    if (!advanceIndex()) {
+      delete wLit;
       return ZS_SYNTAX_ERROR;
+    }
 
     if(Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
       errorLog("ZResource literal : wrong syntax. Expecting close parenthesis. Found <%s> at line %d column %d.",
@@ -1732,11 +1900,20 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
       delete wLit;
       return ZS_MISS_PUNCTSIGN ;
     }
-    wLit->TokenList.push(Tokenizer->Tab(Index));
+
+//    wLit->TokenList.push(Tokenizer->Tab(Index));
+
+    if (!advanceIndex()) {
+      delete wLit;
+      return ZS_SYNTAX_ERROR;
+    }
+
+    if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
+      delete wLit;
+      return ZS_INVTYPE ;
+    }
 
     pOperand = wLit;
-    if (!advanceIndex())
-      return ZS_SYNTAX_ERROR;
 
     return ZS_SUCCESS;
   } // ZSRCH_RESOURCE_LITERAL
@@ -1746,11 +1923,12 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
     ZSearchLiteral<checkSum> *wLit=new ZSearchLiteral<checkSum>;
 
     wLit->Type = ZSTO_LiteralChecksum;
-    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(Tokenizer->Tab(Index));
 
-    if (!advanceIndex())
+    if (!advanceIndex()) {
+      delete wLit;
       return ZS_SYNTAX_ERROR;
-
+    }
     if(Tokenizer->Tab(Index)->Type!=ZSRCH_OPENPARENTHESIS) {
       errorLog("checkSum literal : wrong syntax. Expecting open parenthesis. Found <%s> at line %d column %d.",
           Tokenizer->Tab(Index)->Text.toString(),
@@ -1758,9 +1936,12 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
       delete wLit;
       return ZS_MISS_PUNCTSIGN ;
     }
-    wLit->TokenList.push(Tokenizer->Tab(Index));
-    if (!advanceIndex())
+//    wLit->TokenList.push(Tokenizer->Tab(Index));
+    if (!advanceIndex()) {
+      delete wLit;
       return ZS_SYNTAX_ERROR;
+    }
+
     if(Tokenizer->Tab(Index)->Type != ZSRCH_HEXA_LITERAL ) {
       errorLog("Missing Hexadecimal literal (64 hexa characters). Found <%s> at line %d column %d",
           Tokenizer->Tab(Index)->Text.toString(),
@@ -1777,10 +1958,12 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
       delete wLit;
       return ZS_MISS_LITERAL ;
     }
-    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(Tokenizer->Tab(Index));
 
-    if (!advanceIndex())
+    if (!advanceIndex()) {
+      delete wLit;
       return ZS_SYNTAX_ERROR;
+    }
 
     if(Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
       errorLog("ZResource literal : wrong syntax. Expecting close parenthesis. Found <%s> at line %d column %d.",
@@ -1789,12 +1972,20 @@ ZSearchParser::_parseLiteral(void* &    pOperand)
       delete wLit;
       return ZS_MISS_PUNCTSIGN ;
     }
-    wLit->TokenList.push(Tokenizer->Tab(Index));
-    pOperand = wLit;
+//    wLit->TokenList.push(Tokenizer->Tab(Index));
 
-    if (!advanceIndex())
+
+    if (!advanceIndex()) {
+      delete wLit;
       return ZS_SYNTAX_ERROR;
+    }
 
+    if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
+      delete wLit;
+      return ZS_INVTYPE ;
+    }
+
+    pOperand = wLit;
     return ZS_SUCCESS;
   } // ZSRCH_RESOURCE_LITERAL
 
@@ -1845,6 +2036,7 @@ ZSearchParser::_parseFind(std::shared_ptr<ZSearchEntity> &pCollection)
 {
   ZStatus wSt=ZS_SUCCESS;
   Action = ZSPA_Find;
+  ZSearchLogicalTerm* wLogicalTerm=nullptr;
 
   CurEntities.clear(); /* reset current entities being used (defined within phrase) */
 
@@ -1888,24 +2080,28 @@ ZSearchParser::_parseFind(std::shared_ptr<ZSearchEntity> &pCollection)
 
       if (!advanceIndex())
         return ZS_SYNTAX_ERROR;
-
+/*
     if (Tokenizer->Tab(Index)->Type!=ZSRCH_WITH) {
       warningLog("Syntax error : Expected clause <WITH> while found <%s> at line %d column %d.",
           Tokenizer->Tab(Index)->Text.toString(),
           Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn  );
       return ZS_MISS_KEYWORD;
     }
+*/
+  if (Tokenizer->Tab(Index)->Type == ZSRCH_WITH) {
 
     if (!advanceIndex())
       return ZS_SYNTAX_ERROR;
 
-    ZSearchLogicalTerm* wLogicalTerm=nullptr;
-
-    ZSearchOperandType wMainType=ZSTO_Nothing;
-
-    wSt=_parseLogicalTerm(wLogicalTerm,0,0,Index,wMainType);
+    wSt=_parseLogicalTerm(wLogicalTerm,0,Index);
     if (wSt!=ZS_SUCCESS)
       return wSt;
+
+  } // there is a WITH clause
+  else {
+    warningLog("No WITH clause has been found : all elements from entity <%s> will be selected .",
+        Entity->getName().toString()  );
+  }
 
     /* here token must be 'AS' */
 
@@ -1938,8 +2134,6 @@ ZSearchParser::_parseFind(std::shared_ptr<ZSearchEntity> &pCollection)
     /* create collection */
 
     pCollection = ZSearchEntity::constructWithCollectionEntity(Entity,Tokenizer->Tab(Index));
-//    pCollection->setFormula(wFormula);
-
 
     if (!advanceIndex()) {
       pCollection.reset();
@@ -1983,7 +2177,7 @@ Resource
 */
 
 
-ZSearchOperandType getMainoOperandType(ZSearchLogicalOperand* pOperand)
+ZSearchOperandType getMainOperandType(ZSearchLogicalOperand* pOperand)
 {
   if (pOperand->Type==ZSTO_Logical)
     return ZSTO_Bool;             /* if operand is logical then result has type boolean */
@@ -2058,13 +2252,185 @@ Allowed type correspondance
 
 */
 ZStatus
-ZSearchParser::_parseLogicalTerm(ZSearchLogicalTerm* & pTerm,
-                                  int pParenthesisLevel, int pCollateral, int pBookMark, ZSearchOperandType& pMainType)
+ZSearchParser::_parseOneLogicalOperand(void* & pOperand, ZSearchOperandType  &pMainType,int pParenthesisLevel)
 {
-  ZSearchOperandType wTermMainType1=ZSTO_Nothing,wTermMainType2=ZSTO_Nothing;
+  int wSvIndex=Index;
+  pOperand=nullptr;
+  ZStatus wSt=ZS_SUCCESS;
+
+  while (true) {
+
+    if (Tokenizer->Tab(Index)->Type == ZSRCH_OPENPARENTHESIS) {
+      if (!advanceIndex()) {
+        return ZS_SYNTAX_ERROR;
+      }
+      pParenthesisLevel++;
+      wSt=_parseLogicalTerm((ZSearchLogicalTerm* &)pOperand,pParenthesisLevel+1,Index);
+      if (wSt!=ZS_SUCCESS) {
+        return wSt;
+      }
+      pMainType = ZSTO_Bool;/* result of a logical term operand is a bool */
+
+      if (Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
+        errorLog("Syntax error : Closed parenthesis expected. found <%s> - at line %d column %d",
+            Tokenizer->Tab(Index)->Text.toString(),
+            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+
+        return ZS_SYNTAX_ERROR;
+      }
+      if (pParenthesisLevel<0) {
+        errorLog("Syntax error : Closed parenthesis without corresponding open parenthesis - at line %d column %d",
+            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+
+        return ZS_SYNTAX_ERROR;
+      }
+
+      if (!advanceIndex()) {
+        return ZS_SYNTAX_ERROR;
+      }
+
+      break;  /* Operand is set as a new logical formula */
+    }// ZSRCH_OPENPARENTHESIS
+
+    if (Tokenizer->Tab(Index)->Type==ZSRCH_IDENTIFIER) {
+
+      /* check if symbol or ZEntity */
+
+      if (_parseZEntity(pOperand,pMainType) ) {
+        break;
+      }
+      if (_parseSymbol(pOperand,pMainType) ) {
+        /* Capture base type of operand */
+        break;
+      }
+
+      wSt=_parseOperandField(pOperand,pMainType);
+      if (wSt!=ZS_SUCCESS) {
+        return wSt;
+      }
+
+      break;
+    } // ZSRCH_IDENTIFIER
+
+    if ((Tokenizer->Tab(Index)->Type & ZSRCH_LITERAL)==ZSRCH_LITERAL) {
+      wSt=_parseLiteral(pOperand,pMainType);
+      if (wSt!=ZS_SUCCESS) {
+        return wSt;
+      }
+      //        wTerm->Operand1.Type = ZSTO_Literal;
+      break;
+    } // ZSRCH_LITERAL
+    break;
+  } // while true
+
+  if (ZSearchOperator::isArithmeric(Tokenizer->Tab(Index))) {
+    bool wIsLiteral=true;
+    clearOperand(pOperand);
+
+    wSt=_parseArithmeticTerm((ZSearchArithmeticTerm* &)pOperand,pParenthesisLevel,wSvIndex, pMainType,wIsLiteral);
+    if (wSt!=ZS_SUCCESS) {
+      return wSt;
+    }
+    /* if all components of arithmetic operation are literal, then arithmetic term is once evaluated and its value is stored and never recomputed */
+
+    if (wIsLiteral) {
+
+      utf8VaryingString wFormula ;
+
+      for (int wi=wSvIndex; wi < Index; wi++) {
+        wFormula += Tokenizer->Tab(wi)->Text;
+        wFormula += " ";
+      }
+
+    ZSearchOperandType wType = ZSearchOperandType(static_cast<ZSearchArithmeticTerm*>(pOperand)->Type & ZSTO_BaseMask);
+    infoLog("Arithmetic expression [%s] is a strict literal of type <%s> ", wFormula.toString(),decode_OperandType(wType));
+
+    ZOperandContent wResult=computeArithmeticLiteral(pOperand);
+    if (!wResult.isValid()) {
+        errorLog("Arithmetic expression [%s] is an invalid literal expression ", wFormula.toString());
+        clearOperand(pOperand);
+        return ZS_INVOP;
+    }
+
+    switch (wResult.Type)
+    {
+      case ZSTO_Integer:
+      {
+        ZSearchLiteral<long>* wLit = new ZSearchLiteral<long>;
+        clearOperand(pOperand);
+        wLit->Type = ZSTO_LiteralInteger;
+        wLit->Content = wResult.Integer;
+        wLit->Comment = wFormula;
+        if (!OperandTypeCheck(pMainType,wLit->getOperandBase(),wSvIndex)) {
+          delete wLit;
+          return ZS_INVTYPE;
+        }
+        pOperand = wLit;
+        return ZS_SUCCESS;
+      }
+      case ZSTO_Float:
+      {
+        ZSearchLiteral<double>* wLit = new ZSearchLiteral<double>;
+        wLit->Type = ZSTO_LiteralFloat;
+        wLit->Content = wResult.Float;
+        wLit->Comment = wFormula;
+        if (!OperandTypeCheck(pMainType,wLit->getOperandBase(),wSvIndex)) {
+          delete wLit;
+          return ZS_INVTYPE;
+        }
+        pOperand = wLit;
+        return ZS_SUCCESS;
+      }
+      case ZSTO_UriString:
+      case ZSTO_String:
+      {
+        ZSearchLiteral<utf8VaryingString>* wLit = new ZSearchLiteral<utf8VaryingString>;
+        wLit->Type = ZSTO_LiteralString;
+        wLit->Content = wResult.String;
+        wLit->Comment = wFormula;
+        if (!OperandTypeCheck(pMainType,wLit->getOperandBase(),wSvIndex)) {
+          delete wLit;
+          return ZS_INVTYPE;
+        }
+        pOperand = wLit;
+        return ZS_SUCCESS;
+      }
+
+ /*   No date allowed in an arithmetic operation
+     case ZSTO_Date:
+      {
+        ZSearchLiteral<ZDateFull>* wLit = new ZSearchLiteral<ZDateFull>;
+        wLit->Content = wResult.Date;
+        wLit->Comment = wFormula;
+        break;
+      }
+*/
+      default:
+        _DBGPRINT("_parseOneLogicalOperand Arithmetic expression is a strict literal of type <%s>\n",decode_OperandType(wType))
+        clearOperand(pOperand);
+        return ZS_INVOP;
+      }// switch
+
+   } // is a full literal
+
+    /* arithmetic expression involving at least one field :
+     * pOperand is already loaded with arithmetic terms chain */
+
+    return ZS_SUCCESS;
+  } // operator is arithmetic
+
+
+  return ZS_SUCCESS;
+} // _parseOneLogicalOperand
+
+
+ZStatus
+ZSearchParser::_parseLogicalTerm(ZSearchLogicalTerm* & pTerm,
+    int pParenthesisLevel, int pBookMark)
+{
 
   setIndex(pBookMark);
-
+  int wSvIndex=Index;
   pTerm=nullptr;
 
   ZSearchOperandType wOpType = ZSTO_Nothing;
@@ -2072,7 +2438,7 @@ ZSearchParser::_parseLogicalTerm(ZSearchLogicalTerm* & pTerm,
 
   ZSearchLogicalTerm* wTerm = new ZSearchLogicalTerm;
   wTerm->ParenthesisLevel = pParenthesisLevel;
-  wTerm->Collateral = pCollateral;
+  //  wTerm->Collateral = pCollateral;
 
   setIndex(pBookMark);
 
@@ -2085,106 +2451,26 @@ ZSearchParser::_parseLogicalTerm(ZSearchLogicalTerm* & pTerm,
     }
   }
 
+  wTerm->MainType = ZSTO_Nothing;
+
   /* first operand acquisition */
 
-  while (true) {
-
-    if (Tokenizer->Tab(Index)->Type == ZSRCH_OPENPARENTHESIS)
-    {
-      if (!advanceIndex()) {
-        delete wTerm;
-        return ZS_SYNTAX_ERROR;
-      }
-      pParenthesisLevel++;
-      wSt=_parseLogicalTerm((ZSearchLogicalTerm* &)wTerm->Operand1,pParenthesisLevel+1,0,Index,wTermMainType1);
-      if (wSt!=ZS_SUCCESS) {
-        delete wTerm;
-        return wSt;
-      }
-
-      wTermMainType1 = ZSTO_Bool ; /* result of a logical term operand is a bool */
-
-      if (Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
-        errorLog("Syntax error : Closed parenthesis expected. found <%s> - at line %d column %d",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-
-        delete wTerm;
-        return ZS_SYNTAX_ERROR;
-      }
-      if (pParenthesisLevel<0) {
-        errorLog("Syntax error : Closed parenthesis without corresponding open parenthesis - at line %d column %d",
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-
-        delete wTerm;
-        return ZS_SYNTAX_ERROR;
-      }
-
-      if (!advanceIndex()) {
-        delete wTerm;
-        return ZS_SYNTAX_ERROR;
-      }
-
-      break;  /* Operand is set as a new logical formula */
-    }// ZSRCH_OPENPARENTHESIS
-
-    if (Tokenizer->Tab(Index)->Type==ZSRCH_IDENTIFIER) {
-
-      /* check if symbol or ZEntity */
-
-      if (_parseZEntity(wTerm->Operand1.Operand) ) {
-
-        wTermMainType1 = ZSTO_Integer ; /* result of a ZEntity operand is an integer */
-        break;
-      }
-      if (_parseSymbol(wTerm->Operand1.Operand) ) {
-        break;
-      }
-
-      wSt=_parseOperandField(wTerm->Operand1.Operand);
-      if (wSt!=ZS_SUCCESS) {
-        delete wTerm;
-        return wSt;
-      }
-      wTerm->Operand1.Type = ZSearchOperandType(int(wTerm->Operand1.Type)| int(ZSTO_Field));
-
-      break;
-    } // ZSRCH_IDENTIFIER
-
-    if ((Tokenizer->Tab(Index)->Type & ZSRCH_LITERAL)==ZSRCH_LITERAL) {
-        wSt=_parseLiteral(wTerm->Operand1.Operand);
-        if (wSt!=ZS_SUCCESS) {
-          delete wTerm;
-          return wSt;
-        }
-        wTerm->Operand1.Type = ZSTO_Literal;
-        break;
-    } // ZSRCH_LITERAL
-    break;
-  } // while true
-
-  if (ZSearchOperator::isArithmeric(Tokenizer->Tab(Index))) {
-     wSt=_parseArithmetic((ZSearchArithmeticOperand* &)wTerm->Operand1.Operand,pParenthesisLevel,pCollateral+1,pBookMark, pMainType);
-     if (wSt!=ZS_SUCCESS) {
-       delete wTerm;
-       return wSt;
-     }
-     wTerm->Operand1.Type = ZSTO_Arithmetic;
-     /* arithmetic operand is to be considered as a literal */
-
+  wSt = _parseOneLogicalOperand(wTerm->Operand1,wTerm->MainType,pParenthesisLevel);
+  if (wSt!=ZS_SUCCESS) {
+    delete wTerm;
+    return wSt;
   }
 
   /* compare operator */
 
   else if (!ZSearchOperator::isComparator(Tokenizer->Tab(Index))) {
-    pTerm = wTerm;
-    return ZS_SUCCESS;  /* token compliance test is made by callee */
+    errorLog("Invalid logical operator <%s> at line %d column %d.",
+        Tokenizer->Tab(Index)->Text.toString(),
+        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index+2)->TokenColumn );
+    delete wTerm;
+    return ZS_INV_OPERATOR;
   }// not comparator
 
-  if (!_logicalTypeCheck(pMainType,&wTerm->Operand1)) {
-    delete wTerm;
-    return ZS_INVTYPE;
-  }
 
   wTerm->CompareOperator.set(Tokenizer->Tab(Index));
 
@@ -2194,76 +2480,14 @@ ZSearchParser::_parseLogicalTerm(ZSearchLogicalTerm* & pTerm,
   }
 
   /*----------Operand 2 ----------------*/
+  wSvIndex = Index;
 
-  while (true) {
+  wSt = _parseOneLogicalOperand(wTerm->Operand2,wTerm->MainType,pParenthesisLevel);
+  if (wSt!=ZS_SUCCESS) {
+    delete wTerm;
+    return wSt;
+  }
 
-    if (Tokenizer->Tab(Index)->Type == ZSRCH_OPENPARENTHESIS)
-    {
-      if (!advanceIndex()) {
-        delete wTerm;
-        return ZS_SYNTAX_ERROR;
-      }
-      pParenthesisLevel++;
-      wSt=_parseLogicalTerm((ZSearchLogicalTerm* &)wTerm->Operand2,pParenthesisLevel+1,0,Index,wTermMainType2);
-      if (wSt!=ZS_SUCCESS) {
-        delete wTerm;
-        return wSt;
-      }
-      if (Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
-        errorLog("Syntax error : Closed parenthesis expected. found <%s> - at line %d column %d",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-
-        delete wTerm;
-        return ZS_SYNTAX_ERROR;
-      }
-      if (pParenthesisLevel<0) {
-        errorLog("Syntax error : Closed parenthesis without corresponding open parenthesis - at line %d column %d",
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-
-        delete wTerm;
-        return ZS_SYNTAX_ERROR;
-      }
-
-      if (!advanceIndex()) {
-        delete wTerm;
-        return ZS_SYNTAX_ERROR;
-      }
-
-      break;  /* Operand is set as a new logical formula */
-    }// ZSRCH_OPENPARENTHESIS
-
-    if (Tokenizer->Tab(Index)->Type==ZSRCH_IDENTIFIER) {
-
-      /* check if symbol or ZEntity */
-
-      if (_parseZEntity(wTerm->Operand2.Operand) ) {
-        break;
-      }
-      if (_parseSymbol(wTerm->Operand2.Operand) ) {
-        break;
-      }
-
-      wSt=_parseOperandField(wTerm->Operand2.Operand);
-      if (wSt!=ZS_SUCCESS) {
-        delete wTerm;
-        return wSt;
-      }
-      wTerm->Operand1.Type = ZSTO_Field;
-      break;
-    } // ZSRCH_IDENTIFIER
-
-    if ((Tokenizer->Tab(Index)->Type & ZSRCH_LITERAL)==ZSRCH_LITERAL) {
-      wSt=_parseLiteral(wTerm->Operand2.Operand);
-      if (wSt!=ZS_SUCCESS) {
-        delete wTerm;
-        return wSt;
-      }
-      wTerm->Operand2.Type = ZSTO_Literal;
-      break;
-    } // ZSRCH_LITERAL
-    break;
-  } // while true
 
   if (ZSearchOperator::isAndOr(Tokenizer->Tab(Index))) {
     wTerm->AndOrOperator.set(Tokenizer->Tab(Index));
@@ -2271,7 +2495,7 @@ ZSearchParser::_parseLogicalTerm(ZSearchLogicalTerm* & pTerm,
       delete wTerm;
       return ZS_SYNTAX_ERROR;
     }
-    wSt=_parseLogicalTerm(wTerm->NextTerm,pParenthesisLevel,pCollateral+1,Index,pMainType);
+    wSt=_parseLogicalTerm(wTerm->NextTerm,pParenthesisLevel,Index);
     if (wSt!=ZS_SUCCESS) {
       delete wTerm;
       return wSt;
@@ -2282,9 +2506,11 @@ ZSearchParser::_parseLogicalTerm(ZSearchLogicalTerm* & pTerm,
   pTerm=wTerm;
   return ZS_SUCCESS;
 
-}//ZSearchParser::_parseTerm
+}//ZSearchParser::_parseLogicalTerm
 
-bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOperandBase* pOB)
+
+
+bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOperandBase* pOB, int pIndex)
 {
   ZSearchOperandType wOpBaseType = ZSearchOperandType(pOB->Type & ZSTO_BaseMask);
   switch (pMainType)
@@ -2320,7 +2546,7 @@ bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOp
       return true;
     case ZSTO_Bool:
       errorLog("Type mismatch: invalid operand type Bool in arithmetic expression at line %d column %d.",
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
       return false;
     }// switch
 
@@ -2333,8 +2559,8 @@ bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOp
     if (wOpBaseType!=ZSTO_String) {
       errorLog("Type mismatch: expected operand with type string while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+          Tokenizer->Tab(pIndex)->Text.toString(),
+          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
       return false;
     }
     break;
@@ -2350,8 +2576,8 @@ bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOp
       errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+          Tokenizer->Tab(pIndex)->Text.toString(),
+          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
       return false;
     }
     if (wOpBaseType == ZSTO_Date) {
@@ -2360,8 +2586,8 @@ bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOp
       errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+          Tokenizer->Tab(pIndex)->Text.toString(),
+          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
       return false;
     }
     if (wOpBaseType == ZSTO_Resource) {
@@ -2370,15 +2596,15 @@ bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOp
       errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+          Tokenizer->Tab(pIndex)->Text.toString(),
+          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
       return false;
     }
     errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
         decode_OperandType(pMainType),
         decode_OperandType(wOpBaseType),
-        Tokenizer->Tab(Index)->Text.toString(),
-        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+        Tokenizer->Tab(pIndex)->Text.toString(),
+        Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
     return false;
 
   case ZSTO_Date:
@@ -2387,8 +2613,8 @@ bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOp
       errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+          Tokenizer->Tab(pIndex)->Text.toString(),
+          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
       return false;
     }
     return true;
@@ -2399,8 +2625,8 @@ bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOp
       errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+          Tokenizer->Tab(pIndex)->Text.toString(),
+          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
       return false;
     }
     return true;
@@ -2414,8 +2640,8 @@ bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOp
       errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+          Tokenizer->Tab(pIndex)->Text.toString(),
+          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
       return false;
     }
     return true;
@@ -2423,15 +2649,15 @@ bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOp
     errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
         decode_OperandType(pMainType),
         decode_OperandType(wOpBaseType),
-        Tokenizer->Tab(Index)->Text.toString(),
-        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+        Tokenizer->Tab(pIndex)->Text.toString(),
+        Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
     return false;
   }//swich
 
 } // ZSearchParser::_arithmeticTypeCheck
 
 
-bool ZSearchParser::_logicalTypeCheck(ZSearchOperandType& pMainType,ZSearchOperandBase* pOB)
+bool ZSearchParser::OperandTypeCheck(ZSearchOperandType& pMainType,ZSearchOperandBase* pOB, int pIndex)
 {
   ZSearchOperandType wOpBaseType = ZSearchOperandType(pOB->Type & ZSTO_BaseMask);
   switch (pMainType)
@@ -2479,8 +2705,8 @@ bool ZSearchParser::_logicalTypeCheck(ZSearchOperandType& pMainType,ZSearchOpera
     if (wOpBaseType!=ZSTO_String) {
       errorLog("Type mismatch: expected operand with type string while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+          Tokenizer->Tab(pIndex)->Text.toString(),
+          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
       return false;
     }
     break;
@@ -2496,8 +2722,8 @@ bool ZSearchParser::_logicalTypeCheck(ZSearchOperandType& pMainType,ZSearchOpera
       errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+          Tokenizer->Tab(pIndex)->Text.toString(),
+          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
       return false;
     }
     if (wOpBaseType == ZSTO_Date) {
@@ -2506,8 +2732,8 @@ bool ZSearchParser::_logicalTypeCheck(ZSearchOperandType& pMainType,ZSearchOpera
       errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+          Tokenizer->Tab(pIndex)->Text.toString(),
+          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
       return false;
     }
     if (wOpBaseType == ZSTO_Resource) {
@@ -2516,15 +2742,15 @@ bool ZSearchParser::_logicalTypeCheck(ZSearchOperandType& pMainType,ZSearchOpera
       errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+          Tokenizer->Tab(pIndex)->Text.toString(),
+          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
       return false;
     }
     errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
         decode_OperandType(pMainType),
         decode_OperandType(wOpBaseType),
-        Tokenizer->Tab(Index)->Text.toString(),
-        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+        Tokenizer->Tab(pIndex)->Text.toString(),
+        Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
     return false;
 
   case ZSTO_Date:
@@ -2533,8 +2759,8 @@ bool ZSearchParser::_logicalTypeCheck(ZSearchOperandType& pMainType,ZSearchOpera
       errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+          Tokenizer->Tab(pIndex)->Text.toString(),
+          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
       return false;
     }
     return true;
@@ -2545,8 +2771,8 @@ bool ZSearchParser::_logicalTypeCheck(ZSearchOperandType& pMainType,ZSearchOpera
       errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+          Tokenizer->Tab(pIndex)->Text.toString(),
+          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
       return false;
     }
     return true;
@@ -2560,8 +2786,8 @@ bool ZSearchParser::_logicalTypeCheck(ZSearchOperandType& pMainType,ZSearchOpera
       errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+          Tokenizer->Tab(pIndex)->Text.toString(),
+          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
       return false;
     }
     return true;
@@ -2569,8 +2795,8 @@ bool ZSearchParser::_logicalTypeCheck(ZSearchOperandType& pMainType,ZSearchOpera
     errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
         decode_OperandType(pMainType),
         decode_OperandType(wOpBaseType),
-        Tokenizer->Tab(Index)->Text.toString(),
-        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+        Tokenizer->Tab(pIndex)->Text.toString(),
+        Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
     return false;
   }//swich
 
@@ -2578,36 +2804,37 @@ bool ZSearchParser::_logicalTypeCheck(ZSearchOperandType& pMainType,ZSearchOpera
 
 
 ZStatus
-ZSearchParser::_parseArithmetic(ZSearchArithmeticOperand*& pArithOperand,
-                                int pParenthesisLevel, int pCollateral, int pBookMark, ZSearchOperandType& pMainType)
+ZSearchParser::_parseArithmeticTerm(ZSearchArithmeticTerm*& pArithTerm,
+                                int pParenthesisLevel,  int pBookMark, ZSearchOperandType& pRequestedType, bool &pIsLiteral)
 {
   ZStatus wSt=ZS_SUCCESS;
 
-  pArithOperand=nullptr;
+  pArithTerm=nullptr;
 
   setIndex(pBookMark);
 
-  ZSearchArithmeticOperand* wArithOperand = new ZSearchArithmeticOperand;
-  wArithOperand->ParenthesisLevel = pParenthesisLevel;
-  wArithOperand->Collateral = pCollateral;
+  int wSvIndex=Index;
+
+  ZSearchArithmeticTerm* wArithTerm = new ZSearchArithmeticTerm;
+  wArithTerm->ParenthesisLevel = pParenthesisLevel;
 
   while (true) {
 
     if (Tokenizer->Tab(Index)->Type==ZSRCH_OPENPARENTHESIS) {
       if (!advanceIndex()) {
-        delete wArithOperand;
+        delete wArithTerm;
         return ZS_SYNTAX_ERROR;
       }
-      wSt=_parseArithmetic((ZSearchArithmeticOperand*&)wArithOperand->Operand,pParenthesisLevel+1,0,Index,pMainType);
+      wSt=_parseArithmeticTerm((ZSearchArithmeticTerm*&)wArithTerm->Operand,pParenthesisLevel+1,Index,pRequestedType,pIsLiteral);
       if (wSt!=ZS_SUCCESS) {
-        delete wArithOperand;
+        delete wArithTerm;
         return wSt;
       }
       if (Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
         errorLog("Syntax error: expected closing parenthesis while found <%s> at line %d column %d.",
             Tokenizer->Tab(Index)->Text.toString(),
             Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-        delete wArithOperand;
+        delete wArithTerm;
         return ZS_MISS_PUNCTSIGN;
       }
       break; /* first operand is stored as an arithmetic formula */
@@ -2616,19 +2843,26 @@ ZSearchParser::_parseArithmetic(ZSearchArithmeticOperand*& pArithOperand,
 
     if (Tokenizer->Tab(Index)->Type==ZSRCH_IDENTIFIER) {
 
-      wSt=_parseOperandField(wArithOperand->Operand);
-      if (wSt!=ZS_SUCCESS) {
-        delete wArithOperand;
-        return wSt;
+      if (_parseZEntity(wArithTerm->Operand,pRequestedType) ) {
+        break;
+      }
+      if (_parseSymbol(wArithTerm->Operand,pRequestedType) ) {
+        break;
       }
 
+      wSt=_parseOperandField(wArithTerm->Operand,pRequestedType);
+      if (wSt!=ZS_SUCCESS) {
+        delete wArithTerm;
+        return wSt;
+      }
+      pIsLiteral = false;
       break;
     } // ZSRCH_IDENTIFIER
 
     if ((Tokenizer->Tab(Index)->Type & ZSRCH_LITERAL)==ZSRCH_LITERAL) {
-      wSt=_parseLiteral(wArithOperand->Operand);
+      wSt=_parseLiteral(wArithTerm->Operand,pRequestedType);
       if (wSt!=ZS_SUCCESS) {
-        delete wArithOperand;
+        delete wArithTerm;
         return wSt;
       }
       break;
@@ -2640,118 +2874,40 @@ ZSearchParser::_parseArithmetic(ZSearchArithmeticOperand*& pArithOperand,
     return ZS_INVVALUE;
   }// while true
 
-  ZSearchOperandBase* wOB=static_cast<ZSearchOperandBase*>(wArithOperand->Operand);
-  if (!_arithmeticTypeCheck(pMainType,wOB)) {
-    delete wArithOperand;
+  ZSearchOperandBase* wOB=static_cast<ZSearchOperandBase*>(wArithTerm->Operand);
+  if (!_arithmeticTypeCheck(pRequestedType,wOB,wSvIndex)) {
+    delete wArithTerm;
     return ZS_INVTYPE;
   }
 
-  wArithOperand->Type = ZSearchOperandType(wOB->Type & ZSTO_BaseMask);
-
-
-
-  /* here first operand has been parsed and is stored within pExpression.
-   * Last parsed is the operator that is an arithmetic operator (raison why it is an expression)
-   *
-   *
-   * parse arithmetic expression until it is done :
-   *
-   *  Logical operator
-   *  AS clause
-   *  semi colon
-   *
- */
-
-  if (!advanceIndex()) {
-    delete wArithOperand;
-    return ZS_SYNTAX_ERROR;
-  }
+  wArithTerm->Type = ZSearchOperandType( ZSTO_Arithmetic | (wOB->Type & ZSTO_BaseMask));  /* extract the base type (string, integer,etc.) from operand */
 
   /* if not an arithmetic operator, then arithmetic expression is ended */
   if (!ZSearchOperator::isArithmeric(Tokenizer->Tab(Index))) {
-    wArithOperand->Operator.Type=ZSTO_Nothing;
-    wArithOperand->OperandNext = nullptr;
+    wArithTerm->Operator.Type=ZSTO_Nothing;
+    wArithTerm->OperandNext = nullptr;
+    pArithTerm = wArithTerm;
     return ZS_SUCCESS ;
   }
 
-  /*
-  if (!ZSearchOperator::isArithmeric(Tokenizer->Tab(Index))) {
-    errorLog("Syntax error: expected an arithmetic operator while found <%s> at line %d column %d.",
-        Tokenizer->Tab(Index)->Text.toString(),
-        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-    return ZS_INVOP;
-  }
-*/
-  wArithOperand->Operator.set(Tokenizer->Tab(Index));
+  wArithTerm->Operator.set(Tokenizer->Tab(Index));
 
   if (!advanceIndex()) {
-    delete wArithOperand;
+    delete wArithTerm;
     return ZS_SYNTAX_ERROR;
   }
   /*  parse next operand */
 
-  wSt=_parseArithmetic((ZSearchArithmeticOperand*&)wArithOperand->OperandNext,pParenthesisLevel,pCollateral+1,Index,pMainType);
+  wSt=_parseArithmeticTerm((ZSearchArithmeticTerm*&)wArithTerm->OperandNext,pParenthesisLevel,Index,pRequestedType,pIsLiteral);
   if (wSt!=ZS_SUCCESS) {
-    delete wArithOperand;
+    delete wArithTerm;
     return wSt;
   }
 
-  pArithOperand = wArithOperand;
+  pArithTerm = wArithTerm;
   return wSt;
+}
 
-
-#ifdef __COMMENT__
-  while (true) {
-
-    if (Tokenizer->Tab(Index)->Type==ZSRCH_OPENPARENTHESIS) {
-      if (!advanceIndex())
-        return ZS_SYNTAX_ERROR;
-      wSt=_parseArithmetic(wArithOperand->Operand,pParenthesisLevel+1,pCollateral,Index);
-      if (wSt!=ZS_SUCCESS) {
-        delete wArithOperand;
-        return wSt;
-      }
-
-      if (Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
-        errorLog("Syntax error: expected closing parenthesis while found <%s> at line %d column %d.",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-        delete wArithOperand;
-        return ZS_MISS_PUNCTSIGN;
-      }
-      break; /* second operand is stored as an arithmetic formula */
-    } //ZSRCH_OPENPARENTHESIS
-
-
-
-    if (Tokenizer->Tab(Index)->Type==ZSRCH_IDENTIFIER) {
-
-      wSt=_parseOperandField(pArithOperand->OperandNext);
-      if (wSt!=ZS_SUCCESS) {
-        delete pArithOperand;
-        return wSt;
-      }
-      break;
-    } // ZSRCH_IDENTIFIER
-
-    if ((Tokenizer->Tab(Index)->Type & ZSRCH_LITERAL)==ZSRCH_LITERAL) {
-      wSt=_parseLiteral(pArithOperand->OperandNext);
-      if (wSt!=ZS_SUCCESS) {
-        delete pArithOperand;
-        return wSt;
-      }
-      break;
-    } // ZSRCH_LITERAL
-
-    errorLog("Syntax error: expected either an identifier or a litteral while found <%s> at line %d column %d.",
-        Tokenizer->Tab(Index)->Text.toString(),
-        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-    return ZS_INVVALUE;
-  }// while true
-
-
-  return ZS_SUCCESS;
-#endif // __COMMENT__
 
 /*
  * Example of arithmetic expression and related storage structure
@@ -2782,9 +2938,6 @@ ZSearchParser::_parseArithmetic(ZSearchArithmeticOperand*& pArithOperand,
 
 
 
-
-
-}
 
 
 /*
@@ -2998,7 +3151,7 @@ ZStatus ZSearchParser::_parseSelectionClause(ZSearchFormula *&pOutFormula, const
   return ZS_SUCCESS;
 }
 
-#endif __COMMENT__
+#endif // __COMMENT__
 
 
 bool
@@ -3012,8 +3165,10 @@ ZSearchParser::searchKeyword(ZSearchToken* pToken) {
   return false;
 }
 
-ZStatus ZSearchParser::_parse(bool &pStoreInstruction) {
+ZStatus ZSearchParser::_parse(std::shared_ptr<ZSearchEntity> &pCollection,bool &pStoreInstruction,int &pInstructionType) {
   ZStatus wSt=ZS_SUCCESS;
+
+  FirstToken = Tokenizer->Tab(Index);
 
   CurrentToken=nullptr;
   bool wHasInstruction = false;
@@ -3088,7 +3243,7 @@ ZStatus ZSearchParser::_parse(bool &pStoreInstruction) {
         if (!advanceIndex())
           return ZS_SYNTAX_ERROR;
 
-        wSt=_parseSetFile();
+        wSt=_parseSetFile(pCollection);
         if (wSt!=ZS_SUCCESS)
             return wSt;
         wHasInstruction=true;
@@ -3203,27 +3358,29 @@ ZStatus ZSearchParser::_parse(bool &pStoreInstruction) {
 
       case ZSRCH_FIND:
       {
-        std::shared_ptr<ZSearchEntity>  wCollection=nullptr;
-        wSt=_parseFind(wCollection);
+ //       std::shared_ptr<ZSearchEntity>  wCollection=nullptr;
+        wSt=_parseFind(pCollection);
         if (wSt!=ZS_SUCCESS)
           return wSt;
 
-        EntityList.push(wCollection);
+        EntityList.push(pCollection);
 
-        infoLog("Collection report \n %s\n",wCollection->_report().toString());
+        pInstructionType = ZSITP_Find;
 
+        infoLog("Collection report \n %s\n",pCollection->_report().toString());
+/*
         wSt= _executeFind(wCollection->_CollectionEntity);
         if (wSt!=ZS_SUCCESS) {
           return wSt;
         }
-
+*/
         wHasInstruction=true;
         break;
       } // ZSRCH_FIND
       case ZSRCH_FOR:
         if (!advanceIndex())
           return ZS_SYNTAX_ERROR;
-        wSt=_parseFor();
+        wSt=_parseFor(pCollection);
         if (wSt!=ZS_SUCCESS)
           return wSt;
         wHasInstruction=true;
@@ -3278,13 +3435,16 @@ ZSearchParser::_executeFind(std::shared_ptr<_BaseCollectionEntity> pCollection)
     ProgressCallBack(0);
   long wRank=0;
   zaddress_type wAddress=0;
+
+  ZTimer wTi;
+  wTi.start();
+
   ZStatus wSt=pCollection->get(wRecord,wRank,wAddress);
   int wSelected=0;
   int wUpdate=0;
   bool wResult;
 
-  ZTimer wTi;
-  wTi.start();
+
   while (wSt==ZS_SUCCESS) {
     _DBGPRINT("ZSearchParser::_executeFind processing record rank %ld\n",wRank)
     wSt=pCollection->evaluate(wResult,wRecord);
@@ -3293,21 +3453,23 @@ ZSearchParser::_executeFind(std::shared_ptr<_BaseCollectionEntity> pCollection)
       wSelected++;
     }
 
-    wUpdate++;
-    if (wUpdate > 9) {
-      wUpdate=0;
-      ProgressCallBack(wRank);
+    if (ProgressCallBack!=nullptr) {
+      wUpdate++;
+      if (wUpdate > UpdateFrequence) {
+        wUpdate=0;
+        ProgressCallBack(wRank);
+      }
     }
-
     wRank++;
     wSt=pCollection->get(wRecord,wRank,wAddress);
   } // while ZS_SUCCESS
 /*
-  if (wSt==ZS_EOF) {
+  if (wSt==ZS_OUTBOUNDHIGH) {
     wSt=ZS_SUCCESS;
   }
 */
   ProgressCallBack(wRank);
+
   wTi.end();
   infoLog("_executeFind report\n"
           " Number of record processed  %d\n"
@@ -3458,6 +3620,37 @@ ZSearchParser::loadXmlSearchParserZEntity(const uriString& pXmlFile)
 
 /*
 <?xml version='1.0' encoding='UTF-8'?>
+ <zsearchparsercontext version = "'0.30-0'">
+    <!--  context gathers all session definitions : entities, etc. -->
+  <entities>
+    <files>
+        <fileitem>
+            <path>/home/mydir/filename.ext</path>
+            <symbol>mysymbol</symbol>
+        </fileitem>
+    </files>
+    <collections>
+      <collectionitem>
+          <selectionphrase> </selectionphrase>
+          <entityref> </entityref>
+          <selectionclause>
+            <logicalterm>
+            </logicalterm>
+          </selectionclause>
+
+      </collectionitem>
+    </collections>
+  </entities>
+</zsearchparsercontext>
+*/
+ZStatus
+ZSearchParser::saveContext(uriString& pXmlFile)
+{
+  return ZS_SUCCESS;
+}
+
+/*
+<?xml version='1.0' encoding='UTF-8'?>
  <zsearchparsersymbol version = "'0.30-0'">
     <!--  Symbols table : defines symbols that points to a valid full file path -->
     <symboltable>
@@ -3468,7 +3661,7 @@ ZSearchParser::loadXmlSearchParserZEntity(const uriString& pXmlFile)
     </symboltable>
 
 </zsearchparsersymbol>
-        */
+*/
 ZStatus
 ZSearchParser::loadXmlSearchParserSymbols(const uriString& pXmlFile)
 {

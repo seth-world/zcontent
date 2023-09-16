@@ -19,6 +19,7 @@ class ZOperandContent
 {
 public:
   ZOperandContent() ;
+  ZOperandContent(bool pValid) {Valid=pValid;}
   ZOperandContent(const ZOperandContent& pIn) {_copyFrom(pIn);}
 
   ZOperandContent& _copyFrom(const ZOperandContent& pIn);
@@ -26,12 +27,17 @@ public:
 
   utf8VaryingString display();
 
+  void setInvalid() {Valid=false;}
+
+  bool isValid() {return Valid;}
+
+  bool              Valid=true;
   ZSearchOperandType Type=ZSTO_Nothing;
-  long              Integer;
+  long              Integer=0;
   utf8VaryingString String;
   uriString         URI;
-  double            Float;
-  bool              Bool;
+  double            Float=0.0;
+  bool              Bool=false;
   ZDateFull         Date;
   ZResource         Resource;
   checkSum          CheckSum;
@@ -56,8 +62,9 @@ public:
   ZSearchOperator& operator = (const ZSearchOperator& pIn) {return _copyFrom(pIn);}
 
   void clear() {
-    while (TokenList.count())
+/*    while (TokenList.count())
       TokenList.pop();
+*/
     Type=ZSOPV_Nothing;
   }
 
@@ -92,10 +99,10 @@ public:
   ZSearchOperator_type get() {return Type;}
 
   utf8VaryingString     _report(int pLevel);
-  utf8VaryingString     _reportFormula();
+  utf8VaryingString     _reportFormula(bool pDetailed=true);
 
   ZSearchOperator_type  Type=ZSOPV_Nothing;
-  ZArray<ZSearchToken*> TokenList;
+//  ZArray<ZSearchToken*> TokenList;
 } ;
 
 
@@ -107,9 +114,7 @@ public:
 
   ZSearchOperandBase(const ZSearchOperandBase& pIn) {_copyFrom(pIn);}
   ~ZSearchOperandBase() {
-    while (TokenList.count()>0) {
-      TokenList.pop();
-    }
+
   }
 
   ZSearchOperandBase& _copyFrom(const ZSearchOperandBase& pIn)
@@ -118,24 +123,22 @@ public:
     ModifierType = pIn.ModifierType;
     ModVal1 = pIn.ModVal1;
     ModVal2 = pIn.ModVal2;
-    TokenList.clear();
-    for (long wi=0; wi < pIn.TokenList.count();wi++)
-      TokenList.push(pIn.TokenList[wi]);
-
+    Comment = pIn.Comment;
     return *this;
   }
 
-  static void clearOperand(void *&pOp);  /* here because it is common to any derived class */
+  ZSearchOperandType_type getType() {return Type;}
 
   bool hasModifier() {return ModifierType!=ZSRCH_NOTHING;}
 
   ZSearchOperandBase& operator = (const ZSearchOperandBase& pIn) {return _copyFrom(pIn); }
 
-  ZSearchOperandType  Type=ZSTO_Nothing;
+  ZSearchOperandType    Type=ZSTO_Nothing;
   ZSearchTokentype_type ModifierType=ZSRCH_NOTHING;
+  utf8VaryingString     Comment;
   long ModVal1=0;
   long ModVal2=0;
-  ZArray<ZSearchToken*> TokenList;
+//  ZArray<ZSearchToken*> TokenList;
 };
 
 
@@ -143,7 +146,7 @@ class ZSearchFieldOperandOwnData : public ZSearchOperandBase
 {
 public:
   ZSearchFieldOperandOwnData()=default;
-  ZSearchFieldOperandOwnData(const ZSearchFieldOperandOwnData& pIn) {_copyFrom(pIn);}
+  ZSearchFieldOperandOwnData(const ZSearchFieldOperandOwnData& pIn):ZSearchOperandBase(pIn)  {_copyFrom(pIn);}
   ZSearchFieldOperandOwnData& _copyFrom(const ZSearchFieldOperandOwnData& pIn)
   {
     ZSearchOperandBase::_copyFrom(pIn);
@@ -155,6 +158,9 @@ public:
     return *this;
   }
   ZSearchFieldOperandOwnData& operator=(const ZSearchFieldOperandOwnData& pIn) {return _copyFrom(pIn);}
+
+  ZSearchOperandBase* getOperandBase() {return (ZSearchOperandBase*)this;}
+
   long              MDicRank=0;
   const ZMetaDic*   MDic=nullptr;
   long              IndexRank=-1;  /* index rank to search in if not equal to -1 */
@@ -171,7 +177,6 @@ public:
   ZSearchFieldOperand(const ZSearchFieldOperand& pIn) {_copyFrom(pIn);}
   ~ZSearchFieldOperand() { }
 
-  //  void setOperandBase(const ZSearchOperandBase& pOB) {ZSearchOperandBase::_copyFrom(pOB);}
   void setOwnData(const ZSearchFieldOperandOwnData& pIn) {ZSearchFieldOperandOwnData::_copyFrom(pIn);}
   void setFieldDescription(const ZFieldDescription& pFD) {FieldDescription._copyFrom(pFD);}
 
@@ -211,8 +216,13 @@ template <class _Tp>
 class ZSearchLiteral : public ZSearchOperandBase {
 public:
   ZSearchLiteral()=default;
+  ZSearchLiteral(ZSearchOperandBase& pOB) {ZSearchOperandBase::_copyFrom(pOB);}
   ZSearchLiteral(const ZSearchLiteral& pIn) {_copyFrom(pIn);}
   ~ZSearchLiteral() { }
+
+  void setOperandBase(ZSearchOperandBase& pOB) {
+    ZSearchOperandBase::_copyFrom(pOB);
+  }
 
   ZSearchLiteral<_Tp>& _copyFrom(const ZSearchLiteral<_Tp>& pIn)
   {
@@ -220,6 +230,9 @@ public:
     Content=pIn.Content;
     return *this;
   }
+
+  ZSearchOperandBase* getOperandBase() {return (ZSearchOperandBase*)this;}
+
   _Tp Content;
 };
 
@@ -243,16 +256,7 @@ public:
 
   void copyOperand(void *&pOperand, const void *pOpIn) ;
 
-  void clear()
-  {
-/*    ParenthesisLevel=0;
-    Collateral=0;
-    LeadingOperator.clear();
-    Operator.clear();
-*/
-    clearOperand(Operand);
-//    clearOperand(OperandNext);
-  }
+  void clear();
 
 
   utf8VaryingString             _reportDetailed(int pLevel);
@@ -267,52 +271,9 @@ public:
 
   bool            isNull() const {return Operand==nullptr;}
 
-  /*
-  int             ParenthesisLevel=0;
-  int             Collateral=0;
-  ZSearchOperator LeadingOperator=ZSTO_Nothing;
-*/
   void*           Operand=nullptr;
-/*
-  ZSearchOperator Operator;
-  void*           OperandNext=nullptr;
-*/
+
 };
-
-
-
-
-/* Arithmetic expression as operand */
-class ZSearchArithmeticOperand : public ZSearchOperandBase {
-public:
-  ZSearchArithmeticOperand(): ZSearchOperandBase(ZSTO_Arithmetic)  {}
-  ZSearchArithmeticOperand(const ZSearchArithmeticOperand& pIn) : ZSearchOperandBase(ZSTO_Arithmetic) {_copyFrom(pIn);}
-  //  ZSearchExpressionOperand(const ZSearchExpressionOperand& pIn)=delete;
-  ~ZSearchArithmeticOperand() ;
-
-  void setOperandBase(const ZSearchOperandBase& pOB) {ZSearchOperandBase::_copyFrom(pOB);}
-
-  ZSearchArithmeticOperand& _copyFrom(const ZSearchArithmeticOperand& pIn);
-
-  utf8VaryingString _report(int pLevel);
-  utf8VaryingString _reportFormula();
-  /* initializes and copies to current operand pOperand (either Operand or OperandNext) corresponding data from pOpIn */
-  void copyOperand(void *&pOperand, const void *pOpIn) ;
-  static void _copyOperand(void *&pOperand, const void *pOpIn) ;
-
-  /* compute() evaluate arithmetic expression and all related descendants and returns a qualified literal operand as void*
-   *
-   * URFParser is set at the entity level, while accessing records
-    */
-  ZOperandContent compute(URFParser &pURFParser);
-
-  int             ParenthesisLevel=0;
-  int             Collateral=0;
-  void*           Operand=nullptr;        /* may be either field, literal or ZSearchArithmeticOperand* */
-  ZSearchOperator Operator;               /* arithmetic operator */
-  void*           OperandNext=nullptr;     /* may be either field, literal or ZSearchArithmeticOperand* */
-};
-
 
 
 
@@ -331,5 +292,13 @@ ZStatus evaluateTerm(bool &pOutResult,ZOperandContent& pOp1,ZOperandContent& pOp
  */
 
 ZOperandContent gettermOperandContent (void* pOperand, URFParser &pURFParser);
+ZOperandContent getOperandContent(void* pOp,URFParser& pURFParser);
+
+utf8VaryingString OperandReportFormula(void * pOperand, bool pDetailed=true);
+utf8VaryingString OperandReportDetailed(void *pOperand, int pLevel);
+utf8VaryingString OperandReportLiteral(void *pOp);
+
+void clearOperand(void *&pOp);  /* here because it is common to any derived class */
+void _copyOperand(void *&pOperand, const void *pOpIn) ;
 
 #endif // ZSEARCHOPERAND_H

@@ -20,6 +20,35 @@ class ZSearchTokenizer;
 //class ZSearchMasterFile;
 
 
+/* Cell format code : applies to selected table column */
+enum ZCellFormat : int {
+  ZCFMT_Nothing = 0,  /* default */
+
+  ZCFMT_NumMask = 0x000F,
+  ZCFMT_NumHexa = 0x0001, /* show numeric fields in hexa  (default is standard numeric representation )*/
+
+  ZCFMT_DateMask= 0x0F00,
+
+  ZCFMT_DMY     = 0x0100,   /* day/month/year only */
+  ZCFMT_MDY     = 0x0200,   /* month/day/year only */
+  ZCFMT_DMYHMS  = 0x0300,   /* day/month/year-hh:mm:ss */
+  ZCFMT_MDYHMS  = 0x0400,   /* month/day/year-hh:mm:ss */
+
+  ZCFMT_DLocale = 0x0500,   /* locale date format */
+  ZCFMT_DUTC    = 0x0600,   /* UTC format */
+
+  ZCFMT_ResMask = 0x0F0000,
+
+  ZCFMT_ResSymb = 0x010000, /* Show symbol name in place of numeric value for ZEntities */
+  ZCFMT_ResStd  = 0x020000, /* Resource numeric values are expressed in standard numeric representation (default is hexa)*/
+
+  ZCFMT_ApplyAll= 0x100000  /* apply to all : only used by cell format dialog */
+
+};
+
+
+
+
 class ZSearchMasterFile : public std::enable_shared_from_this <ZSearchMasterFile>
 {
 public:
@@ -261,8 +290,6 @@ public:
   utf8VaryingString                   Name;
   std::shared_ptr <ZSearchEntity>     _BaseEntity = nullptr;
   ZArray<zaddress_type>               AddressList;
-//  ZSearchFormula*                     Formula=nullptr;
-//  ZSearchLogicalOperand*              LogicalOperand=nullptr;
   ZSearchLogicalTerm*                 LogicalTerm=nullptr;
 };
 
@@ -287,19 +314,24 @@ public:
   {
     _FileEntity = make_shared<_BaseFileEntity>(pMasterPtr,pToken);
     _FileEntity->setToken(pToken);
+    allocateCellFormat();
   }
 
 
   ZSearchEntity( std::shared_ptr<_BaseCollectionEntity> pCollectionEntity)
   {
     _CollectionEntity=pCollectionEntity->getSharedPtr();
+    allocateCellFormat();
   }
-
 
 
   ZSearchEntity(const ZSearchEntity& pIn) {_copyFrom(pIn);}
 
-  ~ZSearchEntity() { }
+  ~ZSearchEntity()
+  {
+    if (CellFormat!=nullptr)
+      zfree(CellFormat);
+  }
 
   ZSearchEntity& _copyFrom (const ZSearchEntity& pIn) ;
 
@@ -378,6 +410,11 @@ public:
   }
 
   ZFieldDescription         getFieldByRank(long pRank) const;
+
+  void allocateCellFormat();
+  void reallocateCellFormat();
+
+  int* CellFormat=nullptr;
 
   std::shared_ptr<_BaseFileEntity>          _FileEntity = nullptr;
   std::shared_ptr<_BaseCollectionEntity>    _CollectionEntity = nullptr;

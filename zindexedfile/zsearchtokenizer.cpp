@@ -597,7 +597,7 @@ ZSearchTokenizer::parse(const utf8VaryingString &pIn)
       }
       endToken(wCurrentToken);
       wCurrentToken->setCoords(Line,Column,Offset);
-      wCurrentToken->Type = ZSRCH_OPERATOR_LOGICAL;
+      wCurrentToken->Type = ZSRCH_OPERATOR_GREATER;
       wCurrentToken->Text.addUtfUnit(wCurrCh);
       endToken(wCurrentToken);
       continue;

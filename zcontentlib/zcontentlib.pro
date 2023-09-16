@@ -165,6 +165,7 @@ HEADERS += \
     $$TOOLSET_BASE/config/zconfig_zrf.h \
     ../../config/zconfig.h \
     ../zindexedfile/zsearch.h \
+    ../zindexedfile/zsearcharithmeticterm.h \
     ../zindexedfile/zsearchentity.h \
     ../zindexedfile/zsearchhistory.h \
     ../zindexedfile/zsearchlogicalterm.h \
@@ -222,6 +223,7 @@ SOURCES += \
     $$TOOLSET_CONTENT/zrandomfile/zrfutilities.cpp \
     $$TOOLSET_CONTENT/zrandomfile/zsearchargument.cpp \
     ../zindexedfile/zsearch.cpp \
+    ../zindexedfile/zsearcharithmeticterm.cpp \
     ../zindexedfile/zsearchentity.cpp \
     ../zindexedfile/zsearchhistory.cpp \
     ../zindexedfile/zsearchlogicalterm.cpp \

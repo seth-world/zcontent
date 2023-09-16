@@ -267,11 +267,13 @@ public:
   void setIndex(int pIndex) {
 //    IndexLog.push(Index);
     Index=pIndex;
+    CurrentToken = Tokenizer->Tab(pIndex);
   }
 /*  void popIndex() {
     Index = IndexLog.popR();
   }
 */
+  utf8VaryingString                       Phrase;
   uriString                               URIMaster;
   std::shared_ptr<ZSearchEntity>          Entity=nullptr;
 
@@ -279,16 +281,23 @@ public:
   uint32_t                                Action=ZSPA_Nothing;
   int                                     Index=0;
   ZSearchToken*                           CurrentToken=nullptr;
+  ZSearchToken*                           FirstToken=nullptr;
+public:  ZSearchTokenizer*                Tokenizer=nullptr;
 //  ZArray<int>                             IndexLog;
 //  ZaiErrors                               ErrorLog;
 };
 
 
+enum ZSearchInstructionType {
+    ZSITP_Nothing = 0,
+    ZSITP_Find    = 1,
+    ZSITP_Other   = 2
+};
 
 
 class ZSearchFieldOperandOwnData;
 class ZSearchOperandBase;
-class ZSearchArithmeticOperand;
+class ZSearchArithmeticTerm;
 
 class ZSearchParser : public ZSearchParserState
 {
@@ -337,12 +346,14 @@ public:
 
   void finish() {}
 
-  ZStatus parse(const utf8VaryingString &pContent) ;
+
+
+  ZStatus parse(const utf8VaryingString &pContent,std::shared_ptr<ZSearchEntity> &pCollection) ;
 
 
   bool searchKeyword(ZSearchToken* pToken) ;
 
-  ZStatus _parse(bool &pStoreInstruction);
+  ZStatus _parse(std::shared_ptr<ZSearchEntity> &pCollection, bool &pStoreInstruction, int &pInstructionType);
 
   ZStatus parseAllocationFormula(const utf8VaryingString* pEntity,const utf8VaryingString& pSelectionPhrase);
   ZStatus _parsAllocationFormula(const utf8VaryingString* pEntity,ZSearchTokenizer* pTokenizer);
@@ -350,46 +361,60 @@ public:
 
   ZStatus _parseShow();
 
-  ZStatus _parseSetFile();
+  ZStatus _parseSetFile(std::shared_ptr<ZSearchEntity> &pCollection);
   ZStatus _parseSetHistoryMaximum();
 
   ZStatus _parseFind(std::shared_ptr<ZSearchEntity> &pCollection);
-  ZStatus _parseFor();
+  ZStatus _parseFor(std::shared_ptr<ZSearchEntity> &pCollection);
 
   ZStatus _executeFind(std::shared_ptr<_BaseCollectionEntity> pCollection);
 
 
 
-  /** Parses a field and all possible modifiers. Calls _parseFieldIdentifier() method */
+  /** Parses a field and all possible modifiers. Calls _parseFieldIdentifier() method.
+   *
+   * if pRequestedType is ZSTO_Nothing, then all types are allowed (first operand of an expression)
+ */
 
-  ZStatus _parseOperandField(void *&pTermOperand);
-  ZStatus _parseLiteral(void *&pOperand);
+  ZStatus _parseOperandField(void *&pTermOperand, ZSearchOperandType &pRequestedType);
+  ZStatus _parseLiteral(void *&pOperand, ZSearchOperandType &pRequestedType);
 
   /** parse a field identifier and validate it according CurEntities array
    *  if more than one entity in CurEntities array, then field must be prefixed with its entity name
    *  if not, field may be prefixed or not by its entity name, it is reputated belonging to the unique entity
    *
    *  Field is validated against entity dictionary content.
+   * extracts field identifier either under the form of
+   <field>
+   <field>.<modifier>
+
+    <entity>.<field>
+    <entity>.<field>.<modifier>
+      <modifer> itself and its possible arguments will be extracted by callee routine (i. e. _parseOperandField())
    */
   ZStatus _parseFieldIdentifier (int & pEntityListIndex, ZSearchFieldOperandOwnData *pFOD);
 
 
+  ZStatus _parseModifier(ZSearchOperandBase *pOB);
+
  // ZStatus _parseLogicalOperand(void *&pOperand, int pParenthesisLevel, int pCollateral, int pBookMark);
 
-  bool _parseZEntity(void *&pOperand);
-  bool _parseEntity(void *&pOperand);
-  bool _parseSymbol(void *&pOperand);
+  bool _parseZEntity(void *&pOperand, ZSearchOperandType &pRequestedType);
+  bool _parseEntity(void *&pOperand, ZSearchOperandType &pRequestedType);
+  bool _parseSymbol(void *&pOperand, ZSearchOperandType &pRequestedType);
 
   ZStatus _getZDateOnePiece(int &pValue,int pMaxDigits,ZSearchTokentype pEndSeparator);
 
+  ZStatus _parseOneLogicalOperand(void *&pOperand, ZSearchOperandType &pMainType, int pParenthesisLevel);
+
   ZStatus _parseLogicalTerm(ZSearchLogicalTerm *&pTerm,
-                            int pParenthesisLevel, int pCollateral, int pBookMark, ZSearchOperandType &pMainType);
+                            int pParenthesisLevel, int pBookMark);
 
-  ZStatus _parseArithmetic(ZSearchArithmeticOperand *&pArithOperand,  int pParenthesisLevel, int pCollateral, int pBookMark,ZSearchOperandType &pMainType);
-//  ZStatus _parseFormula(ZSearchFormula *&pFormula, int pParenthesisLevel);
+  ZStatus _parseArithmeticTerm(ZSearchArithmeticTerm *&pArithTerm,  int pParenthesisLevel,
+      int pBookMark, ZSearchOperandType &pRequestedType, bool &pIsLiteral);
 
-  bool _arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOperandBase* pOB);
-  bool _logicalTypeCheck(ZSearchOperandType& pMainType,ZSearchOperandBase* pOB);
+  bool _arithmeticTypeCheck(ZSearchOperandType &pMainType, ZSearchOperandBase *pOB, int pIndex);
+  bool OperandTypeCheck(ZSearchOperandType& pMainType, ZSearchOperandBase* pOB, int pIndex);
 /*
   ZStatus _parseSelectionClause(ZSearchFormula *&pOutFormula, const utf8VaryingString &pEntityName, const ZMetaDic *pDictionary=nullptr );
 */
@@ -424,12 +449,14 @@ public:
 
 //public: ZParserError Errorlog;
 
-public: ZSearchTokenizer*        Tokenizer=nullptr;
+//public: ZSearchTokenizer*        Tokenizer=nullptr;
 
   uint32_t getOption() {return Tokenizer->Options;}
   bool isVerbose()  {return Tokenizer->Options & ZSRCHO_Verbose;}
   bool isFullVerbose()  {return Tokenizer->Options & ZSRCHO_FullVerbose;}
   bool hasOption(Options pOpt) {return Tokenizer->Options & pOpt;}
+
+  ZStatus saveContext(uriString& pXmlFile);
 
   /** @brief loadXmlSearchParserSymbols loads ZSearchParser symbols : translation for uri files path
    */
@@ -461,8 +488,11 @@ public:
     ProgressCallBack  = pdisplayCallback;
   }
   void setProgressSetupCallback(__PROGRESSCALLBACK__(pdisplayCallback) ) {
-    ProgressCallBack  = pdisplayCallback;
+    ProgressSetupCallBack  = pdisplayCallback;
   }
+
+  void setUpdateFrequence(int pFrequence) {UpdateFrequence = pFrequence;}
+
   void displayTokenList(ZArray<ZSearchToken*> &Whole);
 
   //  uint32_t              Options=ZCPO_Recursive;
@@ -476,18 +506,9 @@ public:
   ZArray<std::shared_ptr<ZSearchMasterFile>>      MasterFileList;
 
 
-  /* parser clauses and rules */
-//  class ZConversionRules      ConversionRules;
-
-  /* parser internal data structures */
-
-//  ZArray<ZInstructionItem>        InstructionLog;
-
-
-//  ZArray<std::shared_ptr<ZSearchEntity>>          CollectionList;
-
-
   ZSearchHistory                  History;
+
+  int UpdateFrequence = 5;
   __PROGRESSCALLBACK__(ProgressCallBack)=nullptr;
   __PROGRESSCALLBACK__(ProgressSetupCallBack)=nullptr;
 

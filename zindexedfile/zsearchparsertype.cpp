@@ -385,7 +385,7 @@ decode_SearchTokenType(ZSearchTokentype_type pType)
 
   for (int wi=0; wi < KeywordList.count();wi++) {
     if (pType==KeywordList[wi].Type) {
-      ::sprintf(wSBuffer,"Keyword <%s>",KeywordList[wi].Text.toCChar());
+      ::sprintf(wSBuffer,"%s",KeywordList[wi].Text.toCChar());
       return wSBuffer;
     }
   }
@@ -825,6 +825,7 @@ convert_ZSRCH_ZSOPV(ZSearchTokentype_type pType)
     return ZSOPV_ENDS_WITH;
 
   default:
+    fprintf(stderr,"Invalid operator %s 0x%X",decode_SearchTokenType(pType).toCChar(),int(pType));
     return ZSOPV_INVALID;
 
   }// switch
