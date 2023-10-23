@@ -5,7 +5,7 @@
 
 #include <zindexedfile/zdictionaryfile.h>
 #include <zcppparser/zcppparser.h>
-
+#include <zcontentcommon/zgeneralparameters.h>
 
 using namespace zbs;
 
@@ -266,8 +266,8 @@ ZCppGenerate::loadXmlParameters(const uriString& pXmlFile,
   pErrorLog->setAutoPrintOn(ZAIES_Text);
 
   if (!pXmlFile.exists())  {
-    ZException.setMessage("ZCppParser::loadXmlParserRules",ZS_FILENOTEXIST,Severity_Error,"Parameter file <%s> has not been found.",pXmlFile.toCChar());
-    pErrorLog->errorLog("ZCppParser::loadXmlParserRules-E-FILNFND Parameter file <%s> has not been found.",pXmlFile.toCChar());
+    ZException.setMessage("ZCppGenerate::loadXmlParserRules",ZS_FILENOTEXIST,Severity_Error,"Parameter file <%s> has not been found.",pXmlFile.toCChar());
+    pErrorLog->errorLog("ZCppGenerate::loadXmlParserRules-E-FILNFND Parameter file <%s> has not been found.",pXmlFile.toCChar());
     return ZS_FILENOTEXIST;
   }
 
@@ -298,7 +298,7 @@ ZCppGenerate::loadXmlParameters(const uriString& pXmlFile,
   if (wSt != ZS_SUCCESS) {
     pErrorLog->logZException();
     pErrorLog->errorLog(
-        "DicEdit::loadGenerateParameters-E-PARSERR Xml parsing error for string <%s> ",
+        "ZCppGenerate::loadGenerateParameters-E-PARSERR Xml parsing error for string <%s> ",
         wXmlString.subString(0, 25).toString());
     return wSt;
   }
@@ -309,12 +309,12 @@ ZCppGenerate::loadXmlParameters(const uriString& pXmlFile,
     return wSt;
   }
   if (!(wRoot->getName() == "zcppgenerate")) {
-    ZException.setMessage("ZCppParser::loadXmlParserRules",
+    ZException.setMessage("ZCppGenerate::loadXmlParserRules",
         ZS_XMLINVROOTNAME,
         Severity_Error,
         "Invalid root name <%s> - file <%s>.",wRoot->getName().toString(),pXmlFile.toCChar());
     pErrorLog->errorLog(
-        "DicEdit::loadGenerateParameters-E-INVROOT Invalid root node name <%s> expected <zcppgenerate>",
+        "ZCppGenerate::loadGenerateParameters-E-INVROOT Invalid root node name <%s> expected <zcppgenerate>",
         wRoot->getName().toString());
     return ZS_XMLINVROOTNAME;
   }
@@ -325,7 +325,7 @@ ZCppGenerate::loadXmlParameters(const uriString& pXmlFile,
       pErrorLog->logZStatus(
           ZAIES_Error,
           wSt,
-          "DicEdit::loadGenerateParameters-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
+          "ZCppGenerate::loadGenerateParameters-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
           "generalparameters",
           decode_ZStatus(wSt));
       break;
@@ -350,7 +350,7 @@ ZCppGenerate::loadXmlParameters(const uriString& pXmlFile,
       pErrorLog->logZStatus(
           ZAIES_Error,
           wSt,
-          "DicEdit::loadGenerateParameters-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
+          "ZCppGenerate::loadGenerateParameters-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
           "includefiles",
           decode_ZStatus(wSt));
       break;
@@ -445,7 +445,12 @@ ZCppGenerate::genIncludes(ZTypeBase pType) {
           wFileInclude.sprintf("#include <%s>\n",
               GenIncludeList[GenObjList[wR].IncludeRank].Include.toString());
           GenIncludeList[GenObjList[wR].IncludeRank].Used=true;
+          ErrorLog.infoLog("generating include file definition as <%s> for atomic type <%s>",
+                           GenIncludeList[GenObjList[wR].IncludeRank].Include.toString(),
+                           decode_ZType(pType));
         }
+        else
+          ErrorLog.textLog("Atomic type <%s> has already an include file",decode_ZType(pType));
         return wFileInclude;
       }
     }// for (long wR=0; wR < pGenObjList.count();wi++)
@@ -459,7 +464,12 @@ ZCppGenerate::genIncludes(ZTypeBase pType) {
           wFileInclude.sprintf("#include <%s>\n",
               GenIncludeList[GenObjList[wR].IncludeRank].Include.toString());
           GenIncludeList[GenObjList[wR].IncludeRank].Used=true;
+          ErrorLog.infoLog("generating include file definition as <%s> for object <%s>",
+                           GenIncludeList[GenObjList[wR].IncludeRank].Include.toString(),
+                           decode_ZType(pType));
         }
+        else
+          ErrorLog.textLog("Type <%s> has already an include file",decode_ZType(pType));
         return wFileInclude;
       }
     }// for (long wR=0; wR < pGenObjList.count();wi++)
@@ -523,15 +533,9 @@ ZCppGenerate::genHeaderFields(utf8VaryingString& pFileIncludeList) {
 ZStatus
 ZCppGenerate::loadGenerateParameters(const uriString& pXmlFile,ZaiErrors *pErrorLog) {
   ZStatus wSt;
-  const char* wWDParam=getenv(__PARSER_PARAM_DIRECTORY__);
-  if (!wWDParam)
-    wWDParam="";
-  const char* wWDWork=getenv(__PARSER_WORK_DIRECTORY__);
-  if (!wWDWork)
-    wWDWork="";
 
   if (pXmlFile.isEmpty()) {
-    XmlGenParamsFile = wWDParam;
+    XmlGenParamsFile = GeneralParameters.getParamDirectory();
     XmlGenParamsFile.addConditionalDirectoryDelimiter();
     XmlGenParamsFile += __CPPGENERATE_PARAMETER_FILE__;
   }

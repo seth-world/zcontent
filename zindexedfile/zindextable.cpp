@@ -15,6 +15,23 @@ ZIndexTable::ZIndexTable()
 //------------ZIndexTable-------------------
 
 
+ZRawIndexFile*
+ZIndexTable::operator [] (int wI) {
+    if (count()==0) {
+        ZException.setMessage("IndexFile::operator[]",ZS_OUTBOUNDHIGH,Severity_Fatal,
+                              "Trying to access key index rank %d while no index key has been defined",
+                              wI,count()-1);
+        ZException.exit_abort();
+    }
+    if (wI >= count()) {
+        ZException.setMessage("IndexFile::operator[]",ZS_OUTBOUNDHIGH,Severity_Fatal,
+                              "Trying to access key index rank %d while maximum index rank is %d",
+                              wI,count()-1);
+        ZException.exit_abort();
+    }
+    return _Base::at(wI);
+}
+
 long ZIndexTable::pop (void)
 {
   if (size()<0)
@@ -136,7 +153,7 @@ long ZIndexTable::insert (ZRawIndexFile *pIn, long pRank)
     <index>
       <indexcontrolblock> <!-- no dictionary in index control block -->
           <indexname> </indexname>
-          <keyuniversalsize> </keyuniversalsize>
+          <keyguessedsize> </keyguessedsize>
           <duplicates> </duplicates>
       </indexcontrolblock>
       <file> <!-- from ZIndexTable >

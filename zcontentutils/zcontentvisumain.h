@@ -220,6 +220,10 @@ public:
   QAction*      ZMFRestoreQAc=nullptr;
   QAction*      ZMFQueryQAc=nullptr;
 
+  QMenu*        ParametersQMe=nullptr;
+  QAction*      ParamLoadQAc=nullptr;
+  QAction*      ParamChangeQAc=nullptr;
+
   QAction*      openZRFQAc=nullptr;
 
 

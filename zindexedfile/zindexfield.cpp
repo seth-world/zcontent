@@ -145,7 +145,7 @@ KeyField_Pack::_copyFrom(const KeyField_Pack &pIn)
 }
 
 
-
+KeyField_Pack::KeyField_Pack() {}
 
 KeyField_Pack& KeyField_Pack::set(ZMFDictionary& pDic,long pKeyRank,long pKeyFieldRank)
 {

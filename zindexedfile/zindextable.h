@@ -24,7 +24,9 @@ public:
   using _Base::last;
   using _Base::lastIdx;
 //  using _Base::newBlankElement;
-  using _Base::operator [];
+// using _Base::operator [];
+
+  ZRawIndexFile* operator [] (int wI) ;
 
   long pop (void);
   long erase (long pRank);

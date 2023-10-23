@@ -756,8 +756,8 @@ ZMasterControlBlock::report(FILE*pOutput)
             "Index Rank <%2ld> <%20s> KeyUSize <%6d> <%s>\n",
             wi,
             IndexTable[wi]->IndexName.toCChar(),
-            IndexTable[wi]->KeyUniversalSize,
-            IndexTable[wi]->Duplicates==ZST_DUPLICATES?"Duplicates":"No Duplicates");
+            IndexTable[wi]->KeyGuessedSize,
+            decode_ZST(IndexTable[wi]->Duplicates));
     if (Dictionary!=nullptr)
     {
     fprintf (pOutput,
@@ -787,10 +787,15 @@ ZMasterControlBlock::report(FILE*pOutput)
 } // report
 
 ZStatus
-ZMasterControlBlock::loadDictionary(){
-  return Dictionary->load();
+ZMasterControlBlock::loadDictionary(ZaiErrors* pErrorlog){
+  return Dictionary->load_xml(pErrorlog);
 }
-
+#ifdef __USE_BIN_DICTIONARY__
+ZStatus
+ZMasterControlBlock::loadDictionary_bin(){
+  return Dictionary->load_bin();
+}
+#endif //__USE_BIN_DICTIONARY__
 
 void ZMasterControlBlock::setEngineMode (uint8_t pSE)
 {

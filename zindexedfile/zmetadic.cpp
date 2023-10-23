@@ -8,9 +8,16 @@
 #include <zxml/zxmlprimitives.h>
 
 using namespace zbs;
-
+#ifdef __DEPRECATED__
 ZMetaDic::ZMetaDic() :  ZArray<ZFieldDescription>(cst_ZRF_default_allocation,cst_ZRF_default_extentquota) ,
                         DicName("no name") { }
+#endif
+//ZMetaDic::ZMetaDic() :  ZArray<ZFieldDescription>(cst_ZRF_default_allocation,cst_ZRF_default_extentquota) { }
+ZMetaDic::ZMetaDic() { }
+//ZMetaDic::ZMetaDic() :  ZArray<ZFieldDescription>()
+//{
+//    ZArray<ZFieldDescription>::_mInit(cst_ZRF_default_allocation,cst_ZRF_default_extentquota);
+//}
 /**
  * @brief ZMetaDic::addField Main routine for adding dictionary field. All parameters are input.
  * @param[in] pFieldName
@@ -223,8 +230,8 @@ ZMetaDic::searchFieldByName(const utf8String& pFieldName) const {
     ZException.setMessage(_GET_FUNCTION_NAME_,
                             ZS_INVNAME,
                             Severity_Error,
-                            " Field name <%s> does not exist within Dictionary named <%s>",
-                            pFieldName.toCChar(), DicName.toCChar());
+                            " Field name <%s> does not exist within Dictionary",
+                            pFieldName.toCChar());
 
     return (zrank_type)-1;
 }//zsearchFieldByName
@@ -240,17 +247,12 @@ ZMetaDic::searchFieldByHash(const md5& pHash) const
   ZException.setMessage(_GET_FUNCTION_NAME_,
       ZS_INVNAME,
       Severity_Error,
-      " Field with hascode <%s> does not exist within Dictionary named <%s>",
-      pHash.toHexa().toCChar(), DicName.toCChar());
+      " Field with hascode <%s> does not exist within Dictionary",
+                          pHash.toHexa().toCChar());
   return (zrank_type)-1;
 }
 
-void ZMetaDic ::setModified ()
-{
-  if (CreationDate.isInvalid())
-    CreationDate = ZDateFull::currentDateTime();
-  ModificationDate = ZDateFull::currentDateTime();
-}
+
 
 
 /**
@@ -366,7 +368,7 @@ ZMetaDic::_importMetaDicFlat(const unsigned char* &pPtrIn)
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_CORRUPTED,
         Severity_Error,
-        "ZMetaDic::_importMetaDicFlat Meta dictionary <%s> : start block mark 0xF6F6F6F6 has not been found.",DicName.toCChar());
+        "ZMetaDic::_importMetaDicFlat Meta dictionary : start block mark 0xF6F6F6F6 has not been found.");
     return ZS_CORRUPTED;
   }
 
@@ -396,7 +398,7 @@ ZMetaDic::_importMetaDicFlat(const unsigned char* &pPtrIn)
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_CORRUPTED,
         Severity_Error,
-        " Meta dictionary <%s> : end block mark 0xFBFBFBFB has not been found.",DicName.toCChar());
+        " Meta dictionary : end block mark 0xFBFBFBFB has not been found.");
     return ZS_CORRUPTED;
   }
   pPtrIn += sizeof(uint32_t);
@@ -448,6 +450,7 @@ ZMetaDic::writeXML(FILE* pOutput)
 ZMetaDic&
 ZMetaDic::_copyFrom( const ZMetaDic& pIn)
 {
+#ifdef __DEPRECATED__
   if (CheckSum!=nullptr)
     {
     delete CheckSum;
@@ -455,14 +458,15 @@ ZMetaDic::_copyFrom( const ZMetaDic& pIn)
     }
   if (pIn.CheckSum!=nullptr)
     CheckSum = new checkSum(*pIn.CheckSum);
-
-  _Base::clear();
-  for (long wi=0;wi<pIn.count();wi++)
-    push(ZFieldDescription(pIn.TabConst(wi)));
   DicName = pIn.DicName;
   Version = pIn.Version;
   CreationDate=pIn.CreationDate;
   ModificationDate=pIn.ModificationDate;
+#endif
+  _Base::clear();
+  for (long wi=0;wi<pIn.count();wi++)
+    push(ZFieldDescription(pIn.TabConst(wi)));
+
   return *this;
 }//_copyFrom
 
@@ -547,6 +551,7 @@ utf8VaryingString ZMetaDic::toXml(int pLevel,bool pComment)
   ZDataBuffer wB64;
   wReturn = fmtXMLnode("metadictionary",wLevel);
   wLevel++;
+#ifdef __DEPRECATED__
   wReturn += fmtXMLversion("version",Version,wLevel);
   if (pComment)
     fmtXMLaddInlineComment(wReturn," <version> field is the local version to the dictionary data (not to be confused with software version).");
@@ -562,6 +567,7 @@ utf8VaryingString ZMetaDic::toXml(int pLevel,bool pComment)
     wReturn += fmtXMLcomment("/dicname/ is missing",wLevel);
   else
     wReturn += fmtXMLchar("dicname",DicName.toCChar(),wLevel);
+#endif // __DEPRECATED__
 
   wReturn += fmtXMLnode("dicfields",wLevel);
   /* key fields */
@@ -636,32 +642,6 @@ ZStatus ZMetaDic::fromXml(zxmlNode* pMetaDicRootNode, bool pCheckHash,ZaiErrors*
     return ZS_XMLINVROOTNAME;
     }
 
-  if (XMLgetChildText(wMetaDicNode,"dicname",DicName,pErrorlog,ZAIES_Warning) <0)
-    {
-    pErrorlog->logZStatus(ZAIES_Warning,
-        ZS_XMLWARNING,
-        "ZMetaDic::fromXml-W-CNTFINDND Warning: cannot find node element with name <dicname>. Dictionary has no name.");
-    DicName.clear();
-    }
-  if (XMLgetChildVersion(wMetaDicNode,"version",Version,pErrorlog,ZAIES_Warning) <0)
-    {
-      pErrorlog->logZStatus(ZAIES_Warning,
-          ZS_XMLWARNING,
-          "ZMetaDic::fromXml-W-CNTFINDND Warning: cannot find node element with name <version>. Dictionary version set to <1.0.0>.");
-      Version=1000000UL;
-    }
-  if (XMLgetChildZDateFull(wMetaDicNode,"creationdate",CreationDate,pErrorlog,ZAIES_Warning) <0)
-    {
-      pErrorlog->logZStatus(ZAIES_Warning,
-          ZS_XMLWARNING,
-          "ZMetaDic::fromXml-W-CNTFINDND Warning: cannot find node element with name <creationdate>. Dictionary version set to <1.0.0>.");
-    }
-  if (XMLgetChildZDateFull(wMetaDicNode,"modificationdate",ModificationDate,pErrorlog,ZAIES_Warning) <0)
-    {
-      pErrorlog->logZStatus(ZAIES_Warning,
-          ZS_XMLWARNING,
-          "ZMetaDic::fromXml-W-CNTFINDND Warning: cannot find node element with name <modificationdate>. Dictionary version set to <1.0.0>.");
-    }
   ZStatus wSt=wMetaDicNode->getChildByName((zxmlNode*&)wFieldsRootNode,"dicfields");
   if (wSt!=ZS_SUCCESS)
   {
@@ -679,27 +659,23 @@ ZStatus ZMetaDic::fromXml(zxmlNode* pMetaDicRootNode, bool pCheckHash,ZaiErrors*
   while (wSt==ZS_SUCCESS)
     {
     wFD.clear();
-    wSt=wFD.fromXml(wSingleFieldNode,pCheckHash,pErrorlog);
+    wSt=wFD.fromXml(wSingleFieldNode,pCheckHash,wErroredFields,wWarnedFields,pErrorlog);
     if (wSt > 0) /* ZS_SUCCESS or ZS_WARNING  -> field is oK */
       push(wFD);
-    else
-      wErroredFields ++;
-
-    if (wSt==ZS_XMLWARNING)  /* for our accounting */
-        wWarnedFields ++;
 
     wSt=wSingleFieldNode->getNextNode((zxmlNode*&)wSwapNode);
     XMLderegister(wSingleFieldNode);
     wSingleFieldNode=wSwapNode;
     }
-  pErrorlog->textLog("ZMetaDic::fromXml___________Field definitions load report____________________\n"
-                     " Dictionary name <%s>.\n"
+  pErrorlog->textLog("ZMetaDic::fromXml\n"
+                    "___________Field definitions load report____________________\n"
+
                      " %ld loaded.\n"
                      " %d fields warned.\n"
-                     " %d errored and not loaded.",
-                      DicName.isEmpty()?"<no name>":DicName.toCChar(),
-                      count(), wWarnedFields,
-                      wErroredFields);
+                     " %d errored and not loaded.\n"
+                    "_____________________________________________________________",
+                      count(), wWarnedFields,wErroredFields);
+
   XMLderegister(wMetaDicNode);
   XMLderegister(wFieldsRootNode);
   return pErrorlog->hasError()?ZS_XMLERROR:ZS_SUCCESS;

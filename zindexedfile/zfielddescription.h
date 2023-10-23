@@ -11,6 +11,9 @@
 #include <ztoolset/zaierrors.h>
 #include <QDataStream> /* for Q_DECLARE_METATYPE */
 
+#include <QMetaType>
+#include <QObject>
+
 namespace zbs {
 
 const size_t cst_FieldNameCapacity=cst_fieldnamelen+sizeof(uint8_t)+sizeof(uint16_t);
@@ -21,8 +24,10 @@ class ZFieldDescription;
  * @brief The FieldDesc_Export class used to export ZFieldDescription structure.
  * This structure does not include Name field, which is processed separately.
  */
-class FieldDesc_Export
+class FieldDesc_Export : public QObject
 {
+Q_OBJECT
+
 public:
   uint32_t            StartSign=cst_ZFIELDSTART;
   uint16_t            EndianCheck=cst_EndianCheck_Normal;
@@ -37,13 +42,13 @@ public:
 
     FieldDesc_Export()=default;
 
-    FieldDesc_Export& _copyFrom(FieldDesc_Export& pIn);
+    FieldDesc_Export& _copyFrom(const FieldDesc_Export& pIn);
 
-    FieldDesc_Export(FieldDesc_Export& pIn) {_copyFrom(pIn);}
-    FieldDesc_Export(FieldDesc_Export&& pIn) {_copyFrom(pIn);}
+    FieldDesc_Export(const FieldDesc_Export& pIn) {_copyFrom(pIn);}
+    FieldDesc_Export(const FieldDesc_Export&& pIn) {_copyFrom(pIn);}
 
-    FieldDesc_Export& operator = (FieldDesc_Export& pIn) {return _copyFrom(pIn);}
-    FieldDesc_Export& operator = (FieldDesc_Export&& pIn) {return _copyFrom(pIn);}
+    FieldDesc_Export& operator = (const FieldDesc_Export& pIn) {return _copyFrom(pIn);}
+    FieldDesc_Export& operator = (const FieldDesc_Export&& pIn) {return _copyFrom(pIn);}
 
     FieldDesc_Export& set(ZFieldDescription& pIn);
     void    setFromPtr(const unsigned char *&pPtrIn);
@@ -64,12 +69,20 @@ public:
       return false;
     }
 
+    friend   QDataStream &operator << (QDataStream &out, const FieldDesc_Export &myObj)
+    {
+      out.writeBytes((const char *)&myObj,sizeof(FieldDesc_Export)) ;
+      return(out);
+    }
 };
+
+
 /**
  * @brief The FieldDesc_Check class used to compute md5 hashcode
  */
 class FieldDesc_Check
 {
+
 public:
 
   //       //!< Name of the field with UVF format contained within a fixed Structure
@@ -101,8 +114,10 @@ public:
  * in order to store it in ZPinboard.
  */
 class KeyField_Pack;
-class FieldDesc_Pack
+class FieldDesc_Pack : public QObject
 {
+Q_OBJECT
+
 public:
 
   //       //!< Name of the field with UVF format contained within a fixed Structure
@@ -158,8 +173,10 @@ public:
  *
  *
  */
-class ZFieldDescription
+class ZFieldDescription : public QObject
 {
+  Q_OBJECT
+
   friend class FieldDesc_Export;
   friend class FieldDesc_Pack;
   friend class FieldDesc_Check;
@@ -201,7 +218,7 @@ public:  md5                Hash;        //!< unique hashcode value for the fiel
   bool checkHashcode() ;
 
   /** @brief computeMd5() compute md5 hash key with all current data from the field and store it within Hash field. returns computed value */
-  md5& computeMd5();
+  md5 computeMd5();
   /** @brief _computeMd5() compute md5 hash key with all current data from the field, WITHOUT storeing it within Hash field and returns computed value */
   md5 _computeMd5();
 
@@ -227,7 +244,7 @@ public:  md5                Hash;        //!< unique hashcode value for the fiel
    * ZS_XMLMISREQ some required node(s) is/are missing
    * ZS_XMLINVROOTNAME <field> root node is missing in pFieldRootNode
    */
-  ZStatus fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, ZaiErrors* pErrorlog);
+  ZStatus fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, int &pErrored, int &pWarned, ZaiErrors* pErrorlog);
 
   FieldDesc_Export getFDExp();
 
@@ -245,6 +262,7 @@ public:  md5                Hash;        //!< unique hashcode value for the fiel
 
 using namespace  zbs;
 
-Q_DECLARE_METATYPE(zbs::ZFieldDescription );   // required for using such structure as variant
-Q_DECLARE_METATYPE(zbs::FieldDesc_Pack);   // required for using such structure as variant
+Q_DECLARE_METATYPE(zbs::ZFieldDescription )   // required for using such structure as variant
+Q_DECLARE_METATYPE(zbs::FieldDesc_Pack)   // required for using such structure as variant
+Q_DECLARE_METATYPE(zbs::FieldDesc_Export)
 #endif // ZFIELDDESCRIPTION_H

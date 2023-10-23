@@ -129,9 +129,11 @@ ZStatus testRandomSearchAllExact(const uriString& pZMF);
 
 ZStatus testRandomSearchAllPartial(const uriString& pZMF);
 
+#include <zcontentcommon/zgeneralparameters.h>
 
 int main(int argc, char *argv[])
 {
+
 
   ZDataBuffer wS1,wKey;
   ZDataBuffer wRecord;
@@ -150,15 +152,24 @@ int main(int argc, char *argv[])
 
   QApplication a(argc, argv);
 
-
+  wSt=GeneralParameters.setFromArg(argc,argv);
+/*
   const char* wWD=getenv(__PARSER_WORK_DIRECTORY__);
   if (!wWD)
     wWD="";
 
 uriString wDocFile = wWD ;
-wDocFile.addConditionalDirectoryDelimiter();
-wDocFile += "zdocphysical.zmf";
+*/
+    uriString wDocFile = GeneralParameters.getWorkDirectory() ;
 
+    wDocFile.addConditionalDirectoryDelimiter();
+
+    const char* wWD=getenv("zmasterfile");
+    if (!wWD) {
+        ZException.setMessage("main",ZS_MISS_FIELD,Severity_Fatal, "missing file name as environment variable <zmasterfile>");
+        ZException.exit_abort();
+    }
+    wDocFile += wWD;
 // uriString wPictureDir;
 /*
 uriString wIncludeFile = "/home/gerard/Development/zbasetools/zcontent/test_zrawfile/zdocphysical.cpp";
@@ -176,9 +187,9 @@ uriString wOutFile="/home/gerard/Development/zbasetools/zcontent/test_zrawfile/z
 */
   wSt=populate(wDocFile);
 
-  wSt=testSequentialKey(wDocFile);
+ // wSt=testSequentialKey(wDocFile);
 
-  wSt=testRandomSearchUnique(wDocFile);
+ // wSt=testRandomSearchUnique(wDocFile);
 
 /*
    wSt=testRandomSearchAll(wDocFile);
@@ -1820,9 +1831,11 @@ ZStatus testSequentialKey(const uriString& pZMF) {
     ZException.exit_abort();
   }
 
-  fprintf (stdout,"testSearch Key order sequential read index key <%s>\n",wMasterFile.IndexTable[1]->IndexName.toString());
+  long wIndexRank = 0L;
 
-  wSt=wMasterFile.zgetFirstPerIndex(wMasterRecord,1L);
+  fprintf (stdout,"testSearch Key order sequential read index key <%s>\n",wMasterFile.IndexTable[wIndexRank]->IndexName.toString());
+
+  wSt=wMasterFile.zgetFirstPerIndex(wMasterRecord,wIndexRank);
   int wCurrentRec=0;
   while (wSt==ZS_SUCCESS) {
     fprintf(stdout,"Record #%d\n",wCurrentRec++);

@@ -8,16 +8,16 @@ using namespace zbs;
 ZMFDictionary::ZMFDictionary()
 {
 }
-ZMFDictionary::ZMFDictionary(const ZMFDictionary &pIn)
+ZMFDictionary::ZMFDictionary(const ZMFDictionary &pIn): ZMetaDic()
 {
   _copyFrom(pIn);
 }
-ZMFDictionary::ZMFDictionary(const ZMFDictionary&& pIn)
+ZMFDictionary::ZMFDictionary(const ZMFDictionary&& pIn): ZMetaDic()
 {
   _copyFrom(pIn);
 }
 
-ZMFDictionary::ZMFDictionary(const ZMetaDic& pIn)
+ZMFDictionary::ZMFDictionary(const ZMetaDic& pIn): ZMetaDic()
 {
   ZMetaDic::_copyFrom(pIn);
 }
@@ -25,10 +25,20 @@ ZMFDictionary::ZMFDictionary(const ZMetaDic& pIn)
 ZMFDictionary&
 ZMFDictionary::_copyFrom(const ZMFDictionary& pIn)
 {
+  clearData();
   Active = pIn.Active;
-
+  DicName = pIn.DicName;
+  Version = pIn.Version;
+  CreationDate = pIn.CreationDate;
+  ModificationDate = pIn.ModificationDate;
+/*  if (CheckSum != nullptr)
+      delete CheckSum;
+  CheckSum=nullptr;
+*/
+  if (pIn.CheckSum!=nullptr)
+      CheckSum=new checkSum(*pIn.CheckSum);
   ZMetaDic::_copyFrom(pIn);
-  KeyDic.clear();
+//  KeyDic.clear();
   for (long wi = 0; wi < pIn.KeyDic.count(); wi ++)
   {
     KeyDic.push(new ZKeyDictionary(pIn.KeyDic[wi]));
@@ -37,7 +47,12 @@ ZMFDictionary::_copyFrom(const ZMFDictionary& pIn)
   return *this;
 }
 
-
+void ZMFDictionary ::setModified ()
+{
+  if (CreationDate.isInvalid())
+    CreationDate = ZDateFull::currentDateTime();
+  ModificationDate = ZDateFull::currentDateTime();
+}
 
 ZStatus
 ZMFDictionary::addKey(ZKeyDictionary*pIn, long &pOutKeyRank)
@@ -227,6 +242,25 @@ utf8VaryingString ZMFDictionary::toXml(int pLevel,bool pComment)
   ZDataBuffer wB64;
   wReturn = fmtXMLnode("dictionary",pLevel);
 
+  if (DicName.isEmpty())
+    wReturn += fmtXMLcomment("/dicname/ is missing",wLevel);
+  else
+    wReturn += fmtXMLchar("dicname",DicName.toCChar(),wLevel);
+
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn," /dicname/ field is the main dictionary descriptor.");
+
+  wReturn += fmtXMLversion("version",Version,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn," /version/ field is the local version to the dictionary data (not to be confused with software version).");
+
+  wReturn += fmtXMLdatefull("creationdate",CreationDate,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn," /creationdate/  when dictionary has been firstly created.");
+
+  wReturn += fmtXMLdatefull("modificationdate",ModificationDate,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn," /modificationdate/  when dictionary has lastly being saved.");
 
   wReturn += fmtXMLbool("active",Active,wLevel);
   wReturn += fmtXMLuint32("keycount",KeyDic.count(),wLevel);
@@ -344,6 +378,33 @@ ZMFDictionary::fromXml(zxmlNode* pDicNode, bool pCheckHash, ZaiErrors* pErrorlog
   uint32_t wKeyCount;
   Active=false;
   wRootNode=(zxmlElement *)pDicNode;
+
+  if (XMLgetChildText(wRootNode,"dicname",DicName,pErrorlog,ZAIES_Warning) <0)
+  {
+    pErrorlog->logZStatus(ZAIES_Warning,
+                          ZS_XMLWARNING,
+                          "ZMFDictionary::fromXml-W-CNTFINDND Warning: cannot find node element with name <dicname>. Dictionary has no name.");
+    DicName.clear();
+  }
+  if (XMLgetChildVersion(wRootNode,"version",Version,pErrorlog,ZAIES_Warning) <0)
+  {
+    pErrorlog->logZStatus(ZAIES_Warning,
+                          ZS_XMLWARNING,
+                          "ZMFDictionary::fromXml-W-CNTFINDND Warning: cannot find node element with name <version>. Dictionary version set to <1.0.0>.");
+    Version=1000000UL;
+  }
+  if (XMLgetChildZDateFull(wRootNode,"creationdate",CreationDate,pErrorlog,ZAIES_Warning) <0)
+  {
+    pErrorlog->logZStatus(ZAIES_Warning,
+                          ZS_XMLWARNING,
+                          "ZMFDictionary::fromXml-W-CNTFINDND Warning: cannot find node element with name <creationdate>. Dictionary version set to <1.0.0>.");
+  }
+  if (XMLgetChildZDateFull(wRootNode,"modificationdate",ModificationDate,pErrorlog,ZAIES_Warning) <0)
+  {
+    pErrorlog->logZStatus(ZAIES_Warning,
+                          ZS_XMLWARNING,
+                          "ZMFDictionary::fromXml-W-CNTFINDND Warning: cannot find node element with name <modificationdate>. Dictionary version set to <1.0.0>.");
+  }
 
   if (XMLgetChildBool(wRootNode,"active",Active,pErrorlog,ZAIES_Error)<0) {
     pErrorlog->logZStatus(ZAIES_Warning, ZS_XMLWARNING,"ZMFDictionary::fromXml-W-MISSFLD Missing field <active>");

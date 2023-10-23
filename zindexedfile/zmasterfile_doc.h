@@ -667,10 +667,10 @@ Modification on base RandomFile parameter field will cause a change in the heade
 
 @subsection ZMFCHG ZMasterFile changes
 
-- Duplicates : There is no specific problem to change a value from ZST_NODUPLICATES to ZST_DUPLICATES. However, changing ZST_DUPLICATES to ZST_NODUPLICATES may cause Index to be rejected if a duplicate key is encountered during index rebuild.
+- Duplicates : There is no specific problem to change a value from ZST_NODUPLICATES to ZST_Duplicates. However, changing ZST_Duplicates to ZST_NODUPLICATES may cause Index to be rejected if a duplicate key is encountered during index rebuild.
 In this case, Index will be rejected and former Index will be lost.
 
-@note If a typo is detected then it will be considered as ZST_DUPLICATES.
+@note If a typo is detected then it will be considered as ZST_Duplicates.
 
 Any index without modification, or with modifications that only concern "non modifiable" fields, then index is not modified and not rebuilt.
 

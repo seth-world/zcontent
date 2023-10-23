@@ -39,7 +39,7 @@ ZQT_WIDGET = $${ZQT_ROOT}/zqtwidget
 
 # name of the root include directory
 
-MODULE = zcontentutils
+MODULE = ztestrawfile
 
 #defines DEVELOPMENT_BASE, TOOLSET symbols and ICU symbols
 
@@ -88,8 +88,7 @@ LIBS +=  -licuuc -licudata -licui18n -licuio -licutu -licutest
 #LIBS += $$ICU_BASE/lib/libicutu.a
 #LIBS += $$ICU_BASE/lib/libicutest.a
 
-
-
+INCLUDEPATH +=/usr/include/x86_64-linux-gnu
 INCLUDEPATH += $${TOOLSET_ROOT} \
                 $${TOOLSET_INCLUDE}  \
                 $${TOOLSET_INC_ZBASE} \

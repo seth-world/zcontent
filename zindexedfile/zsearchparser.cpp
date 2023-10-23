@@ -582,8 +582,7 @@ ZSearchParser::_parseSetFile(std::shared_ptr<ZSearchEntity> &pCollection)
 
   textLog("File <%s> has been opened with mode <%s> as <%s> ",
       wPath.toString(),Action & ZSPA_Modify?"Modify":"Readonly",Entity->getName().toString());
-  textLog("Dictionary name <%s> %ld fields %ld index(es)",
-      Entity->getFieldDictionary().DicName.toString(),
+  textLog("Dictionary %ld fields %ld index(es)",
       Entity->getFieldDictionary().count(),
       Entity->getKeyDictionary().count());
   for (long wi=0; wi < Entity->getKeyDictionary().count();wi++) {

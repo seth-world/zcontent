@@ -1,6 +1,7 @@
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION,5): QT += core5compat
 
 CONFIG += c++17
 
@@ -88,6 +89,8 @@ LIBS +=  -licuuc -licudata -licui18n -licuio -licutu -licutest
 #LIBS += $$ICU_BASE/lib/libicutu.a
 #LIBS += $$ICU_BASE/lib/libicutest.a
 
+INCLUDEPATH +=/usr/include/x86_64-linux-gnu
+
 INCLUDEPATH +=  $${OPENSSL_BASE} \
                 $${OPENSSL_INCLUDEPATH} \
                 $${TOOLSET_ROOT} \
@@ -129,10 +132,12 @@ SOURCES += \
     $${ZQT_WIDGET}/zqplaintextedit.cpp \
 #    $${ZQT_WIDGET}/zqpixlabelchecked.cpp \
     ../../zcppparser/zcppparsertype.cpp \
+    ../../zqt/zqtwidget/zcombodelegate.cpp \
     ../../zqt/zqtwidget/zqgraphicscene.cpp \
     ../../zqt/zqtwidget/zqrectangle.cpp \
     ../zcontentcommon/urffield.cpp \
     ../zcontentcommon/urfparser.cpp \
+    ../zcontentcommon/zgeneralparameters.cpp \
 \
     $${ZCONTENT_ROOT}/zcontentcommon/zresource.cpp \
     $${ZCONTENT_ROOT}/zindexedfile/zfielddescription.cpp \
@@ -172,6 +177,7 @@ SOURCES += \
     zcollectionlist.cpp \
     zcppgenerate.cpp \
     zfilegenerate.cpp \
+    zgeneralparamsdlg.cpp \
     zkeylistdlg.cpp \
     zrawkeylistdlg.cpp \
     zrawmasterfilevisu.cpp \
@@ -181,7 +187,8 @@ SOURCES += \
 
 
 HEADERS += \
-    ../../zconfig_general.h \
+    $${TOOLSET_ROOT}/config/zconfig_general.h \
+    $${TOOLSET_ROOT}/config/zconfig.h \
     $${ZQT_WIDGET}/zdatareference.h \
     $${ZQT_WIDGET}/zpinboard.h \
     $${ZQT_WIDGET}/zqlabel.h \
@@ -195,12 +202,14 @@ HEADERS += \
     $${ZQT_WIDGET}/zqplaintextedit.h \
 #    $${ZQT_WIDGET}/zqpixlabelchecked.h \
     ../../zcppparser/zcppparsertype.h \
+    ../../zqt/zqtwidget/zcombodelegate.h \
     ../../zqt/zqtwidget/zqgraphicscene.h \
     ../../zqt/zqtwidget/zqrectangle.h \
     ../../zqt/zqtwidget/zqtutils.h \
     ../../zqt/zqtwidget/zqtwidgets_release.h \
     ../zcontentcommon/urffield.h \
     ../zcontentcommon/urfparser.h \
+    ../zcontentcommon/zgeneralparameters.h \
 \
     $${ZCONTENT_ROOT}/zcontentcommon/zresource.h \
     $${ZCONTENT_ROOT}/zindexedfile/zfielddescription.h \
@@ -236,9 +245,11 @@ HEADERS += \
     zcellformatdlg.h \
     zchangerecord.h \
     zcollectionlist.h \
+    zcontentutils_doc.h \
     zcontentutils_release.h \
     zcppgenerate.h \
     zfilegenerate.h \
+    zgeneralparamsdlg.h \
     zkeylistdlg.h \
     zrawkeylistdlg.h \
     zrawmasterfilevisu.h \

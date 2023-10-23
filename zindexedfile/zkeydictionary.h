@@ -3,8 +3,11 @@
 
 #include <ztoolset/zarray.h>
 
-#include <zindexedfile/zindextype.h>
-#include <zindexedfile/zindexfield.h>
+#include <zcontent/zindexedfile/zindextype.h>
+#include <zcontent/zindexedfile/zindexfield.h>
+#include <zcontent/zcontentcommon/zcontentconstants.h>
+
+
 #include <QDataStream> /* for Q_DECLARE_METATYPE */
 
 #ifndef __KEYDICTYPE__
@@ -52,7 +55,9 @@ public:
   uint16_t    EndianCheck=cst_EndianCheck_Normal;
   uint32_t    KeyDicSize=0;   // overall size of exported key dictionary
   uint32_t    FieldNb=0;      // number of key fields
-  uint8_t     Duplicates=0;   // Self explainatory
+  ZSort_Type  Duplicates=ZST_Nothing;   // Allow duplicates = 1 otherwise do not allow duplicates
+  uint8_t     Forced=0;       // guessed size is forced = 1 otherwise guessed size is computed
+  uint32_t    KeyGuessedSize=0;
   ZAExport    ZAE;            // base ZArray export data
 
   void setFromPtr(const unsigned char *&pPtrIn);
@@ -81,12 +86,12 @@ public:
 };
 
 
-
+/*
 class KeyDic_Pack
 {
 public:
   utf8_t  Name[cst_fieldnamelen];
-  long    KeyUniversalSize;
+  long    KeyGuessedSize;
   uint8_t Duplicates;
   KeyDic_Pack()=default;
   KeyDic_Pack(const KeyDic_Pack& pIn) {_copyFrom(pIn);}
@@ -101,7 +106,7 @@ public:
   void setName(const utf8_t* pName);
   utf8String getName();
 };
-
+*/
 #pragma pack(pop)
 
 
@@ -142,61 +147,39 @@ public:
   }
 
 
-  uint8_t           Duplicates=0;
+  ZSort_Type        Duplicates=ZST_Nothing ;
   utf8String        DicKeyName;       // refers to ZICB::IndexName
   utf8VaryingString ToolTip;         //!< help describing the key
   ZMFDictionary*    Dictionary=nullptr;  // Record Dictionary to which Key Dictionary refers : WARNING : not store in xml <keydictionary>
-                                //  it is stored apart in dedicated <metadic> xml node
-//    uint32_t KDicSize;          //!< Size of the dictionary when exported (other fields are not exported) this field comes first
-        // nb: KDicSize is already given by ZAExport structure.
-//    uint32_t KeyNaturalSize ;     //!< overall size of the key (sum of keyfields NATURAL (total) length). not necessary
-//    uint32_t KeyUniversalSize ;   //!< total of key size with internal format MOVED TO ZSICBOwnData
-  // WARNING: fields below are not stored (xml) nor exported (icb)
-    bool    Recomputed=false;
-    uint8_t Status=0;             // for Xml matching and actions. refers to ZPRES values set.
-    /** @brief computeKeyOffsets (re)compute key fields offset, field by field, and returns the key universal size
+
+  uint32_t          KeyGuessedSize=0;       // used to force or guess an average key size. Example : key has a varying string component.
+  bool              Forced = false;
+  uint8_t           Status=0;             // for Xml matching and actions. refers to ZPRES values set.
+  /** @brief computeKeyOffsets (re)compute key fields offset, field by field, and returns the key universal size
      */
-    uint32_t computeKeyOffsets();
-    uint32_t computeKeyUniversalSize()const;
+  uint32_t computeKeyOffsets();
+  uint32_t computekeyguessedsize()const;
 
-    ZTypeBase getType(long pKFieldRank)const ;
-    uint64_t getUniversalSize(const long pKFieldRank) const;
-    uint64_t getNaturalSize(const long pKFieldRank)const ;
-
-
-    ZStatus addFieldToZKeyByName (const char *pFieldName);
-    ZStatus addFieldToZKeyByRank (const zrank_type pMDicRank);
+  ZTypeBase getType(long pKFieldRank)const ;
+  uint64_t getUniversalSize(const long pKFieldRank) const;
+  uint64_t getNaturalSize(const long pKFieldRank)const ;
 
 
+  ZStatus addFieldToZKeyByName (const char *pFieldName);
+  ZStatus addFieldToZKeyByRank (const zrank_type pMDicRank);
 
-    void report (FILE* pOutput=stdout);
+  void report (FILE* pOutput=stdout);
 
-    /* computes the total universal size of the key according its definition and returns this total size */
-    uint32_t _reComputeKeySize(void) ;
+  /* computes the total universal size of the key according its definition and returns this total size */
+  uint32_t _reComputeKeySize(void) ;
 
-    ZStatus zremoveField (const long pKDicRank);
+  ZStatus zremoveField (const long pKDicRank);
 
+  long zsearchFieldByName(const utf8_t* pFieldName) const ;
+  long zsearchFieldByName(const utf8String &pFieldName) const ;
 
-/*    template <class _Tp>
-    ZStatus zaddField (const char *pFieldName,const size_t pZMFOffset);
-    template <class _Tp>
-    ZStatus zaddField (descString &pFieldName,const size_t pZMFOffset);
-    ZStatus zremoveField (const char *pFieldName);
-    ZStatus zremoveField (const long pFieldRank);
-    ZStatus zsetField (const long pFieldRank,ZKeyDic_type pZKD,auto pValue);
-*/
-    long zsearchFieldByName(const utf8_t* pFieldName) const ;
-    long zsearchFieldByName(const utf8String &pFieldName) const ;
+  void clear (void);
 
-    void clear (void)
-    {
-//      KeyNaturalSize=0;
-//      KeyUniversalSize=0;
-//      KDicSize=0;
-//      Recomputed=false;
-      _Base::clear();
-      return;
-    }
 
     utf8VaryingString toXml(int pLevel, int pRank, bool pComment=false);
     ZStatus fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog);
@@ -223,67 +206,7 @@ public:
 } ;
 
 
-#ifdef __COMMENT__
-/* reference of that to be stored within QStandardItem[0] */
-class ZKeyHeaderRow : public ZKeyDictionary
-{
-public:
-  ZKeyHeaderRow(ZMFDictionary*pMDic) : ZKeyDictionary(pMDic) {}
-  ZKeyHeaderRow(ZKeyDictionary* pKeyDic) : ZKeyDictionary(pKeyDic) {set(pKeyDic);}
-
-  ZKeyHeaderRow(const ZKeyHeaderRow& pIn) : ZKeyDictionary(pIn) {ZKeyHeaderRow::_copyFrom(pIn);}
-  ZKeyHeaderRow(const ZKeyHeaderRow* pIn) : ZKeyDictionary(pIn) {ZKeyHeaderRow::_copyFrom(*pIn);}
-
-  uint32_t          KeyUniversalSize=0;
-
-  ZKeyHeaderRow& _copyFrom(const ZKeyHeaderRow& pIn) {
-    ZKeyDictionary::_copyFrom(pIn);
-    KeyUniversalSize=pIn.KeyUniversalSize;
-    return *this;
-  }
-
-  ZKeyHeaderRow& operator = (const ZKeyHeaderRow& pIn) {return _copyFrom(pIn); }
-
-  void set(const ZKeyDictionary& pKeyDic) ;
-  void set(const ZKeyDictionary* pKeyDic) ;
-  ZKeyDictionary get() ;
-};
-
-class ZKeyFieldRow : public ZIndexField
-{
-public:
-  ZKeyFieldRow()=default;
-  ZKeyFieldRow(const ZIndexField& pKeyField):ZIndexField(pKeyField) {set(pKeyField);}
-  ZKeyFieldRow(const ZKeyFieldRow& pIn) {_copyFrom(pIn);}
-  ZTypeBase         ZType=ZType_Nothing;
-  utf8VaryingString Name;
-  uint32_t          UniversalSize=0;
-//  uint32_t      MDicRank=0;       // reference to Metadictionary row : not stored in XML
-//  uint32_t      KeyOffset=0;      // Offset of the Field from the beginning of Key record computed using universal formats
-//  md5           Hash;             // unique reference to meta dictionary field definition (stored in XML)
-
-  ZKeyFieldRow& _copyFrom(const ZKeyFieldRow& pIn) {
-    ZIndexField::_copyFrom(pIn);
-//    MDicRank=pIn.MDicRank;
-//    KeyOffset=pIn.KeyOffset;
-//    Hash=pIn.Hash;
-    UniversalSize=pIn.UniversalSize;
-    Name =pIn.Name;
-    ZType = pIn.ZType;
-    return *this;
-  }
-
-  ZKeyFieldRow& operator = (const ZKeyFieldRow& pIn) {return _copyFrom(pIn); }
-
-  //  void set(const ZMetaDic& pMetaDic, const ZIndexField& pKeyField) ;
-  void set(const ZIndexField& pKeyField) ;
-  ZIndexField get() ;
-};
-
-#endif// __COMMENT__
-
-
 } //namespace zbs
 
-Q_DECLARE_METATYPE(zbs::KeyDic_Pack);   // required for using such structure as variant
+
 #endif // ZKEYDICTIONARY_H

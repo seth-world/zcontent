@@ -93,10 +93,13 @@ ZKeyListDLg::displayKeyDictionaries(const ZMFDictionary* pDic)
     wKHR.IndexName = pDic->KeyDic[wi]->DicKeyName;
     wKHR.Duplicates = pDic->KeyDic[wi]->Duplicates;
 
-    wKHR.KeySize = 0;
-    for (long wj=0;wj < pDic->KeyDic[wi]->count(); wj++)
-      wKHR.KeySize += pDic->TabConst(pDic->KeyDic[wi]->Tab(wj).MDicRank).UniversalSize;
-
+    if (wKHR.Forced)
+        wKHR.KeySize = pDic->KeyDic[wi]->KeyGuessedSize;
+    else {
+        wKHR.KeySize = 0;
+        for (long wj=0;wj < pDic->KeyDic[wi]->count(); wj++)
+          wKHR.KeySize += pDic->TabConst(pDic->KeyDic[wi]->Tab(wj).MDicRank).UniversalSize;
+    }
 
     wKeyRow=createKeyDicRow_KD(wKHR); /* create item row with appropriate infra data linked to it */
 
@@ -164,7 +167,7 @@ ZKeyListDLg::AcceptClicked() {
   if (KeyDataRef!=nullptr)
     delete KeyDataRef;
 */
-  KeyDataRef =  KeyData(*wDRef.getPtr<KeyData*>());
+  KeyDataRef =  KeyData(*wDRef.getPtr<KeyData>());
   accept();
 }
 
@@ -207,7 +210,7 @@ createKeyDicRow_KD(const KeyData& pKHR) {
 
   wDRef.set(ZLayout_KeyTRv,getNewResource(ZEntity_KeyDic),0);
   wDRef.setPtr(new KeyData(pKHR));
-  wV.setValue<ZDataReference>(wDRef);
+  wV.setValue(wDRef);
   wKeyRow[0]->setData(wV,ZQtDataReference);
 
   wKeyRow << createItem( "Dictionary key");
@@ -220,7 +223,7 @@ createKeyDicRow_KD(const KeyData& pKHR) {
   wKeyRow.last()->setEditable(false);
 
   //  wKeyRow << createItem( pKHR.Duplicates?"Duplicates":"No duplicate","%s");
-
+  /*
   QStandardItem* wDup = createItemAligned( "Duplicates",Qt::AlignLeft);
   wDup->setEditable(false);
   wDup->setCheckable(true);
@@ -230,7 +233,8 @@ createKeyDicRow_KD(const KeyData& pKHR) {
   else
     wDup->setText("No duplicates");
   wDup->setEditable(false);
-  wKeyRow << wDup;
+  */
+  wKeyRow << new QStandardItem(decode_ZST(pKHR.Duplicates));
 
 
   wKeyRow.last()->setEditable(false);
@@ -245,9 +249,7 @@ ZKeyListDLg::clearKeyTRv() {
   if (keyTRv==nullptr)
     return ;
   for (int wi=0; wi < keyTRv->ItemModel->rowCount();wi++) {
-    QStandardItem* wKeyItem = keyTRv->ItemModel->item(wi,0);
-      KeyData* wKFR = wDRef.getPtr<KeyData*>();
-      delete wKFR;
-  }
+    releaseItemData<KeyData>(keyTRv->ItemModel->item(wi,0));
+   }
   keyTRv->ItemModel->removeRows(0,keyTRv->ItemModel->rowCount());
 }

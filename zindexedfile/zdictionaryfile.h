@@ -67,36 +67,54 @@ class ZDictionaryFile :  public ZMFDictionary
 {
 public:
   ZDictionaryFile();
-  ZDictionaryFile(const ZDictionaryFile& pIn) { _copyFrom(pIn);}
+  ZDictionaryFile(const ZDictionaryFile& pIn): ZMFDictionary() { _copyFrom(pIn);}
 
   ZDictionaryFile& _copyFrom(const ZDictionaryFile& pIn) ;
 
   ZMFDictionary& getDictionary() { return *this; }
 
   ZStatus create(const uriString &pDicFilename,  bool pBackup=true);
+#ifdef __USE_BIN_DICTIONARY__
+  ZStatus load_bin();
+  ZStatus save_bin(bool pBackup=true);
+#endif
+  ZStatus load_xml(ZaiErrors *pErrorlog);
+  ZStatus save_xml(bool pBackup=true);
 
-  ZStatus load();
-  ZStatus save(bool pBackup=true);
 
   /** @brief savetoDicFile updates URIDictionary and save current dictionary content to this file */
-  ZStatus saveToDicFile (const uriString& pURIDicFile) {
+  ZStatus saveToDicFile (const uriString& pURIDicFile, bool pBackup=true) {
     URIDictionary = pURIDicFile;
-    return save();
+//    return save_bin();
+    return save_xml(pBackup);
   }
-
+  #ifdef __USE_BIN_DICTIONARY__
+  /** @brief savetoDicFile updates URIDictionary and save current dictionary content to this file */
+  ZStatus saveToDicFile_bin (const uriString& pURIDicFile) {
+    return save_bin();
+  }
+  ZStatus loadDictionary_bin(const uriString& pDicFilename);
+  ZStatus saveAsEmbedded_bin(const uriString& pZMFURIContent) {
+    URIDictionary = generateDicFileName(pZMFURIContent);
+    return save_bin();
+  }
+  #endif //__USE_BIN_DICTIONARY__
   ZStatus saveAsEmbedded(const uriString& pZMFURIContent) {
     URIDictionary = generateDicFileName(pZMFURIContent);
-    return save();
+//    return save_bin();
+    return save_xml();
   }
 
   void setDicFilename(const uriString& pDicFilename) { URIDictionary=pDicFilename; }
   void setDictionary(const ZMFDictionary& pDic) ;
-  ZStatus loadDictionary(const uriString& pDicFilename);
+
+
+  ZStatus loadDictionary(const uriString& pDicFilename, ZaiErrors *pErrorlog);
 
   utf8VaryingString exportToXmlString(bool pComment);
   ZStatus exportToXmlFile(const uriString &pXmlFile,bool pComment);
 
-  ZStatus importFromXmlString(const utf8VaryingString& pXmlContent);
+  ZStatus importFromXmlString(const utf8VaryingString& pXmlContent,bool pCheckHash,ZaiErrors* pErrorlog);
   ZStatus importFromXmlFile(const uriString &pXmlFile);
 
   static utf8VaryingString generateDicFileName(const uriString& pURIContent);

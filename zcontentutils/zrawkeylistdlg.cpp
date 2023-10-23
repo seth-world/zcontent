@@ -79,9 +79,9 @@ ZStatus ZRawKeyListDLg::set(ZMasterFile* pMasterFile) {
     QList<QStandardItem*> wRow;
     utf8VaryingString wStr;
     wRow << new QStandardItem(MasterFile->IndexTable[wi]->IndexName.toCChar());
-    wStr.sprintf("%ld",MasterFile->IndexTable[wi]->KeyUniversalSize);
+    wStr.sprintf("%ld",MasterFile->IndexTable[wi]->KeyGuessedSize);
     wRow << new QStandardItem(wStr.toCChar());
-    wRow << new QStandardItem(MasterFile->IndexTable[wi]->Duplicates?"No duplicates":"Duplicates");
+    wRow << new QStandardItem(decode_ZST( MasterFile->IndexTable[wi]->Duplicates));
     KeyListTBv->ItemModel->appendRow(wRow);
   }// for
 

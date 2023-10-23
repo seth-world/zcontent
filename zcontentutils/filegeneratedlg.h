@@ -38,7 +38,7 @@ class ZQTableView;
 class QStandardItem;
 class textEditMWn;
 
-
+class ZComboDelegate;
 
 enum FGState : uint8_t {
   FGST_Nothing  = 0,
@@ -83,7 +83,6 @@ public:
   /* loads an external dictionary from a dic file without setting up parameters */
   ZStatus loadExternalDicFile();
 
-
   ZStatus XmlDefinitionSave(uriString& pXmlFile,bool pComment=true); /* save definition to an xml formatted text file */
   ZStatus XmlDefinitionLoad(const utf8VaryingString&pXmlContent, ZaiErrors* pErrorlog);
 
@@ -97,9 +96,7 @@ public:
 
   ZStatus createDic(ZMFDictionary& pDic, const uriString &pURIMaster);
 
-
   ZStatus rebuildIndex(long pIndexRankToRebuild);
-
 
   void resizeEvent(QResizeEvent*) override;
 
@@ -129,6 +126,8 @@ public:
 
   void sleepWithLoop(int pTimes);
 
+  bool testGuessed();
+
 Q_SLOT
   void Quit();
   void Compute();
@@ -147,6 +146,8 @@ Q_SLOT
   void MenuAction(QAction* pAction);
 
 private:
+  QPixmap CrossBluePXm,CrossRedPXm;
+
   uint8_t       State=FGST_Nothing;
 
   textEditMWn* ComLog=nullptr;
@@ -245,6 +246,8 @@ private:
   zbs::ZMasterFile* MasterFile=nullptr;
 
   bool FResizeInitial=true;
+
+  ZComboDelegate* ComboDelegate=nullptr;
 };
 
 

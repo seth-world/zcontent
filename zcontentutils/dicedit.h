@@ -2,6 +2,7 @@
 #define DICEDIT_H
 
 #include <QMainWindow>
+
 #include <ztoolset/zstatus.h>
 #include <ztoolset/uristring.h>
 #include <ztoolset/zarray.h>
@@ -34,9 +35,12 @@ class ZDictionaryFile;
 class ZCppGenerate;
 }
 
+class ZComboDelegate;
+
 namespace Ui {
 class DicEdit;
 }
+
 
 class QStandardItemModel;
 class QActionGroup;
@@ -56,10 +60,13 @@ class ZFieldDLg;
 
 class RawFields;
 
+
 namespace zbs {
 class ZKeyHeaderRow;
 class ZKeyFieldRow;
 }
+
+
 
 
 class DicEditMWn : public QMainWindow
@@ -121,8 +128,9 @@ fieldTBv
   QStandardItem * fieldChangeDLg(QStandardItem *pFieldItem);
 
   bool keyCreateDLg(ZKeyHeaderRow &pNewKey);
+#ifdef __COMMENT__
   bool keyChangeDLg(ZKeyHeaderRow &pKey);
-
+#endif
   /** @brief fieldInsert  creates a new field using dialog ZFieldDLg and insert it before the field pointed by pIdx .
    *  Infradata and dictionary data are changed accordingly. */
   bool fieldInsertNewBefore(QModelIndex pIdx);
@@ -206,7 +214,7 @@ fieldTBv
    * Only attributes local to key are changed.
    * Control is made on key name that must not be a duplicate name.
    */
-  QStandardItem* keyChange();
+  void keyChange(QModelIndex &pIdx);
 //  inline bool _keyChange(const QModelIndex &pIdx, ZKeyHeaderRow & pKHR);
 
   /** @brief DicEdit::_keyDelete deletes key field pointed by pIdx :
@@ -245,15 +253,28 @@ fieldTBv
     void manageDictionaryFiles();
     /* new version (simplyfied) of saveOrCreateDictionaryFile() */
     bool saveOrCreateDictionaryFile();
-
+    bool saveToDictionaryFile(uriString &pXmlDictionary);
+    bool saveToXmlFile(uriString &pXmlDictionary);
     bool updateEmbedded();
 
+#ifdef __COMMENT__
   /** @brief recomputeKeyValues recomputes and updates all key values for key whose model index is pKeyIdx.
    *  These values are Key universal size, and for each field, key offset, depending on field row position
    */
   bool updateKeyValues(const QModelIndex &pKeyIdx);
-
-  ZMFDictionary* screenToDic();
+#endif
+  /**
+   * @brief screenToDic sets pZMFDic with the actual dictionary data on screen.
+   * If successful, pZMFDic is updated and is returned.
+   * If something went wrong :  Dictionary (if mentionned) is not updated,
+   *                            ErrorLog is positionned with appropriate message
+   *                            nullptr is returned.
+   * If pZMFDic (input) is set to nullptr (omitted) and operation is successful,
+   *    then a new ZMFDictionary instance is set from data on screen
+   *    and it is returned.
+   *    Attention : In this case, and only in this case, returned object must be deleted later on by callee.
+   */
+  ZMFDictionary* screenToDic(ZMFDictionary *pZMFDic);
 
   void closeEvent(QCloseEvent *event) override {
     Quit();
@@ -312,7 +333,7 @@ fieldTBv
 
   void readWriteActionEvent(QAction*pAction);
 
-  void displayErrorCallBack(const utf8VaryingString &pMessage) ;
+ // void displayErrorCallBack(const utf8VaryingString &pMessage) ;
 
   void resizeEvent(QResizeEvent* pEvent) override;
   bool _FResizeInitial=true;
@@ -324,6 +345,9 @@ fieldTBv
   void closeGenShowCppCB(QEvent *pEvent);
   void closeGenShowHeaderCB(QEvent *pEvent);
 
+  void closeDiclogCB(const QEvent *pEvent);
+  void displayErrorCallBack(const utf8VaryingString& pMessage);
+  void displayErrorColorCB(uint8_t pSeverity, const utf8VaryingString& pMessage);
 
   void setMasterFile(ZMasterFile* pMasterFile) {
     if (MasterFile!=nullptr)
@@ -336,12 +360,15 @@ public slots:
   void fieldActionEvent(QAction*pAction);
   void generalActionEvent(QAction* pAction);
   void dicDescriptionClicked();
+//  void KeyItemChanged(QStandardItem *pItem);
 
 private:
 
   RawFields* rawFields=nullptr;
 
   zbs::ZCppGenerate* GenerateEngine=nullptr;
+
+  textEditMWn*  DicLog=nullptr;
 
   textEditMWn*  GenCppFileWin=nullptr;
   textEditMWn*  GenHeaderFileWin=nullptr;
@@ -414,7 +441,7 @@ private:
 
 //  ZMFDictionary* MasterDic=nullptr;
 
-  ZaiErrors Errorlog;
+  ZaiErrors ErrorLog;
 
   uriString SelectedDirectory;
 
@@ -467,18 +494,5 @@ public:
 };
 
 
-template <class _Tp>
-_Tp* getItemData(QStandardItem* pItem) {
-  if (pItem==nullptr)
-    return nullptr;
-  QVariant wV;
-  ZDataReference wDRef;
-  wV=pItem->data(ZQtDataReference);
-  if (wV.isNull())
-    return nullptr;
-  wDRef=wV.value<ZDataReference>();
-  if (wDRef.isInvalid())
-    return nullptr;
-  return wDRef.getPtr<_Tp*>();
-}
+
 #endif // DICEDIT_H

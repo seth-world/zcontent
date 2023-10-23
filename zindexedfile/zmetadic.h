@@ -52,25 +52,27 @@ class ZMetaDic : public ZArray <ZFieldDescription>
 {
 public:
     typedef ZArray <ZFieldDescription> _Base ;
-
+#ifdef __DEPRECATED__
     utf8VaryingString DicName;         /* name of the entity described by meta dic */
     unsigned long     Version = 1000000UL;
     ZDateFull         CreationDate;
     ZDateFull         ModificationDate;
-    checkSum *        CheckSum=nullptr;/* to check if meta dictionary has changed or not */   
+    checkSum *        CheckSum=nullptr;/* to check if meta dictionary has changed or not */
+#endif // __DEPRECATED__
 
     ZMetaDic() ;
-    ~ZMetaDic() { zdelete (CheckSum) ;}
-
+ //   ~ZMetaDic() { zdelete (CheckSum) ;}
+    ~ZMetaDic() {}
+#ifdef __DEPRECATED__
     ZMetaDic(const utf8VaryingString& pDicName) {setDicName(pDicName);}
-
+#endif
     ZMetaDic& _copyFrom(const ZMetaDic& pIn) ;
 
     ZMetaDic(const ZMetaDic& pIn) {_copyFrom(pIn);}
     ZMetaDic(const ZMetaDic&& pIn) {_copyFrom(pIn);}
     ZMetaDic&  operator = (const ZMetaDic& pIn) { return _copyFrom(pIn); }
 
-
+#ifdef __DEPRECATED__
     void setDicName(const utf8String& pName) {DicName=pName;}
 
     void setVersion(unsigned int pVersion,unsigned int pMajor,unsigned int pMinor)
@@ -90,6 +92,7 @@ public:
             CheckSum=wMetaDic.newcheckSum();
             return;
             }
+#endif // __DEPRECATED__
 
     void insertField(ZFieldDescription &pFieldDef,const long pRank) {insert(pFieldDef,pRank);}
     void addField(ZFieldDescription &pFieldDef){push(pFieldDef);}

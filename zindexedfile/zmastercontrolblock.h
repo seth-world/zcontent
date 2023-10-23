@@ -145,7 +145,9 @@ public:
 
   bool hasDictionary() {return Dictionary != nullptr;}
 
-  ZStatus loadDictionary();
+  ZStatus loadDictionary(ZaiErrors *pErrorlog);
+
+  ZStatus loadDictionary_bin();
 
 } ;
 

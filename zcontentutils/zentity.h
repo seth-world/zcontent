@@ -40,6 +40,8 @@ enum ZEntity : ZEntity_type  /* application defined ZEntity */
     ZEntity_KeyDicRowsSet =        0x0000051, /* ZArray of ZArray with key field rows - with row[0] as key dictionary row */
     ZEntity_KeyFieldRow =          0x0000061, /* ZArray with key field items row  */
 
+    ZEntity_SortType    =          0x0000071, /* Key sort type (ZST_Duplicates,...) */
+
     ZEntity_CppField    =          0x0000101,   /* ZCppParser field */
     ZEntity_CppClass    =          0x0000201,   /* ZCppParser class */
     ZEntity_CppParsingSelection =  0x0000401,   /* multiline selection with either ZEntity_CppClass and/or ZEntity_CppField */

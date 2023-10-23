@@ -46,8 +46,15 @@ ZMasterFile::loadDictionary()
   }
   Dictionary=new ZDictionaryFile;
   utf8VaryingString wDicFileName = Dictionary->generateDicFileName(getURIContent());
-  return Dictionary->loadDictionary(wDicFileName);
+#ifdef __USE_BIN_DICTIONARY__
+  return Dictionary->loadDictionary_bin(wDicFileName);
+#else
+  return Dictionary->loadDictionary(wDicFileName,&ErrorLog);
+#endif
 }// zFullOpen
+
+
+
 
 ZStatus
 ZMasterFile::setDictionary(const ZMFDictionary& pDictionary)
@@ -74,7 +81,11 @@ ZMasterFile::setExternDictionary(const uriString& pDicPath)
   }
   DictionaryPath = pDicPath;
   Dictionary->URIDictionary = pDicPath;
-  return Dictionary->load();
+#ifdef __USE_BIN_DICTIONARY__
+  return Dictionary->loadDictionary_bin(pDicPath);
+#else
+  return Dictionary->loadDictionary(pDicPath,&ErrorLog);
+#endif
 }
 
 ZStatus

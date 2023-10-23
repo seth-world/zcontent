@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <ztoolset/zutfstrings.h>
 #include <zrandomfile/zfilecontrolblock.h>
+#include <zcontentcommon/zcontentconstants.h>
 
 /* IndexPresence values meaning
    * 0 : Index to be deleted
@@ -36,15 +37,15 @@ struct IndexData_st
     Status = pIn.Status;
     IndexName = pIn.IndexName;
     Duplicates = pIn.Duplicates;
-    KeyUniversalSize = pIn.KeyUniversalSize;
+    keyguessedsize = pIn.keyguessedsize;
     FCB=pIn.FCB;
     return *this;
   }
 
   ZPRES       Status=ZPRES_Nothing;
   utf8String  IndexName;
-  ZSort_Type  Duplicates=ZST_NODUPLICATES;
-  uint32_t    KeyUniversalSize=0;
+  ZSort_Type  Duplicates=ZST_NoDuplicates;
+  uint32_t    keyguessedsize=0;
   FCBParams   FCB;
 };
 

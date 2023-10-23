@@ -592,7 +592,7 @@ void
 //DisplayMain::displayICBValues(const unsigned char* pPtrIn,size_t &pOffsetFromMCB, int &wRow) {
 DisplayMain::displayICBValues(const unsigned char *pPtrIn) {
 
-  setWindowTitle(QObject::tr("Master File ICBs list","DisplayMain"));
+  setWindowTitle(QObject::tr("Index control blocks list","DisplayMain"));
   const unsigned char* wPtr = pPtrIn ;
   bool wRet = true;
   int wCount=0;
@@ -767,16 +767,16 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
   wRow++;
 
   wDumpRow.clear();
-  wDumpRow << createItem(sizeof(wICBe->KeyUniversalSize),"%lu");
-  wDumpRow << createItem( "KeyUniversalSize");
+  wDumpRow << createItem(sizeof(wICBe->keyguessedsize),"%lu");
+  wDumpRow << createItem( "keyguessedsize");
   wDumpRow.last()->setToolTip("Offset in bytes to first Index Control Block since beginning of Master Control Block");
-  wDumpRow << createItem(wICBe->KeyUniversalSize,"0x%X");
-  wUInt32=reverseByteOrder_Conditional(wICBe->KeyUniversalSize);
+  wDumpRow << createItem(wICBe->keyguessedsize,"0x%X");
+  wUInt32=reverseByteOrder_Conditional(wICBe->keyguessedsize);
   wDumpRow << createItem(wUInt32,"%u");
 
   displayItemModel->appendRow(wDumpRow);
 
-  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,KeyUniversalSize),displayItemModel->rowCount()-1);
+  createMarginItem(pDisplayOffset + offsetof(ZICB_Export,keyguessedsize),displayItemModel->rowCount()-1);
   wRow++;
 
   wDumpRow.clear();
@@ -784,7 +784,7 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
   wDumpRow << createItem( "Duplicates");
   wDumpRow.last()->setToolTip("Defines if index accepts duplicates (set) or not (unset)");
   wDumpRow << createItem((uint8_t)wICBe->Duplicates,"0x%X");
-  wDumpRow << createItem(wICBe->Duplicates?"Yes":"No");
+  wDumpRow << createItem(decode_ZST( wICBe->Duplicates) );
 
   displayItemModel->appendRow(wDumpRow);
 

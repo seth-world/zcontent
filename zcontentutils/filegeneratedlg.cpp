@@ -2,6 +2,8 @@
 #include "filegeneratedlg.h"
 //#include "ui_filegeneratedlg.h"
 
+#include <zcontent/zcontentcommon/zgeneralparameters.h>
+
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 
@@ -33,6 +35,8 @@
 
 #include <zqt/zqtwidget/zqtwidgettools.h>
 
+#include <zqt/zqtwidget/zcombodelegate.h>
+
 #include <QMenu>
 #include <QMenuBar>
 
@@ -41,6 +45,7 @@
 
 #include <zcppparser/zcppparsertype.h> // for getParserWorkDirectory
 #include <zcontent/zindexedfile/zrawmasterfileutils.h> // for generateIndexRootName
+#include <zcontentcommon/zgeneralparameters.h>
 
 #include <zqt/zqtwidget/zqtutils.h>
 
@@ -85,20 +90,6 @@ using namespace zbs;
 
 void
 FileGenerateMWn::initLayout() {
-/*
-  utf8VaryingString wComplement = "Changing index name induces a change in index file name accordingly.";
-//  ZExceptionDLg::setFixedFont();
-  int wRet=ZExceptionDLg::adhocMessage2B("Change index name",Severity_Information,
-      "Do not change","Change",
-      nullptr,&wComplement,
-      "Index file s<br>"
-      "About to change index file name <br>"
-      "from s to s.<br><br>"
-      "<table border=\"1\">"
-      "<tr><td>Abandon operation and keep index name</td>  <td><b>Do not Change</b></td></tr>.\n"
-      "<tr><td>Change index name and rename index file </td>   <td><b>Change</b></td></tr>."
-      "</table>");
-*/
 
   setWindowTitle(QCoreApplication::translate("FileGenerateDLg", "Master file parameters", nullptr));
 
@@ -293,8 +284,8 @@ FileGenerateMWn::initLayout() {
   QHBoxLayout* wHBDir = new QHBoxLayout;
   wVBB->addLayout(wHBDir);
   DirectoryLBl = new QLabel(wGBB);
-  DirectoryLBl->setText(getParserWorkDirectory());
-  TargetDirectory = getParserWorkDirectory();
+  DirectoryLBl->setText(GeneralParameters.getWorkDirectory().toCChar());
+  TargetDirectory = GeneralParameters.getWorkDirectory().toCChar();
   wHBDir->addWidget(DirectoryLBl);
 
   SearchDirBTn=new QPushButton( "Search",wGBB);
@@ -426,7 +417,6 @@ FileGenerateMWn::initLayout() {
   SameAsMasterBTn->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
   wHB2Dir->addWidget(SameAsMasterBTn);
 
-
   wHB2Dir->addWidget(IndexDirectoryLBl);
   SearchIndexDirBTn=new QPushButton( "Search",wGBB);
   SearchIndexDirBTn->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
@@ -445,16 +435,21 @@ FileGenerateMWn::initLayout() {
 
 
   HideGuessBTn=new QPushButton(verticalLayoutWidget);
-  QPixmap wIP;
   uriString wURIIC1;
+  /*
   const char* wIc=getenv(__PARSER_ICON_DIRECTORY__);
   if (!wIc)
     wIc="";
-  wURIIC1 = wIc;
+  */
+  wURIIC1 = GeneralParameters.getIconDirectory();
+  wURIIC1.addConditionalDirectoryDelimiter();
+  wURIIC1 += "errorcross.png";
+  CrossRedPXm.load(wURIIC1.toCChar());
+  wURIIC1 = GeneralParameters.getIconDirectory();
   wURIIC1.addConditionalDirectoryDelimiter();
   wURIIC1 += "crossblue.gif";
-  wIP.load(wURIIC1.toCChar());
-  HideGuessBTn->setIcon(wIP);
+  CrossBluePXm.load(wURIIC1.toCChar());
+  HideGuessBTn->setIcon(CrossRedPXm);
   HideGuessBTn->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
   wGuessVBx->addWidget(HideGuessBTn);
 
@@ -498,6 +493,14 @@ FileGenerateMWn::initLayout() {
   KeyTBv->ItemModel->setHorizontalHeaderItem(7,new QStandardItem(tr("Allocated Size")));
   KeyTBv->ItemModel->setHorizontalHeaderItem(8,new QStandardItem(tr("Extent quota")));
   KeyTBv->ItemModel->setHorizontalHeaderItem(9,new QStandardItem(tr("Extent Size")));
+
+
+  ComboDelegate=new ZComboDelegate(ZEntity_SortType,KeyTBv);
+  ComboDelegate->addItem( "ZST_Nothing");
+  ComboDelegate->addItem( "ZST_NoDuplicates");
+  ComboDelegate->addItem( "ZST_Duplicates");
+
+  KeyTBv->setItemDelegateForColumn(3,ComboDelegate);
 
   KeyTBv->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   KeyTBv->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -551,6 +554,8 @@ FileGenerateMWn::FileGenerateMWn( QWidget *parent) : QMainWindow(parent)
 
 FileGenerateMWn::~FileGenerateMWn()
 {
+  if (ComboDelegate)
+    delete ComboDelegate;
 //  delete ui;
 }
 
@@ -613,20 +618,22 @@ FileGenerateMWn::dataSetupFromDictionary() {
 
     KeyData wKeyData;
     wKeyData.IndexName = wKeyDic->DicKeyName;
-    wKeyData.KeySize = AllocatedBlocks*wKeyDic->computeKeyUniversalSize();
+    wKeyData.KeySize = wKeyDic->KeyGuessedSize;
+    wKeyData.Forced = wKeyDic->Forced;
+ //   wKeyData.KeySize = AllocatedBlocks*wKeyDic->computeKeyUniversalSize();
     wKeyData.Allocated = AllocatedBlocks;
     wKeyData.AllocatedSize = wKeyData.KeySize * wKeyData.Allocated;
     wKeyData.ExtentQuota = ExtentQuota;
     wKeyData.ExtentSize = wKeyData.KeySize * wKeyData.ExtentQuota;
     wKeyData.IndexRootName = generateIndexRootName(RootName,wKeyDic->DicKeyName);
-    wKeyData.Duplicates   = DictionaryFile->KeyDic.Tab(wi)->Duplicates;
+    wKeyData.Duplicates   = wKeyDic->Duplicates;
 
     wKeyData.GrabFreeSpace = GrabFreeSpace ;
     wKeyData.HighwaterMarking = false ;
     long wR = KeyValues->push(wKeyData);
     if (MasterFile!=nullptr) {
       ZChangeRecord wChgRec(ZFGC_KeyDicAppend);
-      wChgRec.setPost(wKeyData);
+      wChgRec.setPostKeyData(wKeyData);
       wChgRec.setIndexRank (wR);
       ChangeLog.push(wChgRec);
       ComLog->appendText("Created ChangeLog record : new key <%s> waiting for creation.",
@@ -668,6 +675,7 @@ FileGenerateMWn::dataSetupFromDictionary() {
     }
   }// for
 
+  testGuessed();
 
   for (int wi=0;wi < GuessTBv->ItemModel->columnCount();wi++)
     GuessTBv->resizeColumnToContents(wi);
@@ -776,10 +784,11 @@ FileGenerateMWn::dataSetupFromMasterFile(const uriString& pURIMaster) {
   KeyValues->clear();
 
   for (long wi=0; wi < MasterFile->IndexTable.count(); wi++) {
-    uriString wIndexName = MasterFile->getURIIndex(wi);
-    wKeyData.IndexRootName = wIndexName.getRootname();
+    wKeyData.clear();
+ //   uriString wIndexURI = MasterFile->getURIIndex(wi);
+    wKeyData.IndexRootName = MasterFile->getURIIndex(wi).getRootname();
     wKeyData.IndexName = MasterFile->IndexTable[wi]->IndexName ;
-    wKeyData.KeySize = MasterFile->IndexTable[wi]->KeyUniversalSize;
+    wKeyData.KeySize = MasterFile->IndexTable[wi]->KeyGuessedSize;
     wKeyData.Allocated = MasterFile->IndexTable[wi]->getFCB()->AllocatedBlocks;
     wKeyData.AllocatedSize = wKeyData.KeySize * wKeyData.Allocated;
     wKeyData.ExtentQuota = MasterFile->IndexTable[wi]->getFCB()->BlockExtentQuota;
@@ -807,11 +816,7 @@ ZStatus FileGenerateMWn::XmlDefinitionSave(uriString &pXmlFile, bool pComment) {
   /*----------------------Content---------------------------------*/
   wReturn += fmtXMLnode("filedefinition",wLevel);
   wLevel++;
-/*
-  wReturn += fmtXMLint("filetype",int(ZFT_ZMasterFile),wLevel);
-  if (pComment)
-    fmtXMLaddInlineComment(wReturn," File type is ZFT_ZMasterFile i. e. ZRawMasterFile or ZSMasterFile");
-*/
+
   if (TargetDirectory.isEmpty())
     wReturn+=fmtXMLchar("targetdirectory"," ",wLevel);
     else
@@ -897,7 +902,7 @@ ZStatus FileGenerateMWn::XmlDefinitionSave(uriString &pXmlFile, bool pComment) {
       wReturn+=fmtXMLchar("indexname",KeyValues->Tab(wi).IndexName.toString(),wLevel);
       if (pComment)
         fmtXMLaddInlineComment(wReturn,"Name for the key - index.");
-      wReturn+=fmtXMLbool("duplicate",bool(KeyValues->Tab(wi).Duplicates),wLevel);
+      wReturn+=fmtXMLchar("duplicate",decode_ZST(KeyValues->Tab(wi).Duplicates),wLevel);
       if (pComment)
         fmtXMLaddInlineComment(wReturn,"Defines wether key accepts or not duplicates.");
       wReturn+=fmtXMLbool("grabfreespace",bool(KeyValues->Tab(wi).GrabFreeSpace),wLevel);
@@ -939,6 +944,8 @@ FileGenerateMWn::XmlDefinitionLoad(const utf8VaryingString& pXmlContent, ZaiErro
   zxmlElement *wKeyRootNode=nullptr;
   zxmlElement *wSingleKeyNode=nullptr;
   zxmlElement *wSwapNode=nullptr;
+
+  utf8VaryingString wValue;
 
   pErrorlog->setContext("FileGenerateDLg::XmlLoad");
 
@@ -1005,7 +1012,12 @@ FileGenerateMWn::XmlDefinitionLoad(const utf8VaryingString& pXmlContent, ZaiErro
     XMLgetChildLong(wSingleKeyNode,"allocatedsize",(long&)wKeyD.AllocatedSize,pErrorlog,ZAIES_Warning);
     XMLgetChildLong(wSingleKeyNode,"extentquota",(long&)wKeyD.ExtentQuota,pErrorlog,ZAIES_Warning);
     XMLgetChildLong(wSingleKeyNode,"extentsize",(long&)wKeyD.ExtentSize,pErrorlog,ZAIES_Warning);
-    XMLgetChildBool(wSingleKeyNode,"duplicate",wKeyD.Duplicates,pErrorlog,ZAIES_Warning);
+
+ //   XMLgetChildBool(wSingleKeyNode,"duplicate",wKeyD.Duplicates,pErrorlog,ZAIES_Warning);
+    XMLgetChildText(wSingleKeyNode,"duplicate",wValue,pErrorlog,ZAIES_Warning);
+    wKeyD.Duplicates = encode_ZST(wValue.toCChar());
+    if (wKeyD.Duplicates==ZST_Nothing)
+      wKeyD.Duplicates = ZST_NoDuplicates;
     XMLgetChildBool(wSingleKeyNode,"grabfreespace",wKeyD.GrabFreeSpace,pErrorlog,ZAIES_Warning);
     XMLgetChildBool(wSingleKeyNode,"highwatermarking",wKeyD.HighwaterMarking,pErrorlog,ZAIES_Warning);
 
@@ -1104,7 +1116,7 @@ FileGenerateMWn::formatKeyRow(KeyData& pKey) {
   wStr.sprintf("%ld",pKey.KeySize);
   wKeyRow.push_back(new QStandardItem(wStr.toCChar()));
   wKeyRow.last()->setTextAlignment(Qt::AlignRight);
-
+#ifdef __DEPRECATED__
   QStandardItem* wDup=new QStandardItem("Duplicates");
   wDup->setTextAlignment(Qt::AlignLeft);
   wDup->setCheckable(true);
@@ -1117,6 +1129,9 @@ FileGenerateMWn::formatKeyRow(KeyData& pKey) {
     wDup->setCheckState(Qt::Unchecked);
     wDup->setText("No duplicates");
   }
+#endif
+
+  QStandardItem* wDup = ComboDelegate->generateItemWithIndex(int(pKey.Duplicates));
   QStandardItem* wGrab=new QStandardItem("GrabFreeSpace");
   wGrab->setCheckable(true);
   if (pKey.GrabFreeSpace) {
@@ -1186,7 +1201,7 @@ FileGenerateMWn::SearchDir(){
 
   QString wDir;
   if (IndexDirectory.isEmpty())
-    wDir = QFileDialog::getExistingDirectory(this,"Target master directory",getParserWorkDirectory());
+    wDir = QFileDialog::getExistingDirectory(this,"Target master directory",GeneralParameters.getWorkDirectory().toCChar());
   else
     wDir = QFileDialog::getExistingDirectory(this,"Target master directory",TargetDirectory.toCChar());
 
@@ -1339,6 +1354,9 @@ FileGenerateMWn::GuessItemChanged(QStandardItem* pItem){
   ComLog->appendText(wStr);
 
   Compute();
+
+  testGuessed();
+
   return;
 }//FileGenerateDLg::GuessItemChanged
 
@@ -1381,8 +1399,8 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
     /* first setup change log with values ex-ante and ex-post */
     ZChangeRecord wChgRec(ZFGC_INameChange);
     wChgRec.setChangeKey(wName);
-    wChgRec.setAnte(KeyValues->Tab(pItem->row()).IndexName);
-    wChgRec.setPost(wName);
+    wChgRec.setAnteString(KeyValues->Tab(pItem->row()).IndexName);
+    wChgRec.setPostString(wName);
     wChgRec.setIndexRank (pItem->row());
     ChangeLog.push(wChgRec);
 
@@ -1404,29 +1422,36 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
     /* first setup change log with values ex-ante and ex-post */
     ZChangeRecord wChgRec(ZFGC_ChgDuplicate);
     wChgRec.setChangeKey(KeyValues->Tab(pItem->row()).IndexName);
-    wChgRec.setAnte(KeyValues->Tab(pItem->row()).Duplicates);
-    wChgRec.setPost(pItem->checkState()==Qt::Checked );
+    wChgRec.setAnteZSortType(KeyValues->Tab(pItem->row()).Duplicates);
+    QVariant wV = pItem->data(ZQtDataReference);
+    ZDataReference wDRef=wV.value<ZDataReference>();
+
+    KeyValues->Tab(pItem->row()).Duplicates= (ZSort_Type)wDRef.DataRank;
+    wChgRec.setPostZSortType(KeyValues->Tab(pItem->row()).Duplicates);
     wChgRec.setIndexRank (pItem->row());
     ChangeLog.push(wChgRec);
 
-      KeyValues->Tab(pItem->row()).Duplicates = pItem->checkState()==Qt::Checked  ;
-      wStr.sprintf( "%s Key <%s>  : Duplicates  has been set to <%s>. col %d",
+//    KeyValues->Tab(pItem->row()).Duplicates = (pItem->checkState()==Qt::Checked)?ZST_NoDuplicates:ZST_Duplicates  ;
+    wV=pItem->data(ZQtDataReference);
+    KeyValues->Tab(pItem->row()).Duplicates = (ZSort_Type) wV.value<ZDataReference>().DataRank  ;
+    wStr.sprintf( "%s Key <%s>  : Duplicates  has been set to <%s>. col %d",
           ZDateFull::currentDateTime().toFormatted().toString(),
           wMainKeyItem->text().toUtf8().data(),
-          KeyValues->Tab(pItem->row()).Duplicates?"Allow duplicates":"No duplicates allowed" ,
+                 decode_ZST(KeyValues->Tab(pItem->row()).Duplicates) ,
           wCol );
-      ComLog->appendText(wStr);
-      if (KeyValues->Tab(pItem->row()).Duplicates) {
+    ComLog->appendText(wStr);
+/*    if (KeyValues->Tab(pItem->row()).Duplicates==ZST_Duplicates) {
         DoNotChangeKeyValues = true;
         pItem->setText("Duplicates");
       }
       else {
         DoNotChangeKeyValues = true;
         pItem->setText("No duplicates");
-      }
-      DoNotChangeKeyValues = false;
+    }
+*/
+    DoNotChangeKeyValues = false;
 
-      return ;
+    return ;
   }//cst_KeyDupCol
 
   case cst_KeyGrabCol: {
@@ -1434,8 +1459,8 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
     /* first setup change log with values ex-ante and ex-post */
     ZChangeRecord wChgRec(ZFGC_ChgGrab);
     wChgRec.setChangeKey(KeyValues->Tab(pItem->row()).IndexName);
-    wChgRec.setAnte(KeyValues->Tab(pItem->row()).GrabFreeSpace);
-    wChgRec.setPost(pItem->checkState()==Qt::Checked );
+    wChgRec.setAnteBool(KeyValues->Tab(pItem->row()).GrabFreeSpace);
+    wChgRec.setPostBool(pItem->checkState()==Qt::Checked );
     wChgRec.setIndexRank (pItem->row());
     ChangeLog.push(wChgRec);
 
@@ -1455,8 +1480,8 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
     /* first setup change log with values ex-ante and ex-post */
     ZChangeRecord wChgRec(ZFGC_ChgHigh);
     wChgRec.setChangeKey(KeyValues->Tab(pItem->row()).IndexName);
-    wChgRec.setAnte(KeyValues->Tab(pItem->row()).HighwaterMarking);
-    wChgRec.setPost(pItem->checkState()==Qt::Checked );
+    wChgRec.setAnteBool(KeyValues->Tab(pItem->row()).HighwaterMarking);
+    wChgRec.setPostBool(pItem->checkState()==Qt::Checked );
     wChgRec.setIndexRank (pItem->row());
     ChangeLog.push(wChgRec);
 
@@ -1486,8 +1511,8 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
       /* first setup change log with values ex-ante and ex-post */
       ZChangeRecord wChgRec(ZFGC_ChgKeySize);
       wChgRec.setChangeKey(KeyValues->Tab(pItem->row()).IndexName);
-      wChgRec.setAnte(KeyValues->Tab(pItem->row()).KeySize);
-      wChgRec.setPost(wValue);
+      wChgRec.setAnteU64(KeyValues->Tab(pItem->row()).KeySize);
+      wChgRec.setPostU64(wValue);
       wChgRec.setIndexRank (pItem->row());
       ChangeLog.push(wChgRec);
 
@@ -1505,8 +1530,8 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
 
         ZChangeRecord wChgRecAll(ZFGC_ChgAlloc);
         wChgRecAll.setChangeKey(KeyValues->Tab(pItem->row()).IndexName);
-        wChgRecAll.setAnte(size_t(0L));
-        wChgRecAll.setPost(KeyValues->Tab(pItem->row()).Allocated );
+        wChgRecAll.setAnteU64(size_t(0L));
+        wChgRecAll.setPostU64(KeyValues->Tab(pItem->row()).Allocated );
         wChgRecAll.setIndexRank (pItem->row());
         ChangeLog.push(wChgRecAll);
         wStr.sprintf( "%s Value <Key Allocated blocks> for key <%s> has been defaulted to <%ld>.Logging change for this value.",
@@ -1519,8 +1544,8 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
 
       ZChangeRecord wChgRecAllSiz(ZFGC_ChgAlloc);
       wChgRecAllSiz.setChangeKey(KeyValues->Tab(pItem->row()).IndexName);
-      wChgRecAllSiz.setAnte(KeyValues->Tab(pItem->row()).AllocatedSize);
-      wChgRecAllSiz.setPost(KeyValues->Tab(pItem->row()).Allocated * wValue );
+      wChgRecAllSiz.setAnteU64(KeyValues->Tab(pItem->row()).AllocatedSize);
+      wChgRecAllSiz.setPostU64(KeyValues->Tab(pItem->row()).Allocated * wValue );
       wChgRecAllSiz.setIndexRank (pItem->row());
       ChangeLog.push(wChgRecAllSiz);
 
@@ -1556,8 +1581,8 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
       /* first setup change log with values ex-ante and ex-post */
       ZChangeRecord wChgRec(ZFGC_ChgAlloc);
       wChgRec.setChangeKey(KeyValues->Tab(pItem->row()).IndexName);
-      wChgRec.setAnte(KeyValues->Tab(pItem->row()).Allocated);
-      wChgRec.setPost(wValue);
+      wChgRec.setAnteU64(KeyValues->Tab(pItem->row()).Allocated);
+      wChgRec.setPostU64(wValue);
       wChgRec.setIndexRank (pItem->row());
       ChangeLog.push(wChgRec);
 
@@ -1592,8 +1617,8 @@ FileGenerateMWn::KeyItemChanged(QStandardItem* pItem){
       /* first setup change log with values ex-ante and ex-post */
       ZChangeRecord wChgRec(ZFGC_ChgExtent);
       wChgRec.setChangeKey(KeyValues->Tab(pItem->row()).IndexName);
-      wChgRec.setAnte(KeyValues->Tab(pItem->row()).ExtentQuota);
-      wChgRec.setPost(wValue);
+      wChgRec.setAnteU64(KeyValues->Tab(pItem->row()).ExtentQuota);
+      wChgRec.setPostU64(wValue);
       wChgRec.setIndexRank (pItem->row());
       ChangeLog.push(wChgRec);
 
@@ -1662,7 +1687,7 @@ FileGenerateMWn::Compute() {
     }
   } // for
 
-
+  bool wNotGuessed = false;
   for (int wi=0;wi < GuessTBv->ItemModel->rowCount();wi++) {
     QVariant wV = GuessTBv->ItemModel->item(wi,3)->data(Qt::UserRole);
     if (wV.isValid()) {
@@ -1675,10 +1700,14 @@ FileGenerateMWn::Compute() {
       ComLog->appendTextColor(QColor(),WarnedQCl, "%s-W-INVSIZ Size value for field <%s> has not been guessed and remains invalid.",
           ZDateFull::currentDateTime().toFormatted().toString(),
           wItem->text().toUtf8().data());
+      wNotGuessed=true;
     }
-
   }// for
 
+  if (wNotGuessed)
+    HideGuessBTn->setIcon(CrossRedPXm);
+  else
+    HideGuessBTn->setIcon(CrossBluePXm);
 
   MeanRecordSize += sizeof(uint32_t);
 
@@ -1696,6 +1725,33 @@ FileGenerateMWn::Compute() {
   wStr.sprintf("%ld",ExtentQuotaSize);
   ExtentQuotaSizeLEd->setText(wStr.toCChar());
 }
+
+bool FileGenerateMWn::testGuessed() {
+  bool wNotGuessed = false;
+  for (int wi=0;wi < GuessTBv->ItemModel->rowCount();wi++) {
+    QVariant wV = GuessTBv->ItemModel->item(wi,3)->data(Qt::UserRole);
+    if (wV.isValid()) {
+      size_t wValue = wV.value<size_t>();
+      MeanRecordSize += wValue;
+    }
+    else {
+      QStandardItem* wItem = GuessTBv->ItemModel->item(wi,0);
+
+      ComLog->appendTextColor(QColor(),WarnedQCl, "%s-W-INVSIZ Size value for field <%s> has not been guessed and remains invalid.",
+                              ZDateFull::currentDateTime().toFormatted().toString(),
+                              wItem->text().toUtf8().data());
+      wNotGuessed=true;
+    }
+  }// for
+
+  if (wNotGuessed)
+    HideGuessBTn->setIcon(CrossRedPXm);
+  else
+    HideGuessBTn->setIcon(CrossBluePXm);
+
+  return wNotGuessed;
+}
+
 
 void FileGenerateMWn::DicEditQuitCallback(){
   DicEdit = nullptr;
@@ -1918,15 +1974,27 @@ FileGenerateMWn::MenuAction(QAction* pAction){
 
 
   if (pAction==SaveToXmlQAc){
+    if (MasterFile==nullptr) {
+      ZExceptionDLg::adhocMessage("Xml definition file",Severity_Error,
+                                  nullptr,nullptr,
+                                  "No master file has been loaded or defined yet.");
 
-    const char* wWD = getParserWorkDirectory();
+      return;
+    }
+    uriString wXmlFile = GeneralParameters.getWorkDirectory();
+    wXmlFile.addConditionalDirectoryDelimiter();
+    wXmlFile += MasterFile->getURIContent().getRootname().toCChar() ;
+    wXmlFile += "-def.xml" ;
+
+
+
     QString wFileName = QFileDialog::getSaveFileName(this, tr("xml definition file"),
-        wWD,
-        "Xml files (*.xml);;All (*.*)");
+                                                     wXmlFile.toCChar(),
+                                                     "Xml files (*.xml);;All (*.*)");
     if (wFileName.isEmpty()) {
       return;
     }
-    uriString wXmlFile = wFileName.toUtf8().data();
+    wXmlFile = wFileName.toUtf8().data();
     _refresh(); /* update booleans like GrabFreeSpace */
 
     if (XmlDefinitionSave(wXmlFile)==ZS_SUCCESS) {
@@ -2027,7 +2095,7 @@ FileGenerateMWn::KeyDelete() {
   wChgRec.setChangeKey(KeyValues->Tab(wI).IndexName);
 
   wChgRec.setIndexRank (wIdx.row());
-  wChgRec.setAnte(KeyValues->Tab(wI));  /* store deleted key data (post remains nullptr) */
+  wChgRec.setAnteKeyData(KeyValues->Tab(wI));  /* store deleted key data (post remains nullptr) */
 
   ChangeLog.push(wChgRec);
 
@@ -2080,14 +2148,14 @@ FileGenerateMWn::KeyAppendRaw() {
   }//while true
 
   wKD.IndexName = wKHR.DicKeyName ;
-  wKD.Duplicates = bool(wKHR.Duplicates) ;
-  wKD.KeySize = size_t(wKHR.KeyUniversalSize);
+  wKD.Duplicates = wKHR.Duplicates ;
+  wKD.KeySize = size_t(wKHR.KeyGuessedSize);
 
   long wR=KeyValues->push(wKD);
   /* first setup change log with values ex-ante and ex-post */
   ZChangeRecord wChgRec(ZFGC_KeyRawAppend);
   wChgRec.setChangeKey(wKD.IndexName);
-  wChgRec.setPost(wKD);
+  wChgRec.setPostKeyData(wKD);
   wChgRec.setIndexRank (wR);
   ChangeLog.push(wChgRec);
 
@@ -2181,7 +2249,7 @@ FileGenerateMWn::KeyAppendFromZMFDic(const ZMFDictionary* pDic) {
     /* first setup change log with values ex-ante and ex-post */
     ZChangeRecord wChgRec(ZFGC_KeyDicAppend);
     wChgRec.setChangeKey(wKD.IndexName);
-    wChgRec.setPost(wKD);
+    wChgRec.setPostKeyData(wKD);
     wChgRec.setIndexRank (wR);
     ChangeLog.push(wChgRec);
 
@@ -2205,15 +2273,16 @@ FileGenerateMWn::KeyAppendFromZMFDic(const ZMFDictionary* pDic) {
 bool FileGenerateMWn::setupFromZmfFile() {
   utf8VaryingString wStr;
 
-  QFileDialog wFDLg((QWidget*)this,QObject::tr("Search master file","FileGenerateDLg"),getParserWorkDirectory(),
-      "ZMF files (*.zmf);;All files (*.*)");
+  QFileDialog wFDLg((QWidget*)this,QObject::tr("Search master file","FileGenerateDLg"),
+                    GeneralParameters.getWorkDirectory().toCChar(),
+                    "ZMF files (*.zmf);;All files (*.*)");
 
   wFDLg.setLabelText(QFileDialog::Accept,  QObject::tr("Select","FileGenerateDLg"));
   wFDLg.setLabelText(QFileDialog::Reject,  QObject::tr("Cancel","FileGenerateDLg"));
 
   wFDLg.setOptions(QFileDialog::ReadOnly);
   wFDLg.setFileMode(QFileDialog::ExistingFiles);
-  wFDLg.setDirectory(getParserWorkDirectory());
+  wFDLg.setDirectory(GeneralParameters.getWorkDirectory().toCChar());
   int wRet=wFDLg.exec();
 
   if ((wRet==QDialog::Rejected) ||(wFDLg.selectedFiles().isEmpty()))
@@ -2248,10 +2317,9 @@ bool FileGenerateMWn::setupFromDicFile() {
 
 bool FileGenerateMWn::setupFromXmlDef() {
   utf8VaryingString wStr;
-  const char* wWD = getParserWorkDirectory();
   QString wFileName = QFileDialog::getOpenFileName((QWidget*)this, tr("Xml definition file"),
-      wWD,
-      "Xml files (*.xml);;All (*.*)");
+                                                   GeneralParameters.getWorkDirectory().toCChar(),
+                                                   "Xml files (*.xml);;All (*.*)");
   if (wFileName.isEmpty()) {
     ZExceptionDLg::adhocMessage("Xml file",Severity_Information,&ErrorLog,nullptr,"No file selected. Please select a valid file");
     return false;
@@ -2284,10 +2352,9 @@ bool FileGenerateMWn::setupFromXmlDef() {
 ZStatus FileGenerateMWn::loadExternalXmlDic() {
   utf8VaryingString wStr;
 
-  const char* wWD = getParserWorkDirectory();
   QString wFileName = QFileDialog::getOpenFileName((QWidget*)this, tr("Xml Dictionary"),
-      wWD,
-      "Xml files (*.xml);;All (*.*)");
+                                                   GeneralParameters.getWorkDirectory().toCChar(),
+                                                   "Xml files (*.xml);;All (*.*)");
   if (wFileName.isEmpty()) {
     ZExceptionDLg::adhocMessage("Xml file",Severity_Information,nullptr,nullptr,"No file selected. Please select a valid file");
     return ZS_EMPTY ;
@@ -2315,7 +2382,8 @@ ZStatus FileGenerateMWn::loadExternalXmlDic() {
   DictionaryFile->setDicFilename(wXmlURI);
 
   ErrorLog.setAutoPrintOn(ZAIES_Info);
-  wSt=DictionaryFile->ZMFDictionary::XmlLoadFromString(wXmlContent,false,&ErrorLog);
+//  wSt=DictionaryFile->ZMFDictionary::XmlLoadFromString(wXmlContent,false,&ErrorLog);
+  wSt=DictionaryFile->loadDictionary(wXmlURI,&ErrorLog);
   if (wSt!=ZS_SUCCESS) {
     ZExceptionDLg::adhocMessage("Xml Dictionary",Severity_Error,&ErrorLog,nullptr,
         "Cannot load xml dictionary from file <%s>\n"
@@ -2339,10 +2407,9 @@ ZStatus FileGenerateMWn::loadExternalXmlDic() {
 ZStatus FileGenerateMWn::loadExternalDicFile() {
   utf8VaryingString wStr;
 
-  const char* wWD = getParserWorkDirectory();
   QString wFileName = QFileDialog::getOpenFileName((QWidget*)this, tr("Dictionary file"),
-      wWD,
-      "Dic files (*.dic);;All (*.*)");
+                                                   GeneralParameters.getWorkDirectory().toCChar(),
+                                                   "Dic files (*.dic);;All (*.*)");
   if (wFileName.isEmpty()) {
     ZExceptionDLg::adhocMessage("Xml file",Severity_Information,nullptr,nullptr,"No file selected. Please select a valid file");
     return ZS_EMPTY ;
@@ -2352,7 +2419,7 @@ ZStatus FileGenerateMWn::loadExternalDicFile() {
   ComLog->appendText("loading dictionary file <%s>",wURIDic.toString());
 
   DictionaryFile = new ZDictionaryFile;
-  ZStatus wSt = DictionaryFile->loadDictionary(wURIDic);
+  ZStatus wSt = DictionaryFile->loadDictionary(wURIDic,&ErrorLog);
   if (wSt!=ZS_SUCCESS) {
     ZExceptionDLg::adhocMessage("Dictionary load",Severity_Error,"Error while loading dictionary file <%s>.",wURIDic.toString());
     return wSt;
@@ -2421,11 +2488,19 @@ FileGenerateMWn::applyChangesZmf(bool pBackup) {
   ZStatus wSt;
   zbs::ZArray<utf8VaryingString> wIndexToRebuild;
 
+  if ((MasterFile==nullptr) || (!MasterFile->isOpen())) {
+    ZExceptionDLg::adhocMessage("Apply changes",Severity_Error,&ErrorLog,nullptr,"Master file must be open to be changed");
+    return ZS_FILENOTOPEN;
+  }
+
   _refresh(); /* update some booleans like GrabFreeSpace */
 
   if (ValuesControl()) {
     return ZS_INVPARAMS;
   }
+  wSt=MasterFile->Dictionary->save_xml(true);
+//  DictionaryFile->save_xml(true);
+  wSt=MasterFile->writeControlBlocks();
 
   int wModif=0,wKeyModif=0,wKeyCreated=0,wKeyDeleted=0,wKeyErrored=0,wRebuildErrored=0;
 
@@ -2434,13 +2509,13 @@ FileGenerateMWn::applyChangesZmf(bool pBackup) {
   ComLog->appendText("Applying changes to file <%s>.", MasterFile->getURIContent().toString());
 
   if (MasterFile->getOpenMode()!=ZRF_All)  {
-    if (MasterFile->getOpenMode()!=ZRF_NotOpen) {
+//    if (MasterFile->getOpenMode()!=ZRF_NotOpen) {
       ComLog->appendText(" File is open in mode <%s>. Closing file then reopenning it.\n",
           decode_ZRFMode(MasterFile->getOpenMode()));
       MasterFile->zclose();
-    }
+//    }
 
-    ComLog->appendText("Openning file <%s> with mode ZRF_All | ZRF_TypeRegardless.", MasterFile->getURIContent().toString());
+    ComLog->appendText("re-openning file <%s> with mode ZRF_All | ZRF_TypeRegardless.", MasterFile->getURIContent().toString());
 
     wSt=MasterFile->zopen(ZRF_All| ZRF_TypeRegardless);
     if (wSt!=ZS_SUCCESS) {
@@ -2455,7 +2530,7 @@ FileGenerateMWn::applyChangesZmf(bool pBackup) {
           ZException.last().formatFullUserMessage().toString());
       return wSt;
     }
-  }
+  } //if (MasterFile->getOpenMode()!=ZRF_All)
 
 
   /* backup of files */
@@ -2549,13 +2624,13 @@ FileGenerateMWn::applyChangesZmf(bool pBackup) {
 
     case ZFGC_ChgKeySize : {
       size_t wNewKeySize = ChangeLog[wChgIdx].getPostU64();
-      wName="KeyUniversalSize";
+      wName="KeyGuessedSize";
       ComLog->appendText("%s changed %s field from <%ld> to <%ld>.",
           wName,
           MasterFile->IndexTable[wKeyRow]->getURIContent().toString(),
-          MasterFile->IndexTable[wKeyRow]->KeyUniversalSize,
+          MasterFile->IndexTable[wKeyRow]->KeyGuessedSize,
           wNewKeySize);
-      MasterFile->IndexTable[wKeyRow]->KeyUniversalSize = wNewKeySize ;
+      MasterFile->IndexTable[wKeyRow]->KeyGuessedSize = wNewKeySize ;
 
       wKeyModif++;
       break;
@@ -2587,15 +2662,15 @@ FileGenerateMWn::applyChangesZmf(bool pBackup) {
     }
 
     case ZFGC_ChgDuplicate : {
-      bool wNewDup = ChangeLog[wChgIdx].getPostBool();
+      ZSort_Type wNewDup = ChangeLog[wChgIdx].getPostZSortType();
       wName="Duplicates";
       wStr.sprintf("%s changed %s field from <%ld> to <%ld>.",
           wName,
           MasterFile->IndexTable[wKeyRow]->getURIContent().toString(),
-          MasterFile->IndexTable[wKeyRow]->Duplicates?"true":"false",
+          decode_ZST( MasterFile->IndexTable[wKeyRow]->Duplicates),
           wNewDup?"true":"false");
       ComLog->appendText(wStr);
-      MasterFile->IndexTable[wKeyRow]->Duplicates = wNewDup?ZST_DUPLICATES:ZST_NODUPLICATES ;
+      MasterFile->IndexTable[wKeyRow]->Duplicates = wNewDup ;
       wKeyModif++;
       break;
     }
@@ -2757,9 +2832,15 @@ FileGenerateMWn::applyChangesZmf(bool pBackup) {
 
       long wOutRank;
       wSt = MasterFile->_createRawIndexDet(wOutRank,
-          wKD.IndexName,uint32_t(wKD.KeySize),
-          wKD.Duplicates?ZST_DUPLICATES:ZST_NODUPLICATES,long(wKD.Allocated),long(wKD.ExtentQuota),zsize_type(wKD.AllocatedSize),wKD.HighwaterMarking,wKD.GrabFreeSpace,
-          true,&ErrorLog);
+                                           wKD.IndexName,
+                                           uint32_t(wKD.KeySize),
+                                           wKD.Duplicates,
+                                           long(wKD.Allocated),
+                                           long(wKD.ExtentQuota),
+                                           zsize_type(wKD.AllocatedSize),
+                                           wKD.HighwaterMarking,
+                                           wKD.GrabFreeSpace,
+                                           true,&ErrorLog);
 
       if (wSt!=ZS_SUCCESS) {
         utf8VaryingString wComplement = ZException.last().formatFullUserMessage();
@@ -2832,6 +2913,12 @@ FileGenerateMWn::applyChangesZmf(bool pBackup) {
       ComLog->appendText("Rebuilding index key <%s> using embedded dictionary",MasterFile->IndexTable[wIRank]->IndexName.toString());
       wSt=rebuildIndex(wIRank);
       if (wSt!=ZS_SUCCESS){
+        if (wSt==ZS_EMPTY) {
+          ComLog->appendTextColor(ErroredQCl,"%s-W-EMPTY Index key name <%s> cannot be rebuilt because file is empty.\n",
+                                  ZDateFull::currentDateTime().toFormatted().toString(),
+                                  MasterFile->IndexTable[wIRank]->IndexName.toString());
+        }
+        else {
         wStr=ZException.last().formatFullUserMessage();
         ZExceptionDLg::adhocMessage("Index key rebuild",Severity_Error,nullptr,&wStr,
             "Index key rebuilt process has been errored.\n"
@@ -2843,6 +2930,7 @@ FileGenerateMWn::applyChangesZmf(bool pBackup) {
             MasterFile->IndexTable[wIRank]->IndexName.toString(),
             wStr.toString());
         wRebuildErrored++;
+        }
         continue;
       }
       ComLog->appendText("Index key rebuilt process has successfully completed.\n"
@@ -3375,7 +3463,7 @@ void FileGenerateMWn::GenFile() {
        wSt = wMasterFile->_createRawIndexDet (wIndexRank,                               /* returned key rank */
                                               KeyValues->Tab(wi).IndexName,   /* Index name */
                                               KeyValues->Tab(wi).KeySize, /* Key universal total size */
-                                              KeyValues->Tab(wi).Duplicates?ZST_DUPLICATES:ZST_NODUPLICATES,
+                                              KeyValues->Tab(wi).Duplicates,
                                               KeyValues->Tab(wi).Allocated,      /* ---FCB parameters (for index ZRandomFile)---- */
                                               KeyValues->Tab(wi).ExtentQuota,
                                               KeyValues->Tab(wi).AllocatedSize,
@@ -3682,9 +3770,13 @@ GenFileEnd:
 
 ZStatus FileGenerateMWn::createDic(ZMFDictionary& pDic,const uriString& pURIMaster) {
   DictionaryFile = new ZDictionaryFile();
+
+  return DictionaryFile->saveAsEmbedded(pURIMaster);
+  /*
   DictionaryFile->generateDicFileName(pURIMaster);
   DictionaryFile->setDictionary(pDic);
   return DictionaryFile->save();
+*/
 }
 
 

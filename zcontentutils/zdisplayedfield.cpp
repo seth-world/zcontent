@@ -6,17 +6,19 @@ void ZKeyHeaderRow::set(ZKeyDictionary& pKeyDic) {
 //  ZKeyDictionary::_copyFrom(pKeyDic);
   DicKeyName=pKeyDic.DicKeyName;
   ToolTip=pKeyDic.ToolTip;
-  KeyUniversalSize=0;
   Duplicates=pKeyDic.Duplicates;
-  KeyUniversalSize=pKeyDic._reComputeKeySize();
+  Forced=pKeyDic.Forced;
+  ChangeStatus = 0;
+  KeyGuessedSize=pKeyDic.KeyGuessedSize;
 }
+
 void ZKeyHeaderRow::set(ZKeyDictionary* pKeyDic) {
-//  ZKeyDictionary::_copyFrom(pKeyDic);
   DicKeyName=pKeyDic->DicKeyName;
   ToolTip=pKeyDic->ToolTip;
-  KeyUniversalSize=0;
   Duplicates=pKeyDic->Duplicates;
-  KeyUniversalSize=pKeyDic->_reComputeKeySize();
+  Forced=pKeyDic->Forced;
+  KeyGuessedSize=pKeyDic->KeyGuessedSize;
+  ChangeStatus = 0;
 }
 
 ZKeyDictionary ZKeyHeaderRow::get(ZMFDictionary* pDic) {
@@ -25,6 +27,8 @@ ZKeyDictionary ZKeyHeaderRow::get(ZMFDictionary* pDic) {
   wOutKey.DicKeyName =DicKeyName;
   wOutKey.Duplicates =Duplicates;
   wOutKey.ToolTip =ToolTip;
+  wOutKey.KeyGuessedSize=KeyGuessedSize;
+  wOutKey.Forced=Forced;
   return wOutKey;
 }
 
@@ -48,9 +52,9 @@ bool ZKeyFieldRow::setFromQItem(QStandardItem *pField) {
   if (!wV.isValid())
     return false;
   wDRef=wV.value<ZDataReference>();
-  long MDicRank=pField->row();
+ // long MDicRank=pField->row();
 
-  ZFieldDescription* wFDesc=wDRef.getPtr<ZFieldDescription*>();
+  ZFieldDescription* wFDesc=wDRef.getPtr<ZFieldDescription>();
 
   KeyOffset=0;
   Hash=wFDesc->Hash;

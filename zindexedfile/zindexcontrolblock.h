@@ -40,11 +40,11 @@ public:
   uint32_t      ICBTotalSize=0;    // ICB total size when written in file header (ZReserved header section size) this field must preceed ICB export content
   int32_t       ZKDicOffset;       // offset to ZDictionary (taking varying sized Index Name into account) or -1 if no key dictionary
 
-  uint32_t      KeyUniversalSize=0;   // total key size according universal format (in line with ZKDic when exists)
+  uint32_t      keyguessedsize=0;   // total key size according universal format (in line with ZKDic when exists)
 
 //  ZIFKeyType_type         KeyType;            //!< RFFU
 //  uint8_t                 AutoRebuild=false;  //!< RFFU
-  ZSort_Type    Duplicates;         //!< Index key is allowing duplicates (ZST_DUPLICATES) or is not allowing duplicates (ZST_NODUPLICATES)
+  ZSort_Type    Duplicates;         //!< Index key is allowing duplicates (ZST_Duplicates) or is not allowing duplicates (ZST_NODUPLICATES)
 
   ZICB_Export& setFromPtr(const unsigned char* &pPtrIn)
   {
@@ -80,14 +80,14 @@ public:
 //  ::ZIFKeyType_type       KeyType;          //!< RFFU
 //  uint8_t                 AutoRebuild=false;  //!< RFFU
 
-  ZSort_Type              Duplicates=ZST_NODUPLICATES;// Index key is allowing duplicates (ZST_DUPLICATES) or is not allowing duplicates (ZST_NODUPLICATES)
-  uint32_t                KeyUniversalSize=0;         // total of key size with internal format (in line with ZKDic when exists)
+  ZSort_Type              Duplicates=ZST_NoDuplicates;// Index key is allowing duplicates (ZST_Duplicates) or is not allowing duplicates (ZST_NODUPLICATES)
+  uint32_t                KeyGuessedSize=0;         // total of key size with internal format (in line with ZKDic when exists)
   utf8VaryingString       IndexName;                  // Index user name
   uriString               URIIndex;                   // Index file name
   long                    IndexRank=0;                // self explainatory
 
 
-  utf8VaryingString getURIIndex() {return URIIndex;}
+  uriString getURIIndex() {return URIIndex;}
 
   utf8String toXml(int pLevel);
   ZStatus fromXml(zxmlNode* pIndexRankNode,ZaiErrors* pErrorlog);
@@ -99,9 +99,9 @@ public:
 //    ICBTotalSize=0;
 //    ZKDicOffset=0;
 //    HasKeyDictionary=false;
-    KeyUniversalSize=0;
+    KeyGuessedSize=0;
 //    AutoRebuild=false;
-    Duplicates= ZST_NODUPLICATES;
+    Duplicates= ZST_NoDuplicates;
     IndexName.clear();}
 };
 //class ZMFDictionary;

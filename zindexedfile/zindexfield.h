@@ -100,8 +100,9 @@ class ZMFDictionary;
 
 class KeyField_Pack : public FieldDesc_Pack
 {
+  Q_OBJECT
 public:
-  KeyField_Pack()=default;
+  KeyField_Pack() ;
 
   KeyField_Pack& _copyFrom(const KeyField_Pack& pIn);
 

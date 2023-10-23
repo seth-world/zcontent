@@ -10,28 +10,44 @@ namespace  zbs {
 
 class ZMFDictionary : public ZMetaDic
 {
-protected:
+public:
   ZMFDictionary& _copyFrom(const ZMFDictionary &pIn);
 public:
   ZMFDictionary();
-  ZMFDictionary(const utf8String& pName):ZMetaDic(pName) {}
+//  ZMFDictionary(const utf8String& pName):ZMetaDic(pName) {}
   ZMFDictionary(const ZMFDictionary& pIn);
   ZMFDictionary(const ZMFDictionary &&pIn);
 
   ZMFDictionary(const ZMetaDic& pIn);
 
-  ~ZMFDictionary()
-    {
-    while (KeyDic.count()>0)
-      delete KeyDic.popR();
+  ~ZMFDictionary() {
+    clearData();
     }
 
   bool Active=false;
 
+  unsigned long     Version = 1000000UL;
+  ZDateFull         CreationDate;
+  ZDateFull         ModificationDate;
+
+  utf8VaryingString DicName;         /* name of the entity described by dic */
+  checkSum *        CheckSum=nullptr;/* to check if meta dictionary has changed or not */
+
   ZMFDictionary& operator = (const ZMFDictionary& pIn) {return _copyFrom(pIn);}
 
-
   ZArray<ZKeyDictionary*> KeyDic;
+
+  void setModified ();
+
+  void clearData() {
+    zdelete(CheckSum);
+    while (KeyDic.count()>0) {
+      ZKeyDictionary* wKDic=nullptr;
+      KeyDic.popRP(&wKDic);
+      zdelete (wKDic);
+    }
+    ZMetaDic::clear();
+  }
 
   ZKeyDictionary* searchKey(const utf8String& pKeyName)
   {
@@ -108,6 +124,24 @@ public:
     return -1;
     }
 
+  void setDicName(const utf8String& pName) {DicName=pName;}
+  void setVersion(unsigned int pVersion,unsigned int pMajor,unsigned int pMinor)
+    {
+    Version=pVersion*1000000;
+    Version+=pMajor*1000;
+    Version+=pMinor;
+    }
+
+  checkSum* getCheckSum(void) {return CheckSum;}
+  void generateCheckSum (void)
+    {
+    ZDataBuffer wMetaDic;
+    _exportAppend(wMetaDic);
+    if (CheckSum!=nullptr)
+      delete CheckSum;
+    CheckSum=wMetaDic.newcheckSum();
+    return;
+    }
 
   ZDataBuffer& _exportAppend(ZDataBuffer& pZDB);
   ZStatus _import(const unsigned char *&pPtrIn);

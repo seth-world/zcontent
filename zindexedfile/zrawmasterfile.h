@@ -223,8 +223,8 @@ public:
  * 4. Master file and created index file are not closed and remain open after this operation
  *
  * @param[in] pIndexName        User name of the index key as a utfdescString
- * @param[in] pKeyUniversalSize Fixed length index key size
- * @param[in] pDuplicates       Type of key : Allowing duplicates (ZST_DUPLICATES) or not (ZST_NODUPLICATES)
+ * @param[in] pkeyguessedsize Fixed length index key size
+ * @param[in] pDuplicates       Type of key : Allowing duplicates (ZST_Duplicates) or not (ZST_NODUPLICATES)
  * @param[in] pBackup           if set to true (default) then index file with the same name will be backup copied.
  *                              if set to false, index file with the same name will be replaced during creation operation.
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
@@ -233,7 +233,7 @@ public:
  */
   ZStatus zcreateRawIndex  (ZRawIndexFile *&pIndexObjectOut,  /* resulting created index object if successful, nullptr  if not*/
                             const utf8String &pIndexName,
-                            uint32_t pKeyUniversalSize,
+                            uint32_t pkeyguessedsize,
                             ZSort_Type pDuplicates,
                             long &pOutIndexRank,
                             bool pBackup=true);
@@ -241,13 +241,13 @@ public:
   ZStatus zinsertRawIndex  (long pIndexRank,
                             ZRawIndexFile *&pIndexObjectOut,  /* resulting created index object if successful, nullptr  if not*/
                             const utf8String &pIndexName,
-                            uint32_t pKeyUniversalSize,
+                            uint32_t pkeyguessedsize,
                             ZSort_Type pDuplicates,
                             long &pOutIndexRank,
                             bool pBackup=true);
 #ifdef __COMMENT__
   ZStatus zcreateRawIndexDetailed ( const utf8String &pIndexName, /*-----ICB------*/
-                                    uint32_t pKeyUniversalSize,
+                                    uint32_t pkeyguessedsize,
                                     ZSort_Type pDuplicates,
                                     long pAllocatedBlocks,        /* ---FCB (for index ZRandomFile)---- */
                                     long pBlockExtentQuota,
@@ -260,7 +260,7 @@ public:
    * @brief _createRawIndexDet
    *  @warning it is necessary to run zrebuildRawIndex() afterwards
    * @param pIndexName
-   * @param pKeyUniversalSize
+   * @param pkeyguessedsize
    * @param pDuplicates
    * @param pAllocatedBlocks
    * @param pBlockExtentQuota
@@ -272,7 +272,7 @@ public:
    */
   ZStatus _createRawIndexDet (long &pOutRank,
                               const utf8String &pIndexName, /*-----ICB------*/
-                              uint32_t pKeyUniversalSize,
+                              uint32_t pkeyguessedsize,
                               ZSort_Type pDuplicates,
                               long pAllocatedBlocks,      /* ---FCB (for index ZRandomFile)---- */
                               long pBlockExtentQuota,
@@ -286,7 +286,7 @@ public:
    *  @warning it is necessary to run zrebuildRawIndex() afterwards
    * @param pIndexRank
    * @param pIndexName
-   * @param pKeyUniversalSize
+   * @param pkeyguessedsize
    * @param pDuplicates
    * @param pAllocatedBlocks
    * @param pBlockExtentQuota
@@ -299,7 +299,7 @@ public:
    */
   ZStatus _insertRawIndexDet (long pInputIndexRank,
                               const utf8String &pIndexName, /*-----ICB------*/
-                              uint32_t pKeyUniversalSize,
+                              uint32_t pkeyguessedsize,
                               ZSort_Type pDuplicates,
                               long pAllocatedBlocks,      /* ---FCB (for index ZRandomFile)---- */
                               long pBlockExtentQuota,
@@ -387,7 +387,7 @@ public:
    */
   static ZStatus removeMasterFile (const uriString &pContentPath, ZaiErrors *pErrorLog=nullptr);
 
-  utf8VaryingString getURIIndex(long pIndexRank) ;
+  uriString getURIIndex(long pIndexRank) ;
 
   /**
    * @brief _renameBck   local method that renames all component files for ZRawMasterFile whose content file is pointed by pContentPath

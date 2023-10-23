@@ -9,6 +9,8 @@
 
 #include <zcppparser/zcppparsertype.h> // for getParserWorkDirectory()
 
+#include <zcontentcommon/zgeneralparameters.h>
+
 #include <QTextCursor>
 #include <QTextBlock>
 #include <QWidget>
@@ -176,9 +178,9 @@ textEditMWn::MenuAction(QAction* pAction) {
   }// wrapQAc
 
   if (pAction==writeQAc) {
-    const char* wWD = getParserWorkDirectory();
+    uriString wDir = GeneralParameters.getWorkDirectory();
     QString wFileName = QFileDialog::getSaveFileName(this, "text log file",
-        wWD,
+        wDir.toCChar(),
         "Text files (*.txt *.log);;All (*.*)");
     if (wFileName.isEmpty())
       return;

@@ -26,7 +26,7 @@
 
 /* for xml exchanges */
 #include <zxml/zxmlprimitives.h>
-
+#include <zcontentcommon/zgeneralparameters.h>
 
 ZBackupDLg::ZBackupDLg(QWidget* pParent) : QDialog(pParent)
 {
@@ -273,10 +273,10 @@ BckElement ZBackupDLg::getElt(const uriString& pSource,const uriString& pTargetD
 
 bool
 ZBackupDLg::searchFileClicked() {
-  const char* wWD = getParserWorkDirectory();
   while (true) {
-    QString wFileName = QFileDialog::getOpenFileName(this, "Select content master file",wWD,
-        "ZContent files (*.zmf);;All (*.*)");
+    QString wFileName = QFileDialog::getOpenFileName(this, "Select content master file",
+                                                     GeneralParameters.getWorkDirectory().toCChar(),
+                                                     "ZContent files (*.zmf);;All (*.*)");
     if (wFileName.isEmpty()) {
       return false;
     }
@@ -303,8 +303,8 @@ ZBackupDLg::searchFileClicked() {
 void
 ZBackupDLg::searchDirClicked() {
   ZStatus wSt;
-  const char* wWD = getParserWorkDirectory();
-  QString wDirName = QFileDialog::getExistingDirectory(this, "Select target directory",wWD);
+  QString wDirName = QFileDialog::getExistingDirectory(this, "Select target directory",
+                                                       GeneralParameters.getWorkDirectory().toCChar());
   if (wDirName.isEmpty()) {
 //    ZExceptionDLg::adhocMessage("Select directory",Severity_Error,"Please select a valid directory");
     return;

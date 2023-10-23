@@ -73,11 +73,11 @@ public:
     return _MasterFile.zopen(pURI,ZRF_Modify);
   }
 
-  const ZMetaDic& getFieldDictionary() const
+  const ZDictionaryFile& getFieldDictionary() const
   {
     return *_MasterFile.Dictionary;
   }
-  const ZMetaDic* getFieldDictionaryPtr() const
+  const ZDictionaryFile* getFieldDictionaryPtr() const
   {
     return _MasterFile.Dictionary;
   }
@@ -195,8 +195,8 @@ public:
 
   ZStatus setFile(std::shared_ptr<ZSearchMasterFile> pMasterFile);
 
-  const ZMetaDic& getFieldDictionary() const;
-  const ZMetaDic* getFieldDictionaryPtr() const;
+  const ZDictionaryFile& getFieldDictionary() const;
+  const ZDictionaryFile *getFieldDictionaryPtr() const;
   const ZArray<ZKeyDictionary*>& getKeyDictionary() const;
 
   ZFieldDescription         getFieldByRank(long pRank) const;
@@ -266,8 +266,8 @@ public:
     return getFieldDictionary().searchFieldByName(pFieldName);
   }
 
-  const ZMetaDic&     getFieldDictionary() const;
-  const ZMetaDic*     getFieldDictionaryPtr() const;
+  const ZDictionaryFile&     getFieldDictionary() const;
+  const ZDictionaryFile*     getFieldDictionaryPtr() const;
   const ZArray<ZKeyDictionary*>& getKeyDictionary() const;
 
   ZFieldDescription   getFieldByRank(long pRank) const
@@ -382,8 +382,8 @@ public:
 
   long getFieldRankbyName(const utf8VaryingString &pFieldName) const ;
 
-  const ZMetaDic& getFieldDictionary() const;
-  const ZMetaDic* getFieldDictionaryPtr() const;
+  const ZDictionaryFile& getFieldDictionary() const;
+  const ZDictionaryFile* getFieldDictionaryPtr() const;
   const ZArray<ZKeyDictionary*>& getKeyDictionary() const;
 
   bool isCollection() const {return _CollectionEntity!=nullptr; }

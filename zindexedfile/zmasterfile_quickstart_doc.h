@@ -286,7 +286,7 @@ Clearing index file
 
     wSt=ZPicture.zcreateIndex(wDic,                 // the key Dictionary that just has been set
                               "Second Index",        // user defined name (not used internally)
-                              ZST_DUPLICATES);     // Allowing duplicates
+                              ZST_Duplicates);     // Allowing duplicates
 
     wDic.print(stdout);                             // control for fun : see what comes out of an enum
 
@@ -383,7 +383,7 @@ Clearing index file
          <IndexRank>
            <Rank>1</Rank> <!-- not significant -->
            <Name>Second Index</Name> <!-- warning modification of this field is dangerous see documentation -->
-           <Duplicates>ZST_DUPLICATES</Duplicates> <!-- warning modification of this field is dangerous see documentation -->
+           <Duplicates>ZST_Duplicates</Duplicates> <!-- warning modification of this field is dangerous see documentation -->
            <AutoRebuild>false</AutoRebuild>
            <ZKDic>
                <NaturalSize>4</NaturalSize>   <!-- not modifiable -->

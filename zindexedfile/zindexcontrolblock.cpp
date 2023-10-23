@@ -9,7 +9,7 @@ ZICBOwnData& ZICBOwnData::_copyFrom(const ZICBOwnData &pIn)
  // KeyType=pIn.KeyType;
  // AutoRebuild=pIn.AutoRebuild;
   Duplicates=pIn.Duplicates;
-  KeyUniversalSize=pIn.KeyUniversalSize;
+  KeyGuessedSize=pIn.KeyGuessedSize;
   IndexName=pIn.IndexName;
   return *this;
 }
@@ -21,10 +21,10 @@ ZICB_Export::clear(void)
   ZMFVersion =  __ZMF_VERSION__ ;
   //    Name.clear();   // index name is not defined in ICB export structure : got from ICB memory structure and exported as Universal string
   StartSign=cst_ZBLOCKSTART;
-  Duplicates = ZST_NODUPLICATES;
+  Duplicates = ZST_NoDuplicates;
 //  AutoRebuild = false;
   ICBTotalSize =0;
-  KeyUniversalSize=0;
+  keyguessedsize=0;
   ZKDicOffset=0;
   //    Name=nullptr;
   return;
@@ -39,7 +39,7 @@ ZICB_Export& ZICB_Export::_copyFrom(const ZICB_Export &pIn)
   ZMFVersion=pIn.ZMFVersion;
   ICBTotalSize=pIn.ICBTotalSize;
   ZKDicOffset=pIn.ZKDicOffset;
-  KeyUniversalSize = pIn.KeyUniversalSize;
+  keyguessedsize = pIn.keyguessedsize;
 //  AutoRebuild=pIn.AutoRebuild;  /* uint8_t */
   Duplicates=pIn.Duplicates;    /* uint8_t */
 
@@ -56,7 +56,7 @@ ZICB_Export& ZICB_Export::set(const ZICBOwnData* pIn)
 
   ZKDicOffset=(int32_t)ICBTotalSize;
 //  HasKeyDictionary=pIn->HasKeyDictionary; /* uint8_t from bool */
-  KeyUniversalSize = pIn->KeyUniversalSize;
+  keyguessedsize = pIn->KeyGuessedSize;
 //  AutoRebuild=pIn->AutoRebuild;  /* uint8_t */
   Duplicates=pIn->Duplicates;      /* uint8_t */
   return *this;
@@ -74,7 +74,7 @@ void ZICB_Export::_convert()
   ZMFVersion=reverseByteOrder_Conditional<unsigned long>(ZMFVersion);
   ICBTotalSize=reverseByteOrder_Conditional<uint32_t>(ICBTotalSize);
   ZKDicOffset=reverseByteOrder_Conditional<int32_t>(ZKDicOffset);
-  KeyUniversalSize=reverseByteOrder_Conditional<uint32_t>(KeyUniversalSize);
+  keyguessedsize=reverseByteOrder_Conditional<uint32_t>(keyguessedsize);
 /* other fields are uint8_t */
 
   return ;
@@ -142,7 +142,7 @@ ZICBOwnData::_import(const unsigned char* &pPtrIn)
   uint32_t wICBTotalSize=wICBe.ICBTotalSize;
   uint32_t wZKDicOffset=wICBe.ZKDicOffset;
 
-  KeyUniversalSize=wICBe.KeyUniversalSize;
+  KeyGuessedSize=wICBe.keyguessedsize;
 
 //  AutoRebuild=wICBOwn_Import->AutoRebuild;  // uint8_t
   Duplicates=wICBe.Duplicates; // uint8_t
@@ -202,7 +202,7 @@ ZIndexControlBlock::_import(const unsigned char* &pPtrIn)
     return (ZS_BADFILEVERSION);
   }
 
-  KeyUniversalSize=wICBe.KeyUniversalSize;
+  KeyGuessedSize=wICBe.keyguessedsize;
 
   //  AutoRebuild=wICBOwn_Import->AutoRebuild;  // uint8_t
   Duplicates=wICBe.Duplicates; // uint8_t
@@ -257,7 +257,7 @@ ZIndexControlBlock::_exportAppend(ZDataBuffer &pICBContent)
 /*
  <indexcontrolblock> <!-- no dictionary in index control block -->
     <indexname> </indexname>
-    <keyuniversalsize> </keyuniversalsize>
+    <keyguessedsize> </keyguessedsize>
     <duplicates> </duplicates>
   </indexcontrolblock>
 */
@@ -274,11 +274,12 @@ utf8String ZIndexControlBlock::toXml(int pLevel,bool pComment)
 
   //wReturn+=fmtXMLuint32("icbtotalsize",ICBTotalSize,wLevel);
   //wReturn+=fmtXMLint32("zkdicoffset",ZKDicOffset,wLevel);
-  wReturn+=fmtXMLuint32("keyuniversalsize",KeyUniversalSize,wLevel);
+  wReturn+=fmtXMLuint32("keyguessedsize",KeyGuessedSize,wLevel);
 
   //  wReturn+=fmtXMLuint("keytype",  KeyType,wLevel);  /* uint8_t */
   //  wReturn+=fmtXMLuint("autorebuild",AutoRebuild,wLevel);  /* uint16 must be casted */
-  wReturn+=fmtXMLuint("duplicates",Duplicates,wLevel);
+//  wReturn+=fmtXMLuint("duplicates",Duplicates,wLevel);
+  wReturn+=fmtXMLchar("duplicates",decode_ZST(Duplicates),wLevel);
 
   wReturn += fmtXMLendnode("indexcontrolblock",pLevel);
   return wReturn;
@@ -312,10 +313,12 @@ ZStatus ZIndexControlBlock::fromXml(zxmlNode* pIndexNode, ZaiErrors* pErrorlog)
     }
 
 
-  if (XMLgetChildUInt(wRootNode, "keyuniversalsize", KeyUniversalSize, pErrorlog)< 0)
+  if (XMLgetChildUInt(wRootNode, "keyguessedsize", KeyGuessedSize, pErrorlog)< 0)
     {
-      pErrorlog->errorLog("ZSIndexControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter <%s>.\n","keyuniversalsize");
+      pErrorlog->errorLog("ZSIndexControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter <%s>.\n","keyguessedsize");
     }
+
+ /*
   if (XMLgetChildUInt(wRootNode, "duplicates", wInt, pErrorlog)< 0)
     {
       pErrorlog->warningLog("ZSIndexControlBlock::fromXml-W-CNTFINDPAR Cannot find parameter <%s>. Will stay to its default.\n","duplicates");
@@ -323,7 +326,19 @@ ZStatus ZIndexControlBlock::fromXml(zxmlNode* pIndexNode, ZaiErrors* pErrorlog)
     }
     else
       Duplicates = (ZSort_Type)wInt;
-
+*/
+    if (XMLgetChildText(wRootNode, "duplicates", wValue, pErrorlog)< 0)
+    {
+      pErrorlog->warningLog("ZSIndexControlBlock::fromXml-W-CNTFINDPAR Cannot find parameter <%s>. Will stay to its default (ZST_NoDuplicates).\n","duplicates");
+      Duplicates = ZST_NoDuplicates;
+    }
+    else    {
+      Duplicates = encode_ZST(wValue.toCChar());
+      if (Duplicates==ZST_Nothing) {
+          pErrorlog->warningLog("ZSIndexControlBlock::fromXml-W-INVVALUE Parameter <%s> has invalid value and will stay to its default (ZST_NoDuplicates).\n","duplicates");
+          Duplicates = ZST_NoDuplicates;
+      }
+    }
     return pErrorlog->hasError()?ZS_XMLERROR:ZS_SUCCESS;
 }//fromXml
 
@@ -358,13 +373,13 @@ void ZIndexControlBlock::newKeyDic(ZSKeyDictionary *pZKDic,ZMetaDic* pMetaDic)
 // variable fields length impose to compute record size at record level
 ssize_t ZIndexControlBlock::IndexRecordSize (void)
 {
-  return (KeyUniversalSize + sizeof(zaddress_type));
+  return (KeyGuessedSize + sizeof(zaddress_type));
 }//IndexRecordSize
 /*
 <icbowndata>
   <indexname> </indexname>
-  <keyuniversalsize> </keyuniversalsize>
-  <duplicates> </duplicates>
+  <keyguessedsize> </keyguessedsize>
+  <duplicates>ZST_NoDuplicates</duplicates> <!-- ZST_NoDuplicates ZST_Duplicates (ZSort_type) -->
 </icbowndata>
 */
 
@@ -378,11 +393,14 @@ utf8String ZICBOwnData::toXml(int pLevel)
 
   //wReturn+=fmtXMLuint32("icbtotalsize",ICBTotalSize,wLevel);
   //wReturn+=fmtXMLint32("zkdicoffset",ZKDicOffset,wLevel);
-  wReturn+=fmtXMLuint32("keyuniversalsize",KeyUniversalSize,wLevel);
+  wReturn+=fmtXMLuint32("keyguessedsize",KeyGuessedSize,wLevel);
 
 //  wReturn+=fmtXMLuint("keytype",  KeyType,wLevel);  /* uint8_t */
 //  wReturn+=fmtXMLuint("autorebuild",AutoRebuild,wLevel);  /* uint16 must be casted */
-  wReturn+=fmtXMLuint("duplicates",Duplicates,wLevel);
+
+//  wReturn+=fmtXMLuint("duplicates",Duplicates,wLevel);
+  wReturn+=fmtXMLchar("duplicates",decode_ZST(Duplicates),wLevel);
+
 
   wReturn += fmtXMLendnode("icbowndata",pLevel);
   return wReturn;
@@ -413,14 +431,15 @@ ZStatus ZICBOwnData::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog)
     }
 
 
-  if (XMLgetChildUInt(wRootNode, "keyuniversalsize", KeyUniversalSize, pErrorlog)< 0)
+  if (XMLgetChildUInt(wRootNode, "keyguessedsize", KeyGuessedSize, pErrorlog)< 0)
     {
-    pErrorlog->errorLog("ZSICBOwnData::fromXml-E-CNTFINDPAR Cannot find parameter <%s>.\n","keyuniversalsize");
+    pErrorlog->errorLog("ZSICBOwnData::fromXml-E-CNTFINDPAR Cannot find parameter <%s>.\n","keyguessedsize");
+    KeyGuessedSize=0;
     }
   if (XMLgetChildUInt(wRootNode, "duplicates", wInt, pErrorlog)< 0)
     {
     pErrorlog->warningLog("ZSICBOwnData::fromXml-W-CNTFINDPAR Cannot find parameter <%s>. Will stay to its default.\n","duplicates");
-    Duplicates = ZST_NODUPLICATES;
+    Duplicates = ZST_NoDuplicates;
     }
   else
     Duplicates = (ZSort_Type)wInt;
@@ -522,13 +541,13 @@ long ZSIndexControlTable::zsearchCaseIndexByName (const char* pName)
 <indexcontroltable>
   <indexcontrolblock> <!-- no dictionary in index control block -->
     <indexname> </indexname>
-    <keyuniversalsize> </keyuniversalsize>
+    <keyguessedsize> </keyguessedsize>
     <duplicates> </duplicates>
   </indexcontrolblock>
 ...
   <indexcontrolblock> <!-- no dictionary in index control block -->
     <indexname> </indexname>
-    <keyuniversalsize> </keyuniversalsize>
+    <keyguessedsize> </keyguessedsize>
     <duplicates> </duplicates>
   </indexcontrolblock>
 </indexcontroltable>

@@ -256,6 +256,10 @@ private:
   QVBoxLayout *VLayout=nullptr;
   QLabel*   LabLBl=nullptr;
   QTextEdit * AdditionalTEd=nullptr;
+
+  const int cst_Width = 590;
+  const int cst_Height = 350;
+  const int cst_HighHeight = 450;
 };
 
 utf8VaryingString escapeHtmlSeq(const char* pString);

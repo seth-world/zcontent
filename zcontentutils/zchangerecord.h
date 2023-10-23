@@ -62,17 +62,20 @@ public:
     ChangeKey = pChangeKey;
   }
 
-  void setAnte(size_t pAnte) ;
-  void setPost(size_t pPost) ;
+  void setAnteU64(size_t pAnte) ;
+  void setPostU64(size_t pPost) ;
 
-  void setAnte(bool pAnte) ;
-  void setPost(bool pPost) ;
+  void setAnteBool(bool pAnte) ;
+  void setPostBool(bool pPost) ;
 
-  void setAnte(const utf8VaryingString& pAnte) ;
-  void setPost(const utf8VaryingString&  pPost) ;
+  void setAnteZSortType(ZSort_Type pAnte) ;
+  void setPostZSortType(ZSort_Type pPost) ;
 
-  void setAnte(const KeyData& pAnte) ;
-  void setPost(const KeyData&  pPost) ;
+  void setAnteString(const utf8VaryingString& pAnte) ;
+  void setPostString(const utf8VaryingString&  pPost) ;
+
+  void setAnteKeyData(const KeyData& pAnte) ;
+  void setPostKeyData(const KeyData&  pPost) ;
 
   size_t getAnteU64() const{
     return *Pointers.SizePtr.Ante;
@@ -80,7 +83,9 @@ public:
   bool getAnteBool() const{
     return *Pointers.BoolPtr.Ante;
   }
-
+  ZSort_Type getAnteZSortType() const{
+    return *Pointers.SortTypePtr.Ante;
+  }
   utf8VaryingString getAnteString(){
     return *Pointers.StringPtr.Ante;
   }
@@ -95,7 +100,9 @@ public:
   bool getPostBool() const {
     return *Pointers.BoolPtr.Post;
   }
-
+  ZSort_Type getPostZSortType() const{
+    return *Pointers.SortTypePtr.Ante;
+  }
   utf8VaryingString getPostString() const{
     return *Pointers.StringPtr.Post;
   }
@@ -127,6 +134,10 @@ private:
       size_t* Ante;
       size_t* Post;
     } SizePtr;
+    struct {
+      ZSort_Type* Ante;
+      ZSort_Type* Post;
+    } SortTypePtr;
     struct {
       bool* Ante;
       bool* Post;

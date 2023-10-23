@@ -714,7 +714,7 @@ ZArray<ZPRES>    wIndexPresence;
 ZStatus
 ZRawMasterFile::zcreateRawIndex ( ZRawIndexFile *&pIndexObjectOut,
                                   const utf8String &pIndexName,
-                                  uint32_t pKeyUniversalSize,
+                                  uint32_t pkeyguessedsize,
                                   ZSort_Type pDuplicates,
                                   long & pOutIndexRank,
                                   bool pBackup)
@@ -761,7 +761,7 @@ ZRawMasterFile::zcreateRawIndex ( ZRawIndexFile *&pIndexObjectOut,
   // instantiation of the ZIndexFile new structure :
   // it gives a pointer to the actual ICB stored in Index vector
   //
-  pIndexObjectOut = new ZRawIndexFile(this,pKeyUniversalSize,pIndexName,pDuplicates);
+  pIndexObjectOut = new ZRawIndexFile(this,pkeyguessedsize,pIndexName,pDuplicates);
 
   pOutIndexRank=IndexTable.push(pIndexObjectOut); // since here any creation error will induce a desctruction of IndexTableObjects.lastIdx()
 
@@ -859,7 +859,7 @@ ZStatus
 ZRawMasterFile::zinsertRawIndex ( long pIndexRank,
                                   ZRawIndexFile *&pIndexObjectOut,
                                   const utf8String &pIndexName,
-                                  uint32_t pKeyUniversalSize,
+                                  uint32_t pkeyguessedsize,
                                   ZSort_Type pDuplicates,
                                   long & pOutIndexRank,
                                   bool pBackup)
@@ -907,7 +907,7 @@ ZRawMasterFile::zinsertRawIndex ( long pIndexRank,
   // instantiation of the ZIndexFile new structure :
   // it gives a pointer to the actual ICB stored in Index vector
   //
-  pIndexObjectOut = new ZRawIndexFile(this,pKeyUniversalSize,pIndexName,pDuplicates);
+  pIndexObjectOut = new ZRawIndexFile(this,pkeyguessedsize,pIndexName,pDuplicates);
 
   pOutIndexRank=IndexTable.push(pIndexObjectOut); // since here any creation error will induce a desctruction of IndexTableObjects.lastIdx()
 
@@ -1003,7 +1003,7 @@ zcreateRawIndexError:
 #ifdef __COMMENT__
 ZStatus
 ZRawMasterFile::zcreateRawIndexDetailed (const utf8String &pIndexName, /*-----ICB------*/
-                                          uint32_t pKeyUniversalSize,
+                                          uint32_t pkeyguessedsize,
                                           ZSort_Type pDuplicates,
                                           long pAllocatedBlocks,      /* ---FCB (for index ZRandomFile)---- */
                                           long pBlockExtentQuota,
@@ -1056,7 +1056,7 @@ ZRawMasterFile::zcreateRawIndexDetailed (const utf8String &pIndexName, /*-----IC
 
 
   wSt =_createRawIndexDet ( pIndexName,         /*-----ICB------*/
-                            pKeyUniversalSize,
+                            pkeyguessedsize,
                             pDuplicates,
                             pAllocatedBlocks,   /* ---FCB (for index ZRandomFile)---- */
                             pBlockExtentQuota,
@@ -1077,7 +1077,7 @@ ZRawMasterFile::zcreateRawIndexDetailed (const utf8String &pIndexName, /*-----IC
 #ifdef __COMMENT__
 ZStatus
 ZRawMasterFile::zcreateRawIndexDetailed (const utf8String &pIndexName, /*-----ICB------*/
-                                          uint32_t pKeyUniversalSize,
+                                          uint32_t pkeyguessedsize,
                                           ZSort_Type pDuplicates,
                                           long pAllocatedBlocks,      /* ---FCB (for index ZRandomFile)---- */
                                           long pBlockExtentQuota,
@@ -1133,7 +1133,7 @@ ZRawMasterFile::zcreateRawIndexDetailed (const utf8String &pIndexName, /*-----IC
   // instantiation of the ZIndexFile new structure :
   // it gives a pointer to the actual ICB stored in Index vector
   //
-  wIndexObject = new ZRawIndexFile(this,pKeyUniversalSize,pIndexName,pDuplicates);
+  wIndexObject = new ZRawIndexFile(this,pkeyguessedsize,pIndexName,pDuplicates);
 
   wIndexRank=IndexTable.push(wIndexObject); // since here any creation error will induce a desctruction of IndexTableObjects.lastIdx()
 
@@ -1247,7 +1247,7 @@ void ZRawMasterFile::_testZReserved()
 ZStatus
 ZRawMasterFile::_createRawIndexDet (long &pOutRank,
                                     const utf8String &pIndexName,
-                                    uint32_t pKeyUniversalSize,
+                                    uint32_t pkeyguessedsize,
                                     ZSort_Type pDuplicates,
                                     long pAllocatedBlocks,      /* ---FCB parameters (for index ZRandomFile)---- */
                                     long pBlockExtentQuota,
@@ -1311,7 +1311,7 @@ ZRawMasterFile::_createRawIndexDet (long &pOutRank,
   // instantiation of the ZIndexFile new structure :
   // it gives a pointer to the actual ICB stored in Index vector
   //
-  wIndexObject = new ZRawIndexFile(this,pKeyUniversalSize,pIndexName,pDuplicates);
+  wIndexObject = new ZRawIndexFile(this,pkeyguessedsize,pIndexName,pDuplicates);
 
   pOutRank=IndexTable.push(wIndexObject); // since here any creation error will induce a desctruction of IndexTableObjects.lastIdx()
 
@@ -1416,7 +1416,7 @@ createRawIndexDet1Error:
 ZStatus
 ZRawMasterFile::_insertRawIndexDet (long pInputIndexRank,
                                     const utf8String &pIndexName,/*-----ICB------*/
-                                    uint32_t pKeyUniversalSize,
+                                    uint32_t pkeyguessedsize,
                                     ZSort_Type pDuplicates,
                                     long pAllocatedBlocks,      /* ---FCB (for index ZRandomFile)---- */
                                     long pBlockExtentQuota,
@@ -1478,7 +1478,7 @@ ZRawMasterFile::_insertRawIndexDet (long pInputIndexRank,
 
   // it gives a pointer to the actual ICB stored in Index vector
   //
-  wIndexObject = new ZRawIndexFile(this,pKeyUniversalSize,pIndexName,pDuplicates);
+  wIndexObject = new ZRawIndexFile(this,pkeyguessedsize,pIndexName,pDuplicates);
 
   if(IndexTable.insert(wIndexObject,pInputIndexRank)<0) {// since here any creation error will induce a desctruction of IndexTableObjects.lastIdx()
     ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -3159,7 +3159,9 @@ ZRawMasterFile::_addRaw(ZDataBuffer& pRecord, ZArray<ZDataBuffer> &pKeysContent)
     ZException.setMessage("ZRawMasterFile::zaddRaw",
         ZS_CORRUPTED,
         Severity_Severe,
-        "Master file number of indexes <%ld> does not correspond to given keys <%ld>. File <%s> cannot be accessed.",
+        "Master file number of indexes <%ld> does not correspond to given keys <%ld>. File <%s> cannot be accessed.\n"
+                          "Record source definition must be outdated or invalid.\n"
+                          "Align <.h> header file with file structure.",
         IndexTable.count(),pKeysContent.size() ,
         getURIContent().toString());
     return  ZS_CORRUPTED;
@@ -4234,7 +4236,7 @@ ZStatus ZRawMasterFile::XmlSaveToFile(uriString &pXmlFile,bool pComment)
 
 /** @} */ // group XMLGroup
 
-utf8VaryingString ZRawMasterFile::getURIIndex(long pIndexRank) {
+uriString ZRawMasterFile::getURIIndex(long pIndexRank) {
   if (!isOpen())
     return utf8VaryingString();
   if ((pIndexRank < 0) || (pIndexRank > IndexTable.count())) {
@@ -4443,7 +4445,7 @@ ZStatus ZRawMasterFile::createExternalDictionary(const uriString& pDicPath)
   Dictionary = new ZDictionaryFile;
   DictionaryPath=pDicPath;
   Dictionary->URIDictionary = pDicPath;
-  ZStatus wSt=Dictionary->load();
+  ZStatus wSt=Dictionary->load_xml(&ErrorLog);
 
   DictionaryPath = pDicPath;
   return wSt;

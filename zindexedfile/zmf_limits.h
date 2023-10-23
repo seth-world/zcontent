@@ -12,8 +12,8 @@
 #define __ZRF_VERSION_CHAR__  "\"3.3-0\""
 #define __ZRF_XMLVERSION_CONTROL__  "3.3-0"
 
-#define __ZDIC_VERSION__ 30000UL
-//#define __ZDIC_VERSION_CHAR__  "'3.0-00'"
+#define __ZDIC_VERSION__ 20000UL
+//#define __ZDIC_VERSION_CHAR__  "'2.0-00'"
 
 const size_t _cst_zmf_journaling_allocation     = 20; //!< 20 operations in journaling before claiming for new allocation
 const size_t _cst_zmf_journaling_reallocquota   = 10; //!< 10 operations block for space reallocation

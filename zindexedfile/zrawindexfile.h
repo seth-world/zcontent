@@ -121,7 +121,7 @@ public:
  *          If ZIX rebuild is done, there must not be any ZS_DUPLICATEKEY during the rebuild if ZIndexFile duplicates option is set to ZST_NODUPLICATES.
  *          If so, abort() will be called (after having appropriately destroyed objects on father ZAM side).
  *
- * @note if you want to create a ZIX without knowing in advance if there will be duplicates on key or not : you should set pDuplicates to ZST_DUPLICATES.
+ * @note if you want to create a ZIX without knowing in advance if there will be duplicates on key or not : you should set pDuplicates to ZST_Duplicates.
  *      Do not create ZIndexFilees with rejected key values : you will have holes into your index tables that will induce an impredictable result as soon as you will update any part of the hierarchy (ZAM and other dependant ZIXs).
  *
  * @param[in] pFather mandatory ZMF to which the ZIX refers or may be nullptr if debug mode is set
@@ -129,7 +129,7 @@ public:
  */
     ZRawIndexFile  (ZRawMasterFile *pFather);
     ZRawIndexFile  (ZRawMasterFile *pFather,ZIndexControlBlock& pZICB);
-    ZRawIndexFile  (ZRawMasterFile *pFather,int pKeyUniversalsize,const utf8String &pIndexName ,ZSort_Type pDuplicates=ZST_NODUPLICATES);
+    ZRawIndexFile  (ZRawMasterFile *pFather,int pkeyguessedsize,const utf8String &pIndexName ,ZSort_Type pDuplicates=ZST_NoDuplicates);
 
 
     ~ZRawIndexFile() {}
@@ -181,7 +181,7 @@ public:
       wReturn.Status = ZPRES_Nothing;
       wReturn.IndexName = IndexName;
       wReturn.Duplicates = Duplicates;
-      wReturn.KeyUniversalSize = KeyUniversalSize;
+      wReturn.keyguessedsize = KeyGuessedSize;
       return wReturn;
     }
 

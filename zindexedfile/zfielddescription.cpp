@@ -65,12 +65,14 @@ bool ZFieldDescription::checkHashcode()
   return true;
 }//checkHashcode
 
-md5& ZFieldDescription::computeMd5()
+md5 ZFieldDescription::computeMd5()
 {
   FieldDesc_Check wFDCheck;
+  /*
   fprintf (stderr,"ZFieldDescription::computeMd5-I-  name <%s>\n"
                   "ZType <%08X>  header <%ld> Natural <%ld> Universal <%ld>.\n",
                   getName().toCChar(),ZType,HeaderSize,NaturalSize,UniversalSize);
+*/
   wFDCheck.set(*this);
   Hash.clear();
   Hash.compute((unsigned char*)&wFDCheck,sizeof(FieldDesc_Check));
@@ -155,9 +157,9 @@ utf8VaryingString ZFieldDescription::toXml(int pLevel, bool pComment)
   return wReturn;
 }//toXml
 
-ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, ZaiErrors* pErrorlog)
+ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash,int &pErrored,int &pWarned, ZaiErrors* pErrorlog)
 {
-  bool        wErrored=false;
+  bool        wErrored=false, wWarned=false;
   bool        wHashismissing=false;
   zxmlElement *wRootNode;
   utfcodeString wXmlHexaId;
@@ -172,6 +174,7 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, Za
                           ZS_XMLINVROOTNAME,
                           "FieldDescription::fromXml-E-CNTFINDPAR Cannot find root node <%s>. Stopping xml parsing.",
                           "field");
+    pErrored++;
     return ZS_XMLINVROOTNAME;
     }
 
@@ -187,9 +190,10 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, Za
     Name=wName.toCChar();
     /*optional */
     if (XMLgetChildText(wRootNode, "tooltip", wName, pErrorlog,ZAIES_Warning) < 0) {
-      pErrorlog->warningLog(
+        pErrorlog->warningLog(
           "FieldDescription::fromXml-W-MISSTOOLTIP node <Tooltip> is missing for field named %s.",
           Name.toCChar());
+        wWarned=true;
     }
     else
       ToolTip=wName.toCChar();
@@ -200,12 +204,14 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, Za
         "FieldDescription::fromXml-W-CNTFINDHASH Cannot find node <hash> for field named <%s>. Hashcode will be recomputed.",
         Name.toCChar());
       wHashismissing=true;
+      wWarned=true;
     }
 
   if (XMLgetChildUInt(wRootNode, "ztype", wInt, pErrorlog,ZAIES_Error)< 0) {
     pErrorlog->errorLog(
         "FieldDescription::fromXml-E-CNTFINDNOD Cannot find node <%s>.",
         "ztype");
+    wErrored=true;
   }
   else
     ZType = (ZTypeBase)wInt;
@@ -230,7 +236,6 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, Za
     pErrorlog->errorLog(
         "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s.",
         "universalsize");
-    wErrored=true;
   }
   if (XMLgetChildULong(wRootNode, "naturalsize", NaturalSize, pErrorlog,ZAIES_Error)< 0) {
     pErrorlog->errorLog(
@@ -242,9 +247,9 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, Za
 /* optional */
   if (XMLgetChildBool(wRootNode, "keyelibible", wBool, pErrorlog,ZAIES_Warning)< 0) {
     pErrorlog->warningLog(
-        "FieldDescription::fromXml-E-CNTFINDPAR Cannot find parameter %s. ",
+        "FieldDescription::fromXml-W-CNTFINDPAR Cannot find parameter %s. ",
         "keyelibible");
-    wErrored=true;
+    wWarned=true;
   }
   else
     KeyEligible = wBool;
@@ -270,10 +275,16 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, Za
             Hash.toHexa().toCChar());
       }
     }//else if
-  if (wErrored)
+  if (wErrored) {
+    pErrored++;
     return ZS_XMLMISSREQ;
-  if (wHashismissing)
+  }
+  if (wWarned) {
+    pWarned++;
     return ZS_XMLWARNING;
+  }
+
+
   return ZS_SUCCESS;
 }//fromXml
 
@@ -325,7 +336,7 @@ ZFieldDescription::getFDExp()
 
 void FieldDesc_Export::setFromPtr(const unsigned char* &pPtrIn)
 {
-  const FieldDesc_Export* wFLDe=(const FieldDesc_Export*)pPtrIn;
+  FieldDesc_Export* wFLDe=(FieldDesc_Export*)pPtrIn;
 
   StartSign= wFLDe->StartSign;
   EndianCheck= wFLDe->EndianCheck;
@@ -370,7 +381,7 @@ ZFieldDescription::_importConvert(ZFieldDescription& pOut,FieldDesc_Export* pIn)
 
 
 FieldDesc_Export&
-FieldDesc_Export::_copyFrom(FieldDesc_Export& pIn)
+FieldDesc_Export::_copyFrom(const FieldDesc_Export &pIn)
 {
 /*  for (int wi=0; wi < cst_FieldNameCapacity;wi++)
     Name[wi]=pIn.Name[wi];

@@ -1,0 +1,42 @@
+            +------------------------------------------------------------------+
+            | ZContent Library  Engineering log and Release notes |
+            +------------------------------------------------------------------+
+
+main contact    : Gerard POLO gerard.polo@gmail.com
+license         : Opensource General Public License version 3.0
+
+Module / sub-module         version
+
+ZMasterFile                 3.0-1
+ZRandomFile                 3.2-10
+
+
+Table of content
+----------------
+. Release summary
+. Engineering log
+. Test plan
+
+
+
+                            Release summary
+                            ---------------
+ZRawMasterFile
+--------------
+
+- Record storage format
+
+    ZRawMasterFile records are composed of URF formatted data.
+
+- Index keys
+
+Index key is no more of fixed length size.
+
+Index keys allow varying size objects.
+Index key stores URF formatted data and not Natural formatted data
+
+
+Search engines comparizon routines are modified accordingly.
+
+All key fields must be present : return Error ZS_OMITTED if key field is not present 
+

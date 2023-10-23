@@ -1,7 +1,20 @@
 #-------------------------------------------------
 #
 # Project created by QtCreator 2016-02-11T22:56:49
-#
+# required libraries
+# sudo apt-get install build-essential # compiler and debugger
+# sudo apt-get install clang-tools-14
+# sudo apt-get install python3-dev
+# sudo apt-get install python3.11-dev -y  # or the latest version of python (replace 3.11 with appropriate tag)
+# sudo apt-get install python-is-python3 -y # to make python3 recognized as python instruction
+# sudo apt-get -y install libssl-dev
+# sudo apt-get -y install libicu-dev
+# sudo apt-get -y install libxml2-dev
+
+# OpenGL suite
+# sudo apt-get install libopengl-dev -y
+# sudo apt-get install mesa-common-dev -y
+# sudo apt-get install libglu1-mesa-dev -y
 #-------------------------------------------------
 #   DEVELOPMENTBASE (/home/gerard/Development)
 #       |
@@ -22,11 +35,13 @@
 #                                                                                                               |
 #
 
-PYTHON = python3.7
+
 
                                                                                                               ...
 #QT += core gui xml
 #greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+greaterThan(QT_MAJOR_VERSION,5): QT += core5compat
 
 TEMPLATE = lib
 CONFIG += c++17 shared dll
@@ -46,7 +61,9 @@ DEVELOPMENT_BASE = $${HOME}/Development
 TOOLSET_ROOT = $${DEVELOPMENT_BASE}/zbasetools
 
 MODULE = zcontent # name of the root include directory
-INSTALL_ACTION = CLEANCOPY
+
+PYTHON = python
+PYTHON_INSTALL_ACTION = CLEANCOPY
 PYTHON_PROC = $${TOOLSET_ROOT}/common/postlinkcopy.py
 
 #defines DEVELOPMENT_BASE, TOOLSET symbols and ICU symbols
@@ -72,15 +89,16 @@ unix:{
 #                /usr/lib/x86_64-linux-gnu/glibmm-2.4/include \
 #                /usr/include/glib-2.0 \
 #                /usr/lib/x86_64-linux-gnu/glib-2.0/include
-
+ INCLUDEPATH += /usr/include/x86_64-linux-gnu
  INCLUDEPATH += $$TOOLSET_ROOT/include  \
+                $$TOOLSET_CONTENT\
                 $$TOOLSET_INCLUDE/zbase \
                 $$TOOLSET_INCLUDE/znet \
                 $$TOOLSET_ROOT \
                 $$TOOLSET_BASE \
                 $$DEVELOPMENT_ROOT \
-                $$OPENSSL_ROOT \
-                $$TOOLSET_CONTENT
+                $$OPENSSL_ROOT
+
 # if using libxml2
   INCLUDEPATH +=  /usr/include/libxml2
   LIBS +=  -lxml2
@@ -92,6 +110,8 @@ unix:{
 #                $$TOOLSET_ROOT
 
 HEADERS += \
+    $${TOOLSET_ROOT}/config/zconfig_general.h \
+    $${TOOLSET_ROOT}/config/zconfig.h \
     $$TOOLSET_CONTENT/zcontentcommon/urffield.h \
     $$TOOLSET_CONTENT/zcontentcommon/urfparser.h \
     $$TOOLSET_CONTENT/zcontentcommon/zcontentconstants.h \
@@ -164,6 +184,7 @@ HEADERS += \
     $$TOOLSET_BASE/config/zconfig_general.h \
     $$TOOLSET_BASE/config/zconfig_zrf.h \
     ../../config/zconfig.h \
+    ../zcontentcommon/zgeneralparameters.h \
     ../zindexedfile/zsearch.h \
     ../zindexedfile/zsearcharithmeticterm.h \
     ../zindexedfile/zsearchentity.h \
@@ -222,6 +243,8 @@ SOURCES += \
     $$TOOLSET_CONTENT/zrandomfile/zrfpms.cpp \
     $$TOOLSET_CONTENT/zrandomfile/zrfutilities.cpp \
     $$TOOLSET_CONTENT/zrandomfile/zsearchargument.cpp \
+    ../zcontentcommon/zcontentconstants.cpp \
+    ../zcontentcommon/zgeneralparameters.cpp \
     ../zindexedfile/zsearch.cpp \
     ../zindexedfile/zsearcharithmeticterm.cpp \
     ../zindexedfile/zsearchentity.cpp \
@@ -250,7 +273,7 @@ message(PROFILE Building library <$$TARGET> module <$$MODULE> for installing wit
 
 wLaunch="$${PYTHON} "$$quote($${PYTHON_PROC})
 wLaunch+=" "
-wLaunch+=$$INSTALL_ACTION
+wLaunch+=$$PYTHON_INSTALL_ACTION
 wLaunch+=" "
 wLaunch+=$$quote($${MODULE})
 wLaunch+=" "
@@ -270,7 +293,7 @@ QMAKE_POST_LINK +="$$wLaunch"
 
 wLaunch="$${PYTHON} "$$quote($${PYTHON_PROC})
 wLaunch+=" "
-wLaunch+=$$INSTALL_ACTION
+wLaunch+=$$PYTHON_INSTALL_ACTION
 wLaunch+=" "
 wLaunch+=$$quote($${MODULE})
 wLaunch+=" "
@@ -290,7 +313,7 @@ QMAKE_POST_LINK +="$$wLaunch"
 
 wLaunch="$${PYTHON} "$$quote($${PYTHON_PROC})
 wLaunch+=" "
-wLaunch+=$$INSTALL_ACTION
+wLaunch+=$$PYTHON_INSTALL_ACTION
 wLaunch+=" "
 wLaunch+=$$quote($${MODULE})
 wLaunch+=" "
@@ -307,5 +330,5 @@ wLaunch+="'$$quote($${TARGET})'"
 
 QMAKE_POST_LINK +="$$wLaunch"
 #system($$wLaunch)
-
+#message(post link $$QMAKE_POST_LINK )
 

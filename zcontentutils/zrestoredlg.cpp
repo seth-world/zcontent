@@ -30,6 +30,7 @@
 #include <zxml/zxmlprimitives.h>
 
 #include <zqt/zqtwidget/zqtwidgettools.h>
+#include <zcontentcommon/zgeneralparameters.h>
 
 
 ZRestoreDLg::ZRestoreDLg(QWidget* pParent) : QDialog(pParent)
@@ -288,10 +289,10 @@ ZRestoreDLg::dataSetup(uriString& pURIBckset, const uriString &pTargetDir) {
 
 bool
 ZRestoreDLg::searchBcksetClicked() {
-  const char* wWD = getParserWorkDirectory();
   while (true) {
-    QString wFileName = QFileDialog::getOpenFileName(this, "Select backup set file",wWD,
-        "Backup set files (*.bckset);;All (*.*)");
+    QString wFileName = QFileDialog::getOpenFileName(this, "Select backup set file",
+                                                     GeneralParameters.getWorkDirectory().toCChar(),
+                                                     "Backup set files (*.bckset);;All (*.*)");
     if (wFileName.isEmpty()) {
       return false;
     }
@@ -317,8 +318,8 @@ ZRestoreDLg::searchBcksetClicked() {
 
 void
 ZRestoreDLg::searchDirClicked() {
-  const char* wWD = getParserWorkDirectory();
-  QString wDirName = QFileDialog::getExistingDirectory(this, "Select restore target directory",wWD);
+  QString wDirName = QFileDialog::getExistingDirectory(this, "Select restore target directory",
+                                                       GeneralParameters.getWorkDirectory().toCChar());
   if (wDirName.isEmpty()) {
     return;
   }

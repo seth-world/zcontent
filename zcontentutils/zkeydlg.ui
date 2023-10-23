@@ -39,7 +39,7 @@
   <widget class="QCheckBox" name="DuplicatesCHk">
    <property name="geometry">
     <rect>
-     <x>180</x>
+     <x>120</x>
      <y>50</y>
      <width>79</width>
      <height>21</height>
@@ -54,7 +54,7 @@
     <rect>
      <x>20</x>
      <y>50</y>
-     <width>141</width>
+     <width>111</width>
      <height>16</height>
     </rect>
    </property>
@@ -114,24 +114,37 @@
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>150</x>
      <y>50</y>
      <width>141</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Universal size</string>
+    <string>Guessed size</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="KeySizeLEd">
    <property name="geometry">
     <rect>
-     <x>350</x>
-     <y>40</y>
-     <width>151</width>
+     <x>250</x>
+     <y>50</y>
+     <width>111</width>
      <height>23</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="ForceCHk">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>50</y>
+     <width>111</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Force size</string>
    </property>
   </widget>
  </widget>

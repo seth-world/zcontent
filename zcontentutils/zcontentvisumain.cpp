@@ -52,6 +52,9 @@
 
 #include "zsearchquerymwd.h"
 
+#include <zcontentcommon/zgeneralparameters.h>
+#include "zgeneralparamsdlg.h"
+
 #define __FIXED_FONT__ "courrier"
 
 const int cst_maxraisonablevalue = 100000;
@@ -127,29 +130,28 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
 //    VisuTBv->ItemModel->setHorizontalHeaderItem(wi,new QStandardItem(tr(" ")));
   VisuTBv->ItemModel->setHorizontalHeaderItem(20,new QStandardItem(tr("Ascii")));
 
-
-  DictionaryQAc=new QAction("Dictionaries",this);
-  ui->menubar->addAction(DictionaryQAc);
-
-  openZRFQAc = new QAction("Random file");
+  openZRFQAc = new QAction("Random file",this);
   ui->menubar->addAction(openZRFQAc);
 
   MasterFileMEn = new QMenu("Master file",this);
   ui->menubar->addMenu(MasterFileMEn);
 
-  ZMFQueryQAc = new QAction("Query");
+  DictionaryQAc=new QAction("Dictionaries management",this);
+  MasterFileMEn->addAction(DictionaryQAc);
+
+  ZMFQueryQAc = new QAction("Query",this);
   MasterFileMEn->addAction(ZMFQueryQAc);
 
-  ZmfDefQAc = new QAction("Master file definition");
+  ZmfDefQAc = new QAction("Master file definition",this);
   MasterFileMEn->addAction(ZmfDefQAc);
 
-  IndexRebuildQAc = new QAction("Rebuild index");
+  IndexRebuildQAc = new QAction("Rebuild index",this);
   MasterFileMEn->addAction(IndexRebuildQAc);
 
-  ZMFBackupQAc = new QAction("Backup file and all indexes");
+  ZMFBackupQAc = new QAction("Backup file and all indexes",this);
   MasterFileMEn->addAction(ZMFBackupQAc);
 
-  ZMFRestoreQAc = new QAction("Restore file and all indexes");
+  ZMFRestoreQAc = new QAction("Restore file and all indexes",this);
   MasterFileMEn->addAction(ZMFRestoreQAc);
 
   mainQAg = new QActionGroup(this);
@@ -184,19 +186,26 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
 
   mainQAg->addAction(ui->rawDumpQAc);
 
-  displayICBQAc = new QAction(QObject::tr("Index control blocks","ZContentVisuMain"));
+  displayICBQAc = new QAction(QObject::tr("Index control blocks","ZContentVisuMain"),this);
   mainQAg->addAction(displayICBQAc);
 
   ui->headerMEn->insertAction(ui->displayMCBQAc,displayICBQAc);
 
   mainQAg->addAction(displayICBQAc);
 
-  /* dictionary sub-choice */
-  mainQAg->addAction(ui->DictionaryQAc);
-
-  /* dictionary menu */
   mainQAg->addAction(ui->dictionaryQAc);
 //  actionGroup->addAction(ui->dicLoadXmlQAc);
+
+  ParametersQMe=new QMenu(QObject::tr("Parameters"),this);
+  ui->fileMEn->insertMenu(ui->setfileQAc ,ParametersQMe);
+
+  ParamLoadQAc=new QAction(QObject::tr("Load xml parameter file"),this);
+  ParamChangeQAc=new QAction(QObject::tr("Change current parameters"),this);
+  ParametersQMe->addAction(ParamLoadQAc);
+  ParametersQMe->addAction(ParamChangeQAc);
+
+  mainQAg->addAction(ParamLoadQAc);
+  mainQAg->addAction(ParamChangeQAc);
 
   /* Master file menus */
 
@@ -741,9 +750,10 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
 
   if (pAction==ui->setfileQAc)
   {
-    const char* wWD = getParserWorkDirectory();
+
+    uriString wDir = GeneralParameters.getWorkDirectory();
     QString wFileName = QFileDialog::getOpenFileName(this, tr("Open File"),
-        wWD,
+        wDir.toCChar(),
         "ZContent files (*.zrf *.zmf *.zix *.zrh);;All (*.*)");
     if (wFileName.isEmpty()) {
       QMessageBox::critical(this,tr("No file selected"),"Please select a valid file");
@@ -815,6 +825,41 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
     return;
   }
 */
+
+  /* general parameters */
+
+  if (pAction==ParamLoadQAc) {
+    uriString wDir = GeneralParameters.getWorkDirectory();
+    QString wFileName = QFileDialog::getOpenFileName(this, tr("Xml parameter file"),
+                                                     wDir.toCChar(),
+                                                     "xml files (*.xml);;All (*.*)");
+    if (wFileName.isEmpty())
+      return;
+    uriString wXmlParams= wFileName.toUtf8().data();
+    if (!wXmlParams.exists())
+      return;
+    wSt=GeneralParameters.XmlLoad(wXmlParams,nullptr);
+    if (wSt!=ZS_SUCCESS) {
+      utf8VaryingString wExcp = ZException.last().formatFullUserMessage().toString();
+      ZExceptionDLg::adhocMessage("Load parameters",Severity_Error,
+                                  nullptr,&wExcp,"Error while loading xml parameter file %s",wXmlParams.toString());
+      return;
+    }
+    return;
+  } //ParamLoadQAc
+
+  if (pAction==ParamChangeQAc) {
+    ZGeneralParamsDLg* wParamDLg = new ZGeneralParamsDLg(this);
+    wParamDLg->setup(GeneralParameters);
+    wParamDLg->show();
+    int wRet=wParamDLg->exec();
+    if (wRet==QDialog::Rejected)
+      return;
+    return;
+  }
+    /* end general parameters */
+
+
   if (pAction==ui->displayZFBTQAc)
   {
     displayZFBT();
@@ -825,7 +870,7 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
   {
     if (DicEdit==nullptr)
       DicEdit=new DicEditMWn(std::bind(&ZContentVisuMain::DicEditQuitCallback, this),this);
-    DicEdit->clear();
+ //   DicEdit->clear();
 
 //    dictionaryWnd->setNewDictionary();
 
@@ -847,9 +892,9 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
   }
 
   if (pAction==IndexRebuildQAc) {
-    const char* wDir=getParserWorkDirectory();
+    uriString wDir = GeneralParameters.getWorkDirectory();
     QString wFileName = QFileDialog::getOpenFileName(this, tr("Master file"),
-        wDir,
+        wDir.toCChar(),
         "master files (*.zmf);;All (*.*)");
     if (wFileName.isEmpty())
       return;
@@ -1058,10 +1103,10 @@ void
 ZContentVisuMain::actionOpenFileByType(bool pChecked)
 {
   ZStatus wSt;
-  const char* wWD = getParserWorkDirectory();
+  uriString wDir = GeneralParameters.getWorkDirectory();
   QString wFileName = QFileDialog::getOpenFileName(this, tr("Open File"),
-      wWD,
-      "ZContent files (*.zrf *.zmf *.zix *.zrh);;All (*.*)");
+                                                  wDir.toCChar(),
+                                                  "ZContent files (*.zrf *.zmf *.zix *.zrh);;All (*.*)");
   if (wFileName.isEmpty()) {
     QMessageBox::critical(this,tr("No file selected"),"Please select a valid file");
     return;
@@ -1522,9 +1567,9 @@ void
 ZContentVisuMain::getRaw()
 {
 
-  const char* wDir=getParserWorkDirectory();
+  uriString wDir = GeneralParameters.getWorkDirectory();
   QString wFileName = QFileDialog::getOpenFileName(this, "Dictionary file",
-      wDir,"ZContent files (*.zrf *.zmf *.zix *.zrh);;All (*.*)");
+      wDir.toCChar(),"ZContent files (*.zrf *.zmf *.zix *.zrh);;All (*.*)");
   if (wFileName.isEmpty()) {
     return ;
   }

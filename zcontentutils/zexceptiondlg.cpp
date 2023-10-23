@@ -139,7 +139,7 @@ ZExceptionDLg::layoutSetup( const utf8VaryingString& pTitle,
   QLabel *label_7;
   QLabel *label_8;
 
-  this->resize(587, 349);
+  this->resize(cst_Width, cst_Height);
 
   ExceptionFRm = new QFrame(this);
   ExceptionFRm->setGeometry(QRect(10, 10, 391, 81));
@@ -274,13 +274,13 @@ ZExceptionDLg::layoutSetup( const utf8VaryingString& pTitle,
   setWindowTitle(pTitle.toCChar());
 
 
-  QObject::connect (CancelBTn,&QAbstractButton::pressed,this,[this]{ reject(); });
-  QObject::connect (OKBTn,&QAbstractButton::pressed,this,[this]{ accept(); });
-  QObject::connect (OtherBTn,&QAbstractButton::pressed,this,[this]{ done(ZEDLG_Third); });
-  QObject::connect (MoreBTn,&QAbstractButton::pressed,this,[this]{ MoreClicked(); });
-  QObject::connect (ErrlogBTn,&QAbstractButton::pressed,this,[this]{ ErrlogClicked(); });
-  QObject::connect (ZExceptionBTn,&QAbstractButton::pressed,this,[this]{ ZExceptionClicked(); });
-  QObject::connect (ZExceptionPurgeBTn,&QAbstractButton::pressed,this,[this]{ ZExceptionPurgeClicked(); });
+  QObject::connect (CancelBTn,&QAbstractButton::clicked,this,[this]{ reject(); });
+  QObject::connect (OKBTn,&QAbstractButton::clicked,this,[this]{ accept(); });
+  QObject::connect (OtherBTn,&QAbstractButton::clicked,this,[this]{ done(ZEDLG_Third); });
+  QObject::connect (MoreBTn,&QAbstractButton::clicked,this,[this]{ MoreClicked(); });
+  QObject::connect (ErrlogBTn,&QAbstractButton::clicked,this,[this]{ ErrlogClicked(); });
+  QObject::connect (ZExceptionBTn,&QAbstractButton::clicked,this,[this]{ ZExceptionClicked(); });
+  QObject::connect (ZExceptionPurgeBTn,&QAbstractButton::clicked,this,[this]{ ZExceptionPurgeClicked(); });
 }
 
 
@@ -353,14 +353,14 @@ void ZExceptionDLg::MoreClicked()
   {
     FMore=false;
     AdditionalTEd->setVisible(false);
-    this->resize(560, 270);
+    this->resize(cst_Width, cst_Height);
     MoreBTn->setText(QObject::tr("More","ZExceptionDLg"));
     MoreBTn->setVisible(true);
     return;
   }
 
   FMore=true;
-  this->resize(560, 450);
+  this->resize(cst_Width, cst_HighHeight);
   AdditionalTEd->setVisible(true);
   MoreBTn->setText(QObject::tr("Less","ZExceptionDLg"));
   return;

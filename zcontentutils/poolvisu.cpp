@@ -1011,7 +1011,7 @@ void poolVisu::dataSetup(int pPoolid) {
     zaddress_type wAddress = reverseByteOrder_Conditional<zaddress_type>(BDe[wi].Address);
     wRow << createItem(wAddress,"%lld");
     QVariant wV;
-    wV.setValue<zaddress_type>(wAddress);
+    wV.setValue(wAddress);
     wRow[0]->setData(wV,Qt::UserRole);
 
     //    wRow << createItem(wBDe[wi].BlockSize,"%llX");
@@ -1135,7 +1135,7 @@ for (long wi=0; wi < ContentTBv->ItemModel->rowCount();wi++)
     wDRef.DataRank = wi;
 
 //    wDRef.ResourceReference.Entity=ZEntity_ZBAT;
-    wV.setValue<ZDataReference>(wDRef);
+    wV.setValue(wDRef);
     wB1->setData(ZQtDataReference,wV);
 
     if ((ZBAT[wi].Address+ZBAT[wi].BlockSize) > wAddressMax)
@@ -1169,7 +1169,7 @@ for (long wi=0; wi < ContentTBv->ItemModel->rowCount();wi++)
     wDRef.setPtr(&ZFBT[wi]);
     wDRef.DataRank = wi;
 
-    wV.setValue<ZDataReference>(wDRef);
+    wV.setValue(wDRef);
     wB1->setData(ZQtDataReference,wV);
 
     if ((ZFBT[wi].Address+ZFBT[wi].BlockSize) > wAddressMax)
@@ -1191,7 +1191,7 @@ for (long wi=0; wi < ContentTBv->ItemModel->rowCount();wi++)
     wDRef.setPtr(&ZHOT[wi]);
     wDRef.DataRank = wi;
 
-    wV.setValue<ZDataReference>(wDRef);
+    wV.setValue(wDRef);
     wB1->setData(ZQtDataReference,wV);
 
     if ((ZHOT[wi].Address+ZHOT[wi].BlockSize) > wAddressMax)

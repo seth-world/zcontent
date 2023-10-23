@@ -148,7 +148,7 @@ ZRawIndexFile::ZRawIndexFile  (ZRawMasterFile *pFather, ZIndexControlBlock &pZIC
 
 }// ZIF CTOR 2 w
 
-ZRawIndexFile::ZRawIndexFile  (ZRawMasterFile *pFather, int pKeyUniversalsize, const utf8String &pIndexName , ZSort_Type pDuplicates): ZRandomFile(),ZIndexControlBlock()
+ZRawIndexFile::ZRawIndexFile  (ZRawMasterFile *pFather, int pkeyguessedsize, const utf8String &pIndexName , ZSort_Type pDuplicates): ZRandomFile(),ZIndexControlBlock()
 {
 
   ZMFFather=pFather;
@@ -164,7 +164,7 @@ ZRawIndexFile::ZRawIndexFile  (ZRawMasterFile *pFather, int pKeyUniversalsize, c
     }
   }
 
-  KeyUniversalSize=pKeyUniversalsize;
+  KeyGuessedSize=pkeyguessedsize;
   IndexName=pIndexName;
   Duplicates=pDuplicates;
 }
@@ -245,7 +245,7 @@ ZStatus wSt;
     ZRandomFile::setCreateMaximum (pInitialSize,
                              pAllocatedBlocks,
                              pBlockExtentQuota,
-                             pICB.KeyUniversalSize + sizeof(zaddress_type),
+                             pICB.KeyGuessedSize + sizeof(zaddress_type),
                              pHighwaterMarking,
                              pGrabFreeSpace);
     wSt= ZRandomFile::_create(pInitialSize,ZFT_ZIndexFile,pBackup,false);             // Do not leave it open after file creation : ZRF_Exclusive | ZRF_All
@@ -462,7 +462,7 @@ ZStatus wSt;
   }
   if (ZVerbose & ZVB_FileEngine) {
     _DBGPRINT(" ZRawIndexFile::openIndexFile Index <%s> Duplicates <%d> <%s> file <%s>\n",
-        IndexName.toString(), int(Duplicates), Duplicates ? "Yes":"No",
+        IndexName.toString(), Duplicates , decode_ZST(Duplicates),
         pIndexUri.toString())
   }
   ZPMSStats = ZPMS ;
@@ -1101,7 +1101,7 @@ ZIndexItem wIndexItem;
   if (ZVerbose & ZVB_FileEngine)
       {
       _DBGPRINT ("_addKeyValue_Prepare : _Rawsearch Index <%s> Duplicates <%d> <%s> return status <%s> rank <%ld> \n",
-        IndexName.toString(), int(Duplicates), Duplicates ? "Yes":"No",
+        IndexName.toString(), Duplicates , decode_ZST(Duplicates),
         decode_ZStatus(wSt),wIndexItem.IndexRank)
       }
 
@@ -1141,10 +1141,10 @@ ZIndexItem wIndexItem;
 
     case (ZS_FOUND):
       pOutIndexItem->IndexRank = wIndexItem.IndexRank;
-      if (Duplicates==ZST_NODUPLICATES) {
+      if (Duplicates==ZST_NoDuplicates) {
         if (ZVerbose & ZVB_FileEngine)
           _DBGPRINT("_addKeyValue_Prepare : ***Index Duplicate Index key <%s> Duplicates <%d> <%s>  exception at index rank <%ld>\n",
-              IndexName.toCChar(), int(Duplicates), Duplicates ? "Yes":"No",
+              IndexName.toCChar(), Duplicates , decode_ZST(Duplicates),
               wIndexItem.IndexRank)
  /*       ZException.setMessage(_GET_FUNCTION_NAME_,
                                                     ZS_DUPLICATEKEY,
@@ -1947,9 +1947,9 @@ ZDataBuffer wFieldUValue;
             }
 
     if (!pZIF->IdxKeyDic->Recomputed)
-            pZIF->IdxKeyDic->computeKeyUniversalSize();
+            pZIF->IdxKeyDic->computekeyguessedsize();
 
-    pKeyOut.allocateBZero(pZIF->KeyUniversalSize +1);
+    pKeyOut.allocateBZero(pZIF->keyguessedsize +1);
 
     for (long wi=0;wi<pZIF->IdxKeyDic->count();wi++)
         {
@@ -2061,7 +2061,7 @@ void displayURFCompare(long pRank,int pR,unsigned char* pPtr1, unsigned char* pP
  * - Partial is when  comparison is made on the size of the given key (may be a fragment of index key)
  * - Exact : means that both content (Key content and index content) much match exactly in terms of size AND content.
  * - First or Unique : means that a unique index rank is returned corresponding to the unique index content value if found
- * or the first index value matching in case of multiple values found in index (ZST_DUPLICATES).
+ * or the first index value matching in case of multiple values found in index (ZST_Duplicates).
  *
  * - Exact search with duplicate key index : the first matching value found is returned.
  * What is returned is not the first matching value in Index order but the first found value according the search algorithm.
@@ -2410,7 +2410,7 @@ _URFsearch_Return:
  * - Partial is when  comparison is made on the size of the given key (may be a fragment of index key)
  * - Exact : means that both content (Key content and index content) much match exactly in terms of size AND content.
  * - First or Unique : means that a unique index rank is returned corresponding to the unique index content value if found
- * or the first index value matching in case of multiple values found in index (ZST_DUPLICATES).
+ * or the first index value matching in case of multiple values found in index (ZST_Duplicates).
  *
  * - Exact search with duplicate key index : the first matching value found is returned.
  * What is returned is not the first matching value in Index order but the first found value according the search algorithm.
@@ -2472,8 +2472,8 @@ long wpivot = 0;
 // Size of comparison is given by pKey.Size : if partial key Size will be shorter than Index key size.
 
      wCompareSize = pKey.Size;
-    if (wCompareSize > pZIF.KeyUniversalSize)
-                wCompareSize=pZIF.KeyUniversalSize;
+    if (wCompareSize > pZIF.keyguessedsize)
+                wCompareSize=pZIF.keyguessedsize;
 
 
 // Choice of comparison routine : no choice - no dictionary
@@ -2667,7 +2667,7 @@ zrank_type wIndexFound=0;
     pCollection.ZMS = pZMS;
 /*    if (pZMS==ZMS_MatchIndexSize)
             {
-            if (pKey.Size!=pZIF.KeyUniversalSize)
+            if (pKey.Size!=pZIF.keyguessedsize)
                         {return  ZS_INVSIZE ;}//
             }
 */
@@ -2683,8 +2683,8 @@ zrank_type wIndexFound=0;
 // Size of comparison is given by pKey.Size : if partial key Size, given size will be shorter than Index key size.
 /*
      wCompareSize = pKey.Size;
-    if (wCompareSize > pZIF.KeyUniversalSize)
-                wCompareSize=pZIF.KeyUniversalSize;
+    if (wCompareSize > pZIF.keyguessedsize)
+                wCompareSize=pZIF.keyguessedsize;
 */
     pCollection.clear();            // Always clearing the collection when zsearch
     pCollection.setStatus(ZS_NOTFOUND) ;
@@ -2890,7 +2890,7 @@ ZRawIndexFile::_RawsearchAll(const ZDataBuffer        &pKey,     // key content 
   pCollection.ZMS = pZMS;
   if (pZMS==ZMS_MatchIndexSize)
   {
-    if (pKey.Size!=pZIF.KeyUniversalSize)
+    if (pKey.Size!=pZIF.keyguessedsize)
     {return  ZS_INVSIZE ;}//
   }
 
@@ -2906,8 +2906,8 @@ ZRawIndexFile::_RawsearchAll(const ZDataBuffer        &pKey,     // key content 
   // Size of comparison is given by pKey.Size : if partial key Size, given size will be shorter than Index key size.
 
   wCompareSize = pKey.Size;
-  if (wCompareSize> pZIF.KeyUniversalSize)
-    wCompareSize=pZIF.KeyUniversalSize;
+  if (wCompareSize> pZIF.keyguessedsize)
+    wCompareSize=pZIF.keyguessedsize;
 
   pCollection.clear();            // Always clearing the collection when zsearch
   pCollection.setStatus(ZS_NOTFOUND) ;
@@ -3164,8 +3164,8 @@ zrank_type wpivot;
 // Size of comparison is given by pKey.Size : if partial key Size will be shorter than Index key size.
 /*
      wCompareSize = pKeyContent.Size;
-    if (wCompareSize> pZIF.KeyUniversalSize)
-                wCompareSize=pZIF.KeyUniversalSize;
+    if (wCompareSize> pZIF.keyguessedsize)
+                wCompareSize=pZIF.keyguessedsize;
 */
 
 
@@ -3179,7 +3179,7 @@ zrank_type wpivot;
     pCollection->ZMS = pZMS;
     if (pZMS==ZMS_MatchIndexSize)
             {
-            if (pKeyContent.Size!=KeyUniversalSize)
+            if (pKeyContent.Size!=KeyGuessedSize)
                                         {return  ZS_INVSIZE ;}//
             }
 //-----------End Initialization Section---------------------------------
@@ -3364,8 +3364,8 @@ ZRawIndexFile::_RawsearchFirst( const ZDataBuffer        &pKeyContent,     // ke
     // Size of comparison is given by pKey.Size : if partial key Size will be shorter than Index key size.
 
     wCompareSize = pKeyContent.Size;
-    if (wCompareSize> pZIF.KeyUniversalSize)
-      wCompareSize=pZIF.KeyUniversalSize;
+    if (wCompareSize> pZIF.keyguessedsize)
+      wCompareSize=pZIF.keyguessedsize;
 
 
 
@@ -3382,7 +3382,7 @@ ZRawIndexFile::_RawsearchFirst( const ZDataBuffer        &pKeyContent,     // ke
   pCollection->ZMS = pZMS;
   if (pZMS==ZMS_MatchIndexSize)
   {
-    if (pKeyContent.Size!=pZIF.KeyUniversalSize)
+    if (pKeyContent.Size!=pZIF.keyguessedsize)
     {return  ZS_INVSIZE ;}//
   }
   //-----------End Initialization Section---------------------------------
@@ -3789,8 +3789,8 @@ zrank_type wpivot;
 // Size of comparison is given by pKey.Size : if partial key Size will be shorter than Index key size.
 
      wCompareSize = pKeyLow.Size;
-    if (wCompareSize> pZIF.KeyUniversalSize)
-                wCompareSize=pZIF.KeyUniversalSize;
+    if (wCompareSize> pZIF.KeyGuessedSize)
+                wCompareSize=pZIF.KeyGuessedSize;
 
     pCollection=new ZIndexCollection (&pZIF);
 
@@ -4118,10 +4118,11 @@ ZStatus ZRawIndexFile::fromXml(zxmlNode* pIndexNode, ZaiErrors* pErrorlog)
   }
 
 
-  if (XMLgetChildUInt(wRootNode, "keyuniversalsize", KeyUniversalSize, pErrorlog)< 0)
+  if (XMLgetChildUInt(wRootNode, "keyguessedsize", KeyGuessedSize, pErrorlog)< 0)
   {
-    pErrorlog->errorLog("ZSIndexControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter <%s>.\n","keyuniversalsize");
+    pErrorlog->errorLog("ZSIndexControlBlock::fromXml-E-CNTFINDPAR Cannot find parameter <%s>.\n","keyguessedsize");
   }
+  /*
   if (XMLgetChildUInt(wRootNode, "duplicates", wInt, pErrorlog)< 0)
   {
     pErrorlog->warningLog("ZSIndexControlBlock::fromXml-W-CNTFINDPAR Cannot find parameter <%s>. Will stay to its default.\n","duplicates");
@@ -4129,7 +4130,19 @@ ZStatus ZRawIndexFile::fromXml(zxmlNode* pIndexNode, ZaiErrors* pErrorlog)
   }
   else
     Duplicates = (ZSort_Type)wInt;
-
+*/
+  if (XMLgetChildText(wRootNode, "duplicates", wValue, pErrorlog)< 0)
+  {
+    pErrorlog->warningLog("ZSIndexControlBlock::fromXml-W-CNTFINDPAR Cannot find parameter <%s>. Will be set to its default(ZST_NoDuplicates).\n","duplicates");
+    Duplicates = ZST_NoDuplicates;
+  }
+  else {
+    Duplicates = encode_ZST(wValue.toCChar());
+    if (Duplicates==ZST_Nothing) {
+          Duplicates=ZST_NoDuplicates;
+          pErrorlog->warningLog("ZSIndexControlBlock::fromXml-E-INVVALUE Parameter <%s> has an invalid value. Will be set to its default (ZST_NoDuplicates).\n","duplicates");
+    }
+  }
   return pErrorlog->hasError()?ZS_XMLERROR:ZS_SUCCESS;
 }//fromXml
 

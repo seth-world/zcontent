@@ -162,53 +162,67 @@ void ZChangeRecord::clearPost() {
   }
 }
 
-void ZChangeRecord::setAnte(size_t pAnte) {
+void ZChangeRecord::setAnteU64(size_t pAnte) {
   if (ZType != ZType_U64)
     abort();
   clearAnte();
   Pointers.SizePtr.Ante = new size_t(pAnte);
 }
-void ZChangeRecord::setPost(size_t pPost) {
+void ZChangeRecord::setPostU64(size_t pPost) {
   if (ZType != ZType_U64)
     abort();
   clearPost();
   Pointers.SizePtr.Post = new size_t(pPost);
 }
 
-void ZChangeRecord::setAnte(bool pAnte) {
+void ZChangeRecord::setAnteBool(bool pAnte) {
   if (ZType != ZType_Bool)
     abort();
   clearAnte();
   Pointers.BoolPtr.Ante = new bool(pAnte);
 }
 
-void ZChangeRecord::setPost(bool pPost) {
+void ZChangeRecord::setPostBool(bool pPost) {
   if (ZType != ZType_Bool)
     abort();
   clearPost();
   Pointers.BoolPtr.Post = new bool(pPost);
 }
 
-void ZChangeRecord::setAnte(const utf8VaryingString& pAnte) {
+void ZChangeRecord::setAnteZSortType(ZSort_Type pAnte) {
+  if (ZType != ZType_U8)
+    abort();
+  clearAnte();
+  Pointers.SortTypePtr.Ante = new ZSort_Type(pAnte);
+}
+
+void ZChangeRecord::setPostZSortType(ZSort_Type pPost) {
+  if (ZType != ZType_U8)
+    abort();
+  clearPost();
+  Pointers.SortTypePtr.Post = new ZSort_Type(pPost);
+}
+
+void ZChangeRecord::setAnteString(const utf8VaryingString& pAnte) {
   if (ZType != ZType_Utf8VaryingString)
     abort();
   clearAnte();
   Pointers.StringPtr.Ante = new utf8VaryingString(pAnte);
 }
-void ZChangeRecord::setPost(const utf8VaryingString& pPost) {
+void ZChangeRecord::setPostString(const utf8VaryingString& pPost) {
   if (ZType != ZType_Utf8VaryingString)
     abort();
   clearPost();
   Pointers.StringPtr.Post = new utf8VaryingString(pPost);
 }
 
-void ZChangeRecord::setAnte(const KeyData& pAnte) {
+void ZChangeRecord::setAnteKeyData(const KeyData& pAnte) {
   if (ZType != ZType_Class)
     abort();
   clearAnte();
   Pointers.KeyDataPtr.Ante=new KeyData(pAnte);
 }
-void ZChangeRecord::setPost(const KeyData& pPost) {
+void ZChangeRecord::setPostKeyData(const KeyData& pPost) {
   if (ZType != ZType_Class)
     abort();
   clearPost();
@@ -228,14 +242,14 @@ ZChangeRecord::getAnte_Str() const{
 
   case ZType_Class:
     wStr.addsprintf("<%s> | keysize %ld | Dup %s| Alloc %ld | Extent %ld | Grab %s | High %s | Root ",
-          Pointers.KeyDataPtr.Ante->IndexName.toString(),
-          Pointers.KeyDataPtr.Ante->KeySize,
-          Pointers.KeyDataPtr.Ante->Duplicates?"<true>":"<false>",
-          Pointers.KeyDataPtr.Ante->Allocated,
-          Pointers.KeyDataPtr.Ante->ExtentQuota,
-          Pointers.KeyDataPtr.Ante->GrabFreeSpace?"<true>":"<false>",
-          Pointers.KeyDataPtr.Ante->HighwaterMarking?"<true>":"<false>"
-          );
+                      Pointers.KeyDataPtr.Ante->IndexName.toString(),
+                      Pointers.KeyDataPtr.Ante->KeySize,
+                      decode_ZST(Pointers.KeyDataPtr.Ante->Duplicates),
+                      Pointers.KeyDataPtr.Ante->Allocated,
+                      Pointers.KeyDataPtr.Ante->ExtentQuota,
+                      Pointers.KeyDataPtr.Ante->GrabFreeSpace?"<true>":"<false>",
+                      Pointers.KeyDataPtr.Ante->HighwaterMarking?"<true>":"<false>"
+                      );
     wStr += Pointers.KeyDataPtr.Ante->IndexRootName.toString();
     return wStr;
 
@@ -265,14 +279,14 @@ ZChangeRecord::getPost_Str() const{
 
   case ZType_Class:
     wStr.addsprintf("<%s> | keysize %ld | Dup %s| Alloc %ld | Extent %ld | Grab %s | High %s | Root ",
-        Pointers.KeyDataPtr.Post->IndexName.toString(),
-        Pointers.KeyDataPtr.Post->KeySize,
-        Pointers.KeyDataPtr.Post->Duplicates?"<true>":"<false>",
-        Pointers.KeyDataPtr.Post->Allocated,
-        Pointers.KeyDataPtr.Post->ExtentQuota,
-        Pointers.KeyDataPtr.Post->GrabFreeSpace?"<true>":"<false>",
-        Pointers.KeyDataPtr.Post->HighwaterMarking?"<true>":"<false>"
-        );
+                    Pointers.KeyDataPtr.Post->IndexName.toString(),
+                    Pointers.KeyDataPtr.Post->KeySize,
+                    decode_ZST(Pointers.KeyDataPtr.Post->Duplicates),
+                    Pointers.KeyDataPtr.Post->Allocated,
+                    Pointers.KeyDataPtr.Post->ExtentQuota,
+                    Pointers.KeyDataPtr.Post->GrabFreeSpace?"<true>":"<false>",
+                    Pointers.KeyDataPtr.Post->HighwaterMarking?"<true>":"<false>"
+                    );
     wStr += Pointers.KeyDataPtr.Post->IndexRootName.toString();
     return wStr;
 

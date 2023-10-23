@@ -7,7 +7,7 @@ using namespace zbs;
 #include <ztoolset/zfunctions.h>
 #include <zrandomfile/zrfutilities.h> // for removeFile()
 
-ZDictionaryFile::ZDictionaryFile()
+ZDictionaryFile::ZDictionaryFile() : ZMFDictionary()
 {
 
 }
@@ -52,13 +52,14 @@ ZStatus
 ZDictionaryFile::create(const uriString& pDicFilename,bool pBackup){
 
   URIDictionary = pDicFilename;
-  return save();
+  CreationDate = ModificationDate = ZDateFull::now();
+  return save_xml();
 }// create
 
 
-
+#ifdef __USE_BIN_DICTIONARY__
 ZStatus
-ZDictionaryFile::save(bool pBackup){
+ZDictionaryFile::save_bin(bool pBackup){
   ZDataBuffer wDicExport;
 
   setModified();
@@ -71,10 +72,10 @@ ZDictionaryFile::save(bool pBackup){
     URIDictionary.remove();
 
   return URIDictionary.writeContent(wDicExport);
-}//save
+}//save_bin
 
 ZStatus
-ZDictionaryFile::load(){
+ZDictionaryFile::load_bin(){
   ZDataBuffer wDicImport;
   ZStatus wSt=URIDictionary.loadContent(wDicImport);
   if (wSt != ZS_SUCCESS) {
@@ -82,7 +83,37 @@ ZDictionaryFile::load(){
   }
   const unsigned char* wPtrIn=wDicImport.Data;
   return _import(wPtrIn);
-}//load
+}//load_bin
+
+
+#endif
+
+
+
+
+ZStatus
+ZDictionaryFile::load_xml(ZaiErrors* pErrorlog){
+  utf8VaryingString wDicImport;
+  ZStatus wSt=URIDictionary.loadUtf8(wDicImport);
+  if (wSt != ZS_SUCCESS) {
+    return wSt;
+  }
+  return importFromXmlString(wDicImport,false,pErrorlog);
+}//load_xml
+
+ZStatus
+ZDictionaryFile::save_xml(bool pBackup){
+  utf8VaryingString wDicString;
+
+  setModified();
+  wDicString = exportToXmlString(true);
+  if (pBackup && URIDictionary.exists())
+    URIDictionary.renameBck("bck");
+  else
+    URIDictionary.remove();
+
+  return URIDictionary.writeContent(wDicString);
+}//save_xml
 
 
 void
@@ -91,17 +122,28 @@ ZDictionaryFile::setDictionary(const ZMFDictionary& pDic) {
   ZMFDictionary::_copyFrom(pDic);
 }
 
-
+#ifdef __USE_BIN_DICTIONARY__
 ZStatus
-ZDictionaryFile::loadDictionary(const uriString& pDicFilename) {
+ZDictionaryFile::loadDictionary_bin(const uriString& pDicFilename) {
   clear();
   setDicFilename(pDicFilename);
-  return load();
+  return load_bin();
 }
-
+#endif //__USE_BIN_DICTIONARY__
+ZStatus
+ZDictionaryFile::loadDictionary(const uriString& pDicFilename,ZaiErrors* pErrorlog) {
+  clear();
+  setDicFilename(pDicFilename);
+  return load_xml(pErrorlog);
+}
 utf8VaryingString  ZDictionaryFile::exportToXmlString( bool pComment)
 {
   return ZMFDictionary::XmlSaveToString(pComment);
+
+}
+ZStatus  ZDictionaryFile::importFromXmlString( const utf8VaryingString& pXmlContents,bool pCheckHash,ZaiErrors* pErrorlog)
+{
+  return ZMFDictionary::XmlLoadFromString(pXmlContents,pCheckHash, pErrorlog);
 
 }
 ZStatus ZDictionaryFile::exportToXmlFile(const uriString &pXmlFile,bool pComment)

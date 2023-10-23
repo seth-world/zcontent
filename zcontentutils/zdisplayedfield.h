@@ -6,25 +6,34 @@
 #include <QStandardItem>
 
 namespace zbs {
+typedef uint8_t KeyHeaderChanges_type;
+enum KeyHeaderChanges : KeyHeaderChanges_type
+{
+    KHCHG_nothing       =   0,
+    KHCHG_KeyName       =   1,
+    KHCHG_GuessedSize   =   2,
+    KHCHG_Duplicates    =   4,
+    KHCHG_Tooltype      =   8,
+};
+
 /* reference of that to be stored as data within QStandardItem */
 /* usage of dictionary is deprecated */
 class ZKeyHeaderRow //: public ZKeyDictionary
 {
 public:
-//  ZKeyHeaderRow(ZMFDictionary*pMDic) : ZKeyDictionary(pMDic) {}
-//  ZKeyHeaderRow(ZKeyDictionary* pKeyDic) : ZKeyDictionary(pKeyDic) {set(pKeyDic);}
   ZKeyHeaderRow() {}
   ZKeyHeaderRow(const ZKeyHeaderRow& pIn)  {ZKeyHeaderRow::_copyFrom(pIn);}
   ZKeyHeaderRow(const ZKeyHeaderRow* pIn)  {ZKeyHeaderRow::_copyFrom(*pIn);}
-
-
 
   ZKeyHeaderRow& _copyFrom(const ZKeyHeaderRow& pIn) {
 //    ZKeyDictionary::_copyFrom(pIn);
     DicKeyName=pIn.DicKeyName;
     ToolTip=pIn.ToolTip;
-    KeyUniversalSize=pIn.KeyUniversalSize;
+    KeyGuessedSize=pIn.KeyGuessedSize;
     Duplicates=pIn.Duplicates;
+    Forced=pIn.Forced;
+    ChangeStatus = pIn.ChangeStatus;
+ //   Forced = pIn.Forced;
     return *this;
   }
 
@@ -34,8 +43,10 @@ public:
   void set( ZKeyDictionary* pKeyDic) ;
   ZKeyDictionary get(ZMFDictionary *pDic) ;
 
-  uint32_t          KeyUniversalSize=0;
-  uint8_t           Duplicates=0;
+  uint32_t                  KeyGuessedSize=0;
+  ZSort_Type                Duplicates=ZST_Nothing;
+  bool                      Forced=false;
+  KeyHeaderChanges_type     ChangeStatus=0;
   utf8VaryingString DicKeyName;       // refers to ZICB::IndexName
   utf8VaryingString ToolTip;         //!< help describing the key
 };

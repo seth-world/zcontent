@@ -80,12 +80,12 @@ _BaseFileEntity::get(ZDataBuffer& pRecord,const long pRank,zaddress_type& pAddre
   return _MasterFile->get(pRecord,pRank,pAddress);
 }
 
-const ZMetaDic&
+const ZDictionaryFile&
 _BaseFileEntity::getFieldDictionary() const
 {
   return _MasterFile->getFieldDictionary();
 }
-const ZMetaDic*
+const ZDictionaryFile*
 _BaseFileEntity::getFieldDictionaryPtr() const
 {
   return _MasterFile->getFieldDictionaryPtr();
@@ -145,14 +145,13 @@ _BaseCollectionEntity::setLogicalTerm(ZSearchLogicalTerm* pTerm)
     LogicalTerm = new ZSearchLogicalTerm(pTerm);
 }
 
-const ZMetaDic&
+const ZDictionaryFile&
 _BaseCollectionEntity::getFieldDictionary() const
 {
   return _BaseEntity->getFieldDictionary();
 }
 
-const ZMetaDic*
-_BaseCollectionEntity::getFieldDictionaryPtr() const
+const ZDictionaryFile *_BaseCollectionEntity::getFieldDictionaryPtr() const
 {
   return _BaseEntity->getFieldDictionaryPtr();
 }
@@ -448,8 +447,7 @@ ZSearchEntity::reallocateCellFormat()
   CellFormat = (int*)realloc(CellFormat,getFieldDictionary().count()*sizeof(int));
 }
 
-const ZMetaDic&
-ZSearchEntity::getFieldDictionary() const
+const ZDictionaryFile &ZSearchEntity::getFieldDictionary() const
 {
     if (isFile())
       return _FileEntity->getFieldDictionary();
@@ -459,8 +457,7 @@ ZSearchEntity::getFieldDictionary() const
 }
 
 
-const ZMetaDic*
-ZSearchEntity::getFieldDictionaryPtr() const
+const ZDictionaryFile *ZSearchEntity::getFieldDictionaryPtr() const
 {
   if (isFile())
     return _FileEntity->getFieldDictionaryPtr();

@@ -159,13 +159,13 @@ _Tp _getValueAFK (ZDataBuffer &pKeyData,const long pRank,ZIndexFile* pZIF)
 
     ssize_t wFieldOffset = wField.KeyOffset;
 
-    if ((wFieldOffset<0)||((wFieldOffset + wField.UniversalSize)>pZIF->KeyUniversalSize))
+    if ((wFieldOffset<0)||((wFieldOffset + wField.UniversalSize)>pZIF->keyguessedsize))
             {
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_OUTBOUND,
                                     Severity_Severe,
                                     " Field rank is out of key dictionary boundaries while computing field offset given rank <%ld> vs dictionary size <%ld>",
-            pZIF->KeyUniversalSize);
+            pZIF->keyguessedsize);
             return ZS_OUTBOUND;
             }
 
@@ -247,13 +247,13 @@ _Tp _getValueAAFK (ZDataBuffer &pKeyData,const long pIndex,const long pRank,ZInd
     ssize_t wFieldOffset = wField.KeyOffset + (wElementSize*pIndex) ;
 
 
-    if ((wFieldOffset<0)||((wFieldOffset + wField.UniversalSize)>pZIF->KeyUniversalSize))
+    if ((wFieldOffset<0)||((wFieldOffset + wField.UniversalSize)>pZIF->keyguessedsize))
     {
       ZException.setMessage(_GET_FUNCTION_NAME_,
           ZS_OUTBOUND,
           Severity_Severe,
           " Field rank is out of key dictionary boundaries while computing field offset given rank <%ld> vs dictionary size <%ld>",
-          pZIF->KeyUniversalSize);
+          pZIF->keyguessedsize);
       return ZS_OUTBOUND;
     }
 
