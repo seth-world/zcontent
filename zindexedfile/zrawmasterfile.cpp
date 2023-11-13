@@ -5,6 +5,8 @@
 
 #include <stdio.h>
 
+#include <zio/zioutils.h>
+
 //#include <zindexedfile/zkey.h>
 #include <zindexedfile/zindexitem.h>
 
@@ -27,6 +29,8 @@
 #include <zindexedfile/zrawmasterfileutils.h>
 
 #include <zindexedfile/bckelement.h>
+
+#include <zcontentcommon/urfparser.h>
 
 using namespace  zbs;
 
@@ -2942,6 +2946,7 @@ ZStatus
 ZRawMasterFile::_getRaw(ZDataBuffer& pRecord, const zrank_type pRank)
 {
   zaddress_type wAddress;
+  /*
   ZDataBuffer   wRawRecord;
   ZStatus wSt= ZRandomFile::zgetWAddress(wRawRecord,pRank,wAddress);
   if (wSt!=ZS_SUCCESS)
@@ -2950,9 +2955,10 @@ ZRawMasterFile::_getRaw(ZDataBuffer& pRecord, const zrank_type pRank)
   uint64_t wRecSize;
   const unsigned char* wPtr=wRawRecord.Data;
   _importAtomic<uint64_t>(wRecSize,wPtr);
-
   pRecord.setData(wPtr,size_t(wRecSize));
   return wSt;
+*/
+  return ZRandomFile::zgetWAddress(pRecord,pRank,wAddress);
 }// ZRawMasterFile::_getRaw
 
 
@@ -4247,12 +4253,175 @@ uriString ZRawMasterFile::getURIIndex(long pIndexRank) {
   return IndexTable[pIndexRank]->getURIIndex();
 }
 
+// ---------------------import / export function -----------------------------
 
-//-------------------Statistical functions-----------------------------------------
+/*
+    <zmasterfilecontent>
+        <creationdate> </creationdate>
+        <modificationdate> </modificationdate>
+    <record>
+        <field>
+            <!-- if field is present -->
+            <ztype> </ztype>
+            <content>
+            </content>
+            <!-- if field is omitted : no ztype , no content -->
+        </field>
+    </record>
+    <record>
+        ...
+    </record>
+    </zmasterfilecontent>
+*/
+ZStatus
+ZRawMasterFile::exportContent(const uriString& pContentFile)
+{
+  ZArray<URFField> wFieldList;
+  const unsigned char*  wPtr=nullptr;
+  bool wHasBeenOpened=false;
+  long wRank=0;
+  __FILEHANDLE__ wFd=-1;
+  utf8VaryingString wXmlString , wXmlComment;
+  ZStatus wSt=ZS_SUCCESS;
+  ZDataBuffer wZDB;
+  if (!isOpen()) {
+    wSt=zopen(ZRF_Read_Only);
+    if (wSt!=ZS_SUCCESS)
+            return wSt;
+    wHasBeenOpened=true;
+  }
+  uriStat wStats;
+  URIContent.getStatR(wStats);
+
+  wXmlString=fmtXMLdeclaration();
+  wXmlString += fmtXMLnode("zmasterfilecontent",0);
+  wXmlString += fmtXMLdatefull("creationdate",wStats.Created,1);
+  wXmlString += fmtXMLdatefull("modificationdate",wStats.LastModified,1);
+
+  wSt=rawOpen(  wFd,pContentFile.toCChar(),O_CREAT|O_WRONLY|O_TRUNC);
+  if (wSt!=ZS_SUCCESS) {
+    if (wHasBeenOpened)
+            zclose();
+    return wSt;
+  }
+  size_t wSizeWritten=0;
+  wSt=rawWriteText(wFd,wXmlString,wSizeWritten);
+  if (wSt!=ZS_SUCCESS) {
+    goto EndExportContent;
+  }
+
+
+  wSt=zget(wZDB,wRank);
+  while (wSt==ZS_SUCCESS) {
+
+    if (_progressCallBack!=nullptr)
+            _progressCallback(wRank);
+
+    wSt=rawWriteText(wFd,fmtXMLnode("record",1),wSizeWritten);
+    if (wSt!=ZS_SUCCESS)
+        goto EndExportContent;
+
+    wSt=URFParser::parse(wZDB,wFieldList);
+    if (wSt!=ZS_SUCCESS)
+        goto EndExportContent;
+
+
+    for (int wi=0; wi < wFieldList.count();wi++) {
+
+        wSt=rawWriteText(wFd,fmtXMLnode("field",2),wSizeWritten);
+        if (wSt!=ZS_SUCCESS)
+            goto EndExportContent;
+        wSt=rawWriteText(wFd,wFieldList[wi].toXml(3),wSizeWritten);
+        if (wSt!=ZS_SUCCESS)
+            goto EndExportContent;
+
+        wSt=rawWriteText(wFd,fmtXMLendnode("field",2),wSizeWritten);
+        if (wSt!=ZS_SUCCESS)
+            goto EndExportContent;
+
+    }// for
+    wSt=rawWriteText(wFd,fmtXMLendnode("record",1),wSizeWritten);
+    if (wSt!=ZS_SUCCESS) {
+            goto EndExportContent;
+    }
+    wSt=zget(wZDB,++wRank);
+  }// while ZS_SUCCESS
+
+  if (wSt!=ZS_SUCCESS) {
+    if (wSt==ZS_OUTBOUNDHIGH)
+            wSt=ZS_EOF;
+    else
+        goto EndExportContent;
+  }
+   wSt=rawWriteText(wFd,fmtXMLendnode("zmasterfilecontent",0),wSizeWritten);
+
+
+EndExportContent :
+  rawClose(wFd);
+  if (wHasBeenOpened)
+    zclose();
+  return wSt;
+} //exportContent
+
+
+
+
+ZStatus
+ZRawMasterFile::importContent(const uriString& pContentFile,ZRawMasterFile& pRawMasterFile, ZaiErrors* pErrorLog)
+{
+
+
+
+
+}
+
+
+ZStatus
+ZRawMasterFile::importRecordContent(zxmlNode* pRecordRoot, ZDataBuffer& pRecord, ZaiErrors *pErrorLog)
+{
+
+  if (pRecordRoot->getName()!="record") {
+    pErrorLog->errorLog("Invalid record root node name <%s> while expected <record>.",pRecordRoot->getName().toCChar());
+    return ZS_XMLINVNODENAME;
+  }
+
+  ZStatus wSt=ZS_SUCCESS;
+  ZArray<URFField> wFieldList;
+  URFField wField;
+
+  zxmlNode* wFieldNode=nullptr;
+  ZDataBuffer wRecordZDB;
+  ZDataBuffer wFieldZDB;
+
+  int wCount=0;
+  wSt=pRecordRoot->getFirstChild(wFieldNode);
+
+  while (wSt==ZS_SUCCESS) {
+    /* get one field */
+    wSt = wField.fromXml((zxmlElement*)wFieldNode, wFieldZDB,pErrorLog);
+    if (wSt!=ZS_SUCCESS)
+        return wSt;
+    wRecordZDB.appendData(wFieldZDB);
+    wFieldList.push(wField);
+
+    wSt=pRecordRoot->getNextNode(wFieldNode);
+  } // while
+  /* Define field presence : a field is present if at least ZType node has been defined for this field */
+
+  ZBitset wPresence(uint16_t(wFieldList.count()));
+  wPresence.clear();
+  for (int wi=0; wi < wFieldList.count();wi++) {
+    if (wFieldList[wi].Present)
+        wPresence.set(wi);
+  }
+  wPresence._exportURF(pRecord);
+  pRecord.appendData(wRecordZDB);
+  return ZS_SUCCESS;
+}
 
 /**
 @addtogroup ZMFSTATS ZRawMasterFile and ZIndexFile storage statistics and PMS session monitoring
-
+//-------------------Statistical functions-----------------------------------------
 @{
 */
 

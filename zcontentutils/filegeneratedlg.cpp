@@ -64,6 +64,7 @@
 
 #include <ztoolset/ztime.h>
 
+#include "zmfprogressmwn.h"
 
 const QColor ErroredQCl=Qt::red;
 const QColor WarnedQCl=Qt::darkGreen;
@@ -80,7 +81,6 @@ const int cst_KeyAllocSizeCol =  cst_KeyAllocCol + 1  ;
 const int cst_KeyExtentQuotaCol =  cst_KeyAllocSizeCol + 1  ;
 const int cst_KeyExtentSizeCol =  cst_KeyExtentQuotaCol + 1  ;
 
-const int cst_updateRate = 1 ;
 
 //class textEditMWn;
 
@@ -126,8 +126,8 @@ FileGenerateMWn::initLayout() {
   QMenu* DirectoriesMEn = new QMenu("Directories");
   GenMenuBar->addMenu(DirectoriesMEn);
 
-  SearchDirQAc=new QAction("Search master directory" ,GenMEn);
-  IndexSearchDirQAc=new QAction("Search indexes directory" ,GenMEn);
+  SearchDirQAc=new QAction("Change master directory" ,GenMEn);
+  IndexSearchDirQAc=new QAction("Change indexes directory" ,GenMEn);
   SameAsMasterQAc = new QAction("Set indexes directory same as master" ,GenMEn);
 
   DirectoriesMEn->addAction(SearchDirQAc);
@@ -213,7 +213,21 @@ FileGenerateMWn::initLayout() {
   ApplySaveMEn->addAction(TestRunQAc);
   ApplySaveMEn->addAction(SaveToXmlQAc);
 
+
+  QMenu* ExportMEn = new QMenu("Data export",this);
+
+  DataExportQAc=new QAction ("Export content",ExportMEn);
+  DataImportQAc=new QAction ("Import content",ExportMEn);
+
+  GenMenuBar->addMenu(ExportMEn);
+  ExportMEn->addAction(DataExportQAc);
+  ExportMEn->addAction(DataImportQAc);
+
   GenActionGroup = new QActionGroup(this);
+
+  GenActionGroup->addAction(DataExportQAc);
+  GenActionGroup->addAction(DataImportQAc);
+
   GenActionGroup->addAction(SearchDirQAc);
   GenActionGroup->addAction(IndexSearchDirQAc);
   GenActionGroup->addAction(SameAsMasterQAc);
@@ -1252,6 +1266,69 @@ FileGenerateMWn::SameAsMaster(){
   return;
 }//FileGenerateDLg::SameAsMaster
 
+void
+FileGenerateMWn::exportCallBack(int pValue) {
+
+}
+
+void
+FileGenerateMWn::DataImport(){
+
+}
+
+void
+FileGenerateMWn::DataExport(){
+
+  if (MasterFile==nullptr) {
+    ZExceptionDLg::adhocMessage("Data export",Severity_Error,
+                                           "Please select an active master file before exporting its data.");
+    return;
+  }
+  if (MasterFile->getRecordCount()==0) {
+    ZExceptionDLg::adhocMessage("Data export",Severity_Error,
+                                "No record in file. Nothing to export.");
+    return;
+  }
+
+  if (!MasterFile->hasProgressCallback()) {
+    MasterFile->registerProgressCallback(std::bind(&FileGenerateMWn::exportCallBack, this,_1));
+  }
+  QString wDir;
+  wDir = QFileDialog::getSaveFileName(this,"Export content",GeneralParameters.getWorkDirectory().toCChar());
+  if (wDir.isEmpty())
+    return;
+  uriString wURIExport=wDir.toUtf8().data();
+
+  /* export progress window setup */
+
+  ProgressMWn=new ZMFProgressMWn("Data export",this);
+
+  ProgressMWn->MainDescBudyLBl->setText("Export to file");
+  ProgressMWn->MainDescriptionLBl->setText(wURIExport.toCChar());
+
+  ProgressMWn->AdvancePGb->setMaximum(MasterFile->getRecordCount());
+
+  ProgressMWn->show();
+
+
+  ZStatus wSt=MasterFile->exportContent(wURIExport);
+
+  ProgressMWn->CloseBTn->setVisible(true);
+
+  if (wSt!=ZS_SUCCESS) {
+    ZExceptionDLg::adhocMessage("Data export",Severity_Error,
+                                "Something went wrong while exporting data from <%s>",MasterFile->getURIContent().getBasename().toCChar());
+    return;
+  }
+
+
+
+
+
+  return;
+}//FileGenerateDLg::DataExport
+
+
 
 void
 FileGenerateMWn::HideGuess() {
@@ -2017,6 +2094,16 @@ FileGenerateMWn::MenuAction(QAction* pAction){
   }
   if (pAction==IndexSearchDirQAc){
     SearchIndexDir();
+    return;
+  }
+
+  if (pAction==DataExportQAc){
+    DataExport();
+    return;
+  }
+
+  if (pAction==DataImportQAc){
+    DataImport();
     return;
   }
 
@@ -3011,50 +3098,14 @@ FileGenerateMWn::rebuildIndex(long pIndexRankToRebuild) {
 
 /* index rebuild progress window setup */
 
-  QMainWindow* IndexRebuildMWn=new QMainWindow(this);
-  IndexRebuildMWn->setWindowTitle("Index key rebuild");
-  QWidget* wCentralWDg = new QWidget(IndexRebuildMWn);
-  IndexRebuildMWn->setCentralWidget(wCentralWDg);
-  IndexRebuildMWn->resize(300,200);
-  QVBoxLayout* wVB1 = new QVBoxLayout (IndexRebuildMWn->centralWidget());
-  wCentralWDg->setLayout(wVB1);
+  ProgressMWn=new ZMFProgressMWn("Index key rebuild",this);
 
-  QHBoxLayout* wHB1=new QHBoxLayout;
-  wVB1->addLayout(wHB1);
+  ProgressMWn->MainDescBudyLBl->setText("Index key name");
+  ProgressMWn->MainDescriptionLBl->setText(MasterFile->IndexTable[pIndexRankToRebuild]->IndexName.toCChar());
 
-  QLabel* wlb1LBl=new QLabel("Index key name");
-  wHB1->addWidget(wlb1LBl);
+  ProgressMWn->initCount(MasterFile->getRecordCount());
 
-  QLabel* IndexNameLBl=new QLabel(" ");
-  wHB1->addWidget(IndexNameLBl);
-
-
-  QHBoxLayout* wHB2=new QHBoxLayout;
-  wVB1->addLayout(wHB2);
-
-  QLabel* wlb2LBl=new QLabel("Records processed");
-  wHB2->addWidget(wlb2LBl);
-
-  QLabel* RecordsProcessedLBl=new QLabel("0");
-  wHB2->addWidget(RecordsProcessedLBl);
-
-
-  QHBoxLayout* wHB3=new QHBoxLayout;
-  wVB1->addLayout(wHB3);
-
-  QLabel* wlb3LBl=new QLabel("Estimated finish time");
-  wHB3->addWidget(wlb3LBl);
-  QLabel* TargetTimeLBl=new QLabel("unknown");
-  wHB3->addWidget(TargetTimeLBl);
-
-  QProgressBar* AdvancePGb=new QProgressBar;
-  AdvancePGb->setMinimum(0);
-  AdvancePGb->setMaximum(int(MasterFile->getRecordCount()));
-  AdvancePGb->setValue(0);
-
-  wVB1->addWidget(AdvancePGb);
-
-  IndexRebuildMWn->show();
+  ProgressMWn->show();
 
   /* rebuild process*/
 
@@ -3064,7 +3115,6 @@ FileGenerateMWn::rebuildIndex(long pIndexRankToRebuild) {
   zaddress_type wZMFAddress;
   ZIndexItem* wIndexItem=nullptr;
   long wCurrentRank=0L,wRecordCount=0L;
-  int wUpdateRate=cst_updateRate;
   zmode_type wMasterOpenMode, wIndexOpenMode;
 
   wMasterOpenMode = MasterFile->getMode();
@@ -3072,7 +3122,7 @@ FileGenerateMWn::rebuildIndex(long pIndexRankToRebuild) {
     ZException.setMessage("ZMasterFile::rebuildIndex",ZS_FILENOTOPEN,Severity_Error,
         "File is open in mode %s. It must be open with access mode ZRF_All.",decode_ZRFMode(MasterFile->getMode()));
     ComLog->appendText("ZMasterFile::rebuildIndex-E-INVMOD File is open in mode %s. It must be open with access mode ZRF_All.",decode_ZRFMode(MasterFile->getMode()));
-    IndexRebuildMWn->deleteLater();
+    ProgressMWn->close(); /* is deleteonclose */
     return ZS_MODEINVALID;
   }
   wRecordCount = MasterFile->getRecordCount();
@@ -3085,7 +3135,7 @@ FileGenerateMWn::rebuildIndex(long pIndexRankToRebuild) {
     ComLog->appendTextColor( WarnedQCl, "%s-W rebuilding index key <%s> - Master file is empty.\n",
         ZDateFull::currentDateTime().toFormatted().toString(),
         MasterFile->IndexTable[pIndexRankToRebuild]->IndexName.toString());
-    IndexRebuildMWn->deleteLater();
+    ProgressMWn->close(); /* is deleteonclose */
     return ZS_EMPTY;
 
   }
@@ -3095,7 +3145,7 @@ FileGenerateMWn::rebuildIndex(long pIndexRankToRebuild) {
         "Invalid index rank <%ld> while expecting one of [0,%ld[.",pIndexRankToRebuild,MasterFile->IndexTable.count());
     ComLog->appendText("ZMasterFile::rebuildIndex-E-INVRANK Invalid index rank <%ld> while expecting one of [0,%ld[.",pIndexRankToRebuild,MasterFile->IndexTable.count());
 
-    IndexRebuildMWn->deleteLater();
+    ProgressMWn->close(); /* is deleteonclose */
     return ZS_INVTYPE;
   }
 
@@ -3104,7 +3154,6 @@ FileGenerateMWn::rebuildIndex(long pIndexRankToRebuild) {
       ZDateFull::currentDateTime().toFormatted().toString(),
       MasterFile->IndexTable[pIndexRankToRebuild]->IndexName.toString());
 
-  IndexNameLBl->setText(MasterFile->IndexTable[pIndexRankToRebuild]->IndexName.toCChar());
 
   ComLog->appendText("%s- rebuilding index key <%s> - clearing index file.",
       ZDateFull::currentDateTime().toFormatted().toString(),
@@ -3112,15 +3161,13 @@ FileGenerateMWn::rebuildIndex(long pIndexRankToRebuild) {
 
   wSt=MasterFile->IndexTable[pIndexRankToRebuild]->zclearFile();
   if (wSt!=ZS_SUCCESS){
-    delete IndexRebuildMWn;
+    ProgressMWn->close();  /* is deleteonclose */
     return wSt;
   }
 
   ComLog->appendText("%s- rebuilding index key <%s> - populating index file.",
       ZDateFull::currentDateTime().toFormatted().toString(),
       MasterFile->IndexTable[pIndexRankToRebuild]->IndexName.toString());
-
-
 
 
   ZTime wStartTime=ZTime::getCurrentTime();
@@ -3140,37 +3187,17 @@ FileGenerateMWn::rebuildIndex(long pIndexRankToRebuild) {
     if (wSt!=ZS_SUCCESS)
       goto rebuildIndexError;
 
+    ProgressMWn->ProgressDisplay(wCurrentRank);
+
     wSt=MasterFile->zgetNextWAddress(wRecord,wCurrentRank,wZMFAddress);
-    if ((wSt==ZS_SUCCESS)&&(!--wUpdateRate)){
-        sleepWithLoop(1);
-        wUpdateRate=cst_updateRate;
-        /* compute predicted target time */
-        ZTime wElapsed = ZTime::getCurrentTime() - wStartTime ;
-        /* how many times elapsed time should be multiplied to get achievement time */
-        double wRemainTimes = double(MasterFile->getRecordCount()) / double(wCurrentRank);
-        wElapsed = wElapsed * wRemainTimes ;
-        ZTime wTargetTime = wStartTime + wElapsed;
-
-        TargetTimeLBl->setText(wTargetTime.toString("%d-%m-%y %T").toCChar());
-        AdvancePGb->setValue(int(wCurrentRank));
-        wStr.sprintf("%ld / %ld",wCurrentRank,wRecordCount);
-        RecordsProcessedLBl->setText(wStr.toCChar());
-
-        QApplication::processEvents();
-    } //if ((wSt==ZS_SUCCESS)&&(!--wUpdateRate))
   } // while (wSt==ZS_SUCCESS)
 
   if (wSt==ZS_EOF)
     wSt=ZS_SUCCESS;
 
-  if (wSt==ZS_SUCCESS) {
 
-    AdvancePGb->setValue(int(wRecordCount));
-    wStr.sprintf("%ld / %ld",wRecordCount,wRecordCount);
-    RecordsProcessedLBl->setText(wStr.toCChar());
 
-    TargetTimeLBl->setText("Done");
-
+  if (wSt==ZS_SUCCESS) {  
     ComLog->appendText("%s- rebuilding index key <%s> - rebuild process done successfully.\n"
                        "                writting all headers to files.",
         ZDateFull::currentDateTime().toFormatted().toString(),
@@ -3180,14 +3207,15 @@ FileGenerateMWn::rebuildIndex(long pIndexRankToRebuild) {
 
     wSt = MasterFile->_writeAllHeaders();
   }
-  if (wSt==ZS_SUCCESS)
+  if (wSt==ZS_SUCCESS) {
     return wSt;
+  }
 
 //  IndexRebuildMWn->deleteLater();
 
 rebuildIndexError:
+    ProgressMWn->setDone(wSt==ZS_SUCCESS);
 
-  TargetTimeLBl->setText("Errored");
   if (ZException.count()==0){
     ZException.setMessage("ZMasterFile::rebuildIndex",wSt,Severity_Error,"Error while rebuilding index");
   }
@@ -3203,7 +3231,6 @@ rebuildIndexError:
 
   QApplication::processEvents();
 
-//  IndexRebuildMWn->deleteLater();
   return wSt;
 } //rebuildIndex
 

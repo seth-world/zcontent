@@ -358,7 +358,7 @@ public:
      * @brief isOpen test whether file is open or not
      * @return true if file is open false if not
      */
-    bool            isOpen(void)  {return _isOpen;}
+    bool isOpen(void) const  {return _isOpen;}
     /**
      * @brief getMode returns the open mode of the file as a zmode_type
      */

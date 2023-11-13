@@ -39,6 +39,7 @@ class QStandardItem;
 class textEditMWn;
 
 class ZComboDelegate;
+class ZMFProgressMWn;
 
 enum FGState : uint8_t {
   FGST_Nothing  = 0,
@@ -51,6 +52,7 @@ namespace Ui {
 class FileGenerateDLg;
 }
 */
+
 
 class FileGenerateMWn : public QMainWindow , MasterFileValues
 {
@@ -98,6 +100,8 @@ public:
 
   ZStatus rebuildIndex(long pIndexRankToRebuild);
 
+  void exportCallBack(int pValue);
+
   void resizeEvent(QResizeEvent*) override;
 
   void KeyDelete();
@@ -128,6 +132,9 @@ public:
 
   bool testGuessed();
 
+  void DataExport();
+  void DataImport();
+
 Q_SLOT
   void Quit();
   void Compute();
@@ -154,6 +161,8 @@ private:
   textEditMWn* ChangeLogMWn=nullptr;
 
   bool DoNotChangeKeyValues=false;
+
+  ZMFProgressMWn* ProgressMWn=nullptr;
 
   ZaiErrors  ErrorLog;
 
@@ -199,6 +208,11 @@ private:
   QAction* SearchDirQAc=nullptr;
   QAction* IndexSearchDirQAc=nullptr;
   QAction* SameAsMasterQAc=nullptr;
+
+  QAction* DataExportQAc=nullptr;
+  QAction* DataImportQAc=nullptr;
+
+
   QAction* GenXmlQAc=nullptr;
 
   QAction* SetupFromZmfQAc=nullptr;

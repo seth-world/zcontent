@@ -20,6 +20,10 @@
 
 //#include <zindexedfile/zindexitem.h>
 
+
+#define __PROGRESSCALLBACK__(__NAME__)  std::function<void (int)> __NAME__
+
+
 /** @brief RawDataDescription Raw data storage detailed description
  * Raw data :
  * if first uint_32_t is ZType_bitsetFull, then no bitset, all fields are reputed to be present,
@@ -360,6 +364,10 @@ public:
    */
   ZStatus zremoveAll();
 
+
+  void registerProgressCallback(__PROGRESSCALLBACK__(pProgressCallback) ) {_progressCallback=pProgressCallback;}
+  bool hasProgressCallback() { return _progressCallback!=nullptr; }
+
   void _testZReserved();
 
   bool hasDictionary()  {return Dictionary!=nullptr;}
@@ -580,6 +588,13 @@ public:
 
 
 
+  ZStatus exportContent(const uriString& pContentFile);
+  /* formats a raw record structured with an URF format ( i.e. leading ZBitset then URF field list )
+   * following the xml file content defined by pContentFile */
+  static ZStatus importContent(const uriString& pContentFile, ZRawMasterFile& pRawMasterFile, ZaiErrors *pErrorLog);
+
+  ZStatus importRecordContent(zxmlNode* pRecordRoot, ZDataBuffer& pRecord, ZaiErrors *pErrorLog);
+
   //-------- Stats-----------------------------------------------
 
 
@@ -741,11 +756,7 @@ protected:
   ZMutex    _Mutex;
 #endif
 
-
-protected:
-
-
-//  ZRawRecord*  RawRecord=nullptr;
+__PROGRESSCALLBACK__(_progressCallback) = nullptr;
 
 public:
 

@@ -179,6 +179,7 @@ SOURCES += \
     zfilegenerate.cpp \
     zgeneralparamsdlg.cpp \
     zkeylistdlg.cpp \
+    zmfprogressmwn.cpp \
     zrawkeylistdlg.cpp \
     zrawmasterfilevisu.cpp \
     zrestoredlg.cpp \
@@ -251,6 +252,7 @@ HEADERS += \
     zfilegenerate.h \
     zgeneralparamsdlg.h \
     zkeylistdlg.h \
+    zmfprogressmwn.h \
     zrawkeylistdlg.h \
     zrawmasterfilevisu.h \
     zrestoredlg.h \

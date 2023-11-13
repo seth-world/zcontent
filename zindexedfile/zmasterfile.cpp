@@ -123,6 +123,9 @@ ZMasterFile::rebuildIndex(long pIndexRank,long* pRank) {
   }
 
   while (wSt==ZS_SUCCESS) {
+    if (_progressCallBack!=nullptr)
+        _progressCallback(wRank);
+
     wSt=extractKeyValues(wRecord,wKeyRecord,pIndexRank);
     if (wSt!=ZS_SUCCESS)
       goto rebuildIndexError;
@@ -378,3 +381,4 @@ ZMasterFile::getURFFieldByRank(const ZDataBuffer& pRecord,URFField& pURFField,lo
 
   return ZS_SUCCESS;
 } // extractFieldValue
+
