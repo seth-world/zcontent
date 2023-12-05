@@ -3,7 +3,7 @@
 /** @file zlock.h concerns general lock management : independant from application */
 #include <stdint.h>
 #include <zcontentcommon/zidentity.h>
-#include <ztoolset/zutfstrings.h>
+#include <ztoolset/utfvaryingstring.h>
 #include <zcontentcommon/zresource.h>
 
 typedef long            zrank_type;     //!< Block record rank data type NB: could be negative if unknown

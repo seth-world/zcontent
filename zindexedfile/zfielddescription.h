@@ -7,7 +7,7 @@
 #include <ztoolset/zlimit.h>
 
 #include <ztoolset/ztypetype.h>
-#include <ztoolset/zutfstrings.h>
+#include <ztoolset/utfvaryingstring.h>
 #include <ztoolset/zaierrors.h>
 #include <QDataStream> /* for Q_DECLARE_METATYPE */
 
@@ -237,14 +237,14 @@ public:  md5                Hash;        //!< unique hashcode value for the fiel
    * @param pFieldRootNode root node for field to load : must point to <field>
    * @param pCheckHash    if set, this option will induce a computation of hashcode and a comparizon with the existing one.
    *                      if comparizon do not match, a warning message is logged
-   * @param pErrorlog     Pointer to message logging object
+   * @param pErrorLog     Pointer to message logging object
    * @param pSeverity     Severity level to
    * @return ZS_SUCCESS if Ok,
    * ZS_XMLWARNING if a field had some warning(s)  but may be taken as valid
    * ZS_XMLMISREQ some required node(s) is/are missing
    * ZS_XMLINVROOTNAME <field> root node is missing in pFieldRootNode
    */
-  ZStatus fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, int &pErrored, int &pWarned, ZaiErrors* pErrorlog);
+  ZStatus fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, int &pErrored, int &pWarned, ZaiErrors* pErrorLog);
 
   FieldDesc_Export getFDExp();
 

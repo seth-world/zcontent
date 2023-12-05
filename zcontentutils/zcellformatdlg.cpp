@@ -3,6 +3,9 @@
 
 #include <zcontent/zindexedfile/zsearchparser.h>
 
+using namespace zbs;
+
+
 ZCellFormatDLg::ZCellFormatDLg(QWidget *parent) :
                                                 QDialog(parent),
                                                 ui(new Ui::ZCellFormatDLg)
@@ -20,12 +23,16 @@ ZCellFormatDLg::~ZCellFormatDLg()
 void
 ZCellFormatDLg::setup(int pCellFormat)
 {
-  int wBase = pCellFormat & ZCFMT_NumMask;
-  if (wBase & ZCFMT_NumHexa) {
-    ui->NumHexaRBn->setChecked(true);
+    zbs::ZCFMT_Type wBase = pCellFormat & ZCFMT_NumMask;
+    if (wBase & ZCFMT_NumHexa) {
+        ui->NumHexaRBn->setChecked(true);
   }
   else
     ui->NumStdRBn->setChecked(true);
+
+  if (pCellFormat & ZCFMT_PrefZType) {
+      ui->PrefixCBx->setChecked(true);
+  }
 
   wBase = pCellFormat & ZCFMT_DateMask;
 
@@ -70,14 +77,19 @@ ZCellFormatDLg::setAppliance(const char* pAppliance)
   ui->ApplianceLBl->setText(pAppliance);
 }
 
-int
+ZCFMT_Type
 ZCellFormatDLg::get()
 {
-  int wCellFormat=ZCFMT_Nothing;
+    ZCFMT_Type wCellFormat=ZCFMT_Nothing;
 /*
   if (ui->ApplyAllRBn->isChecked())
     wCellFormat |= ZCFMT_ApplyAll;
 */
+    if (ui->PrefixCBx->isChecked()) {
+      wCellFormat |= ZCFMT_PrefZType;
+    }
+
+
   /* general numeric */
   if (ui->NumHexaRBn->isChecked())
     wCellFormat |= ZCFMT_NumHexa;

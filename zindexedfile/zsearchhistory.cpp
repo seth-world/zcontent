@@ -34,7 +34,7 @@ ZStatus
 ZSearchHistory::loadHistory()
 {
   ZDataBuffer wContent;
-  utf8String wInst;
+  utf8VaryingString wInst;
   ZStatus wSt=Path.loadContent(wContent);
   if (wSt!=ZS_SUCCESS)
     return wSt;
@@ -61,13 +61,13 @@ ZSearchHistory::loadHistory()
 
 
 ZStatus
-ZSearchHistory::add(const utf8VaryingString& pInst)
+ZSearchHistory::add(const utf8VaryingString& pInst, InstructionFlag_type pFlag)
 {
-  /* remove trailing spaces \t \n characters */
 
-  if (pInst.isEmpty())
+  if ((pInst.isEmpty())||(pFlag==Forget))
     return ZS_EMPTY;
 
+  /* remove trailing spaces \t \n characters */
   utf8_t* wInst = pInst.duplicate();
   const utf8_t wSet[] = {'\t','\n','\r','\0'};
   unsigned char* wPtr = wInst + pInst.UnitCount -1;

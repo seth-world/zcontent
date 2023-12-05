@@ -124,7 +124,7 @@ ZRawRecord::prepareForWrite(ZDataBuffer& pContent)
 
 //  RawContent.appendData(&cst_ZBLOCKEND,sizeof(cst_ZBLOCKEND)); /* no need to indian convert */
 
-  if (ZVerbose)
+  if (BaseParameters->VerboseFileEngine())
     {
     fprintf (stdout,"ZRawRecord::prepareForWrite-I  raw record prepared presence bitset <%s> # keys <%ld> - user record content <%ld> total raw size <%ld>\n",
         FieldPresence.isNull()?"null":"mentionned",

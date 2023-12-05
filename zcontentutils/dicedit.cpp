@@ -1,11 +1,10 @@
 ﻿#include "dicedit.h"
 #include "ui_dicedit.h"
-
-#include <zcontentcommon/zgeneralparameters.h>
-
-#include <QStandardItemModel>
-
 #include <unistd.h>
+
+
+#include <zcontent/zcontentcommon/zgeneralparameters.h>
+#include <QStandardItemModel>
 
 #include <zrandomfile/zheadercontrolblock.h>
 #include <zrandomfile/zfilecontrolblock.h>
@@ -158,8 +157,9 @@ DicEditMWn::init() {
   ui->SourceURILBl->setText("");
 
   ErrorLog.setAutoPrintOn(ZAIES_Text);
+  ErrorLog.setStoreMinSeverity(ZAIES_Warning);
 //  ErrorLog.setDisplayCallback(std::bind(&DicEditMWn::displayErrorCallBack, this,_1));
-  ErrorLog.setDisplayColorCB(std::bind(&DicEditMWn::displayErrorColorCB, this,placeholders::_1,placeholders::_2));
+  ErrorLog.setDisplayColorCallBack(std::bind(&DicEditMWn::displayErrorColorCB, this,placeholders::_1,placeholders::_2));
 
   ui->ActiveCBx->addItem("Not active");
   ui->ActiveCBx->addItem("Active");
@@ -246,11 +246,13 @@ DicEditMWn::init() {
   generalGroup->addAction(parserQAc);
   generalMEn->addAction(parserQAc);
 
+
   generalMEn->addMenu(FloadMEn);
 
   generateMainMEn=new QMenu(QObject::tr("code generation","DicEdit"),this);
 
-  generalMEn->addMenu(generateMainMEn);
+  ui->menubar->addMenu(generateMainMEn);
+//  generalMEn->addMenu(generateMainMEn);
 
   generateQAc= new QAction(QObject::tr("generate","DicEdit"),generateMainMEn);
   generateQAc->setObjectName("generateQAc");
@@ -260,7 +262,8 @@ DicEditMWn::init() {
   genShowHideMEn = new QMenu(QObject::tr("Show / hide","DicEdit"),generateMainMEn);
 
   genFileMEn=new QMenu(QObject::tr("file generation","DicEdit"),this);
-  generalMEn->addMenu(genFileMEn);
+  ui->menubar->addMenu(genFileMEn);
+//  generalMEn->addMenu(genFileMEn);
 
   fileXmlGenQAc=new QAction(QObject::tr("xml file definition","DicEdit"),genFileMEn);
   genFileMEn->addAction(fileXmlGenQAc);
@@ -806,7 +809,7 @@ DicEditMWn::setupFieldFlexMenu()
 
 void DicEditMWn::fieldActionEvent(QAction* pAction)
 {
-  utf8String wMsg;
+  utf8VaryingString wMsg;
   if (pAction==FInsertQAc) {
     QModelIndex wIdx=fieldTBv->currentIndex();
     if (wIdx.isValid())
@@ -1049,7 +1052,7 @@ DicEditMWn::setupKeyFlexMenu()
 
 void DicEditMWn::keyActionEvent(QAction* pAction)
 {
-  utf8String wMsg;
+  utf8VaryingString wMsg;
   if (pAction==KInsertKeyQAc) {
     insertNewKey();
     return;
@@ -1411,7 +1414,7 @@ DicEditMWn:: renewDicFile(ZMFDictionary& pDic){
 void
 DicEditMWn::readWriteActionEvent(QAction*pAction)
 {
-  utf8String wMsg;
+  utf8VaryingString wMsg;
 
   /* common menu actions key and field menu */
 
@@ -1481,7 +1484,7 @@ DicEditMWn::readWriteActionEvent(QAction*pAction)
       return;
     getDicName(wMasterDic->Version,wMasterDic->Active, wMasterDic->DicName);         /* name meta dictionary */
 
-    utf8String wXmlDic=wMasterDic->XmlSaveToString(true); /* generate full xml definition */
+    utf8VaryingString wXmlDic=wMasterDic->XmlSaveToString(true); /* generate full xml definition */
 
     /* effective write to clipboard */
     QByteArray wBA (wXmlDic.toCChar());
@@ -1502,7 +1505,7 @@ DicEditMWn::readWriteActionEvent(QAction*pAction)
     {
     ZStatus wSt;
     ZMFDictionary wMasterDic;
-    utf8String wXmlContent;
+    utf8VaryingString wXmlContent;
     QClipboard *wClipboard = QGuiApplication::clipboard();
     const QMimeData * wMData=wClipboard->mimeData(QClipboard::Clipboard);
     if (wMData==nullptr)
@@ -1564,7 +1567,7 @@ DicEditMWn::readWriteActionEvent(QAction*pAction)
     ZMFDictionary* wMasterDic = screenToDic(nullptr);
     getDicName(wMasterDic->Version,wMasterDic->Active,wMasterDic->DicName);
 
-    utf8String wXmlDic=wMasterDic->XmlSaveToString(true);
+    utf8VaryingString wXmlDic=wMasterDic->XmlSaveToString(true);
 
     /* display xml content */
     textEditMWn* wTEx=new textEditMWn((QWidget*)this,
@@ -1603,7 +1606,7 @@ DicEditMWn::readWriteActionEvent(QAction*pAction)
     wMasterDic->ModificationDate = ZDateFull::currentDateTime();
     getDicName(wMasterDic->Version,wMasterDic->Active,wMasterDic->DicName);
 
-    utf8String wXmlDic=wMasterDic->XmlSaveToString(true);
+    utf8VaryingString wXmlDic=wMasterDic->XmlSaveToString(true);
 
     wOutFile.writeContent(wXmlDic);
 
@@ -2717,7 +2720,7 @@ QStandardItem* DicEditMWn::fieldChangeDLg( QStandardItem* pFieldItem) {
   int wRow=pFieldItem->row();
 
 //  QList<QStandardItem*> wItemRow = createFieldRowFromField(&pField);
-  utf8String wStr;
+  utf8VaryingString wStr;
   QList<QStandardItem*> wFieldRow;
   QVariant wV;
   ZDataReference wDRef(ZLayout_FieldTBv,getNewResource(ZEntity_DicField),0);
@@ -3208,7 +3211,7 @@ bool DicEditMWn::fieldAppendFromPinboard()
 /* replaces the values (displayed value and dictionary value) of a field at model index wIdx */
 void DicEditMWn::acceptFieldChange(ZFieldDescription& pField,QModelIndex &wIdx)
 {
-  utf8String wStr;
+  utf8VaryingString wStr;
 //  QModelIndex wIdx=fieldTBv->currentIndex();
   if (!wIdx.isValid()) {
     ui->statusBar->showMessage("No current row selected.",cst_MessageDuration);
@@ -4363,7 +4366,7 @@ DicEditMWn::loadXmlDictionary (const uriString& pXmlDic)
 void
 DicEditMWn::displayZMFDictionary(ZMFDictionary &pDic)
 {
-  utf8String wStr;
+  utf8VaryingString wStr;
   QVariant   wV;
   ZDataReference wDRef;
 
@@ -4422,7 +4425,7 @@ DicEditMWn::displayKeyDictionaries(ZMFDictionary &pDic)
 //  ZKeyHeaderRow* wKHR=nullptr;
 //  ZKeyFieldRow* wKFR=nullptr;
 
-  utf8String wStr;
+  utf8VaryingString wStr;
   QVariant   wV;
   ZDataReference wDRefKey , wDRefKeyField;
   QList<QStandardItem *> wKeyRow, wKeyFieldRow ;
@@ -4473,7 +4476,7 @@ DicEditMWn::displayKeyDictionaries(ZMFDictionary &pDic)
 bool
 DicEditMWn::updateKeyValues(const QModelIndex& pKeyIdx)
 {
-  utf8String wStr;
+  utf8VaryingString wStr;
   if (!pKeyIdx.isValid())
   {
     fprintf(stderr,"DicEdit::updateKeyValues-E-INVIDX Index is not valid.\n");
@@ -4724,7 +4727,7 @@ createKeyFieldRowFromFieldItem(QStandardItem* pFieldItem) {
  */
 
 QList<QStandardItem*> createFieldRowFromField(ZFieldDescription* pField) {
-  utf8String wStr;
+  utf8VaryingString wStr;
   QList<QStandardItem*> wFieldRow;
   QVariant wV;
   ZDataReference wDRef(ZLayout_FieldTBv,getNewResource(ZEntity_DicField),0);
@@ -4773,7 +4776,7 @@ QList<QStandardItem*> createFieldRowFromField(ZFieldDescription* pField) {
 }
 
 QStandardItem* setFieldRowFromField(QStandardItemModel *pModel, int pRow, ZFieldDescription& pField) {
-  utf8String wStr;
+  utf8VaryingString wStr;
   if (pModel->columnCount() < 10) {
     fprintf(stderr,"setRowFromField-E-IVCNT  Invalid number of QStandardItem within field row to update.\n");
     return nullptr;
@@ -4819,7 +4822,7 @@ QStandardItem* setFieldRowFromField(QStandardItemModel *pModel, int pRow, ZField
 }//setFieldRowFromField
 
 QStandardItem* DicEditMWn::changeFieldRowFromField(int pRow,ZFieldDescription& pField) {
-  utf8String wStr;
+  utf8VaryingString wStr;
   /* first delete infradata for item (pRow,0) : release resource and delete ZFieldDescription */
   QVariant wV=fieldTBv->ItemModel->item(pRow,0)->data(ZQtDataReference);
   ZDataReference wDRef = wV.value<ZDataReference>();

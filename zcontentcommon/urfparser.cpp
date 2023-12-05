@@ -1,5 +1,5 @@
-#include <zcontent/zcontentcommon/urfparser.h>
-#include <zcontentcommon/zresource.h>
+#include "urfparser.h"
+#include "urffield.h"
 #include <zcontentutils/zentity.h>
 //#include <ztoolset/zdate.h>
 #include <ztoolset/zdatefull.h>
@@ -7,7 +7,46 @@
 
 #include <ztoolset/zcharset.h>
 #include <zcontent/zcontentcommon/zresource.h>
+#include <ztoolset/zdatefull.h>
+#include <ztoolset/zaierrors.h>
 
+#include <zcontent/zindexedfile/zsearchdictionary.h>
+
+
+void URFParser::clear() {
+    Record.clear();
+    HashTime.clear();
+    //      resetPtr();
+    URFFieldList.clear();
+    Presence.clear();
+    URFDataSize=0;
+    AllFieldsPresent=false;
+    URFPS=URFPS_Nothing;
+//    MetaDic = nullptr;
+}
+
+void
+URFParser::resetPtr()
+{
+    ParserPtr=Record.Data;
+    ParserPtrEnd = Record.Data+Record.Size;
+}
+
+void
+URFParser::setRecord(const ZDataBuffer& pRecord)
+{
+    Record.setData(pRecord);
+    _setupRecord();
+}
+void
+URFParser::_setupRecord()
+{
+    HashTime.set(Record) ;
+    ParserPtr=Record.Data;
+    ParserPtrEnd = Record.Data+Record.Size;
+    URFPS = URFPS_RecordSet ;
+}
+#ifdef __OLDVERSION__
 ZStatus URFParser::set(const ZDataBuffer* pRecord) {
   Record = pRecord;
   URFFieldList.clear();
@@ -17,8 +56,7 @@ ZStatus URFParser::set(const ZDataBuffer* pRecord) {
   AllFieldsPresent=false;
   URFDataSize=0;
 
-  Ptr=Record->Data;
-  PtrEnd = Record->Data + Record->Size;
+  resetPtr();
 
   _importAtomic<ZTypeBase>(wZType,Ptr);
   while (true) {
@@ -42,9 +80,9 @@ ZStatus URFParser::set(const ZDataBuffer* pRecord) {
     } // if (wZType!=ZType_bitsetFull)
     /* if neither bitset nor bitsetfull is found then record is not properly formed */
     ZException.setMessage (_GET_FUNCTION_NAME_,
-        ZS_CORRUPTED,
-        Severity_Severe,
-        "Record appears to be malformed : neither ZBitset nor ZBitsetFull has been found.");
+                            ZS_CORRUPTED,
+                            Severity_Severe,
+                            "Record appears to be malformed : neither ZBitset nor ZBitsetFull has been found.");
     return  ZS_CORRUPTED;
   }// while true
 
@@ -55,69 +93,454 @@ ZStatus URFParser::set(const ZDataBuffer* pRecord) {
 }// set
 
 ZStatus URFParser::set(const ZDataBuffer& pRecord) {
-  return set(&pRecord);
+    clear();
+    setRecord(pRecord);
+
+    ZTypeBase wZType;
+
+/*
+    Ptr=Record.Data;
+    PtrEnd = Record.Data+Record.Size;
+*/
+    _importAtomic_KeepPtr<ZTypeBase>(wZType,ParserPtr);
+    while (true) {
+        if (wZType==ZType_bitset) {
+            ssize_t wS = Presence._importURF(ParserPtr);
+            if (wS < 0) {
+                ZException.setMessage (_GET_FUNCTION_NAME_,
+                                      ZS_CORRUPTED,
+                                      Severity_Severe,
+                                      "Record appears to be malformed.");
+                return  ZS_CORRUPTED;
+            }
+            break;
+        } // if (wZType==ZType_bitset)
+
+        /* bitset full is ok : nothing to do */
+        if (wZType==ZType_bitsetFull) {
+            AllFieldsPresent=true;
+            break;
+        } // if (wZType!=ZType_bitsetFull)
+        /* if neither bitset nor bitsetfull is found then record is not properly formed */
+        ZException.setMessage (_GET_FUNCTION_NAME_,
+                              ZS_CORRUPTED,
+                              Severity_Severe,
+                              "Record appears to be malformed : neither ZBitset nor ZBitsetFull has been found.");
+        return  ZS_CORRUPTED;
+    }// while true
+
+    /* second get user URF data size */
+    // _importAtomic<uint64_t>(URFDataSize,wPtr); // Deprecated
+
+    return ZS_SUCCESS;  /* done */
+
 }// set
 
-ZStatus URFParser::parse(const ZDataBuffer &pRecord, ZArray<URFField> &pFieldList) {
 
-  pFieldList.clear();
+ZStatus URFParser::parse(const ZDataBuffer &pRecord,const zbs::ZMetaDic* pDic,ZaiErrors* pErrorLog)
+{
+    ZStatus wSt = ZS_SUCCESS;
+    /* below set other pointers to nullptr */
+    clear();
+    setRecord(pRecord); /* save record and initializes pointers with saved record data */
 
-  ZTypeBase wZType;
-  int wRank=0;
-  bool    wAllFieldsPresent=false;
-  ZBitset wPresence;
+    ZTypeBase wZType;
+    int wRank = 0;
+//    const ZMetaDic* wMDic= pDic->getBaseMetaDic();
+    const zbs::ZMetaDic* wMDic = pDic;
 
+    _importAtomic_KeepPtr<ZTypeBase>(wZType, ParserPtr);
+    while (true) {
+        if (wZType == ZType_bitset) {
+            //            ParserPtr -= sizeof(ZTypeBase);
+            ssize_t wS = Presence._importURF(ParserPtr);
+            if (wS < 0) {
+                ZException.setMessage(_GET_FUNCTION_NAME_,
+                                      ZS_CORRUPTED,
+                                      Severity_Severe,
+                                      "Record appears to be malformed.");
+                if (pErrorLog!=nullptr) {
+                    pErrorLog->errorLog("URFParser::parse-E-INVBITS Record appears to be malformed: Cannot import Presence bit set.");
+                }
+                return ZS_CORRUPTED;
+            }
+            break;
+        } // if (wZType==ZType_bitset)
 
-  const unsigned char* wPtr=pRecord.Data;
-  const unsigned char* wPtrEnd = pRecord.Data + pRecord.Size;
-
-  _importAtomic<ZTypeBase>(wZType,wPtr);
-  while (true) {
-    if (wZType==ZType_bitset) {
-      wPtr -= sizeof(ZTypeBase);
-      ssize_t wS = wPresence._importURF(wPtr);
-      if (wS < 0) {
-        ZException.setMessage (_GET_FUNCTION_NAME_,
+        /* bitset full is ok : nothing to do */
+        if (wZType == ZType_bitsetFull) {
+            AllFieldsPresent = true;
+            break;
+        } // if (wZType!=ZType_bitsetFull)
+        /* if neither bitset nor bitsetfull is found then record is not properly formed */
+        ZException.setMessage(
+            _GET_FUNCTION_NAME_,
             ZS_CORRUPTED,
             Severity_Severe,
-            "Record appears to be malformed.");
-        return  ZS_CORRUPTED;
-      }
-      break;
-    } // if (wZType==ZType_bitset)
+            "Record appears to be malformed : neither ZBitset nor ZBitsetFull has been found.");
+        if (pErrorLog!=nullptr) {
+            pErrorLog->errorLog("URFParser::parse-E-CORRUPT Record appears to be malformed : neither ZBitset nor ZBitsetFull has been found.");
+        }
+        return ZS_CORRUPTED;
+    } // while true
 
-    /* bitset full is ok : nothing to do */
-    if (wZType==ZType_bitsetFull) {
-      wAllFieldsPresent=true;
-      break;
-    } // if (wZType!=ZType_bitsetFull)
-    /* if neither bitset nor bitsetfull is found then record is not properly formed */
-    ZException.setMessage (_GET_FUNCTION_NAME_,
-        ZS_CORRUPTED,
-        Severity_Severe,
-        "Record appears to be malformed : neither ZBitset nor ZBitsetFull has been found.");
-    return  ZS_CORRUPTED;
-  }// while true
+    URFField wField;
+    wField._URFParser=this;
+    wField.HashTime = HashTime;
 
+    URFPS = URFPS_PartiallyParsed ;
 
-  URFField wField;
-  while (wPtr < wPtrEnd) {
-    wField.Ptr = wPtr ;
-    if (!wPresence.test(wRank)) {
-      wField.Present = false;
-      wField.Size = 0 ;
+    while (ParserPtr < ParserPtrEnd) {
+        wSt = ZS_SUCCESS;
+        _importAtomic_KeepPtr<ZTypeBase>(wZType,ParserPtr);
+        if (!ZTypeExists(wZType)) {
+            if (pErrorLog)
+                pErrorLog->errorLog("URFParser::rawParse-E-INVTYP Invalid ZType found <0x%X> offset <%lld>. Searching next valid ZType.",
+                                    wZType, ParserPtr-Record.Data);
+            else
+                _DBGPRINT("URFParser::parse-E-INVTYP Invalid ZType found <0x%X> offset <%lld>. Searching next valid ZType.\n",
+                          wZType, ParserPtr-Record.Data);
+            wSt=URFField::searchNextValidZType(Record,ParserPtr,pErrorLog);
+            if (wSt!=ZS_FOUND) {
+                if (pErrorLog) {
+                    pErrorLog->errorLog("URFParser::parse-F-CORRUPT Cannot find a valid ZType status <%s>.Quitting parser process.",
+                                        decode_ZStatus(wSt));
+                }
+                else {
+                    _DBGPRINT("URFParser::parse-F-CORRUPT Cannot find a valid ZType status <%s>.Quitting parser process.\n",
+                              decode_ZStatus(wSt));
+                }
+                return wSt;
+            }// ! FOUND
+            continue;
+        } // if (!ZTypeExists(wZType))
+
+        wField.FieldPtr = ParserPtr;
+        wField.ZType=wZType;
+
+        _DBGPRINT("URFParser::parse-I-FLDNAM Parsing field  <%s> type <0x%X> <%s> rank %d.\n",
+                  wMDic->TabConst(wRank).getName().toString(),
+                  wMDic->TabConst(wRank).ZType,decode_ZType(wMDic->TabConst(wRank).ZType),
+                  wRank);
+
+        if (wField.ZType != wMDic->TabConst(wRank).ZType) {
+            _DBGPRINT("URFParser::parse-E-INVTYP Parsed type <0x%x> <%s> does not correspond to dictionary ZType <0x%x> <%s>.\n",
+                      wField.ZType , decode_ZType(wField.ZType),
+                      wMDic->TabConst(wRank).ZType,decode_ZType(wMDic->TabConst(wRank).ZType));
+        }
+
+        wField.HashTime = HashTime;
+        if ((!AllFieldsPresent) && (!Presence.test(wRank))) {
+            wField.Present = false;
+            wField.Size = 0;
+        } else {
+            wField.Present = true;
+            wSt = wField.setFromPtr(pRecord, ParserPtr, nullptr);
+        }
+        if (wSt != ZS_SUCCESS)
+            return wSt;
+        URFFieldList.push(wField);
+        wRank++;
+    } // while
+
+    // set(pRecord);
+    URFPS = URFPS_TotallyParsed ;
+    return ZS_SUCCESS; /* done */
+} // parse
+#endif // __OLDVERSION__
+
+ZStatus URFParser::parse(ZaiErrors* pErrorLog)
+{
+    ZStatus wSt = ZS_SUCCESS;
+
+    if(ParserPtr==nullptr) {
+        fprintf(stderr,"URFParser::parse-F-NULLPTR Parser main pointer cannot be nullptr.\n");
+        abort();
     }
-    else {
-    wField.Present = true;
-    wField.setFromPtr(wPtr);
+
+    URFFieldList.clear();
+
+    if ((URFPS == URFPS_Nothing)||(Record.isEmpty())) {
+            _DBGPRINT(" URFParser::parse-F-RECNULL Base URF record is empty or URF parser has not been set.\n")
+            abort();
+            exit(EXIT_FAILURE);
     }
-    pFieldList.push(wField);
-    wRank++;
-  } // while
+    if (MetaDic == nullptr) {
+        _DBGPRINT(" URFParser::parse-F-NULLDIC Parser Meta dictionary has not been set.\n")
+        abort();
+        exit(EXIT_FAILURE);
+    }
 
-  return ZS_SUCCESS;  /* done */
-}// parse
+    resetPtr();
 
+    ZTypeBase wZType;
+    int wRank = 0;
+
+    _importAtomic_KeepPtr<ZTypeBase>(wZType, ParserPtr);
+    while (true) {
+        if (wZType == ZType_bitset) {
+            //            ParserPtr -= sizeof(ZTypeBase);
+            ssize_t wS = Presence._importURF(ParserPtr);
+            if (wS < 0) {
+                ZException.setMessage(_GET_FUNCTION_NAME_,
+                                      ZS_CORRUPTED,
+                                      Severity_Severe,
+                                      "Record appears to be malformed.");
+                if (pErrorLog!=nullptr) {
+                    pErrorLog->errorLog("URFParser::parse-E-INVBITS Record appears to be malformed: Cannot import Presence bit set.");
+                }
+                return ZS_CORRUPTED;
+            }
+            break;
+        } // if (wZType==ZType_bitset)
+
+        /* bitset full is ok : nothing to do */
+        if (wZType == ZType_bitsetFull) {
+            AllFieldsPresent = true;
+            break;
+        } // if (wZType!=ZType_bitsetFull)
+        /* if neither bitset nor bitsetfull is found then record is not properly formed */
+        ZException.setMessage(
+            _GET_FUNCTION_NAME_,
+            ZS_CORRUPTED,
+            Severity_Severe,
+            "Record appears to be malformed : neither ZBitset nor ZBitsetFull has been found.");
+        if (pErrorLog!=nullptr) {
+            pErrorLog->errorLog("URFParser::parse-E-CORRUPT Record appears to be malformed : neither ZBitset nor ZBitsetFull has been found.");
+        }
+        return ZS_CORRUPTED;
+    } // while true
+
+    URFField wField;
+    wField._URFParser=this;
+    wField.HashTime = HashTime;
+
+    URFPS = URFPS_PartiallyParsed ;
+
+    while (ParserPtr < ParserPtrEnd) {
+        wSt = ZS_SUCCESS;
+        _importAtomic_KeepPtr<ZTypeBase>(wZType,ParserPtr);
+        if (!ZTypeExists(wZType)) {
+            if (pErrorLog)
+                pErrorLog->errorLog("URFParser::rawParse-E-INVTYP Invalid ZType found <0x%X> offset <%lld>. Searching next valid ZType.",
+                                    wZType, ParserPtr-Record.Data);
+            else
+                _DBGPRINT("URFParser::parse-E-INVTYP Invalid ZType found <0x%X> offset <%lld>. Searching next valid ZType.\n",
+                          wZType, ParserPtr-Record.Data);
+            wSt=URFField::searchNextValidZType(Record,ParserPtr,pErrorLog);
+            if (wSt!=ZS_FOUND) {
+                if (pErrorLog) {
+                    pErrorLog->errorLog("URFParser::parse-F-CORRUPT Cannot find a valid ZType status <%s>.Quitting parser process.",
+                                        decode_ZStatus(wSt));
+                }
+                else {
+                    _DBGPRINT("URFParser::parse-F-CORRUPT Cannot find a valid ZType status <%s>.Quitting parser process.\n",
+                              decode_ZStatus(wSt));
+                }
+                return wSt;
+            }// ! FOUND
+            continue;
+        } // if (!ZTypeExists(wZType))
+
+        wField.FieldPtr = ParserPtr;
+        wField.ZType=wZType;
+
+        _DBGPRINT("URFParser::parse-I-FLDNAM Parsing field  <%s> type <0x%X> <%s> rank %d.\n",
+                  MetaDic->TabConst(wRank).getName().toString(),
+                  MetaDic->TabConst(wRank).ZType,decode_ZType(MetaDic->TabConst(wRank).ZType),
+                  wRank);
+
+        if (wField.ZType != MetaDic->TabConst(wRank).ZType) {
+            _DBGPRINT("URFParser::parse-E-INVTYP Parsed type <0x%x> <%s> does not correspond to dictionary ZType <0x%x> <%s>.\n",
+                      wField.ZType , decode_ZType(wField.ZType),
+                      MetaDic->TabConst(wRank).ZType,decode_ZType(MetaDic->TabConst(wRank).ZType));
+        }
+
+        wField.HashTime = HashTime;
+        if ((!AllFieldsPresent) && (!Presence.test(wRank))) {
+            wField.Present = false;
+            wField.Size = 0;
+        } else {
+            wField.Present = true;
+            wSt = wField.setFromPtr(Record, ParserPtr, nullptr);
+        }
+        if (wSt != ZS_SUCCESS)
+            return wSt;
+        URFFieldList.push(wField);
+        wRank++;
+    } // while
+
+
+    URFPS = URFPS_TotallyParsed ;
+    return ZS_SUCCESS; /* done */
+} // parse
+
+
+ZStatus URFParser::rawParse(const ZDataBuffer &pRecord,ZaiErrors* pErrorLog)
+{   
+    ZStatus wSt = ZS_SUCCESS;
+    /* below set other pointers to nullptr */
+    clear();
+    setRecord(pRecord); /* save record and initializes pointers with saved record data */
+
+    ZTypeBase wZType;
+    int wRank = 0;
+
+    _importAtomic_KeepPtr<ZTypeBase>(wZType, ParserPtr);
+    while (true) {
+        if (wZType == ZType_bitset) {
+//            ParserPtr -= sizeof(ZTypeBase);
+            ssize_t wS = Presence._importURF(ParserPtr);
+            if (wS < 0) {
+                ZException.setMessage(_GET_FUNCTION_NAME_,
+                                      ZS_CORRUPTED,
+                                      Severity_Severe,
+                                      "Record appears to be malformed.");
+                if (pErrorLog!=nullptr) {
+                    pErrorLog->errorLog("URFParser::rawParse-E-INVBITS Record appears to be malformed: Cannot import Presence bit set.");
+                }
+                return ZS_CORRUPTED;
+            }
+            break;
+        } // if (wZType==ZType_bitset)
+
+        /* bitset full is ok : nothing to do */
+        if (wZType == ZType_bitsetFull) {
+            AllFieldsPresent = true;
+            break;
+        } // if (wZType!=ZType_bitsetFull)
+        /* if neither bitset nor bitsetfull is found then record is not properly formed */
+        ZException.setMessage(
+            _GET_FUNCTION_NAME_,
+            ZS_CORRUPTED,
+            Severity_Severe,
+            "Record appears to be malformed : neither ZBitset nor ZBitsetFull has been found.");
+        if (pErrorLog!=nullptr) {
+            pErrorLog->errorLog("URFParser::rawParse-E-CORRUPT Record appears to be malformed : neither ZBitset nor ZBitsetFull has been found.");
+        }
+        return ZS_CORRUPTED;
+    } // while true
+
+    URFField wField;
+    wField._URFParser=this;
+    wField.HashTime = HashTime;
+
+    URFPS = URFPS_PartiallyParsed;
+
+    while (ParserPtr < ParserPtrEnd) {
+        wSt = ZS_SUCCESS;
+        _importAtomic_KeepPtr<ZTypeBase>(wZType,ParserPtr);
+        if (!ZTypeExists(wZType)) {
+            if (pErrorLog)
+                pErrorLog->errorLog("URFParser::rawParse-E-INVTYP Invalid ZType found <0x%X> offset <%lld>. Searching next valid ZType.",
+                                   wZType, ParserPtr-Record.Data);
+            else
+                _DBGPRINT("URFParser::rawParse-E-INVTYP Invalid ZType found <0x%X> offset <%lld>. Searching next valid ZType.\n",
+                          wZType, ParserPtr-Record.Data);
+            wSt=URFField::searchNextValidZType(Record,ParserPtr,pErrorLog);
+            if (wSt!=ZS_FOUND) {
+                if (pErrorLog) {
+                    pErrorLog->errorLog("URFParser::rawParse-F-CORRUPT Cannot find a valid ZType status <%s>.Quitting parser process.",
+                              decode_ZStatus(wSt));
+                }
+                else {
+                    _DBGPRINT("URFParser::rawParse-F-CORRUPT Cannot find a valid ZType status <%s>.Quitting parser process.\n",
+                              decode_ZStatus(wSt));
+                }
+                return wSt;
+            }// ! FOUND
+            continue;
+        } // if (!ZTypeExists(wZType))
+
+        wField.FieldPtr = ParserPtr;
+        wField.ZType=wZType;
+        wField.HashTime = HashTime;
+        if ((!AllFieldsPresent) && (!Presence.test(wRank))) {
+            wField.Present = false;
+            wField.Size = 0;
+        } else {
+            wField.Present = true;
+            wSt = wField.setFromPtr(pRecord, ParserPtr, nullptr);
+        }
+        if (wSt != ZS_SUCCESS)
+            return wSt;
+        URFFieldList.push(wField);
+        wRank++;
+    } // while
+
+    // set(pRecord);
+
+    URFPS = URFPS_TotallyParsed;
+
+    return ZS_SUCCESS; /* done */
+} // rawParse
+
+
+ZStatus URFParser::rawParse(const ZDataBuffer &pRecord,
+                         ZArray<URFField> &pFieldList,
+                         ZaiErrors *pErrorLog)
+{
+    ZStatus wSt = ZS_SUCCESS;
+    pFieldList.clear();
+
+    ZTypeBase wZType;
+    int wRank = 0;
+    bool    wAllFieldsPresent=false;
+    ZBitset wPresence;
+
+    //  const unsigned char* wPtr=Record.Data;
+    const unsigned char *wPtr = pRecord.Data;
+    const unsigned char *wPtrEnd = pRecord.Data + pRecord.Size;
+
+    _importAtomic<ZTypeBase>(wZType, wPtr);
+    while (true) {
+        if (wZType == ZType_bitset) {
+            wPtr -= sizeof(ZTypeBase);
+            ssize_t wS = wPresence._importURF(wPtr);
+            if (wS < 0) {
+                ZException.setMessage(_GET_FUNCTION_NAME_,
+                                      ZS_CORRUPTED,
+                                      Severity_Severe,
+                                      "Record appears to be malformed.");
+                return ZS_CORRUPTED;
+            }
+            break;
+        } // if (wZType==ZType_bitset)
+
+        /* bitset full is ok : nothing to do */
+        if (wZType == ZType_bitsetFull) {
+            wAllFieldsPresent = true;
+            break;
+        } // if (wZType!=ZType_bitsetFull)
+        /* if neither bitset nor bitsetfull is found then record is not properly formed */
+        ZException.setMessage(
+            _GET_FUNCTION_NAME_,
+            ZS_CORRUPTED,
+            Severity_Severe,
+            "Record appears to be malformed : neither ZBitset nor ZBitsetFull has been found.");
+        return ZS_CORRUPTED;
+    } // while true
+
+    URFField wField;
+    while (wPtr < wPtrEnd) {
+        wSt = ZS_SUCCESS;
+
+        wField.FieldPtr = wPtr;
+        if ((!wAllFieldsPresent) && (!wPresence.test(wRank))) {
+            wField.Present = false;
+            wField.Size = 0;
+        } else {
+            wField.Present = true;
+            wSt = wField.setFromPtr(pRecord, wPtr, pErrorLog);
+        }
+        if (wSt != ZS_SUCCESS)
+            return wSt;
+        pFieldList.push(wField);
+        wRank++;
+    } // while
+
+    return ZS_SUCCESS; /* done */
+} // parse --static--
 
 ZStatus
 URFParser::appendURFFieldByRank (long pRank,ZDataBuffer pBuffer){
@@ -128,17 +551,17 @@ URFParser::appendURFFieldByRank (long pRank,ZDataBuffer pBuffer){
 
   if (wRank < URFFieldList.count()) {
     if (URFFieldList[wRank].Present) {
-      pBuffer.appendData(URFFieldList[wRank].Ptr,URFFieldList[wRank].Size);
+      pBuffer.appendData(URFFieldList[wRank].FieldPtr,URFFieldList[wRank].Size);
       return ZS_SUCCESS;
     }
 
     return ZS_FIELDMISSING;
   }// if (wRank < URFFieldList.count())
 
-  while ((Ptr < PtrEnd )&&(wRank <= pRank)) {
+  while ((ParserPtr < ParserPtrEnd )&&(wRank <= pRank)) {
 
     if ( (!AllFieldsPresent) && !(Presence.test(size_t(wRank)) ) ) {
-      wField.Ptr = Ptr ;
+      wField.FieldPtr = ParserPtr ;
       wField.Size = 0 ;
       wField.Present = false;
 
@@ -151,12 +574,12 @@ URFParser::appendURFFieldByRank (long pRank,ZDataBuffer pBuffer){
     } // field not present
 
     /* here field is present or all fields are declared to be present (ZBitsetFull) */
-    wField.Ptr = Ptr;
+    wField.FieldPtr = ParserPtr;
     wField.Present = true;
-    wField.Size = getURFFieldSize(Ptr);
+    wField.Size = getURFFieldSize(ParserPtr);
     URFFieldList << wField;
     if (wRank == pRank){
-      pBuffer.appendData(URFFieldList[wRank].Ptr,URFFieldList[wRank].Size);
+      pBuffer.appendData(URFFieldList[wRank].FieldPtr,URFFieldList[wRank].Size);
       return ZS_SUCCESS;
     }
     wRank++;
@@ -164,155 +587,158 @@ URFParser::appendURFFieldByRank (long pRank,ZDataBuffer pBuffer){
       /* if ZType is unknown, then field is stored with size = -1, pointer as it is.
        * pointer is then searched for next known ZType (Found) or until the end of record (not Found).
        */
-      wSt=searchNextValidZType(Ptr,PtrEnd);
+      wSt=searchNextValidZType(ParserPtr,ParserPtrEnd);
       if (wSt==ZS_NOTFOUND)
         break;
       continue;
     }
-    Ptr += wField.Size;
+    ParserPtr += wField.Size;
     continue;
   } // while
 
   return ZS_SUCCESS;
 }
 
+ZStatus URFParser::getURFFieldByRankIncremental(long pRank,
+                                                URFField &pField)
+{
+    ZStatus wSt = ZS_MISS_FIELD;
+    pField.clear();
+    //  const unsigned char* wPtr=pData.Data;
+    //  const unsigned char* wPtrEnd=pData.Data+pData.Size;
+    long wRank = URFFieldList.count();
+    URFField wField;
 
-URFField
-URFParser::getURFFieldByRankIncremental (long pRank){
-  ZStatus   wSt = ZS_NOTFOUND;
+    if (pRank < URFFieldList.count()) {
+        pField =  URFFieldList[pRank];
+        return ZS_SUCCESS;
+    } // if (pRank < URFFieldList.count())
 
-//  const unsigned char* wPtr=pData.Data;
-//  const unsigned char* wPtrEnd=pData.Data+pData.Size;
-  long wRank=0;
-  URFField wField;
+    while ((ParserPtr < ParserPtrEnd) && (wRank <= pRank)) {
+        if ((!AllFieldsPresent) && !(Presence.test(size_t(wRank)))) {
+            wField.FieldPtr = ParserPtr;
+            wField.Size = 0;
+            wField.Present = false;
+            URFFieldList << wField;
+            if (wRank == pRank) {
+                return ZS_MISS_FIELD;
+            }
+            wRank++;
+            continue;
+        } // if ((!AllFieldsPresent) && !(Presence.test(size_t(wRank))))
 
-  if (wRank < URFFieldList.count()) {
-    return URFFieldList[wRank];
-  }// if (wRank < URFFieldList.count())
+        /* here field is present or all fields are declared to be present */
+        wField.FieldPtr = ParserPtr;
 
-  while ((Ptr < PtrEnd )&&(wRank <= pRank)) {
+        const unsigned char *pPtrIn = ParserPtr;
+        _importAtomic<ZTypeBase>(wField.ZType, pPtrIn);
 
-    if ( (!AllFieldsPresent) && !(Presence.test(size_t(wRank)) ) ) {
-        wField.Ptr = Ptr ;
-        wField.Size = 0 ;
-        wField.Present = false;
+        ssize_t wFieldSize = getURFFieldSize(ParserPtr); /* gets the total field size including field header */
+
+        if (wFieldSize < 0) {
+            /* if ZType is unknown, then field is stored with size = 0, pointer as it is.
+             * pointer is then searched for next known ZType (Found) or until the end of record (not Found).
+             */
+            wField.Size = 0;
+            wSt = searchNextValidZType(ParserPtr, ParserPtrEnd);
+            if (wSt != ZS_FOUND)
+                return wSt;
+            continue;
+        }
+        ParserPtr += wFieldSize;
+        wField.Size = size_t(wFieldSize);
+        wField.Present = true;
+
         URFFieldList << wField;
-        if (wRank == pRank)
-          break;
+        if (wRank == pRank) {  /* field is extracted and stored in list. NB field list is used for further research in same record */
+            break;
+        }
         wRank++;
-        continue;
+    } // while
+
+/*  This case is managed within searchNextValidZType that returns ZS_OUTBOUND if no valid field type found till end of record
+    if (Ptr >= PtrEnd) {
+        return ZS_OUTBOUNDHIGH;
     }
+*/
+    pField =  URFFieldList[pRank];
+    URFPS = URFPS_PartiallyParsed;
+    return ZS_SUCCESS;
+} // getURFFieldByRankIncremental
 
-    /* here field is present or all fields are declared to be present */
-    wField.Ptr = Ptr;
 
-    const unsigned char* pPtrIn = Ptr;
-    _importAtomic<ZTypeBase>(wField.ZType,pPtrIn);
 
-    ssize_t wS=getURFFieldSize(Ptr);
 
-    if (wS<0) {
-    /* if ZType is unknown, then field is stored with size = 0, pointer as it is.
-     * pointer is then searched for next known ZType (Found) or until the end of record (not Found).
-     */
-    wField.Size = 0;
-    wSt=searchNextValidZType(Ptr,PtrEnd);
-    continue;
-    }
-
-    wField.Size=size_t(wS);
-    wField.Present = true;
-
-    URFFieldList << wField;
-    if (wRank == pRank) {
-      break;
-    }
-    wRank++;
-  } // while
-
-  if (wRank == pRank) {
-    return URFFieldList[pRank];
-  }
-
-  return URFField();
-} // getURFFieldByRank
-
-ZDataBuffer
-URFParser::getURFFieldByRank (long pRank){
+ZStatus
+URFParser::_getURFFieldByRank (long pRank,URFField& pField){
   ZStatus   wSt = ZS_NOTFOUND;
-  ZDataBuffer wFieldValue;
 
-  //  const unsigned char* wPtr=pData.Data;
-  //  const unsigned char* wPtrEnd=pData.Data+pData.Size;
   long wRank=0;
-  URFField wField;
+  pField.clear();
 
-  if (wRank < URFFieldList.count()) {
-    if (URFFieldList[wRank].Present) {
-      wFieldValue.setData(URFFieldList[wRank].Ptr,URFFieldList[wRank].Size);
-      return wFieldValue;
-    }
-    wFieldValue.clear();
-    return wFieldValue;
-  }// if (wRank < URFFieldList.count())
+  if (pRank < URFFieldList.count()) {
+      pField = URFFieldList[pRank];
+      return ZS_SUCCESS;
+  }// if (pRank < URFFieldList.count())
 
-  while ((Ptr < PtrEnd )&&(wRank <= pRank)) {
+  while ((ParserPtr < ParserPtrEnd )&&(wRank <= pRank)) {
 
     if ( (!AllFieldsPresent) && !(Presence.test(size_t(wRank)) ) ) {
-      wField.Ptr = Ptr ;
-      wField.Size = 0 ;
-      wField.Present = false;
-      URFFieldList << wField;
-      if (wRank == pRank)
-        break;
+      pField.FieldPtr = ParserPtr ;
+      pField.Size = 0 ;
+      pField.Present = false;
+      URFFieldList << pField;
+      if (wRank == pRank) {
+ //       pField = URFFieldList[wRank];
+        return ZS_MISS_FIELD;
+      }
       wRank++;
       continue;
     }
 
     /* here field is present or all fields are declared to be present */
-    wField.Ptr = Ptr;
-    wField.Present = true;
+    pField.FieldPtr = ParserPtr;
+    pField.Present = true;
 
-    ssize_t wS=getURFFieldSize(Ptr);
+    ssize_t wS=getURFFieldSize(ParserPtr);
 
 
     /* if ZType is unknown (returned size == -1), then field is stored with size = 0, pointer as it is.
        * pointer is then searched for next known ZType (Found) or until the end of record (not Found).
        */
     if (wS<0) {
-      wField.Size = 0;
+      pField.Size = 0;
     }
     else {
-      wField.Size = size_t(wS);
+      pField.Size = size_t(wS);
     }
-    URFFieldList << wField;
-    wSt=searchNextValidZType(Ptr,PtrEnd);
-    if (wRank == pRank)
-      break;
+    URFFieldList << pField;
+    wSt=searchNextValidZType(ParserPtr,ParserPtrEnd);
+    if (wRank == pRank) {
+        return ZS_SUCCESS;
+    }
     wRank++;
   } // while
 
-  if (wRank == pRank) {
-    wSt=getKeyFieldValue(Ptr,wFieldValue);
+  return ZS_OUTBOUNDHIGH;
 
-    return wFieldValue;
-  }
-
-  return ZDataBuffer();
-} // getURFFieldByRank
+} // _getURFFieldByRank
 
 
 
-ZStatus searchNextValidZType( const unsigned char* &pPtr,const unsigned char* wPtrEnd)
+ZStatus searchNextValidZType( const unsigned char* &pPtr,const unsigned char* pPtrEnd)
 {
   ZStatus wSt=ZS_SUCCESS;
 
   ZTypeBase wZType = reverseByteOrder_Ptr<ZTypeBase>(pPtr);
 
-  while (!ZTypeExists(wZType) && (pPtr < wPtrEnd)) {
+  while (!ZTypeExists(wZType) && (pPtr < pPtrEnd)) {
     pPtr++;
     wZType=reverseByteOrder_Ptr<ZTypeBase>(pPtr);
   }
+
+  if (pPtr >= pPtrEnd)
+      return ZS_OUTBOUNDHIGH;
 
   if (ZTypeExists(wZType)) {
     return ZS_FOUND;
@@ -323,17 +749,34 @@ ZStatus searchNextValidZType( const unsigned char* &pPtr,const unsigned char* wP
 
 bool
 ZTypeExists(ZTypeBase pType) {
-  if (pType & ZType_Atomic)
-    pType &= ~ZType_Atomic;
+//  if (pType & ZType_Atomic)
+//    pType &= ~ZType_Atomic;
 
   switch (pType) {
+
+  case ZType_AtomicChar:
+  case ZType_AtomicUChar:
+  case ZType_AtomicU8:
+  case ZType_AtomicS8:
+  case ZType_AtomicU16:
+  case ZType_AtomicS16:
+
+  case ZType_AtomicU32:
+  case ZType_AtomicS32:
+  case ZType_AtomicU64:
+  case ZType_AtomicS64:
+  case ZType_AtomicFloat:
+  case ZType_AtomicDouble:
+  case ZType_AtomicLDouble:
+      return true;
+
+
   case ZType_Char:
   case ZType_UChar:
   case ZType_U8:
   case ZType_S8:
   case ZType_U16:
   case ZType_S16:
-
   case ZType_U32:
   case ZType_S32:
   case ZType_U64:
@@ -344,24 +787,23 @@ ZTypeExists(ZTypeBase pType) {
     return true;
 
 
-  case ZType_ZDate:
-  case ZType_ZDateFull:
+//  case ZType_ZDate:
+
+  case ZType_URIString:
 
   case ZType_Utf8VaryingString:
-
   case ZType_Utf16VaryingString:
   case ZType_Utf32VaryingString:
-
   case ZType_Utf8FixedString:
-
   case ZType_Utf16FixedString:
-
   case ZType_Utf32FixedString:
 
+  case ZType_ZDateFull:
+  case ZType_Resource:
   case ZType_CheckSum:
   case ZType_MD5:
+      return true;
 
-  case ZType_Resource:
 
   case ZType_bitset:
   case ZType_bitsetFull:
@@ -1292,23 +1734,6 @@ URFParser::displayOneURFField(const unsigned char* &wPtr,bool pShowZType) {
   }
 
     /* from here <wPtr -= sizeof(ZTypeBase);>  has been made and wPtr points on ZType */
-/* Deprecated
-  case ZType_ZDate: {
-    ssize_t wSize;
-    ZDate wZDate;
-    if ((wSize = wZDate._importURF(wPtr)) < 0) {
-      if (pShowZType)
-        wReturn = "ZDate[**Invalid value**]" ;
-      else
-        wReturn = "**Invalid value**" ;
-      return wReturn;
-    }
-    if (!pShowZType)
-      return wZDate.toLocale();
-    wReturn.sprintf("ZDate[%s]",wZDate.toLocale().toCChar());
-    return wReturn;
-  }
-*/
   case ZType_ZDateFull: {
     ssize_t wSize;
     ZDateFull wZDateFull;
@@ -1518,7 +1943,7 @@ URFParser::displayOneURFField(const unsigned char* &wPtr,bool pShowZType) {
   }
 
   default: {
-    wReturn.sprintf("Unknown data type[----]");
+    wReturn.sprintf("Unknown data type[%d %X]",wZType,wZType);
     return wReturn;
   }
 
@@ -1665,6 +2090,25 @@ int URFCompareValues( const unsigned char* &pURF1,size_t pSize1,
     /* both are equal in values and sizes (sizes are exhausted) */
   return 0;
 }// URFCompareValues
+
+
+
+const char* decode_URFPS (URFParserState pURFPS)
+{
+    switch (pURFPS)
+    {
+    case URFPS_Nothing:
+        return "URFPS_Nothing";
+    case URFPS_RecordSet:
+        return "URFPS_RecordSet";
+    case URFPS_PartiallyParsed:
+        return "URFPS_PartiallyParsed";
+    case URFPS_TotallyParsed:
+        return "URFPS_TotallyParsed";
+    default:
+        return "invalid/unknown URFPS";
+    }
+}
 
 
 #ifdef __COMMENT__

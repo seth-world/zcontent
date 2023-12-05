@@ -52,13 +52,6 @@ class ZMetaDic : public ZArray <ZFieldDescription>
 {
 public:
     typedef ZArray <ZFieldDescription> _Base ;
-#ifdef __DEPRECATED__
-    utf8VaryingString DicName;         /* name of the entity described by meta dic */
-    unsigned long     Version = 1000000UL;
-    ZDateFull         CreationDate;
-    ZDateFull         ModificationDate;
-    checkSum *        CheckSum=nullptr;/* to check if meta dictionary has changed or not */
-#endif // __DEPRECATED__
 
     ZMetaDic() ;
  //   ~ZMetaDic() { zdelete (CheckSum) ;}
@@ -72,27 +65,6 @@ public:
     ZMetaDic(const ZMetaDic&& pIn) {_copyFrom(pIn);}
     ZMetaDic&  operator = (const ZMetaDic& pIn) { return _copyFrom(pIn); }
 
-#ifdef __DEPRECATED__
-    void setDicName(const utf8String& pName) {DicName=pName;}
-
-    void setVersion(unsigned int pVersion,unsigned int pMajor,unsigned int pMinor)
-      {
-      Version=pVersion*1000000;
-      Version+=pMajor*1000;
-      Version+=pMinor;
-      }
-
-    checkSum* getCheckSum(void) {return CheckSum;}
-    void generateCheckSum (void)
-            {
-            ZDataBuffer wMetaDic;
-            _exportAppendMetaDicFlat(wMetaDic);
-            if (CheckSum!=nullptr)
-                    delete CheckSum;
-            CheckSum=wMetaDic.newcheckSum();
-            return;
-            }
-#endif // __DEPRECATED__
 
     void insertField(ZFieldDescription &pFieldDef,const long pRank) {insert(pFieldDef,pRank);}
     void addField(ZFieldDescription &pFieldDef){push(pFieldDef);}
@@ -101,21 +73,21 @@ public:
 
     void print (FILE* pOutput=stdout);
 
-    ZStatus addField (const utf8String &pFieldName,
+    ZStatus addField (const utf8VaryingString &pFieldName,
                      const ZTypeBase pType,
                      const size_t pNaturalSize,
                      const size_t pUniversalSize,
                      const URF_Array_Count_type pArrayCount);
     template <class _Tp>
-    ZStatus addField_T (const utf8String &pFieldName);
-    ZStatus removeFieldByName (const utf8String &pFieldName);
+    ZStatus addField_T (const utf8VaryingString &pFieldName);
+    ZStatus removeFieldByName (const utf8VaryingString &pFieldName);
 /*    ZStatus removeFieldByName(const utf8_t *pFieldName)
     {
         return removeFieldByName((const char *) pFieldName);
     }*/
     ZStatus removeFieldByRank (const long pFieldRank);
 
-    zrank_type searchFieldByName(const utf8String &pFieldName) const ;
+    zrank_type searchFieldByName(const utf8VaryingString &pFieldName) const ;
 
     zrank_type searchFieldByHash(const md5& pHash) const ;
 
@@ -123,11 +95,11 @@ public:
 #define getFieldByName searchFieldByName
 
     /** @brief XmlSaveToString  saves the meta dictionary alone without defined keys */
-    utf8String XmlSaveToString(bool pComment);
+    utf8VaryingString XmlSaveToString(bool pComment);
 
     utf8VaryingString toXml(int pLevel, bool pComment=false);
 
-    ZStatus XmlLoadFromString(const utf8String &pXmlString, bool pCheckHash, ZaiErrors* pErrorLog);
+    ZStatus XmlLoadFromString(const utf8VaryingString &pXmlString, bool pCheckHash, ZaiErrors* pErrorLog);
 
     ZStatus fromXml(zxmlNode* pMetaDicRootNode, bool pCheckHash, ZaiErrors* pErrorlog);
 
@@ -145,7 +117,7 @@ public:
 
 template <class _Tp> // template needs to be expanded here
 ZStatus
-ZMetaDic::addField_T (const utf8String& pFieldName)
+ZMetaDic::addField_T (const utf8VaryingString& pFieldName)
 {
 ZStatus wSt;
 size_t wNaturalSize=0, wUniversalSize=0;

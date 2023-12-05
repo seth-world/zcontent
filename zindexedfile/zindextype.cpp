@@ -1342,7 +1342,7 @@ return ZS_SUCCESS;
 
 /** @} */ // ZKeyGroup
 
-utfdescString ZStringBuffer;
+utf8VaryingString ZStringBuffer;
 
 /**
  * @brief decode_ZType decode the ZType_type value given as a long into a human readable string

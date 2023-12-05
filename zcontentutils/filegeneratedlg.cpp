@@ -66,6 +66,12 @@
 
 #include "zmfprogressmwn.h"
 
+//#include "zcontentvisumain.h"
+#include "zentrypoint.h"
+
+#include <zcontent/zindexedfile/zmetadic.h>
+#include <zcontent/zindexedfile/zkeydictionary.h>
+
 const QColor ErroredQCl=Qt::red;
 const QColor WarnedQCl=Qt::darkGreen;
 
@@ -194,7 +200,7 @@ FileGenerateMWn::initLayout() {
   QMenu* ApplySaveMEn = new QMenu("Apply-Save");
   GenMenuBar->addMenu(ApplySaveMEn);
 
-  GenFileQAc=new QAction("Generate master file" ,GenMEn);
+  GenFileQAc=new QAction("Create master file" ,GenMEn);
 
   TestRunQAc=new QAction("Test run",GenMEn);
   TestRunQAc->setCheckable(true);
@@ -450,11 +456,7 @@ FileGenerateMWn::initLayout() {
 
   HideGuessBTn=new QPushButton(verticalLayoutWidget);
   uriString wURIIC1;
-  /*
-  const char* wIc=getenv(__PARSER_ICON_DIRECTORY__);
-  if (!wIc)
-    wIc="";
-  */
+
   wURIIC1 = GeneralParameters.getIconDirectory();
   wURIIC1.addConditionalDirectoryDelimiter();
   wURIIC1 += "errorcross.png";
@@ -823,7 +825,7 @@ FileGenerateMWn::dataSetupFromMasterFile(const uriString& pURIMaster) {
 
 
 ZStatus FileGenerateMWn::XmlDefinitionSave(uriString &pXmlFile, bool pComment) {
-  utf8String wReturn = fmtXMLdeclaration();
+  utf8VaryingString wReturn = fmtXMLdeclaration();
   int wLevel=0;
   wReturn += fmtXMLnodeWithAttributes("zicm","version",__ZRF_XMLVERSION_CONTROL__,0);
 
@@ -946,7 +948,7 @@ ZStatus FileGenerateMWn::XmlDefinitionSave(uriString &pXmlFile, bool pComment) {
 
 
 ZStatus
-FileGenerateMWn::XmlDefinitionLoad(const utf8VaryingString& pXmlContent, ZaiErrors* pErrorlog) {
+FileGenerateMWn::XmlDefinitionLoad(const utf8VaryingString& pXmlContent, ZaiErrors* pErrorLog) {
 
   MasterFileValues wZMFVal;
 
@@ -961,25 +963,20 @@ FileGenerateMWn::XmlDefinitionLoad(const utf8VaryingString& pXmlContent, ZaiErro
 
   utf8VaryingString wValue;
 
-  pErrorlog->setContext("FileGenerateDLg::XmlLoad");
+  pErrorLog->setContext("FileGenerateDLg::XmlLoad");
 
   wDoc = new zxmlDoc;
-  wSt = wDoc->ParseXMLDocFromMemory(pXmlContent.toCChar(), pXmlContent.getUnitCount(), nullptr, 0);
-  if (wSt != ZS_SUCCESS) {
-    pErrorlog->logZException();
-    pErrorlog->errorLog(
-        "FileGenerateDLg::XmlLoad-E-PARSERR Xml parsing error for string <%s>",
-        pXmlContent.subString(0, 25).toUtf());
+  wSt=wDoc->XmlParseFromMemory(pXmlContent,pErrorLog);
+  if (wSt!=ZS_SUCCESS)
     return wSt;
-  }
 
   wSt = wDoc->getRootElement(wRoot);
   if (wSt != ZS_SUCCESS) {
-    pErrorlog->logZException();
+    pErrorLog->logZExceptionLast("FileGenerateMWn::XmlDefinitionLoad");
     return wSt;
   }
   if (!(wRoot->getName() == "zicm")) {
-    pErrorlog->errorLog(
+    pErrorLog->errorLog(
         "FileGenerateDLg::XmlLoad-E-INVROOT Invalid root node name <%s> expected <zicm>",
         wRoot->getName().toCChar());
     return ZS_XMLINVROOTNAME;
@@ -991,7 +988,7 @@ FileGenerateMWn::XmlDefinitionLoad(const utf8VaryingString& pXmlContent, ZaiErro
   wSt=wRoot->getChildByName((zxmlNode*&)wRootNode,"filedefinition");
   if (wSt!=ZS_SUCCESS)
   {
-    pErrorlog->logZStatus(
+    pErrorLog->logZStatus(
         ZAIES_Error,
         wSt,
         "FileGenerateDLg::XmlLoadE-CNTFINDND Error cannot find node element with name <%s> status <%s>",
@@ -999,21 +996,21 @@ FileGenerateMWn::XmlDefinitionLoad(const utf8VaryingString& pXmlContent, ZaiErro
         decode_ZStatus(wSt));
     return wSt;
   }
-  XMLgetChildText(wRootNode,"targetdirectory",wZMFVal.TargetDirectory,pErrorlog,ZAIES_Warning);
-  XMLgetChildText(wRootNode,"indexdirectory",wZMFVal.IndexDirectory,pErrorlog,ZAIES_Warning);
-  XMLgetChildText(wRootNode,"rootname",wZMFVal.RootName,pErrorlog,ZAIES_Warning);
+  XMLgetChildText(wRootNode,"targetdirectory",wZMFVal.TargetDirectory,pErrorLog,ZAIES_Warning);
+  XMLgetChildText(wRootNode,"indexdirectory",wZMFVal.IndexDirectory,pErrorLog,ZAIES_Warning);
+  XMLgetChildText(wRootNode,"rootname",wZMFVal.RootName,pErrorLog,ZAIES_Warning);
 
-  XMLgetChildLong(wRootNode,"meanrecordsize",(long&)wZMFVal.MeanRecordSize,pErrorlog,ZAIES_Warning);
-  XMLgetChildLong(wRootNode,"allocatedblocks",(long&)wZMFVal.AllocatedBlocks,pErrorlog,ZAIES_Warning);
-  XMLgetChildLong(wRootNode,"allocatedsize",(long&)wZMFVal.AllocatedSize,pErrorlog,ZAIES_Warning);
-  XMLgetChildLong(wRootNode,"extentquota",(long&)wZMFVal.ExtentQuota,pErrorlog,ZAIES_Warning);
-  XMLgetChildLong(wRootNode,"extentquotasize",(long&)wZMFVal.ExtentQuotaSize,pErrorlog,ZAIES_Warning);
-  XMLgetChildLong(wRootNode,"initialblocks",(long&)wZMFVal.InitialBlocks,pErrorlog,ZAIES_Warning);
-  XMLgetChildLong(wRootNode,"initialsize",(long&)wZMFVal.InitialSize,pErrorlog,ZAIES_Warning);
+  XMLgetChildLong(wRootNode,"meanrecordsize",(long&)wZMFVal.MeanRecordSize,pErrorLog,ZAIES_Warning);
+  XMLgetChildLong(wRootNode,"allocatedblocks",(long&)wZMFVal.AllocatedBlocks,pErrorLog,ZAIES_Warning);
+  XMLgetChildLong(wRootNode,"allocatedsize",(long&)wZMFVal.AllocatedSize,pErrorLog,ZAIES_Warning);
+  XMLgetChildLong(wRootNode,"extentquota",(long&)wZMFVal.ExtentQuota,pErrorLog,ZAIES_Warning);
+  XMLgetChildLong(wRootNode,"extentquotasize",(long&)wZMFVal.ExtentQuotaSize,pErrorLog,ZAIES_Warning);
+  XMLgetChildLong(wRootNode,"initialblocks",(long&)wZMFVal.InitialBlocks,pErrorLog,ZAIES_Warning);
+  XMLgetChildLong(wRootNode,"initialsize",(long&)wZMFVal.InitialSize,pErrorLog,ZAIES_Warning);
 
-  XMLgetChildBool(wRootNode,"journaling",wZMFVal.Journaling,pErrorlog,ZAIES_Warning);
-  XMLgetChildBool(wRootNode,"highwatermarking",wZMFVal.HighWaterMarking,pErrorlog,ZAIES_Warning);
-  XMLgetChildBool(wRootNode,"grabfreespace",wZMFVal.GrabFreeSpace,pErrorlog,ZAIES_Warning);
+  XMLgetChildBool(wRootNode,"journaling",wZMFVal.Journaling,pErrorLog,ZAIES_Warning);
+  XMLgetChildBool(wRootNode,"highwatermarking",wZMFVal.HighWaterMarking,pErrorLog,ZAIES_Warning);
+  XMLgetChildBool(wRootNode,"grabfreespace",wZMFVal.GrabFreeSpace,pErrorLog,ZAIES_Warning);
 
   wSt=wRootNode->getChildByName((zxmlNode*&)wKeyRootNode,"keyvalues");
   if (wSt==ZS_SUCCESS)
@@ -1021,22 +1018,22 @@ FileGenerateMWn::XmlDefinitionLoad(const utf8VaryingString& pXmlContent, ZaiErro
   while (wSt==ZS_SUCCESS)
   {
     KeyData wKeyD;
-    XMLgetChildLong(wSingleKeyNode,"keysize",(long&)wKeyD.KeySize,pErrorlog,ZAIES_Warning);
-    XMLgetChildLong(wSingleKeyNode,"allocated",(long&)wKeyD.Allocated,pErrorlog,ZAIES_Warning);
-    XMLgetChildLong(wSingleKeyNode,"allocatedsize",(long&)wKeyD.AllocatedSize,pErrorlog,ZAIES_Warning);
-    XMLgetChildLong(wSingleKeyNode,"extentquota",(long&)wKeyD.ExtentQuota,pErrorlog,ZAIES_Warning);
-    XMLgetChildLong(wSingleKeyNode,"extentsize",(long&)wKeyD.ExtentSize,pErrorlog,ZAIES_Warning);
+    XMLgetChildLong(wSingleKeyNode,"keysize",(long&)wKeyD.KeySize,pErrorLog,ZAIES_Warning);
+    XMLgetChildLong(wSingleKeyNode,"allocated",(long&)wKeyD.Allocated,pErrorLog,ZAIES_Warning);
+    XMLgetChildLong(wSingleKeyNode,"allocatedsize",(long&)wKeyD.AllocatedSize,pErrorLog,ZAIES_Warning);
+    XMLgetChildLong(wSingleKeyNode,"extentquota",(long&)wKeyD.ExtentQuota,pErrorLog,ZAIES_Warning);
+    XMLgetChildLong(wSingleKeyNode,"extentsize",(long&)wKeyD.ExtentSize,pErrorLog,ZAIES_Warning);
 
- //   XMLgetChildBool(wSingleKeyNode,"duplicate",wKeyD.Duplicates,pErrorlog,ZAIES_Warning);
-    XMLgetChildText(wSingleKeyNode,"duplicate",wValue,pErrorlog,ZAIES_Warning);
+ //   XMLgetChildBool(wSingleKeyNode,"duplicate",wKeyD.Duplicates,pErrorLog,ZAIES_Warning);
+    XMLgetChildText(wSingleKeyNode,"duplicate",wValue,pErrorLog,ZAIES_Warning);
     wKeyD.Duplicates = encode_ZST(wValue.toCChar());
     if (wKeyD.Duplicates==ZST_Nothing)
       wKeyD.Duplicates = ZST_NoDuplicates;
-    XMLgetChildBool(wSingleKeyNode,"grabfreespace",wKeyD.GrabFreeSpace,pErrorlog,ZAIES_Warning);
-    XMLgetChildBool(wSingleKeyNode,"highwatermarking",wKeyD.HighwaterMarking,pErrorlog,ZAIES_Warning);
+    XMLgetChildBool(wSingleKeyNode,"grabfreespace",wKeyD.GrabFreeSpace,pErrorLog,ZAIES_Warning);
+    XMLgetChildBool(wSingleKeyNode,"highwatermarking",wKeyD.HighwaterMarking,pErrorLog,ZAIES_Warning);
 
-    XMLgetChildText(wSingleKeyNode,"indexname",wKeyD.IndexName,pErrorlog,ZAIES_Warning);
-    XMLgetChildText(wSingleKeyNode,"indexrootname",wKeyD.IndexRootName,pErrorlog,ZAIES_Warning);
+    XMLgetChildText(wSingleKeyNode,"indexname",wKeyD.IndexName,pErrorLog,ZAIES_Warning);
+    XMLgetChildText(wSingleKeyNode,"indexrootname",wKeyD.IndexRootName,pErrorLog,ZAIES_Warning);
 
     if (wZMFVal.KeyValues==nullptr) {
       wZMFVal.KeyValues=new zbs::ZArray<KeyData>;
@@ -1266,65 +1263,63 @@ FileGenerateMWn::SameAsMaster(){
   return;
 }//FileGenerateDLg::SameAsMaster
 
-void
-FileGenerateMWn::exportCallBack(int pValue) {
 
-}
 
 void
 FileGenerateMWn::DataImport(){
-
-}
-
-void
-FileGenerateMWn::DataExport(){
-
+  ZStatus wSt=ZS_SUCCESS;
   if (MasterFile==nullptr) {
-    ZExceptionDLg::adhocMessage("Data export",Severity_Error,
-                                           "Please select an active master file before exporting its data.");
+    ZExceptionDLg::adhocMessage("Data import",Severity_Error,
+                                "Please select an active, valid master file before feeding its data.");
     return;
   }
-  if (MasterFile->getRecordCount()==0) {
-    ZExceptionDLg::adhocMessage("Data export",Severity_Error,
-                                "No record in file. Nothing to export.");
-    return;
+  if (MasterFile->getRecordCount() > 0) {
+    int wRet=ZExceptionDLg::adhocMessage2B("Data import",Severity_Error, "Cancel","Confirm",&ErrorLog,nullptr,
+                                "There are existing records within selected master file.\n"
+                                "This may cause further malfunctions.\n"
+                                "Please confirm import <Confirm> or cancel operation <Cancel>");
+    if (wRet==QDialog::Rejected)
+      return;
   }
 
-  if (!MasterFile->hasProgressCallback()) {
-    MasterFile->registerProgressCallback(std::bind(&FileGenerateMWn::exportCallBack, this,_1));
-  }
   QString wDir;
-  wDir = QFileDialog::getSaveFileName(this,"Export content",GeneralParameters.getWorkDirectory().toCChar());
+  wDir = QFileDialog::getOpenFileName(this,"Import content",GeneralParameters.getWorkDirectory().toCChar(),"Xml files (*.xml);;All (*.*)");
   if (wDir.isEmpty())
     return;
-  uriString wURIExport=wDir.toUtf8().data();
+  uriString wURIImport=wDir.toUtf8().data();
 
   /* export progress window setup */
 
-  ProgressMWn=new ZMFProgressMWn("Data export",this);
+  ProgressMWn=new ZMFProgressMWn("Data import",this,false);
 
-  ProgressMWn->MainDescBudyLBl->setText("Export to file");
-  ProgressMWn->MainDescriptionLBl->setText(wURIExport.toCChar());
+  ProgressMWn->setDescBudy("File");
+  ProgressMWn->setDescText(wURIImport);
 
-  ProgressMWn->AdvancePGb->setMaximum(MasterFile->getRecordCount());
+  ProgressMWn->advanceSetupCallBack(MasterFile->getRecordCount(),"Data import");
+
+  MasterFile->registerProgressSetupCallBack(std::bind(&ZMFProgressMWn::advanceSetupCallBack, ProgressMWn,_1,_2));
+  MasterFile->registerProgressCallBack(std::bind(&ZMFProgressMWn::advanceCallBack, ProgressMWn,_1,_2));
 
   ProgressMWn->show();
 
+  if (!MasterFile->isOpen())
+    wSt=MasterFile->zopen(ZRF_All);
 
-  ZStatus wSt=MasterFile->exportContent(wURIExport);
+  wSt=MasterFile->XmlImportContentByChunk( wURIImport, &ErrorLog);
 
-  ProgressMWn->CloseBTn->setVisible(true);
+  ProgressMWn->setDone(wSt!=ZS_SUCCESS);
 
   if (wSt!=ZS_SUCCESS) {
-    ZExceptionDLg::adhocMessage("Data export",Severity_Error,
-                                "Something went wrong while exporting data from <%s>",MasterFile->getURIContent().getBasename().toCChar());
+    ErrorLog.errorLog("Data import: Something went wrong while importing data from <%s>",MasterFile->getURIContent().getBasename().toCChar());
     return;
   }
 
+  return;
+} // DataImport
 
-
-
-
+void
+FileGenerateMWn::DataExport(){
+  ZStatus wSt=ZEntryPoint::exportZMF(this,MasterFile);
   return;
 }//FileGenerateDLg::DataExport
 
@@ -2188,12 +2183,25 @@ FileGenerateMWn::KeyDelete() {
 
   if (DeletedKeyValues==nullptr)
     DeletedKeyValues = new ZArray<KeyData> ;
-//  KeyValues->Tab(wi).ChangeCode |= ZFGC_KeyDelete ;
+
   DeletedKeyValues->push(KeyValues->Tab(wI));
-  KeyValues->erase(wI);
+
 
   KeyTBv->ItemModel->removeRow(int(wI));
 
+  if (DictionaryFile!=nullptr) {
+      if (DictionaryFile->KeyDic.count()>wI) {
+          ComLog->appendText("Corresponding key named <%s> is been removed from dictionary.",
+                             DictionaryFile->KeyDic[wI]->DicKeyName.toString());
+          DictionaryFile->KeyDic.erase(wI);
+      }
+      else
+          ComLog->appendText("Cannot remove from dictionary key named <%s>.",
+                             KeyValues->Tab(wI).IndexName.toString());
+
+  }
+
+  KeyValues->erase(wI);
   return;
 }
 
@@ -2441,10 +2449,9 @@ ZStatus FileGenerateMWn::loadExternalXmlDic() {
 
   QString wFileName = QFileDialog::getOpenFileName((QWidget*)this, tr("Xml Dictionary"),
                                                    GeneralParameters.getWorkDirectory().toCChar(),
-                                                   "Xml files (*.xml);;All (*.*)");
+                                                   "Xml dictionaries (*.dic);;Xml files (*.xml);;All (*.*)");
   if (wFileName.isEmpty()) {
-    ZExceptionDLg::adhocMessage("Xml file",Severity_Information,nullptr,nullptr,"No file selected. Please select a valid file");
-    return ZS_EMPTY ;
+     return ZS_EMPTY ;
   }
   uriString wXmlURI = wFileName.toUtf8().data();
 
@@ -2544,31 +2551,7 @@ bool FileGenerateMWn::applyToCurrentZmf() {
 
   return applyChangesZmf(false);
 }
-/* Deprecated
-bool FileGenerateMWn::changeChosenZmf() {
 
-  if (ValuesControl()) {
-    return false;
-  }
-
-  utf8VaryingString wStr;
-
-  uriString wURIFile = TargetDirectory ;
-  wURIFile.addConditionalDirectoryDelimiter();
-  wURIFile += RootName;
-  wURIFile += __MASTER_FILEEXTENSION__;
-
-
-  const char* wWD = getParserWorkDirectory();
-  QString wFileName;
-  wFileName = QFileDialog::getOpenFileName(this,"Master file",wURIFile.toCChar(),"Master files (*.zmf);;All (*.*)");
-  if (wFileName.isEmpty()) {
-    return false;
-  }
-
-  return applyChangesZmf(wURIFile,TestRunQAc->isChecked());
-} // changeChosenZmf
-*/
 
 ZStatus
 FileGenerateMWn::applyChangesZmf(bool pBackup) {
@@ -2828,7 +2811,6 @@ FileGenerateMWn::applyChangesZmf(bool pBackup) {
         wSt=MasterFile->zopenIndexFile(wIndexRank,ZRF_All);
       }
 
-
       wFormerIndexURI = MasterFile->IndexTable[wIndexRank]->getURIContent();
 
       wZMFRootName=MasterFile->getURIContent().getRootname();
@@ -2866,14 +2848,8 @@ FileGenerateMWn::applyChangesZmf(bool pBackup) {
       utf8VaryingString wKeyName = ChangeLog[wChgIdx].getChangeKey();
       long wIndexRank=ChangeLog[wChgIdx].getIndexRank();
 
-      if (MasterFile->IndexTable[wIndexRank]->isOpen()){
-        MasterFile->IndexTable[wIndexRank]->zclose();
-      }
-      uriString wURIIndex = MasterFile->getURIIndex(wIndexRank);
+      uriString wURIIndex = MasterFile->IndexTable[wIndexRank]->getURIContent();
 
-      ComLog->appendText("Removing index key named %s.",
-          MasterFile->IndexTable[wIndexRank]->IndexName.toString() );
-      MasterFile->IndexTable.erase(wIndexRank);
       ComLog->appendText("Removing index file %s.", wURIIndex.toString() );
       wKeyModif++;
 
@@ -3098,12 +3074,11 @@ FileGenerateMWn::rebuildIndex(long pIndexRankToRebuild) {
 
 /* index rebuild progress window setup */
 
-  ProgressMWn=new ZMFProgressMWn("Index key rebuild",this);
+  ProgressMWn=new ZMFProgressMWn("Index key rebuild",this,false);
 
-  ProgressMWn->MainDescBudyLBl->setText("Index key name");
-  ProgressMWn->MainDescriptionLBl->setText(MasterFile->IndexTable[pIndexRankToRebuild]->IndexName.toCChar());
-
-  ProgressMWn->initCount(MasterFile->getRecordCount());
+  ProgressMWn->advanceSetupCallBack(MasterFile->getRecordCount(),"Index key rebuild");
+  ProgressMWn->setDescBudy("Index key name");
+  ProgressMWn->setDescText(MasterFile->IndexTable[pIndexRankToRebuild]->IndexName);
 
   ProgressMWn->show();
 
@@ -3159,7 +3134,7 @@ FileGenerateMWn::rebuildIndex(long pIndexRankToRebuild) {
       ZDateFull::currentDateTime().toFormatted().toString(),
       MasterFile->IndexTable[pIndexRankToRebuild]->IndexName.toString());
 
-  wSt=MasterFile->IndexTable[pIndexRankToRebuild]->zclearFile();
+  wSt=MasterFile->IndexTable[pIndexRankToRebuild]->zclearFile(-1,MasterFile->IndexTable[pIndexRankToRebuild]->getFCB()->HighwaterMarking,&ErrorLog);
   if (wSt!=ZS_SUCCESS){
     ProgressMWn->close();  /* is deleteonclose */
     return wSt;
@@ -3170,14 +3145,13 @@ FileGenerateMWn::rebuildIndex(long pIndexRankToRebuild) {
       MasterFile->IndexTable[pIndexRankToRebuild]->IndexName.toString());
 
 
-  ZTime wStartTime=ZTime::getCurrentTime();
   /* browse all master file records, extract key and feed index file */
   wSt=MasterFile->zgetWAddress(wRecord,0L,wZMFAddress);
   if (wSt!=ZS_SUCCESS){
     goto rebuildIndexError;
   }
   while (wSt==ZS_SUCCESS) {
-    wSt=MasterFile->extractKeyValues(wRecord,wKeyRecord,pIndexRankToRebuild);
+    wSt=MasterFile->extractKeyValues(wRecord,wKeyRecord,pIndexRankToRebuild, &ErrorLog);
     if (wSt!=ZS_SUCCESS)
       goto rebuildIndexError;
     wSt=MasterFile->IndexTable[pIndexRankToRebuild]->_addRawKeyValue_Prepare(wIndexItem,wKeyRecord,wZMFAddress);
@@ -3187,7 +3161,7 @@ FileGenerateMWn::rebuildIndex(long pIndexRankToRebuild) {
     if (wSt!=ZS_SUCCESS)
       goto rebuildIndexError;
 
-    ProgressMWn->ProgressDisplay(wCurrentRank);
+    ProgressMWn->AdvanceDisplay(wCurrentRank);
 
     wSt=MasterFile->zgetNextWAddress(wRecord,wCurrentRank,wZMFAddress);
   } // while (wSt==ZS_SUCCESS)
@@ -3214,7 +3188,7 @@ FileGenerateMWn::rebuildIndex(long pIndexRankToRebuild) {
 //  IndexRebuildMWn->deleteLater();
 
 rebuildIndexError:
-    ProgressMWn->setDone(wSt==ZS_SUCCESS);
+    ProgressMWn->setDone(wSt!=ZS_SUCCESS);
 
   if (ZException.count()==0){
     ZException.setMessage("ZMasterFile::rebuildIndex",wSt,Severity_Error,"Error while rebuilding index");
@@ -3559,7 +3533,7 @@ void FileGenerateMWn::GenFile() {
     }
     /* here loaded master file has a dictionary */
     ZExceptionDLg::setFixedFont(true);
-    int wRet=ZExceptionDLg::adhocMessage2B("Generate file",Severity_Information,
+    int wRet=ZExceptionDLg::adhocMessage2BHtml("Generate file",Severity_Information,
         "Raw","Embedded",
         nullptr,nullptr,
         "A master file is loaded <%s>.\n"
@@ -3567,7 +3541,7 @@ void FileGenerateMWn::GenFile() {
         "<table>"
         "<th><tr>Create file </tr></th>"
         "<tr><td> as raw master file without dictionary</td>      <td><b>Raw</b></td> </tr>"
-        "<tr><td> using embedded file dictionary </td>    <td><b>Embedded</b></td> </tr>"
+        "<tr><td> as a master file using embedded dictionary</td>    <td><b>Embedded</b></td> </tr>"
         "</table>",
         MasterFile->getURIContent().toString(),
         MasterFile->Dictionary->DicName.toString());
@@ -3599,9 +3573,9 @@ void FileGenerateMWn::GenFile() {
             " \n"
             "<table>"
             "<th><td>Create file</td></th>"
-            "<tr><td>as raw master file without dictionary</td>      <td><b>Raw</b></td></tr>"
-            "<tr><td>using loaded file dictionary </td>    <td><b>Loaded</b></td></tr>"
-            "<tr><td>using embedded file dictionary  </td>    <td><b>Embedded</b></td></tr>"
+            "<tr><td>as raw master file without dictionary</td>             <td><b>Raw</b></td></tr>"
+            "<tr><td>as master file using loaded file dictionary </td>      <td><b>Loaded</b></td></tr>"
+            "<tr><td>as master file  using embedded file dictionary  </td>  <td><b>Embedded</b></td></tr>"
             "</table>",
             DictionaryFile->DicName.toString(),
             MasterFile->getURIContent().toString(),
@@ -3643,7 +3617,7 @@ void FileGenerateMWn::GenFile() {
           "Create file \n"
           "<table>"
           "<tr><td>as raw master file without dictionary</td>      <td><b>Raw</b></td></tr>"
-          "<tr><td>using loaded file dictionary </td>    <td><b>Loaded</b></td></tr>"
+          "<tr><td>as a master file using loaded file dictionary</td>    <td><b>Loaded</b></td></tr>"
           "</table>",
           DictionaryFile->DicName.toString(),
           MasterFile->getURIContent().toString());
@@ -3678,7 +3652,7 @@ void FileGenerateMWn::GenFile() {
           "<table>"
           "<th><td>Create file</td></th>"
           "<tr><td>as raw master file without dictionary</td>      <td><b>Raw</b></td></tr>"
-          "<tr><td>using loaded file dictionary </td>    <td><b>Loaded</b></td></tr>"
+          "<tr><td>as master file using loaded file dictionary </td>    <td><b>Loaded</b></td></tr>"
           "</table>",
           DictionaryFile->DicName.toString());
       switch (wRet) {
@@ -3732,23 +3706,6 @@ GenFileEnd:
 
 
 
-//  ZExceptionDLg::setFixedFont(true);
-  int wRet=ZExceptionDLg::adhocMessage2BHtml("Generate file",Severity_Information,
-      "No","Yes",
-      nullptr,nullptr,
-      "Do you want to make generated file<br>"
-      "%s<br>"
-      "current master file ?<br>"
-      "<table>"
-      "<tr><td>   set this file as current</td>   <td><b>Yes</b></td></tr>"
-      "<tr><td>   forget this file and stay</td>   <td><b>No</b></td></tr>"
-      "</table>",
-      wMasterFile->getURIContent().toString());
-  if (wRet==QDialog::Rejected) {
-    return;
-  }
-
-  ComLog->appendText("Request to set master file %s as current master file.",wURIMaster.toString());
   if (MasterFile!=nullptr){
     if (MasterFile->isOpen()){
       ComLog->appendText("Current master file %s is to be closed.",MasterFile->getURIContent().toString());
@@ -3770,6 +3727,8 @@ GenFileEnd:
     return;
   }
 
+
+
   SourceContentLBl->setText(MasterFile->getURIContent().toCChar());
 
   if (MasterFile->hasDictionary()) {
@@ -3786,12 +3745,18 @@ GenFileEnd:
       ComLog->appendText("Current raw master file is set to %s.",MasterFile->getURIContent().toString());
     }
     else {
-      wStr.sprintf("External Dictionary <%s> loaded",DictionaryFile->DicName.toCChar());
-      DicEmbedLBl->setText("Dictionary <%s> has been loaded");
+      wStr.sprintf("Embedded dictionary <%s>",DictionaryFile->DicName.toCChar());
+      DicEmbedLBl->setText(wStr.toCChar());
     }
   }
 
-  ComLog->appendText("Current file is set to %s.",MasterFile->getURIContent().toString());
+  ErrorLog.textLog("\n Created file <%s>\n",MasterFile->getURIContent().toString());
+
+  MasterFile->FCBReport(&ErrorLog);
+  MasterFile->PoolReport(&ErrorLog);
+  MasterFile->MCBreport(&ErrorLog);
+
+
   return;
 } //GenFile
 
@@ -3799,14 +3764,12 @@ ZStatus FileGenerateMWn::createDic(ZMFDictionary& pDic,const uriString& pURIMast
   DictionaryFile = new ZDictionaryFile();
 
   return DictionaryFile->saveAsEmbedded(pURIMaster);
-  /*
-  DictionaryFile->generateDicFileName(pURIMaster);
-  DictionaryFile->setDictionary(pDic);
-  return DictionaryFile->save();
-*/
 }
-
-
+ZStatus
+FileGenerateMWn::checkDic()
+{
+    return ZS_SUCCESS;
+}
 void FileGenerateMWn::displayChangeLog(){
   if (ChangeLogMWn==nullptr) {
     ChangeLogMWn = new textEditMWn(this,TEOP_NoFileLab | TEOP_CloseBtnHide,nullptr);

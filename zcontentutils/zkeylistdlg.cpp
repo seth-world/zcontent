@@ -83,7 +83,7 @@ ZKeyListDLg::displayKeyDictionaries(const ZMFDictionary* pDic)
     return ZS_NULLPTR;
   }
   ZMFDic = pDic;
-  utf8String wStr;
+  utf8VaryingString wStr;
   QList<QStandardItem *> wKeyRow, wKeyFieldRow ;
 
   keyTRv->ItemModel->removeRows(0,keyTRv->ItemModel->rowCount());

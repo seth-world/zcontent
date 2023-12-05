@@ -37,13 +37,19 @@ public:
    * @param pRank       Optional (omitted if nullptr) : if mentionned, currently processed ZMF rank is updated there.
    * @return a ZStatus : ZS_SUCCESS if OK, otherwise the faulty status is returned and ZException is set with appropriate message data.
    */
-  ZStatus rebuildIndex(long pIndexRank, long *pRank=nullptr) ;
+  ZStatus rebuildIndex(long pIndexRank, long *pRank, ZaiErrors *pErrorLog) ;
 
-  ZStatus extractKeyValues(const ZDataBuffer& pRecord, ZDataBuffer& pKeyContent, long pIndexRank);
+  ZStatus extractKeyValues(const ZDataBuffer &pRecord,
+                           ZDataBuffer &pKeyContent,
+                           long pIndexRank,
+                           ZaiErrors *pErrorLog);
 
-  ZStatus extractFieldValue(const ZDataBuffer& pRecord,ZDataBuffer& pKeyValue,long pRank);
+  ZStatus extractFieldValue(const ZDataBuffer &pRecord,
+                            ZDataBuffer &pKeyValue,
+                            long pRank,
+                            ZaiErrors *pErrorLog);
 
-  ZStatus getURFFieldByRank(const ZDataBuffer& pRecord, URFField &pURFField, long pRank);
+  ZStatus getURFFieldByRank(const ZDataBuffer& pRecord, URFField &pURFField, long pRank, ZaiErrors* pErrorLog);
 
   ZStatus searchForValue(const utf8VaryingString& pSearchPhrase);
 

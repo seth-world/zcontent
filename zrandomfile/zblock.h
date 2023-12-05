@@ -164,10 +164,19 @@ public:
   ZDataBuffer           Content;    //!< user data content
 
   ZBlock (void) {clear();}
+  ZBlock (const ZBlock& pIn) { _copyFrom(pIn);}
+
+  ZBlock&  _copyFrom(const ZBlock& pIn)
+  {
+      ZBlockHeader::_copyFrom(pIn);
+      Content = pIn.Content ;
+      return *this;
+  }
+
 
   void setBuffer(const ZDataBuffer& pContent) {Content.setData(pContent);}
 
-  void clear(void) {memset(this,0,sizeof(ZBlock)); ZBlockHeader::clear();}
+  void clear(void) {Content.clear(); ZBlockHeader::clear();}
   void resetData(void) {Content.reset();}
 
   unsigned char* allocate (size_t pSize) {return(Content.allocate(pSize));}
@@ -176,8 +185,8 @@ public:
   size_t DataSize(void) {return(Content.Size);}
   char * DataChar(void) {return((char*)Content.Data);}
 
-  ZBlock& operator = (const ZBlockHeader &pHeader) {memmove(this,&pHeader,sizeof(ZBlockHeader)); return *this;}
-  ZBlock& operator = (const ZBlock& pBlock) {memmove(this,&pBlock,sizeof(ZBlock)); return *this;}
+  ZBlock& operator = (const ZBlockHeader &pHeader) {ZBlockHeader::_copyFrom(pHeader); return *this;}
+  ZBlock& operator = (const ZBlock& pIn) { return _copyFrom(pIn);}
 
 };
 #endif // ZBLOCK_H

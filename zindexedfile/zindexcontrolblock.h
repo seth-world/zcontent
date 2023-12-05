@@ -89,7 +89,7 @@ public:
 
   uriString getURIIndex() {return URIIndex;}
 
-  utf8String toXml(int pLevel);
+  utf8VaryingString toXml(int pLevel);
   ZStatus fromXml(zxmlNode* pIndexRankNode,ZaiErrors* pErrorlog);
 //  ZDataBuffer& _exportAppend(ZDataBuffer& pICBE);
 
@@ -158,7 +158,7 @@ public:
   ssize_t IndexRecordSize (void);
 
 
-  utf8String toXml(int pLevel, bool pComment=true);
+  utf8VaryingString toXml(int pLevel, bool pComment=true);
   /**
      * @brief fromXml loads index control block from its xml definition and return ZS_SUCCESS when successfull.
      * When errors returns <>0 and pErrlog contains appropriate error messages.

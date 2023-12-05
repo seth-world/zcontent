@@ -102,6 +102,13 @@ ZDictionaryFile::load_xml(ZaiErrors* pErrorlog){
 }//load_xml
 
 ZStatus
+ZDictionaryFile::saveAsEmbedded(const uriString& pZMFURIContent)
+{
+    URIDictionary = generateDicFileName(pZMFURIContent);
+    return save_xml();
+}
+
+ZStatus
 ZDictionaryFile::save_xml(bool pBackup){
   utf8VaryingString wDicString;
 

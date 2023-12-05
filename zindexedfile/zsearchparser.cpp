@@ -25,7 +25,22 @@
 #include "zsearchlogicalterm.h"
 #include "zsearcharithmeticterm.h"
 
+#include "zsearchcontext.h"
+#include "zsearchentitycontext.h"
+
+#include <ztoolset/utfutils.h>
+
+#include <zcontent/zcontentcommon/urfparser.h>
+#include <zcontent/zcontentcommon/zcontentconstants.h>
+
+
 using namespace zbs;
+
+namespace zbs {
+
+ZArray<ZEntitySymbol>  ZEntitySymbolList;
+
+}
 
 const char* ZSearchQueryHelp =
 " help </b>"
@@ -33,29 +48,118 @@ const char* ZSearchQueryHelp =
     "                      <----------------selection phrase---------------> <br>";
 /*
   help <br><br>
-  set file <path> [mode readonly,modify] as <entity name> ;  // by default mode is read only <br>"
+  declare <entity name> as file <path> [mode readonly,modify] ;  // by default mode is read only <br>"
 <br>
-                                          <-----selection phrase---------><---alias------------>\n";
-  find  [all,first]  <entity name> with   <entity name>.<field name> .... [as <collection name>] ;  NB: by default, find first is executed \n
+
+Entities declarations
+
+  declare <entity name> as file <path> [mode readonly,modify] [;]  // by default mode is read only
+
+  creates an entity definition with name <entity name>.
+  This entity refers to a master file described by <path> that must point to a valid, existing master file.
+  File will be accessed according mode, either readonly (default) or modify.
+
+  <entity name> must be a unique, non existing entity name.
+
+  if mode clause is omitted then mode is set to readonly.
+
+  Once successfully declared, <entity name> will be available to :
+  - be accessed (see fetch, display instructions)
+  - be used in other declare instructions (using its name, here <entity name>)
+
+
+Single entity (Collection)
+
+          ---------------------------Declare predicate--------------------------------------------------------------------------------------------------------
+                            ----- field selection clause--------
+  declare <entity name> as { <field name1>, <field name2> , ....}
+                           { * }
+                        --entity selection--
+                        in <entity name>
+                              ---------------------rank selection clause----------------------
+                        with [<entity name>.]<field name> { = != < > <= >= } <field name1>,....  [;]
+
+
+
+
+                               -----------fields selection clause (from both entities)--------
+  declare <entity name> as join { <entity name1>.<field name1>, <entity name2>.<field name2>,... }
+                             { <entity name1>.* , <entity name2>.* }
+                             ----entities selection--------
+                        in <entity name1> , <entity name2>
+                             -------rank selection clause------
+                        with <see rank selection clause syntax>
+                                -------------------------join clause----------------------------------------------------------
+                        using <entity name>.<field name>[.<modifier>] { = < > >= <= } <entity name2>.<field name2>[.<modifier>] [,...]
+
+Join Entity
+
+  declare <new entity name> as < master entity definition > join <slave entity definition> using <join clause>
+
+                               -----------fields selection clause for first entity (master)----
+  declare <entity name> as { [<entity name1>.]<field name1>, [<entity name1>.]<field name2>... }    nb: only fields from <entity name1>
+                             { <entity name1>.*  }
+                             --Master----
+                        in <entity name1>
+                             --ranks selection clause for master----
+                        with <see rank selection clause syntax>
+                                -----------fields selection clause for second entity (slave)----
+                        join { [<entity name2>.]<field name1>, [<entity name2>.]<field name2>... }
+                             { <entity name2>.* }
+                             ---Slave-----
+                        in  <entity name2>
+                             --ranks selection clause for slave----
+                        with <see rank selection clause syntax>
+                                --------------------------------join clause----------------------------------------------------------
+                        using <entity name>.<field name>[.<modifier>] { = < > >= <= } <entity name2>.<field name2>[.<modifier>] [,...]
+
+  declare <new entity name> as <master entity name> join <slave entity name> using <join clause>
+
+Symbol declaration
+
+  declare <name> = { <literal> , <arithmetic expression> , <logical expression> }
+
+Fetch instruction
+
+  fetch <entity name>  [all]
+  fetch <entity name> first [<count>]
+  fetch <entity name> next [<count>]
+
+  display <entity name>  [all]
+  display <entity name> first [<count>]
+  display <entity name> next [<count>]
+
+
+  find [ {all , first [count] , next [count] } <---Declare predicate--->
+
+    is equivalent to
+
+        declare <declare clause content> ;
+        fetch {all , first [count] , next [count] } ;
+        display {all , first [count] , next [count] }
+
+
 \n
-                      <--------------- assignment phrase ------------>
+                                                       <---------------------------- assignment phrase ------------------------------>
 for <entity> with [all,first] <selection phrase > set [<entity name>.]<field name> = <value> , [<entity name>.]<field name> = <value> ... ;
 
-for <collection name> set <fieldname>=<value> , <fieldname>=<value> ... ;
 
-display {<collection name>.<field>, <collection name>.<field>,... | <collection name>.all | <collection name>.* } ;
+set <symbol name> = { <literal value> , <arithmetic expression> , <logical expression> }  -> replace symbol content regardless symbol type
+
 
 
 -------- Dictionary display -----------------------------------------
 
-  show entities;                                  -> list all entities and collections available
-  show ZEntity;                                   -> list all ZEntity symbols (used for ZResource)
-  show symbols ;                                  -> list all symbols available : a symbol is a shortcut to a filename
-  show {<entity> | <collection name>} fields ;
-  show {<entity> | <collection name>} <fieldname> ; // exact field name
-  show {<entity> | <collection name>} sss* ; // field name starting with 'sss'
-  show {<entity> | <collection name>} *sss ; // field name ending with 'sss'
-  show {<entity> | <collection name>} *sss* ; // field name containing 'sss'
+  show entities;                -> list all entities available
+  show ZEntity;                 -> list all ZEntity symbols (used for ZResource)
+  show symbols ;                -> list all symbols available : a symbol may be a shortcut to a filename
+  show symbol <symbol name> ;   -> displays symbol content
+  show <entity> state [;]       -> displays fetch state for entity <entity>
+  show <entity>  fields ;       -> displays all fields for entity <entity>
+  show <entity>  <fieldname> ;  -> displays exact field name details
+  show <entity>  sss* ;         -> displays details for field whose name starts with 'sss'
+  show <entity> *sss ;          -> displays details for field whose name ends with 'sss'
+  show <entity> *sss* ;         -> displays details for field whose name ends with 'sss'
 
 
 
@@ -79,26 +183,66 @@ Instruction history
 
   finish ;  // release resources flush and close open files
 
+
+  field modifiers :
+
+        a field may be designated using a field modifier.
+        Then its type may change from the field type itself to the modifier result type.
+        Example : ZDate(99/99/999).month will modify type ZDate to integer.
+
+        string modifiers
+          right(<value>)
+          where <value> is a non negative integer
+          retulting type : string
+          extract the substring up to <value> number of characters from the end of the string.
+          If string length is less than <value> then the whole string content is returned.
+
+          left(<value>)
+          where <value> is a non negative integer
+          retulting type : string
+          extract the substring up to <value> number of characters starting at the beginning of the string.
+          If string length is less than <value> then the whole string content is returned.
+
+          substring(<start>,<value>)
+          where <start> and <value> are non negative integers
+          retulting type : string
+          extract the substring up from a string at offset <start> (starting 0) up to <value> number of characters.
+          If string length is less than <start>+<value> then returned string length is adjusted to <input string length> - (<start>+<value>)
+
+        date modifiers
+
+        resource modifiers
+
+
+        Particular case : translate modifier
+
+        tranlate(<entity name>,<key field name>,<resulting field name>,<match operator>)
+
+        This modifier will use current content value to
+            - match within entity <entity name> for <key field name> using <match operator>.
+            - return first match for the <resulting field name> field content value
+        resulting type : type of <resulting field name> field within <entity name> entity
+
+
+
+
 */
-
-
-
+using namespace std;
 
 namespace zbs {
 
-
 class ZSearchParser* GParser=nullptr;
 
-using namespace std;
 ZSearchParser::ZSearchParser()
 {
-Tokenizer = new ZSearchTokenizer;
+//Tokenizer = new ZSearchTokenizer;
 }
+
 ZSearchParser::~ZSearchParser() {
 
-  if (Tokenizer)
+/*  if (Tokenizer)
     delete Tokenizer;
-
+*/
   while (MasterFileList.count())
     MasterFileList.pop();
   while (EntityList.count())
@@ -117,81 +261,128 @@ ZSearchParser::setup(uriString& pXmlParserSymbol,
 
   setOptions(pOptions);
 
-  setAutoPrintOn(ZAIES_Text);
+  ErrorLog.setAutoPrintOn(ZAIES_Text);
 
   ZStatus wSt=loadXmlSearchParserZEntity(pXmlParserZEntity);
   if ((wSt!=ZS_SUCCESS)&&(wSt!=ZS_EOF)) {
-    warningLog("Cannot load parser ZEntity file <%s>, status is <%s>.No application entity will be defined.",
+    ErrorLog.warningLog("Cannot load parser ZEntity xml file <%s>, status is <%s>.No application entity will be defined.",
         pXmlParserZEntity.toCChar(),decode_ZStatus(wSt));
   }
   wSt=loadXmlSearchParserSymbols(pXmlParserSymbol);
   if ((wSt!=ZS_SUCCESS)&&(wSt!=ZS_EOF))  {
-    warningLog("Cannot load parser symbol file <%s>, status is <%s>.No symbol files will be defined.",
+    ErrorLog.warningLog("Cannot load parser symbol file <%s>, status is <%s>.No symbol files will be defined.",
         pXmlParserSymbol.toCChar(),decode_ZStatus(wSt));
   }
 
   wSt=History.setup(pHistory);
   if (wSt!=ZS_SUCCESS) {
-    logZException();
-    logZStatus(ZAIES_Error,wSt,"Cannot open history file <%s>.\n History will be disabled.",pHistory.toString());
+    ErrorLog.logZExceptionLast();
+    ErrorLog.logZStatus(ZAIES_Error,wSt,"Cannot open history file <%s>.\n History will be disabled.",pHistory.toString());
   }
 
-  displayAllLogged(stdout);
-  clear();
+  ErrorLog.displayAllLogged(stdout);
+  //clear();
 
   GParser = this;
 
   return ZS_SUCCESS;
 }
 
-ZStatus ZSearchParser::parse(const utf8VaryingString& pContent, std::shared_ptr<ZSearchEntity> &pCollection) {
+//ZStatus ZSearchParser::parse(const utf8VaryingString& pContent, std::shared_ptr<ZSearchEntity> &pCollection)
+ZStatus ZSearchParser::parse(const utf8VaryingString& pContent, ZSearchContext &pContext)
+{
 
+  if (pContext.isInvalid()) {
+    ErrorLog.errorLog("ZSearchParser::parse-E-INVCTX Parse context is invalid. Use parser to generate a valid context.");
+    return ZS_INVPARAMS ;
+  }
+  ZTimer wTi;
   clear();
 
-  if (pContent.isEmpty())
+  pContext.clear();
+
+  pContext.setMainPhrase(&pContent);
+
+  ErrorLog.textLog("Processing request %s",pContext.MainPhrase->toString());
+
+  if (pContent.isEmpty()) {
+    ErrorLog.errorLog("No text to parse.");
     return ZS_EMPTY;
+  }
 
-  Tokenizer->parse(pContent);
+  wTi.start();
 
-  /* search for keywords */
+  ZSearchTokenizer::parse(pContent);  /* create token list for the whole instruction phrase */
 
-  for (int wi=0; wi < Tokenizer->count();wi++) {
-    if (Tokenizer->Tab(wi)->Type==ZSRCH_IDENTIFIER) {
-      if (searchKeyword(Tokenizer->Tab(wi)))
+  if (ZSearchTokenizer::count()==0) {
+      ErrorLog.errorLog("No token to parse.");
+      return ZS_EMPTY;
+  }
+
+
+  /* search for keywords and replace with appropriate ZSRCH code */
+
+  for (int wi=0; wi < ZSearchTokenizer::count();wi++) {
+    if (ZSearchTokenizer::Tab(wi)->Type==ZSRCH_IDENTIFIER) {
+      if (searchKeyword(ZSearchTokenizer::Tab(wi)))
         continue;
     }
   }// for
 
-  if (Tokenizer->Options & ZSRCHO_Report)
-    Tokenizer->report();
-  bool wStoreInstruction=true;
+  /* split if multiple instruction lines (one line is delimited by end of text or semi colon */
 
-  int wInstructionType = ZSITP_Nothing;
+//  ZArray<ZSearchToken*> wCurrentTokenList;
 
-  Phrase.clear();
+  int MainIndex=0;
+  while (MainIndex < ZSearchTokenizer::count())
+  {
+      pContext.CurrentTokenList.clear();
+      if (ZSearchTokenizer::Tab(MainIndex)->Type==ZSRCH_SEMICOLON) {
+          MainIndex++;
+          continue;
+      }
+      for (; (MainIndex < ZSearchTokenizer::count()) ; MainIndex++  ) {
+          if (ZSearchTokenizer::Tab(MainIndex)->Type==ZSRCH_SEMICOLON)
+              break;
+          pContext.CurrentTokenList.push(ZSearchTokenizer::Tab(MainIndex));
+      }
 
-  ZStatus wSt = _parse(pCollection,wStoreInstruction,wInstructionType);
-  if (wStoreInstruction)
+      if (Options & ZSRCHO_Report)
+        pContext.TokenReport();
+
+       _parseContext(pContext);
+
+      if (pContext.Status!=ZS_SUCCESS)
+          break ;
+      if ((pContext.CurrentTokenList.count() > 0) && pContext.notEOF()) {
+          if (pContext.CurrentToken != pContext.CurrentTokenList.last()) {
+            int wLen = pContext.CurrentTokenList.last()->TokenOffset + pContext.CurrentTokenList.last()->Text.strlen()-pContext.CurrentToken->TokenOffset;
+            ErrorLog.warningLog("Remaining of instruction line will not be processed.\n"
+                                "Ignored instructions are <%s>",
+                                pContext.MainPhrase->subString( pContext.CurrentToken->TokenOffset, wLen ).toString());
+          }
+      }
+  }// while
+/*
+  if (Options & ZSRCHO_Report)
+    ZSearchTokenizer::report();
+
+  ZStatus wSt = _parse(pSearchContext);
+*/
+  wTi.end();
+  ErrorLog.infoLog("Performance report : Parsing elapsed time %s",wTi.reportDeltaTime().toString());
+
+  if (pContext.Store != ZSearchHistory::Forget)
     History.add(pContent);
 
-  Phrase = pContent.subString(FirstToken->TokenOffset,CurrentToken->TokenOffset + 1 - FirstToken->TokenOffset);
-
-  if ((wSt==ZS_SUCCESS)&&(wInstructionType==ZSITP_Find)) {
-    textLog("Collection report \n %s\n",EntityList.last()->_report().toString());
-
-   wSt= _executeFind(EntityList.last()->_CollectionEntity);
-   if (wSt==ZS_OUTBOUNDHIGH)
-     wSt=ZS_SUCCESS;
-  }
-
-//  InstructionLog.push(ZInstructionItem(pContent,wSt));
-  return wSt;
+  return pContext.Status ;
 }//ZSearchParser::parse
 
 
 
 bool  ZSearchParser::_parseComment (ZSearchToken* &pToken) {
-  switch (pToken->Type) {
+  switch (pToken->Type)
+  {
 
   case ZSRCH_COMMENT_BRIEF:
     return true;
@@ -212,534 +403,797 @@ bool  ZSearchParser::_parseComment (ZSearchToken* &pToken) {
     return false;
   }
   return false;
-}
-
-
-bool ZSearchParser::testSemiColon()
-{
-  if (Index >= Tokenizer->count()) {
-    if (Tokenizer->count()==0)
-      errorLog("No valid token parsed.");
-    else
-      errorLog("Expected semi colon at the end of instruction line. Last token <%s> line %d column %d.",
-          Tokenizer->last()->Text.toString(),
-          Tokenizer->last()->TokenLine,Tokenizer->last()->TokenColumn
-          );
-    return false;
-  }
-
-  if (Tokenizer->Tab(Index)->Type != ZSRCH_SEMICOLON) {
-    errorLog("Expected semi colon at the end of instruction line. Last token <%s> line %d column %d.",
-        Tokenizer->Tab(Index)->Text.toString(),
-        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-    return false;
-  }
-
-  return true;
-}
-
-
-bool ZSearchParser::advanceIndex() {
-
-  if (Tokenizer->count()==0) {
-    errorLog("No instruction.");
-    return false;
-  }
-
-  if (Index >= Tokenizer->count()) {
-    errorLog("Syntax error : End of token while expecting more. Last token <%s> line %d column %d.",
-        Tokenizer->last()->Text.toString(),
-        Tokenizer->last()->TokenLine,Tokenizer->last()->TokenColumn
-        );
-    return false;
-  }
-
-  Index++;
-  while (Index < Tokenizer->count()) {
-
-    CurrentToken=Tokenizer->Tab(Index);
-
-    if (Tokenizer->Tab(Index)->Type == ZSRCH_SPACE) {
-      Index++;
-      continue;
-    }
-    if (_parseComment(Tokenizer->Tab(Index))) {
-      Index++;
-      continue;
-    }
-    /*    if (!wRe)
-      break;
-    wRe=false;
-*/
-    break;
-  }// while (pIdx < Tokenizer->count())
-  return true;
-} // ZSearchParser::advanceIndex
-
-ZStatus
-ZSearchParser::_parseShow()
-{
-  int wEntityIndex=0;
-  enum ShowEnum {
-    SHENUM_NOTHING = 0,
-    SHENUM_ENTITY = 1,
-    SHENUM_ENTITYFIELDS = 2,
-    SHENUM_MASTER = 3,
-    SHENUM_ZENTITY = 4,
-    SHENUM_SYMBOL = 5,
-    SHENUM_HISTORY = 6,
-  } wShowEnum=SHENUM_NOTHING;
-
-  ZStatus wSt=ZS_SUCCESS;
-  while ((Index < Tokenizer->count())&&(Tokenizer->Tab(Index)->Type!=ZSRCH_SEMICOLON)) {
-    CurrentToken=Tokenizer->Tab(Index);
-
-    if (Tokenizer->Tab(Index)->Type==ZSRCH_HISTORY) {
-      if (!advanceIndex()) {
-        errorLog("Expected semi colon at the end of instruction line. Last token <%s> line %d column %d.",
-            Tokenizer->last()->Text.toString(),
-            Tokenizer->last()->TokenLine,Tokenizer->last()->TokenColumn
-            );
-      }
-      if (Tokenizer->Tab(Index)->Type==ZSRCH_SEMICOLON) {
-        showHistory();
-        break;
-      }
-      if (Tokenizer->Tab(Index)->Type!=ZSRCH_MAXIMUM) {
-        errorLog("Expected either semi colon or keyword <MAXIMUM>. Last token <%s> line %d column %d.",
-            Tokenizer->last()->Text.toString(),
-            Tokenizer->last()->TokenLine,Tokenizer->last()->TokenColumn
-            );
-        return ZS_SYNTAX_ERROR;
-      }
-      if (!testSemiColon())
-        return ZS_MISS_PUNCTSIGN;
-
-        showHistoryMaximum();
-        return ZS_SUCCESS;
-      }// ZSRCH_HISTORY
-
-    if (Tokenizer->Tab(Index)->Type==ZSRCH_ENTITY) {
-      if (!advanceIndex())
-        return ZS_SYNTAX_ERROR;
-      if (!testSemiColon())
-        return ZS_MISS_PUNCTSIGN;
-      showEntities();
-      break;
-    }
-    if (Tokenizer->Tab(Index)->Type==ZSRCH_ZENTITY) {
-      if (!advanceIndex())
-        return ZS_SYNTAX_ERROR;
-      if (!testSemiColon())
-        return ZS_MISS_PUNCTSIGN;
-      showZEntities();
-      return ZS_SUCCESS;
-    }
-
-    if (Tokenizer->Tab(Index)->Type==ZSRCH_SYMBOL) {
-      if (!advanceIndex())
-        return ZS_SYNTAX_ERROR;
-      if (!testSemiColon())
-        return ZS_MISS_PUNCTSIGN;
-
-      showSymbols();
-      return ZS_SUCCESS;
-    }
-
-    if (Tokenizer->Tab(Index)->Type==ZSRCH_MASTERFILES) {
-      if (!advanceIndex())
-        return ZS_SYNTAX_ERROR;
-      if (!testSemiColon())
-        return ZS_MISS_PUNCTSIGN;
-
-      showMasterFiles();
-      return ZS_SUCCESS;
-    }
-
-    if (Tokenizer->Tab(Index)->Type!=ZSRCH_IDENTIFIER) {
-      errorLog("Syntax error: Found <%s> while expecting one of {ENTITY,MASTERFILE,SYMBOL,ZENTITY} at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-      return ZS_SYNTAX_ERROR;
-    }
-    wEntityIndex=0;
-    for (; wEntityIndex < EntityList.count(); wEntityIndex++) {
-      if (EntityList[wEntityIndex]->getName() == Tokenizer->Tab(Index)->Text) {
-
-        if (!advanceIndex())
-          return ZS_SYNTAX_ERROR;
-        if (!testSemiColon()) {
-          return ZS_MISS_PUNCTSIGN ;
-        }
-
-        showEntityFields(wEntityIndex);
-        return ZS_SUCCESS;
-      }
-    }// for
-
-    if (wEntityIndex == EntityList.count()) {
-      errorLog("Syntax error: Unrecognized keyword <%s> while expecting one of {ENTITY,MASTERFILE,SYMBOL,ZENTITY,<valid entity name>} at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString() ,Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-      return ZS_SYNTAX_ERROR;
-    }
-
-    break;
-
-  } // main while
-/*
-  switch(wShowEnum)
-  {
-  case SHENUM_ENTITY:
-    showEntities();
-    break;
-  case SHENUM_ENTITYFIELDS:
-    showEntityFields(wEntityIndex);
-    break;
-  case SHENUM_MASTER:
-    showMasterFiles();
-    break;
-  case SHENUM_ZENTITY:
-    showZEntities();
-    break;
-  case SHENUM_SYMBOL:
-    showSymbols();
-    break;
-  case SHENUM_HISTORY:
-    showHistory();
-    break;
-  }
-*/
-  return ZS_SUCCESS;
-} // ZSearchParser::_parseShow
-
-ZStatus
-ZSearchParser::_parseSetHistoryMaximum()
-{
-
-}
-
-
-
-/* set file <path> [mode readonly,modify] as <entity name> ;  // by default mode is read only */
-
-ZStatus
-ZSearchParser::_parseSetFile(std::shared_ptr<ZSearchEntity> &pCollection)
-{
-  ZStatus wSt=ZS_SUCCESS;
-  uriString wPath;
-  Action = ZSPA_SetFile;
-  ZSearchToken* wEntityToken=nullptr;
-
-  while ((Index < Tokenizer->count())&&(Tokenizer->Tab(Index)->Type!=ZSRCH_SEMICOLON)) {
-    CurrentToken=Tokenizer->Tab(Index);
-    while (true) {
-    if(Tokenizer->Tab(Index)->Type==ZSRCH_STRING_LITERAL)
-      {
-        wPath=Tokenizer->Tab(Index)->Text;
-//        wPath.eliminateChar('"');
-        wSt=wPath.check();
-        if (wSt!=ZS_SUCCESS) {
-          logZStatus(ZAIES_Error,wSt,"Path <%s> does not point to a valid, existing file.");
-          errorLog("Invalid file path <%s> at line %d column %d.",
-              Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,Tokenizer->Tab(Index)->Text.toString() );
-           return ZS_FILEERROR ;
-        }
-        infoLog("Path <%s> is valid at line %d column %d.",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-        if (!advanceIndex())
-          return ZS_SYNTAX_ERROR;
-        break;
-      } // ZSRCH_STRING_LITERAL
-
-      if(Tokenizer->Tab(Index)->Type==ZSRCH_IDENTIFIER)  /* pre-defined path  <symbol> <path> */
-      {
-        int wi=0;
-        for (;wi < SymbolList.count();wi++) {
-          if (SymbolList[wi].Symbol == Tokenizer->Tab(Index)->Text) {
-            wSt=SymbolList[wi].Path.check();
-            if (wSt!=ZS_SUCCESS) {
-              errorLog("Invalid file path <%s> deduced from symbol <%s> at line %d column %d.",
-                  SymbolList[wi].Path.toString(),Tokenizer->Tab(Index)->Text.toString(),Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-              return wSt ;
-            }
-            break;
-          }
-        }
-        if (wi== SymbolList.count()) {
-          errorLog("Invalid symbol identifier <%s> cannot find corresponding symbol at line %d column %d.",
-              Tokenizer->Tab(Index)->Text.toString(),Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-          return ZS_NOTFOUND ;
-        }
-      wPath = SymbolList[wi].Path;
-      if (!advanceIndex())
-        return ZS_SYNTAX_ERROR;
-      break;
-      }// ZSRCH_IDENTIFIER
-
-      errorLog("Syntax error: Expected either path or symbol identifier. Found <%s> at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-      return ZS_SYNTAX_ERROR ;
-      }// while true
-
-      CurrentToken=Tokenizer->Tab(Index);
-
-      if(Tokenizer->Tab(Index)->Type== ZSRCH_MODE) {
-        if (!advanceIndex())
-          return ZS_SYNTAX_ERROR;
-        if (Tokenizer->Tab(Index)->Type==ZSRCH_READONLY) {
-          Action |= ZSPA_ReadOnly ;
-        } else if (Tokenizer->Tab(Index)->Type==ZSRCH_MODIFY) {
-          Action |= ZSPA_Modify ;
-        } else {
-          errorLog("Expecting mode as one of [READONLY,MODIFY] at line %d column %d. Found <%s>.",
-              Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,Tokenizer->Tab(Index)->Text.toString() );
-          return ZS_INVPARAMS ;
-        }
-        advanceIndex();
-      } else {
-        warningLog("Expecting MODE keyword at line %d column %d. Found <%s>. Mode is set to READONLY.",
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,Tokenizer->Tab(Index)->Text.toString() );
-          Action = ZSPA_ReadOnly ;
-        }
-
-      if (Tokenizer->Tab(Index)->Type != ZSRCH_AS) {
-          errorLog("Expecting AS keyword at line %d column %d. Found <%s>. ",
-              Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,Tokenizer->Tab(Index)->Text.toString() );
-          return ZS_MISS_KEYWORD;
-      }
-      if (!advanceIndex())
-        return ZS_SYNTAX_ERROR;
-
-      if (Tokenizer->Tab(Index)->Type != ZSRCH_IDENTIFIER) {
-          errorLog("Expecting entity identifier at line %d column %d. Found <%s>. ",
-              Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,Tokenizer->Tab(Index)->Text.toString() );
-          return ZS_MISS_KEYWORD;
-        }
-        wEntityToken=Tokenizer->Tab(Index) ;
-
-        if (!advanceIndex())
-          return ZS_SYNTAX_ERROR;
-
-        if (!testSemiColon()) {
-          return ZS_MISS_PUNCTSIGN;
-        }
-
-  }//while not semi colon
-
-
-  std::shared_ptr <ZSearchMasterFile> wMF=nullptr;
-  int wi=0;
-  for (;wi < MasterFileList.count();wi++){
-    if (wPath==MasterFileList[wi]->_MasterFile.getURIContent()) {
-      wMF=MasterFileList[wi]->getSharedPtr();
-      if (Action & ZSPA_Modify) {
-        if (!wMF->isOpenModify()) {
-          warningLog("File <%s> is already is use with access mode <%s> cannot use mode <ZRF_Modify>.",
-              wPath.toString(), decode_ZRFMode(wMF->getOpenMode()));
-          return ZS_MODEINVALID;
-        }
-        break;
-      }// ZSPA_Modify
-      if (!wMF->isOpenAtLeastReadOnly()) {
-        warningLog("File <%s> is already is use with access mode <%s> cannot use mode <ZRF_Modify>.",
-            wPath.toString(), decode_ZRFMode(wMF->getOpenMode()));
-        return ZS_MODEINVALID;
-      }
-      break;
-    } // if (wPath==MasterFileList[wi]->MasterFile.getURIContent())
-  } // for
-
-  if (wi == MasterFileList.count())  {  /* not found in master file list : create one in list */
-    wMF=std::make_shared <ZSearchMasterFile>();
-    if (Action & ZSPA_Modify) {
-      wSt=wMF->openModify(wPath);
-    }
-    else {
-      wSt=wMF->openReadOnly(wPath);
-    }
-    if (wSt!=ZS_SUCCESS) {
-      logZStatus(ZAIES_Error,wSt,"ZSearchParser::_parse-E-ERROPEN Cannot access file <%s> mode <%s>.",
-          wPath.toString(),Action & ZSPA_Modify?"Modify":"Readonly");
-      return wSt;
-    }
-    MasterFileList.push(wMF);
-  }// not found
-
-
-  /* search if an entity with same name already exists */
-
-  if (EntityList.getEntityByName(wEntityToken->Text)!=nullptr) {
-    textLog("An entity with name <%s> has already been registrated previously.",
-        wEntityToken->Text.toString());
-    return ZS_INVNAME;
-  }
-
-  Entity = ZSearchEntity::constructWithMaster(wMF,wEntityToken);
-
-//  CurEntities.push(Entity);
-
-  EntityList.push(Entity);
-
-  textLog("File <%s> has been opened with mode <%s> as <%s> ",
-      wPath.toString(),Action & ZSPA_Modify?"Modify":"Readonly",Entity->getName().toString());
-  textLog("Dictionary %ld fields %ld index(es)",
-      Entity->getFieldDictionary().count(),
-      Entity->getKeyDictionary().count());
-  for (long wi=0; wi < Entity->getKeyDictionary().count();wi++) {
-    textLog("    %ld - index name <%s> ", wi, Entity->getKeyDictionary()[int(wi)]->DicKeyName.toString());
-  }
-
-  textLog("Entity <%s> has been created and registered.",
-     Entity->getName().toString());
-
-  return ZS_SUCCESS;
-} //_parseSetFilePhrase
+} // _parseComment
 
 void
 ZSearchParser::showHistory () {
-  History.show(this);
+  History.show(&ErrorLog);
 }
+
 void
 ZSearchParser::showHistoryMaximum () {
-  textLog(" History maximum is set to %d ",History.Maximum);
+  ErrorLog.textLog(" History maximum is set to %d ",History.Maximum);
+}
+
+ZStatus
+ZSearchParser::setHistoryMaximum (int pMax)
+{
+  return History.setMaximum(pMax,&ErrorLog);
 }
 
 void
-ZSearchParser::setHistoryMaximum (int pMax) {
-  ZStatus wSt=History.setMaximum(pMax,this);
-}
-void
-ZSearchParser::clearHistory () {
+ZSearchParser::clearHistory ()
+{
   History.List.clear();
-  textLog("            ---instruction log is cleared--.");
+  ErrorLog.textLog("            ---instruction log is cleared--.");
+  return ;
 }
-void
-ZSearchParser::clearHistoryFirst (int pLines) {
 
-  History.removeFirst(pLines,this);
+ZStatus
+ZSearchParser::clearHistoryFirst (int pLines)
+{
+  return History.removeFirst(pLines,&ErrorLog);
 }
-void
-ZSearchParser::clearHistoryLast (int pLines) {
-  History.removeLast(pLines,this);
-/*
-  if (History.List.count()<=pLines){
-    History.List.clear();
-    textLog("            ---instruction log is cleared---");
-    return;
-  }
-  for (int wi=0;wi < pLines;wi++)
-    History.List.pop();
 
-  textLog("            --- removed %d lines from then end of instruction log ---",pLines,pLines);
-*/
+ZStatus
+ZSearchParser::clearHistoryLast(int pLines)
+{
+  return History.removeLast(pLines,&ErrorLog);
 }
-void
-ZSearchParser::clearHistoryRank (int pRank) {
-  History.remove(pRank,this);
+ZStatus
+ZSearchParser::clearHistoryRank (int pRank)
+{
+  return History.remove(pRank,&ErrorLog);
 }
 
 
 void
-ZSearchParser::showSymbols () {
-  textLog("__________________Symbol list___________________");
+ZSearchParser::showSymbols ()
+{
+  ErrorLog.textLog("__________________Symbol list___________________");
   if (SymbolList.count()==0)
-    textLog("            ---no symbol to show--.");
+    ErrorLog.textLog("            ---no symbol to show--.");
   else
     for (int wi=0;wi < SymbolList.count();wi++) {
-      textLog("%25s %s",SymbolList[wi].Symbol.toString(),SymbolList[wi].Path.toString());
+          ErrorLog.textLog("%25s %s",SymbolList[wi].getName().toString(),SymbolList[wi].display().toString());
   }
-  textLog("________________________________________________");
+  ErrorLog.textLog("________________________________________________");
 }
+
+ZStatus
+ZSearchParser::showSymbol (ZSearchContext& pContext,ZSearchToken*  pTokenName)
+{
+  if (SymbolList.count()==0) {
+    ErrorLog.warningLog("showSymbol-W-EMPTY            ---no symbol to show--.");
+    return ZS_EMPTY;
+  }
+  int wi=0;
+  for (; (wi < SymbolList.count()) && (pTokenName->Text != SymbolList[wi].getName());wi++) ;
+
+  if (wi == SymbolList.count()){
+    ErrorLog.errorLog("showSymbol-E-NOTFND Symbol %s has not been found",pTokenName->Text.toString());
+    pContext.LastErroredToken=pTokenName;
+    /* suggest symbols */
+    ZArray<utf8VaryingString> wSugArray ;
+    /* add entities names to suggest */
+    for (int wi=0;wi < SymbolList.count();wi++)
+        wSugArray.push(SymbolList[wi].getName());
+
+    /* try to suggest */
+    utf8VaryingString wSuggest=searchAdHocWeighted (pTokenName->Text,wSugArray);
+    if (!wSuggest.isEmpty())
+        ErrorLog.textLog("Do you mean <%s> ?", wSuggest.toString() );
+    return pContext.Status=ZS_INVNAME ;
+  }
+  ErrorLog.textLog("%25s %s",SymbolList[wi].getName().toString(),SymbolList[wi].display().toString());
+  return pContext.Status=ZS_SUCCESS;
+} // ZSearchParser::showSymbol
+
 void
-ZSearchParser::showZEntities () {
-  textLog("__________________ZEntity list___________________");
-  if (ZEntityList.count()==0)
-    textLog("            ---no ZEntity to show--.");
-  else
-    for (int wi=0;wi < ZEntityList.count();wi++) {
-      textLog("%25s 0x%10lX",ZEntityList[wi].Symbol.toString(),ZEntityList[wi].Value);
-    }
-  textLog("________________________________________________");
+ZSearchParser::showDisplay ()
+{
+    ErrorLog.textLog("__________________Display parameters___________________");
+    ErrorLog.textLog("  maximum column size [colmax]   %d",DisplayColMax);
+    ErrorLog.textLog("  minimum column size [colmin]   %d",DisplayColMin);
+    ErrorLog.textLog("  cell format                    %s",decode_ZCellFormat(DisplayCellFormat).toString());
 }
 
 void
-ZSearchParser::showMasterFiles () {
-  textLog("__________________Master files___________________");
+ZSearchParser::showZEntities ()
+{
+  ErrorLog.textLog("__________________ZEntity symbol list___________________");
+  if (ZEntitySymbolList.count()==0)
+    ErrorLog.textLog("            ---no ZEntity to show--.");
+  else
+    for (int wi=0;wi < ZEntitySymbolList.count();wi++) {
+      ErrorLog.textLog("%25s 0x%10lX",ZEntitySymbolList[wi].Symbol.toString(),ZEntitySymbolList[wi].Value);
+    }
+  ErrorLog.textLog("________________________________________________");
+}
+
+void
+ZSearchParser::showMasterFiles ()
+{
+  ErrorLog.textLog("__________________Master files___________________");
   if (MasterFileList.count()==0)
-    textLog("           ---no Master file to show--.");
+    ErrorLog.textLog("           ---no Master file to show--.");
   else
     for (int wi=0;wi < MasterFileList.count();wi++) {
-      textLog("%30s %s",
-          decode_ZRFMode( MasterFileList[wi]->getOpenMode()), MasterFileList[wi]->getPath().toString());
+      ErrorLog.textLog("%30s %s",
+          decode_ZRFMode( MasterFileList[wi]->getOpenMode()), MasterFileList[wi]->getURIContent().toString());
     }
-  textLog("________________________________________________");
+  ErrorLog.textLog("________________________________________________");
 }
 
 void
-ZSearchParser::showEntities () {
-  textLog("__________________Entities___________________");
+ZSearchParser::showEntityList ()
+{
+  ErrorLog.textLog("_________________________________________Entity list____________________________________________________");
   if (EntityList.count()==0)
-    textLog("           ---no Entity to show--.");
+    ErrorLog.textLog("           ---no Entity to show--.");
   else
     for (int wi=0;wi < EntityList.count();wi++) {
       if (!EntityList[wi]->isValid()) {
-        textLog("<Invalid entity>");
+        ErrorLog.textLog("<Invalid/malformed entity> at rank <%d>",wi);
         continue;
       }
-
-      textLog("<%s>",
-          EntityList[wi]->getName().toString());
-      if (EntityList[wi]->isFile()) {
-      textLog("       has associated file : open mode <%30s> %s",
-            decode_ZRFMode( EntityList[wi]->_FileEntity->_MasterFile->getOpenMode()), EntityList[wi]->_FileEntity->_MasterFile->getPath().toString());
-      continue;
-      }
-      if (!EntityList[wi]->isCollection()) {
-        errorLog("       error : entity is neither a file entity nor a collection entity.",
-            decode_ZRFMode( EntityList[wi]->_FileEntity->_MasterFile->getOpenMode()), EntityList[wi]->_FileEntity->_MasterFile->getPath().toString());
-        continue;
-      }
-      const char* wBaseType = nullptr;
-      if (EntityList[wi]->_CollectionEntity->_BaseEntity->isFile())
-        wBaseType="File entity";
-      else if (EntityList[wi]->_CollectionEntity->_BaseEntity->isCollection())
-        wBaseType="Collection entity";
-      else
-        wBaseType="Undefined invalid entity";
-      textLog("       is a collection entity  : base entity is <%30s> of type <%s>.",
-          EntityList[wi]->_CollectionEntity->_BaseEntity->getName().toString(),wBaseType);
-      if (EntityList[wi]->_CollectionEntity->isValid()) {
-        textLog("___________________Logical term_______________________");
-        if (EntityList[wi]->_CollectionEntity->LogicalTerm!=nullptr) {
-          textLog("___________________Logical expression_______________________");
-          textLog(EntityList[wi]->_CollectionEntity->LogicalTerm->_report(0).toCChar());
-        }
-        else
-          textLog("***No logical expression***");
-
-       textLog("___________________ Selected fields _______________________");
-
-       for (long wj=0;wj < EntityList[wi]->_CollectionEntity->getFieldDictionary().count();wj++ ) {
-         textLog(EntityList[wi]->_CollectionEntity->getFieldDictionary().TabConst(wj).getName().toCChar());
-       }
-
-      } // is valid
-      else
-        textLog("***Base entity is NULL***");
+      showEntityDetails(EntityList[wi],3);
     }
-  textLog("__________________________________________________________________");
+
+  ErrorLog.textLog("________________________________________________________________________________________________");
+}
+
+
+
+ZStatus
+ZSearchParser::showEntity (ZSearchContext &pContext, ZSearchToken *pTokenName,int pShowType)
+{
+    if (EntityList.count()==0) {
+      ErrorLog.warningLog("showEntity-W-EMPTY            ---no entity to show--.");
+      return pContext.Status=ZS_EMPTY;
+    }
+    int wi=0;
+    for (; (wi < EntityList.count()) && (pTokenName->Text != EntityList[wi]->getEntityName());wi++) ;
+
+    if (wi == EntityList.count()){
+      ErrorLog.errorLog("showEntity-E-NOTFND Entity <%s> has not been found",pTokenName->Text.toString());
+      pContext.LastErroredToken=pTokenName;
+      /* suggest symbols */
+      ZArray<utf8VaryingString> wSugArray ;
+      /* add entities names to suggest */
+      for (int wi=0;wi < EntityList.count();wi++)
+          wSugArray.push(EntityList[wi]->getEntityName());
+
+      /* try to suggest */
+      utf8VaryingString wSuggest=searchAdHocWeighted (pTokenName->Text,wSugArray);
+      if (!wSuggest.isEmpty())
+          ErrorLog.textLog("Do you mean <%s> ?", wSuggest.toString() );
+      return pContext.Status=ZS_INVNAME ;
+    }
+    if (pShowType & SHENT_Brief) {
+        showEntityDetailsBrief(EntityList[wi],pShowType);
+    }
+    else {
+        showEntityDetails(EntityList[wi],pShowType);
+    }
+  ErrorLog.textLog("________________________________________________________________________________________________");
+
+  return pContext.Status = ZS_SUCCESS;
+} // showEntity
+
+const char*
+entityType(std::shared_ptr<ZSearchEntity> pEntity)
+{
+    const char* wEType="unknown entity type";
+    if (pEntity->isFile())
+        wEType = "File entity";
+    else if (pEntity->isCollection())
+        wEType = "Collection";
+    else if (pEntity->isJoin())
+        wEType = "Join";
+
+    return wEType;
 }
 
 void
-ZSearchParser::showEntityFields (int pEntityIndex) {
-  textLog("__________________Entity %s___________________",EntityList[pEntityIndex]->getName().toString());
-  for (int wi=0; wi < EntityList[pEntityIndex]->getFieldDictionary().count();wi++) {
-    textLog("%30s %s",
-        EntityList[pEntityIndex]->getFieldDictionary()[wi].getName().toString(),
-        decode_ZType(EntityList[pEntityIndex]->getFieldDictionary()[wi].ZType));
-  }
-  textLog("________________end entity %s_________________",EntityList[pEntityIndex]->getName().toString());
+ZSearchParser::showEntityDetailsBrief (std::shared_ptr<ZSearchEntity> pEntity, int pShowType)
+{
+    ErrorLog.textLog("Entity %s %s %s",
+                     pEntity->getEntityName().toString(),
+                     pEntity->getEntityFullName().toString(),
+                     entityType(pEntity));
+
+    while (true) {
+        if (pEntity->isJoin()) {
+            ErrorLog.textLog("     Master entity %s %s %s",
+                             pEntity->_JoinList[0]->getEntityName().toString(),
+                             pEntity->_JoinList[0]->getEntityFullName().toString(),
+                             entityType(pEntity->_JoinList[0]));
+            ErrorLog.textLog("     slave entity %s %s %s",
+                             pEntity->_JoinList[1]->getEntityName().toString(),
+                             pEntity->_JoinList[1]->getEntityFullName().toString(),
+                             entityType(pEntity->_JoinList[1]));
+            break;
+        }
+        if (pEntity->isCollection()) {
+            ErrorLog.textLog("     Base entity %s %s %s",
+                             pEntity->_BaseEntity->getEntityName().toString(),
+                             pEntity->_BaseEntity->getEntityFullName().toString(),
+                             entityType(pEntity->_BaseEntity));
+            break;
+        }
+        if (pEntity->isFile()) {
+            ErrorLog.textLog("     File %s <%s>",
+                             pEntity->_FileEntity->Name.toString(),
+                             pEntity->_FileEntity->getPath().toString());
+            break;
+        }
+        ErrorLog.textLog("Unknown entity type");
+        break;
+    } // while true
+
+    ErrorLog.textLog("     Build dictionary %d fields\n Local dictionary (selected fields) %d fields",
+                     pEntity->BuildDic.count(),pEntity->LocalMetaDic.count());
+
+    utf8VaryingString wFieldList = "      Field selection clause\n";
+    int wi = 0 ;
+    if (pEntity->BuildDic.count()==0) {
+      wFieldList += "<no field selected>";
+    }
+    else {
+        wFieldList.addsprintf("%s ",pEntity->BuildDic[wi]._reportBrief(0).toString());
+        for (wi = 1 ; wi < pEntity->BuildDic.count(); wi++) {
+            wFieldList += ", ";
+            wFieldList.addsprintf("%s ",pEntity->BuildDic[wi]._reportBrief(0).toString());
+        }
+    }
+    ErrorLog.textLog(wFieldList.toCChar());
+
+    if (pEntity->isCollection()) {
+        if (pShowType & SHENT_With) {
+            ErrorLog.textLog("      With clause");
+            if (pEntity->LogicalTerm==nullptr)
+                ErrorLog.textLog("         <nullptr>");
+            else
+                ErrorLog.textLog(pEntity->LogicalTerm->_reportFormula(false).toCChar());
+        }
+    }// Collection
+    else if (pEntity->isJoin()) {
+//        CountTerm wCT;
+        if (pShowType & SHENT_With) {
+            ErrorLog.textLog("     With clause Joined entity :\n"
+                             "          Master entity");
+            ErrorLog.textLog(pEntity->_JoinList[0]->LogicalTerm->_reportFormula(false).toCChar());
+            ErrorLog.textLog("          Slave entity :");
+            ErrorLog.textLog(pEntity->_JoinList[1]->LogicalTerm->_reportFormula(false).toCChar());
+        }
+        if (pShowType & SHENT_Using) {
+            if (pEntity->_Using == nullptr)
+                ErrorLog.errorLog("     Invalid <Using> clause for a join entity : <nullptr> ");
+            else {
+                ErrorLog.textLog("     Using clause ");
+                ErrorLog.textLog(pEntity->_Using->_reportFormula(false).toCChar());
+            }
+        }
+        /*
+        _countLogicalTerm(pEntity->_JoinList[0]->LogicalTerm,wCT);
+        ErrorLog.textLog("     master entity :  logical term(s):%d operands:%d operators:%d - arithmetic term(s):%d operands:%d operators:%d\n"
+                         "                    end scan status: %s",
+                         wCT.LogTerm,wCT.LogOperand,wCT.LogOperator,
+                         wCT.ArithTerm,wCT.ArithOperand,wCT.ArithOperator,
+                         decode_TSST(wCT.Status));
+        wCT.clear();
+        _countLogicalTerm(pEntity->_JoinList[1]->LogicalTerm,wCT);
+        ErrorLog.textLog("     slave entity :  logical term(s):%d operands:%d operators:%d - arithmetic term(s):%d operands:%d operators:%d\n"
+                         "                    end scan status: %s",
+                         wCT.LogTerm,wCT.LogOperand,wCT.LogOperator,
+                         wCT.ArithTerm,wCT.ArithOperand,wCT.ArithOperator,
+                         decode_TSST(wCT.Status));
+
+        wCT.clear();
+        _countLogicalTerm(pEntity->_Using,wCT);
+        */
+
+    }// isJoin
+
+    if (!pEntity->isJoin()){
+        if (pEntity->_Using != nullptr)
+            ErrorLog.errorLog("     Invalid <Using> clause : not allowed for a <%s> entity",
+                              entityType(pEntity));
+    }
+
+//  ErrorLog.textLog("________________________________________________________________________________________________");
+} // ZSearchParser::showEntityDetailsBrief
+
+void
+ZSearchParser::showEntityWithClause (std::shared_ptr<ZSearchEntity> pEntity,int pDetail)
+{
+    ErrorLog.textLog("______________________Ranks selection logical term (with clause)_______________________");
+    if (pEntity->isJoin()) {
+        ErrorLog.textLog("   Master :");
+        if (pEntity->_JoinList[0]->hasFormula()) {
+            if (pDetail & SHENT_Brief)
+                ErrorLog.textLog(pEntity->_JoinList[0]->LogicalTerm->_reportFormula(false).toCChar());
+            else
+                ErrorLog.textLog(pEntity->_JoinList[0]->LogicalTerm->_reportDetailed(false).toCChar());
+        }
+        else {
+            ErrorLog.textLog("   no with clause for master entity (all ranks selected).");
+        }
+        ErrorLog.textLog("   Slave :");
+        if (pEntity->_JoinList[1]->hasFormula()) {
+            if (pDetail & SHENT_Brief)
+                ErrorLog.textLog(pEntity->_JoinList[1]->LogicalTerm->_reportFormula(false).toCChar());
+            else
+                ErrorLog.textLog(pEntity->_JoinList[1]->LogicalTerm->_reportDetailed(false).toCChar());
+        }
+        else {
+            ErrorLog.textLog("   no with clause for slave entity (all ranks selected).");
+        }
+        return;
+    } // isJoin()
+
+    /* either collection or file entity */
+
+    if (pEntity->hasFormula()) {
+        if (pDetail & SHENT_Brief)
+            ErrorLog.textLog(pEntity->LogicalTerm->_reportFormula(false).toCChar());
+        else
+            ErrorLog.textLog(pEntity->LogicalTerm->_reportDetailed(false).toCChar());
+     }
+    else
+     ErrorLog.textLog("  with clause missing (all ranks selected)");
 }
+void
+ZSearchParser::showEntityUsingClause (std::shared_ptr<ZSearchEntity> pEntity,int pDetail)
+{
+    if (pEntity->_Using != nullptr) {
+        ErrorLog.textLog("_____________________________ join logical term (using clause) ______________________________");
+        if (pDetail & SHENT_Brief)
+            ErrorLog.textLog(pEntity->_Using->_reportFormula(false).toCChar());
+        else
+            ErrorLog.textLog(pEntity->_Using->_reportDetailed(false).toCChar());
+
+        if (!pEntity->isJoin()) {
+            ErrorLog.warningLog(" Entity is not a join entity and has an existing using clause");
+        }
+        return;
+     }
+    if (!pEntity->isJoin()) {
+        return ;
+    }
+
+    ErrorLog.warningLog(" Entity is a join entity and has no existing using clause. This may induce disfunctions.");
+
+}
+
+void
+ZSearchParser::showEntityBuildDic (std::shared_ptr<ZSearchEntity> pEntity,int pDetail)
+{
+    ErrorLog.textLog("__________________________ Build dictionary _______________________________");
+    ErrorLog.textLog("   |          Field name     |            ZType        |MetaDic rank");
+    for (long wj=0;wj < pEntity->BuildDic.count();wj++ ) {
+        ErrorLog.textLog("%3d|%25s|%25s|%ld",wj,
+                pEntity->BuildDic[wj].getFieldName().toString(),
+                decode_ZType(pEntity->BuildDic[wj].getZType()),
+                pEntity->BuildDic[wj].getMetaDicRank());
+    }
+}
+
+void
+ZSearchParser::showEntityLocalDic (std::shared_ptr<ZSearchEntity> pEntity,int pDetail)
+{
+    ErrorLog.textLog("__________________________  Local dictionary   _______________________________");
+    ErrorLog.textLog("   |          Field name     |            ZType        ");
+    for (long wj=0;wj < pEntity->LocalMetaDic.count();wj++ ) {
+        ErrorLog.textLog("%3d|%25s|%25s|",wj,
+                pEntity->LocalMetaDic[wj].getName().toString(),
+                decode_ZType(pEntity->LocalMetaDic[wj].ZType));
+    }
+}
+void
+ZSearchParser::showEntityHeader (std::shared_ptr<ZSearchEntity> pEntity)
+{
+  const char* wETp ;
+  if (pEntity->isFile())
+      wETp = "File Entity";
+  else if (pEntity->isJoin())
+      wETp = "Join Entity";
+  else if (pEntity->isCollection())
+      wETp = "Collection Entity";
+  else
+      wETp = "Undefined Entity";
+
+  ErrorLog.textLog("__________________Entity %s %s___________________",
+            pEntity->getEntityName().toString(),
+            wETp);
+
+} // ZSearchParser::showEntityHeader
+void
+ZSearchParser::showEntityTrailer (std::shared_ptr<ZSearchEntity> pEntity)
+{
+  const char* wETp ;
+  if (pEntity->isFile())
+      wETp = "File Entity";
+  else if (pEntity->isJoin())
+      wETp = "Join Entity";
+  else if (pEntity->isCollection())
+      wETp = "Collection Entity";
+  else
+      wETp = "Undefined Entity";
+
+  ErrorLog.textLog("__________________end of %s %s___________________",
+            pEntity->getEntityName().toString(),
+            wETp);
+
+} // ZSearchParser::showEntityHeader
+
+void
+ZSearchParser::showEntityDetails (std::shared_ptr<ZSearchEntity> pEntity,int pShowType)
+{
+    if (pEntity->isJoin()) {
+        showJoinDetails(pEntity, pShowType);
+        return;
+    }
+    showCollectionDetails(pEntity, pShowType);
+}
+
+void
+ZSearchParser::showJoinDetails (std::shared_ptr<ZSearchEntity> pEntity,int pShowType)
+{
+  if (!pEntity->isJoin()) {
+      showCollectionDetails(pEntity, pShowType);
+      return;
+  }
+    showEntityHeader(pEntity);
+
+    ErrorLog.textLog("Join entity main data");
+
+    ErrorLog.textLog("\nBuild dictionary\n");
+
+    ErrorLog.textLog("rnk %15s ZSTO ","Field name");
+    for (int wi=0; wi < pEntity->BuildDic.count() ; wi++) {
+        ZSearchOperandBase* wOpBase = static_cast<ZSearchOperandBase*>(pEntity->BuildDic[wi].Operand);
+        ErrorLog.textLog("%3d %15s %s",
+                         wi,
+                         wOpBase->FullFieldName.toString(),
+                         decode_ZSTO(wOpBase->ZSTO).toString()
+                         );
+
+        if (wOpBase->ZSTO & ZSTO_Field) {
+            ZSearchFieldOperand* wOp = static_cast<ZSearchFieldOperand*>(pEntity->BuildDic[wi].Operand);
+            ErrorLog.textLog("         Entity <%15s> Local dictionary rank <%d> field name <%15s> ZType <%s>",
+                            wOp->Entity->getEntityName().toString(),
+                            wOp->MetaDicRank,
+                            wOp->Entity->LocalMetaDic[wOp->MetaDicRank].getName().toString(),
+                            decode_ZType(wOp->Entity->LocalMetaDic[wOp->MetaDicRank].ZType));
+        }
+        else if (wOpBase->ZSTO & ZSTO_Logical) {
+            ZSearchLogicalOperand* wOp = static_cast<ZSearchLogicalOperand*>(pEntity->BuildDic[wi].Operand);
+            ErrorLog.textLog("      Logical expression <%s>",wOp->_reportBrief(0).toString());
+        }
+        else if (wOpBase->ZSTO & ZSTO_Arithmetic) {
+            ZSearchArithmeticTerm* wOp = static_cast<ZSearchArithmeticTerm*>(pEntity->BuildDic[wi].Operand);
+            ErrorLog.textLog("      Arithmetic expression <%s>",wOp->_reportFormula(true).toString());
+        }
+    }// for
+    ErrorLog.textLog("\nLocal meta dictionary\n");
+
+    for (int wi=0; wi < pEntity->LocalMetaDic.count() ; wi++) {
+        ErrorLog.textLog("rnk %15s ZType","Field name");
+        ErrorLog.textLog("%3d %15s %s",
+                         wi,
+                         pEntity->LocalMetaDic[wi].getName().toString(),
+                         decode_ZType(pEntity->LocalMetaDic[wi].ZType)
+                         );
+
+        ZSearchOperandBase* wOpBase = static_cast<ZSearchOperandBase*>(pEntity->BuildDic[wi].Operand);
+
+        ErrorLog.textLog("rnk %15s ZSTO ","Field name");
+        ErrorLog.textLog("%3d %15s %s",
+                         wi,
+                         wOpBase->FullFieldName.toString(),
+                         decode_ZSTO(wOpBase->ZSTO).toString()
+                         );
+
+        if (wOpBase->ZSTO & ZSTO_Field) {
+            ZSearchFieldOperand* wOp = static_cast<ZSearchFieldOperand*>(pEntity->BuildDic[wi].Operand);
+            ErrorLog.textLog("         Entity <%15s> Local dictionary rank <%d> field name <%15s> ZType <%s>",
+                            wOp->Entity->getEntityName().toString(),
+                            wOp->MetaDicRank,
+                            wOp->Entity->LocalMetaDic[wOp->MetaDicRank].getName().toString(),
+                            decode_ZType(wOp->Entity->LocalMetaDic[wOp->MetaDicRank].ZType));
+        }
+
+    }// for
+
+
+    ErrorLog.textLog("master entity <%s> <%s>\n",
+                     pEntity->_JoinList[0]->getEntityName().toString(),entityType(pEntity->_JoinList[0]));
+
+
+    if (pShowType & SHENT_With) {
+        ErrorLog.textLog("______________________With clause_______________________________\n"
+                         "Master");
+        ErrorLog.textLog(pEntity->_JoinList[0]->LogicalTerm->_reportFormula(false).toCChar());
+        ErrorLog.textLog("Slave");
+        ErrorLog.textLog(pEntity->_JoinList[1]->LogicalTerm->_reportFormula(false).toCChar());
+        ErrorLog.textLog("_________________________________________________________________");
+    }
+    if (pShowType & SHENT_Dictionaries) {
+        showEntityLocalDic(pEntity->_JoinList[0],0);
+        showEntityBuildDic(pEntity->_JoinList[0],0);
+
+    }
+
+    ErrorLog.textLog("slave  entity <%s> <%s>\n",
+                     pEntity->_JoinList[1]->getEntityName().toString(),entityType(pEntity->_JoinList[1]));
+
+    if (pShowType & SHENT_Dictionaries) {
+        showEntityLocalDic(pEntity->_JoinList[1],0);
+        showEntityBuildDic(pEntity->_JoinList[1],0);
+    }
+
+  showEntityTrailer(pEntity);
+} // ZSearchParser::showEntityDetails
+
+void
+ZSearchParser::showCollectionDetails (std::shared_ptr<ZSearchEntity> pEntity,int pShowType)
+{
+  showEntityHeader(pEntity);
+
+    if (pShowType & SHENT_With) {
+       showEntityWithClause(pEntity,pShowType);
+    }
+    if (pShowType & SHENT_Dictionaries) {
+        showEntityLocalDic(pEntity,pShowType);
+
+        showEntityBuildDic(pEntity,pShowType);
+    }
+
+  showEntityTrailer(pEntity);
+} // ZSearchParser::showEntityDetails
+
+int
+analyzeSearchField(const utf8VaryingString& pFieldName, utf8VaryingString& pToSearch)
+{
+    int wSType = 0 ; /* 0 : exact - 1 : starts with - 2 : ends with - 3 : contains - 4 : all - 8 : is like <~> sign */
+/* analyze field name to search */
+
+    utf8_t* wPtr=pFieldName.Data;
+    utf8_t* wPtrStart ;
+    utf8_t* wPtrEnd ;
+
+    if (pFieldName.isEmpty()) {
+        pToSearch.clear();
+        return 4;
+    }
+
+    /* skip leading spaces and other possible bulshits */
+    while ((*wPtr)&& !utfIsAsciiChar(*wPtr) && utfIsSpace(*wPtr))
+        wPtr++;
+
+    wPtrStart = wPtr;
+    if (*wPtr=='~') {
+        wSType = 8 ;    /* is like */
+        wPtrStart ++;
+        wPtrEnd = wPtrStart;
+        while ((*wPtrEnd)&& utfIsAsciiChar(*wPtrEnd) && !utfIsSpace(*wPtrEnd))
+            wPtrEnd++;
+
+        goto analyzeSearchField_End;  /* extract search string and exit */
+    }
+
+
+    if (*wPtr=='*') {
+        wSType = 2 ;    /* ends with : wild card is first character */
+        wPtrStart ++ ;
+        if (!*wPtr || utfIsSpace(*wPtr)) {
+            pToSearch.clear();
+            return 4;   /* no other character than wildcard : all */
+        }
+    }
+    wPtr++;
+    while ( *wPtr && (*wPtr!='*') && !utfIsSpace(*wPtr) && utfIsAsciiChar(*wPtr)  )
+        wPtr++;
+
+    wPtrEnd = wPtr;
+    if (*wPtr=='*') {
+        wSType += 1 ; /* starts with : wild card is last character ( or contains )*/
+//        wPtrEnd -- ;
+    }
+analyzeSearchField_End:
+    /* copy substring to search */
+
+    utf8_t* wPtrOut = pToSearch.allocateUnitsBZero(wPtrEnd-wPtrStart+1);
+
+    while (wPtrStart < wPtrEnd) {
+        *wPtrOut = *wPtrStart;
+        wPtrStart++;
+        wPtrOut++;
+    }
+
+    return wSType;
+} // analyzeSearchField
+
+ZStatus
+ZSearchParser::showEntityField (ZSearchContext& pContext,std::shared_ptr<ZSearchEntity> pEntity,const utf8VaryingString& pFieldName)
+{
+    ErrorLog.textLog("__________________Entity %s %s___________________",
+            pEntity->getEntityName().toString(),
+            pEntity->isFile()?"File entity":"Collection");
+
+    if (pEntity==nullptr) {
+        ErrorLog.errorLog("ZSearchParser::showEntityField-E-NULL Given Entity is invalid or null at line %d column %d.",
+            pContext.previousToken()->TokenLine,pContext.previousToken()->TokenColumn);
+            pContext.LastErroredToken = pContext.previousToken();
+        return pContext.Status=ZS_NULLPTR;
+    }
+
+    if (pEntity->LocalMetaDic.count()==0) {
+        ErrorLog.errorLog("ZSearchParser::showEntityField-E-EMPTY Given Entity <%s> has no local dictionary at line %d column %d.",
+            pContext.previousToken()->Text.toString(), pContext.previousToken()->TokenLine,pContext.previousToken()->TokenColumn);
+          pContext.LastErroredToken = pContext.previousToken();
+        return pContext.Status=ZS_EMPTY;
+    }
+
+    /* 0 : exact - 1 : starts with - 2 : ends with - 3 : contains */
+    utf8VaryingString wSearch;
+    int wSType = analyzeSearchField(pFieldName,wSearch); /* analyze field name to search */
+
+    switch (wSType)
+    {
+    case 0:  /* exact match */
+    {
+        int wi=0;
+        for (;wi < pEntity->LocalMetaDic.count();wi++) {
+            if (pEntity->LocalMetaDic[wi].getName()==pFieldName)
+                break;
+        }
+        if (wi >= pEntity->LocalMetaDic.count()) {
+            ErrorLog.errorLog("Entity %s has no field named %s",
+                    pEntity->getEntityName().toString(),
+                    pFieldName.toString());
+            zbs::ZArray<utf8VaryingString> wFieldNameList;
+            for (long wi=0; wi < pEntity->LocalMetaDic.count();wi++)
+                wFieldNameList.push(pEntity->LocalMetaDic[wi].getName());
+
+            utf8VaryingString wApprox = searchAdHocWeighted(pFieldName,wFieldNameList);
+            if (!wApprox.isEmpty()) {
+                ErrorLog.textLog("Do you mean <%s> ?", wApprox.toString() );
+            }
+            return pContext.Status=ZS_NOTFOUND;
+        }
+        _displayOneFieldDetail(pEntity->LocalMetaDic[wi]);
+        return pContext.Status=ZS_SUCCESS;
+    } // case 0
+
+    case 1:  /* starts with */
+    {
+        bool wFound=false;
+        int wi=0;
+        for (;wi < pEntity->LocalMetaDic.count();wi++) {
+            if (pEntity->LocalMetaDic[wi].getName().startsWithT<utf8VaryingString>(wSearch)) {
+                _displayOneFieldDetail(pEntity->LocalMetaDic[wi]);
+                wFound=true;
+            }
+        }
+        if (!wFound) {
+            ErrorLog.errorLog("Entity %s has no field whose name starts with %s",
+                    pEntity->getEntityName().toString(),
+                    wSearch.toString());
+            zbs::ZArray<utf8VaryingString> wFieldNameList;
+            for (long wi=0; wi < pEntity->LocalMetaDic.count();wi++)
+                wFieldNameList.push(pEntity->LocalMetaDic[wi].getName());
+
+            utf8VaryingString wApprox = searchAdHocWeighted(pFieldName,wFieldNameList);
+            if (!wApprox.isEmpty()) {
+                ErrorLog.textLog("Do you mean <%s> ?", wApprox.toString() );
+            }
+            pContext.LastErroredToken = pContext.TokenIdentifier;
+            return pContext.Status=ZS_NOTFOUND;
+        }
+
+        return pContext.Status=ZS_SUCCESS;
+    } // case 1
+
+    case 2:  /* ends with */
+    {
+        bool wFound=false;
+        int wi=0;
+        for (;wi < pEntity->LocalMetaDic.count();wi++) {
+            if (pEntity->LocalMetaDic[wi].getName().endsWithT<utf8VaryingString>(wSearch)) {
+                _displayOneFieldDetail(pEntity->LocalMetaDic[wi]);
+                wFound=true;
+        }
+        }
+        if (!wFound) {
+            ErrorLog.errorLog("Entity %s has no field whose name ends with <%s>",
+                    pEntity->getEntityName().toString(),
+                    wSearch.toString());
+            zbs::ZArray<utf8VaryingString> wFieldNameList;
+            for (long wi=0; wi < pEntity->LocalMetaDic.count();wi++)
+                wFieldNameList.push(pEntity->LocalMetaDic[wi].getName());
+
+            utf8VaryingString wApprox = searchAdHocWeighted(pFieldName,wFieldNameList);
+            if (!wApprox.isEmpty()) {
+                ErrorLog.textLog("Do you mean <%s> ?", wApprox.toString() );
+            }
+            return pContext.Status=ZS_NOTFOUND;
+        }
+        return pContext.Status=ZS_SUCCESS;
+    } // case 2
+
+    case 3:  /* contains */
+    {
+        bool wFound=false;
+        int wi=0;
+        for (;wi < pEntity->LocalMetaDic.count();wi++) {
+            if (pEntity->LocalMetaDic[wi].getName().containsT<utf8VaryingString>(wSearch)) {
+                _displayOneFieldDetail(pEntity->LocalMetaDic[wi]);
+                wFound=true;
+            }
+        }
+        if (!wFound) {
+            ErrorLog.errorLog("Entity %s has no field whose name contains %s",
+                    pEntity->getEntityName().toString(),
+                    wSearch.toString());
+            zbs::ZArray<utf8VaryingString> wFieldNameList;
+            for (long wi=0; wi < pEntity->LocalMetaDic.count();wi++)
+                wFieldNameList.push(pEntity->LocalMetaDic[wi].getName());
+
+            utf8VaryingString wApprox = searchAdHocWeighted(pFieldName,wFieldNameList);
+            if (!wApprox.isEmpty()) {
+                ErrorLog.textLog("Do you mean <%s> ?", wApprox.toString() );
+            }
+            return pContext.Status=ZS_NOTFOUND;
+        }
+        return pContext.Status=ZS_SUCCESS;
+    } // case 3
+
+    case 4:  /* all */
+    {
+        int wi=0;
+        for (;wi < pEntity->LocalMetaDic.count();wi++) {
+            _displayOneFieldDetail(pEntity->LocalMetaDic[wi]);
+        }
+
+        return pContext.Status=ZS_SUCCESS;
+    } // case 4
+
+    case 8:  /* is like */
+    {
+        CWeightList wWeightList;
+        CMatchResult wR;
+        int wMatch=0;
+        for (int wi=0;wi < pEntity->LocalMetaDic.count();wi++) {
+            if(matchWeight(wR,pEntity->LocalMetaDic[wi].getName(),wSearch)) {
+                wWeightList.add(wR,wi);
+            }
+        }
+        if (wWeightList.count() == 0) {
+            ErrorLog.errorLog("Entity %s has no field whose name is like <%s>",
+                    pEntity->getEntityName().toString(),
+                    wSearch.toString());
+            pContext.LastErroredToken = pContext.TokenIdentifier;
+            return pContext.Status=ZS_NOTFOUND;
+        }
+
+        for (int wi=0;wi < wWeightList.count();wi++) {
+//            _displayOneFieldDetail(pEntity->LocalMetaDic[wWeightList[wi].Index]);
+            ErrorLog.textLog("%25s %25s [match %d radix %d]",
+                    pEntity->LocalMetaDic[wWeightList[wi].Index].getName().toString(),
+                    decode_ZType( pEntity->LocalMetaDic[wWeightList[wi].Index].ZType),
+                    wWeightList[wi].Match,wWeightList[wi].Radix);
+            }
+
+        return pContext.Status=ZS_SUCCESS;
+    } // case 4
+    } // switch
+
+} // ZSearchParser::showEntityField
+
+
 
 ZStatus
 ZSearchParser::_finish()
@@ -752,328 +1206,913 @@ ZSearchParser::_finish()
 /* for <entity name> with < selection clause > set  <entity name>.<field name> = <value> , <entity name>.<field name> = <value> ; */
 
 ZStatus
-ZSearchParser::_parseFor(std::shared_ptr<ZSearchEntity> &pCollection)
+ZSearchParser::_parseFor(ZSearchContext& pContext)
 {
   return ZS_SUCCESS;
 }
 
-#ifdef __COMMENT__
+/*
+    save symbol ;
+    save symbol to <xml file path> ;
 
+    save instruction ;
+*/
 ZStatus
-ZSearchParser::_parseLogicalOperand(void* & pOperand,int pParenthesisLevel, int pCollateral,int pBookMark)
+ZSearchParser::_parseSave(ZSearchContext& pContext)
 {
-  setIndex(pBookMark);
-  ZStatus wSt=ZS_SUCCESS;
-  ZSearchOperandType wOpType=ZSTO_Nothing;
+    ZStatus wSt=ZS_SUCCESS;
 
-  while (true) {
-    if (Tokenizer->Tab(Index)->Type==ZSRCH_IDENTIFIER) {
+    if (!pContext.advanceIndex()) /* skip save key word */
+        return ZS_SYNTAX_ERROR;
 
-      /* check if symbol or ZEntity */
+    switch (pContext.CurrentToken->Type)
+    {
+    case ZSRCH_SYMBOL: {
 
-      if (_parseZEntity(pOperand) ) {
-        break;
-      }
-      if (_parseSymbol(pOperand) ) {
-        break;
-      }
-
-      wSt=_parseOperandField(pOperand);
-      if (wSt!=ZS_SUCCESS) {
+        if ((!pContext.advanceIndex())||(pContext.CurrentToken->Type==ZSRCH_SEMICOLON)) {
+            uriString wXmlPath = __SEARCHPARSER_SYMBOL_FILE__;
+            bool wExists=wXmlPath.exists();
+            wSt = SymbolList.XmlSave(wXmlPath, &ErrorLog);
+            if (wSt==ZS_SUCCESS) {
+                ErrorLog.textLog("Symbol file %s successfully %s",wXmlPath.toString(),wExists?"replaced":"saved");
+                return wSt;
+            }
+            ErrorLog.errorLog("Cannot write symbol file %s status %s",wXmlPath.toString(),decode_ZStatus(wSt));
+            return wSt;
+        }
+        if (pContext.CurrentToken->Type!=ZSRCH_TO) {
+            ErrorLog.errorLog("Expected keyword TO. Found %s instead line %d column %d",
+                     pContext.CurrentToken->Text.toString(), pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+            pContext.LastErroredToken=pContext.CurrentToken;
+            return ZS_MISS_KEYWORD;
+        }
+        if (pContext.CurrentToken->Type!=ZSRCH_STRING_LITERAL) {
+            ErrorLog.errorLog("Expected xml file path. Found %s instead line %d column %d",
+                     pContext.CurrentToken->Text.toString(), pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+            pContext.LastErroredToken=pContext.CurrentToken;
+            return ZS_MISS_KEYWORD;
+        }
+        uriString wXmlPath = pContext.CurrentToken->Text;
+        bool wExists=wXmlPath.exists();
+        wSt = SymbolList.XmlSave(wXmlPath, &ErrorLog);
+        if (wSt==ZS_SUCCESS) {
+            ErrorLog.textLog("Symbol file %s successfully %s",wXmlPath.toString(),wExists?"replaced":"saved");
+            return wSt;
+        }
+        ErrorLog.errorLog("Cannot write symbol file %s status %s",wXmlPath.toString(),decode_ZStatus(wSt));
         return wSt;
-      }
-      wOpType = ZSTO_Field;
-      break;
-    } // ZSRCH_IDENTIFIER
+    }//ZSRCH_SYMBOL
+    default:
+        ErrorLog.errorLog("Expected one of {symbol,... }. Found %s instead line %d column %d",
+                 pContext.CurrentToken->Text.toString(), pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken=pContext.CurrentToken;
+        return ZS_MISS_KEYWORD;
+    }
 
-    if ((Tokenizer->Tab(Index)->Type & ZSRCH_LITERAL)==ZSRCH_LITERAL) {
-      wSt=_parseLiteral(pOperand);
-      if (wSt!=ZS_SUCCESS) {
-        return wSt;
-      }
-      wOpType = ZSTO_Literal;
-      break;
-    } // ZSRCH_LITERAL
-  } // while true
+    while ((pContext.Index < ZSearchTokenizer::count())&&(pContext.CurrentToken->Type!=ZSRCH_SEMICOLON)) {
+//        CurrentToken=pContext.CurrentToken;
+        while (true) {
+            if(pContext.CurrentToken->Type==ZSRCH_STRING_LITERAL)
+                break;
+        }
+    }
+    return ZS_SUCCESS;
+} // _parseSave
 
+/*                  <---field selection clause ---->                         <-------record selection clause------------------->
+                    [<entity name>.]<field name>,...
+  find  [all,first]                                     in <entity name> with <entity name>.<field name> == <value> [and,or] ... [as <collection name>] ;
+                    [ <entity name>.]*
 
-  /*
-    if operator following operand is arithmetic, then the whole operand becomes an arithmetic formula that gives a literal result.
-    - Nature of the operand changes : it becomes ZSearchArithmeticTerm in place of ZSearchFieldOperand or ZSearchLiteralOperand
-    - operand parsed so far becomes the first operand of the arithmetic expression
-    - Expression type is initialized with first operand type :
-        Expression type has two states : literal or field.
-        Purpose :
-          in an arithmetic expression,
-          if all operands are literal, then it is evaluated once, then expression result is used as literal
-          if there are fields involved in there, it is evaluated at each record
-
-  */
-
-  if (ZSearchOperator::isArithmeric(Tokenizer->Tab(Index))) {
-    return _parseArithmetic(pOperand,0,0,pBookMark);
-  }
-  return ZS_SUCCESS;
-}
-#endif // __COMMENT__
+    all = all records corresponding to selection clause
+    first = first record corresponding to selection clause
 
 
-/* extracts field identifier either under the form of
- *
+field selection :
+<field name>
+
+<field name>.decode (<entity name 1>,<match field name>,<resulting field name>,<comparizon operator>)
+
+
+decode field modifier :
+
+search within already declared and stored <entity name 1>
+        for value fo <field name 0> from current selection to match <field name 1> according <comparizon operator>
+                then returns <field name 2>
+
+ */
+
+/* Field selection clause
+
+extracts selected field identifier either under the form of
+
+Global syntax
+    <field selection>,<field selection>,...
+Field selection
    <field>
    <field>.<modifier>
+
+  <numeric literal>.<field>
+  <numeric literal> must correspond to a valid rank of a selected entities + 1.
 
   <entity>.<field>
 
   <entity>.<field>.<modifier>
-
+  <num lit>.<field>.<modifier>
 
   <modifer> itself and its possible arguments will be extracted by callee routine (i. e. _parseOperandField())
-
-
 */
+
 
 ZStatus
-ZSearchParser::_parseFieldIdentifier (int & pEntityListIndex, ZSearchFieldOperandOwnData *pFOD)
+ZSearchParser::_parseSelClause(ZSearchContext& pContext)
 {
- ZStatus wSt=ZS_SUCCESS;
+
+    ZStatus wSt=ZS_SUCCESS;
+
+    if ((pContext.CurrentToken->Type != ZSRCH_IDENTIFIER)&&
+        (pContext.CurrentToken->Type != ZSRCH_NUMERIC_LITERAL)&&
+        (pContext.CurrentToken->Type != ZSRCH_WILDCARD)) {
+        ErrorLog.errorLog("Expected field name , entity identifier , literal or wild card. Found <%s> at line %d column %d.",
+                          pContext.CurrentToken->Text.toString(),
+                          pContext.CurrentToken->TokenLine,
+                          pContext.CurrentToken->TokenColumn );
+        pContext.LastErroredToken=pContext.CurrentToken;
+        return pContext.Status=ZS_MISS_FIELD;
+    }
+
+    ZSearchField wFld;
+    bool wHasAllFields=false;
+    std::shared_ptr<ZSearchEntity> wSourceEntity=nullptr;
+
+    while (pContext.notEOF() && !pContext.hasCurrent(ZSRCH_IN) )  // loop until ZSRCH_IN
+    {
+        wFld.clear();
+        while (true) {
+        /* if nested check entity name vs target entity _BaseEntity if collection or _JoinList entities referential */
+        if (pContext.isNested()) {
+
+            if (pContext.TargetEntity->isCollection()) {
+                if (pContext.CurrentToken->Text != pContext.TargetEntity->_BaseEntity->getEntityName()) {
+                    ErrorLog.errorLog("Entity identifier <%s> is invalid (entity name is <%s>) at line %d column %d.",
+                                      pContext.CurrentToken->Text.toString(),
+                                      pContext.TargetEntity->getEntityName(),
+                                      pContext.CurrentToken->TokenLine,
+                                      pContext.CurrentToken->TokenColumn );
+                    pContext.LastErroredToken = pContext.CurrentToken;
+                    return ZS_INV_ENTITY;
+                }
+                wSourceEntity = pContext.TargetEntity->_BaseEntity;
+            }// collection
+            else if (pContext.TargetEntity->isJoin()) {
+                int wi=0;
+                for (; wi < pContext.TargetEntity->_JoinList.count();wi++) {
+                    if (pContext.CurrentToken->Text == pContext.TargetEntity->_JoinList[wi]->getEntityName()) {
+                        wSourceEntity = pContext.TargetEntity->_JoinList[wi];
+                        break;
+                    }
+                }// for
+                if (wSourceEntity == nullptr) {
+                    ErrorLog.errorLog("Entity identifier <%s> is not found in entity list of join entity <%s> at line %d column %d.",
+                                      pContext.CurrentToken->Text.toString(),
+                                      pContext.TargetEntity->getEntityName(),
+                                      pContext.CurrentToken->TokenLine,
+                                      pContext.CurrentToken->TokenColumn );
+                    pContext.LastErroredToken = pContext.CurrentToken;
+                    return ZS_INV_ENTITY;
+                }
+            }// join
+            /* In case of file entity : entity name is target entity name */
+            else if (pContext.TargetEntity->isFile()) {
+                if (pContext.CurrentToken->Text != pContext.TargetEntity->getEntityName()) {
+                    ErrorLog.errorLog("Entity identifier <%s> is invalid (entity name is <%s>) at line %d column %d.",
+                                      pContext.CurrentToken->Text.toString(),
+                                      pContext.TargetEntity->getEntityName(),
+                                      pContext.CurrentToken->TokenLine,
+                                      pContext.CurrentToken->TokenColumn );
+                    pContext.LastErroredToken = pContext.CurrentToken;
+                    return ZS_INV_ENTITY;
+                }
+                wSourceEntity = pContext.TargetEntity ;
+            } // file
+
+            pContext.advanceIndex(false);
+            pContext.advanceIndex(false);  /* availability of tokens is checked by isNested() */
+
+            if (pContext.CurrentToken->Type == ZSRCH_WILDCARD) {
+                /* if all fields from source entity are selected, align both BuilDic and LocalMetaDic to source */
+                pContext.TargetEntity->BuildDic.setEqualTo(wSourceEntity);
+
+                for (int wi=0; wi < wSourceEntity->LocalMetaDic.count();wi++) {
+                    pContext.TargetEntity->LocalMetaDic.push(wSourceEntity->LocalMetaDic[wi]);
+                }
+                break;
+            }
+            zrank_type wRank=wSourceEntity->LocalMetaDic.searchFieldByName(pContext.CurrentToken->Text);
+            if (wRank < 0) {
+                ErrorLog.errorLog("Field identifier <%s> is invalid within entity <%s> at line %d column %d.",
+                                  pContext.CurrentToken->Text.toString(),
+                                  wSourceEntity->getEntityName(),
+                                  pContext.CurrentToken->TokenLine,
+                                  pContext.CurrentToken->TokenColumn );
+                pContext.LastErroredToken = pContext.CurrentToken;
+                return ZS_INV_FIELD;
+            }
+            pContext.TargetEntity->BuildDic.push(ZSearchField(wSourceEntity,&wSourceEntity->LocalMetaDic,wRank));
+            pContext.TargetEntity->LocalMetaDic.push(wSourceEntity->LocalMetaDic[wRank]);
+            ErrorLog.infoLog("Field <%s> from entity <%s> added to local meta dic of entity <%s> at line %d column %d.",
+                              pContext.CurrentToken->Text.toString(),
+                              pContext.TargetEntity->_BaseEntity->getEntityName(),
+                             pContext.TargetEntity->getEntityName(),
+                              pContext.CurrentToken->TokenLine,
+                              pContext.CurrentToken->TokenColumn );
+
+            break;
+        } // isNested
+
+        /* here identifier is not a nested field descriptor */
+        int wRank=-1;
+
+        if (pContext.TargetEntity->isJoin()) {
+            ErrorLog.warningLog("When parsing a joined entity as <%s> is, field descriptor like <%s> has to be nested as <entity name>::%s at line %d column %d.",
+                                pContext.TargetEntity->getEntityName(),
+                                pContext.CurrentToken->Text.toString(),
+                                pContext.CurrentToken->Text.toString(),
+                                pContext.CurrentToken->TokenLine,
+                                pContext.CurrentToken->TokenColumn );
+            if (pContext.hasCurrent(ZSRCH_WILDCARD)) {
+                ErrorLog.errorLog("Entity <%s> is a join entity and wildcard cannot be used without nested description at line %d column %d.",
+                                  pContext.TargetEntity->getEntityName(),
+                                  pContext.CurrentToken->TokenLine,
+                                  pContext.CurrentToken->TokenColumn );
+                pContext.LastErroredToken = pContext.CurrentToken;
+                return ZS_INV_FIELD;
+            }
+            int wi=0;
+            wSourceEntity = nullptr;
+            for (; wi < pContext.TargetEntity->_JoinList.count();wi++) {
+                for (int wj=0; wj < pContext.TargetEntity->_JoinList[wi]->LocalMetaDic.count(); wj++)
+                    if (pContext.CurrentToken->Text == pContext.TargetEntity->_JoinList[wi]->LocalMetaDic[wj].getName()) {
+                        wSourceEntity = pContext.TargetEntity->_JoinList[wi];
+                        wRank=wj;
+                        break;
+                } // for
+            } // for
+            if (wRank < 0) {
+                ErrorLog.errorLog("Field <%s> has not been found in any joined entity local dictionary of <%s> at line %d column %d.",
+                                  pContext.CurrentToken->Text.toString(),
+                                  pContext.TargetEntity->getEntityName(),
+                                  pContext.CurrentToken->TokenLine,
+                                  pContext.CurrentToken->TokenColumn );
+                pContext.LastErroredToken = pContext.CurrentToken;
+                return ZS_INV_FIELD;
+            }
+            pContext.TargetEntity->BuildDic.push(ZSearchField(wSourceEntity,&wSourceEntity->LocalMetaDic,wRank));
+            ErrorLog.infoLog("Field %s::%s added to local meta dic at line %d column %d.",
+                             wSourceEntity->getEntityName(),
+                             pContext.CurrentToken->Text.toString(),
+                             pContext.CurrentToken->TokenLine,
+                             pContext.CurrentToken->TokenColumn );
+            break;
+
+        } // is join
+
+        /* here remains only Collection and File */
+
+        if (pContext.TargetEntity->isCollection()) {
+            wSourceEntity = pContext.TargetEntity->_BaseEntity;
+        } // Collection
+        else if (pContext.TargetEntity->isFile()) {
+            wSourceEntity = pContext.TargetEntity ;
+        } // file
+        /* Nota bene : target entity type cannot be file entity (defined by DECLARE FILE clause) */
+
+        if (pContext.hasCurrent(ZSRCH_WILDCARD)) {  /* Join is not allowed there : only Collection or File */
+            pContext.TargetEntity->BuildDic.setEqualTo(wSourceEntity);            
+            for (int wi = 0 ; wi < wSourceEntity->LocalMetaDic.count(); wi++) {
+               pContext.TargetEntity->LocalMetaDic.push(wSourceEntity->LocalMetaDic[wi]);
+            }
+
+            pContext.advanceIndex(false);
+            if (pContext.hasCurrent( ZSRCH_COMMA ))
+                pContext.advanceIndex(false);
+            wHasAllFields = true;
+
+            ErrorLog.infoLog("All fields are selected from entity <%s>",wSourceEntity->getEntityName().toString());
+
+            break ;
+        } // ZSRCH_WILDCARD
+
+        for (int wi=0; wi < wSourceEntity->LocalMetaDic.count(); wi++)
+            if (pContext.CurrentToken->Text == wSourceEntity->LocalMetaDic[wi].getName()) {
+                wRank=wi;
+                break;
+        } // for
+        if (wRank < 0) {
+            ErrorLog.errorLog("Field <%s> has not been found in local dictionary of entity <%s> at line %d column %d.",
+                              pContext.CurrentToken->Text.toString(),
+                              wSourceEntity->getEntityName(),
+                              pContext.CurrentToken->TokenLine,
+                              pContext.CurrentToken->TokenColumn );
+            pContext.LastErroredToken = pContext.CurrentToken;
+            return ZS_INV_FIELD;
+        }
+
+        wFld = ZSearchField(wSourceEntity,&wSourceEntity->LocalMetaDic,wRank);
+        ErrorLog.infoLog("Field %s::%s added to local meta dic of entity <%s> at line %d column %d.",
+                         wSourceEntity->getEntityName(),
+                         pContext.CurrentToken->Text.toString(),
+                         pContext.TargetEntity->getEntityName(),
+                         pContext.CurrentToken->TokenLine,
+                         pContext.CurrentToken->TokenColumn );
+        break;
+        } // while true
+
+        if (wHasAllFields)  /* if wild card parse possible literals or expressions */
+            continue;
+
+        ZSearchOperandBase* wFOp=static_cast<ZSearchOperandBase*>(wFld.Operand);
+        if (wFOp->hasModifier()) {
+            wSt = _parseModifier(wFOp , pContext);
+            if (wSt!=ZS_SUCCESS) {
+                return wSt;
+            }
+        }
+        pContext.TargetEntity->BuildDic.push(wFld);
+        pContext.TargetEntity->LocalMetaDic.push(wFld.buildFieldDescription());
+
+        pContext.advanceIndex(false);
+        if (pContext.hasCurrent( ZSRCH_COMMA ))
+            pContext.advanceIndex(false);
+    } // while not eof ....
+
+    return ZS_SUCCESS;
+
+} // ZSearchParser::_parseSelClause
+
+/*
+  extracts one field identifier and returns a ZFieldOperand
+
+    Field syntax may be either under the form of
+
+field expression
+
+  <entity>.<field>.<modifier>
+
+  <entity>.<field>
+
+  <field>.<modifier>
+  <field>
+
+  NB: <modifer> itself and its possible arguments will be extracted by callee routine (i. e. _parseOperandField())
+
+  <arithmetic expression>
+
+        <literal> \          / <literal>
+           or      <operator>    or
+        <field>   /          \  <field>
+
+
+  DECODE (<field expression>,<entity>,<key field name>, <resulting field>)
+
+*/
+ZStatus
+ZSearchParser::_parseFieldIdentifier (ZSearchContext& pContext, ZSearchFieldOperand *pFOD)
+{
  utf8VaryingString wEntityName;
+ std::shared_ptr<ZSearchEntity> wSourceEntity=nullptr;
+ int wRank=0;
 
- int wCurEntityIndex=-1;
+    if (pContext.CurrentToken->Type != ZSRCH_IDENTIFIER) {
+       ErrorLog.errorLog("Missing field or entity identifier. Found <%s> at line %d column %d.",
+           pContext.CurrentToken->Text.toString(),
+           pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+       pContext.LastErroredToken = pContext.CurrentToken;
 
- if (Tokenizer->Tab(Index)->Type != ZSRCH_IDENTIFIER) {
-   errorLog("Missing field or entity identifier. Found <%s> at line %d column %d.",
-       Tokenizer->Tab(Index)->Text.toString(),
-       Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+       return pContext.Status=ZS_MISS_FIELD;
+    }
+    while (true) {
+    /* if next is dot and then identifier , then previous is ZEntity name as prefix and field name follows dot  */
+        if (pContext.isNestedField()) {
+        /* check entity name is one of used in phrase
+         * if multiple entities in pharse, scroll
+         */
+            while (true) {
+                if (pContext.TargetEntity->isJoin()) {
 
-   return ZS_MISS_FIELD;
- }
+                    for (int wi=0; wi < pContext.TargetEntity->_JoinList.count();wi++) {
+                        utf8VaryingString wEName = pContext.TokenIdentifier->Text;
+                        wEName += "$";
+                        wEName += pContext.CurrentToken->Text ;
+                        if (wEName == pContext.TargetEntity->_JoinList[wi]->getEntityName()) {
+                            wSourceEntity = pContext.TargetEntity->_JoinList[wi];
+                            break;
+                        }
+                    }// for
+                    if (wSourceEntity==nullptr) {
+                        ErrorLog.errorLog("Wrong entity identifier <%s> for join entity <%s> at line %d column %d.",
+                                          pContext.CurrentToken->Text.toString(),
+                                          pContext.TargetEntity->getEntityName(),
+                                          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+                        pContext.LastErroredToken = pContext.CurrentToken;
+                        return pContext.Status=ZS_INV_ENTITY;
+                    }
+                    break;
+                } // join
+                /* here entity is Collection */
 
- /* if dot, then previous is ZEntity name as literal  or Field and current is modifier */
- if (Tokenizer->Tab(Index+1)->Type == ZSRCH_DOT) {
-   if ((Tokenizer->Tab(Index+2)->Type & ZSRCH_MODIFIER)==ZSRCH_MODIFIER) {
-     /* there no entity : only one current entity must be selected */
-     if (CurEntities.count()>1) {
-       errorLog("Missing entity identifier : when multiple entities are selected then fields must be prefixed by entity name. Found <%s> at line %d column %d.",
-           Tokenizer->Tab(Index+2)->Text.toString(),
-           Tokenizer->Tab(Index+2)->TokenLine,Tokenizer->Tab(Index+2)->TokenColumn );
-       return ZS_MISS_FIELD;
+                if (pContext.CurrentToken->Text != pContext.TargetEntity->_BaseEntity->getEntityName()) {
+                    ErrorLog.errorLog("Wrong entity identifier. Found <%s> at line %d column %d.",
+                             pContext.CurrentToken->Text.toString(),
+                             pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+                    pContext.LastErroredToken = pContext.CurrentToken;
+                    return pContext.Status=ZS_INV_ENTITY;
+                }
+                wSourceEntity = pContext.TargetEntity->_BaseEntity;
+                break;
+            } // while true
+            /* selected entity is Source entity (of no use if only one entity) */
+
+            /* advance twice to point to possible field identifier */
+            if (!pContext.advanceIndex(true))/* skip entity identifier */
+                return pContext.Status=ZS_SYNTAX_ERROR;
+            if (!pContext.advanceIndex(true))/* skip entity separator sign to point to field identifier */
+                return pContext.Status=ZS_SYNTAX_ERROR;
+            break;
+        } // nested
+
+    /* not nested then target entity should be a Collection */
+        /* if not nested but join entity : emit warning */
+        if (pContext.TargetEntity->isJoin()) {
+            ErrorLog.warningLog("When parsing a joined entity as <%s> is, field descriptor like <%s> has to be nested as <entity name>::%s at line %d column %d.",
+                                pContext.TargetEntity->getEntityName(),
+                                pContext.CurrentToken->Text.toString(),
+                                pContext.CurrentToken->Text.toString(),
+                                pContext.CurrentToken->TokenLine,
+                                pContext.CurrentToken->TokenColumn );
+            if (pContext.hasCurrent(ZSRCH_WILDCARD)) {
+                ErrorLog.errorLog("Entity <%s> is a join entity and wildcard cannot be used without nested description at line %d column %d.",
+                                  pContext.TargetEntity->getEntityName(),
+                                  pContext.CurrentToken->TokenLine,
+                                  pContext.CurrentToken->TokenColumn );
+                pContext.LastErroredToken = pContext.CurrentToken;
+                return pContext.Status=ZS_INV_FIELD;
+            }
+            int wi=0;
+            wRank=-1;
+            wSourceEntity = nullptr;
+            for (; wi < pContext.TargetEntity->_JoinList.count();wi++) {
+                for (int wj=0; wj < pContext.TargetEntity->_JoinList[wi]->LocalMetaDic.count(); wj++)
+                    if (pContext.CurrentToken->Text == pContext.TargetEntity->_JoinList[wi]->LocalMetaDic[wj].getName()) {
+                        wSourceEntity = pContext.TargetEntity->_JoinList[wi];
+                        wRank=wj;
+                        break;
+                } // for
+            } // for
+            if (wRank < 0) {
+                ErrorLog.errorLog("Field <%s> has not been found in any joined entity local dictionary of <%s> at line %d column %d.",
+                                  pContext.CurrentToken->Text.toString(),
+                                  pContext.TargetEntity->getEntityName(),
+                                  pContext.CurrentToken->TokenLine,
+                                  pContext.CurrentToken->TokenColumn );
+                pContext.LastErroredToken = pContext.CurrentToken;
+                return pContext.Status=ZS_INV_FIELD;
+            }
+            break;
+        } // is join
+        wRank = -1 ;
+        if ( pContext.TargetEntity->isFile() )
+            wSourceEntity = pContext.TargetEntity;
+        else
+        /* here remains only Collection  */
+            wSourceEntity = pContext.TargetEntity->_BaseEntity;
+        break;
+    } // while true
+
+     /* here this is a supposed valid field description : search it in current entity local dictionary (generated from field extraction using BuildDic) */
+
+
+    pFOD->Entity = wSourceEntity;
+    pFOD->MetaDicRank=-1;
+    int wi=0;
+    for (;wi < wSourceEntity->LocalMetaDic.count();wi++) {
+         if (wSourceEntity->LocalMetaDic[wi].getName()==pContext.CurrentToken->Text) {
+            pFOD->MetaDicRank=wi;
+            break;
+         }
+    } // for
+
+     if (pFOD->MetaDicRank < 0) {
+       ErrorLog.errorLog("Wrong field name <%s> for entity <%s> (field not found in entity dictionary) at line %d column %d.",
+           pContext.CurrentTokenList.Tab(pContext.Index+2)->Text.toString(),
+           wSourceEntity->getEntityName().toString(),
+           pContext.CurrentTokenList.Tab(pContext.Index+2)->TokenLine,pContext.CurrentTokenList.Tab(pContext.Index+2)->TokenColumn );
+         pContext.LastErroredToken = pContext.CurrentToken;
+       pFOD->MetaDicRank=-1;
+       return pContext.Status=ZS_MISS_FIELD;
      }
-     /* here this is a valid field description : search it in current entity */
-     pFOD->MDicRank=0;
-     for (;pFOD->MDicRank < CurEntities[0]->getFieldDictionary().count();pFOD->MDicRank++) {
-       if (CurEntities[0]->getFieldDictionary().TabConst(pFOD->MDicRank).getName()==Tokenizer->Tab(Index)->Text)
-         break;
+
+    pFOD->MetaDicPtr = &wSourceEntity->LocalMetaDic; /* store a pointer to Local MetaDic object */
+
+    ZSearchOperandType_type wZSTO = getZSTOFromZType(wSourceEntity->LocalMetaDic[pFOD->MetaDicRank].ZType);
+    pFOD->setZSTO(wZSTO | ZSTO_Field);
+
+//     pFOD->FieldDescription = pContext.SourceEntity->LocalMetaDic[pFOD->ZSEDicRank].getFieldDescriptionPtr();
+     pFOD->FullFieldName = wSourceEntity->EntityFullName;
+     pFOD->FullFieldName += __SEARCH_ENTITY_SEPARATOR_ASC__ ;
+     pFOD->FullFieldName += wSourceEntity->LocalMetaDic[pFOD->MetaDicRank].getName();
+
+     _DBGPRINT("ZSearchParser::_parseFieldIdentifier Found field operand <%s>\n"
+               "        ZType <%s> ZSTO Type<%s>  Dictionary rank %ld \n",
+               pFOD->FullFieldName.toString(),
+               decode_ZType(pFOD->getZType()),
+               decode_OperandType(pFOD->ZSTO), pFOD->MetaDicRank
+               )
+     pContext.advanceIndex(false);
+
+     /* check if modifier */
+     if (pContext.isEOF() || (pContext.CurrentToken->Type != __MODIFIER_SEPARATOR__)) {
+         return pContext.Status=ZS_SUCCESS;  /* no modifier */
      }
-     if (pFOD->MDicRank==CurEntities[0]->getFieldDictionary().count()) {
-       errorLog("Wrong field name <%s> for single entity <%s> (field not found in dictionary) at line %d column %d.",
-           Tokenizer->Tab(Index+2)->Text.toString(),
-           CurEntities[0]->getName().toString(),
-           Tokenizer->Tab(Index+2)->TokenLine,Tokenizer->Tab(Index+2)->TokenColumn );
-       pFOD->MDicRank=-1;
-       return ZS_MISS_FIELD;
+     if (!pContext.advanceIndex(true)) {/* skip field identifier */
+       return pContext.Status=ZS_SYNTAX_ERROR;
+     }
+     if ((pContext.CurrentToken->Type & ZSRCH_MODIFIER)!=ZSRCH_MODIFIER) {
+         ErrorLog.errorLog("<%s> has not been found in any joined entity local dictionary of <%s> at line %d column %d.",
+                           pContext.CurrentToken->Text.toString(),
+                           pContext.TargetEntity->getEntityName(),
+                           pContext.CurrentToken->TokenLine,
+                           pContext.CurrentToken->TokenColumn );
+         pContext.LastErroredToken = pContext.CurrentToken;
+         return pContext.Status=ZS_INV_MODIFIER ;
      }
 
-     pFOD->MDic = CurEntities[0]->getFieldDictionaryPtr();
+     return pContext.Status=_parseModifier(pFOD,pContext);
+} // ZSearchParser::_parseFieldIdentifier
 
-     pFOD->FieldDescription = CurEntities[0]->getFieldDictionary()[pFOD->MDicRank];
-     pFOD->FullFieldName = CurEntities[0]->getName();
-     pFOD->FullFieldName.addUtfUnit('.');
-     pFOD->FullFieldName += Tokenizer->Tab(Index)->Text;
-//     pFOD->FullFieldName.addUtfUnit('.');
-//     pFOD->TokenList.push(Tokenizer->Tab(Index+2)); /* modifier name */
-
-
-//     pFOD->TokenList.push(Tokenizer->Tab(Index)); /* store field identifier token */
-     if (!advanceIndex())/* skip field identifier */
-       return ZS_SYNTAX_ERROR;
-//     pFOD->TokenList.push(Tokenizer->Tab(Index)); /* dot token */
-//     if (!advanceIndex())/* skip dot */
-//       return ZS_SYNTAX_ERROR;
-
-//     pFOD->TokenList.push(Tokenizer->Tab(Index)); /* modifier token */
-//     if (!advanceIndex())/* skip modifier */
-//       return ZS_SYNTAX_ERROR;
-
-     return ZS_SUCCESS;
-   } // ZSRCH_MODIFIER
-
-   if (Tokenizer->Tab(Index+2)->Type != ZSRCH_IDENTIFIER) {
-     errorLog("Missing field identifier. Found <%s> at line %d column %d.",
-         Tokenizer->Tab(Index+2)->Text.toString(),
-         Tokenizer->Tab(Index+2)->TokenLine,Tokenizer->Tab(Index+2)->TokenColumn );
-
-     return ZS_MISS_FIELD;
-   }
-   /* check entity identifier is a valid current entity name */
-   wCurEntityIndex=0;
-   for (; wCurEntityIndex < CurEntities.count();wCurEntityIndex++) {
-     if (CurEntities[wCurEntityIndex]->getName() == Tokenizer->Tab(Index)->Text)
-       break;
-   }
-   if (wCurEntityIndex==CurEntities.count()) {
-     errorLog("Identifier<%s> is not a current entity. at line %d column %d.",
-         Tokenizer->Tab(Index)->Text.toString(),
-         Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index+2)->TokenColumn );
-
-     return ZS_INV_ENTITY;
-   }
-
-
-//   pFOD->TokenList.push(Tokenizer->Tab(Index));
-   wEntityName = Tokenizer->Tab(Index)->Text;
-
-   if (!advanceIndex())/* entity identifier */
-     return ZS_SYNTAX_ERROR;
-
-//   pFOD->TokenList.push(Tokenizer->Tab(Index));
-   if (!advanceIndex())/* dot sign */
-     return ZS_SYNTAX_ERROR;
-//   pFOD->TokenList.push(Tokenizer->Tab(Index)); /* store field name token */
-
-/*  must be positionned to field name token
- *   if (!advanceIndex())
-     return ZS_SYNTAX_ERROR;
-*/
- } // dot found ZSRCH_DOT
- else {
- /* if not dot, then CurEntities must have only one entity */
- if (CurEntities.count() > 1) {
-     errorLog("Field identifier <%s> must be prefixed with its entity name (multiple entities selected) at line %d column %d.",
-         Tokenizer->Tab(Index)->Text.toString(),
-         Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-     return ZS_INV_ENTITY;
-   }
-   wCurEntityIndex=0; /* get first and only current entity */
-
-//   pFOD->TokenList.push(Tokenizer->Tab(Index)); /* store field name token */
-   /*  must be positionned to field name token
- *   if (!advanceIndex())
-     return ZS_SYNTAX_ERROR;
-*/
-
-  } // dot not found
-
-//_parseFieldIdentifier_GetField:
-
-  pFOD->MDicRank=0;
-  for (; pFOD->MDicRank < CurEntities[wCurEntityIndex]->getFieldDictionary().count() ; pFOD->MDicRank++)
-    if (CurEntities[wCurEntityIndex]->getFieldDictionary()[pFOD->MDicRank].getName()==Tokenizer->Tab(Index)->Text)
-      break;
-
-  if (pFOD->MDicRank==CurEntities[wCurEntityIndex]->getFieldDictionary().count()) {
-    errorLog("Field identifier <%s> is not found (invalid) for entity <%s> at line %d column %d.",
-        Tokenizer->Tab(Index)->Text.toString(),
-        CurEntities[wCurEntityIndex]->getName().toString(),
-        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-    return ZS_INV_FIELD;
-  }
-
-  pFOD->MDic = CurEntities[wCurEntityIndex]->getFieldDictionaryPtr();
-
-  pFOD->FieldDescription = CurEntities[wCurEntityIndex]->getFieldDictionary()[pFOD->MDicRank];
-  pFOD->FullFieldName = CurEntities[wCurEntityIndex]->getName();
-  pFOD->FullFieldName.addUtfUnit('.');
-  pFOD->FullFieldName += Tokenizer->Tab(Index)->Text;
-
-
-  return ZS_SUCCESS;
-} //_parseFieldIdentifier
 
 
 /**
- * @brief ZSearchParser::_parseModifier   index must point after ZSRC_DOT token directly to Modifier token
+ * @brief ZSearchParser::_parseModifier   pContext.Index must point after ZSRC_DOT token directly to Modifier token
+ *
+ * This routine changes the operand base type ZSTO according the result of modifier action.
+ *
  */
 ZStatus
-ZSearchParser::_parseModifier(ZSearchOperandBase*   pOB)
+ZSearchParser::_parseModifier(ZSearchOperandBase* pOB,ZSearchContext& pContext)
 {
-  if ((Tokenizer->Tab(Index)->Type & ZSRCH_MODIFIER)!=ZSRCH_MODIFIER) {
-      errorLog("Expecting modifier. Possibly there is a mismatch with entity,field name,modifier. Found <%s> at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-      return ZS_SYNTAX_ERROR;
+  if ((pContext.CurrentToken->Type & ZSRCH_MODIFIER)!=ZSRCH_MODIFIER) {
+      ErrorLog.errorLog("Expecting modifier. Possibly there is a mismatch with entity,field name,modifier. Found <%s> at line %d column %d.",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentToken;
+      return pContext.Status=ZS_SYNTAX_ERROR;
   }
 
-  ZSearchOperandType_type wType = pOB->Type & ZSTO_BaseMask;
+  ZSearchOperandType_type wBaseZSTO = pOB->ZSTO & ZSTO_BaseMask;
 
-  switch (Tokenizer->Tab(Index)->Type ) {
-  case ZSRCH_SUBSTRING : {
-    if ((wType != ZSTO_String)&&(wType != ZSTO_UriString)) {
-      errorLog("Modifier SUBSTRING is only possible with a string or an URI string. Possibly there is a mismatch with entity.field name.modifier. Found <%s> at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-      return ZS_INV_MODIFIER;
+  switch (pContext.CurrentToken->Type ) {
+  /* <field name>.DECODE(<Entity name>,<key field name>,<target field name> [,<compare logical operator>=EQUAL] )
+   * <Entity name> must be a current entity
+   * <field name>   must have the same search operand type (ZSTO) given by pOB->ZSTO
+   */
+  case ZSRCH_TRANSLATE :
+  {
+      pOB->ModifierType = pContext.CurrentToken->Type;
+      if (!pContext.advanceIndex()) {
+          return pContext.Status=ZS_SYNTAX_ERROR;
+      }
+      if(pContext.CurrentToken->Type!=ZSRCH_OPENPARENTHESIS) {
+          ErrorLog.errorLog("Wrong modifier syntax. Expecting open parenthesis found <%s> at line %d column %d ",
+                   pContext.CurrentToken->Text.toString(),
+                   pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+          pContext.LastErroredToken = pContext.CurrentToken;
+          return pContext.Status=ZS_MISS_PUNCTSIGN ;
+      }
+      if (!pContext.advanceIndex()) {
+          return pContext.Status=ZS_SYNTAX_ERROR;
+      }
+      if(pContext.CurrentToken->Type!=ZSRCH_IDENTIFIER) {
+          ErrorLog.errorLog("Missing entity identifier. Found <%s> at line %d column %d",
+                   pContext.CurrentToken->Text.toString(),
+                   pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+          pContext.LastErroredToken = pContext.CurrentToken;
+          return pContext.Status=ZS_INV_ENTITY ;
+      }
+
+      Mod_Translate* wMod = new Mod_Translate;
+
+      if ((wMod->Entity = EntityList.getEntityByName(pContext.CurrentToken->Text))==nullptr) {
+          ErrorLog.errorLog("Entity identifier <%s> is not a valid, current entity. at line %d column %d",
+                   pContext.CurrentToken->Text.toString(),
+                   pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+          pContext.LastErroredToken = pContext.CurrentToken;
+          delete wMod;
+          return pContext.Status=ZS_INV_ENTITY ;
+      }
+
+      if (!pContext.advanceIndex()) {
+          delete wMod;
+          return pContext.Status=ZS_SYNTAX_ERROR;
+      }
+      if(pContext.CurrentToken->Type!=ZSRCH_COMMA) {
+          ErrorLog.errorLog("Wrong modifier syntax. Expecting comma, found <%s> at line %d column %d",
+                   pContext.CurrentToken->Text.toString(),
+                   pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+          pContext.LastErroredToken = pContext.CurrentToken;
+          delete wMod;
+          return pContext.Status=ZS_MISS_PUNCTSIGN ;
+      }
+
+    /* get key field name,
+     * check it is a valid entity field
+     * check type compatibility with current field ZSTO
+     */
+      if(pContext.CurrentToken->Type!=ZSRCH_IDENTIFIER) {
+          ErrorLog.errorLog("Missing field identifier. Found <%s> at line %d column %d",
+                   pContext.CurrentToken->Text.toString(),
+                   pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+          pContext.LastErroredToken = pContext.CurrentToken;
+          delete wMod;
+          return pContext.Status=ZS_MISS_FIELD ;
+      }
+
+      int wi=0 ;
+      for (; wi < wMod->Entity->BuildDic.count();wi++) {
+          if (pContext.CurrentToken->Text==wMod->Entity->BuildDic[wi].getFieldName()) {
+              break;
+          }
+      }
+      if (wi == wMod->Entity->BuildDic.count()) {
+          ErrorLog.errorLog("Invalid field identifier <%s> for entity <%s>. at line %d column %d",
+                   pContext.CurrentToken->Text.toString(),
+                   wMod->Entity->EntityName.toString(),
+                   pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+          pContext.LastErroredToken = pContext.CurrentToken;
+          delete wMod;
+          return pContext.Status=ZS_INV_FIELD ;
+      }
+
+      wMod->KeyDicRank =  wi;
+
+      if (!pContext.advanceIndex()) {
+          delete wMod;
+          return pContext.Status=ZS_SYNTAX_ERROR;
+      }
+      if(pContext.CurrentToken->Type!=ZSRCH_COMMA) {
+          ErrorLog.errorLog("Wrong modifier syntax. Expecting comma, found <%s> at line %d column %d",
+                   pContext.CurrentToken->Text.toString(),
+                   pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+          pContext.LastErroredToken = pContext.CurrentToken;
+          return pContext.Status=ZS_MISS_PUNCTSIGN ;
+      }
+
+
+     /* get result field name,
+     * check it is a valid entity field
+     * get Resulting field type : expression type will be resulting ZSTO
+     */
+      if(pContext.CurrentToken->Type!=ZSRCH_IDENTIFIER) {
+          ErrorLog.errorLog("Missing field identifier. Found <%s> at line %d column %d",
+                   pContext.CurrentToken->Text.toString(),
+                   pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+          pContext.LastErroredToken = pContext.CurrentToken;
+          delete wMod;
+          return pContext.Status=ZS_MISS_FIELD ;
+      }
+
+      wi=0 ;
+      for (; wi < wMod->Entity->LocalMetaDic.count();wi++) {
+          if (pContext.CurrentToken->Text==wMod->Entity->LocalMetaDic[wi].getName()) {
+              break;
+          }
+      }
+      if (wi == wMod->Entity->LocalMetaDic.count()) {
+          ErrorLog.errorLog("Invalid field identifier <%s> for entity <%s>. at line %d column %d",
+                   pContext.CurrentToken->Text.toString(),
+                   wMod->Entity->EntityName.toString(),
+                   pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+          pContext.LastErroredToken = pContext.CurrentToken;
+          delete wMod;
+          return pContext.Status=ZS_INV_FIELD ;
+      }
+
+      wMod->ResultDicRank =  wi;
+      ZSearchOperandType_type wZSTO = pOB->ZSTO & ~ZSTO_BaseMask ;      /* get typology (field, literal, expression etc.) */
+      ZSearchOperandType_type wZSTO1 = getZSTOFromZType(wMod->Entity->LocalMetaDic[wi].ZType);
+      wZSTO = wZSTO | wZSTO1 ;                                          /* mix with resulting field base type */
+      pOB->ZSTO = wZSTO;                                                /* replace type in operand */
+
+      if (!pContext.advanceIndex()) {
+          delete wMod;
+          return pContext.Status=ZS_SYNTAX_ERROR;
+      }
+
+      if(pContext.CurrentToken->Type==ZSRCH_COMMA) {  /* if comma then operator argument is not omitted */
+
+          if (!pContext.advanceIndex()) {
+              delete wMod;
+              return pContext.Status=ZS_SYNTAX_ERROR;
+          }
+
+          ZSearchOperator_type wOpTp=ZSOPV_EQUAL;
+          /* here expecting compare operator */
+          switch (pContext.CurrentToken->Type)
+          {
+          case ZSRCH_OPERATOR_EQUAL:
+              wOpTp=ZSOPV_EQUAL;
+              break;
+          case ZSRCH_OPERATOR_LESS:
+              wOpTp=ZSOPV_LESS;
+              break;
+          case ZSRCH_OPERATOR_GREATER:
+              wOpTp=ZSOPV_LESS;
+              break;
+          case ZSRCH_OPERATOR_GREATEROREQUAL:
+              wOpTp=ZSOPV_GREATEREQUAL;
+              break;
+          case ZSRCH_OPERATOR_LESSOREQUAL:
+              wOpTp=ZSOPV_LESSEQUAL;
+              break;
+          default:
+              ErrorLog.errorLog("Invalid operator. Found <%s> at line %d column %d ",
+                       pContext.CurrentToken->Text.toString(),
+                       pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+              pContext.LastErroredToken = pContext.CurrentToken;
+              delete wMod;
+              return pContext.Status=ZS_INV_OPERATOR ;
+          }// switch
+          if (!pContext.advanceIndex()) {
+              delete wMod;
+              return pContext.Status=ZS_SYNTAX_ERROR;
+          }
+      } // ZSRCH_COMMA
+
+      if(pContext.CurrentToken->Type!=ZSRCH_CLOSEPARENTHESIS) {
+          ErrorLog.errorLog("Wrong modifier syntax. Expecting close parenthesis found <%s> at line %d column %d ",
+                   pContext.CurrentToken->Text.toString(),
+                   pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+          pContext.LastErroredToken = pContext.CurrentToken;
+          return pContext.Status=ZS_MISS_PUNCTSIGN ;
+      }
+      pOB->ModParams = wMod;
+      break;
+  } // ZSRCH_DECODE
+
+  /* <field name>.SUBSTRING(<offset>,<length>) */
+  case ZSRCH_SUBSTRING :
+  {
+    if ((wBaseZSTO != ZSTO_String)&&(wBaseZSTO != ZSTO_UriString)) {
+      ErrorLog.errorLog("Modifier SUBSTRING is only possible with a string or an URI string. Possibly there is a mismatch with entity.field name.modifier. Found <%s> at line %d column %d.",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentToken;
+      return pContext.Status=ZS_INV_MODIFIER;
     }
-    pOB->ModifierType = Tokenizer->Tab(Index)->Type;
-    if (!advanceIndex()) {
-      return ZS_SYNTAX_ERROR;
+    pOB->ModifierType = pContext.CurrentToken->Type;
+    if (!pContext.advanceIndex()) {
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
-    if(Tokenizer->Tab(Index)->Type!=ZSRCH_OPENPARENTHESIS) {
-      errorLog("Wrong modifier syntax. Expecting open parenthesis found <%s> at line %d column %d ",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-      return ZS_MISS_PUNCTSIGN ;
+    if(pContext.CurrentToken->Type!=ZSRCH_OPENPARENTHESIS) {
+      ErrorLog.errorLog("Wrong modifier syntax. Expecting open parenthesis found <%s> at line %d column %d ",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+      pContext.LastErroredToken = pContext.CurrentToken;
+      return pContext.Status=ZS_MISS_PUNCTSIGN ;
     }
-    if (!advanceIndex()) {
-      return ZS_SYNTAX_ERROR;
+    if (!pContext.advanceIndex()) {
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
-    if(Tokenizer->Tab(Index)->Type!=ZSRCH_NUMERIC_LITERAL) {
-      errorLog("Missing numeric literal. Found <%s> at line %d column %d",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-      return ZS_MISS_LITERAL ;
+    if(pContext.CurrentToken->Type!=ZSRCH_NUMERIC_LITERAL) {
+      ErrorLog.errorLog("Missing numeric literal. Found <%s> at line %d column %d",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+      pContext.LastErroredToken = pContext.CurrentToken;
+      return pContext.Status=ZS_MISS_LITERAL ;
     }
-    pOB->ModVal1 = Tokenizer->Tab(Index)->Text.toLong();
-    if (!advanceIndex()) {
-      return ZS_SYNTAX_ERROR;
+    int wOffset = pContext.CurrentToken->Text.toInt();
+    if (!pContext.advanceIndex()) {
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
-    if(Tokenizer->Tab(Index)->Type!=ZSRCH_COMMA) {
-      errorLog("Wrong modifier syntax. Expecting comma, found <%s> at line %d column %d",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-      return ZS_MISS_PUNCTSIGN ;
+    if(pContext.CurrentToken->Type!=ZSRCH_COMMA) {
+      ErrorLog.errorLog("Wrong modifier syntax. Expecting comma, found <%s> at line %d column %d",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+      pContext.LastErroredToken = pContext.CurrentToken;
+      return pContext.Status=ZS_MISS_PUNCTSIGN ;
     }
-    if (!advanceIndex()) {
-      return ZS_SYNTAX_ERROR;
+    if (!pContext.advanceIndex()) {
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
-    if(Tokenizer->Tab(Index)->Type!=ZSRCH_NUMERIC_LITERAL) {
-      errorLog("Missing numeric literal. Found <%s> at line %d column %d ",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-      return ZS_MISS_LITERAL ;
+    if(pContext.CurrentToken->Type!=ZSRCH_NUMERIC_LITERAL) {
+      ErrorLog.errorLog("Missing numeric literal. Found <%s> at line %d column %d ",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+      pContext.LastErroredToken = pContext.CurrentToken;
+      return pContext.Status=ZS_MISS_LITERAL ;
     }
-    pOB->ModVal2 = Tokenizer->Tab(Index)->Text.toLong();
-    if(Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
-      errorLog("Wrong modifier syntax. Expecting close parenthesis found <%s> at line %d column %d ",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-      return ZS_MISS_PUNCTSIGN ;
+    int wLength = pContext.CurrentToken->Text.toInt();
+    if (!pContext.advanceIndex()) {
+        return pContext.Status=ZS_SYNTAX_ERROR;
     }
-    /*
-    if (!advanceIndex()) {
-      return ZS_SYNTAX_ERROR;
+    if(pContext.CurrentToken->Type!=ZSRCH_CLOSEPARENTHESIS) {
+      ErrorLog.errorLog("Wrong modifier syntax. Expecting close parenthesis found <%s> at line %d column %d ",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+      pContext.LastErroredToken = pContext.CurrentToken;
+      return pContext.Status=ZS_MISS_PUNCTSIGN ;
     }
-*/
-    return ZS_SUCCESS;
-  }
+
+    Mod_SubString* wMod = new Mod_SubString;
+
+    wMod->Offset   = wOffset;
+    wMod->Length   = wLength;
+    pOB->ModParams = wMod;
+
+    /* NB: pOB->ZSTO does not change - still string */
+
+    break;
+  } // ZSRCH_SUBSTRING
+
+  case ZSRCH_SUBSTRINGRIGHT :
+  case ZSRCH_SUBSTRINGLEFT :
+  {
+      if ((wBaseZSTO != ZSTO_String)&&(wBaseZSTO != ZSTO_UriString)) {
+          ErrorLog.errorLog("Modifiers LEFT OR RIGHT are only compatible with a string or an URI string. Possibly there is a mismatch with entity.field name.modifier. Found <%s> at line %d column %d.",
+                   pContext.CurrentToken->Text.toString(),
+                   pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+          pContext.LastErroredToken = pContext.CurrentToken;
+          return pContext.Status=ZS_INV_MODIFIER;
+      }
+      pOB->ModifierType = pContext.CurrentToken->Type;
+      if (!pContext.advanceIndex()) {
+          return pContext.Status=ZS_SYNTAX_ERROR;
+      }
+      if(pContext.CurrentToken->Type!=ZSRCH_OPENPARENTHESIS) {
+          ErrorLog.errorLog("Wrong modifier syntax. Expecting open parenthesis found <%s> at line %d column %d ",
+                   pContext.CurrentToken->Text.toString(),
+                   pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+          pContext.LastErroredToken = pContext.CurrentToken;
+          return pContext.Status=ZS_MISS_PUNCTSIGN ;
+      }
+      if (!pContext.advanceIndex()) {
+          return ZS_SYNTAX_ERROR;
+      }
+      if(pContext.CurrentToken->Type!=ZSRCH_NUMERIC_LITERAL) {
+          ErrorLog.errorLog("Missing numeric literal. Found <%s> at line %d column %d",
+                   pContext.CurrentToken->Text.toString(),
+                   pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+          pContext.LastErroredToken = pContext.CurrentToken;
+          return pContext.Status=ZS_MISS_LITERAL ;
+      }
+
+      int wLength = pContext.CurrentToken->Text.toInt();
+
+      if (!pContext.advanceIndex()) {
+          return pContext.Status=ZS_SYNTAX_ERROR;
+      }
+      if(pContext.CurrentToken->Type!=ZSRCH_CLOSEPARENTHESIS) {
+          ErrorLog.errorLog("Wrong modifier syntax. Expecting close parenthesis found <%s> at line %d column %d ",
+                   pContext.CurrentToken->Text.toString(),
+                   pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+          pContext.LastErroredToken = pContext.CurrentToken;
+          return pContext.Status=ZS_MISS_PUNCTSIGN ;
+      }
+
+      Mod_LeftRight* wMod = new Mod_LeftRight;
+      wMod->Length   = wLength;
+      pOB->ModParams = wMod;
+
+      /* NB: pOB->ZSTO does not change - still string */
+
+     break;
+  } // ZSRCH_SUBSTRINGRIGHT or RIGHT
+
+
   case ZSRCH_PATH:
   case ZSRCH_EXTENSION:
   case ZSRCH_BASENAME:
   case ZSRCH_ROOTNAME: {
-    if (wType != ZSTO_UriString) {
-      errorLog("Modifier <%s> is only possible with an URI string.at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-      return ZS_INV_MODIFIER;
+    if (wBaseZSTO != ZSTO_UriString) {
+      ErrorLog.errorLog("Modifier <%s> is only possible with an URI string.at line %d column %d.",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentToken;
+      return pContext.Status=ZS_INV_MODIFIER;
     }
 
-    pOB->ModifierType = Tokenizer->Tab(Index)->Type;
+    pOB->ModifierType = pContext.CurrentToken->Type;
     /*
-    if (!advanceIndex()) {
+    if (!pContext.advanceIndex()) {
       return ZS_SYNTAX_ERROR;
     }
-*/
-    return ZS_SUCCESS;
+    */
+    /* NB: pOB->ZSTO changes from uriString to sting */
+    ZSearchOperandType_type wZSTO = pOB->ZSTO & ~ZSTO_BaseMask ;      /* get typology (field, literal, expression etc.) */
+    wZSTO = wZSTO | ZSTO_String  ;                                    /* mix with resulting field base type */
+    pOB->ZSTO = wZSTO;                                                /* replace type in operand */
+
+    break;
   }
   case ZSRCH_YEAR:
   case ZSRCH_MONTH:
@@ -1081,320 +2120,358 @@ ZSearchParser::_parseModifier(ZSearchOperandBase*   pOB)
   case ZSRCH_HOUR:
   case ZSRCH_MIN:
   case ZSRCH_SEC: {
-    if (wType != ZSTO_Date) {
-      errorLog("Modifier <%s> is only possible with an Date.at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-      return ZS_INV_MODIFIER;
+    if (wBaseZSTO != ZSTO_Date) {
+      ErrorLog.errorLog("Modifier <%s> is only possible with an Date.at line %d column %d.",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentToken;
+      return pContext.Status=ZS_INV_MODIFIER;
     }
 
-    pOB->ModifierType = Tokenizer->Tab(Index)->Type;
-/*
-    if (!advanceIndex()) {
-      return ZS_SYNTAX_ERROR;
-    }
-*/
-    return ZS_SUCCESS;
+    pOB->ModifierType = pContext.CurrentToken->Type;
+    ZSearchOperandType_type wZSTO = pOB->ZSTO & ~ZSTO_BaseMask ;      /* get typology (field, literal, expression etc.) */
+    wZSTO = wZSTO | ZSTO_Integer ;                                    /* mix with resulting field base type */
+    pOB->ZSTO = wZSTO;
+    break;
   }
   case ZSRCH_ZENTITY:
   case ZSRCH_ID:  {
-      if (wType != ZSTO_Resource) {
-        errorLog("Modifier <%s> is only possible with an Resource.at line %d column %d.",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-        return ZS_INV_MODIFIER;
+      if (wBaseZSTO != ZSTO_Resource) {
+        ErrorLog.errorLog("Modifier <%s> is only possible with an Resource.at line %d column %d.",
+            pContext.CurrentToken->Text.toString(),
+            pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentToken;
+        return pContext.Status=ZS_INV_MODIFIER;
       }
-      pOB->ModifierType = Tokenizer->Tab(Index)->Type;
-      /*
-      if (!advanceIndex()) {
-        return ZS_SYNTAX_ERROR;
-      }
-*/
-      return ZS_SUCCESS;
+      pOB->ModifierType = pContext.CurrentToken->Type;
+      ZSearchOperandType_type wZSTO = pOB->ZSTO & ~ZSTO_BaseMask ;      /* get typology (field, literal, expression etc.) */
+      wZSTO = wZSTO | ZSTO_Integer ;                                    /* mix with resulting field base type */
+      pOB->ZSTO = wZSTO;
+      break;
   }
   default:
-      errorLog("Invalid modifier <%s> for field at line %d column %d ",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-      return ZS_INV_MODIFIER ;
+      ErrorLog.errorLog("Invalid modifier <%s> for field at line %d column %d ",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+      pContext.LastErroredToken = pContext.CurrentToken;
+      return pContext.Status=ZS_INV_MODIFIER ;
   }// switch Type
+
+  pContext.advanceIndex(false);
+  return pContext.Status=ZS_SUCCESS;
 }// _parseModifier
 
 ZStatus
-ZSearchParser::_parseOperandField(void* &    pTermOperand,ZSearchOperandType& pRequestedType)
+ZSearchParser::_parseOperandField(void* &    pTermOperand,ZSearchContext& pContext, ZSearchOperandType_type& pRequestedType)
 {
   ZStatus wSt=ZS_SUCCESS;
-  int wSvIndex=Index;
-  ZSearchFieldOperandOwnData  wFOD;
+  int wSvIndex=pContext.Index;
+//  ZSearchFieldOperand  wFOD;
 
   int wEntityListIndex=0;
 
   pTermOperand=nullptr;
-
-  wSt=_parseFieldIdentifier(wEntityListIndex,&wFOD);
+  ZSearchFieldOperand* wF1=new ZSearchFieldOperand;
+  wSt=_parseFieldIdentifier(pContext,wF1);
   if (wSt!=ZS_SUCCESS) {
     return wSt;
   }
 
-  /* set up term */
-  switch(wFOD.FieldDescription.ZType) {
-  case ZType_S8:
-  case ZType_U8:
-  case ZType_Char:
-  case ZType_UChar:
-  case ZType_S16:
-  case ZType_U16:
-  case ZType_S32:
-  case ZType_U32:
-  case ZType_S64:
-  case ZType_U64: {
-    wFOD.Type = ZSTO_FieldInteger;
-    ZSearchFieldOperand<long>* wF1=new ZSearchFieldOperand<long>();
+  if (!OperandTypeCheck(pRequestedType,pContext,wF1, wSvIndex)) {
+      delete wF1;
+      ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+               pContext.CurrentTokenList.Tab(wSvIndex)->Text.toString(),
+               pContext.CurrentTokenList.Tab(wSvIndex)->TokenLine,pContext.CurrentTokenList.Tab(wSvIndex)->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentTokenList.Tab(wSvIndex);
+      return pContext.Status=ZS_INVTYPE ;
+  }
+/*
+  if (!pContext.advanceIndex(true)) {
+    delete wF1;
+    return pContext.Status=ZS_SYNTAX_ERROR;
+  }
+*/
+  pTermOperand = wF1;
+  return pContext.Status=ZS_SUCCESS;
 
-    wF1->setOwnData(wFOD);
+
+  ZSearchOperandType_type wZSTO = wF1->ZSTO & ZSTO_BaseMask;
+  /* set up term */
+  switch(wZSTO) {
+
+  case ZSTO_FieldInteger:
+  {
+
+//    wF1->setZSTO(ZSTO_FieldInteger);
 
     /* no modifiers for numeric field */
 
-    if (Tokenizer->Tab(Index)->Type == ZSRCH_DOT) {
-      errorLog("No modifier allowed to integer data. Found <%s> at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index+2)->TokenColumn );
-      return ZS_SYNTAX_ERROR;
+    if (pContext.CurrentToken->Type == __MODIFIER_SEPARATOR__) {
+        ErrorLog.errorLog("No modifier allowed to integer data. Found <%s> at line %d column %d.",
+                 pContext.CurrentTokenList.Tab(pContext.Index+2)->Text.toString(),
+                 pContext.CurrentTokenList.Tab(pContext.Index+2)->TokenLine,
+                 pContext.CurrentTokenList.Tab(pContext.Index+2)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pContext.Index+2);
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
 
 
-    if (!OperandTypeCheck(pRequestedType,wF1->getOperandBase(), wSvIndex)) {
+    if (!OperandTypeCheck(pRequestedType,pContext,wF1, wSvIndex)) {
+        delete wF1;
+        ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+                 pContext.CurrentTokenList.Tab(wSvIndex)->Text.toString(),
+                 pContext.CurrentTokenList.Tab(wSvIndex)->TokenLine,pContext.CurrentTokenList.Tab(wSvIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(wSvIndex);
+        return pContext.Status=ZS_INVTYPE ;
+    }
+/*
+    if (!pContext.advanceIndex()) {
       delete wF1;
-      return ZS_INVTYPE ;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
-    if (!advanceIndex()) {
-      delete wF1;
-      return ZS_SYNTAX_ERROR;
-    }
-
+*/
     pTermOperand = wF1;
-    return ZS_SUCCESS;
+    return pContext.Status=ZS_SUCCESS;
 
   }// ZSTO_FieldInteger
 
-  case ZType_Float:
-  case ZType_Double:
-  case ZType_LDouble: {
-    wFOD.Type = ZSTO_FieldFloat;
-    ZSearchFieldOperand<double>* wF1=new ZSearchFieldOperand<double>();
-    wF1->setOwnData(wFOD);
+  case ZSTO_FieldFloat:
+  {
+
+//    wF1->setZSTO (ZSTO_FieldFloat);
 
     /* no modifiers for numeric field */
-    if (Tokenizer->Tab(Index)->Type == ZSRCH_DOT) {
-      errorLog("No modifier allowed to floating point data. Found <%s> at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-      return ZS_SYNTAX_ERROR;
+    if (pContext.CurrentToken->Type == __MODIFIER_SEPARATOR__) {
+        ErrorLog.errorLog("No modifier allowed to floating point data. Found <%s> at line %d column %d.",
+                 pContext.CurrentToken->Text.toString(),
+                 pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentToken;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
 
-    if (!OperandTypeCheck(pRequestedType,wF1->getOperandBase(), wSvIndex)) {
-      delete wF1;
-      return ZS_INVTYPE ;
+    if (!OperandTypeCheck(pRequestedType,pContext,wF1, wSvIndex)) {
+        delete wF1;
+        ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+                 pContext.CurrentTokenList.Tab(wSvIndex)->Text.toString(),
+                 pContext.CurrentTokenList.Tab(wSvIndex)->TokenLine,pContext.CurrentTokenList.Tab(wSvIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(wSvIndex);
+        return pContext.Status=ZS_INVTYPE ;
     }
 
-    if (!advanceIndex()) {
+    if (!pContext.advanceIndex()) {
       delete wF1;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
 
     pTermOperand = wF1;
-    return ZS_SUCCESS;
-  } //  ZSTO_FieldInteger
+    return pContext.Status=ZS_SUCCESS;
+  } //  ZSTO_FieldFloat
 
 
-  case ZType_Utf8VaryingString:
-  case ZType_Utf16VaryingString:
-  case ZType_Utf32VaryingString:
-  case ZType_Utf8FixedString:
-  case ZType_Utf16FixedString:
-  case ZType_Utf32FixedString: {
-    wFOD.Type = ZSTO_FieldString;
-    ZSearchFieldOperand<utf8VaryingString>* wF1=new ZSearchFieldOperand<utf8VaryingString>();
-    wF1->setOwnData(wFOD);
+  case ZSTO_FieldString:
+  {
 
-    if (Tokenizer->Tab(Index)->Type == ZSRCH_DOT) {
-      if (!advanceIndex()) {  /* position to modifier token */
+//    wF1->setZSTO (ZSTO_FieldString);
+
+    if (pContext.CurrentToken->Type == __MODIFIER_SEPARATOR__) {
+      if (!pContext.advanceIndex()) {  /* position to modifier token */
         delete wF1;
-        return ZS_SYNTAX_ERROR;
+        return pContext.Status=ZS_SYNTAX_ERROR;
       }
 
-      if ((wSt=_parseModifier(wF1->getOperandBase()))!=ZS_SUCCESS) {
+      if ((wSt=_parseModifier(wF1,pContext))!=ZS_SUCCESS) {
         delete wF1;
         return wSt;
       }
 
-    } // ZSRCH_DOT
+    } // __MODIFIER_SEPARATOR__
 
-    if (!OperandTypeCheck(pRequestedType,wF1->getOperandBase(), wSvIndex)) {
-      delete wF1;
-      return ZS_INVTYPE ;
+    if (!OperandTypeCheck(pRequestedType,pContext,wF1, wSvIndex)) {
+        delete wF1;
+        ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+                 pContext.CurrentTokenList.Tab(wSvIndex)->Text.toString(),
+                 pContext.CurrentTokenList.Tab(wSvIndex)->TokenLine,pContext.CurrentTokenList.Tab(wSvIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentToken;
+
+        return pContext.Status=ZS_INVTYPE ;
     }
-    if (!advanceIndex()) {
+    /*
+    if (!pContext.advanceIndex()) {
       delete wF1;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
+    */
     pTermOperand = wF1;
-    return ZS_SUCCESS;
+    return pContext.Status=ZS_SUCCESS;
   } // case strings
 
-  case ZType_URIString: {
-    wFOD.Type = ZSTO_FieldUriString;
-    ZSearchFieldOperand<utf8VaryingString>* wF1=new ZSearchFieldOperand<utf8VaryingString>();
-    wF1->setOwnData(wFOD);
+  case ZSTO_FieldUriString: {
 
-    if (Tokenizer->Tab(Index)->Type == ZSRCH_DOT) {
-      if (!advanceIndex()) {  /* position to modifier token */
+//      wF1->setZSTO (ZSTO_FieldUriString);
+
+    if (pContext.CurrentToken->Type == __MODIFIER_SEPARATOR__) {
+      if (!pContext.advanceIndex()) {  /* position to modifier token */
         delete wF1;
-        return ZS_SYNTAX_ERROR;
+        return pContext.Status=ZS_SYNTAX_ERROR;
       }
 
-      if ((wSt=_parseModifier(wF1->getOperandBase()))!=ZS_SUCCESS) {
+      if ((wSt=_parseModifier(wF1,pContext))!=ZS_SUCCESS) {
         delete wF1;
         return wSt;
       }
 
-    } // ZSRCH_DOT
+    } // __MODIFIER_SEPARATOR__
 
 
-    if (!OperandTypeCheck(pRequestedType,wF1->getOperandBase(), wSvIndex)) {
+    if (!OperandTypeCheck(pRequestedType,pContext,wF1, wSvIndex)) {
       delete wF1;
       pTermOperand = nullptr;
-      return ZS_INVTYPE ;
+      ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+               pContext.CurrentTokenList.Tab(wSvIndex)->Text.toString(),
+               pContext.CurrentTokenList.Tab(wSvIndex)->TokenLine,pContext.CurrentTokenList.Tab(wSvIndex)->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentTokenList.Tab(wSvIndex);
+      return pContext.Status=ZS_INVTYPE ;
     }
-    if (!advanceIndex()) {
+    if (!pContext.advanceIndex()) {
       delete wF1;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
     pTermOperand = wF1;
-    return ZS_SUCCESS;
+    return pContext.Status=ZS_SUCCESS;
   } // ZType_URIString
 
-  case ZType_ZDateFull: {
-    wFOD.Type = ZSTO_FieldDate;
-    ZSearchFieldOperand<ZDateFull>* wF1=new ZSearchFieldOperand<ZDateFull>();
-    wF1->setOwnData(wFOD);
+  case ZSTO_FieldDate: {
 
-    if (Tokenizer->Tab(Index)->Type == ZSRCH_DOT) {
-      if (!advanceIndex()) {  /* position to modifier token */
+//    wF1->setZSTO(ZSTO_FieldDate);
+
+    if (pContext.CurrentToken->Type == __MODIFIER_SEPARATOR__) {
+      if (!pContext.advanceIndex()) {  /* position to modifier token */
         delete wF1;
-        return ZS_SYNTAX_ERROR;
+        return pContext.Status=ZS_SYNTAX_ERROR;
       }
 
-      if ((wSt=_parseModifier(wF1->getOperandBase()))!=ZS_SUCCESS) {
+      if ((wSt=_parseModifier(wF1,pContext))!=ZS_SUCCESS) {
         delete wF1;
         return wSt;
       }
 
-    } // ZSRCH_DOT
+    } // __MODIFIER_SEPARATOR__
 
-    if (!OperandTypeCheck(pRequestedType,wF1->getOperandBase(), wSvIndex)) {
+    if (!OperandTypeCheck(pRequestedType,pContext,wF1, wSvIndex)) {
       delete wF1;
       pTermOperand = nullptr;
-      return ZS_INVTYPE ;
+      ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+               pContext.CurrentTokenList.Tab(wSvIndex)->Text.toString(),
+               pContext.CurrentTokenList.Tab(wSvIndex)->TokenLine,pContext.CurrentTokenList.Tab(wSvIndex)->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentTokenList.Tab(wSvIndex);
+      return pContext.Status=ZS_INVTYPE ;
     }
 
-    if (!advanceIndex()) {
+    if (!pContext.advanceIndex()) {
       delete wF1;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
 
     pTermOperand = wF1;
-    return ZS_SUCCESS;
+    return pContext.Status=ZS_SUCCESS;
   } // ZType_ZDateFull
 
-  case ZType_CheckSum: {
-    ZSearchFieldOperand<checkSum>* wF1=new ZSearchFieldOperand<checkSum>();
-    wF1->setOwnData(wFOD);
+  case ZSTO_FieldChecksum: {
 
+//    wF1->setZSTO(ZSTO_Checksum);
 
-    if (!OperandTypeCheck(pRequestedType,wF1->getOperandBase(), wSvIndex)) {
+    if (!OperandTypeCheck(pRequestedType,pContext,wF1, wSvIndex)) {
       delete wF1;
       pTermOperand = nullptr;
-      return ZS_INVTYPE ;
+      ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+               pContext.CurrentTokenList.Tab(wSvIndex)->Text.toString(),
+               pContext.CurrentTokenList.Tab(wSvIndex)->TokenLine,pContext.CurrentTokenList.Tab(wSvIndex)->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentTokenList.Tab(wSvIndex);
+      return pContext.Status=ZS_INVTYPE ;
     }
 
-    if (!advanceIndex()) {
+    if (!pContext.advanceIndex()) {
       delete wF1;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
 
     pTermOperand = wF1;
-    return ZS_SUCCESS;
+    return pContext.Status=ZS_SUCCESS;
   }
-  case ZType_Resource: {
-    wFOD.Type = ZSTO_FieldResource;
-    ZSearchFieldOperand<ZResource>* wF1=new ZSearchFieldOperand<ZResource>();
-    wF1->setOwnData(wFOD);
+  case ZSTO_FieldResource: {
 
-    if (Tokenizer->Tab(Index)->Type == ZSRCH_DOT) {
-      if (!advanceIndex()) {  /* position to modifier token */
+    wF1->setZSTO(ZSTO_FieldResource);
+
+    if (pContext.CurrentToken->Type == __MODIFIER_SEPARATOR__ ) {
+      if (!pContext.advanceIndex()) {  /* position to modifier token */
         delete wF1;
-        return ZS_SYNTAX_ERROR;
+        return pContext.Status=ZS_SYNTAX_ERROR;
       }
 
-      if ((wSt=_parseModifier(wF1->getOperandBase()))!=ZS_SUCCESS) {
+      if ((wSt=_parseModifier(wF1,pContext))!=ZS_SUCCESS) {
         delete wF1;
-        return wSt;
+        return wSt; // pContext.Status is updated by _parseModifier
       }
 
-    } // ZSRCH_DOT
+    } // __MODIFIER_SEPARATOR__
 
-    if (!OperandTypeCheck(pRequestedType,wF1->getOperandBase(), wSvIndex)) {
-      delete wF1;
-      return ZS_INVTYPE ;
+    if (!OperandTypeCheck(pRequestedType,pContext,wF1, wSvIndex)) {
+        delete wF1;
+        ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+                 pContext.CurrentTokenList.Tab(wSvIndex)->Text.toString(),
+                 pContext.CurrentTokenList.Tab(wSvIndex)->TokenLine,pContext.CurrentTokenList.Tab(wSvIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(wSvIndex);
+        return pContext.Status=ZS_INVTYPE ;
     }
 
-    if (!advanceIndex()) {
+    if (!pContext.advanceIndex()) {
       delete wF1;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
 
     pTermOperand = wF1;
-    return ZS_SUCCESS;
+    return pContext.Status=ZS_SUCCESS;
   } // ZType_Resource
 
   default:
-    errorLog("Dictionary field type <%s> for field <%s>.<%s> is not supported at line %d column %d in entity dictionary <%s>.",
-        decode_ZType(wFOD.FieldDescription.ZType),
-        Tokenizer->Tab(Index-2)->Text.toString(),Tokenizer->Tab(Index)->Text.toString(),
-        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn, Entity->getFieldDictionary().DicName.toString());
-    return ZS_INVTYPE ;
+    ErrorLog.errorLog("Dictionary field type <%s> ZSTO <%s> for field <%s>.<%s> is not supported at line %d column %d.",
+               decode_ZType(wF1->getZType()),
+               decode_OperandType(wF1->ZSTO),
+        pContext.CurrentTokenList.Tab(pContext.Index-2)->Text.toString(),pContext.CurrentToken->Text.toString(),
+               pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+    pContext.LastErroredToken = pContext.CurrentToken;
+    return pContext.Status=ZS_INVTYPE ;
   }// switch
 
-  return ZS_SUCCESS;
+  return pContext.Status=ZS_SUCCESS;
 } //_parseOperandField
 
-
-bool
-ZSearchParser::_parseEntity (void* &    pOperand, ZSearchOperandType &pRequestedType)
+bool ZSearchParser::_parseEntity(void *&pOperand,
+                                 ZSearchContext &pContext,
+                                 ZSearchOperandType_type &pRequestedType)
 {
-  if (Tokenizer->Tab(Index)->Type!=ZSRCH_IDENTIFIER)
+  if (pContext.CurrentToken->Type!=ZSRCH_IDENTIFIER)
     return false;
 
-  int wSvIndex=Index;
+  int wSvIndex=pContext.Index;
   pOperand = nullptr;
 
   /* check if ZEntity */
 
-  for (int wi=0 ; wi < CurEntities.count();wi++) {
-    if (Tokenizer->Tab(Index)->Text.compare(CurEntities[wi]->getName())==0) {
-      ZSearchOperandBase            wOB;
-      wOB.Type = ZSTO_LiteralInteger;
-      ZSearchLiteral<long> *wLit = new ZSearchLiteral<long>(wOB) ;
-      wLit->Content = ZEntityList[wi].Value;
-      wLit->Comment = ZEntityList[wi].Symbol;
+  for (int wi=0 ; wi < ZEntitySymbolList.count();wi++) {
+    if (pContext.CurrentToken->Text.compare(ZEntitySymbolList[wi].Symbol)==0) {
+      ZSearchLiteral *wLit = new ZSearchLiteral ;
+      wLit->setZSTO(ZSTO_LiteralInteger);
+      wLit->setInteger(ZEntitySymbolList[wi].Value);
+      wLit->FullFieldName = ZEntitySymbolList[wi].Symbol;
+//      wLit->Comment = ZEntitySymbolList[wi].Symbol;
 
-      if (!advanceIndex()) {
+      if (!pContext.advanceIndex()) {
         delete wLit;
         return false;
       }
 
-      if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
+      if (!OperandTypeCheck(pRequestedType,pContext,wLit, wSvIndex)) {
         delete wLit;
         return false ;
       }
@@ -1407,29 +2484,29 @@ ZSearchParser::_parseEntity (void* &    pOperand, ZSearchOperandType &pRequested
 } //_parseZEntity
 
 bool
-ZSearchParser::_parseZEntity (void* &    pOperand, ZSearchOperandType &pRequestedType)
+ZSearchParser::_parseZEntity (void* &    pOperand, ZSearchContext& pContext, ZSearchOperandType_type &pRequestedType)
 {
-  if (Tokenizer->Tab(Index)->Type!=ZSRCH_IDENTIFIER)
+  if (pContext.CurrentToken->Type!=ZSRCH_IDENTIFIER)
     return false;
 
   pOperand = nullptr;
   /* check if ZEntity */
 
-  for (int wi=0 ; wi < ZEntityList.count();wi++) {
-    if (Tokenizer->Tab(Index)->Text.compareCase(ZEntityList[wi].Symbol)==0) {
-      ZSearchOperandBase            wOB;
-//      wOB.TokenList.push(Tokenizer->Tab(Index));
-      wOB.Type = ZSTO_LiteralInteger;
-      ZSearchLiteral<long> *wLit = new ZSearchLiteral<long> (wOB);
-      wLit->Content = ZEntityList[wi].Value;
-      wLit->Comment = ZEntityList[wi].Symbol;
+  for (int wi=0 ; wi < ZEntitySymbolList.count();wi++) {
+    if (pContext.CurrentToken->Text.compareCase(ZEntitySymbolList[wi].Symbol)==0) {
 
-      if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), Index)) {
+      ZSearchLiteral *wLit = new ZSearchLiteral ;
+      wLit->setZSTO(ZSTO_LiteralInteger);
+      wLit->setInteger( ZEntitySymbolList[wi].Value);
+      wLit->FullFieldName = ZEntitySymbolList[wi].Symbol;
+//      wLit->Comment = ZEntitySymbolList[wi].Symbol;
+
+      if (!OperandTypeCheck(pRequestedType,pContext,wLit, pContext.Index)) {
         delete wLit;
         return false ;
       }
 
-      if (!advanceIndex()) {
+      if (!pContext.advanceIndex()) {
         delete wLit;
         return false;
       }
@@ -1440,29 +2517,43 @@ ZSearchParser::_parseZEntity (void* &    pOperand, ZSearchOperandType &pRequeste
   return false;
 } //_parseZEntity
 
-bool
-ZSearchParser::_parseSymbol (void* &    pOperand, ZSearchOperandType &pRequestedType)
+bool ZSearchParser::_getSymbol(void *&pOperand,
+                               ZSearchContext &pContext,
+                               ZSearchOperandType_type &pRequestedType)
 {
-  if (Tokenizer->Tab(Index)->Type!=ZSRCH_IDENTIFIER)
+  if (pContext.CurrentToken->Type!=ZSRCH_IDENTIFIER)
     return false;
 
   /* check if symbol */
+  ZSearchSymbol wSymbol=SymbolList.getSymbol(pContext.CurrentToken->Text);
+  if (wSymbol.isNull())
+      return false;
 
+  if (!OperandTypeCheck(pRequestedType,pContext,&wSymbol, pContext.Index)) {
+      return false ;
+  }
+  if (!pContext.advanceIndex()) {
+      pOperand = nullptr;
+      return false;
+  }
+  pOperand = new ZSearchSymbol(wSymbol);
+  return true;
+
+#ifdef __DEPRECATED__
   for (int wi=0 ; wi < SymbolList.count();wi++) {
-    if (Tokenizer->Tab(Index)->Text.compareCase(SymbolList[wi].Symbol)==0) {
-      ZSearchOperandBase            wOB;
- //     wOB.TokenList.push(Tokenizer->Tab(Index));
-      wOB.Type = ZSTO_LiteralUriString;
-      ZSearchLiteral<uriString> *wLit = new ZSearchLiteral<uriString> (wOB);
-      wLit->Content = SymbolList[wi].Path;
-      wLit->Comment = SymbolList[wi].Symbol;
+    if (pContext.CurrentToken->Text.compareCase(SymbolList[wi].Symbol)==0) {
+      ZSearchLiteral *wLit = new ZSearchLiteral ;
+      wLit->setZSTO(ZSTO_LiteralUriString);
+      wLit->setURI( SymbolList[wi].Path);
+      wLit->FullFieldName = SymbolList[wi].Symbol;
+//      wLit->Comment = SymbolList[wi].Symbol;
 
-      if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), Index)) {
+      if (!OperandTypeCheck(pRequestedType,pContext,wLit, pContext.Index)) {
         delete wLit;
         return false ;
       }
 
-      if (!advanceIndex()) {
+      if (!pContext.advanceIndex()) {
         delete wLit;
         pOperand = nullptr;
         return false;
@@ -1474,32 +2565,32 @@ ZSearchParser::_parseSymbol (void* &    pOperand, ZSearchOperandType &pRequested
     }
   }
   return false;
+#endif // __DEPRECATED__
+
 } //_parseSymbol
 
 
 ZStatus
-ZSearchParser::_parseLiteral(void* &    pOperand, ZSearchOperandType &pRequestedType)
+ZSearchParser::_parseLiteral(ZSearchLiteral* & pOperand,ZSearchContext& pContext, ZSearchOperandType_type &pRequestedType)
 {
   ZStatus wSt;
 
   pOperand=nullptr;
-  int wSvIndex=Index;
+  int wStartOperandIndex=pContext.Index;
 
-  switch (Tokenizer->Tab(Index)->Type ) {
+  switch (pContext.CurrentToken->Type ) {
 
   case ZSRCH_STRING_LITERAL: {
-    ZSearchLiteral<utf8VaryingString> *wLit=new ZSearchLiteral<utf8VaryingString>;
+    ZSearchLiteral *wLit=new ZSearchLiteral;
 
-    wLit->Type = ZSTO_LiteralString;
-//    wLit->TokenList.push(Tokenizer->Tab(Index));
-
-    wLit->Content=Tokenizer->Tab(Index)->Text;
+    wLit->setZSTO( ZSTO_LiteralString);
+//    wLit->TokenList.push(pContext.CurrentToken);
 
 /* Eliminate leading and trailing quotes if any */
 
-    utf8_t * wContent = Tokenizer->Tab(Index)->Text.duplicate();
+    utf8_t * wContent = pContext.CurrentToken->Text.duplicate();
     utf8_t * wPtr = wContent;
-    utf8_t * wHardEnd = wContent+Tokenizer->Tab(Index)->Text.UnitCount;
+    utf8_t * wHardEnd = wContent+pContext.CurrentToken->Text.UnitCount;
 
     if (wPtr[0]=='"')
       wPtr++;
@@ -1514,49 +2605,55 @@ ZSearchParser::_parseLiteral(void* &    pOperand, ZSearchOperandType &pRequested
 
     *wEnd = 0;
 
-    wLit->Content=wPtr;
+    wLit->setString(wPtr);
 
     zfree(wContent);
 
     /* done */
 
-    if (!advanceIndex()) {
-      pOperand = nullptr;
-      return ZS_SYNTAX_ERROR;
-    }
+    _DBGPRINT("ZSearchParser::_parseLiteral Found string literal <%s>\n",wLit->getString().toString())
 
-    if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
-      delete wLit;
-      return ZS_INVTYPE ;
+    if (!OperandTypeCheck(pRequestedType,pContext,wLit, wStartOperandIndex)) {
+        delete wLit;
+        ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+                 pContext.CurrentTokenList.Tab(wStartOperandIndex)->Text.toString(),
+                 pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenLine,pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(wStartOperandIndex);
+        return pContext.Status=ZS_INVTYPE ;
     }
 
     pOperand = wLit;
 
-    return ZS_SUCCESS;
+    pContext.advanceIndex(false);
+
+    return pContext.Status=ZS_SUCCESS;
   } //ZSRCH_STRING_LITERAL
 
 
   case ZSRCH_HEXA_LITERAL: {
 /*
-    if (Tokenizer->Tab(Index)->Text.UnitCount >= cst_checksumHexa) { // possible checksum litteral
+    if (pContext.CurrentToken->Text.UnitCount >= cst_checksumHexa) { // possible checksum litteral
 
     }
     else
-        if (Tokenizer->Tab(Index)->Text.UnitCount >= cst_md5Hexa) { // possible md5 litteral
+        if (pContext.CurrentToken->Text.UnitCount >= cst_md5Hexa) { // possible md5 litteral
 
     }
 */
-    ZSearchLiteral<long> *wLit=new ZSearchLiteral<long>;
-    wLit->Type = ZSTO_LiteralInteger;
-//    wLit->TokenList.push(Tokenizer->Tab(Index));
+    ZSearchLiteral *wLit=new ZSearchLiteral;
+    wLit->setZSTO( ZSTO_LiteralInteger);
+//    wLit->TokenList.push(pContext.CurrentToken);
 
     /* getting hexa integer */
 
-    wLit->Content =  0;
-    long wSign = 1;
-    long w16 = 0;
+//    wLit->Content =  0;
 
-    utf8_t* wPtr=Tokenizer->Tab(Index)->Text.Data;
+    long wContent = 0;
+
+    long wSign = 1;
+    long w16 = 1;
+
+    utf8_t* wPtr=pContext.CurrentToken->Text.Data;
 
     if (*wPtr=='-') /* leading sign */
       wSign=-1;
@@ -1566,15 +2663,21 @@ ZSearchParser::_parseLiteral(void* &    pOperand, ZSearchOperandType &pRequested
 
 
     while (*wPtr != 0) {
-      if ((*wPtr>='0')&&((*wPtr<='9')))
-        wLit->Content += long(*wPtr - '0') * (w16==0?1:w16) ;
-
+        if ((*wPtr>='0')&&((*wPtr<='9'))) {
+            wContent *= 16;
+            wContent += long(*wPtr - '0') ;
+        }
       else {
-          if ((*wPtr>='A')&&((*wPtr<='F')))
-            wLit->Content += long(*wPtr - 'A' + 10)* (w16==0?1:w16);
+            if ((*wPtr>='A')&&((*wPtr<='F'))) {
+                wContent *= 16;
+                wContent += long(*wPtr - 'A' + 10) ;
+            }
         else
-         if ((*wPtr>='a')&&((*wPtr<='f')))
-          wLit->Content += long(*wPtr - 'a' + 10)* (w16==0?1:w16);
+                if ((*wPtr>='a')&&((*wPtr<='f'))) {
+                    wContent *= 16;
+                    wContent += long(*wPtr - 'a' + 10);
+                }
+
       }
       if (*wPtr=='-') { /* trailing sign */
           wSign=-1;
@@ -1585,22 +2688,25 @@ ZSearchParser::_parseLiteral(void* &    pOperand, ZSearchOperandType &pRequested
     }
   /* got it */
 
-    wLit->Content *= wSign ;
+    wContent *= wSign ;
+    wLit->setInteger(wContent);
 
+    _DBGPRINT("ZSearchParser::_parseLiteral Found hexa literal <%X>\n",wLit->getInteger())
 
-    if (!advanceIndex()) {
-      delete wLit;
-      return ZS_SYNTAX_ERROR;
-    }
-
-    if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
-      delete wLit;
-      return ZS_INVTYPE ;
+    if (!OperandTypeCheck(pRequestedType,pContext,wLit, wStartOperandIndex)) {
+        delete wLit;
+        ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+                 pContext.CurrentTokenList.Tab(wStartOperandIndex)->Text.toString(),
+                 pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenLine,pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(wStartOperandIndex);
+        return pContext.Status=ZS_INVTYPE ;
     }
 
     pOperand = wLit ;
 
-    return ZS_SUCCESS;
+    pContext.advanceIndex(false);
+
+    return pContext.Status=ZS_SUCCESS;
   } //ZSRCH_HEXA_LITERAL
 
   case ZSRCH_NUMERIC_LITERAL:
@@ -1608,16 +2714,15 @@ ZSearchParser::_parseLiteral(void* &    pOperand, ZSearchOperandType &pRequested
   case ZSRCH_INTEGER_LONG_LITERAL:
   case ZSRCH_INTEGER_ULONG_LITERAL: {
 
-    ZSearchLiteral<long> *wLit=new ZSearchLiteral<long>;
+    ZSearchLiteral *wLit=new ZSearchLiteral;
+    wLit->setZSTO( ZSTO_LiteralInteger);
 
-    wLit->Type = ZSTO_LiteralInteger;
-//    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(pContext.CurrentToken);
 
-    wLit->Content =  0;
+    long wContent = 0;
     long wSign = 1;
-    long w10 = 0;
 
-    utf8_t* wPtr=Tokenizer->Tab(Index)->Text.Data;
+    utf8_t* wPtr=pContext.CurrentToken->Text.Data;
     if (wPtr[0]=='-') { /* leading sign */
       wSign = -1;
       wPtr ++;
@@ -1626,8 +2731,8 @@ ZSearchParser::_parseLiteral(void* &    pOperand, ZSearchOperandType &pRequested
 
     while (*wPtr != 0) {
       if ((*wPtr>='0')&&((*wPtr<='9'))) {
-        wLit->Content += long(*wPtr - '0') * (w10==0?1:w10) ;
-        w10 += 10;
+          wContent *= 10 ;
+          wContent += long(*wPtr - '0')  ;
       }
       if (*wPtr=='-') { /* trailing sign */
         wSign = -1;
@@ -1636,54 +2741,66 @@ ZSearchParser::_parseLiteral(void* &    pOperand, ZSearchOperandType &pRequested
       wPtr++;
     }
 
-    wLit->Content *= wSign ;
+    wContent *= wSign ;
+
+    wLit->setInteger( wContent) ;
+    _DBGPRINT("ZSearchParser::_parseLiteral Found numeric literal <%ld>\n",wLit->getInteger())
 
 
-    if (!advanceIndex()) {
-      delete wLit;
-      pOperand=nullptr;
-      return ZS_SYNTAX_ERROR;
-    }
-
-    if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
-      delete wLit;
-      return ZS_INVTYPE ;
+    if (!OperandTypeCheck(pRequestedType,pContext,wLit, wStartOperandIndex)) {
+        delete wLit;
+        ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+                 pContext.CurrentTokenList.Tab(wStartOperandIndex)->Text.toString(),
+                 pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenLine,pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(wStartOperandIndex);
+        return pContext.Status=ZS_INVTYPE ;
     }
 
     pOperand = wLit ;
-    return ZS_SUCCESS;
+
+    pContext.advanceIndex(false);
+
+    return pContext.Status=ZS_SUCCESS;
   } // long integer unsigned long;
 
   case ZSRCH_FLOAT_LITERAL:
   case ZSRCH_DOUBLE_LITERAL: {
 
-    ZSearchLiteral<double> *wLit=new ZSearchLiteral<double>;
-    wLit->Type = ZSTO_LiteralFloat;
-//    wLit->TokenList.push(Tokenizer->Tab(Index));
+    ZSearchLiteral *wLit=new ZSearchLiteral;
+    wLit->setZSTO( ZSTO_LiteralFloat);
+//    wLit->TokenList.push(pContext.CurrentToken);
 
-    wLit->Content = Tokenizer->Tab(Index)->Text.toDouble();
+    wLit->setFloat(pContext.CurrentToken->Text.toDouble());
 
-    if (!advanceIndex()) {
+    if (!pContext.advanceIndex()) {
       delete wLit;
       pOperand=nullptr;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
 
-    if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
-      delete wLit;
-      return ZS_INVTYPE ;
+    _DBGPRINT("ZSearchParser::_parseLiteral Found fload literal <%g>\n",wLit->getFloat())
+
+    if (!OperandTypeCheck(pRequestedType,pContext,wLit, wStartOperandIndex)) {
+        delete wLit;
+        ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+                 pContext.CurrentTokenList.Tab(wStartOperandIndex)->Text.toString(),
+                 pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenLine,pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(wStartOperandIndex);
+        return pContext.Status=ZS_INVTYPE ;
     }
 
     pOperand = wLit;
 
-    return ZS_SUCCESS;
+    return pContext.Status=ZS_SUCCESS;
   } // long integer unsigned long;
 
-  case ZSRCH_DATE_LITERAL: {
+      /* xx/xx/xx see ZSRCH_ZDATE_LITERAL for another safer format */
+  case ZSRCH_DATE_LITERAL:
+  {
+    ZSearchLiteral *wLit=new ZSearchLiteral;
+    wLit->setZSTO( ZSTO_LiteralDate);
 
-    ZSearchLiteral<ZDateFull> *wLit=new ZSearchLiteral<ZDateFull>;
-    wLit->Type = ZSTO_LiteralDate;
-//    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(pContext.CurrentToken);
 
     /* allowed date format are
      *  dd/mm/yy
@@ -1697,13 +2814,14 @@ ZSearchParser::_parseLiteral(void* &    pOperand, ZSearchOperandType &pRequested
      */
     uint8_t pFed=0;
     struct tm wTm;
-    wSt=ZDateFull::checkDMY(Tokenizer->Tab(Index)->Text,wTm,pFed);
+    wSt=ZDateFull::checkDMY(pContext.CurrentToken->Text,wTm,pFed);
     if (wSt!=ZS_SUCCESS) {
-      wSt=ZDateFull::checkMDY(Tokenizer->Tab(Index)->Text,wTm,pFed);
+      wSt=ZDateFull::checkMDY(pContext.CurrentToken->Text,wTm,pFed);
       if (wSt!=ZS_SUCCESS) {
-        errorLog("Invalid literal date <%s> at line %d column %d.",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+        ErrorLog.errorLog("Invalid literal date <%s> at line %d column %d.",
+            pContext.CurrentToken->Text.toString(),
+            pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
         delete wLit;
         pOperand = nullptr;
         return ZS_INV_LITERAL;
@@ -1711,67 +2829,76 @@ ZSearchParser::_parseLiteral(void* &    pOperand, ZSearchOperandType &pRequested
     }
     ZDateFull wD;
     wD._toInternal(wTm);
-    wLit->Content = wD;
+    wLit->setDate( wD);
 
+    _DBGPRINT("ZSearchParser::_parseLiteral Found date literal <%s>\n",wD.toFormatted().toCChar())
 
-    if (!advanceIndex()) {
+    if (!pContext.advanceIndex()) {
       delete wLit;
       pOperand=nullptr;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
 
-    if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
-      delete wLit;
-      return ZS_INVTYPE ;
+    if (!OperandTypeCheck(pRequestedType,pContext,wLit, wStartOperandIndex)) {
+        delete wLit;
+        ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+                 pContext.CurrentTokenList.Tab(wStartOperandIndex)->Text.toString(),
+                 pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenLine,pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(wStartOperandIndex);
+        return pContext.Status=ZS_INVTYPE ;
     }
 
     pOperand = wLit;
-    return ZS_SUCCESS;
+    return pContext.Status=ZS_SUCCESS;
   } // ZSRCH_DATE_LITERAL
 
+      /* ZDATE(xx/xx/xx) */
   case ZSRCH_ZDATE_LITERAL: {
-    ZSearchLiteral<ZDateFull> *wLit=new ZSearchLiteral<ZDateFull>;
-    wLit->Type = ZSTO_LiteralDate;
-//    wLit->TokenList.push(Tokenizer->Tab(Index));
-    if (!advanceIndex()) {
+    ZSearchLiteral *wLit=new ZSearchLiteral;
+    wLit->setZSTO( ZSTO_LiteralDate);
+
+//    wLit->TokenList.push(pContext.CurrentToken);
+    if (!pContext.advanceIndex()) {
       delete wLit;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
-    if(Tokenizer->Tab(Index)->Type!=ZSRCH_OPENPARENTHESIS) {
-      errorLog("ZDate literal : wrong syntax. Expecting open parenthesis. Found <%s> at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+    if(pContext.CurrentToken->Type!=ZSRCH_OPENPARENTHESIS) {
+        ErrorLog.errorLog("ZDate literal : wrong syntax. Expecting open parenthesis. Found <%s> at line %d column %d.",
+                 pContext.CurrentToken->Text.toString(),
+                 pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
       delete wLit;
-      return ZS_MISS_PUNCTSIGN ;
+      return pContext.Status=ZS_MISS_PUNCTSIGN ;
     }
-    if (!advanceIndex()) {
+    if (!pContext.advanceIndex()) {
       delete wLit;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
-    int SvIndex=Index;
+    int wSvIndex=pContext.Index;
     utf8VaryingString wDLContent;
 
 /*    [d]d{/|-}[m]m{/|-}[yy]yy[-hh:mm:ss] */
 
-    while (Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
-      if ((Tokenizer->Tab(Index)->Type!=ZSRCH_NUMERIC_LITERAL)
-          && (Tokenizer->Tab(Index)->Type!=ZSRCH_OPERATOR_DIVIDEORSLASH)
-          && (Tokenizer->Tab(Index)->Type!=ZSRCH_OPERATOR_MINUS)
-          && (Tokenizer->Tab(Index)->Type!=ZSRCH_COLON))
+    while (pContext.CurrentToken->Type!=ZSRCH_CLOSEPARENTHESIS) {
+      if ((pContext.CurrentToken->Type!=ZSRCH_NUMERIC_LITERAL)
+          && (pContext.CurrentToken->Type!=ZSRCH_OPERATOR_DIVIDEORSLASH)
+          && (pContext.CurrentToken->Type!=ZSRCH_OPERATOR_MINUS)
+          && (pContext.CurrentToken->Type!=ZSRCH_COLON))
       {
-        errorLog("ZDate literal : invalid date literal value. Expecting date literal with format [d]d{/|-}[m]m{/|-}[yy]yy[-hh[:mm:[ss]]]. Found <%s> at line %d column %d.",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+        ErrorLog.errorLog("ZDate literal : invalid date literal value. Expecting date literal with format [d]d{/|-}[m]m{/|-}[yy]yy[-hh[:mm:[ss]]]. Found <%s> at line %d column %d.",
+            pContext.CurrentToken->Text.toString(),
+            pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
         delete wLit;
         pOperand=nullptr;
-        return ZS_SYNTAX_ERROR;
+        return pContext.Status=ZS_SYNTAX_ERROR;
       }
 
-      wDLContent += Tokenizer->Tab(Index)->Text;
-      if (!advanceIndex()) {
+      wDLContent += pContext.CurrentToken->Text;
+      if (!pContext.advanceIndex()) {
         delete wLit;
         pOperand=nullptr;
-        return ZS_SYNTAX_ERROR;
+        return pContext.Status=ZS_SYNTAX_ERROR;
       }
     }// not ZSRCH_CLOSEPARENTHESIS
 
@@ -1781,221 +2908,271 @@ ZSearchParser::_parseLiteral(void* &    pOperand, ZSearchOperandType &pRequested
     if (wSt!=ZS_SUCCESS) {
       wSt=ZDateFull::checkMDY(wDLContent,wTm,pFed);
       if (wSt!=ZS_SUCCESS) {
-        errorLog("Invalid literal date <%s> at line %d column %d.",
+        ErrorLog.errorLog("Invalid literal date <%s> at line %d column %d.",
             wDLContent.toString(),
-            Tokenizer->Tab(SvIndex)->TokenLine,Tokenizer->Tab(SvIndex)->TokenColumn);
-        return ZS_INV_LITERAL;
+            pContext.CurrentTokenList.Tab(wSvIndex)->TokenLine,pContext.CurrentTokenList.Tab(wSvIndex)->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(wSvIndex);
+        return pContext.Status=ZS_INV_LITERAL;
       }
     }
     ZDateFull wD;
     wD._toInternal(wTm);
-    wLit->Content = wD;
+    wLit->setDate(wD) ;
 
-    if (!advanceIndex()) {
+     _DBGPRINT("ZSearchParser::_parseLiteral Found ZDate literal <%s>\n",wD.toFormatted().toCChar())
+
+    if (!pContext.advanceIndex()) {
       delete wLit;
       pOperand=nullptr;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
 
-    if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
-      delete wLit;
-      return ZS_INVTYPE ;
+    if (!OperandTypeCheck(pRequestedType,pContext,wLit->getOperandBase(), wSvIndex)) {
+        delete wLit;
+        ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+                 pContext.CurrentTokenList.Tab(wSvIndex)->Text.toString(),
+                 pContext.CurrentTokenList.Tab(wSvIndex)->TokenLine,pContext.CurrentTokenList.Tab(wSvIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(wSvIndex);
+        return pContext.Status=ZS_INVTYPE ;
     }
 
     pOperand = wLit ;
-    return ZS_SUCCESS;
+    return pContext.Status=ZS_SUCCESS;
   } //ZSRCH_ZDATE_LITERAL
 
   case ZSRCH_RESOURCE_LITERAL: {
 
-    ZSearchLiteral<ZResource> *wLit=new ZSearchLiteral<ZResource>;
+    ZSearchLiteral *wLit=new ZSearchLiteral;
+    wLit->setZSTO( ZSTO_LiteralResource );
 
-    wLit->Type = ZSTO_LiteralResource;
-//    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(pContext.CurrentToken);
 
-    if (!advanceIndex()) {
+    if (!pContext.advanceIndex()) {
       delete wLit;
       pOperand=nullptr;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
 
-    if(Tokenizer->Tab(Index)->Type!=ZSRCH_OPENPARENTHESIS) {
-      errorLog("ZResource literal : wrong syntax. Expecting open parenthesis. Found <%s> at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+    if(pContext.CurrentToken->Type!=ZSRCH_OPENPARENTHESIS) {
+      ErrorLog.errorLog("ZResource literal : wrong syntax. Expecting open parenthesis. Found <%s> at line %d column %d.",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
       delete wLit;
-      return ZS_MISS_PUNCTSIGN ;
+      return pContext.Status=ZS_MISS_PUNCTSIGN ;
     }
-//    wLit->TokenList.push(Tokenizer->Tab(Index));
-    if (!advanceIndex()) {
+//    wLit->TokenList.push(pContext.CurrentToken);
+    if (!pContext.advanceIndex()) {
       delete wLit;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
-    if(Tokenizer->Tab(Index)->Type != ZSRCH_IDENTIFIER ) {
-      errorLog("Missing ZEntity identifier. Found <%s> at line %d column %d",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-      delete wLit;
-      pOperand=nullptr;
-      return ZS_MISS_LITERAL ;
-    }
-    int wi=0;
-    for (;wi < ZEntityList.count();wi++) {
-      if (Tokenizer->Tab(Index)->Text==ZEntityList[wi].Symbol) {
-        wLit->ModVal1 = ZEntityList[wi].Value ;
-        break;
-      }
-    }
-    if (wi==ZEntityList.count()) {
-      errorLog("Invalid ZEntity identifier (not found in ZEntityList). Token <%s> at line %d column %d",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+    if(pContext.CurrentToken->Type != ZSRCH_IDENTIFIER ) {
+      ErrorLog.errorLog("Missing ZEntity identifier. Found <%s> at line %d column %d",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
       delete wLit;
       pOperand=nullptr;
-      return ZS_MISS_LITERAL ;
+      return pContext.Status=ZS_MISS_LITERAL ;
     }
-    ZEntity_type    wEntity = ZEntityList.Tab(wi).Value;
 
-//    wLit->TokenList.push(Tokenizer->Tab(Index));
-    if (!advanceIndex())
-      return ZS_SYNTAX_ERROR;
-    if(Tokenizer->Tab(Index)->Type!=ZSRCH_COMMA) {
-      errorLog("Wrong ZResource literal syntax. Expecting comma, found <%s> at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+    ZEntity_type    wZEntity=0;
+
+    if(pContext.CurrentToken->Type != ZSRCH_IDENTIFIER ) { /* if a symbol has been set here */
+
+        int wi=0;
+        for (;wi < ZEntitySymbolList.count();wi++) {
+          if (pContext.CurrentToken->Text==ZEntitySymbolList[wi].Symbol) {
+            wZEntity = ZEntitySymbolList[wi].Value ;
+            break;
+          }
+        }
+        if (wi==ZEntitySymbolList.count()) {
+          ErrorLog.errorLog("Invalid ZEntity identifier (not found in ZEntityList). Token <%s> at line %d column %d",
+              pContext.CurrentToken->Text.toString(),
+              pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+            pContext.LastErroredToken = pContext.CurrentToken;
+          delete wLit;
+          pOperand=nullptr;
+          return pContext.Status=ZS_MISS_LITERAL ;
+        }
+    } else if (pContext.CurrentToken->Type == ZSRCH_NUMERIC_LITERAL ) {
+        wZEntity = pContext.CurrentToken->Text.toLong(10) ;
+    } else if (pContext.CurrentToken->Type == ZSRCH_HEXA_LITERAL ) {
+        wZEntity = pContext.CurrentToken->Text.toLong(16) ;
+    } else {
+        ErrorLog.errorLog("Missing ZEntity descriptor (ZEntity identifier, numeric / hexa literal). Found <%s> at line %d column %d",
+                 pContext.CurrentToken->Text.toString(),
+                 pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
+        delete wLit;
+        pOperand=nullptr;
+        return pContext.Status=ZS_MISS_LITERAL ;
+    }
+//    wLit->TokenList.push(pContext.CurrentToken);
+    if (!pContext.advanceIndex())
+      return pContext.Status=ZS_SYNTAX_ERROR;
+
+    if(pContext.CurrentToken->Type!=ZSRCH_COMMA) {
+      ErrorLog.errorLog("Wrong ZResource literal syntax. Expecting comma, found <%s> at line %d column %d.",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
       delete wLit;
       pOperand=nullptr;
-      return ZS_MISS_PUNCTSIGN ;
+      return pContext.Status=ZS_MISS_PUNCTSIGN ;
     }
-//    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(pContext.CurrentToken);
 
-    if (!advanceIndex()) {
+    if (!pContext.advanceIndex()) {
       delete wLit;
-      return ZS_SYNTAX_ERROR;
-    }
-
-    if(Tokenizer->Tab(Index)->Type!=ZSRCH_NUMERIC_LITERAL) {
-      errorLog("Wrong ZResource literal syntax. Missing numeric literal. Found <%s> at line %d column %d",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-      delete wLit;
-      return ZS_MISS_LITERAL ;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
 
-    Resourceid_type wId = Tokenizer->Tab(Index)->Text.toLong() ;
-    wLit->Content = ZResource(wId,wEntity);
-
-//    wLit->TokenList.push(Tokenizer->Tab(Index));
-
-    if (!advanceIndex()) {
+    if(pContext.CurrentToken->Type!=ZSRCH_NUMERIC_LITERAL) {
+      ErrorLog.errorLog("Wrong ZResource literal syntax. Missing numeric literal. Found <%s> at line %d column %d",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
       delete wLit;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_MISS_LITERAL ;
     }
 
-    if(Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
-      errorLog("ZResource literal : wrong syntax. Expecting close parenthesis. Found <%s> at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+    Resourceid_type wId = pContext.CurrentToken->Text.toLong() ;
+    wLit->setResource( ZResource(wId,wZEntity));
+
+
+//    wLit->TokenList.push(pContext.CurrentToken);
+
+    if (!pContext.advanceIndex()) {
       delete wLit;
-      return ZS_MISS_PUNCTSIGN ;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
 
-//    wLit->TokenList.push(Tokenizer->Tab(Index));
-
-    if (!advanceIndex()) {
+    if(pContext.CurrentToken->Type!=ZSRCH_CLOSEPARENTHESIS) {
+      ErrorLog.errorLog("ZResource literal : wrong syntax. Expecting close parenthesis. Found <%s> at line %d column %d.",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
       delete wLit;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_MISS_PUNCTSIGN ;
     }
 
-    if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
+//    wLit->TokenList.push(pContext.CurrentToken);
+    _DBGPRINT("ZSearchParser::_parseLiteral Found ZResource literal <%s>\n",ZResource(wId,wZEntity).toStr().toCChar())
+
+    if (!pContext.advanceIndex()) {
       delete wLit;
-      return ZS_INVTYPE ;
+      return pContext.Status=ZS_SYNTAX_ERROR;
+    }
+
+    if (!OperandTypeCheck(pRequestedType,pContext,wLit->getOperandBase(), wStartOperandIndex)) {
+        delete wLit;
+        ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+                 pContext.CurrentTokenList.Tab(wStartOperandIndex)->Text.toString(),
+                 pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenLine,pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentToken;
+        return pContext.Status=ZS_INVTYPE ;
     }
 
     pOperand = wLit;
 
-    return ZS_SUCCESS;
+    return pContext.Status=ZS_SUCCESS;
   } // ZSRCH_RESOURCE_LITERAL
 
   case ZSRCH_CHECKSUM_LITERAL: {
 
-    ZSearchLiteral<checkSum> *wLit=new ZSearchLiteral<checkSum>;
+    ZSearchLiteral *wLit=new ZSearchLiteral;
+    wLit->setZSTO( ZSTO_LiteralChecksum );
 
-    wLit->Type = ZSTO_LiteralChecksum;
-//    wLit->TokenList.push(Tokenizer->Tab(Index));
+//    wLit->TokenList.push(pContext.CurrentToken);
 
-    if (!advanceIndex()) {
+    if (!pContext.advanceIndex()) {
       delete wLit;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
-    if(Tokenizer->Tab(Index)->Type!=ZSRCH_OPENPARENTHESIS) {
-      errorLog("checkSum literal : wrong syntax. Expecting open parenthesis. Found <%s> at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+    if(pContext.CurrentToken->Type!=ZSRCH_OPENPARENTHESIS) {
+      ErrorLog.errorLog("checkSum literal : wrong syntax. Expecting open parenthesis. Found <%s> at line %d column %d.",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
       delete wLit;
-      return ZS_MISS_PUNCTSIGN ;
-    }
-//    wLit->TokenList.push(Tokenizer->Tab(Index));
-    if (!advanceIndex()) {
-      delete wLit;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_MISS_PUNCTSIGN ;
     }
 
-    if(Tokenizer->Tab(Index)->Type != ZSRCH_HEXA_LITERAL ) {
-      errorLog("Missing Hexadecimal literal (64 hexa characters). Found <%s> at line %d column %d",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+//    wLit->TokenList.push(pContext.CurrentToken);
+    if (!pContext.advanceIndex()) {
       delete wLit;
-      return ZS_MISS_LITERAL ;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
 
-    wSt=wLit->Content.fromHexa(Tokenizer->Tab(Index)->Text);
+    if(pContext.CurrentToken->Type != ZSRCH_HEXA_LITERAL ) {
+      ErrorLog.errorLog("Missing Hexadecimal literal (64 hexa characters). Found <%s> at line %d column %d",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
+      delete wLit;
+      return pContext.Status=ZS_MISS_LITERAL ;
+    }
+
+    checkSum wCS;
+    wSt=wCS.fromHexa(pContext.CurrentToken->Text);
     if (wSt!=ZS_SUCCESS) {
-      errorLog("Invalid checksum hexadecimal litteral : possibly invalid size of hash code. Token <%s> at line %d column %d",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+      ErrorLog.errorLog("Invalid checksum hexadecimal litteral : possibly invalid size of hash code. Token <%s> at line %d column %d",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
       delete wLit;
-      return ZS_MISS_LITERAL ;
+      return pContext.Status=ZS_MISS_LITERAL ;
     }
-//    wLit->TokenList.push(Tokenizer->Tab(Index));
+    wLit->setChecksum(wCS);
+//    wLit->TokenList.push(pContext.CurrentToken);
 
-    if (!advanceIndex()) {
+    if (!pContext.advanceIndex()) {
       delete wLit;
-      return ZS_SYNTAX_ERROR;
-    }
-
-    if(Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
-      errorLog("ZResource literal : wrong syntax. Expecting close parenthesis. Found <%s> at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-      delete wLit;
-      return ZS_MISS_PUNCTSIGN ;
-    }
-//    wLit->TokenList.push(Tokenizer->Tab(Index));
-
-
-    if (!advanceIndex()) {
-      delete wLit;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
 
-    if (!OperandTypeCheck(pRequestedType,wLit->getOperandBase(), wSvIndex)) {
+    if(pContext.CurrentToken->Type!=ZSRCH_CLOSEPARENTHESIS) {
+      ErrorLog.errorLog("ZResource literal : wrong syntax. Expecting close parenthesis. Found <%s> at line %d column %d.",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
       delete wLit;
-      return ZS_INVTYPE ;
+      return pContext.Status=ZS_MISS_PUNCTSIGN ;
+    }
+//    wLit->TokenList.push(pContext.CurrentToken);
+
+    _DBGPRINT("ZSearchParser::_parseLiteral Found checksum literal <%s>\n",wLit->getChecksum().toHexa().toCChar())
+
+
+    if (!pContext.advanceIndex()) {
+      delete wLit;
+      return pContext.Status=ZS_SYNTAX_ERROR;
+    }
+
+    if (!OperandTypeCheck(pRequestedType,pContext,wLit->getOperandBase(), wStartOperandIndex)) {
+        delete wLit;
+        ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+                 pContext.CurrentTokenList.Tab(wStartOperandIndex)->Text.toString(),
+                 pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenLine,pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(wStartOperandIndex);
+        return pContext.Status=ZS_INVTYPE ;
     }
 
     pOperand = wLit;
-    return ZS_SUCCESS;
+    return pContext.Status=ZS_SUCCESS;
   } // ZSRCH_RESOURCE_LITERAL
 
   default:
-    errorLog("Wrong literal syntax. Expecting literal, found <%s> at line %d column %d.",
-        Tokenizer->Tab(Index)->Text.toString(),
-        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-    return ZS_MISS_LITERAL ;
+    ErrorLog.errorLog("Wrong literal syntax. Expecting literal, found <%s> at line %d column %d.",
+        pContext.CurrentToken->Text.toString(),
+        pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+      pContext.LastErroredToken = pContext.CurrentToken;
+    return pContext.Status=ZS_MISS_LITERAL ;
   }//switch
 
-  return ZS_SUCCESS;
+  return pContext.Status=ZS_SUCCESS;
 } //_parseLiteral
 /** gets one element of a date either day, month year, hour minute seconds whenever mentionned (will define date precision).
  * Element must be immediately followed by a valid separator pEndSeparator or not if equals SRCH_Nothing.
@@ -2003,117 +3180,186 @@ ZSearchParser::_parseLiteral(void* &    pOperand, ZSearchOperandType &pRequested
  *
 */
 ZStatus
-ZSearchParser::_getZDateOnePiece(int &pValue,int pMaxDigits,ZSearchTokentype pEndSeparator)
+ZSearchParser::_getZDateOnePiece(int &pValue,ZSearchContext& pContext,int pMaxDigits,ZSearchTokentype pEndSeparator)
 {
-  if (Tokenizer->Tab(Index)->Type!=ZSRCH_NUMERIC_LITERAL) {
-    errorLog("Date literal : invalid date literal value. Expecting date literal with format [d]d{/|-}[m]m{/|-}[yy]yy[-hh[:mm:[ss]]]. Found <%s> at line %d column %d.",
-        Tokenizer->Tab(Index)->Text.toString(),
-        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
-    return ZS_SYNTAX_ERROR;
+  if (pContext.CurrentToken->Type!=ZSRCH_NUMERIC_LITERAL) {
+    ErrorLog.errorLog("Date literal : invalid date literal value. Expecting date literal with format [d]d{/|-}[m]m{/|-}[yy]yy[-hh[:mm:[ss]]]. Found <%s> at line %d column %d.",
+        pContext.CurrentToken->Text.toString(),
+        pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+      pContext.LastErroredToken = pContext.CurrentToken;
+    return pContext.Status=ZS_SYNTAX_ERROR;
   }
-  pValue=Tokenizer->Tab(Index)->Text.toInt();
-  if (!advanceIndex()) {
-    return ZS_SYNTAX_ERROR;
+  pValue=pContext.CurrentToken->Text.toInt();
+  if (!pContext.advanceIndex()) {
+    return pContext.Status=ZS_SYNTAX_ERROR;
   }
-  if (Tokenizer->Tab(Index)->Type==ZSRCH_CLOSEPARENTHESIS)
-    return ZS_EOF;
+  if (pContext.CurrentToken->Type==ZSRCH_CLOSEPARENTHESIS)
+    return pContext.Status=ZS_EOF;
 
-  if (Tokenizer->Tab(Index)->Type==pEndSeparator) {
-    if (!advanceIndex()) {
-      return ZS_SYNTAX_ERROR;
+  if (pContext.CurrentToken->Type==pEndSeparator) {
+    if (!pContext.advanceIndex()) {
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
   }
-  return ZS_SUCCESS;
+  return pContext.Status=ZS_SUCCESS;
 }
 
+#ifdef __DEPRECATED__
+/* collection is instantiated as soon as first entity name is known and validated to be a valid, stored entity */
 
-/*                                 <-------selection clause-------------->
-  find  [all,first]  <entity name> with   <entity name>.<field name> .... [as <collection name>] ;  NB: by default, find first is executed \n
- */
 ZStatus
-ZSearchParser::_parseFind(std::shared_ptr<ZSearchEntity> &pCollection)
+ZSearchParser::_parseFind(ZSearchContext & pContext)
 {
   ZStatus wSt=ZS_SUCCESS;
   Action = ZSPA_Find;
-  ZSearchLogicalTerm* wLogicalTerm=nullptr;
+  pContext.InstructionType = ZSITP_Find;
 
-  CurEntities.clear(); /* reset current entities being used (defined within phrase) */
+//  int wSelNumber=-1 ; /* default set to ALL */
+//  ZFldSelClause            wSelClause;
+  ZSearchLogicalTerm*   wLogicalTerm=nullptr;
 
-  if (!advanceIndex())
+  pContext.clearEntities(); /* reset current entities being used (defined within phrase) */
+  pContext.clearMessage();
+
+  if (!pContext.advanceIndex())
     return ZS_SYNTAX_ERROR;
 
-  switch (Tokenizer->Tab(Index)->Type) {
+  switch (pContext.CurrentToken->Type) {
     case ZSRCH_ALL:
       Action |= ZSPA_All;
-      if (!advanceIndex())
+      if (!pContext.advanceIndex())
         return ZS_SYNTAX_ERROR;
       break;
     case ZSRCH_FIRST:
       Action |= ZSPA_First;
-      if (!advanceIndex())
+      pContext.InstructionType |= ZSITP_First;  /* Nb ; Equivalence for ZSITP_All is 0x0 as defaulted value */
+      if (!pContext.advanceIndex())
         return ZS_SYNTAX_ERROR;
+
+      if (pContext.CurrentToken->Type!=ZSRCH_NUMERIC_LITERAL) {
+          ErrorLog.errorLog("Missing numeric literal after clause FIRST. set to default value : 1 - at line %d column %d. Found <%s>.",
+                     pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+          pContext.LastErroredToken = pContext.CurrentToken;
+          return ZS_MISS_LITERAL;
+      }
+
+      pContext.NumberToFind = pContext.CurrentToken->Text.toInt(10);
+      if (!pContext.advanceIndex())
+          return ZS_SYNTAX_ERROR;
       break;
     default:
-      warningLog("Missing keyword one of [<ALL>,<FIRST>] set to default : FIRST - at line %d column %d. Found <%s>.",
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,Tokenizer->Tab(Index)->Text.toString() );
-      Action |= ZSPA_First;
+      ErrorLog.warningLog("Missing keyword one of [<ALL>,<FIRST>] set to default : ALL - at line %d column %d. Found <%s>.",
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+      Action |= ZSPA_All;
       break;
+    }// switch
+
+    /* search for entity(ies) after keyword IN */
+
+    int wFieldListBookMark = pContext.Index;  /* keep memory of fields selection clause beginning */
+
+    while ((pContext.CurrentTokenList.count() > pContext.Index ) &&(pContext.CurrentToken->Type != ZSRCH_IN ))  /* search for beginning of entities */
+    {
+        if (!pContext.advanceIndex()) {
+            ErrorLog.errorLog("Missing keyword <IN> in instruction.");
+            return ZS_SYNTAX_ERROR;
+        }
     }
-
-    if (Tokenizer->Tab(Index)->Type!=ZSRCH_IDENTIFIER) {
-      warningLog("No active entity has been defined." );
-      return ZS_INV_ENTITY;
-    }
-
-    /* search for a valid open entity */
-    Entity = EntityList.getEntityByName(Tokenizer->Tab(Index)->Text);
-    if (Entity==nullptr) {
-        warningLog("Invalid entity identifier found <%s> at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn  );
-        return ZS_INV_ENTITY;
-      }
-      /* here active entity is set to Tokenizer->Tab(Index)->Text */
-
-      CurEntities.push(Entity); /* set found entity as current entity */
-
-      if (!advanceIndex())
+    if (pContext.CurrentTokenList.count() == pContext.Index ) {
+        ErrorLog.errorLog("Missing keyword <IN> in instruction.");
         return ZS_SYNTAX_ERROR;
-/*
-    if (Tokenizer->Tab(Index)->Type!=ZSRCH_WITH) {
-      warningLog("Syntax error : Expected clause <WITH> while found <%s> at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn  );
-      return ZS_MISS_KEYWORD;
     }
-*/
-  if (Tokenizer->Tab(Index)->Type == ZSRCH_WITH) {
+    /* here we are pointing on <IN> */
+    if (!pContext.advanceIndex())
+        return ZS_SYNTAX_ERROR;
 
-    if (!advanceIndex())
-      return ZS_SYNTAX_ERROR;
+    if (pContext.CurrentToken->Type!=ZSRCH_IDENTIFIER) {
+        ErrorLog.errorLog("Expected active entity. Found <%s> line <%d> column <%d>",
+                 pContext.CurrentToken->Text.toString(),
+                 pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken= pContext.CurrentToken;
+        return ZS_INV_ENTITY;
+    }
 
-    wSt=_parseLogicalTerm(wLogicalTerm,0,Index);
-    if (wSt!=ZS_SUCCESS)
-      return wSt;
+    while ((pContext.CurrentToken->Type != ZSRCH_WITH) && (pContext.CurrentToken->Type!=ZSRCH_AS)) {
 
-  } // there is a WITH clause
-  else {
-    warningLog("No WITH clause has been found : all elements from entity <%s> will be selected .",
-        Entity->getName().toString()  );
-  }
+        if (pContext.CurrentToken->Type!=ZSRCH_IDENTIFIER) {
+            ErrorLog.errorLog("Expected entity identifier. Found <%s> at line %d column %d.",
+                       pContext.CurrentToken->Text.toString(),
+                       pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn  );
+            pContext.LastErroredToken=pContext.CurrentToken;
+            return ZS_INV_ENTITY;
+        }
+        /* search for a valid open entity */
+        std::shared_ptr<ZSearchEntity>          wEntity=nullptr;
+        wEntity = EntityList.getEntityByName(pContext.CurrentToken->Text);
+        if (wEntity==nullptr) {
+            ErrorLog.errorLog("Entity identifier not found in declared entities list. Found <%s> at line %d column %d.",
+              pContext.CurrentToken->Text.toString(),
+              pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn  );
+            pContext.LastErroredToken=pContext.CurrentToken;
+            return ZS_INV_ENTITY;
+        }
 
+        /* here active entity is set to pContext.CurrentToken->Text */
+
+/* collection is instantiated as soon as first entity name is known and validated to be a valid, stored entity */
+//        pContext.CurEntity=ZSearchEntity::constructWithZSearchEntity(wEntity,pContext.CurrentToken);
+
+        pContext.SourceEntity = wEntity ;
+        pContext.TargetEntity = std::shared_ptr<ZSearchEntity>(new ZSearchEntity(wEntity,pContext.CurrentToken));
+
+        /* entity name will be allocated later after having parsed AS clause */
+
+        if (!pContext.advanceIndex())
+            return ZS_SYNTAX_ERROR;
+
+        if (pContext.CurrentToken->Type == ZSRCH_COMMA) {
+            if (!pContext.advanceIndex())
+                return ZS_SYNTAX_ERROR;
+            continue;
+        }
+    } //  while != ZSRCH_WITH && !=ZSRCH_AS
+
+    if (pContext.SourceEntity==nullptr) {
+        ErrorLog.errorLog("No valid entity has been mentionned. Found <%s> at line %d column %d.",
+                 pContext.CurrentToken->Text.toString(),
+                 pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn  );
+        pContext.LastErroredToken=pContext.CurrentToken;
+        return ZS_SYNTAX_ERROR;
+    }
+
+
+
+ //   int wWithBookMark = pContext.Index; // store pContext.Index pointing to first token after WITH Clause
+
+    /* get back to parse selection */
+//    setpContext.Index(wWithBookMark);  /* restore pContext.Index to first token after with clause */
+
+    if (pContext.CurrentToken->Type == ZSRCH_WITH) {
+        if (!pContext.advanceIndex())
+          return ZS_SYNTAX_ERROR;
+
+        wSt=_parseLogicalTerm(wLogicalTerm,pContext,0,pContext.Index);
+        if (wSt!=ZS_SUCCESS)
+          return wSt;
+    } // ZSRCH_WITH
+    else {
+        ErrorLog.warningLog("Missing keyword <WITH> : all ranks of entity will be selected." );
+    }
     /* here token must be 'AS' */
 
-    if (Tokenizer->Tab(Index)->Type!=ZSRCH_AS) {
-      errorLog("Syntax error : Missing clause <AS> while found <%s> at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn  );
+    if (pContext.CurrentToken->Type!=ZSRCH_AS) {
+      ErrorLog.errorLog("Syntax error : Missing clause <AS> while found <%s> at line %d column %d.",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn  );
+        pContext.LastErroredToken = pContext.CurrentToken;
       if (wLogicalTerm!=nullptr)
         delete wLogicalTerm;
       return ZS_MISS_KEYWORD;
     }
 
-    if (!advanceIndex()) {
+    if (!pContext.advanceIndex()) {
       if (wLogicalTerm!=nullptr)
         delete wLogicalTerm;
       return ZS_SYNTAX_ERROR;
@@ -2121,39 +3367,53 @@ ZSearchParser::_parseFind(std::shared_ptr<ZSearchEntity> &pCollection)
 
     /* here entity name as collection name */
 
-    if (Tokenizer->Tab(Index)->Type!=ZSRCH_IDENTIFIER ) {
-      warningLog("Syntax error : Missing collection identifier while found <%s> at line %d column %d.",
-          Tokenizer->Tab(Index)->Text.toString(),
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn  );
-      if (wLogicalTerm!=nullptr)
-        delete wLogicalTerm;
-      return ZS_MISS_FIELD;
+ //   ZSearchToken* wEntityNameToken= pContext.CurrentToken;
+
+    if (pContext.CurrentToken->Type!=ZSRCH_IDENTIFIER ) {
+        ErrorLog.errorLog("Syntax error : Missing collection identifier while found <%s> at line %d column %d.",
+                  pContext.CurrentToken->Text.toString(),
+                  pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn  );
+        pContext.LastErroredToken = pContext.CurrentToken;
+        if (wLogicalTerm!=nullptr)
+            delete wLogicalTerm;
+        return ZS_MISS_FIELD;
     }
+/* at this stage, collection is already built */
 
-    /* create collection */
+    pContext.TargetEntity->setNameByToken(pContext.CurrentToken);
 
-    pCollection = ZSearchEntity::constructWithCollectionEntity(Entity,Tokenizer->Tab(Index));
-
-    if (!advanceIndex()) {
-      pCollection.reset();
+    if (!pContext.advanceIndex()) {
+      pContext.clearEntities();
       delete wLogicalTerm;
       return ZS_SYNTAX_ERROR;
     }
-    if (!testSemiColon()){
-      pCollection.reset();
+    if (!pContext.testSemiColon()){
+      pContext.clearEntities();
       delete wLogicalTerm;
       return ZS_MISS_PUNCTSIGN ;
     }
+    pContext.TargetEntity->setLogicalTerm(wLogicalTerm);
 
-    pCollection->setLogicalTerm(wLogicalTerm);
+    /* in the end get back to parse selected fields */
 
-    EntityList.push(pCollection);
-    infoLog("Collection <%s> has been created and registered as a new search entity.",
-        pCollection->getName().toString()  );
+    int wEndIndex = pContext.Index;
+    pContext.setIndex(wFieldListBookMark); /* get back to field list clause : NB: we have entity(ies) field dictionary at disposal */
 
+    wSt=_parseSelClause(pContext);
+    if (wSt!=ZS_SUCCESS)
+        return wSt;
 
+    pContext.setIndex(wEndIndex);
+
+    EntityList.push(pContext.TargetEntity);
+    pContext.setMessage("Collection <%s> has been created and registered as a new search entity.",
+                     pContext.TargetEntity->EntityFullName.toString());
+    ErrorLog.infoLog("Collection <%s> has been created and registered as a new search entity.",
+            pContext.TargetEntity->EntityFullName.toString()  );
   return ZS_SUCCESS;
 }// ZSearchParser::_parseFind
+
+#endif // __DEPRECATED__
 
 /*
 terms operands allowed conversions before logical operation :
@@ -2176,17 +3436,17 @@ Resource
 */
 
 
-ZSearchOperandType getMainOperandType(ZSearchLogicalOperand* pOperand)
+ZSearchOperandType_type getMainOperandType(ZSearchLogicalOperand* pOperand)
 {
-  if (pOperand->Type==ZSTO_Logical)
+  if (pOperand->ZSTO==ZSTO_Logical)
     return ZSTO_Bool;             /* if operand is logical then result has type boolean */
-  if (pOperand->Type==ZSTO_Arithmetic)
-    return pOperand->Type;        /* if operand is arithmetic then result has literal type defined at operand level */
+  if (pOperand->ZSTO==ZSTO_Arithmetic)
+    return pOperand->ZSTO;        /* if operand is arithmetic then result has literal type defined at operand level */
 
 
   /* in all other cases, main type is deduced from detailed operand type */
 
-  ZSearchOperandType wType = ZSearchOperandType(pOperand->Type & ZSTO_BaseMask);
+  ZSearchOperandType_type wType = ZSearchOperandType_type(pOperand->ZSTO & ZSTO_BaseMask);
   switch (wType)
   {
   case ZSTO_String:
@@ -2250,60 +3510,64 @@ Allowed type correspondance
     (ZEntity,id)
 
 */
-ZStatus
-ZSearchParser::_parseOneLogicalOperand(void* & pOperand, ZSearchOperandType  &pMainType,int pParenthesisLevel)
+ZStatus ZSearchParser::_parseOneLogicalOperand(void *&pOperand,
+                                               ZSearchContext &pContext,
+                                               ZSearchOperandType_type &pMainType,
+                                               int pParenthesisLevel)
 {
-  int wSvIndex=Index;
+  int wStartOperandIndex=pContext.Index;
   pOperand=nullptr;
   ZStatus wSt=ZS_SUCCESS;
 
   while (true) {
 
-    if (Tokenizer->Tab(Index)->Type == ZSRCH_OPENPARENTHESIS) {
-      if (!advanceIndex()) {
-        return ZS_SYNTAX_ERROR;
+    if (pContext.CurrentToken->Type == ZSRCH_OPENPARENTHESIS) {
+      if (!pContext.advanceIndex(true)) {
+        return pContext.Status=ZS_SYNTAX_ERROR;
       }
       pParenthesisLevel++;
-      wSt=_parseLogicalTerm((ZSearchLogicalTerm* &)pOperand,pParenthesisLevel+1,Index);
+      wSt=_parseLogicalTerm((ZSearchLogicalTerm* &)pOperand,pContext,pParenthesisLevel+1);
       if (wSt!=ZS_SUCCESS) {
         return wSt;
       }
       pMainType = ZSTO_Bool;/* result of a logical term operand is a bool */
 
-      if (Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
-        errorLog("Syntax error : Closed parenthesis expected. found <%s> - at line %d column %d",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+      if (pContext.CurrentToken->Type!=ZSRCH_CLOSEPARENTHESIS) {
+        ErrorLog.errorLog("Syntax error : Closed parenthesis expected. found <%s> - at line %d column %d",
+            pContext.CurrentToken->Text.toString(),
+            pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
 
-        return ZS_SYNTAX_ERROR;
+        return pContext.Status=ZS_SYNTAX_ERROR;
       }
       if (pParenthesisLevel<0) {
-        errorLog("Syntax error : Closed parenthesis without corresponding open parenthesis - at line %d column %d",
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+        ErrorLog.errorLog("Syntax error : Closed parenthesis without corresponding open parenthesis - at line %d column %d",
+            pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
 
-        return ZS_SYNTAX_ERROR;
+        return pContext.Status=ZS_SYNTAX_ERROR;
       }
 
-      if (!advanceIndex()) {
-        return ZS_SYNTAX_ERROR;
+      if (!pContext.advanceIndex(true)) {
+        return pContext.Status=ZS_SYNTAX_ERROR;
       }
 
       break;  /* Operand is set as a new logical formula */
     }// ZSRCH_OPENPARENTHESIS
 
-    if (Tokenizer->Tab(Index)->Type==ZSRCH_IDENTIFIER) {
+    if (pContext.CurrentToken->Type==ZSRCH_IDENTIFIER) {
 
       /* check if symbol or ZEntity */
 
-      if (_parseZEntity(pOperand,pMainType) ) {
+      if (_parseZEntity(pOperand,pContext,pMainType) ) {
         break;
       }
-      if (_parseSymbol(pOperand,pMainType) ) {
+      if (_getSymbol(pOperand,pContext,pMainType) ) {
         /* Capture base type of operand */
         break;
       }
 
-      wSt=_parseOperandField(pOperand,pMainType);
+      wSt=_parseOperandField(pOperand,pContext,pMainType);
       if (wSt!=ZS_SUCCESS) {
         return wSt;
       }
@@ -2311,22 +3575,30 @@ ZSearchParser::_parseOneLogicalOperand(void* & pOperand, ZSearchOperandType  &pM
       break;
     } // ZSRCH_IDENTIFIER
 
-    if ((Tokenizer->Tab(Index)->Type & ZSRCH_LITERAL)==ZSRCH_LITERAL) {
-      wSt=_parseLiteral(pOperand,pMainType);
+    if ((pContext.CurrentToken->Type & ZSRCH_LITERAL)==ZSRCH_LITERAL) {
+      ZSearchLiteral* wOperand=nullptr;
+      wSt=_parseLiteral(wOperand,pContext,pMainType);
       if (wSt!=ZS_SUCCESS) {
         return wSt;
       }
+      pOperand=wOperand;
       //        wTerm->Operand1.Type = ZSTO_Literal;
       break;
     } // ZSRCH_LITERAL
     break;
   } // while true
 
-  if (ZSearchOperator::isArithmeric(Tokenizer->Tab(Index))) {
+  if (ZSearchOperator::isArithmeric(pContext.CurrentToken)) {
     bool wIsLiteral=true;
     clearOperand(pOperand);
 
-    wSt=_parseArithmeticTerm((ZSearchArithmeticTerm* &)pOperand,pParenthesisLevel,wSvIndex, pMainType,wIsLiteral);
+    pContext.setIndex(wStartOperandIndex);
+    wSt=_parseArithmeticTerm((ZSearchArithmeticTerm* &)pOperand,
+                               pContext,
+                               pParenthesisLevel,
+//                               wStartOperandIndex,
+                               pMainType,
+                               wIsLiteral);
     if (wSt!=ZS_SUCCESS) {
       return wSt;
     }
@@ -2336,63 +3608,78 @@ ZSearchParser::_parseOneLogicalOperand(void* & pOperand, ZSearchOperandType  &pM
 
       utf8VaryingString wFormula ;
 
-      for (int wi=wSvIndex; wi < Index; wi++) {
-        wFormula += Tokenizer->Tab(wi)->Text;
+      for (int wi=wStartOperandIndex; wi < pContext.Index; wi++) {
+        wFormula += pContext.CurrentTokenList.Tab(wi)->Text;
         wFormula += " ";
       }
 
-    ZSearchOperandType wType = ZSearchOperandType(static_cast<ZSearchArithmeticTerm*>(pOperand)->Type & ZSTO_BaseMask);
-    infoLog("Arithmetic expression [%s] is a strict literal of type <%s> ", wFormula.toString(),decode_OperandType(wType));
+    ZSearchOperandType_type wType = ZSearchOperandType_type(static_cast<ZSearchArithmeticTerm*>(pOperand)->ZSTO & ZSTO_BaseMask);
+    ErrorLog.infoLog("Arithmetic expression [%s] is a strict literal of type <%s> ", wFormula.toString(),decode_OperandType(wType));
 
-    ZOperandContent wResult=computeArithmeticLiteral(pOperand);
-    if (!wResult.isValid()) {
-        errorLog("Arithmetic expression [%s] is an invalid literal expression ", wFormula.toString());
+    ZOperandContent wResult;
+    ZSearchArithmeticTerm* wSLOP=static_cast<ZSearchArithmeticTerm*>(pOperand);
+    wSt=computeArithmeticLiteral(wSLOP,wType,wResult);
+    if ((wSt!=ZS_SUCCESS)&&(wSt!=ZS_EOF)) {
+        ErrorLog.errorLog("Arithmetic expression [%s] is an invalid literal expression. Returned status is< %s>", wFormula.toString(),
+                 decode_ZStatus(wSt));
         clearOperand(pOperand);
-        return ZS_INVOP;
+        return wSt;
     }
 
-    switch (wResult.Type)
+    switch (wResult.OperandZSTO)
     {
       case ZSTO_Integer:
       {
-        ZSearchLiteral<long>* wLit = new ZSearchLiteral<long>;
+        ZSearchLiteral* wLit = new ZSearchLiteral;
         clearOperand(pOperand);
-        wLit->Type = ZSTO_LiteralInteger;
-        wLit->Content = wResult.Integer;
-        wLit->Comment = wFormula;
-        if (!OperandTypeCheck(pMainType,wLit->getOperandBase(),wSvIndex)) {
-          delete wLit;
-          return ZS_INVTYPE;
+        wLit->setZSTO (ZSTO_LiteralInteger);
+        wLit->setInteger( wResult.getInteger() );
+        wLit->FullFieldName = wFormula;
+//        wLit->Comment = wFormula;
+        if (!OperandTypeCheck(pMainType,pContext,wLit,wStartOperandIndex)) {
+            delete wLit;
+            ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+                     pContext.CurrentTokenList.Tab(wStartOperandIndex)->Text.toString(),
+                     pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenLine,pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenColumn );
+            return pContext.Status=ZS_INVTYPE;
         }
         pOperand = wLit;
-        return ZS_SUCCESS;
+        return pContext.Status=ZS_SUCCESS;
       }
       case ZSTO_Float:
       {
-        ZSearchLiteral<double>* wLit = new ZSearchLiteral<double>;
-        wLit->Type = ZSTO_LiteralFloat;
-        wLit->Content = wResult.Float;
-        wLit->Comment = wFormula;
-        if (!OperandTypeCheck(pMainType,wLit->getOperandBase(),wSvIndex)) {
-          delete wLit;
-          return ZS_INVTYPE;
+        ZSearchLiteral* wLit = new ZSearchLiteral;
+        wLit->setZSTO(  ZSTO_LiteralFloat);
+        wLit->setFloat(wResult.getFloat());
+        wLit->FullFieldName = wFormula;
+//        wLit->Comment = wFormula;
+        if (!OperandTypeCheck(pMainType,pContext,wLit,wStartOperandIndex)) {
+            delete wLit;
+            ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+                     pContext.CurrentTokenList.Tab(wStartOperandIndex)->Text.toString(),
+                     pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenLine,pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenColumn );
+            return pContext.Status=ZS_INVTYPE;
         }
         pOperand = wLit;
-        return ZS_SUCCESS;
+        return pContext.Status=ZS_SUCCESS;
       }
       case ZSTO_UriString:
       case ZSTO_String:
       {
-        ZSearchLiteral<utf8VaryingString>* wLit = new ZSearchLiteral<utf8VaryingString>;
-        wLit->Type = ZSTO_LiteralString;
-        wLit->Content = wResult.String;
-        wLit->Comment = wFormula;
-        if (!OperandTypeCheck(pMainType,wLit->getOperandBase(),wSvIndex)) {
-          delete wLit;
-          return ZS_INVTYPE;
+        ZSearchLiteral* wLit = new ZSearchLiteral;
+        wLit->setZSTO ( ZSTO_LiteralString);
+        wLit->setString(wResult.getString());
+        wLit->FullFieldName = wFormula;
+//        wLit->Comment = wFormula;
+        if (!OperandTypeCheck(pMainType,pContext,wLit,wStartOperandIndex)) {
+            delete wLit;
+            ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+                     pContext.CurrentTokenList.Tab(wStartOperandIndex)->Text.toString(),
+                     pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenLine,pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenColumn );
+            return pContext.Status=ZS_INVTYPE;
         }
         pOperand = wLit;
-        return ZS_SUCCESS;
+        return pContext.Status=ZS_SUCCESS;
       }
 
  /*   No date allowed in an arithmetic operation
@@ -2407,7 +3694,7 @@ ZSearchParser::_parseOneLogicalOperand(void* & pOperand, ZSearchOperandType  &pM
       default:
         _DBGPRINT("_parseOneLogicalOperand Arithmetic expression is a strict literal of type <%s>\n",decode_OperandType(wType))
         clearOperand(pOperand);
-        return ZS_INVOP;
+        return pContext.Status=ZS_INVOP;
       }// switch
 
    } // is a full literal
@@ -2415,38 +3702,43 @@ ZSearchParser::_parseOneLogicalOperand(void* & pOperand, ZSearchOperandType  &pM
     /* arithmetic expression involving at least one field :
      * pOperand is already loaded with arithmetic terms chain */
 
-    return ZS_SUCCESS;
+    return pContext.Status=ZS_SUCCESS;
   } // operator is arithmetic
 
 
-  return ZS_SUCCESS;
+  return pContext.Status=ZS_SUCCESS;
 } // _parseOneLogicalOperand
 
-
+/*
 ZStatus
 ZSearchParser::_parseLogicalTerm(ZSearchLogicalTerm* & pTerm,
-    int pParenthesisLevel, int pBookMark)
+                                 ZSearchContext& pContext,
+                                 int pParenthesisLevel,
+                                 int pBookMark)
+*/
+ZStatus
+ZSearchParser::_parseLogicalTerm(ZSearchLogicalTerm* & pTerm,
+                                 ZSearchContext& pContext,
+                                 int pParenthesisLevel)
 {
 
-  setIndex(pBookMark);
-  int wSvIndex=Index;
   pTerm=nullptr;
 
-  ZSearchOperandType wOpType = ZSTO_Nothing;
+//  ZSearchOperandType_type wOpType = ZSTO_Nothing;
   ZStatus wSt=ZS_SUCCESS;
 
   ZSearchLogicalTerm* wTerm = new ZSearchLogicalTerm;
   wTerm->ParenthesisLevel = pParenthesisLevel;
   //  wTerm->Collateral = pCollateral;
 
-  setIndex(pBookMark);
+//  pContext.setIndex(pBookMark);
 
 
-  if (Tokenizer->Tab(Index)->Type == ZSRCH_OPERATOR_NOT)  {
-    wTerm->NotOperator.set(Tokenizer->Tab(Index));
-    if (!advanceIndex()) {
+  if (pContext.CurrentToken->Type == ZSRCH_OPERATOR_NOT)  {
+    wTerm->NotOperator.set(pContext.CurrentToken);
+    if (!pContext.advanceIndex(true)) {
       delete wTerm;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
   }
 
@@ -2454,7 +3746,7 @@ ZSearchParser::_parseLogicalTerm(ZSearchLogicalTerm* & pTerm,
 
   /* first operand acquisition */
 
-  wSt = _parseOneLogicalOperand(wTerm->Operand1,wTerm->MainType,pParenthesisLevel);
+  wSt = _parseOneLogicalOperand(wTerm->Operand1,pContext,wTerm->MainType,pParenthesisLevel);
   if (wSt!=ZS_SUCCESS) {
     delete wTerm;
     return wSt;
@@ -2462,56 +3754,62 @@ ZSearchParser::_parseLogicalTerm(ZSearchLogicalTerm* & pTerm,
 
   /* compare operator */
 
-  else if (!ZSearchOperator::isComparator(Tokenizer->Tab(Index))) {
-    errorLog("Invalid logical operator <%s> at line %d column %d.",
-        Tokenizer->Tab(Index)->Text.toString(),
-        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index+2)->TokenColumn );
+  if (pContext.isEOF() ||(!ZSearchOperator::isComparator(pContext.CurrentToken))) {
+    ErrorLog.errorLog("Missing logical operator at line %d column %d. Found <%s>.",
+                      pContext.CurrentToken->TokenLine,pContext.CurrentTokenList.Tab(pContext.Index+2)->TokenColumn,
+                      pContext.CurrentToken->Text.toString());
+    pContext.LastErroredToken = pContext.CurrentToken;
     delete wTerm;
-    return ZS_INV_OPERATOR;
-  }// not comparator
+    return pContext.Status=ZS_INV_OPERATOR;
+  }// is not a comparator
 
+  wTerm->CompareOperator.set(pContext.CurrentToken);
 
-  wTerm->CompareOperator.set(Tokenizer->Tab(Index));
+  _DBGPRINT ("ZSearchParser::_parseLogicalTerm Found operator <%s>\n",decode_ZSOPV(wTerm->CompareOperator.ZSOPV))
 
-  if (!advanceIndex()) {
+  if (!pContext.advanceIndex(true)) {
     delete wTerm;
-    return ZS_SYNTAX_ERROR;
+    return pContext.Status=ZS_SYNTAX_ERROR;
   }
 
   /*----------Operand 2 ----------------*/
-  wSvIndex = Index;
+//  wSvIndex = pContext.Index;
 
-  wSt = _parseOneLogicalOperand(wTerm->Operand2,wTerm->MainType,pParenthesisLevel);
+  wSt = _parseOneLogicalOperand(wTerm->Operand2,pContext,wTerm->MainType,pParenthesisLevel);
   if (wSt!=ZS_SUCCESS) {
     delete wTerm;
     return wSt;
   }
 
+  if (pContext.isEOF()) {
+      pTerm=wTerm;
+      return pContext.Status=ZS_SUCCESS;
+  }
 
-  if (ZSearchOperator::isAndOr(Tokenizer->Tab(Index))) {
-    wTerm->AndOrOperator.set(Tokenizer->Tab(Index));
-    if (!advanceIndex()) {
+  if (ZSearchOperator::isAndOr(pContext.CurrentToken)) {
+    wTerm->AndOrOperator.set(pContext.CurrentToken);
+    if (!pContext.advanceIndex(true)) {
       delete wTerm;
-      return ZS_SYNTAX_ERROR;
+      return pContext.Status=ZS_SYNTAX_ERROR;
     }
-    wSt=_parseLogicalTerm(wTerm->NextTerm,pParenthesisLevel,Index);
+    wSt=_parseLogicalTerm(wTerm->NextTerm,pContext,pParenthesisLevel);
     if (wSt!=ZS_SUCCESS) {
       delete wTerm;
       return wSt;
     }
-
   }
 
   pTerm=wTerm;
-  return ZS_SUCCESS;
+  return pContext.Status=ZS_SUCCESS;
 
 }//ZSearchParser::_parseLogicalTerm
 
-
-
-bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOperandBase* pOB, int pIndex)
+bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType_type &pMainType,
+                                         ZSearchContext &pContext,
+                                         ZSearchOperandBase *pOB,
+                                         int pIndex)
 {
-  ZSearchOperandType wOpBaseType = ZSearchOperandType(pOB->Type & ZSTO_BaseMask);
+  ZSearchOperandType_type wOpBaseType = ZSearchOperandType_type(pOB->ZSTO & ZSTO_BaseMask);
   switch (pMainType)
   {
   case ZSTO_Nothing:  /* set main type */
@@ -2544,8 +3842,9 @@ bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOp
       pMainType = ZSTO_Checksum;
       return true;
     case ZSTO_Bool:
-      errorLog("Type mismatch: invalid operand type Bool in arithmetic expression at line %d column %d.",
-          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+      ErrorLog.errorLog("Arithmetic operand type mismatch: invalid operand type Bool in arithmetic expression at line %d column %d.",
+          pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
       return false;
     }// switch
 
@@ -2556,10 +3855,11 @@ bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOp
   case ZSTO_UriString:
   case ZSTO_String:
     if (wOpBaseType!=ZSTO_String) {
-      errorLog("Type mismatch: expected operand with type string while found base type <%s> within <%s> at line %d column %d.",
+      ErrorLog.errorLog("Arithmetic operand type mismatch: expected operand with type string while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(pIndex)->Text.toString(),
-          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+          pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+          pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
       return false;
     }
     break;
@@ -2572,48 +3872,53 @@ bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOp
     if (wOpBaseType == ZSTO_Date) {
       if (pOB->hasModifier())
         return true;
-      errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
+      ErrorLog.errorLog("Arithmetic operand type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(pIndex)->Text.toString(),
-          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+          pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+          pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
       return false;
     }
     if (wOpBaseType == ZSTO_Date) {
       if (pOB->hasModifier())
         return true;
-      errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
+      ErrorLog.errorLog("Arithmetic operand type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(pIndex)->Text.toString(),
-          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+          pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+          pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
       return false;
     }
     if (wOpBaseType == ZSTO_Resource) {
       if (pOB->hasModifier())
         return true;
-      errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
+      ErrorLog.errorLog("Arithmetic operand type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(pIndex)->Text.toString(),
-          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+          pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+          pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
       return false;
     }
-    errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
+    ErrorLog.errorLog("Arithmetic operand type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
         decode_OperandType(pMainType),
         decode_OperandType(wOpBaseType),
-        Tokenizer->Tab(pIndex)->Text.toString(),
-        Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+        pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+        pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+    pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
     return false;
 
   case ZSTO_Date:
     /* here must be strictly date */
     if (wOpBaseType!=ZSTO_Date) {
-      errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
+      ErrorLog.errorLog("Arithmetic operand type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(pIndex)->Text.toString(),
-          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+          pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+          pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
       return false;
     }
     return true;
@@ -2621,44 +3926,48 @@ bool ZSearchParser::_arithmeticTypeCheck(ZSearchOperandType& pMainType,ZSearchOp
   case ZSTO_Resource:
     /* here must be strictly resource */
     if (wOpBaseType!=ZSTO_Resource) {
-      errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
+      ErrorLog.errorLog("Arithmetic operand type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(pIndex)->Text.toString(),
-          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+          pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+          pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
       return false;
     }
     return true;
   case ZSTO_Bool:
-    errorLog("Arithmetic operand type mismatch: invalid operand with type Bool in an arithmetic expression. Token  <%s> at line %d column %d.",
-        Tokenizer->Tab(Index)->Text.toString(),
-        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+    ErrorLog.errorLog("Arithmetic operand type mismatch: invalid operand with type Bool in an arithmetic expression. Token  <%s> at line %d column %d.",
+        pContext.CurrentToken->Text.toString(),
+        pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
     return false;
   case ZSTO_Checksum:
     if (wOpBaseType!=ZSTO_Checksum) {
-      errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
+      ErrorLog.errorLog("Arithmetic operand type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(pIndex)->Text.toString(),
-          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+          pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+          pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
       return false;
     }
     return true;
   default:
-    errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
+    ErrorLog.errorLog("Arithmetic operand type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
         decode_OperandType(pMainType),
         decode_OperandType(wOpBaseType),
-        Tokenizer->Tab(pIndex)->Text.toString(),
-        Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+        pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+        pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
     return false;
   }//swich
 
 } // ZSearchParser::_arithmeticTypeCheck
 
 
-bool ZSearchParser::OperandTypeCheck(ZSearchOperandType& pMainType,ZSearchOperandBase* pOB, int pIndex)
+bool ZSearchParser::OperandTypeCheck(ZSearchOperandType_type& pMainType,ZSearchContext& pContext,ZSearchOperandBase* pOB, int pIndex)
 {
-  ZSearchOperandType wOpBaseType = ZSearchOperandType(pOB->Type & ZSTO_BaseMask);
+  ZSearchOperandType_type wOpBaseType = ZSearchOperandType_type(pOB->ZSTO & ZSTO_BaseMask);
   switch (pMainType)
   {
   case ZSTO_Nothing:  /* set main type */
@@ -2702,10 +4011,11 @@ bool ZSearchParser::OperandTypeCheck(ZSearchOperandType& pMainType,ZSearchOperan
   case ZSTO_UriString:
   case ZSTO_String:
     if (wOpBaseType!=ZSTO_String) {
-      errorLog("Type mismatch: expected operand with type string while found base type <%s> within <%s> at line %d column %d.",
+        ErrorLog.errorLog("Operand type mismatch: expected operand with type string while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(pIndex)->Text.toString(),
-          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+          pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+          pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
       return false;
     }
     break;
@@ -2718,48 +4028,53 @@ bool ZSearchParser::OperandTypeCheck(ZSearchOperandType& pMainType,ZSearchOperan
     if (wOpBaseType == ZSTO_Date) {
       if (pOB->hasModifier())
         return true;
-      errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
+      ErrorLog.errorLog("Operand type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(pIndex)->Text.toString(),
-          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+          pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+          pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
       return false;
     }
     if (wOpBaseType == ZSTO_Date) {
       if (pOB->hasModifier())
         return true;
-      errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
+      ErrorLog.errorLog("Operand type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(pIndex)->Text.toString(),
-          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+          pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+          pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
       return false;
     }
     if (wOpBaseType == ZSTO_Resource) {
       if (pOB->hasModifier())
         return true;
-      errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
+      ErrorLog.errorLog("Operand type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(pIndex)->Text.toString(),
-          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+          pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+          pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentToken;
       return false;
     }
-    errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
+    ErrorLog.errorLog("Operand type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
         decode_OperandType(pMainType),
         decode_OperandType(wOpBaseType),
-        Tokenizer->Tab(pIndex)->Text.toString(),
-        Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+        pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+        pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+    pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
     return false;
 
   case ZSTO_Date:
     /* here must be strictly date */
     if (wOpBaseType!=ZSTO_Date) {
-      errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
+      ErrorLog.errorLog("Operand type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(pIndex)->Text.toString(),
-          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+          pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+          pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
       return false;
     }
     return true;
@@ -2767,144 +4082,165 @@ bool ZSearchParser::OperandTypeCheck(ZSearchOperandType& pMainType,ZSearchOperan
   case ZSTO_Resource:
     /* here must be strictly resource */
     if (wOpBaseType!=ZSTO_Resource) {
-      errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
+      ErrorLog.errorLog("Operand type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(pIndex)->Text.toString(),
-          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+          pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+          pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
       return false;
     }
     return true;
   case ZSTO_Bool:
-    errorLog("Arithmetic operand type mismatch: invalid operand with type Bool in an arithmetic expression. Token  <%s> at line %d column %d.",
-        Tokenizer->Tab(Index)->Text.toString(),
-        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+    ErrorLog.errorLog("Arithmetic operand type mismatch: invalid operand with type Bool in an arithmetic expression. Token  <%s> at line %d column %d.",
+        pContext.CurrentToken->Text.toString(),
+        pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
     return false;
   case ZSTO_Checksum:
     if (wOpBaseType!=ZSTO_Checksum) {
-      errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
+      ErrorLog.errorLog("Operand type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
           decode_OperandType(pMainType),
           decode_OperandType(wOpBaseType),
-          Tokenizer->Tab(pIndex)->Text.toString(),
-          Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+          pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+          pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
       return false;
     }
     return true;
   default:
-    errorLog("Type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
+    ErrorLog.errorLog("Operand type mismatch: expected operand with type <%s> while found base type <%s> within <%s> at line %d column %d.",
         decode_OperandType(pMainType),
         decode_OperandType(wOpBaseType),
-        Tokenizer->Tab(pIndex)->Text.toString(),
-        Tokenizer->Tab(pIndex)->TokenLine,Tokenizer->Tab(pIndex)->TokenColumn );
+        pContext.CurrentTokenList.Tab(pIndex)->Text.toString(),
+        pContext.CurrentTokenList.Tab(pIndex)->TokenLine,pContext.CurrentTokenList.Tab(pIndex)->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentTokenList.Tab(pIndex);
     return false;
   }//swich
 
 } // ZSearchParser::_logicalTypeCheck
 
-
-ZStatus
-ZSearchParser::_parseArithmeticTerm(ZSearchArithmeticTerm*& pArithTerm,
-                                int pParenthesisLevel,  int pBookMark, ZSearchOperandType& pRequestedType, bool &pIsLiteral)
+ZStatus ZSearchParser::_parseArithmeticTerm(ZSearchArithmeticTerm *&pArithTerm,
+                                            ZSearchContext &pContext,
+                                            int pParenthesisLevel,
+//                                            int pBookMark,
+                                            ZSearchOperandType_type &pRequestedType,
+                                            bool &pIsLiteral)
 {
   ZStatus wSt=ZS_SUCCESS;
 
   pArithTerm=nullptr;
 
-  setIndex(pBookMark);
+//  pContext.setIndex(pBookMark);
 
-  int wSvIndex=Index;
+  int wStartOperandIndex=pContext.Index;
 
   ZSearchArithmeticTerm* wArithTerm = new ZSearchArithmeticTerm;
   wArithTerm->ParenthesisLevel = pParenthesisLevel;
 
   while (true) {
 
-    if (Tokenizer->Tab(Index)->Type==ZSRCH_OPENPARENTHESIS) {
-      if (!advanceIndex()) {
+    if (pContext.CurrentToken->Type==ZSRCH_OPENPARENTHESIS) {
+      if (!pContext.advanceIndex()) {
         delete wArithTerm;
-        return ZS_SYNTAX_ERROR;
+        return pContext.Status=ZS_SYNTAX_ERROR;
       }
-      wSt=_parseArithmeticTerm((ZSearchArithmeticTerm*&)wArithTerm->Operand,pParenthesisLevel+1,Index,pRequestedType,pIsLiteral);
+      wSt=_parseArithmeticTerm((ZSearchArithmeticTerm*&)wArithTerm->Operand,
+                                 pContext,
+                                 pParenthesisLevel+1,
+//                                 pContext.Index,
+                                 pRequestedType,
+                                 pIsLiteral);
       if (wSt!=ZS_SUCCESS) {
         delete wArithTerm;
-        return wSt;
+        return pContext.Status=wSt;
       }
-      if (Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
-        errorLog("Syntax error: expected closing parenthesis while found <%s> at line %d column %d.",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
+      if (pContext.CurrentToken->Type!=ZSRCH_CLOSEPARENTHESIS) {
+        ErrorLog.errorLog("Syntax error: expected closing parenthesis while found <%s> at line %d column %d.",
+            pContext.CurrentToken->Text.toString(),
+            pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+          pContext.LastErroredToken = pContext.CurrentToken;
         delete wArithTerm;
-        return ZS_MISS_PUNCTSIGN;
+        return pContext.Status=ZS_MISS_PUNCTSIGN;
       }
       break; /* first operand is stored as an arithmetic formula */
     } //ZSRCH_OPENPARENTHESIS
 
 
-    if (Tokenizer->Tab(Index)->Type==ZSRCH_IDENTIFIER) {
+    if (pContext.CurrentToken->Type==ZSRCH_IDENTIFIER) {
 
-      if (_parseZEntity(wArithTerm->Operand,pRequestedType) ) {
+      if (_parseZEntity(wArithTerm->Operand,pContext,pRequestedType) ) {
         break;
       }
-      if (_parseSymbol(wArithTerm->Operand,pRequestedType) ) {
+      if (_getSymbol(wArithTerm->Operand,pContext,pRequestedType) ) {
         break;
       }
 
-      wSt=_parseOperandField(wArithTerm->Operand,pRequestedType);
+      wSt=_parseOperandField(wArithTerm->Operand,pContext,pRequestedType);
       if (wSt!=ZS_SUCCESS) {
         delete wArithTerm;
-        return wSt;
+        return pContext.Status=wSt;
       }
       pIsLiteral = false;
       break;
     } // ZSRCH_IDENTIFIER
 
-    if ((Tokenizer->Tab(Index)->Type & ZSRCH_LITERAL)==ZSRCH_LITERAL) {
-      wSt=_parseLiteral(wArithTerm->Operand,pRequestedType);
+    if ((pContext.CurrentToken->Type & ZSRCH_LITERAL)==ZSRCH_LITERAL) {
+      ZSearchLiteral* wOperand=nullptr;
+      wSt=_parseLiteral(wOperand,pContext,pRequestedType);
       if (wSt!=ZS_SUCCESS) {
         delete wArithTerm;
-        return wSt;
+        return pContext.Status=wSt;
       }
+      wArithTerm->Operand=wOperand;
       break;
     } // ZSRCH_LITERAL
 
-    errorLog("Syntax error: expected either an identifier or a litteral while found <%s> at line %d column %d.",
-        Tokenizer->Tab(Index)->Text.toString(),
-        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn );
-    return ZS_INVVALUE;
+    ErrorLog.errorLog("Syntax error: expected either an identifier or a litteral while found <%s> at line %d column %d.",
+        pContext.CurrentToken->Text.toString(),
+        pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+    pContext.LastErroredToken = pContext.CurrentToken;
+    return pContext.Status=ZS_INVVALUE;
   }// while true
 
   ZSearchOperandBase* wOB=static_cast<ZSearchOperandBase*>(wArithTerm->Operand);
-  if (!_arithmeticTypeCheck(pRequestedType,wOB,wSvIndex)) {
-    delete wArithTerm;
-    return ZS_INVTYPE;
+  if (!_arithmeticTypeCheck(pRequestedType,pContext,wOB,wStartOperandIndex)) {
+      delete wArithTerm;
+      return pContext.Status=ZS_INVTYPE;
   }
 
-  wArithTerm->Type = ZSearchOperandType( ZSTO_Arithmetic | (wOB->Type & ZSTO_BaseMask));  /* extract the base type (string, integer,etc.) from operand */
+  wArithTerm->ZSTO = ZSearchOperandType_type( ZSTO_Arithmetic | (wOB->ZSTO & ZSTO_BaseMask));  /* extract the base type (string, integer,etc.) from operand */
 
   /* if not an arithmetic operator, then arithmetic expression is ended */
-  if (!ZSearchOperator::isArithmeric(Tokenizer->Tab(Index))) {
-    wArithTerm->Operator.Type=ZSTO_Nothing;
+  if (!ZSearchOperator::isArithmeric(pContext.CurrentToken)) {
+    wArithTerm->Operator.ZSOPV=ZSTO_Nothing;
     wArithTerm->OperandNext = nullptr;
     pArithTerm = wArithTerm;
-    return ZS_SUCCESS ;
+    return pContext.Status=ZS_SUCCESS ;
   }
 
-  wArithTerm->Operator.set(Tokenizer->Tab(Index));
+  wArithTerm->Operator.set(pContext.CurrentToken);
 
-  if (!advanceIndex()) {
+  if (!pContext.advanceIndex(true)) {
     delete wArithTerm;
-    return ZS_SYNTAX_ERROR;
+    return pContext.Status=ZS_SYNTAX_ERROR;
   }
   /*  parse next operand */
 
-  wSt=_parseArithmeticTerm((ZSearchArithmeticTerm*&)wArithTerm->OperandNext,pParenthesisLevel,Index,pRequestedType,pIsLiteral);
+  wSt=_parseArithmeticTerm((ZSearchArithmeticTerm*&)wArithTerm->OperandNext,
+                           pContext,
+                           pParenthesisLevel,
+//                           pContext.Index,
+                           pRequestedType,
+                           pIsLiteral);
   if (wSt!=ZS_SUCCESS) {
     delete wArithTerm;
-    return wSt;
+    return pContext.Status=wSt;
   }
 
   pArithTerm = wArithTerm;
-  return wSt;
+  pContext.popIndex();
+  return pContext.Status=wSt;
 }
 
 
@@ -3007,20 +4343,20 @@ Term operand
 ZStatus ZSearchParser::_parseFormula(ZSearchFormula* &pFormula,int pParenthesisLevel)
 {
   ZStatus wSt=ZS_SUCCESS;
-  int wBookMark = Index;
+  int wBookMark = pContext.Index;
 
   pFormula = new ZSearchFormula(ZFORT_Term,pParenthesisLevel);
 
-  if (Tokenizer->Tab(Index)->Type == ZSRCH_OPERATOR_NOT)  {
-    pFormula->LeadingOperator.add(Tokenizer->Tab(Index));
+  if (pContext.CurrentToken->Type == ZSRCH_OPERATOR_NOT)  {
+    pFormula->LeadingOperator.add(pContext.CurrentToken);
     pFormula->LeadingOperator.Type |= ZSOPV_NOT ;
-    if (!advanceIndex())
+    if (!pContext.advanceIndex())
       return ZS_SYNTAX_ERROR;
   }
 
-  if (Tokenizer->Tab(Index)->Type == ZSRCH_OPENPARENTHESIS)
+  if (pContext.CurrentToken->Type == ZSRCH_OPENPARENTHESIS)
     {
-    if (!advanceIndex())
+    if (!pContext.advanceIndex())
       return ZS_SYNTAX_ERROR;
       pParenthesisLevel++;
       pFormula->setType(ZFORT_Formula);
@@ -3031,44 +4367,44 @@ ZStatus ZSearchParser::_parseFormula(ZSearchFormula* &pFormula,int pParenthesisL
 
       pFormula->TermOrFormula = wFormulaPtr;
 
-      if (Tokenizer->Tab(Index)->Type!=ZSRCH_CLOSEPARENTHESIS) {
-        errorLog("Syntax error : Closed parenthesis expected. found <%s> - at line %d column %d",
-            Tokenizer->Tab(Index)->Text.toString(),
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+      if (pContext.CurrentToken->Type!=ZSRCH_CLOSEPARENTHESIS) {
+        ErrorLog.errorLog("Syntax error : Closed parenthesis expected. found <%s> - at line %d column %d",
+            pContext.CurrentToken->Text.toString(),
+            pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
 
         wSt = ZS_SYNTAX_ERROR ;
         goto _parseFormulaError;
       }
       if (pParenthesisLevel<0) {
-          errorLog("Syntax error : Closed parenthesis without corresponding open parenthesis - at line %d column %d",
-              Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn);
+          ErrorLog.errorLog("Syntax error : Closed parenthesis without corresponding open parenthesis - at line %d column %d",
+              pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
 
           wSt = ZS_SYNTAX_ERROR ;
           goto _parseFormulaError;
       }
 
-      if (!advanceIndex())
+      if (!pContext.advanceIndex())
         return ZS_SYNTAX_ERROR;
 
     }// ZSRCH_OPENPARENTHESIS
 
-    if ((Tokenizer->Tab(Index)->Type == ZSRCH_IDENTIFIER) ||
-        ((Tokenizer->Tab(Index)->Type & ZSRCH_LITERAL)==ZSRCH_LITERAL)) {
+    if ((pContext.CurrentToken->Type == ZSRCH_IDENTIFIER) ||
+        ((pContext.CurrentToken->Type & ZSRCH_LITERAL)==ZSRCH_LITERAL)) {
 
       ZSearchLogicalOperand* wTerm=nullptr;
-      wSt=_parseLogical((void*)wTerm,0,0,Index);
+      wSt=_parseLogical((void*)wTerm,0,0,pContext.Index);
       if (wSt!=ZS_SUCCESS)
         goto _parseFormulaError;
 
       pFormula->setType(ZFORT_Term);
       pFormula->TermOrFormula=wTerm;
 
-//      advanceIndex();
+//      advanceIndex(pContext);
 
     } else  {
-      errorLog("Syntax error : Expected either field identifier or literal at line %d column %d. Found <%s>.",
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,
-          Tokenizer->Tab(Index)->Text.toString());
+      ErrorLog.errorLog("Syntax error : Expected either field identifier or literal at line %d column %d. Found <%s>.",
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,
+          pContext.CurrentToken->Text.toString());
 
       wSt = ZS_SYNTAX_ERROR ;
       goto _parseFormulaError;
@@ -3078,33 +4414,33 @@ ZStatus ZSearchParser::_parseFormula(ZSearchFormula* &pFormula,int pParenthesisL
 
 
 
-  if ((Tokenizer->Tab(Index)->Type == ZSRCH_OPERATOR_AND) ||
-        (Tokenizer->Tab(Index)->Type == ZSRCH_OPERATOR_OR)) {
-    pFormula->LeadingOperator.add(Tokenizer->Tab(Index));
-    if (!advanceIndex())
+  if ((pContext.CurrentToken->Type == ZSRCH_OPERATOR_AND) ||
+        (pContext.CurrentToken->Type == ZSRCH_OPERATOR_OR)) {
+    pFormula->LeadingOperator.add(pContext.CurrentToken);
+    if (!pContext.advanceIndex())
       return ZS_SYNTAX_ERROR;
   }
-  else if (Tokenizer->Tab(Index)->Type != ZSRCH_AS) {
-    errorLog("Syntax error : Expected logical operator one of {AND,OR} at line %d column %d. Found <%s>.",
-        Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,
-        Tokenizer->Tab(Index)->Text.toString());
+  else if (pContext.CurrentToken->Type != ZSRCH_AS) {
+    ErrorLog.errorLog("Syntax error : Expected logical operator one of {AND,OR} at line %d column %d. Found <%s>.",
+        pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,
+        pContext.CurrentToken->Text.toString());
 
     wSt = ZS_SYNTAX_ERROR ;
     goto _parseFormulaError;
   } // not = 'AS'
 
-  if (Tokenizer->Tab(Index)->Type == ZSRCH_OPERATOR_NOT)  {
+  if (pContext.CurrentToken->Type == ZSRCH_OPERATOR_NOT)  {
 
-    pFormula->LeadingOperator.add(Tokenizer->Tab(Index));
-    if (!advanceIndex())
+    pFormula->LeadingOperator.add(pContext.CurrentToken);
+    if (!pContext.advanceIndex())
       return ZS_SYNTAX_ERROR;
 
     /* NB: NOT operand must be followed by expression within parenthesis */
-    if (Tokenizer->Tab(Index)->Type != ZSRCH_OPENPARENTHESIS)
+    if (pContext.CurrentToken->Type != ZSRCH_OPENPARENTHESIS)
     {
-      errorLog("Syntax error : Logical operator NOT must be followed by parenthesis at line %d column %d. Found <%s>.",
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,
-          Tokenizer->Tab(Index)->Text.toString());
+      ErrorLog.errorLog("Syntax error : Logical operator NOT must be followed by parenthesis at line %d column %d. Found <%s>.",
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,
+          pContext.CurrentToken->Text.toString());
 
       wSt = ZS_SYNTAX_ERROR ;
       goto _parseFormulaError;
@@ -3115,9 +4451,9 @@ ZStatus ZSearchParser::_parseFormula(ZSearchFormula* &pFormula,int pParenthesisL
 
   /* getting next formula */
 
-  if ((Tokenizer->count() < Index) &&
-      (Tokenizer->Tab(Index)->Type!= ZSRCH_AS) &&
-      (Tokenizer->Tab(Index)->Type!= ZSRCH_SEMICOLON)) {
+  if ((ZSearchTokenizer::count() < pContext.Index) &&
+      (pContext.CurrentToken->Type!= ZSRCH_AS) &&
+      (pContext.CurrentToken->Type!= ZSRCH_SEMICOLON)) {
 
     ZSearchFormula* wNextFormula=nullptr;
 
@@ -3164,100 +4500,793 @@ ZSearchParser::searchKeyword(ZSearchToken* pToken) {
   return false;
 }
 
-ZStatus ZSearchParser::_parse(std::shared_ptr<ZSearchEntity> &pCollection,bool &pStoreInstruction,int &pInstructionType) {
-  ZStatus wSt=ZS_SUCCESS;
+#ifdef __DEPRECATED__
+/*
+ZStatus ZSearchParser::_parse(std::shared_ptr<ZSearchEntity> &pCollection,
+                              bool &pStoreInstruction,
+                              int &pInstructionType)
+*/
 
-  FirstToken = Tokenizer->Tab(Index);
+ZStatus ZSearchParser::_parse(ZSearchContext& pContext)
+{
+//  pContext.clear();
+  pContext.Status=ZS_SUCCESS;
+  pContext.begin();
 
-  CurrentToken=nullptr;
-  bool wHasInstruction = false;
+//  pContext.TokenStart = FirstToken = pContext.CurrentToken;
+ pContext.CurrentToken = pContext.TokenStart = pContext.CurrentToken;
 
-  while ((wSt!=ZS_EOF)&&(Index < Tokenizer->count())) {
-    bool wExit=false;
+ // CurrentToken=nullptr;
+  pContext.HasInstruction=false;
 
-    while ((Index < Tokenizer->count())&&(Tokenizer->Tab(Index)->Type==ZSRCH_SPACE))
-      if (!advanceIndex())
-        return ZS_SYNTAX_ERROR;
+  while ((pContext.Status!=ZS_EOF)&&(pContext.Index < ZSearchTokenizer::count())) {
 
-    CurrentToken=Tokenizer->Tab(Index);
+    while ((pContext.Index < ZSearchTokenizer::count())&&(pContext.CurrentToken->Type==ZSRCH_SPACE))
+      if (!pContext.advanceIndex())
+        return pContext.Status=ZS_SYNTAX_ERROR;
 
-    if ((Tokenizer->Tab(Index)->Type & ZSRCH_INSTRUCTION_MASK)!=ZSRCH_INSTRUCTION_MASK) {
-      errorLog("Missing instruction at line %d column %d (one of SET...,FIND---,FOR---). Found <%s>.",
-          Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,Tokenizer->Tab(Index)->Text.toString() );
+//    CurrentToken=pContext.CurrentToken;
 
-      return ZS_MISS_KEYWORD;
+    if ((pContext.CurrentToken->Type & ZSRCH_INSTRUCTION_MASK)!=ZSRCH_INSTRUCTION_MASK) {
+
+     ZArray<utf8VaryingString> wKeyWords = { "DECLARE","SET","FIND","FOR" };
+
+      ErrorLog.errorLog("Missing instruction at line %d column %d one of {DECLARE,SET,FIND,FOR}. Found <%s>.",
+                        pContext.CurrentToken->TokenLine,
+                        pContext.CurrentToken->TokenColumn,
+                        pContext.CurrentToken->Text.toString() );
+      pContext.LastErroredToken = pContext.CurrentToken;
+//      utf8VaryingString wApprox = searchKeywordWeighted(pContext.CurrentToken->Text);
+      utf8VaryingString wApprox = searchAdHocWeighted(pContext.CurrentToken->Text,wKeyWords);
+
+      if (!wApprox.isEmpty()) {
+          ErrorLog.textLog("Do you mean <%s> ?", wApprox.toString() );
+      }
+      return pContext.Status=ZS_MISS_KEYWORD;
     }
 
-    while ((Index < Tokenizer->count())&&(!wExit)) {
-      if (_parseComment (Tokenizer->Tab(Index))) {
-        if (!advanceIndex())
-          return ZS_EOF;
-        continue;
-      }
-      CurrentToken=Tokenizer->Tab(Index);
+    while (pContext.notEOF()) {
 
-      switch (Tokenizer->Tab(Index)->Type) {
-      case ZSRCH_SET:
+//      CurrentToken=pContext.CurrentToken;
+
+      switch (pContext.CurrentToken->Type) {
+
+
+      case ZSRCH_DECLARE:
       {
-        if (!advanceIndex())
-          return ZS_SYNTAX_ERROR;
+          pContext.Status = _parseDeclare(pContext);
+          if ((pContext.Status==ZS_SUCCESS) && !pContext.isEOF()&& !pContext.testSemiColon())
+              return pContext.Status=ZS_MISS_PUNCTSIGN;
+          return pContext.Status;
+      }// ZSRCH_DECLARE
 
-        CurrentToken=Tokenizer->Tab(Index);
+      case ZSRCH_SAVE:
+      {
+          pContext.Status = _parseSave(pContext);
+          if ((pContext.Status==ZS_SUCCESS) && !pContext.isEOF()&& !pContext.testSemiColon())
+              return pContext.Status=ZS_MISS_PUNCTSIGN;
+          return pContext.Status;
+      }// ZSRCH_DECLARE
 
-        if (Tokenizer->Tab(Index)->Type ==ZSRCH_HISTORY) {
-          if (!advanceIndex())
-            return ZS_SYNTAX_ERROR;
+      case ZSRCH_SET:
+        {
+          pContext.InstructionType = ZSITP_Set ;
+          pContext.Store=ZSearchHistory::DataExecute;
 
-          if (Tokenizer->Tab(Index)->Type != ZSRCH_MAXIMUM) {
-          errorLog("Missing required word <MAXIMUM> at line %d column %d . Found <%s>.",
-              Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,Tokenizer->Tab(Index)->Text.toString() );
-          return ZS_MISS_KEYWORD;
+          if (!pContext.advanceIndex())
+              return ZS_SYNTAX_ERROR;
+
+//          CurrentToken=pContext.CurrentToken;
+
+           /* set History xxxx */
+
+          if (pContext.CurrentToken->Type ==ZSRCH_HISTORY) {
+              if (!pContext.advanceIndex())
+                  return pContext.Status=ZS_SYNTAX_ERROR;
+
+              if (pContext.CurrentToken->Type != ZSRCH_MAXIMUM) {
+                  ErrorLog.errorLog("Missing required word <MAXIMUM> at line %d column %d . Found <%s>.",
+                           pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+                  pContext.LastErroredToken = pContext.CurrentToken;
+                  return pContext.Status=ZS_MISS_KEYWORD;
+              }
+              if (!pContext.advanceIndex())
+                  return pContext.Status=ZS_SYNTAX_ERROR;
+
+              if (pContext.CurrentToken->Type != ZSRCH_NUMERIC_LITERAL) {
+                  ErrorLog.errorLog("Missing numeric literal at line %d column %d . Found <%s>.",
+                           pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+                  pContext.LastErroredToken = pContext.CurrentToken;
+                  return pContext.Status=ZS_MISS_LITERAL;
+              }
+
+              int wNewMax = pContext.CurrentToken->Text.toInt();
+
+              setHistoryMaximum(wNewMax);
+
+              if (!pContext.isEOF()&& !pContext.testSemiColon())
+                  return pContext.Status=ZS_MISS_PUNCTSIGN;
+
+              return pContext.Status=ZS_SUCCESS;
+
+          } //   ZSRCH_HISTORY
+
+
+          if (pContext.CurrentToken->Type !=ZSRCH_FILE) {
+              ErrorLog.errorLog("Missing required word <FILE> at line %d column %d . Found <%s>.",
+                       pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+              pContext.LastErroredToken = pContext.CurrentToken;
+              return pContext.Status=ZS_MISS_KEYWORD;
           }
-          if (!advanceIndex())
-            return ZS_SYNTAX_ERROR;
 
-          if (Tokenizer->Tab(Index)->Type != ZSRCH_NUMERIC_LITERAL) {
-            errorLog("Missing numeric literal at line %d column %d . Found <%s>.",
-                Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,Tokenizer->Tab(Index)->Text.toString() );
-            return ZS_MISS_LITERAL;
-          }
+          if (!pContext.advanceIndex())
+              return pContext.Status=ZS_SYNTAX_ERROR;
 
-          int wNewMax = Tokenizer->Tab(Index)->Text.toInt();
-
-          if (!testSemiColon())
-            return ZS_MISS_PUNCTSIGN;
-
-          setHistoryMaximum(wNewMax);
-          break;
-
-        } //   ZSRCH_HISTORY
-
-
-        if (Tokenizer->Tab(Index)->Type !=ZSRCH_FILE) {
-          errorLog("Missing required word <FILE> at line %d column %d . Found <%s>.",
-              Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,Tokenizer->Tab(Index)->Text.toString() );
-          return ZS_MISS_KEYWORD;
-        }
-
-        if (!advanceIndex())
-          return ZS_SYNTAX_ERROR;
-
-        wSt=_parseSetFile(pCollection);
-        if (wSt!=ZS_SUCCESS)
-            return wSt;
-        wHasInstruction=true;
-        break;
-      }// ZSRCH_SET
+          pContext.Status=_parseDeclareFile(pContext);
+          if ((pContext.Status==ZS_SUCCESS) && !pContext.isEOF()&& !pContext.testSemiColon())
+              return pContext.Status=ZS_MISS_PUNCTSIGN;
+          if (pContext.Status!=ZS_SUCCESS)
+              return pContext.Status;
+          pContext.HasInstruction=true;
+          return pContext.Status;
+        }// ZSRCH_SET
 
       case ZSRCH_SHOW:
       {
-        pStoreInstruction=false;
-        if (!advanceIndex())
+        pContext.InstructionType = ZSITP_Show;
+        pContext.Store=ZSearchHistory::Other;
+        if (!pContext.advanceIndex())
           return ZS_SYNTAX_ERROR;
-        wSt = _parseShow();
-        if (wSt!=ZS_SUCCESS)
+        pContext.Status = _parseShow(pContext);
+
+        /* end instruction line management :
+         * in case of error : return status immediately
+         * in case of success :
+         * if end of tokens -> instruction is finished
+         * if not end of tokens :
+         *   if semi-colon : another instruction line may follow or semi-colon is the last token
+         */
+        if ((pContext.Status==ZS_SUCCESS) && !pContext.isEOF()&& !pContext.testSemiColon())
+            return pContext.Status=ZS_MISS_PUNCTSIGN;
+        if (!pContext.isEOF())
+            pContext.advanceIndex();
+
+        if (pContext.Status!=ZS_SUCCESS)
+          return pContext.Status;
+        pContext.HasInstruction=true;
+        return pContext.Status;
+      }
+/*
+
+  clear history ;       -> removes ALL instruction lines in the history. History is then empty.
+
+  clear history first 5; -> removes the 5 FIRST instruction lines in the history or removes all the first lines until 3.
+
+  clear history last 3;  -> removes the 3 LAST instruction lines in the history or removes all the last lines until 3.
+
+  clear history at 3 ; -> removes the third instruction line in the history. If rank 3 does not exist in history, nothing is done.
+
+*/
+      case ZSRCH_CLEAR:
+      {
+        pContext.InstructionType = ZSITP_Clear;
+        pContext.Store=false;
+        if (!pContext.advanceIndex())
+          return pContext.Status=ZS_SYNTAX_ERROR;
+        if (pContext.CurrentToken->Type != ZSRCH_HISTORY) {
+          ErrorLog.errorLog("Missing required word <HISTORY> at line %d column %d . Found <%s>.",
+              pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+          return pContext.Status=ZS_MISS_KEYWORD;
+        }
+        if (!pContext.advanceIndex())
+          return pContext.Status=ZS_SYNTAX_ERROR;
+
+        if (pContext.CurrentToken->Type == ZSRCH_SEMICOLON) {
+          if (!pContext.advanceIndex())
+            return pContext.Status=ZS_SYNTAX_ERROR;
+          clearHistory();
+          break;
+        }
+
+        if (pContext.CurrentToken->Type == ZSRCH_FIRST) {
+          if (!pContext.advanceIndex())
+            return ZS_SYNTAX_ERROR;
+          if (pContext.CurrentToken->Type != ZSRCH_NUMERIC_LITERAL) {
+            ErrorLog.errorLog("Missing required numeric literal as number of history lines to remove at line %d column %d . Found <%s>.",
+                pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+            pContext.LastErroredToken = pContext.CurrentToken;
+            return pContext.Status=ZS_MISS_LITERAL;
+          }
+          int wNb = pContext.CurrentToken->Text.toInt();
+          if (!pContext.advanceIndex())
+            return pContext.Status=ZS_SYNTAX_ERROR;
+
+          if (!pContext.testSemiColon()) {
+            return pContext.Status=ZS_MISS_PUNCTSIGN;
+          }
+          clearHistoryFirst(wNb);
+          break;
+        } // ZSRCH_FIRST
+
+        if (pContext.CurrentToken->Type == ZSRCH_LAST) {
+          if (!pContext.advanceIndex())
+            return pContext.Status=ZS_SYNTAX_ERROR;
+          if (pContext.CurrentToken->Type != ZSRCH_NUMERIC_LITERAL) {
+            ErrorLog.errorLog("Missing required numeric literal as number of history lines to remove at line %d column %d . Found <%s>.",
+                pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+            return pContext.Status=ZS_MISS_LITERAL;
+          }
+          int wNb = pContext.CurrentToken->Text.toInt();
+          if (!pContext.advanceIndex())
+            return pContext.Status=ZS_SYNTAX_ERROR;
+
+          if (!pContext.testSemiColon()) {
+            return pContext.Status=ZS_MISS_PUNCTSIGN;
+          }
+          clearHistoryLast(wNb);
+          break;
+        } // ZSRCH_LAST
+
+        if (pContext.CurrentToken->Type == ZSRCH_AT) {
+          if (!pContext.advanceIndex())
+            return pContext.Status=ZS_SYNTAX_ERROR;
+          if (pContext.CurrentToken->Type != ZSRCH_NUMERIC_LITERAL) {
+            ErrorLog.errorLog("Missing required numeric literal as number of history lines to remove at line %d column %d . Found <%s>.",
+                              pContext.CurrentToken->TokenLine,
+                              pContext.CurrentToken->TokenColumn,
+                              pContext.CurrentToken->Text.toString() );
+            pContext.LastErroredToken = pContext.CurrentToken;
+            return pContext.Status=ZS_MISS_LITERAL;
+          }
+          int wNb = pContext.CurrentToken->Text.toInt();
+          if (!pContext.advanceIndex())
+            return pContext.Status=ZS_SYNTAX_ERROR;
+
+          if (!pContext.testSemiColon()) {
+            return pContext.Status=ZS_MISS_PUNCTSIGN;
+          }
+          clearHistoryRank(wNb);
+          break;
+        } // ZSRCH_AT
+
+          ErrorLog.errorLog("Missing required keyword one of {FIRST,LAST,AT} at line %d column %d . Found <%s>.",
+                            pContext.CurrentToken->TokenLine,
+                            pContext.CurrentToken->TokenColumn,
+                            pContext.CurrentToken->Text.toString() );
+          pContext.LastErroredToken = pContext.CurrentToken;
+          return pContext.Status=ZS_MISS_KEYWORD;
+
+      } // ZSRCH_CLEAR
+
+
+      case ZSRCH_FIND:
+      {
+        pContext.InstructionType = ZSITP_Find;
+        pContext.Store = true;
+        pContext.Status=_parseFind(pContext);
+        if (pContext.Status!=ZS_SUCCESS)
+          return pContext.Status;
+
+//        EntityList.push(CurEntities[0]);  // done within _parseFind()
+/*
+        ErrorLog.infoLog("Collection report \n %s\n",pContext.Entity->_report().toString());
+
+        wSt= _executeFind(wCollection->_CollectionEntity);
+        if (wSt!=ZS_SUCCESS) {
           return wSt;
-        wHasInstruction=true;
+        }
+*/
+        pContext.HasInstruction=true;
+        break;
+      } // ZSRCH_FIND
+      case ZSRCH_FOR:
+        pContext.InstructionType = ZSITP_For ;
+        pContext.Store=true;
+        if (!pContext.advanceIndex())
+          return pContext.Status=ZS_SYNTAX_ERROR;
+        pContext.Status=_parseFor(pContext);
+        if (pContext.Status!=ZS_SUCCESS)
+          return pContext.Status;
+        pContext.HasInstruction=true;
+        break;
+
+      case ZSRCH_FINISH:
+        if (!pContext.testSemiColon())
+          return pContext.Status=ZS_MISS_PUNCTSIGN;
+        pContext.InstructionType = ZSITP_Finish ;
+        pContext.HasInstruction=true;
+        finish();
+        break;
+      default:
+          ErrorLog.errorLog("Keyword <%s> has not been recognized as a valid first instruction at line %d column %d .",
+                            pContext.CurrentToken->Text.toString(),
+                            pContext.CurrentToken->TokenLine,
+                            pContext.CurrentToken->TokenColumn );
+          pContext.LastErroredToken = pContext.CurrentToken;
+          return ZS_SYNTAX_ERROR;
+/*        else {
+        ErrorLog.errorLog("Expected semicolon sign at the end of instruction at line %d column %d . Found <%s>.",
+            pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+        pContext.LastErroredToken = pContext.CurrentToken;
+        return pContext.Status=ZS_SYNTAX_ERROR;
+        }
+*/
+      }// switch
+    }//while
+
+    if (pContext.Index == ZSearchTokenizer::count()) {
+      if (ZSearchTokenizer::_progressCallBack!=nullptr) {
+        ZSearchTokenizer::_progressCallBack(ZSearchTokenizer::count());
+      }
+      return pContext.Status=ZS_SUCCESS;
+    }
+
+    if (ZSearchTokenizer::_progressCallBack!=nullptr) {
+      ZSearchTokenizer::_progressCallBack(int(pContext.Index));
+    }
+
+  }// main while
+
+  if (!pContext.HasInstruction) {
+    ErrorLog.warningLog("Sentence has no valid instruction." );
+  }
+
+  pContext.Phrase = pContext.MainPhrase->subString(pContext.TokenStart->TokenOffset,
+                                                   pContext.CurrentToken->TokenOffset + 1 - pContext.TokenStart->TokenOffset);
+
+  return pContext.Status=ZS_SUCCESS;
+} // ZSearchParser::_parse
+
+
+
+ZStatus
+ZSearchParser::_parseDeclare(ZSearchContext& pContext)
+{
+    if (pContext.CurrentToken->Type!=ZSRCH_DECLARE)
+        return ZS_INVTYPE;
+
+
+    pContext.InstructionType = ZSITP_Declare;
+    pContext.Store=ZSearchHistory::DataExecute;
+
+    if (!pContext.advanceIndex())
+        return ZS_SYNTAX_ERROR;
+
+//    CurrentToken=pContext.CurrentToken;
+
+    if (pContext.CurrentToken->Type ==ZSRCH_FILE) {
+
+        if (!pContext.advanceIndex())
+            return pContext.Status=ZS_SYNTAX_ERROR;
+
+        return _parseDeclareFile(pContext);
+    }
+
+    /* if identifier then a symbol name is expected  :
+         *   declare <symbol name> = <literal>  ;
+         *
+         *   declare gabu = ZDATE(30/01/24) ; -> creates symbol gabu with literal date value set to 30/01/24
+         *   declare wResource = ZResource(ZDoc_Physical,1002) ;
+        */
+
+    if (pContext.CurrentToken->Type ==ZSRCH_IDENTIFIER) {
+        return _parseDeclareSymbol(pContext);
+    }
+    ErrorLog.errorLog("Missing required word <FILE> or valid symbol name at line %d column %d . Found <%s>.",
+             pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+    pContext.LastErroredToken = pContext.CurrentToken;
+    utf8VaryingString wApprox = searchSymbolWeighted(pContext.CurrentToken->Text);
+    if (!wApprox.isEmpty()) {
+        ErrorLog.errorLog("Do you mean <%s> ?", wApprox.toString() );
+    }
+    return pContext.Status=ZS_MISS_KEYWORD;
+
+} //ZSearchParser::_parseDeclare
+
+
+/* if identifier then a symbol name is expected  :
+         *   declare <symbol name> = <literal>  ;
+         *
+         *   declare gabu = ZDATE(30/01/24) ; -> creates symbol gabu with literal date value set to 30/01/24
+         *   declare wResource = ZResource(ZDoc_Physical,1002) ;
+        */
+ZStatus
+ZSearchParser::_parseDeclareSymbol(ZSearchContext& pContext)
+{
+    if (pContext.CurrentToken->Type !=ZSRCH_IDENTIFIER) {
+        return pContext.Status = ZS_INVTYPE ;
+    }
+
+    /* avoid symbol name duplicates */
+
+    if (SymbolList.exists(pContext.CurrentToken->Text)) {
+        ErrorLog.errorLog("Symbol %s has already been defined.Cannot superseed at line %d column %d.",
+                 pContext.CurrentToken->Text.toString(),
+                 pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentToken;
+        return pContext.Status=ZS_INVNAME ;
+    }
+
+    ZSearchSymbol wSymbol;
+    wSymbol.FullFieldName = pContext.CurrentToken->Text;
+
+    if (!pContext.advanceIndex() || (pContext.CurrentToken->Type == ZSRCH_SEMICOLON) ) {
+        SymbolList.push(wSymbol);
+        ErrorLog.textLog("Symbol %s has been defined at line %d column %d.",
+                 pContext.CurrentToken->Text.toString(),
+                 pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+        return pContext.Status = ZS_SUCCESS ;
+    }
+
+    if (pContext.CurrentToken->Type !=ZSRCH_OPERATOR_MOVE) {
+        ErrorLog.errorLog("Expected sign '=' while found %s at line %d column %d.",
+                 pContext.CurrentToken->Text.toString(),
+                 pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentToken;
+        return pContext.Status=ZS_MISS_OPERATOR ;
+    }// ZSRCH_OPERATOR_MOVE
+
+    if (!pContext.advanceIndex())
+        return pContext.Status=ZS_SYNTAX_ERROR;
+
+    ZSearchOperandType_type wZSTO=ZSTO_Nothing;
+    ZSearchLiteral *wLit=nullptr;
+    pContext.Status=_parseLiteral(wLit,pContext,wZSTO);
+    if (pContext.Status!=ZS_SUCCESS)
+        return pContext.Status;
+    wSymbol.setLiteral(wLit);
+    wSymbol.ZSTO = wZSTO | ZSTO_Symbol;
+    SymbolList.push(wSymbol);
+    ErrorLog.textLog("Symbol %s has been defined and its value has been set at line %d column %d.",
+            wSymbol.FullFieldName.toString(),
+            pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+    pContext.Status = ZS_SUCCESS ;
+
+    if (!pContext.advanceIndex())
+        return pContext.Status=ZS_SYNTAX_ERROR;
+}// ZSearchParser::_parseDeclareSymbol
+
+#endif // __DEPRECATED__
+
+
+/*
+ *  set display colmax <value>
+ *              colmin <value>
+ *              format { + , - }    '+' adds the option, '-' removes the option
+ *
+ *                      current,    existing cell format value
+ *                      numhexa ,   show numeric fields in hexa  (default is standard numeric representation )*
+ *                      { --exclusive options --
+ *                      mdy         month/day/year only
+ *                      dmy         day/month/year only
+ *                      dmyhms      day/month/year-hh:mm:ss
+ *                      mdyhms      month/day/year-hh:mm:ss
+ *                      dlocale     locale date format
+ *                      dutc        UTC date format
+ *                      } ,
+ *                      ressymbol , Resources : displays symbol name in place of numeric value for ZEntities
+ *                      resstd  ,   Resources : numeric values for Resource::id  are expressed in standard numeric representation (default is hexa)
+ *
+ *                      prefztype , displayed values are prefixed with explicit ZType name
+ *
+ *                      dumpblob    switch display to <blob content> : a byte dump to max 64 bytes
+ *
+ *
+ *
+ */
+
+
+ZStatus ZSearchParser::_parseContext(ZSearchContext& pContext)
+{
+//  pContext.clear();
+  pContext.Status=ZS_SUCCESS;
+  pContext.beginContext();
+
+  pContext.HasInstruction=false;
+
+  if ((pContext.CurrentToken->Type & ZSRCH_INSTRUCTION_MASK)!=ZSRCH_INSTRUCTION_MASK) {
+
+      ErrorLog.errorLog("Missing instruction at line %d column %d one of { DECLARE,SET,FIND,FOR,FETCH,SAVE,SHOW }. Found <%s>.",
+                        pContext.CurrentToken->TokenLine,
+                        pContext.CurrentToken->TokenColumn,
+                        pContext.CurrentToken->Text.toString() );
+
+      ZArray<utf8VaryingString> wKeyWords = { "DECLARE","SET","FIND","FOR","FETCH","SAVE", "SHOW"  };
+      pContext.LastErroredToken = pContext.CurrentToken;
+      utf8VaryingString wApprox = searchAdHocWeighted(pContext.CurrentToken->Text,wKeyWords);
+
+      if (!wApprox.isEmpty()) {
+          ErrorLog.textLog("Do you mean <%s> ?", wApprox.toString() );
+      }
+      return pContext.Status=ZS_MISS_KEYWORD;
+    }
+
+    while (pContext.notEOF() && (pContext.Status == ZS_SUCCESS) ) {
+
+      switch (pContext.CurrentToken->Type) {
+
+      case ZSRCH_DECLARE:
+      {
+          pContext.InstructionType = ZSITP_Declare;
+          pContext.Status = _parseContextDeclare(pContext);
+          break;
+//          return pContext.Status;
+      }// ZSRCH_DECLARE
+
+      case ZSRCH_SAVE:
+      {
+          pContext.InstructionType = ZSITP_Save;
+          pContext.Status = _parseContextSave(pContext);
+          break;
+//          return pContext.Status;
+      }// ZSRCH_DECLARE
+
+      case ZSRCH_SET:
+        {
+          pContext.InstructionType = ZSITP_Set ;
+          pContext.Store=ZSearchHistory::DataExecute;
+
+          if (!pContext.advanceIndex())
+              return ZS_SYNTAX_ERROR;
+
+           /* set History xxxx */
+
+          if (pContext.CurrentToken->Type ==ZSRCH_HISTORY) {
+              if (!pContext.advanceIndex())
+                  return pContext.Status=ZS_SYNTAX_ERROR;
+
+              if (pContext.CurrentToken->Type != ZSRCH_MAXIMUM) {
+                  ErrorLog.errorLog("Missing required word <MAXIMUM> at line %d column %d . Found <%s>.",
+                                    pContext.CurrentToken->TokenLine,
+                                    pContext.CurrentToken->TokenColumn,
+                                    pContext.CurrentToken->Text.toString() );
+                  pContext.LastErroredToken = pContext.CurrentToken;
+                  return pContext.Status=ZS_MISS_KEYWORD;
+              }
+              pContext.advanceIndex(false);
+
+              if (pContext.isEOF() ||(pContext.CurrentToken->Type != ZSRCH_NUMERIC_LITERAL)) {
+                  ErrorLog.errorLog("Missing numeric literal at line %d column %d . Found <%s>.",
+                                    pContext.CurrentToken->TokenLine,
+                                    pContext.CurrentToken->TokenColumn,
+                                    pContext.CurrentToken->Text.toString() );
+                  pContext.LastErroredToken = pContext.CurrentToken;
+                  return pContext.Status=ZS_MISS_LITERAL;
+              }
+
+              int wNewMax = pContext.CurrentToken->Text.toInt();
+
+              setHistoryMaximum(wNewMax);
+              pContext.advanceIndex(false);
+
+              return pContext.Status=ZS_SUCCESS;
+          } //   ZSRCH_HISTORY
+
+          if (pContext.CurrentToken->Type == ZSRCH_DISPLAY) {
+              if (!pContext.advanceIndex())
+                  return pContext.Status=ZS_SYNTAX_ERROR;
+
+              if (pContext.CurrentToken->Type != ZSRCH_IDENTIFIER) {
+                  ErrorLog.errorLog("Missing required word one of { <COLMAX> ,<COLMIN> , <FORMAT> } at line %d column %d . Found <%s>.",
+                                    pContext.CurrentToken->TokenLine,
+                                    pContext.CurrentToken->TokenColumn,
+                                    pContext.CurrentToken->Text.toString() );
+                  pContext.LastErroredToken = pContext.CurrentToken;
+                  return pContext.Status=ZS_MISS_KEYWORD;
+              }
+              if (pContext.CurrentToken->Text.compareCase("COLMAX")==0) {
+                  pContext.advanceIndex(false);
+                  if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_OPERATOR_MOVE)) {
+                      ErrorLog.errorLog("Missing sign equal '=' at line %d column %d . Found <%s>.",
+                                        pContext.CurrentToken->TokenLine,
+                                        pContext.CurrentToken->TokenColumn,
+                                        pContext.CurrentToken->Text.toString() );
+                      pContext.LastErroredToken = pContext.CurrentToken;
+                      return pContext.Status=ZS_MISS_OPERATOR;
+                  }
+                  pContext.advanceIndex(false);
+                  if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_NUMERIC_LITERAL)) {
+                      ErrorLog.errorLog("Missing numeric literal at line %d column %d . Found <%s>.",
+                                        pContext.CurrentToken->TokenLine,
+                                        pContext.CurrentToken->TokenColumn,
+                                        pContext.CurrentToken->Text.toString() );
+                      pContext.LastErroredToken = pContext.CurrentToken;
+                      return pContext.Status=ZS_MISS_LITERAL;
+                  }
+                  int wNewMax = pContext.CurrentToken->Text.toInt();
+                  setDisplayColMax(wNewMax);
+                  pContext.advanceIndex(false);
+                  return pContext.Status=ZS_SUCCESS;
+              } // COLMAX
+              if (pContext.CurrentToken->Text.compareCase("COLMIN")==0) {
+                  pContext.advanceIndex(false);
+                  if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_OPERATOR_MOVE)) {
+                      ErrorLog.errorLog("Missing sign equal '=' at line %d column %d . Found <%s>.",
+                                        pContext.CurrentToken->TokenLine,
+                                        pContext.CurrentToken->TokenColumn,
+                                        pContext.CurrentToken->Text.toString() );
+                      pContext.LastErroredToken = pContext.CurrentToken;
+                      return pContext.Status=ZS_MISS_OPERATOR;
+                  }
+                  pContext.advanceIndex(false);
+                  if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_NUMERIC_LITERAL)) {
+                      ErrorLog.errorLog("Missing numeric literal at line %d column %d . Found <%s>.",
+                                        pContext.CurrentToken->TokenLine,
+                                        pContext.CurrentToken->TokenColumn,
+                                        pContext.CurrentToken->Text.toString() );
+                      pContext.LastErroredToken = pContext.CurrentToken;
+                      return pContext.Status=ZS_MISS_LITERAL;
+                  }
+                  int wNewMax = pContext.CurrentToken->Text.toInt();
+                  setDisplayColMin(wNewMax);
+                  pContext.advanceIndex(false);
+                  return pContext.Status=ZS_SUCCESS;
+              } // COLMIN
+
+              if (pContext.CurrentToken->Text.compareCase("FORMAT")==0) {
+                  pContext.advanceIndex(false);
+
+                  ZCFMT_Type wZCellFormat = DisplayCellFormat;
+                  bool wEnd=false;
+                  bool wPlus=false;
+                  while (pContext.notEOF() && ! wEnd) {
+                      if (pContext.isEOF() ||
+                              ((pContext.CurrentToken->Type != ZSRCH_OPERATOR_PLUS) &&
+                               (pContext.CurrentToken->Type != ZSRCH_OPERATOR_MINUS))) {
+                          ErrorLog.errorLog("Missing operator : one of { '+' , '-' }  at line %d column %d . Found <%s>.",
+                                            pContext.CurrentToken->TokenLine,
+                                            pContext.CurrentToken->TokenColumn,
+                                            pContext.CurrentToken->Text.toString() );
+                          pContext.LastErroredToken = pContext.CurrentToken;
+                          return pContext.Status=ZS_MISS_OPERATOR;
+                      }
+                      if (pContext.CurrentToken->Type == ZSRCH_OPERATOR_PLUS)
+                          wPlus=true;
+                      /* remark : if not plus, then minus has been mentionned */
+                      pContext.advanceIndex(false);
+                    while (true) {
+
+                    if (pContext.CurrentToken->Text.compareCase("NUMHEXA")==0) {
+                        wZCellFormat &= ~ ZCFMT_NumMask ;
+                        if (wPlus)
+                            wZCellFormat |= ZCFMT_NumHexa;
+                        else
+                            wZCellFormat &= ~ZCFMT_NumHexa;
+                        break;
+                    }
+                    if (pContext.CurrentToken->Text.compareCase("MDY")==0) {
+                        wZCellFormat &= ~ ZCFMT_DateMask ;
+                        if (wPlus)
+                            wZCellFormat |= ZCFMT_MDY;
+                        else
+                            wZCellFormat &= ~ZCFMT_MDY;
+                        break;
+                    }
+                    if (pContext.CurrentToken->Text.compareCase("DMY")==0) {
+                        wZCellFormat &= ~ ZCFMT_DateMask ;
+                        if (wPlus)
+                            wZCellFormat |= ZCFMT_DMY;
+                        else
+                            wZCellFormat &= ~ZCFMT_DMY;
+                        break;
+                    }
+                    if (pContext.CurrentToken->Text.compareCase("MDYHMS")==0) {
+                        wZCellFormat &= ~ ZCFMT_DateMask ;
+                        if (wPlus)
+                            wZCellFormat |= ZCFMT_MDYHMS;
+                        else
+                            wZCellFormat &= ~ZCFMT_MDYHMS;
+                        break;
+                    }
+                    if (pContext.CurrentToken->Text.compareCase("DMYHMS")==0) {
+                        wZCellFormat &= ~ ZCFMT_DateMask ;
+                        if (wPlus)
+                            wZCellFormat |= ZCFMT_DMYHMS;
+                        else
+                            wZCellFormat &= ~ZCFMT_DMYHMS;
+                        break;
+                    }
+                    if (pContext.CurrentToken->Text.compareCase("DLOCALE")==0) {
+                        wZCellFormat &= ~ ZCFMT_DateMask ;
+                        if (wPlus)
+                            wZCellFormat |= ZCFMT_DLocale;
+                        else
+                            wZCellFormat &= ~ZCFMT_DLocale;
+                        break;
+                    }
+                    if (pContext.CurrentToken->Text.compareCase("DUTC")==0) {
+                        wZCellFormat &= ~ ZCFMT_DateMask ;
+                        if (wPlus)
+                            wZCellFormat |= ZCFMT_DUTC;
+                        else
+                            wZCellFormat &= ~ZCFMT_DUTC;
+                        break;
+                    }
+                    if (pContext.CurrentToken->Text.compareCase("RESSYMBOL")==0) {
+                        wZCellFormat &= ~ ZCFMT_ResMask ;
+                        if (wPlus)
+                            wZCellFormat |= ZCFMT_ResSymb;
+                        else
+                            wZCellFormat &= ~ZCFMT_ResSymb;
+                        break;
+                    }
+                    if (pContext.CurrentToken->Text.compareCase("RESSTD")==0) {
+                        wZCellFormat &= ~ ZCFMT_ResMask ;
+                        if (wPlus)
+                            wZCellFormat |= ZCFMT_ResStd;
+                        else
+                            wZCellFormat &= ~ZCFMT_ResStd;
+                        break;
+                    }
+                    if (pContext.CurrentToken->Text.compareCase("PREFZTYPE")==0) {
+                        if (wPlus)
+                            wZCellFormat |= ZCFMT_PrefZType;
+                        else
+                            wZCellFormat &= ~ZCFMT_PrefZType;
+                        break;
+                    }
+                    if (pContext.CurrentToken->Text.compareCase("DUMPBLOB")==0) {
+                        if (wPlus)
+                            wZCellFormat |= ZCFMT_DumpBlob;
+                        else
+                            wZCellFormat &= ~ZCFMT_DumpBlob;
+                        break;
+                    }
+                    wEnd = true;
+                    break;
+                    }// while true
+                    if (!wEnd) {
+                        pContext.advanceIndex(false);
+                    }
+                  }// while not eof and not wEnd
+
+                  if (wZCellFormat == DisplayCellFormat) {
+                      ErrorLog.warningLog("Nothing changed for Cell format");
+                      return pContext.Status=ZS_SUCCESS;
+                  }
+                  DisplayCellFormat = wZCellFormat;
+                  ErrorLog.infoLog("Current display format has been changed to <%s>",decode_ZCellFormat(DisplayCellFormat).toString());
+
+                  return pContext.Status=ZS_SUCCESS;
+              } // FORMAT
+
+              ErrorLog.errorLog("Missing required word one of { <COLMAX> ,<COLMIN> , <FORMAT> } at line %d column %d . Found <%s>.",
+                                pContext.CurrentToken->TokenLine,
+                                pContext.CurrentToken->TokenColumn,
+                                pContext.CurrentToken->Text.toString() );
+              pContext.LastErroredToken = pContext.CurrentToken;
+              return pContext.Status=ZS_MISS_KEYWORD;
+          } //   ZSRCH_DISPLAY
+
+          if (pContext.CurrentToken->Type !=ZSRCH_FILE) {
+              ErrorLog.errorLog("Missing required word one of { <HISTORY> , <FILE> , <DISPLAY> } at line %d column %d. Found <%s>.",
+                                pContext.CurrentToken->TokenLine,
+                                pContext.CurrentToken->TokenColumn,
+                                pContext.CurrentToken->Text.toString() );
+              pContext.LastErroredToken = pContext.CurrentToken;
+              return pContext.Status=ZS_MISS_KEYWORD;
+          }
+
+          if (!pContext.advanceIndex())
+              return pContext.Status=ZS_SYNTAX_ERROR;
+
+          pContext.Status=_parseContextDeclareFile(pContext);
+          if (pContext.Status!=ZS_SUCCESS)
+              return pContext.Status;
+          pContext.HasInstruction=true;
+          return pContext.Status;
+        }// ZSRCH_SET
+
+      case ZSRCH_SHOW:
+      {
+        pContext.InstructionType = ZSITP_Show;
+        pContext.Store=ZSearchHistory::Other;
+
+        pContext.Status = _parseContextShow(pContext);
+
+        if (pContext.Status!=ZS_SUCCESS)
+          return pContext.Status;
+        pContext.HasInstruction=true;
         break;
       }
 /*
@@ -3273,172 +5302,2705 @@ ZStatus ZSearchParser::_parse(std::shared_ptr<ZSearchEntity> &pCollection,bool &
 */
       case ZSRCH_CLEAR:
       {
-        pStoreInstruction=false;
-        if (!advanceIndex())
-          return ZS_SYNTAX_ERROR;
-        if (Tokenizer->Tab(Index)->Type != ZSRCH_HISTORY) {
-          errorLog("Missing required word <HISTORY> at line %d column %d . Found <%s>.",
-              Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,Tokenizer->Tab(Index)->Text.toString() );
-          return ZS_MISS_KEYWORD;
-        }
-        if (!advanceIndex())
-          return ZS_SYNTAX_ERROR;
-
-        if (Tokenizer->Tab(Index)->Type == ZSRCH_SEMICOLON) {
-          if (!advanceIndex())
-            return ZS_SYNTAX_ERROR;
-          clearHistory();
-          break;
-        }
-
-        if (Tokenizer->Tab(Index)->Type == ZSRCH_FIRST) {
-          if (!advanceIndex())
-            return ZS_SYNTAX_ERROR;
-          if (Tokenizer->Tab(Index)->Type != ZSRCH_NUMERIC_LITERAL) {
-            errorLog("Missing required numeric literal as number of history lines to remove at line %d column %d . Found <%s>.",
-                Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,Tokenizer->Tab(Index)->Text.toString() );
-            return ZS_MISS_LITERAL;
-          }
-          int wNb = Tokenizer->Tab(Index)->Text.toInt();
-          if (!advanceIndex())
-            return ZS_SYNTAX_ERROR;
-
-          if (!testSemiColon()) {
-            return ZS_MISS_PUNCTSIGN;
-          }
-          clearHistoryFirst(wNb);
-          break;
-        } // ZSRCH_FIRST
-
-        if (Tokenizer->Tab(Index)->Type == ZSRCH_LAST) {
-          if (!advanceIndex())
-            return ZS_SYNTAX_ERROR;
-          if (Tokenizer->Tab(Index)->Type != ZSRCH_NUMERIC_LITERAL) {
-            errorLog("Missing required numeric literal as number of history lines to remove at line %d column %d . Found <%s>.",
-                Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,Tokenizer->Tab(Index)->Text.toString() );
-            return ZS_MISS_LITERAL;
-          }
-          int wNb = Tokenizer->Tab(Index)->Text.toInt();
-          if (!advanceIndex())
-            return ZS_SYNTAX_ERROR;
-
-          if (!testSemiColon()) {
-            return ZS_MISS_PUNCTSIGN;
-          }
-          clearHistoryLast(wNb);
-          break;
-        } // ZSRCH_LAST
-
-        if (Tokenizer->Tab(Index)->Type == ZSRCH_AT) {
-          if (!advanceIndex())
-            return ZS_SYNTAX_ERROR;
-          if (Tokenizer->Tab(Index)->Type != ZSRCH_NUMERIC_LITERAL) {
-            errorLog("Missing required numeric literal as number of history lines to remove at line %d column %d . Found <%s>.",
-                Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,Tokenizer->Tab(Index)->Text.toString() );
-            return ZS_MISS_LITERAL;
-          }
-          int wNb = Tokenizer->Tab(Index)->Text.toInt();
-          if (!advanceIndex())
-            return ZS_SYNTAX_ERROR;
-
-          if (!testSemiColon()) {
-            return ZS_MISS_PUNCTSIGN;
-          }
-          clearHistoryRank(wNb);
-          break;
-        } // ZSRCH_AT
-
-          errorLog("Missing required keyword one of {FIRST,LAST,AT} at line %d column %d . Found <%s>.",
-              Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,Tokenizer->Tab(Index)->Text.toString() );
-          return ZS_MISS_KEYWORD;
-
+        return _parseContextClear(pContext);
       } // ZSRCH_CLEAR
 
 
       case ZSRCH_FIND:
       {
- //       std::shared_ptr<ZSearchEntity>  wCollection=nullptr;
-        wSt=_parseFind(pCollection);
-        if (wSt!=ZS_SUCCESS)
-          return wSt;
+        pContext.InstructionType = ZSITP_Find;
+        pContext.Store = true;
+        pContext.Status=_parseContextFind(pContext);
+        if (pContext.Status!=ZS_SUCCESS)
+          return pContext.Status;
 
-        EntityList.push(pCollection);
-
-        pInstructionType = ZSITP_Find;
-
-        infoLog("Collection report \n %s\n",pCollection->_report().toString());
-/*
-        wSt= _executeFind(wCollection->_CollectionEntity);
-        if (wSt!=ZS_SUCCESS) {
-          return wSt;
-        }
-*/
-        wHasInstruction=true;
+        pContext.HasInstruction=true;
         break;
       } // ZSRCH_FIND
+
+      case ZSRCH_FETCH:
+      {
+        pContext.InstructionType = ZSITP_Fetch;
+        pContext.Store = true;
+        pContext.Status=_parseFetch(pContext);
+        if (pContext.Status!=ZS_SUCCESS)
+          return pContext.Status;
+        pContext.HasInstruction=true;
+        break;
+      } // ZSRCH_FETCH
+      case ZSRCH_DISPLAY:
+      {
+        pContext.InstructionType = ZSITP_Display;
+        pContext.Store = true;
+        pContext.Status=_parseDisplay(pContext);
+        if (pContext.Status!=ZS_SUCCESS)
+          return pContext.Status;
+        pContext.HasInstruction=true;
+        break;
+      } // ZSRCH_DISPLAY
+
       case ZSRCH_FOR:
-        if (!advanceIndex())
-          return ZS_SYNTAX_ERROR;
-        wSt=_parseFor(pCollection);
-        if (wSt!=ZS_SUCCESS)
-          return wSt;
-        wHasInstruction=true;
+        pContext.InstructionType = ZSITP_For ;
+        pContext.Store=true;
+        if (!pContext.advanceIndex())
+          return pContext.Status=ZS_SYNTAX_ERROR;
+        pContext.Status=_parseContextFor(pContext);
+        if (pContext.Status!=ZS_SUCCESS)
+          return pContext.Status;
+        pContext.HasInstruction=true;
         break;
 
       case ZSRCH_FINISH:
-        if (!testSemiColon())
-          return ZS_MISS_PUNCTSIGN;
+        pContext.InstructionType = ZSITP_Finish ;
+        pContext.HasInstruction=true;
         finish();
         break;
 
       default:
-        if (Tokenizer->Tab(Index)->Type==ZSRCH_SEMICOLON)
-          Index++;
-        else {
-        errorLog("Unrecognized instruction at line %d column %d . Found <%s>.",
-            Tokenizer->Tab(Index)->TokenLine,Tokenizer->Tab(Index)->TokenColumn,Tokenizer->Tab(Index)->Text.toString() );
-        return ZS_SYNTAX_ERROR;
-        }
-      }
-    }//while ((Index < Tokenizer->count())&&(!wExit))
+          ErrorLog.errorLog("Keyword <%s> has not been recognized as a valid first instruction at line %d column %d .",
+                            pContext.CurrentToken->Text.toString(),
+                            pContext.CurrentToken->TokenLine,
+                            pContext.CurrentToken->TokenColumn );
+          pContext.LastErroredToken = pContext.CurrentToken;
+          return ZS_SYNTAX_ERROR;
+      }// switch
+    }//while
 
-    if (Index == Tokenizer->count()) {
-      if (Tokenizer->_progressCallback!=nullptr) {
-        Tokenizer->_progressCallback(Tokenizer->count());
+    if (pContext.isEOF()) {
+      if (ZSearchTokenizer::_progressCallBack!=nullptr) {
+        ZSearchTokenizer::_progressCallBack(pContext.CurrentTokenList.count());
       }
-      return ZS_SUCCESS;
+      return pContext.Status=ZS_SUCCESS;
     }
 
-    if (Tokenizer->_progressCallback!=nullptr) {
-      Tokenizer->_progressCallback(int(Index));
+    if (ZSearchTokenizer::_progressCallBack!=nullptr) {
+      ZSearchTokenizer::_progressCallBack(int(pContext.Index));
     }
 
-  }// main while
+ // }// main while
 
-  if (!wHasInstruction) {
-    infoLog("Sentence has no valid instruction." );
+  if (!pContext.HasInstruction) {
+    ErrorLog.warningLog("Sentence has no valid instruction." );
   }
+  pContext.Phrase = pContext.MainPhrase->subString(pContext.TokenStart->TokenOffset,
+                                                   pContext.CurrentToken->TokenOffset + 1 - pContext.TokenStart->TokenOffset);
 
+  return pContext.Status ;
+} // ZSearchParser::_parseContext
+
+ZStatus
+ZSearchParser::_parseContextClear(ZSearchContext & pContext)
+{
+    pContext.InstructionType = ZSITP_Clear;
+    pContext.Store=false;
+    if (!pContext.advanceIndex())
+      return pContext.Status=ZS_SYNTAX_ERROR;
+
+    if (pContext.CurrentToken->Type != ZSRCH_HISTORY) {
+      ErrorLog.errorLog("Missing required word <HISTORY> at line %d column %d . Found <%s>.",
+                        pContext.CurrentToken->TokenLine,
+                        pContext.CurrentToken->TokenColumn,
+                        pContext.CurrentToken->Text.toString() );
+      pContext.LastErroredToken = pContext.CurrentToken;
+      return pContext.Status=ZS_MISS_KEYWORD;
+    }
+
+    if (pContext.isEOF()) {
+      clearHistory();
+      return pContext.Status= ZS_SUCCESS ;
+    }
+
+    if (!pContext.advanceIndex())
+      return pContext.Status=ZS_SYNTAX_ERROR;
+
+    if (pContext.CurrentToken->Type == ZSRCH_FIRST) {
+        if (pContext.isEOF()) {
+          ErrorLog.errorLog("Missing required numeric literal as number of history lines to remove at line %d column %d . Found <%s>.",
+                            pContext.CurrentToken->TokenLine,
+                            pContext.CurrentToken->TokenColumn,
+                            pContext.CurrentToken->Text.toString() );
+          pContext.LastErroredToken = pContext.CurrentToken;
+          return pContext.Status=ZS_MISS_LITERAL;
+        }
+      if (!pContext.advanceIndex(true))
+        return ZS_SYNTAX_ERROR;
+      if (pContext.CurrentToken->Type != ZSRCH_NUMERIC_LITERAL) {
+        ErrorLog.errorLog("Missing required numeric literal as number of history lines to remove at line %d column %d . Found <%s>.",
+                          pContext.CurrentToken->TokenLine,
+                          pContext.CurrentToken->TokenColumn,
+                          pContext.CurrentToken->Text.toString() );
+        pContext.LastErroredToken = pContext.CurrentToken;
+        return pContext.Status=ZS_MISS_LITERAL;
+      }
+      int wNb = pContext.CurrentToken->Text.toInt();
+
+      pContext.Status = clearHistoryFirst(wNb);
+      pContext.advanceIndex(false);
+      if (pContext.Status==ZS_EOF)
+          pContext.Status=ZS_SUCCESS;
+      return pContext.Status ;
+    } // ZSRCH_FIRST
+
+    if (pContext.CurrentToken->Type == ZSRCH_LAST) {
+      pContext.advanceIndex(false);
+      if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_NUMERIC_LITERAL)) {
+        ErrorLog.errorLog("Missing required numeric literal as number of history lines to remove at line %d column %d . Found <%s>.",
+                          pContext.CurrentToken->TokenLine,
+                          pContext.CurrentToken->TokenColumn,
+                          pContext.CurrentToken->Text.toString() );
+        pContext.LastErroredToken = pContext.CurrentToken;
+        return pContext.Status=ZS_MISS_LITERAL;
+      }
+      int wNb = pContext.CurrentToken->Text.toInt();
+      pContext.Status=clearHistoryLast(wNb);
+      pContext.advanceIndex(false);
+      if (pContext.Status==ZS_EOF)
+          pContext.Status=ZS_SUCCESS;
+      return pContext.Status ;
+    } // ZSRCH_LAST
+
+    if (pContext.CurrentToken->Type == ZSRCH_AT) {
+      if (!pContext.advanceIndex())
+        return pContext.Status=ZS_SYNTAX_ERROR;
+      if (pContext.CurrentToken->Type != ZSRCH_NUMERIC_LITERAL) {
+        ErrorLog.errorLog("Missing required numeric literal as number of history lines to remove at line %d column %d . Found <%s>.",
+                          pContext.CurrentToken->TokenLine,
+                          pContext.CurrentToken->TokenColumn,
+                          pContext.CurrentToken->Text.toString() );
+        pContext.LastErroredToken = pContext.CurrentToken;
+        return pContext.Status=ZS_MISS_LITERAL;
+      }
+      int wNb = pContext.CurrentToken->Text.toInt();
+      pContext.Status=clearHistoryRank(wNb);
+      pContext.advanceIndex(false);
+      if (pContext.Status==ZS_EOF)
+          pContext.Status=ZS_SUCCESS;
+      return pContext.Status ;
+    } // ZSRCH_AT
+
+  ErrorLog.errorLog("Missing required keyword one of {FIRST,LAST,AT} at line %d column %d . Found <%s>.",
+                    pContext.CurrentToken->TokenLine,
+                    pContext.CurrentToken->TokenColumn,
+                    pContext.CurrentToken->Text.toString() );
+  pContext.LastErroredToken = pContext.CurrentToken;
+  return pContext.Status=ZS_MISS_KEYWORD;
+
+} // _parseContextClear
+
+/* collection is instantiated as soon as first entity name is known and validated to be a valid, stored entity */
+
+ZStatus
+ZSearchParser::_parseContextFind(ZSearchContext & pContext)
+{
+  ZStatus wSt=ZS_SUCCESS;
+  pContext.InstructionType = ZSITP_Find;
+
+  ZSearchLogicalTerm*   wLogicalTerm=nullptr;
+
+  pContext.clearEntities(); /* reset current entities being used (defined within phrase) */
+
+  if (!pContext.advanceIndex())
+    return ZS_SYNTAX_ERROR;
+
+  switch (pContext.CurrentToken->Type) {
+    case ZSRCH_ALL:
+      if (!pContext.advanceIndex())
+        return ZS_SYNTAX_ERROR;
+      break;
+    case ZSRCH_FIRST:
+      pContext.InstructionType |= ZSITP_First;  /* Nb ; Equivalence for ZSITP_All is 0x0 as defaulted value */
+      if (!pContext.advanceIndex())
+        return ZS_SYNTAX_ERROR;
+
+      if (pContext.CurrentToken->Type!=ZSRCH_NUMERIC_LITERAL) {
+          ErrorLog.errorLog("Missing numeric literal after clause FIRST. set to default value : 1 - at line %d column %d. Found <%s>.",
+                     pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+          pContext.LastErroredToken = pContext.CurrentToken;
+          return ZS_MISS_LITERAL;
+      }
+
+      pContext.Number = pContext.CurrentToken->Text.toInt(10);
+      if (!pContext.advanceIndex())
+          return ZS_SYNTAX_ERROR;
+      break;
+    default:
+      ErrorLog.warningLog("Missing keyword one of [<ALL>,<FIRST>] set to default : ALL - at line %d column %d. Found <%s>.",
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+      pContext.InstructionType |= ZSITP_All;
+      break;
+    }// switch
+
+    /* search for entity(ies) after keyword IN */
+
+    int wFieldListBookMark = pContext.Index;  /* keep memory of fields selection clause beginning */
+
+    while ((pContext.CurrentTokenList.count() > pContext.Index ) &&(pContext.CurrentToken->Type != ZSRCH_IN ))  /* search for beginning of entities */
+    {
+        if (!pContext.advanceIndex()) {
+            ErrorLog.errorLog("Missing keyword <IN> in instruction.");
+            return ZS_SYNTAX_ERROR;
+        }
+    }
+    if (pContext.isEOF()) {
+        ErrorLog.errorLog("Missing keyword <IN> in instruction.");
+        return ZS_SYNTAX_ERROR;
+    }
+    /* here we are pointing on <IN> */
+    if (!pContext.advanceIndex())
+        return ZS_SYNTAX_ERROR;
+
+    if (pContext.CurrentToken->Type!=ZSRCH_IDENTIFIER) {
+        ErrorLog.errorLog("Expected active entity. Found <%s> line <%d> column <%d>",
+                 pContext.CurrentToken->Text.toString(),
+                 pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken= pContext.CurrentToken;
+        return ZS_INV_ENTITY;
+    }
+
+    while ((pContext.CurrentToken->Type != ZSRCH_WITH) && (pContext.CurrentToken->Type!=ZSRCH_AS)) {
+
+        if (pContext.CurrentToken->Type!=ZSRCH_IDENTIFIER) {
+            ErrorLog.errorLog("Expected entity identifier. Found <%s> at line %d column %d.",
+                       pContext.CurrentToken->Text.toString(),
+                       pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn  );
+            pContext.LastErroredToken=pContext.CurrentToken;
+            return ZS_INV_ENTITY;
+        }
+        /* search for a valid open entity */
+        std::shared_ptr<ZSearchEntity>          wEntity=nullptr;
+        wEntity = EntityList.getEntityByName(pContext.CurrentToken->Text);
+        if (wEntity==nullptr) {
+            ErrorLog.errorLog("Entity identifier not found in declared entities list. Found <%s> at line %d column %d.",
+              pContext.CurrentToken->Text.toString(),
+              pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn  );
+            pContext.LastErroredToken=pContext.CurrentToken;
+            return ZS_INV_ENTITY;
+        }
+
+        /* here active entity is set to pContext.CurrentToken->Text */
+
+/* collection is instantiated as soon as first entity name is known and validated to be a valid, stored entity */
+//        pContext.CurEntity=ZSearchEntity::constructWithZSearchEntity(wEntity,pContext.CurrentToken);
+
+        pContext.SourceEntity = wEntity ;
+        pContext.TargetEntity = std::shared_ptr<ZSearchEntity>(new ZSearchEntity(wEntity,pContext.CurrentToken));
+
+        /* entity name will be allocated later after having parsed AS clause */
+
+        if (!pContext.advanceIndex())
+            return ZS_SYNTAX_ERROR;
+
+        if (pContext.CurrentToken->Type == ZSRCH_COMMA) {
+            if (!pContext.advanceIndex())
+                return ZS_SYNTAX_ERROR;
+            continue;
+        }
+    } //  while != ZSRCH_WITH && !=ZSRCH_AS
+
+    if (pContext.SourceEntity==nullptr) {
+        ErrorLog.errorLog("No valid entity has been mentionned. Found <%s> at line %d column %d.",
+                 pContext.CurrentToken->Text.toString(),
+                 pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn  );
+        pContext.LastErroredToken=pContext.CurrentToken;
+        return ZS_SYNTAX_ERROR;
+    }
+
+
+
+ //   int wWithBookMark = pContext.Index; // store pContext.Index pointing to first token after WITH Clause
+
+    /* get back to parse selection */
+//    setpContext.Index(wWithBookMark);  /* restore pContext.Index to first token after with clause */
+
+    if (pContext.CurrentToken->Type == ZSRCH_WITH) {
+        if (!pContext.advanceIndex(true))
+          return ZS_SYNTAX_ERROR;
+
+        wSt=_parseLogicalTerm(wLogicalTerm,pContext,0);
+        if (wSt!=ZS_SUCCESS)
+          return wSt;
+    } // ZSRCH_WITH
+    else {
+        ErrorLog.warningLog("Missing keyword <WITH> : all ranks of entity will be selected." );
+    }
+    /* here token must be 'AS' */
+
+    if (pContext.CurrentToken->Type!=ZSRCH_AS) {
+      ErrorLog.errorLog("Syntax error : Missing clause <AS> while found <%s> at line %d column %d.",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn  );
+        pContext.LastErroredToken = pContext.CurrentToken;
+      if (wLogicalTerm!=nullptr)
+        delete wLogicalTerm;
+      return ZS_MISS_KEYWORD;
+    }
+
+    if (!pContext.advanceIndex()) {
+      if (wLogicalTerm!=nullptr)
+        delete wLogicalTerm;
+      return ZS_SYNTAX_ERROR;
+    }
+
+    /* here entity name as collection name */
+
+ //   ZSearchToken* wEntityNameToken= pContext.CurrentToken;
+
+    if (pContext.CurrentToken->Type!=ZSRCH_IDENTIFIER ) {
+        ErrorLog.errorLog("Syntax error : Missing collection identifier while found <%s> at line %d column %d.",
+                  pContext.CurrentToken->Text.toString(),
+                  pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn  );
+        pContext.LastErroredToken = pContext.CurrentToken;
+        if (wLogicalTerm!=nullptr)
+            delete wLogicalTerm;
+        return ZS_MISS_FIELD;
+    }
+/* at this stage, collection is already built */
+
+    pContext.TargetEntity->setNameByToken(pContext.CurrentToken);
+
+
+    pContext.TargetEntity->setLogicalTerm(wLogicalTerm);
+
+    /* in the end get back to parse selected fields */
+
+//    int wEndIndex = pContext.Index;
+    pContext.setIndex(wFieldListBookMark); /* get back to field list clause : NB: we have entity(ies) field dictionary at disposal */
+
+    wSt=_parseSelClause(pContext);
+    if (wSt!=ZS_SUCCESS)
+        return wSt;
+
+//    pContext.setIndex(wEndIndex);
+    pContext.popIndex();
+
+    EntityList.push(pContext.TargetEntity);
+
+    ErrorLog.infoLog("Collection <%s> has been created and registered as a new search entity.",
+            pContext.TargetEntity->EntityFullName.toString()  );
+
+    pContext.advanceIndex();
   return ZS_SUCCESS;
-} // ZSearchParser::_parse
+}// ZSearchParser::_parseFind
 
 
 ZStatus
-ZSearchParser::_executeFind(std::shared_ptr<_BaseCollectionEntity> pCollection)
+ZSearchParser::_parseContextDeclare(ZSearchContext& pContext)
 {
+    if (pContext.CurrentToken->Type!=ZSRCH_DECLARE)
+        return pContext.Status=ZS_INVTYPE;
+
+    pContext.InstructionType = ZSITP_Declare;
+    pContext.Store=ZSearchHistory::DataExecute;
+
+    if (!pContext.advanceIndex(true))
+        return pContext.Status=ZS_SYNTAX_ERROR;
+
+    if (pContext.CurrentToken->Type != ZSRCH_IDENTIFIER) {
+        ErrorLog.errorLog("Expecting an identifier (entity or symbol name) while found <%s> at line %d column %d.",
+                 pContext.CurrentToken->Text.toString(),pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
+        return pContext.Status=ZS_SYNTAX_ERROR;
+    }
+
+    pContext.TokenIdentifier = pContext.CurrentToken ; /* store new entity name or new symbol name as token identifier */
+
+    if (!pContext.advanceIndex(true))
+        return pContext.Status=ZS_SYNTAX_ERROR;
+
+    /* if identifier then a symbol name is expected  :
+         *   declare <symbol name> = <literal>  ;
+         *
+         *   declare gabu = ZDATE(30/01/24) ; -> creates symbol gabu with literal date value set to 30/01/24
+         *   declare wResource = ZResource(ZDoc_Physical,1002) ;
+        */
+    if (pContext.CurrentToken->Type == ZSRCH_OPERATOR_MOVE) { /* then it is a symbol and its literal value follows */
+        return _parseContextDeclareSymbol(pContext);
+    }
+
+    if (pContext.CurrentToken->Type ==ZSRCH_AS) {
+        pContext.advanceIndex(false);
+
+        switch (pContext.CurrentToken->Type)
+        {
+        case ZSRCH_FILE:
+            pContext.advanceIndex(false);
+            return _parseContextDeclareFile(pContext);
+
+        case ZSRCH_IDENTIFIER:
+        case ZSRCH_WILDCARD:
+            return _parseContextDeclareEntity(pContext);
+/*
+        case ZSRCH_JOIN:
+            return _parseContextDeclareJoin(pContext);
+*/
+        default:
+        {
+            ErrorLog.errorLog("Expecting one of { <FILE> or  <valid entity name> } while found <%s> at line %d column %d.",
+                     pContext.CurrentToken->Text.toString(),pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+            pContext.LastErroredToken = pContext.CurrentToken;
+
+            /* suggest keywords */
+            ZArray<utf8VaryingString> wSugArray ={"FILE","JOIN" };
+            /* add entities names to suggest */
+            for (int wi=0;wi < EntityList.count();wi++)
+                wSugArray.push(EntityList[wi]->EntityName);
+
+            /* try to suggest */
+            utf8VaryingString wSuggest=searchAdHocWeighted (pContext.CurrentToken->Text,wSugArray);
+            if (!wSuggest.isEmpty())
+                ErrorLog.textLog("Do you mean <%s> ?", wSuggest.toString() );
+
+            return pContext.Status=ZS_SYNTAX_ERROR;
+        } // default
+        }// switch
+    } // ZSRCH_AS
+
+    ErrorLog.errorLog("Missing required word <FILE> , <new symbol name> or <new entity name> at line %d column %d . Found <%s>.",
+             pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+    pContext.LastErroredToken = pContext.CurrentToken;
+    utf8VaryingString wApprox = searchSymbolWeighted(pContext.CurrentToken->Text);
+    if (!wApprox.isEmpty()) {
+        ErrorLog.errorLog("Do you mean <%s> ?", wApprox.toString() );
+    }
+    return pContext.Status=ZS_MISS_KEYWORD;
+
+} //ZSearchParser::_parseContextDeclare
+
+/* declare <entity name> as file <path> [mode readonly,modify]  ;  // by default mode is read only */
+
+ZStatus ZSearchParser::_parseContextDeclareFile(ZSearchContext &pContext)
+{
+//  pContext.clear();
+
+  ZStatus wSt=ZS_SUCCESS;
+  uriString wPath;
+  pContext.InstructionType = ZSITP_Declare;
+
+  while (pContext.notEOF()) {
+
+    while (true) {
+    if(pContext.CurrentToken->Type==ZSRCH_STRING_LITERAL)
+      {
+        wPath=pContext.CurrentToken->Text;
+//        wPath.eliminateChar('"');
+        wSt=wPath.check();
+        if (wSt!=ZS_SUCCESS) {
+          ErrorLog.logZStatus(ZAIES_Error,wSt,"Path <%s> does not point to a valid, existing file.");
+          ErrorLog.errorLog("Invalid file path <%s> at line %d column %d.",
+                            pContext.CurrentToken->TokenLine,
+                            pContext.CurrentToken->TokenColumn,
+                            pContext.CurrentToken->Text.toString() );
+          pContext.LastErroredToken = pContext.CurrentToken;
+          return pContext.Status = ZS_FILEERROR ;
+        }
+        ErrorLog.infoLog("Path <%s> is valid at line %d column %d.",
+                         pContext.CurrentToken->Text.toString(),
+                         pContext.CurrentToken->TokenLine,
+                         pContext.CurrentToken->TokenColumn );
+        break;
+      } // ZSRCH_STRING_LITERAL
+
+      if(pContext.CurrentToken->Type==ZSRCH_IDENTIFIER)  /* pre-defined path  <symbol> <path> */
+      {
+          ZSearchSymbol wSymbol=SymbolList.getSymbol(pContext.CurrentToken->Text);
+          if (wSymbol.isNull()) {
+              ErrorLog.errorLog("Expected symbol : invalid symbol name <%s>  at line %d column %d.",
+                                pContext.CurrentToken->Text.toString(),
+                                pContext.CurrentToken->TokenLine,
+                                pContext.CurrentToken->TokenColumn );
+              pContext.LastErroredToken = pContext.CurrentToken;
+              utf8VaryingString wApprox = searchSymbolWeighted(pContext.CurrentToken->Text);
+              if (!wApprox.isEmpty()) {
+                  ErrorLog.textLog("Do you mean <%s> ?", wApprox.toString() );
+              }
+              return pContext.Status = ZS_INVNAME ;
+          }
+
+          wPath = wSymbol.getURI();
+          if (wPath.isEmpty()) {
+              ErrorLog.errorLog("Symbol name <%s> is not a valid URI symbol.  at line %d column %d.",
+                                pContext.CurrentToken->Text.toString(),
+                                pContext.CurrentToken->TokenLine,
+                                pContext.CurrentToken->TokenColumn );
+              pContext.LastErroredToken = pContext.CurrentToken;
+              return pContext.Status = ZS_INVTYPE ;
+          }
+          if (wPath.check()!=ZS_SUCCESS) {
+//          if (wSt!=ZS_SUCCESS) {
+              ErrorLog.errorLog("Invalid file path <%s> deduced from symbol <%s> at line %d column %d.",
+                                wPath.toString(),
+                                pContext.CurrentToken->Text.toString(),
+                                pContext.CurrentToken->TokenLine,
+                                pContext.CurrentToken->TokenColumn );
+              pContext.LastErroredToken = pContext.CurrentToken;
+              return pContext.Status = wSt ;
+          }
+      break;
+      }// ZSRCH_IDENTIFIER
+
+      ErrorLog.errorLog("Syntax error: Expected either path or symbol identifier. Found <%s> at line %d column %d.",
+                        pContext.CurrentToken->Text.toString(),
+                        pContext.CurrentToken->TokenLine,
+                        pContext.CurrentToken->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentToken;
+      return ZS_SYNTAX_ERROR ;
+      }// while true
+
+    pContext.advanceIndex(false);
+    if (pContext.isEOF() || (pContext.CurrentToken->Type!= ZSRCH_MODE)) {
+        ErrorLog.warningLog("Expecting MODE keyword at line %d column %d. Found <%s>. Mode is set to READONLY.",
+            pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+          pContext.InstructionType |= ZSITP_ReadOnly;
+        break;
+    }
+    pContext.advanceIndex(false);
+    if (pContext.isEOF() || ((pContext.CurrentToken->Type!= ZSRCH_READONLY)&&pContext.CurrentToken->Type!= ZSRCH_MODIFY)) {
+        ErrorLog.errorLog("Expecting mode as one of [READONLY,MODIFY] at line %d column %d. Found <%s>.",
+            pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+        pContext.LastErroredToken = pContext.CurrentToken;
+        return pContext.Status =ZS_INVPARAMS ;
+    }
+
+    if (pContext.CurrentToken->Type==ZSRCH_READONLY) {
+            pContext.InstructionType |= ZSITP_ReadOnly;
+    } else if (pContext.CurrentToken->Type==ZSRCH_MODIFY) {
+            pContext.InstructionType |= ZSITP_Modify;
+    }
+
+    pContext.advanceIndex(false);
+    break;
+  }//wwhile (pContext.notEOF())
+
+
+
+  pContext.Store = ZSearchHistory::DataExecute;
+
+  std::shared_ptr <ZMasterFile> wMF=nullptr;
+  ZSearchMasterFile* wZSRCHMF=nullptr;
+  int wi=0;
+  for (;wi < MasterFileList.count();wi++){
+    if (wPath==MasterFileList[wi]->getURIContent()) {
+      wMF = MasterFileList[wi] ;
+        if (!wMF->isOpen()) {
+            ErrorLog.errorLog("File <%s> is not open.", wPath.toString());
+            return pContext.Status =ZS_FILENOTOPEN;
+        }
+      if (pContext.InstructionType & ZSITP_Modify) {
+            if (wMF->getOpenMode()>=ZRF_Modify) {
+            ErrorLog.errorLog("File <%s> is already is use with access mode <%s> and cannot use mode <ZRF_Modify>.",
+                wPath.toString(), decode_ZRFMode(wMF->getOpenMode()));
+            return pContext.Status =ZS_MODEINVALID;
+            }
+            break;
+      }// ZSPA_Modify
+      if (wMF->getOpenMode()>ZRF_Read_Only) {
+        ErrorLog.errorLog("File <%s> is already is use with access mode <%s> cannot use mode <ZRF_Read_Only>.",
+            wPath.toString(), decode_ZRFMode(wMF->getOpenMode()));
+
+        return pContext.Status =ZS_MODEINVALID;
+      }
+      break;
+    } // if (wPath==MasterFileList[wi]->MasterFile.getURIContent())
+  } // for
+
+  if (wi == MasterFileList.count())  {  /* not found in master file list : create one in list */
+    wMF=std::shared_ptr<ZMasterFile>(new ZMasterFile);
+    wZSRCHMF = new ZSearchMasterFile(wMF,pContext.TokenIdentifier->Text);
+    if (pContext.InstructionType & ZSITP_Modify) {
+        wSt=wZSRCHMF->openModify(wPath);
+    }
+    else {
+        wSt=wZSRCHMF->openReadOnly(wPath);
+    }
+    if (wSt!=ZS_SUCCESS) {
+        ErrorLog.logZExceptionLast("ZSearchParser::_parse");
+        ErrorLog.logZStatus(ZAIES_Error,wSt,"ZSearchParser::_parse-E-ERROPEN Cannot access file <%s> mode <%s>.",
+                   wPath.toString(),
+                   pContext.InstructionType & ZSITP_Modify?"Modify":"Readonly");
+      return pContext.Status =wSt;
+    }
+    ZMasterFileItem wZMFI(pContext.TokenIdentifier->Text,wMF);
+    MasterFileList.push(wZMFI);
+  }// not found
+
+
+  /* search if an entity with same name already exists */
+
+  if (EntityList.getEntityByName(pContext.TokenIdentifier->Text)!=nullptr) {
+    ErrorLog.errorLog("An entity with name <%s> has already been registrated previously.",
+        pContext.TokenIdentifier->Text.toString());
+    return pContext.Status =ZS_INVNAME;
+  }
+
+  pContext.TargetEntity = std::shared_ptr<ZSearchEntity>(new ZSearchEntity(wZSRCHMF,pContext.TokenIdentifier->Text));
+
+  pContext.TargetEntity->BuildDic.addMetaDic(wZSRCHMF->getDictionary());
+  for (int wi=0; wi < wZSRCHMF->getDictionary()->count(); wi++) {
+      pContext.TargetEntity->BuildDic.push(ZSearchField(pContext.TargetEntity,wZSRCHMF->getDictionary(),wi));
+  }
+
+
+  EntityList.push(pContext.TargetEntity);
+
+  ErrorLog.textLog("File <%s> has been opened with mode <%s> as <%s> ",
+      wPath.toString(),pContext.InstructionType & ZSITP_Modify?"Modify":"Readonly",pContext.TargetEntity->getEntityName().toString());
+
+
+//  pContext.setMessage("Entity <%s> has been created and registered.", pContext.TargetEntity->getEntityName().toString());
+  ErrorLog.textLog("Entity <%s> has been created and registered.", pContext.TargetEntity->getEntityName().toString());
+
+  pContext.HasInstruction=true;
+
+  return pContext.Status =ZS_SUCCESS;
+} //_parseContextDeclareFile
+
+ZStatus
+ZSearchParser::_parseContextDeclareEntity(ZSearchContext & pContext)
+{
+  ZStatus wSt=ZS_SUCCESS;
+
+  _parseDeclareEntity(pContext);
+  if (pContext.Status!=ZS_SUCCESS)
+      return pContext.Status;
+
+//  pContext.advanceIndex(false);
+
+  if (pContext.isEOF()||(pContext.CurrentToken->Text.compareCase( "JOIN") != 0)) {
+      /* assign entity name as single entity name from stored token text */
+      pContext.TargetEntity->setNameByToken(pContext.TokenIdentifier);
+      pContext.InstructionType = ZSITP_SingleEntity;
+
+      EntityList.push(pContext.TargetEntity);  /* register created single entity */
+
+      ErrorLog.infoLog("Single entity <%s> <%s> has been created and registered as a new search entity.",
+                       pContext.TargetEntity->EntityName.toString(),
+                       pContext.TargetEntity->EntityFullName.toString()  );
+
+      return pContext.Status;
+  }
+
+  /* here join keyword has been found :
+   *    create join entity and feed with first single entity
+   *    parse second entity
+   *    store parsed entity
+   *    parse using clause
+   *    store all entities
+   */
+  if (!pContext.advanceIndex(true))
+    return ZS_SYNTAX_ERROR;
+
+  /* create join entity with name given by pContext.TokenIdentifier->Text */
+  std::shared_ptr<ZSearchEntity> wJoinEntity = std::make_shared<ZSearchEntity>();
+
+  std::shared_ptr<ZSearchEntity> wEntity = pContext.TargetEntity; /* store parsed first entity */
+  /* Now we may assign name to join entity */
+  wJoinEntity->setNameByToken(pContext.TokenIdentifier);
+
+  /* assign name for first entity */
+  utf8VaryingString wEName = pContext.TokenIdentifier->Text;
+  wEName += "$";
+  wEName += wEntity->_BaseEntity->getEntityName();
+  wEntity->setName(wEName);
+
+  //wJoinEntity->_JoinList.push(wEntity);
+
+  /* parse second entity */
+
+  wSt=_parseDeclareEntity(pContext);
+  if (pContext.Status!=ZS_SUCCESS) {
+      return pContext.Status;
+  }
+
+  /* check we have <using> clause */
+
+  if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_USING))  {
+      ErrorLog.errorLog("Missing keyword <USING> in instruction line. Found <%s> line <%d> column <%d>",
+                        pContext.CurrentToken->Text.toString(),
+                        pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+      pContext.LastErroredToken= pContext.CurrentToken;
+      return pContext.Status = ZS_MISS_KEYWORD;
+  }
+
+  wEName = pContext.TokenIdentifier->Text;
+  wEName += "$";
+  wEName += pContext.TargetEntity->_BaseEntity->getEntityName();
+  pContext.TargetEntity->setName(wEName);
+
+  wJoinEntity->_JoinList.push(wEntity);                  /*  first entity for join entity (join master) */
+  wJoinEntity->_JoinList.push(pContext.TargetEntity);    /*  second entity for join entity (join slave) */
+
+  pContext.TargetEntity = wJoinEntity; /* set join entity as new target */
+
+  /* parse USING clause */
+
+  pContext.Status = _parseUsingClause(pContext);
+  if (pContext.Status!= ZS_SUCCESS) {
+      return pContext.Status;
+  }
+
+  for (int wi=0; wi < pContext.TargetEntity->_JoinList[0]->BuildDic.count();wi++)
+    pContext.TargetEntity->BuildDic.push(pContext.TargetEntity->_JoinList[0]->BuildDic[wi]);
+  for (int wi=0; wi < pContext.TargetEntity->_JoinList[1]->BuildDic.count();wi++)
+    pContext.TargetEntity->BuildDic.push(pContext.TargetEntity->_JoinList[1]->BuildDic[wi]);
+
+  for (int wi=0; wi < pContext.TargetEntity->_JoinList[0]->LocalMetaDic.count();wi++)
+    pContext.TargetEntity->LocalMetaDic.push(pContext.TargetEntity->_JoinList[0]->LocalMetaDic[wi]);
+  for (int wi=0; wi < pContext.TargetEntity->_JoinList[1]->LocalMetaDic.count();wi++)
+    pContext.TargetEntity->LocalMetaDic.push(pContext.TargetEntity->_JoinList[1]->LocalMetaDic[wi]);
+
+
+  EntityList.push(pContext.TargetEntity->_JoinList[0]);
+  ErrorLog.infoLog("Single entity <%s> has been created and registered as a new search entity.",
+                   pContext.TargetEntity->_JoinList[0]->EntityFullName.toString()  );
+
+  EntityList.push(pContext.TargetEntity->_JoinList[1]);
+  ErrorLog.infoLog("Single entity <%s> has been created and registered as a new search entity.",
+                   pContext.TargetEntity->_JoinList[1]->EntityFullName.toString()  );
+
+  EntityList.push(pContext.TargetEntity);  /* register join entity */
+  ErrorLog.infoLog("Join master entity <%s> has been created and registered as a new search entity.",
+                   pContext.TargetEntity->EntityFullName.toString()  );
+
+  pContext.advanceIndex(false);
+  return pContext.Status;
+}// ZSearchParser::_parseContextDeclareEntity
+
+/* one entity definition is parsed :
+ * identifies and creates ZSearchContext::SourceEntity
+ * instantiates ZSearchContext::TargetEntity
+ */
+
+ZStatus
+ZSearchParser::_parseDeclareEntity(ZSearchContext & pContext)
+{
+    ZStatus wSt=ZS_SUCCESS;
+    pContext.InstructionType = ZSITP_Declare | ZSITP_Find;
+
+    ZSearchLogicalTerm*   wLogicalTerm=nullptr;
+
+    pContext.clearEntities(); /* reset source and target entities being used  */
+
+    int wFieldListBookMark = pContext.Index;
+
+      /* go to the end of entity definition to search for source entity name following keyword IN */
+
+      while (pContext.notEOF()  && (pContext.CurrentToken->Type != ZSRCH_IN ))  /* search for beginning of entities list */
+      {
+          pContext.advanceIndex(false) ;
+      }
+      if (pContext.isEOF() ) {
+          ErrorLog.errorLog("Missing keyword <IN> in instruction.");
+          pContext.LastErroredToken = pContext.lastToken();
+          return pContext.Status=ZS_SYNTAX_ERROR;
+      }
+
+      /* here we are pointing on <IN> */
+      pContext.advanceIndex(false) ;
+
+      if (pContext.isEOF() ||(pContext.CurrentToken->Type!=ZSRCH_IDENTIFIER)) {
+          ErrorLog.errorLog("Expected active entity identifier. Found <%s> line <%d> column <%d>",
+                   pContext.CurrentToken->Text.toString(),
+                   pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+          pContext.LastErroredToken= pContext.CurrentToken;
+          return pContext.Status=ZS_INV_ENTITY;
+      }
+
+      /* here we are pointing on source entity identifier */
+      /* search for a valid open entity as source for current entity */
+
+      pContext.SourceEntity = EntityList.getEntityByName(pContext.CurrentToken->Text);
+      if (pContext.SourceEntity==nullptr) {
+          ErrorLog.errorLog("Entity identifier <%s> has not been found in active entities list. at line %d column %d.",
+            pContext.CurrentToken->Text.toString(),
+            pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn  );
+          pContext.LastErroredToken=pContext.CurrentToken;
+          return pContext.Status=ZS_INV_ENTITY;
+      }
+
+/* target entity is instantiated as soon as source entity name is known and validated to be a valid, registered entity */
+
+/*     if (pContext.SourceEntity->isFile()) {
+          ZSearchMasterFile* wMF=new ZSearchMasterFile(pContext.SourceEntity->_FileEntity->getMasterFile(),
+                                                       pContext.SourceEntity->EntityName);
+          pContext.TargetEntity = std::shared_ptr<ZSearchEntity>(new ZSearchEntity(pContext.SourceEntity->_FileEntity,
+                                                                                   pContext.TokenIdentifier))
+      }
+      else
+        pContext.TargetEntity = std::shared_ptr<ZSearchEntity>(new ZSearchEntity(pContext.SourceEntity,
+                                                                                 pContext.TokenIdentifier));
+*/
+      pContext.TargetEntity = std::shared_ptr<ZSearchEntity>(new ZSearchEntity(pContext.SourceEntity,
+                                                                               pContext.TokenIdentifier)) ;
+
+      /* target entity name will be allocated later according the following rule :
+       *  either it is a single entity -> pContext.TokenIdentifier->text
+       *  or it is a member of a join clause :  pContext.TokenIdentifier->text'$'<SourceEntity name>
+       */
+
+      pContext.advanceIndex(false) ;
+
+      if (pContext.notEOF() &&
+              (pContext.CurrentToken->Type != ZSRCH_WITH) &&
+              (pContext.CurrentToken->Type != ZSRCH_JOIN) &&
+              (pContext.CurrentToken->Type != ZSRCH_USING)) {
+
+          ErrorLog.errorLog("Expected one of { <WITH> , <USING> , <JOIN>. Found <%s> at line %d column %d.",
+                   pContext.CurrentToken->Text.toString(),
+                   pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn  );
+          pContext.LastErroredToken=pContext.CurrentToken;
+          pContext.TargetEntity.reset();
+          return pContext.Status=ZS_SYNTAX_ERROR;
+      }
+
+      /* get back to parse source entity ranks selection */
+
+      if (pContext.CurrentToken->Type == ZSRCH_WITH) {
+          if (!pContext.advanceIndex(true))
+            return ZS_SYNTAX_ERROR;
+
+          wSt=_parseLogicalTerm(wLogicalTerm,pContext,0);
+          if (wSt!=ZS_SUCCESS)
+            return wSt;
+
+          pContext.TargetEntity->setLogicalTerm(wLogicalTerm);
+      } // ZSRCH_WITH
+      else {
+          ErrorLog.warningLog("Missing keyword <WITH> : all ranks of entity will be selected." );
+      }
+
+      int wEndEntityIndex = pContext.Index; /* keep book mark of end of entity declaration */
+
+      /* in the end get back to parse selected fields (must be from source entity) */
+
+      pContext.setIndex(wFieldListBookMark); /* get back to field list clause : NB: we have entity(ies) field dictionary at disposal */
+
+      pContext.Status =_parseSelClause(pContext);
+
+      pContext.setIndex(wEndEntityIndex); /* get to end of entity declaration */
+
+      if (pContext.Status!=ZS_SUCCESS) {
+          pContext.TargetEntity.reset();
+      }
+    return pContext.Status;
+}// ZSearchParser::_parseEntity
+
+ZStatus
+ZSearchParser::_parseUsingClause(ZSearchContext & pContext)
+{
+//  ZStatus wSt=ZS_SUCCESS;
+
+
+  if ( pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_USING ) )  {
+      ErrorLog.errorLog("Keyword <USING> was expected here. Found <%s> at line %d column %d.",
+               pContext.CurrentToken->Text.toString(),
+               pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn  );
+      pContext.LastErroredToken=pContext.CurrentToken;
+      return pContext.Status=ZS_MISS_KEYWORD ;
+  }
+
+  if (!pContext.TargetEntity->isJoin()) {
+      ErrorLog.errorLog("<USING> clause is reserved to joined entity. Entity <%s> is not a joined entity. at line %d column %d.",
+                        pContext.TargetEntity->getEntityName().toString(),
+                        pContext.CurrentToken->Text.toString(),
+                        pContext.CurrentToken->TokenLine,
+                        pContext.CurrentToken->TokenColumn  );
+      pContext.LastErroredToken=pContext.CurrentToken;
+      return pContext.Status = ZS_INV_OPERATOR ;
+  }
+
+  if (!pContext.advanceIndex(true))
+    return pContext.Status=ZS_SYNTAX_ERROR;
+
+  pContext.Status =_parseLogicalTerm(pContext.TargetEntity->_Using,pContext,0);
+
+  return pContext.Status;
+}// ZSearchParser::_parseUsingClause
+
+/* if identifier then a symbol name is expected  :
+         *   declare <symbol name> = <literal>  ;
+         *
+         *   declare gabu = ZDATE(30/01/24) ; -> creates symbol gabu with literal date value set to 30/01/24
+         *   declare wResource = ZResource(ZDoc_Physical,1002) ;
+        */
+ZStatus
+ZSearchParser::_parseContextDeclareSymbol(ZSearchContext& pContext)
+{
+    pContext.InstructionType = ZSITP_Declare | ZSITP_Symbol ;
+
+    if (pContext.CurrentToken->Type !=ZSRCH_IDENTIFIER) {
+        return pContext.Status = ZS_INVTYPE ;
+    }
+    /* avoid symbol name duplicates */
+
+    if (SymbolList.exists(pContext.CurrentToken->Text)) {
+        ErrorLog.errorLog("Symbol %s has already been defined.Cannot superseed at line %d column %d.",
+                          pContext.CurrentToken->Text.toString(),
+                          pContext.CurrentToken->TokenLine,
+                          pContext.CurrentToken->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentToken;
+        return pContext.Status=ZS_INVNAME ;
+    }
+
+    ZSearchSymbol wSymbol;
+    wSymbol.FullFieldName = pContext.CurrentToken->Text;
+
+    pContext.advanceIndex(false);
+
+    if (pContext.isEOF())  {
+        SymbolList.push(wSymbol);
+        ErrorLog.textLog("Symbol %s has been defined at line %d column %d.",
+                         pContext.CurrentToken->Text.toString(),
+                         pContext.CurrentToken->TokenLine,
+                         pContext.CurrentToken->TokenColumn );
+        return pContext.Status = ZS_SUCCESS ;
+    }
+
+    if (pContext.CurrentToken->Type !=ZSRCH_OPERATOR_MOVE) {
+        ErrorLog.errorLog("Expected sign '=' while found token <%s> at line %d column %d.",
+                          pContext.CurrentToken->Text.toString(),
+                          pContext.CurrentToken->TokenLine,
+                          pContext.CurrentToken->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentToken;
+        return pContext.Status=ZS_MISS_OPERATOR ;
+    }// ZSRCH_OPERATOR_MOVE
+
+    if (!pContext.advanceIndex(false))
+        return pContext.Status=ZS_SYNTAX_ERROR;
+
+    ZSearchOperandType_type wZSTO=ZSTO_Nothing;
+    ZSearchLiteral *wLit=nullptr;
+    pContext.Status=_parseLiteral(wLit,pContext,wZSTO);
+    if (pContext.Status!=ZS_SUCCESS)
+        return pContext.Status;
+    wSymbol.setLiteral(wLit);
+    wSymbol.ZSTO = wZSTO | ZSTO_Symbol;
+    SymbolList.push(wSymbol);
+    ErrorLog.textLog("Symbol %s has been defined and its value has been set at line %d column %d.",
+                     wSymbol.FullFieldName.toString(),
+                     pContext.CurrentToken->TokenLine,
+                     pContext.CurrentToken->TokenColumn );
+
+    return pContext.Status = ZS_SUCCESS ;
+
+}// ZSearchParser::_parseContextDeclareSymbol
+
+/*
+ * fetch <entity name> {    [first [<number of ranks to display>] ],
+ *                          [next [<number of ranks to display>] ] ,
+ *                          [all] } [;]
+ *
+*/
+ZStatus
+ZSearchParser::_parseFetch(ZSearchContext & pContext)
+{
+  ZStatus wSt=ZS_SUCCESS;
+  pContext.InstructionType = ZSITP_Fetch;
+
+//  ZSearchLogicalTerm*   wLogicalTerm=nullptr;
+
+  pContext.clearEntities(); /* reset current entities being used (defined within phrase) */
+
+  if (!pContext.advanceIndex())
+    return ZS_SYNTAX_ERROR;
+
+  if (pContext.CurrentToken->Type!=ZSRCH_IDENTIFIER) {
+      ErrorLog.errorLog("Expected entity identifier. Found <%s> at line %d column %d.",
+                 pContext.CurrentToken->Text.toString(),
+                 pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn  );
+      pContext.LastErroredToken=pContext.CurrentToken;
+      return ZS_INV_ENTITY;
+  }
+  /* search for a valid open entity */
+  std::shared_ptr<ZSearchEntity>          wEntity=nullptr;
+  wEntity = EntityList.getEntityByName(pContext.CurrentToken->Text);
+  if (wEntity==nullptr) {
+      ErrorLog.errorLog("Entity identifier not found in declared entities list. Found <%s> at line %d column %d.",
+        pContext.CurrentToken->Text.toString(),
+        pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn  );
+      pContext.LastErroredToken=pContext.CurrentToken;
+      return ZS_INV_ENTITY;
+  }
+
+  /* here active entity is set to pContext.CurrentToken->Text */
+
+/* collection is instantiated as soon as first entity name is known and validated to be a valid, stored entity */
+//        pContext.CurEntity=ZSearchEntity::constructWithZSearchEntity(wEntity,pContext.CurrentToken);
+
+  pContext.SourceEntity = wEntity ;
+//  pContext.TargetEntity = std::shared_ptr<ZSearchEntity>(new ZSearchEntity(wEntity,pContext.CurrentToken));
+
+  if (!pContext.advanceIndex())
+    return ZS_SYNTAX_ERROR;
+
+  switch (pContext.CurrentToken->Type) {
+    case ZSRCH_ALL:
+      pContext.InstructionType |= ZSITP_All;
+      /* execute fetch all */
+      break;
+    case ZSRCH_FIRST:
+    {
+      pContext.Number=1;
+      pContext.InstructionType |= ZSITP_First;  /* Nb ; Equivalence for ZSITP_All is 0x0 as defaulted value */
+      pContext.advanceIndex();
+      if (pContext.notEOF()) {
+      if (pContext.CurrentToken->Type!=ZSRCH_NUMERIC_LITERAL) {
+          ErrorLog.errorLog("Expecting numeric literal after clause FIRST. at line %d column %d. Found <%s>.",
+                     pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+          pContext.LastErroredToken = pContext.CurrentToken;
+          return ZS_MISS_LITERAL;
+      }
+      pContext.Number = pContext.CurrentToken->Text.toInt(10);
+      }// not EOF
+
+      /* execute fetch first xx */
+
+      break;
+    } // ZSRCH_FIRST
+
+  case ZSRCH_NEXT:
+  {
+    pContext.Number=1;
+    pContext.InstructionType |= ZSITP_Next;  /* Nb ; Equivalence for ZSITP_All is 0x0 as defaulted value */
+    pContext.advanceIndex();
+    if (!pContext.isEOF()) {
+        if (pContext.CurrentToken->Type!=ZSRCH_NUMERIC_LITERAL) {
+            ErrorLog.errorLog("Expecting numeric literal after clause NEXT at line %d column %d. Found <%s>.",
+                       pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+            pContext.LastErroredToken = pContext.CurrentToken;
+            return ZS_MISS_LITERAL;
+        }
+        pContext.Number = pContext.CurrentToken->Text.toInt(10);
+    }
+    } //ZSRCH_NEXT
+
+    /* execute fetch next pContext.NumberToFind */
+    break;
+    default:
+      ErrorLog.warningLog("Missing keyword one of { ALL , FIRST , NEXT }  at line %d column %d. Found <%s>.",
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+      pContext.InstructionType |= ZSITP_All;
+      break;
+    }// switch
+    pContext.advanceIndex();
+  return executeFetch(pContext);
+}// ZSearchParser::_parseFetch
+
+ZStatus
+ZSearchParser::execute(ZSearchContext & pContext)
+{
+    if (!pContext.InstructionType & ZSITP_ToBeExecuted)   /* display parameters, parameters change etc. */
+        return ZS_SUCCESS;
+
+    /* search for entity context, and create one if not found */
+    pContext.SEC = nullptr;
+    for (int wi=0;wi < SECList.count(); wi++) {
+        if (SECList[wi].Entity == pContext.SourceEntity) {
+            pContext.SEC = &SECList[wi];
+            break;
+        }
+    }
+    if (pContext.SEC==nullptr) {
+        SECList.push(ZSearchEntityContext::newEntityContext (pContext.SourceEntity));
+        pContext.SEC = &SECList.last();
+    }
+
+
+    if (pContext.InstructionType & ZSITP_Fetch)
+        return executeFetch(pContext);
+    if (pContext.InstructionType & ZSITP_Display)
+        return DisplayEntity(pContext);
+    return ZS_SUCCESS;
+}
+
+ZStatus
+ZSearchParser::executeFetch(ZSearchContext & pContext)
+{
+    ZStatus wSt=ZS_SUCCESS;
+
+    if (pContext.InstructionType & ZSITP_Next) {
+        return pContext.SourceEntity->populateNext(*pContext.SEC,pContext.Number);
+    }
+    if (pContext.InstructionType & ZSITP_First) {
+        return pContext.SourceEntity->populateFirst(*pContext.SEC,pContext.Number);
+    }
+    if (pContext.InstructionType & ZSITP_All) {
+        return pContext.SourceEntity->populateAll(*pContext.SEC);
+    }
+    return wSt;
+}
+/*
+ * display <entity name> {  [first [<number of ranks to display>] ],
+ *                          [next [<number of ranks to display>] ] ,
+ *                          [at <rank>] ,
+ *                          [all] } [;]
+ *
+*/
+ZStatus
+ZSearchParser::_parseDisplay(ZSearchContext & pContext)
+{
+  ZStatus wSt=ZS_SUCCESS;
+  pContext.InstructionType = ZSITP_Display;
+
+  pContext.clearEntities(); /* reset current entities being used (defined within phrase) */
+
+  if (!pContext.advanceIndex())
+    return pContext.Status=ZS_SYNTAX_ERROR;
+
+  if (pContext.CurrentToken->Type!=ZSRCH_IDENTIFIER) {
+      ErrorLog.errorLog("Expected active entity. Found <%s> line <%d> column <%d>",
+               pContext.CurrentToken->Text.toString(),
+               pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+      pContext.LastErroredToken= pContext.CurrentToken;
+      return pContext.Status=ZS_INV_ENTITY;
+  }
+  /* search for a valid open entity */
+  std::shared_ptr<ZSearchEntity>          wEntity=nullptr;
+  wEntity = EntityList.getEntityByName(pContext.CurrentToken->Text);
+  if (wEntity==nullptr) {
+      ErrorLog.errorLog("Entity identifier not found in declared entities list. Found <%s> at line %d column %d.",
+        pContext.CurrentToken->Text.toString(),
+        pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn  );
+      pContext.LastErroredToken=pContext.CurrentToken;
+      return pContext.Status=ZS_INV_ENTITY;
+  }
+  pContext.SourceEntity = wEntity;
+
+  pContext.advanceIndex(false);
+
+  if (pContext.isEOF()) {
+      pContext.InstructionType |= ZSITP_All;
+  }
+  else {
+      switch (pContext.CurrentToken->Type) {
+        case ZSRCH_ALL:
+          pContext.InstructionType |= ZSITP_All;
+          pContext.advanceIndex(false);
+          break;
+        case ZSRCH_FIRST:
+          pContext.InstructionType |= ZSITP_First;
+          pContext.Number = 1;
+          pContext.advanceIndex();
+          if (pContext.notEOF()) {
+              if (pContext.CurrentToken->Type!=ZSRCH_NUMERIC_LITERAL) {
+                  ErrorLog.errorLog("Missing numeric literal after clause FIRST at line %d column %d. Found <%s>.",
+                             pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+                  pContext.LastErroredToken = pContext.CurrentToken;
+                  return pContext.Status=ZS_MISS_LITERAL;
+              }
+              pContext.Number = pContext.CurrentToken->Text.toInt(10);
+              pContext.advanceIndex(false);
+          }
+          break;
+      case ZSRCH_NEXT:
+        pContext.InstructionType |= ZSITP_Next;
+        pContext.Number = 1;
+        pContext.advanceIndex(false);
+        if (pContext.notEOF()) {
+            if (pContext.CurrentToken->Type!=ZSRCH_NUMERIC_LITERAL) {
+                ErrorLog.errorLog("Missing numeric literal after clause NEXT at line %d column %d. Found <%s>.",
+                           pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+                pContext.LastErroredToken = pContext.CurrentToken;
+                return pContext.Status=ZS_MISS_LITERAL;
+            }
+            pContext.Number = pContext.CurrentToken->Text.toInt(10);
+            pContext.advanceIndex(false);
+        }
+        break;
+      case ZSRCH_AT:
+        pContext.InstructionType |= ZSITP_At;
+        pContext.Number = 1;
+        pContext.advanceIndex(false);
+        if (pContext.notEOF()) {
+            if (pContext.CurrentToken->Type!=ZSRCH_NUMERIC_LITERAL) {
+                ErrorLog.errorLog("Missing numeric literal after clause AT at line %d column %d. Found <%s>.",
+                           pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+                pContext.LastErroredToken = pContext.CurrentToken;
+                return pContext.Status=ZS_MISS_LITERAL;
+            }
+            pContext.Number = pContext.CurrentToken->Text.toInt(10);
+            pContext.advanceIndex(false);
+        }
+        break;
+        default:
+          ErrorLog.warningLog("Missing keyword one of [<ALL>,<FIRST>]  at line %d column %d. Found <%s>.",
+              pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+          return pContext.Status=ZS_MISS_KEYWORD ;
+          break;
+        }// switch
+    }
+
+
+  return pContext.Status=ZS_SUCCESS;
+}// ZSearchParser::_parseDisplay
+
+
+ZStatus
+ZSearchParser::executeDisplay(ZSearchContext& pContext)
+{
+    ZStatus wSt = ZS_SUCCESS;
+
+//    return DisplayEntity(pContext.SourceEntity,pContext.InstructionType,pContext.Number);
+    return DisplayEntity(pContext);
+/*    if (pContext.InstructionType & ZSITP_Next) {
+        return pContext.SourceEntity->populateNext(pContext.Number);
+    }
+    if (pContext.InstructionType & ZSITP_First) {
+        return pContext.SourceEntity->populateFirst(pContext.Number);
+    }
+    if (pContext.InstructionType & ZSITP_All) {
+        wSt = pContext.SourceEntity->populateAll();
+        if (wSt!=ZS_SUCCESS)
+            return wSt;
+        return DisplayEntity(pContext.SourceEntity);
+    }
+    */
+}
+
+ZStatus ZSearchParser::DisplayEntityDefault (ZSearchContext &pContext)
+{
+    if (pContext.SourceEntity==nullptr) {
+        ErrorLog.errorLog("DisplayEntityDefault-E-NULLPTR No entity defined ");
+        return ZS_NULLPTR ;
+    }
+    if (pContext.SourceEntity->isJoin())
+        return _DisplayEntityJoinDefault(pContext);
+    return _DisplayEntitySingleDefault (pContext);
+}
+
+ZStatus ZSearchParser::_DisplayEntitySingleDefault (ZSearchContext &pContext)
+{
+    utf8VaryingString wStr;
+//    ZDataBuffer wRecord;
+    ZStatus wSt=ZS_SUCCESS;
+
+    ZArray<utf8VaryingString>            wHeader;
+    ZArray<utf8VaryingString>*           wRow=nullptr;
+    ZArray<ZArray<utf8VaryingString>*>   wRowList;
+
+//    URFParser _URFParser;
+
+    if (pContext.SourceEntity==nullptr) {
+        ErrorLog.errorLog("_DisplayEntitySingleDefault-E-NULLPTR No entity defined ");
+        return ZS_NULLPTR ;
+    }
+    if (pContext.SourceEntity->isJoin()) {
+        ErrorLog.errorLog("_DisplayEntitySingleDefault-E-INVTYPE Entity is a join and is not allowed here.\n");
+        return ZS_INVTYPE;
+    }
+
+
+    zaddress_type wAddress;
+
+
+
+    pContext.SEC->CaptureTime=true;
+    pContext.SEC->ProcessTi.init();
+
+
+    if ( (pContext.InstructionType & ZSITP_First) || (pContext.InstructionType & ZSITP_All)) {
+            wSt=pContext.SourceEntity->getFirst(*pContext.SEC,wAddress);
+    }
+    else if (pContext.InstructionType & ZSITP_Next) {
+            wSt=pContext.SourceEntity->getNext(*pContext.SEC,wAddress);
+    }
+    else if (pContext.InstructionType & ZSITP_At) {
+        zaddress_type wAddress;
+        wSt=pContext.SourceEntity->getByRank(*pContext.SEC,pContext.Number,wAddress);
+        pContext.Number=1;
+       /* to be done */
+    }
+        else {
+            ErrorLog.errorLog("Invalid instruction type given. Expected one of {ZSITP_First,ZSITP_All,ZSITP_Next,ZSITP_At}");
+            return ZS_INVOP;
+        }
+    int wCount = 0;
+
+    while ((wSt == ZS_SUCCESS) && ((pContext.InstructionType & ZSITP_All) || (wCount < pContext.Number) )) {
+        /*
+         wSt=_URFParser.parse(wRecord,&pContext.SourceEntity->LocalMetaDic,&ErrorLog);
+
+        if (wSt!=ZS_SUCCESS)
+            break;
+            */
+        if (wCount > 100) {
+            _DBGPRINT("ZSearchParser::_DisplayEntitySingleDefault-E-MAXALLOW Maximum number of record allowed.\n")
+            abort();
+        }
+        wRow = new ZArray<utf8VaryingString>;
+        for (int wi=0; wi < pContext.SEC->_URFParser.URFFieldList.count();wi++) {
+//            wRow->push(_URFParser.URFFieldList[wi].displayFmt(DisplayCellFormat));
+            wRow->push(pContext.SEC->_URFParser.URFFieldList[wi].displayFmt(DisplayCellFormat));
+        } // for
+        wRowList.push(wRow);
+        wCount++;
+        if ((pContext.InstructionType & ZSITP_All) || (wCount < pContext.Number) ) {
+                wSt=pContext.SourceEntity->getNext(*pContext.SEC,wAddress);
+        }
+    } // while
+
+    if (wSt==ZS_OUTBOUNDHIGH)
+        wSt=ZS_SUCCESS;
+
+    if (pContext.SEC->CaptureTime) {
+        ErrorLog.infoLog("Performance report : Entity ranks obtained %d processing time %s",
+                         wCount,pContext.SEC->ProcessTi.reportDeltaTime().toString());
+    }
+
+
+    const char* wAction="Unknown action";
+    if (pContext.InstructionType & ZSITP_First)
+        wAction = "Display first";
+    else if (pContext.InstructionType & ZSITP_Next)
+        wAction = "Display next";
+    else if (pContext.InstructionType & ZSITP_All)
+        wAction = "Display all";
+    else if (pContext.InstructionType & ZSITP_At)
+        wAction = "Display at";
+
+    ErrorLog.textLog("\n Entity %s %s  %s %d ",
+                     pContext.SourceEntity->getEntityName().toString(),
+                     entityType(pContext.SourceEntity), wAction , pContext.Number);
+
+    if (wRowList.count()==0) {
+        ErrorLog.infoLog("No entity rank have been selected for display,");
+//        return;
+    }
+
+    /* compute columns size for detail rows */
+
+    ZArray<int> wColSizeList;
+
+    for (int wi = 0 ; wi < pContext.SourceEntity->LocalMetaDic.count() ; wi++)
+        wColSizeList.push(0);
+
+
+    for (int wi=0; wi < wRowList.count(); wi++) {
+        for (int wj=0; wj < wRowList[wi]->count(); wj++) {
+            int wLen = wRowList[wi]->Tab(wj).strlen();
+
+            if (wLen > DisplayColMax) {
+                wRowList[wi]->Tab(wj).truncate(ssize_t(DisplayColMax));
+                wRowList[wi]->Tab(wj) += cst_OverflowChar8 ;
+                wLen = DisplayColMax;
+            }// if
+
+            if ( wLen > wColSizeList[wj] )
+                wColSizeList[wj] = wLen;
+
+            if (wColSizeList[wj] < DisplayColMin)
+                wColSizeList[wj] = DisplayColMin ;
+        } // for
+//        wColSizeList.push(wColSize);
+    }// for
+
+
+    /* populate header from build dictionary */
+
+    for (int wi=0; wi < pContext.SourceEntity->LocalMetaDic.count(); wi++)
+        wHeader.push(pContext.SourceEntity->LocalMetaDic[wi].getName());
+
+    /* adjust header column size to field sizes */
+
+//    int wTLen = 1;
+
+    for (int wi = 0; wi  < wHeader.count(); wi++ ) {
+        size_t wL1,wL ;
+        wL=wL1=wHeader[wi].strlen();
+        if (wL1 > wColSizeList[wi]) {
+            if (wL1 > DisplayColMax) {
+                wL1=DisplayColMax;
+            }
+            wColSizeList[wi]=wL1;
+            if (wL > wColSizeList[wi]) {
+                wHeader[wi].truncate(ssize_t(wColSizeList[wi]));
+                wHeader[wi] += cst_OverflowChar8 ;
+            }
+        }
+//        wTLen += wColSizeList[wi];
+//        wTLen ++;
+    } // for
+
+    /* display header */
+
+    utf8VaryingString wBar = "+";
+//    wBar.setChar('_',0,ssize_t(wTLen));
+
+    utf8VaryingString wHContent = "|";
+    for (int wi = 0; wi  < wHeader.count(); wi++ ) {
+        /* pad with leading space whenever necessary */
+        ssize_t wPad = ssize_t(wColSizeList[wi] - wHeader[wi].strlen());
+        if (wPad > 0)
+            wHContent.addChar(' ',wPad);
+        wHContent.addsprintf("%s|",wHeader[wi].toString());
+        wBar.addChar('_',wColSizeList[wi]);
+        wBar.addUtfUnit('+');
+    } // for
+
+    ErrorLog.textLog(wBar.toCChar());
+    ErrorLog.textLog(wHContent.toCChar());
+    ErrorLog.textLog(wBar.toCChar());
+
+    /* display detail rows */
+
+    for (int wi = 0; wi  < wRowList.count(); wi++ ) {
+        wHContent = "|" ;
+        for (int wj = 0; wj  < wRowList[wi]->count(); wj++ ) {
+//            wHContent.addsprintf("%s|",leftPad(wRowList[wi]->Tab(wj),wColSizeList[wj],' ').toString());
+            wHContent.addsprintf("%s|",wRowList[wi]->Tab(wj).leftPad(wColSizeList[wj],' ').toString());
+        } // for
+        ErrorLog.textLog(wHContent.toCChar());
+    }// for
+
+    ErrorLog.textLog(wBar.toCChar());
+
+    for (long wi=0 ; wi < wRowList.count() ; wi++) {
+        delete wRowList[wi];
+    }
+
+    return wSt;
+} // ZSearchParser::DisplayEntityDefault
+
+ZStatus ZSearchParser::_DisplayEntityJoinDefault (ZSearchContext &pContext)
+{
+    if (pContext.SourceEntity==nullptr) {
+        ErrorLog.errorLog("_DisplayEntityJoinDefault-E-NULLPTR No entity defined ");
+        return ZS_NULLPTR ;
+    }
+
+    if (!pContext.SourceEntity->isJoin()) {
+        _DBGPRINT("_DisplayEntityJoinDefault-E-INVTYPE Entity <%s> is not a join.\n")
+        return ZS_INVTYPE;
+    }
+
+    ZStatus wSt=ZS_SUCCESS;
+
+    ZArray<utf8VaryingString>            wHeader;
+    ZArray<utf8VaryingString>*           wRow=nullptr;
+    ZArray<ZArray<utf8VaryingString>*>   wRowList;
+
+//    URFParser _URFParser;
+
+    ZSearchJoinTuple wJAddress;
+
+    pContext.SEC->CaptureTime=true;
+    pContext.SEC->ProcessTi.init();
+
+
+    if ( (pContext.InstructionType & ZSITP_First) || (pContext.InstructionType & ZSITP_All)) {
+            wSt=pContext.SourceEntity->getFirstJoin(*pContext.SEC,wJAddress);
+    }
+    else if (pContext.InstructionType & ZSITP_Next) {
+            wSt=pContext.SourceEntity->getNextJoin(*pContext.SEC,wJAddress);
+    }
+    else if (pContext.InstructionType & ZSITP_At) {
+            wSt=pContext.SourceEntity->_getByRankJoin(*pContext.SEC,pContext.Number,wJAddress);
+       pContext.Number=1;
+       /* to be done */
+    }
+        else {
+            ErrorLog.errorLog("_DisplayEntityJoinDefault-E-INVINSTR Invalid instruction type given. Expected one of {ZSITP_First,ZSITP_All,ZSITP_Next,ZSITP_At}");
+            return ZS_INVOP;
+        }
+    int wCount = 0;
+
+    while ((wSt == ZS_SUCCESS) && ((pContext.InstructionType & ZSITP_All) || (wCount < pContext.Number) )) {
+        wRow = new ZArray<utf8VaryingString>;
+        for (int wi=0; wi < pContext.SEC->_URFParser.URFFieldList.count();wi++) {
+            wRow->push(pContext.SEC->_URFParser.URFFieldList[wi].displayFmt(DisplayCellFormat));
+        } // for
+        wRowList.push(wRow);
+        wCount++;
+        if ((pContext.InstructionType & ZSITP_All) || (wCount < pContext.Number) ) {
+                wSt=pContext.SourceEntity->getNextJoin(*pContext.SEC,wJAddress);
+        }
+    } // while
+
+    if (wSt==ZS_OUTBOUNDHIGH)
+        wSt=ZS_SUCCESS;
+
+    if (pContext.SEC->CaptureTime) {
+        ErrorLog.infoLog("Performance report : Entity ranks obtained %d processing time %s",
+                         wCount,pContext.SEC->ProcessTi.reportDeltaTime().toString());
+    }
+
+
+    const char* wAction="Unknown action";
+    if (pContext.InstructionType & ZSITP_First)
+        wAction = "Display first";
+    else if (pContext.InstructionType & ZSITP_Next)
+        wAction = "Display next";
+    else if (pContext.InstructionType & ZSITP_All)
+        wAction = "Display all";
+    else if (pContext.InstructionType & ZSITP_At)
+        wAction = "Display at";
+
+    ErrorLog.textLog("\n Entity %s %s  %s %d ",
+                     pContext.SourceEntity->getEntityName().toString(),
+                     entityType(pContext.SourceEntity), wAction , pContext.Number);
+
+    if (wRowList.count()==0) {
+        ErrorLog.infoLog("No entity rank have been selected for display,");
+//        return;
+    }
+
+    /* compute columns size for detail rows */
+
+    ZArray<int> wColSizeList;
+
+    for (int wi = 0 ; wi < pContext.SourceEntity->LocalMetaDic.count() ; wi++)
+        wColSizeList.push(0);
+
+
+    for (int wi=0; wi < wRowList.count(); wi++) {
+        for (int wj=0; wj < wRowList[wi]->count(); wj++) {
+            int wLen = wRowList[wi]->Tab(wj).strlen();
+
+            if (wLen > DisplayColMax) {
+                wRowList[wi]->Tab(wj).truncate(ssize_t(DisplayColMax));
+                wRowList[wi]->Tab(wj) += cst_OverflowChar8 ;
+                wLen = DisplayColMax;
+            }// if
+
+            if ( wLen > wColSizeList[wj] )
+                wColSizeList[wj] = wLen;
+
+            if (wColSizeList[wj] < DisplayColMin)
+                wColSizeList[wj] = DisplayColMin ;
+        } // for
+//        wColSizeList.push(wColSize);
+    }// for
+
+
+    /* populate header from build dictionary */
+
+    for (int wi=0; wi < pContext.SourceEntity->LocalMetaDic.count(); wi++)
+        wHeader.push(pContext.SourceEntity->LocalMetaDic[wi].getName());
+
+    /* adjust header column size to field sizes */
+
+//    int wTLen = 1;
+
+    for (int wi = 0; wi  < wHeader.count(); wi++ ) {
+        size_t wL1,wL ;
+        wL=wL1=wHeader[wi].strlen();
+        if (wL1 > wColSizeList[wi]) {
+            if (wL1 > DisplayColMax) {
+                wL1=DisplayColMax;
+            }
+            wColSizeList[wi]=wL1;
+            if (wL > wColSizeList[wi]) {
+                wHeader[wi].truncate(ssize_t(wColSizeList[wi]));
+                wHeader[wi] += cst_OverflowChar8 ;
+            }
+        }
+//        wTLen += wColSizeList[wi];
+//        wTLen ++;
+    } // for
+
+    /* display header */
+
+    utf8VaryingString wBar = "+";
+//    wBar.setChar('_',0,ssize_t(wTLen));
+
+    utf8VaryingString wHContent = "|";
+    for (int wi = 0; wi  < wHeader.count(); wi++ ) {
+        /* pad with leading space whenever necessary */
+        ssize_t wPad = ssize_t(wColSizeList[wi] - wHeader[wi].strlen());
+        if (wPad > 0)
+            wHContent.addChar(' ',wPad);
+        wHContent.addsprintf("%s|",wHeader[wi].toString());
+        wBar.addChar('_',wColSizeList[wi]);
+        wBar.addUtfUnit('+');
+    } // for
+
+    ErrorLog.textLog(wBar.toCChar());
+    ErrorLog.textLog(wHContent.toCChar());
+    ErrorLog.textLog(wBar.toCChar());
+
+    /* display detail rows */
+
+    for (int wi = 0; wi  < wRowList.count(); wi++ ) {
+        wHContent = "|" ;
+        for (int wj = 0; wj  < wRowList[wi]->count(); wj++ ) {
+//            wHContent.addsprintf("%s|",leftPad(wRowList[wi]->Tab(wj),wColSizeList[wj],' ').toString());
+            wHContent.addsprintf("%s|",wRowList[wi]->Tab(wj).leftPad(wColSizeList[wj],' ').toString());
+        } // for
+        ErrorLog.textLog(wHContent.toCChar());
+    }// for
+
+    ErrorLog.textLog(wBar.toCChar());
+
+    for (long wi=0 ; wi < wRowList.count() ; wi++) {
+        delete wRowList[wi];
+    }
+
+    return wSt;
+} // ZSearchParser::_DisplayEntityJoinDefault
+utf8VaryingString
+leftPad(const utf8VaryingString& pString,int pSize,utf8_t pPadChar)
+{
+    utf8VaryingString wReturn;
+    ssize_t wPad = ssize_t(pSize - pString.strlen());
+    if (wPad > 0)
+        wReturn.setChar(pPadChar,0,wPad);
+    wReturn += pString;
+    return wReturn;
+}
+
+utf8VaryingString
+rightPad(const utf8VaryingString& pString,int pSize,utf8_t pPadChar)
+{
+    utf8VaryingString wReturn = pString ;
+    ssize_t wPad = ssize_t(pSize - pString.strlen());
+    if (wPad > 0)
+        wReturn.addChar(pPadChar,wPad);
+    return wReturn;
+}
+
+#ifdef __COMMENT__
+QList<QStandardItem *> ZSearchParser::DisplayOneLine( ZDataBuffer &pRecord)
+{
+  utf8VaryingString wStr;
+  utf8VaryingString wRow;
+  zaddress_type wOffset=0;
+  const unsigned char* wPtr = pRecord.Data;
+  const unsigned char* wPtrEnd = pRecord.Data + pRecord.Size;
+  int wFieldRank = 0;
+  ZTypeBase wZType;
+  ZBitset wPresence;
+
+  _importAtomic<ZTypeBase>(wZType,wPtr);
+  while (true) {
+    if ((wZType != ZType_bitset) && (wZType != ZType_bitsetFull)) {
+      utf8VaryingString wStr;
+      wStr.sprintf("Invalid format. While expecting <ZType_bitset>, found <%6X> <%s>.",wZType,decode_ZType(wZType));
+      statusbar->showMessage(wStr.toCChar());
+      displayMWn->appendTextColor(Qt::red,wStr.toCChar());
+      break;
+    }
+    if (wZType==ZType_bitset) {
+      wPtr -= sizeof(ZTypeBase);
+      ssize_t wSize=wPresence._importURF(wPtr);
+      wOffset += wSize;
+    } // if (wZType==ZType_bitset)
+
+    else if (wZType==ZType_bitsetFull) {
+      wPresence.setFullBitset();
+      wOffset += sizeof(ZTypeBase);
+    } // if (wZType==ZType_bitsetFull)
+     break;
+  }// while true
+  ZSearchDictionary& wDic = CurrentEntity->BuildDic;
+  ZCFMT_Type wCellFormat ;
+
+  while (wPtr < wPtrEnd) {
+    if (!wPresence.isFullBitset() && (wFieldRank >= int(wPresence.count())))
+      break;
+    if (wPresence[wFieldRank]) {
+      wCellFormat = wDic[wFieldRank].getCellFormat() |  wDic.getGlobalCellFormat();
+      wRow += DisplayOneURFField(wPtr,wPtrEnd,wCellFormat);
+    }
+    else
+      wRow += "<missing>";
+    wFieldRank++;
+  } // while
+
+  return wRow;
+} //DisplayOneLine
+
+
+utf8VaryingString
+ZSearchParser::DisplayOneURFField(const unsigned char *&pPtr,const unsigned char *wPtrEnd, ZCFMT_Type pCellFormat)
+{
+  ZTypeBase wZType;
+  size_t    wOffset=0;
+
+
+  ZStatus wSt=ZS_SUCCESS;
+
+  utf8VaryingString wStr;
+
+  _importAtomic<ZTypeBase>(wZType,pPtr);
+
+  /* for atomic URF data, value is just following ZType. For other types, use _importURF function that implies ZType */
+  if (!(wZType & ZType_Atomic))
+    pPtr -= sizeof(ZTypeBase);
+  else  {
+    wZType &= ~ZType_Atomic;
+    wOffset += sizeof(ZTypeBase);
+  }
+  switch (wZType) {
+  case ZType_UChar:
+  case ZType_U8: {
+    uint8_t wValue;
+
+    wValue=convertAtomicBack<uint8_t> (ZType_U8,pPtr);
+
+    if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+      wStr.sprintf("0x%X",wValue);
+    else
+      wStr.sprintf("%u",wValue);
+    return  wStr;
+  }
+  case ZType_Char:
+  case ZType_S8: {
+    int8_t wValue;
+    wValue=convertAtomicBack<int8_t> (ZType_S8,pPtr);
+    if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+      wStr.sprintf("0x%X",wValue);
+    else
+      wStr.sprintf("%d",wValue);
+    return wStr;
+  }
+  case ZType_U16:{
+    uint16_t wValue;
+    wValue=convertAtomicBack<uint16_t> (ZType_U16,pPtr);
+    if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+      wStr.sprintf("0x%X",wValue);
+    else
+        wStr.sprintf("%u",wValue);
+
+    return wStr;
+  }
+  case ZType_S16: {
+    int16_t wValue;
+    wValue=convertAtomicBack<int16_t> (ZType_S16,pPtr);
+    if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+      wStr.sprintf("0x%X",wValue);
+    else
+      wStr.sprintf("%d",wValue);
+    return wStr;
+  }
+
+  case ZType_U32:{
+    uint32_t wValue;
+    wValue=convertAtomicBack<uint32_t> (ZType_U32,pPtr);
+    if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+      wStr.sprintf("0x%X",wValue);
+    else
+      wStr.sprintf("%u",wValue);
+    return wStr;
+    break;
+  }
+  case ZType_S32: {
+    int32_t wValue;
+    wValue=convertAtomicBack<int32_t> (ZType_S32,pPtr);
+    if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+      wStr.sprintf("0x%X",wValue);
+    else
+      wStr.sprintf("%d",wValue);
+    return wStr;
+  }
+  case ZType_U64: {
+    uint64_t wValue;
+    wValue=convertAtomicBack<uint64_t> (ZType_U64,pPtr);
+    if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+      wStr.sprintf("0x%X",wValue);
+    else
+      wStr.sprintf("%llu",wValue);
+   return wStr;
+  }
+  case ZType_S64: {
+    int64_t wValue;
+    wValue=convertAtomicBack<int64_t> (ZType_S64,pPtr);
+    if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+      wStr.sprintf("0x%X",wValue);
+    else
+      wStr.sprintf("%lld",wValue);
+
+    return wStr;
+  }
+  case ZType_Float: {
+    float wValue;
+    wValue=convertAtomicBack<float> (ZType_Float,pPtr);
+    if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+      wStr.sprintf("0x%a",wValue);
+    else
+      wStr.sprintf("%g",wValue);
+    return wStr ;
+  }
+
+  case ZType_Double: {
+    double wValue;
+    wValue=convertAtomicBack<double> (ZType_Double,pPtr);
+
+    if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+      wStr.sprintf("0x%a",wValue);
+    else
+      wStr.sprintf("%g",wValue);
+    return wStr ;
+  }
+
+  case ZType_LDouble: {
+    long double wValue;
+    wValue=convertAtomicBack<long double> (ZType_LDouble,pPtr);
+
+    if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+      wStr.sprintf("0x%a",wValue);
+    else
+      wStr.sprintf("%g",wValue);
+    return wStr ;
+
+  }
+
+  case ZType_ZDateFull: {
+    ssize_t wSize;
+    ZDateFull wZDateFull;
+    utf8VaryingString wStr;
+
+    if ((wSize = wZDateFull._importURF(pPtr)) < 0) {
+      return "**Invalid date value**";
+    }
+    int wFmt = pCellFormat & ZCFMT_DateMask;
+    switch (wFmt)
+    {
+
+    case ZCFMT_DMY:
+      wStr=wZDateFull.toDMY();
+      break;
+    case ZCFMT_MDY:
+      wStr=wZDateFull.toMDY();
+      break;
+    case ZCFMT_MDYHMS:
+      wStr=wZDateFull.toMDYhms();
+      break;
+    case ZCFMT_DMYHMS:
+      wStr=wZDateFull.toDMYhms();
+      break;
+    case ZCFMT_DLocale:
+      wStr=wZDateFull.toLocale();
+      break;
+    case ZCFMT_DUTC:
+      wStr=wZDateFull.toUTCGMT();
+      break;
+    case ZCFMT_Nothing:
+    default:
+      wStr=wZDateFull.toLocale();
+      break;
+    }
+    return wStr;
+  } //ZType_ZDateFull
+
+  case ZType_URIString:{
+    uriString wString;
+    ssize_t wSize = wString._importURF(pPtr);
+
+    if (wString.strlen() > StringDiplayMax){
+      utf8VaryingString w1 = cst_OverflowChar8 ;
+      w1 += wString.Right(StringDiplayMax).toString();
+
+      wString = w1;
+    }
+
+    if (wString.isEmpty()) {
+      return "<empty string>";
+    }
+
+    return wString ;
+  }
+  case ZType_Utf8VaryingString: {
+    utf8VaryingString wString;
+    ssize_t wSize = wString._importURF(pPtr);
+
+    if (wString.strlen() > StringDiplayMax){
+      utf8VaryingString w1 = cst_OverflowChar8 ;
+      w1 += wString.Right(StringDiplayMax).toString();
+
+      wString = w1;
+    }
+
+    if (wString.isEmpty()) {
+      return "<empty string>";
+    }
+
+    return wString ;
+  }
+
+
+  case ZType_Utf16VaryingString:{
+    utf16VaryingString wString;
+
+    ssize_t wSize = wString._importURF(pPtr);
+    if (wString.strlen() > StringDiplayMax){
+      wString.truncate(StringDiplayMax);
+      wString.addUtfUnit(cst_OverflowChar16);
+    }
+    if (wString.isEmpty()) {
+      return  new QStandardItem("<empty string>");
+    }
+    return new QStandardItem(QString((const QChar *)wString.toString()));
+  }
+  case ZType_Utf32VaryingString:{
+    utf32VaryingString wString;
+    utf16VaryingString wAdd;
+
+    ssize_t wSize = wString._importURF(pPtr);
+    if (wString.strlen() > StringDiplayMax){
+      wString.truncate(StringDiplayMax);
+      wString.addUtfUnit(cst_OverflowChar32);
+      wString += wAdd ;
+    }
+    if (wString.isEmpty()) {
+      return new QStandardItem("<empty string>");
+    }
+
+    return wString.toUtf8();
+  }
+
+  case ZType_Utf8FixedString:{
+    utf8VaryingString wString;
+
+    URF_Capacity_type   wCapacity;
+    URF_UnitCount_type  wUnitsCount;
+    size_t              wStringByteSize;
+
+    pPtr += sizeof(ZTypeBase);
+
+    _importAtomic<URF_Capacity_type>(wCapacity,pPtr);
+    _importAtomic<URF_UnitCount_type>(wUnitsCount,pPtr);
+
+    wStringByteSize = size_t (wUnitsCount) * sizeof(utf8_t);
+
+    URF_Capacity_type wI = wUnitsCount;
+
+    wString.allocateUnitsBZero(size_t(wUnitsCount+1));
+
+    utf8_t* wPtrOut = (utf8_t*)wString.Data;
+    utf8_t* wPtrIn = (utf8_t*)pPtr;
+    while (wI--&& *wPtrIn )
+      *wPtrOut++ = *wPtrIn++;
+
+    pPtr = (unsigned char*) wPtrIn;
+
+    if (wUnitsCount > StringDiplayMax) {
+      wString.truncate(StringDiplayMax);
+      wString += cst_OverflowChar8 ;
+    }
+    wOffset += sizeof(ZTypeBase)+sizeof(URF_Capacity_type) +sizeof(URF_UnitCount_type)+ wStringByteSize;
+
+
+    if (wUnitsCount == 0)
+      return  "<empty string>";
+    else
+      return wString;
+  } // ZType_Utf8FixedString
+
+    /* for fixed string URF header is different */
+
+  case ZType_Utf16FixedString:{
+    utf16VaryingString wString;
+
+    URF_Capacity_type wCapacity;
+    URF_UnitCount_type  wUnitsCount;
+
+
+    pPtr += sizeof(ZTypeBase);
+
+    _importAtomic<URF_Capacity_type>(wCapacity,pPtr);
+    _importAtomic<URF_UnitCount_type>(wUnitsCount,pPtr);
+
+    size_t wStringByteSize = size_t (wUnitsCount) * sizeof(utf16_t);
+
+    /* the whole string must be imported, then possibly truncated afterwards to maximum displayable */
+
+    URF_Capacity_type wI = wUnitsCount;
+
+    wString.allocateUnitsBZero(size_t(wUnitsCount+1));
+
+    utf16_t* wPtrOut = (utf16_t*)wString.Data;
+    utf16_t* wPtrIn = (utf16_t*)pPtr;
+    while ( wI-- && *wPtrIn )
+      *wPtrOut++ = *wPtrIn++;
+
+    pPtr = (unsigned char*) wPtrIn;
+
+    if (wUnitsCount > StringDiplayMax) {
+      wString.truncate(StringDiplayMax);
+      wString.addUtfUnit( cst_OverflowChar16);
+    }
+    wOffset += sizeof(ZTypeBase) + sizeof(URF_Capacity_type) + sizeof(URF_UnitCount_type) + wStringByteSize ;
+
+
+    if (wUnitsCount == 0)
+      return "<empty string>";
+    else
+      return wString.toUtf8() ;
+    break;
+  }
+
+  case ZType_Utf32FixedString:{
+    utf32VaryingString wString;
+    URF_Capacity_type wCapacity;
+    URF_UnitCount_type  wUnitsCount;
+
+    pPtr += sizeof(ZTypeBase);
+
+    _importAtomic<URF_Capacity_type>(wCapacity,pPtr);
+    _importAtomic<URF_UnitCount_type>(wUnitsCount,pPtr);
+
+    size_t wStringByteSize = size_t (wUnitsCount) * sizeof(utf32_t);
+
+    URF_Capacity_type wI = wUnitsCount;
+
+    wString.allocateUnitsBZero(size_t(wUnitsCount+1));
+
+    utf32_t* wPtrOut = (utf32_t*)wString.Data;
+    utf32_t* wPtrIn = (utf32_t*)pPtr;
+
+    while (wI--&& *wPtrIn )
+      *wPtrOut++ = *wPtrIn++;
+
+    pPtr = (unsigned char*) wPtrIn;
+
+    if (wUnitsCount > StringDiplayMax) {
+      wString.truncate(StringDiplayMax);
+      wString.addUtfUnit(cst_OverflowChar32);
+    }
+    wOffset += sizeof(ZTypeBase) + sizeof(URF_Capacity_type) + sizeof(URF_UnitCount_type) + wStringByteSize ;
+
+    if (wUnitsCount == 0)
+      return "<empty string>";
+    else
+     return wString.toUtf8();
+  }
+
+  case ZType_CheckSum: {
+    checkSum wCheckSum;
+
+    wCheckSum._importURF(pPtr);
+    wOffset += wCheckSum.getURFSize();
+
+    return createItem(wCheckSum);
+  }
+
+  case ZType_MD5: {
+    md5 wCheckSum;
+
+    wCheckSum._importURF(pPtr);
+    wOffset += wCheckSum.getURFSize();
+
+    return createItem(wCheckSum);
+    break;
+  }
+
+  case ZType_Blob: {
+    uint64_t wDataSize;
+    pPtr += sizeof(ZTypeBase);
+    _importAtomic(wDataSize,pPtr);
+
+    pPtr += size_t(wDataSize);
+
+    return  new QStandardItem("<Blob content cannot be displayed>");
+    break;
+  }
+
+  case ZType_bitset: {
+    ZBitset wBitset;
+
+    ssize_t wSize=wBitset._importURF(pPtr);
+    utf8VaryingString wBS = "<";
+    wBS += wBitset.toString();
+    wBS += ">";
+
+    wOffset += wBitset.getURFSize();
+    return new QStandardItem(wBS.toCChar());
+
+    break;
+  }
+
+  case ZType_bitsetFull: {
+    pPtr += sizeof(ZTypeBase);
+    return new QStandardItem("All bits are set");
+  }
+
+  case ZType_Resource: {
+    ZResource wValue;
+    ssize_t wSize=wValue._importURF(pPtr);
+
+    if (!wValue.isValid()) {
+      return new QStandardItem("<Invalid resource>");
+    }
+    else {
+
+      int wFmt = pCellFormat & ZCFMT_ResMask;
+      if (wFmt & ZCFMT_ResSymb) {
+        int wi=0;
+        for (; wi < ZEntitySymbolList.count();wi++)
+          if (ZEntitySymbolList[wi].Value == wValue.Entity)
+            break;
+        utf8VaryingString wZEntitySymbol = "Unknown entity";
+        if (wi < ZEntitySymbolList.count())
+          wZEntitySymbol = ZEntitySymbolList[wi].Symbol;
+        if (wFmt & ZCFMT_ResStd) {
+          wStr.sprintf("ZResource[%s,%ld]",wZEntitySymbol.toCChar(),wValue.id);
+        }
+        else {
+          wStr.sprintf("ZResource[%s,0x%X]",wZEntitySymbol.toCChar(),wValue.id);
+        }
+      } // ZCFMT_ResSymb
+      else {
+        if (wFmt & ZCFMT_ResStd) {
+          wStr.sprintf("ZResource[%d,%ld]",wValue.Entity,wValue.id);
+        }
+        else {
+          wStr.sprintf("ZResource[0x%X,0x%X]",wValue.Entity,wValue.id);
+        }
+      }// else
+
+    } // else
+    return new  QStandardItem(wStr.toCChar());
+  }// ZType_Resource
+
+  default: {
+    pPtr += sizeof(ZTypeBase);
+    return new QStandardItem("--Unknown data type--");
+  }
+
+  }// switch
+
+
+  return new QStandardItem();
+} // DisplayOneURFField
+#endif // __COMMENT__
+
+
+ZStatus
+ZSearchParser::_parseContextFor(ZSearchContext& pContext)
+{
+
+}
+
+
+/*
+    save symbol ;
+    save symbol to <xml file path> ;
+
+    save instruction ;
+*/
+
+ZStatus
+ZSearchParser::_parseContextSave(ZSearchContext& pContext)
+{
+    ZStatus wSt=ZS_SUCCESS;
+
+    if (!pContext.advanceIndex()) /* skip save key word */
+        return ZS_SYNTAX_ERROR;
+
+    switch (pContext.CurrentToken->Type)
+    {
+    case ZSRCH_SYMBOL: {
+
+        if (pContext.isEOF()) {
+            uriString wXmlPath = __SEARCHPARSER_SYMBOL_FILE__;
+            bool wExists=wXmlPath.exists();
+            wSt = SymbolList.XmlSave(wXmlPath, &ErrorLog);
+            if (wSt==ZS_SUCCESS) {
+                ErrorLog.textLog("Symbol file %s successfully %s",wXmlPath.toString(),wExists?"replaced":"saved");
+                return wSt;
+            }
+            ErrorLog.errorLog("Cannot write symbol file %s status %s",wXmlPath.toString(),decode_ZStatus(wSt));
+            return wSt;
+        }
+        pContext.advanceIndex();
+
+        if (pContext.CurrentToken->Type!=ZSRCH_TO)  {
+            ErrorLog.errorLog("Expected keyword TO. Found %s instead line %d column %d",
+                     pContext.CurrentToken->Text.toString(), pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+            pContext.LastErroredToken=pContext.CurrentToken;
+            return ZS_MISS_KEYWORD;
+        }
+
+        pContext.advanceIndex();
+
+        if (pContext.CurrentToken->Type!=ZSRCH_STRING_LITERAL) {
+            ErrorLog.errorLog("Expected xml file path. Found %s instead line %d column %d",
+                     pContext.CurrentToken->Text.toString(), pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+            pContext.LastErroredToken=pContext.CurrentToken;
+            return ZS_MISS_KEYWORD;
+        }
+        uriString wXmlPath = pContext.CurrentToken->Text;
+        bool wExists=wXmlPath.exists();
+        wSt = SymbolList.XmlSave(wXmlPath, &ErrorLog);
+        if (wSt==ZS_SUCCESS) {
+            ErrorLog.textLog("Symbol file %s successfully %s",wXmlPath.toString(),wExists?"replaced":"saved");
+            return wSt;
+        }
+        ErrorLog.errorLog("Cannot write symbol file %s status %s",wXmlPath.toString(),decode_ZStatus(wSt));
+        return wSt;
+    }//ZSRCH_SYMBOL
+    default:
+        ErrorLog.errorLog("Expected one of {symbol,... }. Found %s instead line %d column %d",
+                 pContext.CurrentToken->Text.toString(), pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken=pContext.CurrentToken;
+        return ZS_MISS_KEYWORD;
+    }
+
+    /* here parsing of save whole context */
+    /*
+    while (pContext.notEOF()) {
+//        CurrentToken=pContext.CurrentToken;
+        while (true) {
+            if(pContext.CurrentToken->Type==ZSRCH_STRING_LITERAL)
+                break;
+        }
+    }
+    */
+    return ZS_SUCCESS;
+} //_parseContextSave
+
+
+ZStatus
+ZSearchParser::_parseContextShow(ZSearchContext& pContext)
+{
+  ZStatus wSt=ZS_SUCCESS;
+
+    if (!pContext.advanceIndex(true))
+        return pContext.Status;
+
+    switch(pContext.CurrentToken->Type)
+    {
+    case ZSRCH_HISTORY:
+    {
+        pContext.advanceIndex(false);
+
+        if (pContext.isEOF() ) {
+          showHistory();
+          return pContext.Status=ZS_SUCCESS ;
+        }
+
+        if (pContext.CurrentToken->Type!=ZSRCH_MAXIMUM) {
+            ErrorLog.errorLog("Expected either keyword <MAXIMUM> or end of instruction line. Found <%s> line %d column %d.",
+                     pContext.CurrentToken->Text.toString(),
+                     pContext.CurrentToken->TokenLine,
+                     pContext.CurrentToken->TokenColumn);
+            pContext.LastErroredToken = pContext.CurrentToken;
+          return pContext.Status=ZS_SYNTAX_ERROR;
+        }
+        showHistoryMaximum();
+        pContext.advanceIndex(false);
+        return pContext.Status=ZS_SUCCESS;
+    }// ZSRCH_HISTORY
+    case ZSRCH_ENTITY:
+    {
+        pContext.advanceIndex(false);
+        if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_IDENTIFIER) ) {
+            showEntityList();
+            return pContext.Status=ZS_SUCCESS;
+        }
+        pContext.TokenIdentifier = pContext.CurrentToken;
+
+        pContext.advanceIndex(false);
+        if (pContext.isEOF()) {
+        return showEntity (pContext,pContext.TokenIdentifier,0xFF);
+        }
+
+        int wShowType=SHENT_Nothing;
+        bool wLoop=true;
+        while (wLoop) {
+            switch (pContext.CurrentToken->Type)
+            {
+            case ZSRCH_WITH:
+                 wShowType |= SHENT_With ;
+                 pContext.advanceIndex(false);
+            case ZSRCH_USING:
+                wShowType |= SHENT_Using ;
+                pContext.advanceIndex(false);
+                break;
+            case ZSRCH_ALL:
+                wShowType |= SHENT_All ;
+                pContext.advanceIndex(false);
+                break;
+            case ZSRCH_IDENTIFIER:
+                if (!pContext.CurrentToken->Text.compareCase("BRIEF")) {
+                    wShowType |= SHENT_Brief;
+                    pContext.advanceIndex(false);
+                    break;
+                }
+                if (!pContext.CurrentToken->Text.compareCase("DICTIONARIES")) {
+                    wShowType |= SHENT_Dictionaries ;
+                    pContext.advanceIndex(false);
+                    break;
+                }
+                wLoop=false;
+                break;
+            case ZSRCH_SEMICOLON:
+            default:
+                wLoop=false;
+                break;
+            } // switch
+
+        } // while
+
+        return showEntity (pContext,pContext.TokenIdentifier,wShowType);
+
+     }//ZSRCH_ENTITY
+
+    case ZSRCH_SYMBOL:
+    {
+        pContext.advanceIndex(false);
+        if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_IDENTIFIER) ) {
+            showSymbols();
+            return pContext.Status=ZS_SUCCESS;
+        }
+
+        /* here we have an identifier following SHOW SYMBOL : specific symbol name to show */
+        showSymbol (pContext,pContext.CurrentToken);
+        pContext.advanceIndex(false);
+        return pContext.Status ;
+    }//ZSRCH_SYMBOL
+    case ZSRCH_MASTERFILES:
+    {
+        showMasterFiles();
+//        pContext.advanceIndex(false);
+        return pContext.Status=ZS_SUCCESS;
+    }// ZSRCH_MASTERFILES
+
+    case ZSRCH_DISPLAY :
+    {
+        showDisplay();
+        pContext.advanceIndex(false);
+        return  pContext.Status=ZS_SUCCESS;
+    }
+
+
+    case ZSRCH_IDENTIFIER: /* if identifier : must be an entity name */
+    {
+        pContext.TokenIdentifier = pContext.CurrentToken;
+
+        pContext.advanceIndex(false);
+        if (pContext.isEOF()) {
+        return showEntity (pContext,pContext.TokenIdentifier,0xFF);
+        }
+
+        int wShowType=SHENT_Nothing;
+        bool wLoop=true;
+        while (wLoop) {
+
+            switch (pContext.CurrentToken->Type)
+            {
+            case ZSRCH_WITH:
+                 wShowType |= SHENT_With ;
+                 pContext.advanceIndex(false);
+            case ZSRCH_USING:
+                wShowType |= SHENT_Using ;
+                pContext.advanceIndex(false);
+                break;
+            case ZSRCH_ALL:
+                wShowType |= SHENT_All ;
+                pContext.advanceIndex(false);
+                break;
+            case ZSRCH_IDENTIFIER:
+                if (!pContext.CurrentToken->Text.compareCase("BRIEF")) {
+                    wShowType |= SHENT_Brief;
+                    pContext.advanceIndex(false);
+                    break;
+                }
+                if (!pContext.CurrentToken->Text.compareCase("DICTIONARIES")) {
+                    wShowType |= SHENT_Dictionaries ;
+                    pContext.advanceIndex(false);
+                    break;
+                }
+                wLoop=false;
+                break;
+            case ZSRCH_SEMICOLON:
+            default:
+                wLoop=false;
+                break;
+            } // switch
+            if (pContext.isEOF())
+                break;
+        } // while
+
+        return showEntity (pContext,pContext.TokenIdentifier,wShowType);
+
+
+    }//ZSRCH_IDENTIFIER
+    default:
+    {
+        /* if not one of above, then syntax error */
+        pContext.LastErroredToken = pContext.CurrentToken;
+        ErrorLog.errorLog("Syntax error: Found <%s> while expecting one of {ENTITY,MASTERFILE,SYMBOL,ZENTITY} at line %d column %d.",
+            pContext.CurrentToken->Text.toString(),pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+
+        /* suggest keywords */
+        ZArray<utf8VaryingString> wSugArray ={"ENTITY","MASTERFILE","SYMBOL","ZENTITY" };
+        /* add entities names to suggest */
+        for (int wi=0;wi < EntityList.count();wi++)
+            wSugArray.push(EntityList[wi]->EntityName);
+
+        /* try to suggest */
+        utf8VaryingString wSuggest=searchAdHocWeighted (pContext.CurrentToken->Text,wSugArray);
+        if (!wSuggest.isEmpty())
+            ErrorLog.textLog("Do you mean <%s> ?", wSuggest.toString() );
+
+        return pContext.Status=ZS_SYNTAX_ERROR;
+    }  // default
+    }// switch
+
+
+} // ZSearchParser::_parseContextShow
+
+
+ZStatus
+ZSearchParser::_parseContextShowEntity(ZSearchContext& pContext)
+{
+
+    int wEntityIndex=0;
+    for (; wEntityIndex < EntityList.count(); wEntityIndex++) {
+      if (EntityList[wEntityIndex]->getEntityName() == pContext.CurrentToken->Text) {
+          break;
+      } // if (EntityList[wEnti
+    }// for
+
+
+    if (wEntityIndex >= EntityList.count()) {
+      ErrorLog.errorLog("Syntax error: Unrecognized keyword <%s> while expecting one of {ENTITY,MASTERFILE,SYMBOL,ZENTITY,<valid entity name>} at line %d column %d.",
+          pContext.CurrentToken->Text.toString() ,pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
+
+        /* suggest keywords */
+        ZArray<utf8VaryingString> wSugArray ={"ENTITY","MASTERFILE","SYMBOL","ZENTITY" };
+        /* add entities names to suggest */
+        for (int wi=0;wi < EntityList.count();wi++)
+            wSugArray.push(EntityList[wi]->EntityName);
+
+        /* try to suggest */
+        utf8VaryingString wSuggest=searchAdHocWeighted (pContext.CurrentToken->Text,wSugArray);
+        if (!wSuggest.isEmpty())
+            ErrorLog.textLog("Do you mean <%s> ?", wSuggest.toString() );
+
+      return pContext.Status=ZS_SYNTAX_ERROR;
+    }
+
+    pContext.SourceEntity = EntityList[wEntityIndex] ;
+    pContext.TokenIdentifier = pContext.CurrentToken;
+
+    pContext.advanceIndex(false);
+
+    int wF=3;
+    if (pContext.isEOF()) {
+        wF=3;
+        showEntityDetails(EntityList[wEntityIndex],wF);
+        return pContext.Status= ZS_SUCCESS;
+    }
+
+    switch (pContext.CurrentToken->Type)
+    {
+//        case ZSRCH_SEMICOLON:
+
+    case ZSRCH_STRING_LITERAL:
+    {
+        pContext.Status = showEntityField(pContext,EntityList[wEntityIndex],pContext.CurrentToken->Text);
+        if (pContext.Status!=ZS_SUCCESS)
+            return pContext.Status ;
+        pContext.advanceIndex(false);
+        return pContext.Status ;
+     }
+
+    case ZSRCH_IDENTIFIER:  /* request to show an entity field */
+    {
+        utf8VaryingString wSearchField = pContext.CurrentToken->Text;
+        pContext.advanceIndex(false);
+        if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_OPERATOR_MULTIPLY) ) {
+            for (int wi=0; wi < pContext.SourceEntity->LocalMetaDic.count(); wi++) {
+                if (pContext.SourceEntity->LocalMetaDic[wi].getName()==pContext.CurrentToken->Text) {
+                    _displayOneFieldDetail(pContext.SourceEntity->LocalMetaDic[wi]);
+                    return pContext.Status=ZS_SUCCESS;
+                }
+            }// for
+
+            /* field name not found
+                NB : if eof then current token points to the last valid token before eof
+            */
+            ErrorLog.errorLog("Entity <%s> has no field named <%s> at line %d column %d.",
+                pContext.CurrentToken->Text.toString() ,pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+              pContext.LastErroredToken = pContext.CurrentToken;
+
+            ZArray<utf8VaryingString> wSugArray ;
+            /* add entities names to suggest */
+            for (int wi=0;wi < EntityList.count();wi++)
+                wSugArray.push(EntityList[wi]->EntityName);
+
+            /* try to suggest */
+            utf8VaryingString wSuggest=searchAdHocWeighted (pContext.CurrentToken->Text,wSugArray);
+            if (!wSuggest.isEmpty())
+                ErrorLog.textLog("Do you mean <%s> ?", wSuggest.toString() );
+
+            return pContext.Status=ZS_INVNAME;
+        }// isEOF
+/*
+        if (pContext.CurrentToken->Type != ZSRCH_OPERATOR_MULTIPLY) {
+            ErrorLog.errorLog("Invalid token <%s> at line %d column %d.",
+                pContext.CurrentToken->Text.toString() ,pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+              pContext.LastErroredToken = pContext.CurrentToken;
+              return pContext.Status=ZS_SYNTAX_ERROR;
+        }
+*/
+        /* here current token is wild card for end of field name */
+        bool wFound=false;
+        for (int wi=0; wi < pContext.SourceEntity->LocalMetaDic.count(); wi++) {
+            if (pContext.SourceEntity->LocalMetaDic[wi].getName().startsWithT(wSearchField)) {
+                _displayOneFieldDetail(pContext.SourceEntity->LocalMetaDic[wi]);
+                wFound=true;
+            }
+        }// for
+
+        if (!wFound) {
+            ErrorLog.errorLog("Entity <%s> has no field with name starting with <%s> at line %d column %d.",
+                wSearchField.toString() ,pContext.previousToken()->TokenLine,pContext.previousToken()->TokenColumn);
+              pContext.LastErroredToken = pContext.previousToken();
+
+            ZArray<utf8VaryingString> wSugArray ;
+            /* add entities names to suggest */
+            for (int wi=0;wi < EntityList.count();wi++)
+                wSugArray.push(EntityList[wi]->EntityName);
+
+            /* try to suggest */
+            utf8VaryingString wSuggest=searchAdHocWeighted (pContext.CurrentToken->Text,wSugArray);
+            if (!wSuggest.isEmpty())
+                ErrorLog.textLog("Do you mean <%s> ?", wSuggest.toString() );
+            return pContext.Status=ZS_INVNAME;
+        }
+        pContext.advanceIndex(false);
+        return pContext.Status=ZS_SUCCESS;
+
+    } // ZSRCH_IDENTIFIER
+
+    case ZSRCH_OPERATOR_MULTIPLY: /* wild card for beginning of name (ends with) or alone (all) or wild card-string-wild card (contains) */
+    {
+        bool wFound=false;
+        pContext.advanceIndex(false);
+        if (pContext.isEOF()) {  /* wild card alone : all fields requested to be displayed */
+            for (int wi=0; wi < pContext.SourceEntity->LocalMetaDic.count(); wi++) {
+                 _displayOneFieldDetail(pContext.SourceEntity->LocalMetaDic[wi]);
+                 wFound=true;
+            }// for
+
+            return pContext.Status=ZS_SUCCESS;
+        }
+        /*
+        if (pContext.CurrentToken->Type != ZSRCH_IDENTIFIER) {
+            ErrorLog.errorLog("Expected identifier at line %d column %d. Found <%s>",
+                pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString());
+              pContext.LastErroredToken = pContext.CurrentToken;
+            return pContext.Status=ZS_SYNTAX_ERROR ;
+        }
+        */
+
+        utf8VaryingString wSearchField = pContext.CurrentToken->Text;
+        pContext.advanceIndex(false);
+        if (pContext.isEOF()||(pContext.CurrentToken->Type != ZSRCH_OPERATOR_MULTIPLY)) {
+            for (int wi=0; wi < pContext.SourceEntity->LocalMetaDic.count(); wi++) {
+                if (pContext.SourceEntity->LocalMetaDic[wi].getName().endsWithT(wSearchField)) {
+                    _displayOneFieldDetail(pContext.SourceEntity->LocalMetaDic[wi]);
+                    wFound=true;
+                }
+            }// for
+            if (!wFound) {
+                ErrorLog.errorLog("Entity <%s> has no field with name ending with <%s> at line %d column %d.",
+                                  pContext.SourceEntity->getEntityName().toString(),
+                                  wSearchField.toString() ,pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+                  pContext.LastErroredToken = pContext.CurrentToken;
+            }
+            return pContext.Status=ZS_SUCCESS;
+        }// isEOF
+
+/*        if (pContext.CurrentToken->Type != ZSRCH_OPERATOR_MULTIPLY) {
+            ErrorLog.errorLog("Invalid token <%s> at line %d column %d.",
+                pContext.CurrentToken->Text.toString() ,pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+              pContext.LastErroredToken = pContext.CurrentToken;
+              return pContext.Status=ZS_SYNTAX_ERROR;
+        }
+*/
+        /* here search string enclosed in wild cards : contains */
+        wFound=false;
+        for (int wi=0; wi < pContext.SourceEntity->LocalMetaDic.count(); wi++) {
+            if (pContext.SourceEntity->LocalMetaDic[wi].getName().containsT(wSearchField)) {
+                _displayOneFieldDetail(pContext.SourceEntity->LocalMetaDic[wi]);
+                wFound=true;
+            }
+        }// for
+
+        if (!wFound) {
+            ErrorLog.errorLog("Entity <%s> has no field with name containing <%s> at line %d column %d.",
+                wSearchField.toString() ,pContext.previousToken()->TokenLine,pContext.previousToken()->TokenColumn);
+              pContext.LastErroredToken = pContext.previousToken();
+
+            ZArray<utf8VaryingString> wSugArray ;
+            /* add entities names to suggest */
+            for (int wi=0;wi < EntityList.count();wi++)
+                wSugArray.push(EntityList[wi]->EntityName);
+
+            /* try to suggest */
+            utf8VaryingString wSuggest=searchAdHocWeighted (pContext.CurrentToken->Text,wSugArray);
+            if (!wSuggest.isEmpty())
+                ErrorLog.textLog("Do you mean <%s> ?", wSuggest.toString() );
+            return pContext.Status=ZS_INVNAME;
+        }
+        pContext.advanceIndex(false);
+        return pContext.Status=ZS_SUCCESS;
+
+    } // ZSRCH_OPERATOR_MULTIPLY
+
+    case ZSRCH_ALL:
+        wF=3;
+        break;
+    case ZSRCH_FIELDS:
+        wF=1;
+        break;
+    case ZSRCH_FORMULA:
+        wF=2;
+        break;
+    default:
+        pContext.LastErroredToken = pContext.CurrentToken;
+        ErrorLog.errorLog("Syntax error: Found <%s> while expecting one of {ALL,FORMULA,FIELDS} at line %d column %d.",
+                 pContext.CurrentToken->Text.toString(),pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentToken;
+
+        ZArray<utf8VaryingString> wSugArray ={"ALL","FORMULA","FIELDS" };
+        utf8VaryingString wSuggest=searchAdHocWeighted (pContext.CurrentToken->Text,wSugArray);
+        if (!wSuggest.isEmpty())
+            ErrorLog.textLog("Do you mean <%s> ?", wSuggest.toString() );
+
+        return ZS_SYNTAX_ERROR;
+    }
+
+    showEntityDetails(EntityList[wEntityIndex],wF);
+
+    return pContext.Status=ZS_SUCCESS;
+
+} // ZSearchParser::_parseContextShowEntity
+
+void
+ZSearchParser::_displayOneFieldDetail(const ZFieldDescription& pField)
+{
+    ErrorLog.textLog("%25s %25s ",
+            pField.getName().toString(),
+            decode_ZType(pField.ZType));
+}
+#ifdef __COMMENT__
+ZStatus
+ZSearchParser::_executeFind(std::shared_ptr <ZSearchEntity>  pCollection)
+{
+    if(pCollection==nullptr) {
+        ErrorLog.errorLog("ZSearchParser::_executeFind-E-NULLPTR Requested collection to execute is null.");
+        return ZS_NULLPTR;
+    }
   pCollection->AddressList.clear();
   ZDataBuffer wRecord;
   if (ProgressSetupCallBack!=nullptr)
-    ProgressSetupCallBack(int(pCollection->getMaxRecords()));
+    ProgressSetupCallBack(int(pCollection->_rootGetCount()),"Finding collection");
   if (ProgressCallBack!=nullptr)
-    ProgressCallBack(0);
+    ProgressCallBack(0,"Preparing");
   long wRank=0;
   zaddress_type wAddress=0;
 
   ZTimer wTi;
   wTi.start();
 
-  ZStatus wSt=pCollection->get(wRecord,wRank,wAddress);
+  pCollection->AddressList.clear();
+
+  ZStatus wSt=pCollection->_baseGet(wRecord,wRank,wAddress);
   int wSelected=0;
   int wUpdate=0;
   bool wResult;
@@ -3446,7 +8008,11 @@ ZSearchParser::_executeFind(std::shared_ptr<_BaseCollectionEntity> pCollection)
 
   while (wSt==ZS_SUCCESS) {
     _DBGPRINT("ZSearchParser::_executeFind processing record rank %ld\n",wRank)
-    wSt=pCollection->evaluate(wResult,wRecord);
+//    wSt=pCollection->evaluateRecord(wResult,wRecord);
+    wSt=pCollection->evaluateRecord(wResult);
+    _DBGPRINT("ZSearchParser::_executeFind evaluate status <%s> result is <%s>\n",
+              decode_ZStatus(wSt),
+              wResult?"true":"false")
     if(wResult) {
       pCollection->AddressList.push(wAddress);
       wSelected++;
@@ -3456,34 +8022,34 @@ ZSearchParser::_executeFind(std::shared_ptr<_BaseCollectionEntity> pCollection)
       wUpdate++;
       if (wUpdate > UpdateFrequence) {
         wUpdate=0;
-        ProgressCallBack(wRank);
+        ProgressCallBack(wRank,utf8VaryingString());
       }
     }
     wRank++;
-    wSt=pCollection->get(wRecord,wRank,wAddress);
+    wSt=pCollection->_baseGet(wRecord,wRank,wAddress);
   } // while ZS_SUCCESS
 /*
   if (wSt==ZS_OUTBOUNDHIGH) {
     wSt=ZS_SUCCESS;
   }
 */
-  ProgressCallBack(wRank);
+  ProgressCallBack(wRank,utf8VaryingString());
 
   wTi.end();
-  infoLog("_executeFind report\n"
+  ErrorLog.infoLog("_executeFind report\n"
           " Number of record processed  %d\n"
           " Matches (address count)     %d\n"
           " End status                  %s\n"
           " Elapsed                     %s",
-      wRank,pCollection->AddressList.count(),decode_ZStatus(wSt),wTi.reportElapsed().toString());
+      wRank,pCollection->AddressList.count(),decode_ZStatus(wSt),wTi.reportDeltaTime().toString());
 
   return wSt;
 }
-
+#endif // __COMMENT__
 
 void ZSearchParser::displayTokenList(ZArray<ZSearchToken*> &Whole)
 {
-  Tokenizer->_print("    Token list  <%ld>\n",Whole.count());
+  ZSearchTokenizer::_print("    Token list  <%ld>\n",Whole.count());
   for (long wi=0;wi<Whole.count();wi++)
     fprintf(stdout,"     %3ld [line %d col %d]  %15s-<%15s> \n",
         wi,Whole[wi]->TokenLine,Whole[wi]->TokenColumn,
@@ -3510,17 +8076,17 @@ ZSearchParser::loadXmlSearchParserZEntity(const uriString& pXmlFile)
   utf8VaryingString wXmlString;
   ZStatus wSt;
 
-  setAutoPrintOn(ZAIES_Text);
+  ErrorLog.setAutoPrintOn(ZAIES_Text);
 
   if (!pXmlFile.exists())  {
-    errorLog("ZSearchParser::loadXmlSearchParserZEntity-E-FILNFND Parameter file <%s> has not been found.",pXmlFile.toCChar());
+    ErrorLog.errorLog("ZSearchParser::loadXmlSearchParserZEntity-E-FILNFND Parameter file <%s> has not been found.",pXmlFile.toCChar());
     return ZS_FILENOTEXIST;
   }
 
   URIZEntity=pXmlFile;
 
   if ((wSt=URIZEntity.loadUtf8(wXmlString))!=ZS_SUCCESS) {
-    logZException();
+    ErrorLog.logZExceptionLast();
     return wSt;
   }
 
@@ -3541,8 +8107,8 @@ ZSearchParser::loadXmlSearchParserZEntity(const uriString& pXmlFile)
   wDoc = new zxmlDoc;
   wSt = wDoc->ParseXMLDocFromMemory(wXmlString.toCChar(), wXmlString.getUnitCount(), nullptr, 0);
   if (wSt != ZS_SUCCESS) {
-    logZException();
-    errorLog(
+    ErrorLog.logZExceptionLast();
+    ErrorLog.errorLog(
         "ZSearchParser::loadXmlSearchParserZEntity-E-PARSERR Xml parsing error for string <%s> ",
         wXmlString.subString(0, 25).toUtf());
     return wSt;
@@ -3550,11 +8116,11 @@ ZSearchParser::loadXmlSearchParserZEntity(const uriString& pXmlFile)
 
   wSt = wDoc->getRootElement(wRoot);
   if (wSt != ZS_SUCCESS) {
-    logZException();
+    ErrorLog.logZExceptionLast();
     return wSt;
   }
   if (!(wRoot->getName() == "zsearchparserzentity")) {
-    errorLog(
+    ErrorLog.errorLog(
         "ZSearchParser::loadXmlSearchParserZEntity-E-INVROOT Invalid root node name <%s> expected <zsearchparserzentity>",
         wRoot->getName().toCChar());
     return ZS_XMLINVROOTNAME;
@@ -3565,7 +8131,7 @@ ZSearchParser::loadXmlSearchParserZEntity(const uriString& pXmlFile)
   while (true) {
     wSt=wRoot->getChildByName((zxmlNode*&)wSymbolListNode,"zentitytable");
     if (wSt!=ZS_SUCCESS) {
-      logZStatus(
+      ErrorLog.logZStatus(
           ZAIES_Error,
           wSt,
           "ZSearchParser::loadXmlSearchParserZEntity-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
@@ -3577,33 +8143,33 @@ ZSearchParser::loadXmlSearchParserZEntity(const uriString& pXmlFile)
 
     wSt=wSymbolListNode->getFirstChild((zxmlNode*&)wSymbolKeyword);
 
-    ZSearchFileZEntity wZEntityElt;
+    ZEntitySymbol wZEntityElt;
     while (wSt==ZS_SUCCESS) {
       if (wSymbolKeyword->getName()=="zentityitem") {
-        wSt=XMLgetChildText( wSymbolKeyword,"zentity",wKeyword,this);
+        wSt=XMLgetChildText( wSymbolKeyword,"zentity",wKeyword,&ErrorLog);
         if (wSt >= 1)
            wZEntityElt.Symbol = wKeyword ;
 
-        wSt=XMLgetChildLongHexa( wSymbolKeyword,"value",wValue,this);
+        wSt=XMLgetChildLongHexa( wSymbolKeyword,"value",wValue,&ErrorLog);
         wZEntityElt.Value = wValue;
 
-        ZEntityList.push(wZEntityElt);
+        ZEntitySymbolList.push(wZEntityElt);
       } // typeconversion
       wSt=wSymbolKeyword->getNextNode((zxmlNode*&)wSwapNode);
       XMLderegister(wSymbolKeyword);
       wSymbolKeyword=wSwapNode;
     }// while (wSt==ZS_SUCCESS)
 
-    textLog("_________________Search Parser ZEntity table load ____________________\n"
-                              " %ld ZEntity values loaded.\n", ZEntityList.count());
-    textLog("%3s- %27s %10s\n","rnk","ZEntity","Value");
-    for (long wi=0;wi<ZEntityList.count();wi++) {
-      textLog("%3ld- <%25s> <0x%08lX>\n",wi+1,
-          ZEntityList[wi].Symbol.toString(),
-          ZEntityList[wi].Value
+    ErrorLog.textLog("_________________Search Parser ZEntity table load ____________________"
+                              " %ld ZEntity values loaded.", ZEntitySymbolList.count());
+    ErrorLog.textLog("%3s- %25s %8s\n","rnk","ZEntity","Value");
+    for (long wi=0;wi<ZEntitySymbolList.count();wi++) {
+      ErrorLog.textLog("%3ld- %25s 0x%08lX",wi+1,
+          ZEntitySymbolList[wi].Symbol.toString(),
+          ZEntitySymbolList[wi].Value
           );
     }
-    textLog("________________________________________________________________\n");
+    ErrorLog.textLog("________________________________________________________________\n");
     XMLderegister(wSymbolListNode);
     break;
   } // while (true)
@@ -3667,19 +8233,19 @@ ZSearchParser::loadXmlSearchParserSymbols(const uriString& pXmlFile)
   utf8VaryingString wXmlString;
   ZStatus wSt;
 
-  setAutoPrintOn(ZAIES_Text);
+  ErrorLog.setAutoPrintOn(ZAIES_Text);
 
-   textLog(" Loading symbol table <%s>",pXmlFile.toString());
+  ErrorLog.textLog(" Loading symbol table <%s>",pXmlFile.toString());
 
   if (!pXmlFile.exists())  {
-    errorLog("ZSearchParser::loadXmlSearchParserSymbols-E-FILNFND Parameter file <%s> has not been found.",pXmlFile.toCChar());
+    ErrorLog.errorLog("ZSearchParser::loadXmlSearchParserSymbols-E-FILNFND Parameter file <%s> has not been found.",pXmlFile.toCChar());
     return ZS_FILENOTEXIST;
   }
 
   URIZEntity=pXmlFile;
 
   if ((wSt=URIZEntity.loadUtf8(wXmlString))!=ZS_SUCCESS) {
-    logZException();
+    ErrorLog.logZExceptionLast();
     return wSt;
   }
 
@@ -3701,8 +8267,8 @@ ZSearchParser::loadXmlSearchParserSymbols(const uriString& pXmlFile)
   wDoc = new zxmlDoc;
   wSt = wDoc->ParseXMLDocFromMemory(wXmlString.toCChar(), wXmlString.getUnitCount(), nullptr, 0);
   if (wSt != ZS_SUCCESS) {
-    logZException();
-    errorLog(
+    ErrorLog.logZExceptionLast();
+    ErrorLog.errorLog(
         "ZSearchParser::loadXmlSearchParserSymbols-E-PARSERR Xml parsing error for string <%s> ",
         wXmlString.subString(0, 25).toUtf());
     return wSt;
@@ -3710,11 +8276,11 @@ ZSearchParser::loadXmlSearchParserSymbols(const uriString& pXmlFile)
 
   wSt = wDoc->getRootElement(wRoot);
   if (wSt != ZS_SUCCESS) {
-    logZException();
+    ErrorLog.logZExceptionLast();
     return wSt;
   }
   if (!(wRoot->getName() == "zsearchparsersymbol")) {
-    errorLog(
+    ErrorLog.errorLog(
         "ZSearchParser::loadXmlSearchParserSymbols-E-INVROOT Invalid root node name <%s> expected <zsearchparsersymbol>",
         wRoot->getName().toCChar());
     return ZS_XMLINVROOTNAME;
@@ -3725,7 +8291,7 @@ ZSearchParser::loadXmlSearchParserSymbols(const uriString& pXmlFile)
   while (true) {
     wSt=wRoot->getChildByName((zxmlNode*&)wSymbolListNode,"symboltable");
     if (wSt!=ZS_SUCCESS) {
-      logZStatus(
+      ErrorLog.logZStatus(
           ZAIES_Error,
           wSt,
           "ZSearchParser::loadXmlSearchParserSymbols-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
@@ -3737,7 +8303,9 @@ ZSearchParser::loadXmlSearchParserSymbols(const uriString& pXmlFile)
 
     wSt=wSymbolListNode->getFirstChild((zxmlNode*&)wSymbolKeyword);
 
-    ZSearchFileSymbol wSymbolElt;
+    ZSearchSymbol wSymbolElt;
+
+#ifdef __DEPRECATED__
     while (wSt==ZS_SUCCESS) {
       if (wSymbolKeyword->getName()=="symbolitem") {
         wSt=XMLgetChildText( wSymbolKeyword,"symbol",wKeyword,this);
@@ -3753,17 +8321,27 @@ ZSearchParser::loadXmlSearchParserSymbols(const uriString& pXmlFile)
       XMLderegister(wSymbolKeyword);
       wSymbolKeyword=wSwapNode;
     }// while (wSt==ZS_SUCCESS)
+#endif // __DEPRECATED__
 
-    textLog("_________________Search Parser symbols table load ____________________\n"
+
+    while (wSt==ZS_SUCCESS) {
+        wSt=wSymbolElt.fromXml(wSymbolKeyword);
+        SymbolList.push(wSymbolElt);
+        wSt=wSymbolKeyword->getNextNode((zxmlNode*&)wSwapNode);
+        XMLderegister(wSymbolKeyword);
+        wSymbolKeyword=wSwapNode;
+    }// while (wSt==ZS_SUCCESS)
+
+    ErrorLog.textLog("_________________Search Parser symbols table load ____________________\n"
                               " %ld symbols loaded.\n", SymbolList.count());
-    textLog("%3s- %27s %s\n","rnk","Symbol","Path");
+    ErrorLog.textLog("%3s- %27s %s\n","rnk","Symbol","Content");
     for (long wi=0;wi<SymbolList.count();wi++) {
-      textLog("%3ld- <%25s> <%s>\n",wi+1,
-          SymbolList[wi].Symbol.toString(),
-          SymbolList[wi].Path.toString()
+      ErrorLog.textLog("%3ld- <%25s> <%s>",wi+1,
+          SymbolList[wi].FullFieldName.toString(),
+          SymbolList[wi].display().toString()
           );
     }
-    textLog("________________________________________________________________\n");
+    ErrorLog.textLog("________________________________________________________________\n");
     XMLderegister(wSymbolListNode);
     break;
   } // while (true)
@@ -3807,19 +8385,19 @@ ZSearchParser::loadXmlSearchParserParams(const uriString& pXmlFile)
   utf8VaryingString wXmlString;
   ZStatus wSt;
 
-  setAutoPrintOn(ZAIES_Text);
+  ErrorLog.setAutoPrintOn(ZAIES_Text);
 
-  textLog(" Loading symbol table <%s>",pXmlFile.toString());
+  ErrorLog.textLog(" Loading symbol table <%s>",pXmlFile.toString());
 
   if (!pXmlFile.exists())  {
-    errorLog("ZSearchParser::loadXmlSearchParserParams-E-FILNFND Parameter file <%s> has not been found.",pXmlFile.toCChar());
+    ErrorLog.errorLog("ZSearchParser::loadXmlSearchParserParams-E-FILNFND Parameter file <%s> has not been found.",pXmlFile.toCChar());
     return ZS_FILENOTEXIST;
   }
 
   URIParams=pXmlFile;
 
   if ((wSt=URIParams.loadUtf8(wXmlString))!=ZS_SUCCESS) {
-    logZException();
+    ErrorLog.logZExceptionLast();
     return wSt;
   }
 
@@ -3841,8 +8419,8 @@ ZSearchParser::loadXmlSearchParserParams(const uriString& pXmlFile)
   wDoc = new zxmlDoc;
   wSt = wDoc->ParseXMLDocFromMemory(wXmlString.toCChar(), wXmlString.getUnitCount(), nullptr, 0);
   if (wSt != ZS_SUCCESS) {
-    logZException();
-    errorLog(
+    ErrorLog.logZExceptionLast();
+    ErrorLog.errorLog(
         "ZSearchParser::loadXmlSearchParserSymbols-E-PARSERR Xml parsing error for string <%s> ",
         wXmlString.subString(0, 25).toUtf());
     return wSt;
@@ -3850,11 +8428,11 @@ ZSearchParser::loadXmlSearchParserParams(const uriString& pXmlFile)
 
   wSt = wDoc->getRootElement(wRoot);
   if (wSt != ZS_SUCCESS) {
-    logZException();
+    ErrorLog.logZExceptionLast();
     return wSt;
   }
   if (!(wRoot->getName() == "zsearchparsersymbol")) {
-    errorLog(
+    ErrorLog.errorLog(
         "ZSearchParser::loadXmlSearchParserSymbols-E-INVROOT Invalid root node name <%s> expected <zsearchparsersymbol>",
         wRoot->getName().toCChar());
     return ZS_XMLINVROOTNAME;
@@ -3865,7 +8443,7 @@ ZSearchParser::loadXmlSearchParserParams(const uriString& pXmlFile)
   while (true) {
     wSt=wRoot->getChildByName((zxmlNode*&)wParamsNode,"symboltable");
     if (wSt!=ZS_SUCCESS) {
-      logZStatus(
+      ErrorLog.logZStatus(
           ZAIES_Error,
           wSt,
           "ZSearchParser::loadXmlSearchParserSymbols-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
@@ -3877,9 +8455,10 @@ ZSearchParser::loadXmlSearchParserParams(const uriString& pXmlFile)
 
     wSt=wParamsNode->getFirstChild((zxmlNode*&)wParamKeyword);
 
-    ZSearchFileSymbol wSymbolElt;
+    ZSearchSymbol wSymbolElt;
     while (wSt==ZS_SUCCESS) {
-      if (wParamKeyword->getName()=="symbolitem") {
+      wSt =  wSymbolElt.fromXml(wParamKeyword,"symbolitem",&ErrorLog);
+/*      if (wParamKeyword->getName()=="symbolitem") {
         wSt=XMLgetChildText( wParamKeyword,"symbol",wKeyword,this);
         if (wSt >= 1)
           wSymbolElt.Symbol = wKeyword ;
@@ -3889,28 +8468,30 @@ ZSearchParser::loadXmlSearchParserParams(const uriString& pXmlFile)
 
         SymbolList.push(wSymbolElt);
       } // typeconversion
+*/
+      SymbolList.push(wSymbolElt);
       wSt=wParamKeyword->getNextNode((zxmlNode*&)wSwapNode);
       XMLderegister(wParamKeyword);
       wParamKeyword=wSwapNode;
     }// while (wSt==ZS_SUCCESS)
 
-    textLog("_________________Search Parser symbols table load ____________________\n"
-            " %ld symbols loaded.\n", SymbolList.count());
-    textLog("%3s- %27s %s\n","rnk","Symbol","Path");
-    for (long wi=0;wi<SymbolList.count();wi++) {
-      textLog("%3ld- <%25s> <%s>\n",wi+1,
-          SymbolList[wi].Symbol.toString(),
-          SymbolList[wi].Path.toString()
-          );
-    }
-    textLog("________________________________________________________________\n");
     XMLderegister(wParamsNode);
     break;
   } // while (true)
 
-
   XMLderegister((zxmlNode *&) wParamRootNode);
   XMLderegister((zxmlNode *&) wRoot);
+
+  ErrorLog.textLog("_________________Search Parser symbols table load ____________________\n"
+          " %ld symbols loaded.\n", SymbolList.count());
+  ErrorLog.textLog("%3s- %27s %s\n","rnk","Symbol","Path");
+  for (long wi=0;wi<SymbolList.count();wi++) {
+      ErrorLog.textLog("%3ld- <%25s> <%s>\n",wi+1,
+              SymbolList[wi].FullFieldName.toString(),
+              SymbolList[wi].display().toString()
+              );
+  }
+  ErrorLog.textLog("________________________________________________________________\n");
 
   if (wSt==ZS_EOF)
     return ZS_SUCCESS;
@@ -4080,7 +8661,7 @@ ZSearchParser::convertToZType(ZSearchTokentype_type pType) {
     wZTp |= ZType_Pointer;
 
   if (pType & ZSRCH_AMPERSAND)   // reference is not taken into account in ZType
-    infoLog("ZSearchParser::convertToZType-I-REFSKIP Found reference (Ampersand). Skipped.");
+    ErrorLog.infoLog("ZSearchParser::convertToZType-I-REFSKIP Found reference (Ampersand). Skipped.");
   if (pType & ZSRCH_LONG) {
     if ((pType & ZSRCH_DOUBLE)==ZSRCH_DOUBLE)
       wZTp = ZType_LDouble ;
@@ -4102,44 +8683,325 @@ extractURIfromLiteral(const utf8VaryingString& pPathLiteral,uriString pURIOut)
 
 
 
-
-void ZParserError::errorLog(const char* pFormat,...)
+/*
+void ZParserError::ErrorLog.errorLog(const char* pFormat,...)
 {
-  LastErroredToken = Father->CurrentToken;
+  pContext.LastErroredToken = Father->CurrentToken;
   va_list args;
   va_start (args, pFormat);
-  _errorLog(pFormat,args);
+  _log(ZAIES_Error,pFormat,args);
 
   va_end(args);
 }
 void ZParserError::textLog(const char* pFormat,...)
 {
-  LastErroredToken= Father->CurrentToken;
+  pContext.LastErroredToken= Father->CurrentToken;
   va_list args;
   va_start (args, pFormat);
-  _textLog(pFormat,args);
+  _log(ZAIES_Text,pFormat,args);
   va_end(args);
 }
-void ZParserError::infoLog(const char* pFormat,...)
+void ZParserError::ErrorLog.infoLog(const char* pFormat,...)
 {
-  LastErroredToken= Father->CurrentToken;
+  pContext.LastErroredToken= Father->CurrentToken;
   va_list args;
   va_start (args, pFormat);
-  _infoLog(pFormat,args);
+   _log(ZAIES_Info,pFormat,args);
   va_end(args);
 }
 void ZParserError::warningLog(const char* pFormat,...)
 {
-  LastErroredToken= Father->CurrentToken;
+  pContext.LastErroredToken= Father->CurrentToken;
   va_list args;
   va_start (args, pFormat);
-  _warningLog(pFormat,args);
+  _log(ZAIES_Warning,pFormat,args);
   va_end(args);
 }
 
+*/
+
+
+
+
+
+
+
+class CWeightList  WeightList ;
+
+
+
+bool
+matchWeight(CMatchResult& pResult,const utf8VaryingString& pIn,const utf8VaryingString& pToMatch,int pMatchMin,int pRadixMin)
+{
+    pResult.clear();
+    int wRadCur=0;
+    size_t wInLen=0 , wKwLen=0 ;
+    utf8_t* wPtrIn=pIn.Data ;
+    utf8_t* wPtrKw=pToMatch.Data ;
+
+    /* get size of word to match */
+    while (*wPtrKw) {
+        wPtrKw++;
+        wKwLen++;
+    }
+
+    /* first get match count */
+    while (*wPtrIn) {
+        wPtrKw=pToMatch.Data ;
+
+        while (*wPtrIn && *wPtrKw) {
+            if ( utfUpper(*wPtrIn) == utfUpper(*wPtrKw)) {
+                pResult.Match++;
+                break;
+            }
+            wPtrKw++;
+        }// while
+        wInLen++;
+        wPtrIn++;
+    }// while
+
+
+    /* get consecutive count : radix
+     * search consecutive sequences of segments of keyword in input string
+     *
+     *  for each character of input string
+     *   search for possible substrings matches in keyword string
+     *
+    */
+    utf8_t* wPtrIn1=wPtrIn=pIn.Data ;
+
+    while (*wPtrIn) {
+        wPtrKw=pToMatch.Data ;
+        wPtrIn1 = wPtrIn;
+        while (*wPtrIn1 && *wPtrKw) {
+            if ( utfUpper(*wPtrIn1) == utfUpper(*wPtrKw)) {
+                wRadCur++;
+                if ( wRadCur > pResult.Radix )
+                    pResult.Radix = wRadCur;
+                wPtrKw++;
+                wPtrIn1++;
+                continue ;
+            }
+            wRadCur=0;
+            wPtrIn1 = wPtrIn;
+            wPtrKw++;
+        }// while
+
+        wInLen++;
+        wPtrIn++;
+    }// while
+/*
+    if ( wRadCur > pResult.Radix )
+        pResult.Radix = wRadCur;
+*/
+    if (pMatchMin < 1) {
+        if ( wInLen < 4 )
+            pMatchMin = (wInLen - 1)>2?(wInLen - 1):wInLen;
+        else
+            pMatchMin = std::min(wInLen,wKwLen) * 40 / 100 ;
+    }
+
+    if ((pResult.Match < pMatchMin) || (pResult.Radix < pRadixMin))
+        return false;
+
+    return true ;
+} // matchWeight
+
+utf8VaryingString
+searchAdHocWeighted_old(const utf8VaryingString& pIn, ZArray<utf8VaryingString>& pKeyArray)
+{
+    CWeightList WeightList ;
+
+    if (pKeyArray.count()==0)
+        return utf8VaryingString();
+
+    utf8_t* wPtrIn=pIn.Data ;
+    size_t wInLen=pIn.strlen();
+    int wMin = wInLen - 3 ;
+    if ( wInLen < 4 )
+        wMin = (wInLen - 1)>2?(wInLen - 1):wInLen;
+    int wMatch=0 ;
+    int wi=0 ;
+    for (; wi < pKeyArray.count() ; wi++) {
+        wMatch=0;
+        CWeight wWeight;
+        wPtrIn=pIn.Data ;
+        utf8_t* wPtrKw=pKeyArray[wi].Data ;
+        while (*wPtrIn && *wPtrKw ) {
+            if ( utfUpper(*wPtrIn) == utfUpper(*wPtrKw))
+                wMatch++;
+            wPtrIn++;
+            wPtrKw++;
+        }// while
+        if (wMatch>0) {
+            wWeight.Match = wMatch ;
+            wWeight.Index = wi ;
+            WeightList.add(wWeight);
+        }
+    }// for
+
+    /* return the highest pounded if match is more than minimum */
+
+    if (WeightList.count()>0)
+        if ( WeightList.Tab(0).Match >= wMin )
+            return pKeyArray[WeightList.Tab(0).Index] ;
+
+    return utf8VaryingString();
+}//searchAdHocWeighted_old
+
+utf8VaryingString
+searchAdHocWeighted(const utf8VaryingString& pIn, ZArray<utf8VaryingString>& pKeyArray)
+{
+    CWeightList WeightList ;
+
+    if (pKeyArray.count()==0)
+        return utf8VaryingString();
+
+    utf8_t* wPtrIn=pIn.Data ;
+    size_t wInLen=pIn.strlen();
+    int wMinimum = wInLen - (wInLen * 30 / 100) ;
+    if ( wInLen < 4 )
+        wMinimum = (wInLen - 1)>2?(wInLen - 1):wInLen;
+
+
+
+    int wMatch=0 ;
+    int wi=0 ;
+    for (; wi < pKeyArray.count() ; wi++) {
+        CWeight wWeight;
+        CMatchResult wMR;
+        if(matchWeight(wMR,pIn,pKeyArray[wi],wMinimum)) {
+            wWeight.Index = wi ;
+            wWeight.Match = wMR.Match;
+            wWeight.Radix = wMR.Radix;
+            WeightList.add(wWeight);
+        }
+    }// for
+
+    /* return the highest pounded if match is more than minimum */
+
+    if (WeightList.count()>0)
+            return pKeyArray[WeightList.Tab(0).Index] ;
+
+    return utf8VaryingString();
+}//searchAdHocWeighted
+
+
+
+utf8VaryingString
+searchSymbolWeighted(const utf8VaryingString& pIn)
+{
+    CWeightList WeightList ;
+
+    utf8_t* wPtrIn=pIn.Data ;
+    size_t wInLen=pIn.strlen();
+    int wMin = wInLen - 3 ;
+    if ( wInLen < 4 )
+        wMin = (wInLen - 1)>2?(wInLen - 1):wInLen;
+    int wMatch=0 ;
+    int wi=0 ;
+    for (; wi < GParser->SymbolList.count() ; wi++) {
+        wMatch=0;
+        CWeight wWeight;
+        wPtrIn=pIn.Data ;
+        utf8_t* wPtrKw=GParser->SymbolList[wi].FullFieldName.Data ;
+        while (*wPtrIn && *wPtrKw ) {
+            if ( utfUpper(*wPtrIn) == utfUpper(*wPtrKw))
+                wMatch++;
+            wPtrIn++;
+            wPtrKw++;
+        }// while
+        if (wMatch>0) {
+            wWeight.Match = wMatch ;
+            wWeight.Index = wi ;
+            WeightList.add(wWeight);
+        }
+    }// for
+
+    /* return the highest pounded if match is more than minimum */
+
+    if (WeightList.count()>0)
+        if ( WeightList.Tab(0).Match >= wMin )
+            return GParser->SymbolList[WeightList.Tab(0).Index].FullFieldName ;
+
+    return utf8VaryingString();
+}//searchSymbolWeighted
+
+
+utf8VaryingString
+searchKeywordWeighted(const utf8VaryingString& pIn)
+{
+    CWeightList WeightList ;
+    ZArray<ZSearchKeyWord>* wKeyWordList=&KeywordList;// for debug
+    WeightList.clear();
+
+    utf8_t* wPtrIn=pIn.Data ;
+    size_t wInLen=pIn.strlen();
+    int wMin = wInLen - 3 ;
+    if ( wInLen < 4 )
+        wMin = (wInLen - 1)>2?(wInLen - 1):wInLen;
+    int wMatch=0 ;
+    int wi=0 ;
+    for (; wi < KeywordList.count() ; wi++) {
+        wMatch=0;
+        CWeight wWeight;
+        wPtrIn=pIn.Data ;
+        utf8_t* wPtrKw=KeywordList[wi].Text.Data ;
+        while (*wPtrIn && *wPtrKw ) {
+            if ( utfUpper(*wPtrIn) == utfUpper(*wPtrKw))
+                wMatch++;
+            wPtrIn++;
+            wPtrKw++;
+        }// while
+        if (wMatch>0) {
+            wWeight.Match = wMatch ;
+            wWeight.Index = wi ;
+            WeightList.add(wWeight);
+        }
+    }// for
+
+    /* return the highest pounded if match is more than minimum */
+
+    if (WeightList.count()>0)
+        if ( WeightList.Tab(0).Match >= wMin )
+            return KeywordList[WeightList.Tab(0).Index].Text ;
+
+    return utf8VaryingString();
+}//searchKeywordWeighted
+
+
+/** @brief setDisplayColMax sets maximum column width for default entity display routine */
+void ZSearchParser::setDisplayColMax(int pColMax)
+{
+    if (pColMax < DisplayColMin) {
+        ErrorLog.errorLog("setDisplayColMax-E-INVVALUE Display column maximum value %d cannot be less than minimum %d.\n"
+                          "                            Maximum stays at its former value %d.",
+                          pColMax,DisplayColMin,DisplayColMax);
+        return;
+    }
+    DisplayColMax=pColMax;
+    ErrorLog.infoLog("setDisplayColMax Display column maximum value has been set successfully to %d.", DisplayColMax);
+    return ;
+}
+/** @brief setDisplayColMin sets minimum column width for default entity display routine */
+void ZSearchParser::setDisplayColMin(int pColMin)
+{
+    if (pColMin > DisplayColMax) {
+        ErrorLog.errorLog("setDisplayColMin-E-INVVALUE Display column minimum value %d cannot be greater than maximum %d.\n"
+                          "                            Minimum stays at its former value %d.",
+                          pColMin,DisplayColMax,DisplayColMin);
+        return;
+    }
+    if (pColMin < 3) {
+        ErrorLog.errorLog("setDisplayColMin-E-INVVALUE Display column minimum value %d cannot be less than 3.\n"
+                          "                            Maximum stays at its former value %d.",
+                          pColMin,DisplayColMin);
+        return;
+    }
+    DisplayColMin=pColMin;
+    ErrorLog.infoLog("setDisplayColMax Display column minimum value has been set successfully to %d.", DisplayColMin);
+    return ;
+}
 
 
 }//namespace zbs
-
-
-

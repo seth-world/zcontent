@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>90</y>
+     <y>100</y>
      <width>351</width>
      <height>81</height>
     </rect>
@@ -85,8 +85,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>340</y>
-     <width>361</width>
+     <y>350</y>
+     <width>351</width>
      <height>81</height>
     </rect>
    </property>
@@ -123,8 +123,8 @@
   <widget class="QPushButton" name="OKBTn">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>430</y>
+     <x>280</x>
+     <y>440</y>
      <width>80</width>
      <height>23</height>
     </rect>
@@ -136,9 +136,9 @@
   <widget class="QGroupBox" name="DateGBx">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>170</y>
-     <width>361</width>
+     <x>10</x>
+     <y>180</y>
+     <width>351</width>
      <height>161</height>
     </rect>
    </property>
@@ -226,6 +226,19 @@
      <string>locale date format</string>
     </property>
    </widget>
+  </widget>
+  <widget class="QCheckBox" name="PrefixCBx">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>70</y>
+     <width>281</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Prefix displayed value with explicit ZType name</string>
+   </property>
   </widget>
  </widget>
  <resources/>

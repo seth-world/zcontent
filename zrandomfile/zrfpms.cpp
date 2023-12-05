@@ -230,6 +230,127 @@ ZRFPMS::reportDetails (FILE*pOutput)
 
   return ;
 }
+/**
+ * @brief ZRFPMS::reportDetails detailed report of PMS data
+ * @param[in] pOutput   a FILE* pointer where the reporting will be made. Defaulted to stdout.
+ */
+    void
+    ZRFPMS::reportDetails (ZaiErrors* pErrorLog)
+{
+  long long wAverageUserWrite;
+  if ((UserWrites)==0)
+    wAverageUserWrite = 0;
+  else
+    wAverageUserWrite=(long long)((float)UserWriteSize / (float)UserWrites);
+  long long wAverageUserRead;
+  if ((UserReads)==0)
+    wAverageUserRead = 0;
+  else
+    wAverageUserRead=(long long)((float)UserReadSize / (float)UserReads);
+  long long wAverageExtent;
+  if ((ExtentWrites)==0)
+    wAverageExtent = 0;
+  else
+    wAverageExtent=(long long)((float)ExtentSize / (float)ExtentWrites);
+
+  long long wAverageFieldRead;
+  if (FieldReads  ==0)
+    wAverageFieldRead = 0;
+  else
+    wAverageFieldRead=(long long)((float)FieldReadSize / (float)FieldReads);
+
+  long long wAverageFieldWrite;
+  if (FieldWrites  ==0)
+    wAverageFieldWrite = 0;
+  else
+    wAverageFieldWrite=(long long)((float)FieldWriteSize / (float)FieldWrites);
+
+  pErrorLog->textLog(
+          "________________________________________________\n"
+          " Header\n"
+          "   File header reads          %10ld\n"
+          "               writes         %10ld\n"
+          "   File lock info read        %10ld\n"
+          "                  write       %10ld\n"
+          "   File descriptor reads      %10ld\n"
+          "                   writes     %10ld\n"
+          "   Reserved block reads       %10ld\n"
+          "                  writes      %10ld\n"
+          " Content\n"
+          "   Block header reads         %10ld\n"
+          "                size          %10lld\n"
+          "                writes        %10ld\n"
+          "                size          %10lld\n"
+          "   User content reads         %10ld\n"
+          "                size          %10lld\n"
+          "             average/read     %10lld\n"
+
+          "   User content writes        %10ld\n"
+          "                size          %10lld\n"
+          "             average/write    %10lld\n"
+
+          "   Field content reads        %10ld\n"
+          "                size          %10lld\n"
+          "             average/read     %10lld\n"
+
+          "   Field content writes       %10ld\n"
+          "                size          %10lld\n"
+          "             average/write    %10lld\n"
+
+          "   Highwater marking writes   %10ld\n"
+
+          "                     size     %10lld\n"
+
+          "   Free pool matches          %10ld\n"
+          "   Free pool mismatches :\n"
+          "   Extent writes              %10ld\n"
+          "          size                %10lld\n"
+          "      extent average/write    %10lld\n"
+
+          "________________________________________________\n",
+
+          HFHReads,
+          HFHWrites,
+          LockReads,
+          LockWrites,
+          HFCBReads,
+          HFCBWrites,
+          HReservedReads,
+          HReservedWrites,
+
+          CBHReads,
+          CBHReadBytesSize,
+          CBHWrites,
+          CBHWriteBytesSize,
+
+          UserReads,
+          UserReadSize,
+          wAverageUserRead,
+
+          UserWrites,
+          UserWriteSize,
+          wAverageUserWrite,
+
+          FieldReads,
+          FieldReadSize,
+          wAverageFieldRead,
+
+          FieldWrites,
+          FieldWriteSize,
+          wAverageFieldWrite,
+
+          HighWaterWrites,
+          //             pDescriptor.ZFCB.HighwaterMarking?"<On>":"<Off>",
+          HighWaterBytesSize,
+
+          FreeMatches,
+          ExtentWrites,
+          ExtentSize,
+          wAverageExtent
+          );
+
+  return ;
+}
 
 //! @cond Development
 

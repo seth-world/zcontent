@@ -80,6 +80,8 @@ ZMCB_Export& ZMCB_Export::_copyFrom(const ZMCB_Export& pIn)
   JCBOffset=pIn.JCBOffset;
   JCBSize=pIn.JCBSize;
   HistoryOn=pIn.HistoryOn;
+  HealthStatus = pIn.HealthStatus;
+  EngineMode = pIn.EngineMode;
   return *this;
 }
 
@@ -116,6 +118,7 @@ ZMCB_Export& ZMCB_Export::setFromPtr(const unsigned char*& pPtrIn)
   pPtrIn += sizeof(ZMCB_Export);
   return *this;
 }
+
 ZMCB_Export& ZMCB_Export::_import( const unsigned char*& pPtrIn)
 {
   memmove (this,pPtrIn,sizeof(ZMCB_Export));
@@ -201,11 +204,11 @@ uriString ZMasterControlBlock::getURIDictionary() {
     <indexcount> </indexcount>
 </zmastercontrolblock>
 */
-utf8String
+utf8VaryingString
 ZMasterControlBlock::toXml(int pLevel,bool pComment)
 {
   int wLevel=pLevel;
-  utf8String wReturn;
+  utf8VaryingString wReturn;
   wReturn = fmtXMLnode("zmastercontrolblock",pLevel);
   wLevel++;
 
@@ -216,6 +219,15 @@ ZMasterControlBlock::toXml(int pLevel,bool pComment)
   wReturn+=fmtXMLchar("indexfilepath",  IndexFilePath.toCChar(),wLevel);
   if (pComment)
     fmtXMLaddInlineComment(wReturn," Directory path for index files. If empty, then directory path of main content file is taken");
+
+  wReturn+=fmtXMLint("healthstatus",  int(HealthStatus) ,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn," Flag for describing health state of the file : e. g. index(es) have to be recomputed.");
+
+  wReturn+=fmtXMLint("enginemode",  int(EngineMode) ,wLevel);
+  if (pComment)
+    fmtXMLaddInlineComment(wReturn," Defines what type of search engine is involved.");
+
 
   wReturn+=fmtXMLbool("historyon",  HistoryOn,wLevel);
   if (pComment)
@@ -265,7 +277,8 @@ ZMasterControlBlock::toXml(int pLevel,bool pComment)
 ZStatus ZMasterControlBlock::fromXml(zxmlNode* pRootNode, ZaiErrors* pErrorlog)
 {
   zxmlElement *wRootNode;
-  utf8String wValue;
+  utf8VaryingString wValue;
+  int wIntValue;
   bool wBool;
   ZStatus wSt = pRootNode->getChildByName((zxmlNode *&) wRootNode, "zmastercontrolblock");
   if (wSt != ZS_SUCCESS) {
@@ -294,6 +307,22 @@ ZStatus ZMasterControlBlock::fromXml(zxmlNode* pRootNode, ZaiErrors* pErrorlog)
   }
   else
     IndexFilePath=wValue.toCChar();
+
+  if (XMLgetChildInt(wRootNode, "healthstatus", wIntValue, pErrorlog)< 0) {
+    fprintf(stderr,
+            "ZSMCBOwnData::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to <false>.\n",
+            "healthstatus");
+  }
+  else
+    HealthStatus=uint8_t(wIntValue);
+
+  if (XMLgetChildInt(wRootNode, "enginemode", wIntValue, pErrorlog)< 0) {
+    fprintf(stderr,
+            "ZSMCBOwnData::fromXml-E-CNTFINDPAR Cannot find parameter %s. It will stay to <false>.\n",
+            "enginemode");
+  }
+  else
+    EngineMode=uint8_t(wIntValue);
 
   if (XMLgetChildBool(wRootNode, "historyon", wBool, pErrorlog)< 0) {
     fprintf(stderr,
@@ -446,23 +475,15 @@ ssize_t ZMasterControlBlock::_exportAppend(ZDataBuffer &pMCBContent)
   wMCBExp.ICBOffset=wMCBExp.MCBSize;
 
   wMCBExp.HistoryOn=HistoryOn;
+  wMCBExp.HealthStatus=HealthStatus;
+  wMCBExp.EngineMode=EngineMode;
 
   wRet=wMCBExp._exportAppend(pMCBContent);
 
   //DictionaryName._exportAppendUVF(pMCBContent);
   DictionaryPath._exportAppendUVF(pMCBContent);
   IndexFilePath._exportAppendUVF(pMCBContent);
-  /*
-  size_t      wMCBSize = wMCB.Size;
 
-  ZMCB_Export* wMCB_Fin = (ZMCB_Export*)wMCB.Data;
-
-  wMCB_Fin->MCBSize = reverseByteOrder_Conditional<uint32_t>(uint32_t(wMCB.Size));
-  wMCB_Fin->ICBOffset = wMCB_Fin->MCBSize;
-
-  wMCB_Fin->ICBSize = reverseByteOrder_Conditional<uint32_t>(uint32_t(wZDBIndexes.Size));
-  wMCB_Fin->JCBOffset = reverseByteOrder_Conditional<uint32_t>(uint32_t (wZDBIndexes.Size+wMCB.Size));
-*/
   pMCBContent.appendData(wZDBIndexes);
 
   pMCBContent.appendData(wZDBJCB);
@@ -711,19 +732,18 @@ ZMasterControlBlock::_import(const unsigned char* &pDataIn)
  * @brief ZMasterControlBlock::print Reports the whole content of ZMCB : indexes definitions and dictionaries
  */
 void
-ZMasterControlBlock::report(FILE*pOutput)
+ZMasterControlBlock::report(ZaiErrors* pErrorLog)
 {
-  fprintf (pOutput,
-      "________________ZMasterControlBlock Content________________________________\n");
-  fprintf(pOutput,
+  pErrorLog->textLog("________________ZMasterControlBlock Content________________________________");
+  pErrorLog->textLog(
       "Master Dictionary\n"
-      "-----------------\n");
+      "-----------------");
   if (Dictionary==nullptr)
-    fprintf(pOutput,"---------No master dictionary (file might be of type ZRawMasterFile)-----------\n");
+    pErrorLog->textLog("---------No master dictionary (file might be of type ZRawMasterFile)-----------");
   else
     {
-    fprintf (pOutput,
-        "   Fields %17s %10s %10s %8s %s\n",
+    pErrorLog->textLog(
+        "   Fields %17s %10s %10s %8s %s",
         "Field Name",
         "Natural",
         "Universal",
@@ -732,8 +752,8 @@ ZMasterControlBlock::report(FILE*pOutput)
 
     for (long wi=0;wi < Dictionary->size();wi++)
     {
-      fprintf (pOutput,
-          "    <%2ld> <%15s> %10ld %10ld %8s %s\n",
+      pErrorLog->textLog(
+          "    <%2ld> <%15s> %10ld %10ld %8s %s",
           wi,
           Dictionary->Tab(wi).getName().toCChar(),
           Dictionary->Tab(wi).NaturalSize,
@@ -741,27 +761,33 @@ ZMasterControlBlock::report(FILE*pOutput)
           Dictionary->Tab(wi).KeyEligible?"Yes":"No",
           decode_ZType(Dictionary->Tab(wi).ZType));
     }
-    fprintf (pOutput,
-        "___________________________________________________________________________\n");
+    pErrorLog->textLog(
+        "___________________________________________________________________________");
   }// else
 
 
-  fprintf(pOutput,
+  pErrorLog->textLog(
       "Index Control Blocks\n"
-      "--------------------\n");
+      "--------------------");
+
+  if (IndexTable.count()==0) {
+      pErrorLog->textLog("No index key has been defined for this file." );
+  }
+
+  pErrorLog->textLog(" Index files path : <%s>",IndexFilePath.toString());
+
   for (long wi=0;wi < IndexTable.size();wi++)
   {
-
-    fprintf (pOutput,
-            "Index Rank <%2ld> <%20s> KeyUSize <%6d> <%s>\n",
+    pErrorLog->textLog(
+            "Index Rank <%2ld> <%20s> KeyUSize <%6d> <%s>",
             wi,
             IndexTable[wi]->IndexName.toCChar(),
             IndexTable[wi]->KeyGuessedSize,
             decode_ZST(IndexTable[wi]->Duplicates));
     if (Dictionary!=nullptr)
     {
-    fprintf (pOutput,
-        "   Fields %17s  %15s  %5s %12s %s\n",
+    pErrorLog->textLog(
+        "   Fields %17s  %15s  %5s %12s %s",
         "Field Name",
         "Natural",
         "Internal",
@@ -769,8 +795,8 @@ ZMasterControlBlock::report(FILE*pOutput)
         "ZType");
     for (long wj=0; wj < Dictionary->KeyDic[wi]->size();wj++)
     {
-      fprintf (pOutput,
-          "    <%ld> <%15s> %5ld %5ld %12d %s\n",
+      pErrorLog->textLog(
+          "    <%ld> <%15s> %5ld %5ld %12d %s",
           wj,
           Dictionary->Tab(Dictionary->KeyDic[wi]->Tab(wj).MDicRank).getName().toCChar(),
           Dictionary->Tab(Dictionary->KeyDic[wi]->Tab(wj).MDicRank).NaturalSize,
@@ -781,8 +807,7 @@ ZMasterControlBlock::report(FILE*pOutput)
     }// if (Dictionary!=nullptr)
   }// for (long wi=0;wi < IndexTable.size();wi++)
 
-  fprintf (pOutput,
-      "___________________________________________________________________________\n");
+  pErrorLog->textLog("___________________________________________________________________________");
   return ;
 } // report
 

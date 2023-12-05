@@ -84,7 +84,7 @@ int ZFieldDLg::exec()
 void
 ZFieldDLg::ZTypeListClicked()
 {
-  utf8String wStr;
+  utf8VaryingString wStr;
   if (ZTypeTRv==nullptr)
     {
     ZTypeTRv=new ZTypeDLg(this);
@@ -251,7 +251,7 @@ void ZFieldDLg::setup(ZFieldDescription &pField, bool pRawFields)
 {
   FCreate=false;
   Field=pField;
-  utf8String wStr;
+  utf8VaryingString wStr;
 
   RawField=pRawFields;
 
@@ -381,7 +381,7 @@ ZFieldDescription ZFieldDLg::getFieldDescription()
 
 void ZFieldDLg::refresh()
 {
-  utf8String wStr;
+  utf8VaryingString wStr;
 
   Field.setFieldName(ui->FieldNameLEd->text().toUtf8().data());
 

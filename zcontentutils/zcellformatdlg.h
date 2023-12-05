@@ -1,7 +1,10 @@
-#ifndef ZCELLFOMATDLG_H
-#define ZCELLFOMATDLG_H
+#ifndef ZCELLFORMATDLG_H
+#define ZCELLFORMATDLG_H
 
 #include <QDialog>
+#include <zcontentcommon/zcontentconstants.h>
+
+using namespace zbs;
 
 namespace Ui {
 class ZCellFormatDLg;
@@ -16,11 +19,11 @@ public:
   ~ZCellFormatDLg();
   void setup(int pCellFormat);
 
-  int get();
+  ZCFMT_Type get();
   void setAppliance(const char* pAppliance);
 
 private:
   Ui::ZCellFormatDLg *ui;
 };
 
-#endif // ZCELLFOMATDLG_H
+#endif // ZCELLFORMATDLG_H

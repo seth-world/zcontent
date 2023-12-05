@@ -4,10 +4,10 @@
 #include <ztoolset/zexceptionmin.h>
 #include <zio/zioutils.h>
 
-const long cst_FileNudge = 100;
+const long cst_FilePayload = 100;
 
 
-ZFileUtils::~ZFileUtils()
+ZRandomFileUtils::~ZRandomFileUtils()
 {
   if (_isOpen) {
     rawClose(Fd);
@@ -15,8 +15,9 @@ ZFileUtils::~ZFileUtils()
   }
 }
 
+
 ZStatus
-ZFileUtils::rebuildHeader(uriString * pURIHeader) {
+ZRandomFileUtils::rebuildHeader(uriString * pURIHeader) {
   ZStatus wSt;
   ZBlockPool wZBAT;
   ZBlockPool wZFBT;
@@ -170,10 +171,10 @@ ZFileUtils::rebuildHeader(uriString * pURIHeader) {
     return wSt;
   }
   _print("Header file <%s> has been successfully written.",URIHeader.toString());
-} // ZFileUtils::rebuildHeader
+} // ZRandomFileUtils::rebuildHeader
 
 ZStatus
-ZFileUtils::_openContent(uriString& pURIContent) {
+ZRandomFileUtils::_openContent(uriString& pURIContent) {
   ZStatus wSt=rawOpen(Fd,pURIContent.toCChar(),O_RDWR);
   if (wSt!=ZS_SUCCESS)
     return wSt;
@@ -182,7 +183,7 @@ ZFileUtils::_openContent(uriString& pURIContent) {
 }
 
 ZStatus
-ZFileUtils::_openHeader(uriString *pURIHeader) {
+ZRandomFileUtils::_openHeader(uriString *pURIHeader) {
 
   ZStatus wSt=ZS_SUCCESS;
   if (pURIHeader==nullptr) {
@@ -201,7 +202,7 @@ ZFileUtils::_openHeader(uriString *pURIHeader) {
 }
 
 ZStatus
-ZFileUtils::seekAndGet(ZDataBuffer& pOut, ssize_t &pSize, size_t pAddress) {
+ZRandomFileUtils::seekAndGet(ZDataBuffer& pOut, ssize_t &pSize, size_t pAddress) {
 
   ZStatus wSt=rawSeek(Fd,(off_t &)pAddress,SEEK_SET);
   if (wSt!=ZS_SUCCESS)
@@ -223,7 +224,7 @@ ZFileUtils::seekAndGet(ZDataBuffer& pOut, ssize_t &pSize, size_t pAddress) {
 
 
 ZStatus
-ZFileUtils::searchNextStartSign(zaddress_type pStartAddress, zaddress_type & pOutAddress) {
+ZRandomFileUtils::searchNextStartSign(zaddress_type pStartAddress, zaddress_type & pOutAddress) {
 
 
   if ((pStartAddress < 0)||(pStartAddress>FileSize)) {
@@ -286,7 +287,7 @@ ZFileUtils::searchNextStartSign(zaddress_type pStartAddress, zaddress_type & pOu
   return ZS_SUCCESS;
 }// searchNextStartSign
 
-void ZFileUtils::_print(const char* pFormat,...) {
+void ZRandomFileUtils::_print(const char* pFormat,...) {
   utf8VaryingString wOut;
   va_list ap;
   va_start(ap, pFormat);
@@ -295,7 +296,7 @@ void ZFileUtils::_print(const char* pFormat,...) {
   _print(wOut);
 }
 
-void ZFileUtils::_print(const utf8VaryingString& pOut) {
+void ZRandomFileUtils::_print(const utf8VaryingString& pOut) {
   if (_displayCallback==nullptr) {
     if (Output==nullptr)
       Output=stdout;
@@ -308,7 +309,7 @@ void ZFileUtils::_print(const utf8VaryingString& pOut) {
 }
 
 ZStatus
-ZFileUtils::searchNextBlock(ZBlockDescriptor_Export& pBlock, zaddress_type pStartAddress) {
+ZRandomFileUtils::searchNextBlock(ZBlockDescriptor_Export& pBlock, zaddress_type pStartAddress) {
   ZBlockHeader_Export wBExp;
   ZDataBuffer wRecord;
   ssize_t wSize= ssize_t(sizeof(ZBlockHeader_Export));
@@ -332,7 +333,7 @@ ZFileUtils::searchNextBlock(ZBlockDescriptor_Export& pBlock, zaddress_type pStar
   return ZS_SUCCESS;
 }
 ZStatus
-ZFileUtils::searchPreviousBlock(ZBlockDescriptor_Export& pBlock, zaddress_type pStartAddress) {
+ZRandomFileUtils::searchPreviousBlock(ZBlockDescriptor_Export& pBlock, zaddress_type pStartAddress) {
   ZDataBuffer wRecord;
   zaddress_type pOutAddress;
   ZBlockHeader_Export wBExp;
@@ -356,15 +357,15 @@ ZFileUtils::searchPreviousBlock(ZBlockDescriptor_Export& pBlock, zaddress_type p
   return ZS_SUCCESS;
 } //searchPreviousBlock
 
-void ZFileUtils::getPrevAddrVal(zaddress_type &pAddress, long &pNudge, long &pBucket){
-  pNudge = FileNudge ;
-  if (pAddress < pNudge) {
-    pNudge = pBucket =  pAddress ;
+void ZRandomFileUtils::getPrevAddrVal(zaddress_type &pAddress, long &pPayload, long &pBucket){
+  pPayload = FileNudge ;
+  if (pAddress < pPayload) {
+    pPayload = pBucket =  pAddress ;
     pAddress = 0L;
     return;
   }
 
-  pAddress -= pNudge;
+  pAddress -= pPayload;
 
   if ((pAddress + FileNudge) > FileSize){
     pBucket = FileSize - pAddress ;
@@ -375,7 +376,7 @@ void ZFileUtils::getPrevAddrVal(zaddress_type &pAddress, long &pNudge, long &pBu
 
 /* search previous start block starting at pAddress and decreasing to beginning of file */
 ZStatus
-ZFileUtils::searchPreviousStartSign(zaddress_type pStartAddress, zaddress_type & pOutAddress ) {
+ZRandomFileUtils::searchPreviousStartSign(zaddress_type pStartAddress, zaddress_type & pOutAddress ) {
 
   if ((pStartAddress < 0)||(pStartAddress>FileSize)) {
     utf8VaryingString wStr;
@@ -438,7 +439,7 @@ ZFileUtils::searchPreviousStartSign(zaddress_type pStartAddress, zaddress_type &
 
 
 ZStatus
-ZFileUtils::writeHeaderFromPool(const uriString& pURIHeader,
+ZRandomFileUtils::writeHeaderFromPool(const uriString& pURIHeader,
     ZHeaderControlBlock& pHCB, ZFileControlBlock& pFCB, ZDataBuffer& pReserved,
     ZBlockPool* pZBAT,ZBlockPool* pZFBT,ZBlockPool* pZHOT)
 {
@@ -513,14 +514,23 @@ bool testSequence (const unsigned char* pSequence,size_t pSeqLen, const unsigned
 */
 
 ZStatus
-rawSearchNextStartSign(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,zaddress_type pStartAddress, zaddress_type & pOutAddress) {
+rawSearchNextStartSign(__FILEHANDLE__ pFd,
+                       size_t pFileSize,
+                       long pPayload,
+                       zaddress_type pStartAddress,
+                       zaddress_type & pOutAddress)
+{
 
   if ((pStartAddress < 0)||(pStartAddress>pFileSize)) {
     return ZS_OUTBOUND;
   }
 
   ZStatus wSt=ZS_SUCCESS;
-  long wNudge = pNudge;
+  long wNudge;
+  if (pPayload < 0)
+    wNudge = cst_FilePayload;
+  else
+    wNudge = pPayload;
 
   ZDataBuffer wRecord;
 
@@ -533,13 +543,10 @@ rawSearchNextStartSign(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,zaddress_
 
   wSt=rawReadAt(pFd,wRecord,wNudge,pStartAddress);
   if (wSt!=ZS_SUCCESS) {
-    ZException.setMessage(_GET_FUNCTION_NAME_,
-        wSt,
-        Severity_Severe,
-        "Error positionning at address <%ld> for file <%s> ",
-        pStartAddress,
-        rawGetNameFromFd(pFd).toCChar());
-    return wSt;
+      if (wSt==ZS_READPARTIAL)
+        wSt=ZS_SUCCESS;
+      else
+        return wSt;
   }
 
   const unsigned char* wPtr = wRecord.Data ;
@@ -547,15 +554,12 @@ rawSearchNextStartSign(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,zaddress_
 
   const unsigned char* wSignPtr=(const unsigned char*)&cst_ZFILEBLOCKSTART;
 
-  uint32_t* wStartSign = (uint32_t*)wPtr;
   if (testSequence(wSignPtr,sizeof(uint32_t),wPtr)) {
     pOutAddress = pStartAddress;
     return ZS_SUCCESS;
   }
 
-
-
-  while ((pStartAddress < zaddress_type(pFileSize)) && (wSt==ZS_SUCCESS)) {
+  while ((pStartAddress < zaddress_type(pFileSize)) && ((wSt==ZS_SUCCESS)||(wSt==ZS_READPARTIAL))) {
 
     while ((!testSequence(wSignPtr,sizeof(uint32_t),wPtr)) && (wPtr < wPtrEnd)) {
       pStartAddress ++;
@@ -569,11 +573,15 @@ rawSearchNextStartSign(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,zaddress_
     if (pStartAddress >= zaddress_type(pFileSize)) {
       break;
     }
-    pStartAddress -= (sizeof(cst_ZFILEBLOCKSTART)-1);
+    pStartAddress -= (sizeof(cst_ZFILEBLOCKSTART)-1); /* sign may be split between two payloads */
 
     wSt=rawReadAt(pFd,wRecord,wNudge,pStartAddress);
-    if (wSt!=ZS_SUCCESS)
-      break;
+    if (wSt!=ZS_SUCCESS) {
+        if (wSt==ZS_READPARTIAL)
+            wSt=ZS_SUCCESS;
+        else
+            return wSt;
+    }
     wPtr = wRecord.Data;
     wPtrEnd = wRecord.Data + wRecord.Size ;
   } // while wAddress
@@ -590,7 +598,7 @@ rawSearchNextStartSign(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,zaddress_
 
 
 ZStatus
-searchNextSequence(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,
+searchNextSequence(__FILEHANDLE__ pFd,size_t pFileSize,long pPayload,
                     const unsigned char* pSequence,size_t pSeqLen,
                     zaddress_type pStartAddress, zaddress_type & pOutAddress)
 {
@@ -600,7 +608,7 @@ searchNextSequence(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,
   }
 
   ZStatus wSt=ZS_SUCCESS;
-  long wNudge = pNudge;
+  long wNudge = pPayload;
 
   ZDataBuffer wRecord;
 
@@ -734,6 +742,89 @@ rawCheckContentBlock(int pPoolId,__FILEHANDLE__ pFdContent,ZBlockDescriptor& pBl
 */
   return wRet;
 } // checkContentBlock
+
+
+
+ZStatus
+_searchBlockStart  (__FILEHANDLE__ pContentFd,
+                  zaddress_type pBeginAddress,      // Address to start searching for for next block
+                  zaddress_type &pNextAddress,
+                  ZDataBuffer &pBlockContent,
+                  ssize_t &pPayload,
+                  int     &pCount,
+                  size_t &pFileSize,
+                  uint32_t* pBeginContent) {
+
+    ZDataBuffer     wBuffer;
+    pBlockContent.clear();
+
+    pNextAddress = pBeginAddress ;
+
+    /* find StartSign */
+
+    if (off_t (pBeginAddress + pPayload) > pFileSize ) {
+        pPayload = pFileSize - pBeginAddress  ;
+    }
+    unsigned char wStartSign [5]={cst_ZFILESTART_BYTE,cst_ZFILESTART_BYTE,cst_ZFILESTART_BYTE,cst_ZFILESTART_BYTE , 0 };
+
+    ssize_t wOffset= -1;
+
+    wBuffer.allocate(pPayload);
+
+    ZStatus wSt=rawReadAt(pContentFd,wBuffer,pPayload,pBeginAddress);
+    if (wSt!=ZS_SUCCESS)
+        return wSt;
+
+    /*if cst_ZBLOCKSTART if at first position, skip it */
+    if (pPayload > sizeof(uint32_t)){
+        uint32_t wStartMark=*((uint32_t*)wBuffer.Data);
+        if (pBeginContent)
+            *pBeginContent = wStartMark;
+        if (wStartMark==cst_ZFILEBLOCKSTART)
+            wOffset = sizeof(uint32_t) ;
+    }
+
+    /* search for cst_ZBLOCKSTART. If cst_ZBLOCKSTART if at first position, skip it */
+    wOffset=wBuffer.bsearch(wStartSign,sizeof(cst_ZFILEBLOCKSTART),wOffset);
+
+    /* if not found in first payload, try one or more times until found or EOF */
+    size_t wOff;
+    while (wOffset < 0) {
+        wOff = wBuffer.Size - sizeof(cst_ZFILEBLOCKSTART);
+        pBlockContent.appendData(wBuffer.Data,wBuffer.Size - sizeof(cst_ZFILEBLOCKSTART));
+
+        if ((pNextAddress + wBuffer.Size) >= pFileSize) {
+            pNextAddress = pFileSize;
+            return ZS_EOF;
+        }
+
+        pNextAddress += wBuffer.Size - sizeof(cst_ZFILEBLOCKSTART) ;
+
+        wSt=rawReadAt(pContentFd,wBuffer,pPayload,(size_t&)pNextAddress);
+        if ((wSt!=ZS_READPARTIAL)&& (wSt!=ZS_SUCCESS))
+            return wSt;
+        wOffset=wBuffer.bsearch(wStartSign,sizeof(cst_ZFILEBLOCKSTART),0L);
+        if (wOffset >= 0) {
+            pNextAddress += wOffset;
+            return ZS_FOUND;
+        }
+
+        pBlockContent.appendData(wBuffer);
+        pNextAddress += wBuffer.Size;
+
+        /* for stats purpose */
+        double wT = double(pPayload * pCount);
+        wT += double(pBlockContent.Size);
+        pCount++;
+        wT = wT / double(pCount);
+        pPayload = ssize_t(wT);
+        /*
+    return  (ZS_FOUND) ;
+*/
+    }// while (wOffset < 0)
+    return ZS_EOF;
+}//_searchBlockStart
+
 
 utf8VaryingString
 decode_ZBEx(uint16_t pBEx) {

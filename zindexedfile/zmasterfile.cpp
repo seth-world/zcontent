@@ -89,7 +89,7 @@ ZMasterFile::setExternDictionary(const uriString& pDicPath)
 }
 
 ZStatus
-ZMasterFile::rebuildIndex(long pIndexRank,long* pRank) {
+ZMasterFile::rebuildIndex(long pIndexRank,long* pRank,ZaiErrors* pErrorLog) {
   ZDataBuffer wRecord, wKeyRecord;
   zaddress_type wZMFAddress;
   ZIndexItem* wIndexItem=nullptr;
@@ -111,7 +111,16 @@ ZMasterFile::rebuildIndex(long pIndexRank,long* pRank) {
   }
   wSt=zopenIndexFile(pIndexRank,ZRF_All);
 */
-  wSt=IndexTable[pIndexRank]->zclearFile(-1);
+
+  if (_progressSetupCallBack!=nullptr) {
+    utf8VaryingString wTitle = "Rebuilding index ";
+    wTitle += IndexTable[pIndexRank]->IndexName;
+    _progressSetupCallBack(int(getRecordCount()),wTitle);
+  }
+  if (_progressCallBack!=nullptr)
+    _progressCallBack(wRank,"Clearing index");
+
+  wSt=IndexTable[pIndexRank]->zclearFile(-1,getFCB()->HighwaterMarking,pErrorLog);
   if (wSt!=ZS_SUCCESS){
     return wSt;
   }
@@ -121,12 +130,14 @@ ZMasterFile::rebuildIndex(long pIndexRank,long* pRank) {
   if (wSt!=ZS_SUCCESS){
     return wSt;
   }
+  if (_progressCallBack!=nullptr)
+    _progressCallBack(wRank,"Building index");
 
   while (wSt==ZS_SUCCESS) {
     if (_progressCallBack!=nullptr)
-        _progressCallback(wRank);
+         _progressCallBack(wRank,utf8VaryingString());  /* with null string */
 
-    wSt=extractKeyValues(wRecord,wKeyRecord,pIndexRank);
+    wSt=extractKeyValues(wRecord,wKeyRecord,pIndexRank,pErrorLog);
     if (wSt!=ZS_SUCCESS)
       goto rebuildIndexError;
     wSt=IndexTable[pIndexRank]->_addRawKeyValue_Prepare(wIndexItem,wKeyRecord,wZMFAddress);
@@ -141,10 +152,12 @@ ZMasterFile::rebuildIndex(long pIndexRank,long* pRank) {
   }
 
   IndexTable[pIndexRank]->zclose();
+  _progressCallBack(wRank,"Processing completed");
   if (wSt==ZS_EOF)
     wSt=ZS_SUCCESS;
   return wSt;
 rebuildIndexError:
+  _progressCallBack(wRank,"Processing errored");
   if (ZException.count()==0){
     ZException.setMessage("ZMasterFile::rebuildIndex",wSt,Severity_Error,"Error while rebuilding index");
   }
@@ -164,7 +177,8 @@ rebuildIndexError:
 
 */
 ZStatus
-ZMasterFile::extractKeyValues(const ZDataBuffer& pRecord,ZDataBuffer& pKeyContent,long pIndexRank) {
+ZMasterFile::extractKeyValues(const ZDataBuffer& pRecord,ZDataBuffer& pKeyContent,long pIndexRank,
+                              ZaiErrors *pErrorLog) {
   ZTypeBase wZType;
   ZBitset wBitset;
   bool  wBitSetFull=false;
@@ -222,7 +236,7 @@ ZMasterFile::extractKeyValues(const ZDataBuffer& pRecord,ZDataBuffer& pKeyConten
         continue;
       }
 
-      URFField wF=getURFField(wPtrIn);
+      URFField wF=getURFField(pRecord,wPtrIn, pErrorLog);
       wR++;
     }//while
 
@@ -234,18 +248,19 @@ ZMasterFile::extractKeyValues(const ZDataBuffer& pRecord,ZDataBuffer& pKeyConten
       ZException.setMessage("ZMasterFile::extractKeyValues",ZS_FIELDMISSING,Severity_Error,"Requested field - position <%ld> name <%s> is omitted. Cannot build an index key with omitted field.",wFldRank);
       return ZS_FIELDMISSING;
     }
-    URFField wF=getURFField(wPtrIn);
-    if (wF.Ptr==nullptr) {
+    URFField wF=getURFField(pRecord,wPtrIn,pErrorLog);
+    if (wF.FieldPtr==nullptr) {
       return ZException.last().Status;
     }
-    pKeyContent.appendData(wF.Ptr,wF.Size);
+    pKeyContent.appendData(wF.FieldPtr,wF.Size);
   }// for
   return ZS_SUCCESS;
 } // extractKeyValues
 
 
 ZStatus
-ZMasterFile::extractFieldValue(const ZDataBuffer& pRecord,ZDataBuffer& pValue,long pRank) {
+ZMasterFile::extractFieldValue(const ZDataBuffer& pRecord,ZDataBuffer& pValue,long pRank,
+                               ZaiErrors *pErrorLog) {
   ZTypeBase wZType;
   ZBitset wBitset;
   bool  wBitSetFull=false;
@@ -291,7 +306,7 @@ ZMasterFile::extractFieldValue(const ZDataBuffer& pRecord,ZDataBuffer& pValue,lo
         continue;
       }
 
-      URFField wF=getURFField(wPtrIn);
+      URFField wF=getURFField(pRecord,wPtrIn,pErrorLog);
       wR++;
     }//while
 
@@ -303,82 +318,95 @@ ZMasterFile::extractFieldValue(const ZDataBuffer& pRecord,ZDataBuffer& pValue,lo
       ZException.setMessage("ZMasterFile::extractFieldValue",ZS_OMITTED,Severity_Error,"Requested field - position <%ld> name <%s> is omitted. Cannot build an index key with omitted field.",wFldRank);
       return ZS_FIELDMISSING;
     }
-    URFField wF=getURFField(wPtrIn);
-    if (wF.Ptr==nullptr) {
+    URFField wF=getURFField(pRecord,wPtrIn,pErrorLog);
+    if (wF.FieldPtr==nullptr) {
       return ZException.last().Status;
     }
-    pValue.setData(wF.Ptr,wF.Size);
+    pValue.setData(wF.FieldPtr,wF.Size);
 
   return ZS_SUCCESS;
 } // extractFieldValue
 
+ZStatus ZMasterFile::getURFFieldByRank(const ZDataBuffer &pRecord,
+                                       URFField &pURFField,
+                                       long pRank,
+                                       ZaiErrors *pErrorLog)
+{
+    ZTypeBase wZType;
+    ZBitset wBitset;
+    bool wBitSetFull = false;
+    uint64_t wURFDataSize = 0;
 
-ZStatus
-ZMasterFile::getURFFieldByRank(const ZDataBuffer& pRecord,URFField& pURFField,long pRank) {
-  ZTypeBase wZType;
-  ZBitset wBitset;
-  bool  wBitSetFull=false;
-  uint64_t wURFDataSize=0;
-
-
-  const unsigned char* wPtrIn=pRecord.Data;
-  /*
+    const unsigned char *wPtrIn = pRecord.Data;
+    /*
   ZBitset wFieldPresence ;
   wFieldPresence._importURF(wPtrIn);
 */
-  _importAtomic<ZTypeBase>(wZType,wPtrIn);
+    _importAtomic<ZTypeBase>(wZType, wPtrIn);
 
-  if ((wZType != ZType_bitset) && (wZType != ZType_bitsetFull)) {
-    ZException.setMessage("ZMasterFile::extractKey",ZS_INVTYPE,Severity_Error, "Invalid format. While expecting <ZType_bitset>, found <%6X> <%s>.",wZType,decode_ZType(wZType)
-        );
-    return ZS_INVTYPE;
-  }
-  if (wZType==ZType_bitset) {
-    wPtrIn -= sizeof(ZTypeBase);
-    ssize_t wSize=wBitset._importURF(wPtrIn);
-  } // if (wZType==ZType_bitset)
+    if ((wZType != ZType_bitset) && (wZType != ZType_bitsetFull)) {
+        ZException.setMessage("ZMasterFile::extractKey",
+                              ZS_INVTYPE,
+                              Severity_Error,
+                              "Invalid format. While expecting <ZType_bitset>, found <%6X> <%s>.",
+                              wZType,
+                              decode_ZType(wZType));
+        return ZS_INVTYPE;
+    }
+    if (wZType == ZType_bitset) {
+        wPtrIn -= sizeof(ZTypeBase);
+        ssize_t wSize = wBitset._importURF(wPtrIn);
+    } // if (wZType==ZType_bitset)
 
-  else if (wZType==ZType_bitsetFull) {
-    wBitSetFull=true;
-  } // if (wZType==ZType_bitsetFull)
+    else if (wZType == ZType_bitsetFull) {
+        wBitSetFull = true;
+    } // if (wZType==ZType_bitsetFull)
 
-  if ((!wBitSetFull) && (!wBitset.test(pRank)))
-    return ZS_FIELDMISSING;
+    if ((!wBitSetFull) && (!wBitset.test(pRank)))
+        return ZS_FIELDMISSING;
 
-  /* second get user URF data size */
-  //  _importAtomic<uint64_t>(wURFDataSize,wPtrIn);  // Deprecated
+    /* second get user URF data size */
+    //  _importAtomic<uint64_t>(wURFDataSize,wPtrIn);  // Deprecated
 
-  //  const unsigned char* wFldPtr=wPtrIn;
-  const unsigned char* wPtrEnd=wPtrIn + pRecord.Size;
-  long wR=0;
+    //  const unsigned char* wFldPtr=wPtrIn;
+    const unsigned char *wPtrEnd = wPtrIn + pRecord.Size;
+    long wR = 0;
 
-  long wFldRank=pRank;
+    long wFldRank = pRank;
 
-  /* find sequentially field of rank MDicRank */
-  wR=0;
-  while ((wR < wFldRank)&&(wPtrIn < wPtrEnd)) {
-    if ((!wBitSetFull) && (!wBitset.test(wR)))  {
-      wR++;
-      continue;
+    /* find sequentially field of rank MDicRank */
+    wR = 0;
+    while ((wR < wFldRank) && (wPtrIn < wPtrEnd)) {
+        if ((!wBitSetFull) && (!wBitset.test(wR))) {
+            wR++;
+            continue;
+        }
+
+        URFField wF = getURFField(pRecord, wPtrIn,pErrorLog);
+        wR++;
+    } //while
+
+    if (wR != wFldRank) {
+        ZException.setMessage("ZMasterFile::extractFieldValue",
+                              ZS_OUTBOUNDHIGH,
+                              Severity_Error,
+                              "Requested field position <%ld> is out of range",
+                              wFldRank);
+        return ZS_OUTBOUNDHIGH;
+    }
+    if (!wBitset.test(wR)) {
+        ZException.setMessage("ZMasterFile::extractFieldValue",
+                              ZS_OMITTED,
+                              Severity_Error,
+                              "Requested field - position <%ld> name <%s> is omitted. Cannot build "
+                              "an index key with omitted field.",
+                              wFldRank);
+        return ZS_FIELDMISSING;
+    }
+    pURFField = getURFField(pRecord, wPtrIn,pErrorLog);
+    if (pURFField.FieldPtr == nullptr) {
+        return ZException.last().Status;
     }
 
-    URFField wF=getURFField(wPtrIn);
-    wR++;
-  }//while
-
-  if (wR != wFldRank) {
-    ZException.setMessage("ZMasterFile::extractFieldValue",ZS_OUTBOUNDHIGH,Severity_Error,"Requested field position <%ld> is out of range",wFldRank);
-    return ZS_OUTBOUNDHIGH;
-  }
-  if (!wBitset.test(wR)) {
-    ZException.setMessage("ZMasterFile::extractFieldValue",ZS_OMITTED,Severity_Error,"Requested field - position <%ld> name <%s> is omitted. Cannot build an index key with omitted field.",wFldRank);
-    return ZS_FIELDMISSING;
-  }
-  pURFField=getURFField(wPtrIn);
-  if (pURFField.Ptr==nullptr) {
-    return ZException.last().Status;
-  }
-
-  return ZS_SUCCESS;
+    return ZS_SUCCESS;
 } // extractFieldValue
-

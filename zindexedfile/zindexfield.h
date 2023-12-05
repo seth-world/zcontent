@@ -146,7 +146,7 @@ public:
     void clear();
 
 /* to and from Xml are managed within zkeydictionary
-    utf8String toXml(int pLevel);
+    utf8VaryingString toXml(int pLevel);
     int fromXml(zxmlElement* pFieldNode, ZaiErrors* pErrorlog);
 */
     ZDataBuffer& _exportAppend(ZDataBuffer& pZDBExport) const;

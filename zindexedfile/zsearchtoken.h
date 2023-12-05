@@ -9,7 +9,7 @@
 #include "zsearchparsertype.h"
 
 #define __DISPLAYCALLBACK__(__NAME__)  std::function<void (const utf8VaryingString&)> __NAME__
-#define __PROGRESSCALLBACK__(__NAME__)  std::function<void (int)> __NAME__
+#define __progressCallBack__(__NAME__)  std::function<void (int)> __NAME__
 
 
 namespace zbs {

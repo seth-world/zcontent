@@ -104,7 +104,7 @@ public:
   KeyDic_Pack& set(ZKeyDictionary &pIn);
 
   void setName(const utf8_t* pName);
-  utf8String getName();
+  utf8VaryingString getName();
 };
 */
 #pragma pack(pop)
@@ -116,7 +116,7 @@ typedef ZArray<ZIndexField> _Base;
 
 public:
   ZKeyDictionary(ZMFDictionary*pMDic) ;
-  ZKeyDictionary(const utf8String& pName,ZMFDictionary*pMDic) {setName(pName);Dictionary=pMDic;}
+  ZKeyDictionary(const utf8VaryingString& pName,ZMFDictionary*pMDic) {setName(pName);Dictionary=pMDic;}
   ZKeyDictionary(const ZKeyDictionary* pIn);
   ZKeyDictionary(const ZKeyDictionary& pIn);
   ~ZKeyDictionary() { } // just to call the base destructor
@@ -125,7 +125,7 @@ public:
 
   ZKeyDictionary& operator=( ZKeyDictionary& pIn) {return _copyFrom(pIn);}
 
-  void setName(const utf8String& pName) {DicKeyName=pName;}
+  void setName(const utf8VaryingString& pName) {DicKeyName=pName;}
 
   bool hasSameContentAs(ZKeyDictionary*pKey);
 
@@ -148,7 +148,7 @@ public:
 
 
   ZSort_Type        Duplicates=ZST_Nothing ;
-  utf8String        DicKeyName;       // refers to ZICB::IndexName
+  utf8VaryingString        DicKeyName;       // refers to ZICB::IndexName
   utf8VaryingString ToolTip;         //!< help describing the key
   ZMFDictionary*    Dictionary=nullptr;  // Record Dictionary to which Key Dictionary refers : WARNING : not store in xml <keydictionary>
 
@@ -176,7 +176,7 @@ public:
   ZStatus zremoveField (const long pKDicRank);
 
   long zsearchFieldByName(const utf8_t* pFieldName) const ;
-  long zsearchFieldByName(const utf8String &pFieldName) const ;
+  long zsearchFieldByName(const utf8VaryingString &pFieldName) const ;
 
   void clear (void);
 

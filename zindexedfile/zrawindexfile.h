@@ -129,7 +129,7 @@ public:
  */
     ZRawIndexFile  (ZRawMasterFile *pFather);
     ZRawIndexFile  (ZRawMasterFile *pFather,ZIndexControlBlock& pZICB);
-    ZRawIndexFile  (ZRawMasterFile *pFather,int pkeyguessedsize,const utf8String &pIndexName ,ZSort_Type pDuplicates=ZST_NoDuplicates);
+    ZRawIndexFile  (ZRawMasterFile *pFather,int pkeyguessedsize,const utf8VaryingString &pIndexName ,ZSort_Type pDuplicates=ZST_NoDuplicates);
 
 
     ~ZRawIndexFile() {}
@@ -198,7 +198,7 @@ public:
                             const ZBitset& pFieldPresence) ;
 
     ZStatus setIndexURI(uriString &pUri);
-    void setIndexName (utf8String &pName);
+    void setIndexName (utf8VaryingString &pName);
 
     ZStatus removeIndexFiles(ZaiErrors *pErrorLog=nullptr);
 
@@ -455,7 +455,7 @@ protected:
     ZStatus _alignZIndexFile(ZOp pZAMOp,ZOp pZIXOp, size_t pZAMIdx, size_t pZIXIdx);
 
 
-public: utf8String toXml(int pLevel,bool pComment);
+public: utf8VaryingString toXml(int pLevel,bool pComment);
 
 public: ZStatus  fromXml(zxmlNode* pIndexNode, ZaiErrors* pErrorlog);
 
@@ -515,6 +515,6 @@ ZStatus _printKeyFieldsValues (ZDataBuffer *wKeyContent,ZIndexFile* pZIF, bool p
 ZStatus zrepairIndexes (const char *pZMFPath,
     bool pRepair,
     bool pRebuildAll,
-    FILE* pOutput);
+    ZaiErrors* pErrorLog);
 
 #endif  //ZRAWINDEXFILE_H

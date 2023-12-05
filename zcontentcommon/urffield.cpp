@@ -1,14 +1,21 @@
 #include "urffield.h"
+#include "urfparser.h"
+
+using namespace zbs;
+
+#include <ztoolset/utfvaryingstring.h>
+#include <ztoolset/utffixedstring.h>
+
 #include <ztoolset/ztypetype.h>
 
+#include <ztoolset/zexceptionmin.h>
 #include <ztoolset/zdatabuffer.h>
 #include <zcontent/zcontentutils/zentity.h>
 #include <zcontent/zcontentcommon/zresource.h>
 
-#include <ztoolset/zexceptionmin.h>
+#include <zcontent/zindexedfile/zsearchparser.h>
 
-#include <ztoolset/utfvaryingstring.h>
-#include <ztoolset/utffixedstring.h>
+
 
 #include <zxml/zxmlprimitives.h>
 
@@ -21,6 +28,17 @@
 #include <zcrypt/checksum.h>
 #include <zcrypt/md5.h>
 
+//#include "urfparser.h"
+#include <ztoolset/zaierrors.h>
+
+#include <ztoolset/zarray.h>
+
+#include <zcontent/zindexedfile/zsearchfileentity.h>
+
+namespace zbs {
+extern class ZSearchParser* GParser;
+extern ZArray<ZEntitySymbol>  ZEntitySymbolList;
+} // namespace zbs
 
 
 URFField::URFField()
@@ -28,222 +46,297 @@ URFField::URFField()
 
 }
 
-ZStatus URFField::setFromPtr(const unsigned char* &pPtrIn) {
-  Ptr=pPtrIn;
-  Size = sizeof(ZTypeBase);
+ZStatus
+URFField::setFromPtr(const ZDataBuffer &pRecord,
+                     const unsigned char *&pPtrIn,
+                     ZaiErrors *pErrorLog)
+{
+    ZStatus wSt=ZS_SUCCESS;
+    FieldPtr = pPtrIn;
+    Size = sizeof(ZTypeBase);
 
-  _importAtomic<ZTypeBase>(ZType,pPtrIn);
-  switch (ZType){
-  case ZType_UChar:
-  case ZType_AtomicUChar:
-  case ZType_U8:
-  case ZType_AtomicU8: {
-    Size += sizeof(uint8_t);
-    pPtrIn += sizeof(uint8_t);
-    break;
-  }
-  case ZType_Char:
-  case ZType_AtomicChar:
-  case ZType_S8:
-  case ZType_AtomicS8: {
-    Size += sizeof(int8_t)+1;
-    pPtrIn += sizeof(int8_t)+1;
-    break;
-  }
-  case ZType_U16:
-  case ZType_AtomicU16:{
-    Size += sizeof(uint16_t);
-    pPtrIn += sizeof(uint16_t);
-    break;
-  }
-  case ZType_S16:
-  case ZType_AtomicS16: {
-    Size += sizeof(int16_t)+1;
-    pPtrIn += sizeof(int16_t)+1;
-    break;
-  }
+    while (true) {
+        _importAtomic<ZTypeBase>(ZType, pPtrIn);
+        switch (ZType) {
+        case ZType_UChar:
+        case ZType_AtomicUChar:
+        case ZType_U8:
+        case ZType_AtomicU8: {
+            Size += sizeof(uint8_t);
+            pPtrIn += sizeof(uint8_t);
+            Present = true;
+            return ZS_SUCCESS;
+        }
+        case ZType_Char:
+        case ZType_AtomicChar:
+        case ZType_S8:
+        case ZType_AtomicS8: {
+            Size += sizeof(int8_t) + 1;
+            pPtrIn += sizeof(int8_t) + 1;
+            Present = true;
+            return ZS_SUCCESS;
+        }
+        case ZType_U16:
+        case ZType_AtomicU16:
+        {
+            Size += sizeof(uint16_t);
+            pPtrIn += sizeof(uint16_t);
+            Present = true;
+            return ZS_SUCCESS;
+        }
+        case ZType_S16:
+        case ZType_AtomicS16: {
+            Size += sizeof(int16_t) + 1;
+            pPtrIn += sizeof(int16_t) + 1;
+            Present = true;
+            return ZS_SUCCESS;
+        }
 
-  case ZType_U32:
-  case ZType_AtomicU32:{
-    Size += sizeof(uint32_t);
-    pPtrIn += sizeof(uint32_t);
-    break;
-  }
-  case ZType_S32:
-  case ZType_AtomicS32: {
-    Size += sizeof(int32_t)+1;
-    pPtrIn += sizeof(int32_t)+1;
-    break;
-  }
-  case ZType_U64:
-  case ZType_AtomicU64: {
-    Size += sizeof(uint64_t);
-    pPtrIn += sizeof(uint64_t);
-    break;
-  }
-  case ZType_S64:
-  case ZType_AtomicS64: {
-    Size += sizeof(int64_t)+1;
-    pPtrIn += sizeof(int64_t)+1;
-    break;
-  }
-  case ZType_Float:
-  case ZType_AtomicFloat: {
-    Size += sizeof(float)+1;
-    pPtrIn += sizeof(float)+1;
-    break;
-  }
-  case ZType_Double:
-  case ZType_AtomicDouble: {
-    Size += sizeof(double)+1;
-    pPtrIn += sizeof(double)+1;
-    break;
-  }
+        case ZType_U32:
+        case ZType_AtomicU32: {
+            Size += sizeof(uint32_t);
+            pPtrIn += sizeof(uint32_t);
+            Present = true;
+            return ZS_SUCCESS;
+        }
+        case ZType_S32:
+        case ZType_AtomicS32: {
+            Size += sizeof(int32_t) + 1;
+            pPtrIn += sizeof(int32_t) + 1;
+            break;
+        }
+        case ZType_U64:
+        case ZType_AtomicU64: {
+            Size += sizeof(uint64_t);
+            pPtrIn += sizeof(uint64_t);
+            Present = true;
+            return ZS_SUCCESS;
+        }
+        case ZType_S64:
+        case ZType_AtomicS64: {
+            Size += sizeof(int64_t) + 1;
+            pPtrIn += sizeof(int64_t) + 1;
+            Present = true;
+            return ZS_SUCCESS;
+        }
+        case ZType_Float:
+        case ZType_AtomicFloat: {
+            Size += sizeof(float) + 1;
+            pPtrIn += sizeof(float) + 1;
+            Present = true;
+            return ZS_SUCCESS;
+        }
+        case ZType_Double:
+        case ZType_AtomicDouble: {
+            Size += sizeof(double) + 1;
+            pPtrIn += sizeof(double) + 1;
+            Present = true;
+            return ZS_SUCCESS;
+        }
 
-  case ZType_LDouble:
-  case ZType_AtomicLDouble: {
-    Size += sizeof(long double)+1;
-    pPtrIn += sizeof(long double)+1;
-    break;
-  }
+        case ZType_LDouble:
+        case ZType_AtomicLDouble: {
+            Size += sizeof(long double) + 1;
+            pPtrIn += sizeof(long double) + 1;
+            Present = true;
+            return ZS_SUCCESS;
+        }
 
-    /* from here <wPtr -= sizeof(ZTypeBase);>  has been made and wPtr points on ZType */
+            /* from here <wPtr -= sizeof(ZTypeBase);>  has been made and wPtr points on ZType */
 
-  case ZType_ZDate: {
-    Size += sizeof(uint32_t);
-    pPtrIn += sizeof(uint32_t);
-    break;
-  }
-  case ZType_ZDateFull: {
-    Size += sizeof(uint64_t);
-    pPtrIn += sizeof(uint64_t);
-    break;
-  }
+        case ZType_ZDate: {
+            Size += sizeof(uint32_t);
+            pPtrIn += sizeof(uint32_t);
+            Present = true;
+            return ZS_SUCCESS;
+        }
+        case ZType_ZDateFull: {
+            Size += sizeof(uint64_t);
+            pPtrIn += sizeof(uint64_t);
+            Present = true;
+            return ZS_SUCCESS;
+        }
 
-  case ZType_URIString:{
-    URF_UnitCount_type wUnitCount;
-    Size += _importAtomic<URF_UnitCount_type>(wUnitCount,pPtrIn);
-    Size += wUnitCount * sizeof(utf8_t);
-    pPtrIn += wUnitCount * sizeof(utf8_t);
-    break;
-  }
-  case ZType_Utf8VaryingString: {
-    URF_UnitCount_type wUnitCount;
-    Size += _importAtomic<URF_UnitCount_type>(wUnitCount,pPtrIn);
-    Size += wUnitCount * sizeof(utf8_t);
-    pPtrIn += wUnitCount * sizeof(utf8_t);
-    break;
-  }
+        case ZType_URIString: {
+            URF_UnitCount_type wUnitCount;
+            Size += _importAtomic<URF_UnitCount_type>(wUnitCount, pPtrIn);
+            Size += wUnitCount * sizeof(utf8_t);
+            pPtrIn += wUnitCount * sizeof(utf8_t);
+            Present = true;
+            return ZS_SUCCESS;
+        }
+        case ZType_Utf8VaryingString: {
+            URF_UnitCount_type wUnitCount;
+            Size += _importAtomic<URF_UnitCount_type>(wUnitCount, pPtrIn);
+            Size += wUnitCount * sizeof(utf8_t);
+            pPtrIn += wUnitCount * sizeof(utf8_t);
+            Present = true;
+            return ZS_SUCCESS;
+        }
 
-  case ZType_Utf16VaryingString:{
-    URF_UnitCount_type wUnitCount;
-    Size += _importAtomic<URF_UnitCount_type>(wUnitCount,pPtrIn);
-    Size += wUnitCount * sizeof(utf16_t);
-    pPtrIn += wUnitCount * sizeof(utf16_t);
-    break;
-  }
-  case ZType_Utf32VaryingString:{
-    URF_UnitCount_type wUnitCount;
-    Size += _importAtomic<URF_UnitCount_type>(wUnitCount,pPtrIn);
-    Size += wUnitCount * sizeof(utf32_t);
-    pPtrIn += wUnitCount * sizeof(utf32_t);
-    break;
-  }
+        case ZType_Utf16VaryingString: {
+            URF_UnitCount_type wUnitCount;
+            Size += _importAtomic<URF_UnitCount_type>(wUnitCount, pPtrIn);
+            Size += wUnitCount * sizeof(utf16_t);
+            pPtrIn += wUnitCount * sizeof(utf16_t);
+            Present = true;
+            return ZS_SUCCESS;
+        }
+        case ZType_Utf32VaryingString: {
+            URF_UnitCount_type wUnitCount;
+            Size += _importAtomic<URF_UnitCount_type>(wUnitCount, pPtrIn);
+            Size += wUnitCount * sizeof(utf32_t);
+            pPtrIn += wUnitCount * sizeof(utf32_t);
+            Present = true;
+            return ZS_SUCCESS;
+        }
 
-  case ZType_Utf8FixedString:{
-    URF_Capacity_type   wCapacity;
-    URF_UnitCount_type  wUnitsCount;
+        case ZType_Utf8FixedString: {
+            URF_Capacity_type wCapacity;
+            URF_UnitCount_type wUnitsCount;
 
-    Size +=_importAtomic<URF_Capacity_type>(wCapacity,pPtrIn);
-    Size +=_importAtomic<URF_UnitCount_type>(wUnitsCount,pPtrIn);
+            Size += _importAtomic<URF_Capacity_type>(wCapacity, pPtrIn);
+            Size += _importAtomic<URF_UnitCount_type>(wUnitsCount, pPtrIn);
 
-    Size += size_t (wUnitsCount) * sizeof(utf8_t);
-    pPtrIn += size_t (wUnitsCount) * sizeof(utf8_t);
-    break;
-  }
+            Size += size_t(wUnitsCount) * sizeof(utf8_t);
+            pPtrIn += size_t(wUnitsCount) * sizeof(utf8_t);
+            Present = true;
+            return ZS_SUCCESS;
+        }
 
-    /* for fixed string URF header is different */
+            /* for fixed string URF header is different */
 
-  case ZType_Utf16FixedString:{
-    URF_Capacity_type   wCapacity;
-    URF_UnitCount_type  wUnitsCount;
+        case ZType_Utf16FixedString: {
+            URF_Capacity_type wCapacity;
+            URF_UnitCount_type wUnitsCount;
 
-    Size +=_importAtomic<URF_Capacity_type>(wCapacity,pPtrIn);
-    Size +=_importAtomic<URF_UnitCount_type>(wUnitsCount,pPtrIn);
+            Size += _importAtomic<URF_Capacity_type>(wCapacity, pPtrIn);
+            Size += _importAtomic<URF_UnitCount_type>(wUnitsCount, pPtrIn);
 
-    Size += size_t (wUnitsCount) * sizeof(utf16_t);
-    pPtrIn += size_t (wUnitsCount) * sizeof(utf16_t);
-    break;
-  }
+            Size += size_t(wUnitsCount) * sizeof(utf16_t);
+            pPtrIn += size_t(wUnitsCount) * sizeof(utf16_t);
+            Present = true;
+            return ZS_SUCCESS;
+        }
 
-  case ZType_Utf32FixedString:{
-    URF_Capacity_type   wCapacity;
-    URF_UnitCount_type  wUnitsCount;
+        case ZType_Utf32FixedString: {
+            URF_Capacity_type wCapacity;
+            URF_UnitCount_type wUnitsCount;
 
-    Size +=_importAtomic<URF_Capacity_type>(wCapacity,pPtrIn);
-    Size +=_importAtomic<URF_UnitCount_type>(wUnitsCount,pPtrIn);
+            Size += _importAtomic<URF_Capacity_type>(wCapacity, pPtrIn);
+            Size += _importAtomic<URF_UnitCount_type>(wUnitsCount, pPtrIn);
 
-    Size += size_t (wUnitsCount) * sizeof(utf32_t);
-    pPtrIn += size_t (wUnitsCount) * sizeof(utf32_t);
-    break;
-  }
+            Size += size_t(wUnitsCount) * sizeof(utf32_t);
+            pPtrIn += size_t(wUnitsCount) * sizeof(utf32_t);
+            Present = true;
+            return ZS_SUCCESS;
+        }
 
-  case ZType_CheckSum: {
-    Size += cst_checksum ;
-    pPtrIn += cst_checksum;
-    break;
-  }
+        case ZType_CheckSum: {
+            Size += cst_checksum;
+            pPtrIn += cst_checksum;
+            Present = true;
+            return ZS_SUCCESS;
+        }
 
-  case ZType_MD5: {
-    Size += cst_md5 ;
-    break;
-  }
+        case ZType_MD5: {
+            Size += cst_md5;
+            Present = true;
+            return ZS_SUCCESS;
+        }
 
-  case ZType_Blob: {
-    uint64_t wDataSize;
-    Size += _importAtomic(wDataSize,pPtrIn);
-    Size += wDataSize;
-    pPtrIn += wDataSize;
-    break;
-  }
+        case ZType_Blob: {
+            uint64_t wDataSize;
+            Size += _importAtomic(wDataSize, pPtrIn);
+            Size += wDataSize;
+            pPtrIn += wDataSize;
+            Present = true;
+            return ZS_SUCCESS;
+        }
 
-  case ZType_bitset: {
-    uint16_t    wByteSize,wEffectiveBitSize;
-    Size += _importAtomic<uint16_t>(wByteSize,pPtrIn);
-    Size += _importAtomic<uint16_t>(wEffectiveBitSize,pPtrIn);
-    Size += size_t(wByteSize);
-    pPtrIn += size_t(wByteSize);
-    break;
-  }
+        case ZType_bitset: {
+            uint16_t wByteSize, wEffectiveBitSize;
+            Size += _importAtomic<uint16_t>(wByteSize, pPtrIn);
+            Size += _importAtomic<uint16_t>(wEffectiveBitSize, pPtrIn);
+            Size += size_t(wByteSize);
+            pPtrIn += size_t(wByteSize);
+            Present = true;
+            return ZS_SUCCESS;
+        }
 
-  case ZType_bitsetFull: {
-    break;
-  }
+        case ZType_bitsetFull: {
+            Present = true;
+            return ZS_SUCCESS;
+        }
 
-  case ZType_Resource: {
-    Size += sizeof(ZEntity_type)+sizeof(Resourceid_type);
-    pPtrIn += sizeof(ZEntity_type)+sizeof(Resourceid_type);
-    break;
-  }
+        case ZType_Resource: {
+            Size += sizeof(ZEntity_type) + sizeof(Resourceid_type);
+            pPtrIn += sizeof(ZEntity_type) + sizeof(Resourceid_type);
+            Present = true;
+            return ZS_SUCCESS;
+        }
 
-  default: {
-    ZException.setMessage("getURFField",ZS_INVTYPE,Severity_Error,"Invalid ZType found %X ",ZType);
-    Size=0;
-    Ptr=nullptr;
-    Present = false;
-    return ZS_INVTYPE;
-  }
-  } // switch
-  Present = true;
-  return ZS_SUCCESS;
-}// fromPtr
+        default: {
+            ZException.setMessage("URFField",
+                                  ZS_INVTYPE,
+                                  Severity_Error,
+                                  "Invalid ZType found %X  record offset %ld",
+                                  ZType, pPtrIn - pRecord.Data);
+            if (pErrorLog!=nullptr) {
+                pErrorLog->logZExceptionLast("URFField::setFromPtr searching new ZType");
+            }
+            wSt=searchNextValidZType(pRecord,pPtrIn,pErrorLog);
+            if (wSt!=ZS_FOUND) {
+                ZException.setMessage("URFField",
+                                      wSt,
+                                      Severity_Error,
+                                      "Cannot find a valid ZType till end of record");
+                if (pErrorLog!=nullptr) {
+                    pErrorLog->logZExceptionLast("URFField::setFromPtr");
+                }
+                return wSt;
+            }
+            break;
+        } // default
+        } // switch
+    }// while true
 
-URFField
-getURFField(const unsigned char* &pPtrIn) {
-  URFField wF;
-  wF.setFromPtr(pPtrIn);
-  return wF;
-} //getURFField
+    return ZS_SUCCESS;
+} // setFromPtr
+
+ZStatus
+URFField::searchNextValidZType(const ZDataBuffer& pRecord,
+                               const unsigned char* &pPtr,
+                               ZaiErrors* pErrorLog)
+{
+    ZStatus wSt=ZS_SUCCESS;
+    const unsigned char* wPtrSv=pPtr;
+    const unsigned char* wPtrEnd = pRecord.Data + pRecord.Size ;
+
+    ZTypeBase wZType = reverseByteOrder_Ptr<ZTypeBase>(pPtr);
+
+    while (!ZTypeExists(wZType) && (pPtr < wPtrEnd)) {
+        pPtr++;
+        wZType=reverseByteOrder_Ptr<ZTypeBase>(pPtr);
+    }
+
+    if (ZTypeExists(wZType)) {
+        if (pErrorLog!=nullptr)
+            pErrorLog->infoLog("searchNextValidZType Found valid type 0x%X <%s> shifted %ld bytes right at record offset %ld as next valid data type.",
+                               wZType,decode_ZType(wZType),pPtr-wPtrSv, pPtr-pRecord.Data);
+        else
+            _DBGPRINT("searchNextValidZType Found type %X <%s>  shifted %ld bytes right at record offset %ld as next valid data type.\n",
+                      wZType,decode_ZType(wZType),pPtr-wPtrSv, pPtr-pRecord.Data);
+
+        return ZS_FOUND;
+    }
+    if (pErrorLog!=nullptr)
+        pErrorLog->infoLog("searchNextValidZType No valid ZType can be found until end of block.");
+    else
+        _DBGPRINT("searchNextValidZType No valid ZType can be found until end of block.");
+    return ZS_NOTFOUND;
+}// searchNextValidZType
+
 
 
 utf8VaryingString
@@ -252,7 +345,7 @@ URFField::display() {
     return "not present";
   }
   ZTypeBase wZType;
-  const unsigned char* wPtr=Ptr;
+  const unsigned char* wPtr=FieldPtr;
   utf8VaryingString wReturn;
   Size = sizeof(ZTypeBase);
   _importAtomic<ZTypeBase>(wZType,wPtr);
@@ -522,14 +615,697 @@ URFField::display() {
   }// switch
 
   return wReturn;
+} //display
+
+URFField& URFField::_copyFrom(const URFField& pIn) {
+    Present=pIn.Present;
+    FieldPtr=pIn.FieldPtr;
+    Size=pIn.Size;
+    ZType=pIn.ZType;
+    _URFParser = pIn._URFParser;
+    HashTime = pIn.HashTime;
+    return *this;
 }
+
+void URFField::clear()
+{
+    Present=false;
+    FieldPtr=nullptr;
+    HashTime.clear() ;
+    Size=0;
+    ZType=ZType_Nothing;
+    _URFParser = nullptr;
+    return;
+}
+
+utf8VaryingString
+URFField::displayFmt(zbs::ZCFMT_Type pCellFormat)
+{
+    if (!Present) {
+        return "not present";
+    }
+    ZTypeBase wZType;
+    const unsigned char* wPtr=FieldPtr;
+    utf8VaryingString wStr;
+    Size = sizeof(ZTypeBase);
+    _importAtomic_KeepPtr<ZTypeBase>(wZType,wPtr);
+
+    if (HashTime!=_URFParser->HashTime) {
+        _DBGPRINT("URFField::displayFmt-E-CORRUPT Hashtime values does not match.\n")
+    }
+
+    if (wZType!=ZType) {
+        _DBGPRINT("URFField::displayFmt-E-INVTYP Effective ZType 0x%X %s does not correspond to parsed ZType 0x%X %s\n",
+                  wZType,decode_ZType(wZType),ZType,decode_ZType(ZType))
+    }
+    /* for atomic URF data, value is just following ZType. For other types, use _importURF function that implies ZType */
+    if (wZType & ZType_Atomic) {
+         wPtr += sizeof(ZTypeBase);
+//        wZType &= ~ZType_Atomic;
+    }
+
+
+
+    switch (wZType) {
+    case ZType_AtomicUChar:
+    case ZType_UChar:
+    {
+        if (pCellFormat & ZCFMT_PrefZType) {
+                        wStr = "UChar[";
+        }
+        uint8_t wValue;
+        wValue=convertAtomicBack<uint8_t> (ZType_U8,wPtr);
+        if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+            wStr.addsprintf("0x%X",wValue);
+        else
+            wStr.addsprintf("%u",wValue);
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+    case ZType_AtomicU8:
+    case ZType_U8:
+    {
+        if (pCellFormat & ZCFMT_PrefZType) {
+                wStr = "U8[";
+        }
+        uint8_t wValue;
+        wValue=convertAtomicBack<uint8_t> (ZType_U8,wPtr);
+        if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+            wStr.addsprintf("0x%X",wValue);
+        else
+            wStr.addsprintf("%u",wValue);
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+    case ZType_Char:
+    case ZType_AtomicChar:
+    {
+        int8_t wValue;
+        if (pCellFormat & ZCFMT_PrefZType) {
+                wStr = "Char[";
+        }
+        wValue=convertAtomicBack<int8_t> (ZType_S8,wPtr);
+        if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+            wStr.addsprintf("0x%X",wValue);
+        else
+            wStr.addsprintf("%d",wValue);
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+    case ZType_S8:
+
+    case ZType_AtomicS8:
+    {
+        int8_t wValue;
+        if (pCellFormat & ZCFMT_PrefZType) {
+                wStr = "S8[";
+        }
+        wValue=convertAtomicBack<int8_t> (ZType_S8,wPtr);
+        if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+            wStr.addsprintf("0x%X",wValue);
+        else
+            wStr.addsprintf("%d",wValue);
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+    case ZType_AtomicU16:
+    case ZType_U16:
+    {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "U16[";
+        }
+        uint16_t wValue;
+        wValue=convertAtomicBack<uint16_t> (ZType_U16,wPtr);
+        if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+            wStr.addsprintf("0x%X",wValue);
+        else
+            wStr.addsprintf("%u",wValue);
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+    case ZType_AtomicS16:
+    case ZType_S16: {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "ZType_S16[";
+        }
+        int16_t wValue;
+        wValue=convertAtomicBack<int16_t> (ZType_S16,wPtr);
+        if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+            wStr.addsprintf("0x%X",wValue);
+        else
+            wStr.addsprintf("%d",wValue);
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+
+    case ZType_AtomicU32:
+    case ZType_U32:
+    {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "U32[";
+        }
+        uint32_t wValue;
+        wValue=convertAtomicBack<uint32_t> (ZType_U32,wPtr);
+        if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+            wStr.addsprintf("0x%X",wValue);
+        else
+            wStr.addsprintf("%u",wValue);
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+    case ZType_AtomicS32:
+    case ZType_S32:
+    {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "S32[";
+        }
+        int32_t wValue;
+        wValue=convertAtomicBack<int32_t> (ZType_S32,wPtr);
+        if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+            wStr.addsprintf("0x%X",wValue);
+        else
+            wStr.addsprintf("%d",wValue);
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+    case ZType_AtomicU64:
+    case ZType_U64:
+    {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "U64[";
+        }
+        uint64_t wValue;
+        wValue=convertAtomicBack<uint64_t> (ZType_U64,wPtr);
+        if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+            wStr.addsprintf("0x%X",wValue);
+        else
+            wStr.addsprintf("%0llu",wValue);
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+    case ZType_AtomicS64:
+    case ZType_S64:
+    {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "S64[";
+        }
+        int64_t wValue;
+        wValue=convertAtomicBack<int64_t> (ZType_S64,wPtr);
+        if ((pCellFormat & ZCFMT_NumMask)==ZCFMT_NumHexa)
+            wStr.addsprintf("0x%X",wValue);
+        else
+            wStr.addsprintf("%lld",wValue);
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+    case ZType_AtomicFloat:
+    case ZType_Float:
+    {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "Float[";
+        }
+        float wValue;
+        wValue=convertAtomicBack<float> (ZType_Float,wPtr);
+        wStr.addsprintf("%g",wValue);
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+
+    case ZType_AtomicDouble:
+    case ZType_Double:
+    {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "Double[";
+        }
+        double wValue;
+        wValue=convertAtomicBack<double> (ZType_Double,wPtr);
+        wStr.addsprintf("%g",wValue);
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+    case ZType_AtomicLDouble:
+    case ZType_LDouble:
+    {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "LDouble[";
+        }
+        long double wValue;
+        wValue=convertAtomicBack<long double> (ZType_LDouble,wPtr);
+        wStr.addsprintf("%g",wValue);
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+
+    /* classes */
+
+    case ZType_ZDateFull: {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "ZDateFull[";
+        }
+        ssize_t wSize;
+        ZDateFull wZDateFull;
+
+        if ((wSize = wZDateFull._importURF(wPtr)) < 0) {
+            wStr += "**value**";
+        }
+        else {
+            ZCFMT_Type wFmt = pCellFormat & ZCFMT_DateMask;
+            switch (wFmt)
+            {
+            case ZCFMT_DMY:
+                wStr+=wZDateFull.toDMY();
+                break;
+            case ZCFMT_MDY:
+                wStr+=wZDateFull.toMDY();
+                break;
+            case ZCFMT_MDYHMS:
+                wStr+=wZDateFull.toMDYhms();
+                break;
+            case ZCFMT_DMYHMS:
+                wStr+=wZDateFull.toDMYhms();
+                break;
+            case ZCFMT_DLocale:
+                wStr+=wZDateFull.toLocale();
+                break;
+            case ZCFMT_DUTC:
+                wStr+=wZDateFull.toUTCGMT();
+                break;
+            case ZCFMT_Nothing:
+            default:
+                wStr+=wZDateFull.toLocale();
+                break;
+            }
+        }// else
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+
+    case ZType_URIString:{
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "URIString[";
+        }
+        uriString wString;
+        ssize_t wSize = wString._importURF(wPtr);
+        if (wSize<0) {
+            wString += "**errored**";
+        }
+
+        if (wString.strlen() > cst_StringDisplayMax){
+            wStr += wString.Right(cst_StringDisplayMax).toString();
+            wStr += cst_OverflowChar8;
+        }
+        else if (wString.isEmpty()) {
+            wStr += "<empty>";
+        }
+        else {
+            wStr += wString;
+        }
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    } // ZType_URIString
+
+    case ZType_Utf8VaryingString:
+    {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "Utf8VaryingString[";
+        }
+        utf8VaryingString wString;
+        ssize_t wSize=wString._importURF(wPtr);
+        if (wSize<0) {
+            wString += "**errored**";
+        }
+        if (wString.isEmpty()) {
+            wStr += "<empty>";
+        }
+        else {
+            if (wString.strlen() > cst_StringDisplayMax){
+                wStr += wString.Right(cst_StringDisplayMax).toString();
+                wStr += cst_OverflowChar8;
+            }
+            else {
+                wStr += wString;
+            }
+        }// else
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    } // ZType_Utf8VaryingString
+
+    case ZType_Utf16VaryingString:
+    {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "Utf16VaryingString[";
+        }
+        utf16VaryingString wString;
+
+        ssize_t wSize = wString._importURF(wPtr);
+        if (wSize<0) {
+            wString += "**errored**";
+        }
+        if (wString.isEmpty()) {
+            wStr += "<empty>";
+        }
+        else {
+            utf8VaryingString wString8;
+            wString8.fromUtf16(wString);
+            if (wString8.strlen() > cst_StringDisplayMax){
+                wStr += wString8.Right(cst_StringDisplayMax).toString();
+                wStr += cst_OverflowChar8;
+            }
+            else {
+                wStr += wString8;
+            }
+        } // else
+
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    } // ZType_Utf16VaryingString
+
+    case ZType_Utf32VaryingString:
+    {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "Utf32VaryingString[";
+        }
+        utf32VaryingString wString;
+
+        ssize_t wSize = wString._importURF(wPtr);
+        if (wSize<0) {
+            wString += "**errored**";
+        }
+
+        if (wString.isEmpty()) {
+            wStr += "<empty>";
+        }
+        else {
+            utf8VaryingString wString8;
+            wString8.fromUtf32(wString);
+
+            if (wString8.strlen() > cst_StringDisplayMax){
+                utf8VaryingString w1 = cst_OverflowChar8 ;
+                wStr += wString8.Right(cst_StringDisplayMax).toString();
+                wStr += cst_OverflowChar8;
+            }
+            else {
+                wStr += wString8;
+            }
+        } // else
+
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    } // ZType_Utf32VaryingString
+
+    case ZType_Utf8FixedString:
+    {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "Utf8FixedString[";
+        }
+
+        URF_Capacity_type   wCapacity;
+        URF_UnitCount_type  wUnitsCount;
+        size_t              wStringByteSize;
+
+        wPtr += sizeof(ZTypeBase);
+
+        _importAtomic<URF_Capacity_type>(wCapacity,wPtr);
+        _importAtomic<URF_UnitCount_type>(wUnitsCount,wPtr);
+
+        wStringByteSize = size_t (wUnitsCount) * sizeof(utf8_t);
+        utf8_t* wPtrOut ;
+        bool wSizeOverflow=false;
+        if (wUnitsCount > cst_StringDisplayMax) {
+            wUnitsCount = cst_StringDisplayMax ;
+            wSizeOverflow=true;
+            wPtrOut = wStr.extendUnitsBZero(size_t(wUnitsCount+2));
+        }
+        else
+            wPtrOut = wStr.extendUnitsBZero(size_t(wUnitsCount+1));
+
+        URF_Capacity_type wI = wUnitsCount;
+
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wPtrOut--;  /* to skip leading '\0' */
+        }
+
+//        utf8_t* wPtrOut = (utf8_t*)wStr.Data;
+        utf8_t* wPtrIn = (utf8_t*)wPtr;
+        while (wI--&& *wPtrIn )
+            *wPtrOut++ = *wPtrIn++;
+        if (wSizeOverflow)
+            wStr += cst_OverflowChar8 ;
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    } // ZType_Utf8FixedString
+
+        /* for fixed string URF header is different */
+
+    case ZType_Utf16FixedString:{
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "ZType_Utf16FixedString[";
+        }
+        utf16VaryingString wString;
+
+        URF_Capacity_type wCapacity;
+        URF_UnitCount_type  wUnitsCount;
+
+
+        wPtr += sizeof(ZTypeBase);
+
+        _importAtomic<URF_Capacity_type>(wCapacity,wPtr);
+        _importAtomic<URF_UnitCount_type>(wUnitsCount,wPtr);
+
+        size_t wStringByteSize = size_t (wUnitsCount) * sizeof(utf16_t);
+
+        /* the whole string must be imported, then possibly truncated afterwards to maximum displayable */
+
+        utf16_t* wPtrOut ;
+        URF_Capacity_type wI = wUnitsCount;
+        bool wSizeOverflow=false;
+        if (wUnitsCount > cst_StringDisplayMax) {
+            wUnitsCount = cst_StringDisplayMax;
+            wSizeOverflow=true;
+        }
+
+        wPtrOut = wString.allocateUnitsBZero(size_t(wUnitsCount+1));
+
+        utf16_t* wPtrIn = (utf16_t*)wPtr;
+        while ( wI-- && *wPtrIn )
+            *wPtrOut++ = *wPtrIn++;
+
+        wPtr = (unsigned char*) wPtrIn;
+
+        utf8VaryingString wString8;
+
+        wString8.fromUtf16(wString);
+        if (wSizeOverflow)
+            wString8 += cst_OverflowChar8 ;
+
+        wString += wString8;
+
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    } // ZType_Utf16FixedString
+
+    case ZType_Utf32FixedString:{
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "ZType_Utf32FixedString[";
+        }
+        utf32VaryingString wString;
+        URF_Capacity_type wCapacity;
+        URF_UnitCount_type  wUnitsCount;
+
+        wPtr += sizeof(ZTypeBase);
+
+        _importAtomic<URF_Capacity_type>(wCapacity,wPtr);
+        _importAtomic<URF_UnitCount_type>(wUnitsCount,wPtr);
+
+        size_t wStringByteSize = size_t (wUnitsCount) * sizeof(utf32_t);
+
+        URF_Capacity_type wI = wUnitsCount;
+        bool wSizeOverflow=false;
+        if (wUnitsCount > cst_StringDisplayMax) {
+            wUnitsCount = cst_StringDisplayMax;
+            wSizeOverflow=true;
+        }
+
+        wString.allocateUnitsBZero(size_t(wUnitsCount+1));
+
+        utf32_t* wPtrOut = (utf32_t*)wString.Data;
+        utf32_t* wPtrIn = (utf32_t*)wPtr;
+
+        while (wI--&& *wPtrIn )
+            *wPtrOut++ = *wPtrIn++;
+
+        utf8VaryingString wString8;
+
+        wString8.fromUtf32(wString);
+        if (wSizeOverflow)
+            wString8 += cst_OverflowChar8 ;
+        wStr=wString8;
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    } // ZType_Utf32FixedString
+
+    case ZType_CheckSum: {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "ZType_CheckSum[";
+        }
+        checkSum wCheckSum;
+        wCheckSum._importURF(wPtr);
+        wStr += wCheckSum.toHexa();
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+
+    case ZType_MD5: {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "ZType_MD5[";
+        }
+        md5 wCheckSum;
+        wCheckSum._importURF(wPtr);
+        wStr += wCheckSum.toHexa();
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+
+    case ZType_Blob: {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "ZType_Blob[";
+        }
+        if (pCellFormat & ZCFMT_DumpBlob) {
+            ZDataBuffer wZDB;
+            if (wZDB._importURF(wPtr)<0) {
+                wStr += "invalid URF blob";
+            }
+            else {
+                wStr += wZDB.simpleDump(false,cst_StringDisplayMax/2);
+            }
+        } // ZCFMT_DumpBlob
+        else
+        {
+            uint64_t wDataSize;
+            wPtr += sizeof(ZTypeBase);
+            _importAtomic(wDataSize,wPtr);
+            wStr.addsprintf("<blob %lld bytes>",wDataSize);
+        }
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+
+    case ZType_bitset: {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "ZType_bitset[";
+        }
+        ZBitset wBitset;
+
+        ssize_t wSize=wBitset._importURF(wPtr);
+        wStr += "<";
+        wStr += wBitset.toString();
+        wStr += ">";
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+
+    case ZType_bitsetFull: {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "ZType_bitsetFull[";
+        }
+        wStr += "<bitset full>";
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    }
+
+    case ZType_Resource: {
+        if (pCellFormat & ZCFMT_PrefZType) {
+            wStr = "ZType_Resource[";
+        }
+        ZResource wValue;
+        ssize_t wSize=wValue._importURF(wPtr);
+        if (!wValue.isValid()) {
+            wStr += "<Invalid resource>";
+        }
+        else {
+            ZCFMT_Type wFmt = pCellFormat & ZCFMT_ResMask;
+            if (wFmt & ZCFMT_ResSymb) {
+                utf8VaryingString  wZEntitySymbol ;
+
+                int wi=0;
+                for (; wi < ZEntitySymbolList.count();wi++) {
+                    if (ZEntitySymbolList[wi].Value == wValue.Entity)
+                        break;
+                }
+
+                if (wi < ZEntitySymbolList.count())
+                    wZEntitySymbol = ZEntitySymbolList[wi].Symbol;
+                else
+                    wZEntitySymbol.addsprintf("%X",int(wValue.Entity));
+
+                if (wFmt & ZCFMT_ResStd) {
+                    wStr.addsprintf("[%s,%ld]",wZEntitySymbol.toCChar(),wValue.id);
+                }
+                else {
+                    wStr.addsprintf("[%s,0x%X]",wZEntitySymbol.toCChar(),wValue.id);
+                }
+            } // ZCFMT_ResSymb
+            else {
+                if (wFmt & ZCFMT_ResStd) {
+                    wStr.addsprintf("[%d,%ld]",wValue.Entity,wValue.id);
+                }
+                else {
+                    wStr.addsprintf("[0x%X,0x%X]",wValue.Entity,wValue.id);
+                } //ZCFMT_ResStd
+            }// else
+        }
+
+        if (pCellFormat & ZCFMT_PrefZType)
+            wStr += "]";
+        return wStr;
+    } //ZType_Resource
+
+    default: {
+        wStr.sprintf ("Unknown data type <%d> <%X>",wZType,wZType);
+        return wStr;
+    }
+
+    }// switch
+
+    return wStr;
+} //displayFmt
+
+
+
+
 utf8VaryingString
 URFField::stdDisplay() {
   if (!Present) {
     return "not present";
   }
   ZTypeBase wZType;
-  const unsigned char* wPtr=Ptr;
+  const unsigned char* wPtr=FieldPtr;
   utf8VaryingString wReturn;
 
   _importAtomic<ZTypeBase>(wZType,wPtr);
@@ -767,7 +1543,7 @@ URFField::stdDisplay() {
     uint64_t wDataSize;
     wPtr += sizeof(ZTypeBase);
     _importAtomic(wDataSize,wPtr);
-    wBlob.setData(Ptr,wDataSize);
+    wBlob.setData(FieldPtr,wDataSize);
     wBlob.encryptB64();
     wReturn=(utf8_t*)wBlob.Data;
     wPtr += size_t(wDataSize);
@@ -818,8 +1594,8 @@ URFField::toXml(int pLevel)
   ZTypeBase wZType = ZType ;
   if (ZType & ZType_Atomic )
      wZType = ZType & ~ ZType_Atomic ;
-  const unsigned char* wPtrAtomic = Ptr + sizeof(ZTypeBase); /* for atomic data */
-  const unsigned char* wPtr = Ptr ; /* for classes and others : need to point to ZTypeBase */
+  const unsigned char* wPtrAtomic = FieldPtr + sizeof(ZTypeBase); /* for atomic data */
+  const unsigned char* wPtr = FieldPtr ; /* for classes and others : need to point to ZTypeBase */
 
   switch (wZType)
   {
@@ -955,7 +1731,7 @@ URFField::toXml(int pLevel)
 
     utf8_t* wPtrOut = (utf8_t*)wString.Data;
     utf8_t* wPtrIn = (utf8_t*)wPtrAtomic;
-    while (wI--&& *wPtrIn )
+    while ((wI-->0) && *wPtrIn )
       *wPtrOut++ = *wPtrIn++;
     wXmlString += fmtXMLuint("capacity",wCapacity,pLevel);
     wXmlString += fmtXMLchar("content",wString.toCChar(),pLevel);
@@ -1040,19 +1816,7 @@ URFField::toXml(int pLevel)
     break;
   }
 
-  case ZType_Blob: {
-    ZDataBuffer wBlob;
-    uint64_t wDataSize;
-    utf8VaryingString wBlobContent;
-//    wPtrAtomic += sizeof(ZTypeBase);
-    wDataSize=convertAtomicBack<uint64_t>(ZType_U64,wPtrAtomic);
-    wBlob.setData(wPtrAtomic,wDataSize);
-    wBlob.encryptB64();
-    wXmlString += "<content>";
-    wXmlString.nadd((utf8_t*)wBlob.Data,wBlob.Size);
-    wXmlString += fmtXMLendnode("content",0);
-    break;
-  }
+
 
   case ZType_bitsetFull:
   case ZType_bitset: {
@@ -1077,7 +1841,23 @@ URFField::toXml(int pLevel)
     wXmlString += fmtXMLendnode("content",pLevel);
     break;
   }
-
+  case ZType_Blob: {
+    ZDataBuffer wBlob;
+    wBlob._importURF(wPtr);
+    wXmlString += fmtXMLBlob("content",wBlob,pLevel);
+/*
+    uint64_t wDataSize;
+    utf8VaryingString wBlobContent;
+    //    wPtrAtomic += sizeof(ZTypeBase);
+    wDataSize=convertAtomicBack<uint64_t>(ZType_U64,wPtrAtomic);
+    wBlob.setData(wPtrAtomic,wDataSize);
+    wBlob.encryptB64();
+    wXmlString += "<content>";
+    wXmlString.nadd((utf8_t*)wBlob.Data,wBlob.Size);
+    wXmlString += fmtXMLendnode("content",0);
+    break;
+*/
+  }
   default: {
     fprintf(stderr,"exportContent-F-INVTYP Unknown data type <%d> <%X>\n",wZType,wZType);
     wXmlComment.sprintf("Unknown/unmanaged data type <%d> <%X>",wZType,wZType);
@@ -1100,14 +1880,14 @@ URFField::fromXml(zxmlElement* pFieldNode,ZDataBuffer& pURFContent,ZaiErrors* pE
   ZStatus wSt=XMLgetChildUInt32(pFieldNode,"ztype",ZType,pErrorLog,ZAIES_Info);
   if (wSt!=ZS_SUCCESS) {
     Present = false;
-    Ptr = nullptr;
+    FieldPtr = nullptr;
     Size = 0 ;
     return ZS_SUCCESS;
   }
 
   Present = true;
-
-  if (ZType & ZType_Atomic)
+  wZTypeB = ZType;
+  if (wZTypeB & ZType_Atomic)
     wZTypeB = ZType & ~ ZType_Atomic;
   switch (wZTypeB)
   {
@@ -1286,7 +2066,7 @@ URFField::fromXml(zxmlElement* pFieldNode,ZDataBuffer& pURFContent,ZaiErrors* pE
 
     Size= sizeof(ZTypeBase) + sizeof(URF_Capacity_type) + sizeof(URF_UnitCount_type) + (sizeof(uint8_t)*wString.getUnitCount()) ;
     pURFContent.allocateBZero(Size);
-    Ptr = pURFContent.Data;
+    FieldPtr = pURFContent.Data;
     unsigned char* wPtrOut = pURFContent.Data;
     ZTypeBase* wPtrTB = (ZTypeBase*)wPtrOut;
     *wPtrTB = reverseByteOrder_Conditional<ZTypeBase>(ZType) ;
@@ -1325,7 +2105,7 @@ URFField::fromXml(zxmlElement* pFieldNode,ZDataBuffer& pURFContent,ZaiErrors* pE
 
     Size= sizeof(ZTypeBase) + sizeof(URF_Capacity_type) + sizeof(URF_UnitCount_type) + (sizeof(uint16_t)*wString.getUnitCount()) ;
     pURFContent.allocateBZero(Size);
-    Ptr = pURFContent.Data;
+    FieldPtr = pURFContent.Data;
     unsigned char* wPtrOut = pURFContent.Data;
     ZTypeBase* wPtrTB = (ZTypeBase*)wPtrOut;
     *wPtrTB = reverseByteOrder_Conditional<ZTypeBase>(ZType) ;
@@ -1365,7 +2145,7 @@ URFField::fromXml(zxmlElement* pFieldNode,ZDataBuffer& pURFContent,ZaiErrors* pE
 
     Size= sizeof(ZTypeBase) + sizeof(URF_Capacity_type) + sizeof(URF_UnitCount_type) + (sizeof(uint32_t)*wString.getUnitCount()) ;
     pURFContent.allocateBZero(Size);
-    Ptr = pURFContent.Data;
+    FieldPtr = pURFContent.Data;
     unsigned char* wPtrOut = pURFContent.Data;
     ZTypeBase* wPtrTB = (ZTypeBase*)wPtrOut;
     *wPtrTB = reverseByteOrder_Conditional<ZTypeBase>(ZType) ;
@@ -1410,8 +2190,44 @@ URFField::fromXml(zxmlElement* pFieldNode,ZDataBuffer& pURFContent,ZaiErrors* pE
     return ZS_SUCCESS ;
   } // ZType_MD5
 
-  case ZType_Blob: {
+  case ZType_bitsetFull:
+  case ZType_bitset: {
+    utf8VaryingString wBitsetContent;
+    pErrorLog->warningLog("exportContent-F-INVTYP ZType_bitset data type cannot be imported.");
+    ZBitset wBitset;
+    wSt=XMLgetChildText(pFieldNode,"content",wBitsetContent,pErrorLog,ZAIES_Error);
+    if (wSt!=ZS_SUCCESS)
+      return wSt;
+
+    utf8_t* wPtr=wBitsetContent.Data;
+    wBitset._allocate(wBitsetContent.getByteSize());
+    wBitset.clear();
+    size_t wI=0;
+    for (size_t wi=0; (wi < wBitsetContent.ByteSize) && (wPtr[wi]!=0) ; wi ++) {
+      if (wPtr[wi]=='1')
+        wBitset.set(wi);
+    }
+    return ZS_SUCCESS;
+  } // ZType_bitset ZType_bitsetFull
+
+  case ZType_Resource: {
+     ZResource wValue;
+    ZStatus wSt= wValue.fromXml(pFieldNode,"content",pErrorLog,ZAIES_Error);
+    if (wSt!=ZS_SUCCESS)
+      return wSt;
+    wValue._exportURF(pURFContent);
+    return ZS_SUCCESS;
+  }
+
+  case ZType_Blob:
+  {
     ZDataBuffer wBlob;
+    wSt=XMLgetChildBlob(pFieldNode,"content",wBlob,pErrorLog,ZAIES_Error);
+    if (wSt!=ZS_SUCCESS)
+      return wSt;
+    wBlob._exportURF(pURFContent);
+    return ZS_SUCCESS ;
+    /*
     uint64_t wDataSize;
     utf8VaryingString wBlobContent;
 
@@ -1436,44 +2252,27 @@ URFField::fromXml(zxmlElement* pFieldNode,ZDataBuffer& pURFContent,ZaiErrors* pE
 
     pURFContent.appendData(wBlobZDB);
     return ZS_SUCCESS ;
-  }
-
-  case ZType_bitsetFull:
-  case ZType_bitset: {
-    utf8VaryingString wBitsetContent;
-    pErrorLog->warningLog("exportContent-F-INVTYP ZType_bitset data type cannot be imported.");
-    ZBitset wBitset;
-    wSt=XMLgetChildText(pFieldNode,"content",wBitsetContent,pErrorLog,ZAIES_Error);
-    if (wSt!=ZS_SUCCESS)
-      return wSt;
-
-    utf8_t* wPtr=wBitsetContent.Data;
-    wBitset._allocate(wBitsetContent.getByteSize());
-    wBitset.clear();
-    size_t wI=0;
-    for (size_t wi=0; (wi < wBitsetContent.ByteSize) && (wPtr[wi]!=0) ; wi ++) {
-      if (wPtr[wi]=='1')
-        wBitset.set(wi);
-    }
-    return ZS_SUCCESS;
-  } // ZType_bitset ZType_bitsetFull
-
-  case ZType_Resource: {
-    ZResource wValue;
-    int wRet=wValue.fromXml(pFieldNode,"content",pErrorLog);
-    if (wRet < 0)
-      return ZS_XMLERROR;
-
-    wValue._exportURF(pURFContent);
-    return ZS_SUCCESS;
+*/
   }
 
   default: {
-    fprintf(stderr,"importContent-F-INVTYPE Unknown data type <%d> <%X>\n",wZType,wZType);
-    pErrorLog->errorLog("importContent-F-INVTYPE Unknown/unmanaged data type <%d> <%X>",wZType,wZType);
+    fprintf(stderr,"importContent-F-INVTYPE Unknown data type <%d> <%X>\n",ZType,ZType);
+    pErrorLog->errorLog("importContent-F-INVTYPE Unknown/unmanaged data type <%d> <%X>",ZType,ZType);
     return ZS_INVTYPE;
   }
   }// switch
 
   return ZS_INVTYPE;
+}
+
+
+URFField getURFField(const ZDataBuffer& pRecord,
+                     const unsigned char* &pPtrIn,
+                     ZaiErrors* pErrorLog)
+{
+    URFField wReturn;
+    ZStatus wSt=wReturn.setFromPtr(pRecord,pPtrIn,pErrorLog);
+    if (wSt==ZS_NOTFOUND)
+        return URFField();
+    return wReturn;
 }

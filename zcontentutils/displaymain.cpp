@@ -14,7 +14,8 @@
 
 #include <zexceptiondlg.h>
 
-#include <zcontentvisumain.h>
+//#include <zcontentvisumain.h>
+#include <ztoolset/uristring.h>
 
 #include <zqt/zqtwidget/zqtwidgettools.h>
 
@@ -24,50 +25,66 @@
 
 extern Qt::AlignmentFlag QtAlignmentFlag;
 
-
+/*
 DisplayMain::DisplayMain(ZContentVisuMain *parent) :QMainWindow((QWidget*)parent),ui(new Ui::DisplayMain)
 {
-  ui->setupUi(this);
+ initLayout();
   VisuMain=parent;
-  setWindowTitle("Entity display");
 
-/*  ui->displayTBv->setStyleSheet(QString::fromUtf8("QTableView::item{border-left : 1px solid black;\n"
+}
+*/
+DisplayMain::DisplayMain(const uriString* pURIContent,QWidget *parent) :QMainWindow((QWidget*)parent),ui(new Ui::DisplayMain)
+{
+    initLayout();
+    URIContent=pURIContent;
+
+}
+void
+DisplayMain::initLayout()
+{
+    ui->setupUi(this);
+
+    setWindowTitle("Entity display");
+
+    /*  ui->displayTBv->setStyleSheet(QString::fromUtf8("QTableView::item{border-left : 1px solid black;\n"
                                                 "border-right  : 1px solid black;\n"
                                                 "font: 75 12pt \"Courier\";\n"
                                                 " }"));
 */
-  displayItemModel=new QStandardItemModel(0,5,this) ;/* 4 columns */
+    displayItemModel=new QStandardItemModel(0,5,this) ;/* 4 columns */
 
-  ui->ClosedLBl->setVisible(false);
+    ui->ClosedLBl->setVisible(false);
 
-  displayItemModel->setHorizontalHeaderItem(0,new QStandardItem(tr("Size")));
-  displayItemModel->setHorizontalHeaderItem(1,new QStandardItem(tr("Field")));
-  displayItemModel->setHorizontalHeaderItem(2,new QStandardItem(tr("Raw value(hexa)")));
-  displayItemModel->setHorizontalHeaderItem(3,new QStandardItem(tr("converted")));
-  displayItemModel->setHorizontalHeaderItem(4,new QStandardItem(tr("additional info")));
+    displayItemModel->setHorizontalHeaderItem(0,new QStandardItem(tr("Size")));
+    displayItemModel->setHorizontalHeaderItem(1,new QStandardItem(tr("Field")));
+    displayItemModel->setHorizontalHeaderItem(2,new QStandardItem(tr("Raw value(hexa)")));
+    displayItemModel->setHorizontalHeaderItem(3,new QStandardItem(tr("converted")));
+    displayItemModel->setHorizontalHeaderItem(4,new QStandardItem(tr("additional info")));
 
-  ui->displayTBv->setModel(displayItemModel );
-  ui->displayTBv->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  ui->displayTBv->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    ui->displayTBv->setModel(displayItemModel );
+    ui->displayTBv->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    ui->displayTBv->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
 
-//  ui->displayTBv->verticalHeader()->hide();
+    //  ui->displayTBv->verticalHeader()->hide();
 
-  ui->displayTBv->setShowGrid(true);
+    ui->displayTBv->setShowGrid(true);
 
-  ui->displayTBv->setSelectionMode(QAbstractItemView::SingleSelection); // only one row can be selected
-  ui->displayTBv->setWordWrap(false);
+    ui->displayTBv->setSelectionMode(QAbstractItemView::SingleSelection); // only one row can be selected
+    ui->displayTBv->setWordWrap(false);
 
-  ui->displayTBv->setSortingEnabled(false);  // will be set to true in the end of setup_effective
+    ui->displayTBv->setSortingEnabled(false);  // will be set to true in the end of setup_effective
 
-  ui->OffsetLBl->setText("0  - Ox0");
+    ui->OffsetLBl->setText("0  - Ox0");
 
-//  ui->OffsetSLd->setSingleStep(1);
+    //  ui->OffsetSLd->setSingleStep(1);
 
-  ui->offsetSBx->setSingleStep(1);
+    ui->offsetSBx->setSingleStep(1);
 
-  QObject::connect(ui->offsetSBx, SIGNAL(valueChanged(int)), this, SLOT(sliderChange(int)));
+    QObject::connect(ui->offsetSBx, SIGNAL(valueChanged(int)), this, SLOT(sliderChange(int)));
+
 }
+
 
 void DisplayMain::setFileClosed(bool pYesNo)
 {
@@ -77,7 +94,7 @@ void DisplayMain::setFileClosed(bool pYesNo)
 void
 DisplayMain::displayHCB(ZDataBuffer &pData)
 {
-  utf8String wStr;
+  utf8VaryingString wStr;
   PtrIn=pData.Data;
   if (pData.Size < sizeof(ZHeaderControlBlock_Export))
   {
@@ -128,7 +145,7 @@ DisplayMain::setOffset(size_t pOffset,size_t pMax) {
 void
 DisplayMain::displayFCB(ZDataBuffer &pData)
 {
-  utf8String wStr;
+  utf8VaryingString wStr;
   PtrIn=pData.Data;
   clear();
   show();
@@ -144,28 +161,28 @@ DisplayMain::displayFCB(ZDataBuffer &pData)
     if (wRet==ZEDLG_Rejected)
         return;
 //      case ZEDLG_Accepted:
-    if (VisuMain->URICurrent.getFileSize()>100000000)
+    if (URIContent->getFileSize()>100000000)
         {
         ZExceptionDLg::message("DisplayMain::displayFCB",ZS_INVSIZE,Severity_Error,
                               "Cannot load content of file <%s> size <%lld> exceeds capacity",
-                               VisuMain->URICurrent.toCChar(),
-                               VisuMain->URICurrent.getFileSize());
+                               URIContent->toCChar(),
+                               URIContent->getFileSize());
         return;
         }
-    if (VisuMain->URICurrent.getFileSize()<(sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+1))
+    if (URIContent->getFileSize()<(sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+1))
         {
         ZExceptionDLg::message("DisplayMain::displayFCB",ZS_INVSIZE,Severity_Error,
             "file <%s> has size <%lld> that does not allow to store a header + a file control block.",
-            VisuMain->URICurrent.toCChar(),
-            VisuMain->URICurrent.getFileSize());
+            URIContent->toCChar(),
+            URIContent->getFileSize());
         return;
         }
 /*      ZDataBuffer wNewRaw;
       VisuMain->URICurrent.loadContent(wNewRaw);
       DisplayMain::displayFCB(wNewRaw);
 */
-      VisuMain->URICurrent.loadContent(VisuMain->RawData);
-      DisplayMain::displayFCB(VisuMain->RawData);
+      URIContent->loadContent(RawData);
+      DisplayMain::displayFCB(RawData);
       return;
   }//if (pData.Size < sizeof(ZHeaderControlBlock_Export))
 
@@ -177,7 +194,7 @@ DisplayMain::displayFCB(ZDataBuffer &pData)
   zaddress_type wOffset=reverseByteOrder_Conditional(wHCBExport->OffsetFCB);
   if (pData.Size < (wOffset+sizeof(ZFCB_Export)))
   {
-    utf8String wStr;
+    utf8VaryingString wStr;
     wStr.sprintf("Cannot view File Control Block : requested minimum size <%ld> Bytes \n"
                  "Only <%ld> Bytes have been loaded.",(wOffset+sizeof(ZFCB_Export)),pData.Size);
     ZExceptionDLg::message("DisplayMain::displayHCB",ZS_NEEDMORESPACE,Severity_Error,wStr.toCChar());
@@ -210,13 +227,13 @@ DisplayMain::displayPool(ZDataBuffer& pData)
 void
 DisplayMain::getMCB(ZDataBuffer& pData)
 {
-  utf8String wStr;
+  utf8VaryingString wStr;
   PtrIn=pData.Data;
   clear();
   show();
   if (pData.Size < sizeof(ZHeaderControlBlock_Export))
   {
-    utf8String wStr;
+    utf8VaryingString wStr;
     wStr.sprintf("Cannot view Header Control Block : requested minimum size <%ld> Bytes \n"
                  "Only <%ld> Bytes have been loaded.",sizeof(ZHeaderControlBlock_Export),pData.Size);
     ZExceptionDLg::message("DisplayMain::getMCB",ZS_NEEDMORESPACE,Severity_Error,wStr.toCChar());
@@ -229,7 +246,7 @@ DisplayMain::getMCB(ZDataBuffer& pData)
   zaddress_type wOffset=reverseByteOrder_Conditional(wHCBExport->OffsetReserved);
   if (pData.Size < (wOffset+sizeof(ZMCB_Export)))
   {
-    utf8String wStr;
+    utf8VaryingString wStr;
     wStr.sprintf("Not enough loaded data. Requested minimum size <%ld> Bytes \n"
                  "Only <%ld> Bytes have been loaded.",(wOffset+sizeof(ZMCB_Export)),pData.Size);
     ZExceptionDLg::message("DisplayMain::getMCB",ZS_NEEDMORESPACE,Severity_Error,wStr.toCChar());
@@ -252,13 +269,13 @@ DisplayMain::getMCB(ZDataBuffer& pData)
 void
 DisplayMain::displayMCB(ZDataBuffer& pData)
 {
-  utf8String wStr;
+  utf8VaryingString wStr;
   PtrIn=pData.Data;
   clear();
   show();
   if (pData.Size < sizeof(ZHeaderControlBlock_Export))
   {
-    utf8String wStr;
+    utf8VaryingString wStr;
     wStr.sprintf("Not enough loaded data. Requested minimum size <%ld> Bytes \n"
                  "Only <%ld> Bytes have been loaded.",sizeof(ZHeaderControlBlock_Export),pData.Size);
     ZExceptionDLg::message("DisplayMain::displayMCB",ZS_NEEDMORESPACE,Severity_Error,wStr.toCChar());
@@ -269,7 +286,7 @@ DisplayMain::displayMCB(ZDataBuffer& pData)
   zaddress_type wOffset=reverseByteOrder_Conditional(wHCBExport->OffsetReserved);
   if (pData.Size < (wOffset+sizeof(ZMCB_Export)))
     {
-    utf8String wStr;
+    utf8VaryingString wStr;
     wStr.sprintf("Not enough loaded data. Requested minimum size <%ld> Bytes \n"
                  "Only <%ld> Bytes have been loaded.",(wOffset+sizeof(ZMCB_Export)),pData.Size);
     ZExceptionDLg::message("DisplayMain::displayMCB",ZS_NEEDMORESPACE,Severity_Error,wStr.toCChar());
@@ -310,7 +327,7 @@ DisplayMain::displayAll(unsigned char* pData)
 void
 DisplayMain::sliderChange(int pValue)
 {
-  utf8String wStr;
+  utf8VaryingString wStr;
   Offset = pValue ;
   wStr.sprintf("%4ld - Ox%4lX",Offset,Offset);
   ui->OffsetLBl->setText(wStr.toCChar());
@@ -347,14 +364,17 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
   if (pPtrIn==nullptr)
     return;
 
-  utf8String wStr;
+  utf8VaryingString wStr;
   zaddress_type wOffsetReserved=0;
   int64_t       wInt64;
   long wOffset=Offset;
 
   int wRowOffsetFCB=0;
 //  ui->ZEntityLBl->setText("ZHeaderControlBlock");
-  setWindowTitle(QObject::tr("Header control block","DisplayMain"));
+  wStr = URIContent->getBasename().toString();
+  wStr += "::Header control block";
+
+  setWindowTitle(wStr.toCChar());
 /*
   ContentToDump.setData(pPtrIn,sizeof(ZHeaderControlBlock_Export));
   ZHeaderControlBlock_Export* wHCBExport=(ZHeaderControlBlock_Export*)ContentToDump.Data;
@@ -552,7 +572,7 @@ DisplayMain::displayPoolValues(unsigned char* pPtrIn)
   if (pPtrIn==nullptr)
     return;
 
-  utf8String wStr;
+  utf8VaryingString wStr;
 
   setWindowTitle(QObject::tr("Pool","DisplayMain"));
 }
@@ -592,7 +612,11 @@ void
 //DisplayMain::displayICBValues(const unsigned char* pPtrIn,size_t &pOffsetFromMCB, int &wRow) {
 DisplayMain::displayICBValues(const unsigned char *pPtrIn) {
 
-  setWindowTitle(QObject::tr("Index control blocks list","DisplayMain"));
+    utf8VaryingString wStr  = URIContent->getBasename().toString();
+    wStr += "::Index control blocks list";
+
+    setWindowTitle(wStr.toCChar());
+
   const unsigned char* wPtr = pPtrIn ;
   bool wRet = true;
   int wCount=0;
@@ -628,10 +652,8 @@ DisplayMain::displaySingleICBValues(const unsigned char* &pPtrIn,size_t &pDispla
   if (pPtrIn==nullptr)
     return false;
 
-//  ui->ZEntityLBl->setText("ZIndexControlBlock");
 
   utf8VaryingString wStr;
-//  utf8VaryingString wIndexFilePath,wIndexName,wKeyName;
 
 
   QList<QStandardItem*> wDumpRow;
@@ -882,12 +904,16 @@ DisplayMain::displayMCBValues(const unsigned char* pPtrIn)
   if (pPtrIn==nullptr)
     return;
 
-  utf8String    wStr;
+  utf8VaryingString    wStr;
   size_t        wOffset=Offset;
 
   uint32_t      wUInt32;
 
-  setWindowTitle(QObject::tr("Master control block","DisplayMain"));
+  wStr = URIContent->getBasename().toString();
+  wStr += "::Master control block";
+
+  setWindowTitle(wStr.toCChar());
+
 //  ui->ZEntityLBl->setText("ZMasterControlBlock");
 /*
   ContentToDump.setData(pPtrIn,sizeof(ZSMCBOwnData_Export));
@@ -1138,10 +1164,12 @@ DisplayMain::displayFCBValues(unsigned char *pPtrIn)
   if (pPtrIn==nullptr)
     return;
 
-  utf8String wStr;
+  utf8VaryingString wStr;
   int wOffset=0;
 
-  setWindowTitle(QObject::tr("File control block","DisplayMain"));
+  wStr = URIContent->getBasename().toString();
+  wStr += "::File control block";
+  setWindowTitle(wStr.toCChar());
 //  ui->ZEntityLBl->setText("ZFileControlBlock");
 /*
   ContentToDump.setData(pPtrIn,sizeof(ZFCB_Export));

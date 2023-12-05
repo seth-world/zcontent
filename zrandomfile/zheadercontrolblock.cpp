@@ -53,7 +53,7 @@ ZHeaderControlBlock::_exportAppend(ZDataBuffer& pZDBExport)
 
 
 ZHeaderControlBlock_Export&
-ZHeaderControlBlock_Export::_copyFrom(ZHeaderControlBlock_Export& pIn)
+ZHeaderControlBlock_Export::_copyFrom(const ZHeaderControlBlock_Export& pIn)
 {
   StartSign=pIn.StartSign;
   BlockId=pIn.BlockId;
@@ -200,10 +200,10 @@ ZHeaderControlBlock::_import(const unsigned char *&pPtrIn)
   return  ZS_SUCCESS;
 }//_import
 
-utf8String ZHeaderControlBlock::toXml(int pLevel)
+utf8VaryingString ZHeaderControlBlock::toXml(int pLevel)
 {
   int wLevel=pLevel;
-  utf8String wReturn;
+  utf8VaryingString wReturn;
   wReturn = fmtXMLnode("zheadercontrolblock",pLevel);
 //  fmtXMLaddInlineComment(wReturn," all children fields of zheadercontrolblock are not modifiable ");
   wLevel++;
@@ -225,9 +225,9 @@ utf8String ZHeaderControlBlock::toXml(int pLevel)
 int ZHeaderControlBlock::fromXml(zxmlNode* pHCBRootNode, ZaiErrors* pErrorlog)
 {
   zxmlElement *wRootNode;
-  utfcodeString wXmlHexaId;
-  utf8String wValue;
-  utfcodeString wCValue;
+  utf8VaryingString wXmlHexaId;
+  utf8VaryingString wValue;
+  utf8VaryingString wCValue;
   bool wBool;
   unsigned int wInt;
   ZStatus wSt = pHCBRootNode->getChildByName((zxmlNode *&) wRootNode, "zheadercontrolblock");

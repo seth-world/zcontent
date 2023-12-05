@@ -96,7 +96,7 @@ long ZIndexTable::searchCaseIndexByName (const char* pName)
   return -1;
 }//zsearchIndexByName
 
-long ZIndexTable::searchIndexByName (const utf8String& pName)
+long ZIndexTable::searchIndexByName (const utf8VaryingString& pName)
 {
   for (long wi =0;wi<size();wi++)
   {
@@ -107,7 +107,7 @@ long ZIndexTable::searchIndexByName (const utf8String& pName)
   return -1;
 }//zsearchIndexByName
 
-long ZIndexTable::searchCaseIndexByName (const utf8String& pName)
+long ZIndexTable::searchCaseIndexByName (const utf8VaryingString& pName)
 {
   for (long wi =0;wi<size();wi++)
   {
@@ -182,10 +182,10 @@ long ZIndexTable::insert (ZRawIndexFile *pIn, long pRank)
   </indextable>
 */
 
-utf8String ZIndexTable::toXml(int pLevel,bool pComment)
+utf8VaryingString ZIndexTable::toXml(int pLevel,bool pComment)
 {
   int wLevel=pLevel+1;
-  utf8String wReturn;
+  utf8VaryingString wReturn;
   wReturn = fmtXMLnode("indextable",pLevel);
   if (pComment)
     fmtXMLaddInlineComment(wReturn," no dictionary in index control block");

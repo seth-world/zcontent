@@ -365,10 +365,10 @@ ZFCB_Export::deserialize()
 
 //-------------xml export import ----------------------------
 
-utf8String ZFileControlBlock::toXml(int pLevel,bool pComment)
+utf8VaryingString ZFileControlBlock::toXml(int pLevel,bool pComment)
 {
   int wLevel=pLevel;
-  utf8String wReturn;
+  utf8VaryingString wReturn;
   wReturn = fmtXMLnode("zfilecontrolblock",pLevel);
   wLevel++;
 
@@ -422,9 +422,9 @@ int ZFileControlBlock::fromXml(zxmlNode* pFCBRootNode, ZaiErrors* pErrorlog)
 {
   clear();
   zxmlElement *wRootNode;
-  utfcodeString wXmlHexaId;
-  utf8String wValue;
-  utfcodeString wCValue;
+  utf8VaryingString wXmlHexaId;
+  utf8VaryingString wValue;
+  utf8VaryingString wCValue;
   bool wBool;
   ZStatus wSt = pFCBRootNode->getChildByName((zxmlNode *&) wRootNode, "zfilecontrolblock");
   if (wSt != ZS_SUCCESS) {
@@ -560,5 +560,25 @@ int ZFileControlBlock::fromXml(zxmlNode* pFCBRootNode, ZaiErrors* pErrorlog)
         GrabFreeSpace =(uint8_t)wBool;
 
   return (int)pErrorlog->hasError();
-}//ZHeaderControlBlock::fromXml
+}// ZFileControlBlock::fromXml
 
+void
+ZFileControlBlock::report(ZaiErrors* pErrorLog)
+{
+    pErrorLog->textLog("________________ZFileControlBlock Content________________________________");
+    pErrorLog->textLog("Main values\n"
+                       "-----------");
+
+    pErrorLog->textLog("Allocated blocks %ld\n"
+                       "BlockExtentQuota %ld\n"
+                       "InitialSize      %ld\n"
+                       "BlockTargetSize  %ld\n"
+                       "Maximum rec size %ld\n"
+                       "Minimum rec size %ld\n"
+                       "HighwaterMarking %s\n"
+                       "GrabFreeSpace    %s",
+                       AllocatedBlocks,BlockExtentQuota,InitialSize,BlockTargetSize,MaxSize,MinSize,
+                       HighwaterMarking?"Yes":"No",GrabFreeSpace?"Yes":"No"
+                       );
+
+}

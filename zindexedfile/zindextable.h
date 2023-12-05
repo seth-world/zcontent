@@ -5,7 +5,7 @@
 
 #include <ztoolset/zarray.h>
 #include <ztoolset/zstatus.h>
-#include <ztoolset/zutfstrings.h>
+#include <ztoolset/utfvaryingstring.h>
 
 namespace zbs {
 
@@ -37,12 +37,12 @@ public:
 
   long searchIndexByName (const char* pName);
   long searchCaseIndexByName (const char* pName);
-  long searchIndexByName (const utf8String& pName);
-  long searchCaseIndexByName (const utf8String& pName);
+  long searchIndexByName (const utf8VaryingString& pName);
+  long searchCaseIndexByName (const utf8VaryingString& pName);
 
 
 
-  utf8String toXml(int pLevel,bool pComment=true);
+  utf8VaryingString toXml(int pLevel,bool pComment=true);
   ZStatus fromXml(zxmlNode* pRoot,ZaiErrors*pErrorlog);
 } ;
 

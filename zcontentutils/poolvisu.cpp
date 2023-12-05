@@ -24,7 +24,8 @@ using namespace std::placeholders ; // for std::bind
 
 #include <texteditmwn.h>
 #include <displaymain.h>
-#include <zcontentvisumain.h>
+//#include <ZEntryPoint.h>
+#include "zentrypoint.h"
 
 #include <zcontent/zrandomfile/zheadercontrolblock.h>
 #include <zcontent/zindexedfile/zmastercontrolblock.h>
@@ -322,7 +323,7 @@ poolVisu::generalActionEvent(QAction* pAction) {
 
     /* Index file : ICB is the only content of reserved block */
     if (wZHCBe.FileType==ZFT_ZIndexFile) {
-      if (!ZContentVisuMain::testRequestedSize(URIHeader,wRawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZICB_Export)))
+      if (!ZEntryPoint::testRequestedSize(URIHeader,wRawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZICB_Export)))
         return;
       if (!entityWnd)
         entityWnd=new DisplayMain(nullptr);
@@ -348,7 +349,7 @@ poolVisu::generalActionEvent(QAction* pAction) {
       return;
     }
 
-    if (!ZContentVisuMain::testRequestedSize(URIHeader,wRawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)+wZMCBe.ICBOffset + wZMCBe.ICBSize))
+    if (!ZEntryPoint::testRequestedSize(URIHeader,wRawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)+wZMCBe.ICBOffset + wZMCBe.ICBSize))
       return;
     if (!entityWnd)
       entityWnd=new DisplayMain(nullptr);
@@ -382,7 +383,7 @@ poolVisu::rawListZBAT()
 {
   ZDataBuffer wRawData;
   URIHeader.loadContent(wRawData);
-  if (!ZContentVisuMain::testRequestedSize(URIHeader,wRawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
+  if (!ZEntryPoint::testRequestedSize(URIHeader,wRawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
     return ;
 
   unsigned char* wPtr=wRawData.Data;
@@ -410,7 +411,7 @@ poolVisu::rawListZFBT()
 {
   ZDataBuffer wRawData;
   URIHeader.loadContent(wRawData);
-  if (!ZContentVisuMain::testRequestedSize(URIHeader,wRawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
+  if (!ZEntryPoint::testRequestedSize(URIHeader,wRawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
     return ;
 
   unsigned char* wPtr=wRawData.Data;
@@ -437,7 +438,7 @@ poolVisu::rawListZHOT()
 {
   ZDataBuffer wRawData;
   URIHeader.loadContent(wRawData);
-  if (!ZContentVisuMain::testRequestedSize(URIHeader,wRawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
+  if (!ZEntryPoint::testRequestedSize(URIHeader,wRawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
     return ;
 
   unsigned char* wPtr=wRawData.Data;
@@ -550,7 +551,7 @@ poolVisu::rawSurfaceScan()
 {
   ZDataBuffer wRawData;
   URIHeader.loadContent(wRawData);
-  if (!ZContentVisuMain::testRequestedSize(URIHeader,wRawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
+  if (!ZEntryPoint::testRequestedSize(URIHeader,wRawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)))
     return ;
   utf8VaryingString wOut;
   utf8VaryingString wStr;
@@ -1306,7 +1307,8 @@ void poolVisu::showBlockDetail(int pPoolId,long pDataRank,ZBlockDescriptor* pBD)
 void poolVisu::viewBlock(zaddress_type pAddress, zrank_type pRank) {
   if (ContentVisu==nullptr)
     ContentVisu= new ZRawMasterFileVisu(this);
-  ContentVisu->setup(URIContent, FdContent);
+//  ContentVisu->setup(URIContent, FdContent);
+  ContentVisu->setup(URIContent);
   ContentVisu->setModal(false);
   ContentVisu->goToAddress(pAddress,pRank);
   ContentVisu->setViewModeRaw();
@@ -1331,7 +1333,8 @@ void poolVisu::poolMouseCallback(int pZEF, QMouseEvent *pEvent)
   zaddress_type wAddress = wV.value<zaddress_type>();
   if (ContentVisu==nullptr)
     ContentVisu= new ZRawMasterFileVisu(this);
-  ContentVisu->setup(URIContent, FdContent);
+//  ContentVisu->setup(URIContent, FdContent);
+  ContentVisu->setup(URIContent);
 
   ContentVisu->setModal(false);
   ContentVisu->_goToAddress(wAddress,zrank_type(wIdx.row()));
@@ -1345,7 +1348,7 @@ void poolVisu::poolMouseCallback(int pZEF, QMouseEvent *pEvent)
 void
 poolVisu::menuFlex(QContextMenuEvent *event) {
   QMenu* flexMEn=new QMenu;
-  flexMEn->setTitle(QObject::tr("Evaluate","ZContentVisuMain"));
+  flexMEn->setTitle(QObject::tr("Evaluate","ZEntryPoint"));
   if (flexAGp==nullptr) {
     flexAGp=new QActionGroup(this) ;
   //  QObject::connect(visuActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(visuActionEvent(QAction*)));
@@ -1470,7 +1473,8 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
     zaddress_type wAddress = wV.value<zaddress_type>();
     if (ContentVisu==nullptr)
       ContentVisu= new ZRawMasterFileVisu(this);
-    ContentVisu->setup(URIContent, FdContent);
+    ContentVisu->setup(URIContent);
+//    ContentVisu->setup(URIContent, FdContent);
     ContentVisu->setModal(false);
 
     ContentVisu->_goToAddress(wAddress,zrank_type(wIdx.row()));
@@ -1488,7 +1492,8 @@ poolVisu::flexMenActionEvent(QAction* pAction) {
     zaddress_type wAddress = wV.value<zaddress_type>();
     if (ContentVisu==nullptr)
       ContentVisu= new ZRawMasterFileVisu(this);
-    ContentVisu->setup(URIContent, FdContent);
+//    ContentVisu->setup(URIContent, FdContent);
+    ContentVisu->setup(URIContent);
     ContentVisu->setModal(false);
 
     ContentVisu->_goToAddress(wAddress,zrank_type(wIdx.row()));

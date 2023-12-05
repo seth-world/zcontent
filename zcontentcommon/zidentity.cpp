@@ -18,9 +18,9 @@ CharMan ZIdentity::toHexa()
     return wId;
 }
 
-utf8String ZIdentity::toXml(const char* pName,int pLevel)
+utf8VaryingString ZIdentity::toXml(const char* pName,int pLevel)
 {
-    utf8String wContent = fmtXMLnode(pName, pLevel);
+    utf8VaryingString wContent = fmtXMLnode(pName, pLevel);
 
     wContent += fmtXMLint64Hexa("identityid", id, pLevel+1);
     wContent += fmtXMLendnode(pName, pLevel);

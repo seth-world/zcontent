@@ -7,7 +7,7 @@
 #include <ztoolset/charfixedstring.h>
 #include <ztoolset/utffixedstring.h>
 
-#include <ztoolset/charvaryingstring.h>
+//#include <ztoolset/charvaryingstring.h>
 #include <ztoolset/utfvaryingstring.h>
 
 ZStatus
@@ -244,7 +244,7 @@ const unsigned char* wURFDataPtr;
                 *pURFdDataPtr=wURFDataPtr;
         return  ZS_SUCCESS;
 
-    case ZType_CharVaryingString: // varying strings
+//    case ZType_CharVaryingString: // varying strings
     case ZType_Utf8VaryingString:
     case ZType_Utf16VaryingString:
     case ZType_Utf32VaryingString:
@@ -482,7 +482,7 @@ get_ZStringNfURF(void* pValue, ZTypeBase pType, ZDataBuffer *&pURFData)
     {
         case ZType_Char:
         case ZType_UChar:
-          return (static_cast<utfVaryingString<char>*>(pValue)->_importURF(wPtr));
+          return (static_cast<utfVaryingString<utf8_t>*>(pValue)->_importURF(wPtr));
         case ZType_U8:
         case ZType_S8:
               return static_cast<utfVaryingString<utf8_t>*>(pValue)->_importURF(wPtr);

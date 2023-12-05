@@ -84,7 +84,7 @@ ZMFDictionary::addKey(ZKeyDictionary*pIn, long &pOutKeyRank)
 }//addKey
 
 ZStatus
-ZMFDictionary::addKey(ZKeyDictionary*pIn,const utf8String& pKeyName, long &pOutKeyRank)
+ZMFDictionary::addKey(ZKeyDictionary*pIn,const utf8VaryingString& pKeyName, long &pOutKeyRank)
 {
   pOutKeyRank=-1;
   for (long wi=0;wi < KeyDic.count();wi++)
@@ -228,7 +228,7 @@ ZStatus ZMFDictionary::_import(const unsigned char* &pPtrIn)
 
 utf8VaryingString ZMFDictionary::XmlSaveToString(bool pComment)
 {
-  utf8String wReturn = fmtXMLdeclaration();
+  utf8VaryingString wReturn = fmtXMLdeclaration();
   wReturn += fmtXMLmainVersion("zmfdictionary",__ZDIC_VERSION__,0);
   wReturn += toXml(1,pComment);
   wReturn += fmtXMLendnode("zmfdictionary",0);
@@ -238,7 +238,7 @@ utf8VaryingString ZMFDictionary::XmlSaveToString(bool pComment)
 utf8VaryingString ZMFDictionary::toXml(int pLevel,bool pComment)
 {
   int wLevel=pLevel+1;
-  utf8String wReturn;
+  utf8VaryingString wReturn;
   ZDataBuffer wB64;
   wReturn = fmtXMLnode("dictionary",pLevel);
 
@@ -287,7 +287,7 @@ utf8VaryingString ZMFDictionary::toXml(int pLevel,bool pComment)
 } // ZMFDictionary::toXml
 
 
-ZStatus ZMFDictionary::XmlLoadFromString(const utf8String &pXmlString,bool pCheckHash,ZaiErrors* pErrorlog)
+ZStatus ZMFDictionary::XmlLoadFromString(const utf8VaryingString &pXmlString,bool pCheckHash,ZaiErrors* pErrorLog)
 {
   ZStatus wSt;
 
@@ -295,25 +295,30 @@ ZStatus ZMFDictionary::XmlLoadFromString(const utf8String &pXmlString,bool pChec
   zxmlElement *wRoot = nullptr;
   zxmlElement *wMetaRootNode=nullptr;
 
-  pErrorlog->setContext("ZMFDictionary::XmlLoadFromString");
+  pErrorLog->setContext("ZMFDictionary::XmlLoadFromString");
 
   wDoc = new zxmlDoc;
+  /*
   wSt = wDoc->ParseXMLDocFromMemory(pXmlString.toCChar(), pXmlString.getUnitCount(), nullptr, 0);
   if (wSt != ZS_SUCCESS) {
-    pErrorlog->logZException();
+    pErrorlog->logZExceptionLast();
     pErrorlog->errorLog(
         "ZMFDictionary::XmlloadFromString-E-PARSERR Xml parsing error for string <%s>",
         pXmlString.subString(0, 25).toUtf());
     return wSt;
   }
-
+*/
+  wSt = wDoc->XmlParseFromMemory(pXmlString,pErrorLog);
+  if (wSt != ZS_SUCCESS) {
+    return wSt;
+  }
   wSt = wDoc->getRootElement(wRoot);
   if (wSt != ZS_SUCCESS) {
-    pErrorlog->logZException();
+    pErrorLog->logZExceptionLast("ZMFDictionary::XmlLoadFromString");
     return wSt;
   }
   if (!(wRoot->getName() == "zmfdictionary")) {
-    pErrorlog->errorLog(
+    pErrorLog->errorLog(
         "ZMFDictionary::XmlLoadFromString-E-INVROOT Invalid root node name <%s> expected <zmfdictionary>",
         wRoot->getName().toCChar());
     return ZS_XMLINVROOTNAME;
@@ -323,7 +328,7 @@ ZStatus ZMFDictionary::XmlLoadFromString(const utf8String &pXmlString,bool pChec
   wSt=wRoot->getChildByName((zxmlNode*&)wMetaRootNode,"dictionary");
   if (wSt!=ZS_SUCCESS)
     {
-    pErrorlog->logZStatus(
+    pErrorLog->logZStatus(
         ZAIES_Error,
         wSt,
         "ZMFDictionary::XmlLoadFromString-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
@@ -332,7 +337,7 @@ ZStatus ZMFDictionary::XmlLoadFromString(const utf8String &pXmlString,bool pChec
     return wSt;
     }
 
-  wSt = fromXml(wMetaRootNode, pCheckHash,pErrorlog);
+  wSt = fromXml(wMetaRootNode, pCheckHash,pErrorLog);
 
   XMLderegister((zxmlNode *&) wMetaRootNode);
   XMLderegister((zxmlNode *&) wRoot);

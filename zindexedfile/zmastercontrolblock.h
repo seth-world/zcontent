@@ -77,6 +77,13 @@ public:
 #endif // __DEPRECATED__
 
 //-----------------Master control block-------------------------------------
+typedef uint8_t HealthStatus_type;
+enum HealthStatusEnum : HealthStatus_type
+{
+    HSTP_Nothing = 0,
+    HSTP_IndexMustRebuild = 1
+};
+
 
 /**
  * @brief The ZMasterFileControlBlock class Master File Control Block contains all operational infradata necessary for a master file to operate.
@@ -89,7 +96,7 @@ public:
 class ZJournalControlBlock;
 class ZMFDictionary;
 
-class ZMasterControlBlock // : public ZSMCBOwnData
+class ZMasterControlBlock
 {
 public:
   friend class ZSJournal;
@@ -101,7 +108,7 @@ public:
 
   void clear(void);
 
-  utf8String toXml(int pLevel, bool pComment=true);
+  utf8VaryingString toXml(int pLevel, bool pComment=true);
   /**
      * @brief fromXml loads master control block from its xml definition and return 0 when successfull.
      * When errors returns ZS_XMLERROR or appropriate status and pErrlog contains appropriate error messages.
@@ -119,12 +126,18 @@ public:
 //  ZStatus _import(ZRawMasterFile *pMaster, const unsigned char *&pPtrIn, ZArray<ZPRES> &pIndexPresence);
   ZStatus _import( const unsigned char *&pPtrIn);
 
-  void report(FILE *pOutput=stdout);
+  void report(ZaiErrors *pErrorLog);
 
   void setEngineMode (uint8_t pSE) ;
   uint8_t getEngineMode () {return EngineMode;}
 
   uriString getURIDictionary();
+
+  bool hasDictionary() {return Dictionary != nullptr;}
+
+  ZStatus loadDictionary(ZaiErrors *pErrorlog);
+
+  ZStatus loadDictionary_bin();
 
 
   uint8_t     HistoryOn=false; /* RFFU: if set, journaling events are historized see if no duplicate role with journaling keep option */
@@ -141,14 +154,8 @@ public:
 
   ZRawMasterFile* RawMasterFile=nullptr;
 
+  uint8_t HealthStatus = 0;
   uint8_t EngineMode = 0;
-
-  bool hasDictionary() {return Dictionary != nullptr;}
-
-  ZStatus loadDictionary(ZaiErrors *pErrorlog);
-
-  ZStatus loadDictionary_bin();
-
 } ;
 
 
@@ -176,6 +183,7 @@ public:
 
   //  ZSMCBOwnData_Export& reverseConditional();
 
+  /* sets object structure from a pointer to an ZMCB_Export serialized data */
   ZMCB_Export& setFromPtr(const unsigned char*& pPtrIn);
 
   ZMCB_Export& _import(const unsigned char*& pPtrIn);
@@ -200,6 +208,8 @@ public:
   uint32_t    ICBSize=0;
   uint32_t    JCBOffset=0;
   uint32_t    JCBSize=0;
+  uint8_t     HealthStatus=0;
+  uint8_t     EngineMode = 0;
   //  uint32_t    MDicOffset;
   //  uint32_t    MDicSize;
 

@@ -5,29 +5,76 @@
 #include <ztoolset/zstatus.h>
 #include <ztoolset/ztypetype.h>
 
+#include "zcontentconstants.h"
+using namespace zbs;
+
 class utf8VaryingString;
 class zxmlElement;
 class ZaiErrors;
+class URFParser;
+#ifndef __HASH_TIME__
+#define __HASH_TIME__
+#include <ztoolset/zdatabuffer.h>
+class ZHash
+{
+public:
+    ZHash() { clear(); }
+    ZHash(const ZHash& pIn) {_copyFrom(pIn);}
+
+    ZHash& _copyFrom(const ZHash& pIn)
+    {
+        Value = pIn.Value;
+        return *this;
+    }
+    void clear()
+    {
+        Value=0;
+    }
+
+    void set(const ZDataBuffer& pIn) {
+        Value = (unsigned long)pIn.Data;
+    }
+
+    ZHash& operator = (const ZHash& pIn) {return _copyFrom(pIn); }
+
+    bool operator == (const ZHash& pIn) {return (Value==pIn.Value)  ; }
+
+    bool operator != (const ZHash& pIn) {return !(Value==pIn.Value)  ; }
+
+    bool operator == (const ZDataBuffer& pIn) {return (Value == (unsigned long)pIn.Data);}
+
+    unsigned long Value=0;
+};
+
+#endif //  __HASH_TIME__
 
 class URFField {
 public:
   URFField() ;
   URFField(const URFField& pIn) {_copyFrom(pIn);}
-  URFField&_copyFrom(const URFField& pIn) {
-    Present=pIn.Present;
-    Ptr=pIn.Ptr;
-    Size=pIn.Size;
-    ZType=pIn.ZType;
-    return *this;
-  }
+  URFField&_copyFrom(const URFField& pIn) ;
+
+  URFField& operator = (const URFField& pIn) { return _copyFrom(pIn);}
+
+  void clear() ;
+
   bool                  Present=false;
-  const unsigned char*  Ptr=nullptr; /* points to the first byte of ZTypeBase for field */
+  const unsigned char*  FieldPtr=nullptr; /* points to the first byte of ZTypeBase for field */
+  ZHash                 HashTime;
   size_t                Size=0;
   ZTypeBase             ZType=ZType_Nothing;
+  URFParser*            _URFParser=nullptr;
 
-  ZStatus setFromPtr(const unsigned char* &pPtrIn);
+  ZStatus setFromPtr(const ZDataBuffer& pRecord,
+                     const unsigned char* &pPtrIn,
+                     ZaiErrors* pErrorLog);
+
+  static ZStatus searchNextValidZType(const ZDataBuffer& pRecord,
+                                       const unsigned char* &pPtr,
+                                       ZaiErrors* pErrorLog);
   /* formats field content for screen display */
   utf8VaryingString display();
+  utf8VaryingString displayFmt(ZCFMT_Type pCellFormat = 0);
 
   /* formats field content for storing as text data  */
   utf8VaryingString stdDisplay() ;
@@ -40,7 +87,7 @@ public:
   void getURFfromAtomicValue (_Tp pValue,ZDataBuffer& pURFContent)
   {
     pURFContent.allocate(sizeof(ZTypeBase)+sizeof(_Tp));
-    const unsigned char* wPtr= Ptr = pURFContent.Data ;
+    const unsigned char* wPtr= FieldPtr = pURFContent.Data ;
     ZTypeBase* wTypPtr = (ZTypeBase*)wPtr;
     *wTypPtr = ZType ;
     wPtr += sizeof (ZTypeBase);
@@ -88,5 +135,7 @@ void getURFfromAtomicValue (_Tp pValue,URFField& pField,ZDataBuffer& pURFContent
 }
 */
 
-
+URFField getURFField(const ZDataBuffer& pRecord,
+                     const unsigned char* &pPtrIn,
+                     ZaiErrors* pErrorLog);
 #endif // URFFIELD_H

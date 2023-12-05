@@ -2,12 +2,15 @@
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QGridLayout>
+//#include <QGridLayout>
+#include <QGroupBox>
 
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QProgressBar>
+#include <QCheckBox>
+#include <QFrame>
 
 #include <QStandardItemModel>
 #include <QStandardItem>
@@ -37,7 +40,7 @@
 
 #define __SEARCH_ICON__ "question.png"
 
-ZGeneralParamsDLg::ZGeneralParamsDLg(QWidget* pParent)
+ZGeneralParamsDLg::ZGeneralParamsDLg(QWidget* pParent) : WorkParams(&WorkBaseParams) , QDialog(pParent)
 {
     initLayout();
 }
@@ -83,6 +86,43 @@ ZGeneralParamsDLg::initLayout() {
     ParamsTBv = new ZQTableView(this);
     QHLTBv->addWidget(ParamsTBv);
 
+    QFrame* wFRm=new QFrame(this);
+    wFRm->setFrameShape(QFrame::StyledPanel);
+    wFRm->setFrameShadow(QFrame::Raised);
+    QVBoxLayout* wVBL1 = new QVBoxLayout;
+    wFRm->setLayout(wVBL1);
+
+
+    QVL->addWidget(wFRm);
+
+    ZVB_BasicCBx=new QCheckBox("Basic: Messages with no particular domain",this);
+    wVBL1->addWidget(ZVB_BasicCBx);
+    ZVB_MutexCBx=new QCheckBox("Mutex: Mutexes management",this);
+    wVBL1->addWidget(ZVB_MutexCBx);
+    ZVB_ThreadCBx=new QCheckBox("Thread: Threads management",this);
+    wVBL1->addWidget(ZVB_ThreadCBx);
+    ZVB_StatsCBx=new QCheckBox("Stats: Collects stats and performance data",this);
+    wVBL1->addWidget(ZVB_StatsCBx);
+    ZVB_NetCBx=new QCheckBox("Net: Sockets servers SSL & protocol",this);
+    wVBL1->addWidget(ZVB_NetCBx);
+    ZVB_NetStatsCBx=new QCheckBox("NetStats: Collects stats and performance for net operations",this);
+    wVBL1->addWidget(ZVB_NetStatsCBx);
+    ZVB_XmlCBx=new QCheckBox("Xml: Xml engine verbose",this);
+    wVBL1->addWidget(ZVB_XmlCBx);
+
+    ZVB_ZRFCBx=new QCheckBox("ZRF: ZRandomFile general messages",this);
+    wVBL1->addWidget(ZVB_ZRFCBx);
+    ZVB_MemEngineCBx=new QCheckBox("MemEngine: file memory space allocation and management operations",this);
+    wVBL1->addWidget(ZVB_MemEngineCBx);
+    ZVB_FileEngineCBx=new QCheckBox("FileEngine: file access operations from file engine",this);
+    wVBL1->addWidget(ZVB_FileEngineCBx);
+    ZVB_SearchEngineCBx=new QCheckBox("SearchEngine: all search operations from search enginest",this);
+    wVBL1->addWidget(ZVB_SearchEngineCBx);
+
+    ZVB_ZMFCBx=new QCheckBox("ZMF: ZMasterFile general messages",this);
+    wVBL1->addWidget(ZVB_ZMFCBx);
+    ZVB_ZIFCBx=new QCheckBox("ZIF: ZIndexFile general messages",this);
+    wVBL1->addWidget(ZVB_ZIFCBx);
 
 
     /* buttons */
@@ -98,8 +138,6 @@ ZGeneralParamsDLg::initLayout() {
 
     QObject::connect(OkBTn, &QPushButton::clicked, this, &ZGeneralParamsDLg::update);
     QObject::connect(CancelBTn, &QPushButton::clicked, this, &QDialog::reject);
-
-
 
     /* table view setup */
 
@@ -264,13 +302,71 @@ ZGeneralParamsDLg::ParamsTBvClicked (const QModelIndex &pIndex)
     } //if (pIndex.row()==3)
 
 }
+
+ZVerbose_Base
+ZGeneralParamsDLg::fromScreenVerbose()
+{
+    ZVerbose_Base wVerbose=ZVB_NoVerbose;
+
+    if (ZVB_BasicCBx->isChecked())
+        wVerbose |= ZVB_Basic ;
+    if (ZVB_MutexCBx->isChecked())
+        wVerbose |= ZVB_Mutex ;
+    if (ZVB_ThreadCBx->isChecked())
+        wVerbose |= ZVB_Thread ;
+    if (ZVB_StatsCBx->isChecked())
+        wVerbose |= ZVB_Stats ;
+    if (ZVB_NetCBx->isChecked())
+        wVerbose |= ZVB_Net ;
+    if (ZVB_NetStatsCBx->isChecked())
+        wVerbose |= ZVB_NetStats ;
+    if (ZVB_XmlCBx->isChecked())
+        wVerbose |= ZVB_Xml ;
+    if (ZVB_ZRFCBx->isChecked())
+        wVerbose |= ZVB_ZRF ;
+    if (ZVB_ZMFCBx->isChecked())
+        wVerbose |= ZVB_ZMF ;
+    if (ZVB_ZIFCBx->isChecked())
+        wVerbose |= ZVB_ZIF ;
+    if (ZVB_MemEngineCBx->isChecked())
+        wVerbose |= ZVB_MemEngine ;
+    if (ZVB_FileEngineCBx->isChecked())
+        wVerbose |= ZVB_FileEngine ;
+    if (ZVB_SearchEngineCBx->isChecked())
+        wVerbose |= ZVB_SearchEngine ;
+
+    return wVerbose;
+}
+void
+ZGeneralParamsDLg::displayVerbose(ZVerbose_Base pVerbose)
+{
+    ZVB_BasicCBx->setChecked(pVerbose&ZVB_Basic);
+    ZVB_MutexCBx->setChecked(pVerbose&ZVB_Mutex);
+    ZVB_ThreadCBx->setChecked(pVerbose&ZVB_Thread);
+    ZVB_StatsCBx->setChecked(pVerbose&ZVB_Stats);
+    ZVB_NetCBx->setChecked(pVerbose&ZVB_Net);
+    ZVB_NetStatsCBx->setChecked(pVerbose&ZVB_NetStats);
+    ZVB_XmlCBx->setChecked(pVerbose&ZVB_Xml);
+    ZVB_ZRFCBx->setChecked(pVerbose&ZVB_ZRF);
+    ZVB_ZMFCBx->setChecked(pVerbose&ZVB_ZMF);
+    ZVB_ZIFCBx->setChecked(pVerbose&ZVB_ZIF);
+    ZVB_MemEngineCBx->setChecked(pVerbose&ZVB_MemEngine);
+    ZVB_FileEngineCBx->setChecked(pVerbose&ZVB_FileEngine);
+    ZVB_SearchEngineCBx->setChecked(pVerbose&ZVB_SearchEngine);
+
+    return ;
+}
+
 void
 ZGeneralParamsDLg::update()
 {
+    WorkBaseParams.setVerbose(fromScreenVerbose());
+
     ZStatus wSt;
     QString wParamsBase = __GENERAL_PARAMETERS_FILE__;
     uriString wDir = WorkParams.getParamDirectory();
     if (!WorkParams.currentXml.isEmpty()) {
+        wDir = WorkParams.currentXml;
         wParamsBase = WorkParams.currentXml.getBasename().toCChar();
     }
     QString wFileName = QFileDialog::getSaveFileName(this, tr("Xml parameter file"),
@@ -473,5 +569,22 @@ ZGeneralParamsDLg::setup(ZGeneralParameters &pGeneralParameters) {
     ParamsTBv->resizeColumnsToContents();
     ParamsTBv->resizeRowsToContents();
 
+    displayVerbose(WorkParams.getVerbose());
+  /*
+    ZVB_BasicCBx->setChecked(BaseParameters->VerboseBasic());
+    ZVB_MutexCBx->setChecked(BaseParameters->VerboseMutex());
+    ZVB_ThreadCBx->setChecked(BaseParameters->VerboseThread());
+    ZVB_StatsCBx->setChecked(BaseParameters->VerboseStats());
+    ZVB_NetCBx->setChecked(BaseParameters->VerboseNet());
+    ZVB_NetStatsCBx->setChecked(BaseParameters->VerboseNetStats());
+    ZVB_XmlCBx->setChecked(BaseParameters->VerboseXml());
+    ZVB_ZRFCBx->setChecked(BaseParameters->VerboseZRF());
+    ZVB_ZMFCBx->setChecked(BaseParameters->VerboseZMF());
+    ZVB_ZIFCBx->setChecked(BaseParameters->VerboseZIF());
+    ZVB_MemEngineCBx->setChecked(BaseParameters->VerboseMemEngine());
+    ZVB_FileEngineCBx->setChecked(BaseParameters->VerboseFileEngine());
+    ZVB_SearchEngineCBx->setChecked(BaseParameters->VerboseSearchEngine());
+    ZVB_BasicCBx->setChecked(BaseParameters->VerboseBasic());
+*/
     return ZS_SUCCESS;
 } // dataSetup

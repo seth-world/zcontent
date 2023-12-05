@@ -86,21 +86,20 @@ public:
   ZStatus loadExternalDicFile();
 
   ZStatus XmlDefinitionSave(uriString& pXmlFile,bool pComment=true); /* save definition to an xml formatted text file */
-  ZStatus XmlDefinitionLoad(const utf8VaryingString&pXmlContent, ZaiErrors* pErrorlog);
+  ZStatus XmlDefinitionLoad(const utf8VaryingString&pXmlContent, ZaiErrors* pErrorLog);
 
-//  bool changeChosenZmf(); /* apply to a zmf file current definition  deprecated */
+
   bool applyToCurrentZmf(); /* apply to currently loaded ZMF */
 
   /* no test run possible */
-//  ZStatus applyChangesZmf(const uriString &pURIMaster, bool pBackup=true);
+
+  ZStatus checkDic();
 
   ZStatus applyChangesZmf(bool pBackup=true);
 
   ZStatus createDic(ZMFDictionary& pDic, const uriString &pURIMaster);
 
   ZStatus rebuildIndex(long pIndexRankToRebuild);
-
-  void exportCallBack(int pValue);
 
   void resizeEvent(QResizeEvent*) override;
 
@@ -114,6 +113,7 @@ public:
   void displayErrorCallBack(const utf8VaryingString& pMessage) ;
   void DicEditQuitCallback();
   void closeComlogCB(const QEvent* pEvent);
+
 
   void displayChangeLog();
   void displayChangeLine(const ZChangeRecord& pChgRec);

@@ -17,15 +17,15 @@ class ZRemoteMirroring
 public:
   int8_t              Protocol;
   ZHostAddressType    AddressType=ZHAT_IPV4;
-  utf8String          Host;
+  utf8VaryingString          Host;
   int                 Port;
-  utf8String          Authenticate;
+  utf8VaryingString          Authenticate;
   /* key and vector are for application data encoding using OpenSSL over a standard non encoded connection
    * and not using a SSL connection */
   ZCryptKeyAES256*    SSLKey=nullptr ;
   ZCryptVectorAES256* SSLVector=nullptr;
 
-  utf8String toXml(int pLevel);
+  utf8VaryingString toXml(int pLevel);
 
 
   /* SSL Encryption rules :
@@ -143,7 +143,7 @@ public:
                           ZCryptVectorAES256 *pSSLVector);
 
 
-  utf8String toXml(int pLevel, bool pComment=true);
+  utf8VaryingString toXml(int pLevel, bool pComment=true);
   ZStatus fromXml(zxmlNode* pRootNode, ZaiErrors* pErrorlog, ZaiE_Severity pSeverity=ZAIES_Error);
 
   ZStatus purge(const zrank_type pKeepRanks=-1);

@@ -23,6 +23,7 @@
 
 //! @macro  __HEADER_FILEEXTENSION__ preprocessor parameter for standard header file extension
 #define __HEADER_FILEEXTENSION__ ".zrh"
+#define __HEADEREXTENSIONSTRING__ "zrh"
 //! @macro __ZINDEX_FILEEXTENSION__  preprocessor parameter for index content file extension
 #define __ZINDEX_FILEEXTENSION__ ".zix"
 //! @macro __ZINDEX_FILEEXTENSION__  preprocessor parameter for master dictionary content file extension
@@ -150,8 +151,7 @@ ZStatus generateURIHeader(uriString pURIPath, uriString &pURIHeader);
 const char * decode_ZBS (uint8_t pZBS);
 
 const char * decode_ZRFMode (zmode_type pZRF);
-zmode_type encode_ZRFMode (char* pZRF);
-
+zmode_type encode_ZRFMode(const utf8VaryingString &pZRF);
 
 const char *decode_ZFile_type(uint8_t pType);
 uint8_t encode_ZFile_type(const utf8VaryingString &pType);

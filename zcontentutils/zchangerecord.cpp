@@ -50,11 +50,11 @@ ZChangeRecord& ZChangeRecord::_copyFrom(const ZChangeRecord& pIn){
   switch (ZType){
   case ZType_Utf8VaryingString:
     if (pIn.Pointers.StringPtr.Ante!=nullptr) {
-      Pointers.StringPtr.Ante = new utf8String(*pIn.Pointers.StringPtr.Ante);
+      Pointers.StringPtr.Ante = new utf8VaryingString(*pIn.Pointers.StringPtr.Ante);
     }
 
     if (pIn.Pointers.StringPtr.Post!=nullptr) {
-      Pointers.StringPtr.Post = new utf8String(*pIn.Pointers.StringPtr.Post);
+      Pointers.StringPtr.Post = new utf8VaryingString(*pIn.Pointers.StringPtr.Post);
     }
 
     return *this;

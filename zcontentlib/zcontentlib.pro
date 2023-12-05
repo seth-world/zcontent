@@ -184,17 +184,26 @@ HEADERS += \
     $$TOOLSET_BASE/config/zconfig_general.h \
     $$TOOLSET_BASE/config/zconfig_zrf.h \
     ../../config/zconfig.h \
+#    ../zcontentcommon/zgeneralparameters.h \
     ../zcontentcommon/zgeneralparameters.h \
+#    ../zindexedfile/zcollectionentity.h \
     ../zindexedfile/zsearch.h \
     ../zindexedfile/zsearcharithmeticterm.h \
+    ../zindexedfile/zsearchcontext.h \
+    ../zindexedfile/zsearchdictionary.h \
     ../zindexedfile/zsearchentity.h \
+    ../zindexedfile/zsearchentitycontext.h \
+    ../zindexedfile/zsearchfield.h \
+    ../zindexedfile/zsearchfileentity.h \
     ../zindexedfile/zsearchhistory.h \
     ../zindexedfile/zsearchlogicalterm.h \
     ../zindexedfile/zsearchoperand.h \
     ../zindexedfile/zsearchparser.h \
     ../zindexedfile/zsearchparsertype.h \
+    ../zindexedfile/zsearchsymbol.h \
     ../zindexedfile/zsearchtoken.h \
-    ../zindexedfile/zsearchtokenizer.h
+    ../zindexedfile/zsearchtokenizer.h \
+    ../zindexedfile/zselclause.h
 
 FURTHER_H =    $$TOOLSET_CONTENT/zrandomfile/zrandomlockfile.h
 
@@ -244,17 +253,26 @@ SOURCES += \
     $$TOOLSET_CONTENT/zrandomfile/zrfutilities.cpp \
     $$TOOLSET_CONTENT/zrandomfile/zsearchargument.cpp \
     ../zcontentcommon/zcontentconstants.cpp \
+#    ../zcontentcommon/zgeneralparameters.cpp \
     ../zcontentcommon/zgeneralparameters.cpp \
+#    ../zindexedfile/zcollectionentity.cpp \
     ../zindexedfile/zsearch.cpp \
     ../zindexedfile/zsearcharithmeticterm.cpp \
+    ../zindexedfile/zsearchcontext.cpp \
+    ../zindexedfile/zsearchdictionary.cpp \
     ../zindexedfile/zsearchentity.cpp \
+    ../zindexedfile/zsearchentitycontext.cpp \
+    ../zindexedfile/zsearchfield.cpp \
+    ../zindexedfile/zsearchfileentity.cpp \
     ../zindexedfile/zsearchhistory.cpp \
     ../zindexedfile/zsearchlogicalterm.cpp \
     ../zindexedfile/zsearchoperand.cpp \
     ../zindexedfile/zsearchparser.cpp \
     ../zindexedfile/zsearchparsertype.cpp \
+    ../zindexedfile/zsearchsymbol.cpp \
     ../zindexedfile/zsearchtoken.cpp \
-    ../zindexedfile/zsearchtokenizer.cpp
+    ../zindexedfile/zsearchtokenizer.cpp \
+    ../zindexedfile/zselclause.cpp
 
 FURTHER_CPP=         $$TOOLSET_CONTENT/zrandomfile/zrandomlockfile.cpp
 

@@ -1,7 +1,7 @@
 #ifndef ZCHANGERECORD_H
 #define ZCHANGERECORD_H
 #include <stddef.h>
-#include <ztoolset/zutfstrings.h>
+#include <ztoolset/utfvaryingstring.h>
 #include "keydata.h"
 
 

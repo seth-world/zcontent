@@ -28,7 +28,8 @@ public:
   explicit ZRawMasterFileVisu(QWidget *parent = nullptr);
   ~ZRawMasterFileVisu();
 
-  ZStatus setup(const uriString& pURI, int pFd);
+  ZStatus setup(const uriString &pURI);
+  ZStatus _setup();
   ZStatus displayBlock(ZBlockDescriptor_Export pBlock);
 
   ZStatus displayURFBlock(ZDataBuffer& pData, bool pTruncated);
@@ -109,6 +110,8 @@ public:
 
   void setNudge(long pNudge) { if (pNudge > 0) FileNudge=pNudge; }
 
+
+  QPushButton* ExitBTn=nullptr;
   /* evaluate actions */
   QAction* ZBlockHeaderQAc = nullptr;
   QAction* URFFieldQAc = nullptr;
@@ -182,6 +185,7 @@ private:
   int Width = 16;
   bool  Raw=false;
   ZBlockDescriptor_Export BlockCur;
+
 
 //  ZArray<ZBlockDescriptor_Export> BlockList;
 

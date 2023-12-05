@@ -3,7 +3,7 @@
 
 
 
-#include <ztoolset/zutfstrings.h>
+#include <ztoolset/utfvaryingstring.h>
 #include <zrandomfile/zrandomfile.h>
 #include <zindexedfile/zindexdata.h>
 
@@ -24,15 +24,15 @@ class ZRawMasterFile;
 class ZMasterFile;
 }
 
-utf8String generateIndexRootName(const utf8String &pMasterRootName,
-                                 const utf8String &pIndexName);
+utf8VaryingString generateIndexRootName(const utf8VaryingString &pMasterRootName,
+                                 const utf8VaryingString &pIndexName);
 /* see zrawmasterfileutils.h
 ZStatus
 generateIndexURI(uriString &pIndexFileUri,
                 const uriString pMasterFileUri,
                 const uriString &pDirectory,
 //                const long pRank,
-                const utf8String& pIndexName);
+                const utf8VaryingString& pIndexName);
 */
 /*
 ZStatus getChildElementValue(QDomNode pNodeWork,const char*pTagName,QString &pContent, bool pMandatory);
@@ -194,7 +194,7 @@ ZStatus zmuXMLgetChild(zxmlElement* pRootNode,const char* pName,long& pValue,Zai
 
 
 ZStatus zmuXMLgetChild(zxmlElement* pRootNode,const char* pName,md5& pValue,ZaiErrors* pErrorlog,bool pMandatory,ZaiE_Severity pSeverity=ZAIES_Error);
-ZStatus zmuXMLgetChild(zxmlElement* pRootNode,const char* pName,utf8String& pValue,ZaiErrors* pErrorlog,bool pMandatory,ZaiE_Severity pSeverity=ZAIES_Error);
+ZStatus zmuXMLgetChild(zxmlElement* pRootNode,const char* pName,utf8VaryingString& pValue,ZaiErrors* pErrorlog,bool pMandatory,ZaiE_Severity pSeverity=ZAIES_Error);
 
 
 void displayKeyDicElement(ZMFDictionary* pDictionary,long pIdx,ZaiErrors* pMessageLog);

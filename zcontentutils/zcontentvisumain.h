@@ -15,6 +15,8 @@
 #include <zcontent/zrandomfile/zrandomfile.h>
 #include <QModelIndex>
 
+#include <ztoolset/zaierrors.h>
+
 extern const int cst_maxraisonablevalue;
 
 class ZQTableView;
@@ -66,19 +68,22 @@ public:
 };
 
 
-
+/*
 namespace Ui {
 class ZContentVisuMain;
 }
-class QStandardItemModel;
-class QActionGroup;
-class QAction;
+*/
+
+
+
+
 namespace zbs {
 //class ZRandomFile;
 class ZRawMasterFile;
 }
 
-
+#ifndef __VISUMODE__
+#define __VISUMODE__
 //class textEditMWn;
 enum VisuMode_type : uint8_t
 {
@@ -89,29 +94,49 @@ enum VisuMode_type : uint8_t
   VMD_Master        = 4,
   VMD_Header        = 5
 };
+#endif
 
 class DisplayMain;
 class textEditMWn;
-
 class DicEditMWn;
+
+class QLabel;
+class QLineEdit;
+class QComboBox;
+class QAction;
+class QStandardItemModel;
+class QActionGroup;
+class QPushButton;
+class QMenu;
+class QStatusBar;
+class QMenuBar;
+class QFrame;
+class QProgressBar;
+class QVBoxLayout;
+
+
 extern class DicEditMWn* DicEdit;
 
+enum ZCVM_VisuType  {
+    ZCVM_Nothing        = 0,
+    ZCVM_Raw            = 1,
+    ZCVM_RandomFile     = 2,
+    ZCVM_MasterFile     = 3
+};
 
 class ZContentVisuMain : public QMainWindow
 {
-  Q_OBJECT
-
 public:
   explicit ZContentVisuMain(QWidget *parent = nullptr);
   ~ZContentVisuMain();
 
-
+  ZStatus setUpRawFile(const uriString& pFile);
   ZStatus openZRF();
   ZStatus openZMF(const char* pFileName);
   ZStatus openZRH(const char* pFileName);
-  ZStatus openOther(const char *pFileName);
+  ZStatus openOther(const uriString &pFile);
 
-  void    openZRH();
+  ZStatus openZRH();
 
   void    getRaw();
 
@@ -139,6 +164,14 @@ public:
   void displayMCB();
   void displayICBs();
 
+  static ZStatus exportZMF(QWidget *pParent, zbs::ZRawMasterFile* pRawMasterFile, ZaiErrors *pErrorLog);
+  static ZStatus importZMF(QWidget* pParent,  ZaiErrors *pErrorLog);
+  static ZStatus clearZMF(QWidget* pParent,  ZaiErrors *pErrorLog);
+
+  ZStatus cloneZRF();
+  ZStatus clearZRF();
+  ZStatus rebuildHeaderZRF();
+  ZStatus reorganizeZRF();
 
   void displayPool(const unsigned char* pPtr,zaddress_type pOffset,const char* pTitle);
 
@@ -146,7 +179,7 @@ public:
   void displayZFBT();
 //  void displayZDBT();  // Deprecated
 
-  void surfaceScanZRF(const uriString &pFileToScan);
+  void surfaceScanZRF();
   void displayRawSurfaceScan(const uriString& pFile);
 
   ZStatus surfaceScanRaw(const uriString & pURIContent, FILE *pOutput=stdout);
@@ -160,9 +193,11 @@ public:
   void reorganizeZMF();
   void reportMCB();
 
+  void setPayLoad(size_t pPayLoad) {PayLoad=pPayLoad;}
+  ZStatus displayRawFromOffset();
 
   void getFileSize(const uriString &pFile);
-  void setFileType (const char* pFilePath);
+  void setFileType(const uriString &pFilePath);
 
   void removeAllRows();
 
@@ -172,6 +207,8 @@ public:
   void closeGenlogCB(const QEvent *pEvent);
 
   textEditMWn* openGenLogWin();
+  void GenlogWindisplayErrorCallBack(const utf8VaryingString& pMessage) ;
+  void GenlogWindisplayErrorColorCB(uint8_t pSeverity,const utf8VaryingString& pMessage);
 /*
   void _print(const utf8VaryingString& pOut);
   void _print(const char* pFormat,...);
@@ -183,17 +220,21 @@ public:
   textEditMWn* MCBWin=nullptr;
   textEditMWn* GenlogWin=nullptr;
 
+  ZaiErrors     ErrorLog;
 
-  zbs::ZRandomFile* RandomFile=nullptr;
-  zbs::ZRawMasterFile* MasterFile=nullptr;
+  zbs::ZRandomFile*     RandomFile=nullptr;
+  zbs::ZRawMasterFile*  RawMasterFile=nullptr;
 
   __FILEHANDLE__    Fd=-1;
   long              FileOffset=0;
+  size_t            FileSize=0;
   long              BlockSize=64;
   const int         Width=16;
 
   bool              AllFileLoaded=false;
   bool              HeaderFile = false;
+
+  size_t            PayLoad=2500;
 
   long RecordNumber=0;
   zaddress_type Address=0;
@@ -204,14 +245,125 @@ public:
 
   uint8_t OpenMode = VMD_Nothing;
 
+  class DicEditMWn* DicEdit=nullptr;
   uriString     URICurrent;
 
   ZDataBuffer   RawData;
 
-//  QStandardItemModel* TBlItemModel =nullptr;
+/*---------------------------------------------*/
+
+    void initLayout();
+
+  QAction *openByTypeQAc;
+  QAction *rawQAc;
+  QAction *ZRFRecordsQac;
+  QAction *actionSuface;
+  QAction *surfaceScanRawQAc;
+  QAction *RecoveryQAc;
+  QAction *closeQAc;
+  QAction *rawDumpQAc;
+  QAction *surfaceScanZRFQAc;
+  QAction *displayHCBQAc;
+  QAction *QuitQAc;
+  QAction *displayFCBQAc;
+  QAction *displayMCBQAc;
+  QAction *setfileQAc;
+  QAction *openRawQAc;
+  QAction *openZRFQAc;
+  QAction *openZMFQAc;
+  QAction *actionHeader_file;
+  QAction *unlockZRFQAc;
+  QAction *headerFileUnlockQAc;
+ // QAction *HeaderRawUnlockQAc;
+  QAction *listIndexesQAc;
+  QAction *clearQAc;
+  QAction *cloneQAc;
+  QAction *truncateQAc;
+  QAction *extendQAc;
+  QAction *rebuildHeaderQAc;
+  QAction *reorganizeQAc;
+  QAction *downgradeZMFtoZRFQAc;
+  QAction *upgradeZRFtoZMFQAc;
+  QAction *reorganizeZMFQAc;
+  QAction *removeIndexQAc;
+  QAction *addIndexQAc;
+  QAction *rebuildIndexQAc;
+  QAction *extractIndexQAc;
+  QAction *extractAllIndexesQAc;
+  QAction *testRunQAc;
+  QAction *rebuilAllQAc;
+  QAction *runRepairQAc;
+  QAction *MCBReportQAc;
+  QAction *DictionaryQAc;
+  QAction *displayZBATQAc;
+  QAction *displayZDBTQAc;
+  QAction *displayZFBTQAc;
+  QAction *dictionaryQAc;
+  QAction *dicLoadXmlQAc;
+  QAction *cppparserQAc;
+  QAction *openZRHQAc;
+  QWidget *centralwidget=nullptr;
+  QFrame *MainFRm;
+  QLabel *OpenModeLbl;
+  QLabel *FileTypeLBl;
+  QLabel *FullPathLbl;
+  QPushButton *BackwardBTn;
+  QPushButton *ForwardBTn;
+  QFrame *RecordFRm;
+  QLabel *RecordNumberLBl;
+  QLabel *label_2;
+  QLabel *AddressLBl;
+  QLabel *label_10;
+  QLabel *BlockSizeLBl;
+  QLabel *label_11;
+  QLabel *UserSizeLBl;
+  QLabel *label_12;
+  QLabel *StateLBl;
+  QLabel *label_13;
+  QLabel *LockMaskLBl;
+  QLabel *RecordTotalLBl;
+  QLabel *label;
+  QLabel *FileSizeLBl;
+  QLabel *label_3;
+  QPushButton *LoadAllBTn;
+  QProgressBar *ProgressPGb;
+  QFrame *SequentialFRm;
+  QLabel *label_6;
+  QLabel *ReadSizeLBl;
+
+  QLabel *InterPunctLBl=nullptr;
+  QLabel *FullSizeLBl=nullptr;
+  QLabel *label_00;
+  QLabel *PayLoadLBl=nullptr;
+  QLabel *label_1;
+  QLabel *ZRFVersionLBl;
+  QLabel *ZMFVersionLBl;
+  QLabel *label_4;
+  QLabel *label_5;
+  QLabel *ClosedLBl;
+  QLineEdit *searchLEd;
+  QComboBox *searchTypeCBx;
+  QPushButton *searchFwdBTn;
+  QLabel *label_8;
+  QLabel *CurAddressLBl;
+  QPushButton *searchBckBTn;
+  QWidget *verticalLayoutWidget;
+  QVBoxLayout *verticalLayout;
+  QMenuBar *menubar;
+  QMenu *fileMEn=nullptr;
+  QMenu *ZRFMEn;
+  QMenu *ZMFMEn=nullptr;
+  QMenu *menurepair_all_indexes;
+  QMenu *rawMEn;
+  QMenu *headerMEn;
+  QMenu *menuView_pool;
+  QStatusBar *statusbar;
+  QToolBar *toolBar;
+
+/*---------------------------------------------*/
 
   QActionGroup* mainQAg=nullptr;
-  QAction*      DictionaryQAc = nullptr;
+//  QAction*      DictionaryQAc = nullptr;
   QAction*      GetRawQAc=nullptr;
   QMenu *       MasterFileMEn=nullptr;
   QAction*      ZmfDefQAc = nullptr;
@@ -219,14 +371,22 @@ public:
   QAction*      ZMFBackupQAc=nullptr;
   QAction*      ZMFRestoreQAc=nullptr;
   QAction*      ZMFQueryQAc=nullptr;
+  QAction*      ZMFExportQAc=nullptr;
+  QAction*      ZMFImportQAc=nullptr;
+  QAction*      ZMFClearQAc=nullptr;
+
+  QMenu*        RandomFileMEn=nullptr;
+
+  QAction*      ZRFCloneQAc=nullptr;
+  QAction*      ZRFClearQAc=nullptr;
+  QAction*      ZRFReorgQAc=nullptr;
+  QAction*      ZRFRebuildHeaderQAc=nullptr;
+  QAction*      ZRFSurfaceScanQAc=nullptr;
 
   QMenu*        ParametersQMe=nullptr;
   QAction*      ParamLoadQAc=nullptr;
   QAction*      ParamChangeQAc=nullptr;
-
-  QAction*      openZRFQAc=nullptr;
-
-
+ // QAction*      openZRFQAc=nullptr;
   VisuRaw*      VizuRaw=nullptr;
 
   /* evaluate actions */
@@ -271,12 +431,13 @@ private slots:
 
   void backward();
   void forward();
-  void loadAll();
-// Deprecated
-//  void visuActionEvent(QAction* pAction);
-//  void visuActionEventOld(QAction* pAction);  // Deprecated
-// Deprecated
-//  void VisuBvFlexMenuCallback(QContextMenuEvent *event);
+  ZStatus loadAll();
+  ZStatus loadRawPayLoad();
+  // Deprecated
+  //  void visuActionEvent(QAction* pAction);
+  //  void visuActionEventOld(QAction* pAction);  // Deprecated
+  // Deprecated
+  //  void VisuBvFlexMenuCallback(QContextMenuEvent *event);
   void VisuMouseCallback(int pZEF, QMouseEvent *pEvent);
 
 private:
@@ -288,6 +449,9 @@ private:
   ssize_t           FormerSearchOffset=-1;
   ssize_t           FormerSearchSize=-1;
 
+  ZCVM_VisuType     VisuType=ZCVM_Nothing;
+ // bool              FromOffset=false;
+
   QVariant          DefaultBackGround;
   QVariant          SelectedBackGround;
 
@@ -295,51 +459,15 @@ private:
 
   void              DicEditQuitCallback();
   bool              FResizeInitial=true;
-  Ui::ZContentVisuMain *ui;
+ // Ui::ZContentVisuMain *ui;
 };
 
-utf8String formatSize(long long wSize);
 
-/**
- * @brief _searchBlockStart scans file pointed by pContentFd since pBeginAddress for a start mark (cst_ZBLOCKSTART 0xF5F5F5F5)
- * and returns
- *  . address of found mark in pNextAddress (pointing to first byte of start mark),
- *  . ZDataBuffer containing the file space between two start mark or until end of file.
- * Each read access loads pPayload bytes from file. pPayload is adjusted progressively to block sizes.
- * When found pNextAddress points to the first byte of start mark.
- * @param pContentFd    File descriptor to search. File must be opened with READ capabilities (O_RDONLY)
- * @param pBeginAddress address to begin the search.
- * WARNING: if pBeginAddress points to a cst_ZBLOCKSTART block, then this address will be returned as pNextAddress.
- * @param pNextAddress  address of first byte of found cst_START
- * @param pPayload      number of bytes to read at each read operation
- * @param pFileSize     total number of bytes for the file to be scanned
- * @return  a ZStatus
- * - ZS_FOUND     start mark has been found.
- *                pNextAddress points to first byte of start mark.
- *                pBlockContent contains block data since pBeginAddress until next start mark (excluded).
- * - ZS_EOF       no more to read and start mark has not been found since pBeginAddress.
- *                pNextAddress is set to the last address processed.
- *                pBlockContent contains data since pBeginAddress until EndofFile.
- * - ZS_READERROR a low level error has been encountered. ZException is set with appropriate message.
- *                pNextAddress is set to the last address processed.
- * - ZS_FILEERROR a seek operation failed with a low level error.
- *                ZException is set with appropriate message.
- *                pNextAddress is set to the last address processed.
- */
-ZStatus
-_searchBlockStart (__FILEHANDLE__ pContentFd,
-                    zaddress_type pBeginAddress,      // Address to start searching for start mark
-                    zaddress_type &pNextAddress,
-                    ZDataBuffer &pBlockContent,
-                    ssize_t &pPayload,
-                    int     &pCount,
-                    size_t  &pFileSize,
-                    uint32_t *pBeginContent=nullptr);
 
 void setLoadMax (ssize_t pLoadMax);
 
 ssize_t computeOffsetFromCoord(int pRow, int pCol);
 
-
+void sleepTimes (int pTimes);
 
 #endif // ZCONTENTVISUMAIN_H

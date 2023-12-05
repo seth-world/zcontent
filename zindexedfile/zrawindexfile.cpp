@@ -148,7 +148,7 @@ ZRawIndexFile::ZRawIndexFile  (ZRawMasterFile *pFather, ZIndexControlBlock &pZIC
 
 }// ZIF CTOR 2 w
 
-ZRawIndexFile::ZRawIndexFile  (ZRawMasterFile *pFather, int pkeyguessedsize, const utf8String &pIndexName , ZSort_Type pDuplicates): ZRandomFile(),ZIndexControlBlock()
+ZRawIndexFile::ZRawIndexFile  (ZRawMasterFile *pFather, int pkeyguessedsize, const utf8VaryingString &pIndexName , ZSort_Type pDuplicates): ZRandomFile(),ZIndexControlBlock()
 {
 
   ZMFFather=pFather;
@@ -177,7 +177,7 @@ ZRawIndexFile::setIndexURI  (uriString &pURI)
 }
 
 void
-ZRawIndexFile::setIndexName  (utf8String &pName)
+ZRawIndexFile::setIndexName  (utf8VaryingString &pName)
 {
     IndexName = pName;
     return ;
@@ -460,7 +460,7 @@ ZStatus wSt;
     ZException.setLastSeverity(Severity_Severe);
     return  wSt;
   }
-  if (ZVerbose & ZVB_FileEngine) {
+  if (BaseParameters->VerboseFileEngine()) {
     _DBGPRINT(" ZRawIndexFile::openIndexFile Index <%s> Duplicates <%d> <%s> file <%s>\n",
         IndexName.toString(), Duplicates , decode_ZST(Duplicates),
         pIndexUri.toString())
@@ -1098,7 +1098,7 @@ ZIndexItem wIndexItem;
 #ifdef __ZTHREAD_AUTOMATIC__
   _Mtx.lock();
 #endif
-  if (ZVerbose & ZVB_FileEngine)
+  if (BaseParameters->VerboseFileEngine())
       {
       _DBGPRINT ("_addKeyValue_Prepare : _Rawsearch Index <%s> Duplicates <%d> <%s> return status <%s> rank <%ld> \n",
         IndexName.toString(), Duplicates , decode_ZST(Duplicates),
@@ -1111,7 +1111,7 @@ ZIndexItem wIndexItem;
       pOutIndexItem->IndexRank=0L;
 //    ZJoinIndex=0;
       wSt=_insert2Phases_Prepare (pOutIndexItem->toFileKey(),pOutIndexItem->IndexRank,pOutIndexItem->IndexAddress);// equivalent to push_front
-      if (ZVerbose & ZVB_FileEngine)
+      if (BaseParameters->VerboseFileEngine())
         _DBGPRINT ("_addKeyValue_Prepare : Index ZO_Insert (push front)  Index key  <%s> rank %ld index address %ld \n",
             IndexName.toCChar(),
             pOutIndexItem->IndexRank,pOutIndexItem->IndexAddress)
@@ -1121,7 +1121,7 @@ ZIndexItem wIndexItem;
       pOutIndexItem->Operation=ZO_Push ;
 //    ZJoinIndex=this->size();
       wSt=ZRandomFile::_add2Phases_Prepare(pOutIndexItem->toFileKey(),pOutIndexItem->IndexRank,pOutIndexItem->IndexAddress);// equivalent to push
-      if (ZVerbose & ZVB_FileEngine) {
+      if (BaseParameters->VerboseFileEngine()) {
         _DBGPRINT ("_addKeyValue_Prepare : Index Push (last) Index key  <%s> rank %ld index address %ld \n",
             IndexName.toCChar(),
             pOutIndexItem->IndexRank,pOutIndexItem->IndexAddress)
@@ -1132,7 +1132,7 @@ ZIndexItem wIndexItem;
       pOutIndexItem->Operation=ZO_Insert ;
       pOutIndexItem->IndexRank = wIndexItem.IndexRank ;
       wSt=ZRandomFile::_insert2Phases_Prepare(pOutIndexItem->toFileKey(),wIndexItem.IndexRank,pOutIndexItem->IndexAddress);// insert at position returned by seekGeneric
-      if (ZVerbose & ZVB_FileEngine) {
+      if (BaseParameters->VerboseFileEngine()) {
         _DBGPRINT ("_addKeyValue_Prepare : Index ZO_Insert  Index key <%s> index rank %ld index address %ld \n",
             IndexName.toCChar(),
             pOutIndexItem->IndexRank,pOutIndexItem->IndexAddress)
@@ -1142,7 +1142,7 @@ ZIndexItem wIndexItem;
     case (ZS_FOUND):
       pOutIndexItem->IndexRank = wIndexItem.IndexRank;
       if (Duplicates==ZST_NoDuplicates) {
-        if (ZVerbose & ZVB_FileEngine)
+        if (BaseParameters->VerboseFileEngine())
           _DBGPRINT("_addKeyValue_Prepare : ***Index Duplicate Index key <%s> Duplicates <%d> <%s>  exception at index rank <%ld>\n",
               IndexName.toCChar(), Duplicates , decode_ZST(Duplicates),
               wIndexItem.IndexRank)
@@ -1158,7 +1158,7 @@ ZIndexItem wIndexItem;
 
 
     /* if duplicates allowed */
-      if (ZVerbose & ZVB_FileEngine) {
+      if (BaseParameters->VerboseFileEngine()) {
         _DBGPRINT ("_addKeyValue_Prepare : Index Index key <%s> Duplicate key valid insert at index rank <%ld>\n",
             IndexName.toCChar(),
             pOutIndexItem->IndexRank)
@@ -1201,7 +1201,7 @@ ZRawIndexFile::_rawKeyValue_Commit(ZIndexItem *pIndexItem)
   ZStatus wSt;
   const char* wAction=nullptr;
   zaddress_type wAddress; // local index address : of no use there
-  if (ZVerbose & ZVB_FileEngine)
+  if (BaseParameters->VerboseFileEngine())
     _DBGPRINT("ZRawIndexFile::_rawKeyValue_Commit  Commit index <%s> Operation is <%s> index rank <%ld> index address %ld zmf address %ld \n",
         IndexName.toCChar(),
         decode_ZOperation(pIndexItem->Operation).toCChar(),
@@ -1224,7 +1224,7 @@ ZRawIndexFile::_rawKeyValue_Commit(ZIndexItem *pIndexItem)
     wAction="_remove_Commit";
     break;
   default:
-    if (ZVerbose & ZVB_FileEngine)
+    if (BaseParameters->VerboseFileEngine())
       _DBGPRINT("ZRawIndexFile::_rawKeyValue_Commit-E-INVOP  Invalid commit operation code <%s> for index key <%s>",
           decode_ZOperation(pIndexItem->Operation).toCChar(),IndexName.toCChar())
     ZException.setMessage("ZRawIndexFile::_rawKeyValue_Commit",ZS_INVOP,Severity_Severe,
@@ -1233,7 +1233,7 @@ ZRawIndexFile::_rawKeyValue_Commit(ZIndexItem *pIndexItem)
     return ZS_INVOP;
   }//switch
 
-  if (ZVerbose & ZVB_FileEngine)
+  if (BaseParameters->VerboseFileEngine())
     _DBGPRINT("ZRawIndexFile::_rawKeyValue_Commit  index key <%s> commit operation <%s> done. status is <%s> \n",
         IndexName.toCChar(),wAction,decode_ZStatus(wSt))
 
@@ -1261,7 +1261,7 @@ ZRawIndexFile::_rawKeyValue_Rollback(ZIndexItem *pIndexItem)
   ZStatus wSt;
   const char* wAction=nullptr;
 
-  if (ZVerbose & ZVB_FileEngine)
+  if (BaseParameters->VerboseFileEngine())
     _DBGPRINT("ZRawIndexFile::_rawKeyValue_Rollback  index key <%s> rollback operation <%s>.\n",
         IndexName.toCChar(),decode_ZOperation(pIndexItem->Operation).toString())
 
@@ -1302,7 +1302,7 @@ ZRawIndexFile::_rawKeyValue_Rollback(ZIndexItem *pIndexItem)
   // history and journaling take place here
   pIndexItem->Operation |= ZO_RolledBack ;
 
-  if (ZVerbose & ZVB_FileEngine)
+  if (BaseParameters->VerboseFileEngine())
     _DBGPRINT("ZRawIndexFile::_rawKeyValue_Rollback  index key <%s> rollback done. status is <%s> \n",
         IndexName.toCChar(),decode_ZStatus(wSt))
 
@@ -1332,7 +1332,7 @@ ZRawIndexFile::_rawKeyValue_HardRollback(ZIndexItem *pIndexItem)
 
   ZOp_type wOp = pIndexItem->Operation & ZO_OpMask ;
 
-  if (ZVerbose & ZVB_FileEngine)
+  if (BaseParameters->VerboseFileEngine())
     _DBGPRINT("ZRawIndexFile::_rawKeyValue_HardRollback  index key <%s> hard rollback operation <%s> requested.\n",
         IndexName.toCChar(),decode_ZOperation(wOp).toString())
 
@@ -1357,7 +1357,7 @@ ZRawIndexFile::_rawKeyValue_HardRollback(ZIndexItem *pIndexItem)
   }//switch
 
 
-  if (ZVerbose & ZVB_FileEngine)
+  if (BaseParameters->VerboseFileEngine())
     _DBGPRINT( "ZRawIndexFile::_rawKeyValue_HardRollback Index  key <%s> raw Key Value Hard rollback of op <%s> action <%s>  index rank <%ld>\n",
                 IndexName.toCChar(),
                 decode_ZOperation(pIndexItem->Operation).toCChar(),
@@ -2128,12 +2128,12 @@ ZRawIndexFile::_URFsearchDychoUnique(  const ZDataBuffer &pKeyToSearch,
 
   if (wR==0) {
     wSt=ZS_FOUND ;
-    if (ZVerbose & ZVB_SearchEngine)
+    if (BaseParameters->VerboseSearchEngine())
       _DBGPRINT("ZRawIndexFile::_URFsearchDychoUnique  Match index at rank %ld index address %ld\n",pOutIndexItem.IndexRank,pOutIndexItem.IndexAddress)
     goto _URFsearch_Return;
   }
   if (wR<0) {
-    if (ZVerbose & ZVB_SearchEngine)
+    if (BaseParameters->VerboseSearchEngine())
       _DBGPRINT("ZRawIndexFile::_URFsearchDychoUnique ZS_OUTBOUNDLOW rank %ld\n",pOutIndexItem.IndexRank)
     wSt =  ZS_OUTBOUNDLOW;
     goto _URFsearch_Return;
@@ -2147,14 +2147,14 @@ ZRawIndexFile::_URFsearchDychoUnique(  const ZDataBuffer &pKeyToSearch,
 
   if (wR==0) {
     wSt=ZS_FOUND ;
-    if (ZVerbose & ZVB_SearchEngine)
+    if (BaseParameters->VerboseSearchEngine())
       _DBGPRINT("ZRawIndexFile::_URFsearchUnique  Match index at rank %ld index address %ld zmf address %ld\n",pOutIndexItem.IndexRank,pOutIndexItem.IndexAddress,pOutIndexItem.ZMFAddress)
     wSt=ZS_FOUND ;
     return wSt ;
   }
 
   if (wR>0) {
-    if (ZVerbose & ZVB_SearchEngine)
+    if (BaseParameters->VerboseSearchEngine())
       _DBGPRINT("ZRawIndexFile::_URFsearchDychoUnique ZS_OUTBOUNDHIGH rank %ld\n",pOutIndexItem.IndexRank)
     return  ZS_OUTBOUNDHIGH;
     }
@@ -2171,7 +2171,7 @@ ZRawIndexFile::_URFsearchDychoUnique(  const ZDataBuffer &pKeyToSearch,
       goto _URFsearch_Return;
 
     if (wR==0) {
-      if (ZVerbose & ZVB_SearchEngine)
+      if (BaseParameters->VerboseSearchEngine())
         _DBGPRINT("ZRawIndexFile::_URFsearchDychoUnique  Match index at rank %ld index address %ld zmf address %ld\n",pOutIndexItem.IndexRank,pOutIndexItem.IndexAddress,pOutIndexItem.ZMFAddress)
       wSt=ZS_FOUND ;
       return wSt ;
@@ -2218,7 +2218,7 @@ ZRawIndexFile::_URFsearchDychoUnique(  const ZDataBuffer &pKeyToSearch,
   pOutIndexItem.IndexRank = wpivot ;
 
   if (wR==0) {
-    if (ZVerbose & ZVB_SearchEngine)
+    if (BaseParameters->VerboseSearchEngine())
       _DBGPRINT("ZRawIndexFile::_URFsearchDychoUnique  Match index at rank %ld index address %ld zmf address %ld\n",
           pOutIndexItem.IndexRank,pOutIndexItem.IndexAddress,pOutIndexItem.ZMFAddress)
     wSt=ZS_FOUND;
@@ -2229,7 +2229,7 @@ ZRawIndexFile::_URFsearchDychoUnique(  const ZDataBuffer &pKeyToSearch,
 //  pOutIndexItem->_copyFrom( wPrevious );
 
 //  pIndexRank = wPreviousRank;
-  if (ZVerbose & ZVB_SearchEngine)
+  if (BaseParameters->VerboseSearchEngine())
     _DBGPRINT("ZRawIndexFile::_URFsearchDychoUnique ZS_NOTFOUND last index rank %ld last index address %ld last zmf address %ld\\n",
         pOutIndexItem.IndexRank,pOutIndexItem.IndexAddress,pOutIndexItem.ZMFAddress)
   return  ZS_NOTFOUND ;
@@ -2279,7 +2279,7 @@ ZStatus wSt;
   /* NB: ZMF address is given by ZIndexItem::fromFileKey() routine */
 
   pReturn = URFComparePtr(pKeyToSearch.Data,pKeyToSearch.Size,pIndexItem.Data,pIndexItem.Size);
-  if (ZVerbose & ZVB_SearchEngine)
+  if (BaseParameters->VerboseSearchEngine())
     displayURFCompare(pIndexRank,pReturn,pKeyToSearch.Data,pIndexItem.Data);
 
   return ZS_SUCCESS ;
@@ -2327,7 +2327,7 @@ ZRawIndexFile::_URFsearchUnique(  const ZDataBuffer &pKeyToSearch,
 
 
 _URFsearch_Return:
-  if (ZVerbose & ZVB_SearchEngine)
+  if (BaseParameters->VerboseSearchEngine())
     _DBGPRINT("ZRawIndexFile::_URFsearchUnique  Index key <%s> status <%s> last index rank %ld last index address %ld last zmf address %ld \n",
               IndexName.toCChar(),
               decode_ZStatus(wSt),
@@ -2390,7 +2390,7 @@ ZRawIndexFile::_URFsearchAll( const ZDataBuffer     &pKeyToSearch,
 
 
 _URFsearch_Return:
-  if (ZVerbose & ZVB_SearchEngine)
+  if (BaseParameters->VerboseSearchEngine())
     _DBGPRINT("ZRawIndexFile::_URFsearchUnique  Index key <%s> status <%s> last index rank %ld last index address %ld last zmf address %ld \n",
         IndexName.toCChar(),
         decode_ZStatus(wSt),
@@ -4074,10 +4074,10 @@ ZDataBuffer wIndexRecord;
 //--------------------------End Search routines--------------------------------------
 
 
-utf8String ZRawIndexFile::toXml(int pLevel,bool pComment)
+utf8VaryingString ZRawIndexFile::toXml(int pLevel,bool pComment)
 {
   int wLevel=pLevel+1;
-  utf8String wReturn;
+  utf8VaryingString wReturn;
   wReturn = fmtXMLnode("index",pLevel);
 
   wReturn += ZIndexControlBlock::toXml(wLevel,pComment);
@@ -4093,9 +4093,9 @@ utf8String ZRawIndexFile::toXml(int pLevel,bool pComment)
 ZStatus ZRawIndexFile::fromXml(zxmlNode* pIndexNode, ZaiErrors* pErrorlog)
 {
   zxmlElement *wRootNode;
-  utfcodeString wXmlHexaId;
-  utf8String wValue;
-  utfcodeString wCValue;
+  utf8VaryingString wXmlHexaId;
+  utf8VaryingString wValue;
+  utf8VaryingString wCValue;
   uint32_t wInt=0;
 
   ZStatus wSt;

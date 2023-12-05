@@ -21,7 +21,7 @@ typedef void  (*ZFCBgetReserved) (ZDataBuffer &) ;
 class ZHeaderControlBlock;
 class ZHeaderControlBlock_Export
 {
-public:
+public:    
   uint32_t                StartSign   = cst_ZBLOCKSTART;  /**< check for block start */
   ZBlockId                BlockId     = ZBID_HCB;         /**< identification is file header */
   uint16_t                EndianCheck = cst_EndianCheck_Normal;
@@ -39,7 +39,8 @@ public:
 
 
   ZHeaderControlBlock_Export()=default;
-  ZHeaderControlBlock_Export(ZHeaderControlBlock_Export& pIn) {_copyFrom(pIn);}
+  ZHeaderControlBlock_Export(const ZHeaderControlBlock_Export& pIn) {_copyFrom(pIn);}
+  ZHeaderControlBlock_Export(const ZHeaderControlBlock_Export&& pIn) {_copyFrom(pIn);}
 
   ZHeaderControlBlock_Export& operator=(ZHeaderControlBlock_Export& pIn) {return _copyFrom(pIn);}
 
@@ -55,7 +56,7 @@ public:
   void serialize();
   void deserialize();
 
-  ZHeaderControlBlock_Export& _copyFrom(ZHeaderControlBlock_Export& pIn);
+  ZHeaderControlBlock_Export &_copyFrom(const ZHeaderControlBlock_Export &pIn);
 
   bool isReversed() const
   {
@@ -120,7 +121,7 @@ public:
 
 
 
-  utf8String toXml(int pLevel);
+  utf8VaryingString toXml(int pLevel);
   /**
      * @brief fromXml loads header control block from its xml definition and return 0 when successfull.
      * When errors returns <>0 and pErrlog contains appropriate error messages.

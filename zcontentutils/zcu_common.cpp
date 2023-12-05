@@ -55,13 +55,13 @@ QList<QStandardItem*> itemRow (QStandardItemModel*pModel,QModelIndex pIdx)
 }//itemRow
 
 /* creates a list pointing to cloned items */
-QList<QStandardItem*> cloneRow (QStandardItemModel*pModel,QModelIndex& pIdx, ZaiErrors* pErrorlog)
+QList<QStandardItem*> cloneRow (QStandardItemModel*pModel,QModelIndex& pIdx, ZaiErrors* pErrorLog)
 {
   QList<QStandardItem*> wRow;
   if (!pIdx.isValid())
   {
-    if (pErrorlog)
-      pErrorlog->errorLog("cloneRow-E-INVIDX Index is not valid.\n");
+    if (pErrorLog)
+      pErrorLog->errorLog("cloneRow-E-INVIDX Index is not valid.\n");
     else
       fprintf(stderr,"cloneRow-E-INVIDX Index is not valid.\n");
     return wRow;
@@ -88,7 +88,7 @@ QList<QStandardItem*> cloneRow (QStandardItemModel*pModel,QModelIndex& pIdx, Zai
 
   return wRow;
 }//cloneRow
-QList<QStandardItem*> cloneRow (QStandardItemModel*pModel,QStandardItem* pFather,int pRow, ZaiErrors* pErrorlog)
+QList<QStandardItem*> cloneRow (QStandardItemModel*pModel,QStandardItem* pFather,int pRow, ZaiErrors* pErrorLog)
 {
   QList<QStandardItem*> wRow;
 
@@ -113,13 +113,13 @@ QList<QStandardItem*> cloneRow (QStandardItemModel*pModel,QStandardItem* pFather
   return wRow;
 }//cloneRow
 /* creates a list pointing to effective items after having cut them */
-QList<QStandardItem*> cutRow (QStandardItemModel*pModel,QModelIndex& pIdx, ZaiErrors* pErrorlog)
+QList<QStandardItem*> cutRow (QStandardItemModel*pModel,QModelIndex& pIdx, ZaiErrors* pErrorLog)
 {
   QList<QStandardItem*> wRow;
   if (!pIdx.isValid())
   {
-    if (pErrorlog)
-      pErrorlog->errorLog("cutRow-E-INVIDX Index is not valid.\n");
+    if (pErrorLog)
+      pErrorLog->errorLog("cutRow-E-INVIDX Index is not valid.\n");
     else
       fprintf(stderr,"cutRow-E-INVIDX Index is not valid.\n");
     return wRow;
@@ -137,7 +137,7 @@ QList<QStandardItem*> cutRow (QStandardItemModel*pModel,QModelIndex& pIdx, ZaiEr
     return wFatherItem->takeRow(pIdx.row());
 }//cutRow
 
-QList<QStandardItem*> cutRow (QStandardItemModel*pModel,QStandardItem* wFatherItem, int pRow, ZaiErrors* pErrorlog)
+QList<QStandardItem*> cutRow (QStandardItemModel*pModel,QStandardItem* wFatherItem, int pRow, ZaiErrors* pErrorLog)
 {
   QList<QStandardItem*> wRow;
 

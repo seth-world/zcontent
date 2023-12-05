@@ -53,6 +53,6 @@ private:
   Ui::ZScan *ui;
 };
 
-utf8String formatSize(long long wSize);
+utf8VaryingString formatSize(long long wSize);
 
 #endif // ZSCAN_H

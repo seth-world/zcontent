@@ -335,7 +335,7 @@ utf8VaryingString ZKeyDictionary::toXml(int pLevel,int pRank, bool pComment)
     long w2 = Tab(wi).MDicRank;
     wReturn +=fmtXMLchar("name",Dictionary->Tab(w2).getName().toCChar(),wLevel+2);
     wReturn +=fmtXMLuint32("ztype",Dictionary->Tab(w2).ZType,wLevel+2);    /* ZTypeBase = uint32_t*/
-    utf8String wZTStr;
+    utf8VaryingString wZTStr;
     wZTStr.sprintf(" ZType_type <%s> converted to its value number",decode_ZType(Dictionary->Tab(wi).ZType));
     fmtXMLaddInlineComment(wReturn,wZTStr.toCChar());
     wReturn +=fmtXMLuint64("universalsize",Dictionary->Tab(w2).UniversalSize,wLevel+2);
@@ -355,9 +355,9 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
   zxmlElement *wFieldsRootNode=nullptr;
   zxmlElement *wSingleFieldNode=nullptr;
   zxmlElement *wSwapNode=nullptr;
-  utfcodeString wXmlHexaId;
-  utf8String wValue;
-  utfcodeString wCValue;
+  utf8VaryingString wXmlHexaId;
+  utf8VaryingString wValue;
+  utf8VaryingString wCValue;
   ZIndexField wIFld;
   bool wBool;
   bool wRecomputeKey=false;
@@ -445,7 +445,7 @@ ZStatus ZKeyDictionary::fromXml(zxmlNode* pKeyDicNode, ZaiErrors* pErrorlog)
 
   while (wSt==ZS_SUCCESS)
       {
-      utf8String wName;
+      utf8VaryingString wName;
       wSingleFieldNode=wSwapNode;
       if (wSingleFieldNode->getName()=="field")
         {
@@ -562,7 +562,7 @@ ZKeyDictionary::zsearchFieldByName(const utf8_t *pFieldName) const
  * @return the field position (rank) in dictionary. returns -1 if field name has not been found.
  */
 long
-ZKeyDictionary::zsearchFieldByName(const utf8String &pFieldName) const
+ZKeyDictionary::zsearchFieldByName(const utf8VaryingString &pFieldName) const
 {
   long wMDicRank=0;
   for (long wi=0;wi<size();wi++)

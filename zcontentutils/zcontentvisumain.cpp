@@ -1,7 +1,14 @@
 ﻿#include "zcontentvisumain.h"
-#include "ui_zcontentvisumain.h"
+//#include "ui_zcontentvisumain.h"
+
+#include <zio/zdir.h>
+#include <stdio.h>
+#include <fcntl.h>
+
+#include <zcontentcommon/zgeneralparameters.h>
 
 #include <zio/zioutils.h>
+#include <ztoolset/utfutils.h>  /* for formatSize  */
 
 #include <QStandardItemModel>
 #include <qaction.h>
@@ -9,9 +16,23 @@
 #include <qfiledialog.h>
 #include <qmessagebox.h>
 
-#include <zio/zdir.h>
-#include <stdio.h>
-#include <fcntl.h>
+#include <QVBoxLayout>
+
+#include <QLabel>
+#include <QAction>
+#include <QActionGroup>
+#include <QPushButton>
+#include <QMenu>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QStatusBar>
+#include <QMenuBar>
+#include <QFrame>
+#include <QCoreApplication>
+#include <QProgressBar>
+
+
+
 
 #include <zcontent/zrandomfile/zrandomfile.h>
 #include <zcontent/zindexedfile/zrawmasterfile.h>
@@ -51,11 +72,20 @@
 #include "zrestoredlg.h"
 
 #include "zsearchquerymwd.h"
+#include "zmfprogressmwn.h"
 
 #include <zcontentcommon/zgeneralparameters.h>
 #include "zgeneralparamsdlg.h"
 
-#define __FIXED_FONT__ "courrier"
+#include <ztoolset/zexceptionmin.h>
+
+#include <zclearfiledlg.h>
+
+#include <QApplication>
+
+#include <zio/zioutils.h>
+#include <zcontent/zrandomfile/zrfutilities.h>
+#include <zqt/zqtwidget/zqtwidgettools.h>
 
 const int cst_maxraisonablevalue = 100000;
 
@@ -63,23 +93,27 @@ using namespace std;
 using namespace zbs;
 
 
-class DicEditMWn* DicEdit=nullptr;
+DicEditMWn* DicEdit=nullptr;
 
-ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
-                                                     ui(new Ui::ZContentVisuMain)
+
+//ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
+//                                                     ui(new Ui::ZContentVisuMain)
+ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent)
 {
-  ui->setupUi(this);
+ // setupUi(this);
+
+  initLayout();
 
   GetRawQAc = new QAction(QCoreApplication::translate("ZContentVisuMain", "Open raw file", nullptr),this);
 
-  ui->fileMEn->insertAction(ui->openZMFQAc ,GetRawQAc);
+  fileMEn->insertAction(openZMFQAc ,GetRawQAc);
 
-  ui->CurAddressLBl->setText("0");
+  CurAddressLBl->setText("0");
 
   setWindowTitle("File dump and explore");
 
-  ui->ZRFVersionLBl->setText(getVersionStr(__ZRF_VERSION__).toCChar());
-  ui->ZMFVersionLBl->setText(getVersionStr(__ZMF_VERSION__).toCChar());
+  ZRFVersionLBl->setText(getVersionStr(__ZRF_VERSION__).toCChar());
+  ZMFVersionLBl->setText(getVersionStr(__ZMF_VERSION__).toCChar());
 
   /* columns : group of (4 byte hexa plus 1) x 4 - 1 large for ascii  = 20 + 1 */
 
@@ -102,15 +136,11 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
 
   VisuTBv->setContextMenuCallback(std::bind(&VisuRaw::VisuBvFlexMenuCallback, VizuRaw,placeholders::_1));
 
-//  VisuTBv->setContextMenuCallback(std::bind(&ZContentVisuMain::VisuBvFlexMenuCallback, this,placeholders::_1));
-
-//  VisuTBv->setMouseClickCallback(std::bind(&ZContentVisuMain::VisuMouseCallback, this,placeholders::_1,placeholders::_2)  );
-
-  QFont wVisuFont ("Monospace");
+  QFont wVisuFont (GeneralParameters.getFixedFont().toCChar());
 
   VisuTBv->setFont(wVisuFont);
 
-  ui->verticalLayout->addWidget(VisuTBv);
+  verticalLayout->addWidget(VisuTBv);
 
   utf8VaryingString wStr;
   int wj=0;
@@ -131,10 +161,24 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
   VisuTBv->ItemModel->setHorizontalHeaderItem(20,new QStandardItem(tr("Ascii")));
 
   openZRFQAc = new QAction("Random file",this);
-  ui->menubar->addAction(openZRFQAc);
+  menubar->addAction(openZRFQAc);
+
+  RandomFileMEn = new QMenu("Random file",this);
+  menubar->addMenu(RandomFileMEn);
+
+  ZRFCloneQAc = new QAction("Clone",this);
+  RandomFileMEn->addAction(ZRFCloneQAc);
+  ZRFClearQAc = new QAction("Clear",this);
+  RandomFileMEn->addAction(ZRFClearQAc);
+  ZRFReorgQAc = new QAction("Reorganize",this);
+  RandomFileMEn->addAction(ZRFReorgQAc);
+  ZRFRebuildHeaderQAc = new QAction("Rebuild header",this);
+  RandomFileMEn->addAction(ZRFRebuildHeaderQAc);
+  ZRFSurfaceScanQAc = new QAction("Surface scan",this);
+  RandomFileMEn->addAction(ZRFSurfaceScanQAc);
 
   MasterFileMEn = new QMenu("Master file",this);
-  ui->menubar->addMenu(MasterFileMEn);
+  menubar->addMenu(MasterFileMEn);
 
   DictionaryQAc=new QAction("Dictionaries management",this);
   MasterFileMEn->addAction(DictionaryQAc);
@@ -148,6 +192,15 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
   IndexRebuildQAc = new QAction("Rebuild index",this);
   MasterFileMEn->addAction(IndexRebuildQAc);
 
+  ZMFExportQAc = new QAction("Export data",this);
+  MasterFileMEn->addAction(ZMFExportQAc);
+
+  ZMFImportQAc = new QAction("Import data",this);
+  MasterFileMEn->addAction(ZMFImportQAc);
+
+  ZMFClearQAc = new QAction("Clear all file data",this);
+  MasterFileMEn->addAction(ZMFClearQAc);
+
   ZMFBackupQAc = new QAction("Backup file and all indexes",this);
   MasterFileMEn->addAction(ZMFBackupQAc);
 
@@ -160,44 +213,45 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
   mainQAg->addAction(openZRFQAc);
 
   mainQAg->addAction(ZMFQueryQAc);
+  mainQAg->addAction(ZMFExportQAc);
+  mainQAg->addAction(ZMFImportQAc);
 
+  mainQAg->addAction(setfileQAc); /* set the current file to be open */
 
-  mainQAg->addAction(ui->setfileQAc); /* set the current file to be open */
+  mainQAg->addAction(openByTypeQAc);  /* open according file extension */
 
-  mainQAg->addAction(ui->openByTypeQAc);  /* open according file extension */
-
-  mainQAg->addAction(ui->openRawQAc);/* force open as raw file */
-  mainQAg->addAction(ui->openZRFQAc);/* force open as ZRF file */
-  mainQAg->addAction(ui->openZMFQAc);/* force open as ZMF file */
-  mainQAg->addAction(ui->openZRHQAc);/* force open as header file */
+  mainQAg->addAction(openRawQAc);/* force open as raw file */
+  mainQAg->addAction(openZRFQAc);/* force open as ZRF file */
+  mainQAg->addAction(openZMFQAc);/* force open as ZMF file */
+  mainQAg->addAction(openZRHQAc);/* force open as header file */
 
   mainQAg->addAction(GetRawQAc);     /* Shortcut to open file as raw */
 
-  mainQAg->addAction(ui->surfaceScanZRFQAc); /* surface scan ZRF file */
-  mainQAg->addAction(ui->surfaceScanRawQAc); /* surface scan raw file */
+  mainQAg->addAction(surfaceScanZRFQAc); /* surface scan ZRF file */
+  mainQAg->addAction(surfaceScanRawQAc); /* surface scan raw file */
 
-  mainQAg->addAction(ui->closeQAc);
+  mainQAg->addAction(closeQAc);
 
-  mainQAg->addAction(ui->QuitQAc);
+  mainQAg->addAction(QuitQAc);
 
-  mainQAg->addAction(ui->displayHCBQAc);
-  mainQAg->addAction(ui->displayFCBQAc);
-  mainQAg->addAction(ui->displayMCBQAc);
+  mainQAg->addAction(displayHCBQAc);
+  mainQAg->addAction(displayFCBQAc);
+  mainQAg->addAction(displayMCBQAc);
 
-  mainQAg->addAction(ui->rawDumpQAc);
+  mainQAg->addAction(rawDumpQAc);
 
   displayICBQAc = new QAction(QObject::tr("Index control blocks","ZContentVisuMain"),this);
   mainQAg->addAction(displayICBQAc);
 
-  ui->headerMEn->insertAction(ui->displayMCBQAc,displayICBQAc);
+  headerMEn->insertAction(displayMCBQAc,displayICBQAc);
 
   mainQAg->addAction(displayICBQAc);
 
-  mainQAg->addAction(ui->dictionaryQAc);
-//  actionGroup->addAction(ui->dicLoadXmlQAc);
+  mainQAg->addAction(dictionaryQAc);
+//  actionGroup->addAction(dicLoadXmlQAc);
 
   ParametersQMe=new QMenu(QObject::tr("Parameters"),this);
-  ui->fileMEn->insertMenu(ui->setfileQAc ,ParametersQMe);
+  fileMEn->insertMenu(setfileQAc ,ParametersQMe);
 
   ParamLoadQAc=new QAction(QObject::tr("Load xml parameter file"),this);
   ParamChangeQAc=new QAction(QObject::tr("Change current parameters"),this);
@@ -209,130 +263,391 @@ ZContentVisuMain::ZContentVisuMain(QWidget *parent) :QMainWindow(parent),
 
   /* Master file menus */
 
-  /* get definition from ZMF */
   mainQAg->addAction(ZmfDefQAc);
   mainQAg->addAction(IndexRebuildQAc);
   mainQAg->addAction(ZMFBackupQAc);
   mainQAg->addAction(ZMFRestoreQAc);
+  mainQAg->addAction(ZMFClearQAc);
 
   /* display pool choices */
 
-  mainQAg->addAction(ui->displayZBATQAc);
-  mainQAg->addAction(ui->displayZDBTQAc);
-  mainQAg->addAction(ui->displayZFBTQAc);
+  mainQAg->addAction(displayZBATQAc);
+  mainQAg->addAction(displayZDBTQAc);
+  mainQAg->addAction(displayZFBTQAc);
 
-  mainQAg->addAction(ui->HeaderRawUnlockQAc);
+//  mainQAg->addAction(HeaderRawUnlockQAc);
 
-  mainQAg->addAction(ui->unlockZRFQAc);
+  mainQAg->addAction(unlockZRFQAc);
 
-  mainQAg->addAction(ui->clearQAc);
-  mainQAg->addAction(ui->cloneQAc);
-  mainQAg->addAction(ui->extendQAc);
-  mainQAg->addAction(ui->truncateQAc);
-  mainQAg->addAction(ui->reorganizeQAc);
-  mainQAg->addAction(ui->upgradeZRFtoZMFQAc);
-  mainQAg->addAction(ui->rebuildHeaderQAc);
+  mainQAg->addAction(clearQAc);
+  mainQAg->addAction(cloneQAc);
+  mainQAg->addAction(extendQAc);
+  mainQAg->addAction(truncateQAc);
+  mainQAg->addAction(reorganizeQAc);
+  mainQAg->addAction(upgradeZRFtoZMFQAc);
+  mainQAg->addAction(rebuildHeaderQAc);
 
 /* ZMFMEn */
-  mainQAg->addAction(ui->runRepairQAc); /* repair all indexes */
-  mainQAg->addAction(ui->removeIndexQAc);
-  mainQAg->addAction(ui->addIndexQAc);      /* adds an index from an xml definition */
-  mainQAg->addAction(ui->downgradeZMFtoZRFQAc);
-  mainQAg->addAction(ui->rebuildIndexQAc);      /* rebuild single index */
-  mainQAg->addAction(ui->extractIndexQAc);      /* extract xml index definition */
-  mainQAg->addAction(ui->extractAllIndexesQAc); /* extract all xml index definitions */
-  mainQAg->addAction(ui->reorganizeZMFQAc);
-  mainQAg->addAction(ui->MCBReportQAc);         /* list Master Control Block */
+  mainQAg->addAction(runRepairQAc); /* repair all indexes */
+  mainQAg->addAction(removeIndexQAc);
+  mainQAg->addAction(addIndexQAc);      /* adds an index from an xml definition */
+  mainQAg->addAction(downgradeZMFtoZRFQAc);
+  mainQAg->addAction(rebuildIndexQAc);      /* rebuild single index */
+  mainQAg->addAction(extractIndexQAc);      /* extract xml index definition */
+  mainQAg->addAction(extractAllIndexesQAc); /* extract all xml index definitions */
+  mainQAg->addAction(reorganizeZMFQAc);
+  mainQAg->addAction(MCBReportQAc);         /* list Master Control Block */
 
-  ui->openByTypeQAc->setVisible(true);  /* open file by type is always visible */
 
-  ui->openRawQAc->setVisible(false);
-  ui->openZRFQAc->setVisible(false);
-  ui->openZMFQAc->setVisible(false);
-  ui->openZRHQAc->setVisible(false);
-  ui->unlockZRFQAc->setVisible(false);
-  ui->closeQAc->setVisible(false);
+  mainQAg->addAction(ZRFCloneQAc);
+  mainQAg->addAction(ZRFClearQAc);
+  mainQAg->addAction(ZRFReorgQAc);
+  mainQAg->addAction(ZRFRebuildHeaderQAc);
+  mainQAg->addAction(ZRFSurfaceScanQAc);
 
-  ui->rawMEn->setEnabled(false);
-  ui->ZRFMEn->setEnabled(false);
-  ui->headerMEn->setEnabled(false);
-  ui->ZMFMEn->setEnabled(false);
+  openByTypeQAc->setVisible(true);  /* open file by type is always visible */
 
-  ui->RecordFRm->setVisible(false);
-  ui->SequentialFRm->setVisible(false);
+  openRawQAc->setVisible(false);
+  openZRFQAc->setVisible(false);
+  openZMFQAc->setVisible(false);
+  openZRHQAc->setVisible(false);
+  unlockZRFQAc->setVisible(false);
+  closeQAc->setVisible(false);
 
-  ui->displayHCBQAc->setEnabled(false);
-  ui->displayMCBQAc->setEnabled(false);
+  rawMEn->setEnabled(false);
+  ZRFMEn->setEnabled(false);
+  headerMEn->setEnabled(false);
+  ZMFMEn->setEnabled(false);
+
+  RecordFRm->setVisible(false);
+  SequentialFRm->setVisible(false);
+
+  displayHCBQAc->setEnabled(false);
+  displayMCBQAc->setEnabled(false);
   displayICBQAc->setEnabled(false);
-  ui->displayFCBQAc->setEnabled(false);
+  displayFCBQAc->setEnabled(false);
 
 
-  ui->BackwardBTn->setVisible(false);
-  ui->ForwardBTn->setVisible(false);
-  ui->LoadAllBTn->setVisible(false);
+  BackwardBTn->setVisible(false);
+  ForwardBTn->setVisible(false);
+  LoadAllBTn->setVisible(false);
 
-  ui->LoadAllBTn->setText(QObject::tr("All","ZContentVisuMain"));
+  LoadAllBTn->setText(QObject::tr("All","ZContentVisuMain"));
 
-  ui->ProgressPGb->setVisible(false);
+  ProgressPGb->setVisible(false);
 
-  ui->OpenModeLbl->setVisible(false);
-  ui->ClosedLBl->setVisible(true);
+  OpenModeLbl->setVisible(false);
+  ClosedLBl->setVisible(true);
 
-/* mem.h
-const uint32_t     cst_ZMSTART = 0xF6F6F6F6;  //!< Begin marker of a data structure on file it is a palyndroma
-const uint32_t     cst_ZSTRINGEND   = 0xFAFAFAFA;  //!< End marker of a string data memory zone
-const uint32_t     cst_ZBUFFEREND   = 0xFBFBFBFB;  //!< End marker of a ZDataBuffer data structure in memory
-*/
+  searchTypeCBx->addItem("Ascii case sensitive");       /* 0 */
+  searchTypeCBx->addItem("Ascii no case");              /* 1 */
+  searchTypeCBx->addItem("Hexa free sequence");         /* 2 */
+  searchTypeCBx->addItem("F9F9F9F9 File block start");  /* 3 */
+  searchTypeCBx->addItem("F5F5F5F5 Data block start");  /* 4 */
+  searchTypeCBx->addItem("F4F4F4F4 Dictionary field start (file)");  /* 5 */
+  searchTypeCBx->addItem("FCFCFCFC Data block end");  /* 6 */
+  searchTypeCBx->addItem("F6F6F6F6 Dictionary structure begin(file)");  /* 7 */
+  searchTypeCBx->addItem("FAFAFAFA String data begin (memory)");  /* 8 */
+  searchTypeCBx->addItem("FBFBFBFB Buffer end");  /* 9 */
 
-  ui->searchTypeCBx->addItem("Ascii case sensitive");       /* 0 */
-  ui->searchTypeCBx->addItem("Ascii no case");              /* 1 */
-  ui->searchTypeCBx->addItem("Hexa free sequence");         /* 2 */
-  ui->searchTypeCBx->addItem("F9F9F9F9 File block start");  /* 3 */
-  ui->searchTypeCBx->addItem("F5F5F5F5 Data block start");  /* 4 */
-  ui->searchTypeCBx->addItem("F4F4F4F4 Dictionary field start (file)");  /* 5 */
-  ui->searchTypeCBx->addItem("FCFCFCFC Data block end");  /* 6 */
-  ui->searchTypeCBx->addItem("F6F6F6F6 Dictionary structure begin(file)");  /* 7 */
-  ui->searchTypeCBx->addItem("FAFAFAFA String data begin (memory)");  /* 8 */
-  ui->searchTypeCBx->addItem("FBFBFBFB Buffer end");  /* 9 */
+  QObject::connect(BackwardBTn, &QPushButton::clicked, this, &ZContentVisuMain::backward);
+  QObject::connect(ForwardBTn, &QPushButton::clicked, this, &ZContentVisuMain::forward);
+  QObject::connect(LoadAllBTn, &QPushButton::clicked, this, &ZContentVisuMain::loadAll);
 
-  QObject::connect(ui->BackwardBTn, SIGNAL(pressed()), this, SLOT(backward()));
-  QObject::connect(ui->ForwardBTn, SIGNAL(pressed()), this, SLOT(forward()));
-  QObject::connect(ui->LoadAllBTn, SIGNAL(pressed()), this, SLOT(loadAll()));
+ // QObject::connect(mainQAg, SIGNAL(triggered(QAction*)), this, SLOT(actionMenuEvent(QAction*)));
+  QObject::connect(mainQAg, &QActionGroup::triggered, this, &ZContentVisuMain::actionMenuEvent);
+  QObject::connect(searchFwdBTn, &QPushButton::clicked, this, &ZContentVisuMain::searchFwd);
+  QObject::connect(searchBckBTn, &QPushButton::clicked, this, &ZContentVisuMain::searchBck);
+  QObject::connect(searchTypeCBx, &QComboBox::currentIndexChanged, this, &ZContentVisuMain::searchCBxChanged);
+  QObject::connect(VisuTBv, &ZQTableView::doubleClicked, this, &ZContentVisuMain::VisuClicked);
+  QObject::connect(VisuTBv, &ZQTableView::clicked, this, &ZContentVisuMain::VisuClicked);
 
-  QObject::connect(mainQAg, SIGNAL(triggered(QAction*)), this, SLOT(actionMenuEvent(QAction*)));
-  QObject::connect(ui->searchFwdBTn, SIGNAL(pressed()), this, SLOT(searchFwd()));
-  QObject::connect(ui->searchBckBTn, SIGNAL(pressed()), this, SLOT(searchBck()));
-  QObject::connect(ui->searchTypeCBx, SIGNAL(currentIndexChanged(int)), this, SLOT(searchCBxChanged(int)));
-  QObject::connect(VisuTBv, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(VisuClicked(QModelIndex)));
-  QObject::connect(VisuTBv, SIGNAL(clicked(QModelIndex)), this, SLOT(VisuClicked(QModelIndex)));
+
+ // ErrorLog.setDisplayCallback(std::bind(&ZContentVisuMain::GenlogWindisplayErrorCallBack, this,std::placeholders::_1));
+  ErrorLog.setDisplayColorCB(std::bind(&ZContentVisuMain::GenlogWindisplayErrorColorCB, this,placeholders::_1,placeholders::_2));
 
 }
-
 ZContentVisuMain::~ZContentVisuMain()
 {
-  if (VizuRaw!=nullptr)
-    delete VizuRaw;
+    if (VizuRaw!=nullptr)
+        delete VizuRaw;
 
-  if (entityWnd)
-    delete entityWnd;
+    if (entityWnd)
+        delete entityWnd;
 
-  if (RandomFile)
-    if (RandomFile->isOpen())
-      {
-        RandomFile->zclose();
-        delete RandomFile;
-      }
-  if (MasterFile)
+    if (RandomFile)
+        if (RandomFile->isOpen())
+        {
+            RandomFile->zclose();
+            delete RandomFile;
+        }
+    if (RawMasterFile)
     {
-      if (MasterFile->isOpen())
-        MasterFile->zclose();
-      delete MasterFile;
+        if (RawMasterFile->isOpen())
+            RawMasterFile->zclose();
+        delete RawMasterFile;
     }
-  if (Fd>=0)
-    ::close(Fd);
+    if (Fd>=0)
+        ::close(Fd);
 
-  delete ui;
+//    delete ui;
 }
+void
+ZContentVisuMain::initLayout()
+{
+    resize(868, 676);
+    openByTypeQAc = new QAction("Open file according type",this);
+    rawQAc = new QAction("Raw",this);
+    ZRFRecordsQac = new QAction("ZRF Records",this);
+    actionSuface = new QAction("Suface",this);
+    surfaceScanRawQAc = new QAction("Surface scan",this);
+    RecoveryQAc = new QAction("Record recovery",this);
+    closeQAc = new QAction("Close current", this);
+    rawDumpQAc = new QAction("Raw dump",this);
+    surfaceScanZRFQAc = new QAction("Surface dump (ZRF)",this);
+    displayHCBQAc = new QAction("Header Control Block", this);
+    QuitQAc = new QAction("Quit",this);
+
+    displayFCBQAc = new QAction("File Control Block",this);
+    displayMCBQAc = new QAction("Master Control Block",this);
+    setfileQAc = new QAction("Set file",this);
+    openRawQAc = new QAction("Open file as raw file",this);
+    openZRFQAc = new QAction("Open file as Random File",this);
+    openZMFQAc = new QAction("Open file as Master File",this);
+    actionHeader_file = new QAction("Header file", this);
+    unlockZRFQAc = new QAction("Unlock random file",this);
+    headerFileUnlockQAc = new QAction("Header file unlock",this);
+
+    listIndexesQAc = new QAction("List indexes",this);
+    clearQAc = new QAction("Clear file",this);
+    cloneQAc = new QAction( "Clone file",this);
+    truncateQAc = new QAction("Truncate file",this);
+    extendQAc = new QAction("Extend File",this);
+    rebuildHeaderQAc = new QAction("Rebuild header file",this);
+    reorganizeQAc = new QAction("Reorganize file",this);
+    downgradeZMFtoZRFQAc = new QAction("dowgrade to ZRF",this);
+    upgradeZRFtoZMFQAc = new QAction("upgrade to MasterFile",this);
+    reorganizeZMFQAc = new QAction("reorganize",this);
+    removeIndexQAc = new QAction("remove Index",this);
+    addIndexQAc = new QAction("add Index",this);
+    rebuildIndexQAc = new QAction("rebuild single Index",this);
+    extractIndexQAc = new QAction("extract Index definition",this);
+    extractAllIndexesQAc = new QAction("extract all Indexes definitions", this);
+    testRunQAc = new QAction("test run",this);
+    testRunQAc->setCheckable(true);
+    rebuilAllQAc = new QAction("rebuild all",this);
+     rebuilAllQAc->setCheckable(true);
+    runRepairQAc = new QAction("run repair", this);
+    MCBReportQAc = new QAction("Master Control Block report",this);
+    DictionaryQAc = new QAction( "Dictionary",this);
+    displayZBATQAc = new QAction("Block Access Table",this);
+    displayZDBTQAc = new QAction("Deleted Blocks Table",this);
+    displayZFBTQAc = new QAction("Free Blocks Table",this);
+    dictionaryQAc = new QAction("Dictionary facilities", this);
+    dicLoadXmlQAc = new QAction( "Load from Xml file",this);
+    cppparserQAc = new QAction( "c++ parser",this);
+    openZRHQAc = new QAction("Open file as header file",this);
+    centralwidget = new QWidget(this);
+    MainFRm = new QFrame(centralwidget);
+    MainFRm->setGeometry(QRect(0, 0, 861, 211));
+    MainFRm->setFrameShape(QFrame::StyledPanel);
+    MainFRm->setFrameShadow(QFrame::Raised);
+    OpenModeLbl = new QLabel("not open", MainFRm);
+    OpenModeLbl->setGeometry(QRect(140, 40, 131, 16));
+    FileTypeLBl = new QLabel("Unknown type",MainFRm);
+    FileTypeLBl->setGeometry(QRect(140, 80, 131, 16));
+    FullPathLbl = new QLabel("no file selected",MainFRm);
+    FullPathLbl->setGeometry(QRect(20, 10, 831, 16));
+    FullPathLbl->setFrameShape(QFrame::NoFrame);
+    FullPathLbl->setFrameShadow(QFrame::Plain);
+    BackwardBTn = new QPushButton("<",MainFRm);
+    BackwardBTn->setGeometry(QRect(320, 47, 41, 41));
+    ForwardBTn = new QPushButton(">",MainFRm);
+    ForwardBTn->setGeometry(QRect(810, 47, 41, 41));
+    RecordFRm = new QFrame(MainFRm);
+    RecordFRm->setGeometry(QRect(370, 37, 421, 71));
+    RecordFRm->setFrameShape(QFrame::StyledPanel);
+    RecordFRm->setFrameShadow(QFrame::Raised);
+    RecordNumberLBl = new QLabel("Record",RecordFRm);
+    RecordNumberLBl->setGeometry(QRect(10, 10, 61, 20));
+    label_2 = new QLabel("Address",RecordFRm);
+    label_2->setGeometry(QRect(220, 10, 61, 16));
+    AddressLBl = new QLabel("0",RecordFRm);
+    AddressLBl->setGeometry(QRect(310, 10, 101, 20));
+    label_10 = new QLabel("Block Size", RecordFRm);
+    label_10->setGeometry(QRect(10, 30, 71, 16));
+    BlockSizeLBl = new QLabel("Block Size",RecordFRm);
+    BlockSizeLBl->setGeometry(QRect(80, 30, 81, 16));
+    label_11 = new QLabel("User Size",RecordFRm);
+    label_11->setGeometry(QRect(220, 30, 54, 15));
+    UserSizeLBl = new QLabel("User Size",RecordFRm);
+    UserSizeLBl->setGeometry(QRect(310, 30, 101, 20));
+    label_12 = new QLabel("State",RecordFRm);
+    label_12->setGeometry(QRect(10, 50, 54, 15));
+    StateLBl = new QLabel("State",RecordFRm);
+    StateLBl->setGeometry(QRect(80, 50, 81, 16));
+    label_13 = new QLabel("Lock mask",RecordFRm);
+    label_13->setGeometry(QRect(220, 50, 61, 16));
+    LockMaskLBl = new QLabel("lock",RecordFRm);
+    LockMaskLBl->setGeometry(QRect(300, 50, 121, 16));
+    RecordTotalLBl = new QLabel("Record total",RecordFRm);
+    RecordTotalLBl->setGeometry(QRect(140, 10, 61, 20));
+    label = new QLabel("of",RecordFRm);
+    label->setGeometry(QRect(100, 10, 21, 16));
+    FileSizeLBl = new QLabel("File Size",MainFRm);
+    FileSizeLBl->setGeometry(QRect(80, 60, 131, 16));
+    label_3 = new QLabel("File size", MainFRm);
+    label_3->setGeometry(QRect(20, 60, 91, 16));
+    LoadAllBTn = new QPushButton("All",MainFRm);
+    LoadAllBTn->setGeometry(QRect(800, 97, 51, 41));
+    ProgressPGb = new QProgressBar(MainFRm);
+    ProgressPGb->setGeometry(QRect(20, 100, 191, 20));
+    QFont font;
+    font.setPointSize(6);
+    font.setItalic(true);
+    ProgressPGb->setFont(font);
+    ProgressPGb->setValue(24);
+    SequentialFRm = new QFrame(MainFRm);
+    SequentialFRm->setGeometry(QRect(370, 170, 421, 31));
+    SequentialFRm->setFrameShape(QFrame::StyledPanel);
+    SequentialFRm->setFrameShadow(QFrame::Raised);
+    label_6 = new QLabel("Read", SequentialFRm);
+    label_6->setGeometry(QRect(10, 10, 41, 16));
+    ReadSizeLBl = new QLabel(SequentialFRm);
+    ReadSizeLBl->setGeometry(QRect(80, 10, 81, 16));
+    InterPunctLBl = new QLabel("of",SequentialFRm);
+    InterPunctLBl->setGeometry(QRect(170, 10, 21, 16));
+    FullSizeLBl = new QLabel("Full Size",SequentialFRm);
+    FullSizeLBl->setGeometry(QRect(210, 10, 81, 16));
+    label_00 = new QLabel("File is open as",MainFRm);
+    label_00->setGeometry(QRect(20, 40, 91, 16));
+    label_1 = new QLabel( "File has type",MainFRm);
+    label_1->setGeometry(QRect(20, 80, 91, 16));
+    ZRFVersionLBl = new QLabel("ZRF Version",MainFRm);
+    ZRFVersionLBl->setGeometry(QRect(240, 170, 101, 16));
+    ZMFVersionLBl = new QLabel("ZMF Version",MainFRm);
+    ZMFVersionLBl->setGeometry(QRect(240, 190, 101, 16));
+    label_4 = new QLabel("Random File Software version",MainFRm);
+    label_4->setGeometry(QRect(20, 170, 211, 16));
+    label_5 = new QLabel("Master File Software version",MainFRm);
+    label_5->setGeometry(QRect(20, 190, 211, 16));
+    ClosedLBl = new QLabel("No Open File", MainFRm);
+    ClosedLBl->setGeometry(QRect(130, 30, 151, 31));
+    QFont font1;
+    font1.setPointSize(12);
+    font1.setBold(true);
+    ClosedLBl->setFont(font1);
+    searchLEd = new QLineEdit(MainFRm);
+    searchLEd->setGeometry(QRect(530, 110, 261, 23));
+    searchTypeCBx = new QComboBox(MainFRm);
+    searchTypeCBx->setGeometry(QRect(380, 110, 141, 23));
+    searchTypeCBx->setMinimumContentsLength(0);
+    searchFwdBTn = new QPushButton("search forward",MainFRm);
+    searchFwdBTn->setGeometry(QRect(240, 110, 121, 23));
+    label_8 = new QLabel("Address", MainFRm);
+    label_8->setGeometry(QRect(390, 140, 61, 16));
+    CurAddressLBl = new QLabel("Cur Address",MainFRm);
+    CurAddressLBl->setGeometry(QRect(480, 140, 101, 20));
+    searchBckBTn = new QPushButton("search backward",MainFRm);
+    searchBckBTn->setGeometry(QRect(240, 140, 121, 23));
+    verticalLayoutWidget = new QWidget(centralwidget);
+    verticalLayoutWidget->setGeometry(QRect(0, 220, 861, 381));
+    verticalLayout = new QVBoxLayout(verticalLayoutWidget);
+    verticalLayout->setContentsMargins(0, 0, 0, 0);
+    setCentralWidget(centralwidget);
+    menubar = new QMenuBar(this);
+    menubar->setGeometry(QRect(0, 0, 868, 20));
+    fileMEn = new QMenu("File", menubar);
+    ZRFMEn = new QMenu("ZRF",menubar);
+    ZMFMEn = new QMenu("ZMF",menubar);
+    menurepair_all_indexes = new QMenu("repair all indexes",ZMFMEn);
+    rawMEn = new QMenu("Raw file",menubar);
+    headerMEn = new QMenu("Header file",menubar);
+    menuView_pool = new QMenu("View pool", headerMEn);
+    setMenuBar(menubar);
+    statusbar = new QStatusBar(this);
+    setStatusBar(statusbar);
+    /*
+    toolBar = new QToolBar(this);
+    toolBar->setObjectName("toolBar");
+    addToolBar(Qt::TopToolBarArea, toolBar);
+    */
+    menubar->addAction(fileMEn->menuAction());
+    menubar->addAction(ZRFMEn->menuAction());
+    menubar->addAction(ZMFMEn->menuAction());
+    menubar->addAction(rawMEn->menuAction());
+    menubar->addAction(headerMEn->menuAction());
+    fileMEn->addAction(setfileQAc);
+    fileMEn->addAction(openByTypeQAc);
+    fileMEn->addAction(openRawQAc);
+    fileMEn->addAction(openZRFQAc);
+    fileMEn->addAction(openZMFQAc);
+    fileMEn->addAction(openZRHQAc);
+    fileMEn->addAction(unlockZRFQAc);
+    fileMEn->addAction(closeQAc);
+    fileMEn->addAction(QuitQAc);
+    ZRFMEn->addAction(surfaceScanZRFQAc);
+    ZRFMEn->addAction(RecoveryQAc);
+    ZRFMEn->addAction(clearQAc);
+    ZRFMEn->addAction(cloneQAc);
+    ZRFMEn->addAction(truncateQAc);
+    ZRFMEn->addAction(extendQAc);
+    ZRFMEn->addAction(rebuildHeaderQAc);
+    ZRFMEn->addAction(reorganizeQAc);
+    ZRFMEn->addAction(upgradeZRFtoZMFQAc);
+    ZMFMEn->addAction(listIndexesQAc);
+    ZMFMEn->addAction(menurepair_all_indexes->menuAction());
+    ZMFMEn->addAction(downgradeZMFtoZRFQAc);
+    ZMFMEn->addAction(reorganizeZMFQAc);
+    ZMFMEn->addAction(removeIndexQAc);
+    ZMFMEn->addAction(addIndexQAc);
+    ZMFMEn->addAction(rebuildIndexQAc);
+    ZMFMEn->addAction(extractIndexQAc);
+    ZMFMEn->addAction(extractAllIndexesQAc);
+    ZMFMEn->addAction(MCBReportQAc);
+    menurepair_all_indexes->addAction(testRunQAc);
+    menurepair_all_indexes->addAction(rebuilAllQAc);
+    menurepair_all_indexes->addAction(runRepairQAc);
+    rawMEn->addAction(rawDumpQAc);
+    rawMEn->addAction(surfaceScanRawQAc);
+    headerMEn->addAction(headerFileUnlockQAc);
+    headerMEn->addAction(displayFCBQAc);
+    headerMEn->addAction(displayHCBQAc);
+    headerMEn->addAction(displayMCBQAc);
+    headerMEn->addAction(menuView_pool->menuAction());
+    menuView_pool->addAction(displayZBATQAc);
+    menuView_pool->addAction(displayZFBTQAc);
+//    toolBar->addAction(HeaderRawUnlockQAc);
+
+
+
+    searchTypeCBx->setCurrentText(QString());
+
+} // initLayout
+
+ZStatus ZContentVisuMain::setUpRawFile(const uriString& pFile)
+{
+    URICurrent = pFile;
+    FullPathLbl->setText(URICurrent.toCChar());
+    VisuType = ZCVM_Raw;
+/*
+    ZStatus wSt=URICurrent.loadContent(RawData);
+
+    if (wSt!=ZS_SUCCESS) {
+        utf8VaryingString wAdd = ZException.last().formatFullUserMessage().toString();
+        ZExceptionDLg::adhocMessage("Raw File load error",ZException.last().Severity,nullptr,&wAdd,
+                                    "Cannot load file");
+        return wSt;
+    }
+*/
+ //   removeAllRows();
+    FileSize = URICurrent.getFileSize();
+    FullSizeLBl->setText(formatSize(FileSize).toCChar());
+    return displayRawFromOffset();
+
+} // setup
+
+
 void ZContentVisuMain::VisuMouseCallback(int pZEF, QMouseEvent *pEvent)
 {
   /* update offset */
@@ -343,7 +658,7 @@ void ZContentVisuMain::VisuMouseCallback(int pZEF, QMouseEvent *pEvent)
   SearchOffset=wOffset;
   utf8VaryingString wStr;
   wStr.sprintf("%ld",wOffset);
-  ui->CurAddressLBl->setText(wStr.toCChar());
+  CurAddressLBl->setText(wStr.toCChar());
 }//VisuMouseCallback
 
 
@@ -357,7 +672,7 @@ void ZContentVisuMain::setSearchOffset(ssize_t pOffset) {
   utf8VaryingString wStr;
   SearchOffset=pOffset;
   wStr.sprintf("%ld",SearchOffset);
-  ui->CurAddressLBl->setText(wStr.toCChar());
+  CurAddressLBl->setText(wStr.toCChar());
 }
 
 void ZContentVisuMain::searchCBxChanged(int pIndex){
@@ -368,39 +683,39 @@ void ZContentVisuMain::searchCBxChanged(int pIndex){
     SearchOffset=-1;
     return ;
   case 3:
-    ui->searchLEd->clear();
-    ui->searchLEd->setText("F9F9F9F9");
+    searchLEd->clear();
+    searchLEd->setText("F9F9F9F9");
     SearchOffset=-1;
     return;
   case 4:
-    ui->searchLEd->clear();
-    ui->searchLEd->setText("F5F5F5F5");
+    searchLEd->clear();
+    searchLEd->setText("F5F5F5F5");
     SearchOffset=-1;
     return;
   case 5:
-    ui->searchLEd->clear();
-    ui->searchLEd->setText("F4F4F4F4");
+    searchLEd->clear();
+    searchLEd->setText("F4F4F4F4");
     SearchOffset=-1;
     return;
   case 6:
-    ui->searchLEd->clear();
-    ui->searchLEd->setText("FCFCFCFC");
+    searchLEd->clear();
+    searchLEd->setText("FCFCFCFC");
     SearchOffset=-1;
     return;
   case 7:
-    ui->searchLEd->clear();
-    ui->searchLEd->setText("F6F6F6F6");
+    searchLEd->clear();
+    searchLEd->setText("F6F6F6F6");
     SearchOffset=-1;
     return;
   case 8:
-    ui->searchLEd->clear();
-    ui->searchLEd->setText("FAFAFAFA");
+    searchLEd->clear();
+    searchLEd->setText("FAFAFAFA");
     SearchOffset=-1;
     return;
 
   case 9:
-    ui->searchLEd->clear();
-    ui->searchLEd->setText("FBFBFBFB");
+    searchLEd->clear();
+    searchLEd->setText("FBFBFBFB");
     SearchOffset=-1;
     return;
   }
@@ -416,30 +731,30 @@ void ZContentVisuMain::searchFwd() {
   SelectedBackGround = QVariant(QBrush(Qt::cyan));
   /* analyzis of string to search */
 
-  switch (ui->searchTypeCBx->currentIndex()) {
+  switch (searchTypeCBx->currentIndex()) {
   case 0:
     if (searchAscii(false,false)) {
       wStr.sprintf("%ld",SearchOffset-SearchContent.Size);
-      ui->CurAddressLBl->setText(wStr.toCChar());
+      CurAddressLBl->setText(wStr.toCChar());
     }
     else
-      ui->CurAddressLBl->setText("--");
+      CurAddressLBl->setText("--");
     return;
   case 1:
     if (searchAscii(true,false)) {
       wStr.sprintf("%ld",SearchOffset-SearchContent.Size);
-      ui->CurAddressLBl->setText(wStr.toCChar());
+      CurAddressLBl->setText(wStr.toCChar());
     }
     else
-      ui->CurAddressLBl->setText("--");
+      CurAddressLBl->setText("--");
     return;
   default:
     if (searchHexa(false)) {
       wStr.sprintf("%ld",SearchOffset-SearchContent.Size);
-      ui->CurAddressLBl->setText(wStr.toCChar());
+      CurAddressLBl->setText(wStr.toCChar());
     }
     else
-      ui->CurAddressLBl->setText("--");
+      CurAddressLBl->setText("--");
     return;
   }
 }// searchFwd
@@ -453,35 +768,35 @@ void ZContentVisuMain::searchBck() {
   SelectedBackGround = QVariant(QBrush(Qt::cyan));
   /* analyzis of string to search */
 
-  switch (ui->searchTypeCBx->currentIndex()) {
+  switch (searchTypeCBx->currentIndex()) {
   case 0:
     if (searchAscii(false,true)) {
       wStr.sprintf("%ld",SearchOffset-SearchContent.Size);
-      ui->CurAddressLBl->setText(wStr.toCChar());
+      CurAddressLBl->setText(wStr.toCChar());
     }
     else
-      ui->CurAddressLBl->setText("--");
+      CurAddressLBl->setText("--");
     return;
   case 1:
     if (searchAscii(true,true)) {
       wStr.sprintf("%ld",SearchOffset-SearchContent.Size);
-      ui->CurAddressLBl->setText(wStr.toCChar());
+      CurAddressLBl->setText(wStr.toCChar());
     }
     else
-      ui->CurAddressLBl->setText("--");
+      CurAddressLBl->setText("--");
     return;
   default:
     if (searchHexa(true)) {
       wStr.sprintf("%ld",SearchOffset-SearchContent.Size);
-      ui->CurAddressLBl->setText(wStr.toCChar());
+      CurAddressLBl->setText(wStr.toCChar());
     }
     else
-      ui->CurAddressLBl->setText("--");
+      CurAddressLBl->setText("--");
     return;
   }
 }
 
-
+/*
 uint8_t getHexaFromChar(uint8_t pChar) {
   if ((pChar >= '0') && (pChar <= '9')) {
     return uint8_t(pChar - '0');
@@ -510,7 +825,7 @@ int getHexaDigits(uint8_t* &pChar,uint8_t & pHexaValue) {
   return 0;
 }// getHexaDigits
 
-
+*/
 
 void
 ZContentVisuMain::setSelectionBackGround(QVariant& pBackground,ssize_t pOffset,size_t pSize,bool pScrollTo) {
@@ -559,7 +874,7 @@ ZContentVisuMain::setSelectionBackGround(QVariant& pBackground,ssize_t pOffset,s
 
 bool ZContentVisuMain::searchHexa(bool pReverse) {
 
-  utf8VaryingString wSearchStr=ui->searchLEd->text().toUtf8().data();
+  utf8VaryingString wSearchStr=searchLEd->text().toUtf8().data();
 
   /* must be hexa digit*/
   SearchContent.allocateBZero(wSearchStr.strlen() / 2);
@@ -610,7 +925,7 @@ bool ZContentVisuMain::searchHexa(bool pReverse) {
 }//ZContentVisuMain::searchHexa
 
 bool ZContentVisuMain::searchAscii(bool pCaseRegardless, bool pReverse) {
-  utf8VaryingString wSearchStr=ui->searchLEd->text().toUtf8().data();
+  utf8VaryingString wSearchStr=searchLEd->text().toUtf8().data();
   if (pReverse) {
     if (SearchOffset==0) {
     ZExceptionDLg::adhocMessage("Search",Severity_Error,nullptr,&wSearchStr,"Already at beginning.");
@@ -666,14 +981,14 @@ void ZContentVisuMain::resizeEvent(QResizeEvent* pEvent)
     FResizeInitial=false;
     return;
   }
-  QRect wR1 = ui->verticalLayoutWidget->geometry();
+  QRect wR1 = verticalLayoutWidget->geometry();
 
   int wWMargin = (wRDlg.width()-wR1.width());
   int wVW=pEvent->size().width() - wWMargin;
   int wHMargin = wRDlg.height() - wR1.height();
   int wVH=pEvent->size().height() - wHMargin ;
 
-  ui->verticalLayoutWidget->resize(wVW,wVH);  /* expands in width and height */
+  verticalLayoutWidget->resize(wVW,wVH);  /* expands in width and height */
 
 }//ZContentVisuMain::resizeEvent
 
@@ -684,25 +999,26 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
   ZStatus wSt=ZS_SUCCESS;
 
 
-  if (pAction==ui->openByTypeQAc)
+  if (pAction==openByTypeQAc)
   {
     actionOpenFileByType();
 
     return;
   }
-  if (pAction==ui->openRawQAc) {
+  if (pAction==openRawQAc) {
     openRaw();
-    ui->OpenModeLbl->setText("Raw file");
+    OpenModeLbl->setText("Raw file");
     return;
   }
   if (pAction==openZRFQAc) {
     openZRF();
-    ui->OpenModeLbl->setText("Random file");
+    OpenModeLbl->setText("Random file");
     return;
   }
-  if (pAction==ui->rawDumpQAc) {
+  if (pAction==rawDumpQAc) {
     ZRawMasterFileVisu* wVisu= new ZRawMasterFileVisu(this);
-    wVisu->setup(URICurrent, Fd);
+//    wVisu->setup(URICurrent, Fd);
+    wVisu->setup(URICurrent);
     wVisu->setModal(false);
     wVisu->firstIterate();
     wVisu->show();
@@ -711,10 +1027,10 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
   if (pAction==GetRawQAc)
   {
     getRaw();
-    ui->OpenModeLbl->setText("Raw file");
+    OpenModeLbl->setText("Raw file");
     return;
   }
-  if (pAction==ui->openZRFQAc) {
+  if (pAction==openZRFQAc) {
     wSt=openZRF();
     if ((wSt==ZS_SUCCESS)||(wSt==ZS_FILETYPEWARN))
     {
@@ -723,32 +1039,32 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
 //      displayListZRFFirstRecord(Width);
       return;
     }
-    ui->OpenModeLbl->setText("Random file");
+    OpenModeLbl->setText("Random file");
     return;
   }
-  if (pAction==ui->openZMFQAc)
+  if (pAction==openZMFQAc)
   {
     OpenMode = VMD_Master;
     removeAllRows();
     wSt=openZMF(URICurrent.toCChar());
-    ui->OpenModeLbl->setText("Master file");
+    OpenModeLbl->setText("Master file");
     return;
   }
-  if (pAction==ui->openZRHQAc)
+  if (pAction==openZRHQAc)
   {
     OpenMode = VMD_Header;
     removeAllRows();
     wSt=openZRH(URICurrent.toCChar());
-    ui->OpenModeLbl->setText("Header file");
+    OpenModeLbl->setText("Header file");
     return;
   }
-  if (pAction==ui->unlockZRFQAc)
+  if (pAction==unlockZRFQAc)
   {
     unlockZRFZMF(URICurrent.toCChar());
     return;
   }
 
-  if (pAction==ui->setfileQAc)
+  if (pAction==setfileQAc)
   {
 
     uriString wDir = GeneralParameters.getWorkDirectory();
@@ -760,49 +1076,51 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
       return;
     }
     URICurrent = wFileName.toUtf8().data();
-    ui->FullPathLbl->setText(wFileName);
+    FullPathLbl->setText(wFileName);
 
     setFileType (wFileName.toUtf8().data());
 //    chooseFile(true);
     return;
   }
 
-  if (pAction==ui->ZRFRecordsQac)
+  if (pAction==ZRFRecordsQac)
   {
-    ui->OpenModeLbl->setText("By record");
-    ui->BackwardBTn->setVisible(true);
-    ui->ForwardBTn->setVisible(true);
+    OpenModeLbl->setText("By record");
+    BackwardBTn->setVisible(true);
+    ForwardBTn->setVisible(true);
     return;
   }
-  if (pAction==ui->unlockZRFQAc)
+  if (pAction==unlockZRFQAc)
   {
     ZRFUnlock();
     return;
   }
-  if (pAction==ui->HeaderRawUnlockQAc)
+/*
+  if (pAction==HeaderRawUnlockQAc)
   {
     ZHeaderRawUnlock();
     return;
   }
-  if (pAction==ui->closeQAc)
+*/
+  if (pAction==closeQAc)
   {
     OpenMode = VMD_Nothing;
-    ui->BackwardBTn->setVisible(false);
-    ui->ForwardBTn->setVisible(false);
+    BackwardBTn->setVisible(false);
+    ForwardBTn->setVisible(false);
     actionClose();
     return;
   }
-  if (pAction==ui->displayHCBQAc)
+  if (pAction==displayHCBQAc)
   {
     displayHCB();
     return;
   }
-  if (pAction==ui->displayFCBQAc)
+  if (pAction==displayFCBQAc)
   {
     displayFCB();
     return;
   }
-  if (pAction==ui->displayMCBQAc)
+  if (pAction==displayMCBQAc)
   {
     displayMCB();
     return;
@@ -813,18 +1131,11 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
     return;
   }
 
-  if (pAction==ui->displayZBATQAc)
+  if (pAction==displayZBATQAc)
   {
     displayZBAT();
     return;
   }
-  /*
-  if (pAction==ui->displayZDBTQAc)
-  {
-    displayZDBT();
-    return;
-  }
-*/
 
   /* general parameters */
 
@@ -860,19 +1171,44 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
     /* end general parameters */
 
 
-  if (pAction==ui->displayZFBTQAc)
+  if (pAction==displayZFBTQAc)
   {
     displayZFBT();
     return;
+  }
+
+  if (pAction==ZRFCloneQAc)
+  {
+
+      cloneZRF();
+      return;
+  }
+
+  if (pAction==ZRFClearQAc)
+  {
+      clearZRF();
+      return;
+  }
+  if (pAction==ZRFReorgQAc)
+  {
+      reorganizeZRF();
+      return;
+  }
+  if (pAction==ZRFRebuildHeaderQAc)
+  {
+      rebuildHeaderZRF();
+      return;
+  }
+  if (pAction==ZRFSurfaceScanQAc)
+  {
+      rebuildHeaderZRF();
+      return;
   }
 
   if (pAction==DictionaryQAc)
   {
     if (DicEdit==nullptr)
       DicEdit=new DicEditMWn(std::bind(&ZContentVisuMain::DicEditQuitCallback, this),this);
- //   DicEdit->clear();
-
-//    dictionaryWnd->setNewDictionary();
 
     DicEdit->show();
     return;
@@ -883,7 +1219,6 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
     QueryMWd->show();
     return;
   }
-
 
   if (pAction==ZmfDefQAc) {
     FileGenerate= new FileGenerateMWn(this);
@@ -925,20 +1260,105 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
       delete KeyListDLg;
       return;
     }
+    if (wRet!=QDialog::Accepted) {
+        wZMF.zclose();
+        delete KeyListDLg;
+        return;
+    }
 
-    if (wRet==QDialog::Accepted) {
+      wSt=wZMF.rebuildIndex(KeyListDLg->getCurrentIndexRank(),nullptr,&ErrorLog);
 
-      wSt=wZMF.rebuildIndex(KeyListDLg->getCurrentIndexRank());
+
       if (wSt!=ZS_SUCCESS) {
         ZExceptionDLg::displayLast("Index rebuild");
       }
+
       wZMF.zclose();
       delete KeyListDLg;
       return;
-    }
 
   }//IndexRebuildQAc
 
+  if (pAction==ZMFExportQAc) {
+    uriString wDir = GeneralParameters.getWorkDirectory();
+    ZRawMasterFile *wZMF=nullptr;
+    ZStatus wSt=ZS_SUCCESS;
+    bool wHasBeenOpened=false;
+    bool wHasBeenCreated=false;
+    while (true) {
+        if (RawMasterFile!=nullptr) {
+          int wRet=ZExceptionDLg::adhocMessage3B("Export raw master file",Severity_Question,"Other","Quit","Use",nullptr,nullptr,
+                                        "There is a current raw masterfile in use :\n"
+                                        "%s\n"
+                                        "Do you want to export this raw masterfile data ?\n"
+                                        "Use it                      <Use>\n"
+                                        "Choose another one          <Other>\n"
+                                        "Quit without doing anything <Quit>\n",
+                                        RawMasterFile->getURIContent().toString());
+          if (wRet==QDialog::Rejected)
+            return;
+          if (wRet==QDialog::Accepted) {
+            wZMF = RawMasterFile;
+            if (!wZMF->isOpen()) {
+                wSt=wZMF->zopen(ZRF_Read_Only);
+                if (wSt!=ZS_SUCCESS) {
+                    utf8VaryingString wExcp = ZException.last().formatFullUserMessage().toString();
+                    ZExceptionDLg::adhocMessage("ZMF data export",Severity_Error,
+                                                nullptr,&wExcp,"Error while opening master file %s",wZMF->getURIContent().toString());
+                    return;
+                }
+                wHasBeenOpened=true;
+            }
+            break;
+          }// QDialog::Accepted)
+          /* ZEDLG_Third : let's go to file selection */
+          //if (wRet==QDialog::ZEDLG_Third) {
+          //} // ZEDLG_Third
+        } //if (RawMasterFile!=nullptr)
+
+        QString wFileName = QFileDialog::getOpenFileName(this, tr("Raw master file"),
+                                                         wDir.toCChar(),
+                                                         "master files (*.zmf);;All (*.*)");
+        if (wFileName.isEmpty())
+          return;
+        uriString wZMFURI= wFileName.toUtf8().data();
+        if (!wZMFURI.exists())
+          return;
+        wZMF = new ZRawMasterFile;
+        wHasBeenCreated=true;
+        wSt=wZMF->zopen(wZMFURI,ZRF_Read_Only);
+        if (wSt!=ZS_SUCCESS) {
+          utf8VaryingString wExcp = ZException.last().formatFullUserMessage().toString();
+          ZExceptionDLg::adhocMessage("ZMF data export",Severity_Error,
+                                      nullptr,&wExcp,"Error while opening master file %s",wZMFURI.toString());
+          return;
+        }
+        wHasBeenOpened=true;
+        break;
+    } // while true
+
+    wSt=exportZMF(this,wZMF, nullptr);
+    if (wHasBeenOpened)
+        wZMF->zclose();
+    if (wHasBeenCreated)
+        delete wZMF;
+    return;
+  }//ZMFExportQAc
+
+  if (pAction==ZMFImportQAc) {
+    openGenLogWin();
+    GenlogWin->setWindowTitle("Import process log");
+    GenlogWin->show();
+
+    wSt=importZMF(this, &ErrorLog);
+/*
+    if (wHasBeenOpened)
+        wZMF->zclose();
+    if (wHasBeenCreated)
+        delete wZMF;
+*/
+    return;
+  }//ZMFImportQAc
 
   if (pAction==ZMFBackupQAc) {
     ZBackupDLg wBckDLg(this);
@@ -954,19 +1374,22 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
 
   } //ZMFRestoreQAc
 
+  if (pAction==ZMFClearQAc) {
+    clearZMF(this,&ErrorLog);
+  } //ZMFClearQAc
 
 
-  if (pAction==ui->surfaceScanZRFQAc) {
-    surfaceScanZRF(URICurrent);
+  if (pAction==ZRFSurfaceScanQAc) {
+    surfaceScanZRF();
     return;
   }
-  if (pAction==ui->surfaceScanRawQAc)
+  if (pAction==surfaceScanRawQAc)
   {
     displayRawSurfaceScan(URICurrent);
     return;
   }
 
-  if (pAction==ui->QuitQAc)
+  if (pAction==QuitQAc)
   {
     actionClose();
     //    this->deleteLater();
@@ -977,12 +1400,12 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
 
   /* ZMFMEn */
 
-  if (pAction==ui->runRepairQAc) {
-    repairIndexes(ui->testRunQAc->isChecked(), ui->rebuilAllQAc->isChecked());
+  if (pAction==runRepairQAc) {
+    repairIndexes(testRunQAc->isChecked(), rebuilAllQAc->isChecked());
     return;
   }
 
-  if (pAction==ui->MCBReportQAc) {
+  if (pAction==MCBReportQAc) {
     reportMCB();
     return;
   }
@@ -994,7 +1417,7 @@ ZContentVisuMain::actionMenuEvent(QAction* pAction)
 void ZContentVisuMain::reportMCB()
 {
   FILE* wReportLog = fopen("reportMCB.log","w");
-  MasterFile->report(wReportLog);
+  RawMasterFile->report(wReportLog);
   fflush(wReportLog);
   fclose(wReportLog);
 
@@ -1112,7 +1535,7 @@ ZContentVisuMain::actionOpenFileByType(bool pChecked)
     return;
   }
   URICurrent = wFileName.toUtf8().data();
-  ui->FullPathLbl->setText(wFileName);
+  FullPathLbl->setText(wFileName);
 
   setFileType (wFileName.toUtf8().data());
 
@@ -1128,7 +1551,7 @@ ZContentVisuMain::actionOpenFileByType(bool pChecked)
 
   if (URICurrent.getFileExtension()=="zmf")
       {
-        ui->FileTypeLBl->setText("Master file");
+        FileTypeLBl->setText("Master file");
         wSt=openZMF(URICurrent.toCChar());
         if ((wSt==ZS_SUCCESS)||(wSt==ZS_FILETYPEWARN))
         {
@@ -1140,7 +1563,7 @@ ZContentVisuMain::actionOpenFileByType(bool pChecked)
   if (URICurrent.getFileExtension()=="zrh")
       {
         removeAllRows();
-        ui->FileTypeLBl->setText("Header file");
+        FileTypeLBl->setText("Header file");
         openZRH();
         loadAll();
         return;
@@ -1149,8 +1572,8 @@ ZContentVisuMain::actionOpenFileByType(bool pChecked)
   if (ZS_SUCCESS==openOther(URICurrent.toCChar()))
     {
       removeAllRows();
-      ui->LoadAllBTn->setVisible(true);
-      ui->LoadAllBTn->setText(QObject::tr("All","ZContentVisuMain"));
+      LoadAllBTn->setVisible(true);
+      LoadAllBTn->setText(QObject::tr("All","ZContentVisuMain"));
       return;
     }
 
@@ -1159,6 +1582,8 @@ ZContentVisuMain::actionOpenFileByType(bool pChecked)
 
   return;
 } // actionOpenFileByType
+
+
 
 #ifdef __COMMENT__
 void
@@ -1212,7 +1637,7 @@ ZContentVisuMain::actionOpenFileByType(bool pChecked)
       else
           if (URICurrent.getFileExtension()=="zmf")
       {
-        ui->FileTypeLBl->setText("Master file");
+        FileTypeLBl->setText("Master file");
         wSt=openZMF(URICurrent.toCChar());
         if ((wSt==ZS_SUCCESS)||(wSt==ZS_FILETYPEWARN))
         {
@@ -1227,7 +1652,7 @@ ZContentVisuMain::actionOpenFileByType(bool pChecked)
         if (ZS_SUCCESS==openOther(URICurrent.toCChar()))
         {
           removeAllRows();
-          ui->LoadAllBTn->setVisible(true);
+          LoadAllBTn->setVisible(true);
 //          displayFdNextRawBlock(BlockSize,Width);
           break;
         }
@@ -1238,12 +1663,12 @@ ZContentVisuMain::actionOpenFileByType(bool pChecked)
     }//while (true)
 
   setFileType (FileSelectionDLg->selectedFiles()[0].toUtf8().data());
-  ui->FullPathLbl->setText(FileSelectionDLg->selectedFiles()[0]);
+  FullPathLbl->setText(FileSelectionDLg->selectedFiles()[0]);
 
-  ui->BackwardBTn->setVisible(false);
-  ui->ForwardBTn->setVisible(true);
+  BackwardBTn->setVisible(false);
+  ForwardBTn->setVisible(true);
 
-  ui->displayHCBQAc->setEnabled(false);
+  displayHCBQAc->setEnabled(false);
 
 
   return;
@@ -1287,97 +1712,105 @@ ZContentVisuMain::chooseFile(bool pChecked)
   }//while (true)
 
   URICurrent = wFileSelectionDLg->selectedFiles()[0].toUtf8().data();
-  ui->FullPathLbl->setText(wFileSelectionDLg->selectedFiles()[0]);
+  FullPathLbl->setText(wFileSelectionDLg->selectedFiles()[0]);
 
   setFileType (wFileSelectionDLg->selectedFiles()[0].toUtf8().data());
 
   wFileSelectionDLg->deleteLater();
 
-  ui->BackwardBTn->setVisible(false);
-  ui->ForwardBTn->setVisible(true);
+  BackwardBTn->setVisible(false);
+  ForwardBTn->setVisible(true);
 
-  ui->RecordFRm->setVisible(false);
-  ui->SequentialFRm->setVisible(true);
+  RecordFRm->setVisible(false);
+  SequentialFRm->setVisible(true);
 
   return true;
 }//chooseFile
 #endif //  __COMMENT__
-void
+
+ZStatus
 ZContentVisuMain::openZRH()
 {
-
-  if (openZRH(URICurrent.toCChar())!= ZS_SUCCESS)
+    ZStatus wSt= openZRH(URICurrent.toCChar());
+  if (wSt != ZS_SUCCESS)
     {
     QMessageBox::critical(this,tr("header file open error"),ZException.formatFullUserMessage().toCChar());
-    return;
+    return wSt;
     }
 
   removeAllRows();
 //  displayFdNextRawBlock(BlockSize,16);
 
-  ui->BackwardBTn->setVisible(false);
-  ui->ForwardBTn->setVisible(true);
+  BackwardBTn->setVisible(false);
+  ForwardBTn->setVisible(true);
 
-  ui->RecordFRm->setVisible(false);
-  ui->SequentialFRm->setVisible(true);
+  RecordFRm->setVisible(false);
+  SequentialFRm->setVisible(true);
 
 
-  ui->rawMEn->setEnabled(true);
+  rawMEn->setEnabled(true);
 
-  ui->openByTypeQAc->setVisible(false);
-  ui->openRawQAc->setVisible(false);
-  ui->openZRFQAc->setVisible(false);
-  ui->openZMFQAc->setVisible(false);
-  ui->unlockZRFQAc->setVisible(false);
+  openByTypeQAc->setVisible(false);
+  openRawQAc->setVisible(false);
+  openZRFQAc->setVisible(false);
+  openZMFQAc->setVisible(false);
+  unlockZRFQAc->setVisible(false);
 
-  return;
+  return wSt;
 }//actionOpenFileAsZRH
 
 void
 ZContentVisuMain::openRaw()
 {
   ZStatus wSt;
-  if ((wSt=openOther(URICurrent.toCChar()))!= ZS_SUCCESS) {
+    if ((wSt=openOther(URICurrent))!= ZS_SUCCESS) {
     utf8VaryingString wStr=ZException.formatFullUserMessage();
-    ZExceptionDLg::messageWAdd("openRaw",wSt, Severity_Error,wStr,"Random File open error. File %s",URICurrent.toCChar());
+    ZExceptionDLg::messageWAdd("openRaw",wSt, Severity_Error,wStr,"File open error. File %s",URICurrent.toCChar());
     return;
   }
 
   removeAllRows();
 
-  ui->BackwardBTn->setVisible(false);
-  ui->ForwardBTn->setVisible(true);
+  BackwardBTn->setVisible(false);
+  ForwardBTn->setVisible(true);
 
-  ui->RecordFRm->setVisible(false);
-  ui->SequentialFRm->setVisible(true);
+  RecordFRm->setVisible(false);
+  SequentialFRm->setVisible(true);
 
-  ui->closeQAc->setVisible(true);
+  closeQAc->setVisible(true);
 
-  ui->rawMEn->setEnabled(true);
+  rawMEn->setEnabled(true);
 
-  ui->openByTypeQAc->setVisible(false);
-  ui->openRawQAc->setVisible(false);
-  ui->openZRFQAc->setVisible(false);
-  ui->openZMFQAc->setVisible(false);
-  ui->unlockZRFQAc->setVisible(false);
+  openByTypeQAc->setVisible(false);
+  openRawQAc->setVisible(false);
+  openZRFQAc->setVisible(false);
+  openZMFQAc->setVisible(false);
+  unlockZRFQAc->setVisible(false);
 
   return;
 }//actionOpenFileAsRaw
 
 
 
+
+
 ZStatus
 ZContentVisuMain::openZRF()
 {
+
+/*
   const char* wWDParam=getenv(__PARSER_PARAM_DIRECTORY__);
   if (!wWDParam)
     wWDParam="";
   const char* wWDWork=getenv(__PARSER_WORK_DIRECTORY__);
   if (!wWDWork)
     wWDWork="";
+*/
+  uriString wWDWork = GeneralParameters.getWorkDirectory();
+//  uriString wWDParam = GeneralParameters.getParamDirectory();
 
     QString wFileName = QFileDialog::getOpenFileName(this, tr("Open File"),
-        wWDWork,
+        wWDWork.toCChar(),
         "Random files(*.zmf *.zrf *.zix);;All(*.*)");
 
     if (wFileName.isEmpty())
@@ -1396,7 +1829,7 @@ ZContentVisuMain::openZRF()
       if (wRet==QDialog::Rejected)
         return ZS_CANCEL;
       wFileName = QFileDialog::getOpenFileName(this, tr("Open File"),
-          wWDParam,
+          wWDWork.toCChar(),
           "Header (*.zrh);;All (*.*)");
       if (wFileName.isEmpty())
         return ZS_CANCEL;
@@ -1448,43 +1881,43 @@ ZStatus wSt=ZS_SUCCESS;
     Fd=-1;
   }
 
-  if (MasterFile)
+  if (RawMasterFile)
   {
-    if (MasterFile->isOpen())
-      MasterFile->zclose();
-    delete MasterFile;
-    MasterFile=nullptr;
+    if (RawMasterFile->isOpen())
+      RawMasterFile->zclose();
+    delete RawMasterFile;
+    RawMasterFile=nullptr;
   }
   FileOffset=0;
   RecordNumber=0;
 
-  ui->SequentialFRm->setVisible(false);
-  ui->RecordFRm->setVisible(true);
+  SequentialFRm->setVisible(false);
+  RecordFRm->setVisible(true);
 
   wStr.sprintf("%ld",RandomFile->getFileDescriptor().ZBAT.count());
-  ui->RecordTotalLBl->setText(wStr.toCChar());
+  RecordTotalLBl->setText(wStr.toCChar());
 
-  ui->LoadAllBTn->setVisible(false);
+  LoadAllBTn->setVisible(false);
 
-  ui->BackwardBTn->setVisible(false);
+  BackwardBTn->setVisible(false);
   if (RandomFile->getFileDescriptor().ZBAT.count() > 1)
-    ui->BackwardBTn->setVisible(true);
+    BackwardBTn->setVisible(true);
   else
-    ui->BackwardBTn->setVisible(false);
+    BackwardBTn->setVisible(false);
 
-  ui->OpenModeLbl->setText("Random file mode");
+  OpenModeLbl->setText("Random file mode");
   OpenMode = VMD_Random;
 
-  ui->openByTypeQAc->setVisible(false);
-  ui->openRawQAc->setVisible(false);
-  ui->openZRFQAc->setVisible(false);
-  ui->openZMFQAc->setVisible(false);
+  openByTypeQAc->setVisible(false);
+  openRawQAc->setVisible(false);
+  openZRFQAc->setVisible(false);
+  openZMFQAc->setVisible(false);
 
-   ui->FileTypeLBl->setText("Random file");
+   FileTypeLBl->setText("Random file");
 
-   ui->rawMEn->setEnabled(false);
-   ui->ZRFMEn->setEnabled(true);
-   ui->ZMFMEn->setEnabled(false);
+   rawMEn->setEnabled(false);
+   ZRFMEn->setEnabled(true);
+   ZMFMEn->setEnabled(false);
 
   return ZS_SUCCESS;
 //  return  displayListZRFFirstRecord(Width);
@@ -1496,23 +1929,23 @@ ZContentVisuMain::openZMF(const char* pFilePath)
 utf8String wStr;
 ZStatus wSt=ZS_SUCCESS;
 
-  if (MasterFile)
+  if (RawMasterFile)
     {
-    if (MasterFile->isOpen())
-      MasterFile->zclose();
+    if (RawMasterFile->isOpen())
+      RawMasterFile->zclose();
     }
   else
-    MasterFile=new ZRawMasterFile;
+    RawMasterFile=new ZRawMasterFile;
 
-  wSt= MasterFile->zopen(pFilePath,ZRF_Read_Only);
+  wSt= RawMasterFile->zopen(pFilePath,ZRF_Read_Only);
   if (wSt!=ZS_SUCCESS)
   {
     if (wSt==ZS_FILETYPEWARN)
       ZExceptionDLg::displayLast("Open file");
     else
     {
-      delete MasterFile;
-      MasterFile=nullptr;
+      delete RawMasterFile;
+      RawMasterFile=nullptr;
       ZExceptionDLg::displayLast("Open file");
       return wSt;
     }
@@ -1537,27 +1970,27 @@ ZStatus wSt=ZS_SUCCESS;
   FileOffset=0;
   RecordNumber=0;
 
-  wStr.sprintf("%ld",MasterFile->getFileDescriptor().ZBAT.count());
-  ui->RecordTotalLBl->setText(wStr.toCChar());
+  wStr.sprintf("%ld",RawMasterFile->getFileDescriptor().ZBAT.count());
+  RecordTotalLBl->setText(wStr.toCChar());
 
-  ui->LoadAllBTn->setVisible(false);
-  ui->BackwardBTn->setVisible(false);
-  if (MasterFile->getFileDescriptor().ZBAT.count() > 1)
-    ui->BackwardBTn->setVisible(true);
+  LoadAllBTn->setVisible(false);
+  BackwardBTn->setVisible(false);
+  if (RawMasterFile->getFileDescriptor().ZBAT.count() > 1)
+    BackwardBTn->setVisible(true);
   else
-    ui->BackwardBTn->setVisible(false);
+    BackwardBTn->setVisible(false);
 
-   ui->OpenModeLbl->setText("Master file mode");
+   OpenModeLbl->setText("Master file mode");
    OpenMode = VMD_Master;
 
-   ui->openByTypeQAc->setVisible(false);
-   ui->openRawQAc->setVisible(false);
-   ui->openZRFQAc->setVisible(false);
-   ui->openZMFQAc->setVisible(false);
+   openByTypeQAc->setVisible(false);
+   openRawQAc->setVisible(false);
+   openZRFQAc->setVisible(false);
+   openZMFQAc->setVisible(false);
 
-   ui->rawMEn->setEnabled(false);
-   ui->ZRFMEn->setEnabled(false);
-   ui->ZMFMEn->setEnabled(true);
+   rawMEn->setEnabled(false);
+   ZRFMEn->setEnabled(false);
+   ZMFMEn->setEnabled(true);
 
   return ZS_SUCCESS;
 } // openZMF
@@ -1613,73 +2046,44 @@ ZContentVisuMain::unlockZRFZMF(const char* pFilePath)
 
 
 
-utf8String
-formatSize(long long wSize)
-{
-  utf8String wSizeStr;
-  double wSizeD = (double)wSize;
-
-  const char* wUnit= "B";
-  if (wSizeD > 1024.0)
-  {
-    wSizeD= wSizeD / 1024.0;
-    if (wSizeD > 1024.0)
-    {
-      wSizeD= wSizeD / 1024.0;
-      if (wSizeD > 1024.0)
-        {
-        wSizeD= wSizeD / 1024.0;
-        wUnit="gB";
-        }
-      else
-        wUnit="mB";
-    }
-    else
-      wUnit="kB";
-  }
-  wSizeStr.sprintf("%g %s",wSizeD,wUnit);
-  return wSizeStr;
-}
 
 void
 ZContentVisuMain::getFileSize(const uriString& pFile)
 {
-  ui->FileSizeLBl->setText(formatSize(pFile.getFileSize()).toCChar());
-  ui->FullSizeLBl->setText(formatSize(pFile.getFileSize()).toCChar());
+  FileSizeLBl->setText(formatSize(pFile.getFileSize()).toCChar());
 }
 
 
 ZStatus
-ZContentVisuMain::openOther(const char* pFileName)
+ZContentVisuMain::openOther(const uriString& pFile)
 {
 
   ZStatus wSt=ZS_SUCCESS;
-  uriString wFilePath = pFileName;
 
-  Fd = open(wFilePath.toCChar(),O_RDONLY);       // open content file for read only
-
-  if (Fd < 0)
-    {
-    ZException.getErrno(errno,
+  URICurrent = pFile ;
+  wSt=rawOpen(Fd,URICurrent,O_RDONLY);
+  if (wSt!=ZS_SUCCESS) {
+    ZException.setMessage(
               _GET_FUNCTION_NAME_,
               ZS_ERROPEN,
               Severity_Severe,
               " Error opening file %s ",
-              wFilePath.toCChar());
+              URICurrent.toCChar());
     return  ZS_ERROPEN;
     }
 
   RawData.clear();
-  ui->LoadAllBTn->setVisible(true);
-  ui->LoadAllBTn->setText(QObject::tr("All","ZContentVisuMain"));
-  getFileSize(pFileName);
+  LoadAllBTn->setVisible(true);
+  LoadAllBTn->setText(QObject::tr("All","ZContentVisuMain"));
 
-  if (MasterFile)
+  FileSizeLBl->setText(formatSize(URICurrent.getFileSize()).toCChar());
+
+  if (RawMasterFile)
     {
-    if (MasterFile->isOpen())
-      MasterFile->zclose();
-    delete MasterFile;
-    MasterFile=nullptr;
+    if (RawMasterFile->isOpen())
+      RawMasterFile->zclose();
+    delete RawMasterFile;
+    RawMasterFile=nullptr;
     }
 
   if (RandomFile)
@@ -1694,25 +2098,25 @@ ZContentVisuMain::openOther(const char* pFileName)
   FileOffset=0;
   RecordNumber=0;
 
-  ui->SequentialFRm->setVisible(true);
-  ui->RecordFRm->setVisible(false);
+  SequentialFRm->setVisible(true);
+  RecordFRm->setVisible(false);
 
-  ui->displayHCBQAc->setEnabled(true);
-  ui->displayMCBQAc->setEnabled(true);
+  displayHCBQAc->setEnabled(true);
+  displayMCBQAc->setEnabled(true);
   displayICBQAc->setEnabled(true);
-  ui->displayFCBQAc->setEnabled(true);
+  displayFCBQAc->setEnabled(true);
 
-  ui->headerMEn->setEnabled(true);
+  headerMEn->setEnabled(true);
 
-  ui->OpenModeLbl->setText("Raw mode");
-  ui->OpenModeLbl->setVisible(true);
-  ui->ClosedLBl->setVisible(false);
+  OpenModeLbl->setText("Raw mode");
+  OpenModeLbl->setVisible(true);
+  ClosedLBl->setVisible(false);
 
   OpenMode = VMD_RawSequential;
 
-  ui->rawMEn->setEnabled(true);
-  ui->ZRFMEn->setEnabled(false);
-  ui->ZMFMEn->setEnabled(false);
+  rawMEn->setEnabled(true);
+  ZRFMEn->setEnabled(false);
+  ZMFMEn->setEnabled(false);
 
   return ZS_SUCCESS;
 }//openOther
@@ -1737,16 +2141,16 @@ ZContentVisuMain::openZRH(const char* pFileName)
   }
 
   RawData.clear();
-  ui->LoadAllBTn->setVisible(true);
-  ui->LoadAllBTn->setText(QObject::tr("All","ZContentVisuMain"));
+  LoadAllBTn->setVisible(true);
+  LoadAllBTn->setText(QObject::tr("All","ZContentVisuMain"));
   getFileSize(pFileName);
 
-  if (MasterFile)
+  if (RawMasterFile)
   {
-    if (MasterFile->isOpen())
-      MasterFile->zclose();
-    delete MasterFile;
-    MasterFile=nullptr;
+    if (RawMasterFile->isOpen())
+      RawMasterFile->zclose();
+    delete RawMasterFile;
+    RawMasterFile=nullptr;
   }
 
   if (RandomFile)
@@ -1762,28 +2166,28 @@ ZContentVisuMain::openZRH(const char* pFileName)
   FileOffset=0;
   RecordNumber=0;
 
-  ui->SequentialFRm->setVisible(true);
-  ui->RecordFRm->setVisible(false);
+  SequentialFRm->setVisible(true);
+  RecordFRm->setVisible(false);
 
-  ui->LoadAllBTn->setVisible(true);
+  LoadAllBTn->setVisible(true);
 
-  ui->displayHCBQAc->setEnabled(true);
+  displayHCBQAc->setEnabled(true);
   displayICBQAc->setEnabled(true);
-  ui->displayMCBQAc->setEnabled(true);
-  ui->displayFCBQAc->setEnabled(true);
+  displayMCBQAc->setEnabled(true);
+  displayFCBQAc->setEnabled(true);
 
-  ui->headerMEn->setEnabled(true);
+  headerMEn->setEnabled(true);
 
-  ui->OpenModeLbl->setText("Header");
-  ui->OpenModeLbl->setVisible(true);
-  ui->ClosedLBl->setVisible(false);
-  ui->closeQAc->setVisible(true);
+  OpenModeLbl->setText("Header");
+  OpenModeLbl->setVisible(true);
+  ClosedLBl->setVisible(false);
+  closeQAc->setVisible(true);
 
   OpenMode = VMD_Header;
 
-  ui->rawMEn->setEnabled(true);
-  ui->ZRFMEn->setEnabled(false);
-  ui->ZMFMEn->setEnabled(false);
+  rawMEn->setEnabled(true);
+  ZRFMEn->setEnabled(false);
+  ZMFMEn->setEnabled(false);
 
   return ZS_SUCCESS;
 }//openZRH
@@ -1795,7 +2199,7 @@ ZContentVisuMain::displayHCB()
     return;
 
   if (!entityWnd)
-    entityWnd=new DisplayMain(this);
+    entityWnd=new DisplayMain(&URICurrent,this);
   entityWnd->displayHCB(RawData);
 }
 
@@ -1806,7 +2210,7 @@ ZContentVisuMain::displayFCB()
     return;
 
   if (!entityWnd)
-    entityWnd=new DisplayMain(this);
+    entityWnd=new DisplayMain(&URICurrent,this);
   entityWnd->displayFCB(RawData);
 }
 
@@ -1817,7 +2221,7 @@ ZContentVisuMain::displayMCB()
     return ;
 
   if (!entityWnd)
-      entityWnd=new DisplayMain(this);
+      entityWnd=new DisplayMain(&URICurrent,this);
   entityWnd->displayMCB(RawData);
 }
 
@@ -1846,7 +2250,7 @@ ZContentVisuMain::displayICBs()
     if (!testRequestedSize(URICurrent,RawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZICB_Export)))
       return;
     if (!entityWnd)
-      entityWnd=new DisplayMain(this);
+      entityWnd=new DisplayMain(&URICurrent,this);
     const unsigned char* wPtrIn=RawData.Data + wZHCBe.OffsetReserved;
     size_t wDisplayOffset = sizeof(ZHeaderControlBlock_Export) + wZHCBe.OffsetReserved ;
     int wRow=0;
@@ -1872,7 +2276,7 @@ ZContentVisuMain::displayICBs()
   if (!testRequestedSize(URICurrent,RawData,sizeof(ZHeaderControlBlock_Export)+sizeof(ZFCB_Export)+sizeof(ZMCB_Export)+wZMCBe.ICBOffset + wZMCBe.ICBSize))
     return;
   if (!entityWnd)
-    entityWnd=new DisplayMain(this);
+    entityWnd=new DisplayMain(&URICurrent,this);
 
   entityWnd->displayICBs(RawData);
 
@@ -2100,56 +2504,56 @@ ZContentVisuMain::Dictionary()
 }
 */
 void
-ZContentVisuMain::setFileType (const char* pFilePath)
+ZContentVisuMain::setFileType (const uriString &pFilePath)
 {
 
-  utf8String wExt=URICurrent.getFileExtension();
+  utf8String wExt=pFilePath.getFileExtension();
 
   while (true)
   {
   if (wExt=="zrf")
     {
-    ui->FileTypeLBl->setText("Random file");
+    FileTypeLBl->setText("Random file");
     break;
     }
     if (wExt=="zmf")
     {
-      ui->FileTypeLBl->setText("Master file");
+      FileTypeLBl->setText("Master file");
       break;
     }
     if (wExt=="zix")
     {
-      ui->FileTypeLBl->setText("Index file");
+      FileTypeLBl->setText("Index file");
       break;
     }
     if (wExt=="zrh")
     {
-      ui->FileTypeLBl->setText("Header file");
-      ui->unlockZRFQAc->setVisible(true);
+      FileTypeLBl->setText("Header file");
+      unlockZRFQAc->setVisible(true);
       return ;
     }
     if (wExt=="dic")
     {
-      ui->FileTypeLBl->setText("Dictionary file");
-      ui->unlockZRFQAc->setVisible(true);
+      FileTypeLBl->setText("Dictionary file");
+      unlockZRFQAc->setVisible(true);
       return ;
     }
-    ui->FileTypeLBl->setText("Unmanaged file type");
+    FileTypeLBl->setText("Unmanaged file type");
     break;
   }//while true
 
 
-  ui->openByTypeQAc->setVisible(true);
-  ui->openRawQAc->setVisible(true);
-  ui->openZRFQAc->setVisible(true);
-  ui->openZMFQAc->setVisible(true);
-  ui->unlockZRFQAc->setVisible(true);
-  ui->closeQAc->setVisible(true);
+  openByTypeQAc->setVisible(true);
+  openRawQAc->setVisible(true);
+  openZRFQAc->setVisible(true);
+  openZMFQAc->setVisible(true);
+  unlockZRFQAc->setVisible(true);
+  closeQAc->setVisible(true);
 /*
-  ui->OpenModeLbl->setVisible(true);
-  ui->ClosedLBl->setVisible(false);
+  OpenModeLbl->setVisible(true);
+  ClosedLBl->setVisible(false);
 */
-//  ui->actionMEn->setEnabled(true);
+//  actionMEn->setEnabled(true);
 }//setFileType
 
 void
@@ -2163,32 +2567,32 @@ ZContentVisuMain::actionClose(bool pChecked)
     RandomFile=nullptr;
     }
 
-  if (MasterFile)
+  if (RawMasterFile)
     {
-      MasterFile->zclose();
-      delete MasterFile;
-      MasterFile=nullptr;
+      RawMasterFile->zclose();
+      delete RawMasterFile;
+      RawMasterFile=nullptr;
     }
   if (Fd >= 0)
       {
       ::close(Fd);
       Fd=-1;
       }
-    ui->BackwardBTn->setVisible(false);
-    ui->ForwardBTn->setVisible(false);
+    BackwardBTn->setVisible(false);
+    ForwardBTn->setVisible(false);
 
-    ui->rawMEn->setEnabled(false);
-    ui->ZRFMEn->setEnabled(false);
-    ui->ZMFMEn->setEnabled(false);
+    rawMEn->setEnabled(false);
+    ZRFMEn->setEnabled(false);
+    ZMFMEn->setEnabled(false);
 
-    ui->openByTypeQAc->setVisible(true);
-    ui->openRawQAc->setVisible(true);
-    ui->openZRFQAc->setVisible(true);
-    ui->openZMFQAc->setVisible(true);
+    openByTypeQAc->setVisible(true);
+    openRawQAc->setVisible(true);
+    openZRFQAc->setVisible(true);
+    openZMFQAc->setVisible(true);
 
-    ui->OpenModeLbl->setText("not open");
-    ui->OpenModeLbl->setVisible(false);
-    ui->ClosedLBl->setVisible(true);
+    OpenModeLbl->setText("not open");
+    OpenModeLbl->setVisible(false);
+    ClosedLBl->setVisible(true);
 
     OpenMode=VMD_Nothing;
 
@@ -2205,7 +2609,7 @@ ZContentVisuMain::displayFdNextRawBlock(ssize_t pBlockSize,size_t pWidth)
   ZStatus wSt=rawRead(Fd,wRecord,pBlockSize);
   if (wSt==ZS_EOF) {
     AllFileLoaded=true;
-    ui->ForwardBTn->setVisible(false);
+    ForwardBTn->setVisible(false);
     return wSt;
   }
   if (wSt!=ZS_SUCCESS)
@@ -2213,7 +2617,7 @@ ZContentVisuMain::displayFdNextRawBlock(ssize_t pBlockSize,size_t pWidth)
 
   RawData.appendData(wRecord);
 
-  ui->ReadSizeLBl->setText(formatSize(RawData.Size).toCChar());
+  ReadSizeLBl->setText(formatSize(RawData.Size).toCChar());
 
   return displayWidgetBlock(wRecord);
 }//displayFdNextRawBlock
@@ -2262,9 +2666,9 @@ ZStatus
 ZContentVisuMain::displayWidgetBlock(ZDataBuffer& pData) {
 //  VisuTBv->horizontalHeader()->hide();
 
-  ui->ProgressPGb->setRange(0,pData.Size);
-  ui->ProgressPGb->setValue(0);
-  ui->ProgressPGb->setVisible(true);
+  ProgressPGb->setRange(0,pData.Size);
+  ProgressPGb->setValue(0);
+  ProgressPGb->setVisible(true);
 
   /* how many lines within pData block */
 
@@ -2299,7 +2703,7 @@ ZContentVisuMain::displayWidgetBlock(ZDataBuffer& pData) {
     wCurLine++;
     if (wTick++ > 10) {
       wTick=0;
-      ui->ProgressPGb->setValue(wProgress);
+      ProgressPGb->setValue(wProgress);
     }
   }//while ((wPtr < wPtrEnd)&&(wRemain >= Width))
 
@@ -2316,7 +2720,7 @@ ZContentVisuMain::displayWidgetBlock(ZDataBuffer& pData) {
   VisuTBv->setColumnWidth(9,4);
   VisuTBv->setColumnWidth(16,4);
 
-  ui->ProgressPGb->setValue(pData.Size);
+  ProgressPGb->setValue(pData.Size);
   return ZS_SUCCESS;
 }//displayBlock
 
@@ -2325,20 +2729,20 @@ ZContentVisuMain::displayBlockData()
 {
   utf8String wStr;
   wStr.sprintf("%6ld",RecordNumber+1L) ;
-  ui->RecordNumberLBl->setText(wStr.toCChar());
+  RecordNumberLBl->setText(wStr.toCChar());
   wStr.sprintf("0x%08X",Address) ;
-  ui->AddressLBl->setText(wStr.toCChar());
+  AddressLBl->setText(wStr.toCChar());
 
   wStr.sprintf("%8ld",Block.BlockSize) ;
-  ui->BlockSizeLBl->setText(wStr.toCChar());
+  BlockSizeLBl->setText(wStr.toCChar());
 
   wStr.sprintf("%8ld",Block.DataSize()) ;
-  ui->UserSizeLBl->setText(wStr.toCChar());
+  UserSizeLBl->setText(wStr.toCChar());
 
-  ui->StateLBl->setText(decode_ZBS(Block.State));
+  StateLBl->setText(decode_ZBS(Block.State));
 
   wStr.sprintf("%02X %s",Block.Lock,decode_ZLockMask(Block.Lock).toCChar());
-  ui->LockMaskLBl->setText(wStr.toCChar());
+  LockMaskLBl->setText(wStr.toCChar());
 
 }
 
@@ -2347,18 +2751,18 @@ ZContentVisuMain::displayListZRFNextRecord(size_t pWidth)
 {
   ZStatus wSt;
   if (RecordNumber==0)
-    ui->BackwardBTn->setVisible(false);
+    BackwardBTn->setVisible(false);
   else
-    ui->BackwardBTn->setVisible(true);
+    BackwardBTn->setVisible(true);
 
   // get first block of the file
   wSt=RandomFile->_getNext(Block,RecordNumber,Address);     // next logical block
   if (wSt==ZS_EOF)
   {
-    ui->ForwardBTn->setVisible(false);
+    ForwardBTn->setVisible(false);
     return ZS_EOF;
   }
-  ui->ForwardBTn->setVisible(true);
+  ForwardBTn->setVisible(true);
   if (wSt!=ZS_SUCCESS)
   {
     ZExceptionDLg::displayLast("Read file");
@@ -2375,7 +2779,7 @@ ZContentVisuMain::displayListZRFNextRecord(size_t pWidth)
 
   displayWidgetBlock(RawData);
 
-  ui->ForwardBTn->setVisible(true);
+  ForwardBTn->setVisible(true);
   return ZS_SUCCESS;
 }//displayListZRFNextRecord
 
@@ -2386,13 +2790,13 @@ ZContentVisuMain::displayListZRFPreviousRecord(size_t pWidth)
 
   RecordNumber--;
   if (RecordNumber==0)
-    ui->BackwardBTn->setVisible(false);
+    BackwardBTn->setVisible(false);
 
   // get first block of the file
   wSt=RandomFile->_getByRank(Block,RecordNumber,Address);     // get first block of the file
   if (wSt==ZS_EOF)
   {
-    ui->ForwardBTn->setVisible(false);
+    ForwardBTn->setVisible(false);
     return ZS_EOF;
   }
 
@@ -2405,7 +2809,7 @@ ZContentVisuMain::displayListZRFPreviousRecord(size_t pWidth)
   displayBlockData();
 
   if (RandomFile->getFileDescriptor().ZBAT.count() > 1)
-    ui->ForwardBTn->setVisible(true);
+    ForwardBTn->setVisible(true);
   RawData=Block.Content;
 
   displayWidgetBlock(RawData);
@@ -2419,14 +2823,14 @@ ZContentVisuMain::displayListZRFFirstRecord(size_t pWidth)
 {
   ZStatus wSt;
 
-  ui->BackwardBTn->setVisible(false);
+  BackwardBTn->setVisible(false);
 
   FileOffset=0;
   RecordNumber = 0L;
   wSt=RandomFile->_getByRank(Block,RecordNumber,Address);     // get first block of the file
   if (wSt==ZS_EOF)
   {
-    ui->ForwardBTn->setVisible(false);
+    ForwardBTn->setVisible(false);
     return ZS_EOF;
   }
 
@@ -2441,7 +2845,7 @@ ZContentVisuMain::displayListZRFFirstRecord(size_t pWidth)
 
   displayWidgetBlock(RawData);
 
-  ui->ForwardBTn->setVisible(true);
+  ForwardBTn->setVisible(true);
   return ZS_SUCCESS;
 }//displayListZRFFirstRecord
 
@@ -2452,12 +2856,12 @@ ZContentVisuMain::removeAllRows()
     if (TBlItemModel->rowCount()>0)
       TBlItemModel->removeRows(0,TBlItemModel->rowCount());
 
-  if (ui->ListOffsetWDg->count() > 0)
-    ui->ListOffsetWDg->clear();
-  if (ui->ListHexaWDg->count() > 0)
-    ui->ListHexaWDg->clear();
-  if (ui->ListAsciiWDg->count() > 0)
-    ui->ListAsciiWDg->clear();
+  if (ListOffsetWDg->count() > 0)
+    ListOffsetWDg->clear();
+  if (ListHexaWDg->count() > 0)
+    ListHexaWDg->clear();
+  if (ListAsciiWDg->count() > 0)
+    ListAsciiWDg->clear();
 */
   if (VisuTBv->ItemModel->rowCount() > 0)
   {
@@ -2468,8 +2872,36 @@ ZContentVisuMain::removeAllRows()
 void
 ZContentVisuMain::backward()
 {
-  ui->ForwardBTn->setEnabled(true);
-  ui->ForwardBTn->setVisible(true);
+  ZStatus wSt=ZS_SUCCESS;
+/*  ForwardBTn->setEnabled(true);
+  ForwardBTn->setVisible(true);
+*/
+  switch (VisuType)
+  {
+  case ZCVM_RandomFile:
+      wSt =  displayListZRFNextRecord(Width);
+      break;
+  case ZCVM_Raw:
+      if (FileOffset == 0 ) {
+          BackwardBTn->setVisible(false);
+          return ;
+      }
+      FileOffset -= PayLoad;
+      if (FileOffset < 0 )
+          FileOffset = 0;
+
+      if ((FileOffset+PayLoad) > FileSize)
+          ForwardBTn->setVisible(false);
+      else
+          ForwardBTn->setVisible(true);
+
+      wSt=displayRawFromOffset();
+      break;
+  case ZCVM_MasterFile:
+      wSt =  displayListZRFNextRecord(Width);
+      break;
+  }
+
 
   if (RandomFile)
   {
@@ -2480,73 +2912,158 @@ ZContentVisuMain::backward()
   FileOffset=lseek(Fd,(__off_t)-BlockSize,SEEK_CUR);
   if (FileOffset <= 0)
     {
-    ui->BackwardBTn->setVisible(false);
+    BackwardBTn->setVisible(false);
     }
   displayFdNextRawBlock(BlockSize,Width);
 }
 void
 ZContentVisuMain::forward()
 {
+ZStatus wSt=ZS_SUCCESS;
+
+  switch (VisuType)
+    {
+    case ZCVM_RandomFile:
+        wSt =  displayListZRFNextRecord(Width);
+        break;
+    case ZCVM_Raw:
+        wSt=displayRawFromOffset();
+    //    wSt=displayFdNextRawBlock(BlockSize,Width);
+        break;
+    case ZCVM_MasterFile:
+        wSt =  displayListZRFNextRecord(Width);
+        break;
+    }
+/*
   if (RandomFile)
   {
     displayListZRFNextRecord(Width);
     return;
   }
 
-  ui->AddressLBl->setText("0");
-  ui->RecordNumberLBl->setText("0");
+  AddressLBl->setText("0");
+  RecordNumberLBl->setText("0");
 
-//  ui->BackwardBTn->setVisible(true);
-  ZStatus wSt=displayFdNextRawBlock(BlockSize,Width);
-  if (wSt==ZS_EOF)
-    ui->ForwardBTn->setVisible(false);
+  if (FromOffset) {
+      wSt=displayRawFromOffset();
+  } else {
+  wSt=displayFdNextRawBlock(BlockSize,Width);
+  }
+*/
+  if ((wSt==ZS_EOF) || (wSt==ZS_READPARTIAL))
+    ForwardBTn->setVisible(false);
 }
 
-void
+ZStatus
+ZContentVisuMain::displayRawFromOffset()
+{
+    ZDataBuffer wPayLoad;
+
+    ForwardBTn->setVisible(true);
+
+    LoadAllBTn->setVisible(false);
+//    LoadAllBTn->setText(QObject::tr("Reload","ZContentVisuMain"));
+
+    SequentialFRm->setVisible(true);
+
+    if (FileOffset==0) {
+        BackwardBTn->setVisible(false);
+    }
+    else
+        BackwardBTn->setVisible(true);
+
+    ZStatus wSt = URICurrent.loadContentAt(wPayLoad,FileOffset,PayLoad);
+
+    if (wSt!=ZS_SUCCESS){
+        if (wSt==ZS_READPARTIAL) {
+            ForwardBTn->setVisible(false);
+        }
+        else if (wSt==ZS_EOF) {
+            return wSt;
+        } else {
+            utf8VaryingString wAdd = ZException.last().formatFullUserMessage().toString();
+            ZExceptionDLg::adhocMessage("Raw File load error",ZException.last().Severity,nullptr,&wAdd,
+                                        "Cannot load file");
+            return wSt;
+        }
+    }
+
+    ReadSizeLBl->setText((formatSize(wPayLoad.Size)).toCChar());
+
+    removeAllRows();
+    wSt=displayWidgetBlock(wPayLoad);
+
+
+ //   AllFileLoaded=true;
+    return wSt;
+} // ZContentVisuMain::loadAll
+
+ZStatus
 ZContentVisuMain::loadAll()
 {
-  ui->BackwardBTn->setVisible(false);
-  ui->ForwardBTn->setVisible(false);
+  BackwardBTn->setVisible(false);
+  ForwardBTn->setVisible(false);
 
-  ui->LoadAllBTn->setVisible(true);
-  ui->LoadAllBTn->setText(QObject::tr("Reload","ZContentVisuMain"));
+  LoadAllBTn->setVisible(true);
+  LoadAllBTn->setText(QObject::tr("Reload","ZContentVisuMain"));
 
-  ui->SequentialFRm->setVisible(true);
+  SequentialFRm->setVisible(true);
 
   FileOffset=0;
 
   RawData.clear();
-  URICurrent.loadContent(RawData);
-  removeAllRows();
-  ZStatus wSt=displayWidgetBlock(RawData);
-
-  ui->ReadSizeLBl->setText((formatSize(RawData.Size)).toCChar());
-  AllFileLoaded=true;
-  return;
-}
-
-void
-ZContentVisuMain::surfaceScanZRF(const uriString& pFileToScan)
-{
-  FILE* wScan=fopen ("surfacescanzrf.txt","w");
-  ZStatus wSt=RandomFile->zsurfaceScan(pFileToScan,wScan);
-  fflush(wScan);
-  fclose(wScan);
-  if (wSt!=ZS_SUCCESS)
-  {
-    ZExceptionDLg::display("Surface Scan",ZException.last());
-//    QMessageBox::critical(this,tr("Random file error"),ZException.formatFullUserMessage().toCChar());
-    return;
+  ZStatus wSt = URICurrent.loadContent(RawData);
+  if (wSt!=ZS_SUCCESS) {
+      utf8VaryingString wAdd = ZException.last().formatFullUserMessage().toString();
+      ZExceptionDLg::adhocMessage("Raw File load error",ZException.last().Severity,nullptr,&wAdd,
+                                  "Cannot load file");
+      return wSt;
   }
 
-  openGenLogWin();
+  ReadSizeLBl->setText((formatSize(RawData.Size)).toCChar());
 
-  GenlogWin->setTextFromFile("surfacescanzrf.txt");
-  GenlogWin->show();
+  removeAllRows();
+  wSt=displayWidgetBlock(RawData);
 
-  return;
-}
 
+  AllFileLoaded=true;
+  return wSt;
+} // ZContentVisuMain::loadAll
+
+ZStatus
+ZContentVisuMain::loadRawPayLoad()
+{
+    VisuType = ZCVM_Raw;
+    ZDataBuffer wReadPayLoad;
+ //   BackwardBTn->setVisible(false);
+ //   ForwardBTn->setVisible(false);
+
+    LoadAllBTn->setVisible(true);
+ //   LoadAllBTn->setText(QObject::tr("Reload","ZContentVisuMain"));
+
+    SequentialFRm->setVisible(true);
+
+    FileOffset=0;
+
+//    RawData.clear();
+
+    ZStatus wSt=rawRead(Fd,wReadPayLoad,PayLoad);
+    if ((wSt!=ZS_SUCCESS)&&(wSt != ZS_READPARTIAL)) {
+
+        return wSt;
+    }
+
+    if (wSt==ZS_READPARTIAL)
+        AllFileLoaded=true;
+
+    RawData.appendData(wReadPayLoad);
+ //   removeAllRows();
+    wSt=displayWidgetBlock(wReadPayLoad);
+
+    ReadSizeLBl->setText((formatSize(RawData.Size)).toCChar());
+
+    return wSt;
+} //loadRawPayLoad
 
 
 zbs::ZArray<ScanBlock> BlockList;
@@ -2975,11 +3492,467 @@ textEditMWn*  ZContentVisuMain::openGenLogWin()
     GenlogWin->clear();
   return GenlogWin;
 }
-
+void
+ZContentVisuMain::GenlogWindisplayErrorCallBack(const utf8VaryingString& pMessage) {
+  if (GenlogWin!=nullptr)
+    GenlogWin->appendText(pMessage);
+  else
+    fprintf(stderr,pMessage.toCChar());
+}
+void
+ZContentVisuMain::GenlogWindisplayErrorColorCB(uint8_t pSeverity,const utf8VaryingString& pMessage) {
+  if (GenlogWin==nullptr) {
+    fprintf(stderr,pMessage.toCChar());
+    return;
+  }
+  switch (pSeverity) {
+  case ZAIES_Text:
+    GenlogWin->appendText(pMessage);
+    return;
+  case ZAIES_Info:
+    GenlogWin->appendTextColor(Qt::blue, pMessage);
+    return;
+  case ZAIES_Warning:
+    GenlogWin->appendTextColor(Qt::darkGreen, pMessage);
+    return;
+  case ZAIES_Error:
+  case ZAIES_Fatal:
+    GenlogWin->appendTextColor(Qt::red, pMessage);
+    return;
+  default:
+    GenlogWin->appendTextColor(Qt::yellow, pMessage);
+    return;
+  }
+}
 void ZContentVisuMain::DicEditQuitCallback(){
 //  delete dictionaryWnd;
   DicEdit = nullptr;
 }
+
+ZStatus
+ZContentVisuMain::exportZMF(QWidget* pParent,zbs::ZRawMasterFile* pRawMasterFile,ZaiErrors* pErrorLog)
+{
+  if (pRawMasterFile==nullptr) {
+    ZExceptionDLg::adhocMessage("Data export",Severity_Error,
+                                "Please select a (raw) master file before exporting its data.");
+    return ZS_FILENOTEXIST;
+  }
+
+  if (pRawMasterFile->getRecordCount()==0) {
+    ZExceptionDLg::adhocMessage("Data export",Severity_Error,
+                                "No record in file. Nothing to export.");
+    return ZS_EMPTY;
+  }
+
+
+  QString wDir;
+  wDir = QFileDialog::getSaveFileName(pParent,"Export content",GeneralParameters.getWorkDirectory().toCChar(),"Xml files (*.xml);;All (*.*)");
+  if (wDir.isEmpty())
+    return ZS_EMPTY ;
+  uriString wURIExport=wDir.toUtf8().data();
+
+  /* export progress window setup */
+
+  ZMFProgressMWn* ProgressMWn = new ZMFProgressMWn("Data export",pParent);
+
+  /*
+  ProgressMWn->setDescBudy("Export to file");
+  ProgressMWn->setDescText(wURIExport);
+  ProgressMWn->setProcessDescription("Records processed");
+  */
+  ProgressMWn->labelsSetup("Export to file",wURIExport,"Records processed");
+
+  ProgressMWn->advanceSetupCallBack(pRawMasterFile->getRecordCount(),"Export to file");
+
+  ProgressMWn->show();
+
+  pRawMasterFile->registerProgressSetupCallBack(std::bind(&ZMFProgressMWn::advanceSetupCallBack, ProgressMWn,std::placeholders::_1,std::placeholders::_2));
+  pRawMasterFile->registerProgressCallBack(std::bind(&ZMFProgressMWn::advanceCallBack, ProgressMWn,std::placeholders::_1,std::placeholders::_2));
+
+  ZStatus wSt=pRawMasterFile->XmlExportContent(wURIExport,nullptr);
+
+  ProgressMWn->setDone(wSt!=ZS_SUCCESS);
+
+  if (wSt!=ZS_SUCCESS) {
+    if (pErrorLog==nullptr)
+        fprintf(stderr,"Data export: Something went wrong status <%s> while exporting data from <%s>",
+                decode_ZStatus(wSt),
+                pRawMasterFile->getURIContent().getBasename().toCChar());
+    else
+        pErrorLog->errorLog("Data export: Something went wrong status <%s> while exporting data from <%s>",
+                            decode_ZStatus(wSt),
+                            pRawMasterFile->getURIContent().getBasename().toCChar());
+  }
+
+  return wSt;
+} //ZContentVisuMain::exportZMF
+
+ZStatus
+ZContentVisuMain::clearZMF(QWidget* pParent, ZaiErrors *pErrorLog)
+{
+  uriString wDir = GeneralParameters.getWorkDirectory();
+  uriString wZMFURI;
+  ZRawMasterFile *wZMF=nullptr;
+  zmode_type wOpenMode=0;
+  ZStatus wSt=ZS_SUCCESS;
+
+  QString wFileName = QFileDialog::getOpenFileName(pParent, tr("Raw master file to be cleared"),
+                                                   wDir.toCChar(),
+                                                   "master files (*.zmf);;All (*.*)");
+  if (wFileName.isEmpty())
+    return ZS_EMPTY ;
+  wZMFURI= wFileName.toUtf8().data();
+  if (!wZMFURI.exists()) {
+    return ZS_FILENOTEXIST;
+  }
+
+
+  long wSize = wZMFURI.getFileSize();
+  wZMF = new ZMasterFile;
+  wSt=wZMF->zopen(wZMFURI,ZRF_All);
+  if (wSt!=ZS_SUCCESS) {
+    delete wZMF;
+    return wSt;
+  }
+
+  ZClearFileDLg* wClearFileDLg = new ZClearFileDLg(pParent);
+  wClearFileDLg->setup(wZMF);
+
+  int wRet=wClearFileDLg->exec();
+  if (wRet==QDialog::Rejected)
+      return ZS_SUCCESS ;
+
+
+  ZMFProgressMWn* ProgressMWn=new ZMFProgressMWn("Clearing master file",pParent);
+
+  wZMF->registerProgressCallBack(std::bind(&ZMFProgressMWn::advanceCallBack,ProgressMWn,std::placeholders::_1,std::placeholders::_2));
+  wZMF->registerProgressSetupCallBack(std::bind(&ZMFProgressMWn::advanceSetupCallBack,ProgressMWn,std::placeholders::_1,std::placeholders::_2));
+
+  ProgressMWn->setDescBudy("File");
+  ProgressMWn->setDescText(wZMFURI.toCChar());
+
+  ProgressMWn->show();
+
+  bool wHighwater = wClearFileDLg->getHighwater();
+  size_t wSizeToKeep = wClearFileDLg->getSizeToKeep();
+  
+  wSt = wZMF->zclearAll(wSizeToKeep,wHighwater,pErrorLog);
+
+  ProgressMWn->setDone(wSt!=ZS_SUCCESS);
+
+  wZMF->zclose();
+  delete wZMF;
+  return wSt;
+}
+ZStatus ZContentVisuMain::clearZRF()
+{
+    uriString wDir = GeneralParameters.getWorkDirectory();
+    uriString wZRFURI;
+    ZRandomFile *wZRF=nullptr;
+    zmode_type wOpenMode=0;
+    ZStatus wSt=ZS_SUCCESS;
+
+    QString wFileName = QFileDialog::getOpenFileName(this, tr("Random file to be cleared"),
+                                                     wDir.toCChar(),
+                                                     "random files (*.zrf);;All (*.*)");
+    if (wFileName.isEmpty())
+        return ZS_EMPTY ;
+    wZRFURI= wFileName.toUtf8().data();
+    if (!wZRFURI.exists()) {
+        return ZS_FILENOTEXIST;
+    }
+
+
+    long wSize = wZRFURI.getFileSize();
+    wZRF = new ZRandomFile;
+    wSt=wZRF->zopen(wZRFURI,ZRF_All);
+    if (wSt!=ZS_SUCCESS) {
+        delete wZRF;
+        return wSt;
+    }
+
+    ZClearFileDLg* wClearFileDLg = new ZClearFileDLg(this);
+    wClearFileDLg->setup(wZRF);
+
+    int wRet=wClearFileDLg->exec();
+    if (wRet==QDialog::Rejected)
+        return ZS_SUCCESS ;
+
+
+    ZMFProgressMWn* ProgressMWn=new ZMFProgressMWn("Clearing random file",this);
+
+    wZRF->registerProgressCallBack(std::bind(&ZMFProgressMWn::advanceCallBack,ProgressMWn,std::placeholders::_1,std::placeholders::_2));
+    wZRF->registerProgressSetupCallBack(std::bind(&ZMFProgressMWn::advanceSetupCallBack,ProgressMWn,std::placeholders::_1,std::placeholders::_2));
+
+    ProgressMWn->setDescBudy("File");
+    ProgressMWn->setDescText(wZRFURI.toCChar());
+
+    ProgressMWn->show();
+
+    bool wHighwater = wClearFileDLg->getHighwater();
+    size_t wSizeToKeep = wClearFileDLg->getSizeToKeep();
+
+    wSt = wZRF->zclearFile(wSizeToKeep,wHighwater,&ErrorLog);
+
+    ProgressMWn->setDone(wSt!=ZS_SUCCESS);
+
+    wZRF->zclose();
+    delete wZRF;
+    return wSt;
+}
+
+ZStatus
+ZContentVisuMain::cloneZRF( )
+{
+    uriString wDir = GeneralParameters.getWorkDirectory();
+    uriString wZRFURI;
+    uriString wCloneURI;
+    ZRandomFile *wZRF=nullptr;
+    zmode_type wOpenMode=0;
+    ZStatus wSt=ZS_SUCCESS;
+
+    QString wFileName = QFileDialog::getOpenFileName(this, tr("Source Random file to be cloned"),
+                                                     wDir.toCChar(),
+                                                     "random files (*.zrf);;All (*.*)");
+    if (wFileName.isEmpty())
+        return ZS_EMPTY ;
+    wZRFURI= wFileName.toUtf8().data();
+    if (!wZRFURI.exists()) {
+        return ZS_FILENOTEXIST;
+    }
+
+    wFileName = QFileDialog::getOpenFileName(this, tr("Target cloned file name"),
+                                                     wDir.toCChar(),
+                                                     "random files (*.zrf);;All (*.*)");
+
+    if (!wFileName.isEmpty())
+        wCloneURI=wFileName.toUtf8().data();
+
+    wZRF = new ZRandomFile;
+
+    textEditMWn* wTEMWn = new textEditMWn(this);
+    wTEMWn->setWindowTitle("Clone random file log");
+    wTEMWn->setDisplayColorCallBack(&ErrorLog);
+
+    ZMFProgressMWn* ProgressMWn=new ZMFProgressMWn("Cloning file",this);
+
+    wZRF->registerProgressCallBack(std::bind(&ZMFProgressMWn::advanceCallBack,ProgressMWn,std::placeholders::_1,std::placeholders::_2));
+    wZRF->registerProgressSetupCallBack(std::bind(&ZMFProgressMWn::advanceSetupCallBack,ProgressMWn,std::placeholders::_1,std::placeholders::_2));
+
+    ProgressMWn->setDescBudy("File");
+    ProgressMWn->setDescText(wZRFURI.toCChar());
+
+    ProgressMWn->show();
+
+    wSt=wZRF->_cloneFile(-1,wCloneURI,&ErrorLog);
+
+    ProgressMWn->setDone(wSt!=ZS_SUCCESS);
+
+    delete wZRF;
+    return wSt;
+}
+ZStatus
+ZContentVisuMain::reorganizeZRF( )
+{
+    textEditMWn* wTEMWn = new textEditMWn(this);
+    wTEMWn->setWindowTitle("Clone random file log");
+    wTEMWn->setDisplayColorCallBack(&ErrorLog);
+
+    uriString wDir = GeneralParameters.getWorkDirectory();
+    uriString wZRFURI;
+    uriString wCloneURI;
+    ZRandomFile *wZRF=nullptr;
+    zmode_type wOpenMode=0;
+    ZStatus wSt=ZS_SUCCESS;
+
+    QString wFileName = QFileDialog::getOpenFileName(this, tr("Random file to reorganize"),
+                                                     wDir.toCChar(),
+                                                     "random files (*.zrf);;All (*.*)");
+    if (wFileName.isEmpty())
+        return ZS_EMPTY ;
+    wZRFURI= wFileName.toUtf8().data();
+    if (!wZRFURI.exists()) {
+        return ZS_FILENOTEXIST;
+    }
+
+    wZRF = new ZRandomFile;
+
+    ZMFProgressMWn* ProgressMWn=new ZMFProgressMWn("Reorganize file",this);
+
+    wZRF->registerProgressCallBack(std::bind(&ZMFProgressMWn::advanceCallBack,ProgressMWn,std::placeholders::_1,std::placeholders::_2));
+    wZRF->registerProgressSetupCallBack(std::bind(&ZMFProgressMWn::advanceSetupCallBack,ProgressMWn,std::placeholders::_1,std::placeholders::_2));
+
+    ProgressMWn->setDescBudy("File");
+    ProgressMWn->setDescText(wZRFURI.toCChar());
+
+    ProgressMWn->show();
+
+    wSt=wZRF->zreorgFile(true,&ErrorLog);
+
+    ProgressMWn->setDone(wSt!=ZS_SUCCESS);
+
+    delete wZRF;
+    return wSt;
+}
+
+ZStatus
+ZContentVisuMain::rebuildHeaderZRF()
+{
+    uriString wDir = GeneralParameters.getWorkDirectory();
+    uriString wZRFURI;
+    uriString wCloneURI;
+    ZRandomFile *wZRF=nullptr;
+    zmode_type wOpenMode=0;
+    ZStatus wSt=ZS_SUCCESS;
+
+    QString wFileName = QFileDialog::getOpenFileName(this, tr("Random content file to rebuild"),
+                                                     wDir.toCChar(),
+                                                     "random content files (*.zrf);;All (*.*)");
+    if (wFileName.isEmpty())
+        return ZS_EMPTY ;
+    wZRFURI= wFileName.toUtf8().data();
+    if (!wZRFURI.exists()) {
+        return ZS_FILENOTEXIST;
+    }
+
+    wZRF = new ZRandomFile;
+
+    ZMFProgressMWn* ProgressMWn=new ZMFProgressMWn("Reorganize file",this);
+
+    wZRF->registerProgressCallBack(std::bind(&ZMFProgressMWn::advanceCallBack,ProgressMWn,std::placeholders::_1,std::placeholders::_2));
+    wZRF->registerProgressSetupCallBack(std::bind(&ZMFProgressMWn::advanceSetupCallBack,ProgressMWn,std::placeholders::_1,std::placeholders::_2));
+
+    ProgressMWn->setDescBudy("File");
+    ProgressMWn->setDescText(wZRFURI.toCChar());
+
+    ProgressMWn->show();
+
+    wSt=ZRandomFile::zheaderRebuild(wZRFURI,true,&ErrorLog,
+                                      std::bind(&ZMFProgressMWn::advanceCallBack,ProgressMWn,std::placeholders::_1,std::placeholders::_2),
+                                      std::bind(&ZMFProgressMWn::advanceSetupCallBack,ProgressMWn,std::placeholders::_1,std::placeholders::_2));
+
+    ProgressMWn->setDone(wSt!=ZS_SUCCESS);
+
+    delete wZRF;
+    return wSt;
+}
+
+
+void ZContentVisuMain::surfaceScanZRF()
+{
+    uriString wDir = GeneralParameters.getWorkDirectory();
+    uriString wZRFURI;
+    ZRandomFile *wZRF=nullptr;
+    zmode_type wOpenMode=0;
+    ZStatus wSt=ZS_SUCCESS;
+
+    QString wFileName = QFileDialog::getOpenFileName(this, tr("Random file to scan"),
+                                                     wDir.toCChar(),
+                                                     "random content files (*.zrf);;All (*.*)");
+    if (wFileName.isEmpty())
+        return  ;
+    wZRFURI= wFileName.toUtf8().data();
+    if (!wZRFURI.exists()) {
+        return ;
+    }
+    wZRF = new ZRandomFile;
+    //  FILE* wScan=fopen ("surfacescanzrf.txt","w");
+    textEditMWn* wTEMWn = new textEditMWn(this);
+    ErrorLog.setDisplayColorCB(std::bind(&textEditMWn::displayColorCallBack,wTEMWn,std::placeholders::_1,std::placeholders::_2));
+    ErrorLog.setStoreSeverityAtLeast(ZAIES_Info);
+
+    wSt=wZRF->zsurfaceScan(wZRFURI,&ErrorLog);
+
+    wZRF->zclose();
+    delete wZRF;
+    return;
+} //surfaceScanZRF
+
+ZStatus
+ZContentVisuMain::importZMF(QWidget* pParent, ZaiErrors *pErrorLog)
+{
+  uriString wDir = GeneralParameters.getWorkDirectory();
+  uriString wZMFURI;
+  ZRawMasterFile *wZMF=nullptr;
+  zmode_type wOpenMode=0;
+  ZStatus wSt=ZS_SUCCESS;
+
+  QString wFileName = QFileDialog::getOpenFileName(pParent, tr("Target import raw master file"),
+                                                     wDir.toCChar(),
+                                                     "master files (*.zmf);;All (*.*)");
+  if (wFileName.isEmpty())
+        return ZS_EMPTY ;
+  wZMFURI= wFileName.toUtf8().data();
+  if (!wZMFURI.exists()) {
+
+        return ZS_FILENOTEXIST;
+  }
+  wZMF = new ZRawMasterFile;
+
+  wSt=wZMF->zopen(wZMFURI,ZRF_All);
+
+  if (wZMF->getRecordCount() > 0) {
+  int wRet=ZExceptionDLg::adhocMessage2B("Import raw master file",Severity_Question,"Quit","Do it",nullptr,nullptr,
+                                            "Processing %s\n"
+                                           "Master file has already %ld record(s).\n"
+                                           "Populating this file with imported data may cause key collisions and/or incompatibility.\n"
+                                           "Do you want to import data ?\n"
+                                           "Import anyway               <Do it>\n"
+                                           "Quit without doing anything <Quit>\n",
+                                           wZMFURI.toString(),
+                                           wZMF->getRecordCount());
+  if (wRet==QDialog::Rejected)
+    return ZS_FILEERROR ;
+  }
+ // wZMF->zclose();
+
+
+  wFileName = QFileDialog::getOpenFileName(pParent,"Source import xml content",wDir.toCChar(),"Xml files (*.xml);;All (*.*)");
+  if (wFileName.isEmpty())
+    return ZS_EMPTY ;
+  uriString wURIContentImport=wFileName.toUtf8().data();
+
+  /* export progress window setup */
+
+  ZMFProgressMWn* ProgressMWn = new ZMFProgressMWn("Data import",pParent);
+
+  /*
+  ProgressMWn->setDescBudy("Export to file");
+  ProgressMWn->setDescText(wURIExport);
+  ProgressMWn->setProcessDescription("Records processed");
+  */
+  ProgressMWn->labelsSetup("Export to file",wURIContentImport,"Bytes of text processed");
+
+  ProgressMWn->advanceSetupCallBack(wZMF->getRecordCount(),"Import to file");
+
+  ProgressMWn->show();
+
+  wZMF->registerProgressSetupCallBack(std::bind(&ZMFProgressMWn::advanceSetupCallBack, ProgressMWn,std::placeholders::_1,std::placeholders::_2));
+  wZMF->registerProgressCallBack(std::bind(&ZMFProgressMWn::advanceCallBack, ProgressMWn,std::placeholders::_1,std::placeholders::_2));
+
+  wSt=wZMF->XmlImportContentByChunk(wURIContentImport,pErrorLog);
+
+  ProgressMWn->setDone(wSt!=ZS_SUCCESS);
+
+  if (wSt!=ZS_SUCCESS) {
+    if (pErrorLog==nullptr)
+        fprintf(stderr,"Data import: Something went wrong status <%s> while importing data from <%s>",
+                decode_ZStatus(wSt),
+                wZMF->getURIContent().getBasename().toCChar());
+    else
+        pErrorLog->errorLog("Data import: Something went wrong status <%s> while importing data from <%s>",
+                            decode_ZStatus(wSt),
+                            wZMF->getURIContent().getBasename().toCChar());
+    utf8VaryingString wMsg = ZException.formatFullUserMessage();
+    ZExceptionDLg::adhocMessage("Data import",Severity_Error,pErrorLog,&wMsg,"Data export: Something went wrong status <%s> while importing data from <%s>",
+                                decode_ZStatus(wSt),
+                                wZMF->getURIContent().getBasename().toCChar());
+  }
+
+  wZMF->zclose();
+  delete wZMF;
+  return wSt;
+} // ZContentVisuMain::importZMF
 
 
 ssize_t computeOffsetFromCoord(int pRow, int pCol) {

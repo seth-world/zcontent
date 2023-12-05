@@ -122,7 +122,9 @@ SOURCES += \
     ../zcontentcommon/zresource.cpp \
     ../zcontentutils/zentity.cpp \
     main.cpp \
-    zdocphysical.cpp
+    zdocphysical.cpp \
+    zdocphysical_2keys.cpp \
+    zdocphysical_nokey.cpp
 
 
 
@@ -130,7 +132,10 @@ SOURCES += \
 HEADERS += \
     ../../zconfig_general.h \
     ../zcontentcommon/zresource.h \
-    zdocphysical.h
+    zdocphysical.h \
+    zdocphysical_1key.h \
+    zdocphysical_2keys.h \
+    zdocphysical_nokey.h
 
 
 

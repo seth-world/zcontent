@@ -26,8 +26,8 @@ ZCollectionList::setup()
   CollectionListTBv->setColumnCount(2);
   for (int wi=0;wi < Parser->EntityList.count();wi++) {
     wRow.clear();
-    wRow << new QStandardItem(Parser->EntityList[wi]->getName().toCChar());
-    if (Parser->EntityList[wi]->_CollectionEntity!=nullptr)
+    wRow << new QStandardItem(Parser->EntityList[wi]->getEntityName().toCChar());
+    if (Parser->EntityList[wi]->_BaseEntity!=nullptr)
       wRow << new QStandardItem("Collection");
     else
         if (Parser->EntityList[wi]->_FileEntity!=nullptr)

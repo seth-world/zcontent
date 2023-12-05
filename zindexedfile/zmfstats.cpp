@@ -220,6 +220,21 @@ ZMFStats::reportShort(FILE* pOutput)
 
   return ;
 }
+void
+ZMFStats::reportShort(ZaiErrors* pErrorLog)
+{
+  pErrorLog->infoLog(
+          "________________________________________________\n"
+          "               Statistics\n"
+          " Iterations %ld\n"
+          " Reads      %ld\n"
+          " Time        %s\n",
+          Iterations,
+          Reads,
+          Timer.reportDeltaTime().toString());
+
+  return ;
+}
 /**
  * @brief zstatistics::reportFull displays to pOuput the content of statistical counters plus base ZRFPMS data
  *
@@ -232,6 +247,12 @@ ZMFStats::reportFull(FILE* pOutput)
   reportDetails(pOutput);
   return ;
 }
-
+void
+ZMFStats::reportFull(ZaiErrors*pErrorLog)
+{
+  reportShort(pErrorLog);
+  reportDetails(pErrorLog);
+  return ;
+}
 /** @} */ //  ZMFSTATS
 

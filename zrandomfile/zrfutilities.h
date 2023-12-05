@@ -1,11 +1,11 @@
 #ifndef ZRFUTILITIES_H
 #define ZRFUTILITIES_H
 
-#include <zcontent/zrandomfile/zrandomfile.h>
 #include <config/zconfig.h>
+#include "zrandomfile.h"
 #include <zio/zioutils.h>
 
-extern const long cst_FileNudge;
+extern const long cst_FilePayload;
 
 
 enum ZBlockExistence : uint16_t {
@@ -34,14 +34,15 @@ enum ZPoolType : uint8_t {
 };
 
 
-class ZFileUtils {
+class ZRandomFileUtils {
 public:
-  ZFileUtils() = default;
-  ZFileUtils(uriString & pURI) {setUri(pURI);}
+  ZRandomFileUtils() = default;
+  ZRandomFileUtils(uriString & pURI) {setUri(pURI);}
 
-  ~ZFileUtils() ;
+  ~ZRandomFileUtils() ;
 
   void setUri(uriString& pURI) {URI=pURI;}
+
 
   ZStatus rebuildHeader(uriString * pURIHeader);
 
@@ -72,14 +73,17 @@ public:
               ZBlockPool* pZBAT, ZBlockPool* pZFBT, ZBlockPool* pZHOT);
 
 
-  void getPrevAddrVal(zaddress_type &pAddress, long &pNudge, long &pBucket);
+  void getPrevAddrVal(zaddress_type &pAddress, long &pPayload, long &pBucket);
 
   void _print(const char* pFormat,...);
   void _print(const utf8VaryingString& pOut) ;
 
   void set_Output(FILE* pOutput) {Output=pOutput;}
   void set_displayCallBack(__DISPLAYCALLBACK__(pDCB)) {_displayCallback=pDCB;}
+
   __DISPLAYCALLBACK__(_displayCallback)=nullptr;
+  __progressCallBack__(_progressCallBack)=nullptr;
+  __progressSetupCallBack__(_progressSetupCallBack)=nullptr;
 
   __FILEHANDLE__ Fd=-1;
   __FILEHANDLE__ FdHeader=-1;
@@ -87,7 +91,7 @@ public:
   size_t FileSize=0;
   uriString URI;
   uriString URIHeader;
-  long FileNudge=cst_FileNudge;
+  long FileNudge=cst_FilePayload;
   bool _isOpen=false;
   ZBlockDescriptor_Export BlockCur;
 
@@ -95,26 +99,27 @@ public:
   ZHeaderControlBlock HCB;
 
   FILE* Output;
-};
+}; // ZRandomFileUtils
 
 /**
  * @brief rawSearchNextStartSign searches cst_ZFILEBLOCKSTART mark
  * within a file described by its descriptor pFd (must be open) of total size pFileSize,
  * starting at address pStartAddress.
  * At first found, returns pOutAddress, address of first byte of the found sequence.
- * Each access to file is done using pNudge bytes.
+ * Each access to file is done using pPayload bytes.
  * @param pFd       a valid open file descriptor
  * @param pFileSize file size
- * @param pNudge    quantum of byte to load for each file access
- * @param pStartAddress file offset to start search
+ * @param pPayload    quantum of byte to load for each file access
+ * @param pStartAddress file offset to start search : WARNING if it points to startsign then pStartAddress will be returned.
  * @param pOutAddress   returned address (file offset) when found. set to -1 if not found
  * @return a ZStatus
  * ZS_SUCCESS if sequence is successfully found
  * ZS_EOF or ZS_OUTBOUNDHIGH if end of file is reached
- * All possible status from rawReadAt and rawSeekToPosition
+ * ZS_READPARTIAL is depending on payload but IS NOT RETURNED. Search is done normally and if found ZS_SUCCESS is returned.
+ * All other possible status from rawReadAt and rawSeekToPosition
  */
 ZStatus
-rawSearchNextStartSign(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,
+rawSearchNextStartSign(__FILEHANDLE__ pFd,size_t pFileSize,long pPayload,
                     zaddress_type pStartAddress, zaddress_type & pOutAddress);
 
 /**
@@ -122,10 +127,10 @@ rawSearchNextStartSign(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,
  * within a file described by its descriptor pFd (must be open) of total size pFileSize,
  * starting at address pStartAddress.
  * At first found, returns pOutAddress, address of first byte of the found sequence.
- * Each access to file is done using pNudge bytes.
+ * Each access to file is done using pPayload bytes.
  * @param pFd       a valid open file descriptor
  * @param pFileSize file size
- * @param pNudge    quantum of byte to load for each file access
+ * @param pPayload    quantum of byte to load for each file access
  * @param pSequence sequence to search for
  * @param pSeqLen   sequence length
  * @param pStartAddress file offset to start search
@@ -136,7 +141,7 @@ rawSearchNextStartSign(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,
  * All possible status from rawReadAt and rawSeekToPosition
  */
 ZStatus
-rawSearchNextSequence(__FILEHANDLE__ pFd,size_t pFileSize,long pNudge,
+rawSearchNextSequence(__FILEHANDLE__ pFd,size_t pFileSize,long pPayload,
                       const unsigned char* pSequence,size_t pSeqLen,
                       zaddress_type pStartAddress, zaddress_type & pOutAddress);
 
@@ -149,9 +154,48 @@ rawCheckContentBlock(int pPoolId,__FILEHANDLE__ pFdContent,ZBlockDescriptor& pBl
 
 ZStatus rebuildZRFHeader(uriString& pURIContent);
 
-utf8VaryingString decode_ZBEx(uint16_t pBEx);
 
 
+
+/**
+ * @brief _searchBlockStart scans file pointed by pContentFd since pBeginAddress for a start mark (cst_ZBLOCKSTART 0xF5F5F5F5)
+ * and returns
+ *  . address of found mark in pNextAddress (pointing to first byte of start mark),
+ *  . ZDataBuffer containing the file space between two start mark or until end of file.
+ * Each read access loads pPayload bytes from file. pPayload is adjusted progressively to block sizes.
+ * When found pNextAddress points to the first byte of start mark.
+ * @param pContentFd    File descriptor to search. File must be opened with READ capabilities (O_RDONLY)
+ * @param pBeginAddress address to begin the search.
+ * WARNING: if pBeginAddress points to a cst_ZBLOCKSTART block, then this address will be returned as pNextAddress.
+ * @param pNextAddress  address of first byte of found cst_START
+ * @param pPayload      number of bytes to read at each read operation
+ * @param pFileSize     total number of bytes for the file to be scanned
+ * @return  a ZStatus
+ * - ZS_FOUND     start mark has been found.
+ *                pNextAddress points to first byte of start mark.
+ *                pBlockContent contains block data since pBeginAddress until next start mark (excluded).
+ * - ZS_EOF       no more to read and start mark has not been found since pBeginAddress.
+ *                pNextAddress is set to the last address processed.
+ *                pBlockContent contains data since pBeginAddress until EndofFile.
+ * - ZS_READERROR a low level error has been encountered. ZException is set with appropriate message.
+ *                pNextAddress is set to the last address processed.
+ * - ZS_FILEERROR a seek operation failed with a low level error.
+ *                ZException is set with appropriate message.
+ *                pNextAddress is set to the last address processed.
+ */
+ZStatus
+_searchBlockStart (__FILEHANDLE__ pContentFd,
+                  zaddress_type pBeginAddress,      // Address to start searching for start mark
+                  zaddress_type &pNextAddress,
+                  ZDataBuffer &pBlockContent,
+                  ssize_t &pPayload,
+                  int     &pCount,
+                  size_t  &pFileSize,
+                  uint32_t *pBeginContent=nullptr);
 //bool testSequence (const unsigned char* pSequence,size_t pSeqLen, const unsigned char* pToCompare);
+
+
+
+utf8VaryingString decode_ZBEx(uint16_t pBEx);
 
 #endif // ZRFUTILITIES_H

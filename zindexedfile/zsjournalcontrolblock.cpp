@@ -345,11 +345,11 @@ ZJournalControlBlock::setRemoteMirroring (int8_t pProtocol,
     </zjournalcontrolblock>
 */
 
-utf8String
+utf8VaryingString
 ZJournalControlBlock::toXml(int pLevel,bool pComment)
 {
   int wLevel=pLevel+1;
-  utf8String wReturn;
+  utf8VaryingString wReturn;
   ZDataBuffer wB64;
   wReturn = fmtXMLnode("zjournalcontrolblock",pLevel);
 
@@ -381,7 +381,7 @@ ZStatus ZJournalControlBlock::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErro
   zxmlElement *wRootNode=nullptr;
   zxmlElement *wRootNode_1=nullptr;
 
-  utf8String wValue;
+  utf8VaryingString wValue;
   bool wBool;
   ZStatus wSt = pIndexRankNode->getChildByName((zxmlNode *&) wRootNode, "zjournalcontrolblock");
   if (wSt != ZS_SUCCESS) {
@@ -443,11 +443,11 @@ ZStatus ZJournalControlBlock::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErro
 
 
 
-utf8String
+utf8VaryingString
 ZRemoteMirroring::toXml(int pLevel)
 {
   int wLevel=pLevel+1;
-  utf8String wReturn;
+  utf8VaryingString wReturn;
   ZDataBuffer wB64;
   wReturn = fmtXMLnode("zremotemirroring",pLevel);
 
@@ -479,7 +479,7 @@ ZRemoteMirroring::toXml(int pLevel)
 ZStatus ZRemoteMirroring::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog,ZaiE_Severity pSeverity)
 {
   zxmlElement *wRootNode=nullptr;
-  utf8String wValue;
+  utf8VaryingString wValue;
   int wInt;
   ZStatus wSt = pIndexRankNode->getChildByName((zxmlNode *&) wRootNode, "zremotemirroring");
   if (wSt != ZS_SUCCESS) {

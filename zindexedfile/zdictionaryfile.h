@@ -72,6 +72,7 @@ public:
   ZDictionaryFile& _copyFrom(const ZDictionaryFile& pIn) ;
 
   ZMFDictionary& getDictionary() { return *this; }
+  const ZMetaDic* getMetaDic() const { return (const ZMetaDic*)this; }
 
   ZStatus create(const uriString &pDicFilename,  bool pBackup=true);
 #ifdef __USE_BIN_DICTIONARY__
@@ -99,11 +100,7 @@ public:
     return save_bin();
   }
   #endif //__USE_BIN_DICTIONARY__
-  ZStatus saveAsEmbedded(const uriString& pZMFURIContent) {
-    URIDictionary = generateDicFileName(pZMFURIContent);
-//    return save_bin();
-    return save_xml();
-  }
+  ZStatus saveAsEmbedded(const uriString& pZMFURIContent);
 
   void setDicFilename(const uriString& pDicFilename) { URIDictionary=pDicFilename; }
   void setDictionary(const ZMFDictionary& pDic) ;

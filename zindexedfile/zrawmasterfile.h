@@ -8,7 +8,7 @@
 
 #include <znet/zbasenet/znetcommon.h>
 
-#include <ztoolset/zutfstrings.h>
+#include <ztoolset/utfvaryingstring.h>
 
 #include <ztoolset/zaierrors.h>
 #include <zxml/zxml.h>
@@ -20,8 +20,10 @@
 
 //#include <zindexedfile/zindexitem.h>
 
-
-#define __PROGRESSCALLBACK__(__NAME__)  std::function<void (int)> __NAME__
+/*
+#define __progressCallBack__(__NAME__)  std::function<void (int,const utf8VaryingString&)> __NAME__
+#define __progressSetupCallBack__(__NAME__)  std::function<void (int,const utf8VaryingString&)> __NAME__
+*/
 
 
 /** @brief RawDataDescription Raw data storage detailed description
@@ -86,6 +88,26 @@ enum ZIXMode : uint8_t {
 namespace zbs //========================================================================
 {
 
+class ZMFIdentification
+{
+public:
+    ZMFIdentification() {}
+    ZMFIdentification(ZMFIdentification& pIn) {_copyFrom(pIn);}
+
+    ZMFIdentification& _copyFrom(ZMFIdentification& pIn) {
+        CreationDate = pIn.CreationDate;
+        ModificationDate = pIn.ModificationDate;
+        return *this;
+    }
+
+    ZMFIdentification& operator = (ZMFIdentification& pIn) { return _copyFrom(pIn);}
+
+    ZDateFull CreationDate;
+    ZDateFull ModificationDate;
+};
+
+
+
 class ZKey;
 class ZIndexItem;
 class ZIndexItemList;
@@ -139,6 +161,15 @@ public:
 
   using ZRandomFile::getRecordCount;
 
+
+  using ZRandomFile::registerProgressCallBack;
+  using ZRandomFile::registerProgressSetupCallBack;
+
+  using ZRandomFile::hasProgressCallBack;
+  using ZRandomFile::hasProgressSetupCallBack;
+
+  using ZRandomFile::getUsedBlocksCount ;
+
 //  ZFileControlBlock& getZFCB() {return ZFCB;}
 
   void setTypeRaw() { ZRandomFile::setFileType(ZFT_ZRawMasterFile); }
@@ -165,22 +196,33 @@ public:
    * @brief zclearAll clears content of master file and of all defined indexes of master file.
    * @return a ZStatus
    */
-  ZStatus zclearAll();
+  ZStatus zclearAll(ssize_t pSizeToKeep,bool pHighwater,ZaiErrors *pErrorLog);
 
+  static ZStatus zcopyTo(const uriString& pOldContentName,const uriString& pNewContentName,
+                          uint8_t pFlag,     // see ZCopyManip_enum (zioutils.h)
+                          int pPayLoad,
+                          ZaiErrors* pErrorLog);
 
-//    using _Base::zclearFile;  // for tests only : must be suppressed imperatively
+    ZStatus _copyTo(const uriString& pNewContentURI,
+                    uint8_t pFlag,
+                    int pPayLoad,  /* if -1 then defaulted to rawCopyPayLoad see setRawCopyPayLoad() (zioutils.h)*/
+                    ZaiErrors* pErrorLog);
 
-  //--------------Setting parameters------------------------------------
-  ZStatus  setFCBParameters (ZFile_type pFileType,
-                          const bool pGrabFreeSpace,
-                          const bool pHighwaterMarking,
-                          const ssize_t pBlockTargetSize,
-                          const size_t pBlockExtentQuota)
-  { return _Base::_setParameters( pFileType,
-                                  pGrabFreeSpace,
-                                  pHighwaterMarking,
-                                  pBlockTargetSize,
-                                  pBlockExtentQuota);
+    ZStatus getCopySize(size_t &pSize, uint8_t pFlag, ZaiErrors *pErrorLog);
+    //    using _Base::zclearFile;  // for tests only : must be suppressed imperatively
+
+    //--------------Setting parameters------------------------------------
+    ZStatus setFCBParameters(ZFile_type pFileType,
+                             const bool pGrabFreeSpace,
+                             const bool pHighwaterMarking,
+                             const ssize_t pBlockTargetSize,
+                             const size_t pBlockExtentQuota)
+    {
+        return _Base::_setParameters(pFileType,
+                                     pGrabFreeSpace,
+                                     pHighwaterMarking,
+                                     pBlockTargetSize,
+                                     pBlockExtentQuota);
   }
 
   void setFileType(ZFile_type pFileType) {return _Base::setFileType(pFileType);}
@@ -236,7 +278,7 @@ public:
  *
  */
   ZStatus zcreateRawIndex  (ZRawIndexFile *&pIndexObjectOut,  /* resulting created index object if successful, nullptr  if not*/
-                            const utf8String &pIndexName,
+                            const utf8VaryingString &pIndexName,
                             uint32_t pkeyguessedsize,
                             ZSort_Type pDuplicates,
                             long &pOutIndexRank,
@@ -244,13 +286,13 @@ public:
 
   ZStatus zinsertRawIndex  (long pIndexRank,
                             ZRawIndexFile *&pIndexObjectOut,  /* resulting created index object if successful, nullptr  if not*/
-                            const utf8String &pIndexName,
+                            const utf8VaryingString &pIndexName,
                             uint32_t pkeyguessedsize,
                             ZSort_Type pDuplicates,
                             long &pOutIndexRank,
                             bool pBackup=true);
 #ifdef __COMMENT__
-  ZStatus zcreateRawIndexDetailed ( const utf8String &pIndexName, /*-----ICB------*/
+  ZStatus zcreateRawIndexDetailed ( const utf8VaryingString &pIndexName, /*-----ICB------*/
                                     uint32_t pkeyguessedsize,
                                     ZSort_Type pDuplicates,
                                     long pAllocatedBlocks,        /* ---FCB (for index ZRandomFile)---- */
@@ -275,7 +317,7 @@ public:
    * @return
    */
   ZStatus _createRawIndexDet (long &pOutRank,
-                              const utf8String &pIndexName, /*-----ICB------*/
+                              const utf8VaryingString &pIndexName, /*-----ICB------*/
                               uint32_t pkeyguessedsize,
                               ZSort_Type pDuplicates,
                               long pAllocatedBlocks,      /* ---FCB (for index ZRandomFile)---- */
@@ -302,7 +344,7 @@ public:
    * @return
    */
   ZStatus _insertRawIndexDet (long pInputIndexRank,
-                              const utf8String &pIndexName, /*-----ICB------*/
+                              const utf8VaryingString &pIndexName, /*-----ICB------*/
                               uint32_t pkeyguessedsize,
                               ZSort_Type pDuplicates,
                               long pAllocatedBlocks,      /* ---FCB (for index ZRandomFile)---- */
@@ -364,9 +406,10 @@ public:
    */
   ZStatus zremoveAll();
 
-
-  void registerProgressCallback(__PROGRESSCALLBACK__(pProgressCallback) ) {_progressCallback=pProgressCallback;}
-  bool hasProgressCallback() { return _progressCallback!=nullptr; }
+/*
+  void registerProgressCallback(__progressCallBack__(pProgressCallback) ) {_progressCallBack=pProgressCallback;}
+  void registerProgressSetupCallback(__progressSetupCallBack__(pProgressCallback) ) {_progressSetupCallBack=pProgressCallback;}
+*/
 
   void _testZReserved();
 
@@ -411,7 +454,10 @@ public:
    *
    * @return  a ZStatus for error codes @see ZRandomFile::_renameBck
    */
-  ZStatus _renameBck(const char* pContentPath, ZaiErrors* pErrorLog=nullptr,const char* pBckExt="bck");
+  ZStatus _renameBck(const uriString &pContentPath,
+                     ZaiErrors *pErrorLog = nullptr,
+                     bool pNoExcept=false,
+                     const char *pBckExt = "bck");
 
   /**
    * @brief renameBck   static function that renames all component files for ZRawMasterFile whose content file is pointed by pContentPath
@@ -422,14 +468,18 @@ public:
    *
    * pBckExt is defaulted to string "bck".
    *
+   *  @see ZStandardBackupFileNames
    *
    * Components are :
    * for main file : ZRandomFile content + header
    * for each index : ZRandomFile content + header
+   * dictionary if ever is backuped too.
    * @return  a ZStatus for error codes @see ZRandomFile::_renameBck
    */
-  static ZStatus renameBck (const char* pContentPath, ZaiErrors* pErrorLog=nullptr, const char* pBckExt="bck");
-
+  static ZStatus renameBck(const uriString &pContentPath,
+                           ZaiErrors *pErrorLog = nullptr,
+                           bool pNoExcept=false,
+                           const char *pBckExt = "bck");
 
   ZStatus zget      (ZDataBuffer &pRecordContent, const zrank_type pZMFRank);
 
@@ -453,20 +503,18 @@ public:
    */
   ZStatus zadd      (ZDataBuffer& pRecordContent, ZArray<ZDataBuffer> &pKeys );
 
-
-
   /**
    * @brief zinsert insert a new record whose content is pRecordContent within a Raw Master File at logical position pRank, and updates all indexes.
    *      As Raw Master File does not use any dictionary, user must extract and provide keys content (pKeys).
    */
   ZStatus zinsert   (ZDataBuffer& pRecordContent, ZArray<ZDataBuffer> &pKeys, const zrank_type pZMFRank);
 
-
-
 protected:
 
-//  ZStatus _addRaw   (ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeysContent);
   ZStatus _addRaw   (ZDataBuffer& pRecord, ZArray<ZDataBuffer> &pKeysContent);
+
+  /* this protected routine does not take any key into account. After using it, an index rebuild is necessary */
+  ZStatus _addRawDisregardKeys (ZDataBuffer& pRecord);
 
   ZStatus _insertRaw (const ZDataBuffer& pRecord, ZArray<ZDataBuffer>& pKeys, const zrank_type pZMFRank);
   ZStatus _removeByRankR  (ZDataBuffer &pRecord, const zrank_type pZMFRank);
@@ -550,16 +598,17 @@ public:
 
   using ZRandomFile::getFileDescriptor ;
 
+  using ZRandomFile::FCBReport;
+  using ZRandomFile::PoolReport;
 
   ZStatus zsearchInterval (ZKey &pZKeyLow, ZKey &pZKeyHigh,const zrank_type pIndexNumber,ZIndexCollectionContext *pSearchContext );
 
 
   //                  Reports
-  void ZMCBreport(FILE *pOutput=stdout);
+  void MCBreport(ZaiErrors *pErrorLog);
   //                  Utilities
 
-
-  ZStatus zclearMCB (FILE *pOutput=nullptr);
+  ZStatus zclearMCB(ZaiErrors *pErrorLog = nullptr);
 
   ZStatus zremoveIndex (const long pIndexRank, bool pBackup=false, ZaiErrors *pErrorLog=nullptr);
 
@@ -578,25 +627,39 @@ public:
   /** @brief XmlSaveToFile() Exports ZRandomFile parameters to full Xml formatted file */
   ZStatus XmlSaveToFile(uriString &pXmlFile,bool pComment=true);
   /** @brief XmlSaveToFile() Exports all ZRandomFile parameters to full Xml formatted string */
-  utf8String XmlSaveToString(bool pComment=true);
+  utf8VaryingString XmlSaveToString(bool pComment=true);
   /**
    * @brief toXml writes ZRawMasterFile definition as xml at level (indentation) pLevel.
    * If pComment is set to true, then available explainations are commented in output xml code.
-   * @return an utf8String with xml definition
+   * @return an utf8VaryingString with xml definition
    */
-  utf8String toXml(int pLevel,bool pComment=true);
+  utf8VaryingString toXml(int pLevel,bool pComment=true);
 
 
-
-  ZStatus exportContent(const uriString& pContentFile);
+  /* raw master file must be open at least in ZRF_ReadOnly mode when calling XmlExportContent() routine */
+  ZStatus XmlExportContent(const uriString &pXmlContentFile, ZaiErrors *pErrorLog);
+  static ZStatus XmlExportContentFromSurfaceScan(const uriString& pURIContentFile,
+                                                 const uriString& pXmlContentFile,
+                                                 __progressCallBack__(_progressCallBack),
+                                                 __progressSetupCallBack__(_progressSetupCallBack),
+                                                 ZaiErrors* pErrorLog);
+  static ZStatus XmlExportOneRecord(int pFd,
+                                    const ZDataBuffer &pRecord,
+                                    int pLevel,
+                                    ZBlockHeader* pBlockHeader,
+                                    ZaiErrors *pErrorLog);
   /* formats a raw record structured with an URF format ( i.e. leading ZBitset then URF field list )
    * following the xml file content defined by pContentFile */
-  static ZStatus importContent(const uriString& pContentFile, ZRawMasterFile& pRawMasterFile, ZaiErrors *pErrorLog);
 
-  ZStatus importRecordContent(zxmlNode* pRecordRoot, ZDataBuffer& pRecord, ZaiErrors *pErrorLog);
+  /*  raw master file must exist and be opened in mode ZRF_All. File is left open when returning.
+ *  _progressSetupCallBack  and _progressCallBack must be set to appropriate routine
+*/
+  ZStatus XmlImportContentByChunk(const uriString& pXmlContentFile, ZaiErrors *pErrorlog);
+
+  ZStatus XmlImportIdentification(const utf8VaryingString& pXmlRecordContent, ZMFIdentification& pIdentification, ZaiErrors *pErrorLog);
+  ZStatus XmlImportRecordContent(const utf8VaryingString& pXmlRecordContent, ZDataBuffer& pRecord, ZaiErrors *pErrorLog);
 
   //-------- Stats-----------------------------------------------
-
 
   using _Base::ZRFPMSReport;
   using _Base::ZRFstat;
@@ -609,8 +672,7 @@ public:
 
   void    zstartPMSMonitoring (void);
   void    zendPMSMonitoring (void);
-  void    zreportPMSMonitoring (FILE* pOutput);
-
+  void zreportPMSMonitoring(ZaiErrors *pErrorLog);
 
   //---------End Stats-------------------------------------------
   /** @brief getRawIndex
@@ -756,7 +818,6 @@ protected:
   ZMutex    _Mutex;
 #endif
 
-__PROGRESSCALLBACK__(_progressCallback) = nullptr;
 
 public:
 
@@ -771,7 +832,8 @@ public:
 }; //--------------------end class ZMasterFile-------------------------------
 
 
-
-
 } // namespace zbs
+
+void sleepTimes (int pTimes);
+
 #endif // ZRAWMASTERFILE_H

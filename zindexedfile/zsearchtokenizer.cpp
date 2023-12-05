@@ -205,6 +205,13 @@ ZSearchTokenizer::parse(const utf8VaryingString &pIn)
         continue;
       }
       if (wCurrentToken->Type == ZSRCH_NUMERIC_LITERAL) {
+
+        if ((pIn[wi+1]<0)&&(pIn[wi+1]>9)) { /* not a double ? but may be a dotted identifer ex. <1.FieldName> */
+            endToken(wCurrentToken);
+            wCurrentToken->Type = ZSRCH_DOT;
+            endToken(wCurrentToken);
+            continue;
+          }
         wCurrentToken->Type = ZSRCH_DOUBLE_LITERAL;
         wCurrentToken->Text.addUtfUnit(wCurrCh);
         continue;
@@ -415,6 +422,17 @@ ZSearchTokenizer::parse(const utf8VaryingString &pIn)
       }
       endToken(wCurrentToken);
       wCurrentToken->setCoords(Line,Column,Offset);
+      if (pIn[wi+1]=='>') {
+          wi++;
+          Column++;
+          Offset++;
+          wCurrentToken->Text.addUtfUnit(wCurrCh);
+          wCurrentToken->Text.addUtfUnit(pIn[wi]);
+          wCurrentToken->Type = ZSRCH_RIGHTARROW ;
+          endToken(wCurrentToken);
+          continue;
+      }
+
       wCurrentToken->Type = ZSRCH_OPERATOR_MINUS;
       wCurrentToken->Text.addUtfUnit(wCurrCh);
       endToken(wCurrentToken);
@@ -555,10 +573,11 @@ ZSearchTokenizer::parse(const utf8VaryingString &pIn)
         wCurrentToken->Text.addUtfUnit(wCurrCh);
         continue;
       }
+      endToken(wCurrentToken);
+      wCurrentToken->setCoords(Line,Column,Offset);
+
       /* true < logical operator */
       if (pIn[wi+1]=='=') {
-        endToken(wCurrentToken);
-        wCurrentToken->setCoords(Line,Column,Offset);
         wCurrentToken->Type = ZSRCH_OPERATOR_LESSOREQUAL;
         wCurrentToken->Text.addUtfUnit(wCurrCh);
         wi++;
@@ -568,8 +587,17 @@ ZSearchTokenizer::parse(const utf8VaryingString &pIn)
         endToken(wCurrentToken);
         continue;
       }
-      endToken(wCurrentToken);
-      wCurrentToken->setCoords(Line,Column,Offset);
+      if (pIn[wi+1]=='-') {
+          wi++;
+          Column++;
+          Offset++;
+          wCurrentToken->Text.addUtfUnit(wCurrCh);
+          wCurrentToken->Text.addUtfUnit(pIn[wi]);
+          wCurrentToken->Type = ZSRCH_LEFTARROW ;
+          endToken(wCurrentToken);
+          continue;
+      }
+
       wCurrentToken->Type = ZSRCH_OPERATOR_LESS;
       wCurrentToken->Text.addUtfUnit(wCurrCh);
       endToken(wCurrentToken);
@@ -1132,10 +1160,11 @@ void ZSearchTokenizer::endToken(ZSearchToken *&pToken) {
     return;
   }
   if (pToken->Type ==ZSRCH_SPACE) {
-    ErrorLog.infoLog("ZSearchTokenizer::endToken line %4d col.%3d Ignoring space token\n",
+/*    ErrorLog.infoLog("ZSearchTokenizer::endToken line %4d col.%3d Ignoring space token\n",
         pToken->TokenLine,
         pToken->TokenColumn,
         pToken->Text.toCChar());
+*/
     pToken->reset();
     return;
   }
@@ -1190,7 +1219,7 @@ void ZSearchTokenizer::endToken(ZSearchToken *&pToken) {
   } // while true;
 
   if (pToken->Type != ZSRCH_SPACE) {
-    _Base::push(pToken);
+    _TokenList::push(pToken);
 
     if (Options & ZSRCHO_Verbose )
       pToken->displayNoindex();

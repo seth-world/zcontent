@@ -3,19 +3,31 @@
 
 #include <ztoolset/zstatus.h>
 #include <ztoolset/uristring.h>
-#include <ztoolset/zutfstrings.h>
+#include <ztoolset/utfvaryingstring.h>
 
 namespace zbs {
+
+typedef int InstructionFlag_type;
+
+
+
 class ZSearchHistory
 {
 public:
   ZSearchHistory()=default;
   ~ZSearchHistory() ;
 
+  enum InstructionFlag : InstructionFlag_type {
+      Forget        = 0 ,
+      DataExecute   = 1 ,
+      Other         = 2
+  };
+
+
   ZStatus setup(const uriString& pHistoryPath);
   ZStatus loadHistory();
 
-  ZStatus add(const utf8VaryingString& pInst);
+  ZStatus add(const utf8VaryingString& pInst, InstructionFlag_type pFlag=DataExecute);
   ZStatus getPrevious(utf8VaryingString &pPrevious);
   ZStatus getFirst(utf8VaryingString &pNext);
   ZStatus getNext(utf8VaryingString &pNext);

@@ -261,10 +261,10 @@ ZIndexControlBlock::_exportAppend(ZDataBuffer &pICBContent)
     <duplicates> </duplicates>
   </indexcontrolblock>
 */
-utf8String ZIndexControlBlock::toXml(int pLevel,bool pComment)
+utf8VaryingString ZIndexControlBlock::toXml(int pLevel,bool pComment)
 {
   int wLevel=pLevel;
-  utf8String wReturn;
+  utf8VaryingString wReturn;
   wReturn = fmtXMLnode("indexcontrolblock",pLevel);
   if (pComment)
     fmtXMLaddInlineComment(wReturn," no dictionary in index control block");
@@ -288,9 +288,9 @@ utf8String ZIndexControlBlock::toXml(int pLevel,bool pComment)
 ZStatus ZIndexControlBlock::fromXml(zxmlNode* pIndexNode, ZaiErrors* pErrorlog)
 {
   zxmlElement *wRootNode=nullptr;
-  utfcodeString wXmlHexaId;
-  utf8String wValue;
-  utfcodeString wCValue;
+  utf8VaryingString wXmlHexaId;
+  utf8VaryingString wValue;
+  utf8VaryingString wCValue;
   uint32_t wInt=0;
 
   ZStatus wSt = pIndexNode->getName()=="indexcontrolblock"?ZS_SUCCESS:ZS_INVNAME;
@@ -383,10 +383,10 @@ ssize_t ZIndexControlBlock::IndexRecordSize (void)
 </icbowndata>
 */
 
-utf8String ZICBOwnData::toXml(int pLevel)
+utf8VaryingString ZICBOwnData::toXml(int pLevel)
 {
   int wLevel=pLevel;
-  utf8String wReturn;
+  utf8VaryingString wReturn;
   wReturn = fmtXMLnode("icbowndata",pLevel);
   wLevel++;
   wReturn+=fmtXMLchar("indexname",IndexName.toCChar(),wLevel);
@@ -409,9 +409,9 @@ utf8String ZICBOwnData::toXml(int pLevel)
 ZStatus ZICBOwnData::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog)
 {
   zxmlElement *wRootNode;
-  utfcodeString wXmlHexaId;
-  utf8String wValue;
-  utfcodeString wCValue;
+  utf8VaryingString wXmlHexaId;
+  utf8VaryingString wValue;
+  utf8VaryingString wCValue;
   bool wBool;
   unsigned int wInt;
   ZStatus wSt = pIndexRankNode->getChildByName((zxmlNode *&) wRootNode, "icbowndata");
@@ -553,10 +553,10 @@ long ZSIndexControlTable::zsearchCaseIndexByName (const char* pName)
 </indexcontroltable>
 */
 #ifdef __COMMENT__
-utf8String ZSIndexControlTable::toXml(int pLevel)
+utf8VaryingString ZSIndexControlTable::toXml(int pLevel)
 {
   int wLevel=pLevel;
-  utf8String wReturn;
+  utf8VaryingString wReturn;
   wReturn = fmtXMLnode("indexcontroltable",pLevel);
   wLevel++;
 

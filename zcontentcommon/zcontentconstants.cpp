@@ -2,6 +2,59 @@
 #include <string.h>
 #include <stdio.h>
 
+namespace zbs {
+
+utf8VaryingString decode_ZCellFormat(ZCFMT_Type pZCFMT)
+{
+
+    if (pZCFMT==ZCFMT_Nothing)
+        return "ZCFMT_Nothing";
+    utf8VaryingString wReturn;
+
+    ZCFMT_Type wZCFMT = pZCFMT & ZCFMT_NumMask;
+    if (wZCFMT == ZCFMT_NumHexa)
+        wReturn.addConditionalOR("ZCFMT_NumHexa");
+
+    wZCFMT = pZCFMT & ZCFMT_DateMask;
+    if (wZCFMT == ZCFMT_DMY)
+        wReturn.addConditionalOR("ZCFMT_DMY");
+    if (wZCFMT == ZCFMT_MDY)
+        wReturn.addConditionalOR("ZCFMT_MDY");
+    if (wZCFMT == ZCFMT_DMYHMS)
+        wReturn.addConditionalOR("ZCFMT_DMYHMS");
+    if (wZCFMT == ZCFMT_MDYHMS)
+        wReturn.addConditionalOR("ZCFMT_MDYHMS");
+    if (wZCFMT == ZCFMT_DLocale)
+        wReturn.addConditionalOR("ZCFMT_DLocale");
+    if (wZCFMT == ZCFMT_DUTC)
+        wReturn.addConditionalOR("ZCFMT_DUTC");
+
+    wZCFMT = pZCFMT & ZCFMT_ResMask;
+    if (wZCFMT == ZCFMT_ResSymb)
+        wReturn.addConditionalOR("ZCFMT_ResSymb");
+    if (wZCFMT == ZCFMT_ResStd)
+        wReturn.addConditionalOR("ZCFMT_ResStd");
+
+
+    if (pZCFMT & ZCFMT_PrefZType)
+        wReturn.addConditionalOR("ZCFMT_PrefZType");
+
+    if (pZCFMT & ZCFMT_DumpBlob)
+        wReturn.addConditionalOR("ZCFMT_DumpBlob");
+    if (pZCFMT & ZCFMT_ApplyAll)
+        wReturn.addConditionalOR("ZCFMT_ApplyAll");
+    return wReturn;
+}
+} // namespace zbs
+
+
+long cst_StringDisplayMax = 64;
+void setStringMaxDislay (long pMax)
+{
+    cst_StringDisplayMax=pMax;
+}
+
+
 const char*
 decode_ZST(ZSort_Type pZST)
 {

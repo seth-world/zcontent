@@ -2,6 +2,7 @@
 #include "ui_zrawmasterfilevisu.h"
 
 #include <zqt/zqtwidget/zqtutils.h> // for  setQLabelNum() template
+#include <zcontentcommon/zgeneralparameters.h>
 
 #include <qnamespace.h>
 
@@ -49,11 +50,12 @@ ZRawMasterFileVisu::ZRawMasterFileVisu( QWidget *parent) :
                                                           QDialog(parent),
                                                           ui(new Ui::ZRawMasterFileVisu)
 {
+
   ui->setupUi(this);
+  setAttribute(Qt::WA_DeleteOnClose , true);
 
   ui->BottomLBl->setVisible(false);
   ui->TopLBl->setVisible(false);
-
 
   QFont wVisuFont ("Monospace");
   ui->BitsetHeaderLBl->setFont(wVisuFont);
@@ -121,103 +123,142 @@ ZRawMasterFileVisu::~ZRawMasterFileVisu()
 }
 
 ZStatus
-ZRawMasterFileVisu::setup(const uriString& pURI , int pFd) {
+ZRawMasterFileVisu::setup(const uriString& pURI )
+{
 
-  ui->ForwardBTn->setEnabled(true);
-  ui->BackwardBTn->setEnabled(true);
-  ui->BeginBTn->setEnabled(true);
-  ui->EndBTn->setEnabled(true);
-
-  utf8VaryingString wStr;
-  if (pFd < -1)
-    return ZS_FILENOTOPEN;
-  if (!pURI.exists())
-    return ZS_FILENOTEXIST;
-
-  BlockCur.BlockSize=0L;
-  BlockCur.Address=0L;
-
-  Fd = pFd;
-
-  FileSize=size_t(pURI.getFileSize());
-
-  setQLabelNum(ui->FileSizeLBl,FileSize);
-
-  AllFileLoaded=false;
-
-/*
-  Fd = ::open(pURI.toCChar(),O_RDONLY);// open content file for read only
-  if (Fd < 0)
-  {
-    ZException.getErrno(errno,
-        _GET_FUNCTION_NAME_,
-        ZS_ERROPEN,
-        Severity_Severe,
-        " Error opening file %s ",
-        pURI.toCChar());
-    return  ZS_ERROPEN;
-  }
-*/
-  URICurrent = pURI;
-//  BlockList.clear();
-
-  BlockTBv = new ZQTableView(this);
-  BlockTBv->newModel(5);
-  BlockTBv->setGeometry(10,190,660,320);
-
-  //  BlockTBv->setContextMenuCallback(std::bind(&ZRawMasterFileVisu::VisuBvFlexMenuCallback, this,placeholders::_1));
-
-  QFont wVisuFont ("Monospace");
-  BlockTBv->setFont(wVisuFont);
-
-//  ui->horizontalLayoutTBv->addWidget(BlockTBv);
-//  ui->verticalLayoutTBv->addWidget(BlockTBv);
-  int wCol=0;
-  BlockTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem("Offset"));
-  BlockTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem("ZType hexa"));
-  BlockTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem("ZType"));
-  BlockTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem("Head.size"));
-  BlockTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem("Data size"));
-  BlockTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem("Field data"));
-
-
-  BlockDumpTBv=new ZQTableView(this);
-  BlockDumpTBv->setGeometry(10,190,660,320);
-  BlockDumpTBv->newModel(21);
-
-  BlockDumpTBv->setFont(wVisuFont);
-
-
-//  BlockDumpTBv->setMouseClickCallback(std::bind(&ZRawMasterFileVisu::VisuMouseCallback, this,placeholders::_1,placeholders::_2)  );
-// Deprecated
-//  BlockDumpTBv->setContextMenuCallback(std::bind(&ZRawMasterFileVisu::VisuBvFlexMenuCallback, this,placeholders::_1));
-
-  VizuRaw = new VisuRaw(BlockDumpTBv,&RawRecord);
-  BlockDumpTBv->setContextMenuCallback(std::bind(&VisuRaw::VisuBvFlexMenuCallback, VizuRaw,placeholders::_1));
-
-
-  int wj=0;
-  int wk=0;
-  for (int wi=0;wi < 20;wi++) {
-    if (wk==4) {
-      wk=0;
-      BlockDumpTBv->ItemModel->setHorizontalHeaderItem(wi,new QStandardItem(" "));
-      continue;
+  //  Fd = pFd;
+ //   Fd = ::open(pURI.toCChar(),O_RDONLY);// open content file for read only
+    ZStatus wSt=rawOpen(Fd,pURI,O_RDONLY);
+    if (wSt != ZS_SUCCESS)
+    {
+        ZException.setMessage("RawMasterFileVisu::setup",
+                            wSt,
+                            Severity_Error,
+                            " Error opening file %s ",
+                            pURI.toCChar());
+        return  wSt;
     }
-    wStr.sprintf("%d",wj);
-    BlockDumpTBv->ItemModel->setHorizontalHeaderItem(wi,new QStandardItem(wStr.toCChar()));
-    wj++;
-    wk++;
-  }
-  BlockDumpTBv->ItemModel->setHorizontalHeaderItem(20,new QStandardItem(tr("Ascii")));
+    URICurrent = pURI;
 
 
-  BlockTBv->setVisible(false);
-  BlockDumpTBv->setVisible(true);
 
-  return ZS_SUCCESS;
+  return _setup();
 } // setup
 
+
+ZStatus
+ZRawMasterFileVisu::_setup()
+{
+    ui->ForwardBTn->setEnabled(true);
+    ui->BackwardBTn->setEnabled(true);
+    ui->BeginBTn->setEnabled(true);
+    ui->EndBTn->setEnabled(true);
+
+    ExitBTn = new QPushButton(ui->groupBox);
+    ExitBTn->setGeometry(QRect(610, 10, 31, 23));
+
+    QObject::connect(ExitBTn,&QPushButton::clicked,this,&QDialog::accept);
+
+/*
+    ui->BeginBTn->setVisible(true);
+    ui->EndBTn->setVisible(true);
+    ui->ForwardBTn->setVisible(true);
+    ui->BackwardBTn->setVisible(true);
+*/
+    uriString wImg;
+    QIcon wBegICn ;
+
+    wImg = GeneralParameters.getIconDirectory();
+    wImg.addConditionalDirectoryDelimiter();
+    wImg += "backward.gif";
+    ui->BackwardBTn->setIcon(QIcon(QString(wImg.toCChar())));
+
+    wImg = GeneralParameters.getIconDirectory();
+    wImg.addConditionalDirectoryDelimiter();
+    wImg += "forward.gif";
+    ui->ForwardBTn->setIcon(QIcon(QString(wImg.toCChar())));
+
+    wImg = GeneralParameters.getIconDirectory();
+    wImg.addConditionalDirectoryDelimiter();
+    wImg += "tobegin.gif";
+    ui->BeginBTn->setIcon(QIcon(QString(wImg.toCChar())));
+
+    wImg = GeneralParameters.getIconDirectory();
+    wImg.addConditionalDirectoryDelimiter();
+    wImg += "toend.gif";
+    ui->EndBTn->setIcon(QIcon(QString(wImg.toCChar())));
+
+    wImg = GeneralParameters.getIconDirectory();
+    wImg.addConditionalDirectoryDelimiter();
+    wImg += "system-shutdown.png";
+    ExitBTn->setIcon(QIcon(QString(wImg.toCChar())));
+
+
+    utf8VaryingString wStr;
+
+    BlockCur.BlockSize=0L;
+    BlockCur.Address=0L;
+
+    FileSize=size_t(URICurrent.getFileSize());
+
+    setQLabelNum(ui->FileSizeLBl,FileSize);
+
+    AllFileLoaded=false;
+
+    BlockTBv = new ZQTableView(this);
+    BlockTBv->newModel(5);
+    BlockTBv->setGeometry(10,190,660,320);
+
+    //  BlockTBv->setContextMenuCallback(std::bind(&ZRawMasterFileVisu::VisuBvFlexMenuCallback, this,placeholders::_1));
+
+    QFont wVisuFont ("Monospace");
+    BlockTBv->setFont(wVisuFont);
+
+    //  ui->horizontalLayoutTBv->addWidget(BlockTBv);
+    //  ui->verticalLayoutTBv->addWidget(BlockTBv);
+    int wCol=0;
+    BlockTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem("Offset"));
+    BlockTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem("ZType hexa"));
+    BlockTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem("ZType"));
+    BlockTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem("Head.size"));
+    BlockTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem("Data size"));
+    BlockTBv->ItemModel->setHorizontalHeaderItem(wCol++,new QStandardItem("Field data"));
+
+
+    BlockDumpTBv=new ZQTableView(this);
+    BlockDumpTBv->setGeometry(10,190,660,320);
+    BlockDumpTBv->newModel(21);
+
+    BlockDumpTBv->setFont(wVisuFont);
+
+
+    //  BlockDumpTBv->setMouseClickCallback(std::bind(&ZRawMasterFileVisu::VisuMouseCallback, this,placeholders::_1,placeholders::_2)  );
+    // Deprecated
+    //  BlockDumpTBv->setContextMenuCallback(std::bind(&ZRawMasterFileVisu::VisuBvFlexMenuCallback, this,placeholders::_1));
+
+    VizuRaw = new VisuRaw(BlockDumpTBv,&RawRecord);
+    BlockDumpTBv->setContextMenuCallback(std::bind(&VisuRaw::VisuBvFlexMenuCallback, VizuRaw,placeholders::_1));
+
+
+    int wj=0;
+    int wk=0;
+    for (int wi=0;wi < 20;wi++) {
+        if (wk==4) {
+            wk=0;
+            BlockDumpTBv->ItemModel->setHorizontalHeaderItem(wi,new QStandardItem(" "));
+            continue;
+        }
+        wStr.sprintf("%d",wj);
+        BlockDumpTBv->ItemModel->setHorizontalHeaderItem(wi,new QStandardItem(wStr.toCChar()));
+        wj++;
+        wk++;
+    }
+    BlockDumpTBv->ItemModel->setHorizontalHeaderItem(20,new QStandardItem(tr("Ascii")));
+
+
+    BlockTBv->setVisible(false);
+    BlockDumpTBv->setVisible(true);
+}
 
 ZStatus
 ZRawMasterFileVisu::displayRawBlock(ZDataBuffer& pData, bool pTruncated) {
@@ -312,7 +353,7 @@ ZRawMasterFileVisu::displayRawBlock(ZDataBuffer& pData, bool pTruncated) {
 void
 ZRawMasterFileVisu::displayOneLine(int pRow,unsigned char* &wPtr,unsigned char* wPtrEnd) {
 
-  utf8String  wLineHexa,wLineAscii,wlineOffset;
+  utf8VaryingString  wLineHexa,wLineAscii,wlineOffset;
 
   wlineOffset.sprintf("%6d-%6X",FileOffset,FileOffset);
 
@@ -413,10 +454,7 @@ ZRawMasterFileVisu::searchNextValidZType(const ZDataBuffer& pRecord,
       wStr.sprintf("searchNextValidZType Found type %X <%s> address %ld as next valid data type.",
           wZType,decode_ZType(wZType),pAddress);
       ui->MessagePTe->appendPlainText(wStr.toCChar());
-/*
-      _DBGPRINT ("ZRawMasterFileVisu::searchNextValidZType-I-FND Found type %X <%s> address %ld.\n",
-          wZType,decode_ZType(wZType),pAddress)
-*/
+
       return ZS_FOUND;
     }
     utf8VaryingString wStr;
@@ -1049,10 +1087,6 @@ ZRawMasterFileVisu::displayURFBlock(ZDataBuffer & pData, bool pTruncated)
   wPtr += sizeof(ZBlockHeader_Export); /* NB: stored on file is ZBlockHeader and not ZBlockDescriptor (address is missing on file) */
 
   ZTypeBase wZType;
-//  size_t    wURFHeaderSize=0;
-//  uint64_t  wURFDataSize = 0;
-//  uint32_t  wKeyNb=0;
-//  zaddress_type wKeyAddress=0;
 
   /* leading user record size */
 /*  _importAtomic<uint64_t>(wURFDataSize,wPtr);
@@ -1085,7 +1119,7 @@ ZRawMasterFileVisu::displayURFBlock(ZDataBuffer & pData, bool pTruncated)
       wBSH.allocateUnitsBZero(wBitset.EffectiveBitSize+1);
       utf8_t* wPtrH=wBSH.Data;
       int wC=0 , wCC=0;
-      while (wC < int(wBitset.EffectiveBitSize+1)) {
+      while (wC < int(wBitset.EffectiveBitSize)) {
         if (wCC == 10)
           wCC=0;
         *wPtrH = utf8_t(wCC + '0');

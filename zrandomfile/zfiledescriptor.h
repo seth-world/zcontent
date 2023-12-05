@@ -4,7 +4,7 @@
 #include <config/zconfig.h>
 
 #include <ztoolset/zdatabuffer.h>
-#include <ztoolset/zutfstrings.h>
+#include <ztoolset/utfvaryingstring.h>
 #include <ztoolset/zsystemuser.h>
 
 #include <zrandomfile/zrandomfiletypes.h>
@@ -100,7 +100,7 @@ enum ZHeaderAccess_type : uint8_t
 class ZFDOwnData  // following is not saved on file and therefore doesn't need to be exported
 {
 public:
-  FILE*             FContent=nullptr;
+//  FILE*             FContent=nullptr;
   __FILEHANDLE__    ContentFd=0;
 //  FILE*             FHeader=nullptr;
   __FILEHANDLE__    HeaderFd=0;
@@ -147,7 +147,7 @@ public:
 
   ZFDOwnData& _copyFrom(const ZFDOwnData& pIn);
 
-  utf8String toXml(int pLevel);
+  utf8VaryingString toXml(int pLevel);
   /**
    * @brief fromXml loads header control block from its xml definition and return 0 when successfull.
    * When errors returns <>0 and pErrlog contains appropriate error messages.
@@ -197,7 +197,7 @@ public:
   ZStatus _close();
   void _forceClose();
 
-  //------------------uriStrings------------------------------------
+
   uriString& getURIContent(void) {return URIContent;}
 
 
@@ -364,7 +364,7 @@ protected:
 //      memset (this,0,sizeof(ZFDOwnData));
 //      FHeader=nullptr;
       HeaderFd=0;
-      FContent=nullptr;
+//      FContent=nullptr;
       ContentFd=0;
 
       Pid= getpid();  // get current pid for ZFileDescriptor
@@ -403,7 +403,7 @@ protected:
 //  void setupFCB (void);
   void clearFCB (void);
 
-  utf8String toXml(int pLevel, bool pComment=true);
+  utf8VaryingString toXml(int pLevel, bool pComment=true);
   /**
      * @brief fromXml loads file descriptor from its xml definition and returns ZS_SUCCESS when successfull.
      * When errors returns <>0 and pErrlog contains appropriate error messages.

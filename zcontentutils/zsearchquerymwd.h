@@ -1,17 +1,23 @@
 #ifndef ZSEARCHQUERYMWD_H
 #define ZSEARCHQUERYMWD_H
 
+
+/*
+namespace zbs {
+    typedef int ZCFMT_Type;
+}
+*/
+
 #include <memory>
 #include <QMainWindow>
 
 #include <ztoolset/utfvaryingstring.h>
 
 #include <zcontent/zindexedfile/zsearchentity.h>
-/*
-namespace Ui {
-class ZSearchQueryMWd;
-}
-*/
+#include <QPalette>
+
+//using namespace zbs;
+
 class QWidget;
 class QTextEdit;
 
@@ -23,6 +29,7 @@ class QPushButton;
 class QWidget;
 class QACtion;
 class QLabel;
+class ZQLabel;
 class QStandardItem;
 
 class QProgressBar;
@@ -31,8 +38,8 @@ class QProgressBar;
 class textEditMWn;
 namespace zbs {
   class ZSearchParser;
+  class ZHelp;
 }
-
 
 
 class ZSearchQueryMWd : public QMainWindow
@@ -43,7 +50,22 @@ public:
   explicit ZSearchQueryMWd(QWidget *parent = nullptr);
   ~ZSearchQueryMWd();
 
-  void setup();
+  ZQLabel *createZButton(const utf8VaryingString &pIconName,
+                         const utf8VaryingString &pToolTip,
+                         int wSize,
+                         QWidget *pParent);
+
+  ZQLabel* createBiStateZButton(const utf8VaryingString& pIconEnabled,
+                                const utf8VaryingString& pIconDisabled,
+                                const utf8VaryingString& pToolTip,
+                                int wSize,
+                                QWidget* pParent);
+
+  void initLayout();
+
+
+  void help();
+  void helpClose(QEvent *);
 
   void insertHighlightedText(const utf8VaryingString& pText);
   void recallForward() ;
@@ -64,18 +86,31 @@ public:
 
   void SaveInstructions();
 
-  void setProgressBarMax(int pMax);
-  void setProgressBarValue(int pValue);
+  void setProgressBarMax(int pMax, const utf8VaryingString &pStep);
+  void setProgressBarValue(int pValue, const utf8VaryingString &pStep);
+
+  ZStatus DisplayEntityRaw(std::shared_ptr<ZSearchEntity> &pEntity);
+  ZStatus DisplayEntity(std::shared_ptr<ZSearchEntity> pEntity, int pInstructionType, int pNumber);
 
   void DisplayCurrentEntity ();
-  QList<QStandardItem *> DisplayOneLine(int pRow, ZDataBuffer &pRecord, int *pCellFormat);
-  QStandardItem * DisplayOneURFField(const unsigned char* &pPtr, const unsigned char* wPtrEnd, int pCellFormat);
 
-private slots:
-  void QuitBTnClicked(bool pChecked);
-  void ExecuteBTnClicked(bool pChecked);
-  void ClearBTnClicked(bool pChecked);
-  void ListBTnClicked(bool pChecked);
+
+  QList<QStandardItem *> DisplayOneRawLine(ZDataBuffer &pRecord);
+
+  QStandardItem *DisplayOneURFFieldFromSurface(const unsigned char *&pPtr,
+                                               const unsigned char *wPtrEnd,
+                                               zbs::ZCFMT_Type pCellFormat);
+  QList<QStandardItem *> DisplayOneLine(ZArray<URFField> &pFields);
+
+  //  QStandardItem * DisplayOneURFField(URFField& pURFField, int pCellFormat);
+
+  void ClearLog();
+
+  private slots:
+
+//  void QuitBTnClicked(bool pChecked);
+//  void ClearBTnClicked(bool pChecked);
+//  void ListBTnClicked(bool pChecked);
   void ParseAndStoreQuery();
 
   void MenuTriggered(QAction* pAction);
@@ -83,8 +118,22 @@ private slots:
   void TableHeaderClicked(int pLogicalIndex);
 
   void TableHeaderCornerClicked();
+
+  void BackwardClicked();
+  void ForwardClicked();
+  void ExecuteClicked();
+  void QuitLBlClicked();
+  void TextClearLBlClicked();
+  void EntityListLBlClicked();
+
+
+
 private:
-  QWidget     *centralwidget=nullptr;
+  zbs::ZHelp*  HelpMWn=nullptr;
+  QWidget     *CentralWidget=nullptr;
+  QWidget*     QueryWDg = nullptr;
+  QWidget*     ExpWidget2 = nullptr;
+  QWidget*     ForBackWDg = nullptr;
 
   ZQPlainTextEdit   *QueryQTe=nullptr;
   ZQTableView *ResultTBv=nullptr;
@@ -94,35 +143,42 @@ private:
   QLabel*     RecordCountLBl=nullptr;
   QLabel*     LastStatusLBl=nullptr;
 
-  QWidget     *horizontalLayoutWidget=nullptr;
-  QWidget*    ExpWidget1=nullptr;
-  QWidget*    ExpWidget2=nullptr;
+  ZQLabel*    ForwardLBl=nullptr;
+  ZQLabel*    BackwardLBl=nullptr;
+  ZQLabel*    ExecuteLBl=nullptr;
+  ZQLabel*    EraseLBl=nullptr;
 
+  ZQLabel*    EntityListLBl=nullptr;
+  ZQLabel*    TextClearLBl=nullptr;
+  ZQLabel*    GlobalCellFmtLBl=nullptr;
 
-  QPushButton *ExecuteBTn=nullptr;
-  QPushButton *QuitBTn=nullptr;
-  QPushButton *ClearBTn=nullptr;
-  QPushButton *ListBTn=nullptr;
+  int LBlSize = 25;
+  int HeightMargin = 2;
+  int WidthMargin = 6 ;
 
   QMenuBar    *menubar;
   QStatusBar  *statusbar;
 
   QAction* ExecQAc=nullptr;
   QAction* QuitQAc=nullptr;
+  QAction* QuitIconQAc=nullptr;
 
   QAction* SaveInstructionsQAc=nullptr;
+
+  QAction* ClearLogQAc=nullptr;
 
   QAction*  OptReportQAc=nullptr;
   QAction*  OptNoVerboseQAc=nullptr;
   QAction*  OptVerboseQAc=nullptr;
   QAction*  OptFullVerboseQAc=nullptr;
 
-
-  QProgressBar* ProgressBar=nullptr;
-
   textEditMWn* displayMWn=nullptr;
 
   std::shared_ptr<ZSearchEntity> CurrentEntity=nullptr;
+
+  QPalette LabelDefaultPalette;
+  QPalette LabelBadPalette;
+  QPalette LabelGoodPalette;
 
   int IndexRecall             = -1;
   int LastHighlightPosition   = -1;

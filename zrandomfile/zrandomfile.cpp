@@ -4,29 +4,56 @@
 //#define __REPORT_POOLS__ 1
 //#define __ZRFVERBOSE__
 
-#include <zrandomfile/zrandomfile.h>
+#include "zrandomfile.h"
 
-#include <zrandomfile/zrandomfiletypes.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>  // for atexit, rand
+
+#include "zrandomfiletypes.h"
 
 #include <zcontentcommon/zcontentconstants.h>
-#include <zrandomfile/zrfcollection.h>
+#include "zrfcollection.h"
 #include <ztoolset/zdatabuffer.h>
 
 #include <ztoolset/charman.h>
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>  // for atexit
 #include <zxml/zxmlprimitives.h>
+
+#include <ztoolset/zexceptionmin.h>
+#include <functional>
 
 #include <limits.h>
 #include <zio/zioutils.h>
 
+#include <ztoolset/zaierrors.h>
+
+#include <zcontent/zcontentcommon/zgeneralparameters.h>
+
+#include "zrfutilities.h"
 
 namespace zbs {
 ZOpenZRFPool GZRFPool;
 ZOpenZRFPool* ZRFPool=&GZRFPool;
+
+
+ZOpenZRFPool::ZOpenZRFPool()
+{
+
+    ZException.setAbortCallBack(std::bind(&ZOpenZRFPool::abortCallBack,this));
+
 }
+void
+ZOpenZRFPool::abortCallBack()
+{
+    _DBGPRINT("ZOpenZRFPool Termination requested. Closing all open files before aborting.")
+    closeAll();
+    exit(2);
+}
+
+}//namespace zbs
+
+
 
 using namespace  zbs;
 ZStatus
@@ -75,7 +102,7 @@ ZOpenZRFPool::closeAll()
   ZException.setThrowOnSeverity(Severity_Highest);
 
   //    if (__ZRFVERBOSE__)
-  fprintf (stdout,"...Unlocking and closing all remaining open ZRandomFiles (if any)...\n");
+  fprintf (stdout,"ZOpenZRFPool...Unlocking and closing all remaining open ZRandomFiles (if any)...\n");
 
   while (size())
   {
@@ -100,8 +127,7 @@ ZOpenZRFPool::closeAll()
 
 
 //===================== Open ZRandomFiles management====================================================
-namespace zbs { // see <ztoolset/zmodulestack.h> for global/external conditional definition  (__USE_ZRANDOMFILE__ must be defined in zconfig.h)
-
+namespace zbs {
 
 // for ZOpenZRFPool methods see at beginning of <zrandomfile/zrandomfile.cpp>
 
@@ -548,7 +574,7 @@ ZRandomFile::setBlockExtentQuota (const size_t pBlockExtentQuota)
 #include <cstdio>
 
 ZStatus
-ZRandomFile::_removeFile(const char* pContentPath,bool pBackup, ZaiErrors *pErrorLog)
+ZRandomFile::_removeFile(const uriString& pContentPath,bool pBackup, ZaiErrors *pErrorLog)
 {
 
   ZStatus wSt=zopen(pContentPath,ZRF_All);
@@ -580,7 +606,7 @@ ZRandomFile::_removeFile(bool pBackup,ZaiErrors *pErrorLog)
     if ((wSt=zopen(ZRF_All))!=ZS_SUCCESS)
       {
         if (pErrorLog!=nullptr)
-          pErrorLog->logZException();
+          pErrorLog->logZExceptionLast();
         return wSt;
       }
   zclose();
@@ -589,14 +615,14 @@ ZRandomFile::_removeFile(bool pBackup,ZaiErrors *pErrorLog)
     wSt=URIHeader.renameBck("bck");
     if (wSt!=ZS_SUCCESS) {
       if (pErrorLog!=nullptr)
-        pErrorLog->logZException();
+        pErrorLog->logZExceptionLast();
       return wSt;
     }
 
   } else
       if ((wSt=URIHeader.remove())!=ZS_SUCCESS) {
         if (pErrorLog!=nullptr)
-          pErrorLog->logZException();
+          pErrorLog->logZExceptionLast();
       return wSt;
   }
 
@@ -608,14 +634,14 @@ ZRandomFile::_removeFile(bool pBackup,ZaiErrors *pErrorLog)
     wSt=URIContent.renameBck("bck");
     if (wSt!=ZS_SUCCESS) {
       if (pErrorLog!=nullptr)
-        pErrorLog->logZException();
+        pErrorLog->logZExceptionLast();
       return wSt;
     }
 
   } else
       if ((wSt=URIContent.remove())!=ZS_SUCCESS) {
         if (pErrorLog!=nullptr)
-            pErrorLog->logZException();
+            pErrorLog->logZExceptionLast();
         return wSt;
       }
   if (pErrorLog!=nullptr)
@@ -624,87 +650,201 @@ ZRandomFile::_removeFile(bool pBackup,ZaiErrors *pErrorLog)
 } //_removeFile
 
 ZStatus
-ZRandomFile::_renameBck(ZaiErrors* pErrorLog,const char* pBckExt)
+ZRandomFile::zcopyTo(const uriString& pOldContentName,
+                    const uriString& pNewContentName,
+                    uint8_t pFlag,     // see ZCopyManip_enum (zioutils.h)
+                    int pPayLoad,
+                    ZaiErrors* pErrorLog)
+{
+    ZRandomFile wZRF;
+    wZRF.setPath(pOldContentName);
+    return wZRF._copyTo(pNewContentName,pFlag,pPayLoad, pErrorLog);
+}
+
+ZStatus
+ZRandomFile::_copyTo(const uriString& pNewContentURI,
+                     uint8_t pFlag,
+                     int pPayLoad,  /* if -1 then defaulted to rawCopyPayLoad see setRawCopyPayLoad() (zioutils.h)*/
+                     ZaiErrors* pErrorLog)
 {
   ZStatus wSt;
+  /* if not open : must open exclusive to load header data and to insure no user is using it */
+  if (isOpen())
+      zclose();
+  wSt=zopen(ZRF_All);
+  if (wSt!=ZS_SUCCESS) {
+      if (pErrorLog!=nullptr)
+          pErrorLog->logZExceptionLast("ZRandomFile::_copyTo");
+      return wSt;
+  }
+  zclose();
+  uriString  wFormerContentURI= getURIContent();
+  uriString  wFormerHeaderURI = getURIHeader();
+  uriString wNewHeaderURI;
+  wSt = generateURIHeader(pNewContentURI,wNewHeaderURI)  ;
+  if (wSt!=ZS_SUCCESS) {
+      pErrorLog->logZExceptionLast("ZRandomFile::_copyTo");
+      return wSt;
+  }
+
+  if (wFormerContentURI.exists()) {
+
+      if (pFlag & ZMNP_Backup) {
+          ZRandomFile::renameBck(wFormerContentURI,pErrorLog,"bck");
+      }
+
+      if (pFlag & ZMNP_Replace) {
+        ZRandomFile::removeFile(wFormerContentURI,false,pErrorLog);
+      }
+  }
+
+  /* copies as it is header file, then content file */
+
+  wSt=rawCopy(wFormerHeaderURI,wNewHeaderURI,pFlag,pPayLoad,_progressCallBack,_progressSetupCallBack,pErrorLog);
+
+    if (wSt!=ZS_SUCCESS)
+        return wSt;
+
+  return rawCopy(wFormerContentURI,pNewContentURI,pFlag,pPayLoad,_progressCallBack,_progressSetupCallBack,pErrorLog);
+} //_renameTo
+
+
+int
+ZRandomFile::_getBckNumber(const char* pBckExt)
+{
+    uriString wNewContentURI, wNewHeaderURI;
+    int wNumber=0;
+    do {
+        wNumber ++;
+        wNewContentURI=URIContent;
+        wNewContentURI.addsprintf("_%s%02d",pBckExt,wNumber);
+        wNewHeaderURI=URIHeader;
+        wNewHeaderURI.addsprintf("_%s%02d",pBckExt,wNumber);
+    } while ((wNewContentURI.exists())||(wNewHeaderURI.exists()));
+
+    return wNumber;
+}
+
+int
+ZRandomFile::_testBckNumber(int pNumber,const char* pBckExt)
+{
+    uriString wNewContentURI, wNewHeaderURI;
+    int wNumber=pNumber;
+    do {
+        wNewContentURI=URIContent;
+        wNewContentURI.addsprintf("_%s%02d",pBckExt,wNumber);
+        wNewHeaderURI=URIHeader;
+        wNewHeaderURI.addsprintf("_%s%02d",pBckExt,wNumber);
+        wNumber ++;
+    } while ((wNewContentURI.exists())||(wNewHeaderURI.exists()));
+
+    return wNumber;
+}
+
+ZStatus
+ZRandomFile::_renameBck(ZaiErrors* pErrorLog,bool pNoExcept,const char* pBckExt)
+{
+  ZStatus wSt;
+  ZArray<uriString> wFileList;
   /* if not open : must open exclusive to load header data and to insure no user is using it */
   if (!isOpen())
     {
     if ((wSt=zopen(ZRF_All))!=ZS_SUCCESS)
       {
       if (pErrorLog!=nullptr)
-          pErrorLog->logZException();
+          pErrorLog->logZExceptionLast("ZRandomFile::_renameBck");
       return wSt;
       }
     }
   zclose();
-  int wFormerNumber = 1;
-  uriString  wFormerContentURI;
-  uriString  wFormerHeaderURI ;
 
-  do {
-      wFormerNumber ++;
-      wFormerContentURI=URIContent;
-      wFormerContentURI.addsprintf("_%s%02d",pBckExt,wFormerNumber);
-      wFormerHeaderURI=URIHeader;
-      wFormerHeaderURI.addsprintf("_%s%02d",pBckExt,wFormerNumber);
-  } while ((wFormerContentURI.exists())||(wFormerHeaderURI.exists()));
+  int wBckNumber = _testBckNumber(1,pBckExt);
 
-  int wRet= rename(URIContent.toCChar(),wFormerContentURI.toCChar());
-  if (wRet!=0)
-      {
-      ZException.getErrno(errno,
-          _GET_FUNCTION_NAME_,
-          ZS_FILEERROR,
-          Severity_Severe,
-          "During file creation : Error renaming existing file <%s> to <%s>\n",
-          URIContent.toCChar(),
-          wFormerContentURI.toCChar());
+  uriString  wNewContentURI;
+  uriString  wNewrHeaderURI ;
+  wNewContentURI.addsprintf("_%s%02d",pBckExt,wBckNumber);
+  wNewrHeaderURI.addsprintf("_%s%02d",pBckExt,wBckNumber);
 
-      if (pErrorLog!=nullptr)
-        pErrorLog->logZException();
-      return ZS_FILEERROR;
-      }
-  if (pErrorLog!=nullptr)
-        pErrorLog->textLog("%s>> renamed existing file <%s> to <%s> \n",
-                          _GET_FUNCTION_NAME_,
-                          URIContent.toCChar(),
-                          wFormerContentURI.toCChar());
+  wSt=rawRename(URIContent,wNewContentURI,pNoExcept,pErrorLog);
+  if (wSt!=ZS_SUCCESS)
+      return wSt;
 
-  wRet= rename(URIHeader.toCChar(),wFormerHeaderURI.toCChar());
-  if (wRet!=0)
-    {
-      ZException.getErrno(errno,
-          _GET_FUNCTION_NAME_,
-          ZS_FILEERROR,
-          Severity_Severe,
-          "During file creation : Error renaming existing file <%s> to <%s>\n",
-          URIHeader.toCChar(),
-          wFormerHeaderURI.toCChar());
-
-      if (pErrorLog!=nullptr)
-          pErrorLog->logZException();
-      return ZS_FILEERROR;
-    }
-
-    if (pErrorLog!=nullptr)
-      pErrorLog->textLog("%s>> renamed existing file <%s> to <%s> \n",
-          _GET_FUNCTION_NAME_,
-          URIHeader.toCChar(),
-          wFormerHeaderURI.toCChar());
-
-  return ZS_SUCCESS;
+  return rawRename(URIHeader,wNewrHeaderURI,pNoExcept,pErrorLog);
 } //_renameBck
+ZStatus
+ZRandomFile::renameTo(const uriString& pOldContentName,const uriString& pNewContentName, ZaiErrors* pErrorLog)
+{
+    ZRandomFile wZRF;
+    ZStatus wSt=wZRF.setPath(pOldContentName);
+    if (wSt!=ZS_SUCCESS) {
+
+    }
+    return wZRF._renameTo(pNewContentName,pErrorLog);
+}
 
 ZStatus
-ZRandomFile::renameBck(const char* pContentPath, ZaiErrors *pErrorLog, const char *pBckExt)
+ZRandomFile::_renameTo(const uriString& pNewContentName, ZaiErrors* pErrorLog)
+{
+  ZStatus wSt;
+  /* if not open : must open exclusive to load header data and to insure no user is using it */
+  if (isOpen())
+      zclose();
+  wSt=zopen(ZRF_All);
+  if (wSt!=ZS_SUCCESS) {
+      if (pErrorLog!=nullptr)
+          pErrorLog->logZExceptionLast("ZRandomFile::_renameTo");
+      return wSt;
+  }
+  zclose();
+  uriString  wFormerContentURI= getURIContent();
+  uriString  wFormerHeaderURI = getURIHeader();
+  uriString wNewHeaderName;
+  wSt = generateURIHeader(pNewContentName,wNewHeaderName)  ;
+  if (wSt!=ZS_SUCCESS) {
+      pErrorLog->logZExceptionLast("ZRandomFile::_renameTo");
+      return wSt;
+  }
+
+  wSt=wFormerHeaderURI.rename(wNewHeaderName);
+  if (wSt!=ZS_SUCCESS) {
+      pErrorLog->logZExceptionLast("ZRandomFile::_renameTo");
+      return wSt;
+  }
+  wSt=wFormerHeaderURI.rename(wNewHeaderName);
+  if (wSt!=ZS_SUCCESS) {
+      pErrorLog->logZExceptionLast("ZRandomFile::_renameTo");
+      return wSt;
+  }
+  if (pErrorLog!=nullptr)
+    pErrorLog->textLog("%s>> renamed file <%s> to <%s> \n",
+        "ZRandomFile::_renameTo",
+        wFormerHeaderURI.toCChar(),
+        wNewHeaderName.toCChar());
+
+  wSt=wFormerContentURI.rename(pNewContentName);
+  if (wSt!=ZS_SUCCESS) {
+      pErrorLog->logZExceptionLast("ZRandomFile::_renameTo");
+      return wSt;
+  }
+  if (pErrorLog!=nullptr)
+    pErrorLog->textLog("%s>> renamed file <%s> to <%s> \n",
+        "ZRandomFile::_renameTo",
+        wFormerContentURI.toCChar(),
+        pNewContentName.toCChar());
+
+  return ZS_SUCCESS;
+} //_renameTo
+
+
+ZStatus
+ZRandomFile::renameBck(const uriString& pContentPath, ZaiErrors *pErrorLog, const char *pBckExt)
 {
   ZRandomFile wZRF;
   ZStatus wSt=wZRF.zopen(pContentPath,ZRF_Exclusive);
   if (wSt!=ZS_SUCCESS)
     {
     if (pErrorLog!=nullptr)
-      pErrorLog->logZException();
+      pErrorLog->logZExceptionLast();
     return wSt;
     }
   return wZRF._renameBck(pErrorLog,pBckExt);
@@ -1579,7 +1719,7 @@ ZStatus
 ZRandomFile::_writeAllFileHeader()
 {
   ZDataBuffer wZDB;
-  if (ZVerbose & ZVB_FileEngine)
+  if (BaseParameters->VerboseFileEngine())
     _DBGPRINT("ZRandomFile::_writeAllFileHeader \n") // debug
 
 
@@ -1899,7 +2039,7 @@ ZRandomFile::_getFullFileHeader(bool pForceRead)
 ZStatus wSt;
 ZDataBuffer wHeaderContent;
 
-    if (ZVerbose & ZVB_FileEngine)
+    if (BaseParameters->VerboseFileEngine())
       _DBGPRINT("ZRandomFile::_getFullFileHeader \n") // debug
 
     if (getOpenMode() & ZRF_Exclusive)
@@ -2621,7 +2761,7 @@ zaddress_type wPreviousAddress;
       /* here previous block header has a state either free or deleted */
 
        wStartFreeBlockAddress=wPreviousAddress;            // grab this space !
-       if(ZVerbose & ZVB_MemEngine)
+       if(BaseParameters->VerboseMemEngine())
             _DBGPRINT("Grabbing previous free block : address %ld size %ld\n",
                       wPreviousAddress,
                       wPreviousBlockHeader.BlockSize)
@@ -2643,7 +2783,7 @@ zaddress_type wPreviousAddress;
 //  previous block start address + blockSize + 1 < freed block start address : there is a hole
 
       if (wStartFreeBlockAddress < ZBAT[pZBATRank].Address)   {   // yes there is a hole there
-        if(ZVerbose & ZVB_MemEngine)
+        if(BaseParameters->VerboseMemEngine())
           _DBGPRINT("Grabbing previous hole and/or block from address %ld\n", wStartFreeBlockAddress)
       }
         // else no Hole no Previous Free block : use current block address - as initialized
@@ -2669,7 +2809,7 @@ zaddress_type wPreviousAddress;
     if (wSt==ZS_FOUND)
       // if next block is free : grab its space and remove this block from freeblock pool
       if (wNextBlockHeader.State & (ZBS_Free & ZBS_Deleted) ) {
-        if(ZVerbose & ZVB_MemEngine)
+        if(BaseParameters->VerboseMemEngine())
           _DBGPRINT("Grabbing next free block from address %ld size %ld\n",
               wNextAddress,wNextBlockHeader.BlockSize)
 
@@ -2690,7 +2830,7 @@ zaddress_type wPreviousAddress;
     ZBAT[pZBATRank].Address     = wStartFreeBlockAddress;
     ZBAT[pZBATRank].BlockSize   = wSizeFreeSpace;
 
-    if(ZVerbose & ZVB_MemEngine)
+    if(BaseParameters->VerboseMemEngine())
       _DBGPRINT("Final block for ZBAT rank %ld is address %ld size %ld\n",
           ZBAT[pZBATRank].Address ,ZBAT[pZBATRank].BlockSize)
 
@@ -2730,7 +2870,7 @@ ZRandomFile::_grabHoleBefore(long &pHoleRankTBD,ZBlockDescriptor &pBS) {
     if (pBS.Address != (ZHOT[wgrab].Address+ZHOT[wgrab].BlockSize))
       continue;
 
-    if(ZVerbose & ZVB_MemEngine) {
+    if(BaseParameters->VerboseMemEngine()) {
         _DBGPRINT("ZRandomFile::_grabFreeSpaceLogical  Grabbing previous hole at address %ld size %ld\n",
             ZHOT[wgrab].Address, ZHOT[wgrab].BlockSize)
     }
@@ -2783,7 +2923,7 @@ ZRandomFile::_grabHoleAfter(long &pHoleRankTBD,ZBlockDescriptor &pBS) {
   if (wEndAddr != ZHOT[wgrab].Address) /* no hole following block */
     return;
 
-  if(ZVerbose & ZVB_MemEngine) {
+  if(BaseParameters->VerboseMemEngine()) {
         _DBGPRINT("ZRandomFile::_grabFreeSpaceLogical  Grabbing following hole at address %ld size %ld\n",
             ZHOT[wgrab].Address, ZHOT[wgrab].BlockSize)
   }
@@ -2811,7 +2951,7 @@ ZRandomFile::_grabFreeBefore(long &pFreeRankTBD,ZBlockDescriptor &pBS) {
     if (pBS.Address != (ZFBT[wgrab].Address + ZFBT[wgrab].BlockSize))
       continue;
 
-    if(ZVerbose & ZVB_MemEngine) {
+    if(BaseParameters->VerboseMemEngine()) {
       _DBGPRINT("ZRandomFile::_grabFreeSpaceLogical  Grabbing previous free block rank %ld at address %ld size %ld\n",
           wgrab,ZFBT[wgrab].Address, ZFBT[wgrab].BlockSize)
     }
@@ -2843,7 +2983,7 @@ ZRandomFile::_grabFreeAfter(long &pFreeRankTBD,ZBlockDescriptor &pBS) {
   if (wEndAddr != ZFBT[wgrab].Address) /* no hole following block */
     return;
 
-  if(ZVerbose & ZVB_MemEngine) {
+  if(BaseParameters->VerboseMemEngine()) {
     _DBGPRINT("ZRandomFile::_grabFreeSpaceLogical  Grabbing following free block rank %ld at address %ld size %ld\n",
         wgrab,ZFBT[wgrab].Address, ZFBT[wgrab].BlockSize)
   }
@@ -3019,7 +3159,7 @@ ZBlockDescriptor wBS;
         wSizeFreeSpace += ZFBT[wgrab].BlockSize ;
         wBS.BlockSize = wSizeFreeSpace ;
 
-        if(ZVerbose & ZVB_MemEngine) {
+        if(BaseParameters->VerboseMemEngine()) {
           _DBGPRINT("ZRandomFile::_grabFreeSpaceLogical  Grabbing previous free block : address %ld size %ld\n",
               ZFBT[wgrab].Address, ZFBT[wgrab].BlockSize)
         }
@@ -3046,7 +3186,7 @@ ZBlockDescriptor wBS;
         if (wStartFreeBlockAddress == (ZHOT[wgrab].Address+ZHOT[wgrab].BlockSize)) {
 
 
-          if(ZVerbose & ZVB_MemEngine) {
+          if(BaseParameters->VerboseMemEngine()) {
             _DBGPRINT("ZRandomFile::_grabFreeSpaceLogical  Grabbing previous hole at address %ld size %ld\n",
                 ZHOT[wgrab].Address, ZHOT[wgrab].BlockSize)
           }
@@ -3086,7 +3226,7 @@ ZBlockDescriptor wBS;
 
        // if block is not free or deleted (meaning allocated) in the pool : cannot grab it
        if ((ZFBT[wgrab].State != ZBS_Free) && (ZFBT[wgrab].State != ZBS_Deleted))  {
-          if(ZVerbose & ZVB_MemEngine) {
+          if(BaseParameters->VerboseMemEngine()) {
            _DBGPRINT("ZRandomFile::_grabFreeSpaceLogical  Found free block to grab but it is locked : address %ld size %ld - sate %s locked mask %uc reason %s \n",
                           ZFBT[wgrab].Address,
                           ZFBT[wgrab].BlockSize,
@@ -3097,7 +3237,7 @@ ZBlockDescriptor wBS;
 
        wEndAddress = ZFBT[wgrab].Address + ZFBT[wgrab].BlockSize;
 
-       if(ZVerbose & ZVB_MemEngine)
+       if(BaseParameters->VerboseMemEngine())
           _DBGPRINT("ZRandomFile::_grabFreeSpaceLogical Grabbing following free block : rank %ld address %ld size %ld\n",
              wgrab,
              ZFBT[wgrab].Address,
@@ -3141,7 +3281,7 @@ ZBlockDescriptor wBS;
 ZStatus
 ZRandomFile::_markBlockAsDeleted (zrank_type pRank)
 {
-    if(ZVerbose & ZVB_MemEngine)
+    if(BaseParameters->VerboseMemEngine())
         _DBGPRINT("ZRandomFile::_markBlockAsDeleted Marking block from Block Access Table as ZBS_Deleted- address %ld size %ld\n",
                   ZBAT[pRank].Address,
                   ZBAT[pRank].BlockSize)
@@ -3169,7 +3309,7 @@ ZStatus
 ZRandomFile::_recoverFreeBlock (zrank_type pRank)
 {
 ZStatus wSt;
-    if(ZVerbose & ZVB_MemEngine)
+    if(BaseParameters->VerboseMemEngine())
             _DBGPRINT("Recovering Free block from Free block Pool  address %ld size %ld\n",
                       ZFBT[pRank].Address,
                       ZFBT[pRank].BlockSize)
@@ -3260,7 +3400,7 @@ zaddress_type    wAddress;
 //zoffset_type    wRealAddress;
 ZDataBuffer     wBuffer;
 
-    if(ZVerbose & ZVB_FileEngine)
+    if(BaseParameters->VerboseFileEngine())
         _DBGPRINT("%s : scanning file surface for previous physical block for address %lld \n",_GET_FUNCTION_NAME_, pCurrentAddress);
 
 ZBlockHeader_Export*   wBlockHeader_Export=nullptr;
@@ -3276,7 +3416,7 @@ ssize_t wRewindQuota ;
     if (pCurrentAddress==ZFCB.StartOfData) // Only if it is not the first block for the file because 0L is the start address for File effective Data blocks
         {
         pPreviousAddress = ZFCB.StartOfData ;
-        if(ZVerbose & ZVB_FileEngine)
+        if(BaseParameters->VerboseFileEngine())
                 _DBGPRINT("%s : reaching beginning of data returning address %lld \n",_GET_FUNCTION_NAME_, pPreviousAddress);
         return (ZS_OUTBOUNDLOW);
         }
@@ -3318,7 +3458,7 @@ ssize_t wRewindQuota ;
         if (wAddress == ZFCB.StartOfData)  //! no start of block found till start of data : this is a hole since the beginning till current address
                     {
                     pPreviousAddress = ZFCB.StartOfData ;
-                    if(ZVerbose & ZVB_FileEngine)
+                    if(BaseParameters->VerboseFileEngine())
                             _DBGPRINT("%s : reaching beginning of data returning address %lld \n",_GET_FUNCTION_NAME_, pPreviousAddress);
                     return  (ZS_OUTBOUNDLOW);
                     }
@@ -3338,7 +3478,7 @@ ssize_t wRewindQuota ;
     if (wSt!=ZS_SUCCESS)
             {return  wSt;}
      pPreviousAddress = wAddress + wOffset;
-    if(ZVerbose & ZVB_FileEngine)
+    if(BaseParameters->VerboseFileEngine())
         _DBGPRINT("%s : found previous not deleted block returning address block header at address %lld \n",_GET_FUNCTION_NAME_, pPreviousAddress);
 
     return  (ZS_FOUND) ;
@@ -3390,8 +3530,14 @@ ssize_t         wSizeToRead=0;
 size_t          wAdvanceQuota;
 zaddress_type    wAddress;
 ZDataBuffer     wBuffer;
+size_t wFileSize =0;
 
-  off_t wFileSize = lseek(ContentFd,0,SEEK_END);  /* get file total size */
+  wSt=rawSeekEnd(ContentFd,wFileSize); /* get file total size */
+  if (wSt!=ZS_SUCCESS) {
+      ZException.setMessage("ZRandomFile::_searchNextPhysicalBlock",wSt,Severity_Error,"Error seeking end of file %s",URIContent.toString());
+      return wSt;
+  }
+
 
   wAdvanceQuota = sizeof(ZBlockHeader_Export) + (ZFCB.BlockTargetSize * 2); // user content target size * 2 must be OK
   wSizeToRead = sizeof(ZBlockHeader_Export) + (ZFCB.BlockTargetSize * 2); // user content target size * 2 must be OK
@@ -3399,7 +3545,7 @@ ZDataBuffer     wBuffer;
   if (off_t (wAddress + ZFCB.StartOfData + wSizeToRead) > wFileSize ) {
     wSizeToRead = wFileSize - (wAddress + ZFCB.StartOfData) ;
   }
-  unsigned char wStartSign [5]={cst_ZSTART_BYTE,cst_ZSTART_BYTE,cst_ZSTART_BYTE,cst_ZSTART_BYTE , 0 };
+  unsigned char wStartSign [5]={cst_ZFILESTART_BYTE,cst_ZFILESTART_BYTE,cst_ZFILESTART_BYTE,cst_ZFILESTART_BYTE , 0 };
 
     wBuffer.allocate(wSizeToRead);
     zaddress_type wOffset= -1;
@@ -3414,7 +3560,7 @@ ZDataBuffer     wBuffer;
       wBuffer.allocate(wSizeToRead);
     }
 
-    if ((wSt=_readAt(wBuffer,wSizeToRead,wAddress,ZPMS_Other))!=ZS_SUCCESS) {
+    if ((wSt= _readAt(wBuffer,wSizeToRead,wAddress,ZPMS_Other))!=ZS_SUCCESS) {
         if (wSt==ZS_EOF) {
           pNextAddress = wAddress;
           return  (ZS_EOF);
@@ -3461,6 +3607,96 @@ ZDataBuffer     wBuffer;
     return  (ZS_FOUND) ;
 }//_searchNextPhysicalBlock
 
+#ifdef __DEPRECATED__
+ZStatus
+ZRandomFile::_searchNextPhysicalBlock (zaddress_type pAddress,      // Address to start searching for for next block
+                                       zaddress_type &pNextAddress,
+                                       ZBlockHeader &pBlockHeader)  // ZBlockDescriptor is a ZBlockHeader + Address of block as an offset in file
+{
+
+ZStatus         wSt;
+ssize_t         wSizeToRead=0;
+size_t          wAdvanceQuota;
+zaddress_type    wAddress;
+ZDataBuffer     wBuffer;
+size_t wFileSize =0;
+
+  wSt=rawSeekEnd(ContentFd,wFileSize); /* get file total size */
+  if (wSt!=ZS_SUCCESS) {
+      ZException.setMessage("ZRandomFile::_searchNextPhysicalBlock",wSt,Severity_Error,"Error seeking end of file %s",URIContent.toString());
+      return wSt;
+  }
+
+
+  wAdvanceQuota = sizeof(ZBlockHeader_Export) + (ZFCB.BlockTargetSize * 2); // user content target size * 2 must be OK
+  wSizeToRead = sizeof(ZBlockHeader_Export) + (ZFCB.BlockTargetSize * 2); // user content target size * 2 must be OK
+  wAddress = pAddress;
+  if (off_t (wAddress + ZFCB.StartOfData + wSizeToRead) > wFileSize ) {
+    wSizeToRead = wFileSize - (wAddress + ZFCB.StartOfData) ;
+  }
+  unsigned char wStartSign [5]={cst_ZFILESTART_BYTE,cst_ZFILESTART_BYTE,cst_ZFILESTART_BYTE,cst_ZFILESTART_BYTE , 0 };
+
+    wBuffer.allocate(wSizeToRead);
+    zaddress_type wOffset= -1;
+
+  while (wOffset==-1) {
+    if (wAddress >= wFileSize) {
+      pAddress = wAddress;
+      return ZS_EOF;
+    }
+    if (off_t (wAddress + ZFCB.StartOfData + wSizeToRead) > wFileSize ) {
+      wSizeToRead = wFileSize - (wAddress + ZFCB.StartOfData) ;
+      wBuffer.allocate(wSizeToRead);
+    }
+
+    if ((wSt= _readAt(wBuffer,wSizeToRead,wAddress,ZPMS_Other))!=ZS_SUCCESS) {
+        if (wSt==ZS_EOF) {
+          pNextAddress = wAddress;
+          return  (ZS_EOF);
+        }
+        if (wSt==ZS_READPARTIAL)
+           {
+            wOffset=wBuffer.bsearch(wStartSign,4L,0L);
+            if (wOffset<0)
+                {
+              /* assume that wStartSign is truncated at the end of wBuffer (max will be 3 bytes) */
+                pNextAddress = wBuffer.Size + wAddress - 3 ;
+                return  (ZS_EOF);
+                }
+                else
+                {
+                 pNextAddress = wAddress + wOffset;
+                 wSt=pBlockHeader._importConvert(pBlockHeader,(ZBlockHeader_Export*)&wBuffer.Data[wOffset]);
+                 if (wSt!=ZS_SUCCESS)
+                             { return (wSt); }
+                 return  (ZS_FOUND) ;
+                 }
+           }// ZS_READPARTIAL
+        return  wSt;  // file error to be returned
+        }
+
+      wOffset=wBuffer.bsearch(wStartSign,4L,0L);
+      if (wOffset==-1) {
+        if (off_t (wAddress + ZFCB.StartOfData + wAdvanceQuota) > wFileSize ) {
+          wAdvanceQuota = wFileSize - (wAddress + ZFCB.StartOfData) ;
+          if (wAdvanceQuota == 0) {
+            pNextAddress = wAddress;
+            return  (ZS_EOF);
+          }
+
+        }
+        wAddress += wAdvanceQuota ;
+      }
+  }// while (wOffset==-1)
+
+     pNextAddress = wAddress + wOffset;
+     wSt=pBlockHeader._importConvert(pBlockHeader,(ZBlockHeader_Export*)&wBuffer.Data[wOffset]);
+     if (wSt!=ZS_SUCCESS)
+                 { return (wSt); }
+    return  (ZS_FOUND) ;
+}//_searchNextPhysicalBlock
+#endif // __DEPRECATED__
+
 /**
  * @brief ZRandomFile::_getFreeBlockEngine Delivers a free block of size pRequestedSize.
  *
@@ -3504,7 +3740,7 @@ ZDataBuffer     wBuffer;
 long
 ZRandomFile::_getFreeBlockEngine (const size_t pRequestedSize, const zaddress_type pBaseAddress)
 {
-  if(ZVerbose & ZVB_MemEngine)
+  if(BaseParameters->VerboseMemEngine())
     _DBGPRINT("ZRandomFile::_getFreeBlockEngine Request for free block of minimum size %ld \n", pRequestedSize)
 
   for (long wi=0;wi<ZFBT.size();wi ++) {
@@ -3517,7 +3753,7 @@ ZRandomFile::_getFreeBlockEngine (const size_t pRequestedSize, const zaddress_ty
       continue;
 
     if (pRequestedSize <= ZFBT.Tab(wi).BlockSize)  {               // Sizes match
-      if(ZVerbose & ZVB_MemEngine)
+      if(BaseParameters->VerboseMemEngine())
         _DBGPRINT("ZRandomFile::_getFreeBlockEngine found block in pool index %ld address %ld state %s size %ld - requested size %ld \n",
             wi,
             ZFBT.Tab(wi).Address,
@@ -3530,7 +3766,7 @@ ZRandomFile::_getFreeBlockEngine (const size_t pRequestedSize, const zaddress_ty
     }// if pSize
   }// for
 
-  if(ZVerbose & ZVB_MemEngine)
+  if(BaseParameters->VerboseMemEngine())
     _DBGPRINT( "ZRandomFile::_getFreeBlockEngine not found block in pool : expanding file \n");
 
   /* -----------------------------------------------------------------------------------------------------------
@@ -3664,18 +3900,20 @@ ZRandomFile::checkSplitFreeBlock (long pZFBTRank, size_t pRequestedSize){
   ZStatus wSt;
 
   if (pRequestedSize==0) {  /* just to debug */
+      _DBGPRINT("ZRandomFile::checkSplitFreeBlock-F-INCONS Program inconsistency : requested size is Zero\n")
     abort();
   }
 /* test program usage error */
   if (pRequestedSize > ZFBT[pZFBTRank].BlockSize) {
+      _DBGPRINT("ZRandomFile::checkSplitFreeBlock-F-INCONS Program inconsistency : requested size <%ld> greater than Free block table element size <%ld>\n",pRequestedSize,ZFBT[pZFBTRank].BlockSize)
     abort();
   }
-#ifdef __DEPRECATED__  // no more use of Deleted block pool
+#ifdef __DEPRECATED__  // no more use of Deleted block pool. Deleted blocks are part of ZFBT free blocks table
   if (ZFBT[pZFBTRank].State & ZBS_Deleted) {
     for (long wi=0; wi < ZDBT.count();wi++) {
       if (ZDBT[wi].Address==ZFBT[pZFBTRank].Address) {
         ZDBT.erase(wi);
-        if(ZVerbose & ZVB_MemEngine)
+        if(BaseParameters->VerboseMemEngine())
           _DBGPRINT( "ZRandomFile::checkSplitFreeBlock  Removed block from deleted pool rank %ld address %ld size %ld.\n",wi, ZDBT.Tab(wi).Address,ZDBT.Tab(wi).BlockSize)
         break;
       }
@@ -3683,14 +3921,14 @@ ZRandomFile::checkSplitFreeBlock (long pZFBTRank, size_t pRequestedSize){
   } // if (ZFBT[pZFBTRank].State & ZBS_Deleted)
 #endif // __DEPRECATED__
 
-  if(ZVerbose & ZVB_MemEngine)
+  if(BaseParameters->VerboseMemEngine())
     _DBGPRINT( "ZRandomFile::checkSplitFreeBlock  Requested size %ld - given free block size %ld address %ld.\n",
         pRequestedSize,ZFBT[pZFBTRank].BlockSize,ZFBT[pZFBTRank].Address)
 
   /* see <when found or extended> found : must adjust sizes. Free block size must correspond exactly to requested size */
   if (pRequestedSize==ZFBT[pZFBTRank].BlockSize) {
 
-    if(ZVerbose & ZVB_MemEngine)
+    if(BaseParameters->VerboseMemEngine())
       _DBGPRINT( "ZRandomFile::checkSplitFreeBlock  Sizes match. No split.\n")
     ZFBT[pZFBTRank].State =  ZBS_Allocated ;
     return pZFBTRank;
@@ -3713,7 +3951,7 @@ ZRandomFile::checkSplitFreeBlock (long pZFBTRank, size_t pRequestedSize){
   if (wNewBlock.BlockSize < sizeof(ZBlockHeader_Export)) {
     wNewBlock.State = ZBS_Hole;
     zrank_type wZHOTRank = ZHOT._addSorted(wNewBlock);
-    if(ZVerbose & ZVB_MemEngine)
+    if(BaseParameters->VerboseMemEngine())
       _DBGPRINT( "ZRandomFile::checkSplitFreeBlock  Remaining from split is sized %ld and is added to hole pool address %ld size %ld.\n",
           wNewBlock.BlockSize ,ZHOT[wZHOTRank].Address,ZHOT[wZHOTRank].BlockSize)
   }
@@ -3721,11 +3959,11 @@ ZRandomFile::checkSplitFreeBlock (long pZFBTRank, size_t pRequestedSize){
     /* if enough space : create new block header on file surface */
     wNewBlock.State = ZBS_Free;
     zrank_type wNewZFBTRank = ZFBT._addSorted(wNewBlock);/* create new entry within free block pool */
-    if(ZVerbose & ZVB_MemEngine)
+    if(BaseParameters->VerboseMemEngine())
       _DBGPRINT( "ZRandomFile::checkSplitFreeBlock  Creating new splitted free block entry in ZFBT pool at rank %ld of size %ld address %ld.\n",
           wNewZFBTRank , wNewBlock.BlockSize , wNewBlock.Address)
 
-    if(ZVerbose & ZVB_MemEngine)
+    if(BaseParameters->VerboseMemEngine())
       _DBGPRINT( "ZRandomFile::checkSplitFreeBlock  Creating and writing to file block header remaining from split at address %ld size %ld.\n",
           ZFBT[wNewZFBTRank].Address,ZFBT[wNewZFBTRank].BlockSize)
 
@@ -3747,7 +3985,7 @@ ZRandomFile::checkSplitFreeBlock (long pZFBTRank, size_t pRequestedSize){
 
   /* update block header to file */
 
-  if(ZVerbose & ZVB_MemEngine)
+  if(BaseParameters->VerboseMemEngine())
     _DBGPRINT( "ZRandomFile::checkSplitFreeBlock  Updating to file free block header at address <%ld> with new size <%ld>.\n",
         ZFBT[pZFBTRank].Address,ZFBT[pZFBTRank].BlockSize)
 
@@ -3843,7 +4081,7 @@ zaddress_type    wNewOffset , wNewFileSize;
     pBlockDesc.Address    = wNewOffset ;
     pBlockDesc.BlockSize  = wExtentSize ;
 
-    if(ZVerbose & ZVB_MemEngine)
+    if(BaseParameters->VerboseMemEngine())
         _DBGPRINT(" extended file from offset %ld for size %ld for requested size %ld\n", wNewOffset, wExtentSize, pExtentSize);
     return   ZS_SUCCESS;
 }//_getExtent
@@ -4027,7 +4265,7 @@ ZRandomFile::_add2Phases_Prepare(const ZDataBuffer &pUserContent,
 
 
 //    CurrentRecord = pUserBuffer;
-  if(ZVerbose & ZVB_MemEngine)
+  if(BaseParameters->VerboseMemEngine())
     _DBGPRINT("ZRandomFile::_add2Phases_Prepare prepare to add block at %ld size %ld state %s to ZBAT rank %ld\n",
         ZBAT[pZBATIndex].Address,
         ZBAT[pZBATIndex].BlockSize,
@@ -4074,7 +4312,7 @@ ZBlock  wBlock;
       return  wSt;
     }
 
-    if(ZVerbose & ZVB_MemEngine)
+    if(BaseParameters->VerboseMemEngine())
       _DBGPRINT("ZRandomFile::_add2Phases_Commit-- commit appending block rank %ld @ %ld size %ld \n",
           pZBATIndex,
           ZBAT[pZBATIndex].Address,
@@ -4524,7 +4762,7 @@ zaddress_type wLogicalAddress=0;
 zrank_type
 ZRandomFile::_moveZBAT2ZFBT(const zrank_type &pZBATRank) {
 
-  if(ZVerbose & ZVB_MemEngine)
+  if(BaseParameters->VerboseMemEngine())
     _DBGPRINT("ZRandomFile::_moveZBAT2ZFBT Deleting ZBAT block rank %ld size %ld address %ld\n",
         pZBATRank,ZBAT[pZBATRank].BlockSize,ZBAT[pZBATRank].Address)
 
@@ -4629,7 +4867,7 @@ ZRandomFile::_replace( const ZDataBuffer &pUserContent, const zrank_type pZBATRa
   if (wSt!=ZS_SUCCESS)
     goto _replace_Errored;
 
-  if(ZVerbose & ZVB_MemEngine)
+  if(BaseParameters->VerboseMemEngine())
     _DBGPRINT("ZRandomFile::_replace Replaced ZBAT block rank %ld size %ld address %ld with block size %ld address %ld\n",
         pZBATRank,
         ZFBT[pFreeBlockRank].BlockSize,ZFBT[pFreeBlockRank].Address,
@@ -4723,7 +4961,7 @@ size_t wNeededSize = pUserBuffer.Size + sizeof(ZBlockHeader_Export);
 
   ZFBT.erase(pFreeBlockRank) ;
 
-  if (ZVerbose & ZVB_MemEngine)
+  if (BaseParameters->VerboseMemEngine())
     _DBGPRINT("ZRandomFile::_insert2Phases_Prepare prepare to insert block at %ld size %ld state %s to ZBAT rank %ld\n",
         ZBAT[pZBATIndex].Address,
         ZBAT[pZBATIndex].BlockSize,
@@ -4761,7 +4999,7 @@ ZBlock  wBlock;
       ZException.last().setComplement("during _insert2Phases_Commit");
       return  wSt;
     }
-    if(ZVerbose & ZVB_MemEngine)
+    if(BaseParameters->VerboseMemEngine())
       _DBGPRINT("ZRandomFile::_insert2Phases_Commit-- commit inserting block rank %ld @ %ld size %ld \n",
           pZBATIndex,
           ZBAT[pZBATIndex].Address,
@@ -5534,15 +5772,17 @@ ZRandomFile::_getByRank(ZBlock &pBlock,
                         zaddress_type &pPhysicalAddress)
 {
 ZStatus wSt;
-    if ((wSt=testRank(pRank,_GET_FUNCTION_NAME_))!=ZS_SUCCESS)
-                {
-                ZException.addToLast("| Wrong status getting block rank %ld status %s for file %s",
+    if ((wSt=testRank(pRank,_GET_FUNCTION_NAME_))!=ZS_SUCCESS) {
+        if (wSt==ZS_OUTBOUNDHIGH)
+            wSt=ZS_EOF;
+        else
+            ZException.addToLast("| Wrong status getting block rank %ld status %s for file %s",
                                        pRank,
                                        decode_ZStatus(wSt),
                                        URIContent.toString());
 
-                return (wSt); // can be out of boundaries (program issue) OR locked for deletion - locked for creation (concurrent access)
-                }
+        return (wSt); // can be out of boundaries (program issue) OR locked for deletion - locked for creation (concurrent access)
+    }
 
     setRank(pRank);
 // should test lock here
@@ -5655,7 +5895,7 @@ ZRandomFile::_ZRFopen(zmode_type pMode, const ZFile_type pFileType, bool pLockRe
 {
 ZStatus wSt=ZS_SUCCESS;
 
-    if (__ZRFVERBOSE__)
+    if (BaseParameters->VerboseFileEngine())
       _DBGPRINT("ZRandomFile::_open-I-OPENNING Openning file <%s>.\n",URIContent.toCChar()) // debug
 
     if (_isOpen) {
@@ -5758,7 +5998,8 @@ ZStatus wSt=ZS_SUCCESS;
         case ZFT_ZMasterFile :
         case ZFT_ZRawMasterFile :
         case ZFT_ZIndexFile :
-        case ZFT_DictionaryFile :
+        case ZFT_ZDicMasterFile :
+//        case ZFT_DictionaryFile :
           break;
         default:
           _forceClose();
@@ -5812,7 +6053,7 @@ ZStatus wSt=ZS_SUCCESS;
             ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_BADFILETYPE,
                                     Severity_Error,
-                                    "file %s cannot be opened : invalid given type <%s> while expected <%s>",
+                                    "file %s cannot be opened : invalid given type <%s> while found <%s>",
                                     URIContent.toString(),
                                     decode_ZFile_type (pFileType),
                                     decode_ZFile_type (ZHeader.FileType));
@@ -5848,7 +6089,7 @@ ZStatus wSt=ZS_SUCCESS;
           ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_BADFILETYPE,
                                     Severity_Error,
-                                    "file %s cannot be opened : invalid given type <%s> while expected <%s>",
+                                    "file %s cannot be opened : invalid given type <%s> while found <%s>",
                                     URIContent.toString(),
                                     decode_ZFile_type (pFileType),
                                     decode_ZFile_type (ZHeader.FileType));
@@ -5881,7 +6122,7 @@ ZStatus wSt=ZS_SUCCESS;
           ZException.setMessage(_GET_FUNCTION_NAME_,
                                     ZS_BADFILETYPE,
                                     Severity_Error,
-                                    "file %s cannot be opened : invalid given type <%s> while expected <%s>",
+                                    "file %s cannot be opened : invalid given type <%s> while found <%s>",
                                     URIContent.toString(),
                                     decode_ZFile_type (pFileType),
                                     decode_ZFile_type (ZHeader.FileType));
@@ -5911,7 +6152,7 @@ ZStatus wSt=ZS_SUCCESS;
                 ZException.setMessage(_GET_FUNCTION_NAME_,
                     ZS_FILETYPEWARN,
                     Severity_Warning,
-                    "file %s has been opened but given type is <%s> while expected <%s>",
+                    "file %s has been opened but given type is <%s> while found <%s>",
                     URIContent.toString(),
                     decode_ZFile_type (pFileType),
                     decode_ZFile_type (ZHeader.FileType));
@@ -5923,7 +6164,7 @@ ZStatus wSt=ZS_SUCCESS;
               ZException.setMessage(_GET_FUNCTION_NAME_,
                   ZS_BADFILETYPE,
                   Severity_Error,
-                  "file %s cannot be opened : invalid given type <%s> while expected <%s>",
+                  "file %s cannot be opened : invalid given type <%s> while found <%s>",
                   URIContent.toString(),
                   decode_ZFile_type (pFileType),
                   decode_ZFile_type (ZHeader.FileType));
@@ -5936,7 +6177,7 @@ ZStatus wSt=ZS_SUCCESS;
         ZException.setMessage(_GET_FUNCTION_NAME_,
                                 ZS_BADFILETYPE,
                                 Severity_Error,
-                                "file %s cannot be opened : invalid given type <%s> while expected <%s>",
+                                "file %s cannot be opened : invalid given type <%s> while found <%s>",
                                 URIContent.toString(),
                                 decode_ZFile_type (pFileType),
                                 decode_ZFile_type (ZHeader.FileType));
@@ -6361,9 +6602,9 @@ ZStatus wSt;
 
 //----------------------XML Routines----------------------------------------
 
-utf8String ZRandomFile::toXml(int pLevel,bool pComment)
+utf8VaryingString ZRandomFile::toXml(int pLevel,bool pComment)
 {
-  utf8String wReturn = fmtXMLnode("file",pLevel);
+  utf8VaryingString wReturn = fmtXMLnode("file",pLevel);
 
   wReturn += fmtXMLint("filetype",int(ZFT_ZRandomFile),pLevel+1);
   if (pComment)
@@ -6375,9 +6616,9 @@ utf8String ZRandomFile::toXml(int pLevel,bool pComment)
   return wReturn;
 } // ZRandomFile:toXml
 
-utf8String ZRandomFile::XmlSaveToString(bool pComment)
+utf8VaryingString ZRandomFile::XmlSaveToString(bool pComment)
 {
-utf8String wReturn = fmtXMLdeclaration();
+utf8VaryingString wReturn = fmtXMLdeclaration();
   wReturn += fmtXMLnodeWithAttributes("zicm","version",__ZRF_VERSION_CHAR__,0);
 
   wReturn += toXml(0,pComment);
@@ -6391,7 +6632,7 @@ ZStatus ZRandomFile::XmlSaveToFile(uriString &pXmlFile,bool pComment)
   bool wExist=pXmlFile.exists();
   ZStatus wSt;
   ZDataBuffer wOutContent;
-  utf8String wContent = XmlSaveToString(pComment);
+  utf8VaryingString wContent = XmlSaveToString(pComment);
 
   wOutContent.setData(wContent.toCChar(), wContent.ByteSize);
 
@@ -6420,9 +6661,9 @@ ZStatus wSt;
   pErrorlog.setAutoPrintOn(ZAIES_Text);
 
     uriString uriOutput;
-    utf8String wOutPath;
-    utf8String wLogPath;
-    utf8String wOutBase;
+    utf8VaryingString wOutPath;
+    utf8VaryingString wLogPath;
+    utf8VaryingString wOutBase;
     uriOutput= pZRandomFileName;
     wOutBase = uriOutput.getBasename();
     wOutPath = uriOutput.getDirectoryPath();
@@ -6474,8 +6715,8 @@ ZRandomFile::XmlWriteFileDefinition (FILE *pOutput)
         if (pOutput==nullptr)
         {
 
-            utf8String OutPath;
-            utf8String OutBase;
+            utf8VaryingString OutPath;
+            utf8VaryingString OutBase;
 
             uriOutput = URIContent.toString();
             OutBase = uriOutput.getBasename();
@@ -6674,13 +6915,6 @@ if (wZRF.Output==nullptr)
 
 
 
-void
-ZRandomFile::zfullDump(const int pColumn,FILE* pOutput)       // full dump current ZRF
-{
-    zfullDump(URIContent,pColumn,pOutput);
-    return;
-}
-
 
 
 
@@ -6747,8 +6981,8 @@ void ZRandomFile::_blockDump (const long pRank,const int pColumn)
       getURIContent().toUtf());
 
 
-  utf8String wRulerHexa;
-  utf8String wRulerAscii;
+  utf8VaryingString wRulerHexa;
+  utf8VaryingString wRulerAscii;
   ZBlock wBlock;
   zaddress_type wAddress;
 
@@ -6770,19 +7004,19 @@ void ZRandomFile::_blockDump (const long pRank,const int pColumn)
 } // _blockDump
 
 
-ZStatus ZRandomFile::zsurfaceScan(const uriString pURIContent, FILE *pOutput)
+ZStatus ZRandomFile::zsurfaceScan(const uriString pURIContent, ZaiErrors* pErrorLog)
 {
 ZStatus wSt;
 
 ZRandomFile wZRF;
-
+    pErrorLog->setStoreSeverityAtLeast(ZAIES_Info);
     wSt=wZRF.setPath(pURIContent);  // generates also Header file structures within ZFileDescriptor
     if (wSt!=ZS_SUCCESS)
       {
       return wSt;
       }
 
-    wZRF.set_Output(pOutput);
+ //   wZRF.set_Output(pOutput);
     wSt=wZRF._ZRFopen(ZRF_Read_Only,ZFT_Any);
     if (wSt!=ZS_SUCCESS)
                 {
@@ -6794,18 +7028,19 @@ ZRandomFile wZRF;
                 ZException.addToLast("Error while getting header file %s for ZRF file %s",
                 wZRF.getURIHeader().toCChar(),
                 wZRF.getURIContent().toCChar());
+                pErrorLog->logZExceptionLast("ZRandomFile::zsurfaceScan");
                 return wSt;
                 }
 
-    wZRF._print(
+    pErrorLog->textLog(
             "        --------------ZRandomFile Surface Analysis Utility------------------\n"
             "         File %s\n"
-            "        --------------------------------------------------------------------\n",
+            "        --------------------------------------------------------------------",
                     wZRF.getURIContent().toString());
 
 
-    wZRF._headerDump();
-    wZRF._surfaceScan();
+    wZRF._headerDump(pErrorLog);
+    wZRF._surfaceScan(pErrorLog);
     return wZRF.zclose();
 
 }//zsurfaceScan
@@ -6813,11 +7048,11 @@ ZRandomFile wZRF;
 //! @cond Development
 
 ZStatus
-ZRandomFile::_surfaceScan()
+ZRandomFile::_surfaceScan(ZaiErrors* pErrorLog)
  {
 ZStatus wSt;
-
-  _print("\n___________________________Content Data blocks in physical order___________________________________");
+  pErrorLog->setStoreSeverityAtLeast(ZAIES_Info);
+  pErrorLog->textLog("\n___________________________Content Data blocks in physical order___________________________________");
 
   wSt=ZS_SUCCESS;
 
@@ -6828,7 +7063,7 @@ zsize_type    wOldSize = 0;
 zaddress_type wAddressNext = 0;
 zaddress_type wTheoricAddress = 0;
 
-    _print(
+    pErrorLog->textLog(
              "Physical address    |   State       | Block size         | User content size  | Theorical next Add\n"
              "____________________|_______________|____________________|____________________|____________________"
              );
@@ -6843,7 +7078,7 @@ zaddress_type wTheoricAddress = 0;
                         break;
 
         if (wBlockHeader.State==ZBS_Deleted) {
-          _print( "--%18ld|%15s|%20ld|%20ld|%20s",
+          pErrorLog->textLog( "--%18ld|%15s|%20ld|%20ld|%20s",
                     wAddressNext,
                     decode_ZBS( wBlockHeader.State),
                     wBlockHeader.BlockSize,
@@ -6859,13 +7094,13 @@ zaddress_type wTheoricAddress = 0;
     while (wSt==ZS_FOUND) {
         wTheoricAddress = wOldAddress+wOldSize;
         if (wAddressNext!=wTheoricAddress) {
-          _print( "%20ld|%15s|%20ld|                    |",
+          pErrorLog->textLog( "%20ld|%15s|%20ld|                    |",
                             wTheoricAddress,
                             "--- <Hole> ---",
                             wAddressNext-wTheoricAddress
                             );
         }
-        _print( "%20ld|%15s|%20ld|%20ld|%20ld",
+        pErrorLog->textLog( "%20ld|%15s|%20ld|%20ld|%20ld",
                 wAddressNext,
                 decode_ZBS( wBlockHeader.State),
                 wBlockHeader.BlockSize,
@@ -6886,7 +7121,7 @@ zaddress_type wTheoricAddress = 0;
                         break;
 
             if (wBlockHeader.State==ZBS_Deleted) {
-              _print("--%18lld|%15s|%20lld|%20lld|%20s",
+              pErrorLog->textLog("--%18lld|%15s|%20lld|%20lld|%20s",
                         wAddressNext,
                         decode_ZBS( wBlockHeader.State),
                         wBlockHeader.BlockSize,
@@ -6900,11 +7135,11 @@ zaddress_type wTheoricAddress = 0;
     }// while ZS_FOUND
 
     if (wSt==ZS_EOF) {
-        _print("\n       **** End of File reached at address <%lld> *****",
+        pErrorLog->textLog("\n       **** End of File reached at address <%lld> *****",
                 wAddressNext);
     }
     else {
-      _print(ZException.last().formatFullUserMessage(false));
+      pErrorLog->logZExceptionLast("_surfaceScan");;
     }
     return wSt;
 } // _physicalcontentDump
@@ -6912,12 +7147,284 @@ zaddress_type wTheoricAddress = 0;
 
 
 
-
+const utf8_t cst_DigitSep = '\'';
 
 //! @endcond
+
+utf8VaryingString fmtIntWDigSep (long pInt,int pDisplaySize)
+{
+    utf8VaryingString wN ,wReturn ;
+    wN.sprintf("%ld",pInt);
+
+    size_t wS=wN.strlen();
+
+    wReturn.allocateUnitsBZero(wS+5L);
+
+    utf8_t* wNPtr=wN.Data+wS-1 ;
+
+    utf8_t* wRetPtr=wReturn.Data ;
+    utf8_t* wRetPtrEnd=wReturn.Data+wReturn.UnitCount ;
+
+    if ((*wNPtr =='-')||(*wNPtr =='+') ) {
+        *wRetPtr++ = *wNPtr-- ;
+    }
+    int wSk=3;
+    while (wNPtr >= wN.Data) {
+        if (wRetPtr >= wRetPtrEnd) {
+            wReturn.extendUnitsBZero(5L);
+            wRetPtrEnd += 5;
+            continue;
+        }
+        if (!wSk--) {
+            wSk = 3;
+            *wRetPtr++ = cst_DigitSep;
+            continue;
+        }
+        if ((*wNPtr < '0') || (*wNPtr > '9')) {
+            break;
+        }
+        *wRetPtr++ = *wNPtr-- ;
+    } // while
+
+    if (wNPtr >= wN.Data) {
+        if (wRetPtr >= wRetPtrEnd) {
+            wReturn.extendUnitsBZero(1L);
+            wRetPtrEnd ++ ;
+        }
+        *wRetPtr++ = *wNPtr-- ;
+    }
+
+    /* now reverse return */
+
+    utf8VaryingString wReturn1;
+    wS = wReturn.strlen();
+    wReturn1.allocateUnitsBZero(wS+1);
+
+    utf8_t* wPtrIn=wReturn.Data+wS-1;
+    utf8_t* wPtrOut=wReturn1.Data;
+
+    while (wPtrIn >= wReturn.Data) {
+        *wPtrOut++=*wPtrIn--;
+    }
+
+    /* managing display size */
+
+    if ((pDisplaySize < 0)||(wS >= pDisplaySize)) {
+        return wReturn1;
+    }
+    /* left pad */
+    utf8VaryingString wReturn2;
+    wReturn2.allocateUnits(pDisplaySize-wS);
+    wReturn2.setChar(' ');
+
+    wReturn2 += wReturn1;
+
+    return wReturn2;
+} // fmtIntWDigSep
+
+
 /* static method */
+
+ZStatus
+ZRandomFile::RawSurfaceScan(const uriString& pURIContentFile,
+                            __progressCallBack__(_progressCallBack),
+                            __progressSetupCallBack__(_progressSetupCallBack),
+                            ZaiErrors* pErrorLog)
+{
+//    ZArray<URFField> wFieldList;
+    ZBlockDescriptor wBlockDescriptor;
+    ZDataBuffer wRecord;
+    size_t wProgress=0;
+    size_t wFileSize =  0;
+    int     wBlockCount=0;
+    uint32_t wStart=0;
+    size_t  wTotalBlockSize=0, wTotalUserSize=0,wUserSize , wTotalFreeSize=0 , wTotalDeletedSize=0 ;
+    zaddress_type wCurrentAddress=0, wNextAddress=0,wPhysicalSize=0;
+
+    __FILEHANDLE__ wFdContent=__FILEHANDLEINVALID__;
+
+    ZStatus wSt=ZS_SUCCESS;
+
+     const char* wP = "          |          |               |          |          |          |%s";
+
+
+    pErrorLog->setStoreSeverityAtLeast(ZAIES_Info);
+
+    wSt = rawOpenRead(wFdContent,pURIContentFile);
+    if (wSt!=ZS_SUCCESS) {
+        pErrorLog->logZExceptionLast("ZRandomFile::SurfaceScan");
+        return wSt ;
+    }
+
+    wSt = rawSeekEnd(wFdContent,wFileSize);
+    if (wSt!=ZS_SUCCESS) {
+        pErrorLog->logZExceptionLast("ZRandomFile::SurfaceScan");
+        return wSt ;
+    }
+    long wFileSize1 = -wFileSize;
+
+    pErrorLog->textLog("Processing file %s\n"
+                       "Total file size <%15s> <%>ld>", pURIContentFile.toString(),
+                       fmtIntWDigSep(wFileSize,-1).toString(),
+                       wFileSize);
+
+    if (wFileSize == 0) {
+        pErrorLog->infoLog("===============File is empty==================");
+        goto EndScanSurface;
+    }
+
+    wSt = rawReadAt(wFdContent,wRecord,sizeof(cst_ZFILEBLOCKSTART),0L);
+    if (wSt!=ZS_SUCCESS) {
+       goto ErrorScanSurface;
+    }
+
+
+    wStart = wRecord.moveTo<uint32_t>();
+    if (wStart != cst_ZFILEBLOCKSTART) {
+        pErrorLog->errorLog("File block start mark not found : file is corrupted. Searching anyway...");
+    }
+    else
+       pErrorLog->infoLog("File appears to be a valid ZRandomFile.");
+
+    if (_progressSetupCallBack!=nullptr)
+        _progressSetupCallBack(int(wFileSize),"Read byte size");
+
+
+    if (_progressCallBack!=nullptr)
+        _progressCallBack(wProgress,"Scanning surface");
+
+    pErrorLog->textLog("Scanning surface begins");
+
+    pErrorLog->textLog("\n___________________________Content Data blocks in physical order______________________________________");
+
+    wSt=rawSearchNextStartSign(wFdContent,wFileSize,-1,wCurrentAddress,wCurrentAddress);
+    if (wSt!=ZS_SUCCESS) {
+        if (wSt==ZS_EOF) {
+            pErrorLog->warningLog("No start sign mark has been found on file surface.");
+            goto EndScanSurface;
+        }
+        goto ErrorScanSurface;
+    }
+    /* search next block to test block size validity */
+    wSt=rawSearchNextStartSign(wFdContent,wFileSize,-1,wCurrentAddress+sizeof(cst_ZFILEBLOCKSTART),wNextAddress);
+    if (wSt!=ZS_SUCCESS) { /* ZS_READPARTIAL is not returned : considered as valid access if startsign is found */
+        if (wSt==ZS_EOF)
+            wNextAddress = wFileSize;
+        else
+            goto ErrorScanSurface;
+    }
+
+    pErrorLog->textLog(
+             "Address   |Next Addr.|   State       |Block size| User size|Phys. Size| Comment\n"
+             "__________|__________|_______________|__________|__________|__________|_______________________________"
+             );
+
+
+    while (wSt==ZS_SUCCESS) {
+        wProgress = wCurrentAddress ;
+        if (_progressCallBack!=nullptr)
+            _progressCallBack(wProgress,utf8VaryingString());  /* with null string */
+
+        wSt=rawGetBlockDescriptor(wFdContent,wBlockDescriptor,wCurrentAddress);
+        if (wSt!=ZS_SUCCESS) {
+            goto ErrorScanSurface;
+        }
+        wPhysicalSize = wNextAddress-wCurrentAddress;
+
+        /* check if user content is URF format : if so, must be preceeded by presence bitset */
+        wSt = rawRead(wFdContent,wRecord,sizeof(ZType_type));
+        if (wSt!=ZS_SUCCESS) {
+            pErrorLog->logZExceptionLast("ZRandomFile::SurfaceScan");
+            goto ErrorScanSurface;
+        }
+        const char* wComment = " ";
+        ZTypeBase wZType = wRecord.moveTo<ZTypeBase>();
+        wZType=reverseByteOrder_Conditional<ZTypeBase>(wZType);
+        if ((wZType == ZType_bitset) || (wZType == ZType_bitsetFull)) {
+            wComment = "URF (bitset detected)";
+        }
+
+        pErrorLog->textLog( "%10ld|%10ld|%15s|%10ld|%10ld|%10ld|%s",
+                            wCurrentAddress,wNextAddress,
+                            decode_ZBS( wBlockDescriptor.State),
+                            wBlockDescriptor.BlockSize,
+                            (wBlockDescriptor.BlockSize-(zsize_type)sizeof(ZBlockHeader_Export)),
+                            wPhysicalSize,
+                            wComment);
+
+        if (wPhysicalSize > wBlockDescriptor.BlockSize) {
+            utf8VaryingString wHoleStr;
+            wHoleStr.sprintf("Hole of %ld bytes",wPhysicalSize-wBlockDescriptor.BlockSize);
+            pErrorLog->textLog(wP,wHoleStr.toString());
+        }
+        if (wPhysicalSize < wBlockDescriptor.BlockSize) {
+            pErrorLog->textLog(wP,"Block overlaps following block boundaries");
+        }
+
+        wTotalBlockSize += wBlockDescriptor.BlockSize;
+        if (wBlockDescriptor.State==ZBS_Free)
+            wTotalFreeSize += wBlockDescriptor.BlockSize ;
+        else
+            if (wBlockDescriptor.State==ZBS_Deleted)
+                wTotalDeletedSize += wBlockDescriptor.BlockSize ;
+        else
+            wTotalUserSize += wUserSize = wBlockDescriptor.BlockSize - sizeof(ZBlockDescriptor_Export);
+         wBlockCount++;
+
+        wCurrentAddress = wNextAddress;
+        wSt=rawSearchNextStartSign(wFdContent,wFileSize,-1,wCurrentAddress + sizeof(cst_ZFILEBLOCKSTART) ,wNextAddress);
+    } // while
+
+    wProgress = wCurrentAddress ;
+
+    if (_progressCallBack!=nullptr)
+        _progressCallBack(wProgress,"End process");
+
+    pErrorLog->textLog("__________|__________|_______________|__________|__________|__________|_______________________________");
+
+EndScanSurface:
+
+
+    pErrorLog->textLog("___________Export from surface scan Report___________\n"
+                       "Overall file size                   %ld\n"
+                       "Total block volume read             %ld\n"
+                       "User volume                         %ld\n"
+                       "Free volume                         %ld\n"
+                       "Deleted volume                      %ld\n"
+                       "Number of blocks found              %ld\n"
+                       "Mean used block size                %ld\n"
+                       "Last address                        %ld\n"
+                       "Overall content space usage (1)     %g %\n"
+                       "Used content space usage (2)        %g %\n"
+                       "Free space vs used size (3)         %g %\n"
+                       "(1) Percentage of user used space vs total file size.\n"
+                       "(2) Percentage of user used space vs total of used blocks size.\n"
+                       "(3) Percentage of free space vs total blocks size.\n",
+                       wFileSize,
+                       wTotalBlockSize,
+                       wTotalUserSize,
+                       wTotalFreeSize,
+                       wBlockCount,
+                       wTotalUserSize / wBlockCount,
+                       wCurrentAddress,
+                       double(wTotalUserSize) * 100.0 / double(wFileSize),
+                       double(wTotalUserSize) * 100.0 / double(wTotalBlockSize),
+                       double(wTotalFreeSize+wTotalDeletedSize) * 100.0 / double(wTotalBlockSize)
+                       );
+
+
+    rawClose(wFdContent);
+    return wSt;
+ErrorScanSurface:
+    pErrorLog->logZExceptionLast("ZRandomFile::SurfaceScan");
+    pErrorLog->errorLog("Export from surface scan stopped at address %ld",wCurrentAddress);
+    goto EndScanSurface;
+} // ZRandomFile::SurfaceScan
+
+
+
 void
-ZRandomFile::zfullDump(const uriString &pURIContent, const int pColumn, FILE* pOutput) // dump another ZRF
+ZRandomFile::zfullDump(const uriString &pURIContent, int pColumn,ZaiErrors* pErrorLog) // dump another ZRF
 {
 ZStatus wSt;
 ZRandomFile wZRF;
@@ -6928,8 +7435,7 @@ ZRandomFile wZRF;
     wSt=wZRF._ZRFopen(ZRF_Read_Only,ZFT_Any);
     if (wSt!=ZS_SUCCESS)
                 {
-                ZException.printUserMessage(stderr);
-                abort();
+                ZException.exit_abort();
                 }
 
     if ((wSt=wZRF._getFileControlBlock(true))!=ZS_SUCCESS)
@@ -6937,18 +7443,18 @@ ZRandomFile wZRF;
                 ZException.addToLast("Error while getting header %s for ZRF file %s",
                                             wZRF.getURIHeader().toString(),
                                             wZRF.getURIContent().toString());
-                ZException.printUserMessage(pOutput);
+                pErrorLog->logZExceptionLast("ZRandomFile::zfullDump");
                 return ;
                 }
 
-    fprintf(pOutput,
+    pErrorLog->textLog(
             "        ***********************************************************\n"
             "        * Logical Full Dump of file %30s *\n"
             "        ***********************************************************\n",
             wZRF.getURIContent().toString());
 
-    wZRF._headerDump();
-    wZRF._fullcontentDump(pColumn);
+    wZRF._headerDump(pErrorLog);
+    wZRF._fullcontentDump(pColumn,pErrorLog);
     wZRF.zclose();
     return;
 
@@ -6956,7 +7462,7 @@ ZRandomFile wZRF;
 
 /* local method */
 ZStatus
-ZRandomFile::_fullDump( const int pColumn)
+ZRandomFile::_fullDump( const int pColumn,ZaiErrors* pErrorLog)
 {
   ZStatus wSt;
 
@@ -6965,18 +7471,18 @@ ZRandomFile::_fullDump( const int pColumn)
     ZException.addToLast("Error while getting header %s for ZRF file %s",
         getURIHeader().toUtf(),
         getURIContent().toUtf());
-    _print(ZException.last().formatFullUserMessage());
+    pErrorLog->logZExceptionLast("ZRandomFile::_fullDump");
     return wSt;
   }
 
-  _print(
+  pErrorLog->textLog(
       "        ***********************************************************\n"
       "        * Logical Full Dump of file %30s *\n"
       "        ***********************************************************",
       getURIContent().toUtf());
 
-  _headerDump();
-  return _fullcontentDump(pColumn);
+  _headerDump(pErrorLog);
+  return _fullcontentDump(pColumn,pErrorLog);
 
 }//zfullDump
 
@@ -6995,14 +7501,14 @@ ZRandomFile::_fullDump( const int pColumn)
  * @param pOutput   a FILE* pointer where the reporting will be made. By default, set to stdout.
  */
 void
-ZRandomFile::zheaderDumpS(const uriString &pURIContent, FILE* pOutput)
+ZRandomFile::zheaderDumpS(const uriString &pURIContent, ZaiErrors* pErrorLog)
 {
 ZStatus wSt;
 ZRandomFile wZRF;
 
     wSt=wZRF.setPath(pURIContent);  // generates also Header file structures within ZFileDescriptor
 
-    wZRF.set_Output(pOutput);
+//    wZRF.set_Output(pOutput);
     wSt=wZRF._ZRFopen(ZRF_Read_Only,ZFT_ZRandomFile);
     if (wSt!=ZS_SUCCESS)
                 {
@@ -7014,16 +7520,17 @@ ZRandomFile wZRF;
           ZException.addToLast("Error while getting header %s for ZRF file %s",
                                 wZRF.getURIHeader().toUtf(),
                                 wZRF.getURIContent().toUtf());
+          pErrorLog->logZExceptionLast("ZRandomFile::zheaderDumpS");
           ZException.exit_abort();
           }
 
-    fprintf(pOutput,
+    pErrorLog->textLog(
             "        *******************************************************\n"
             "        *  Dump of Header-file %30s *\n"
             "        *******************************************************\n",
               wZRF.getURIContent().toUtf());
 
-    wZRF._headerDump();
+    wZRF._headerDump(pErrorLog);
     wZRF.zclose();
     return ;
 
@@ -7044,7 +7551,7 @@ ZRandomFile wZRF;
  * @param pOutput   a FILE* pointer where the reporting will be made. By default, set to stdout.
  */
 void
-ZRandomFile::zcontentDumpS(uriString pURIContent,int pColumn,FILE* pOutput)
+ZRandomFile::zcontentDumpS(const uriString &pURIContent, int pColumn, ZaiErrors* pErrorLog)
 {
 ZStatus wSt;
 ZRandomFile wZRF;
@@ -7058,7 +7565,7 @@ ZRandomFile wZRF;
                 ZException.printUserMessage(stderr);
                 abort();
                 }
-    wSt=wZRF._contentDump(pColumn);
+    wSt=wZRF._contentDump(pColumn,pErrorLog);
     wZRF.zclose();
     return;
 
@@ -7070,7 +7577,7 @@ ZRandomFile wZRF;
  * @param pColumn   the number of bytes used to present ascii and hexa dump @see ZDataBuffer::Dump
  */
 ZStatus
-ZRandomFile::_contentDump(int pColumn)
+ZRandomFile::_contentDump(int pColumn,ZaiErrors* pErrorLog)
 {
   ZStatus wSt;
 
@@ -7080,17 +7587,17 @@ ZRandomFile::_contentDump(int pColumn)
     ZException.addToLast("Error while getting header %s for ZRF file %s",
         getURIHeader().toString(),
         getURIContent().toString());
-    _print(ZException.last().formatFullUserMessage());
+    pErrorLog->logZExceptionLast("ZRandomFile::_contentDump");
     return wSt;
   }
 
-  _print(
+  pErrorLog->textLog(
       "        ***********ZRandomFile Content Dump Utility******************\n"
       "        File %s\n"
       "        *************************************************************",
       getURIContent().toUtf());
 
-  _fullcontentDump(pColumn);
+  _fullcontentDump(pColumn,pErrorLog);
 
 }//zcontentDump local
 
@@ -7100,21 +7607,22 @@ ZRandomFile::_contentDump(int pColumn)
  * ZRF must be opened for reading
  *
  * @param pDescriptor ZFileDescriptor of the ZRandonFile to dump
- * @param pColumn   Number of bytes displayed both in ascii and hexadecimal per row
+ * @param pWidth    Number of bytes displayed both in ascii and hexadecimal per row
  * @param pOutput   a FILE* pointer where the reporting will be made. Defaulted to stdout.
  */
 ZStatus
-ZRandomFile::_fullcontentDump(const int pWidth)
+ZRandomFile::_fullcontentDump(int pWidth, ZaiErrors* pErrorLog)
  {
 ZStatus wSt;
-
-  _print("\n....................Content Data blocks..........................");
+    if (pWidth<0)
+        pWidth = 16;
+  pErrorLog->textLog("\n....................Content Data blocks..........................");
 
 wSt=ZS_SUCCESS;
 
 ZBlock          wBlock;
-utf8String     wRulerHexa;
-utf8String     wRulerAscii;
+utf8VaryingString     wRulerHexa;
+utf8VaryingString     wRulerAscii;
 zaddress_type   wAddress;
 zrank_type      wRank;
 
@@ -7125,7 +7633,7 @@ zrank_type      wRank;
     wRank = 0L;
     wSt=_getByRank(wBlock,wRank,wAddress);     // get first block of the file
     while (wSt==ZS_SUCCESS) {
-      _print("\n                 == Block number %4ld - Physical address %ld ==",
+      pErrorLog->textLog("\n                 == Block number %4ld - Physical address %ld ==",
              wRank,
              wAddress);
 //             getCurrentRank(),
@@ -7137,10 +7645,11 @@ zrank_type      wRank;
     }// while
 
     if (wSt==ZS_EOF) {
-        _print( "\n       ***** End of File reached at block %d *****", wBN);
+        pErrorLog->textLog( "\n       ***** End of File reached at block %d *****", wBN);
     }
     else {
-          _print(ZException.last().formatFullUserMessage());
+        pErrorLog->logZExceptionLast("_contentDump");
+//          _print(ZException.last().formatFullUserMessage());
     }
     return wSt;
 } // _contentDump
@@ -7155,11 +7664,11 @@ zrank_type      wRank;
  * @param pRulerAscii   Ruler for Ascii
  * @param pColumn   Number of bytes displayed both in ascii and hexadecimal per row
  */
-void ZRandomFile::_dumpOneDataBlock( ZBlock &pBlock, utf8String &pRulerHexa, utf8String &pRulerAscii,
+void ZRandomFile::_dumpOneDataBlock( ZBlock &pBlock, utf8VaryingString &pRulerHexa, utf8VaryingString &pRulerAscii,
                                 const int pWidth)
 {
-    utf8String wLineChar;
-    utf8String wLineHexa;
+    utf8VaryingString wLineChar;
+    utf8VaryingString wLineHexa;
     const int wGroupFactor=4;
     int wGroup=pWidth/wGroupFactor;
 
@@ -7209,8 +7718,8 @@ void ZRandomFile::_dumpOneDataBlock( ZBlock &pBlock, utf8String &pRulerHexa, utf
 /**
  * @brief ZRandomFile::zheaderDump reports the header data of the currently opened ZRandomFile
  */
-void
-ZRandomFile::_headerDump()
+ZStatus
+ZRandomFile::_headerDump(ZaiErrors* pErrorLog)
 {
 ZStatus wSt;
 ZHeaderControlBlock_Export wHeaderExp;
@@ -7218,12 +7727,12 @@ ZDataBuffer wZDB;
 
   wSt=rawSeekBegin(HeaderFd);
   if (wSt!=ZS_SUCCESS) {
-    return ;
+    return wSt;
   }
   ZPMS.HFHReads ++;
   wSt=rawRead(HeaderFd,wZDB,sizeof(ZHeaderControlBlock_Export));
   if (wSt!=ZS_SUCCESS)
-    return ;
+    return wSt;
   if (wZDB.Size < sizeof(ZHeaderControlBlock_Export)) {
     ZException.setMessage(_GET_FUNCTION_NAME_,
         ZS_BADFILEHEADER,
@@ -7231,7 +7740,8 @@ ZDataBuffer wZDB;
         "Invalid/corrupted header file  <%s> size read %ld while expected at least %ld",
         URIHeader.toCChar(),
         wZDB.Size, sizeof(ZHeaderControlBlock_Export));
-    return  ;
+    pErrorLog->logZExceptionLast("ZRandomFile::_headerDump");
+    return  ZS_BADFILEHEADER;
   }
 
   memmove(&wHeaderExp,wZDB.Data,sizeof(ZHeaderControlBlock_Export));
@@ -7239,13 +7749,13 @@ ZDataBuffer wZDB;
   wHeaderExp.deserialize();
 
 
-  _print(
+  pErrorLog->textLog(
       "        +-----------------------------------------------------+\n"
       "        |  Dump of Header-file %30s |\n"
       "        +-----------------------------------------------------+",
       getURIContent().toUtf());
 
-  _print(
+  pErrorLog->textLog(
       " Header file name     <%s>\n"
       " Header file block \n"
       " Identification       %s\n"
@@ -7284,14 +7794,14 @@ ZDataBuffer wZDB;
         ZFCB.HighwaterMarking?"On":"Off",
         ZFCB.GrabFreeSpace?"On":"Off");
 
-  _print(
+  pErrorLog->textLog(
         " Block Access Table (ZBAT) - Active blocks are stored here\n"
         "------+------------+------+--------------------+--------------------+\n"
         " Rank |      State |      |    Address         |          Block size|\n"
         "------+------------+------+--------------------+--------------------+");
 
   for (long wi=0; wi<ZBAT.size();wi++)
-    _print(
+    pErrorLog->textLog(
         "%5ld |%12s|%6s|%20ld|%20ld|",
         wi,
         decode_ZBS(ZBAT.Tab(wi).State),
@@ -7300,16 +7810,16 @@ ZDataBuffer wZDB;
         ZBAT.Tab(wi).BlockSize );
 
   if (ZBAT.size()>0)
-    _print(
+    pErrorLog->textLog(
                 "------+------------+------+--------------------+--------------------+");
-  _print(
+  pErrorLog->textLog(
         " Free Blocks Pool(ZFBT) Available blocks are stored here\n"
         "------+------------+------+--------------------+--------------------+\n"
         " Rank |      State |      |    Address         |          Block size|\n"
         "------+------------+------+--------------------+--------------------+");
 
         for (long wi=0; wi<ZFBT.size();wi++)
-  _print(
+  pErrorLog->textLog(
         "%5ld |%12s|%6s|%20ld|%20ld|",
         wi,
         decode_ZBS(ZFBT.Tab(wi).State),
@@ -7318,7 +7828,7 @@ ZDataBuffer wZDB;
         ZFBT.Tab(wi).BlockSize );
 
   if (ZFBT.size()>0)
-    _print("------+------------+------+--------------------+--------------------+");
+    pErrorLog->textLog("------+------------+------+--------------------+--------------------+");
 #ifdef __DEPRECATED__
   _print(
         " Deleted Blocks Pool(ZDBT) - Recovery Pool\n"
@@ -7339,7 +7849,7 @@ ZDataBuffer wZDB;
     _print( "------+------------+------+--------------------+--------------------+");
 #endif // __DEPRECATED__
 
-  return;
+  return ZS_SUCCESS;
 }// _headerDump
 
 //----------------End Dump routines--------------------------------------
@@ -7377,7 +7887,7 @@ ZBlockDescriptor wBD;
 
     wBD = wBlock;
     wBD.Address = pFrom;
-    if (__ZRFVERBOSE__)
+    if (BaseParameters->VerboseFileEngine())
             fprintf(stdout,
                 ".... moving Block. Former block Address %ld Size %ld",
                 pFrom,
@@ -7385,14 +7895,14 @@ ZBlockDescriptor wBD;
     if (pCreateZFBTEntry) {
       wBD.State = ZBS_Free;
       ZFBT._addSorted(wBD);
-      if (__ZRFVERBOSE__)
+      if (BaseParameters->VerboseFileEngine())
                     fprintf (stdout,
                          " put to free blocks pool ZFBT. Pool rank %ld\n ",
                          ZFBT.lastIdx());
       }
       else {
         wBD.State = ZBS_Deleted ;
-        if (__ZRFVERBOSE__)
+        if (BaseParameters->VerboseFileEngine())
                     fprintf (stdout,
                          " deleted (ZBS_Deleted)\n");
       }
@@ -7411,49 +7921,34 @@ ZBlockDescriptor wBD;
  * @{
   */
 
-/**
- * @brief ZRandomFile::zheaderRebuild This static function rebuilds ZRandomFile header from an existing ZRandomFile content.
- *
- * If Header is damaged or lost, ZRandomFile content cannot be accessed anymore.
- * zheaderRebuild tries to create a new header from ZRandomFile content, and populate the 3 pools from existing blocks found :
- *  - ZBlockAccessTable : references all found blocks with State field as ZBS_Used
- *  - ZFreeBlockPool    : references all found blocks with State field as ZBS_Free
- *  - ZDeletedBlockPool : references all block headers found with state as ZBS_Deleted
- *
- *  The previous relative order of record in absolutely not garanteed, as ZBAT is populated in the physical block order.
- *
- *  At the end of the process, ZRandomFile header is saved to file to create the new file header.
- *  Both content file and header file are closed.
- *
- *
- * @param[in] pContentURI path of the ZRandomFile file's content to rebuild the header for
- * @param[in] pDump       Option if set (true) a surface scan of the file will be made before processing the file
- * @param[in] pOutput     a FILE* pointer where the reporting will be made. Defaulted to stdout.
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
-ZStatus
-ZRandomFile::zheaderRebuild(uriString pContentURI,bool pDump, FILE*pOutput)
-{
 
+ZStatus
+ZRandomFile::zheaderRebuild(uriString pContentURI,
+                            bool pDump,
+                            ZaiErrors* pErrorLog)
+//                            __progressSetupCallBack__(pProgressSetupCB)=nullptr,
+//                            __progressCallBack__(pProgressCB)=nullptr)
+{
 ZStatus wSt;
 //ZFileDescriptor wDescriptor;
 
 ZRandomFile wZRF;
-int wS;
 ZBlockDescriptor wBlockDescriptor;
+
+size_t wFileSize=pContentURI.getFileSize(); /* for stats */
 
 zaddress_type wAddress, wAddressNext,wOldAddress,wTheoricAddress;
 zsize_type wOldSize;
 
+    pErrorLog->setStoreSeverityAtLeast(ZAIES_Info);
     wZRF.setPath(pContentURI);
 
+    pErrorLog->textLog(    " Rebuilding header for ZRandomFile content file <%s>\n"
+                           "     Header file will be <%s>"
+                           ,
+                           wZRF.URIContent.toString(),
+                           wZRF.URIHeader.toString());
 
-    _print(
-             " Rebuilding header for ZRandomFile content file <%s>\n"
-             "     Header file will be <%s>\n"
-             "   **************Surface scan of content file*****************\n",
-             wZRF.URIContent.toString(),
-             wZRF.URIHeader.toString());
     if (!wZRF.URIContent.exists())
             {
             ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -7461,27 +7956,28 @@ zsize_type wOldSize;
                                    Severity_Error,
                                    "File <%s> does not exist. It must exist to be opened.",
                                    wZRF.URIContent.toString());
-            ZException.printUserMessage(pOutput);
+            pErrorLog->logZExceptionLast("ZRandomFile::zheaderRebuild");
             return  (ZS_FILENOTEXIST);
             }
   wSt=rawOpen(wZRF.ContentFd,wZRF.URIContent,O_RDONLY); // open content file for read only
-  if (wSt != ZS_SUCCESS)
+  if (wSt != ZS_SUCCESS) {
+            pErrorLog->errorLog("rawOpen-E Cannot open (rawOpen) O_RDONLY status <%s> file <%s>",
+                                decode_ZStatus(wSt),
+                                wZRF.URIContent.toUtf());
     return wSt;
-   /*
-    wZRF.ContentFd = open(wZRF.URIContent.toCChar(),O_RDONLY);       // open content file for read only
-    if (wZRF.ContentFd<0)
-            {
-            ZException.getErrno(errno,
-                             _GET_FUNCTION_NAME_,
-                             ZS_ERROPEN,
-                             Severity_Severe,
-                             " Error opening ZRandomFile content file %s ",
-                             wZRF.URIContent.toString());
-            return  ZS_ERROPEN;
-            }
-  */
-  if (pDump)
-    _surfaceScan();
+  }
+
+  if (pDump) {
+      pErrorLog->textLog("   **************Surface scan of content file*****************");
+    wZRF._surfaceScan(pErrorLog);
+  }
+  if (hasProgressSetupCallBack()) {
+      _progressSetupCallBack(wFileSize,"Byte size");
+  }
+
+  if (hasProgressCallBack()) {
+      _progressCallBack(0,"Bytes processed");
+  }
 
   mode_t wPosixMode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
   wSt=rawOpen(wZRF.HeaderFd,wZRF.URIHeader,O_RDWR|O_CREAT|O_TRUNC,wPosixMode);
@@ -7500,43 +7996,17 @@ zsize_type wOldSize;
   if (wSt!=ZS_SUCCESS)
     return wSt;
   wAddress=0L;
-  /*
-  wS=    posix_fallocate(wZRF.HeaderFd,0L,(off_t)wHeaderSize);
-  if (wS!=0)
-            {
-            ZException.getErrno(wS,  // no errno is set by posix_fallocate : returned value is the status : ENOSPC means no space
-                             _GET_FUNCTION_NAME_,
-                             ZS_WRITEERROR,
-                             Severity_Severe,
-                             " Error during creation of file <%s> cannot allocate disk space",
-                             wZRF.URIHeader.toCChar());
-            wSt=ZS_WRITEERROR;
-            goto end_zheaderRebuild;
-            }
 
-    wAddress=0L;
-    wS=lseek(wZRF.ContentFd,wAddress,SEEK_SET);
-    if (wS<0)
-        {
-        ZException.getErrno(errno,
-                        _GET_FUNCTION_NAME_,
-                        ZS_FILEPOSERR,
-                        Severity_Severe,
-                        "Error while positionning file <%s> at address <%lld>",
-                        wZRF.URIContent.toCChar(),
-                        wAddress);
-        return  (ZS_FILEPOSERR);
-        }
-    */
   while (true) {
-    wSt=_searchNextPhysicalBlock(wAddress,wAddressNext,wBlockDescriptor);     //! get first physical block of the file
+    wSt=wZRF._searchNextPhysicalBlock(wAddress,wAddressNext,wBlockDescriptor);     //! get first physical block of the file
     if (wSt!=ZS_FOUND) {
-                ZException.setMessage(_GET_FUNCTION_NAME_,
-                                        ZS_EMPTYFILE,
-                                        Severity_Severe,
-                                        " No valid block has been found in content file %s",
-                                        wZRF.URIContent.toCChar());
-                goto error_zheaderRebuild;
+        ZException.setMessage(_GET_FUNCTION_NAME_,
+                                ZS_EMPTYFILE,
+                                Severity_Severe,
+                                " No valid block has been found in content file %s",
+                                wZRF.URIContent.toCChar());
+        pErrorLog->logZExceptionLast("zheaderRebuild");
+        goto error_zheaderRebuild;
     }
     wBlockDescriptor.Address = wAddressNext;
 
@@ -7544,14 +8014,12 @@ zsize_type wOldSize;
     // first block
     wZRF.ZFCB.StartOfData = wBlockDescriptor.Address;
     if (wBlockDescriptor.State==ZBS_Deleted) {
-      if (__ZRFVERBOSE__)
-        fprintf(pOutput,
-                            "--%18ld|%15s|%20ld|%20ld|%20s\n",
-                            wAddressNext,
-                            decode_ZBS( wBlockDescriptor.State),
-                            wBlockDescriptor.BlockSize,
-                            (wBlockDescriptor.BlockSize-(zsize_type)sizeof(ZBlockHeader_Export)),
-                            "--deleted block--");
+        pErrorLog->textLog("--%18ld|%15s|%20ld|%20ld|%20s\n",
+                           wAddressNext,
+                           decode_ZBS( wBlockDescriptor.State),
+                           wBlockDescriptor.BlockSize,
+                           (wBlockDescriptor.BlockSize-(zsize_type)sizeof(ZBlockHeader_Export)),
+                           "--deleted block--");
 
     wAddressNext += sizeof(ZBlockHeader_Export);
 
@@ -7562,21 +8030,21 @@ zsize_type wOldSize;
       break;
   }// while true
 
+
     while (wSt==ZS_FOUND)
         {
         wTheoricAddress = wOldAddress+wOldSize;
-        if (wAddressNext!=wTheoricAddress)
-                    {
-            if (__ZRFVERBOSE__)
-                    fprintf(pOutput,
+        if (wAddressNext!=wTheoricAddress) {
+            if (pErrorLog!=nullptr)
+                pErrorLog->textLog(
                             "%20ld|%15s|%20ld|                    |\n",
                             wTheoricAddress,
                             "--- <Hole> ---",
                             wAddressNext-wTheoricAddress
                             );
-                    }
-        if (__ZRFVERBOSE__)
-            fprintf(pOutput,
+        }
+        if (pErrorLog!=nullptr)
+            pErrorLog->textLog(
                 "%20ld|%15s|%20ld|%20ld|%20ld\n",
                 wAddressNext,
                 decode_ZBS( wBlockDescriptor.State),
@@ -7603,16 +8071,21 @@ zsize_type wOldSize;
 
             wAddressNext += sizeof(ZBlockHeader_Export);   // just to grab deleted Blocks
         }
+
+        if (hasProgressCallBack()) {
+            _progressCallBack(wAddressNext,utf8VaryingString());
+        }
+
         while (true) {
-          wSt=_searchNextPhysicalBlock(wAddressNext,wAddressNext,wBlockDescriptor); // get first physical block of the file
+          wSt=wZRF._searchNextPhysicalBlock(wAddressNext,wAddressNext,wBlockDescriptor); // get first physical block of the file
           if (wSt!=ZS_FOUND)
                         break;
 
           wBlockDescriptor.Address = wAddressNext;
 
           if (wBlockDescriptor.State==ZBS_Deleted) {
-            if (__ZRFVERBOSE__)
-                                fprintf(pOutput,
+            if (pErrorLog!=nullptr)
+                  pErrorLog->textLog(
                                     "--%18ld|%15s|%20ld|%20ld|%20s\n",
                                     wAddressNext,
                                     decode_ZBS( wBlockDescriptor.State),
@@ -7630,70 +8103,63 @@ zsize_type wOldSize;
 
     if (wSt==ZS_EOF)
         {
-        if (__ZRFVERBOSE__)
-            fprintf(pOutput,
-                "\n       **** End of File reached at address <%ld> *****\n",
-                wAddressNext);
+        pErrorLog->textLog( "\n       **** End of File reached at address <%ld> *****\n", wAddressNext);
         }
         else
         {
-        ZException.printUserMessage(pOutput);
+        pErrorLog->logZExceptionLast();
         }
 
 
     wZRF._writeFileHeader(true);
 
-    _print(
-             " *********Header rebuild results**************\n");
+    if (pErrorLog!=nullptr)
+        pErrorLog->textLog( " *********Header rebuild results**************\n");
 
-    _headerDump();
+    wSt=wZRF._headerDump(pErrorLog);
 
 end_zheaderRebuild:
-     _writeAllFileHeader();
+    wSt=wZRF._writeAllFileHeader();
     close (wZRF.HeaderFd);
     close (wZRF.ContentFd);
     return  wSt;
 error_zheaderRebuild:
-  _print(ZException.last().formatFullUserMessage());
-  goto end_zheaderRebuild;
+  pErrorLog->logZExceptionLast("ZRandomFile::zheaderRebuild");
+  close (wZRF.HeaderFd);
+  close (wZRF.ContentFd);
+  return  wSt;
 }// zheaderRebuild
 
+uriString ZRandomFile::_getURIClone(const uriString pURIContent)
+{
+    uriString wCloneContent = pURIContent.getDirectoryPath() ;
+    wCloneContent.addConditionalDirectoryDelimiter();
+    wCloneContent += pURIContent.getBasename().toCChar();
+    wCloneContent += __CLONE_BASEEXTENSION__ ;
+    wCloneContent +=".";
+    wCloneContent += pURIContent.getFileExtension().toCChar();
+    return wCloneContent;
+}
 
+uriString ZRandomFile::_getURIReorgClone(const uriString pURIContent)
+{
+    uriString wReorgCloned = GeneralParameters.getWorkDirectory();
+    wReorgCloned.addConditionalDirectoryDelimiter();
+    wReorgCloned += pURIContent.getRootname();
+    wReorgCloned += "_reorg.";
+    wReorgCloned += pURIContent.getFileExtension();
+    return wReorgCloned;
+}
 
-//! @brief __CLONE_BASEEXTENSION__ Preprocessor symbol : base name extension for creating cloned file name
-#define __CLONE_BASEEXTENSION__ "_cln"
-
-
-/**
- * @brief ZRandomFile::zcloneFile Clones the current ZRandomFile : duplicates anything concerning its file header and copies its data
- *
- *  This routine does also a logical reorganization of the random file that will be physically ordered by rank.
- *
- *  @par Clone name generation
- *  name is composed as <path><basename><__CLONE_BASEEXTENSION__>.<extension>
- * __CLONE_BASEEXTENSION__ is a preprocessor parameter that is added to ZRandomFile base name to clone.
- * By default, __CLONE_BASEEXTENSION__ is equal to <_cln>.
- * This base name extension is located right before the file name extension (before <.>).
- *
- *  @par Clone process
- * Duplicates the file structure and the data
- * - same structure, same parameters
- * - however copy is done in reorganizing blocks in the order of relative ranks
- * - at creation time :
- *  size is set using : used size + pFreeBlock (fallocate)
- *   Only one free block of size pFreeBlock is added at the end of physical file
- *  if pFreeBlocks = -1 (default) then BlockTargetSize is taken.
- * @par Free blocks
- * As a result, all free blocks (and therefore all deleted blocks) from the source ZRF file will be eliminated for the cloned file surface.
- * Only one free block, with a size equal to pFreeSpace bytes, will remain at the very top of physical address space.
- *
- * @param[in] pDescriptor   The current file descriptor read-only
- * @param[in] pFreeSpace    defaulted to -1 : free space to add at the top of file addresses when all used ranks are copied
- * @param[in] pOutput       a FILE* pointer where the reporting will be made. Defaulted to stdout.
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
 ZStatus
-ZRandomFile::zcloneFile(const zsize_type pFreeSpace,  FILE*pOutput)
+ZRandomFile::zcloneFile()
+{
+    ZaiErrors ErrorLog;
+    return _cloneFile(-1,uriString(),&ErrorLog);
+}
+
+ZStatus
+ZRandomFile::_cloneFile(const zsize_type pFreeSpace, const uriString &pCloneName,ZaiErrors* pErrorLog)
 {
 ZStatus wSt;
 long wi=0, wj=0;
@@ -7709,6 +8175,8 @@ ZFileDescriptor wDescriptor_Clone;
 
 ZRandomFile wZRF;
 
+size_t  wMSize=0 ;
+int     wPg = 0;
 
   wMode=getOpenMode();
   if (wMode!=ZRF_NotOpen)
@@ -7720,26 +8188,64 @@ ZRandomFile wZRF;
     goto error_zcloneFile;
 
 
-  wCloneContent = wZRF.getURIContent().getDirectoryPath().toCChar();
-  wCloneContent.addConditionalDirectoryDelimiter();
-  wCloneContent += wZRF.getURIContent().getBasename().toCChar();
-  wCloneContent += __CLONE_BASEEXTENSION__ ;
-  wCloneContent +=".";
-  wCloneContent += wZRF.getURIContent().getFileExtension().toCChar();
 
-  _print(
-        " preparing to clone file <%s> into <%s>\n ...Setting path and duplicating header \n",
-        getURIContent().toCChar(),
-        wCloneContent.toCChar());
-
+  if (pCloneName.isEmpty()) {
+      wCloneContent = _getURIClone(wZRF.getURIContent());
+/*      wCloneContent = wZRF.getURIContent().getDirectoryPath().toCChar();
+      wCloneContent.addConditionalDirectoryDelimiter();
+      wCloneContent += wZRF.getURIContent().getBasename().toCChar();
+      wCloneContent += __CLONE_BASEEXTENSION__ ;
+      wCloneContent +=".";
+      wCloneContent += wZRF.getURIContent().getFileExtension().toCChar();
+      */
+  }
+  else
+      wCloneContent = pCloneName;
 
   wZRF._copyFrom((ZFileDescriptor&)*this);
-//  if (wZRF.ZFCB)
-//    delete wZRF.ZFCB;
-
   wZRF.ZFCB._copyFrom(ZFCB);
 
-  wFreeSpace = (pFreeSpace>0)?pFreeSpace:ZFCB.BlockTargetSize ;
+  pErrorLog->textLog(
+        " preparing to clone file <%s> into <%s>\n"
+        "  requested to set free block size at %ld\n"
+        " ...Setting path and duplicating header",
+        getURIContent().toCChar(),
+        wCloneContent.toCChar(),
+         (pFreeSpace>0)?pFreeSpace:ZFCB.BlockTargetSize  );
+
+  if (hasProgressSetupCallBack()) {
+      _progressSetupCallBack(wZRF.ZBAT.count()+10,wZRF.URIContent.toUtf()); /* add 10 to ZBAT count for post processing effort */
+  }
+
+  /* processing free space */
+
+  wFreeSpace = (pFreeSpace > 0)?pFreeSpace:(ZFCB.BlockTargetSize * ZFCB.BlockExtentQuota) ;
+  if (wFreeSpace==0) {
+      if (ZFCB.BlockTargetSize==0)  {
+        while (true) {
+            if (ZBAT.count() == 0 )  { /* no records yet (why using clone ?) */
+                wFreeSpace = 2000 ;
+                break;
+            }
+            for (int wi=0;wi < ZBAT.count() ; wi++) {
+                wMSize += ZBAT[wi].BlockSize;
+            }
+            wMSize = wMSize / ZBAT.count() ;
+            if (ZFCB.BlockExtentQuota == 0) {
+                wFreeSpace = wMSize * cst_ZRF_default_extentquota ;
+                break;
+            }
+            wFreeSpace = wMSize * ZFCB.BlockExtentQuota ;
+            break;
+        }// while true
+      }// ZFCB.BlockTargetSize
+      if (ZFCB.BlockExtentQuota == 0) {
+          wFreeSpace = ZFCB.BlockTargetSize * cst_ZRF_default_extentquota ;
+      } else {
+          wFreeSpace = ZFCB.BlockTargetSize * ZFCB.BlockExtentQuota ;
+      }
+  } //if (wFreeSpace==0)
+
 // composing name
 
 // setting up file header
@@ -7749,11 +8255,15 @@ ZRandomFile wZRF;
      // duplicating FCB parameters
  //    memmove(wDescriptor_Clone.ZFCB,ZFCB, sizeof(ZFileControlBlock));
 
+     if (hasProgressCallBack()) {
+         wPg = 1 ;
+         _progressCallBack(wPg,"Creating file");
+     }
+
      wDescriptor_Clone.Mode = ZBS_Nothing;
      wDescriptor_Clone.ZHeader.Lock =ZLock_Nolock ;
      wDescriptor_Clone.ZFCB.UsedSize = 0;
-    if (__ZRFVERBOSE__)
-        _print(
+     pErrorLog->infoLog(
               " creating clone file <%s>. \n"
               " source used size is %ld - requested additional free size is %ld <%s>\n"
               " Total cloned file size will be %ld\n"
@@ -7764,12 +8274,12 @@ ZRandomFile wZRF;
               "  BlockTargetSize  %ld\n"
               "  HighwaterMarking %s\n"
               "  GrabFreeSpace    %s\n"
-              "______________________________________________\n"
+              "______________________________________________"
           ,
               wCloneContent.toCChar(),
               ZFCB.UsedSize,
               wFreeSpace,
-              (pFreeSpace==0)?"Defaulted to BlockTargetSize":"Given value",
+              (pFreeSpace < 1)?"Computed from BlockTargetSize * extension quota":"Given value",
               ZFCB.UsedSize+wFreeSpace,
 
               ZFCB.UsedSize+wFreeSpace,
@@ -7800,12 +8310,19 @@ ZRandomFile wZRF;
 
      wSt=_open(wDescriptor_Clone,ZRF_Exclusive,wFileType);
 */
-
+    pErrorLog->textLog("Created and opened.");
     wSt=wZRF.zopen(ZRF_Exclusive|ZRF_Write);
     if (wSt!=ZS_SUCCESS)
       goto error_zcloneFile;
 
-    _print("...Populating file with source file with active blocks (%ld)\n",ZBAT.size());
+    if (hasProgressCallBack()) {
+        _progressCallBack(2,"Populating...");
+    }
+
+    pErrorLog->textLog("...Populating file with source file with %ld active blocks.",ZBAT.size());
+    if (hasProgressCallBack()) {
+        _progressCallBack(0,"Populating");
+    }
      for (wi=0;wi<ZBAT.size();wi++)
          {
           wSt=_getByRank(wBlock,wi,wAddress1);        // read block from file
@@ -7817,14 +8334,34 @@ ZRandomFile wZRF;
           if (wj > 10)
           {
             wj=0;
-            fprintf(pOutput,"%ld/%ld\n",wi,ZBAT.size());
+            if (hasProgressCallBack()) {
+
+                _progressCallBack(wPg + wi,utf8VaryingString());
+            }
           }
           wj++;
          } // for
-    fprintf(pOutput,"%ld/%ld\n",wi,ZBAT.size());
+    wPg += wi;
+    pErrorLog->infoLog( "...Populated %ld of %ld blocks from source file\n", wi, ZBAT.size());
 
-    _print( "...Populated %ld blocks from source file\n", wi);
+    if (hasProgressCallBack()) {
+        _progressCallBack(++wPg,"Reserved space");
+    }
+    pErrorLog->textLog("Processing reserved space...");
+
+    if (ZReserved.isEmpty()) {
+         pErrorLog->infoLog("No reserved space to process.");
+    }
+    else {
+        wZRF.setReservedContent(ZReserved);
+        wZRF.updateReservedBlock(ZReserved,true);
+        pErrorLog->infoLog("Updated %ld bytes of reserved space.",ZReserved.Size);
+    }
+    if (hasProgressCallBack()) {
+        _progressCallBack(++wPg,utf8VaryingString());
+    }
      wZRF.zclose();
+
 
 end_zcloneFile:
   zclose();
@@ -7878,29 +8415,9 @@ ZStatus wSt;
     return (_writeFCB(true));
 }
 
-/**
- * @brief ZRandomFile::ztruncateFile will truncate the file pointed by pDescriptor that must be a ZRandomFile opened file to leave a free block of pFreeSpace at the physical end of the file.
- *
- * @note ztruncateFile may only reduce the amount of file space that is declared as "free", that mean : space allocated to
- *  - free block in FreeBlockPool
- *  - the highest address of the file
- * In other words, it should be the last physical block in the file, and this block must be in the Free pool.
- * @see ZRFPools
- *
- * Before truncating file, it could be required to :
- *  - use zreorgFile to free as much file space as possible and to put it at the highest address in a free block
- *  - OR to use zclearFile : Warning : In this case (using zclearFile), all records are lost.
- *
- * If you mention a desired free space equal to -1, then ztruncateFile will take a last block equal to ZFileControlBlock::BlockTargetSize,
- * under the condition that this value is greater than size of a ZBlockHeader.
- *
- * @param[in] pFreeSpace Minimum amount of free space to be left in a last free block at the physical end of the file.
- * If a value of -1 is mentionned (default value) then a space of ZFileControlBlock::BlockTargetSize will be allocated.
- * @param[in] pOutput
- * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
+
 ZStatus
-ZRandomFile::ztruncateFile(const zsize_type pFreeSpace, FILE*pOutput)
+ZRandomFile::ztruncateFile(const zsize_type pFreeSpace, ZaiErrors* pErrorLog)
 {
 ZStatus wSt;
 // search for highest address block within both pools
@@ -7961,11 +8478,10 @@ zsize_type wFreeSpace = (pFreeSpace < 0)?ZFCB.BlockTargetSize : pFreeSpace ;
 
     zsize_type wNewSize = wHighBlock.Address ;
     wNewSize += wFreeSpace;
-
+/*
     int wR=ftruncate(ContentFd,(off_t)wNewSize);
-    if (wR<0)
-            {
-            ZException.getFileError(FContent,
+    if (wR<0) {
+        ZException.getErrno(errno,
                                       _GET_FUNCTION_NAME_,
                                       ZS_FILEERROR,
                                       Severity_Fatal,
@@ -7973,6 +8489,12 @@ zsize_type wFreeSpace = (pFreeSpace < 0)?ZFCB.BlockTargetSize : pFreeSpace ;
                                       URIContent.toString(),
                                       wNewSize);
             ZException.exit_abort();
+            }
+*/
+    wSt=rawTruncate(ContentFd,wNewSize);
+    if (wSt!=ZS_SUCCESS)
+            {
+            return  wSt;
             }
     wHighBlock.BlockSize = wFreeSpace;
     ZFBT[wHighBlockIndex].BlockSize = wFreeSpace;
@@ -8047,44 +8569,135 @@ ZRandomFile::zremoveAll() {
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZRandomFile::zclearFile(const ssize_t pSize)
+ZRandomFile::zclearFile(const ssize_t pSize,bool pHighwater,ZaiErrors* pErrorLog)
 {
 ZStatus wSt;
 long wi;
 zmode_type wMode = ZRF_Nothing ;
 ZFile_type wZFT = ZFT_Nothing;
 bool FOpen = false;
+size_t wFreeBlockSize = 0;
+ssize_t wFreeUserSize = 0;
+int wTotalSize =0;
+ZBlockDescriptor wBS;
 
 
-   if (isOpen())
-            {
-            FOpen=true;
-            wMode=getMode();
-            wZFT = ZHeader.FileType;
-            zclose();
+   if (isOpen()) {
+        FOpen=true;
+        wMode=getMode();
+        wZFT = ZHeader.FileType;
+        zclose();
+   }
+   else {
+        if (ZHeader.FileType==ZFT_Nothing) {
+            wSt=ZS_BADFILETYPE;
+            ZException.setMessage(_GET_FUNCTION_NAME_,
+                                    ZS_FILETYPEWARN,
+                                    Severity_Warning,
+                                    " ZFile_type == ZFT_Nothing : it must be set either by a previous zopen or by setting ZHeader::FileType. Set to ZFT_ZRandomFile");
+            wZFT=ZFT_ZRandomFile;
+            if (pErrorLog!=nullptr) {
+            pErrorLog->errorLog("ZFile_type == ZFT_Nothing : it must be set either by a previous zopen or by setting ZHeader::FileType. Set to ZFT_ZRandomFile  %s",
+                                URIContent.toString());
             }
+        }
         else
-            {
-            if (ZHeader.FileType==ZFT_Nothing)
-                        {
-                        wSt=ZS_BADFILETYPE;
-                        ZException.setMessage(_GET_FUNCTION_NAME_,
-                                                ZS_FILETYPEWARN,
-                                                Severity_Warning,
-                                                " ZFile_type == ZFT_Nothing : it must be set either by a previous zopen or by setting ZHeader::FileType. Set to ZFT_ZRandomFile");
-                        wZFT=ZFT_ZRandomFile;
-                        }
-                else
-                    wZFT = ZHeader.FileType;
-            }// else
-    if ((wSt=_ZRFopen(ZRF_Exclusive|ZRF_All,wZFT))!=ZS_SUCCESS)
-                                                return wSt;
+            wZFT = ZHeader.FileType;
+   }// else
+   wSt=_ZRFopen(ZRF_Exclusive|ZRF_All,wZFT);
+   if (wSt!=ZS_SUCCESS) {
+        if (pErrorLog!=nullptr)
+            pErrorLog->errorLog("Cannot open file mode ZRF_Exclusive|ZRF_All status <%s> file <%s>.",
+                                decode_ZStatus(wSt),URIContent.toString());
+        return wSt;
+   }
 
-    while ((ZBAT.count()>0)&&(wSt==ZS_SUCCESS)) {
+   pHighwater |= getFCB()->HighwaterMarking;
+
+   if (pErrorLog!=nullptr)
+        pErrorLog->infoLog("Requested to clear ZRandomFile %s\n"
+                           "Option are :\n"
+                           " During operation, file size will be adjusted to %ld %s\n"
+                           " %s ",
+                           URIContent.toString(),
+                           pSize, (pSize < 0)?"Existing size will be kept":"",
+                           pHighwater?"Current data will be highwater marked.":"No highwater marking will be applied.");
+
+   /* gather progress information */
+   if (hasProgressSetupCallBack()) {
+    for (int wi=0; wi < ZBAT.count(); wi++)
+        wTotalSize += ZBAT[wi].BlockSize ;
+
+    for (int wi=0; wi < ZFBT.count(); wi++)
+            wTotalSize += ZFBT[wi].BlockSize ;
+    _progressSetupCallBack(int(wTotalSize),"Clearing random file");
+   } // hasProgressSetupCallBack
+
+
+
+   if (pHighwater) { /* highwater marking existing data */
+
+       /* mark used blocks ZBAT */
+       if (hasProgressCallBack())
+            _progressCallBack(0,"Marked ZBAT used blocks");
+
+       if (pErrorLog!=nullptr)
+        pErrorLog->infoLog("Highwater marking.");
+
+       for (int wi=0; wi < ZBAT.count();wi++) {
+           wSt=_highwaterMark_Block(ZBAT[wi]);
+           if (wSt!=ZS_SUCCESS) {
+                if (pErrorLog!=nullptr) {
+                    pErrorLog->errorLog("Severe error status <%s> cannot high water mark record address %ld for file %s",
+                                        decode_ZStatus(wSt),
+                                        ZBAT[wi].Address,
+                                        URIContent.toString());
+                }
+                zclose();
+                return  wSt;
+           }
+           if (hasProgressCallBack()) {
+                wTotalSize += ZBAT[wi].BlockSize;
+                _progressCallBack(wTotalSize,utf8VaryingString());
+           }
+       }
+       /* mark freed blocks ZFBT */
+       if (hasProgressCallBack())
+           _progressCallBack(0,"Marked ZFBT free blocks");
+       for (int wi=0; wi < ZFBT.count();wi++) {
+           wSt=_highwaterMark_Block(ZFBT[wi]);
+           if (wSt!=ZS_SUCCESS) {
+                if (pErrorLog!=nullptr) {
+                    pErrorLog->errorLog("Severe error status <%s> cannot high water mark record address %ld for file %s",
+                                        decode_ZStatus(wSt),
+                                        ZFBT[wi].Address,
+                                        URIContent.toString());
+                }
+                goto zclearFileEnd;
+           }
+           if (hasProgressCallBack()) {
+                wTotalSize += ZBAT[wi].BlockSize;
+                _progressCallBack(wTotalSize,utf8VaryingString());
+           }
+       }
+       if (pErrorLog!=nullptr)
+            pErrorLog->infoLog("End highwater marking process. %ld volume processed.",wTotalSize);
+       /* end highwater marking existing data */
+   } // pHighwater
+
+   if (pErrorLog!=nullptr)
+        pErrorLog->infoLog("Clearing pools.");
+
+   if (hasProgressCallBack())
+        _progressCallBack(0,"Marked ZBAT used blocks");
+
+   while ((ZBAT.count()>0)&&(wSt==ZS_SUCCESS)) {
       wSt=_freeBlock_Commit(0L);
-    }
+   }
     if (wSt!=ZS_SUCCESS) {
-      return  wSt;
+      if (pErrorLog!=nullptr)
+        pErrorLog->infoLog("Error while freeing ZBAT blocks. count is %d ",ZBAT.count());
+      goto zclearFileEnd;
     }
 
     while ((ZFBT.count()>0)&&(wSt==ZS_SUCCESS)) {
@@ -8099,21 +8712,21 @@ bool FOpen = false;
 // Computing size of user content for mega free block
 //          computed size for mega free block - sizeof(ZBlockHeader_Export)
 
-    size_t wFreeBlockSize = 0;
-    ssize_t wFreeUserSize = 0;
-
     // get file size
     wSt=rawSeekEnd(ContentFd,wFreeBlockSize);
     if (wSt!=ZS_SUCCESS) {
       ZException.setMessage(
-          _GET_FUNCTION_NAME_,
-          ZS_FILEPOSERR,
+          "ZRandomFile::zclearFile",
+          wSt,
           Severity_Severe,
-          " Severe error while positionning to end of file %s",
+          "Severe error while positionning to end of file %s",
           URIContent.toString());
-      wSt=ZS_FILEPOSERR;
-      zclose();
-      return  wSt;
+      if (pErrorLog!=nullptr) {
+            pErrorLog->errorLog("Severe error status <%s> while positionning to end of file %s",
+                                decode_ZStatus(wSt),
+                                URIContent.toString());
+      }
+       goto zclearFileEnd;
     }
 
     // user requested pSize bytes
@@ -8125,20 +8738,22 @@ bool FOpen = false;
         wSt = rawAllocate(ContentFd,wFreeBlockSize,(pSize-wFreeBlockSize));
         if (wSt != ZS_SUCCESS) {
           ZException.setMessage(_GET_FUNCTION_NAME_,
-              ZS_CANTALLOCSPACE,
+              wSt,
               Severity_Severe,
-              " Severe error while extending file space to end of file %s",
+              " Severe error while extending file space from end of file %s",
               URIContent.toString());
-          wSt= ZS_CANTALLOCSPACE;
-          zclose();
-          return  wSt;
+            if (pErrorLog!=nullptr) {
+                pErrorLog->errorLog("Severe error status <%s> while extending file space from end of file %s",
+                                    decode_ZStatus(wSt),
+                                    URIContent.toString());
+            }
+ //         wSt= ZS_CANTALLOCSPACE;
+           goto zclearFileEnd;
         } // if (wSt != ZS_SUCCESS)
       } // if (wFreeBlockSize < size_t(pSize))
     } // if (pSize > 0)
 // create one block with all the available space
 // write the block descriptor to content file
-
-    ZBlockDescriptor wBS;
 
     wBS.Address = resetPosition() ; // get the start of data physical address and align logicalPosition
 
@@ -8150,11 +8765,14 @@ bool FOpen = false;
 // write this block header to content file at start of data
 
     wSt=_writeBlockHeader((ZBlockHeader&)wBS,wBS.Address);
-    if (wSt!=ZS_SUCCESS)
-                {
-                zclose();
-                return  wSt;
-                }
+    if (wSt!=ZS_SUCCESS) {
+      if (pErrorLog!=nullptr) {
+        pErrorLog->errorLog("Severe error status <%s> cannot write record block header file %s",
+                            decode_ZStatus(wSt),
+                            URIContent.toString());
+      }
+      goto zclearFileEnd;
+    }
 // Then reset all pools
 //
 
@@ -8168,14 +8786,19 @@ bool FOpen = false;
 // just the mega free block in free block pool
 
 // Now take care of HighwaterMarking : if no HWM : job is done
-    if (ZFCB.HighwaterMarking)  {    // if highwatermarking then set the file region to zero
-        wSt=_highwaterMark_Block(wBS);
-        if (wSt!=ZS_SUCCESS)
-                    {
-                    zclose();
-                    return  wSt;
-                    }
-        }// if HighWaterMarking
+//    if (ZFCB.HighwaterMarking)  {    // if highwatermarking then set the file region to zero
+    if (pHighwater)  {    // if highwatermarking then set the file region to zero
+         wSt=_highwaterMark_Block(wBS);
+        if (wSt!=ZS_SUCCESS) {
+            if (pErrorLog!=nullptr) {
+              pErrorLog->errorLog("Severe error status <%s> cannot high water mark record address %ld for file %s",
+                                  decode_ZStatus(wSt),
+                                  wBS.Address,
+                                  URIContent.toString());
+            }
+            goto zclearFileEnd;
+        }
+    }// if HighWaterMarking
 
     fdatasync(ContentFd); // quicker than flush : writes only data and not metadata to file
     ZFCB.UsedSize = 0 ;
@@ -8185,11 +8808,15 @@ bool FOpen = false;
     CurrentRank = -1;
     LogicalPosition = -1;
     PhysicalPosition = -1;
+
+ zclearFileEnd:
+
     zclose();                           // nb zclose write the whole file header
 
     if (FOpen)     // if file was open re-open in same mode
             { return  _ZRFopen(wMode,wZFT);}
-    return  ZS_SUCCESS;
+    return  wSt;
+
 }// zclearFile
 
 /**
@@ -8232,54 +8859,8 @@ bool FOpen = false;
  * @return    a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
 
  */
-ZStatus
-ZRandomFile::zreorgUriFile (uriString &pURI, bool pDump, FILE *pOutput)
- {
 
 
-ZStatus wSt;
-
-    wSt=setPath(pURI);
-    if (wSt!=ZS_SUCCESS)
-                { return  wSt;}
-
-    return  _reorgFile(pDump,pOutput);
-}
-
-/**
- * @brief ZRandomFile::zreorgFile Will reorganize the current ZRandomFile's file surface : eliminate remaining holes between holes and sort physical blocks according to their rank (logical position)
- *
- * using this routine, content file is reorganized internally to the existing file using ZRandomFile capabilities :
- *  - existing freeblocks allocations
- *  - content file space temporary extensions
- *
- * @par Result
- * As a result to this routine :
- *  - holes will be eliminated
- *  - no free block AND no holes will physically remain between used blocks
- *  - only one free block gathering all available space will take place physically at the end of the file
- *  - rank of active records is not changed.
- *
- * So that, at the end of the process, file may be used as it was used previously.
- *
- * @par File size and extensions
- *  During reorganization process, content file will most probably be extended.
- *  To this purpose, there will be a need of disk space during extension :
- *  - depending to the file structure and specifically to the maximum blocksize (ZFileControlBlock::MaxSize) that could be evaluated with routines like ZRandomFile::ZRFstat,
- *    we can however state that one third of the file space will be used as an extension.
- *  - this disk space will be freed at the end of the reorganization process, and content file size will be readjusted to the size it had before the start of the process.
- *
- * @warning this routine cannot be used in a ZMasterFile / ZIndexedFile context. If such a processing is done, integrity of Key indexes is totally lost.
- * Why? Because the main link between index keys and record content is block addresses. zreorgFile changes addresses for blocks, then it will totally mess up index key orders.
- * @param[in] pOutput a FILE* pointer where the reporting will be made. Defaulted to stdout.
-  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
- */
-ZStatus
-ZRandomFile::zreorgFile(FILE*pOutput)
-{
-
-    return(_reorgFile(pOutput));
-}
 
 /**
  * @brief ZRandomFile::_reorgFile Will reorganize the file surface : eliminate remaining holes between holes and sort physical blocks according to their rank (logical position)
@@ -8312,7 +8893,7 @@ ZRandomFile::zreorgFile(FILE*pOutput)
   * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZRandomFile::_reorgFile(bool pDump,FILE*pOutput)
+ZRandomFile::zreorgFile(long pRequestedFreeBlocks ,bool pDump,ZaiErrors* pErrorLog)
 {
 ZStatus wSt;
 bool wgrabFreeSpaceSet = false ;
@@ -8336,30 +8917,44 @@ ZFile_type wFileType = ZFT_ZRandomFile;
             wFileType = ZHeader.FileType;
             zclose();
             }
-    if ((wSt=_ZRFopen(ZRF_Exclusive|ZRF_Read_Only,wFileType))!=ZS_SUCCESS) // open with appropriate ZFile_type
-                                                        return wSt;
+    if ((wSt=_ZRFopen(ZRF_Exclusive|ZRF_Read_Only,wFileType))!=ZS_SUCCESS) { // open with appropriate ZFile_type
+        pErrorLog->logZExceptionLast("ZRandomFile::zreorgFile");
+        return wSt;
+    }
     if (!ZFCB.GrabFreeSpace)        // activate grabFreeSpace if it has been set on
                 {
                 ZFCB.GrabFreeSpace=true;
                 wgrabFreeSpaceSet = true;
                 }
+/*
+    wSt= _reorgFileInternals(pRequestedFreeBlocks,pDump,pErrorLog);
+    if (wSt!=ZS_SUCCESS) {
+        pErrorLog->logZExceptionLast("ZRandomFile::_reorgFile");
+    }
+    if (wgrabFreeSpaceSet)   {        // restore grabFreeSpace if it was off and has been set on
+        ZFCB.GrabFreeSpace=false;
+    }
+*/
+    uriString wFileToReorg = getURIContent();
+    uriString wReorgCloned = _getURIReorgClone(getURIContent());
 
-    wSt= _reorgFileInternals(pDump,pOutput);
-    if (wSt!=ZS_SUCCESS)
-            ZException.printUserMessage(pOutput);
-
-    if (wgrabFreeSpaceSet)        // restore grabFreeSpace if it was off and has been set on
-                 {
-                 ZFCB.GrabFreeSpace=false;
-                 }
+    wSt=_cloneFile(pRequestedFreeBlocks,wReorgCloned,pErrorLog);
     zclose ();
-    if (wasOpen)
-            _ZRFopen(wMode,wFileType);
+
+    pErrorLog->textLog("Replacing file <%s> by <%s> .",getURIContent().toString(),wReorgCloned.toString());
+
+    _removeFile(false,pErrorLog);
+
+    wSt=renameTo(wReorgCloned,wFileToReorg,pErrorLog);
+    if (wSt==ZS_SUCCESS) {
+    pErrorLog->textLog("Reorganized file sucessfull.");
+    }
+
     return  (wSt);
 } // _reorgFile
 
 ZStatus
-ZRandomFile::_reorgFileInternals(bool pDump,FILE*pOutput)
+ZRandomFile::_reorgFileInternals(long pRequestedFreeBlocks ,/*bool pDump,*/ ZaiErrors *pErrorLog)
 {
 ZStatus wSt;
 zrank_type    wZBATIdx = 0;
@@ -8379,20 +8974,28 @@ zsize_type wSumUsedSize  = 0;
 zsize_type wSumBlockSize = 0;
 zsize_type wMinBlockSize ;
 zsize_type wMaxBlockSize = 0;
+
+long    wMovedBlocks = 0;
+long    wAlignedBlocks = 0;
+
 long wOld;
 
 long wi;
+    pErrorLog->setStoreSeverityAtLeast(ZAIES_Text);
 
-
-_print("ZRandomFile::_reorgFileInternals Starting at %s reorganization of file %s", ZDateFull::currentDateTime().toFormatted().toUtf(),URIContent.toCChar());
+    pErrorLog->textLog("ZRandomFile::_reorgFileInternals Starting at %s reorganization of file %s", ZDateFull::currentDateTime().toFormatted().toUtf(),URIContent.toCChar());
 // pDescriptor MUST point to an opened ZRandomFile in ZRF_Exclusive move
 
     wCurrentAddress = ZFCB.StartOfData ;
 
-zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
+    zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
 
     // first add a last element in ZBAT that will contain remaining space at each time
     // in order for free space not to be grabbed by _getFreeBlock allocation
+
+    if (hasProgressSetupCallBack()) {
+        _progressSetupCallBack(ZBAT.count(),URIContent);
+    }
 
     wBlockReminder.clear();
     wMaxAddress= -1;
@@ -8402,6 +9005,10 @@ zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
 
     wBlockReminder.State = ZBS_Control ; // special ZBS
 //    ZBAT.push(wBlockReminder); // created
+
+    if (hasProgressCallBack()) {
+        _progressCallBack(0,"Used records");
+    }
 
      while (wZBATIdx<ZBAT.size())
      {
@@ -8416,17 +9023,16 @@ zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
      if (wMaxBlockSize < ZBAT[wZBATIdx].BlockSize)
                                     wMaxBlockSize = ZBAT[wZBATIdx].BlockSize;
 
-     if (ZBAT[wZBATIdx].Address == wCurrentAddress) // is block already at correct place ?
-                    {
-                    wCurrentAddress += ZBAT[wZBATIdx].BlockSize ;    // ready for next block
+     if (ZBAT[wZBATIdx].Address == wCurrentAddress) { // is block already at correct place ?
+        wCurrentAddress += ZBAT[wZBATIdx].BlockSize ;    // ready for next block
 
-                    wBlockReminder.Address = wCurrentAddress;
-                    wBlockReminder.BlockSize = 0;
-//                    ZBAT.last().Address = wCurrentAddress;
-//                    ZBAT.last().BlockSize = 0;
-                    wZBATIdx ++;
-                    continue ;
-                    }
+        wBlockReminder.Address = wCurrentAddress;
+        wBlockReminder.BlockSize = 0;
+        wZBATIdx ++;
+        wAlignedBlocks++;
+        _progressCallBack(wZBATIdx,utf8VaryingString());
+        continue ;
+     }
 
 
      wMaxAddress = -1;
@@ -8437,10 +9043,11 @@ zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
      wCurrentBlock = ZBAT[wZBATIdx] ;
      wNeedOfSpace = wCurrentBlock.BlockSize ;
 
+     wMovedBlocks++;
+
      wStartAddress = wCurrentAddress;                       // we will implant
      wEndAddress = wStartAddress + wCurrentBlock.BlockSize + 1 ;   // up to here
-     if (__ZRFVERBOSE__)
-       _print(
+     pErrorLog->textLog(
               "---------ZBAT rank %ld \n"
               "  Source address %ld block size %ld \n"
               "  Start address %ld End Address %ld  Size needed %ld------\n"
@@ -8453,6 +9060,7 @@ zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
               wEndAddress,
               wCurrentBlock.BlockSize,
               (wCurrentBlock.Address < wEndAddress) ? "   Warning : destination address overlaps source\n":"\n");
+
 // find all blocks that are present on wCurrentAddress , wNeedOfSpace
 
 
@@ -8471,8 +9079,7 @@ zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
                                     }
                         wZAIdx.push(wi);
                         wZABlocksMove.push(ZBAT.Tab(wi));
-                        if (__ZRFVERBOSE__)
-                            _print(
+                        pErrorLog->textLog(
                                  " Selecting for move ZBAT block rank %ld address %ld size %ld ",
                                  wi,
                                  ZBAT.Tab(wi).Address,
@@ -8481,25 +9088,21 @@ zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
 
             }// for
 
-    for (long wi=0;wi < ZFBT.size();wi++)
-            {
-    if ((ZFBT.Tab(wi).Address >= wStartAddress)&&(ZFBT.Tab(wi).Address < wEndAddress))
-                        {
-                        if (ZFBT.Tab(wi).Address>wMaxAddress)
-                                        {
-                                        wMaxAddress = ZFBT.Tab(wi).Address;
-                                        wMaxLastAddress = wMaxAddress + ZFBT.Tab(wi).BlockSize;
-                                        }
-                        wZAIdx.push(wi);
-                        wZABlocksMove.push(ZFBT.Tab(wi));
-                        if (__ZRFVERBOSE__)
-                            _print(
-                                 " Selecting for deletion ZFBT block rank %ld address %ld size %ld",
-                                 wi,
-                                 ZFBT.Tab(wi).Address,
-                                 ZFBT.Tab(wi).BlockSize);
-                        }
-            }// for
+    for (long wi=0;wi < ZFBT.size();wi++) {
+        if ((ZFBT.Tab(wi).Address >= wStartAddress)&&(ZFBT.Tab(wi).Address < wEndAddress)) {
+            if (ZFBT.Tab(wi).Address>wMaxAddress) {
+                            wMaxAddress = ZFBT.Tab(wi).Address;
+                            wMaxLastAddress = wMaxAddress + ZFBT.Tab(wi).BlockSize;
+            }
+        wZAIdx.push(wi);
+        wZABlocksMove.push(ZFBT.Tab(wi));
+        pErrorLog->textLog (
+                 "Selecting for deletion ZFBT block rank %ld address %ld size %ld",
+                 wi,
+                 ZFBT.Tab(wi).Address,
+                 ZFBT.Tab(wi).BlockSize);
+        } // if
+    }// for
 
 // up to here we have
 // the list of index from ZFBT and ZBAT concerned
@@ -8535,8 +9138,7 @@ zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
         wi ++;
         continue;
       }
-      if (__ZRFVERBOSE__)
-        _print(" ----Moving ZBAT block rank %ld----- \n    Getting free space size %ld",
+      pErrorLog->infoLog(" ----Moving ZBAT block rank %ld----- \n    Getting free space size %ld",
                     wZAIdx[wi],
                     wZABlocksMove[wi].BlockSize);
       long wFBTRank=0;
@@ -8544,6 +9146,7 @@ zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
         ZException.setMessage(_GET_FUNCTION_NAME_,ZS_CANTALLOCSPACE,Severity_Fatal,
             "Cannot get free block under constraint of address %ld file %s.\n"
             "File reorganization is interrupted. This may cause file structure problems.",wEndAddress,URIContent.toCChar());
+        pErrorLog->logZExceptionLast("ZRandomFile::_reorgFileInternals");
         return    ZS_CANTALLOCSPACE;
       }
       wBMin.Address=ZFBT[wFBTRank].Address;
@@ -8554,7 +9157,7 @@ zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
       // moving block to make room
       ZBAT[wZAIdx[wi]].State = ZBS_Used;         // state is still ZBS_Used
       ZBAT[wZAIdx[wi]].Address = wBMin.Address;  // new address for moved block
-      _print(
+      pErrorLog->textLog(
                " Making room : Moving block ZBAT index %ld from address %ld to address %ld size is %ld",
                 wZAIdx[wi],
                wZABlocksMove[wi].Address,
@@ -8575,17 +9178,17 @@ zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
     } // if wBlockReminder has not enough space
 
 
-    if (wCurrentBlock.Address < wEndAddress)
-                {
-        _print(" Warning : Block Overlap Detected-----------");
-        if (pDump)
-                    {
-            _headerDump();
-            _surfaceScan();
-                    }
-                }
-    if (__ZRFVERBOSE__)
-        _print(
+    if (wCurrentBlock.Address < wEndAddress) {
+        pErrorLog->warningLog("------------Block Overlap Detected at address %ld with address %ld-----------",
+                              wCurrentBlock.Address,wEndAddress);
+  /*      if (pDump) {
+            _headerDump(pErrorLog);
+            _surfaceScan(pErrorLog);
+        }
+  */
+    }
+
+    pErrorLog->infoLog(
              " -- Moving block ZBAT index %ld from address %ld to its sorted address %ld  size of block is %ld",
               wZBATIdx,
              ZBAT[wZBATIdx].Address,
@@ -8609,40 +9212,41 @@ zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
 
     wCurrentAddress += ZBAT[wZBATIdx].BlockSize ;    // ready for next block
 
-    if (wMaxLastAddress>0) // if there was some blocks moved (ZBAT) or deleted (ZFBT)
-            {
+    if (wMaxLastAddress > 0)  { // if there was some blocks moved (ZBAT) or deleted (ZFBT)
 //    ZBAT.last().Address = wCurrentAddress;
 //    ZBAT.last().BlockSize = wMaxLastAddress-wCurrentAddress;
     wBlockReminder.Address = wCurrentAddress;
     wBlockReminder.BlockSize = wMaxLastAddress-wCurrentAddress;
-            }
-        else    // if not
-            {
+    }
+    else    {    // if not
             wBlockReminder.BlockSize -= wCurrentBlock.BlockSize ;
             wBlockReminder.Address = wCurrentAddress;
-            }
-    _print("   Reminder address %ld size %ld    - wMaxAddress %ld wMaxLastAddress  %ld  wCurrentAddress %ld",
+    }
+    pErrorLog->infoLog("   Reminder address %ld size %ld    - wMaxAddress %ld wMaxLastAddress  %ld  wCurrentAddress %ld",
              wBlockReminder.Address,
              wBlockReminder.BlockSize,
              wMaxAddress,
              wMaxLastAddress,
              wCurrentAddress);
-    if (pDump)
-                {
-        _headerDump();
-        _surfaceScan();
-                }
-
+ /*   if (pDump) {
+        _headerDump(pErrorLog);
+        _surfaceScan(pErrorLog);
+    }
+*/
 
     //_writeFileDescriptor(pDescriptor) ; // needed because we read the descriptor in _scanSurface
 
-    wZBATIdx ++;
-     }// while
+    if (hasProgressCallBack()) {
+        _progressCallBack(wZBATIdx,utf8VaryingString());
+    }
+
+        wZBATIdx ++;
+     }// while wZBATIdx
 
 //
 //  Cleaning Free blocks pool
 //
-  _print(".....Deleting Free blocks....");
+  pErrorLog->textLog(".....Deleting Free blocks....");
   for (wi=0;wi < ZFBT.size();wi++) {
          ZFBT.Tab(wi).State = ZBS_Deleted;
          wSt=_writeBlockHeader(ZFBT.Tab(wi),ZFBT.Tab(wi).Address);
@@ -8650,7 +9254,7 @@ zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
                      { return  wSt;}
   }
   ZFBT.clear();
-  _print(" <%ld> free blocks deleted\n",wi);
+  pErrorLog->infoLog(" <%ld> free blocks deleted\n",wi);
 
 // compute now free block is what remains after the last address
 // at this stage, remaining free blocks will be at the upper stack of the file
@@ -8660,28 +9264,27 @@ zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
     wCurrentBlock.Address = wCurrentAddress ;
     wCurrentBlock.State = ZBS_Free;
 
-    if ((wCurrentBlock.BlockSize=(zsize_type)lseek(ContentFd,0L,SEEK_END))<0)    // position to end of file and get position in return as file size
-                {
-                ZException.getErrno(errno,
-                                _GET_FUNCTION_NAME_,
-                                ZS_FILEPOSERR,
-                                Severity_Severe,
-                                " Severe error while positionning to end of file %s",
-                                URIContent.toString());
+    if ((wCurrentBlock.BlockSize=(zsize_type)lseek(ContentFd,0L,SEEK_END))<0) {    // position to end of file and get position in return as file size
+        ZException.getErrno(errno,
+                        _GET_FUNCTION_NAME_,
+                        ZS_FILEPOSERR,
+                        Severity_Severe,
+                        " Severe error while positionning to end of file %s",
+                        URIContent.toString());
 
-
-                wSt=ZS_FILEPOSERR;
-                return  wSt;
-                }
+        pErrorLog->logZExceptionLast("ZRandomFile::_reorgFileInternals");
+        wSt=ZS_FILEPOSERR;
+        return  wSt;
+    }
 //
     wCurrentBlock.BlockSize -= wCurrentAddress;
     ZFBT._addSorted(wCurrentBlock);
     wSt=_writeBlockHeader(wCurrentBlock,wCurrentAddress);
     if (wSt!=ZS_SUCCESS)
                 { return  wSt;}
-    if (__ZRFVERBOSE__)
-        _print(
-             " creating one free block gathering all available space\n"
+    pErrorLog->textLog(
+             " creating one free block gathering all available space");
+    pErrorLog->infoLog(
              "    free block is address %ld blocksize %ld",
              wCurrentBlock.Address,
              wCurrentBlock.BlockSize);
@@ -8690,58 +9293,104 @@ zsize_type wFileSize = getAllocatedSize(); // get initial allocated size
     if (wSt!=ZS_SUCCESS)
                 {  return  wSt;}
 
-    _print("  Physical file surface reorganization finished successfully at %s",ZDateFull::currentDateTime().toFormatted().toUtf());
+
 
 // compute Block Target Size
-    _print(" ----------adjusting file size to initial value %ld",wFileSize);
+    pErrorLog->infoLog(" ----------adjusting file size to initial value %ld",wFileSize);
 
-    if (getAllocatedSize()<=wFileSize) {
-      _print(" No need to readjust file size.");
+    if (getAllocatedSize() <= wFileSize) {
+      pErrorLog->infoLog(" No need to readjust file size.");
             }
     else {
       zsize_type wS=wFileSize-wCurrentBlock.Address;
       if (wS>0) {
-        wSt=ztruncateFile(wS,pOutput);
+        wSt=ztruncateFile(wS,pErrorLog);
         if (wSt!=ZS_SUCCESS)
                     {  return  wSt;}
       }
     }// else
 
-    _print(" -----------------Adjusting values -----------------------");
+    pErrorLog->textLog(" -----------------Adjusting values -----------------------");
 
     wOld = ZFCB.BlockTargetSize ;
     ZFCB.BlockTargetSize  = (long)((float)wSumBlockSize / (float)ZBAT.size());
-    _print(
+    pErrorLog->infoLog(
              " BlockTargetSize former value %ld  new value %ld.",
              wOld,
              ZFCB.BlockTargetSize);
 
     wOld = ZFCB.UsedSize ;
     ZFCB.UsedSize  = (long)((float)wSumUsedSize / (float)ZBAT.size());
-    _print(
+    pErrorLog->infoLog(
              " UsedSize former value %ld  new value %ld.",
              wOld,
              ZFCB.UsedSize);
 
 
-    _print(
+    pErrorLog->infoLog(
              " MinSize- Minimum block size found : former value %ld  new value %ld.",
              ZFCB.MinSize,
              wMinBlockSize
              );
     ZFCB.MinSize=wMinBlockSize;
-    _print(
+    pErrorLog->infoLog(
              " MaxSize- Maximum block size found : former value %ld  new value %ld.",
              ZFCB.MaxSize,
              wMaxBlockSize
              );
-
-
     ZFCB.MaxSize=wMaxBlockSize;
+
+    const char* wM="given value";
+    if (pRequestedFreeBlocks < 0) {
+        wM = "computed value";
+        if (ZBAT.count() < cst_ZRF_default_extentquota) {
+            pRequestedFreeBlocks = cst_ZRF_default_extentquota ;
+        }
+        else {
+            pRequestedFreeBlocks = size_t (double(ZBAT.count()) / 10.0);
+            if (pRequestedFreeBlocks < cst_ZRF_default_extentquota)
+                pRequestedFreeBlocks = cst_ZRF_default_extentquota ;
+        }
+    }
+
+
+    size_t wRequestedFreeSpace = pRequestedFreeBlocks * ZFCB.BlockTargetSize;
+    pErrorLog->textLog( "---------Computing required free size----------------------\n"
+                        "free space requested : for a number of blocks of %ld (%s) with mean block size of %ld\n"
+                        "Computed free space is %ld",
+             pRequestedFreeBlocks, wM , ZFCB.BlockTargetSize,
+             wRequestedFreeSpace
+             );
+    while (true) {
+        if (wRequestedFreeSpace != ZFBT.last().BlockSize) {
+            pErrorLog->infoLog("File free space is correct and does not need to be extended or truncated.");
+            break;
+        }
+        if (wRequestedFreeSpace < ZFBT.last().BlockSize) {
+            wSt=ztruncateFile(wRequestedFreeSpace,pErrorLog);
+            pErrorLog->infoLog("File free space has been truncated with a free space of %ld");
+            break;
+        }
+        /* here file needs to be extended */
+        wRequestedFreeSpace = wRequestedFreeSpace - ZFBT.last().BlockSize ;
+        wSt=zextendFile(wRequestedFreeSpace);
+        pErrorLog->infoLog("File free space has been extended with a free space of %ld");
+        break;
+    }// while true
+
+
 
     CurrentRank = -1;
     LogicalPosition = -1;
     PhysicalPosition = -1;
+
+    pErrorLog->textLog("ZRandomFile::_reorgFileInternals Physical file surface reorganization finished successfully at %s\n"
+                       "Aligned blocks %ld\n"
+                       "Moved blocks   %ld",
+                       ZDateFull::currentDateTime().toFormatted().toUtf(),
+                       wAlignedBlocks,
+                       wMovedBlocks);
+
     return  wSt;
 } // _reorgFileInternals
 
@@ -8775,12 +9424,22 @@ void ZRandomFile::_print(const utf8VaryingString& pOut) {
  * @brief ZRandomFile::putTheMess  For test purposes changes blocks allocations
  */
 void
-ZRandomFile::putTheMess (void)
+ZRandomFile::putTheMess (ZaiErrors* pErrorLog)
 {
+    int wSrc, wDest , wi=0, wM = ZBAT.count() / 2;
+    while (wi < wM) {
+        while (true) {
+        wSrc = rand() % ZBAT.count() ;
+        wDest = rand() % ZBAT.count() ;
+        if (wSrc==wDest)
+            continue;
+        break;
+        }
+        pErrorLog->textLog("putTheMess Swapping ZBAT rank %d with %d.", wSrc,wDest);
+        ZBAT.swap(wSrc,wDest) ;
+        wi++;
+    }
 
-    ZBAT.swap(1,3) ;
-    ZBAT.swap(0,5) ;
-    ZBAT.swap(2,7) ;
     _writeFCB(true);
     return;
 }
@@ -8872,9 +9531,9 @@ off_t wOff = lseek (ContentFd,pBlock.Address + sizeof(ZBlockHeader_Export),SEEK_
 int ZRandomFile::fromXml(zxmlNode* pIndexRankNode, ZaiErrors* pErrorlog)
 {
   zxmlElement *wRootNode;
-  utfcodeString wXmlHexaId;
-  utf8String wValue;
-  utfcodeString wCValue;
+  utf8VaryingString wXmlHexaId;
+  utf8VaryingString wValue;
+  utf8VaryingString wCValue;
   bool wBool;
   unsigned int wInt;
   ZStatus wSt = pIndexRankNode->getChildByName((zxmlNode *&) wRootNode, "icbowndata");
@@ -9145,7 +9804,7 @@ ZStatus wSt;
 ZStatus
 generateURIHeader (uriString pURIPath,uriString &pURIHeader)
 {
-    utf8String wExt=pURIPath.getFileExtension();
+    utf8VaryingString wExt=pURIPath.getFileExtension();
 
 //    const utf8_t* wExtension=(const utf8_t*)__HEADER_FILEEXTENSION__ + 1;
 //     if (wExtension[0]=='.')
@@ -9173,6 +9832,33 @@ generateURIHeader (uriString pURIPath,uriString &pURIHeader)
     return ZS_SUCCESS;
 }
 
+
+
+
+void
+ZRandomFile::PoolReport(ZaiErrors *pErrorLog)
+{
+    size_t wZBATSize=0,wZFBTSize=0,wZHOTSize=0;
+    pErrorLog->textLog("_____________________Pool Content________________________________________");
+
+    for (int wi=0;wi < ZBAT.count();wi++) {
+        wZBATSize += ZBAT[wi].BlockSize;
+    }
+    for (int wi=0;wi < ZFBT.count();wi++) {
+        wZFBTSize += ZFBT[wi].BlockSize;
+    }
+    for (int wi=0;wi < ZHOT.count();wi++) {
+        wZHOTSize += ZHOT[wi].BlockSize;
+    }
+
+    pErrorLog->textLog("Block access table (ZBAT) count %4d  volume %6ld\n"
+                       "Free blocks  table (ZFBT) count %4d  volume %6ld\n"
+                       "Holes table (ZHOT)        count %4d  volume %6ld",
+                       ZBAT.count(),wZBATSize,
+                       ZFBT.count(),wZFBTSize,
+                       ZHOT.count(),wZHOTSize);
+    pErrorLog->textLog("_________________________________________________________________________");
+}
 
 /**
  * @brief decode_ZBS gives the key word content of a ZBlockState_type using its code
@@ -9284,7 +9970,7 @@ decode_ZBID (ZBlockId pZBID)
 }//switch
 }//decode_ZBS
 
-utf8String wMode;
+utf8VaryingString wMode;
 
 const char *
 decode_ZRFMode (zmode_type pZRF)
@@ -9314,35 +10000,36 @@ decode_ZRFMode (zmode_type pZRF)
 }//decode_ZRFMode
 
 zmode_type
-encode_ZRFMode (char *pZRF)
+encode_ZRFMode (const utf8VaryingString& pZRF)
 {
 zmode_type wRet = ZRF_Nothing;
 
-  if (strstr(pZRF,"ZRF_NotOpen" )!=nullptr)
+  if (pZRF.hasToken((const utf8_t*)"ZRF_NotOpen"))
       return ZRF_NotOpen;
 
-  if (strstr(pZRF,"ZRF_TypeRegardless" )!=nullptr)
+  if (pZRF.hasToken((const utf8_t*)"ZRF_TypeRegardless"))
     wRet |= ZRF_TypeRegardless;
 
-    if (strstr(pZRF,"ZRF_Exclusive" )!=nullptr)
-                            wRet |= ZRF_Exclusive;
-    if (strstr(pZRF,"ZRF_ManualLock" )!=nullptr)
-                            wRet |= ZRF_ManualLock;
+    if (pZRF.hasToken((const utf8_t*)"ZRF_Exclusive"))
+        wRet |= ZRF_Exclusive;
 
-    if (strstr(pZRF,"ZRF_Read_Only" )!=nullptr)
-                            wRet |= ZRF_Read_Only;
-    if (strstr(pZRF,"ZRF_Write_Only" )!=nullptr)
-                            wRet |= ZRF_Write_Only;
-    if (strstr(pZRF,"ZRF_Delete_Only" )!=nullptr)
-                            wRet |= ZRF_Delete_Only;
-    if (strstr(pZRF,"ZRF_All" )!=nullptr)
-                            wRet |= ZRF_All;
-    if (strstr(pZRF,"ZRF_Modify" )!=nullptr)
-                            wRet |= ZRF_Modify;
-    if (strstr(pZRF,"ZRF_Write" )!=nullptr)
-                            wRet |= ZRF_Write;
-    if (strstr(pZRF,"ZRF_Delete" )!=nullptr)
-                            wRet |= ZRF_Delete;
+    if (pZRF.hasToken((const utf8_t*)"ZRF_ManualLock"))
+        wRet |= ZRF_ManualLock;
+
+    if (pZRF.hasToken((const utf8_t*)"ZRF_Read_Only"))
+        wRet |= ZRF_Read_Only;
+    if (pZRF.hasToken((const utf8_t*)"ZRF_Write_Only"))
+        wRet |= ZRF_Write_Only;
+    if (pZRF.hasToken((const utf8_t*)"ZRF_Delete_Only"))
+        wRet |= ZRF_Delete_Only;
+    if (pZRF.hasToken((const utf8_t*)"ZRF_All"))
+        wRet |= ZRF_All;
+    if (pZRF.hasToken((const utf8_t*)"ZRF_Modify"))
+        wRet |= ZRF_Modify;
+    if (pZRF.hasToken((const utf8_t*)"ZRF_Write"))
+        wRet |= ZRF_Write;
+    if (pZRF.hasToken((const utf8_t*)"ZRF_Delete"))
+        wRet |= ZRF_Delete;
     return wRet;
 }//encode_ZRFMode
 

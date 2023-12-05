@@ -6,7 +6,8 @@
 #include <functional>
 
 #include <QTextCursor>
-
+#include <stdint.h>
+#include <ztoolset/zaierrors.h>
 
 extern const int cst_MessageDuration ;
 
@@ -14,6 +15,16 @@ extern const int cst_MessageDuration ;
 #define __MORE_CALLBACK__(__NAME__)  std::function<void ()> __NAME__
 #define __FILTRATE_CALLBACK__(__NAME__)  std::function<bool (const utf8VaryingString&)> __NAME__
 
+class QVBoxLayout;
+class QHBoxLayout;
+
+class QSpacerItem;
+class QLineEdit;
+class QLabel;
+class QPushButton;
+
+class QStatusBar;
+class QMenuBar;
 
 class uriString;
 class utf8VaryingString;
@@ -24,11 +35,13 @@ class QTextCharFormat;
 class QActionGroup;
 class QAction;
 class QMenu;
-
+/*
 namespace Ui {
 class textEditMWn;
 }
-
+*/
+#ifndef __ZTEXTEDITOPTION__
+#define __ZTEXTEDITOPTION__
 enum ZTextEditOption : uint32_t {
   TEOP_Nothing        = 0,
   TEOP_CloseBtnHide   = 0x01,     /* if set Close button hides dialog, while if not set close button closes */
@@ -36,6 +49,7 @@ enum ZTextEditOption : uint32_t {
   TEOP_NoCloseBtn     = 0x08,      /* no close button */
   TEOP_NoFileLab      = 0x10      /* hide label closed / open file */
 };
+#endif // __ZTEXTEDITOPTION__
 
 class ZContentVisuMain;
 class ZLineNumberArea;
@@ -63,16 +77,11 @@ public:
   }
   void appendTextColor(QColor pTextColor,const char *pText,...);
 
-
   void appendHtml(const char *pText,...);
-
-
 
   void setPositionOrigin ();
 
   void filtrate() ;
-
-  void setFileClosed(bool pYesNo);
 
   void useLineNumbers(bool pOnOff) ;
 
@@ -100,7 +109,16 @@ public:
   void lineNumbersOnOff();
   void wordWrap();
 
-private Q_SLOTS :
+  void displayColorCallBack(uint8_t pSeverity, const utf8VaryingString &pMessage);
+  void displayCallBack(const utf8VaryingString &pMessage);
+
+  void registerDisplayColorCallBack(ZaiErrors* pErrorLog)
+  {
+      ErrorLog=pErrorLog;
+      pErrorLog->setDisplayColorCallBack(std::bind(&textEditMWn::displayColorCallBack,this,std::placeholders::_1,std::placeholders::_2));
+  }
+
+  private Q_SLOTS:
   void morePressed();
   void closePressed();
   void wrapPressed();
@@ -112,11 +130,36 @@ private Q_SLOTS :
 
   void MenuAction(QAction* pAction);
 
+
+
+  bool hasErrorLog() {return ErrorLog!=nullptr;}
+
 private:
   void search(const utf8VaryingString &pSearchString);
   void searchFirst(const utf8VaryingString &pSearchString);
 
+  ZaiErrors* ErrorLog=nullptr;
 private:
+  QWidget *centralwidget=nullptr;
+  QWidget *verticalLayoutWidget=nullptr;
+  QVBoxLayout *verticalLayout=nullptr;
+  QHBoxLayout *horizontalLayout=nullptr;
+//  QLabel *ClosedLBl=nullptr;
+  QSpacerItem *horizontalSpacer=nullptr;
+  QHBoxLayout *horizontalLayout_2=nullptr;
+  QPushButton *searchBTn=nullptr;
+  QLineEdit *searchLEd=nullptr;
+  QPushButton *searchMainBTn=nullptr;
+  QPushButton *filterBTn=nullptr;
+  QPushButton *lineNumbersBTn=nullptr;
+  QPushButton *wrapBTn=nullptr;
+  QPushButton *closeBTn=nullptr;
+ // ZQPlainTextEdit *textPTe=nullptr;
+  QStatusBar *statusbar=nullptr;
+  QMenuBar *menubar=nullptr;
+
+
+
   QMenu*        genMEn=nullptr;
   QAction*      writeQAc=nullptr;
   QAction*      clearQAc=nullptr;
@@ -145,9 +188,9 @@ private:
 
   bool              FiltrateActive=false;
   uint32_t          Options=TEOP_Nothing;
-  ZQPlainTextEdit*  Text=nullptr;
+  ZQPlainTextEdit*  TextPTe=nullptr;
   bool              FResizeInitial=true;
-  Ui::textEditMWn   *ui;
+ // Ui::textEditMWn   *ui;
 };
 
 #endif // TEXTEDITMWN_H

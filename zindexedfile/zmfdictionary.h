@@ -14,7 +14,7 @@ public:
   ZMFDictionary& _copyFrom(const ZMFDictionary &pIn);
 public:
   ZMFDictionary();
-//  ZMFDictionary(const utf8String& pName):ZMetaDic(pName) {}
+//  ZMFDictionary(const utf8VaryingString& pName):ZMetaDic(pName) {}
   ZMFDictionary(const ZMFDictionary& pIn);
   ZMFDictionary(const ZMFDictionary &&pIn);
 
@@ -49,28 +49,28 @@ public:
     ZMetaDic::clear();
   }
 
-  ZKeyDictionary* searchKey(const utf8String& pKeyName)
+  ZKeyDictionary* searchKey(const utf8VaryingString& pKeyName)
   {
     for (long wi=0;wi<KeyDic.count();wi++)
       if (KeyDic[wi]->DicKeyName==pKeyName)
         return KeyDic[wi];
     return nullptr;
   }
-  ZKeyDictionary* searchKeyCase(const utf8String& pKeyName)
+  ZKeyDictionary* searchKeyCase(const utf8VaryingString& pKeyName)
   {
     for (long wi=0;wi<KeyDic.count();wi++)
       if (KeyDic[wi]->DicKeyName.isEqualCase(pKeyName))
         return KeyDic[wi];
     return nullptr;
   }
-  long searchKeyRank(const utf8String& pKeyName)
+  long searchKeyRank(const utf8VaryingString& pKeyName)
   {
     for (long wi=0;wi<KeyDic.count();wi++)
       if (KeyDic[wi]->DicKeyName==pKeyName)
         return wi;
     return -1;
   }
- long searchKeyRankCase(const utf8String& pKeyName)
+ long searchKeyRankCase(const utf8VaryingString& pKeyName)
   {
     for (long wi=0;wi<KeyDic.count();wi++)
       if (KeyDic[wi]->DicKeyName.isEqualCase(pKeyName))
@@ -78,7 +78,7 @@ public:
     return -1;
   }
 
-  ZIndexField* searchKeyFieldCase(const utf8String& pKeyFieldName)
+  ZIndexField* searchKeyFieldCase(const utf8VaryingString& pKeyFieldName)
   {
     long wR=-1;
     for (long wi=0;wi<KeyDic.count();wi++)
@@ -99,9 +99,9 @@ public:
    * ZSKeyDictionary::DicKeyName is replaced with pKeyName.
    * @return Key rank or -1 if errored
    */
-  ZStatus addKey(ZKeyDictionary*pIn, const utf8String& pKeyName, long &pOutKeyRank);
+  ZStatus addKey(ZKeyDictionary*pIn, const utf8VaryingString& pKeyName, long &pOutKeyRank);
 
-  long removeKey(const utf8String& pName)
+  long removeKey(const utf8VaryingString& pName)
     {
     for (long wi=0;wi<KeyDic.count();wi++)
       if (KeyDic[wi]->DicKeyName==pName)
@@ -124,7 +124,7 @@ public:
     return -1;
     }
 
-  void setDicName(const utf8String& pName) {DicName=pName;}
+  void setDicName(const utf8VaryingString& pName) {DicName=pName;}
   void setVersion(unsigned int pVersion,unsigned int pMajor,unsigned int pMinor)
     {
     Version=pVersion*1000000;
@@ -152,7 +152,7 @@ public:
   utf8VaryingString toXml(int pLevel,bool pComment);
 
   /** @brief XmlSaveToString  loads the whole master dictionary (ZMFDictionary) including its defined keys */
-  ZStatus XmlLoadFromString(const utf8String &pXmlString,bool pCheckHash, ZaiErrors* pErrorlog);
+  ZStatus XmlLoadFromString(const utf8VaryingString &pXmlString, bool pCheckHash, ZaiErrors* pErrorLog);
   ZStatus fromXml(zxmlNode* pZmfDicNode, bool pCheckHash,ZaiErrors* pErrorlog);
 
 };

@@ -1,6 +1,8 @@
 
 #include <zindexedfile/zrawmasterfileutils.h>
 
+#include <zcontent/zindexedfile/zmasterfile.h>
+
 /**
   @ingroup ZMFPhysical
   @{ */
@@ -18,12 +20,12 @@
  * @param[in] pMasterRootName   a descString containing the father ZSMasterFile's root name
  * @param[in] pRank             Index rank
  * @param[in] pIndexName        Index user name : could be empty
- * @return an utf8String with the appropriate ZIndexFile root name
+ * @return an utf8VaryingString with the appropriate ZIndexFile root name
  */
-utf8VaryingString generateIndexRootName(const utf8String &pMasterRootName,
-                                        const utf8String &pIndexName)
+utf8VaryingString generateIndexRootName(const utf8VaryingString &pMasterRootName,
+                                        const utf8VaryingString &pIndexName)
 {
-  utf8String wIndexRootName;
+  utf8VaryingString wIndexRootName;
   wIndexRootName = pMasterRootName;
   wIndexRootName.addUtfUnit('-');
   if (pIndexName.isEmpty())
@@ -40,10 +42,10 @@ utf8VaryingString generateIndexRootName(const utf8String &pMasterRootName,
   return wIndexRootName;
 } // generateIndexRootName
 
-utf8VaryingString generateIndexBaseName(const utf8String &pMasterRootName,
-    const utf8String &pIndexName)
+utf8VaryingString generateIndexBaseName(const utf8VaryingString &pMasterRootName,
+    const utf8VaryingString &pIndexName)
 {
-  utf8String wIndexRootName = generateIndexRootName(pMasterRootName,pIndexName);
+  utf8VaryingString wIndexRootName = generateIndexRootName(pMasterRootName,pIndexName);
   wIndexRootName += __ZINDEX_FILEEXTENSION__;
   return wIndexRootName;
 } // generateIndexBaseName
@@ -72,8 +74,8 @@ generateIndexURI( uriString &pIndexFileUri,
                   const utf8VaryingString& pIndexName)
 {
   uriString  wPath_Uri;
-  utf8String wMasterRoot;
-  utf8String wMasterExt;
+  utf8VaryingString wMasterRoot;
+  utf8VaryingString wMasterExt;
 
 
   if (pDirectory.isEmpty())
@@ -102,7 +104,7 @@ generateIndexURI( uriString &pIndexFileUri,
     return ZS_INVNAME;
   }
 
-  utf8String wM;
+  utf8VaryingString wM;
 
   wM=generateIndexBaseName(wMasterRoot,pIndexName);
   pIndexFileUri += wM.toString();
@@ -177,10 +179,13 @@ const char *decode_ZCOP (uint16_t pZCOP)
 ZStatus zrepairIndexes (const char *pZMFPath,
                         bool pRepair,
                         bool pRebuildAll,
-                        FILE* pOutput)
+                        ZaiErrors* pErrorLog)
 {
-
-  ZStatus wSt;
+/*
+    pErrorLog->setAutoPrintOn(ZAIES_Text);
+    pErrorLog->setStoreMinSeverity(ZAIES_Warning);
+*/
+    ZStatus wSt;
   ZRawMasterFile  wMasterFile;
   ZRandomFile     wMasterZRF;
 
@@ -195,11 +200,11 @@ ZStatus zrepairIndexes (const char *pZMFPath,
   ZDataBuffer wICBContent;
 
   long wi=0, IndexRank=0;
-
+/*
   FILE* wOutput=nullptr;
   bool FOutput=false;
   utfdescString wBase;
-
+*/
   ZArray<char> IndexPresence ; // 0 : Index to be deleted     1 : Index present but not to be rebuilt    2 : Index to be built or rebuilt
 
   long wIndexProcessed = 0,wMissIndexFile = 0, wCorruptZICB = 0, wCreatedIndex = 0, wRebuiltIndex = 0 ;
@@ -209,7 +214,7 @@ ZStatus zrepairIndexes (const char *pZMFPath,
 
 
   wURIContent = pZMFPath;
-
+/*
   wOutput=pOutput;
   if (pOutput==nullptr)
   {
@@ -230,37 +235,31 @@ ZStatus zrepairIndexes (const char *pZMFPath,
       FOutput=true;
     }
   } // if nullptr
-
-  fprintf (wOutput,
-      "_____________________________________________________________________________________________\n");
-  fprintf (wOutput,"%s>> starting repairing indexes for ZSMasterFile <%s>  \n"
-      ,
-      _GET_FUNCTION_NAME_,
-      pZMFPath);
+*/
+  pErrorLog->textLog( "_____________________________________________________________________________________________");
+  pErrorLog->textLog(" starting repairing indexes for ZSMasterFile <%s>", pZMFPath);
 
 
   wSt=wMasterZRF.setPath(wURIContent);
   if (wSt!=ZS_SUCCESS) {
-    ZException.exit_abort();
+      pErrorLog->logZExceptionLast("zrepairIndexes");
+      return wSt;
   }
   wSt=wMasterZRF._ZRFopen (ZRF_Exclusive | ZRF_All,ZFT_ZMasterFile,true);  // open ZMF using ZRandomFile routines
   if (wSt!=ZS_SUCCESS)
     goto ErrorRepairIndexes;
   //  Must be a ZFT_ZRawMasterFile
 
-  if (wMasterZRF.getFileType()!=ZFT_ZRawMasterFile)
-  {
-
-    fprintf (wOutput,"%s>> **** Fatal error : file is not of mandatory type ZFT_ZSMasterFile but is <%s> ******\n",
-        _GET_FUNCTION_NAME_,
+  if ((wMasterZRF.getFileType()!=ZFT_ZRawMasterFile)||(wMasterZRF.getFileType()!=ZFT_ZMasterFile)) {
+    pErrorLog->textLog(" **** Fatal error : file is not of mandatory type Master file (either raw or with dictionary) but is <%s> ******",
         decode_ZFile_type( wMasterZRF.getFileType()));
+      wSt=ZS_INVTYPE;
     goto ErrorRepairIndexes;
   }
 
   //wMasterFile.ZMFURI = wMasterZRF.getURIContent();     // align uris: ZMFURI is getting redundant. Only using ZRandomFile URIContent
 
-  fprintf (wOutput,"%s>> getting ZReservedBlock content and load ZMasterControlBlock\n",
-      _GET_FUNCTION_NAME_);
+  pErrorLog->textLog(" getting ZReservedBlock content and load ZMasterControlBlock");
 
   wSt=wMasterZRF._getReservedHeader(true);     // get reserved block content
   if (wSt!=ZS_SUCCESS)
@@ -274,13 +273,12 @@ ZStatus zrepairIndexes (const char *pZMFPath,
     ZException.exit_abort();
   }
 
-  fprintf (wOutput,
-      "%s>> existing ZSMasterFile index(es)\n"
-      "            <%ld>  defined index(es) in ZMasterControlBlock\n",
-      _GET_FUNCTION_NAME_,
+  pErrorLog->textLog(
+      " existing ZSMasterFile index(es)\n"
+      "            <%ld>  defined index(es) in ZMasterControlBlock",
       wMasterFile.IndexTable.size());
 
-  wMasterFile.ZMCBreport();
+  wMasterFile.MCBreport(pErrorLog);
 
   /*
  *  for each index
@@ -302,22 +300,17 @@ ZStatus zrepairIndexes (const char *pZMFPath,
     {
       return  wSt;// Beware return  is multiple instructions in debug mode
     }
-    fprintf (wOutput,
-        "%s>>   .....rank <%ld> processing index file <%s> \n",
-        _GET_FUNCTION_NAME_,
+   pErrorLog->textLog(
+        "   .....rank <%ld> processing index file <%s> ",
         IndexRank,
         wIndexUri.toString());
     if (wIndexUri.exists())
-      fprintf(wOutput,
-
-          "%s>>       Index file has been found\n",
-          _GET_FUNCTION_NAME_);
+      pErrorLog->textLog("       Index file has been found");
     else
     {
-      fprintf(wOutput,
-          "\n%s>>  ****Error Index file <%s> is missing ****\n"
-          "                        Index will be created then rebuilt\n\n",
-          _GET_FUNCTION_NAME_,
+      pErrorLog->textLog(
+          "\n  ****Error Index file <%s> is missing ****\n"
+          "                        Index will be created then rebuilt\n",
           wIndexUri.toString());
 
       wMissIndexFile++;
@@ -328,9 +321,7 @@ ZStatus zrepairIndexes (const char *pZMFPath,
       //---------------Create a new ZIndexFile-------------------------
 
 
-      fprintf (wOutput,
-          "%s>> creating index file\n",
-          _GET_FUNCTION_NAME_);
+      pErrorLog->textLog(" creating index file");
 
       wIndexAllocatedSize=0;
       if (wMasterZRF.getBlockTargetSize()>0)
@@ -351,21 +342,17 @@ ZStatus zrepairIndexes (const char *pZMFPath,
       {
         goto ErrorRepairIndexes;
       }
-      fprintf (wOutput,
-          "%s>> index file has been created\n",
-          _GET_FUNCTION_NAME_);
+      pErrorLog->textLog("index file has been created");
       wCreatedIndex++;
 
-      fprintf (wOutput,
-          "%s>> ......rebuilding created index file\n",
-          _GET_FUNCTION_NAME_);
+      pErrorLog->textLog(" ......rebuilding created index file");
 
       wSt = wIndexFile.openIndexFile(wIndexUri,IndexRank,ZRF_Exclusive| ZRF_All);
       if (wSt!=ZS_SUCCESS)
       {
-        fprintf (wOutput,
-            "%s>>  ****Error: Unexpected Fatal Error while opening ZIndexFile index rank <%ld> path <%s> ****\n",
-            _GET_FUNCTION_NAME_,
+          pErrorLog->logZExceptionLast("RepairIndexes");
+        pErrorLog->textLog(
+            "  ****Error: Unexpected Fatal Error while opening ZIndexFile index rank <%ld> path <%s> ****",
             IndexRank,
             wIndexUri.toString());
         wIndexFile.zclose();
@@ -375,9 +362,9 @@ ZStatus zrepairIndexes (const char *pZMFPath,
       /*                 wSt = wIndexFile.zrebuildRawIndex(ZMFStatistics,wOutput);*/
       if (wSt!=ZS_SUCCESS)
       {
-        fprintf (wOutput,
-            "%s>>  ****Unexpected Fatal Error while rebuilding ZIndexFile index rank <%ld> path <%s> *******\n",
-            _GET_FUNCTION_NAME_,
+          pErrorLog->logZExceptionLast("RepairIndexes");
+        pErrorLog->textLog(
+            "  ****Unexpected Fatal Error while rebuilding ZIndexFile index rank <%ld> path <%s> *******\n",
             IndexRank,
             wIndexUri.toString());
         wIndexFile.zclose();
@@ -385,9 +372,7 @@ ZStatus zrepairIndexes (const char *pZMFPath,
       } // ! ZS_SUCCESS
 
       wIndexFile.zclose();
-      fprintf (wOutput,
-          "%s>>  Index file has been rebuilt successfully\n",
-          _GET_FUNCTION_NAME_);
+      pErrorLog->textLog("  Index file has been rebuilt successfully");
 
       IndexPresence[IndexRank] = 1; // Index file is now present and does not need to be rebuilt
       wRebuiltIndex ++;
@@ -397,8 +382,7 @@ ZStatus zrepairIndexes (const char *pZMFPath,
     }  // IndexUri does not exist
 
     //---------- wIndexUri exists-----------------
-    fprintf (wOutput,"%s>>  Opening ZIndexFile\n",
-        _GET_FUNCTION_NAME_);
+    pErrorLog->textLog("  Opening ZIndexFile");
 
 
     wSt=wIndexZRF.setPath(wIndexUri);
@@ -409,19 +393,18 @@ ZStatus zrepairIndexes (const char *pZMFPath,
     wSt=wIndexZRF._ZRFopen(ZRF_Exclusive | ZRF_All,ZFT_ZIndexFile,true);
     if (wSt!=ZS_SUCCESS)
     {
-      fprintf (wOutput,
-          "%s>>   ******Error: rank <%ld> cannot open index file <%s>.\n"
+      pErrorLog->textLog(
+          "   ******Error: rank <%ld> cannot open index file <%s>.\n"
           "                  Status is <%s> Check <IndexFileDirectoryPath> parameter\n"
-          "       ...continuing...\n",
-          _GET_FUNCTION_NAME_,
+          "       ...continuing...",
           IndexRank,
           decode_ZStatus(wSt),
           wIndexUri.toString());
       if (pRepair)
       {
-        fprintf (wOutput,
+        pErrorLog->textLog(
             "                  Repare option has been chosen "
-            "                  Trying to delete file and reprocess it as missing file.\n");
+            "                  Trying to delete file and reprocess it as missing file.");
 
         wIndexZRF._removeFile(true,&wMasterFile.ErrorLog); // may be not necessary : to be checked
 
@@ -432,27 +415,24 @@ ZStatus zrepairIndexes (const char *pZMFPath,
 
     wReservedBlock.clear();
 
-    fprintf (wOutput,"%s>>  getting ZReservedBlock content and load ZICB\n",
-        _GET_FUNCTION_NAME_);
+    pErrorLog->textLog("  getting ZReservedBlock content and load ZICB\n");
 
     wSt=wIndexZRF.getReservedBlock(wReservedBlock,true);     // get reserved block content
     if (wSt!=ZS_SUCCESS)
     {
-      fprintf (wOutput,
-          "%s>>   ******Error: Index file rank <%ld> file  <%s>.\n"
+      pErrorLog->textLog(
+          "   ******Error: Index file rank <%ld> file  <%s>.\n"
           "                  Status is <%s> Cannot get ZReservedBlock from header file. \n"
           "       ...continuing...\n",
-          _GET_FUNCTION_NAME_,
-
           IndexRank,
           wIndexUri.toString(),
           decode_ZStatus(wSt));
 
       if (pRepair)
       {
-        fprintf (wOutput,
+        pErrorLog->textLog(
             "                  Repare option has been chosen \n"
-            "                  Trying to delete file and reprocess it as missing file.\n");
+            "                  Trying to delete file and reprocess it as missing file.");
 
         wIndexZRF._removeFile(true,&wMasterFile.ErrorLog); // may be not necessary : to be checked
 
@@ -471,20 +451,19 @@ ZStatus zrepairIndexes (const char *pZMFPath,
 
     if (wSt!=ZS_SUCCESS)
     {
-      fprintf (wOutput,
-          "%s>>   ******Error: Index file rank <%ld> file  <%s>.\n"
+      pErrorLog->textLog(
+          "   ******Error: Index file rank <%ld> file  <%s>.\n"
           "                  Status is <%s> Cannot import ZIndexControlBlock \n"
-          "       ...continuing...\n",
-          _GET_FUNCTION_NAME_,
+          "       ...continuing...",
           IndexRank,
           wIndexUri.toString(),
           decode_ZStatus(wSt));
 
       if (pRepair)
       {
-        fprintf (wOutput,
+        pErrorLog->textLog(
             "                  Repare option has been chosen \n"
-            "                  Trying to delete file and reprocess it as missing file.\n");
+            "                  Trying to delete file and reprocess it as missing file.");
 
         wIndexZRF._removeFile(true,&wMasterFile.ErrorLog); // may be not necessary : to be checked
 
@@ -492,24 +471,21 @@ ZStatus zrepairIndexes (const char *pZMFPath,
         continue;
       }
     }
-    fprintf (wOutput,"%s>>  checking ZICB content alignment with ZSMasterFile\n",
-        _GET_FUNCTION_NAME_);
+    pErrorLog->textLog("  checking ZICB content alignment with master file");
 
     size_t wRet = wMasterFile.IndexTable[IndexRank]->_exportAppend(wICBContent);
     if (memcmp(wReservedBlock.Data,wICBContent.Data,wReservedBlock.Size)==0)
     {
-      fprintf (wOutput,
-          "%s>>  ZICB content is aligned with its ZSMasterFile for index rank <%ld> path <%s>\n"
-          "             To rebuild ZIndexFile content (zrebuid) use Option rebuildAll\n",
-          _GET_FUNCTION_NAME_,
+      pErrorLog->textLog(
+          "  ZICB content is aligned with its ZSMasterFile for index rank <%ld> path <%s>\n"
+          "             To rebuild ZIndexFile content (zrebuid) use Option rebuildAll",
           IndexRank,
           wIndexUri.toString());
 
       if (pRebuildAll)
       {
-        fprintf (wOutput,
-            "%s>>  Option <RebuildAll> : healthy index file is marked for rebuilt\n",
-            _GET_FUNCTION_NAME_);
+        pErrorLog->textLog(
+            "  Option <RebuildAll> : healthy index file is marked for rebuilt");
 
         IndexPresence[IndexRank]=2;
       }
@@ -517,10 +493,9 @@ ZStatus zrepairIndexes (const char *pZMFPath,
     }
     else
     {
-      fprintf (wOutput,
-          "%s>>  ****Error: ZICB content is NOT aligned with its ZSMasterFile index rank <%ld> path <%s>\n"
-          "             Need to be realigned and rebuilt rebuildAll\n",
-          _GET_FUNCTION_NAME_,
+      pErrorLog->textLog(
+          "  ****Error: ZICB content is NOT aligned with its ZSMasterFile index rank <%ld> path <%s>\n"
+          "             Need to be realigned and rebuilt rebuildAll",
           IndexRank,
           wIndexUri.toString());
 
@@ -532,14 +507,12 @@ ZStatus zrepairIndexes (const char *pZMFPath,
 
       if(pRepair)
       {
-        fprintf (wOutput,
-            "%s>> removing corrupted index file\n",
-            _GET_FUNCTION_NAME_);
+        pErrorLog->textLog(
+            " removing corrupted index file.");
 
         wIndexZRF._removeFile(true,&wMasterFile.ErrorLog);
-        fprintf (wOutput,
-            "%s>> reprocessing index as missing index file\n",
-            _GET_FUNCTION_NAME_);
+        pErrorLog->textLog(
+            " reprocessing index as missing index file");
         IndexRank --;
         continue;
 
@@ -561,69 +534,59 @@ ZStatus zrepairIndexes (const char *pZMFPath,
 
   wMasterFile.zopen(ZRF_Exclusive | ZRF_All);
 
-  fprintf (wOutput,"%s>>   Rebuilding indexes to be rebuilt \n",
-      _GET_FUNCTION_NAME_);
+  pErrorLog->textLog("   Rebuilding indexes to be rebuilt ");
 
   for (wi=0;wi<IndexPresence.size();wi ++)
   {
     if (IndexPresence[wi]==2)
     {
-      fprintf (wOutput,"%s>>   Rebuilding index rank <%ld> <%s> \n",
-          _GET_FUNCTION_NAME_,
+      pErrorLog->textLog("   Rebuilding index rank <%ld> <%s> ",
           wi,
           wMasterFile.IndexTable[wi]->IndexName.toCChar());
 
       /*                          wSt=wMasterFile.zindexRebuild(wi,ZMFStatistics,wOutput); */
       if (wSt!=ZS_SUCCESS)
       {
-        fprintf (wOutput,
-            "%s>>   ****Error while rebuilding index rank <%ld> <%s> \n"
-            "          Status is <%s>\n",
-            _GET_FUNCTION_NAME_,
+        pErrorLog->textLog(
+            "  ****Error while rebuilding index rank <%ld> <%s> \n"
+            "          Status is <%s>",
             wi,
             wMasterFile.IndexTable[wi]->IndexName.toCChar(),
             decode_ZStatus(wSt));
         goto ErrorRepairIndexes;
       }
-      fprintf (wOutput,"      rebuilt done\n");
+      pErrorLog->textLog("      rebuilt done\n");
       wRebuiltIndex ++;
     }// if IndexPresence == 2
   }// for
 
 EndRepairIndexes:
 
-  fprintf (wOutput,"%s>>  Closing ZSMasterFile\n",
-      _GET_FUNCTION_NAME_);
+    pErrorLog->textLog(" Closing ZSMasterFile\n");
   wMasterZRF.zclose();
 
-  fprintf (wOutput,
-      "_____________________________________________________________________________________________\n");
+  pErrorLog->textLog(
+      "_____________________________________________________________________________________________");
 
-  fprintf (wOutput,
-      "%s>>  Report\n"
+  pErrorLog->textLog(
+      "  Report\n"
       "          Index(es) processed         %ld\n"
       "          Index file(s) missing       %ld\n"
       "          Index ZICB corrupted        %ld\n\n"
       "          Index(es) rebuilt           %ld\n",
-      _GET_FUNCTION_NAME_,
       wIndexProcessed,
       wMissIndexFile,
       wCorruptZICB,
       wRebuiltIndex);
-  fprintf (wOutput,
-      "_____________________________________________________________________________________________\n");
-  ZException.printUserMessage(wOutput);
-  fprintf (wOutput,
-      "_____________________________________________________________________________________________\n");
+  pErrorLog->textLog(
+      "_____________________________________________________________________________________________");
+
   if (wSt==ZS_SUCCESS)
     ZException.clearStack();
-  if (FOutput)
-    fclose(wOutput);
   return  wSt;
 
 ErrorRepairIndexes:
-  fprintf (wOutput,"%s>>  **** Index repair ended with error ***\n",
-      _GET_FUNCTION_NAME_);
+    pErrorLog->textLog("  **** Index repair ended with error ***");
   goto EndRepairIndexes;
 }//zrepairIndexes
 
@@ -639,7 +602,7 @@ ErrorRepairIndexes:
  * @param[in] pOutput defaulted to nullptr. Could be stdout or stderr.
  *                    If set to its default value (nullptr), then an log file is generated with name <directory path><base name>.downgradelog
  */
-void zdowngradeZMFtoZRF (const uriString &pZMFPath, FILE* pOutput)
+ZStatus zdowngradeZMFtoZRF (const uriString &pZMFPath, ZaiErrors *pErrorLog)
 {
 
 
@@ -651,101 +614,70 @@ void zdowngradeZMFtoZRF (const uriString &pZMFPath, FILE* pOutput)
 
   ZDataBuffer wReservedBlock;
 
-  FILE* wOutput=nullptr;
-  bool FOutput=false;
-  utfdescString wBase;
-
   wURIContent = pZMFPath;
 
-  wOutput=pOutput;
-  if (pOutput==nullptr)
-  {
-    //       utfdescString wDInfo;
-    wBase=wURIContent.getBasename().toCChar();
-    wBase+=(const utf8_t*)".downgradelog";
-    wOutput=fopen(wBase.toCChar(),"w");
-    if (wOutput==nullptr)
-    {
-      wOutput=stdout;
-      fprintf(wOutput,
-          "%s>>  cannot open file <%s> redirected to stdout\n",
-          _GET_FUNCTION_NAME_,
-          wBase.toString());
-    }
-    else
-    {
-      FOutput=true;
-    }
-  } // if nullptr
+  pErrorLog->textLog("_____________________________________________________________________________________________");
+  pErrorLog->textLog(" starting downgrading ZRawMasterFile to ZRandomFile <%s>", pZMFPath.toString());
 
-  fprintf (wOutput,
-      "_____________________________________________________________________________________________\n");
-  fprintf (wOutput,"%s>> starting downgrading ZRawMasterFile to ZRandomFile file path <%s>  \n",
-      _GET_FUNCTION_NAME_,
-      pZMFPath.toString());
 
 
   wSt=wMasterFile.zopen(wURIContent,(ZRF_Exclusive|ZRF_All));
 
-  fprintf (wOutput,"%s>> getting ZReservedBlock content and load ZMasterControlBlock\n",
-      _GET_FUNCTION_NAME_);
+  pErrorLog->textLog(" getting ZReservedBlock content and load ZMasterControlBlock");
 
 
-  fprintf (wOutput,
-      "%s>> clearing ZMCB\n"
+  pErrorLog->textLog(
+      " clearing ZMCB\n"
       "            <%ld>  defined index(es) in ZMasterControlBlock. Destroying all index files & definitions from ZMasterControlBlock\n",
       _GET_FUNCTION_NAME_,
       wMasterFile.IndexTable.size());
 
-  wSt=wMasterFile.zclearMCB(wOutput);
+  wSt=wMasterFile.zclearMCB(pErrorLog);
   if (wSt!=ZS_SUCCESS) {
-    ZException.exit_abort();
+      pErrorLog->logZExceptionLast("zupgradeZRFtoZMF");
+      wMasterFile.zclose();
+      return wSt;
   }
 
-  fprintf (wOutput,"%s>>  ZMCB cleared successfully\n",
-      _GET_FUNCTION_NAME_);
+  pErrorLog->textLog("Master Control Block cleared successfully");
 
   wMasterFile.zclose();
 
-  fprintf (wOutput,"%s>>  Converting to ZRandomFile\n",
-      _GET_FUNCTION_NAME_);
+  pErrorLog->textLog("  Converting to ZRandomFile\n" );
   wSt=wMasterZRF.setPath(wURIContent);
   if (wSt!=ZS_SUCCESS) {
-    ZException.exit_abort();
+      pErrorLog->logZExceptionLast("zupgradeZRFtoZMF");
+      return wSt;
   }
 
   wSt=wMasterZRF._ZRFopen (ZRF_Exclusive | ZRF_All,ZFT_ZMasterFile);  // open ZMF using ZRandomFile routines
   if (wSt!=ZS_SUCCESS) {
-    ZException.exit_abort();
+      pErrorLog->logZExceptionLast("zupgradeZRFtoZMF");
+      return wSt;
   }
 
   wMasterZRF.setFileType ( ZFT_ZRandomFile);
   wReservedBlock.clear();
   wMasterZRF.setReservedContent(wReservedBlock);
 
-  fprintf (wOutput,"%s>>  Writing new header to file\n",
-      _GET_FUNCTION_NAME_);
+  pErrorLog->textLog("  Writing new header to file");
 
   wSt=wMasterZRF._writeAllFileHeader();
   if (wSt!=ZS_SUCCESS)
   {
-    ZException.exit_abort();
+      pErrorLog->logZExceptionLast("zupgradeZRFtoZMF");
+      wMasterZRF.zclose();
+      return wSt;
   }
 
   wMasterZRF.zclose();
-  fprintf (wOutput,"%s>>  File <%s> has been successfully converted from ZRawMasterFile to ZRandomFile\n",
-      _GET_FUNCTION_NAME_,
-      wURIContent.toString());
-  fprintf (wOutput,
+  pErrorLog->textLog(" File <%s> has been successfully converted from ZRawMasterFile to ZRandomFile", wURIContent.toString());
+   pErrorLog->textLog(
       "_____________________________________________________________________________________________\n");
-  ZException.printUserMessage(wOutput);
-  fprintf (wOutput,
-      "_____________________________________________________________________________________________\n");
-  //   if (wSt==ZS_SUCCESS)
+
   ZException.clearStack();
-  if (FOutput)
-    fclose(wOutput);
-  return ;
+
+  return wSt;
 }//zdowngradeZMFtoZRF
 
 /**
@@ -756,92 +688,180 @@ void zdowngradeZMFtoZRF (const uriString &pZMFPath, FILE* pOutput)
  * @param[in] pOutput defaulted to nullptr. Could be stdout or stderr.
  *                    If set to its default value (nullptr), then an log file is generated with name <directory path><base name>.upgradelog
  */
-void zupgradeZRFtoZMF (const uriString& pZRFPath,FILE* pOutput)
+ZStatus zupgradeZRFtoZMF(const uriString &pZRFPath,
+//                         const uriString &pZMFPath,
+                         const uriString& pDictionaryFile,
+                         ZaiErrors *pErrorLog)
 {
-
 
   ZStatus wSt;
   ZRawMasterFile wMasterFile;
+  ZDictionaryFile wDictionary;
   ZRandomFile wMasterZRF;
-
+  ZFile_type wFileType= ZFT_ZRawMasterFile;
   uriString   wURIContent;
 
   ZDataBuffer wReservedBlock;
 
-  FILE* wOutput=nullptr;
-  bool FOutput=false;
-  utfdescString wBase;
+  utf8VaryingString wBase;
 
   wURIContent = pZRFPath;
 
-  wOutput=pOutput;
-  if (pOutput==nullptr)
-  {
-    //       utfdescString wDInfo;
-    wBase=wURIContent.getBasename().toCChar();
-    wBase+=".upgradelog";
-    wOutput=fopen(wBase.toCChar(),"w");
-    if (wOutput==nullptr)
-    {
-      wOutput=stdout;
-      fprintf(wOutput,
-          "%s>>  cannot open file <%s> redirected to stdout\n",
-          _GET_FUNCTION_NAME_,
-          wBase.toString());
-    }
-    else
-    {
-      FOutput=true;
-    }
-  } // if nullptr
 
-  fprintf (wOutput,
-      "_____________________________________________________________________________________________\n");
-  fprintf (wOutput,"%s>> starting upgrading ZRandomFile to ZRawMasterFile file path <%s>  \n",
-      _GET_FUNCTION_NAME_,
-      pZRFPath.toString());
+  pErrorLog->textLog("_____________________________________________________________________________________________");
+  pErrorLog->textLog(" starting upgrading ZRandomFile <%s>", pZRFPath.toString());
+
+  if (pDictionaryFile.isEmpty()) {
+      pErrorLog->textLog(" ZRandomFile will be upgraded to a simple ZRawMasterFile with no embedded dictionary.");
+  }
+  else {
+      pErrorLog->textLog(" ZRandomFile will be upgraded to ZMasterFile with embedded dictionary <%s>", pDictionaryFile.toString());
+      wFileType = ZFT_ZMasterFile;
+  }
 
 
   wSt=wMasterZRF.zopen(wURIContent,(ZRF_Exclusive|ZRF_All));
-  if (wSt!=ZS_SUCCESS)
-  {
-    ZException.exit_abort();
+  if (wSt!=ZS_SUCCESS) {
+    pErrorLog->logZExceptionLast("zupgradeZRFtoZMF");
+    wMasterZRF.zclose();
+    return wSt;
   }
-  fprintf (wOutput,"%s>> creating ZReservedBlock content and write ZMasterControlBlock\n",
-      _GET_FUNCTION_NAME_);
+  if (wMasterZRF.getFileType() != ZFT_ZRandomFile) {
+      pErrorLog->errorLog(" Input file is not a ZRandomFile. Its file type is  <%s>\n"
+                          " Processing is interrupted. ", decode_ZFile_type( wMasterZRF.getFileType()));
+      return ZS_INVTYPE;
+  }
+
+  pErrorLog->textLog(" Creating ZReservedBlock content ");
 
   wSt=wMasterFile.setPath(wURIContent);
-  if (wSt!=ZS_SUCCESS)
-  {
-    ZException.exit_abort();
+  if (wSt!=ZS_SUCCESS) {
+      pErrorLog->logZExceptionLast("zupgradeZRFtoZMF");
+      wMasterZRF.zclose();
+      return wSt;
   }
+
+  if (!pDictionaryFile.isEmpty()) {
+      pErrorLog->textLog(" Loading dictionary to embed <%s>.",pDictionaryFile.toString());
+      wSt=wDictionary.loadDictionary(pDictionaryFile,pErrorLog);
+      if (wSt!=ZS_SUCCESS) {
+          pErrorLog->logZExceptionLast("zupgradeZRFtoZMF");
+          wMasterZRF.zclose();
+          wMasterFile.zclose();
+          return wSt;
+      }
+      pErrorLog->textLog(" Embedding dictionary <%s>.",wDictionary.DicName.toString());
+      /* see ZMasterFile::setDictionary */
+      wMasterFile.Dictionary = new ZDictionaryFile;
+      wMasterFile.Dictionary->setDictionary(wDictionary);
+      uriString wURIdic = ZDictionaryFile::generateDicFileName(wMasterFile.getURIContent());
+
+      wSt=wMasterFile.Dictionary->saveToDicFile(wURIdic);
+      if (wSt!=ZS_SUCCESS) {
+          pErrorLog->logZExceptionLast("zupgradeZRFtoZMF");
+          wMasterZRF.zclose();
+          wMasterFile.zclose();
+          return wSt;
+      }
+      pErrorLog->infoLog(" Dictionary <%s> embedded.",wDictionary.DicName.toString());
+  } // if (!pDictionaryFile.isEmpty())
+
+
+  pErrorLog->textLog(" Writing ZReservedBlock content to file.");
+
   wMasterFile._exportAppend(wReservedBlock);
   wMasterZRF.setReservedContent(wReservedBlock);
-  wMasterZRF.setFileType( ZFT_ZMasterFile);
+  wMasterZRF.setFileType( wFileType);
   wSt=wMasterZRF._writeAllFileHeader();
-  if (wSt!=ZS_SUCCESS)
-  {
-    ZException.exit_abort();
+  if (wSt!=ZS_SUCCESS) {
+      pErrorLog->logZExceptionLast("zupgradeZRFtoZMF");
+      wMasterZRF.zclose();
+      return wSt;
   }
 
   wMasterZRF.zclose();
-  fprintf (wOutput,"%s>>  File <%s> has been successfully converted from ZRandomFile to ZRawMasterFile.\n",
-      _GET_FUNCTION_NAME_,
-      wURIContent.toString());
-  fprintf (wOutput,
-      "_____________________________________________________________________________________________\n");
-  ZException.printUserMessage(wOutput);
-  fprintf (wOutput,
-      "_____________________________________________________________________________________________\n");
+  pErrorLog->textLog("File <%s> has been successfully converted from ZRandomFile to %s.",
+                     wURIContent.toString(), decode_ZFile_type( wMasterFile.getFileType()));
+  pErrorLog->textLog(
+      "_____________________________________________________________________________________________");
+
   //  if (wSt==ZS_SUCCESS)
   ZException.clearStack();
-  if (FOutput)
-    fclose(wOutput);
-  return ;
+
+  return wSt;
 }//zupgradeZRFtoZMF
 
+ZStatus
+zreorgMasterFile (const uriString& pURIRawMF,
+                    long pRequestedFreeBlocks,
+                    //  bool pDump,
+                    ZaiErrors* pErrorLog)
+{
+    ZStatus wSt;
+    ZMasterFile wZMF;
+    long wi = 0;
+    long wIndexRank=0;
+
+    bool wgrabFreeSpaceSet = false;
+
+    if ((wSt=wZMF.zopen(pURIRawMF,ZRF_All))!=ZS_SUCCESS)
+    {  return  wSt;}
 
 
+    if (!wZMF.getFCB()->GrabFreeSpace)        // activate grabFreeSpace if it has been set on
+    {
+        wZMF.getFCB()->GrabFreeSpace=true;
+        wgrabFreeSpaceSet = true;
+    }
 
+    wZMF.zstartPMSMonitoring();
+
+    wSt = wZMF._reorgFileInternals(pRequestedFreeBlocks,pErrorLog);
+
+    while (wi < wZMF.IndexTable.size()) {
+
+        wSt=wZMF.rebuildIndex(wi,&wIndexRank,pErrorLog);
+        if (wSt!=ZS_SUCCESS)
+        {
+            //               ZException_sv = ZException; // in case of error : store the exception but continue rolling back other indexes
+            ZException.addToLast(" during Index rebuild on index <%s> number <%02ld> ",
+                                 wZMF.IndexTable[wi]->IndexName.toCChar(),
+                                 wi);
+
+            pErrorLog->logZExceptionLast("zreorgMasterFile");
+            return wSt;
+        }
+
+        wi++;
+    }
+
+    wZMF.zendPMSMonitoring ();
+    pErrorLog->textLog(
+        " ----------End of ZRawMasterFile reorganization process-------------\n");
+
+    wZMF.zreportPMSMonitoring(pErrorLog);
+
+    if (ZException.getLastStatus()!=ZS_SUCCESS)
+    {
+        //             ZException=ZException_sv;
+        goto error_zreorgMasterFile;
+    }
+
+//    ZException.getLastStatus() = ZS_SUCCESS;
+
+end_zreorgMasterFile:
+
+    if (wgrabFreeSpaceSet)        // restore grabFreeSpace if it was off and has been set on
+    {
+        wZMF.getFCB()->GrabFreeSpace=false;
+    }
+    wZMF.zclose ();
+    return  wSt;
+
+error_zreorgMasterFile:
+    pErrorLog->logZExceptionLast("zreorgRawMasterFile");
+    goto end_zreorgMasterFile;
+
+}
 
 /** @ */ // ZMFUtilities

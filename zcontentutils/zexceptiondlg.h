@@ -4,7 +4,7 @@
 #include <QDialog>
 
 #include <ztoolset/utfvaryingstring.h>
-typedef utf8VaryingString utf8String;
+typedef utf8VaryingString utf8VaryingString;
 typedef utf16VaryingString utf16String;
 typedef utf32VaryingString utf32String;
 #include <ztoolset/uristring.h>
@@ -98,15 +98,15 @@ public:
   void setFatal(const utf8VaryingString &pTitle);
   void setHighest(const utf8VaryingString &pTitle);
 
-  void setButtonText(int pOrder,const utf8String& pButtonText);
-  void setThirdButton(const utf8String& pButtonText);
+  void setButtonText(int pOrder,const utf8VaryingString& pButtonText);
+  void setThirdButton(const utf8VaryingString& pButtonText);
 
   static int adhocMessage(const utf8VaryingString &pTitle, Severity_type pSeverity, const char *pFormat,...);
   /**
    * @brief adhocMessage  displays an adhoc message(not dependant from ZException) with one button <close>
    * @param pTitle        displayed dialog title
    * @param pSeverity     induces the severity logo (one of info,warning, error, fatal) in the top right corner of dialog
-   * @param pErrorlog     when exists (not nullptr) must point to a valid Error log object. Then an <ErrorLog> button becomes visible.
+   * @param pErrorLog     when exists (not nullptr) must point to a valid Error log object. Then an <ErrorLog> button becomes visible.
    * Error log full content is displayed in a separate window when clicked.
    * @param pComplement   a string with potential complement to be displayed.
    * If exists (not nullptr) then <More> button becomes visible
@@ -115,13 +115,13 @@ public:
    * @return  a return type corresponding to the button pressed
    */
   static int adhocMessage(const utf8VaryingString &pTitle, Severity_type pSeverity,
-                          ZaiErrors *pErrorlog, const utf8VaryingString *pComplement,
+                          ZaiErrors *pErrorLog, const utf8VaryingString *pComplement,
                           const char *pFormat,...);
   static int adhocMessageHtml(const utf8VaryingString &pTitle, Severity_type pSeverity,
-                              ZaiErrors *pErrorlog, const utf8VaryingString *pComplement,
+                              ZaiErrors *pErrorLog, const utf8VaryingString *pComplement,
                               const char *pFormat,...);
   static int _adhocMessage(const utf8VaryingString &pTitle, Severity_type pSeverity,
-                            ZaiErrors *pErrorlog, const utf8VaryingString *pComplement, bool pHtml,
+                            ZaiErrors *pErrorLog, const utf8VaryingString *pComplement, bool pHtml,
                             const utf8VaryingString &pMessage);
   /**
    * @brief adhocMessage2B displays an adhoc message(not dependant from ZException) with two buttons, cancel and ok button.
@@ -133,46 +133,52 @@ public:
    * @param pFormat       the main message with variadic content
    * @return  a return type corresponding to the button pressed (Dialog::Rejected or Dialog::Accepted)
    */
-  static int adhocMessage2B(const utf8String&pTitle, Severity_type pSeverity,
-      const utf8String& pCancelText, const utf8String& pOkText,
+  static int adhocMessage2B(const utf8VaryingString&pTitle, Severity_type pSeverity,
+      const utf8VaryingString& pCancelText, const utf8VaryingString& pOkText,
       const char *pFormat,...);
 
-  static int adhocMessage2B(const utf8String&pTitle, Severity_type pSeverity,
-      const utf8String& pCancelText, const utf8String& pOkText,
-      ZaiErrors *pErrorlog, const utf8VaryingString *pComplement,
+  static int adhocMessage2B(const utf8VaryingString&pTitle, Severity_type pSeverity,
+      const utf8VaryingString& pCancelText, const utf8VaryingString& pOkText,
+      ZaiErrors *pErrorLog, const utf8VaryingString *pComplement,
       const char *pFormat,...);
 
-  static int adhocMessage2BHtml(const utf8String&pTitle, Severity_type pSeverity,
-      const utf8String& pCancelText, const utf8String& pOkText,
-      ZaiErrors *pErrorlog, const utf8VaryingString *pComplement,
+  static int adhocMessage2BHtml(const utf8VaryingString&pTitle, Severity_type pSeverity,
+      const utf8VaryingString& pCancelText, const utf8VaryingString& pOkText,
+      ZaiErrors *pErrorLog, const utf8VaryingString *pComplement,
       const char *pFormat,...);
 
   static int _adhocMessage2B(const utf8VaryingString &pTitle, Severity_type pSeverity,
-      const utf8String& pCancelText, const utf8String& pOkText,
-      ZaiErrors *pErrorlog, const utf8VaryingString *pComplement, bool pHtml,
+      const utf8VaryingString& pCancelText, const utf8VaryingString& pOkText,
+      ZaiErrors *pErrorLog, const utf8VaryingString *pComplement, bool pHtml,
       const utf8VaryingString &pMessage);
 
-  static int adhocMessage3B(const utf8String&pTitle, Severity_type pSeverity,
-      const utf8String& pOtherText, const utf8String& pCancelText, const utf8String& pOkText,
-      const char *pFormat,...);
-  static int adhocMessage3B(const utf8String&pTitle, Severity_type pSeverity,
-      const utf8String& pOtherText, const utf8String& pCancelText, const utf8String& pOkText,
-      ZaiErrors *pErrorlog, const utf8VaryingString *pComplement,
+  static int adhocMessage3B(const utf8VaryingString&pTitle, Severity_type pSeverity,
+      const utf8VaryingString& pOtherText, const utf8VaryingString& pCancelText, const utf8VaryingString& pOkText,
       const char *pFormat,...);
 
-  static int adhocMessage3BHtml(const utf8String&pTitle, Severity_type pSeverity,
-      const utf8String& pOtherText, const utf8String& pCancelText, const utf8String& pOkText,
-      ZaiErrors *pErrorlog, const utf8VaryingString *pComplement,
+  /* returns an int with possible values :
+   *  ZEDLG_Third -> this button clicked
+   *  QDialog::Rejected -> Cancel button clicked
+   *  QDialog::Accepted -> Ok button clicked
+   */
+  static int adhocMessage3B(const utf8VaryingString&pTitle, Severity_type pSeverity,
+      const utf8VaryingString& pOtherText, const utf8VaryingString& pCancelText, const utf8VaryingString& pOkText,
+      ZaiErrors *pErrorLog, const utf8VaryingString *pComplement,
+      const char *pFormat,...);
+
+  static int adhocMessage3BHtml(const utf8VaryingString&pTitle, Severity_type pSeverity,
+      const utf8VaryingString& pOtherText, const utf8VaryingString& pCancelText, const utf8VaryingString& pOkText,
+      ZaiErrors *pErrorLog, const utf8VaryingString *pComplement,
       const char *pFormat,...);
 
   static int _adhocMessage3B(const utf8VaryingString &pTitle, Severity_type pSeverity,
-      const utf8String& pOtherText,const utf8String& pCancelText, const utf8String& pOkText,
-      ZaiErrors *pErrorlog, const utf8VaryingString *pComplement, bool pHtml,
+      const utf8VaryingString& pOtherText,const utf8VaryingString& pCancelText, const utf8VaryingString& pOkText,
+      ZaiErrors *pErrorLog, const utf8VaryingString *pComplement, bool pHtml,
       const utf8VaryingString &pMessage);
 
   static int message(const char *pModule, ZStatus pStatus, Severity_type pSeverity,const char *pFormat,...);
-  static int message2B(const char *pModule, ZStatus pStatus, Severity_type pSeverity, const utf8String& pCancelText, const utf8String& pOkText, const char *pFormat,...);
-  static int message3B(const char *pModule, ZStatus pStatus, Severity_type pSeverity,const utf8String& pButtonText, const char *pFormat,...);
+  static int message2B(const char *pModule, ZStatus pStatus, Severity_type pSeverity, const utf8VaryingString& pCancelText, const utf8VaryingString& pOkText, const char *pFormat,...);
+  static int message3B(const char *pModule, ZStatus pStatus, Severity_type pSeverity,const utf8VaryingString& pButtonText, const char *pFormat,...);
 
 
   /** @brief messageWAdd one button message with additional information */
@@ -186,8 +192,8 @@ public:
                             ZStatus pStatus,
                             Severity_type pSeverity,
                             const utf8VaryingString& pAdd,
-                            const utf8String& pCancelText,
-                            const utf8String& pOkText,
+                            const utf8VaryingString& pCancelText,
+                            const utf8VaryingString& pOkText,
                             const char *pFormat,...);
   static int createErrno(const int pErrno,const char *pModule, ZStatus pStatus, Severity_type pSeverity,const char *pFormat,...);
   static int createFileError(FILE *pf,const char *pModule, ZStatus pStatus, Severity_type pSeverity,const char *pFormat,...);
@@ -198,7 +204,7 @@ public:
 
   static int display(const utf8VaryingString& pTitle, const ZExceptionBase pException);
   static int display2B(const utf8VaryingString& pTitle,const ZExceptionBase pException, const char *pCancelText=nullptr, const char *pOKText=nullptr);
-  static int display3B(const utf8VaryingString &pTitle, const ZExceptionBase pException, const utf8String& pButtonText, const char *pCancelText=nullptr, const char *pOKText=nullptr);
+  static int display3B(const utf8VaryingString &pTitle, const ZExceptionBase pException, const utf8VaryingString& pButtonText, const char *pCancelText=nullptr, const char *pOKText=nullptr);
 
 
   static void resetDontShow() ;
@@ -261,8 +267,8 @@ private:
   const int cst_Height = 350;
   const int cst_HighHeight = 450;
 };
-
+/*
 utf8VaryingString escapeHtmlSeq(const char* pString);
 utf8VaryingString escapeHtmlSeq(const utf8VaryingString& pString);
-
+*/
 #endif // ZEXCEPTIONDLG_H

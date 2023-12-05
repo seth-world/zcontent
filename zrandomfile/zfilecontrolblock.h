@@ -248,9 +248,10 @@ public:
   FCBParams getUseableParams();
   void setUseableParams(const FCBParams& pIn);
 
+  void report(ZaiErrors* pErrorLog);
 
   /* NB: if pComment is set to true, then xml code is commented, if not, no comment is generated */
-  utf8String toXml(int pLevel, bool pComment=false);
+  utf8VaryingString toXml(int pLevel, bool pComment=false);
     /**
      * @brief fromXml loads header control block from its xml definition and return 0 when successfull.
      * When errors returns <>0 and pErrlog contains appropriate error messages.

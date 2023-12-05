@@ -36,12 +36,17 @@
 #include "zsearchoperand.h"
 
 namespace zbs {
+
+
+
 class ZSearchLogicalTerm
 {
 public:
   ZSearchLogicalTerm() ;
   ZSearchLogicalTerm(const ZSearchLogicalTerm& pIn) {_copyFrom(pIn);}
   ZSearchLogicalTerm(const ZSearchLogicalTerm* pIn) {_copyFrom(pIn);}
+
+  ~ZSearchLogicalTerm();
 
   ZSearchLogicalTerm& _copyFrom(const ZSearchLogicalTerm& pIn);
   ZSearchLogicalTerm& _copyFrom(const ZSearchLogicalTerm* pIn);
@@ -50,10 +55,13 @@ public:
   void setOperand2(const ZSearchLogicalOperand& pOperand2);
 
   utf8VaryingString             _report(int pLevel);
+  utf8VaryingString             _reportDetailed(int pLevel);
   utf8VaryingString             _reportFormula(bool pHasParenthesis=false);
 
-  bool            evaluate(URFParser &pURFParser);
+//  ZStatus evaluate(URFParser &pURFParser, bool &pResult);
+  ZStatus evaluate(ZSearchEntityContext& pSEC, bool &pResult);
 
+  utf8VaryingString FullFieldName;
   int             ParenthesisLevel=0;
 //  int             Collateral=0;
   ZSearchOperator NotOperator=ZSOPV_Nothing;
@@ -62,9 +70,12 @@ public:
   ZSearchOperator CompareOperator;
 //  ZSearchLogicalOperand Operand2;
   void* Operand2=nullptr;
-  ZSearchOperandType  MainType=ZSTO_Nothing;
+  ZSearchOperandType_type  MainType=ZSTO_Nothing;
   ZSearchOperator     AndOrOperator=ZSOPV_Nothing;
   ZSearchLogicalTerm* NextTerm=nullptr;
 };
+
+void _countLogicalTerm(ZSearchLogicalTerm *pLogicalTerm, CountTerm &wCT);
+
 } //namespace zbs
 #endif // ZSEARCHLOGICALTERM_H

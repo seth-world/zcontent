@@ -108,7 +108,7 @@ ZParsingRulesDLg::setup(const ZConversionElement& pConvElt) {
 
 void ZParsingRulesDLg::refresh()
 {
-  utf8String wStr;
+  utf8VaryingString wStr;
 
   ConversionElt.Syntax=SyntaxLEd->text().toUtf8().data();
 
@@ -133,7 +133,7 @@ void ZParsingRulesDLg::refresh()
 
 bool
 ZParsingRulesDLg::getSyntaxFromClipboard() {
-  utf8String wClipContent;
+  utf8VaryingString wClipContent;
   ZaiErrors Errorlog;
   QByteArray wBA ;
   QClipboard *wClipboard = QGuiApplication::clipboard();
@@ -171,7 +171,7 @@ ZParsingRulesDLg::contextMenuCallback(QContextMenuEvent*pEvent) {
 
 void
 ZParsingRulesDLg::ZTypeListClicked() {
-  utf8String wStr;
+  utf8VaryingString wStr;
   if (ZTypeTRv==nullptr)
   {
     ZTypeTRv=new ZTypeDLg(this);

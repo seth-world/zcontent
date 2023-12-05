@@ -1,35 +1,37 @@
 #ifndef ZRESOURCE_CPP
 #define ZRESOURCE_CPP
 
-#include <zcontentcommon/zresource.h>
+#include "zresource.h"
 #include <zxml/zxmlprimitives.h>
 #include <zindexedfile/zdatatype.h>
 #include <zindexedfile/zdataconversion.h>
 #include <zxml/zxml.h>
-
+#include <stdint.h>
 
 
 Resourceid_type ResourceId = 0;
 
 Resourceid_type getUniqueResourceId() {return ResourceId++;}
 
-utf8String ZResource::toXml(int pLevel)
+
+utf8VaryingString ZResource::toXml( int pLevel,const utf8VaryingString &pName)
 {
-    utf8String wContent = fmtXMLnode("zresource", pLevel);
+    utf8VaryingString wContent = fmtXMLnode(pName, pLevel);
 
     wContent += fmtXMLint64("id", id, pLevel+1);
     wContent += fmtXMLint64("entity", Entity, pLevel+1);
-//    wContent += fmtXMLint64("datarank", DataRank, pLevel);
-    wContent += fmtXMLendnode("zresource", pLevel);
+    //    wContent += fmtXMLint64("datarank", DataRank, pLevel);
+    wContent += fmtXMLendnode(pName, pLevel);
     return wContent;
 }
-int ZResource::fromXml(zxmlElement *pRootNode, const char *pChildName, ZaiErrors *pErrorlog)
+/*
+int ZResource::fromXml(zxmlElement *pRootNode, const char *pChildName, ZaiErrors *pErrorLog)
 {
     zxmlElement*wChild=nullptr;
     ZStatus wSt=pRootNode->getChildByName((zxmlNode*&)wChild,pChildName);
     if (wSt!=ZS_SUCCESS)
     {
-        pErrorlog->logZStatus(ZAIES_Error,wSt,"ZResource::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
+        pErrorLog->logZStatus(ZAIES_Error,wSt,"ZResource::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
             pChildName,
             decode_ZStatus(wSt));
         return -1;
@@ -37,20 +39,20 @@ int ZResource::fromXml(zxmlElement *pRootNode, const char *pChildName, ZaiErrors
     wSt=wChild->getChildByName((zxmlNode*&)wChild,"zresource");
     if (wSt!=ZS_SUCCESS)
     {
-        pErrorlog->logZStatus(ZAIES_Error,wSt,"ZResource::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
+        pErrorLog->logZStatus(ZAIES_Error,wSt,"ZResource::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
             pChildName,
             decode_ZStatus(wSt));
         return -1;
     }
-    if (XMLgetChildUInt64Hexa(pRootNode, "entity", Entity, pErrorlog) < 0) {
-        pErrorlog->errorLog("ZResource::fromXML-E-CANTGETTXT Cannot get child <entity> as "
+    if (XMLgetChildUInt64Hexa(pRootNode, "entity", Entity, pErrorLog) < 0) {
+        pErrorLog->errorLog("ZResource::fromXML-E-CANTGETTXT Cannot get child <entity> as "
                             "hexadecimal text for node <%s>",
             pRootNode->getName().toCChar(),
             "zresource");
         return -1;
     }
-    if (XMLgetChildInt64Hexa(pRootNode, "entity", id, pErrorlog) < 0) {
-        pErrorlog->errorLog("ZResource::fromXML-E-CANTGETTXT Cannot get child <id> as "
+    if (XMLgetChildInt64Hexa(pRootNode, "entity", id, pErrorLog) < 0) {
+        pErrorLog->errorLog("ZResource::fromXML-E-CANTGETTXT Cannot get child <id> as "
                             "hexadecimal text for node <%s>",
             pRootNode->getName().toCChar(),
             "zresource");
@@ -58,17 +60,63 @@ int ZResource::fromXml(zxmlElement *pRootNode, const char *pChildName, ZaiErrors
     }
     return 0;
 }
+*/
 
-int ZResource::fromXmltoHexa(zxmlElement *pRootNode,const char* pChildName,utfcodeString& wCode, ZaiErrors *pErrorlog)
+ZStatus
+ZResource::fromXml (zxmlElement*pElement,const utf8VaryingString &pChildName,ZaiErrors* pErrorLog, ZaiE_Severity pSeverity)
 {
-    utf8String wValue;
-//    utfcodeString wCode;
+    uint64_t wValue;
+
+     zxmlElement* wChild=nullptr;
+    zxmlElement* wChildRes=nullptr;
+ //   zxmlElement*wChildEntity=nullptr;
+ //   zxmlElement*wChildId=nullptr;
+    ZStatus wSt=pElement->getChildByName((zxmlNode*&)wChild,pChildName);
+    if (wSt!=ZS_SUCCESS)
+    {
+        pErrorLog->logZStatus(pSeverity,wSt,"ZResource::fromXml-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
+                              pChildName.toCChar(),
+                              decode_ZStatus(wSt));
+        return ZS_NOTFOUND;
+    }
+
+    wSt=wChild->getChildByName((zxmlNode*&)wChildRes,"zresource");
+    XMLderegister(wChild);
+    if (wSt!=ZS_SUCCESS)
+    {
+        pErrorLog->logZStatus(pSeverity,wSt,"ZResource::fromXml-E-CNTFINDND Error cannot find node element with name <zresource> status <%s>",
+                              decode_ZStatus(wSt));
+        return ZS_INVNAME;
+    }
+    int wRet=XMLgetChildUInt64(wChildRes,"entity",wValue,pErrorLog,pSeverity);
+    if (wRet < 0) {
+        XMLderegister(wChildRes);
+        return ZS_INVNAME;
+    }
+    Entity=(ZEntity_type)wValue;
+
+    wRet=XMLgetChildUInt64(wChildRes,"id",wValue,pErrorLog,pSeverity);
+    XMLderegister(wChildRes);
+    if (wRet < 0) {
+        return ZS_INVNAME;
+    }
+    id = wValue;
+    return ZS_SUCCESS;
+} //fromXml
+
+int ZResource::fromXmltoHexa(zxmlElement *pRootNode,
+                             const char *pChildName,
+                             utf8VaryingString &wCode,
+                             ZaiErrors *pErrorLog)
+{
+    utf8VaryingString wValue;
+//    utf8VaryingString wCode;
 
     zxmlElement*wChild=nullptr;
     ZStatus wSt=pRootNode->getChildByName((zxmlNode*&)wChild,pChildName);
     if (wSt!=ZS_SUCCESS)
     {
-        pErrorlog->logZStatus(ZAIES_Error,wSt,"ZResource::fromXmltoHexa-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
+        pErrorLog->logZStatus(ZAIES_Error,wSt,"ZResource::fromXmltoHexa-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
             pChildName,
             decode_ZStatus(wSt));
         return -1;
@@ -76,22 +124,22 @@ int ZResource::fromXmltoHexa(zxmlElement *pRootNode,const char* pChildName,utfco
     wSt=wChild->getChildByName((zxmlNode*&)wChild,"zresource");
     if (wSt!=ZS_SUCCESS)
     {
-        pErrorlog->logZStatus(ZAIES_Error,wSt,"ZResource::fromXmltoHexa-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
+        pErrorLog->logZStatus(ZAIES_Error,wSt,"ZResource::fromXmltoHexa-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
             pChildName,
             decode_ZStatus(wSt));
         return -1;
     }
 
-    if (XMLgetChildText(wChild, "entity", wValue, pErrorlog) < 0) {
-        pErrorlog->errorLog("ZResource::fromXML-E-CANTGETTXT Cannot get child <entity> as "
+    if (XMLgetChildText(wChild, "entity", wValue, pErrorLog) < 0) {
+        pErrorLog->errorLog("ZResource::fromXML-E-CANTGETTXT Cannot get child <entity> as "
                             "hexadecimal text for node <%s>",
             pRootNode->getName().toCChar(),
             "zresource");
         return -1;
     }
     wCode = wValue.toCChar();
-    if (XMLgetChildText(pRootNode, "id", wValue, pErrorlog) < 0) {
-        pErrorlog->errorLog("ZResource::fromXML-E-CANTGETTXT Cannot get child <id> as hexadecimal "
+    if (XMLgetChildText(pRootNode, "id", wValue, pErrorLog) < 0) {
+        pErrorLog->errorLog("ZResource::fromXML-E-CANTGETTXT Cannot get child <id> as hexadecimal "
                             "text for node <%s>",
             pRootNode->getName().toCChar(),
             "zresource");
@@ -104,9 +152,9 @@ int ZResource::fromXmltoHexa(zxmlElement *pRootNode,const char* pChildName,utfco
     return 0;
 }//fromXmltoHexa
 
-utf8String ZResource::toStr() const
+utf8VaryingString ZResource::toStr() const
 {
-    utf8String wContent;
+    utf8VaryingString wContent;
     if (Entity==cst_EntityInvalid)
       wContent = "InvalidEntity#";
     else
@@ -117,9 +165,9 @@ utf8String ZResource::toStr() const
       wContent.addsprintf("%ld", id);
     return wContent;
 }
-utf8String ZResource::toHexa() const
+utf8VaryingString ZResource::toHexa() const
 {
-    utf8String wContent;
+    utf8VaryingString wContent;
     if (Entity==cst_EntityInvalid)
       wContent = "InvalidEntity#";
     else

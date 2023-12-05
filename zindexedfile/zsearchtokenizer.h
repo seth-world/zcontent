@@ -20,20 +20,21 @@ extern int Line,Column,Offset;
 
 class ZDictionaryFile ;
 
-class ZSearchTokenizer : public ZArray<ZSearchToken*> {
+class ZSearchTokenizer : public ZArray<ZSearchToken*>
+{
 public:
-  typedef ZArray<ZSearchToken*> _Base;
+  typedef ZArray<ZSearchToken*> _TokenList;
   ZSearchTokenizer(uint32_t pOptions=ZSRCHO_Default) : Options(pOptions) {}
   ~ZSearchTokenizer() {
-    while (_Base::count())
-      delete popR();
+    while (_TokenList::count())
+          delete _TokenList::popR();
   }
 
   void clear()
   {
-    while (count()) {
-      delete last();
-      pop();
+      while (_TokenList::count()) {
+      delete _TokenList::last();
+      _TokenList::pop();
     }
 
   }
@@ -53,8 +54,8 @@ public:
 
   void report() {
 
-    for(long wi=0; wi < count(); wi++) {
-      Tab(wi)->displayNoindex();
+    for(long wi=0; wi < _TokenList::count(); wi++) {
+      _TokenList::Tab(wi)->displayNoindex();
     }
   }//report
 
@@ -65,11 +66,11 @@ public:
 
   __DISPLAYCALLBACK__(_displayCallback) = nullptr;
 
-  void setProgressCallback(__PROGRESSCALLBACK__(pdisplayCallback) ) {
-    _progressCallback=pdisplayCallback;
+  void setProgressCallback(__progressCallBack__(pdisplayCallback) ) {
+    _progressCallBack=pdisplayCallback;
   }
 
-  __PROGRESSCALLBACK__ (_progressCallback) = nullptr;
+  __progressCallBack__ (_progressCallBack) = nullptr;
 
   void _print(const char* pFormat,...) const;
   void _print(const utf8VaryingString& pOut) const;
@@ -93,7 +94,6 @@ private:
   void endCommentToken(ZSearchToken* &pCommentToken);
 
   ZDictionaryFile* DictionaryFile=nullptr;
-
 
 };
 

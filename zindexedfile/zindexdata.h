@@ -2,7 +2,7 @@
 #define ZINDEXDATA_H
 
 #include <stdint.h>
-#include <ztoolset/zutfstrings.h>
+#include <ztoolset/utfvaryingstring.h>
 #include <zrandomfile/zfilecontrolblock.h>
 #include <zcontentcommon/zcontentconstants.h>
 
@@ -43,7 +43,7 @@ struct IndexData_st
   }
 
   ZPRES       Status=ZPRES_Nothing;
-  utf8String  IndexName;
+  utf8VaryingString  IndexName;
   ZSort_Type  Duplicates=ZST_NoDuplicates;
   uint32_t    keyguessedsize=0;
   FCBParams   FCB;

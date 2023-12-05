@@ -107,7 +107,7 @@ ZFileDescriptor::setupFCB (void)
 
 ZFDOwnData& ZFDOwnData::_copyFrom(const ZFDOwnData& pIn)
 {
-  FContent=pIn.FContent;
+//  FContent=pIn.FContent;
   ContentFd=pIn.ContentFd;
 //  FHeader=pIn.FHeader;
   HeaderFd=pIn.HeaderFd;
@@ -131,10 +131,10 @@ ZFDOwnData& ZFDOwnData::_copyFrom(const ZFDOwnData& pIn)
   return *this;
 }//_copyFrom
 
-utf8String ZFDOwnData::toXml(int pLevel)
+utf8VaryingString ZFDOwnData::toXml(int pLevel)
 {
   int wLevel=pLevel;
-  utf8String wReturn;
+  utf8VaryingString wReturn;
   wReturn = fmtXMLnode("zfdowndata",pLevel);
   wLevel++;
   /* see if it is really required */
@@ -155,9 +155,9 @@ utf8String ZFDOwnData::toXml(int pLevel)
 int ZFDOwnData::fromXml(zxmlNode* pFDBRootNode,ZaiErrors* pErrorlog)
 {
   zxmlElement *wRootNode;
-  utfcodeString wXmlHexaId;
-  utf8String wValue;
-  utfcodeString wCValue;
+  utf8VaryingString wXmlHexaId;
+  utf8VaryingString wValue;
+  utf8VaryingString wCValue;
   bool wBool;
   unsigned int wInt;
   ZStatus wSt = pFDBRootNode->getChildByName((zxmlNode *&) wRootNode, "zfdowndata");
@@ -209,8 +209,8 @@ int ZFDOwnData::fromXml(zxmlNode* pFDBRootNode,ZaiErrors* pErrorlog)
 ZStatus ZFileDescriptor::fromXml(zxmlNode* pFDRootNode,ZaiErrors* pErrorlog)
 {
   zxmlElement *wRootNode;
-  utfcodeString wXmlHexaId;
-  utf8String wValue;
+  utf8VaryingString wXmlHexaId;
+  utf8VaryingString wValue;
 
   ZStatus wSt = pFDRootNode->getChildByName((zxmlNode *&) wRootNode, "zfiledescriptor");
   if (wSt != ZS_SUCCESS) {
@@ -432,10 +432,10 @@ ZFileDescriptor::getRankFromAddress(const zaddress_type pAddress)
 }
 
 
-utf8String ZFileDescriptor::toXml(int pLevel,bool pComment)
+utf8VaryingString ZFileDescriptor::toXml(int pLevel,bool pComment)
 {
   int wLevel=pLevel;
-  utf8String wReturn;
+  utf8VaryingString wReturn;
   wReturn = fmtXMLnode("zfiledescriptor",pLevel);
   wLevel++;
 
@@ -456,3 +456,4 @@ utf8String ZFileDescriptor::toXml(int pLevel,bool pComment)
   wReturn += fmtXMLendnode("zfiledescriptor",pLevel);
   return wReturn;
 }//ZFileDescriptor::toXml
+

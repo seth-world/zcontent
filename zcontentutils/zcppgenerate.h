@@ -13,7 +13,7 @@
 
 #define __CPPGENERATE_PARAMETER_FILE__ "zcppgenerateparameters.xml"
 
-#define __CPPGENERATE_VERSION__ "1.0-1"
+#define __CPPGENERATE_VERSION__ "1.1-0"
 
 namespace zbs {
 
@@ -21,9 +21,12 @@ namespace zbs {
 class GenObj {
 public:
   GenObj()=default;
+  GenObj(ZTypeBase pZType,const utf8VaryingString& pInclude) {ZType=pZType; Include=pInclude; }
   GenObj(ZTypeBase pZType,long pIncludeRank) {ZType=pZType; IncludeRank=pIncludeRank;}
-  ZTypeBase   ZType=ZType_Nothing;
-  long        IncludeRank=-1;
+  ZTypeBase         ZType=ZType_Nothing;
+  utf8VaryingString Include;
+  bool              Used = false;
+  long              IncludeRank=-1;
 };
 
 class GenInclude {
@@ -78,11 +81,14 @@ public:
 
   ZStatus loadXmlParameters(const uriString& pXmlFile,
                                 ZArray<GenObj> &pGenObjList,
-                                ZArray<GenInclude> &pGenIncludeList,
                                 ZaiErrors *pErrorLog);
 
 
-  utf8VaryingString genIncludes(ZTypeBase pField);
+  int getOneIncludeFiles(ZTypeBase pType);
+  void resetIncludeFiles();
+  void setupIncludeFiles();
+
+  utf8VaryingString genIncludes();
 
   utf8VaryingString genHeaderFields(utf8VaryingString& pFileIncludeList);
 
@@ -114,7 +120,7 @@ private:
   uriString           XmlGenParamsFile;
   uriString           XmlDictionaryFile;
   ZArray<GenObj>      GenObjList;
-  ZArray<GenInclude>  GenIncludeList;
+ // ZArray<GenInclude>  GenIncludeList;
 
   ZArray<long> ErroredFields;
 

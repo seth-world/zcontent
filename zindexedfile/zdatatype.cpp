@@ -451,7 +451,7 @@ ZStatus _getBlobType(void*pValue, ZTypeBase &pType, size_t &pNaturalSize , size_
     pArrayCount=1;
     return ZS_SUCCESS;
 }
-
+/*
 ZStatus _getFixedStringType(void*pValue,
                             ZTypeBase &pType,
                             size_t &pNaturalSize ,
@@ -464,6 +464,7 @@ ZStatus _getFixedStringType(void*pValue,
     pArrayCount=(uint16_t)wT->getCapacity();
     return ZS_SUCCESS;
 }
+*/
 /*
 ZStatus _getFixedWStringType(void*pValue, ZTypeBase &pType, size_t &pNaturalSize , size_t &pUniversalSize , URF_Array_Count_type &pArrayCount)
 {

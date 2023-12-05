@@ -16,8 +16,6 @@
 
 #include <ztoolset/uristring.h>
 
-#include <zcppparser/zcppparsertype.h> // for getParserWorkDirectory()
-
 #include <zcontent/zcontentutils/zexceptiondlg.h>
 
 #include <zqt/zqtwidget/zqtableview.h>
@@ -26,6 +24,7 @@
 
 /* for xml exchanges */
 #include <zxml/zxmlprimitives.h>
+
 #include <zcontentcommon/zgeneralparameters.h>
 
 ZBackupDLg::ZBackupDLg(QWidget* pParent) : QDialog(pParent)
@@ -504,7 +503,7 @@ ZBackupDLg::doBackup() {
 
 ZStatus
 ZBackupDLg::XmlSaveBackupset(uriString& pXmlFile, bool pComment) {
-  utf8String wReturn = fmtXMLdeclaration();
+  utf8VaryingString wReturn = fmtXMLdeclaration();
   int wLevel=0;
   wReturn += fmtXMLnodeWithAttributes("zbackupset","version",__ZRF_XMLVERSION_CONTROL__,0);
 

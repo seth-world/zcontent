@@ -3,6 +3,11 @@
 #include <zcontent/zindexedfile/zrawmasterfileutils.h>
 #include <zcontent/zindexedfile/zrawindexfile.h>
 #include "zdocphysical.h"
+
+#include "zdocphysical_nokey.h"
+#include "zdocphysical_1key.h"
+#include "zdocphysical_2keys.h"
+
 #include <QApplication>
 
 #include <zcontent/zrandomfile/zrandomfile.h>
@@ -18,7 +23,13 @@
 
 #include <zcontent/zcontentcommon/zresource.h>
 
+#include <ztoolset/zaierrors.h>
+
+
 #define __PARSER_WORK_DIRECTORY__  "zparserworkdir"
+
+#define __NOKEY__
+
 /*
 file:///home/gerard/Development/zmftest/testpicture/emailconnection.jpg
 file:///home/gerard/Development/zmftest/testpicture/graverip.jpg
@@ -131,10 +142,13 @@ ZStatus testRandomSearchAllPartial(const uriString& pZMF);
 
 #include <zcontentcommon/zgeneralparameters.h>
 
+
+ZaiErrors ErrorLog;
+
 int main(int argc, char *argv[])
 {
 
-
+  addVerbose(ZVB_MemEngine);
   ZDataBuffer wS1,wKey;
   ZDataBuffer wRecord;
   ZResource wResource;
@@ -164,11 +178,33 @@ uriString wDocFile = wWD ;
 
     wDocFile.addConditionalDirectoryDelimiter();
 
-    const char* wWD=getenv("zmasterfile");
+//    const char* wWD=getenv("zmasterfile");
+
+#ifdef __NOKEY__
+    const char* wWD=getenv("zmasterfilenokey");
     if (!wWD) {
-        ZException.setMessage("main",ZS_MISS_FIELD,Severity_Fatal, "missing file name as environment variable <zmasterfile>");
+        ZException.setMessage("main",ZS_MISS_FIELD,Severity_Fatal, "missing file name as environment variable <zmasterfilenokey>");
         ZException.exit_abort();
     }
+#endif
+#ifdef __ONEKEY__
+   const char* wWD=getenv("zmasterfileonekey");
+    if (!wWD) {
+        ZException.setMessage("main",ZS_MISS_FIELD,Severity_Fatal, "missing file name as environment variable <zmasterfileonekey>");
+        ZException.exit_abort();
+    }
+
+#endif
+#ifdef __TWOKEY__
+    const char* wWD=getenv("zmasterfiletwokeys");
+    if (!wWD) {
+        ZException.setMessage("main",ZS_MISS_FIELD,Severity_Fatal, "missing file name as environment variable <zmasterfiletwokeys>");
+        ZException.exit_abort();
+    }
+
+#endif
+
+
     wDocFile += wWD;
 // uriString wPictureDir;
 /*
@@ -341,14 +377,21 @@ ZStatus populate(const uriString& pZMF) {
             "____________________________________________________________________\n",pZMF.toString() )
 
 
-  wSt=wMasterFile.zclearAll();
+  wSt=wMasterFile.zclearAll(-1,false,&ErrorLog);
   if (wSt!=ZS_SUCCESS)
     ZException.exit_abort();
 
   wMasterFile.setEngineMode(ZIXM_SearchDycho);
 
-
-  ZDocPhysical wDocPhy;
+#ifdef __NOKEY__
+  ZDocPhysical_nokey wDocPhy; /* no key */
+#endif
+#ifdef __ONEKEY__
+  ZDocPhysical_1key wDocPhy; /* one key */
+#endif
+#ifdef __TWOKEY__
+  ZDocPhysical_2keys wDocPhy; /* one key */
+#endif
 
 
   ZArray<ZDataBuffer> wKeys;
@@ -705,7 +748,7 @@ ZStatus populate(const uriString& pZMF) {
     ZException.exit_abort();
   }
 
-
+ _DBGPRINT("                   Record #10\n")
 
   wDocPhy.Documentid  = wR10;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
@@ -740,7 +783,7 @@ ZStatus populate(const uriString& pZMF) {
     ZException.exit_abort();
   }
 
-
+ _DBGPRINT("                   Record #11\n")
 
   wDocPhy.Documentid  = wR11;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
@@ -775,7 +818,7 @@ ZStatus populate(const uriString& pZMF) {
     ZException.exit_abort();
   }
 
-
+ _DBGPRINT("                   Record #12\n")
   wDocPhy.Documentid  = wR12;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -811,7 +854,7 @@ ZStatus populate(const uriString& pZMF) {
 
 
 
-
+ _DBGPRINT("                   Record #13\n")
   wDocPhy.Documentid  = wR13;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -845,7 +888,7 @@ ZStatus populate(const uriString& pZMF) {
     ZException.exit_abort();
   }
 
-
+ _DBGPRINT("                   Record #14\n")
   wDocPhy.Documentid  = wR14;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -879,7 +922,7 @@ ZStatus populate(const uriString& pZMF) {
     ZException.exit_abort();
   }
 
-
+ _DBGPRINT("                   Record #15\n")
   wDocPhy.Documentid  = wR15;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -913,6 +956,7 @@ ZStatus populate(const uriString& pZMF) {
     ZException.exit_abort();
   }
 
+ _DBGPRINT("                   Record #16\n")
   wDocPhy.Documentid  = wR30;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -947,7 +991,7 @@ ZStatus populate(const uriString& pZMF) {
   }
 
 
-
+_DBGPRINT("                   Record #17\n")
   wDocPhy.Documentid  = wR16;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -982,7 +1026,7 @@ ZStatus populate(const uriString& pZMF) {
   }
 
 
-
+_DBGPRINT("                   Record #18\n")
   wDocPhy.Documentid  = wR18;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -1016,7 +1060,7 @@ ZStatus populate(const uriString& pZMF) {
     ZException.exit_abort();
   }
 
-
+_DBGPRINT("                   Record #19\n")
   wDocPhy.Documentid  = wR19;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -1050,7 +1094,7 @@ ZStatus populate(const uriString& pZMF) {
     ZException.exit_abort();
   }
 
-
+_DBGPRINT("                   Record #20\n")
   wDocPhy.Documentid  = wR20;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -1084,7 +1128,7 @@ ZStatus populate(const uriString& pZMF) {
     ZException.exit_abort();
   }
 
-
+_DBGPRINT("                   Record #21\n")
   wDocPhy.Documentid  = wR21;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -1128,6 +1172,8 @@ ZStatus populate(const uriString& pZMF) {
             "   Duplicate key on secondary key test \n"
             "_______________________________________\n")
 
+  _DBGPRINT("                   Record #22\n")
+
   wDocPhy.Documentid  = wR17;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -1160,7 +1206,7 @@ ZStatus populate(const uriString& pZMF) {
   if (wSt!=ZS_SUCCESS) {
     ZException.exit_abort();
   }
-
+ _DBGPRINT("                   Record #23\n")
   wDocPhy.Documentid  = wR22;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -1193,7 +1239,7 @@ ZStatus populate(const uriString& pZMF) {
   if (wSt!=ZS_SUCCESS) {
     ZException.exit_abort();
   }
-
+ _DBGPRINT("                   Record #24\n")
   wDocPhy.Documentid  = wR24;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -1227,6 +1273,7 @@ ZStatus populate(const uriString& pZMF) {
     ZException.exit_abort();
   }
 
+ _DBGPRINT("                   Record #25\n")
   wDocPhy.Documentid  = wR23;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -1266,7 +1313,7 @@ ZStatus populate(const uriString& pZMF) {
             "________________________________\n")
 
   addVerbose(ZVB_SearchEngine);
-
+ _DBGPRINT("                   Record #26\n")
   wDocPhy.Documentid  = wR1;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -1295,11 +1342,12 @@ ZStatus populate(const uriString& pZMF) {
   wDocPhy.Ownerid=wUserId;
   wDocPhy.Vaultid=ZResource();
 
-  wSt=wMasterFile.zadd_T<ZDocPhysical>(wDocPhy);
+  wSt=wMasterFile.zadd_T(wDocPhy);
   if (wSt!=ZS_DUPLICATEKEY) {
     ZException.exit_abort();
   }
 
+ _DBGPRINT("                   Record #27\n")
   wDocPhy.Documentid  = wR3;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -1328,11 +1376,12 @@ ZStatus populate(const uriString& pZMF) {
   wDocPhy.Ownerid=wUserId;
   wDocPhy.Vaultid=ZResource();
 
-  wSt=wMasterFile.zadd_T<ZDocPhysical>(wDocPhy);
+  wSt=wMasterFile.zadd_T(wDocPhy);
   if (wSt!=ZS_DUPLICATEKEY) {
     ZException.exit_abort();
   }
 
+  _DBGPRINT("                   Record #28\n")
   wDocPhy.Documentid  = wR15;
   _DBGPRINT("            %s\n",displayResource( wDocPhy.Documentid ).toString() )
 
@@ -1361,7 +1410,7 @@ ZStatus populate(const uriString& pZMF) {
   wDocPhy.Ownerid=wUserId;
   wDocPhy.Vaultid=ZResource();
 
-  wSt=wMasterFile.zadd_T<ZDocPhysical>(wDocPhy);
+  wSt=wMasterFile.zadd_T(wDocPhy);
   if (wSt!=ZS_DUPLICATEKEY) {
     ZException.exit_abort();
   }
@@ -1428,7 +1477,7 @@ ZStatus testRandomSearchUnique(const uriString& pZMF) {
     ZException.exit_abort();
 
 
-  wSt=URFParser::parse(wMasterRecord,wFieldList);
+  wSt=URFParser::parse(wMasterRecord,wFieldList,&ErrorLog);
   if (wSt!=ZS_SUCCESS)
     ZException.exit_abort();
 
@@ -1450,7 +1499,7 @@ ZStatus testRandomSearchUnique(const uriString& pZMF) {
     ZException.exit_abort();
 
 
-  wSt=URFParser::parse(wMasterRecord,wFieldList);
+  wSt=URFParser::parse(wMasterRecord,wFieldList,&ErrorLog);
   if (wSt!=ZS_SUCCESS)
     ZException.exit_abort();
 
@@ -1471,7 +1520,7 @@ ZStatus testRandomSearchUnique(const uriString& pZMF) {
     ZException.exit_abort();
 
 
-  wSt=URFParser::parse(wMasterRecord,wFieldList);
+  wSt=URFParser::parse(wMasterRecord,wFieldList,&ErrorLog);
   if (wSt!=ZS_SUCCESS)
     ZException.exit_abort();
 
@@ -1492,7 +1541,7 @@ ZStatus testRandomSearchUnique(const uriString& pZMF) {
     ZException.exit_abort();
 
 
-  wSt=URFParser::parse(wMasterRecord,wFieldList);
+  wSt=URFParser::parse(wMasterRecord,wFieldList,&ErrorLog);
   if (wSt!=ZS_SUCCESS)
     ZException.exit_abort();
 
@@ -1564,7 +1613,7 @@ ZStatus testRandomSearchAllExact(const uriString& pZMF) {
     ZException.exit_abort();
 
 
-  wSt=URFParser::parse(wMasterRecord,wFieldList);
+  wSt=URFParser::parse(wMasterRecord,wFieldList,&ErrorLog);
   if (wSt!=ZS_SUCCESS)
     ZException.exit_abort();
 
@@ -1586,7 +1635,7 @@ ZStatus testRandomSearchAllExact(const uriString& pZMF) {
     ZException.exit_abort();
 
 
-  wSt=URFParser::parse(wMasterRecord,wFieldList);
+  wSt=URFParser::parse(wMasterRecord,wFieldList,&ErrorLog);
   if (wSt!=ZS_SUCCESS)
     ZException.exit_abort();
 
@@ -1607,7 +1656,7 @@ ZStatus testRandomSearchAllExact(const uriString& pZMF) {
     ZException.exit_abort();
 
 
-  wSt=URFParser::parse(wMasterRecord,wFieldList);
+  wSt=URFParser::parse(wMasterRecord,wFieldList,&ErrorLog);
   if (wSt!=ZS_SUCCESS)
     ZException.exit_abort();
 
@@ -1628,7 +1677,7 @@ ZStatus testRandomSearchAllExact(const uriString& pZMF) {
     ZException.exit_abort();
 
 
-  wSt=URFParser::parse(wMasterRecord,wFieldList);
+  wSt=URFParser::parse(wMasterRecord,wFieldList,&ErrorLog);
   if (wSt!=ZS_SUCCESS)
     ZException.exit_abort();
 
@@ -1702,7 +1751,7 @@ ZStatus testRandomSearchAllPartial(const uriString& pZMF) {
     ZException.exit_abort();
 
 
-  wSt=URFParser::parse(wMasterRecord,wFieldList);
+  wSt=URFParser::parse(wMasterRecord,wFieldList,&ErrorLog);
   if (wSt!=ZS_SUCCESS)
     ZException.exit_abort();
 
@@ -1724,7 +1773,7 @@ ZStatus testRandomSearchAllPartial(const uriString& pZMF) {
     ZException.exit_abort();
 
 
-  wSt=URFParser::parse(wMasterRecord,wFieldList);
+  wSt=URFParser::parse(wMasterRecord,wFieldList,&ErrorLog);
   if (wSt!=ZS_SUCCESS)
     ZException.exit_abort();
 
@@ -1745,7 +1794,7 @@ ZStatus testRandomSearchAllPartial(const uriString& pZMF) {
     ZException.exit_abort();
 
 
-  wSt=URFParser::parse(wMasterRecord,wFieldList);
+  wSt=URFParser::parse(wMasterRecord,wFieldList,&ErrorLog);
   if (wSt!=ZS_SUCCESS)
     ZException.exit_abort();
 
@@ -1766,7 +1815,7 @@ ZStatus testRandomSearchAllPartial(const uriString& pZMF) {
     ZException.exit_abort();
 
 
-  wSt=URFParser::parse(wMasterRecord,wFieldList);
+  wSt=URFParser::parse(wMasterRecord,wFieldList,&ErrorLog);
   if (wSt!=ZS_SUCCESS)
     ZException.exit_abort();
 
@@ -1840,7 +1889,7 @@ ZStatus testSequentialKey(const uriString& pZMF) {
   while (wSt==ZS_SUCCESS) {
     fprintf(stdout,"Record #%d\n",wCurrentRec++);
     ZArray<URFField> wFieldList;
-    wSt=URFParser::parse(wMasterRecord,wFieldList);
+    wSt=URFParser::parse(wMasterRecord,wFieldList,&ErrorLog);
     if (wSt!=ZS_SUCCESS)
       ZException.exit_abort();
 

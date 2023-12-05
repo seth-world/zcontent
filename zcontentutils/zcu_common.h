@@ -55,12 +55,12 @@ ZDataReference getParent( QStandardItemModel* pItemModel,QModelIndex &wIdx);
 QList<QStandardItem*> itemRowDuplicate (QStandardItemModel*pModel,const QModelIndex  pIdx);
 
 /* creates a list pointing to effective items after having cut them */
-QList<QStandardItem*> cutRow (QStandardItemModel*pModel,QModelIndex& pIdx, ZaiErrors* pErrorlog=nullptr);
+QList<QStandardItem*> cutRow (QStandardItemModel*pModel,QModelIndex& pIdx, ZaiErrors* pErrorLog=nullptr);
 /* creates a list pointing to cloned items : each item of the row is cloned to a copied row */
-QList<QStandardItem*> cloneRow (QStandardItemModel*pModel,QModelIndex& pIdx, ZaiErrors* pErrorlog=nullptr);
+QList<QStandardItem*> cloneRow (QStandardItemModel*pModel,QModelIndex& pIdx, ZaiErrors* pErrorLog=nullptr);
 /** @brief cloneRow creates a cloned list of items : Row is selected as child of row pRow for item pFather.
  *  if pFather is nullptr then top level of item model
 */
-QList<QStandardItem*> cloneRow (QStandardItemModel*pModel,QStandardItem* pFather,int pRow, ZaiErrors* pErrorlog=nullptr);
+QList<QStandardItem*> cloneRow (QStandardItemModel*pModel,QStandardItem* pFather,int pRow, ZaiErrors* pErrorLog=nullptr);
 
 #endif // ZCU_COMMON_H

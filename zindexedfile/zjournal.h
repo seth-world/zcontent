@@ -37,8 +37,8 @@ struct ZJState
 //public:
     ZJState_base State;
     ZJState() {State = (ZJState_base)ZJS_Nothing;}
-    const char *decode(void);
-    ZJState &encode(char *pString) ;
+    utf8VaryingString decode(void);
+    ZJState &encode(const utf8VaryingString &pString);
 
     ZJState& operator = (ZJState_type pState) {State=(ZJState_base)pState; return *this;}
     ZJState& operator = (ZJState_base pState) {State=(ZJState_base)pState; return *this;}
@@ -50,8 +50,7 @@ struct ZJState
     int8_t operator << (int8_t pState,ZJState pZJState) {pState=pZJState.State; return pState;}
 */
 
-private:
-    utfdescString  Buf ;
+
 };
 
 
@@ -238,7 +237,7 @@ public:
 protected:
     pid_t       Pid;
     ZSystemUserId     Uid;
-    utf8String    Username;
+    utf8VaryingString    Username;
     ZRawMasterFile* Father;
 //    uriString   URIJournal;
 };

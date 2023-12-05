@@ -4,10 +4,11 @@
 #include <stdint.h>
 
 //#include <zcontentcommon/zidentity.h>
-#include <ztoolset/zutfstrings.h> // for utfcodeString
+#include <ztoolset/utfvaryingstring.h> // for utf8VaryingString
+#include <ztoolset/zaierrors.h>
 #include <zxml/zxml.h>
 
-#include <ztoolset/zaierrors.h>
+
 
 typedef int64_t Resourceid_type;
 typedef uint64_t ZEntity_type;
@@ -84,7 +85,7 @@ public:
         Entity = pEntity;
     }
     bool isPureEntity(void) const { return (id == cst_PureEntity); }
-    //    ZResource(Entity_type pEntity, utfcodeString &pCode) { pEntity = pCode.toLong(); }
+    //    ZResource(Entity_type pEntity, utf8VaryingString &pCode) { pEntity = pCode.toLong(); }
 
 
     static ZResource getNew(const ZEntity_type pEntity)
@@ -97,9 +98,9 @@ public:
 
 public:
     //    ZResourceid (ZEntity_type pEntity, Docid_type &pDocid) {fromDocid(pEntity,pDocid);}
-    utfcodeString tocodeString (void)
+    utf8VaryingString tocodeString (void)
         {
-            utfcodeString pString ;
+            utf8VaryingString pString ;
             pString.sprintf("0x%08lX-0x%08lX",Entity,id);
             return pString;
         }
@@ -144,17 +145,17 @@ public:
             return 1;
         }
 
-    /* virtual methods : to be replaced by derived classes own methods */
-    utf8String toXml(int pLevel) ;
-    int fromXml(zxmlElement *pRootNode, const char *pChildName,ZaiErrors *pErrorlog);
+
+    utf8VaryingString toXml(int pLevel,const utf8VaryingString &pName="zresource") ;
+    ZStatus fromXml(zxmlElement *pRootNode, const utf8VaryingString &pChildName,ZaiErrors *pErrorLog, ZaiE_Severity pSeverity=ZAIES_Error);
 
     static int fromXmltoHexa(zxmlElement *pRootNode,
             const char *pChildName,
-            utfcodeString &wCode,
-            ZaiErrors *pErrorlog);
+            utf8VaryingString &wCode,
+            ZaiErrors *pErrorLog);
 
-    utf8String toStr() const;
-    utf8String toHexa() const;
+    utf8VaryingString toStr() const;
+    utf8VaryingString toHexa() const;
 
     size_t getUniversalSize();
     size_t getUniversal_Ptr(unsigned char*& pPtr);

@@ -1,5 +1,6 @@
-#ifndef ZSEARCHDESCRIPTOR_H
-#define ZSEARCHDESCRIPTOR_H
+#ifndef ZSEARCHENTITY_H
+#define ZSEARCHENTITY_H
+#include <stdint.h>
 
 #include <memory>
 
@@ -7,419 +8,462 @@
 #include "zmetadic.h"
 #include "zmasterfile.h"
 
+#include <zcontentcommon/zcontentconstants.h>
+
+#include "zsearchdictionary.h"
+
 #include <zcontentcommon/urfparser.h>
 
-namespace zbs {
+#include "zsearchfileentity.h"
+//#include "zcollectionentity.h"
+#include "zsearchdictionary.h"
+#include "zsearchentitycontext.h"
+
+//#include <zthread/zthread.h>
+#include <zthread/zmutex.h>
+#include <ztoolset/ztimer.h>
 
 using namespace std;
 using namespace zbs;
 
+//#include "zsearchcontext.h"
+
+/*
+
+ Once accessing entity, the objective is NOT to get a record, but to get an updated, accurate URFParser corresponding to entity and record.
+
+Join entity
+
+    do loop until <selection clause is true> or <EOF for master entity>
+
+        get <master base entity> ( <Base context URF parser> owns record and fields )
+        What is done in get operation :
+            get raw record from <master base entity>
+            parse raw record using <Base context URF parser>
+
+        do loop until EOF for slave entity or <USING clause is true>
+
+            get <slave base entity>  ( <slave context URF parser> owns record and fields )
+            What is done in get operation :
+                get raw record from <slave base entity>
+                parse raw record using <Slave context URF parser>
+
+            evaluate USING clause using fields from <base URF parser> corresponding to <base entity> (either master or slave)
+
+        loop until evaluate <USING is true> or EOF for slave entity
+
+        evaluate selection clause using fields from <base URF parser> corresponding to <base entity> (either master or slave)
+
+    loop until <selection clause is true> or <EOF for master entity>
+
+    compose upper record in <upper entity context URF Parser> using <base URF Parser> corresponding to <base entity> (either master or slave)
+
+    parse record using <upper entity context URF Parser>
+
+    done one get for join entity
+
+
+
+Single collection
+
+    do loop until <selection clause is true> or <EOF for base entity>
+
+        get base entity ( <Base context URF parser> owns record and fields )
+        What is done in get operation :
+            get raw record from <base entity>
+            parse raw record using <Base context URF parser>
+
+
+        evaluate selection clause using fields from <base URF parser>
+
+    loop until <selection clause is true> or <EOF for master entity>
+
+    compose upper record in <upper entity context URF Parser> using <base URF Parser>
+
+    parse record using <upper entity context URF Parser>
+
+    done one get for join entity
+
+
+*/
+
+
+
+namespace zbs {
 
 class ZSearchTokenizer;
-
-//class ZSearchMasterFile;
-
-
-/* Cell format code : applies to selected table column */
-enum ZCellFormat : int {
-  ZCFMT_Nothing = 0,  /* default */
-
-  ZCFMT_NumMask = 0x000F,
-  ZCFMT_NumHexa = 0x0001, /* show numeric fields in hexa  (default is standard numeric representation )*/
-
-  ZCFMT_DateMask= 0x0F00,
-
-  ZCFMT_DMY     = 0x0100,   /* day/month/year only */
-  ZCFMT_MDY     = 0x0200,   /* month/day/year only */
-  ZCFMT_DMYHMS  = 0x0300,   /* day/month/year-hh:mm:ss */
-  ZCFMT_MDYHMS  = 0x0400,   /* month/day/year-hh:mm:ss */
-
-  ZCFMT_DLocale = 0x0500,   /* locale date format */
-  ZCFMT_DUTC    = 0x0600,   /* UTC format */
-
-  ZCFMT_ResMask = 0x0F0000,
-
-  ZCFMT_ResSymb = 0x010000, /* Show symbol name in place of numeric value for ZEntities */
-  ZCFMT_ResStd  = 0x020000, /* Resource numeric values are expressed in standard numeric representation (default is hexa)*/
-
-  ZCFMT_ApplyAll= 0x100000  /* apply to all : only used by cell format dialog */
-
-};
-
-
-
-
-class ZSearchMasterFile : public std::enable_shared_from_this <ZSearchMasterFile>
-{
-public:
-  ZSearchMasterFile()=default;
-  ZSearchMasterFile(ZSearchMasterFile&)=delete;
-
-  ~ZSearchMasterFile()
-  {
-    if (_MasterFile.isOpen())
-      _MasterFile.zclose();
-  }
-
-  ZStatus set(const uriString& pPath);
-
-  std::shared_ptr<ZSearchMasterFile> getSharedPtr() {return shared_from_this();}     /* increase count */
-  ZStatus openReadOnly(const uriString& pURI)
-  {
-    return _MasterFile.zopen(pURI,ZRF_Read_Only);
-  }
-  ZStatus openModify(const uriString& pURI)
-  {
-    return _MasterFile.zopen(pURI,ZRF_Modify);
-  }
-
-  const ZDictionaryFile& getFieldDictionary() const
-  {
-    return *_MasterFile.Dictionary;
-  }
-  const ZDictionaryFile* getFieldDictionaryPtr() const
-  {
-    return _MasterFile.Dictionary;
-  }
-  const ZArray<ZKeyDictionary*>& getKeyDictionary() const
-  {
-    return _MasterFile.Dictionary->KeyDic;
-  }
-  ZStatus close()
-  {
-    return _MasterFile.zclose();
-  }
-
-  size_t getRecordCount()
-  {
-    return _MasterFile.getRecordCount();
-  }
-
-  ZStatus  openReadOnly()
-  {
-    return _MasterFile.zopen(ZRF_Read_Only);
-  }
-  ZStatus openModify()
-  {
-    return _MasterFile.zopen(ZRF_Modify);
-  }
-
-  bool    isOpen()
-  {
-    return _MasterFile.isOpen();
-  }
-  bool    isOpenModify()
-  {
-    return (_MasterFile.getOpenMode() & ZRF_Modify)== ZRF_Modify;
-  }
-  bool    isOpenAtLeastReadOnly()
-  {
-    return (_MasterFile.getOpenMode() & ZRF_Read_Only)== ZRF_Read_Only;
-  }
-  zmode_type getOpenMode(){
-    return _MasterFile.getOpenMode() ;
-  }
-
-  ZStatus get(ZDataBuffer& pRecord,const long pRank,zaddress_type &pAddress) {
-    return _MasterFile.zgetWAddress(pRecord,pRank,pAddress);
-  }
-
-  ZStatus getByAddress(ZDataBuffer& pRecord,const zaddress_type pAddress) {
-    return _MasterFile.zgetByAddress(pRecord,pAddress);
-  }
-
-  uriString getPath() {return _MasterFile.getURIContent();}
-
-  ZMasterFile _MasterFile;
-};
-
-
-class  ZSearchFileZEntity
-{
-public:
-  ZSearchFileZEntity()=default;
-
-  ZSearchFileZEntity(const ZSearchFileZEntity& pIn) {_copyFrom(pIn);}
-
-  ZSearchFileZEntity& _copyFrom(const ZSearchFileZEntity& pIn) {
-    Symbol=pIn.Symbol;
-    Value=pIn.Value;
-    return *this;
-  }
-
-  ZSearchFileZEntity& operator=(const ZSearchFileZEntity& pIn) {return _copyFrom(pIn);}
-
-  utf8VaryingString Symbol;
-  long              Value;
-};
-
-
-
-/* a file entity must have an associated master file */
-class _BaseFileEntity : public std::enable_shared_from_this <_BaseFileEntity>
-{
-public:
-//  ZSearchEntity() {}
-  /* std::shared_ptr<ZSearchMasterFil is passed by value to increase usage count */
-  _BaseFileEntity( std::shared_ptr<ZSearchMasterFile> pMasterPtr,ZSearchToken* pToken)
-  {
-    _MasterFile=pMasterPtr->getSharedPtr();
-    setToken(pToken);
-  }
-  _BaseFileEntity(const _BaseFileEntity& pIn) {_copyFrom(pIn);}
-
-  ~_BaseFileEntity() { }
-
-  _BaseFileEntity& _copyFrom (const _BaseFileEntity& pIn) ;
-
-  _BaseFileEntity& operator = (const _BaseFileEntity& pIn) {return _copyFrom(pIn);}
-
-  std::shared_ptr<_BaseFileEntity> getSharedPtr() {return shared_from_this();}
-
-  static std::shared_ptr<_BaseFileEntity> construct( std::shared_ptr<ZSearchMasterFile> pMasterPtr,ZSearchToken* pToken)
-  {
-    return std::make_shared<_BaseFileEntity>(pMasterPtr,pToken);
-  }
-
-  bool isValid() {return (_MasterFile!=nullptr )&& (!Name.isEmpty()); }
-
-  /**
-   * @brief set sets up Descriptor from current tokenizer array position and updates token text and type, row column and offset as well as token number
-   */
-  void setToken(ZSearchToken *pToken);
-  void set(std::shared_ptr<ZSearchMasterFile> pMasterFile, ZSearchToken* pToken) ;
-  utf8VaryingString getName( ) const ;
-
-  bool hasFile() {return _MasterFile!=nullptr;}
-  long getFieldRankbyName(const utf8VaryingString &pFieldName) const ;
-
-  ZStatus setFile(std::shared_ptr<ZSearchMasterFile> pMasterFile);
-
-  const ZDictionaryFile& getFieldDictionary() const;
-  const ZDictionaryFile *getFieldDictionaryPtr() const;
-  const ZArray<ZKeyDictionary*>& getKeyDictionary() const;
-
-  ZFieldDescription         getFieldByRank(long pRank) const;
-
-  size_t          getRecordCount();
-  ZStatus get(ZDataBuffer& pRecord,const long pRank,zaddress_type& pAddress);
-
-  utf8VaryingString         Name;
-  uriString                 Path;
-  std::shared_ptr <ZSearchMasterFile> _MasterFile = nullptr;
-};
-
-
 
 class ZSearchEntity;
 //class ZSearchFormula;
 //class ZSearchLogicalOperand;
 class ZSearchLogicalTerm;
+class ZSearchMasterFile;
 
-class _BaseCollectionEntity : public std::enable_shared_from_this <_BaseCollectionEntity>
-{
+class ZSearchJoinTuple {
 public:
-  //  ZSearchEntity() {}
-  /* std::shared_ptr<ZSearchMasterFil is passed by value to increase usage count */
-  _BaseCollectionEntity( std::shared_ptr<ZSearchEntity> pBaseEntity,ZSearchToken* pToken)
-  {
-    _BaseEntity=pBaseEntity;
-    setToken(pToken);
-  }
-  _BaseCollectionEntity(const _BaseCollectionEntity& pIn) {_copyFrom(pIn);}
+    ZSearchJoinTuple() = default;
+    ZSearchJoinTuple(const ZSearchJoinTuple& pIn) { _copyFrom(pIn);}
 
-  ~_BaseCollectionEntity()
-  {
-    if (LogicalTerm != nullptr)
-      delete LogicalTerm;
-  }
+    ZSearchJoinTuple(zaddress_type pMAddress,zaddress_type pSAddress)
+    {
+        MasterAddress = pMAddress;
+        SlaveAddress = pSAddress;
+    }
+    ZSearchJoinTuple& _copyFrom(const ZSearchJoinTuple& pIn)
+    {
+        MasterAddress=pIn.MasterAddress;
+        SlaveAddress=pIn.SlaveAddress;
+        return *this;
+    }
 
-  _BaseCollectionEntity& _copyFrom (const _BaseCollectionEntity& pIn) ;
+    ZSearchJoinTuple& operator = (const ZSearchJoinTuple& pIn) { return _copyFrom(pIn);}
 
-  _BaseCollectionEntity& operator = (const _BaseCollectionEntity& pIn) {return _copyFrom(pIn);}
+    void setInvalid() { MasterAddress=-1 ; SlaveAddress=-1; }
 
-  bool isValid() {return (_BaseEntity!=nullptr )&& (!Name.isEmpty()); }
+    bool isValid() { return (MasterAddress > -1) && (SlaveAddress > -1) ; }
 
-  std::shared_ptr<_BaseCollectionEntity> getSharedPtr() {return shared_from_this();}
-
-  static std::shared_ptr<_BaseCollectionEntity> construct( std::shared_ptr<ZSearchEntity> pBaseEntity,ZSearchToken* pToken)
-  {
-    std::shared_ptr<_BaseCollectionEntity> wOut = std::make_shared<_BaseCollectionEntity>(pBaseEntity,pToken);
-    return wOut;
-  }
-
-
-  /**
-   * @brief set sets up Descriptor from current tokenizer array position and updates token text and type, row column and offset as well as token number
-   */
-  void setToken(ZSearchToken *pToken);
-
-  utf8VaryingString getName( ) const ;
-
-//  void setFormula(ZSearchFormula * pFormula);
-//  void setLogicalOperand(ZSearchLogicalOperand * pFormula);
-
-  void setLogicalTerm(ZSearchLogicalTerm * pTerm);
-
-  long getFieldRankbyName(const utf8VaryingString &pFieldName) const
-  {
-    return getFieldDictionary().searchFieldByName(pFieldName);
-  }
-
-  const ZDictionaryFile&     getFieldDictionary() const;
-  const ZDictionaryFile*     getFieldDictionaryPtr() const;
-  const ZArray<ZKeyDictionary*>& getKeyDictionary() const;
-
-  ZFieldDescription   getFieldByRank(long pRank) const
-  {
-    return getFieldDictionary().TabConst(pRank);
-  }
-
-  size_t getMaxRecords();
-  size_t getCount() { return AddressList.count(); }
-
-//  ZStatus evaluateFormula(bool &pOutResult, ZSearchFormula *wFormula, const ZDataBuffer &pRecord, int pDepth);
-
-//  ZStatus evaluateFormulaNew(bool &pOutResult, ZSearchFormula* wFormula, const ZDataBuffer& pRecord,int pDepth);
-
-  ZStatus evaluate(bool &pOutResult, const ZDataBuffer &pRecord);
-  ZStatus get(ZDataBuffer& pRecord,const long pRank,zaddress_type& pAddress);
-
-  URFParser                 _URFParser;
-
-  utf8VaryingString                   Name;
-  std::shared_ptr <ZSearchEntity>     _BaseEntity = nullptr;
-  ZArray<zaddress_type>               AddressList;
-  ZSearchLogicalTerm*                 LogicalTerm=nullptr;
+    zaddress_type MasterAddress=-1;
+    zaddress_type SlaveAddress=-1;
 };
+
+
+/** a ZCollectionEntity is a single collection entit< with
+ *  - an array of URFParser objects, one per entity in the entities set
+ *  - an associated dictionary
+ *      pointing to dictionary of selected entities :
+ *          if selected entity is a file entity, dictionary is file dictionary
+ *  - a join clause
+ *      to link entities between each others
+ *      this clause is omitted if only one entity is in the selected entities set
+ *      this clause must exist if more than one entity is in the selected entities set
+ *  - a selection clause to select records from each entity of the set
+ *  - a number of records to display
+ */
 
 /**
  * @brief The ZSearchEntity class generic entity class that may hold both file entity OR collection entity.
  * Both may transparently be used and accessed as if it refers to a file.
  *
- * A ZSearchEntity has no name, its name is stored within either _BaseFileEntity or _BaseCollectionEntity.
+ * A ZSearchEntity has no name, its name is stored within either _BaseFileEntity or ZCollectionEntity.
+ *
+ * A ZSearchEntity is a set of one or more base entities with
+ *  - an array of URFParser objects, one per base entity in the entities set
+ *  - an associated dictionary
+ *      pointing to dictionary of selected entities :
+ *          if selected entity is a file entity, dictionary is file dictionary
+ *  - a join clause
+ *      to link any of base entities for entity set between each others
+ *      this clause is omitted if only one entity is in the selected base entities set
+ *      this clause must exist if more than one entity is in the selected base entities set
+ *  - a selection clause to select records from each of base entity within the set
+ *  - a number of resulting records to display as first found records
  */
-class ZSearchEntity : public std::enable_shared_from_this <ZSearchEntity>
+
+class ZSearchEntity // : public std::enable_shared_from_this <ZSearchEntity>
 {
+//    friend class _BaseFileEntity;
 public:
-  ZSearchEntity() {}
+ZSearchEntity()  {}
 
-  /* std::shared_ptr<ZSearchMasterFil is passed by value to increase usage count */
-  ZSearchEntity( std::shared_ptr<_BaseFileEntity> pFileEntity)
+
+  ZSearchEntity(  ZSearchMasterFile* pZSMaster,const utf8VaryingString& pName)
   {
-    _FileEntity=pFileEntity;
+      _FileEntity = pZSMaster ;
+      EntityName = EntityFullName = pName;
+      /* file entity has no build dic : direct field extraction from ZMasterFile without any change */
+      /*             has no local meta dic -> meta dic is the one from master file (via _URFParser) */
+      BuildDic.clear();
+
+      for (int wi=0; wi < pZSMaster->getDictionary()->count(); wi++) {
+          LocalMetaDic.push(pZSMaster->getDictionary()->TabConst(wi));
+      }
+      ErrorLog=pZSMaster->_getErrorLog();
+  }
+  /* create a search entity from another entity (file entity or collection) */
+  ZSearchEntity( std::shared_ptr<ZSearchEntity> pBaseEntity,ZSearchToken* pToken)
+  {
+      _BaseEntity = pBaseEntity;
+      setNameByToken(pToken);
+      ErrorLog=pBaseEntity->_getErrorLog();
+//      _URFParser.setDictionary(&LocalMetaDic);
   }
 
-  ZSearchEntity( std::shared_ptr<ZSearchMasterFile> pMasterPtr,ZSearchToken* pToken)
-  {
-    _FileEntity = make_shared<_BaseFileEntity>(pMasterPtr,pToken);
-    _FileEntity->setToken(pToken);
-    allocateCellFormat();
-  }
-
-
-  ZSearchEntity( std::shared_ptr<_BaseCollectionEntity> pCollectionEntity)
-  {
-    _CollectionEntity=pCollectionEntity->getSharedPtr();
-    allocateCellFormat();
-  }
-
+public:
 
   ZSearchEntity(const ZSearchEntity& pIn) {_copyFrom(pIn);}
 
   ~ZSearchEntity()
   {
-    if (CellFormat!=nullptr)
-      zfree(CellFormat);
+      if (_FileEntity!=nullptr) {
+        delete _FileEntity;
+      }
+      if (LogicalTerm!=nullptr) {
+          delete LogicalTerm;
+      }
   }
 
   ZSearchEntity& _copyFrom (const ZSearchEntity& pIn) ;
 
   ZSearchEntity& operator = (const ZSearchEntity& pIn) {return _copyFrom(pIn);}
 
-  std::shared_ptr<ZSearchEntity> getSharedPtr() {return shared_from_this();}
+// moved to ZSearchEntityContext
+//  static ZSearchEntityContext newEntityContext(std::shared_ptr<ZSearchEntity> pEntity) ;
 
-  std::shared_ptr<_BaseFileEntity> getBaseFileEntity() {
-    if (_FileEntity==nullptr)
-      return nullptr;
-    return make_shared<_BaseFileEntity> (*_FileEntity);
+
+//  std::shared_ptr<ZSearchEntity> getSharedPtr() {return shared_from_this();}
+
+  ZSearchMasterFile*  getRootFileEntity() {
+      if (isFile())
+        return  _FileEntity;
+    return _BaseEntity->getRootFileEntity();
+//      return _CollectionEntityList[0]->_BaseEntity->getBaseFileEntity();
   }
-
-
-  /* returns a shared point to created entity (file entity) or nullptr in case of error. In this later case, ZException is set with appropriate explainations */
-
-  /* constructs : the master file object using path, the base file entity, then the ZSearchEntity */
-  static std::shared_ptr<ZSearchEntity> constructWithFileEntity(const utf8VaryingString& pZMFPath, zmode_type pAccessMode, ZSearchToken* pToken);
-  /* uses an already constructed  base file entity to construct the ZSearchEntity */
-  static std::shared_ptr<ZSearchEntity> constructWithFileEntity(std::shared_ptr<_BaseFileEntity> pBaseFileEntity,  ZSearchToken* pToken);
-
-  static std::shared_ptr<ZSearchEntity> constructWithMaster(std::shared_ptr<ZSearchMasterFile> pMasterFile,  ZSearchToken* pToken);
-
-  static std::shared_ptr<ZSearchEntity> constructWithCollectionEntity(const utf8VaryingString& pSourceEntityName, ZSearchToken* pToken);
-  static std::shared_ptr<ZSearchEntity> constructWithCollectionEntity(std::shared_ptr<ZSearchEntity> pZSearchEntity, ZSearchToken* pToken);
 
 
   static void _checkCircularReference(std::shared_ptr<ZSearchEntity> pTop) ;
 
   bool isValid()
   {
-    if (isCollection())
-      return _CollectionEntity->isValid();
     if (isFile())
-      return _FileEntity->isValid();
-    return false;
+        return _FileEntity!=nullptr;
+    return _BaseEntity!=nullptr;
+
   }
 
-//  void setFormula(ZSearchFormula* pFormula);
-//  void setLogicalOperand(ZSearchLogicalOperand *pOperand);
+
   void setLogicalTerm(ZSearchLogicalTerm * pTerm);
-  /**
-   * @brief set sets up Descriptor from current tokenizer array position and updates token text and type, row column and offset as well as token number
-   */
-  void setToken(ZSearchToken *pToken);
   void set(std::shared_ptr<ZSearchMasterFile> pMasterFile, ZSearchToken* pToken) ;
-  utf8VaryingString getName( ) const ;
 
   long getFieldRankbyName(const utf8VaryingString &pFieldName) const ;
 
-  const ZDictionaryFile& getFieldDictionary() const;
-  const ZDictionaryFile* getFieldDictionaryPtr() const;
-  const ZArray<ZKeyDictionary*>& getKeyDictionary() const;
+  bool isCollection() const { return _BaseEntity != nullptr; }
+  bool isFile() const       { return _FileEntity!=nullptr; }
+  bool isJoin() const       { return _JoinList.count()>0 ; }
 
-  bool isCollection() const {return _CollectionEntity!=nullptr; }
-  bool isFile() const       {return _FileEntity!=nullptr; }
+ // bool isUnique() const { return _CollectionEntityList.count() == 1;}
+
+
+
+  ZStatus populateAllJoin(ZSearchEntityContext &pSEC);
+
+  ZStatus populateFirstJoin(ZSearchEntityContext &pSEC,int pCount=1);
+  ZStatus populateNextJoin(ZSearchEntityContext &pSEC,int pCount=1);
+
+  ZStatus getFirstJoin(ZSearchEntityContext &pSEC,ZSearchJoinTuple& pAddress);
+  ZStatus getNextJoin(ZSearchEntityContext &pSEC,ZSearchJoinTuple& pAddress);
+
+  ZStatus _getFirstJoin(ZSearchEntityContext &pSEC,ZSearchJoinTuple& pAddress);
+  ZStatus _getNextJoin(ZSearchEntityContext &pSEC,ZSearchJoinTuple& pAddress);
+
+  ZStatus _getByAddressJoin(ZSearchEntityContext &pSEC,ZSearchJoinTuple &pAddress);
+
+  ZStatus getByRankJoin(ZSearchEntityContext &pSEC,long pRank,ZSearchJoinTuple& pAddress);
+  ZStatus _getByRankJoin(ZSearchEntityContext &pSEC,long pRank,ZSearchJoinTuple& pAddress);
+
+
+  /* Populate operations : refers to FETCH */
+
+  /**
+   * @brief populateAll generates AddressList from base
+   */
+  ZStatus populateAll(ZSearchEntityContext& pSEC);
+
+  /**
+   * @brief populateFirst Initialize AddressList from base with at least pCount valid addresses
+   */
+  ZStatus populateFirst(ZSearchEntityContext &pSEC,long pCount);
+  ZStatus _populateFirst(ZSearchEntityContext &pSEC,long pCount);
+  /**
+   * @brief populateNext Feeds AddressList from base with at least pCount valid additional addresses
+   *                   if pCount is equal or less than 0, then AddressList will be complemented until end of available records.
+   */
+  ZStatus populateNext(ZSearchEntityContext &pSEC,long pCount);
+
+  ZStatus _populateNext(ZSearchEntityContext &pSEC,long pCount);
+
+  /** get operations
+   *
+   * NB: Current rank within entity and within context are updated ONLY if get operation is TOTALLY successfull */
+
+  /**
+   * @brief getFirst Seeks first record from base (either file or entity) that correspond to selection formula
+   * When successfull, a valid record formatted according LocalMetaDic is available in _URFParser, with its full list of URFFields.
+   *
+   */
+  ZStatus getFirst(ZSearchEntityContext &pSEC,zaddress_type &pAddress);
+
+  /**
+   * @brief getNext Seeks from base (either file or entity) for next record that correspond to selection formula
+   * Next record has entity rank = ZSearchEntityContext::CurrentRank + 1
+   * When successfull,
+   * ZSearchEntityContext::_URFParser contains a valid record formatted according LocalMetaDic is available in
+   *                                            with its associated full list of URFFields.
+   * ZSearchEntityContext::CurrentRank is updated with current position within entity
+   */
+  ZStatus getNext(ZSearchEntityContext &pSEC, zaddress_type &pAddress);
+
+  ZStatus _getFirst(ZSearchEntityContext &pSEC,zaddress_type &pAddress);
+  /** @brief _getNext
+   * find next URF content from entity according current entity rank :
+   *                            Entity AddressList is first searched for appropriate (Gives the first next selected rank of base entity)
+   */
+  ZStatus _getNext(ZSearchEntityContext &pSEC,zaddress_type &pAddress);
+  /* effective access to entity first record (selected record) : ZSearchEntity::AddressList is not used even if available */
+  ZStatus _getFirstHard(ZSearchEntityContext &pSEC,zaddress_type &pAddress);
+
+  /* effective access to next record : ZSearchEntity::AddressList is not used even if available
+   *                                    next rank is obtained from current entity and sub-entities state */
+  ZStatus _getNextHard(ZSearchEntityContext &pSEC,zaddress_type &pAddress);
+
+  ZStatus getByRank(ZSearchEntityContext &pSEC,long pRank,zaddress_type &pAddress);
+  ZStatus _getByRank(ZSearchEntityContext &pSEC,long pRank,zaddress_type &pAddress);
+
+  ZStatus _getByAddress(ZSearchEntityContext &pSEC, zaddress_type pAddress);
+
+  /* Gets the whole raw record from the very base file entity (file effective record)
+   * and returns it in raw format as pRecord ZDataBuffer as well as its file's address pAddress */
+  ZStatus _getRawRecord(ZSearchEntityContext &pSEC, const long pRank, zaddress_type &pAddress);
+
+  /**
+   * @brief constructURFRecord Builds a record corresponding to a Search Dictionary from an input record
+   */
+
+ /**
+ * @brief ZSearchEntity::constructURF constructs URFParser for current entity using either _BaseEntity or _FileEntity URFParser.
+ *                                    at the end, URFParser has an appropriate record and an updated URF field list.
+ * @return a ZStatus
+ *  errored statuses may come from
+ *      URFParser::_getURFFieldByRank()
+ *          ZS_MISS_FIELD : field presence is set to false
+ *          ZS_OUTBOUNDHIGH : requested field rank exceeds fields number
+ *      URFParser::parse()
+ *          ZS_CORRUPTED URFParser record is malformed : presence bitset is not found or corrupted
+ *
+ *      ZS_INVTYPE : operand content type is not what is expected in an expression
+ *
+ */
+  ZStatus constructURF(ZSearchEntityContext &pSEC);
+#ifdef __COMMENT__
+  URFParser* getParserFromField(ZSearchEntityContext& pSEC,ZSearchField& pField );
+  URFParser* getParserFromEntity(ZSearchEntityContext& pSEC,std::shared_ptr<ZSearchEntity> pEntity );
+#endif // __COMMENT__
+
+  ZStatus evaluateRecord(ZSearchEntityContext &pSEC, bool &pOutResult);
+
+  ZStatus findFirstFieldValueSequential(ZSearchEntityContext &pSEC,
+                                        long pFieldRank,
+                                        ZOperandContent *pSearchValue,
+                                        ZDataBuffer &pOutRecord);
 
   utf8VaryingString _report() ;
+  utf8VaryingString _reportDetail();
+  utf8VaryingString _reportJoin() ;
 
-  size_t getMaxRecords() {
-    if (isFile()) {
-      return _FileEntity->getRecordCount();
-    }
-    if (isCollection())
-      return _CollectionEntity->getMaxRecords();
-    _DBGPRINT("ZSearchEntity::getMaxRecords Search entity is neither a file entity nor a collection entity.")
-    abort;
+  size_t getCount() {
+      if (isFile()) {
+          return _FileEntity->getRecordCount();
+      }
+      if (isCollection())
+          return _BaseEntity->getCount();
+      _DBGPRINT("ZSearchEntity::getMaxRecords Search entity is neither a file entity nor a collection entity.")
+      abort();
   }
 
-  ZStatus get(ZDataBuffer& pRecord,const long pRank,zaddress_type& pAddress)
+  void _enableErrorLogFromBase()
   {
-    if (isFile()) {
-      return _FileEntity->get(pRecord,pRank,pAddress);
-    }
-    return _CollectionEntity->get(pRecord,pRank,pAddress);
+      ErrorLog=_getErrorLog();
+  }
+  void setErrorLog(ZaiErrors* pErrorLog) {ErrorLog=pErrorLog; }
+
+  ZaiErrors* _getErrorLog()
+  {
+      if (ErrorLog==nullptr) {
+          if (_FileEntity!=nullptr) {
+              return ErrorLog = _FileEntity->_getErrorLog();
+          }
+          return ErrorLog = _BaseEntity->_getErrorLog();
+      }
+      return ErrorLog;
   }
 
-  ZFieldDescription         getFieldByRank(long pRank) const;
+  size_t _rootGetCount() {
+      if (_FileEntity!=nullptr)
+          return getCount();
+      return _BaseEntity->_rootGetCount();
+  }
 
-  void allocateCellFormat();
-  void reallocateCellFormat();
 
-  int* CellFormat=nullptr;
+/*
+  URFParser& getURFParser()
+  {
+      return _URFParser;
+  }
+*/
 
-  std::shared_ptr<_BaseFileEntity>          _FileEntity = nullptr;
-  std::shared_ptr<_BaseCollectionEntity>    _CollectionEntity = nullptr;
+  ZStatus _baseGet(ZSearchEntityContext& pSEC, const long pRank,zaddress_type& pAddress)
+  {
+      if (isFile()) {
+          return _FileEntity->getByRank(pSEC,pRank,pAddress);
+      }
+      return _BaseEntity->_baseGet(pSEC,pRank,pAddress);
+  }
+
+  /* adds all fields from source entity to ZSearchDictionary and ZMetadic (BuildDic and LocalMetaDic) */
+  void addAllFields(std::shared_ptr<ZSearchEntity> &pSourceEntity);
+
+  /* clears dictionaries and all fields from source entity to ZSearchDictionary and ZMetadic (BuildDic and LocalMetaDic) */
+  void setEqual(std::shared_ptr<ZSearchEntity> &pSourceEntity);
+
+  ZSearchDictionary* getDic() { return &BuildDic; }
+  const ZMetaDic* getMetaDic() {
+      return (const ZMetaDic*)&LocalMetaDic;
+  }
+  /**
+   * @brief set sets up Descriptor from current tokenizer array position and updates token text and type, row column and offset as well as token number
+   */
+  void setNameByToken(ZSearchToken *pToken);
+  void setName(const utf8VaryingString& pName);
+
+  utf8VaryingString getEntityName( ) const;
+  utf8VaryingString getEntityFullName( ) const;
+  bool hasFormula()
+  {
+      return (LogicalTerm!=nullptr);
+  }
+
+//  void setCaptureTime(bool pOnOff) { CaptureTime=pOnOff; }
+  long                                          CurrentRank=-1;
+  zaddress_type                                 LastAddress=-1;
+
+  utf8VaryingString                             EntityName;
+  utf8VaryingString                             EntityFullName;
+  /** @brief BuildDic : result of parsing.
+   *  This dictionary will be used to extract/compute fields/expressions/literals from base entity records
+   *  in order to create  URF formatted records with its own LocalMetaDic meta dictionary.
+   *  It has the link to base entity BuildDic.
+  */
+  ZSearchDictionary                             BuildDic;
+
+  ZMetaDic                                      LocalMetaDic;
+  ZSearchMasterFile*                            _FileEntity=nullptr; /* ZSearchMasterFile is unique per File entity and owns all context */
+
+  /* base collection is not shared : only master file access and ZSearchEntity global entities are potentially shared */
+  std::shared_ptr<ZSearchEntity>                _BaseEntity=nullptr;
+  ZArray<std::shared_ptr<ZSearchEntity>>        _JoinList ;
+  ZArray<ZSearchJoinTuple>                      JoinAddressList;
+  ZSearchLogicalTerm*                           _Using=nullptr;
+  ZArray<zaddress_type>                         AddressList ;
+  ZSearchLogicalTerm*                           LogicalTerm=nullptr;  /* entity selection phrase */
+  ZaiErrors*                                    ErrorLog=nullptr;  /* entity does not own an errorlog but uses the one from file entity */
+//  URFParser                                     _URFParser;
+
+  EFST_Type                                     FetchState=EFST_Nothing;
+
+//  bool                                          CaptureTime=true;
+//  ZTimer                                        ProcessTi;
+  ZMutex                                        _Mutex;
 };
 
 } // namespace zbs
 
-#endif // ZSEARCHDESCRIPTOR_H
+#endif // ZSEARCHENTITY_H

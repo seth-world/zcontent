@@ -1,7 +1,7 @@
 #ifndef ZIDENTITY_H
 #define ZIDENTITY_H
 #include <limits.h>
-#include <ztoolset/zutfstrings.h>
+#include <ztoolset/utfvaryingstring.h>
 
 #include <zxml/zxml.h>
 #include <ztoolset/zaierrors.h>
@@ -34,7 +34,7 @@ public:
 
 //    static ZIdentity getNew(void) {return ZIdentity(GlobalId++);}
 
-    utfcodeString tocodeString (void)               {utfcodeString pString ; pString.sprintf("%08lX",id); return pString;}
+    utf8VaryingString tocodeString (void)               {utf8VaryingString pString ; pString.sprintf("%08lX",id); return pString;}
     ZIdentity& fromString (const char *pString,int pBase=10)  {id =strtol (pString,nullptr,pBase); return *this;}
 
 //    ZIdentity& getNext (void) { id++; return *this; }
@@ -58,7 +58,7 @@ public:
         id =strtol (pId,nullptr,10);
         return *this;
     }
-    ZIdentity &operator = (const utfcodeString& pId)
+    ZIdentity &operator = (const utf8VaryingString& pId)
     {
         fromString (pId.toCChar(),10);
         return *this;
@@ -76,7 +76,7 @@ public:
     CharMan toStr();
     CharMan toHexa();
 
-    utf8String toXml(const char *pName, int pLevel);
+    utf8VaryingString toXml(const char *pName, int pLevel);
     int fromXml(zxmlElement *pRootNode, const char *pChildName, ZaiErrors *pErrorlog);
 
 

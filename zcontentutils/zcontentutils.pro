@@ -133,10 +133,13 @@ SOURCES += \
 #    $${ZQT_WIDGET}/zqpixlabelchecked.cpp \
     ../../zcppparser/zcppparsertype.cpp \
     ../../zqt/zqtwidget/zcombodelegate.cpp \
+    ../../zqt/zqtwidget/zhelp.cpp \
     ../../zqt/zqtwidget/zqgraphicscene.cpp \
     ../../zqt/zqtwidget/zqrectangle.cpp \
+    ../../zqt/zqtwidget/zqtextbrowser.cpp \
     ../zcontentcommon/urffield.cpp \
     ../zcontentcommon/urfparser.cpp \
+#    ../zcontentcommon/zgeneralparameters.cpp \
     ../zcontentcommon/zgeneralparameters.cpp \
 \
     $${ZCONTENT_ROOT}/zcontentcommon/zresource.cpp \
@@ -155,7 +158,7 @@ SOURCES += \
 #    ../../zcppparser/zcppparserutils/rawfields.cpp \
 #/home/gerard/Development/zbasetools/zcppparser/zcppparserutils/rawfields.h
     $${ZCONTENT_ROOT}/zcontentutils/texteditmwn.cpp \
-    $${ZCONTENT_ROOT}/zcontentutils/zcontentvisumain.cpp \
+#    $${ZCONTENT_ROOT}/zcontentutils/zcontentvisumain.cpp \
     $${ZCONTENT_ROOT}/zcontentutils/zentity.cpp \
     $${ZCONTENT_ROOT}/zcontentutils/zexceptiondlg.cpp \
     $${ZCONTENT_ROOT}/zcontentutils/zfielddlg.cpp \
@@ -174,14 +177,18 @@ SOURCES += \
     zbackupdlg.cpp \
     zcellformatdlg.cpp \
     zchangerecord.cpp \
+    zclearfiledlg.cpp \
     zcollectionlist.cpp \
+    zcopydlg.cpp \
     zcppgenerate.cpp \
+    zentrypoint.cpp \
     zfilegenerate.cpp \
     zgeneralparamsdlg.cpp \
     zkeylistdlg.cpp \
     zmfprogressmwn.cpp \
     zrawkeylistdlg.cpp \
     zrawmasterfilevisu.cpp \
+    zrawvisumain.cpp \
     zrestoredlg.cpp \
     zsearchquerymwd.cpp
 
@@ -204,12 +211,15 @@ HEADERS += \
 #    $${ZQT_WIDGET}/zqpixlabelchecked.h \
     ../../zcppparser/zcppparsertype.h \
     ../../zqt/zqtwidget/zcombodelegate.h \
+    ../../zqt/zqtwidget/zhelp.h \
     ../../zqt/zqtwidget/zqgraphicscene.h \
     ../../zqt/zqtwidget/zqrectangle.h \
+    ../../zqt/zqtwidget/zqtextbrowser.h \
     ../../zqt/zqtwidget/zqtutils.h \
     ../../zqt/zqtwidget/zqtwidgets_release.h \
     ../zcontentcommon/urffield.h \
     ../zcontentcommon/urfparser.h \
+#    ../zcontentcommon/zgeneralparameters.h \
     ../zcontentcommon/zgeneralparameters.h \
 \
     $${ZCONTENT_ROOT}/zcontentcommon/zresource.h \
@@ -225,7 +235,7 @@ HEADERS += \
     $${ZCONTENT_ROOT}/zcontentutils/zstdlistdlg.h \
     $${ZCONTENT_ROOT}/zcontentutils/ztypedlg.h \
     $${ZCONTENT_ROOT}/zcontentutils/texteditmwn.h \
-    $${ZCONTENT_ROOT}/zcontentutils/zcontentvisumain.h \
+#    $${ZCONTENT_ROOT}/zcontentutils/zcontentvisumain.h \
     $${ZCONTENT_ROOT}/zcontentutils/zentity.h \
     $${ZCONTENT_ROOT}/zcontentutils/zexceptiondlg.h \
     $${ZCONTENT_ROOT}/zcontentutils/zfielddlg.h \
@@ -245,16 +255,20 @@ HEADERS += \
     zbackupdlg.h \
     zcellformatdlg.h \
     zchangerecord.h \
+    zclearfiledlg.h \
     zcollectionlist.h \
     zcontentutils_doc.h \
     zcontentutils_release.h \
+    zcopydlg.h \
     zcppgenerate.h \
+    zentrypoint.h \
     zfilegenerate.h \
     zgeneralparamsdlg.h \
     zkeylistdlg.h \
     zmfprogressmwn.h \
     zrawkeylistdlg.h \
     zrawmasterfilevisu.h \
+    zrawvisumain.h \
     zrestoredlg.h \
     zsearchquerymwd.h
 

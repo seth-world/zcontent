@@ -4,7 +4,7 @@
 #include <zindexedfile/zmetadic.h>
 #include <zindexedfile/zdataconversion.h> // for _getURFHeaderSize
 
-#include <ztoolset/zutfstrings.h>
+#include <ztoolset/utfvaryingstring.h>
 #include <zxml/zxmlprimitives.h>
 
 using namespace zbs;
@@ -28,7 +28,7 @@ ZMetaDic::ZMetaDic() { }
  * @return a ZStatus
  */
 ZStatus
-ZMetaDic::addField (const utf8String& pFieldName,
+ZMetaDic::addField (const utf8VaryingString& pFieldName,
                    const ZTypeBase pType,
                    const size_t pNaturalSize,
                    const size_t pUniversalSize,
@@ -218,7 +218,7 @@ ZDataBuffer wDBV1;
  * @return the field position (rank) in dictionary. returns -1 if field name has not been found.
  */
 zrank_type
-ZMetaDic::searchFieldByName(const utf8String& pFieldName) const {
+ZMetaDic::searchFieldByName(const utf8VaryingString& pFieldName) const {
     if (pFieldName.isEmpty())
             return (zrank_type)-1;
 
@@ -310,7 +310,7 @@ void ZMetaDic ::print (FILE* pOutput)
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 ZStatus
-ZMetaDic::removeFieldByName (const utf8String & pFieldName)
+ZMetaDic::removeFieldByName (const utf8VaryingString & pFieldName)
 {
 
     long wRank = searchFieldByName(pFieldName);
@@ -535,9 +535,9 @@ void deleteZMetaDic(void* pMetaDic)
   </metadic>
 */
 
-utf8String ZMetaDic::XmlSaveToString(bool pComment)
+utf8VaryingString ZMetaDic::XmlSaveToString(bool pComment)
 {
-  utf8String wReturn = fmtXMLdeclaration();
+  utf8VaryingString wReturn = fmtXMLdeclaration();
   wReturn += fmtXMLmainVersion("zmetadictionary",__ZDIC_VERSION__,0);
   wReturn += toXml(1,pComment);
   wReturn += fmtXMLendnode("zmetadictionary",0);
@@ -547,7 +547,7 @@ utf8String ZMetaDic::XmlSaveToString(bool pComment)
 utf8VaryingString ZMetaDic::toXml(int pLevel,bool pComment)
 {
   int wLevel=pLevel;
-  utf8String wReturn;
+  utf8VaryingString wReturn;
   ZDataBuffer wB64;
   wReturn = fmtXMLnode("metadictionary",wLevel);
   wLevel++;
@@ -582,7 +582,7 @@ utf8VaryingString ZMetaDic::toXml(int pLevel,bool pComment)
 } // ZMetaDic::toXml
 
 
-ZStatus ZMetaDic::XmlLoadFromString(const utf8String &pXmlString,bool pCheckHash, ZaiErrors* pErrorLog)
+ZStatus ZMetaDic::XmlLoadFromString(const utf8VaryingString &pXmlString,bool pCheckHash, ZaiErrors* pErrorLog)
 {
   ZStatus wSt;
 
@@ -590,18 +590,20 @@ ZStatus ZMetaDic::XmlLoadFromString(const utf8String &pXmlString,bool pCheckHash
   zxmlElement *wRoot = nullptr;
 
   wDoc = new zxmlDoc;
-  wSt = wDoc->ParseXMLDocFromMemory(pXmlString.toCChar(), pXmlString.getUnitCount(), nullptr, 0);
+//  wSt = wDoc->ParseXMLDocFromMemory(pXmlString.toCChar(), pXmlString.getUnitCount(), nullptr, 0);
+  wSt = wDoc->XmlParseFromMemory(pXmlString,pErrorLog);
   if (wSt != ZS_SUCCESS) {
-    pErrorLog->logZException();
+/*    pErrorLog->logZExceptionLast();
     pErrorLog->errorLog(
         "ZMetaDic::XmlloadFromString-E-PARSERR Xml parsing error for string <%s> ",
         pXmlString.subString(0, 25).toUtf());
+*/
     return wSt;
   }
 
   wSt = wDoc->getRootElement(wRoot);
   if (wSt != ZS_SUCCESS) {
-    pErrorLog->logZException();
+    pErrorLog->logZExceptionLast();
     return wSt;
   }
   if (!(wRoot->getName() == "metadictionary")) {
@@ -624,10 +626,10 @@ ZStatus ZMetaDic::fromXml(zxmlNode* pMetaDicRootNode, bool pCheckHash,ZaiErrors*
   zxmlElement *wFieldsRootNode=nullptr;
   zxmlElement *wSingleFieldNode=nullptr;
   zxmlElement *wSwapNode=nullptr;
-  utfcodeString wXmlHexaId;
+  utf8VaryingString wXmlHexaId;
   ZFieldDescription wFD;
-  utf8String wValue;
-  utfcodeString wCValue;
+  utf8VaryingString wValue;
+  utf8VaryingString wCValue;
   int wErroredFields=0,wWarnedFields=0;
 
 //  ZStatus wSt = pDicRootNode->getChildByName((zxmlNode *&) wMetaDicNode, "metadic");

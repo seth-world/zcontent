@@ -70,6 +70,7 @@ public:
 
   void clear(void) {memset(this,0,sizeof(ZRFPMS)); return;}
   void reportDetails (FILE*pOutput=stdout);
+  void reportDetails (ZaiErrors* pErrorLog) ;
 
   void PMSCounterRead(ZPMSCounter_type pC, const zsize_type pSize=0);
   void PMSCounterWrite(ZPMSCounter_type pC, const zsize_type pSize=0);

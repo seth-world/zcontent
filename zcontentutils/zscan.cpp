@@ -89,7 +89,7 @@ ZScan::scanMain()
   long          wOldSize=0;
 
   int wTick=0;
-  utf8String wStr;
+  utf8VaryingString wStr;
   int wRow=0;
   int wCol=0;
 
@@ -221,7 +221,7 @@ ZScan::displayOneBlock(zaddress_type pAddress,ZBlockHeader& pBlockHeader)
 {
   int wRow=0;
   int wCol=0;
-  utf8String wStr;
+  utf8VaryingString wStr;
   //            "Physical address    |   State       | Block size         | User content size  | Theorical next Add\n"
 
   wStr.sprintf("%8X",pAddress);

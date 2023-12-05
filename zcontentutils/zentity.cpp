@@ -229,34 +229,34 @@ utf8VaryingString decode_ZEntityL(ZEntity_type pEntity)
 
 ZEntity_type encode_ZEntity(const utf8VaryingString &pEntity)
 {
-  if (pEntity.strcasestr((const utf8_t *) "ZEntity_KeyDic"))
+  if (pEntity.hasToken((const utf8_t *) "ZEntity_KeyDic"))
     return ZEntity_KeyDic;
-  if (pEntity.strcasestr((const utf8_t *) "ZEntity_KeyField"))
+  if (pEntity.hasToken((const utf8_t *) "ZEntity_KeyField"))
     return ZEntity_KeyField;
-  if (pEntity.strcasestr((const utf8_t *) "ZEntity_DicField"))
+  if (pEntity.hasToken((const utf8_t *) "ZEntity_DicField"))
     return ZEntity_DicField;
 /*
-    if (pEntity.strcasestr((const utf8_t *) "ZEntity_Activity"))
+    if (pEntity.hasToken((const utf8_t *) "ZEntity_Activity"))
         return ZEntity_Activity;
-    if (pEntity.strcasestr((const utf8_t *) "ZEntity_Domain"))
+    if (pEntity.hasToken((const utf8_t *) "ZEntity_Domain"))
         return ZEntity_Domain;
-    if (pEntity.strcasestr((const utf8_t *) "ZEntity_SubDomain"))
+    if (pEntity.hasToken((const utf8_t *) "ZEntity_SubDomain"))
         return ZEntity_SubDomain;
-    if (pEntity.strcasestr((const utf8_t *) "ZEntity_Project"))
+    if (pEntity.hasToken((const utf8_t *) "ZEntity_Project"))
         return ZEntity_Project;
-    if (pEntity.strcasestr((const utf8_t *) "ZEntity_SubProject"))
+    if (pEntity.hasToken((const utf8_t *) "ZEntity_SubProject"))
         return ZEntity_SubProject;
-    if (pEntity.strcasestr((const utf8_t *) "ZEntity_Agent"))
+    if (pEntity.hasToken((const utf8_t *) "ZEntity_Agent"))
         return ZEntity_Agent;
-    if (pEntity.strcasestr((const utf8_t *) "ZEntity_Category"))
+    if (pEntity.hasToken((const utf8_t *) "ZEntity_Category"))
         return ZEntity_Category;
-    if (pEntity.strcasestr((const utf8_t *) "ZEntity_Unit"))
+    if (pEntity.hasToken((const utf8_t *) "ZEntity_Unit"))
         return ZEntity_Unit;
-    if (pEntity.strcasestr((const utf8_t *) "ZEntity_SubProject"))
+    if (pEntity.hasToken((const utf8_t *) "ZEntity_SubProject"))
         return ZEntity_SubProject;
-    if (pEntity.strcasestr((const utf8_t *) "ZEntity_SubProject"))
+    if (pEntity.hasToken((const utf8_t *) "ZEntity_SubProject"))
         return ZEntity_SubProject;
-    if (pEntity.strcasestr((const utf8_t *) "ZEntity_Currency"))
+    if (pEntity.hasToken((const utf8_t *) "ZEntity_Currency"))
         return ZEntity_Currency;
 */
 

@@ -2,8 +2,8 @@
 #define ZSEARCHPARSERTYPE_H
 
 #include <ztoolset/utfvaryingstring.h>
-
-#define __SEARCHPARSER_HISTORY_FILE__ "zsearchparserhistory.log"
+#define __QUERY_HISTORY_FILE__ "zqueryhistory.log"
+//#define __SEARCHPARSER_HISTORY_FILE__ "zsearchparserhistory.log"
 #define __SEARCHPARSER_SYMBOL_FILE__ "zsearchparsersymbol.xml"
 #define __SEARCHPARSER_PARAMS_FILE__ "zsearchparserparams.xml"
 #define __SEARCHPARSER_ZENTITY_FILE__ "zsearchparserzentity.xml"
@@ -14,7 +14,7 @@
 namespace zbs {
 
 /* Parser and tokenizer options */
-enum Options : uint32_t {
+enum ZSRCHO : uint32_t {
   ZSRCHO_Nothing      =      0,
   ZSRCHO_Include      =   0x01,       /* Allows  include files */
 
@@ -93,8 +93,7 @@ enum ZSearchTokentype : ZSearchTokentype_type {
   ZSRCH_COMMENT_BRIEF_IDENTIFIER =   0x2130,
   ZSRCH_COMMENT_PREVIOUS         =   0x2140,
   ZSRCH_COMMENT_AFTER            =   0x2180,
-  ZSRCH_COMMENT_TEXT             =    0x2102,
-
+  ZSRCH_COMMENT_TEXT             =   0x2102,
 
   ZSRCH_OPERATOR                 =    0x4000,
 
@@ -113,7 +112,7 @@ enum ZSearchTokentype : ZSearchTokentype_type {
   ZSRCH_OPERATOR_LESSOREQUAL     =    0x4109, // '<=' or LESS OR EQUAL
   ZSRCH_OPERATOR_GREATEROREQUAL  =    0x410A, // '>=' or GREATER OR EQUAL
 
-  ZSRCH_OPERATOR_MOVE            =    0x410B, // move operator  single '='  EQUAL
+  ZSRCH_OPERATOR_MOVE            =    0x420B, // move operator  single '='  EQUAL
 
 
   ZSRCH_OPERATOR_ARITHMETIC      =    0x4200, // mask for arithmetic operators
@@ -121,11 +120,12 @@ enum ZSearchTokentype : ZSearchTokentype_type {
   ZSRCH_OPERATOR_PLUS            =    0x4201,
   ZSRCH_OPERATOR_MINUS           =    0x4202,
   ZSRCH_OPERATOR_DIVIDEORSLASH   =    0x4203,
-  ZSRCH_OPERATOR_MULTIPLY        =    0x4204,
+
+  ZSRCH_OPERATOR_MULTIPLY        =    0x4204, // is also wildcard operator
+  ZSRCH_WILDCARD                 =    0x4204,
+
   ZSRCH_OPERATOR_POWER           =    0x4205,
   ZSRCH_OPERATOR_MODULO          =    0x4206,
-
-
 
   /* string operators */
 
@@ -154,10 +154,12 @@ enum ZSearchTokentype : ZSearchTokentype_type {
 
   ZSRCH_DOT                      =     0x810A,
 
+  ZSRCH_RIGHTARROW               =     0x810B,
+  ZSRCH_LEFTARROW                =     0x810C,
+
   ZSRCH_EOL                      =     0x8110,
 
   ZSRCH_BACKSLASH                =     0x8111,
-
 
   ZSRCH_SIMPLE_TOKEN             =   0x010000,
 
@@ -173,6 +175,12 @@ enum ZSearchTokentype : ZSearchTokentype_type {
 
 
   ZSRCH_INSTRUCTION_MASK         = 0x00010300,
+
+  ZSRCH_DECLARE                  = 0x000103A0,   /* declare { file , symbol } */
+
+  ZSRCH_SAVE                     = 0x000103B0,   /* save symbol [ to <xml file path> ] */
+  ZSRCH_LOAD                     = 0x000103B1,   /* load symbol [ from <xml file path> ] */
+
   ZSRCH_SET                      = 0x00010310,
   ZSRCH_FILE                     = 0x00010311,
 
@@ -182,12 +190,18 @@ enum ZSearchTokentype : ZSearchTokentype_type {
 
   ZSRCH_AS                       = 0x00010315,
 
+  ZSRCH_TO                       = 0x0001031,
+  ZSRCH_FROM                     = 0x0001032,
 
   ZSRCH_FINISH                   = 0x0001031F,
 
   ZSRCH_FIND                     = 0x00010320,
   ZSRCH_WITH                     = 0x00010321,
 
+  ZSRCH_IN                       = 0x00010322,
+  ZSRCH_FETCH                    = 0x00010323,
+
+  ZSRCH_USING                    = 0x00010324,
 
   ZSRCH_INDEX                    = 0x00010331,
   ZSRCH_INDEXNUM                 = 0x00010332,
@@ -204,22 +218,31 @@ enum ZSearchTokentype : ZSearchTokentype_type {
   ZSRCH_ENTITY                   = 0x00010354,  /* show instruction */
   ZSRCH_SYMBOL                   = 0x00010355,  /* show instruction */
   ZSRCH_MASTERFILES              = 0x00010356,  /* show instruction */
+  ZSRCH_FORMULA                  = 0x00010357,  /* show instruction */
 
-  ZSRCH_MAXIMUM                  = 0x00010356,  /* set history maximum instruction */
+  ZSRCH_MAXIMUM                  = 0x00010358,  /* set history maximum instruction */
 
-  ZSRCH_DISPLAY                  = 0x00010357,  /* diplay instruction */
+  ZSRCH_DISPLAY                  = 0x00010359,  /* diplay instruction */
 
   ZSRCH_ALL                      = 0x00010360,
   ZSRCH_FIRST                    = 0x00010361,
-  ZSRCH_LAST                     = 0x00010362,
-  ZSRCH_AT                       = 0x00010363,
+  ZSRCH_NEXT                     = 0x00010362,
+  ZSRCH_LAST                     = 0x00010363,
+  ZSRCH_AT                       = 0x00010364,
+
+  ZSRCH_JOIN                     = 0x00010365,
 
 
   ZSRCH_MODIFIER                 = 0x00020300,
 
+  ZSRCH_TRANSLATE                = 0x00020310,
+  ZSRCH_DECODETABLE              = 0x00020311,
+
   /* string modifier */
 
   ZSRCH_SUBSTRING                 = 0x00020366,
+  ZSRCH_SUBSTRINGLEFT             = 0x00020367,
+  ZSRCH_SUBSTRINGRIGHT            = 0x00020368,
 
   /* Date modifier */
 
@@ -238,7 +261,6 @@ enum ZSearchTokentype : ZSearchTokentype_type {
   ZSRCH_ZENTITY                   = 0x00020381,  /* used for resource */
   ZSRCH_ID                        = 0x00020382,
 
-
   /* uristring modifiers */
 
   ZSRCH_PATH                      = 0x00020390,
@@ -249,6 +271,8 @@ enum ZSearchTokentype : ZSearchTokentype_type {
   /* checksum */
 
   /* md5 */
+
+  /* end modifiers */
 
   ZSRCH_FIELD                    = 0x00011000,
   ZSRCH_ARGUMENT                 = 0x00011001,
@@ -398,6 +422,8 @@ enum ZSearchOperandType : ZSearchOperandType_type
   ZSTO_ArithLiteralUriString  = ZSTO_Arithmetic|ZSTO_LiteralUriString,
   ZSTO_ArithLiteralBool       = ZSTO_Arithmetic|ZSTO_LiteralBool,
 
+  ZSTO_Symbol            = 0x1000
+
 };
 
 const char* decode_OperandType(ZSearchOperandType_type pType);
@@ -406,8 +432,7 @@ utf8VaryingString decode_SearchTokenType(ZSearchTokentype_type pType);
 ZSearchTokentype_type encode_ZTokenType(const utf8VaryingString& pIn);
 
 ZSearchOperandType ZSTOfromZType(ZTypeBase pZType);
-
-
+ZTypeBase ZTypefromZSTO(ZSearchOperandType_type pZSTO);
 
 typedef uint32_t ZSearchOperator_type;
 
@@ -450,6 +475,8 @@ enum ZSearchOperatorValue : ZSearchOperator_type {
   ZSOPV_STARTS_WITH   =     0x020000,
   ZSOPV_ENDS_WITH     =     0x040000,
 
+  ZSOPV_MOVE          =     0x100000,           /* simple equal sign '=' */
+
   ZSOPV_INVALID       =   0xFFF00000
 };
 
@@ -491,6 +518,8 @@ class ZSearchToken;
 bool
 searchForKeyword(ZSearchToken* &pCurrentToken,const utf8VaryingString &pIn,long &pCurrentIndex) ;
 
+utf8VaryingString decode_ZSTO(ZSearchOperandType_type pZSTO);
+ZSearchOperandType_type encode_ZSTO(const utf8VaryingString& pZSTOString);
 
 }//namespace zbs
 

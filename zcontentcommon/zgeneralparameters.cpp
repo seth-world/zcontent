@@ -15,17 +15,18 @@ using namespace zbs;
 
 ZGeneralParameters::ZGeneralParameters()
 {
+    BaseParameters = _BaseParameters = new ZBaseParameters;
 }
 
 ZGeneralParameters::ZGeneralParameters(int argc, char *argv[])
 {
+    BaseParameters = _BaseParameters = new ZBaseParameters;
     setFromArg(argc, argv);
 }
 
 ZStatus
 ZGeneralParameters::setFromArg(int argc, char *argv[])
 {
-
     if (argc < 2) {
         fprintf (stderr,"ZGeneralParameters::setFromArg-E-NOARG no argument given.");
         return ZS_NOTFOUND;
@@ -58,11 +59,12 @@ ZStatus ZGeneralParameters::XmlSave(uriString& pXmlFile,ZaiErrors* pErrorLog)
     if (pErrorLog!=nullptr)
         pErrorLog->setAutoPrintOn(ZAIES_Text);
 
-    utf8String wReturn = fmtXMLdeclaration();
+    utf8VaryingString wReturn = fmtXMLdeclaration();
     wReturn += fmtXMLmainVersion("zmasterfileparameters",__ZMF_VERSION__,0);
     wLevel=1;
     wReturn += fmtXMLnode("generalparameters",wLevel);
     wLevel++;
+    wReturn += fmtXMLchar("verbose",decode_Verbose(getVerbose()),wLevel);
     wReturn += fmtXMLchar("defaultworkdirectory",getWorkDirectory(),wLevel);
     wReturn += fmtXMLchar("defaultparamdirectory",getParamDirectory(),wLevel);
     wReturn += fmtXMLchar("defaulticondirectory",getIconDirectory(),wLevel);
@@ -94,11 +96,12 @@ ZStatus ZGeneralParameters::XmlLoad(uriString& pXmlFile,ZaiErrors* pErrorLog)
 
     if ((wSt=pXmlFile.loadUtf8(wXmlString))!=ZS_SUCCESS) {
         if (pErrorLog!=nullptr) {
-            pErrorLog->logZException();
+            pErrorLog->logZExceptionLast();
         }
         return wSt;
     }
 
+    utf8VaryingString wVerbose;
     zxmlDoc     *wDoc = nullptr;
     zxmlElement *wRoot = nullptr;
     zxmlElement *wParamRootNode=nullptr;
@@ -119,7 +122,7 @@ ZStatus ZGeneralParameters::XmlLoad(uriString& pXmlFile,ZaiErrors* pErrorLog)
     wSt = wDoc->ParseXMLDocFromMemory(wXmlString.toCChar(), wXmlString.getUnitCount(), nullptr, 0);
     if (wSt != ZS_SUCCESS) {
         if (pErrorLog!=nullptr) {
-            pErrorLog->logZException();
+            pErrorLog->logZExceptionLast();
             pErrorLog->errorLog(
                 "ZGeneralParameters::XMLLoad-E-PARSERR Xml parsing error for string <%s> ",
                 wXmlString.subString(0, 25).toString());
@@ -130,7 +133,7 @@ ZStatus ZGeneralParameters::XmlLoad(uriString& pXmlFile,ZaiErrors* pErrorLog)
     wSt = wDoc->getRootElement(wRoot);
     if (wSt != ZS_SUCCESS) {
         if (pErrorLog!=nullptr)
-            pErrorLog->logZException();
+            pErrorLog->logZExceptionLast();
         return wSt;
     }
     if (!(wRoot->getName() == "zmasterfileparameters")) {
@@ -152,11 +155,19 @@ ZStatus ZGeneralParameters::XmlLoad(uriString& pXmlFile,ZaiErrors* pErrorLog)
         pErrorLog->logZStatus(
             ZAIES_Error,
             wSt,
-            "DicEdit::loadGenerateParameters-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
+            "ZGeneralParameters::loadGenerateParameters-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
             "generalparameters",
             decode_ZStatus(wSt));
         return wSt;
     }
+    wSt=XMLgetChildText( wGenParamsNode,"verbose",wVerbose,pErrorLog,ZAIES_Warning);
+    if (wSt!=ZS_SUCCESS)
+        _DBGPRINT("ZGeneralParameters::XmlLoad-W-NOVERBOSE No verbose parameters have been found.\n")
+    else {
+        _BaseParameters->setVerbose(encode_Verbose(wVerbose));
+        _DBGPRINT("ZGeneralParameters::XmlLoad-I-VERBOSE Verbose is set to %s.\n", decode_Verbose(getVerbose()).toCChar())
+    }
+
     wSt=XMLgetChildText( wGenParamsNode,"defaultworkdirectory",WorkDirectory,pErrorLog,ZAIES_Warning);
     wSt=XMLgetChildText( wGenParamsNode,"defaultparamdirectory",ParamDirectory,pErrorLog,ZAIES_Error);
     wSt=XMLgetChildText( wGenParamsNode,"defaulticondirectory",IconDirectory,pErrorLog,ZAIES_Error);
@@ -165,13 +176,16 @@ ZStatus ZGeneralParameters::XmlLoad(uriString& pXmlFile,ZaiErrors* pErrorLog)
     XMLderegister(wGenParamsNode);
 
     XMLderegister((zxmlNode *&) wParamRootNode);
+
+    currentXml = pXmlFile ;
+
     if (wSt==ZS_EOF) {
         Init=true;
         return ZS_SUCCESS;
     }
     if (wSt==ZS_SUCCESS)
         Init = true;
-    currentXml = pXmlFile;
+
     return wSt;
 }//  XmlLoad
 
@@ -186,6 +200,9 @@ ZGeneralParameters::_copyFrom (const ZGeneralParameters& pIn)
     FixedFont = pIn.FixedFont;
     currentXml= pIn.currentXml;
     Init = pIn.Init;
+
+    _BaseParameters->Verbose = pIn._BaseParameters->Verbose;
+
     return *this;
 }
 
@@ -241,3 +258,86 @@ ZGeneralParameters::getFixedFont() {
     return FixedFont;
 }
 
+
+utf8VaryingString
+decode_Verbose(ZVerbose_Base pVerbose)
+{
+    utf8VaryingString wReturn;
+    if (pVerbose & ZVB_Basic) {
+        wReturn.addConditionalOR( "ZVB_Basic");
+    }
+    if (pVerbose & ZVB_Thread) {
+        wReturn.addConditionalOR( "ZVB_Thread");
+    }
+    if (pVerbose & ZVB_Net) {
+        wReturn.addConditionalOR( "ZVB_Net");
+    }
+    if (pVerbose & ZVB_NetStats) {
+        wReturn.addConditionalOR( "ZVB_NetStats");
+    }
+    if (pVerbose & ZVB_Mutex) {
+        wReturn.addConditionalOR( "ZVB_Mutex");
+    }
+    if (pVerbose & ZVB_Xml) {
+        wReturn.addConditionalOR( "ZVB_Xml");
+    }
+
+    if (pVerbose & ZVB_ZRF) {
+        wReturn.addConditionalOR( "ZVB_ZRF");
+    }
+    if (pVerbose & ZVB_MemEngine) {
+        wReturn.addConditionalOR( "ZVB_MemEngine");
+    }
+    if (pVerbose & ZVB_FileEngine) {
+        wReturn.addConditionalOR( "ZVB_FileEngine");
+    }
+    if (pVerbose & ZVB_SearchEngine) {
+        wReturn.addConditionalOR( "ZVB_SearchEngine");
+    }
+    if (pVerbose & ZVB_ZMF) {
+        wReturn.addConditionalOR( "ZVB_ZMF");
+    }
+    if (pVerbose & ZVB_ZIF) {
+        wReturn.addConditionalOR( "ZVB_ZIF");
+    }
+    if (pVerbose & ZVB_Net) {
+        wReturn.addConditionalOR( "ZVB_Net");
+    }
+
+    if (wReturn.isEmpty())
+        wReturn = "ZVB_NoVerbose";
+
+    return wReturn;
+}
+
+ZVerbose_Base
+encode_Verbose(const utf8VaryingString& pVerboseString)
+{
+    ZVerbose_Base wV=ZVB_NoVerbose;
+    if (pVerboseString.hasToken((const utf8_t*)"ZVB_Basic"))
+        wV |= ZVB_Basic;
+    if (pVerboseString.hasToken((const utf8_t*)"ZVB_Thread"))
+        wV |= ZVB_Thread;
+    if (pVerboseString.hasToken((const utf8_t*)"ZVB_Net"))
+        wV |= ZVB_Net;
+    if (pVerboseString.hasToken((const utf8_t*)"ZVB_NetStats"))
+        wV |= ZVB_NetStats;
+    if (pVerboseString.hasToken((const utf8_t*)"ZVB_Mutex"))
+        wV |= ZVB_Mutex;
+
+    if (pVerboseString.hasToken((const utf8_t*)"ZVB_Xml"))
+        wV |= ZVB_Xml;
+
+    if (pVerboseString.hasToken((const utf8_t*)"ZVB_ZRF"))
+        wV |= ZVB_ZRF;
+    if (pVerboseString.hasToken((const utf8_t*)"ZVB_ZMF"))
+        wV |= ZVB_ZMF;
+
+    if (pVerboseString.hasToken((const utf8_t*)"ZVB_MemEngine"))
+        wV |= ZVB_MemEngine;
+    if (pVerboseString.hasToken((const utf8_t*)"ZVB_FileEngine"))
+        wV |= ZVB_FileEngine;
+    if (pVerboseString.hasToken((const utf8_t*)"ZVB_SearchEngine"))
+        wV |= ZVB_SearchEngine;
+    return wV;
+}

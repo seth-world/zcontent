@@ -18,16 +18,18 @@ class ZRandomFile;
 class ZMasterFile;
 }
 
-class ZContentVisuMain;
-
+//class ZContentVisuMain;
+class uriString;
 class DisplayMain : public QMainWindow
 {
   Q_OBJECT
 
 public:
-  explicit DisplayMain(ZContentVisuMain *parent = nullptr);
+ // explicit DisplayMain(ZContentVisuMain *parent = nullptr);
+  explicit DisplayMain(const uriString* pURIContent,QWidget *parent = nullptr);
   ~DisplayMain();
 
+  void initLayout();
 
   QStandardItemModel* displayItemModel =nullptr;
 
@@ -61,7 +63,9 @@ public:
   ZDataBuffer           ContentToDump;
   size_t                Offset=0;
   unsigned char*        PtrIn=nullptr;
-  ZContentVisuMain*     VisuMain=nullptr;
+//  ZContentVisuMain*     VisuMain=nullptr;
+  const uriString* URIContent=nullptr;
+  ZDataBuffer RawData;
 
   enum DisplayWhat {
     ZDW_Nothing = 0,

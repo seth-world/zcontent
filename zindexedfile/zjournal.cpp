@@ -641,168 +641,58 @@ const char * decode_ZJOP (const ZJOperation pOperation)
 }// decode_ZJOP
 
 
-const char*
+utf8VaryingString
 ZJState::decode (void)
 {
-
+    utf8VaryingString wReturn;
     if (State==ZJS_Nothing)
                 return "ZJS_Nothing";
 
 
     if (State&ZJS_Created)
             {
-            Buf.addConditionalOR((const utf8_t*) "ZJS_Created");
+            wReturn.addConditionalOR( "ZJS_Created");
             }
     if (State&ZJS_Exported)
             {
-            Buf.addConditionalOR((const utf8_t*) "ZJS_Exported");
+            wReturn.addConditionalOR( "ZJS_Exported");
             }
     if (State&ZJS_RolledBack)
             {
-            Buf.addConditionalOR((const utf8_t*) "ZJS_RolledBack");
+            wReturn.addConditionalOR("ZJS_RolledBack");
             }
 
-    if (Buf.isEmpty())
+    if (wReturn.isEmpty())
                 {
                 return "Unknown ZJState";
                 }
-    return Buf.toCString_Strait();
+    return wReturn;
 }// decode
 
 ZJState &
-ZJState::encode (char *pString)
+ZJState::encode (const utf8VaryingString& pString)
 {
     State = ZJS_Nothing;
-    if (pString==nullptr)
+    if (pString.isEmpty())
                 {
                     return *this;
                 }
-    if (strlen(pString)==0)
-                {
-                    return *this;
-                }
-utfdescString wBuf;
-    wBuf.clear();
-    wBuf = (const utf8_t*)pString;
-    wBuf.toUpper();
-    if (wBuf=="ZJS_NOTHING")
+
+
+    if (pString.hasToken((utf8_t*)"ZJS_Nothing"))
             {
                 return *this;
             }
-    if (Buf.contains((utf8_t*)"ZJS_CREATED"))
+    if (pString.hasToken((utf8_t*)"ZJS_Created"))
                      State |= ZJS_Created;
-    if (Buf.contains((utf8_t*)"ZJS_ROLLEDBACK"))
+    if (pString.hasToken((utf8_t*)"ZJS_RolledBack"))
                      State |= ZJS_RolledBack;
-    if (Buf.contains((utf8_t*)"ZJS_EXPORTED"))
+    if (pString.hasToken((utf8_t*)"ZJS_Exported"))
                      State |= ZJS_Exported;
 
     return *this;
 
 }// encode
-
-
-const char*
-ZProtocol::decode (void)
-{
-
-    if (Protocol==ZP_Nothing)
-                return "ZP_Nothing";
-
-    if ((Protocol&ZP_Base)==ZP_Base)
-            {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZP_Base";
-            }
-    if (Protocol&ZP_RPC)
-            {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZP_RPC";
-            }
-    if (Protocol&ZP_Corba)
-            {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZP_Corba";
-            }
-    if (Protocol&ZP_DBus)
-            {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZP_DBus";
-            }
-    if (Protocol&ZP_RPC)
-            {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZP_RPC";
-            }
-    if (Protocol&ZP_XMLRPC)
-            {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZP_XMLRPC";
-            }
-    if (Protocol&ZP_SSLV5)
-            {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZP_SSLV5";
-            }
-    if (Protocol&ZP_B64)
-            {
-            if (!Buf.isEmpty())
-                        Buf += "|" ;
-            Buf += "ZP_B64";
-            }
-    if (Buf.isEmpty())
-                {
-                return "Unknown ZJProtocol";
-                }
-    return Buf.toCString_Strait();
-
-}// decode
-
-ZProtocol &
-ZProtocol::encode (const char *pString)
-{
-    Protocol = ZP_Nothing;
-    if (pString==nullptr)
-                {
-                    return *this;
-                }
-    if (strlen(pString)==0)
-                {
-                    return *this;
-                }
-    Buf.clear();
-    Buf = (const utf8_t*)pString;
-    Buf.toUpper();
-    Buf.Trim();
-    if (Buf==(const utf8_t*)"ZJS_NOTHING")
-            {
-                return *this;
-            }
-    if (Buf.containsCase((utf8_t*)"ZP_Base"))
-                     Protocol |= ZP_Base;
-    if (Buf.containsCase((utf8_t*)"ZP_RPC"))
-                     Protocol |= ZP_RPC;
-    if (Buf.containsCase((utf8_t*)"ZP_Corba"))
-                     Protocol |= ZP_Corba;
-    if (Buf.containsCase((utf8_t*)"ZP_DBus"))
-                     Protocol |= ZP_DBus;
-    if (Buf.containsCase((utf8_t*)"ZP_XML-RPC"))
-                     Protocol |= ZP_XMLRPC;
-    if (Buf.containsCase((utf8_t*)"ZP_SSLV5"))
-                     Protocol |= ZP_SSLV5;
-    if (Buf.containsCase((utf8_t*)"ZP_B64"))
-                     Protocol |= ZP_B64;
-
-    return *this;
-
-}// encode
- 
 
 
 //! @} JournalingGroup

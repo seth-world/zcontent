@@ -10,6 +10,10 @@ using namespace zbs;
 
 ZArray<ZSearchKeyWord> KeywordList = {
     {"SET",ZSRCH_SET},
+    {"DECLARE",ZSRCH_DECLARE},
+    {"SAVE",ZSRCH_SAVE},
+    {"LOAD",ZSRCH_LOAD},
+    {"SYMBOL",ZSRCH_SYMBOL},
     {"FILE",ZSRCH_FILE},
 
     {"MODE",ZSRCH_MODE},
@@ -19,13 +23,21 @@ ZArray<ZSearchKeyWord> KeywordList = {
     {"FINISH",ZSRCH_FINISH},
 
     {"FIND",ZSRCH_FIND},
+    {"FETCH",ZSRCH_FETCH},
+    {"IN",ZSRCH_IN},
     {"ALL",ZSRCH_ALL},
     {"FIRST",ZSRCH_FIRST},
+    {"NEXT",ZSRCH_NEXT},
     {"LAST",ZSRCH_LAST},
     {"AT",ZSRCH_AT},
 
     {"WITH",ZSRCH_WITH},
     {"AS",ZSRCH_AS},
+    {"JOIN",ZSRCH_JOIN},
+    {"USING",ZSRCH_USING},
+
+    {"TO",ZSRCH_TO},
+    {"FROM",ZSRCH_FROM},
 
     {"INDEX",ZSRCH_INDEX},
     {"FOR",ZSRCH_FOR},
@@ -42,6 +54,12 @@ ZArray<ZSearchKeyWord> KeywordList = {
 
     {"MAXIMUM",ZSRCH_MAXIMUM},
 
+    {"FORMULA",ZSRCH_FORMULA},
+    {"FIELDS",ZSRCH_FIELDS},
+
+    {"MASTERFILES",ZSRCH_MASTERFILES},
+    {"FILES",ZSRCH_MASTERFILES},
+
     {"DISPLAY",ZSRCH_DISPLAY},
 
 
@@ -53,6 +71,8 @@ ZArray<ZSearchKeyWord> KeywordList = {
     {"STARTS",ZSRCH_MAYBE_STARTS_WITH},
     {"ENDS",ZSRCH_MAYBE_ENDS_WITH},
     {"SUBSTRING",ZSRCH_SUBSTRING},
+    {"RIGHT",ZSRCH_SUBSTRINGRIGHT},
+    {"LEFT",ZSRCH_SUBSTRINGLEFT},
 
 
     {"YEAR",ZSRCH_YEAR},
@@ -80,281 +100,19 @@ ZArray<ZSearchKeyWord> KeywordList = {
     {"ROOTNAME",ZSRCH_ROOTNAME},
 
     {"INT",ZSRCH_INTEGER},
-    {"INTEGER",ZSRCH_INTEGER}
+    {"INTEGER",ZSRCH_INTEGER} ,
+
+    {"TRANSLATE",ZSRCH_TRANSLATE},
+    {"DECODETABLE",ZSRCH_DECODETABLE},
+
 
 };
 
 
 
 
-char wSBuffer[150];
-#ifdef __COMMENT__
-const char*
-_decode_TokenType(ZSearchTokentype_type pType)
-{
+//char wSBuffer[150];
 
-
-  switch (pType)
-  {
-  case ZSRCH_SPACE:
-    return "ZSRCH_SPACE";
-  case ZSRCH_MAYBE_IDENTIFIER:
-    return "ZSRCH_MAYBE_IDENTIFIER";
-  case ZSRCH_IDENTIFIER:
-    return "ZSRCH_IDENTIFIER";
-
-  case ZSRCH_ARRAY_IDENTIFIER:
-    return "ZSRCH_ARRAY_IDENTIFIER";
-
-
-  case ZSRCH_IF:
-    return "ZSRCH_IF";
-
-  case ZSRCH_FIELD_IDENTIFIER:
-    return "ZSRCH_FIELD_IDENTIFIER";
-  case ZSRCH_FIELD_INITIALIZER:
-    return "ZSRCH_FIELD_INITIALIZER";
-
-  case ZSRCH_NUMERIC_LITERAL:
-    return "ZSRCH_NUMERIC_LITERAL";
-  case ZSRCH_INTEGER_LITERAL:
-    return "ZSRCH_INTEGER_LITERAL";
-  case ZSRCH_MAYBE_DOUBLE_LITERAL:
-    return "ZSRCH_MAYBE_DOUBLE_LITERAL";
-  case ZSRCH_DOUBLE_LITERAL:
-    return "ZSRCH_DOUBLE_LITERAL";
-  case ZSRCH_FLOAT_LITERAL:
-    return "ZSRCH_FLOAT_LITERAL";
-  case ZSRCH_LONGDOUBLE_LITERAL:
-    return "ZSRCH_LONGDOUBLE_LITERAL";
-  case ZSRCH_STRING_LITERAL:
-    return "ZSRCH_STRING_LITERAL";
-  case ZSRCH_STRING_ESCAPE_SEQUENCE:
-    return "ZSRCH_STRING_ESCAPE_SEQUENCE";
-  case ZSRCH_MAYBE_COMMENT:
-    return "ZSRCH_MAYBE_COMMENT";
-  case ZSRCH_MAYBE_ENDCOMMENT:
-    return "ZSRCH_MAYBE_ENDCOMMENT";
-  case ZSRCH_COMMENT_DOUBLESLASH:
-    return "ZSRCH_COMMENT_DOUBLESLASH";
-  case ZSRCH_COMMENT_SLASHSTAR:
-    return "ZSRCH_COMMENT_SLASHSTAR";
-  case ZSRCH_COMMENT_ENDSLASHSTAR:
-    return "ZSRCH_COMMENT_ENDSLASHSTAR";
-
-  case ZSRCH_COMMENT_BRIEF:
-    return "ZSRCH_COMMENT_BRIEF";
-  case ZSRCH_COMMENT_BRIEF_IDENTIFIER:
-    return "ZSRCH_COMMENT_BRIEF_IDENTIFIER";
-  case ZSRCH_COMMENT_PREVIOUS:
-    return "ZSRCH_COMMENT_PREVIOUS";
-  case ZSRCH_COMMENT_AFTER:
-    return "ZSRCH_COMMENT_AFTER"  ;
-
-  case ZSRCH_COMMENT_TEXT:
-    return "ZSRCH_COMMENT_TEXT";
-
-  case ZSRCH_OPERATOR:
-    return "ZSRCH_OPERATOR";
-
-  case ZSRCH_OPERATOR_ARITHMETIC:
-    return "ZSRCH_OPERATOR_ARITHMETIC";
-
-
-
-  case ZSRCH_OPERATOR_LOGICAL:
-
-
-  case ZSRCH_OPENBRACE:
-    return "ZSRCH_OPENBRACE";
-  case ZSRCH_CLOSEBRACE:
-    return "ZSRCH_CLOSEBRACE";
-  case ZSRCH_OPENBRACKET:
-    return "ZSRCH_OPENBRACKET";
-  case ZSRCH_CLOSEBRACKET:
-    return "ZSRCH_CLOSEBRACKET";
-  case ZSRCH_OPENPARENTHESIS:
-    return "ZSRCH_OPERATOR_OPENPARENTHESIS";
-  case ZSRCH_CLOSEPARENTHESIS:
-    return "ZSRCH_OPERATOR_CLOSEPARENTHESIS";
-  case ZSRCH_SEMICOLON:
-    return "ZSRCH_OPERATOR_SEMICOLON";
-  case ZSRCH_COLON:
-    return "ZSRCH_OPERATOR_COLON";
-  case ZSRCH_COMMA:
-    return "ZSRCH_OPERATOR_COMMA";
-
-  case ZSRCH_EOL:
-    return "ZSRCH_EOL";
-
-
-
-
-
-  case ZSRCH_SIMPLE_TOKEN:
-    return "ZSRCH_SIMPLE_TOKEN";
-    /*
-  case ZSRCH_EXPOSURE_TOKEN:
-    return "ZSRCH_EXPOSURE_TOKEN";
-  case ZSRCH_FRIEND_TOKEN:
-    return "ZSRCH_FRIEND_TOKEN";
-
-  case ZSRCH_DELETED_TOKEN:
-    return "ZSRCH_DELETED_TOKEN";
-  case ZSRCH_DEFAULT_TOKEN:
-    return "ZSRCH_DEFAULT_TOKEN";
-
-  case ZSRCH_TEMPLATE_TOKEN:
-    return "ZSRCH_TEMPLATE_TOKEN";
-*/
-
-
-  case ZSRCH_FIELD:
-    return "ZSRCH_FIELD";
-  case ZSRCH_ARGUMENT:
-    return "ZSRCH_ARGUMENT";
-
-  case ZSRCH_MAYBE_DATA_TYPE:
-    return "ZSRCH_MAYBE_DATA_TYPE";
-
-  case ZSRCH_DATA_TYPE:
-    return "ZSRCH_DATA_TYPE";
-
-  case ZSRCH_VOID:
-    return "ZSRCH_VOID";
-
-  case ZSRCH_BOOL:
-    return "ZSRCH_BOOL";
-
-  case ZSRCH_CHAR:
-    return "ZSRCH_CHAR";
-  case ZSRCH_INTEGER:
-    return "ZSRCH_INTEGER";
-    /*  case ZSRCH_LONG:
-        return "ZSRCH_LONG";
-*/
-  case ZSRCH_LONG_LONG:
-    return "ZSRCH_LONG_LONG";
-  case ZSRCH_FLOAT:
-    return "ZSRCH_FLOAT";
-  case ZSRCH_DOUBLE:
-    return "ZSRCH_DOUBLE";
-  case ZSRCH_LONG_DOUBLE:
-    return "ZSRCH_LONG_DOUBLE";
-
-    /*
-  case ZSRCH_CONST:
-    return "ZSRCH_CONST";
-  case ZSRCH_UNSIGNED:
-    return "ZSRCH_UNSIGNED";
-  case ZSRCH_REFERENCE:
-    return "ZSRCH_REFERENCE";
-  case ZSRCH_POINTER:
-    return "ZSRCH_POINTER";
- */
-  case ZSRCH_INT8:
-    return "ZSRCH_INT8";
-  case ZSRCH_INT16:
-    return "ZSRCH_INT16";
-  case ZSRCH_INT32:
-    return "ZSRCH_INT32";
-  case ZSRCH_INT64:
-    return "ZSRCH_INT64";
-
-  case ZSRCH_MAYBE_METHOD:
-    return "ZSRCH_MAYBE_METHOD";
-  case ZSRCH_METHOD:
-    return "ZSRCH_METHOD";
-  case ZSRCH_METHOD_CTOR:
-    return "ZSRCH_METHOD_CTOR";
-  case ZSRCH_METHOD_DTOR:
-    return "ZSRCH_METHOD_DTOR";
-  case ZSRCH_OPERATOR_OVERLD:
-    return "ZSRCH_OPERATOR_OVERLD";
-
-
-  case ZSRCH_METHOD_ARGUMENT:
-    return "ZSRCH_METHOD_ARGUMENT";
-
-
-  case ZSRCH_MAYBE_PREPROC:
-    return "ZSRCH_MAYBE_PREPROFULLC";
-  case ZSRCH_INCLUDE:
-    return "ZSRCH_INCLUDE";
-  case ZSRCH_PRAGMA:
-    return "ZSRCH_PRAGMA";
-  case ZSRCH_IFDEF:
-    return "ZSRCH_IFDEF";
-  case ZSRCH_IFNDEF:
-    return "ZSRCH_IFDEF";
-
-  case ZSRCH_DEFINE:
-    return "ZSRCH_DEFINE";
-  case ZSRCH_ENDIF:
-    return "ZSRCH_ENDIF";
-
-  case ZSRCH_MAYBE_INCLUDE_FILE:
-    return "ZSRCH_MAYBE_INCLUDE_FILE";
-  case ZSRCH_INCLUDE_FILE:
-    return "ZSRCH_INCLUDE_FILE";
-
-  case ZSRCH_UTF8VARYINGSTRING:
-    return "ZSRCH_UTF8VARYINGSTRING";
-  case ZSRCH_UTF16VARYINGSTRING:
-    return "ZSRCH_UTF16VARYINGSTRING";
-  case ZSRCH_UTF32VARYINGSTRING:
-    return "ZSRCH_UTF32VARYINGSTRING";
-  case ZSRCH_URISTRING:
-    return "ZSRCH_URISTRING";
-
-  case ZSRCH_UTF8FIXEDSTRING:
-    return "ZSRCH_UTF8FIXEDSTRING";
-  case ZSRCH_UTF16FIXEDSTRING:
-    return "ZSRCH_UTF16FIXEDSTRING";
-  case ZSRCH_UTF32FIXEDSTRING:
-    return "ZSRCH_UTF32FIXEDSTRING";
-
-  case ZSRCH_ZDATEFULL:
-    return "ZSRCH_ZDATEFULL";
-    /*  case ZSRCH_ZDATE:
-    return "ZSRCH_ZDATE";
-*/
-  case ZSRCH_MD5:
-    return "ZSRCH_MD5";
-  case ZSRCH_CHECKSUM:
-    return "ZSRCH_CHECKSUM";
-
-  case ZSRCH_ZDATABUFFER:
-    return "ZSRCH_ZDATABUFFER";
-  case ZSRCH_ZRESOURCE:
-    return "ZSRCH_ZRESOURCE";
-  case ZSRCH_ZRESOURCECODE:
-    return "ZSRCH_ZRESOURCECODE";
-
-  case ZSRCH_ZBITSET:
-    return "ZSRCH_BITSET";
-
-  case ZSRCH_STDSTRING:
-    return "ZSRCH_STDSTRING";
-
-  case ZSRCH_UNKNOWN_TYPE:
-    return "ZSRCH_UNKNOWN_TYPE";
-  case ZSRCH_SUBSTITUED:
-    return "ZSRCH_SUBSTITUED";
-/*
-  default:
-    memset(wSBuffer,0,sizeof(wSBuffer));
-
-    sprintf(wSBuffer,"%s 0x%08X","unKnown Type",pType);
-    return wSBuffer;
-*/
-  }
-  memset(wSBuffer,0,sizeof(wSBuffer));
-  sprintf(wSBuffer,"%s 0x%08lX","unKnown Type",pType);
-  return wSBuffer;
-}//_decode_TokenType
-
-#endif // __COMMENT__
 
 bool
 searchForKeyword(ZSearchToken* &pCurrentToken,const utf8VaryingString &pIn,long &pCurrentIndex) {
@@ -382,14 +140,14 @@ decode_SearchTokenType(ZSearchTokentype_type pType)
 {
   utf8VaryingString wReturn;
 
-
+/*
   for (int wi=0; wi < KeywordList.count();wi++) {
     if (pType==KeywordList[wi].Type) {
-      ::sprintf(wSBuffer,"%s",KeywordList[wi].Text.toCChar());
-      return wSBuffer;
+      wReturn.sprintf("%s",KeywordList[wi].Text.toCChar());
+      return wReturn;
     }
   }
-
+*/
 
 
   switch (pType)
@@ -510,6 +268,10 @@ decode_SearchTokenType(ZSearchTokentype_type pType)
     return "ZSRCH_COMMA";
   case ZSRCH_DOT:
     return "ZSRCH_DOT";
+  case ZSRCH_RIGHTARROW:
+      return "ZSRCH_RIGHTARROW";
+  case ZSRCH_LEFTARROW:
+      return "ZSRCH_LEFTARROW";
 
   case ZSRCH_EOL:
     return "ZSRCH_EOL";
@@ -520,6 +282,13 @@ decode_SearchTokenType(ZSearchTokentype_type pType)
 
   case ZSRCH_SET:
     return "ZSRCH_SET";
+  case ZSRCH_DECLARE:
+      return "ZSRCH_DECLARE";
+  case ZSRCH_SAVE:
+      return "ZSRCH_SAVE";
+  case ZSRCH_LOAD:
+      return "ZSRCH_LOAD";
+
   case ZSRCH_FILE:
     return "ZSRCH_FILE";
 
@@ -528,15 +297,23 @@ decode_SearchTokenType(ZSearchTokentype_type pType)
   case ZSRCH_READONLY:
     return "ZSRCH_READONLY";
   case ZSRCH_MODIFY:
-    return "ZSRCH_AS";
+    return "ZSRCH_MODIFY";
   case ZSRCH_AS:
+     return "ZSRCH_AS";
+  case ZSRCH_TO:
+      return "ZSRCH_TO";
+  case ZSRCH_FROM:
+      return "ZSRCH_FROM";
 
+   case ZSRCH_FINISH:
     return "ZSRCH_FINISH";
-  case ZSRCH_FINISH:
-    return "ZSRCH_OPENBRACKET";
+
 
   case ZSRCH_FIND:
     return "ZSRCH_FIND";
+  case ZSRCH_FETCH:
+      return "ZSRCH_FETCH";
+
   case ZSRCH_WITH:
     return "ZSRCH_WITH";
 
@@ -566,10 +343,32 @@ decode_SearchTokenType(ZSearchTokentype_type pType)
   case ZSRCH_ENDS_WITH:
     return "ZSRCH_ENDS_WITH";
 
+
+  case ZSRCH_IN:
+      return "ZSRCH_IN";
+  case ZSRCH_AT:
+      return "ZSRCH_AT";
+
+  case ZSRCH_JOIN:
+      return "ZSRCH_JOIN";
+  case ZSRCH_USING:
+      return "ZSRCH_USING";
+
+  /* modifiers */
+  case ZSRCH_TRANSLATE:
+      return "ZSRCH_TRANSLATE";
+  case ZSRCH_DECODETABLE:
+      return "ZSRCH_DECODETABLE";
+
+
     /* string modifiers */
 
   case ZSRCH_SUBSTRING:
-    return "ZSRCH_SUBSTRING";
+      return "ZSRCH_SUBSTRING";
+  case ZSRCH_SUBSTRINGRIGHT:
+      return "ZSRCH_SUBSTRINGRIGHT";
+  case ZSRCH_SUBSTRINGLEFT:
+      return "ZSRCH_SUBSTRINGLEFT";
 
     /* Date modifiers */
 
@@ -623,120 +422,120 @@ ZSearchTokentype_type encode_ZTokenType(const utf8VaryingString& pIn)
 {
   ZSearchTokentype_type wType=0;
   /* modifiers */
-  if (pIn.strstr((const utf8_t*)"ZSRCH_CONST")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_CONST")) {
     wType |= ZSRCH_CONST;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_UNSIGNED")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_UNSIGNED")) {
     wType |= ZSRCH_UNSIGNED;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_AMPERSAND")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_AMPERSAND")) {
     wType |= ZSRCH_AMPERSAND;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_DOUBLE_AMPERSAND")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_DOUBLE_AMPERSAND")) {
     wType |= ZSRCH_DOUBLE_AMPERSAND;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_POINTER")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_POINTER")) {
     wType |= ZSRCH_POINTER;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_ARRAY")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_ARRAY")) {
     wType |= ZSRCH_ARRAY;
   }
 
-  if (pIn.strstr((const utf8_t*)"ZSRCH_LONG")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_LONG")) {
     wType |= ZSRCH_LONG;
   }
 
   /* return or data type */
 
-  if (pIn.strstr((const utf8_t*)"ZSRCH_VOID")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_VOID")) {
     wType |=  ZSRCH_VOID;
     return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_BOOL")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_BOOL")) {
     wType |= ZSRCH_BOOL; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_CHAR")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_CHAR")) {
     wType |= ZSRCH_CHAR; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_INTEGER")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_INTEGER")) {
     wType |= ZSRCH_INTEGER; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_LONG_LONG")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_LONG_LONG")) {
     wType |= ZSRCH_LONG_LONG; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_FLOAT")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_FLOAT")) {
     wType |= ZSRCH_FLOAT; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_DOUBLE")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_DOUBLE")) {
     wType |= ZSRCH_DOUBLE; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_LONG_DOUBLE")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_LONG_DOUBLE")) {
     wType |= ZSRCH_LONG_DOUBLE; return wType ;
   }
 
-  if (pIn.strstr((const utf8_t*)"ZSRCH_INT8")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_INT8")) {
     wType |= ZSRCH_INT8; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_INT16")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_INT16")) {
     wType |= ZSRCH_INT16; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_INT32")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_INT32")) {
     wType |= ZSRCH_INT32; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_INT64")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_INT64")) {
     wType |= ZSRCH_INT64; return wType ;
   }
 
-  if (pIn.strstr((const utf8_t*)"ZSRCH_UTF8VARYINGSTRING")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_UTF8VARYINGSTRING")) {
     wType |= ZSRCH_UTF8VARYINGSTRING; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_UTF16VARYINGSTRING")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_UTF16VARYINGSTRING")) {
     wType |= ZSRCH_UTF16VARYINGSTRING; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_UTF32VARYINGSTRING")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_UTF32VARYINGSTRING")) {
     wType |= ZSRCH_UTF32VARYINGSTRING; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_URISTRING")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_URISTRING")) {
     wType |= ZSRCH_URISTRING; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_UTF8FIXEDSTRING")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_UTF8FIXEDSTRING")) {
     wType |= ZSRCH_UTF8FIXEDSTRING; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_UTF16FIXEDSTRING")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_UTF16FIXEDSTRING")) {
     wType |= ZSRCH_UTF16FIXEDSTRING; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_UTF32FIXEDSTRING")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_UTF32FIXEDSTRING")) {
     wType |= ZSRCH_UTF32FIXEDSTRING; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_ZDATEFULL")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_ZDATEFULL")) {
     wType |= ZSRCH_ZDATEFULL; return wType ;
   }
-  /*  if (pIn.strstr((const utf8_t*)"ZSRCH_ZDATE")) {
+  /*  if (pIn.hasToken((const utf8_t*)"ZSRCH_ZDATE")) {
      wType |= ZSRCH_ZDATE; return wType ;
   }
 */
-  if (pIn.strstr((const utf8_t*)"ZSRCH_MD5")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_MD5")) {
     wType |= ZSRCH_MD5; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_CHECKSUM")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_CHECKSUM")) {
     wType |= ZSRCH_CHECKSUM; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_ZDATABUFFER")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_ZDATABUFFER")) {
     wType |= ZSRCH_ZDATABUFFER; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_ZRESOURCECODE")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_ZRESOURCECODE")) {
     wType |= ZSRCH_ZRESOURCECODE; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_ZRESOURCE")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_ZRESOURCE")) {
     wType |= ZSRCH_ZRESOURCE; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_ZBITSET")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_ZBITSET")) {
     wType |= ZSRCH_ZBITSET; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_STDSTRING")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_STDSTRING")) {
     wType |= ZSRCH_STDSTRING; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_UNKNOWN_TYPE")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_UNKNOWN_TYPE")) {
     return ZSRCH_UNKNOWN_TYPE;
   }
   if (pIn.strstr((const utf8_t*)"ZSRCH_SUBSTITUED")) {
@@ -744,35 +543,35 @@ ZSearchTokentype_type encode_ZTokenType(const utf8VaryingString& pIn)
   }
   /* not data type or return type */
 
-  if (pIn.strstr((const utf8_t*)"ZSRCH_METHOD_ARGUMENT")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_METHOD_ARGUMENT")) {
     wType |= ZSRCH_METHOD_ARGUMENT; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_INCLUDE")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_INCLUDE")) {
     wType |= ZSRCH_INCLUDE; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_PRAGMA")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_PRAGMA")) {
     wType |= ZSRCH_PRAGMA; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_IFDEF")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_IFDEF")) {
     wType |= ZSRCH_IFDEF; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_DEFINE")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_DEFINE")) {
     wType |= ZSRCH_DEFINE; return wType ;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_INCLUDE_FILE")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_INCLUDE_FILE")) {
     wType |= ZSRCH_INCLUDE_FILE; return wType ;
   }
 
-  if (pIn.strstr((const utf8_t*)"ZSRCH_OPENBRACE")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_OPENBRACE")) {
     wType |= ZSRCH_OPENBRACE;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_CLOSEBRACE")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_CLOSEBRACE")) {
     wType |= ZSRCH_CLOSEBRACE;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_OPENBRACKET")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_OPENBRACKET")) {
     wType |= ZSRCH_OPENBRACKET;
   }
-  if (pIn.strstr((const utf8_t*)"ZSRCH_CLOSEBRACKET")) {
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_CLOSEBRACKET")) {
     wType |= ZSRCH_CLOSEBRACKET;
   }
 
@@ -824,8 +623,11 @@ convert_ZSRCH_ZSOPV(ZSearchTokentype_type pType)
   case ZSRCH_ENDS_WITH:
     return ZSOPV_ENDS_WITH;
 
+  case ZSRCH_OPERATOR_MOVE:
+      return ZSOPV_MOVE;
+
   default:
-    fprintf(stderr,"Invalid operator %s 0x%X",decode_SearchTokenType(pType).toCChar(),int(pType));
+    fprintf(stderr,"convert_ZSRCH_ZSOPV-E-INVOP Invalid operator %s 0x%X\n",decode_SearchTokenType(pType).toCChar(),int(pType));
     return ZSOPV_INVALID;
 
   }// switch
@@ -851,17 +653,30 @@ ZSTOfromZType(ZTypeBase pZType) {
   case ZType_U16:
   case ZType_U32:
   case ZType_U64:
+  case ZType_AtomicUChar:
+  case ZType_AtomicU8:
+  case ZType_AtomicU16:
+  case ZType_AtomicU32:
+  case ZType_AtomicU64:
     return ZSTO_Integer;
   case ZType_Char:
   case ZType_S8:
   case ZType_S16:
   case ZType_S32:
   case ZType_S64:
+  case ZType_AtomicChar:
+  case ZType_AtomicS8:
+  case ZType_AtomicS16:
+  case ZType_AtomicS32:
+  case ZType_AtomicS64:
     return ZSTO_Integer;
 
   case ZType_Float:
   case ZType_Double:
   case ZType_LDouble:
+  case ZType_AtomicFloat:
+  case ZType_AtomicDouble:
+  case ZType_AtomicLDouble:
     return ZSTO_Float;
 
   case ZType_ZDateFull:
@@ -872,7 +687,31 @@ ZSTOfromZType(ZTypeBase pZType) {
     return ZSTO_Checksum;
 
   }
+  return ZSTO_Nothing;
+}
 
+ZTypeBase
+ZTypefromZSTO(ZSearchOperandType_type pZSTO) {
+
+    switch (pZSTO) {
+    case ZSTO_String:
+        return ZType_Utf8VaryingString;
+    case ZSTO_Integer:
+        return ZType_S32;
+
+    case ZSTO_Float:
+        return ZType_Double;
+
+    case ZSTO_Date:
+        return ZType_ZDateFull;
+
+    case ZSTO_Resource:
+        return ZType_Resource;
+    case ZSTO_Checksum:
+        return ZType_CheckSum;
+
+    }
+    return ZType_Nothing;
 }
 
 const char* decode_OperandType(ZSearchOperandType_type pType)
@@ -956,7 +795,8 @@ const char* decode_OperandType(ZSearchOperandType_type pType)
     return "ZSTO_Literal";
   case ZSTO_Field:
     return "ZSTO_Field";
-
+  case ZSTO_Symbol:
+      return "ZSTO_Symbol";
 
   case ZSTO_String:
     return "ZSTO_String";
@@ -979,6 +819,7 @@ const char* decode_OperandType(ZSearchOperandType_type pType)
     return "ZSTO_Nothing";
 
   default:
+
     return "invalid/unknown ZSTO";
 
   }// switch
@@ -1034,6 +875,8 @@ const char* decode_ZSOPV(ZSearchOperator_type pOp)
   case ZSOPV_ENDS_WITH:
     return "ZSOPV_ENDS_WITH";
 
+  case ZSOPV_MOVE:
+      return "ZSOPV_MOVE";
 
   case ZSOPV_INVALID:
     return "ZSOPV_INVALID";
@@ -1044,6 +887,104 @@ const char* decode_ZSOPV(ZSearchOperator_type pOp)
   }// switch
 
 }
+
+
+ZSearchOperandType_type
+encode_ZSTO(const utf8VaryingString& pZSTOString)
+{
+    ZSearchOperandType_type wZSTO=ZSTO_Nothing;
+    if (pZSTOString.contains("ZSTO_Field")) {
+        wZSTO |=  ZSTO_Field ;
+    }
+    if (pZSTOString.contains("ZSTO_Literal")) {
+        wZSTO |=  ZSTO_Literal ;
+    }
+    if (pZSTOString.contains("ZSTO_Logical")) {
+        wZSTO |=  ZSTO_Logical ;
+    }
+    if (pZSTOString.contains("ZSTO_Arithmetic")) {
+        wZSTO |=  ZSTO_Arithmetic ;
+    }
+
+    if (pZSTOString.contains("ZSTO_String")) {
+        wZSTO |=  ZSTO_String ;
+    }
+    if (pZSTOString.contains("ZSTO_UriString")) {
+        wZSTO |=  ZSTO_UriString ;
+    }
+    if (pZSTOString.contains("ZSTO_Integer")) {
+        wZSTO |=  ZSTO_Integer ;
+    }
+    if (pZSTOString.contains("ZSTO_Float")) {
+        wZSTO |=  ZSTO_Float ;
+    }
+    if (pZSTOString.contains("ZSTO_Bool")) {
+        wZSTO |=  ZSTO_Bool ;
+    }
+    if (pZSTOString.contains("ZSTO_Date")) {
+        wZSTO |=  ZSTO_Date ;
+    }
+    if (pZSTOString.contains("ZSTO_Resource")) {
+        wZSTO |=  ZSTO_Resource ;
+    }
+    if (pZSTOString.contains("ZSTO_Checksum")) {
+        wZSTO |=  ZSTO_Checksum ;
+    }
+    return wZSTO;
+}
+
+utf8VaryingString
+decode_ZSTO(ZSearchOperandType_type pZSTO)
+{
+    ZSearchOperandType_type wZSTO=ZSTO_Nothing;
+    utf8VaryingString wReturn;
+    if (pZSTO & ZSTO_Field) {
+        wReturn.addConditionalOR("ZSTO_Field");
+    }
+    if (pZSTO & ZSTO_Literal) {
+        wReturn.addConditionalOR("ZSTO_Literal");
+    }
+    if (pZSTO & ZSTO_Logical) {
+        wReturn.addConditionalOR("ZSTO_Logical");
+    }
+    if (pZSTO & ZSTO_Arithmetic) {
+        wReturn.addConditionalOR("ZSTO_Arithmetic");
+    }
+    if (pZSTO & ZSTO_Symbol) {
+        wReturn.addConditionalOR("ZSTO_Symbol");
+    }
+
+
+    if (pZSTO & ZSTO_String) {
+        wReturn.addConditionalOR("ZSTO_String");
+    }
+    if (pZSTO & ZSTO_UriString) {
+        wReturn.addConditionalOR("ZSTO_UriString");
+    }
+    if (pZSTO & ZSTO_Integer) {
+        wReturn.addConditionalOR("ZSTO_Integer");
+    }
+    if (pZSTO & ZSTO_Float) {
+        wReturn.addConditionalOR("ZSTO_Float");
+    }
+    if (pZSTO & ZSTO_Bool) {
+        wReturn.addConditionalOR("ZSTO_Bool");
+    }
+    if (pZSTO & ZSTO_Date) {
+        wReturn.addConditionalOR("ZSTO_Date");
+    }
+    if (pZSTO & ZSTO_Resource) {
+        wReturn.addConditionalOR("ZSTO_Resource");
+    }
+    if (pZSTO & ZSTO_Checksum) {
+        wReturn.addConditionalOR("ZSTO_Checksum");
+    }
+    if (wReturn.isEmpty())
+        wReturn = "ZSTO_Nothing";
+
+    return wReturn;
+}
+
 
 
 }//zbs

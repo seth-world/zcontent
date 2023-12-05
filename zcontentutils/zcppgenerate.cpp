@@ -252,13 +252,20 @@ ZCppGenerate::ZCppGenerate(ZDictionaryFile *pDictionaryFile)
   DictionaryFile = pDictionaryFile;
 }
 
-
+/*
 ZStatus
 ZCppGenerate::loadXmlParameters(const uriString& pXmlFile,
     ZArray<GenObj> &pGenObjList,
     ZArray<GenInclude> &pGenIncludeList,
     ZaiErrors* pErrorLog) {
+*/
 
+
+ZStatus
+ZCppGenerate::loadXmlParameters(const uriString& pXmlFile,
+                              ZArray<GenObj> &pGenObjList,
+//                              ZArray<GenInclude> &pGenIncludeList,
+                              ZaiErrors* pErrorLog) {
 
   utf8VaryingString wXmlString;
 
@@ -273,7 +280,7 @@ ZCppGenerate::loadXmlParameters(const uriString& pXmlFile,
 
 
   if ((wSt=pXmlFile.loadUtf8(wXmlString))!=ZS_SUCCESS) {
-    pErrorLog->logZException();
+    pErrorLog->logZExceptionLast("ZCppGenerate::loadXmlParameters");
     return wSt;
   }
 
@@ -294,18 +301,14 @@ ZCppGenerate::loadXmlParameters(const uriString& pXmlFile,
   utf8VaryingString     wIncludeFile;
 
   wDoc = new zxmlDoc;
-  wSt = wDoc->ParseXMLDocFromMemory(wXmlString.toCChar(), wXmlString.getUnitCount(), nullptr, 0);
-  if (wSt != ZS_SUCCESS) {
-    pErrorLog->logZException();
-    pErrorLog->errorLog(
-        "ZCppGenerate::loadGenerateParameters-E-PARSERR Xml parsing error for string <%s> ",
-        wXmlString.subString(0, 25).toString());
+
+  wSt=wDoc->XmlParseFromMemory(wXmlString,pErrorLog);
+  if (wSt!=ZS_SUCCESS)
     return wSt;
-  }
 
   wSt = wDoc->getRootElement(wRoot);
   if (wSt != ZS_SUCCESS) {
-    pErrorLog->logZException();
+    pErrorLog->logZExceptionLast("ZCppGenerate::loadXmlParameters");
     return wSt;
   }
   if (!(wRoot->getName() == "zcppgenerate")) {
@@ -363,8 +366,11 @@ ZCppGenerate::loadXmlParameters(const uriString& pXmlFile,
 
         wSt=XMLgetChildText( wObjectNode,"ztype",wKeyword,pErrorLog);
         wZType = encode_ZType(wKeyword);
-
         wSt=XMLgetChildText( wObjectNode,"file",wIncludeFile,pErrorLog);
+        if (wSt==ZS_SUCCESS) {
+            GenObjList.push(GenObj(wZType,wIncludeFile));
+        }
+/*
         long wIncludeRank=0;
         for (;wIncludeRank < pGenIncludeList.count();wIncludeRank++) {
           if (pGenIncludeList[wIncludeRank].Include ==  wIncludeFile ) {
@@ -376,6 +382,7 @@ ZCppGenerate::loadXmlParameters(const uriString& pXmlFile,
         }
 
         pGenObjList.push(GenObj(wZType,wIncludeRank));
+*/
       }//if (wObjectNode->getName()=="object")
       wSt=wObjectNode->getNextNode((zxmlNode*&)wSwapNode);
       XMLderegister(wObjectNode);
@@ -383,21 +390,24 @@ ZCppGenerate::loadXmlParameters(const uriString& pXmlFile,
     }//while (wSt==ZS_SUCCESS)
 
     pErrorLog->textLog("_________________Generation parameters load report____________________\n"
-                       " %ld object types %ld include files.", pGenObjList.count(),pGenIncludeList.count());
+//                       " %ld object types %ld include files.", pGenObjList.count(),pGenIncludeList.count());
+                       " %ld object types & include files.", pGenObjList.count());
     pErrorLog->textLog("     Object types");
 
     for (long wi=0;wi<pGenObjList.count();wi++) {
       pErrorLog->textLog("%3ld- <%25s> <%s>",wi,
-          decode_ZType( pGenObjList[wi].ZType),
-          pGenObjList[wi].IncludeRank < 0?"***MISS INCLUDE***":pGenIncludeList[pGenObjList[wi].IncludeRank].Include.toCChar()
+                         decode_ZType( pGenObjList[wi].ZType),
+                         pGenObjList[wi].Include.isEmpty() ? "***MISS INCLUDE***":pGenObjList[wi].Include.toCChar()
           );
     }
+    /*
     pErrorLog->textLog("     include file definitions ");
     for (long wi=0;wi<pGenIncludeList.count();wi++) {
       pErrorLog->textLog("%3ld- <%25s>",wi,
           pGenIncludeList[wi].Include.toString()
           );
     }
+    */
     pErrorLog->textLog("________________________________________________________________");
     XMLderegister(wObjectNode);
     XMLderegister(wIncludeFileNode);
@@ -431,8 +441,66 @@ ZCppGenerate::genCopyFrom(utf8VaryingString& pClassName) {
   return wReturn;
 } // genCopyFrom
 */
+void
+ZCppGenerate::resetIncludeFiles()
+{
+    for (int wi=0; wi < GenObjList.count();wi++) {
+        GenObjList[wi].Used = false;
+    }
+}
 
 
+void
+ZCppGenerate::setupIncludeFiles()
+{
+    resetIncludeFiles();
+
+
+    for (int wi=0; wi < DictionaryFile->count();wi++) {
+
+        if (getOneIncludeFiles(DictionaryFile->Tab(wi).ZType) < 0)
+          ErrorLog.errorLog("ZCppGenerate::setupIncludeFiles Cannot find ZType <%s> within Generation parameters.",
+                            decode_ZType( DictionaryFile->Tab(wi).ZType ));
+
+    } // for
+
+} // searchIncludeFiles
+
+
+int
+ZCppGenerate::getOneIncludeFiles(ZTypeBase pType)
+{
+  if (pType & ZType_Atomic)
+    pType = ZType_Atomic;
+  int wR=0;
+  for (;wR < GenObjList.count(); wR++) {
+    if (GenObjList[wR].ZType == pType) {
+        GenObjList[wR].Used=true;
+        break;
+    }
+  }// for
+  if (wR == GenObjList.count()) {
+    wR = -1;
+  }
+  return wR;
+} // getOneIncludeFiles
+
+
+utf8VaryingString
+ZCppGenerate::genIncludes() {
+
+  utf8VaryingString wIncludes;
+
+  for (int wi=0; wi < GenObjList.count() ; wi++ ) {
+    if (GenObjList[wi].Used) {
+      wIncludes.addsprintf("#include <%s>\n",GenObjList[wi].Include.toString());
+    }
+  }// for
+  return wIncludes;
+} // genIncludes
+
+
+#ifdef __COMMENT__
 utf8VaryingString
 ZCppGenerate::genIncludes(ZTypeBase pType) {
 
@@ -452,6 +520,19 @@ ZCppGenerate::genIncludes(ZTypeBase pType) {
         else
           ErrorLog.textLog("Atomic type <%s> has already an include file",decode_ZType(pType));
         return wFileInclude;
+      }
+      else {
+        if (pType & (ZType_Class | ZType_ByteSeq) ) { /* classes have an include file associated to it */
+          for (long wR=0; wR < GenObjList.count();wR++) {
+              if (GenObjList[wR].ZType == (pType & ~(ZType_Pointer | ZType_Array)) ) {
+                  if (!GenIncludeList[GenObjList[wR].IncludeRank].Used) {
+                      wFileInclude.sprintf("#include <%s>\n",
+                                           GenIncludeList[GenObjList[wR].IncludeRank].Include.toString());
+                      GenIncludeList[GenObjList[wR].IncludeRank].Used=true;
+                      ErrorLog.infoLog("generating include file definition as <%s> for object <%s>",
+                                       GenIncludeList[GenObjList[wR].IncludeRank].Include.toString(),
+                                       decode_ZType(pType));
+                  }
       }
     }// for (long wR=0; wR < pGenObjList.count();wi++)
   }
@@ -478,6 +559,7 @@ ZCppGenerate::genIncludes(ZTypeBase pType) {
   return utf8VaryingString("");
 } //genIncludes
 
+#endif // __COMMENT__
 
 utf8VaryingString
 ZCppGenerate::genHeaderFields(utf8VaryingString& pFileIncludeList) {
@@ -505,11 +587,10 @@ ZCppGenerate::genHeaderFields(utf8VaryingString& pFileIncludeList) {
         }
       wReturn += ";\n";
       }
-    /* search for include files when classes */
-
-      pFileIncludeList += genIncludes(DictionaryFile->Tab(wi).ZType);
+    /* search for include files when classes */    
   } // for
 
+  pFileIncludeList += genIncludes();
   return wReturn;
 }//genHeaderFields
 
@@ -539,7 +620,8 @@ ZCppGenerate::loadGenerateParameters(const uriString& pXmlFile,ZaiErrors *pError
     XmlGenParamsFile.addConditionalDirectoryDelimiter();
     XmlGenParamsFile += __CPPGENERATE_PARAMETER_FILE__;
   }
-  wSt=loadXmlParameters(XmlGenParamsFile,GenObjList,GenIncludeList,pErrorLog);
+//  wSt=loadXmlParameters(XmlGenParamsFile,GenObjList,GenIncludeList,pErrorLog);
+  wSt=loadXmlParameters(XmlGenParamsFile,GenObjList,pErrorLog);
   if (wSt!=ZS_SUCCESS) {
     std::cout.flush();
     ZExceptionDLg::displayLast("Load parameters file");
@@ -577,18 +659,32 @@ ZCppGenerate::genHeader(const utf8VaryingString& pClassName,
   const char* cst_getKeyMain =
       "   ZDataBuffer       getKey(long pKeyNumber) ;\n"
       "   utf8VaryingString getKeyName(long pKeyNumber) ;\n";
+
+
   ZStatus wSt;
   utf8VaryingString wHContent,wIncludeContent,wFieldsContent,wHBanner;
   utf8VaryingString wClassUpper = pClassName.toUpper().toString();
+
+
 
   wHContent.addsprintf(wHHeader,
       wClassUpper.toString(),
       wClassUpper.toString());
 
+    setupIncludeFiles( );
+
   /* add bitset as default include file */
 
   wIncludeContent += "/*      private include files        */\n";
-  wIncludeContent += genIncludes(ZType_bitset);
+  int wZBitsetIncRank = getOneIncludeFiles(ZType_bitset);
+  if (wZBitsetIncRank < 0 ) {
+      wIncludeContent += "\n// CppGenerator message : cannot find include file for ZType_bitset\n\n";
+  }
+  else
+      wIncludeContent.addsprintf("#include <%s>\n",GenObjList[wZBitsetIncRank].Include.toString());
+
+//  wIncludeContent += genIncludes(ZType_bitset);
+
   wIncludeContent += "/*      local include files          */\n";
 
   wFieldsContent += genHeaderFields(wIncludeContent);
@@ -1105,9 +1201,12 @@ ZCppGenerate::generateInterface(const utf8VaryingString& pOutBase,
 
   utf8VaryingString wBase= wClassLower;
 
+  /* deprecated
   const char* wWDWork=getenv(__PARSER_WORK_DIRECTORY__);
   if (!wWDWork)
     wWDWork="";
+*/
+  uriString wWDWork = GeneralParameters.getWorkDirectory();
 
   /* directory path precedence :
    *    1- pGenPath
@@ -1182,14 +1281,14 @@ ZStatus ZTypeToCTypeDefinition (ZTypeBase pType,
     pDeclaration.sprintf("/* Null type for field %s */",pName.toCChar());
     ZException.setMessage("ZTypeToCTypeDefinition",ZS_INVTYPE,Severity_Error,
         "Field <%s> has a null type ZType_Nothing.",pName.toString());
-    pErrorLog->logZException();
+    pErrorLog->logZExceptionLast("ZTypeToCTypeDefinition");
     return  ZS_INVTYPE;
   }
   if (pType==ZType_Unknown) {
     pDeclaration.sprintf("/* Unknown type for field <%s> */",pName.toCChar());
     ZException.setMessage("ZTypeToCTypeDefinition",ZS_INVTYPE,Severity_Error,
         "Field <%s> has an unknown type ZType_Unknown",pName.toString());
-    pErrorLog->logZException();
+    pErrorLog->logZExceptionLast("ZTypeToCTypeDefinition");
     return  ZS_INVTYPE;
   }
   ZTypeBase wSType = pType & ZType_StructureMask ;

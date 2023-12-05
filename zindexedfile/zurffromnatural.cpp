@@ -4,7 +4,7 @@
 #include <zindexedfile/zurffromnatural.h>
 #include <ztoolset/zatomicconvert.h>
 
-#include <ztoolset/charvaryingstring.h>
+//#include <ztoolset/charvaryingstring.h>
 #include <ztoolset/utfvaryingstring.h>
 
 #include <ztoolset/charfixedstring.h>
@@ -136,9 +136,10 @@ ZStatus wSt;
             {
             switch (pTargetCapacity)
             {
+/* deprecated
             case cst_codelen+1:
                 {
-                utfcodeString wString;
+                utf8VaryingString wString;
                 wString.strset((utf8_t*)pSourceNatural);
                 wString._exportURF(pTargetURFData);
                 return ZS_SUCCESS;
@@ -158,7 +159,7 @@ ZStatus wSt;
                 wString._exportURF(pTargetURFData);
                 return ZS_SUCCESS;
                 }
-            case cst_urilen+1:
+            case cst_urilen+1:   // Uri string is now varying
                 {
                 uriString wString;
                 wString.strset((utf8_t*)pSourceNatural);
@@ -172,6 +173,7 @@ ZStatus wSt;
                 wString._exportURF(pTargetURFData);
                 return ZS_SUCCESS;
                 }
+*/
             default :
                 {
                   ZException.setMessage(_GET_FUNCTION_NAME_,
@@ -404,7 +406,7 @@ ZStatus wSt;
             {
             case cst_codelen+1:
                 {
-                utfcodeString wString;
+                utf8VaryingString wString;
                 wString.fromWString_PtrCount((wchar_t*)pNatural,pSourceArrayCount);
                 wString._exportURF(pURFData);
                 return ZS_SUCCESS;
@@ -688,7 +690,7 @@ ZStatus wSt;
             {
             case cst_codelen+1:
                 {
-                utfutfcodeString wString;
+                utfutf8VaryingString wString;
                 wString.fromUtfCount(wPString->toString(),wPString->size());
                 wString._exportURF(pURFData);
                 return ZS_SUCCESS;
@@ -956,7 +958,7 @@ ZStatus wSt;
             {
             case cst_codelen+1:
                 {
-                utfutfcodeString wString;
+                utfutf8VaryingString wString;
                 wString.fromWString_PtrCount(wPString->toWString(),wPString->size());
                 wString._exportURF(pURFData);
                 return ZS_SUCCESS;
@@ -1203,7 +1205,7 @@ ZStatus wSt=ZS_SUCCESS;
             {
             case cst_codelen+1:
                 {
-                utfutfcodeString wString;
+                utfutf8VaryingString wString;
                 if (wPString->size()>wString.capacity())
                                             wSt=ZS_FIELDCAPAOVFLW;
                 wString.fromUtfCount(wPString->toString(),wPString->size());
@@ -1456,7 +1458,7 @@ ZStatus wSt=ZS_SUCCESS;
             {
             case cst_codelen+1:
                 {
-                utfutfcodeString wString;
+                utfutf8VaryingString wString;
                 if (wPString->size()>wString.capacity())
                                             wSt=ZS_FIELDCAPAOVFLW;
                 wString.fromWString_PtrCount(wPString->toWString(),wPString->size());

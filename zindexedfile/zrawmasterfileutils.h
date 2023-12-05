@@ -4,23 +4,23 @@
 #include <zindexedfile/zrawmasterfile.h>
 #include <zindexedfile/zrawindexfile.h>
 
-  ZStatus zrepairIndexes (const char *pZMFPath,
-                          bool pRepair=false,
-                          bool pRebuildAll=false,
-                          FILE *pOutput=nullptr);
+ZStatus zrepairIndexes(const char *pZMFPath,
+                       bool pRepair ,
+                       bool pRebuildAll ,
+                       ZaiErrors *pErrorLog);
 
+ZStatus zdowngradeZMFtoZRF(const uriString &pZMFPath, ZaiErrors *pErrorLog);
 
+ZStatus zupgradeZRFtoZMF(const uriString &pZRFPath,
+                         const uriString &pDictionaryFile,
+                         ZaiErrors *pErrorLog);
 
-  void    zdowngradeZMFtoZRF (const  uriString & pZMFPath,FILE* pOutput=nullptr);
-
-  void    zupgradeZRFtoZMF (const uriString &pZRFPath, FILE* pOutput=nullptr);
-
-  /* returns index root name (without index file extension) */
-  utf8VaryingString generateIndexRootName(const utf8String &pMasterRootName,
-                                          const utf8String &pIndexName);
-  /* return index base name : i. e. <index root name>.<index file extension> */
-  utf8VaryingString generateIndexBaseName(const utf8String &pMasterRootName,
-      const utf8String &pIndexName);
+/* returns index root name (without index file extension) */
+utf8VaryingString generateIndexRootName(const utf8VaryingString &pMasterRootName,
+                                        const utf8VaryingString &pIndexName);
+/* return index base name : i. e. <index root name>.<index file extension> */
+utf8VaryingString generateIndexBaseName(const utf8VaryingString &pMasterRootName,
+                                        const utf8VaryingString &pIndexName);
 
 ZStatus
 generateIndexURI(uriString &pIndexFileUri,
@@ -43,9 +43,10 @@ const char *decode_ZCOP (uint16_t pZCOP);
  * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
 
-template <class _Tp>
+template <class _RecordClass>
 ZStatus
-zrebuildRawIndex(ZRawMasterFile& pMasterFile,const long pIndexRank,bool pStat=false, FILE*pOutput=stdout)
+//zrebuildRawIndex(ZRawMasterFile& pMasterFile,const long pIndexRank,bool pStat=false, FILE*pOutput=stdout)
+zrebuildRawIndex(ZRawMasterFile& pMasterFile,const long pIndexRank,bool pStat,ZaiErrors* pErrorLog)
 {
   ZStatus         wSt = ZS_SUCCESS;
   ZDataBuffer     wRecord;
@@ -57,7 +58,7 @@ zrebuildRawIndex(ZRawMasterFile& pMasterFile,const long pIndexRank,bool pStat=fa
   ZRawIndexFile&  wIF = *pMasterFile.IndexTable[pIndexRank];
  // long            wIndexRank;
 
-  _Tp             wClass;
+  _RecordClass    wClass;
 
   long            wIndexCount=0;
 
@@ -69,37 +70,34 @@ zrebuildRawIndex(ZRawMasterFile& pMasterFile,const long pIndexRank,bool pStat=fa
         "Request to rebuild index for master file <%s> while open mode is invalid <%s>. Must be (ZRF_Exclusive | ZRF_All)",
         pMasterFile.getURIContent().toCChar(),
         decode_ZRFMode(pMasterFile.getOpenMode()));
+      if (pErrorLog!=nullptr)
+        pErrorLog->errorLog("Request to rebuild index for master file <%s> while open mode is invalid <%s>. Must be (ZRF_Exclusive | ZRF_All)",
+                              pMasterFile.getURIContent().toCChar(),
+                              decode_ZRFMode(pMasterFile.getOpenMode()));
     return  ZS_MODEINVALID;
   }
 
   if (pStat)
     wIF.ZPMSStats.init();
-  fprintf (pOutput,
-      "______________Rebuilding Index <%s>_______________\n"
-      " File is %s \n",
-      wIF.IndexName.toCChar(),
-      wIF.getURIContent().toCChar());
+
+  pErrorLog->textLog("______________Rebuilding Index <%s>_______________\n"
+                     " File is %s \n",
+                     wIF.IndexName.toCChar(),
+                     wIF.getURIContent().toCChar());
 
   zsize_type wFatherSize = pMasterFile.getSize();
   zsize_type wSize = wIF.IndexRecordSize() * wFatherSize ;
-  if (ZVerbose)
-  {
-    fprintf (pOutput,
-        " Index file size is computed to be %ld\n",
-        wSize);
 
-    fprintf (pOutput,"Clearing index file\n");
-  }
+  pErrorLog->textLog(" Index file size is computed to be %ld", wSize);
+  pErrorLog->textLog(" Clearing index file");
 
-  wSt=wIF.zclearFile(wSize);  // clearing file with a free block space equals to the whole index
+
+  wSt=wIF.zclearFile(wSize,pMasterFile.getFCB()->HighwaterMarking,pErrorLog);  // clearing file with a free block space equals to the whole index
 
   if (wIF.getRawMasterFile()->isEmpty())
   {
-    fprintf(pOutput,
-        " ------------No record in ZMasterFile <%s> : no index to rebuild..........\n",
-        pMasterFile.getURIContent().toString());
-
-
+    pErrorLog->infoLog(" ------------No record in ZMasterFile <%s> : no index to rebuild..........\n",
+                        pMasterFile.getURIContent().toString());
     return  ZS_SUCCESS;
   }
 
@@ -124,18 +122,15 @@ zrebuildRawIndex(ZRawMasterFile& pMasterFile,const long pIndexRank,bool pStat=fa
   if (pStat)
   {
     wIF.ZPMSStats.end();
-    wIF.ZPMSStats.reportFull(pOutput);
+    wIF.ZPMSStats.reportFull(pErrorLog);
   }
-  fprintf (pOutput,"\n   %ld index keys added to index \n", wIndexCount);
+  pErrorLog->infoLog("   %ld index key values added to index \n", wIndexCount);
 
-  if (wSt!=ZS_SUCCESS)
-  {
-    fprintf (pOutput," ----- index rebuild ended with error --------\n");
-    ZException.printUserMessage();
+  if (wSt!=ZS_SUCCESS) {
+    pErrorLog->logZExceptionLast(" ----- index rebuild ended with error --------");
     return  wSt;
   }
-  fprintf (pOutput," ---------Successfull end rebuilding process for Index <%s>------------\n",
-      wIF.IndexName.toCChar());
+  pErrorLog->infoLog (" ---------Successfull rebuilding process for Index <%s>------------\n", wIF.IndexName.toCChar());
   return  wSt;
 
 }//zrebuildIndex
@@ -158,84 +153,82 @@ zrebuildRawIndex(ZRawMasterFile& pMasterFile,const long pIndexRank,bool pStat=fa
  * @param[in] pOutput a FILE* pointer where the reporting will be made. Defaulted to stdout.
   * @return  a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.see: @ref ZBSError
  */
-template<class _Tp>
+
+
+template <class _RecordClass>
 ZStatus
-zreorgRawMasterFile (ZRawMasterFile& pRawMF, bool pDump,FILE *pOutput)
+zreorgRawMasterFile (const uriString& pURIRawMF,
+                    long pRequestedFreeBlocks,
+                    //  bool pDump,
+                    ZaiErrors* pErrorLog)
 {
-  ZStatus wSt;
-  long wi = 0;
-  //ZExceptionMin ZException_sv;
-  bool wasOpen=false;
-  bool wgrabFreeSpaceSet = false;
+    ZStatus wSt;
+    ZRawMasterFile pRawMF;
+    long wi = 0;
 
-  zmode_type wMode = ZRF_Nothing ;
-  if (pRawMF.isOpen())
-  {
-    wMode=pRawMF.getMode();
-    pRawMF.zclose();
-    wasOpen=true;
-  }
-  if ((wSt=pRawMF.zopen(pRawMF.getURIContent(),ZRF_Exclusive|ZRF_Write))!=ZS_SUCCESS)
-  {  return  wSt;}
+    bool wgrabFreeSpaceSet = false;
+
+    if ((wSt=pRawMF.zopen(pURIRawMF,ZRF_All))!=ZS_SUCCESS)
+    {  return  wSt;}
 
 
-  if (!pRawMF.getFCB()->GrabFreeSpace)        // activate grabFreeSpace if it has been set on
-  {
-    pRawMF.getFCB()->GrabFreeSpace=true;
-    wgrabFreeSpaceSet = true;
-  }
-
-  pRawMF.zstartPMSMonitoring();
-
-  wSt = pRawMF._reorgFileInternals(pDump,pOutput);
-
-  while (wi < pRawMF.IndexTable.size()) {
-    //      wSt=IndexTable[wi]->zrebuildRawIndex(false,pOutput); // hard rollback update on each already committed index
-    wSt=zrebuildRawIndex<_Tp>(pRawMF.IndexTable[wi],false,pOutput); // hard rollback update on each already committed index
-
-    if (wSt!=ZS_SUCCESS)
+    if (!pRawMF.getFCB()->GrabFreeSpace)        // activate grabFreeSpace if it has been set on
     {
-      //               ZException_sv = ZException; // in case of error : store the exception but continue rolling back other indexes
-      ZException.addToLast(" during Index rebuild on index <%s> number <%02ld> ",
-          pRawMF.IndexTable[wi]->IndexName.toCChar(),
-          wi);
+        pRawMF.getFCB()->GrabFreeSpace=true;
+        wgrabFreeSpaceSet = true;
     }
 
-    wi++;
-  }
+    pRawMF.zstartPMSMonitoring();
 
-  pRawMF.zendPMSMonitoring ();
-  fprintf (pOutput,
-      " ----------End of ZRawMasterFile reorganization process-------------\n");
+    wSt = pRawMF._reorgFileInternals(pRequestedFreeBlocks,pErrorLog);
 
-  pRawMF.zreportPMSMonitoring(pOutput);
+    while (wi < pRawMF.IndexTable.size()) {
+        wSt=zrebuildRawIndex<_RecordClass>(pRawMF.IndexTable[wi],wi,false,pErrorLog); // hard rollback update on each already committed index
 
-  if (ZException.getLastStatus()!=ZS_SUCCESS)
-  {
-    //             ZException=ZException_sv;
-    goto error_zreorgZMFFile;
-  }
+        if (wSt!=ZS_SUCCESS)
+        {
+            //               ZException_sv = ZException; // in case of error : store the exception but continue rolling back other indexes
+            ZException.addToLast(" during Index rebuild on index <%s> number <%02ld> ",
+                                 pRawMF.IndexTable[wi]->IndexName.toCChar(),
+                                 wi);
+        }
+
+        wi++;
+    }
+
+    pRawMF.zendPMSMonitoring ();
+    pErrorLog->textLog(
+        " ----------End of ZRawMasterFile reorganization process-------------\n");
+
+    pRawMF.zreportPMSMonitoring(pErrorLog);
+
+    if (ZException.getLastStatus()!=ZS_SUCCESS)
+    {
+        //             ZException=ZException_sv;
+        goto error_zreorgRawMasterFile;
+    }
 
 //    ZException.getLastStatus() = ZS_SUCCESS;
 
-end_zreorgZMFFile:
+end_zreorgRawMasterFile:
 
-  if (wgrabFreeSpaceSet)        // restore grabFreeSpace if it was off and has been set on
-  {
-    pRawMF.getFCB()->GrabFreeSpace=false;
-  }
-  pRawMF.zclose ();
-  if (wasOpen)
-    pRawMF.zopen(pRawMF.getURIContent(),wMode);
+    if (wgrabFreeSpaceSet)        // restore grabFreeSpace if it was off and has been set on
+    {
+        pRawMF.getFCB()->GrabFreeSpace=false;
+    }
+    pRawMF.zclose ();
+    return  wSt;
 
-  return  ZException.getLastStatus();
+error_zreorgRawMasterFile:
+    pErrorLog->logZExceptionLast("zreorgRawMasterFile");
+    goto end_zreorgRawMasterFile;
 
-error_zreorgZMFFile:
-  ZException.printUserMessage(pOutput);
-  goto end_zreorgZMFFile;
+}
 
-}// ZRawMasterFile::zreorgFile
-
+ZStatus
+zreorgMasterFile (const uriString& pURIRawMF,
+                 long pRequestedFreeBlocks,
+                 ZaiErrors* pErrorLog);
 
 
 #endif // ZRAWMASTERFILEUTILS_H

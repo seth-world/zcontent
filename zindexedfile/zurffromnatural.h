@@ -628,7 +628,7 @@ ZStatus wSt=ZS_SUCCESS;
         case ZType_Utf8FixedString:
         case ZType_Utf16FixedString:
         case ZType_Utf32FixedString:
-        case ZType_CharVaryingString:
+//        case ZType_CharVaryingString:
         case ZType_Utf8VaryingString:
         case ZType_Utf16VaryingString:
         case ZType_Utf32VaryingString:

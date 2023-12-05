@@ -1,7 +1,9 @@
 #include "zsearchquerymwd.h"
 //#include "ui_zsearchquerymwd.h"
-
 #include <functional>
+
+#include <zcontent/zcontentcommon/zgeneralparameters.h>
+#include <zcontent/zcontentcommon/zcontentconstants.h>
 
 #include <QWidget>
 
@@ -19,17 +21,25 @@
 #include <QStatusBar>
 #include <QLabel>
 
+#include <QTableView>
+
+#include <zqt/zqtwidget/zqlabel.h>
+
+
 #include <QProgressBar>
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <QList>
 #include <QHeaderView>
 
+
 #include <zqt/zqtwidget/zqplaintextedit.h>
 
 #include <zqt/zqtwidget/zqtableview.h>
 
 #include "texteditmwn.h"
+
+#include <zqt/zqtwidget/zhelp.h>
 
 #include <zcontent/zindexedfile/zsearchparser.h>
 
@@ -40,12 +50,28 @@
 
 #include "zcellformatdlg.h"
 #include "zcollectionlist.h"
+#include "zmfprogressmwn.h"
+
+#include <zqtwidget/zhelp.h>
+
+#include <zcontent/zindexedfile/zsearchentitycontext.h>
+
+namespace zbs {
+ZSearchParser* GParser=nullptr;
+
+void
+setGParser(ZSearchParser* pParser) {
+    GParser=pParser;
+}
+
+} // namespace zbs
 
 const long StringDiplayMax = 64;
+using namespace zbs;
 
 ZSearchQueryMWd::ZSearchQueryMWd(QWidget *parent) : QMainWindow(parent)
 {
-  setup();
+  initLayout();
 }
 
 ZSearchQueryMWd::~ZSearchQueryMWd()
@@ -57,247 +83,372 @@ ZSearchQueryMWd::~ZSearchQueryMWd()
 //  delete ui;
 }
 
-
-
-void ZSearchQueryMWd::setup()
+ZQLabel* ZSearchQueryMWd::createBiStateZButton(const utf8VaryingString& pIconEnabled,
+                                               const utf8VaryingString& pIconDisabled,
+                                               const utf8VaryingString& pToolTip,
+                                               int wSize,
+                                               QWidget* pParent)
 {
+    uriString  wURIEnabledImg,wURIDisabledImg;
+    wURIEnabledImg = GeneralParameters.getIconDirectory();
+    wURIEnabledImg.addConditionalDirectoryDelimiter();
+    wURIEnabledImg += pIconEnabled;
+
+    wURIDisabledImg = GeneralParameters.getIconDirectory();
+    wURIDisabledImg.addConditionalDirectoryDelimiter();
+    wURIDisabledImg += pIconDisabled;
+
+
+    ZQLabel* wButtonLBl=new ZQLabel(pParent);
+    wButtonLBl->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    wButtonLBl->setScaledContents( true );
+    wButtonLBl->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
+    wButtonLBl->setMaximumSize(wSize,wSize);
+    wButtonLBl->setEnabledPixMap(QPixmap(wURIEnabledImg.toCChar()));
+    wButtonLBl->setDisabledPixMap(QPixmap(wURIDisabledImg.toCChar()));
+//   wButtonLBl->setPixmap(QPixmap(wURIGenericImg.toCChar()));
+    wButtonLBl->setToolTip(pToolTip.toCChar());
+    wButtonLBl->enable();
+    return wButtonLBl;
+}
+
+ZQLabel* ZSearchQueryMWd::createZButton(const utf8VaryingString& pIconName,
+                                        const utf8VaryingString& pToolTip,
+                                        int wSize,
+                                        QWidget* pParent)
+{
+    uriString  wURIGenericImg;
+    wURIGenericImg = GeneralParameters.getIconDirectory();
+    wURIGenericImg.addConditionalDirectoryDelimiter();
+    wURIGenericImg += pIconName;
+
+    ZQLabel* wButtonLBl=new ZQLabel(pParent);
+    wButtonLBl->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    wButtonLBl->setScaledContents( true );
+    wButtonLBl->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
+    wButtonLBl->setMaximumSize(wSize,wSize);
+    wButtonLBl->setPixmap(QPixmap(wURIGenericImg.toCChar()));
+    wButtonLBl->setToolTip(pToolTip.toCChar());
+    return wButtonLBl;
+}
+
+void ZSearchQueryMWd::initLayout()
+{
+    menubar = new QMenuBar(this);
+    menubar->setGeometry(QRect(0, 0, 814, 20));
+
+    QHBoxLayout *ButtonBox=nullptr;
+
+    resize(815, 640);
+    CentralWidget = new QWidget(this);
+    setCentralWidget(CentralWidget);
+
+    ForBackWDg=new QWidget(centralWidget());
+    ForBackWDg->setGeometry(QRect(0 , 0 , 801, 50));
+    ForBackWDg->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+
+    QHBoxLayout* hl10 = new QHBoxLayout;
+    ForBackWDg->setLayout(hl10);
+
+    int wWidgetSize=LBlSize;
+    int wWidth = ForBackWDg->geometry().width() - WidthMargin ;
+    int wCount = wWidth / (wWidgetSize + 1);
+    wWidth = wWidth - (wWidgetSize*5);
+    int wHeigth= ForBackWDg->geometry().height()-2;
+/*
+    GlobalCellFmtLBl = createBiStateZButton("pen-simple.gif","pen-simple-grey.gif","Column global format",wWidgetSize,ForBackWDg);
+    GlobalCellFmtLBl->disable();
+*/
+    GlobalCellFmtLBl = createZButton("pen-simple.gif","Column global format",wWidgetSize,ForBackWDg);
+    GlobalCellFmtLBl->setVisible(false);
+
+    hl10->addWidget(GlobalCellFmtLBl);
+
+    QObject::connect(GlobalCellFmtLBl,&ZQLabel::clicked, this, &ZSearchQueryMWd::TableHeaderCornerClicked);
+
+    TextClearLBl = createZButton("brandnew.gif","Clear text log window",wWidgetSize,ForBackWDg);
+    hl10->addWidget(TextClearLBl);
+//    TextClearLBl->setToolTip("Clear text log window");
+    QObject::connect(TextClearLBl,&ZQLabel::clicked, this, &ZSearchQueryMWd::TextClearLBlClicked);
+
+    EntityListLBl = createZButton("magnifyingglass.png","List all active entities",wWidgetSize,ForBackWDg);
+    hl10->addWidget(EntityListLBl);
+//    EntityListLBl->setToolTip("List all active entities");
+    QObject::connect(EntityListLBl,&ZQLabel::clicked, this, &ZSearchQueryMWd::EntityListLBlClicked);
+
+ //   hl10->addItem(wSpacer0);
+    QSpacerItem* wSpacer0= new QSpacerItem(wWidth, wHeigth, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    hl10->addItem(wSpacer0);
+
+    EraseLBl = createZButton("errorcross.png","Clear instruction text window",wWidgetSize,ForBackWDg);
+    hl10->addWidget(EraseLBl);
+
+
+    BackwardLBl = createZButton("backward.gif","Previous instruction",wWidgetSize,ForBackWDg);
+    hl10->addWidget(BackwardLBl);
+//    BackwardLBl->setToolTip("Previous instruction");
+    QObject::connect(BackwardLBl,&ZQLabel::clicked, this, &ZSearchQueryMWd::BackwardClicked);
+
+    ExecuteLBl = createZButton("check.gif","Execute current instruction",wWidgetSize,ForBackWDg);
+    hl10->addWidget(ExecuteLBl);
+//    ExecuteLBl->setToolTip("Execute current instruction");
+    QObject::connect(ExecuteLBl,&ZQLabel::clicked, this, &ZSearchQueryMWd::ExecuteClicked);
 
-  QHBoxLayout *ButtonBox=nullptr;
-  QSpacerItem *horizontalSpacer=nullptr;
-  setObjectName(QString::fromUtf8("ZSearchQueryMWd"));
+    ForwardLBl = createZButton("forward.gif","Next instruction",wWidgetSize,ForBackWDg);
+    hl10->addWidget(ForwardLBl,0,Qt::AlignRight);
+//    ForwardLBl->setToolTip("Next instruction");
+    QObject::connect(ForwardLBl,&ZQLabel::clicked, this, &ZSearchQueryMWd::ForwardClicked);
 
-  resize(814, 641);
-  centralwidget = new QWidget(this);
-  setCentralWidget(centralwidget);
 
-  ExpWidget1= new QWidget(centralwidget);
-  ExpWidget1->setGeometry(QRect(0, 10, 801, 91));
-  QHBoxLayout* hl1 = new QHBoxLayout;
-  ExpWidget1->setLayout(hl1);
 
-  QueryQTe = new ZQPlainTextEdit(ExpWidget1);
-  QueryQTe->setGeometry(QRect(0, 10, 801, 91));
-  QueryQTe->setObjectName(QString::fromUtf8("QueryQTe"));
+    int wY= ForBackWDg->size().height()+HeightMargin;
+    QueryQTe = new ZQPlainTextEdit(centralWidget());
+    QueryQTe->setGeometry(QRect(WidthMargin, wY, 801-WidthMargin, 91));
 
-  hl1->addWidget(QueryQTe);
+    QObject::connect(EraseLBl,&ZQLabel::clicked, QueryQTe, &ZQPlainTextEdit::clear);
 
-  ExpWidget2= new QWidget(centralwidget);
-  ExpWidget2->setGeometry(0,130,801,411);
+    wY += QueryQTe->size().height() + HeightMargin;
 
-  QVBoxLayout* vl1 = new QVBoxLayout;
-  QHBoxLayout* hl20 = new QHBoxLayout;
-  QHBoxLayout* hl21 = new QHBoxLayout;
+    ExpWidget2= new QWidget(centralWidget());
+    ExpWidget2->setGeometry(0,wY,800,470);
 
-  ExpWidget2->setLayout(vl1);
+    QGridLayout* hl20 = new QGridLayout;
+    QHBoxLayout* hl21 = new QHBoxLayout;
 
-  vl1->setAlignment(Qt::AlignLeft);
+    QVBoxLayout* vl1 = new QVBoxLayout;
+    ExpWidget2->setLayout(vl1);
 
-  vl1->addLayout(hl20);
-  QLabel* QL10 = new QLabel("Entity",ExpWidget2);
-  EntityNameLBl = new QLabel(ExpWidget2);
-  EntityNameLBl->setFrameStyle(QFrame::Panel | QFrame::Raised);
-  EntityNameLBl->setLineWidth(2);
+    vl1->addLayout(hl20);
 
-  QLabel* QL11 = new QLabel("Type",ExpWidget2);
-  EntityTypeLBl = new QLabel(ExpWidget2);
-  EntityTypeLBl->setFrameStyle(QFrame::Panel | QFrame::Raised);
-  EntityTypeLBl->setLineWidth(2);
 
-  QLabel* QL12 = new QLabel("Count",ExpWidget2);
-  RecordCountLBl = new QLabel(ExpWidget2);
-  RecordCountLBl->setFrameStyle(QFrame::Panel | QFrame::Raised);
-  RecordCountLBl->setLineWidth(2);
-   QLabel* QL13 = new QLabel("Last status",ExpWidget2);
-  LastStatusLBl = new QLabel(ExpWidget2);
-  LastStatusLBl->setFrameStyle(QFrame::Panel | QFrame::Raised);
-  LastStatusLBl->setLineWidth(2);
+    QLabel* QL10 = new QLabel("Entity",ExpWidget2);
+    EntityNameLBl = new QLabel(ExpWidget2);
+    EntityNameLBl->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    EntityNameLBl->setLineWidth(2);
 
-  QSpacerItem* wSpacer= new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    QLabel* QL11 = new QLabel("Type",ExpWidget2);
+    EntityTypeLBl = new QLabel(ExpWidget2);
+    EntityTypeLBl->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    EntityTypeLBl->setLineWidth(2);
 
+    QLabel* QL12 = new QLabel("Count",ExpWidget2);
+    RecordCountLBl = new QLabel(ExpWidget2);
+    RecordCountLBl->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    RecordCountLBl->setLineWidth(2);
+    QLabel* QL13 = new QLabel("Last status",ExpWidget2);
+    LastStatusLBl = new QLabel(ExpWidget2);
+    LastStatusLBl->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    LastStatusLBl->setLineWidth(2);
+    LastStatusLBl->setAutoFillBackground(true);
 
-  hl20->addWidget(QL10);
-  hl20->addWidget(EntityNameLBl);
-  hl20->addWidget(QL11);
-  hl20->addWidget(EntityTypeLBl);
-  hl20->addWidget(QL12);
-  hl20->addWidget(RecordCountLBl);
-  hl20->addWidget(QL13);
-  hl20->addWidget(LastStatusLBl);
-  hl20->addItem(wSpacer);
+//    QSpacerItem* wSpacer= new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    hl20->addWidget(QL10,0,0,Qt::AlignRight);
+    hl20->addWidget(EntityNameLBl,0,1);
+    hl20->addWidget(QL11,0,2,Qt::AlignRight);
+    hl20->addWidget(EntityTypeLBl,0,3);
+    hl20->addWidget(QL12,0,4,Qt::AlignRight);
+    hl20->addWidget(RecordCountLBl,0,5);
+    hl20->addWidget(QL13,0,6,Qt::AlignRight);
+    hl20->addWidget(LastStatusLBl,0,7);
 
-  vl1->addLayout(hl21);
+    vl1->addLayout(hl21);
 
-  ResultTBv = new ZQTableView(ExpWidget2);
-  ResultTBv->setObjectName(QString::fromUtf8("ResultTBv"));
+    ResultTBv = new ZQTableView(ExpWidget2);
+    hl21->addWidget(ResultTBv);
 
-  hl21->addWidget(ResultTBv);
+    setMenuBar(menubar);
+    statusbar = new QStatusBar(this);
+    setStatusBar(statusbar);
 
-  ButtonBox = new QHBoxLayout;
-  ButtonBox->setObjectName(QString::fromUtf8("ButtonBox"));
-  ButtonBox->setContentsMargins(0, 0, 0, 0);
-  horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    QActionGroup* wMainAGp=new QActionGroup(menubar);
 
-  ButtonBox->addItem(horizontalSpacer);
-  vl1->addLayout(ButtonBox);
+    /*----------Leading quit icon--------------*/
 
+    uriString wQuitImg;
+    wQuitImg = GeneralParameters.getIconDirectory();
+    wQuitImg.addConditionalDirectoryDelimiter();
+    wQuitImg += "system-shutdown.png";
+    QIcon wQuitICn(wQuitImg.toCChar());
 
-  ListBTn = new QPushButton("List",ExpWidget2);
-  ButtonBox->addWidget(ListBTn);
+    QuitIconQAc = new QAction("",menubar);
+    QuitIconQAc->setIcon(wQuitICn);
 
-  ClearBTn = new QPushButton("Clear log",ExpWidget2);
-  ButtonBox->addWidget(ClearBTn);
+    menubar->addAction(QuitIconQAc);
+    wMainAGp->addAction(QuitIconQAc);
 
-  QuitBTn = new QPushButton("Quit",ExpWidget2);
-  ButtonBox->addWidget(QuitBTn);
-  ExecuteBTn = new QPushButton("Execute",ExpWidget2);
-  ButtonBox->addWidget(ExecuteBTn);
 
+    /* other menu bar  menus */
 
+    QMenu* MainMenuMEn = new QMenu("General",this);
+    menubar->addMenu(MainMenuMEn);
 
 
-  ProgressBar = new QProgressBar(this);
-  QHBoxLayout* hl3 = new QHBoxLayout;
+    ExecQAc=new QAction("Execute (F9)");
+    ClearLogQAc= new QAction("Clear log");
+    QuitQAc=new QAction("Quit");
+    SaveInstructionsQAc=new QAction("Save instuctions");
 
-  vl1->addLayout(hl3);
-  hl3->addWidget(ProgressBar);
+    MainMenuMEn->addAction(ExecQAc);
+    MainMenuMEn->addAction(SaveInstructionsQAc);
+    MainMenuMEn->addAction(ClearLogQAc);
+    MainMenuMEn->addAction(QuitQAc);
 
-  menubar = new QMenuBar(this);
-  menubar->setGeometry(QRect(0, 0, 814, 20));
-  setMenuBar(menubar);
-  statusbar = new QStatusBar(this);
-  setStatusBar(statusbar);
+    wMainAGp->addAction(QuitQAc);
+    wMainAGp->addAction(ExecQAc);
+    wMainAGp->addAction(ClearLogQAc);
+    wMainAGp->addAction(SaveInstructionsQAc);
 
-  QMenu* MainMenuMEn = new QMenu("General");
-  menubar->addMenu(MainMenuMEn);
+    /* not in action group */
 
-  QActionGroup* wMainAGp=new QActionGroup(MainMenuMEn);
+    QMenu*    OptionsQMe=new QMenu("Options",this);
+    MainMenuMEn->addMenu(OptionsQMe);
 
-  ExecQAc=new QAction("Execute (F9)");
-  QuitQAc=new QAction("Quit");
-  SaveInstructionsQAc=new QAction("Save instuctions");
+    QAction*  OptReportQAc=new QAction("Parsing report");
+    OptReportQAc->setCheckable(true);
 
 
-  MainMenuMEn->addAction(QuitQAc);
-  MainMenuMEn->addAction(ExecQAc);
-  MainMenuMEn->addAction(SaveInstructionsQAc);
+    QMenu*    VerboseQMe=new QMenu("Verbose level");
+    QAction*  OptNoVerboseQAc=new QAction("Mute");
+    OptNoVerboseQAc->setCheckable(true);
+    QAction*  OptVerboseQAc=new QAction("Verbose");
+    OptNoVerboseQAc->setCheckable(true);
+    QAction*  OptFullVerboseQAc=new QAction("Full verbose");
+    OptNoVerboseQAc->setCheckable(true);
 
-  wMainAGp->addAction(QuitQAc);
-  wMainAGp->addAction(ExecQAc);
-  wMainAGp->addAction(SaveInstructionsQAc);
+    VerboseQMe->addAction(OptFullVerboseQAc);
+    VerboseQMe->addAction(OptVerboseQAc);
+    VerboseQMe->addAction(OptNoVerboseQAc);
 
-  /* not in action group */
+    QHeaderView * wHV=ResultTBv->horizontalHeader();
+    wHV->setSectionsClickable(true);
+    QObject::connect(wHV,&QHeaderView::sectionDoubleClicked,this,&ZSearchQueryMWd::TableHeaderClicked);
+    QObject::connect(wMainAGp,&QActionGroup::triggered,this,&ZSearchQueryMWd::MenuTriggered);
 
-  QMenu*    OptionsQMe=new QMenu("Options");
-  MainMenuMEn->addMenu(OptionsQMe);
+    /* table corner */
+    ResultTBv->SelectAllCallBack = std::bind(&ZSearchQueryMWd::TableHeaderCornerClicked, this);
 
-  QAction*  OptReportQAc=new QAction("Parsing report");
-  OptReportQAc->setCheckable(true);
+    /* set call back for function keys */
+    QueryQTe->TrappedKeyPressCallBack =  std::bind(&ZSearchQueryMWd::KeyFiltered, this,placeholders::_1,placeholders::_2);
+    QueryQTe->UntrappedKeyPressCallBack =  std::bind(&ZSearchQueryMWd::KeyUnFiltered, this,placeholders::_1);
 
+    displayMWn = new textEditMWn(this,TEOP_NoFileLab|TEOP_CloseBtnHide);
+    displayMWn->setWindowTitle("Search parser output");
 
-  QMenu*    VerboseQMe=new QMenu("Verbose level");
-  QAction*  OptNoVerboseQAc=new QAction("Mute");
-  OptNoVerboseQAc->setCheckable(true);
-  QAction*  OptVerboseQAc=new QAction("Verbose");
-  OptNoVerboseQAc->setCheckable(true);
-  QAction*  OptFullVerboseQAc=new QAction("Full verbose");
-  OptNoVerboseQAc->setCheckable(true);
+    Parser = new ZSearchParser;
+    setGParser(Parser);
 
-  VerboseQMe->addAction(OptFullVerboseQAc);
-  VerboseQMe->addAction(OptVerboseQAc);
-  VerboseQMe->addAction(OptNoVerboseQAc);
+    Parser->ErrorLog.setStoreMinSeverity(ZAIES_Warning);
+    Parser->ErrorLog.setAutoPrintOn(ZAIES_Text);
 
-  QHeaderView * wHV=ResultTBv->horizontalHeader();
-  wHV->setSectionsClickable(true);
-  QObject::connect(wHV,&QHeaderView::sectionDoubleClicked,this,&ZSearchQueryMWd::TableHeaderClicked);
+//    Parser->setEntityDisplayCallBack(std::bind(&ZSearchQueryMWd::DisplayEntity, this,placeholders::_1,placeholders::_2,placeholders::_3));
 
-  QObject::connect(QuitBTn,&QPushButton::clicked,this,&ZSearchQueryMWd::QuitBTnClicked);
-  QObject::connect(ExecuteBTn,&QPushButton::clicked,this,&ZSearchQueryMWd::ExecuteBTnClicked);
-  QObject::connect(ClearBTn,&QPushButton::clicked,this,&ZSearchQueryMWd::ClearBTnClicked);
+    displayMWn->registerDisplayColorCallBack(&Parser->ErrorLog);
+    displayMWn->show();
 
-  QObject::connect(ListBTn,&QPushButton::clicked,this,&ZSearchQueryMWd::ListBTnClicked);
+    uriString wXMLSymbol = GeneralParameters.getParamDirectory();
+    wXMLSymbol.addConditionalDirectoryDelimiter();
+    wXMLSymbol += __SEARCHPARSER_SYMBOL_FILE__ ;
 
-  QObject::connect(wMainAGp,&QActionGroup::triggered,this,&ZSearchQueryMWd::MenuTriggered);
+    uriString wXMLZEntity = GeneralParameters.getParamDirectory();
+    wXMLZEntity.addConditionalDirectoryDelimiter();
+    wXMLZEntity += __SEARCHPARSER_ZENTITY_FILE__ ;
 
-  ResultTBv->SelectAllCallBack = std::bind(&ZSearchQueryMWd::TableHeaderCornerClicked, this);
+    uriString wHistory = GeneralParameters.getParamDirectory();
+    wHistory.addConditionalDirectoryDelimiter();
+    wHistory += __QUERY_HISTORY_FILE__ ;
 
-  /* set call back for function keys */
-  QueryQTe->TrappedKeyPressCallBack =  std::bind(&ZSearchQueryMWd::KeyFiltered, this,placeholders::_1,placeholders::_2);
-  QueryQTe->UntrappedKeyPressCallBack =  std::bind(&ZSearchQueryMWd::KeyUnFiltered, this,placeholders::_1);
+    uriString wParams = GeneralParameters.getParamDirectory();;
+    wParams.addConditionalDirectoryDelimiter();
+    wParams += __SEARCHPARSER_PARAMS_FILE__ ;
 
-  displayMWn = new textEditMWn(this,TEOP_NoFileLab|TEOP_CloseBtnHide);
-  displayMWn->setWindowTitle("Search parser output");
+    Parser->setup(wXMLSymbol,wXMLZEntity,wParams,wHistory);
 
-  Parser = new ZSearchParser;
+} // initLayout
 
-//  Parser->setDisplayCallback(std::bind(&ZSearchQueryMWd::displayErrorCallBack, this,placeholders::_1));
-  Parser->setDisplayColorCB(std::bind(&ZSearchQueryMWd::displayErrorColorCB, this,placeholders::_1,placeholders::_2));
 
-  Parser->setProgressSetupCallback(std::bind(&ZSearchQueryMWd::setProgressBarMax, this,placeholders::_1));
-  Parser->setProgressCallback(std::bind(&ZSearchQueryMWd::setProgressBarValue, this,placeholders::_1));
+void
+ZSearchQueryMWd::help()
+{
+    if (HelpMWn==nullptr) {
+        HelpMWn = new zbs::ZHelp(this,"Help");
+        HelpMWn->setCloseCallBack(std::bind(&ZSearchQueryMWd::helpClose,this,std::placeholders::_1));
+    }
+    HelpMWn->setHtmlSource("file://home/gerard/Development/zbasetools/zqt/help/generalindex.html");
 
-  displayMWn->show();
+    HelpMWn->show();
 
-  const char* wWD=getenv(__SEARCHPARSER_PARAM_DIRECTORY__);
-  if (!wWD)
-    wWD="";
-
-  uriString wXMLSymbol = wWD;
-  wXMLSymbol.addConditionalDirectoryDelimiter();
-  wXMLSymbol += __SEARCHPARSER_SYMBOL_FILE__ ;
-
-  uriString wXMLZEntity = wWD;
-  wXMLZEntity.addConditionalDirectoryDelimiter();
-  wXMLZEntity += __SEARCHPARSER_ZENTITY_FILE__ ;
-
-  uriString wHistory = wWD;
-  wHistory.addConditionalDirectoryDelimiter();
-  wHistory += __SEARCHPARSER_HISTORY_FILE__ ;
-
-  uriString wParams = wWD;
-  wParams.addConditionalDirectoryDelimiter();
-  wParams += __SEARCHPARSER_PARAMS_FILE__ ;
-
-  Parser->setup(wXMLSymbol,wXMLZEntity,wParams,wHistory);
-
-
-
-
-} // setup
-
+    return;
+}
+void
+ZSearchQueryMWd::helpClose(QEvent*)
+{
+    if (HelpMWn==nullptr) {
+        return;
+    }
+    HelpMWn=nullptr;
+    return;
+}
 
 
 bool
 ZSearchQueryMWd::KeyFiltered(int pKey, QKeyEvent *pEvent)
 {
 
-  if(pKey == Qt::Key_F3) {
-    recallBackward();
-    return true;
-  }
-  if(pKey == Qt::Key_F4) {
-    recallForward();
-    return true;
-  }
+    if(pKey == Qt::Key_F3) {
+        recallBackward();
+        return true;
+    }
+    if(pKey == Qt::Key_F4) {
+        recallForward();
+        return true;
+    }
 
-  if(pKey == Qt::Key_F9) {
-    ExecuteBTnClicked(true);
-    return true;
-  }
-  if(pKey == Qt::Key_F10) {
-    Parser->showEntities();
-    return true;
-  }
-  if(pKey == Qt::Key_F11) {
-    Parser->showEntities();
-    return true;
-  }
-
-  return false;
+    if(pKey == Qt::Key_F9) {
+        ExecuteClicked();
+        return true;
+    }
+    if(pKey == Qt::Key_F10) {
+        Parser->showEntityList();
+        return true;
+    }
+    if(pKey == Qt::Key_F11) {
+        Parser->showZEntities();
+        return true;
+    }
+    if(pKey == Qt::Key_F1) {
+        help();
+        return true;
+    }
+    return false;
 }//KeyFiltered
 
 void
 ZSearchQueryMWd::KeyUnFiltered( QKeyEvent *pEvent)
 {
+
+    if( pEvent->key() == Qt::Key_Up) {
+        if (QueryQTe->textCursor().atStart()) {
+            recallBackward();
+            QTextCursor wTC=QueryQTe->textCursor();
+            wTC.movePosition(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
+//            wTC.setPosition(0,QTextCursor::MoveAnchor);
+            QueryQTe->setTextCursor(wTC);
+        }
+    }
+    if( pEvent->key() == Qt::Key_Down) {
+        QTextCursor wTC=QueryQTe->textCursor();
+        if (wTC.atEnd())
+            recallForward();
+        return ;
+    }
+    if( pEvent->key() == Qt::Key_Enter) {
+        ExecuteClicked();
+        return ;
+    }
+    if( pEvent->key() == Qt::Key_F9) {
+        ExecuteClicked();
+        return ;
+    }
   normalKeyEnter();
 }//KeyFiltered
 
@@ -365,7 +516,33 @@ ZSearchQueryMWd::insertHighlightedText(const utf8VaryingString& pText)
 //  _DBGPRINT("LastInsertedPosition %d\n",LastInsertedPosition);
   QueryQTe->setTextCursor(wTC);
 } //insertHighlightedText
+void
+ZSearchQueryMWd::ForwardClicked()
+{
+    recallForward();
+}
+void
+ZSearchQueryMWd::BackwardClicked()
+{
+    recallBackward();
+}
 
+void
+ZSearchQueryMWd::TextClearLBlClicked()
+{
+
+    ClearLog();
+    if (ResultTBv==nullptr)
+        return;
+    if (ResultTBv->ItemModel==nullptr)
+        return;
+    ResultTBv->ItemModel->removeColumns(0,ResultTBv->ItemModel->columnCount());
+    GlobalCellFmtLBl->setVisible(false);
+
+    EntityTypeLBl->setText("");
+    EntityNameLBl->setText("");
+    RecordCountLBl->setText("");
+}
 
 void
 ZSearchQueryMWd::recallForward()
@@ -396,12 +573,13 @@ ZSearchQueryMWd::recallBackward()
 void
 ZSearchQueryMWd::MenuTriggered(QAction* pAction)
 {
-  if (pAction == QuitQAc){
-    QuitBTnClicked(true);
+  if ((pAction==QuitQAc)||(pAction==QuitIconQAc))
+    {
+    QuitLBlClicked();
     return;
   }
   if (pAction == ExecQAc){
-    ExecuteBTnClicked(true);
+    ExecuteClicked();
     return;
   }
   if (pAction == SaveInstructionsQAc){
@@ -409,23 +587,34 @@ ZSearchQueryMWd::MenuTriggered(QAction* pAction)
     return;
   }
 }
-
+/*
 void
 ZSearchQueryMWd::QuitBTnClicked (bool pChecked)
 {
   hide();
   this->deleteLater();
 }
+*/
 
 void
-ZSearchQueryMWd::ClearBTnClicked (bool pChecked)
+ZSearchQueryMWd::QuitLBlClicked ()
 {
-  Parser->clearErrors();
-  displayMWn->clear();
+    hide();
+    this->deleteLater();
+}
+
+
+void
+ZSearchQueryMWd::ClearLog ()
+{
+    if (Parser!=nullptr)
+        Parser->clearErrors();
+    if (displayMWn!=nullptr)
+        displayMWn->clear();
 }
 
 void
-ZSearchQueryMWd::ListBTnClicked (bool pChecked)
+ZSearchQueryMWd::EntityListLBlClicked ()
 {
   ZCollectionList* wColList=new ZCollectionList(Parser,this);
   int wRet=wColList->exec();
@@ -437,10 +626,10 @@ ZSearchQueryMWd::ListBTnClicked (bool pChecked)
   wColList->deleteLater();
 
   DisplayCurrentEntity();
-}
+} // EntityListLBlClicked
 
 void
-ZSearchQueryMWd::ExecuteBTnClicked (bool pChecked)
+ZSearchQueryMWd::ExecuteClicked ()
 {
   ZStatus wSt=ZS_SUCCESS;
   utf8VaryingString wQuery = QueryQTe->getText();
@@ -448,119 +637,281 @@ ZSearchQueryMWd::ExecuteBTnClicked (bool pChecked)
 
   displayMWn->show();
 
-  wSt=Parser->parse(wQuery,CurrentEntity);
-  if (wSt!=ZS_SUCCESS) {
+  ZSearchContext wSearchContext = Parser->buildContext();
+  LastStatusLBl->setText("");
 
-    LastStatusLBl->setText(decode_ZStatus(wSt));
+  wSt=Parser->parse(wQuery,wSearchContext);
 
-    if (Parser->LastErroredToken!=nullptr) {
-      int wLen = Parser->LastErroredToken->Text.strlen();
-      if (Parser->LastErroredToken->Type==ZSRCH_STRING_LITERAL)
-        wLen += 2 ; // the quotes are elided within token content but are present in the text
-      QueryQTe->highlightLengthAtOffset( Parser->LastErroredToken->TokenOffset,wLen);
-    }
-    statusbar->showMessage(Parser->ZaiErrors::last()->Message());
-    return;
+  if (LabelGoodPalette == QPalette()) {
+      LabelGoodPalette=LabelBadPalette=LabelDefaultPalette = LastStatusLBl->palette();
+      LabelGoodPalette.setColor(QPalette::Window, Qt::white);
+      LabelGoodPalette.setColor(QPalette::WindowText, Qt::darkGreen);
+      LabelBadPalette.setColor(QPalette::Window, Qt::white);
+      LabelBadPalette.setColor(QPalette::WindowText, Qt::red);
   }
+
+  if ((wSearchContext.Status==ZS_SUCCESS)&&(wSearchContext.InstructionType & ZSITP_ToBeExecuted)) {
+
+      ZMFProgressMWn* wProgress = new ZMFProgressMWn("Query progress", this,ZPTP_TimedClose | ZPTP_HasCloseBtn);
+      Parser->setProgressSetupCallback(std::bind(&ZProgressBase::advanceSetupCallBack,wProgress,std::placeholders::_1,std::placeholders::_2));
+      Parser->setProgressCallback(std::bind(&ZProgressBase::advanceCallBack,wProgress,std::placeholders::_1,std::placeholders::_2));
+      wProgress->show();
+
+      wSt=Parser->execute(wSearchContext);
+/*
+       if (wSearchContext.TargetEntity != nullptr) {
+        wSt=DisplayEntity(wSearchContext.TargetEntity);
+           if (wSt==ZS_SUCCESS) {
+               GlobalCellFmtLBl->setVisible(true);
+           }
+      }
+*/
+      wProgress->setDone((wSt!=ZS_SUCCESS)&&(wSt!=ZS_OUTBOUNDHIGH));
+  }
+
+
+  if ((wSt==ZS_SUCCESS)||(wSt==ZS_OUTBOUNDHIGH))
+      LastStatusLBl->setPalette(LabelGoodPalette);
+  else
+      LastStatusLBl->setPalette(LabelBadPalette);
+
   LastStatusLBl->setText(decode_ZStatus(wSt));
+
+  if (wSt!=ZS_SUCCESS) {
+    if (wSearchContext.LastErroredToken!=nullptr) {
+      int wLen = wSearchContext.LastErroredToken->Text.strlen();
+      if (wSearchContext.LastErroredToken->Type==ZSRCH_STRING_LITERAL)
+        wLen += 2 ; // the quotes are elided within token content but are present in the text
+      QueryQTe->highlightLengthAtOffset( wSearchContext.LastErroredToken->TokenOffset,wLen);
+    }
+    if (Parser->ErrorLog.hasSomething())
+        statusbar->showMessage(Parser->ErrorLog.last()->Message(),30000); /* timout is expressed in milliseconds */
+    return ;
+  } // if (wSt!=ZS_SUCCESS)
+
+//  if (wSearchContext.hasMessage()) {
+//      statusbar->showMessage(wSearchContext.Message.toCChar(),30000); /* timout is expressed in milliseconds */
+//  }
+
+  /*
   if (CurrentEntity!=nullptr)
     DisplayCurrentEntity();
+  */
   QueryQTe->clear();
-
 
 } // ZSearchQueryMWd::ExecuteBTnClicked
 
 
-void ZSearchQueryMWd::DisplayCurrentEntity ()
+ZStatus ZSearchQueryMWd::DisplayEntity (std::shared_ptr<ZSearchEntity> pEntity,int pInstructionType,int pNumber)
 {
   utf8VaryingString wStr;
-  ZDataBuffer wRecord;
+//  ZDataBuffer wRecord;
   ZStatus wSt=ZS_SUCCESS;
 
+  ZSearchEntityContext* wSEC=nullptr;
 
+  for (int wi=0 ; wi < Parser->SECList.count() ; wi++ ) {
+      if ( Parser->SECList[wi].Entity == pEntity ) {
+          wSEC = &Parser->SECList[wi];
+          break;
+      }
+  }
+  if (wSEC==nullptr) {
+      Parser->SECList.push(ZSearchEntityContext::newEntityContext(pEntity));
+      wSEC = &Parser->SECList.last();
+  }
 
   QList<QStandardItem*> wRow;
 
-  if (CurrentEntity==nullptr)
-    return;
-
-  LastStatusLBl->setText("");
-
-  const ZMetaDic* wMDic = CurrentEntity->getFieldDictionaryPtr();
-
-  if (CurrentEntity->CellFormat==nullptr) {
-    CurrentEntity->reallocateCellFormat();
+  if (pEntity==nullptr) {
+      statusBar()->showMessage("No entity defined ",30);
+      return ZS_NULLPTR ;
   }
 
+  CurrentEntity = pEntity;
 
+  ZSearchDictionary* wDic = pEntity->getDic();
+
+/*
   if (ResultTBv==nullptr) {
     ResultTBv = new ZQTableView(this);
   }
-
+*/
   if (!ResultTBv->hasModel())
-    ResultTBv->newModel(wMDic->count());
+    ResultTBv->newModel(wDic->count());
   else {
     ResultTBv->ItemModel->clear();
-    ResultTBv->setColumnCount(wMDic->count());
-    ResultTBv->ItemModel->setColumnCount(wMDic->count());
+    ResultTBv->setColumnCount(wDic->count());
+    ResultTBv->ItemModel->setColumnCount(wDic->count());
   }
-
-
 
   ResultTBv->verticalHeader()->setVisible(true);
 
-  for (int wi=0;wi < wMDic->count();wi++) {
-    ResultTBv->ItemModel->setHorizontalHeaderItem(wi,new QStandardItem(wMDic->TabConst(wi).getName().toCChar()));
+  bool wHasCorner = ResultTBv->isCornerButtonEnabled();
+
+
+  for (int wi=0;wi < wDic->count();wi++) {
+    ResultTBv->ItemModel->setHorizontalHeaderItem(wi,new QStandardItem(wDic->TabConst(wi).getFieldName().toCChar()));
   }
 
+  EntityNameLBl->setText(pEntity->getEntityName().toCChar());
 
-  EntityNameLBl->setText(CurrentEntity->getName().toCChar());
-
-  if (CurrentEntity->isCollection()) {
+  if (pEntity->isCollection()) {
     EntityTypeLBl->setText("Collection");
-    wStr.sprintf("%ld",CurrentEntity->_CollectionEntity->getMaxRecords());
-    RecordCountLBl->setText(wStr.toCChar());
   }
-  else if (CurrentEntity->isFile()) {
+  else if (pEntity->isFile()) {
     EntityTypeLBl->setText("File");
-    wStr.sprintf("%ld",CurrentEntity->_FileEntity->getRecordCount());
-    RecordCountLBl->setText(wStr.toCChar());
   } else {
-    EntityTypeLBl->setText("Unknown type");
+    EntityTypeLBl->setText("Unknown(invalid) type");
     RecordCountLBl->setText("---");
   }
-
+  wStr.sprintf("%ld",pEntity->_BaseEntity->getCount());
+  RecordCountLBl->setText(wStr.toCChar());
 
   long wRank=0;
   zaddress_type wAddress;
-  const unsigned char* wRecordPtr=nullptr;
-  const unsigned char* wRecordPtrEnd=nullptr;
 
+  ZArray<URFField> wFieldList;
 
+  wSt=pEntity->getFirst(*wSEC,wAddress);
 
-  wSt=CurrentEntity->get(wRecord,wRank,wAddress);
 
   while (wSt == ZS_SUCCESS) {
-    wRecordPtr = wRecord.Data;
-    wRecordPtrEnd = wRecord.Data + wRecord.Size;
-    wRow=DisplayOneLine(int(wRank),wRecord,CurrentEntity->CellFormat);
+      wRow=DisplayOneLine(wSEC->_URFParser.URFFieldList);
     ResultTBv->ItemModel->appendRow(wRow);
     wRank++;
-    wSt=CurrentEntity->get(wRecord,wRank,wAddress);
+    wSt=pEntity->getNext(*wSEC,wAddress);
   }
+  if (wSt==ZS_OUTBOUNDHIGH)
+      wSt=ZS_SUCCESS;
+
   LastStatusLBl->setText(decode_ZStatus(wSt));
 
 
-  int wR=ResultTBv->ItemModel->rowCount();
-  ResultTBv->setVisible(true);
-  ResultTBv->repaint();
+  ResultTBv->resizeColumnsToContents();
+  ResultTBv->resizeRowsToContents();
+
+  wHasCorner = ResultTBv->isCornerButtonEnabled();
+
+  _DBGPRINT("Table view <%s> corner button enabled\n",wHasCorner?"has":"does not have")
+ // ResultTBv->setVisible(true);
+//  ResultTBv->repaint();
   ResultTBv->show();
-  return;
-}
+  return wSt;
+} // ZSearchQueryMWd::DisplayEntity
+
+ZStatus ZSearchQueryMWd::DisplayEntityRaw (std::shared_ptr<ZSearchEntity> &pEntity)
+{
+    utf8VaryingString wStr;
+    ZStatus wSt=ZS_SUCCESS;
+
+    QList<QStandardItem*> wRow;
+
+    if (pEntity==nullptr) {
+        statusBar()->showMessage("No entity defined ",30);
+        return ZS_NULLPTR ;
+    }
 
 
-QList<QStandardItem*>
-ZSearchQueryMWd::DisplayOneLine(int pRow,ZDataBuffer& pRecord,int* pCellFormat)
+    ZSearchEntityContext* wSEC=nullptr;
+
+    for (int wi=0 ; wi < Parser->SECList.count() ; wi++ ) {
+        if ( Parser->SECList[wi].Entity == pEntity ) {
+            wSEC = &Parser->SECList[wi];
+            break;
+        }
+    }
+    if (wSEC==nullptr) {
+        Parser->SECList.push(ZSearchEntityContext::newEntityContext(pEntity));
+        wSEC = &Parser->SECList.last();
+    }
+
+
+    ZSearchDictionary* wDic = pEntity->getDic();
+
+    if (!ResultTBv->hasModel())
+        ResultTBv->newModel(wDic->count());
+    else {
+//        ResultTBv->ItemModel->clear();
+        ResultTBv->setColumnCount(wDic->count());
+        ResultTBv->ItemModel->setColumnCount(wDic->count());
+    }
+
+    ResultTBv->setCornerButtonEnabled(true);
+
+    ResultTBv->verticalHeader()->setVisible(true);
+
+    for (int wi=0;wi < wDic->count();wi++) {
+        ResultTBv->ItemModel->setHorizontalHeaderItem(wi,new QStandardItem(wDic->TabConst(wi).getFieldName().toCChar()));
+    }
+
+    EntityNameLBl->setText(pEntity->getEntityName().toCChar());
+
+    if (pEntity->isCollection()) {
+        EntityTypeLBl->setText("Collection");
+    }
+    else if (pEntity->isFile()) {
+        EntityTypeLBl->setText("File");
+    } else {
+        EntityTypeLBl->setText("Unknown(invalid) type");
+        RecordCountLBl->setText("---");
+    }
+    wStr.sprintf("%ld",pEntity->_BaseEntity->getCount());
+    RecordCountLBl->setText(wStr.toCChar());
+
+    long wRank=0;
+    zaddress_type wAddress;
+    const unsigned char* wRecordPtr=nullptr;
+    const unsigned char* wRecordPtrEnd=nullptr;
+
+    ResultTBv->setCornerButtonEnabled(true);
+    wSt=pEntity->getFirst(*wSEC,wAddress);
+
+    while (wSt == ZS_SUCCESS) {
+
+        wRecordPtr = wSEC->_URFParser.Record.Data;
+        wRecordPtrEnd = wSEC->_URFParser.Record.Data + wSEC->_URFParser.Record.Size;
+        wRow=DisplayOneRawLine(wSEC->_URFParser.Record);
+        ResultTBv->ItemModel->appendRow(wRow);
+        wRank++;
+        wSt=pEntity->getNext(*wSEC,wAddress);
+    }
+    if (wSt==ZS_OUTBOUNDHIGH)
+        wSt=ZS_SUCCESS;
+
+    ResultTBv->setCornerButtonEnabled(true);
+/*
+    uriString wURIGenericImg = GeneralParameters.getIconDirectory();
+    wURIGenericImg.addConditionalDirectoryDelimiter();
+    wURIGenericImg += "crossblue.gif";
+    ZQLabel* wResultCornerLBl=new ZQLabel(ForBackWDg);
+    wResultCornerLBl->setPixmap(QPixmap(wURIGenericImg.toCChar()));
+    ResultTBv->setCornerWidget(wResultCornerLBl);
+
+
+    QObject::connect(wResultCornerLBl,&ZQLabel::clicked, this, &ZSearchQueryMWd::TableHeaderCornerClicked);
+*/
+
+    LastStatusLBl->setText(decode_ZStatus(wSt));
+
+
+    ResultTBv->resizeColumnsToContents();
+    ResultTBv->resizeRowsToContents();
+
+
+    // ResultTBv->setVisible(true);
+    //  ResultTBv->repaint();
+    ResultTBv->show();
+    return wSt;
+} // ZSearchQueryMWd::DisplayEntityRaw
+
+void ZSearchQueryMWd::DisplayCurrentEntity ()
+{
+    DisplayEntity(CurrentEntity,ZSITP_Display|ZSITP_All,1);
+    return;
+} // ZSearchQueryMWd::DisplayCurrentEntity
+
+QList<QStandardItem *> ZSearchQueryMWd::DisplayOneRawLine( ZDataBuffer &pRecord)
 {
   utf8VaryingString wStr;
   QList<QStandardItem*> wRow;
@@ -592,20 +943,15 @@ ZSearchQueryMWd::DisplayOneLine(int pRow,ZDataBuffer& pRecord,int* pCellFormat)
     } // if (wZType==ZType_bitsetFull)
      break;
   }// while true
+  ZSearchDictionary& wDic = CurrentEntity->BuildDic;
+  ZCFMT_Type wCellFormat ;
 
   while (wPtr < wPtrEnd) {
     if (!wPresence.isFullBitset() && (wFieldRank >= int(wPresence.count())))
       break;
     if (wPresence[wFieldRank]) {
-      int wCellFormat = ZCFMT_Nothing;
-      if (pCellFormat!=nullptr) {
-        if (pCellFormat[wFieldRank+1]==ZCFMT_Nothing)
-          wCellFormat = pCellFormat[0];
-        else
-          wCellFormat = pCellFormat[wFieldRank+1];
-      }
-
-      wRow << DisplayOneURFField(wPtr,wPtrEnd,wCellFormat);
+      wCellFormat = wDic[wFieldRank].getCellFormat() |  wDic.getGlobalCellFormat();
+      wRow << DisplayOneURFFieldFromSurface(wPtr,wPtrEnd,wCellFormat);
     }
     else
       wRow << new QStandardItem("missing");
@@ -615,18 +961,39 @@ ZSearchQueryMWd::DisplayOneLine(int pRow,ZDataBuffer& pRecord,int* pCellFormat)
   return wRow;
 } //DisplayOneLine
 
+QList<QStandardItem *> ZSearchQueryMWd::DisplayOneLine( ZArray<URFField> &pFields)
+{
+    utf8VaryingString wStr;
+    QList<QStandardItem*> wRow;
+    ZSearchDictionary& wDic = CurrentEntity->BuildDic;
+    ZCFMT_Type wCellFormat ;
+    for (int wi=0; wi < pFields.count(); wi++) {
+        wCellFormat = wDic[wi].getCellFormat() |  wDic.getGlobalCellFormat();
+        wRow << createItem(pFields[wi].displayFmt(wCellFormat));
+    }
+
+    return wRow;
+} //DisplayOneLine
+
+
+
 void
 ZSearchQueryMWd::TableHeaderCornerClicked()
 {
-  int wCellFormat=CurrentEntity->CellFormat[0];
+  if (CurrentEntity==nullptr)
+    return;
+  if (!GlobalCellFmtLBl->isVisible())
+      return;
+  ZCFMT_Type wCellFormat=CurrentEntity->BuildDic.getGlobalCellFormat();
+
   ZCellFormatDLg* ZCellFormat= new ZCellFormatDLg(this);
   ZCellFormat->setup(wCellFormat);
   ZCellFormat->setAppliance("All columns");
   ZCellFormat->exec();
 
-  int wNewCellFormat=ZCellFormat->get();
+  ZCFMT_Type wNewCellFormat=ZCellFormat->get();
   if (wNewCellFormat!=wCellFormat) {
-    CurrentEntity->CellFormat[0]=wNewCellFormat;
+    CurrentEntity->BuildDic.setGlobalCellFormat(wNewCellFormat);
     DisplayCurrentEntity();
   }
 }
@@ -634,24 +1001,28 @@ ZSearchQueryMWd::TableHeaderCornerClicked()
 void
 ZSearchQueryMWd::TableHeaderClicked(int pLogicalIndex)
 {
-  int wCellFormat=CurrentEntity->CellFormat[pLogicalIndex+1];
+    if (pLogicalIndex<0)
+        return;
+  ZCFMT_Type wCellFormat=CurrentEntity->BuildDic[pLogicalIndex].getCellFormat();
   ZCellFormatDLg* ZCellFormat= new ZCellFormatDLg(this);
   ZCellFormat->setup(wCellFormat);
   utf8VaryingString wStr;
-  wStr.sprintf("Column %d",pLogicalIndex+1);
+  wStr.sprintf("Column %d <%s>",pLogicalIndex+1,CurrentEntity->BuildDic[pLogicalIndex].getFieldName().toString());
   ZCellFormat->setAppliance(wStr.toCChar());
 
   ZCellFormat->exec();
 
-  int wNewCellFormat=ZCellFormat->get();
+  ZCFMT_Type wNewCellFormat=ZCellFormat->get();
   if (wNewCellFormat!=wCellFormat) {
-    CurrentEntity->CellFormat[pLogicalIndex+1]=wNewCellFormat;
+    CurrentEntity->BuildDic[pLogicalIndex].setCellFormat(wNewCellFormat);
     DisplayCurrentEntity();
   }
 }
 
-QStandardItem*
-ZSearchQueryMWd::DisplayOneURFField(const unsigned char* &pPtr,const unsigned char* wPtrEnd,int pCellFormat)
+
+QStandardItem *ZSearchQueryMWd::DisplayOneURFFieldFromSurface(const unsigned char *&pPtr,
+                                                              const unsigned char *wPtrEnd,
+                                                              ZCFMT_Type pCellFormat)
 {
   ZTypeBase wZType;
   size_t    wOffset=0;
@@ -772,8 +1143,6 @@ ZSearchQueryMWd::DisplayOneURFField(const unsigned char* &pPtr,const unsigned ch
     return createItem(wValue,"%g");
 
   }
-
-
 
   case ZType_ZDateFull: {
     ssize_t wSize;
@@ -1057,12 +1426,12 @@ ZSearchQueryMWd::DisplayOneURFField(const unsigned char* &pPtr,const unsigned ch
       int wFmt = pCellFormat & ZCFMT_ResMask;
       if (wFmt & ZCFMT_ResSymb) {
         int wi=0;
-        for (; wi < Parser->ZEntityList.count();wi++)
-          if (Parser->ZEntityList[wi].Value == wValue.Entity)
+        for (; wi < ZEntitySymbolList.count();wi++)
+          if (ZEntitySymbolList[wi].Value == wValue.Entity)
             break;
         utf8VaryingString wZEntitySymbol = "Unknown entity";
-        if (wi < Parser->ZEntityList.count())
-          wZEntitySymbol = Parser->ZEntityList[wi].Symbol;
+        if (wi < ZEntitySymbolList.count())
+          wZEntitySymbol = ZEntitySymbolList[wi].Symbol;
         if (wFmt & ZCFMT_ResStd) {
           wStr.sprintf("ZResource[%s,%ld]",wZEntitySymbol.toCChar(),wValue.id);
         }
@@ -1092,7 +1461,7 @@ ZSearchQueryMWd::DisplayOneURFField(const unsigned char* &pPtr,const unsigned ch
 
 
   return new QStandardItem();
-}
+} // DisplayOneURFFieldFromSurface
 
 
 void
@@ -1105,17 +1474,21 @@ ZSearchQueryMWd::ParseAndStoreQuery ()
 
   displayMWn->show();
 
-  wSt=Parser->parse(wQuery,CurrentEntity);
+  ZSearchContext wSearchContext = Parser->buildContext();
+  wSt=Parser->parse(wQuery,wSearchContext);
+
   if (wSt!=ZS_SUCCESS) {
-    if (Parser->LastErroredToken!=nullptr) {
-      int wLen = Parser->LastErroredToken->Text.strlen();
-      if (Parser->LastErroredToken->Type==ZSRCH_STRING_LITERAL)
+    if (wSearchContext.LastErroredToken!=nullptr) {
+      int wLen = wSearchContext.LastErroredToken->Text.strlen();
+      if (wSearchContext.LastErroredToken->Type==ZSRCH_STRING_LITERAL)
         wLen += 2 ; // the quotes are elided within token content but are present in the text
-      QueryQTe->highlightLengthAtOffset( Parser->LastErroredToken->TokenOffset,wLen);
+      QueryQTe->highlightLengthAtOffset( wSearchContext.LastErroredToken->TokenOffset,wLen);
     }
-    statusbar->showMessage(Parser->ZaiErrors::last()->Message());
+    statusbar->showMessage(Parser->ErrorLog.last()->Message());
     return;
   }
+//  if (wSearchContext.hasMessage())
+//      statusbar->showMessage(wSearchContext.Message.toCChar());
   QueryQTe->clear();
 } // ZSearchQueryMWd::ExecuteBTnClicked
 
@@ -1132,20 +1505,44 @@ ZSearchQueryMWd::resizeEvent(QResizeEvent* pEvent)
   }
   QRect wRNew = geometry();
 
-  int wWMargin = (wRNew.width() - wROld.width());
+  int wWMargin = (pEvent->size().width() - pEvent->oldSize().width());
   int wVW=pEvent->size().width() - wWMargin;
-  int wHMargin =  wRNew.height() - wROld.height();
+  int wHMargin =  pEvent->size().height() - pEvent->oldSize().height();
   int wVH=pEvent->size().height() - wHMargin ;
-
-  QRect wR1 = ExpWidget1->geometry();
-  int wWd1gW= wR1.width()+wWMargin;     /* resize only in width */
-  ExpWidget1->resize(wWd1gW,wR1.height());  /* expands in width only */
-
-  QRect wR2 = ExpWidget2->geometry();
-
+  QRect wR2 = geometry();
   int wWdgW= wR2.width()+wWMargin;
   int wWdgH= wR2.height()+wHMargin;
 
+#ifdef __COMMENT__
+  QRect wR1 = Centralwidget->geometry();
+  int wWd1gW= wR1.width()+wWMargin;     /* resize only in width */
+  Centralwidget->resize(wWd1gW,wR1.height());  /* expands in width only */
+#endif // __COMMENT__
+/*
+
+  CentralWidget->resize(wWdgW,wWdgH);  // expands in width and height
+*/
+  QRect wR3 = ForBackWDg->geometry();
+  wWdgW= wR3.width()+wWMargin;
+  ForBackWDg->setGeometry(QRect(0, 0, wWdgW, wR3.height())); /* expands in width only */
+/*
+  int wX = ForBackWDg->size().width() - LBlSize -LBlSize;
+  ForwardLBl->setGeometry(QRect(wX,HeightMargin,LBlSize,LBlSize));
+  wX -= (ForwardLBl->size().width()*2);
+  ExecuteLBl->setGeometry(QRect(wX,HeightMargin,LBlSize,LBlSize));
+  wX -= (ExecuteLBl->size().width()*2);
+  BackwardLBl->setGeometry(QRect(wX,HeightMargin,LBlSize,LBlSize));
+*/
+  int wY= ForBackWDg->size().height()+HeightMargin;
+  QRect wR4 = QueryQTe->geometry();
+  wWdgW= wR4.width()+wWMargin;
+  QueryQTe->setGeometry(QRect(5, wY, wWdgW, 91)); /* expands in width only */
+
+  wY += QueryQTe->size().height() + HeightMargin;
+
+  QRect wR5 = ExpWidget2->geometry();
+  wWdgW= wR5.width()+wWMargin;
+  wWdgH= wR5.height()+wHMargin;
   ExpWidget2->resize(wWdgW,wWdgH);  /* expands in width and height */
 
 }//DicEdit::resizeEvent
@@ -1190,10 +1587,3 @@ void ZSearchQueryMWd::displayErrorColorCB(uint8_t pSeverity, const utf8VaryingSt
 
 }
 
-void ZSearchQueryMWd::setProgressBarMax(int pMax) {
-  ProgressBar->setMaximum(pMax);
-}
-
-void ZSearchQueryMWd::setProgressBarValue(int pValue) {
-  ProgressBar->setValue(pValue);
-}

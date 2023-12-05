@@ -50,6 +50,9 @@ public:
     void reportShort(FILE* pOutput=stdout);
     void reportFull(FILE* pOutput=stdout);
 
+    void reportShort(ZaiErrors* pErrorLog);
+    void reportFull(ZaiErrors* pErrorLog);
+
     ZMFStats & operator = (const ZRFPMS& pPMSIn) { ZRFPMS::_copyFrom(pPMSIn); return *this;}
     ZMFStats & operator = (ZMFStats pStatIn) {  return _copyFrom(pStatIn);}
 

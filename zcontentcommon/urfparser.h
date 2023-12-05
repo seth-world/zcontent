@@ -9,26 +9,8 @@
 #include <ztoolset/zbitset.h>
 #include <ztoolset/zexceptionmin.h>
 
-#include <zcontentcommon/urffield.h>
+#include "urffield.h"
 
-//#include <ztoolset/zarray.h>
-
-/*
-class URFField {
-public:
-  URFField() =default;
-  URFField(const URFField& pIn) {_copyFrom(pIn);}
-  URFField&_copyFrom(const URFField& pIn) {
-    Present=pIn.Present;
-    Ptr=pIn.Ptr;
-    Size=pIn.Size;
-    return *this;
-  }
-  bool                  Present=false;
-  const unsigned char*  Ptr=nullptr;
-  size_t                Size=0;
-};
-*/
 
 enum CompareOptions : uint8_t {
   COPT_Nothing = 0,
@@ -37,27 +19,124 @@ enum CompareOptions : uint8_t {
   COPT_Default    = COPT_DropAccute | COPT_UpCase
 };
 
-class URFParserState
-{
-  URFParserState()=default;
 
-  ZBitset Bitset;
+namespace zbs {
+class ZMetaDic;
+}
+
+#ifndef __HASH_TIME__
+#define __HASH_TIME__
+
+class ZHash
+{
+public:
+    ZHash() { clear(); }
+    ZHash(const ZHash& pIn) {_copyFrom(pIn);}
+
+    ZHash& _copyFrom(const ZHash& pIn)
+    {
+        Value = pIn.Value;
+        return *this;
+    }
+    void clear()
+    {
+        Value=0;
+    }
+
+    ZHash& operator = (const ZHash& pIn) {return _copyFrom(pIn); }
+
+    bool operator == (const ZHash& pIn) {return (Value==pIn.Value)  ; }
+
+    unsigned long Value=0;
 };
 
+#endif //  __HASH_TIME__
+
+
+enum URFParserState
+{
+    URFPS_Nothing = 0,
+    URFPS_RecordSet = 1,
+    URFPS_PartiallyParsed = 2,
+    URFPS_TotallyParsed = 3
+};
+const char* decode_URFPS (URFParserState pURFPS) ;
+
+class ZSearchDictionary;
 
 class URFParser {
 public:
   URFParser(){  }
 
-  URFParser(const ZDataBuffer& pRecord) {set(pRecord);}
+  URFParser( const ZMetaDic* pMDic) {MetaDic=pMDic;}
 
-  URFParser(const URFParser&) = delete;
-  URFParser& operator= (const URFParser&) = delete;
+  URFParser(const URFParser& pIn) { _copyFrom(pIn);}
+  URFParser& operator= (const URFParser& pIn) {return _copyFrom(pIn);}
 
-  ZStatus set(const ZDataBuffer * pRecord);
-  ZStatus set(const ZDataBuffer& pRecord);
+  URFParser& _copyFrom (const URFParser& pIn)
+  {
+      AllFieldsPresent=pIn.AllFieldsPresent;
+      Record=pIn.Record;
+      HashTime=pIn.HashTime;
+      URFFieldList.clear();
+      for (int wi=0; wi < pIn.URFFieldList.count() ; wi++ )
+          URFFieldList.push(pIn.URFFieldList[wi]);
+      Presence=pIn.Presence;
+      URFDataSize=pIn.URFDataSize;
+      ParserPtr=pIn.ParserPtr;
+      ParserPtrEnd=pIn.ParserPtrEnd;
+      URFPS=pIn.URFPS;
+      MetaDic=pIn.MetaDic;
+      return *this;
+  }
 
-  static ZStatus parse(const ZDataBuffer& pRecord, ZArray<URFField> &pFieldList);
+  /**
+   * @brief set makes pRecord current record to be parsed,
+   *            Presence bit set is updated from record
+   *            Pointers are initialized :
+   *                - PtrEnd points to the first byte after record surface
+   *                - Ptr points to the first byte of URFField (after bitset)
+   *
+   *  Nota Bene : NO LOCAL COPY of record is made in order to advantage performance so Record must stay available.
+   *
+   * @param pRecord
+   * @return ZS_CORRUPTED if bitset is not present or is malformed : URF is not respected.
+   *                      In this case, ZException is positionned with appropriate message
+   *         ZS_SUCCES if OK
+   */
+
+//  ZStatus set(const ZDataBuffer& pRecord); // Deprecated
+
+  void setDictionary(const ZMetaDic* pMetaDic) {MetaDic=pMetaDic;}
+
+  /* save record and initializes pointers with saved record data */
+  void setRecord(const ZDataBuffer& pRecord) ;
+  void _setupRecord();
+
+
+  ZDataBuffer& getRecord() {return Record;}
+
+  void clear() ;
+  /* reset pointers to record data (begin, end)*/
+  void resetPtr() ;
+
+  /**
+   * @brief rawParse creates the URF field list from pRecord without any check with dictionary
+   */
+  ZStatus rawParse(const ZDataBuffer &pRecord, ZaiErrors *pErrorLog);
+
+/* Deprecated
+  ZStatus parse(const ZDataBuffer &pRecord, const zbs::ZMetaDic *pDic, ZaiErrors *pErrorLog);
+*/
+  /**
+   * @brief parse creates the URF field list from pRecord and check fields validity vs URFParser meta dictionary
+   */
+  ZStatus parse(ZaiErrors *pErrorLog);
+
+  /* static version to obtain dynamically field list. NB: URFPS is not positioned to URFPS_TotallyParsed */
+  static ZStatus rawParse(const ZDataBuffer &pRecord,
+                       ZArray<URFField> &pFieldList,
+                       ZaiErrors *pErrorLog);
 
   /**
    * @brief appendURFFieldByRank parse record surface for urf fields and append to pBuffer found field as an URF field definition.
@@ -67,21 +146,20 @@ public:
    */
   ZStatus appendURFFieldByRank (long pRank,ZDataBuffer pBuffer);
 
-  URFField getURFFieldByRankIncremental (long pRank);
+  /* not to be used anymore */
+  ZStatus getURFFieldByRankIncremental(long pRank, URFField &pField);
+
   ZDataBuffer getURFFieldByRank (long pRank);
-
-
+  ZStatus _getURFFieldByRank (long pRank,URFField& pField);
 
   /** @brief getURFFieldSize returns size of URF field pointed by pPtrIn.
-   * pPtrIn is not modified, and size includes URF header size.
-   * Return -1 if URF format is malformed.
+   * pPtrIn is NOT modified,
+   * Returned size includes URF header size.
+   * Return -1 if if ZType is unknown
    */
   static ssize_t getURFFieldSize (const unsigned char *pPtrIn); /* pPtrIn is NOT updated */
 
 
-
-  /**
-   *  */
   /**
    * @brief getURFFieldAllSizes gets ZType (pType) URF header size (pURFHeaderSize) and data size(pDataSize) without header
    *  from an URF field pointed by pPtr.
@@ -96,15 +174,19 @@ public:
 
   static utf8VaryingString displayOneURFField(const unsigned char* &Ptr, bool pShowZType=true);
 
+  bool hasRecord() {return (!Record.isEmpty()) && (URFPS >= URFPS_RecordSet );}
 
 
   bool                  AllFieldsPresent=false;
-  const ZDataBuffer*    Record=nullptr;
+  ZDataBuffer           Record;             /* local copy of the record to parse */
+  ZHash                 HashTime;
   ZArray<URFField>      URFFieldList;
   ZBitset               Presence;
   uint64_t              URFDataSize=0;
-  const unsigned char*  Ptr=nullptr;
-  const unsigned char*  PtrEnd=nullptr;
+  const unsigned char*  ParserPtr=nullptr;
+  const unsigned char*  ParserPtrEnd=nullptr;
+  URFParserState        URFPS = URFPS_Nothing;
+  const zbs::ZMetaDic*  MetaDic=nullptr;
 };
 
 /** @brief URFCompare  Compare two buffers composed each of one or many URF fields, each field potentially of variable length.
@@ -137,7 +219,7 @@ int UTF16Compare(const unsigned char *&pKey1, size_t pSize1, const unsigned char
 int UTF32Compare(const unsigned char* &pKey1,size_t pSize1,const unsigned char* &pKey2,size_t pSize2) ;
 
 bool ZTypeExists(ZTypeBase pType);
-ZStatus searchNextValidZType( const unsigned char* &pPtr,const unsigned char* wPtrEnd);
+ZStatus searchNextValidZType(const unsigned char *&pPtr, const unsigned char *pPtrEnd);
 
 bool TypeExists(ZTypeBase pType);
 

@@ -139,7 +139,7 @@ _getClassZTypeFull( _Tp*  pValue,               /* value is required to get much
 
 using namespace zbs ;
 
-typedef utf8String ZFieldName_type ;
+typedef utf8VaryingString ZFieldName_type ;
 
 
 
@@ -198,12 +198,12 @@ static const size_t PtrArrayUCharType= typeid(unsigned char []).hash_code();
 
 static const size_t Prohibit= typeid(void*).hash_code();
 
-static const size_t descStringType= typeid(utfdescString).hash_code();
-static const size_t codeStringType= typeid(utfcodeString).hash_code();
+//static const size_t descStringType= typeid(utfdescString).hash_code();
+static const size_t codeStringType= typeid(utf8VaryingString).hash_code();
 static const size_t uriStringType= typeid(uriString).hash_code();
 
-static const size_t keywordStringType= typeid(utfkeywordString).hash_code();
-static const size_t identityStringType= typeid(utfidentityString).hash_code();
+//static const size_t keywordStringType= typeid(utfkeywordString).hash_code();
+//static const size_t identityStringType= typeid(utfidentityString).hash_code();
 
 /*static const size_t descWStringType= typeid(descWString).hash_code();
 static const size_t codeWStringType= typeid(codeWString).hash_code();
@@ -240,8 +240,9 @@ ZTypeBase _getAtomicZType(const size_t pTypeHashCode);
 template <class _Tp>
 ZTypeBase _getClassZType(size_t pTypeHashCode);
 
-
+/*
 ZStatus _getFixedStringType(void*pValue, ZTypeBase &pType,size_t &pNaturalSize ,size_t &pUniversalSize ,URF_Array_Count_type &pArrayCount);
+*/
 //ZStatus _getFixedWStringType(void*pValue, ZTypeBase &pType, size_t &pNaturalSize , size_t &pUniversalSize , URF_Array_Count_type &pArrayCount);
 
 ZStatus _getBlobType(void*pValue,ZTypeBase &pType,size_t &pNaturalSize , size_t &pUniversalSize ,URF_Array_Count_type &pArrayCount);
@@ -727,7 +728,7 @@ _getZTypeFull_T(typename std::enable_if_t<std::is_array<_Tp>::value,_Tp> &pValue
 
 //--------------Enum will not be allowed anymore : deprecated and not useful----------------
 
-//#include <ztoolset/zutfstrings.h>
+//#include <ztoolset/utfvaryingstring.h>
 
 /*============== simple get data type =================*/
 
@@ -873,7 +874,7 @@ const size_t wTypeHash = typeid(pValue[0]).hash_code();
 
 //--------------Enum will not be allowed anymore : deprecated and not useful----------------
 
-//#include <ztoolset/zutfstrings.h>
+//#include <ztoolset/utfvaryingstring.h>
 ZStatus _getFixedStringType(void*pValue,
                             ZTypeBase &pType,
                             size_t &pNaturalSize ,
@@ -929,7 +930,7 @@ _getClassZType(size_t pTypeHashCode)
     return ZType_StdWString;
 
   //===============Fixed utf strings=================================
-
+/*  deprecated
   if (pTypeHashCode==descStringType)
     return ZType_Utf8FixedString;
   if (pTypeHashCode==codeStringType)
@@ -939,7 +940,7 @@ _getClassZType(size_t pTypeHashCode)
     return ZType_Utf8FixedString;
   if (pTypeHashCode==identityStringType)
     return ZType_Utf8FixedString;
-
+*/
   if (pTypeHashCode==uriStringType)
     return ZType_URIString;
 
@@ -1064,7 +1065,7 @@ _getClassZTypeFull( _Tp*  pValue,               /* value is required to get much
     return pType;
   }
   //===============Fixed size strings=================================
-
+#ifdef __DEPRECATED__
   if (wTypeHashCode==descStringType)
   {
     _getUtfStringData<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
@@ -1081,11 +1082,6 @@ _getClassZTypeFull( _Tp*  pValue,               /* value is required to get much
         pNaturalSize = pUniversalSize =pUnitCount = cst_codelen+1;
         return ZS_SUCCESS ;*/
   }
-  if (wTypeHashCode==uriStringType)
-  {
-    _getUtfStringData<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
-    return pType;
-  }
 
   if (wTypeHashCode==keywordStringType)
   {
@@ -1097,7 +1093,13 @@ _getClassZTypeFull( _Tp*  pValue,               /* value is required to get much
     _getUtfStringData<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
     return pType;
   }
+#endif // __DEPRECATED__
 
+  if (wTypeHashCode==uriStringType)
+  {
+      _getUtfStringData<_Tp>(pValue,pType,pNaturalSize,pUniversalSize,pUnitCount) ;
+      return pType;
+  }
 
   pType=ZType_Unknown;
   pNaturalSize = pUniversalSize = pUnitCount=0;
@@ -1170,15 +1172,16 @@ ZStatus wSt;
             {
             if (pType & ZType_Pointer)
                 {
-                 utfdescString wOutName;
-                 typeDemangler(typeid(_Tp).name(),(char*)wOutName.content,wOutName.getByteSize());
-                 ZException.setMessage (  _GET_FUNCTION_NAME_,
+                utf8VaryingString wOutName;
+                wOutName.allocateUnitsBZero(200);
+                typeDemangler(typeid(_Tp).name(),(char*)wOutName.Data,199);
+                ZException.setMessage (  _GET_FUNCTION_NAME_,
                                             ZS_INVTYPE,
                                             Severity_Fatal,
                                             " Invalid field data type  <%s>(before demangling <%s>).A pointer is not usable as a valid key field while extracting from a record (Key definition)",
                                             wOutName.toCString_Strait(),
                                             typeid(_Tp).name() );
-                 return ZS_INVTYPE;
+                return ZS_INVTYPE;
                 }
             }
 

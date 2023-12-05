@@ -11,6 +11,7 @@ class QLineEdit;
 class ZQTableView;
 class textEditMWn;
 class QStandardItem;
+class QCheckBox;
 
 class ZGeneralParamsDLg : public QDialog
 {
@@ -27,6 +28,9 @@ public:
     int getDir(uriString &pDir);
     int getFont(utf8VaryingString &pFont);
 
+    ZVerbose_Base fromScreenVerbose();
+    void displayVerbose(ZVerbose_Base pVerbose);
+
 private slots:
     void searchXmlFileClicked ();
     void update();
@@ -35,9 +39,10 @@ private slots:
 
 
 private:
+    ZBaseParameters     WorkBaseParams;
     ZGeneralParameters  WorkParams;
-    uriString           XmlParamFile;
 
+    uriString           XmlParamFile;
 
     QLabel*       XmlParamsLBl=nullptr;
     QLabel*       TargetRestoreLBl=nullptr;
@@ -47,6 +52,20 @@ private:
     QLabel*       CommentLBl=nullptr;
     ZQTableView*  ParamsTBv=nullptr;
 
+
+    QCheckBox*    ZVB_BasicCBx=nullptr;
+    QCheckBox*    ZVB_MutexCBx=nullptr;
+    QCheckBox*    ZVB_ThreadCBx=nullptr;
+    QCheckBox*    ZVB_StatsCBx=nullptr;
+    QCheckBox*    ZVB_NetCBx=nullptr;
+    QCheckBox*    ZVB_NetStatsCBx=nullptr;
+    QCheckBox*    ZVB_XmlCBx=nullptr;
+    QCheckBox*    ZVB_ZRFCBx=nullptr;
+    QCheckBox*    ZVB_ZMFCBx=nullptr;
+    QCheckBox*    ZVB_ZIFCBx=nullptr;
+    QCheckBox*    ZVB_MemEngineCBx=nullptr;
+    QCheckBox*    ZVB_FileEngineCBx=nullptr;
+    QCheckBox*    ZVB_SearchEngineCBx=nullptr;
 
     QPushButton* SearchXmlFileBTn=nullptr;
     QPushButton* OkBTn=nullptr;
