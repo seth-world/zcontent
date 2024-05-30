@@ -375,7 +375,7 @@ ZRestoreDLg::searchDirClicked() {
 void
 ZRestoreDLg::doRestore() {
   if (ComLog==nullptr) {
-    ComLog = new textEditMWn(this,TEOP_NoFileLab | TEOP_NoCloseBtn);
+    ComLog = new textEditMWn(this,TEOP_NoFileLab | TEOP_NoCloseBtn,&ComLog);
     ComLog->setWindowTitle("Restore log");
   }
   ComLog->show();

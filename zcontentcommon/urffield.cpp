@@ -1583,10 +1583,10 @@ utf8VaryingString
 URFField::toXml(int pLevel)
 {
   if (!Present)
-     return fmtXMLcomment(" Missing field  ",pLevel);
+     return fmtXMLcomment(" Missing field (Presence flag set to false) ",pLevel);
 
   utf8VaryingString wXmlString , wXmlComment;
-  wXmlString = fmtXMLuint32("ztype",ZType,pLevel);
+  wXmlString = fmtXMLZType("ztype",ZType,pLevel);
   wXmlComment.sprintf(" integer value of ZType <%s> ",decode_ZType(ZType));
   fmtXMLaddInlineComment(wXmlString,wXmlComment);
 
@@ -1603,26 +1603,26 @@ URFField::toXml(int pLevel)
   case ZType_U8: {
     uint8_t wValue;
     wValue=convertAtomicBack<uint8_t> (ZType_U8,wPtrAtomic);
-    wXmlString += fmtXMLuint32("content",uint32_t(wValue),pLevel);
+    wXmlString += fmtXMLuint8("content",uint32_t(wValue),pLevel);
     break;
   }
   case ZType_Char:
   case ZType_S8: {
     int8_t wValue;
     wValue=convertAtomicBack<int8_t> (ZType_S8,wPtrAtomic);
-    wXmlString += fmtXMLint32("content",int32_t(wValue),pLevel);
+    wXmlString += fmtXMLint8("content",int32_t(wValue),pLevel);
     break;
   }
   case ZType_U16:{
     uint16_t wValue;
     wValue=convertAtomicBack<uint16_t> (ZType_U16,wPtrAtomic);
-    wXmlString += fmtXMLuint("content",(unsigned int)(wValue),pLevel);
+    wXmlString += fmtXMLuint16("content",(unsigned int)(wValue),pLevel);
     break;
   }
   case ZType_S16: {
     int16_t wValue;
     wValue=convertAtomicBack<int16_t> (ZType_S16,wPtrAtomic);
-    wXmlString += fmtXMLint("content",int(wValue),pLevel);
+    wXmlString += fmtXMLint16("content",int(wValue),pLevel);
     break;
   }
 
@@ -1877,7 +1877,7 @@ URFField::fromXml(zxmlElement* pFieldNode,ZDataBuffer& pURFContent,ZaiErrors* pE
   ZType = 0;
 
   ZTypeBase wZType=0,wZTypeB=0;
-  ZStatus wSt=XMLgetChildUInt32(pFieldNode,"ztype",ZType,pErrorLog,ZAIES_Info);
+  ZStatus wSt=XMLgetChildZType(pFieldNode,"ztype",ZType,pErrorLog,ZAIES_Info);
   if (wSt!=ZS_SUCCESS) {
     Present = false;
     FieldPtr = nullptr;

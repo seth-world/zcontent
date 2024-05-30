@@ -978,7 +978,6 @@ ZSearchEntity::findFirstFieldValueSequential(ZSearchEntityContext& pSEC,long pFi
     zaddress_type wAddress=0;
     ZOperandContent wOpContent;
     ZSearchTokentype_type wZSTO = pSearchValue->OperandZSTO;
-    pSEC.CurrentRank = 0;
     pSEC.Status=getFirst(pSEC,wAddress);
     while (pSEC.Status==ZS_SUCCESS)
     {
@@ -991,7 +990,6 @@ ZSearchEntity::findFirstFieldValueSequential(ZSearchEntityContext& pSEC,long pFi
                 }
             }
         }
-        pSEC.CurrentRank++;
         pSEC.Status=getNext(pSEC,wAddress);
     }
     pSEC.Status = ZS_NOTFOUND;
@@ -1015,11 +1013,8 @@ ZStatus ZSearchEntity::getFirst(ZSearchEntityContext &pSEC, zaddress_type &pAddr
 
 ZStatus ZSearchEntity::_getFirst(ZSearchEntityContext &pSEC, zaddress_type &pAddress)
 {
-
     if (AddressList.count()==0) {
         pSEC.Status=_populateFirst(pSEC,1);
-/*        pSEC.Status=_getFirstHard(pSEC,pAddress);
- */
         if (pSEC.Status!=ZS_SUCCESS)
             return pSEC.Status;
     }
@@ -1036,17 +1031,21 @@ ZStatus ZSearchEntity::_getFirst(ZSearchEntityContext &pSEC, zaddress_type &pAdd
         return pSEC.Status;
     } // file
 
-    pSEC.Status=_BaseEntity->_getByAddress(*pSEC.BaseContext,AddressList[0]); /* use URFParser feeding while accessing base entity */
+    pSEC.Status=_BaseEntity->_getByAddressRaw(*pSEC.BaseContext,AddressList[0]); /* use URFParser feeding while accessing base entity */
     if (pSEC.Status!=ZS_SUCCESS)
         return pSEC.Status;
+
+    pSEC.CurrentRank = CurrentRank = 0 ;
+    pSEC.LastAddress = LastAddress = AddressList[0];
 
     pAddress = AddressList[0];
 
     pSEC.Status=constructURF(pSEC);
-    if (pSEC.Status==ZS_SUCCESS) {
+ /*   if (pSEC.Status==ZS_SUCCESS) {
         pSEC.CurrentRank = CurrentRank = 0 ;
         pSEC.LastAddress = LastAddress = AddressList[0];
     }
+*/
     return pSEC.Status;
 } //ZSearchEntity::_getFirst
 
@@ -1069,7 +1068,7 @@ ZStatus ZSearchEntity::_getFirstHard(ZSearchEntityContext &pSEC, zaddress_type &
             return pSEC.Status;
 
         while ((!wResult)&&(pSEC.Status==ZS_SUCCESS)) {
-            pSEC.Status=_FileEntity->getNext(*pSEC.BaseContext,wRank,pAddress);
+            pSEC.Status=_FileEntity->getNext(*pSEC.BaseContext,pAddress);
             if (pSEC.Status!=ZS_SUCCESS)
                 return pSEC.Status;
             pSEC.Status = evaluateRecord(pSEC,wResult);
@@ -1107,32 +1106,20 @@ ZStatus ZSearchEntity::_getFirstHard(ZSearchEntityContext &pSEC, zaddress_type &
     pSEC.Status=constructURF(pSEC);
     if (pSEC.Status==ZS_SUCCESS) {
         pSEC.CurrentRank = CurrentRank = 0;
-        pSEC.LastAddress = LastAddress = 0;
+        pSEC.LastAddress = LastAddress = pAddress;
     }
     return pSEC.Status;
 } //ZSearchEntity::_getFirstHard
 
-#ifdef __COMMENT__
+
 ZStatus ZSearchEntity::getNext(ZSearchEntityContext &pSEC,zaddress_type &pAddress)
 {
     if (pSEC.CaptureTime)
         pSEC.ProcessTi.start();
     _Mutex.lockBlock(); /* blocking lock  : no status returned */
+
+//    pSEC.Status=_getByRank(pSEC,pSEC.CurrentRank+1,pAddress);
     pSEC.Status=_getNext(pSEC,pAddress);
-    _Mutex.unlock();
-    if (pSEC.CaptureTime)
-        pSEC.ProcessTi.end();
-    return pSEC.Status;
-} //ZSearchEntity::getNext
-#endif // __COMMENT__
-
-ZStatus ZSearchEntity::getNext(ZSearchEntityContext &pSEC,zaddress_type &pAddress)
-{
-    if (pSEC.CaptureTime)
-        pSEC.ProcessTi.start();
-    _Mutex.lockBlock(); /* blocking lock  : no status returned */
-
-    pSEC.Status=_getByRank(pSEC,pSEC.CurrentRank+1,pAddress);
     _Mutex.unlock();
     if (pSEC.CaptureTime)
         pSEC.ProcessTi.end();
@@ -1145,21 +1132,20 @@ ZStatus ZSearchEntity::_getNext(ZSearchEntityContext &pSEC,zaddress_type &pAddre
 bool wResult=false;
 long wRank=0;
     /* test if base entity is positionned to pSEC.CurrentRank */
-    if (pSEC.CurrentRank < 1) {
+    if (pSEC.CurrentRank < 0) {
         return _getFirst(pSEC,pAddress);
     }
 
-    if (CurrentRank != pSEC.CurrentRank) {
-        zaddress_type wAddress;
-        pSEC.Status = _getByRank(pSEC,pSEC.CurrentRank,wAddress); /* currentrank and lastaddress are updated */
-        if (pSEC.Status!=ZS_SUCCESS)
-            return pSEC.Status;
+    wRank=pSEC.CurrentRank+1;
+
+    if (CurrentRank != pSEC.CurrentRank) {  
+        return _getByRank(pSEC,wRank,pAddress); /* currentrank and lastaddress are updated within entity and Context */
     }
 
     pSEC.Status=ZS_SUCCESS;
     if (_FileEntity!=nullptr) {
         while ((!wResult)&&(pSEC.Status==ZS_SUCCESS)) {
-            pSEC.Status=_FileEntity->getNext(*pSEC.BaseContext,wRank,pAddress);
+            pSEC.Status=_FileEntity->getNext(*pSEC.BaseContext,pAddress);
             if (pSEC.Status!=ZS_SUCCESS)
                 return pSEC.Status;
             pSEC.Status = evaluateRecord(pSEC,wResult);
@@ -1176,7 +1162,6 @@ long wRank=0;
         pSEC.Status =_BaseEntity->getNext(*pSEC.BaseContext,pAddress);
         if (pSEC.Status!=ZS_SUCCESS)
             return pSEC.Status;
-//            wSt = evaluateRecord(wResult,wBaseRecord);
         pSEC.Status = evaluateRecord(pSEC,wResult);
     }
     if (pSEC.Status!=ZS_SUCCESS)
@@ -1190,12 +1175,11 @@ long wRank=0;
 ZStatus ZSearchEntity::_getNextHard(ZSearchEntityContext &pSEC,zaddress_type &pAddress)
 {
     bool wResult=false;
-    long wRank=0;
 
     pSEC.Status=ZS_SUCCESS;
     if (_FileEntity!=nullptr) {
         while ((!wResult)&&(pSEC.Status==ZS_SUCCESS)) {
-            pSEC.Status=_FileEntity->getNext(*pSEC.BaseContext,wRank,pAddress);
+            pSEC.Status=_FileEntity->getNext(*pSEC.BaseContext,pAddress);
             if (pSEC.Status!=ZS_SUCCESS)
                 return pSEC.Status;
             pSEC.Status = evaluateRecord(pSEC,wResult);
@@ -1236,9 +1220,6 @@ ZStatus ZSearchEntity::_getNextHard(ZSearchEntityContext &pSEC,zaddress_type &pA
     pSEC.LastAddress = LastAddress=pAddress;
 
     pSEC.Status = constructURF(pSEC);
- //   if (pSEC.Status==ZS_SUCCESS) {
- //       pSEC.CurrentRank=++CurrentRank;
- //   }
     return pSEC.Status ;
 
 } //ZSearchEntity::_getNextHard
@@ -1283,7 +1264,17 @@ ZStatus ZSearchEntity::_populateFirst(ZSearchEntityContext &pSEC, long pCount)
     pSEC.Status=_getFirstHard(pSEC,wAddress);
     if (pSEC.Status!=ZS_SUCCESS)
         goto _populateFirstEnd;
-    AddressList.push(wAddress);
+    if (AddressList.count()) {
+        _DBGPRINT("ZSearchEntity::_populateFirst Warning AddressList is already populated while populating first record.\n"
+                  "                              Replacing first address in AddressList.\n")
+        AddressList[0] = wAddress;
+    }
+    else
+        AddressList.push(wAddress);
+
+    pSEC.CurrentRank = CurrentRank = 0;
+    pSEC.LastAddress = LastAddress = wAddress;
+
     pCount--;
     while ((pSEC.Status==ZS_SUCCESS)&&(pCount>0)) {
 
@@ -1291,6 +1282,8 @@ ZStatus ZSearchEntity::_populateFirst(ZSearchEntityContext &pSEC, long pCount)
         if (pSEC.Status!=ZS_SUCCESS)
             goto _populateFirstEnd;
         AddressList.push(wAddress);
+        pSEC.CurrentRank = ++CurrentRank ;
+        pSEC.LastAddress = LastAddress = wAddress;
         pCount--;
     }
 _populateFirstEnd:
@@ -1331,32 +1324,43 @@ ZStatus ZSearchEntity::_populateNext(ZSearchEntityContext &pSEC, long pCount)
 {
     pSEC.Status=ZS_SUCCESS;
     zaddress_type wAddress;
+
+    /* position to last selected address for entity */
+    if (AddressList.count()==0) {
+        pSEC.Status = _getFirstHard(pSEC,wAddress);
+        if (pSEC.Status!=ZS_SUCCESS)
+            goto _populateNextEnd;
+        AddressList.push(wAddress);
+        pSEC.CurrentRank = CurrentRank = 0;
+        pSEC.LastAddress = LastAddress = wAddress;
+        pCount--;
+    }
+    else {
+        pSEC.Status = _getByAddressRaw(pSEC,AddressList.last());
+        pSEC.CurrentRank = CurrentRank = AddressList.count()-1;
+        pSEC.LastAddress = LastAddress = AddressList.last();
+    }
+
     if (pCount > 0) {
-        /* position to last selected address for entity */
-        if (AddressList.count()==0) {
-            pSEC.Status = _getFirstHard(pSEC,wAddress);
-            if (pSEC.Status!=ZS_SUCCESS)
-                goto _populateNextEnd;
-            AddressList.push(wAddress);
-            pCount--;
-        }
-        else
-            pSEC.Status = _getByAddress(pSEC,AddressList.last());
         while ((pSEC.Status==ZS_SUCCESS)&&(pCount > 0)) {
             pSEC.Status=_getNextHard(pSEC,wAddress);
             if (pSEC.Status!=ZS_SUCCESS)
                 goto _populateNextEnd;
             AddressList.push(wAddress);
+            pSEC.CurrentRank = ++CurrentRank ;
+            pSEC.LastAddress = LastAddress = wAddress;
             pCount--;
         }
         goto _populateNextEnd ;
-    }
+    } // if (pCount > 0
 
     /* if pCount is equal or less than 0, then AddressList is populated til end of available records */
     while (pSEC.Status==ZS_SUCCESS) {
         pSEC.Status=_getNextHard(pSEC,wAddress);
         if (pSEC.Status!=ZS_SUCCESS)
             goto _populateNextEnd ;
+        pSEC.CurrentRank = ++CurrentRank ;
+        pSEC.LastAddress = LastAddress = wAddress;
         AddressList.push(wAddress);
     }
 _populateNextEnd:
@@ -1412,7 +1416,7 @@ populateAllEnd:
     if (pSEC.CaptureTime)
         pSEC.ProcessTi.end();
     if ((pSEC.Status==ZS_EOF)||(pSEC.Status==ZS_OUTBOUNDHIGH))
-         pSEC.Status=ZS_SUCCESS;
+         pSEC.Status=ZS_EOF;
     return pSEC.Status;
 } // ZSearchEntity::populateAll
 
@@ -1440,7 +1444,7 @@ ZSearchEntity::_getByRank(ZSearchEntityContext &pSEC,long pRank,zaddress_type &p
     }
 
     pAddress = AddressList[pRank];
-    pSEC.Status = _getByAddress(pSEC,AddressList[pRank]);
+    pSEC.Status = _getByAddressRaw(pSEC,AddressList[pRank]);
     if (pSEC.Status==ZS_SUCCESS) {
         pSEC.CurrentRank = CurrentRank = pRank;
         pSEC.LastAddress = LastAddress = AddressList[pRank];
@@ -1448,9 +1452,10 @@ ZSearchEntity::_getByRank(ZSearchEntityContext &pSEC,long pRank,zaddress_type &p
     return pSEC.Status;
 } // ZSearchEntity::getByRank
 
-/* record address is reputated to be valided by selection clause */
+/* record address is reputated to be valided by selection clause.
+ * Neither local Entity Counters CurrentRank, LastAddress nor Entity Context counters are updated */
 ZStatus
-ZSearchEntity::_getByAddress(ZSearchEntityContext &pSEC,zaddress_type pAddress)
+ZSearchEntity::_getByAddressRaw(ZSearchEntityContext &pSEC,zaddress_type pAddress)
 {
     pSEC.Status=ZS_SUCCESS;
 
@@ -1461,7 +1466,7 @@ ZSearchEntity::_getByAddress(ZSearchEntityContext &pSEC,zaddress_type pAddress)
         return constructURF(pSEC);
     }
 
-    pSEC.Status =_BaseEntity->_getByAddress(pSEC,pAddress);
+    pSEC.Status =_BaseEntity->_getByAddressRaw(pSEC,pAddress);
     if (pSEC.Status!=ZS_SUCCESS)
         return pSEC.Status;
 
@@ -1502,7 +1507,7 @@ ZStatus ZSearchEntity::populateAllJoin(ZSearchEntityContext &pSEC)
     JoinAddressList.clear();
     AddressList.clear();
 
-    ZSearchJoinTuple wAddress;
+    ZSearchJoinAddress wAddress;
 
  //   _JoinList[0]->CaptureTime=_JoinList[1]->CaptureTime=false;
 
@@ -1524,14 +1529,14 @@ populateAllJoinEnd:
     if (pSEC.CaptureTime)
         pSEC.ProcessTi.end();
     if ((pSEC.Status==ZS_EOF)||(pSEC.Status==ZS_OUTBOUNDHIGH))
-        pSEC.Status=ZS_SUCCESS;
+        pSEC.Status=ZS_EOF;
     return pSEC.Status;
 } // ZSearchEntity::populateAllJoin
 
 ZStatus
 ZSearchEntity::populateFirstJoin(ZSearchEntityContext &pSEC,int pCount)
 {
-    pSEC.Status=ZS_SUCCESS;
+
     if (pSEC.CaptureTime)
         pSEC.ProcessTi.start();
     if (FetchState == EFST_Total) {
@@ -1539,17 +1544,31 @@ ZSearchEntity::populateFirstJoin(ZSearchEntityContext &pSEC,int pCount)
             pSEC.ProcessTi.end();
         return ZS_SUCCESS;
     }
+    pSEC.BaseContext->CaptureTime = pSEC.SlaveContext->CaptureTime = false ;
     _Mutex.lock();
 
+    pSEC.Status=_populateFirstJoin(pSEC,pCount);
+
+    _Mutex.unlock();
+
+    if (pSEC.CaptureTime)
+        pSEC.ProcessTi.end();
+    if ((pSEC.Status==ZS_EOF)||(pSEC.Status==ZS_OUTBOUNDHIGH))
+        pSEC.Status=ZS_EOF;
+    return pSEC.Status;
+} // ZSearchEntity::populateFirstJoin
+
+ZStatus
+ZSearchEntity::_populateFirstJoin(ZSearchEntityContext &pSEC,int pCount)
+{
+    pSEC.Status=ZS_SUCCESS;
     bool wResult=false;
 
     JoinAddressList.clear();
     AddressList.clear();
 
-    ZSearchJoinTuple wAddress;
+    ZSearchJoinAddress wAddress;
 
- //   _JoinList[0]->CaptureTime=_JoinList[1]->CaptureTime=false;
-    pSEC.BaseContext->CaptureTime = pSEC.SlaveContext->CaptureTime = false ;
     pSEC.Status=_getFirstJoin(pSEC,wAddress);
 
     while ((pSEC.Status==ZS_SUCCESS) && --pCount) {
@@ -1557,7 +1576,7 @@ ZSearchEntity::populateFirstJoin(ZSearchEntityContext &pSEC,int pCount)
         pSEC.Status=_getNextJoin(pSEC,wAddress);
     }// while
 
-populateFirstJoinEnd:
+_populateFirstJoinEnd:
     if ((pSEC.Status==ZS_OUTBOUNDHIGH)||(pSEC.Status==ZS_SUCCESS))
         FetchState = EFST_Total;
     else
@@ -1567,9 +1586,12 @@ populateFirstJoinEnd:
     if (pSEC.CaptureTime)
         pSEC.ProcessTi.end();
     if ((pSEC.Status==ZS_EOF)||(pSEC.Status==ZS_OUTBOUNDHIGH))
-        pSEC.Status=ZS_SUCCESS;
+        pSEC.Status=ZS_EOF;
     return pSEC.Status;
 } // ZSearchEntity::populateFirstJoin
+
+
+
 
 ZStatus ZSearchEntity::populateNextJoin(ZSearchEntityContext &pSEC, int pCount)
 {
@@ -1585,8 +1607,7 @@ ZStatus ZSearchEntity::populateNextJoin(ZSearchEntityContext &pSEC, int pCount)
 
     bool wResult=false;
 
-
-    ZSearchJoinTuple wAddress;
+    ZSearchJoinAddress wAddress;
 
 //    _JoinList[0]->CaptureTime=_JoinList[1]->CaptureTime=false;
     pSEC.BaseContext->CaptureTime = pSEC.SlaveContext->CaptureTime = false ;
@@ -1608,11 +1629,11 @@ populateFirstJoinEnd:
     if (pSEC.CaptureTime)
         pSEC.ProcessTi.end();
     if ((pSEC.Status==ZS_EOF)||(pSEC.Status==ZS_OUTBOUNDHIGH))
-        pSEC.Status=ZS_SUCCESS;
+        pSEC.Status=ZS_EOF;
     return pSEC.Status;
 } // ZSearchEntity::populateNextJoin
 
-ZStatus ZSearchEntity::getFirstJoin(ZSearchEntityContext &pSEC, ZSearchJoinTuple &pAddress)
+ZStatus ZSearchEntity::getFirstJoin(ZSearchEntityContext &pSEC, ZSearchJoinAddress &pAddress)
 {
     if (pSEC.CaptureTime)
         pSEC.ProcessTi.start();
@@ -1625,7 +1646,7 @@ ZStatus ZSearchEntity::getFirstJoin(ZSearchEntityContext &pSEC, ZSearchJoinTuple
 } //ZSearchEntity::getFirstJoin
 
 
-ZStatus ZSearchEntity::_getFirstJoin(ZSearchEntityContext &pSEC, ZSearchJoinTuple &pAddress)
+ZStatus ZSearchEntity::_getFirstJoin(ZSearchEntityContext &pSEC, ZSearchJoinAddress &pAddress)
 {
     bool wResult=false;
 
@@ -1650,6 +1671,8 @@ ZStatus ZSearchEntity::_getFirstJoin(ZSearchEntityContext &pSEC, ZSearchJoinTupl
             if (wResult) {
                 wHasAtLeastOne=true;
                 pSEC.Status = constructURF(pSEC);
+                pSEC.CurrentRank = CurrentRank = 0;
+                pSEC.LastAddressJoin = LastAddressJoin = pAddress ;
                 return pSEC.Status;
             }
             /* NB: selection clause (WITH) for each entity member of join are evaluated within base / slave entity */
@@ -1669,44 +1692,10 @@ ZStatus ZSearchEntity::_getFirstJoin(ZSearchEntityContext &pSEC, ZSearchJoinTupl
     }//while  master
 
     return pSEC.Status;
-/*
-    wSt=constructURF(pSEC);
-    if (wSt!=ZS_SUCCESS)
-        return wSt;
-    wSt = evaluateRecord(pSEC,wResult);
-    if (wSt!=ZS_SUCCESS)
-        return wSt;
 
-    while (!wResult && (wSt==ZS_SUCCESS)) {
-        while ((!wResult)&&(wSt==ZS_SUCCESS)) {
-            wSt=constructURF();
-            if (wSt!=ZS_SUCCESS)
-                return wSt;
-            wSt = evaluateRecord(wResult);
-            if (wSt!=ZS_SUCCESS)
-                return wSt;
-            if (wResult) {
-                if (_Using != nullptr) {
-                    wSt=_Using->evaluate(wResult) ;
-                    if (wSt!=ZS_SUCCESS)
-                        return wSt;
-                    if (wResult)
-                        return wSt;
-                }
-            }
-            wSt=_JoinList[1]->_getNext(pAddress.SlaveAddress);
-        }// while
-        if ((wSt!=ZS_EOF)&&(wSt!=ZS_OUTBOUNDHIGH))
-            break;
-        wSt=_JoinList[0]->_getNext(pAddress.MasterAddress);
-        if (wSt==ZS_SUCCESS) {
-            wSt=_JoinList[1]->_getFirst(pAddress.SlaveAddress);
-        }
-    }// while
-    return wSt;*/
 } //ZSearchEntity::_getFirstJoin
 
-ZStatus ZSearchEntity::getNextJoin(ZSearchEntityContext &pSEC, ZSearchJoinTuple &pAddress)
+ZStatus ZSearchEntity::getNextJoin(ZSearchEntityContext &pSEC, ZSearchJoinAddress &pAddress)
 {
     if (pSEC.CaptureTime)
         pSEC.ProcessTi.start();
@@ -1718,7 +1707,7 @@ ZStatus ZSearchEntity::getNextJoin(ZSearchEntityContext &pSEC, ZSearchJoinTuple 
     return pSEC.Status;
 } //ZSearchEntity::getFirstJoin
 
-ZStatus ZSearchEntity::_getNextJoin(ZSearchEntityContext &pSEC, ZSearchJoinTuple &pAddress)
+ZStatus ZSearchEntity::_getNextJoin(ZSearchEntityContext &pSEC, ZSearchJoinAddress &pAddress)
 {
     bool wResult=false;
 
@@ -1756,6 +1745,8 @@ ZStatus ZSearchEntity::_getNextJoin(ZSearchEntityContext &pSEC, ZSearchJoinTuple
     } // not success
 
     if (_Using == nullptr) {  /* if no <USING> clause then a cartesian product is made */
+        pSEC.CurrentRank = ++CurrentRank;
+        pSEC.LastAddressJoin = LastAddressJoin = pAddress ;
         return  constructURF(pSEC);
     }
 
@@ -1766,6 +1757,8 @@ ZStatus ZSearchEntity::_getNextJoin(ZSearchEntityContext &pSEC, ZSearchJoinTuple
             if (pSEC.Status!=ZS_SUCCESS)
                 return pSEC.Status;
             if (wResult) {
+                pSEC.CurrentRank = ++CurrentRank;
+                pSEC.LastAddressJoin = LastAddressJoin = pAddress ;
                 return  constructURF(pSEC);
             }
             pSEC.Status=_JoinList[1]->_getNext(pSEC,pAddress.SlaveAddress);
@@ -1783,15 +1776,15 @@ ZStatus ZSearchEntity::_getNextJoin(ZSearchEntityContext &pSEC, ZSearchJoinTuple
 
 } //ZSearchEntity::_getNextJoin
 
-ZStatus ZSearchEntity::_getByAddressJoin(ZSearchEntityContext &pSEC, ZSearchJoinTuple &pAddress)
+ZStatus ZSearchEntity::_getByAddressJoin(ZSearchEntityContext &pSEC, ZSearchJoinAddress &pAddress)
 {
     pSEC.Status=ZS_SUCCESS;
     pAddress.setInvalid();
 
-    pSEC.Status=_JoinList[0]->_getByAddress(pSEC,pAddress.SlaveAddress);
+    pSEC.Status=_JoinList[0]->_getByAddressRaw(pSEC,pAddress.SlaveAddress);
     if (pSEC.Status!=ZS_SUCCESS)
         return pSEC.Status;
-    pSEC.Status=_JoinList[1]->_getByAddress(pSEC,pAddress.SlaveAddress);
+    pSEC.Status=_JoinList[1]->_getByAddressRaw(pSEC,pAddress.SlaveAddress);
     if (pSEC.Status!=ZS_SUCCESS)
         return pSEC.Status;
     return constructURF(pSEC);
@@ -1801,7 +1794,7 @@ ZStatus ZSearchEntity::_getByAddressJoin(ZSearchEntityContext &pSEC, ZSearchJoin
 
 ZStatus ZSearchEntity::getByRankJoin(ZSearchEntityContext &pSEC,
                                      long pRank,
-                                     ZSearchJoinTuple &pAddress)
+                                     ZSearchJoinAddress &pAddress)
 {
     if (pSEC.CaptureTime)
         pSEC.ProcessTi.start();
@@ -1815,7 +1808,7 @@ ZStatus ZSearchEntity::getByRankJoin(ZSearchEntityContext &pSEC,
 
 ZStatus ZSearchEntity::_getByRankJoin(ZSearchEntityContext &pSEC,
                                       long pRank,
-                                      ZSearchJoinTuple &pAddress)
+                                      ZSearchJoinAddress &pAddress)
 {
     pSEC.Status=ZS_SUCCESS;
     if (pRank > JoinAddressList.count()) {
@@ -1825,8 +1818,10 @@ ZStatus ZSearchEntity::_getByRankJoin(ZSearchEntityContext &pSEC,
     }
 
     pSEC.Status= _getByAddressJoin(pSEC,JoinAddressList[pRank]);
-    if (pSEC.Status==ZS_SUCCESS)
+    if (pSEC.Status==ZS_SUCCESS) {
         pSEC.CurrentRank = CurrentRank = pRank ;
+        pSEC.LastAddressJoin = LastAddressJoin =  JoinAddressList[pRank];
+    }
     return pSEC.Status;
 } //ZSearchEntity::_getByRankJoin
 

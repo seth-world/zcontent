@@ -331,7 +331,8 @@ void ZSearchQueryMWd::initLayout()
     QueryQTe->TrappedKeyPressCallBack =  std::bind(&ZSearchQueryMWd::KeyFiltered, this,placeholders::_1,placeholders::_2);
     QueryQTe->UntrappedKeyPressCallBack =  std::bind(&ZSearchQueryMWd::KeyUnFiltered, this,placeholders::_1);
 
-    displayMWn = new textEditMWn(this,TEOP_NoFileLab|TEOP_CloseBtnHide);
+//    displayMWn = new textEditMWn(this,TEOP_NoFileLab|TEOP_CloseBtnHide);
+    displayMWn = new textEditMWn(this,TEOP_NoFileLab,&displayMWn);
     displayMWn->setWindowTitle("Search parser output");
 
     Parser = new ZSearchParser;
@@ -340,7 +341,7 @@ void ZSearchQueryMWd::initLayout()
     Parser->ErrorLog.setStoreMinSeverity(ZAIES_Warning);
     Parser->ErrorLog.setAutoPrintOn(ZAIES_Text);
 
-//    Parser->setEntityDisplayCallBack(std::bind(&ZSearchQueryMWd::DisplayEntity, this,placeholders::_1,placeholders::_2,placeholders::_3));
+    Parser->setEntityDisplayCallBack(std::bind(&ZSearchQueryMWd::DisplayEntity, this,placeholders::_1));
 
     displayMWn->registerDisplayColorCallBack(&Parser->ErrorLog);
     displayMWn->show();
@@ -702,35 +703,26 @@ ZSearchQueryMWd::ExecuteClicked ()
 } // ZSearchQueryMWd::ExecuteBTnClicked
 
 
-ZStatus ZSearchQueryMWd::DisplayEntity (std::shared_ptr<ZSearchEntity> pEntity,int pInstructionType,int pNumber)
+ZStatus ZSearchQueryMWd::DisplayEntity (ZSearchContext& pContext)
 {
   utf8VaryingString wStr;
-//  ZDataBuffer wRecord;
   ZStatus wSt=ZS_SUCCESS;
 
-  ZSearchEntityContext* wSEC=nullptr;
-
-  for (int wi=0 ; wi < Parser->SECList.count() ; wi++ ) {
-      if ( Parser->SECList[wi].Entity == pEntity ) {
-          wSEC = &Parser->SECList[wi];
-          break;
-      }
-  }
+  std::shared_ptr <ZSearchEntityContext> wSEC=SECList.getSEC(pContext.SourceEntity);
   if (wSEC==nullptr) {
-      Parser->SECList.push(ZSearchEntityContext::newEntityContext(pEntity));
-      wSEC = &Parser->SECList.last();
+      wSEC = ZSearchEntityContext::newEntityContext(pContext.SourceEntity);
   }
 
   QList<QStandardItem*> wRow;
 
-  if (pEntity==nullptr) {
+  if (pContext.SourceEntity==nullptr) {
       statusBar()->showMessage("No entity defined ",30);
       return ZS_NULLPTR ;
   }
 
-  CurrentEntity = pEntity;
+  CurrentEntity = pContext.SourceEntity;
 
-  ZSearchDictionary* wDic = pEntity->getDic();
+  ZSearchDictionary* wDic = pContext.SourceEntity->getDic();
 
 /*
   if (ResultTBv==nullptr) {
@@ -754,18 +746,18 @@ ZStatus ZSearchQueryMWd::DisplayEntity (std::shared_ptr<ZSearchEntity> pEntity,i
     ResultTBv->ItemModel->setHorizontalHeaderItem(wi,new QStandardItem(wDic->TabConst(wi).getFieldName().toCChar()));
   }
 
-  EntityNameLBl->setText(pEntity->getEntityName().toCChar());
+  EntityNameLBl->setText(pContext.SourceEntity->getEntityName().toCChar());
 
-  if (pEntity->isCollection()) {
+  if (pContext.SourceEntity->isCollection()) {
     EntityTypeLBl->setText("Collection");
   }
-  else if (pEntity->isFile()) {
+  else if (pContext.SourceEntity->isFile()) {
     EntityTypeLBl->setText("File");
   } else {
     EntityTypeLBl->setText("Unknown(invalid) type");
     RecordCountLBl->setText("---");
   }
-  wStr.sprintf("%ld",pEntity->_BaseEntity->getCount());
+  wStr.sprintf("%ld",pContext.SourceEntity->getCount());
   RecordCountLBl->setText(wStr.toCChar());
 
   long wRank=0;
@@ -773,14 +765,14 @@ ZStatus ZSearchQueryMWd::DisplayEntity (std::shared_ptr<ZSearchEntity> pEntity,i
 
   ZArray<URFField> wFieldList;
 
-  wSt=pEntity->getFirst(*wSEC,wAddress);
+  wSt=pContext.SourceEntity->getFirst(*wSEC,wAddress);
 
 
   while (wSt == ZS_SUCCESS) {
       wRow=DisplayOneLine(wSEC->_URFParser.URFFieldList);
     ResultTBv->ItemModel->appendRow(wRow);
     wRank++;
-    wSt=pEntity->getNext(*wSEC,wAddress);
+    wSt=pContext.SourceEntity->getNext(*wSEC,wAddress);
   }
   if (wSt==ZS_OUTBOUNDHIGH)
       wSt=ZS_SUCCESS;
@@ -813,17 +805,9 @@ ZStatus ZSearchQueryMWd::DisplayEntityRaw (std::shared_ptr<ZSearchEntity> &pEnti
     }
 
 
-    ZSearchEntityContext* wSEC=nullptr;
-
-    for (int wi=0 ; wi < Parser->SECList.count() ; wi++ ) {
-        if ( Parser->SECList[wi].Entity == pEntity ) {
-            wSEC = &Parser->SECList[wi];
-            break;
-        }
-    }
+    std::shared_ptr <ZSearchEntityContext> wSEC=SECList.getSEC(pEntity);
     if (wSEC==nullptr) {
-        Parser->SECList.push(ZSearchEntityContext::newEntityContext(pEntity));
-        wSEC = &Parser->SECList.last();
+        wSEC = ZSearchEntityContext::newEntityContext(pEntity);
     }
 
 
@@ -907,7 +891,12 @@ ZStatus ZSearchQueryMWd::DisplayEntityRaw (std::shared_ptr<ZSearchEntity> &pEnti
 
 void ZSearchQueryMWd::DisplayCurrentEntity ()
 {
-    DisplayEntity(CurrentEntity,ZSITP_Display|ZSITP_All,1);
+    ZSearchContext wContext = Parser->buildContext();
+    wContext.SourceEntity = CurrentEntity;
+    wContext.InstructionType = ZSITP_Display|ZSITP_All;
+    wContext.Number = -1 ;
+    DisplayEntity(wContext);
+//    DisplayEntity(CurrentEntity,ZSITP_Display|ZSITP_All,1);
     return;
 } // ZSearchQueryMWd::DisplayCurrentEntity
 

@@ -188,7 +188,7 @@ ZRawVisuMain::ZRawVisuMain(QWidget *parent) :QMainWindow(parent)
   ZMFQueryQAc = new QAction("Query",this);
   MasterFileMEn->addAction(ZMFQueryQAc);
 
-  ZmfDefQAc = new QAction("Master file definition",this);
+  ZmfDefQAc = new QAction("Master file structure",this);
   MasterFileMEn->addAction(ZmfDefQAc);
 
   IndexRebuildQAc = new QAction("Rebuild index",this);
@@ -3293,7 +3293,7 @@ void ZRawVisuMain::displayRawSurfaceScan(const uriString& pFileToScan)
   ZStatus wSt=surfaceScanRaw(pFileToScan,wScan);
   fflush(wScan);
   fclose(wScan);
-  textEditMWn* wDisp=new textEditMWn(this,TEOP_ShowLineNumbers);
+  textEditMWn* wDisp=new textEditMWn(this,TEOP_ShowLineNumbers|TEOP_NoFileLab,&wDisp);
 
   wDisp->setTextFromFile("surfacescanraw.txt");
   wDisp->setWindowTitle(pFileToScan.getBasename().toCChar());
@@ -3317,8 +3317,8 @@ void ZRawVisuMain::closeGenlogCB(const QEvent* pEvent)
 textEditMWn*  ZRawVisuMain::openGenLogWin()
 {
   if (GenlogWin==nullptr) {
-      GenlogWin = new textEditMWn(this);
-      GenlogWin->registerCloseCallback(std::bind(&ZRawVisuMain::closeGenlogCB, this,std::placeholders::_1));
+      GenlogWin = new textEditMWn(this,TEOP_NoFileLab,&GenlogWin);
+//      GenlogWin->registerCloseCallback(std::bind(&ZRawVisuMain::closeGenlogCB, this,std::placeholders::_1));
   }
   else
     GenlogWin->clear();

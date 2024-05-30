@@ -328,8 +328,8 @@ DicEditMWn::init() {
 
  // QObject::connect(keyTRv->ItemModel,&QStandardItemModel::itemChanged,this,&DicEditMWn::KeyItemChanged);
 
-  DicLog=new textEditMWn((QWidget*)this,TEOP_CloseBtnHide | TEOP_NoFileLab,nullptr);
-  DicLog->registerCloseCallback(std::bind(&DicEditMWn::closeDiclogCB, this,std::placeholders::_1));
+  DicLog=new textEditMWn((QWidget*)this,TEOP_CloseBtnHide | TEOP_NoFileLab,&DicLog);
+//  DicLog->registerCloseCallback(std::bind(&DicEditMWn::closeDiclogCB, this,std::placeholders::_1));
   DicLog->setWindowTitle("Communication log");
   DicLog->show();
 
@@ -337,12 +337,13 @@ DicEditMWn::init() {
 
   DictionaryFile = new ZDictionaryFile;
 } // DicEditMWn::init()
-
+/*
 void
 DicEditMWn::closeDiclogCB(const QEvent* pEvent)
 {
     DicLog=nullptr;
 }
+*/
 void
 DicEditMWn::displayErrorCallBack(const utf8VaryingString& pMessage) {
     if (DicLog!=nullptr)
@@ -501,16 +502,25 @@ DicEditMWn::generalActionEvent(QAction* pAction) {
     wSt=GenerateEngine->generateInterface(wOutFileBaseName,wClass,wBrief,wGenPath);
 
     if (GenCppFileWin==nullptr) {
-      GenCppFileWin = new textEditMWn(this,
-          TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
-          std::bind(&DicEditMWn::closeGenShowCppCB, this,std::placeholders::_1));
+//      GenCppFileWin = new textEditMWn(this,
+//          TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
+//          std::bind(&DicEditMWn::closeGenShowCppCB, this,std::placeholders::_1));
+
+        GenCppFileWin = new textEditMWn(this,
+                                        TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
+                                        &GenCppFileWin);
+
+
       if (genShowCppQAc->isChecked())
         GenCppFileWin->show();
     }
     if (GenHeaderFileWin==nullptr) {
-      GenHeaderFileWin = new textEditMWn(this,
-          TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
-          std::bind(&DicEditMWn::closeGenShowHeaderCB, this,std::placeholders::_1));
+//      GenHeaderFileWin = new textEditMWn(this,
+//          TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
+//          std::bind(&DicEditMWn::closeGenShowHeaderCB, this,std::placeholders::_1));
+        GenCppFileWin = new textEditMWn(this,
+                                        TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
+                                        &GenCppFileWin);
       if (genShowHeaderQAc->isChecked())
         GenHeaderFileWin->show();
     }
@@ -524,9 +534,12 @@ DicEditMWn::generalActionEvent(QAction* pAction) {
 
   if (pAction == genShowCppQAc) {
     if (GenCppFileWin==nullptr) {
-      GenCppFileWin = new textEditMWn(this,
-          TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
-          std::bind(&DicEditMWn::closeGenShowCppCB, this,std::placeholders::_1));
+//      GenCppFileWin = new textEditMWn(this,
+//          TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
+//          std::bind(&DicEditMWn::closeGenShowCppCB, this,std::placeholders::_1));
+        GenCppFileWin = new textEditMWn(this,
+                                        TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
+                                        &GenCppFileWin);
 
       if (GenerateEngine && GenerateEngine->getGenCppFile().exists())
         GenCppFileWin->setTextFromFile(GenerateEngine->getGenCppFile());
@@ -540,9 +553,12 @@ DicEditMWn::generalActionEvent(QAction* pAction) {
 
   if (pAction == genShowHeaderQAc) {
     if (GenHeaderFileWin==nullptr) {
-      GenHeaderFileWin = new textEditMWn(this,
-          TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
-          std::bind(&DicEditMWn::closeGenShowHeaderCB, this,std::placeholders::_1));
+//      GenHeaderFileWin = new textEditMWn(this,
+//          TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
+//          std::bind(&DicEditMWn::closeGenShowHeaderCB, this,std::placeholders::_1));
+        GenHeaderFileWin = new textEditMWn(this,
+                                        TEOP_ShowLineNumbers | TEOP_CloseBtnHide , /* show line numbers and close button hides dialog */
+                                        &GenHeaderFileWin);
 
       if (GenerateEngine && GenerateEngine->getGenHeaderFile().exists())
         GenHeaderFileWin->setTextFromFile(GenerateEngine->getGenHeaderFile());

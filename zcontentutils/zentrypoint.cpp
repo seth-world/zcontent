@@ -188,6 +188,11 @@ ZEntryPoint::initLayout()
     ParametersQMe->addAction(ParamChangeQAc);
     mainQAg->addAction(ParamChangeQAc);
 
+    TextFileVisuQAc = new QAction("Load text file",this);
+    generalMEn->addAction(TextFileVisuQAc);
+    mainQAg->addAction(TextFileVisuQAc);
+
+
     QuitQAc = new QAction("Quit",this);
     generalMEn->addAction(QuitQAc);
     mainQAg->addAction(QuitQAc);
@@ -322,7 +327,7 @@ ZEntryPoint::initLayout()
   //   ZMFQueryQAc = new QAction("Query",this);
   //   MasterFileMEn->addAction(ZMFQueryQAc);
 
-  ZmfDefQAc = new QAction("Master file definition",this);
+  ZmfDefQAc = new QAction("Master file structure",this);
   MasterFileMEn->addAction(ZmfDefQAc);
   mainQAg->addAction(ZmfDefQAc);
 
@@ -478,6 +483,23 @@ ZEntryPoint::actionMenuEvent(QAction* pAction)
       return;
   }
   /* end general parameters */
+  if (pAction==TextFileVisuQAc)
+  {
+      QString wFileName = QFileDialog::getOpenFileName(this, tr("Text file"),
+                                                       GeneralParameters.getWorkDirectory().toCChar(),
+                                                       "text file(*.txt);;All (*.*)");
+      if (wFileName.isEmpty())
+          return ;
+      uriString wURIText= wFileName.toUtf8().data();
+      if (!wURIText.exists())
+          return ;
+      utf8VaryingString wTextContent;
+      wURIText.loadUtf8(wTextContent);
+      textEditMWn* wMw = new textEditMWn(this);
+      wMw->setText(wTextContent,wURIText.getBasename());
+      wMw->show();
+      return;
+  }
 
   if ((pAction==QuitQAc)||(pAction==QuitIconQAc))
   {
@@ -700,69 +722,103 @@ ZEntryPoint::actionMenuEvent(QAction* pAction)
 
   if (pAction==ZMFExportQAc) {
     uriString wDir = GeneralParameters.getWorkDirectory();
-    ZRawMasterFile *wZMF=nullptr;
+    ZMasterFile *wZMF=nullptr;
     ZStatus wSt=ZS_SUCCESS;
-    bool wHasBeenOpened=false;
-    bool wHasBeenCreated=false;
-    while (true) {
-        if (RawMasterFile!=nullptr) {
-          int wRet=ZExceptionDLg::adhocMessage3B("Export raw master file",Severity_Question,"Other","Quit","Use",nullptr,nullptr,
-                                        "There is a current raw masterfile in use :\n"
-                                        "%s\n"
-                                        "Do you want to export this raw masterfile data ?\n"
-                                        "Use it                      <Use>\n"
-                                        "Choose another one          <Other>\n"
-                                        "Quit without doing anything <Quit>\n",
-                                        RawMasterFile->getURIContent().toString());
-          if (wRet==QDialog::Rejected)
-            return;
-          if (wRet==QDialog::Accepted) {
-            wZMF = RawMasterFile;
-            if (!wZMF->isOpen()) {
-                wSt=wZMF->zopen(ZRF_Read_Only);
-                if (wSt!=ZS_SUCCESS) {
-                    utf8VaryingString wExcp = ZException.last().formatFullUserMessage().toString();
-                    ZExceptionDLg::adhocMessage("ZMF data export",Severity_Error,
-                                                nullptr,&wExcp,"Error while opening master file %s",wZMF->getURIContent().toString());
-                    return;
-                }
-                wHasBeenOpened=true;
-            }
-            break;
-          }// QDialog::Accepted)
-          /* ZEDLG_Third : let's go to file selection */
-          //if (wRet==QDialog::ZEDLG_Third) {
-          //} // ZEDLG_Third
-        } //if (RawMasterFile!=nullptr)
-
-        QString wFileName = QFileDialog::getOpenFileName(this, tr("Raw master file"),
-                                                         wDir.toCChar(),
-                                                         "master files (*.zmf);;All (*.*)");
-        if (wFileName.isEmpty())
-          return;
-        uriString wZMFURI= wFileName.toUtf8().data();
-        if (!wZMFURI.exists())
-          return;
-        wZMF = new ZRawMasterFile;
-        wHasBeenCreated=true;
-        wSt=wZMF->zopen(wZMFURI,ZRF_Read_Only);
-        if (wSt!=ZS_SUCCESS) {
-          utf8VaryingString wExcp = ZException.last().formatFullUserMessage().toString();
-          ZExceptionDLg::adhocMessage("ZMF data export",Severity_Error,
-                                      nullptr,&wExcp,"Error while opening master file %s",wZMFURI.toString());
-          return;
-        }
-        wHasBeenOpened=true;
-        break;
-    } // while true
-
+    QString wFileName = QFileDialog::getOpenFileName(this, tr("Master files"),
+                                                     wDir.toCChar(),
+                                                     "master files (*.zmf);;All (*.*)");
+    if (wFileName.isEmpty())
+      return;
+    uriString wZMFURI= wFileName.toUtf8().data();
+    if (!wZMFURI.exists())
+      return;
+    wZMF = new ZMasterFile;
+    wSt=wZMF->zopen(wZMFURI,ZRF_Read_Only);
+    if (wSt!=ZS_SUCCESS) {
+      utf8VaryingString wExcp = ZException.last().formatFullUserMessage().toString();
+      ZExceptionDLg::adhocMessage("ZMF data export",Severity_Error,
+                                  nullptr,&wExcp,"Error while opening master file %s",wZMFURI.toString());
+      return;
+    }
     wSt=exportZMF(this,wZMF);
-    if (wHasBeenOpened)
-        wZMF->zclose();
-    if (wHasBeenCreated)
-        delete wZMF;
+    wZMF->zclose();
+    delete wZMF;
     return;
   }//ZMFExportQAc
+
+  if (pAction==ZMFExportQAc) {
+      uriString wDir = GeneralParameters.getWorkDirectory();
+      ZRawMasterFile *wZMF=nullptr;
+      ZStatus wSt=ZS_SUCCESS;
+      bool wHasBeenOpened=false;
+      bool wHasBeenCreated=false;
+      while (true) {
+          if (RawMasterFile!=nullptr) {
+              int wRet=ZExceptionDLg::adhocMessage3B("Export raw master file",Severity_Question,"Other","Quit","Use",nullptr,nullptr,
+                                                       "There is a current raw masterfile in use :\n"
+                                                       "%s\n"
+                                                       "Do you want to export this raw masterfile data ?\n"
+                                                       "Use it                      <Use>\n"
+                                                       "Choose another one          <Other>\n"
+                                                       "Quit without doing anything <Quit>\n",
+                                                       RawMasterFile->getURIContent().toString());
+              if (wRet==QDialog::Rejected)
+                  return;
+              if (wRet==QDialog::Accepted) {
+                  wZMF = RawMasterFile;
+                  if (!wZMF->isOpen()) {
+                      wSt=wZMF->zopen(ZRF_Read_Only);
+                      if (wSt!=ZS_SUCCESS) {
+                          utf8VaryingString wExcp = ZException.last().formatFullUserMessage().toString();
+                          ZExceptionDLg::adhocMessage("ZMF data export",Severity_Error,
+                                                      nullptr,&wExcp,"Error while opening master file %s",wZMF->getURIContent().toString());
+                          return;
+                      }
+                      wHasBeenOpened=true;
+                  }
+                  break;
+              }// QDialog::Accepted)
+
+          } //if (RawMasterFile!=nullptr)
+
+          QString wFileName = QFileDialog::getOpenFileName(this, tr("Raw master file"),
+                                                           wDir.toCChar(),
+                                                           "master files (*.zmf);;All (*.*)");
+          if (wFileName.isEmpty())
+              return;
+          uriString wZMFURI= wFileName.toUtf8().data();
+          if (!wZMFURI.exists())
+              return;
+          wZMF = new ZRawMasterFile;
+          wHasBeenCreated=true;
+          wSt=wZMF->zopen(wZMFURI,ZRF_Read_Only);
+          if (wSt!=ZS_SUCCESS) {
+              utf8VaryingString wExcp = ZException.last().formatFullUserMessage().toString();
+              ZExceptionDLg::adhocMessage("ZMF data export",Severity_Error,
+                                          nullptr,&wExcp,"Error while opening master file %s",wZMFURI.toString());
+              return;
+          }
+          if (wZMF->getFileType()==ZFT_ZDicMasterFile) {
+              wZMF->zclose();
+              delete wZMF;
+              ZMasterFile* wDZMF = new ZMasterFile;
+              wSt=exportZMF(this,wDZMF);
+              wDZMF->zclose();
+              delete wDZMF;
+              return ;
+          }
+          wHasBeenOpened=true;
+          break;
+      } // while true
+
+      wSt=exportZMF(this,wZMF);
+      if (wHasBeenOpened)
+          wZMF->zclose();
+      if (wHasBeenCreated)
+          delete wZMF;
+      return;
+  }//ZMFExportQAc
+
 
   if (pAction==ZMFExportFromSurfaceQAc) {
       exportZMFFromSurface();
@@ -1547,9 +1603,15 @@ ZEntryPoint::exportZMF(QWidget* pParent,zbs::ZRawMasterFile* pRawMasterFile)
     return ZS_EMPTY;
   }
 
+  uriString wCFName = GeneralParameters.getWorkDirectory().toCChar() ;
+  wCFName.addConditionalDirectoryDelimiter();
+  wCFName += pRawMasterFile->getURIContent().getRootname().toCChar() ;
+  wCFName += "-content.xml" ;
 
   QString wDir;
-  wDir = QFileDialog::getSaveFileName(pParent,"Export content",GeneralParameters.getWorkDirectory().toCChar(),"Xml files (*.xml);;All (*.*)");
+//  wDir = QFileDialog::getSaveFileName(pParent,"Export content",GeneralParameters.getWorkDirectory().toCChar(),"Xml files (*.xml);;All (*.*)");
+  wDir = QFileDialog::getSaveFileName(pParent,"Export content",wCFName.toCChar(),"Xml files (*.xml);;All (*.*)");
+
   if (wDir.isEmpty())
     return ZS_EMPTY ;
   uriString wURIExport=wDir.toUtf8().data();

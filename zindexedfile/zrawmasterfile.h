@@ -647,6 +647,7 @@ public:
                                     const ZDataBuffer &pRecord,
                                     int pLevel,
                                     ZBlockHeader* pBlockHeader,
+                                    ZMetaDic*   pMetaDic,
                                     ZaiErrors *pErrorLog);
   /* formats a raw record structured with an URF format ( i.e. leading ZBitset then URF field list )
    * following the xml file content defined by pContentFile */

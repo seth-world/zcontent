@@ -11,7 +11,7 @@
 
 extern const int cst_MessageDuration ;
 
-#define __CLOSE_CALLBACK__(__NAME__)  std::function<void (QEvent*)> __NAME__
+//#define __CLOSE_CALLBACK__(__NAME__)  std::function<void (QEvent*)> __NAME__
 #define __MORE_CALLBACK__(__NAME__)  std::function<void ()> __NAME__
 #define __FILTRATE_CALLBACK__(__NAME__)  std::function<bool (const utf8VaryingString&)> __NAME__
 
@@ -44,8 +44,8 @@ class textEditMWn;
 #define __ZTEXTEDITOPTION__
 enum ZTextEditOption : uint32_t {
   TEOP_Nothing        = 0,
-  TEOP_CloseBtnHide   = 0x01,     /* if set Close button hides dialog, while if not set close button closes */
-  TEOP_ShowLineNumbers= 0x04,
+  TEOP_CloseBtnHide   = 0x01,     /* if set Close button hides dialog, while if not set close button closes and destroys */
+  TEOP_ShowLineNumbers= 0x04,     /* toggles line numbers on */
   TEOP_NoCloseBtn     = 0x08,      /* no close button */
   TEOP_NoFileLab      = 0x10      /* hide label closed / open file */
 };
@@ -59,21 +59,24 @@ class textEditMWn : public QMainWindow
 {
   Q_OBJECT
 
-  void _init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack) );
+//  void _init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack) );
+  void _init(uint32_t pOptions );
 public:
-  explicit textEditMWn(QWidget*parent ,uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)=nullptr);
-  explicit textEditMWn(QWidget*parent );
-  ~textEditMWn();
+//  explicit textEditMWn(QWidget*parent ,uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)=nullptr);
+    explicit textEditMWn(QWidget *parent, uint32_t pOptions, textEditMWn **pCalleePointer);
+    explicit textEditMWn(QWidget *parent);
+    ~textEditMWn();
 
-  ZStatus setTextFromFile(const uriString& pTextFile);
-  void setText(const utf8VaryingString& pText, const utf8VaryingString &pTitle);
-  void appendText(const utf8VaryingString& pText);
-  void appendText(const char *pText,...);
+    ZStatus setTextFromFile(const uriString &pTextFile);
+    void setText(const utf8VaryingString &pText, const utf8VaryingString &pTitle);
+    void appendText(const utf8VaryingString &pText);
+    void appendText(const char *pText, ...);
 
-  void appendTextColor(QColor pBkgndColor,QColor pTextColor,const utf8VaryingString& pText);
-  void appendTextColor(QColor pBkgndColor,QColor pTextColor,const char *pText,...);
-  void appendTextColor(QColor pTextColor,const utf8VaryingString& pText) {
-    appendTextColor(QColor(),pTextColor,pText);
+    void appendTextColor(QColor pBkgndColor, QColor pTextColor, const utf8VaryingString &pText);
+    void appendTextColor(QColor pBkgndColor, QColor pTextColor, const char *pText, ...);
+    void appendTextColor(QColor pTextColor, const utf8VaryingString &pText)
+    {
+        appendTextColor(QColor(), pTextColor, pText);
   }
   void appendTextColor(QColor pTextColor,const char *pText,...);
 
@@ -92,7 +95,7 @@ public:
 
   void clear() ;
 
-  void registerCloseCallback(__CLOSE_CALLBACK__(pCloseCallBack)) {CloseCallBack=pCloseCallBack;}
+//  void registerCloseCallback(__CLOSE_CALLBACK__(pCloseCallBack)) {CloseCallBack=pCloseCallBack;}
   void registerMoreCallback(__MORE_CALLBACK__(pCloseCallBack)) {MoreCallBack=pCloseCallBack;}
   void registerFiltrateCallback(__FILTRATE_CALLBACK__(pFiltrateCallBack)) {FiltrateCallBack=pFiltrateCallBack;}
 
@@ -179,12 +182,14 @@ private:
 
   int             searchOffset=0;
 
-  __CLOSE_CALLBACK__(CloseCallBack) =nullptr;
+//  __CLOSE_CALLBACK__(CloseCallBack) =nullptr;
   __MORE_CALLBACK__(MoreCallBack) =nullptr;
   __FILTRATE_CALLBACK__(FiltrateCallBack)=nullptr;
 
   bool FWrap=false;
   bool FSearch=false;
+
+  textEditMWn** CalleePointer=nullptr;
 
   bool              FiltrateActive=false;
   uint32_t          Options=TEOP_Nothing;

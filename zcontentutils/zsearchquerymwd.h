@@ -14,9 +14,12 @@ namespace zbs {
 #include <ztoolset/utfvaryingstring.h>
 
 #include <zcontent/zindexedfile/zsearchentity.h>
+#include <zcontent/zindexedfile/zsearchcontext.h>
 #include <QPalette>
 
-//using namespace zbs;
+
+
+using namespace zbs;
 
 class QWidget;
 class QTextEdit;
@@ -90,7 +93,7 @@ public:
   void setProgressBarValue(int pValue, const utf8VaryingString &pStep);
 
   ZStatus DisplayEntityRaw(std::shared_ptr<ZSearchEntity> &pEntity);
-  ZStatus DisplayEntity(std::shared_ptr<ZSearchEntity> pEntity, int pInstructionType, int pNumber);
+  ZStatus DisplayEntity(ZSearchContext &pContext);
 
   void DisplayCurrentEntity ();
 

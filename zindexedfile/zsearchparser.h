@@ -398,6 +398,8 @@ public:
   ZStatus _parseFetch(ZSearchContext & pContext);
   ZStatus _parseDisplay(ZSearchContext & pContext);
 
+  ZStatus _parseSetDisplay(ZSearchContext & pContext);
+
   ZStatus executeDisplay(ZSearchContext& pContext);
 
 
@@ -609,15 +611,21 @@ public:
   void setUpdateFrequence(int pFrequence) {UpdateFrequence = pFrequence;}
 
   void displayTokenList(ZArray<ZSearchToken*> &Whole);
-
+  void displayTokenList();
 
   /** @brief DisplayEntityDefault default routine to output entity content to ErrorLog */
   ZStatus DisplayEntityDefault(ZSearchContext& pContext);
   ZStatus _DisplayEntitySingleDefault(ZSearchContext& pContext);
   ZStatus _DisplayEntityJoinDefault (ZSearchContext &pContext);
+
+  /* base routine for output */
+  void _DESD_Display (const utf8VaryingString& pFormat,...);
+  void _DESD_Init();
   /* Deprecated
   ZStatus DisplayEntityDefault(std::shared_ptr<ZSearchEntity> pEntity,int pInstructionType,int pNumber);
   */
+  /** @brief setDisplayLimit sets maximum number of entity ranks to be displayed.If pLimit is negative, then no limit is applied */
+  void setDisplayLimit(int pLimit);
   /** @brief setDisplayColMax sets maximum column width for default entity display routine */
   void setDisplayColMax(int pColMax);
   /** @brief setDisplayColMin sets minimum column width for default entity display routine */
@@ -631,11 +639,14 @@ public:
   uriString             URISymbol;
   uriString             URIParams;
 
+  uriString             URIDisplay;
+  bool                  DisplayCurrent=false;
+  int                   DisplayLimit=-1;
+
 //  ZArray<ZSearchFileSymbol>                         SymbolList;
   ZSearchSymbolList                                 SymbolList;
 //  ZArray<ZEntitySymbol>                           ZEntitySymbolList;
   ZSearchEntityList                                 EntityList;
-  ZArray<ZSearchEntityContext>                      SECList;
 //  ZArray<std::shared_ptr<ZSearchMasterFile>>      MasterFileList;
   ZArray<ZMasterFileItem>                           MasterFileList;
 
@@ -647,9 +658,11 @@ public:
   int UpdateFrequence = 5;
   __progressCallBack__(ProgressCallBack)=nullptr;
   __progressSetupCallBack__(ProgressSetupCallBack)=nullptr;
-
+/*
   std::function<ZStatus (ZSearchContext&)>  DisplayEntity =
       std::bind(&ZSearchParser::DisplayEntityDefault, this,placeholders::_1);
+*/
+  std::function<ZStatus (ZSearchContext&)>  DisplayEntity = nullptr ;
   int DisplayColMax = 35;
   int DisplayColMin = 5;
   ZCFMT_Type DisplayCellFormat = ZCFMT_ResSymb | ZCFMT_DMYHMS ;

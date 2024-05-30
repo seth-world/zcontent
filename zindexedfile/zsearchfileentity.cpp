@@ -43,9 +43,9 @@ ZSearchMasterFile::getFirst(ZSearchEntityContext& pSEC,zaddress_type &pAddress)
 }
 
 ZStatus
-ZSearchMasterFile::getNext(ZSearchEntityContext& pSEC,long& pOutRank,zaddress_type &pAddress)
+ZSearchMasterFile::getNext(ZSearchEntityContext& pSEC,zaddress_type &pAddress)
 {
-    pOutRank = CurrentRank + 1;
+    int pOutRank = CurrentRank + 1;
     pSEC.Status=(*this)->zgetWAddress(pSEC._URFParser.Record,pOutRank,pAddress);
     if (pSEC.Status!=ZS_SUCCESS) {
         return pSEC.Status;

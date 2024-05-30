@@ -138,7 +138,7 @@ public:
     std::shared_ptr<ZSearchEntity> SourceEntity=nullptr;
     std::shared_ptr<ZSearchEntity> TargetEntity=nullptr;
 
-    ZSearchEntityContext*       SEC=nullptr;
+    std::shared_ptr<ZSearchEntityContext>      SEC=nullptr;
 
     int                         InstructionType = ZSITP_Nothing;
     int                         Number = -1;  /* default is all (-1) */

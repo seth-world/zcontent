@@ -114,11 +114,6 @@ DisplayMain::displayHCB(ZDataBuffer &pData)
 
   ui->offsetSBx->setMaximum(int(pData.Size));
 
-/*  ui->OffsetSLd->setMinimum(0);
-  ui->OffsetSLd->setMaximum(pData.Size);
-  ui->OffsetSLd->setValue (0);
-  ui->OffsetSLd->setSingleStep(1);
-*/
   ui->offsetSBx->setValue(0);
 
   displayHCBValues(pData.Data);
@@ -177,10 +172,7 @@ DisplayMain::displayFCB(ZDataBuffer &pData)
             URIContent->getFileSize());
         return;
         }
-/*      ZDataBuffer wNewRaw;
-      VisuMain->URICurrent.loadContent(wNewRaw);
-      DisplayMain::displayFCB(wNewRaw);
-*/
+
       URIContent->loadContent(RawData);
       DisplayMain::displayFCB(RawData);
       return;
@@ -202,14 +194,6 @@ DisplayMain::displayFCB(ZDataBuffer &pData)
   }
 
   setOffset(wOffset,pData.Size);
-/*
-  Offset=wOffset;
-  ui->OffsetSLd->setMinimum(0);
-  ui->OffsetSLd->setMaximum(pData.Size);
-  ui->OffsetSLd->setValue (Offset);
-  wStr.sprintf("%4ld - Ox%4lX",Offset,Offset);
-  ui->OffsetLBl->setText(wStr.toCChar());
-*/
   displayFCBValues(pData.Data+wOffset);
 }
 
@@ -375,23 +359,17 @@ DisplayMain::displayHCBValues(unsigned char *pPtrIn)
   wStr += "::Header control block";
 
   setWindowTitle(wStr.toCChar());
-/*
-  ContentToDump.setData(pPtrIn,sizeof(ZHeaderControlBlock_Export));
-  ZHeaderControlBlock_Export* wHCBExport=(ZHeaderControlBlock_Export*)ContentToDump.Data;
-*/
+
   ZHeaderControlBlock_Export* wHCBExport=(ZHeaderControlBlock_Export*)pPtrIn;
 
-
-  if (displayItemModel)
+  if (displayItemModel) {
     if (displayItemModel->rowCount()>0)
       displayItemModel->removeRows(0,displayItemModel->rowCount());
-
-
+  }
   ZQStandardItem::setItemAlignment(Qt::AlignRight);
 
   int wRow=0;
   QList<QStandardItem *> wDumpRow ;
-//  QStandardItem* wCurItem=nullptr;
 
   wDumpRow.clear();
   wDumpRow << createItem(sizeof(wHCBExport->StartSign),"%ld");

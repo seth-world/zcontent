@@ -388,7 +388,7 @@ void ZExceptionDLg::setErrorLogBTn(ZaiErrors* pErrorLog) {
 void ZExceptionDLg::ErrlogClicked()
 {
   utf8VaryingString wStr;
-  textEditMWn* wTE=new textEditMWn(this,TEOP_ShowLineNumbers | TEOP_NoFileLab);
+  textEditMWn* wTE=new textEditMWn(this,TEOP_ShowLineNumbers | TEOP_NoFileLab,nullptr);
   wTE->setWindowTitle("Error log");
 
   if (ErrorLog==nullptr) {
@@ -415,7 +415,7 @@ void ZExceptionDLg::ZExceptionClicked()
   if (ZException.count()==0)
     return;
   utf8VaryingString wStr;
-  textEditMWn* wTE=new textEditMWn(this,TEOP_ShowLineNumbers | TEOP_NoFileLab);
+  textEditMWn* wTE=new textEditMWn(this,TEOP_ShowLineNumbers | TEOP_NoFileLab,nullptr);
   wTE->setWindowTitle("ZException stack");
   for (long wi = ZException.count()-1;wi >= 0; wi--) {
       wTE->appendText(ZException.Tab(wi)->formatFullUserMessage(false));

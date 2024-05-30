@@ -345,7 +345,7 @@ fieldTBv
   void closeGenShowCppCB(QEvent *pEvent);
   void closeGenShowHeaderCB(QEvent *pEvent);
 
-  void closeDiclogCB(const QEvent *pEvent);
+//  void closeDiclogCB(const QEvent *pEvent);
   void displayErrorCallBack(const utf8VaryingString& pMessage);
   void displayErrorColorCB(uint8_t pSeverity, const utf8VaryingString& pMessage);
 

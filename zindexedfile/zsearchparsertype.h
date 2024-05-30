@@ -182,26 +182,26 @@ enum ZSearchTokentype : ZSearchTokentype_type {
   ZSRCH_LOAD                     = 0x000103B1,   /* load symbol [ from <xml file path> ] */
 
   ZSRCH_SET                      = 0x00010310,
-  ZSRCH_FILE                     = 0x00010311,
+  ZSRCH_FILE                     = 0x00010411,
 
-  ZSRCH_MODE                     = 0x00010312,
-  ZSRCH_READONLY                 = 0x00010313,
-  ZSRCH_MODIFY                   = 0x00010314,
+  ZSRCH_MODE                     = 0x00010412,
+  ZSRCH_READONLY                 = 0x00010413,
+  ZSRCH_MODIFY                   = 0x00010414,
 
-  ZSRCH_AS                       = 0x00010315,
+  ZSRCH_AS                       = 0x00010415,
 
-  ZSRCH_TO                       = 0x0001031,
-  ZSRCH_FROM                     = 0x0001032,
+  ZSRCH_TO                       = 0x00010416,
+  ZSRCH_FROM                     = 0x00010417,
 
   ZSRCH_FINISH                   = 0x0001031F,
 
   ZSRCH_FIND                     = 0x00010320,
-  ZSRCH_WITH                     = 0x00010321,
+  ZSRCH_WITH                     = 0x00010421,
 
-  ZSRCH_IN                       = 0x00010322,
+  ZSRCH_IN                       = 0x00010422,
   ZSRCH_FETCH                    = 0x00010323,
 
-  ZSRCH_USING                    = 0x00010324,
+  ZSRCH_USING                    = 0x00010424,
 
   ZSRCH_INDEX                    = 0x00010331,
   ZSRCH_INDEXNUM                 = 0x00010332,
@@ -212,26 +212,28 @@ enum ZSearchTokentype : ZSearchTokentype_type {
   ZSRCH_SHOW                     = 0x00010350,
 
   ZSRCH_CLEAR                    = 0x00010351,
-  ZSRCH_HISTORY                  = 0x00010352,
+  ZSRCH_HISTORY                  = 0x00010452,
 
-  ZSRCH_FIELDS                   = 0x00010353,  /* show instruction */
-  ZSRCH_ENTITY                   = 0x00010354,  /* show instruction */
-  ZSRCH_SYMBOL                   = 0x00010355,  /* show instruction */
-  ZSRCH_MASTERFILES              = 0x00010356,  /* show instruction */
-  ZSRCH_FORMULA                  = 0x00010357,  /* show instruction */
+  ZSRCH_FIELDS                   = 0x00010453,  /* show instruction */
+  ZSRCH_ENTITY                   = 0x00010454,  /* show instruction */
+  ZSRCH_SYMBOL                   = 0x00010455,  /* show instruction */
+  ZSRCH_MASTERFILES              = 0x00010456,  /* show instruction */
+  ZSRCH_FORMULA                  = 0x00010457,  /* show instruction */
 
-  ZSRCH_MAXIMUM                  = 0x00010358,  /* set history maximum instruction */
+  ZSRCH_MAXIMUM                  = 0x00010458,  /* set history maximum instruction */
 
   ZSRCH_DISPLAY                  = 0x00010359,  /* diplay instruction */
 
-  ZSRCH_ALL                      = 0x00010360,
-  ZSRCH_FIRST                    = 0x00010361,
-  ZSRCH_NEXT                     = 0x00010362,
-  ZSRCH_LAST                     = 0x00010363,
-  ZSRCH_AT                       = 0x00010364,
+  ZSRCH_ALL                      = 0x00010460,
+  ZSRCH_FIRST                    = 0x00010461,
+  ZSRCH_NEXT                     = 0x00010462,
+  ZSRCH_LAST                     = 0x00010463,
+  ZSRCH_AT                       = 0x00010464,
 
   ZSRCH_JOIN                     = 0x00010365,
 
+  ZSRCH_CURRENT                  = 0x00010470,
+  ZSRCH_DEFAULT                  = 0x00010471,
 
   ZSRCH_MODIFIER                 = 0x00020300,
 

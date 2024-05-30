@@ -33,6 +33,7 @@
 #include <zcontent/zcontentcommon/urfparser.h>
 #include <zcontent/zcontentcommon/zcontentconstants.h>
 
+#include <zcontentcommon/zgeneralparameters.h>
 
 using namespace zbs;
 
@@ -319,6 +320,7 @@ ZStatus ZSearchParser::parse(const utf8VaryingString& pContent, ZSearchContext &
       return ZS_EMPTY;
   }
 
+  displayTokenList();
 
   /* search for keywords and replace with appropriate ZSRCH code */
 
@@ -493,6 +495,13 @@ void
 ZSearchParser::showDisplay ()
 {
     ErrorLog.textLog("__________________Display parameters___________________");
+    if (URIDisplay.isEmpty()) {
+        ErrorLog.textLog("Output is <%s>",DisplayCurrent?"Application defined":"Default");
+    }
+    else
+        ErrorLog.textLog("Output is <%s>",URIDisplay.toString());
+    ErrorLog.textLog("Default display");
+    ErrorLog.textLog("  maximum entity ranks [limit]   %d %s",DisplayLimit,DisplayLimit<0?"[no limit]":"");
     ErrorLog.textLog("  maximum column size [colmax]   %d",DisplayColMax);
     ErrorLog.textLog("  minimum column size [colmin]   %d",DisplayColMin);
     ErrorLog.textLog("  cell format                    %s",decode_ZCellFormat(DisplayCellFormat).toString());
@@ -5063,199 +5072,7 @@ ZStatus ZSearchParser::_parseContext(ZSearchContext& pContext)
           } //   ZSRCH_HISTORY
 
           if (pContext.CurrentToken->Type == ZSRCH_DISPLAY) {
-              if (!pContext.advanceIndex())
-                  return pContext.Status=ZS_SYNTAX_ERROR;
-
-              if (pContext.CurrentToken->Type != ZSRCH_IDENTIFIER) {
-                  ErrorLog.errorLog("Missing required word one of { <COLMAX> ,<COLMIN> , <FORMAT> } at line %d column %d . Found <%s>.",
-                                    pContext.CurrentToken->TokenLine,
-                                    pContext.CurrentToken->TokenColumn,
-                                    pContext.CurrentToken->Text.toString() );
-                  pContext.LastErroredToken = pContext.CurrentToken;
-                  return pContext.Status=ZS_MISS_KEYWORD;
-              }
-              if (pContext.CurrentToken->Text.compareCase("COLMAX")==0) {
-                  pContext.advanceIndex(false);
-                  if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_OPERATOR_MOVE)) {
-                      ErrorLog.errorLog("Missing sign equal '=' at line %d column %d . Found <%s>.",
-                                        pContext.CurrentToken->TokenLine,
-                                        pContext.CurrentToken->TokenColumn,
-                                        pContext.CurrentToken->Text.toString() );
-                      pContext.LastErroredToken = pContext.CurrentToken;
-                      return pContext.Status=ZS_MISS_OPERATOR;
-                  }
-                  pContext.advanceIndex(false);
-                  if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_NUMERIC_LITERAL)) {
-                      ErrorLog.errorLog("Missing numeric literal at line %d column %d . Found <%s>.",
-                                        pContext.CurrentToken->TokenLine,
-                                        pContext.CurrentToken->TokenColumn,
-                                        pContext.CurrentToken->Text.toString() );
-                      pContext.LastErroredToken = pContext.CurrentToken;
-                      return pContext.Status=ZS_MISS_LITERAL;
-                  }
-                  int wNewMax = pContext.CurrentToken->Text.toInt();
-                  setDisplayColMax(wNewMax);
-                  pContext.advanceIndex(false);
-                  return pContext.Status=ZS_SUCCESS;
-              } // COLMAX
-              if (pContext.CurrentToken->Text.compareCase("COLMIN")==0) {
-                  pContext.advanceIndex(false);
-                  if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_OPERATOR_MOVE)) {
-                      ErrorLog.errorLog("Missing sign equal '=' at line %d column %d . Found <%s>.",
-                                        pContext.CurrentToken->TokenLine,
-                                        pContext.CurrentToken->TokenColumn,
-                                        pContext.CurrentToken->Text.toString() );
-                      pContext.LastErroredToken = pContext.CurrentToken;
-                      return pContext.Status=ZS_MISS_OPERATOR;
-                  }
-                  pContext.advanceIndex(false);
-                  if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_NUMERIC_LITERAL)) {
-                      ErrorLog.errorLog("Missing numeric literal at line %d column %d . Found <%s>.",
-                                        pContext.CurrentToken->TokenLine,
-                                        pContext.CurrentToken->TokenColumn,
-                                        pContext.CurrentToken->Text.toString() );
-                      pContext.LastErroredToken = pContext.CurrentToken;
-                      return pContext.Status=ZS_MISS_LITERAL;
-                  }
-                  int wNewMax = pContext.CurrentToken->Text.toInt();
-                  setDisplayColMin(wNewMax);
-                  pContext.advanceIndex(false);
-                  return pContext.Status=ZS_SUCCESS;
-              } // COLMIN
-
-              if (pContext.CurrentToken->Text.compareCase("FORMAT")==0) {
-                  pContext.advanceIndex(false);
-
-                  ZCFMT_Type wZCellFormat = DisplayCellFormat;
-                  bool wEnd=false;
-                  bool wPlus=false;
-                  while (pContext.notEOF() && ! wEnd) {
-                      if (pContext.isEOF() ||
-                              ((pContext.CurrentToken->Type != ZSRCH_OPERATOR_PLUS) &&
-                               (pContext.CurrentToken->Type != ZSRCH_OPERATOR_MINUS))) {
-                          ErrorLog.errorLog("Missing operator : one of { '+' , '-' }  at line %d column %d . Found <%s>.",
-                                            pContext.CurrentToken->TokenLine,
-                                            pContext.CurrentToken->TokenColumn,
-                                            pContext.CurrentToken->Text.toString() );
-                          pContext.LastErroredToken = pContext.CurrentToken;
-                          return pContext.Status=ZS_MISS_OPERATOR;
-                      }
-                      if (pContext.CurrentToken->Type == ZSRCH_OPERATOR_PLUS)
-                          wPlus=true;
-                      /* remark : if not plus, then minus has been mentionned */
-                      pContext.advanceIndex(false);
-                    while (true) {
-
-                    if (pContext.CurrentToken->Text.compareCase("NUMHEXA")==0) {
-                        wZCellFormat &= ~ ZCFMT_NumMask ;
-                        if (wPlus)
-                            wZCellFormat |= ZCFMT_NumHexa;
-                        else
-                            wZCellFormat &= ~ZCFMT_NumHexa;
-                        break;
-                    }
-                    if (pContext.CurrentToken->Text.compareCase("MDY")==0) {
-                        wZCellFormat &= ~ ZCFMT_DateMask ;
-                        if (wPlus)
-                            wZCellFormat |= ZCFMT_MDY;
-                        else
-                            wZCellFormat &= ~ZCFMT_MDY;
-                        break;
-                    }
-                    if (pContext.CurrentToken->Text.compareCase("DMY")==0) {
-                        wZCellFormat &= ~ ZCFMT_DateMask ;
-                        if (wPlus)
-                            wZCellFormat |= ZCFMT_DMY;
-                        else
-                            wZCellFormat &= ~ZCFMT_DMY;
-                        break;
-                    }
-                    if (pContext.CurrentToken->Text.compareCase("MDYHMS")==0) {
-                        wZCellFormat &= ~ ZCFMT_DateMask ;
-                        if (wPlus)
-                            wZCellFormat |= ZCFMT_MDYHMS;
-                        else
-                            wZCellFormat &= ~ZCFMT_MDYHMS;
-                        break;
-                    }
-                    if (pContext.CurrentToken->Text.compareCase("DMYHMS")==0) {
-                        wZCellFormat &= ~ ZCFMT_DateMask ;
-                        if (wPlus)
-                            wZCellFormat |= ZCFMT_DMYHMS;
-                        else
-                            wZCellFormat &= ~ZCFMT_DMYHMS;
-                        break;
-                    }
-                    if (pContext.CurrentToken->Text.compareCase("DLOCALE")==0) {
-                        wZCellFormat &= ~ ZCFMT_DateMask ;
-                        if (wPlus)
-                            wZCellFormat |= ZCFMT_DLocale;
-                        else
-                            wZCellFormat &= ~ZCFMT_DLocale;
-                        break;
-                    }
-                    if (pContext.CurrentToken->Text.compareCase("DUTC")==0) {
-                        wZCellFormat &= ~ ZCFMT_DateMask ;
-                        if (wPlus)
-                            wZCellFormat |= ZCFMT_DUTC;
-                        else
-                            wZCellFormat &= ~ZCFMT_DUTC;
-                        break;
-                    }
-                    if (pContext.CurrentToken->Text.compareCase("RESSYMBOL")==0) {
-                        wZCellFormat &= ~ ZCFMT_ResMask ;
-                        if (wPlus)
-                            wZCellFormat |= ZCFMT_ResSymb;
-                        else
-                            wZCellFormat &= ~ZCFMT_ResSymb;
-                        break;
-                    }
-                    if (pContext.CurrentToken->Text.compareCase("RESSTD")==0) {
-                        wZCellFormat &= ~ ZCFMT_ResMask ;
-                        if (wPlus)
-                            wZCellFormat |= ZCFMT_ResStd;
-                        else
-                            wZCellFormat &= ~ZCFMT_ResStd;
-                        break;
-                    }
-                    if (pContext.CurrentToken->Text.compareCase("PREFZTYPE")==0) {
-                        if (wPlus)
-                            wZCellFormat |= ZCFMT_PrefZType;
-                        else
-                            wZCellFormat &= ~ZCFMT_PrefZType;
-                        break;
-                    }
-                    if (pContext.CurrentToken->Text.compareCase("DUMPBLOB")==0) {
-                        if (wPlus)
-                            wZCellFormat |= ZCFMT_DumpBlob;
-                        else
-                            wZCellFormat &= ~ZCFMT_DumpBlob;
-                        break;
-                    }
-                    wEnd = true;
-                    break;
-                    }// while true
-                    if (!wEnd) {
-                        pContext.advanceIndex(false);
-                    }
-                  }// while not eof and not wEnd
-
-                  if (wZCellFormat == DisplayCellFormat) {
-                      ErrorLog.warningLog("Nothing changed for Cell format");
-                      return pContext.Status=ZS_SUCCESS;
-                  }
-                  DisplayCellFormat = wZCellFormat;
-                  ErrorLog.infoLog("Current display format has been changed to <%s>",decode_ZCellFormat(DisplayCellFormat).toString());
-
-                  return pContext.Status=ZS_SUCCESS;
-              } // FORMAT
-
-              ErrorLog.errorLog("Missing required word one of { <COLMAX> ,<COLMIN> , <FORMAT> } at line %d column %d . Found <%s>.",
-                                pContext.CurrentToken->TokenLine,
-                                pContext.CurrentToken->TokenColumn,
-                                pContext.CurrentToken->Text.toString() );
-              pContext.LastErroredToken = pContext.CurrentToken;
-              return pContext.Status=ZS_MISS_KEYWORD;
+              return pContext.Status=_parseSetDisplay(pContext);
           } //   ZSRCH_DISPLAY
 
           if (pContext.CurrentToken->Type !=ZSRCH_FILE) {
@@ -5387,6 +5204,339 @@ ZStatus ZSearchParser::_parseContext(ZSearchContext& pContext)
 
   return pContext.Status ;
 } // ZSearchParser::_parseContext
+
+ZStatus
+ZSearchParser::_parseSetDisplay(ZSearchContext &pContext)
+{
+    if (!pContext.advanceIndex())
+        return pContext.Status=ZS_SYNTAX_ERROR;
+
+
+    if (pContext.CurrentToken->Type==ZSRCH_PATH) {
+        pContext.advanceIndex(false);
+        if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_OPERATOR_MOVE)) {
+            ErrorLog.errorLog("Missing sign equal '=' at line %d column %d . Found <%s>.",
+                              pContext.CurrentToken->TokenLine,
+                              pContext.CurrentToken->TokenColumn,
+                              pContext.CurrentToken->Text.toString() );
+            pContext.LastErroredToken = pContext.CurrentToken;
+            return pContext.Status=ZS_MISS_OPERATOR;
+        }
+        pContext.advanceIndex(false);
+        if (pContext.isEOF() ||
+                ((pContext.CurrentToken->Type != ZSRCH_STRING_LITERAL) &&
+                (pContext.CurrentToken->Type != ZSRCH_URISTRING))) {
+            ErrorLog.errorLog("Missing string literal or uriString description at line %d column %d . Found <%s>.",
+                              pContext.CurrentToken->TokenLine,
+                              pContext.CurrentToken->TokenColumn,
+                              pContext.CurrentToken->Text.toString() );
+            pContext.LastErroredToken = pContext.CurrentToken;
+            return pContext.Status=ZS_MISS_LITERAL;
+        }
+
+        if (pContext.CurrentToken->Type == ZSRCH_STRING_LITERAL) {
+                URIDisplay = pContext.CurrentToken->Text;
+                if (URIDisplay.getDirectoryPath().isEmpty()) {
+                    URIDisplay = GeneralParameters.getWorkDirectory().addConditionalDirectoryDelimiter() + URIDisplay;
+                }
+
+                ZStatus wSt=URIDisplay.check();
+                if (wSt!=ZS_SUCCESS && wSt!=ZS_FILENOTEXIST && wSt!=ZS_FILENOTOPEN) {
+                    ErrorLog.errorLog("<%s> is an invalid path at line %d column %d.",
+                                      pContext.CurrentToken->Text.toString(),
+                                      pContext.CurrentToken->TokenLine,
+                                      pContext.CurrentToken->TokenColumn);
+                    return ZS_INV_LITERAL;
+                }
+                ErrorLog.infoLog("Entity report display is redirected to file <%s>.",URIDisplay.toString());
+                pContext.advanceIndex(false);
+                return pContext.Status=ZS_SUCCESS;
+        }//ZSRCH_STRING_LITERAL
+
+        if (pContext.CurrentToken->Type == ZSRCH_URISTRING) {
+            pContext.advanceIndex(false);
+            if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_OPENPARENTHESIS)) {
+                ErrorLog.errorLog("Missing open parenthesis at line %d column %d . Found <%s>.",
+                                  pContext.CurrentToken->TokenLine,
+                                  pContext.CurrentToken->TokenColumn,
+                                  pContext.CurrentToken->Text.toString() );
+                pContext.LastErroredToken = pContext.CurrentToken;
+                return pContext.Status=ZS_MISS_PUNCTSIGN;
+            }
+            pContext.advanceIndex(true);
+            URIDisplay = pContext.CurrentToken->Text;
+            if (URIDisplay.getDirectoryPath().isEmpty()) {
+                URIDisplay = GeneralParameters.getWorkDirectory().addConditionalDirectoryDelimiter() + URIDisplay;
+            }
+            ZStatus wSt=URIDisplay.check();
+            if (wSt!=ZS_SUCCESS) {
+                ErrorLog.errorLog("<%s> is an invalid path at line %d column %d.",
+                                  pContext.CurrentToken->Text.toString(),
+                                  pContext.CurrentToken->TokenLine,
+                                  pContext.CurrentToken->TokenColumn);
+                return ZS_INV_LITERAL;
+            }
+            pContext.advanceIndex(false);
+            if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_CLOSEPARENTHESIS)) {
+                ErrorLog.errorLog("Missing close parenthesis at line %d column %d . Found <%s>.",
+                                  pContext.CurrentToken->TokenLine,
+                                  pContext.CurrentToken->TokenColumn,
+                                  pContext.CurrentToken->Text.toString() );
+                pContext.LastErroredToken = pContext.CurrentToken;
+                return pContext.Status=ZS_MISS_PUNCTSIGN;
+            }
+
+            ErrorLog.infoLog("Entity content display is set to file <%s>.",URIDisplay.toString());
+            pContext.advanceIndex(false);
+            return pContext.Status=ZS_SUCCESS;
+        }//ZSRCH_URISTRING
+
+        if (pContext.CurrentToken->Type == ZSRCH_DEFAULT) {
+            pContext.advanceIndex(false);
+            ErrorLog.infoLog("Entity content display is redirected DEFAULT.");
+            DisplayCurrent = false;
+            URIDisplay.clear();
+
+            pContext.advanceIndex(false);
+            return pContext.Status=ZS_SUCCESS;
+        }//ZSRCH_URISTRING
+        ErrorLog.errorLog("Missing one of { <file path as literal> , uristring(<file uri>) } at line %d column %d. Found <%s>.",
+                          pContext.CurrentToken->TokenLine,
+                          pContext.CurrentToken->TokenColumn,
+                          pContext.CurrentToken->Text.toString() );
+        pContext.LastErroredToken = pContext.CurrentToken;
+        return pContext.Status=ZS_SYNTAX_ERROR;
+    } // ZSRCH_PATH
+
+    if (pContext.CurrentToken->Type==ZSRCH_DEFAULT) {
+        pContext.advanceIndex(false);
+        ErrorLog.infoLog("setDisplay-I_DEFAULT Entity display output is set to <DEFAULT>.\n");
+        DisplayCurrent = false;
+        return pContext.Status=ZS_SUCCESS;
+    } // ZSRCH_DEFAULT
+
+    if (pContext.CurrentToken->Type==ZSRCH_CURRENT) {
+        pContext.advanceIndex(false);
+        if (DisplayEntity==nullptr) {
+            ErrorLog.errorLog("setDisplay-E-NOCURRENT Current entity display has not been yet defined.");
+            ErrorLog.errorLog("                       Entity display is set to <DEFAULT> (Error log).");
+        DisplayCurrent = false;
+        return pContext.Status=ZS_NULLPTR;
+        }
+        ErrorLog.infoLog("setDisplay-I_CURRENT Entity display output is set to <CURRENT>.\n");
+        DisplayCurrent = true;
+        return pContext.Status=ZS_SUCCESS;
+    } // ZSRCH_CURRENT
+
+    if (pContext.CurrentToken->Text.compareCase("LIMIT")==0) {
+        pContext.advanceIndex(false);
+        if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_OPERATOR_MOVE)) {
+            ErrorLog.errorLog("Missing sign equal '=' at line %d column %d . Found <%s>.",
+                              pContext.CurrentToken->TokenLine,
+                              pContext.CurrentToken->TokenColumn,
+                              pContext.CurrentToken->Text.toString() );
+            pContext.LastErroredToken = pContext.CurrentToken;
+            return pContext.Status=ZS_MISS_OPERATOR;
+        }
+        pContext.advanceIndex(false);
+        if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_NUMERIC_LITERAL)) {
+            ErrorLog.errorLog("Missing numeric literal at line %d column %d . Found <%s>.",
+                              pContext.CurrentToken->TokenLine,
+                              pContext.CurrentToken->TokenColumn,
+                              pContext.CurrentToken->Text.toString() );
+            pContext.LastErroredToken = pContext.CurrentToken;
+            return pContext.Status=ZS_MISS_LITERAL;
+        }
+        int wNewMax = pContext.CurrentToken->Text.toInt();
+        setDisplayLimit(wNewMax);
+        pContext.advanceIndex(false);
+        return pContext.Status=ZS_SUCCESS;
+    } // LIMIT
+
+    if (pContext.CurrentToken->Text.compareCase("COLMAX")==0) {
+        pContext.advanceIndex(false);
+        if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_OPERATOR_MOVE)) {
+            ErrorLog.errorLog("Missing sign equal '=' at line %d column %d . Found <%s>.",
+                              pContext.CurrentToken->TokenLine,
+                              pContext.CurrentToken->TokenColumn,
+                              pContext.CurrentToken->Text.toString() );
+            pContext.LastErroredToken = pContext.CurrentToken;
+            return pContext.Status=ZS_MISS_OPERATOR;
+        }
+        pContext.advanceIndex(false);
+        if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_NUMERIC_LITERAL)) {
+            ErrorLog.errorLog("Missing numeric literal at line %d column %d . Found <%s>.",
+                              pContext.CurrentToken->TokenLine,
+                              pContext.CurrentToken->TokenColumn,
+                              pContext.CurrentToken->Text.toString() );
+            pContext.LastErroredToken = pContext.CurrentToken;
+            return pContext.Status=ZS_MISS_LITERAL;
+        }
+        int wNewMax = pContext.CurrentToken->Text.toInt();
+        setDisplayColMax(wNewMax);
+        pContext.advanceIndex(false);
+        return pContext.Status=ZS_SUCCESS;
+    } // COLMAX
+    if (pContext.CurrentToken->Text.compareCase("COLMIN")==0) {
+        pContext.advanceIndex(false);
+        if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_OPERATOR_MOVE)) {
+            ErrorLog.errorLog("Missing sign equal '=' at line %d column %d . Found <%s>.",
+                              pContext.CurrentToken->TokenLine,
+                              pContext.CurrentToken->TokenColumn,
+                              pContext.CurrentToken->Text.toString() );
+            pContext.LastErroredToken = pContext.CurrentToken;
+            return pContext.Status=ZS_MISS_OPERATOR;
+        }
+        pContext.advanceIndex(false);
+        if (pContext.isEOF() || (pContext.CurrentToken->Type != ZSRCH_NUMERIC_LITERAL)) {
+            ErrorLog.errorLog("Missing numeric literal at line %d column %d . Found <%s>.",
+                              pContext.CurrentToken->TokenLine,
+                              pContext.CurrentToken->TokenColumn,
+                              pContext.CurrentToken->Text.toString() );
+            pContext.LastErroredToken = pContext.CurrentToken;
+            return pContext.Status=ZS_MISS_LITERAL;
+        }
+        int wNewMax = pContext.CurrentToken->Text.toInt();
+        setDisplayColMin(wNewMax);
+        pContext.advanceIndex(false);
+        return pContext.Status=ZS_SUCCESS;
+    } // COLMIN
+
+    if (pContext.CurrentToken->Text.compareCase("FORMAT")==0) {
+        pContext.advanceIndex(false);
+
+        ZCFMT_Type wZCellFormat = DisplayCellFormat;
+        bool wEnd=false;
+        bool wPlus=false;
+        while (pContext.notEOF() && ! wEnd) {
+            if (pContext.isEOF() ||
+                    ((pContext.CurrentToken->Type != ZSRCH_OPERATOR_PLUS) &&
+                     (pContext.CurrentToken->Type != ZSRCH_OPERATOR_MINUS))) {
+                ErrorLog.errorLog("Missing operator : one of { '+' , '-' }  at line %d column %d . Found <%s>.",
+                                  pContext.CurrentToken->TokenLine,
+                                  pContext.CurrentToken->TokenColumn,
+                                  pContext.CurrentToken->Text.toString() );
+                pContext.LastErroredToken = pContext.CurrentToken;
+                return pContext.Status=ZS_MISS_OPERATOR;
+            }
+            if (pContext.CurrentToken->Type == ZSRCH_OPERATOR_PLUS)
+                wPlus=true;
+            /* remark : if not plus, then minus has been mentionned */
+            pContext.advanceIndex(false);
+          while (true) {
+
+          if (pContext.CurrentToken->Text.compareCase("NUMHEXA")==0) {
+              wZCellFormat &= ~ ZCFMT_NumMask ;
+              if (wPlus)
+                  wZCellFormat |= ZCFMT_NumHexa;
+              else
+                  wZCellFormat &= ~ZCFMT_NumHexa;
+              break;
+          }
+          if (pContext.CurrentToken->Text.compareCase("MDY")==0) {
+              wZCellFormat &= ~ ZCFMT_DateMask ;
+              if (wPlus)
+                  wZCellFormat |= ZCFMT_MDY;
+              else
+                  wZCellFormat &= ~ZCFMT_MDY;
+              break;
+          }
+          if (pContext.CurrentToken->Text.compareCase("DMY")==0) {
+              wZCellFormat &= ~ ZCFMT_DateMask ;
+              if (wPlus)
+                  wZCellFormat |= ZCFMT_DMY;
+              else
+                  wZCellFormat &= ~ZCFMT_DMY;
+              break;
+          }
+          if (pContext.CurrentToken->Text.compareCase("MDYHMS")==0) {
+              wZCellFormat &= ~ ZCFMT_DateMask ;
+              if (wPlus)
+                  wZCellFormat |= ZCFMT_MDYHMS;
+              else
+                  wZCellFormat &= ~ZCFMT_MDYHMS;
+              break;
+          }
+          if (pContext.CurrentToken->Text.compareCase("DMYHMS")==0) {
+              wZCellFormat &= ~ ZCFMT_DateMask ;
+              if (wPlus)
+                  wZCellFormat |= ZCFMT_DMYHMS;
+              else
+                  wZCellFormat &= ~ZCFMT_DMYHMS;
+              break;
+          }
+          if (pContext.CurrentToken->Text.compareCase("DLOCALE")==0) {
+              wZCellFormat &= ~ ZCFMT_DateMask ;
+              if (wPlus)
+                  wZCellFormat |= ZCFMT_DLocale;
+              else
+                  wZCellFormat &= ~ZCFMT_DLocale;
+              break;
+          }
+          if (pContext.CurrentToken->Text.compareCase("DUTC")==0) {
+              wZCellFormat &= ~ ZCFMT_DateMask ;
+              if (wPlus)
+                  wZCellFormat |= ZCFMT_DUTC;
+              else
+                  wZCellFormat &= ~ZCFMT_DUTC;
+              break;
+          }
+          if (pContext.CurrentToken->Text.compareCase("RESSYMBOL")==0) {
+              wZCellFormat &= ~ ZCFMT_ResMask ;
+              if (wPlus)
+                  wZCellFormat |= ZCFMT_ResSymb;
+              else
+                  wZCellFormat &= ~ZCFMT_ResSymb;
+              break;
+          }
+          if (pContext.CurrentToken->Text.compareCase("RESSTD")==0) {
+              wZCellFormat &= ~ ZCFMT_ResMask ;
+              if (wPlus)
+                  wZCellFormat |= ZCFMT_ResStd;
+              else
+                  wZCellFormat &= ~ZCFMT_ResStd;
+              break;
+          }
+          if (pContext.CurrentToken->Text.compareCase("PREFZTYPE")==0) {
+              if (wPlus)
+                  wZCellFormat |= ZCFMT_PrefZType;
+              else
+                  wZCellFormat &= ~ZCFMT_PrefZType;
+              break;
+          }
+          if (pContext.CurrentToken->Text.compareCase("DUMPBLOB")==0) {
+              if (wPlus)
+                  wZCellFormat |= ZCFMT_DumpBlob;
+              else
+                  wZCellFormat &= ~ZCFMT_DumpBlob;
+              break;
+          }
+          wEnd = true;
+          break;
+          }// while true
+          if (!wEnd) {
+              pContext.advanceIndex(false);
+          }
+        }// while not eof and not wEnd
+
+        if (wZCellFormat == DisplayCellFormat) {
+            ErrorLog.warningLog("Nothing changed for Cell format");
+            return pContext.Status=ZS_SUCCESS;
+        }
+        DisplayCellFormat = wZCellFormat;
+        ErrorLog.infoLog("Current display format has been changed to <%s>",decode_ZCellFormat(DisplayCellFormat).toString());
+
+        return pContext.Status=ZS_SUCCESS;
+    } // FORMAT
+
+    ErrorLog.errorLog("Missing required word one of { <DEFAULT>,<CURRENT>,<PATH>,<LIMIT>,<COLMAX>,<COLMIN>,<FORMAT> } at line %d column %d . Found <%s>.",
+                      pContext.CurrentToken->TokenLine,
+                      pContext.CurrentToken->TokenColumn,
+                      pContext.CurrentToken->Text.toString() );
+    pContext.LastErroredToken = pContext.CurrentToken;
+    return pContext.Status=ZS_MISS_KEYWORD;
+} //  ZSearchParser::_parseSetDisplay
+
 
 ZStatus
 ZSearchParser::_parseContextClear(ZSearchContext & pContext)
@@ -6394,21 +6544,21 @@ ZSearchParser::execute(ZSearchContext & pContext)
     /* search for entity context, and create one if not found */
     pContext.SEC = nullptr;
     for (int wi=0;wi < SECList.count(); wi++) {
-        if (SECList[wi].Entity == pContext.SourceEntity) {
-            pContext.SEC = &SECList[wi];
+        if (SECList[wi]->Entity == pContext.SourceEntity) {
+            pContext.SEC = SECList[wi];
             break;
         }
     }
     if (pContext.SEC==nullptr) {
-        SECList.push(ZSearchEntityContext::newEntityContext (pContext.SourceEntity));
-        pContext.SEC = &SECList.last();
+        pContext.SEC = ZSearchEntityContext::newEntityContext (pContext.SourceEntity);
+        SECList.push(pContext.SEC);
     }
 
 
     if (pContext.InstructionType & ZSITP_Fetch)
         return executeFetch(pContext);
     if (pContext.InstructionType & ZSITP_Display)
-        return DisplayEntity(pContext);
+        return executeDisplay(pContext);
     return ZS_SUCCESS;
 }
 
@@ -6540,7 +6690,9 @@ ZSearchParser::executeDisplay(ZSearchContext& pContext)
     ZStatus wSt = ZS_SUCCESS;
 
 //    return DisplayEntity(pContext.SourceEntity,pContext.InstructionType,pContext.Number);
-    return DisplayEntity(pContext);
+    if (DisplayCurrent && (DisplayEntity != nullptr))
+        return DisplayEntity(pContext);
+    return DisplayEntityDefault(pContext);
 /*    if (pContext.InstructionType & ZSITP_Next) {
         return pContext.SourceEntity->populateNext(pContext.Number);
     }
@@ -6567,10 +6719,57 @@ ZStatus ZSearchParser::DisplayEntityDefault (ZSearchContext &pContext)
     return _DisplayEntitySingleDefault (pContext);
 }
 
+
+void ZSearchParser::_DESD_Init ()
+{
+    if (URIDisplay.isEmpty())
+        return;
+
+    ZStatus wSt = URIDisplay.createFile();
+    if (wSt!=ZS_SUCCESS) {
+        ErrorLog.errorLog("ZSearchParser::_DESD_Init-E-CREERR Cannot create / replace display output file %s",
+                          URIDisplay.toString() );
+        ErrorLog.errorLog("                 Status is %s",
+                          decode_ZStatus(wSt));
+        ErrorLog.errorLog("                 Entity display output is redicted to DEFAULT.");
+        URIDisplay.clear();
+        if (DisplayCurrent)
+            DisplayCurrent = false;
+    }
+} // ZSearchParser::_DESD_Init
+
+void ZSearchParser::_DESD_Display (const utf8VaryingString& pFormat,...)
+{
+    utf8VaryingString wStr;
+    va_list arglist;
+    va_start (arglist, pFormat);
+        wStr.vsnprintf(cst_messagelen,pFormat.toCChar(), arglist);
+//        wStr.addUtfUnit( '\n' );
+    va_end(arglist);
+
+    if (!URIDisplay.isEmpty()) {
+        ZStatus wSt = URIDisplay << wStr;
+        if (wSt!=ZS_SUCCESS) {
+            ErrorLog.errorLog("ZSearchParser::_DESD_Display-E-WRITERR Cannot write to display output file %s",
+                              URIDisplay.toString() );
+            ErrorLog.errorLog("                 Status is %s",
+                              decode_ZStatus(wSt));
+            ErrorLog.errorLog("                 Entity display output is redicted to DEFAULT.");
+            URIDisplay.clear();
+            if (DisplayCurrent)
+                DisplayCurrent = false;
+
+            ErrorLog.textLog(wStr.toCChar());
+        }
+        return ;
+    }
+    ErrorLog.textLog(wStr.toCChar());
+} // ZSearchParser::_DESD_Display
+
 ZStatus ZSearchParser::_DisplayEntitySingleDefault (ZSearchContext &pContext)
 {
     utf8VaryingString wStr;
-//    ZDataBuffer wRecord;
+
     ZStatus wSt=ZS_SUCCESS;
 
     ZArray<utf8VaryingString>            wHeader;
@@ -6590,8 +6789,6 @@ ZStatus ZSearchParser::_DisplayEntitySingleDefault (ZSearchContext &pContext)
 
 
     zaddress_type wAddress;
-
-
 
     pContext.SEC->CaptureTime=true;
     pContext.SEC->ProcessTi.init();
@@ -6613,18 +6810,20 @@ ZStatus ZSearchParser::_DisplayEntitySingleDefault (ZSearchContext &pContext)
             ErrorLog.errorLog("Invalid instruction type given. Expected one of {ZSITP_First,ZSITP_All,ZSITP_Next,ZSITP_At}");
             return ZS_INVOP;
         }
+
+    _DESD_Init();
+
     int wCount = 0;
 
     while ((wSt == ZS_SUCCESS) && ((pContext.InstructionType & ZSITP_All) || (wCount < pContext.Number) )) {
-        /*
-         wSt=_URFParser.parse(wRecord,&pContext.SourceEntity->LocalMetaDic,&ErrorLog);
 
-        if (wSt!=ZS_SUCCESS)
-            break;
-            */
-        if (wCount > 100) {
-            _DBGPRINT("ZSearchParser::_DisplayEntitySingleDefault-E-MAXALLOW Maximum number of record allowed.\n")
-            abort();
+        if ((DisplayLimit>0)&&(wCount > DisplayLimit)) {
+            if (!URIDisplay.isEmpty())
+                _DESD_Display("ZSearchParser::_DisplayEntitySingleDefault-W-LIMIT Maximum number of ranks allowed reached. Limit %d",
+                              DisplayLimit);
+             ErrorLog.warningLog("ZSearchParser::_DisplayEntitySingleDefault-W-LIMIT Maximum number of ranks allowed reached. Limit %d",
+                                 DisplayLimit);
+             break ;
         }
         wRow = new ZArray<utf8VaryingString>;
         for (int wi=0; wi < pContext.SEC->_URFParser.URFFieldList.count();wi++) {
@@ -6657,12 +6856,14 @@ ZStatus ZSearchParser::_DisplayEntitySingleDefault (ZSearchContext &pContext)
     else if (pContext.InstructionType & ZSITP_At)
         wAction = "Display at";
 
-    ErrorLog.textLog("\n Entity %s %s  %s %d ",
+    _DESD_Display("\n Entity %s %s  %s %d ",
                      pContext.SourceEntity->getEntityName().toString(),
                      entityType(pContext.SourceEntity), wAction , pContext.Number);
 
+
+
     if (wRowList.count()==0) {
-        ErrorLog.infoLog("No entity rank have been selected for display,");
+        _DESD_Display("No entity rank are available for display,");
 //        return;
     }
 
@@ -6736,22 +6937,21 @@ ZStatus ZSearchParser::_DisplayEntitySingleDefault (ZSearchContext &pContext)
         wBar.addUtfUnit('+');
     } // for
 
-    ErrorLog.textLog(wBar.toCChar());
-    ErrorLog.textLog(wHContent.toCChar());
-    ErrorLog.textLog(wBar.toCChar());
+    _DESD_Display(wBar.toCChar());
+    _DESD_Display(wHContent.toCChar());
+    _DESD_Display(wBar.toCChar());
 
     /* display detail rows */
 
     for (int wi = 0; wi  < wRowList.count(); wi++ ) {
         wHContent = "|" ;
         for (int wj = 0; wj  < wRowList[wi]->count(); wj++ ) {
-//            wHContent.addsprintf("%s|",leftPad(wRowList[wi]->Tab(wj),wColSizeList[wj],' ').toString());
             wHContent.addsprintf("%s|",wRowList[wi]->Tab(wj).leftPad(wColSizeList[wj],' ').toString());
         } // for
-        ErrorLog.textLog(wHContent.toCChar());
+        _DESD_Display(wHContent.toCChar());
     }// for
 
-    ErrorLog.textLog(wBar.toCChar());
+    _DESD_Display(wBar.toCChar());
 
     for (long wi=0 ; wi < wRowList.count() ; wi++) {
         delete wRowList[wi];
@@ -6780,7 +6980,7 @@ ZStatus ZSearchParser::_DisplayEntityJoinDefault (ZSearchContext &pContext)
 
 //    URFParser _URFParser;
 
-    ZSearchJoinTuple wJAddress;
+    ZSearchJoinAddress wJAddress;
 
     pContext.SEC->CaptureTime=true;
     pContext.SEC->ProcessTi.init();
@@ -6824,6 +7024,8 @@ ZStatus ZSearchParser::_DisplayEntityJoinDefault (ZSearchContext &pContext)
     }
 
 
+    _DESD_Init();
+
     const char* wAction="Unknown action";
     if (pContext.InstructionType & ZSITP_First)
         wAction = "Display first";
@@ -6834,12 +7036,12 @@ ZStatus ZSearchParser::_DisplayEntityJoinDefault (ZSearchContext &pContext)
     else if (pContext.InstructionType & ZSITP_At)
         wAction = "Display at";
 
-    ErrorLog.textLog("\n Entity %s %s  %s %d ",
+    _DESD_Display("\n Entity %s %s  %s %d ",
                      pContext.SourceEntity->getEntityName().toString(),
                      entityType(pContext.SourceEntity), wAction , pContext.Number);
 
     if (wRowList.count()==0) {
-        ErrorLog.infoLog("No entity rank have been selected for display,");
+        _DESD_Display("No entity rank have been selected for display,");
 //        return;
     }
 
@@ -6913,9 +7115,9 @@ ZStatus ZSearchParser::_DisplayEntityJoinDefault (ZSearchContext &pContext)
         wBar.addUtfUnit('+');
     } // for
 
-    ErrorLog.textLog(wBar.toCChar());
-    ErrorLog.textLog(wHContent.toCChar());
-    ErrorLog.textLog(wBar.toCChar());
+    _DESD_Display(wBar.toCChar());
+    _DESD_Display(wHContent.toCChar());
+    _DESD_Display(wBar.toCChar());
 
     /* display detail rows */
 
@@ -6925,10 +7127,10 @@ ZStatus ZSearchParser::_DisplayEntityJoinDefault (ZSearchContext &pContext)
 //            wHContent.addsprintf("%s|",leftPad(wRowList[wi]->Tab(wj),wColSizeList[wj],' ').toString());
             wHContent.addsprintf("%s|",wRowList[wi]->Tab(wj).leftPad(wColSizeList[wj],' ').toString());
         } // for
-        ErrorLog.textLog(wHContent.toCChar());
+        _DESD_Display(wHContent.toCChar());
     }// for
 
-    ErrorLog.textLog(wBar.toCChar());
+    _DESD_Display(wBar.toCChar());
 
     for (long wi=0 ; wi < wRowList.count() ; wi++) {
         delete wRowList[wi];
@@ -8056,6 +8258,14 @@ void ZSearchParser::displayTokenList(ZArray<ZSearchToken*> &Whole)
         decode_SearchTokenType( Whole[wi]->Type).toCChar(),Whole[wi]->Text.toCChar());
 }
 
+void ZSearchParser::displayTokenList()
+{
+  ZSearchTokenizer::_print("    Token list  <%ld>\n",count());
+  for (long wi=0;wi < count();wi++)
+    fprintf(stdout,"     %3ld [line %d col %d]  %15s-<%15s> \n",
+        wi,Tab(wi)->TokenLine,Tab(wi)->TokenColumn,
+        decode_SearchTokenType( Tab(wi)->Type).toCChar(),Tab(wi)->Text.toCChar());
+}
 
 /*
 <?xml version='1.0' encoding='UTF-8'?>
@@ -8969,6 +9179,18 @@ searchKeywordWeighted(const utf8VaryingString& pIn)
     return utf8VaryingString();
 }//searchKeywordWeighted
 
+/** @brief setDisplayColMax sets maximum column width for default entity display routine */
+void ZSearchParser::setDisplayLimit(int pLimit)
+{
+    if (pLimit < 0) {
+        ErrorLog.infoLog("setDisplayLimit-I-NOLIMIT No limit set to default entity display routine.\n");
+        DisplayLimit=pLimit;
+        return;
+    }
+    DisplayLimit=pLimit;
+    ErrorLog.infoLog("setDisplayLimit A limit of maximum %d rank is defined for default entity display.", DisplayLimit);
+    return ;
+}
 
 /** @brief setDisplayColMax sets maximum column width for default entity display routine */
 void ZSearchParser::setDisplayColMax(int pColMax)

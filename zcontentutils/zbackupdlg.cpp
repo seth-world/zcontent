@@ -330,7 +330,7 @@ ZBackupDLg::computeAllSizes(){
 void
 ZBackupDLg::doBackup() {
   if (ComLog==nullptr) {
-    ComLog = new textEditMWn(this,TEOP_NoFileLab | TEOP_CloseBtnHide);
+    ComLog = new textEditMWn(this,TEOP_NoFileLab | TEOP_CloseBtnHide,&ComLog);
     ComLog->setWindowTitle("Backup log");
   }
   ComLog->show();

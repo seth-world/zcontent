@@ -195,6 +195,8 @@ public:
   QAction*      ParamChangeQAc=nullptr;
   QAction *     QuitQAc=nullptr;
 
+  QAction*      TextFileVisuQAc=nullptr;
+
   QAction*      QuitIconQAc=nullptr;
 
 /*----------------------------------*/

@@ -14,6 +14,7 @@ using namespace zbs;
 #include <ztoolset/ztime.h>
 #include <iostream>
 #include <zcontent/zindexedfile/zdictionaryfile.h>
+#include "zsearchparsertype.h"
 
 
 #define __NAME__ "ZSearchTokenizer::parse"
@@ -724,6 +725,7 @@ ZSearchTokenizer::parse(const utf8VaryingString &pIn)
         continue;
       }
       if (wCurrentToken->Type == ZSRCH_SPACE) {
+        endToken(wCurrentToken);
         if (compareKeyword(&pIn.Data[wi],(utf8_t*)"BOOL",wLen)) {
           wCurrentToken->setCoords(Line,Column,Offset);
           wCurrentToken->Type = ZSRCH_BOOL;
@@ -734,7 +736,7 @@ ZSearchTokenizer::parse(const utf8VaryingString &pIn)
           //                     endToken(wCurrentToken);
           continue;
         }
-        endToken(wCurrentToken);
+
         wCurrentToken->setCoords(Line,Column,Offset);
         wCurrentToken->Type=ZSRCH_MAYBE_IDENTIFIER;
       }
@@ -742,6 +744,7 @@ ZSearchTokenizer::parse(const utf8VaryingString &pIn)
       continue;
 
     case 'c':
+    case 'C':
       if ((wCurrentToken->Type & ZSRCH_STRING_LITERAL)==ZSRCH_STRING_LITERAL) { /* type is string literal OR comment */
         wCurrentToken->Text.addUtfUnit(wCurrCh);
         continue;
@@ -751,49 +754,26 @@ ZSearchTokenizer::parse(const utf8VaryingString &pIn)
         continue;
       }
       if (wCurrentToken->Type == ZSRCH_SPACE) {
-        endToken(wCurrentToken);
-        wCurrentToken->setCoords(Line,Column,Offset);
-        wCurrentToken->Type=ZSRCH_MAYBE_IDENTIFIER;
-      }//ZSRCH_SPACE
+          endToken(wCurrentToken);
+          if (compareKeyword(&pIn.Data[wi],(utf8_t*)"CURRENT",wLen)) {
+              wCurrentToken->setCoords(Line,Column,Offset);
+              wCurrentToken->Type = ZSRCH_CURRENT;
+              wCurrentToken->Text = "CURRENT";
+              wi += wLen;
+              Column+=wLen;
+              Offset+=wLen;
+              //                     endToken(wCurrentToken);
+              continue;
+          }
+
+          wCurrentToken->setCoords(Line,Column,Offset);
+          wCurrentToken->Type=ZSRCH_MAYBE_IDENTIFIER;
+      }
 
       wCurrentToken->Text.addUtfUnit(wCurrCh);
       continue;
-
-    case 'C':
-      if ((wCurrentToken->Type & ZSRCH_STRING_LITERAL)==ZSRCH_STRING_LITERAL) { /* type is string literal OR comment */
-        wCurrentToken->Text.addUtfUnit(wCurrCh);
-        continue;
-      }
-      if (wCurrentToken->Type == ZSRCH_HEXA_LITERAL) {
-        wCurrentToken->Text.addUtfUnit(wCurrCh);
-        continue;
-      }
-      if (wCurrentToken->Type == ZSRCH_SPACE) {
-        wCurrentToken->setCoords(Line,Column,Offset);
-        wCurrentToken->Type=ZSRCH_MAYBE_IDENTIFIER;
-      }//ZSRCH_SPACE
-
-      wCurrentToken->Text.addUtfUnit(wCurrCh);
-      continue;
-
 
     case 'd':
-      if ((wCurrentToken->Type & ZSRCH_STRING_LITERAL)==ZSRCH_STRING_LITERAL) { /* type is string literal OR comment */
-        wCurrentToken->Text.addUtfUnit(wCurrCh);
-        continue;
-      }
-      if (wCurrentToken->Type == ZSRCH_HEXA_LITERAL) {
-        wCurrentToken->Text.addUtfUnit('D');
-        continue;
-      }
-      if (wCurrentToken->Type == ZSRCH_SPACE) {
-        wCurrentToken->setCoords(Line,Column,Offset);
-        wCurrentToken->Type=ZSRCH_MAYBE_IDENTIFIER;
-      }//ZSRCH_SPACE
-
-      wCurrentToken->Text.addUtfUnit(wCurrCh);
-      continue;
-
     case 'D':
       if ((wCurrentToken->Type & ZSRCH_STRING_LITERAL)==ZSRCH_STRING_LITERAL) { /* type is string literal OR comment */
         wCurrentToken->Text.addUtfUnit(wCurrCh);
@@ -804,9 +784,28 @@ ZSearchTokenizer::parse(const utf8VaryingString &pIn)
         continue;
       }
       if (wCurrentToken->Type == ZSRCH_SPACE) {
-        wCurrentToken->setCoords(Line,Column,Offset);
-        wCurrentToken->Type=ZSRCH_MAYBE_IDENTIFIER;
-      }//ZSRCH_SPACE
+          endToken(wCurrentToken);
+          if (compareKeyword(&pIn.Data[wi],(utf8_t*)"DEFAULT",wLen)) {
+              wCurrentToken->setCoords(Line,Column,Offset);
+              wCurrentToken->Type = ZSRCH_DEFAULT;
+              wCurrentToken->Text = "DEFAULT";
+              wi += wLen;
+              Column+=wLen;
+              Offset+=wLen;
+              continue;
+          }
+          if (compareKeyword(&pIn.Data[wi],(utf8_t*)"DISPLAY",wLen)) {
+              wCurrentToken->setCoords(Line,Column,Offset);
+              wCurrentToken->Type = ZSRCH_DISPLAY;
+              wCurrentToken->Text = "DISPLAY";
+              wi += wLen;
+              Column+=wLen;
+              Offset+=wLen;
+              continue;
+          }
+          wCurrentToken->setCoords(Line,Column,Offset);
+          wCurrentToken->Type=ZSRCH_MAYBE_IDENTIFIER;
+      }
 
       wCurrentToken->Text.addUtfUnit(wCurrCh);
       continue;
@@ -1054,8 +1053,54 @@ ZSearchTokenizer::parse(const utf8VaryingString &pIn)
       wCurrentToken->Text.addUtfUnit(wCurrCh);
       continue;
 
+    case 'p':
+    case 'P':
+        if ((wCurrentToken->Type & ZSRCH_STRING_LITERAL)==ZSRCH_STRING_LITERAL) { /* type is string literal OR comment */
+            wCurrentToken->Text.addUtfUnit(wCurrCh);
+            continue;
+        }
+        if (wCurrentToken->Type == ZSRCH_SPACE) {
+            endToken(wCurrentToken);
+            if (compareKeyword(&pIn.Data[wi],(utf8_t*)"PATH",wLen)) {
+                wCurrentToken->setCoords(Line,Column,Offset);
+                wCurrentToken->Type = ZSRCH_PATH;
+                wCurrentToken->Text = "PATH";
+                _DBGPRINT("Tokenizer Found Path keyword.\n")
+                wi += wLen;
+                Column+=wLen;
+                Offset+=wLen;
+                continue;
+            }
 
+            wCurrentToken->setCoords(Line,Column,Offset);
+            wCurrentToken->Type=ZSRCH_MAYBE_IDENTIFIER;
+        }
+        wCurrentToken->Text.addUtfUnit(wCurrCh);
+        continue;
+    case 'u':
+    case 'U':
+        if ((wCurrentToken->Type & ZSRCH_STRING_LITERAL)==ZSRCH_STRING_LITERAL) { /* type is string literal OR comment */
+            wCurrentToken->Text.addUtfUnit(wCurrCh);
+            continue;
+        }
+        if (wCurrentToken->Type == ZSRCH_SPACE) {
+            endToken(wCurrentToken);
+            if (compareKeyword(&pIn.Data[wi],(utf8_t*)"URI",wLen)) {
+                wCurrentToken->setCoords(Line,Column,Offset);
+                wCurrentToken->Type = ZSRCH_URISTRING;
+                wCurrentToken->Text = "URI";
+                wi += wLen;
+                Column+=wLen;
+                Offset+=wLen;
+                continue;
+            }
 
+            wCurrentToken->setCoords(Line,Column,Offset);
+            wCurrentToken->Type=ZSRCH_MAYBE_IDENTIFIER;
+        }
+
+        wCurrentToken->Text.addUtfUnit(wCurrCh);
+        continue;
     default:
       if ((wCurrentToken->Type & ZSRCH_STRING_LITERAL)==ZSRCH_STRING_LITERAL) { /* type is string literal OR comment */
         wCurrentToken->Text.addUtfUnit(wCurrCh);
@@ -1179,6 +1224,16 @@ void ZSearchTokenizer::endToken(ZSearchToken *&pToken) {
     }
     if (pToken->Type == ZSRCH_MAYBE_IDENTIFIER) {
       pToken->Type = ZSRCH_IDENTIFIER;
+
+      /* capture any keyword */
+
+      for (int wi=0;wi < KeywordList.count();wi++) {
+          if (pToken->Text.compareCase(KeywordList[wi].Text)==0) {
+              pToken->Type == KeywordList[wi].Type;
+              break;
+          }
+      }// for
+
       break;
     }//ZSRCH_MAYBE_IDENTIFIER
 /*

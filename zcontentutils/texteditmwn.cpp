@@ -25,9 +25,8 @@
 #include <ztoolset/zaierrors.h>
 
 void
-textEditMWn::_init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)) {
-
- // setupUi(this);
+//textEditMWn::_init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)) {
+textEditMWn::_init(uint32_t pOptions) {
 
     if (objectName().isEmpty())
         setObjectName("textEditMWn");
@@ -219,7 +218,7 @@ textEditMWn::_init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)) {
   else
     lineNumbersBTn->setText(tr("Show line numbers"));
 
-  CloseCallBack = pCloseCallBack;
+
 
   setAttribute(Qt::WA_DeleteOnClose , true);
 
@@ -229,12 +228,7 @@ textEditMWn::_init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)) {
   TextPTe->setCenterOnScroll(true);
 
   TextPTe->setWordWrapMode(QTextOption::NoWrap);
-/*
-  Cursor = new QTextCursor(Text->textCursor());
-  FmtDefault = new QTextCharFormat(Cursor->charFormat());
-  delete Cursor;
-  Cursor=nullptr;
-*/
+
   filterBTn->setVisible(false);
 
   searchMainBTn->setVisible(true);
@@ -246,7 +240,6 @@ textEditMWn::_init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)) {
   QMainWindow::setWindowTitle("Text");
 
 
-  //  QObject::connect(this, SIGNAL(resizeEvent(QResizeEvent*)), this, SLOT(resizeWindow(QResizeEvent*)));
   QObject::connect(lineNumbersBTn, SIGNAL(pressed()), this, SLOT(lineNumbersBTnClicked()));
   QObject::connect(closeBTn, SIGNAL(pressed()), this, SLOT(closePressed()));
   QObject::connect(wrapBTn, SIGNAL(pressed()), this, SLOT(wrapPressed()));
@@ -264,23 +257,35 @@ textEditMWn::_init(uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)) {
     closeBTn->setVisible(false);
   }
 
+  //  CloseCallBack = pCloseCallBack;
+
   setCloseButtonRole();
 }
 
 textEditMWn::textEditMWn(QWidget *parent) :QMainWindow(parent)//,ui(new Ui::textEditMWn)
 {
-  _init(TEOP_Nothing,nullptr);
+//  _init(TEOP_Nothing,nullptr);
+  _init(TEOP_Nothing);
 }
 
-
+/*
 textEditMWn::textEditMWn(QWidget *parent,uint32_t pOptions, __CLOSE_CALLBACK__(pCloseCallBack)) :QMainWindow(parent)//,ui(new Ui::textEditMWn)
 {
   _init(pOptions,pCloseCallBack);
+}
+*/
+textEditMWn::textEditMWn(QWidget *parent,uint32_t pOptions,textEditMWn** pCalleePointer ) :QMainWindow(parent)//,ui(new Ui::textEditMWn)
+{
+//    _init(pOptions,nullptr);
+    _init(pOptions);
+    CalleePointer=pCalleePointer;
 }
 textEditMWn::~textEditMWn()
 {
     if (hasErrorLog())
         ErrorLog->clearDisplayCallBacks();
+    if (CalleePointer!=nullptr)
+        *CalleePointer=nullptr;
  // delete ui;
 }
 
@@ -375,9 +380,13 @@ void textEditMWn::setCloseButtonRole () {
 
 void textEditMWn::closeEvent(QCloseEvent *event)
 {
+/*
   if (CloseCallBack!=nullptr) {
-    CloseCallBack(event);
+        CloseCallBack(event);
   }
+*/
+  if (CalleePointer!=nullptr)
+      *CalleePointer=nullptr;
   QMainWindow::closeEvent(event);
   return;
 }
@@ -512,11 +521,13 @@ void textEditMWn::closePressed()
 {
   if (Options & TEOP_CloseBtnHide) {
     this->hide();
+      /*
     if (CloseCallBack) {
       QEvent wEv(QEvent::Hide);
 
       CloseCallBack(&wEv);
     }
+*/
     return;
   }
   this->close();

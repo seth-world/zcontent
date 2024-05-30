@@ -528,8 +528,9 @@ FileGenerateMWn::initLayout() {
   GuessTBv->ItemModel->setHorizontalHeaderItem(2,new QStandardItem(tr("Header size")));
   GuessTBv->ItemModel->setHorizontalHeaderItem(3,new QStandardItem(tr("Guessed size (including header)")));
 
-  ComLog=new textEditMWn((QWidget*)this,TEOP_CloseBtnHide | TEOP_NoFileLab,nullptr);
-  ComLog->registerCloseCallback(std::bind(&FileGenerateMWn::closeComlogCB, this,std::placeholders::_1));
+  ComLog=new textEditMWn((QWidget*)this,TEOP_CloseBtnHide | TEOP_NoFileLab,&ComLog);
+
+//  ComLog->registerCloseCallback(std::bind(&FileGenerateMWn::closeComlogCB, this,std::placeholders::_1));
   ComLog->setWindowTitle("Communication log");
   ComLog->show();
 

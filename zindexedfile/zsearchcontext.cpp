@@ -14,8 +14,10 @@ namespace zbs {
 
 ZSearchContext::~ZSearchContext()
 {
-    if (SEC!=nullptr)
+/*
+     if (SEC!=nullptr)
         delete SEC;
+*/
 }
 
 
@@ -39,10 +41,8 @@ ZSearchContext::_copyFrom(const ZSearchContext&pIn)
     Index = pIn.Index;
     Parser = pIn.Parser;
 
-    if (SEC!=nullptr)
-        delete SEC;
-    if (pIn.SEC!=nullptr)
-        SEC = new ZSearchEntityContext(*pIn.SEC);
+
+    SEC = pIn.SEC;
 
     return *this;
 }

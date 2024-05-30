@@ -105,6 +105,8 @@ ZArray<ZSearchKeyWord> KeywordList = {
     {"TRANSLATE",ZSRCH_TRANSLATE},
     {"DECODETABLE",ZSRCH_DECODETABLE},
 
+    {"DEFAULT",ZSRCH_DEFAULT},
+    {"CURRENT",ZSRCH_CURRENT}
 
 };
 
@@ -351,8 +353,15 @@ decode_SearchTokenType(ZSearchTokentype_type pType)
 
   case ZSRCH_JOIN:
       return "ZSRCH_JOIN";
+
   case ZSRCH_USING:
       return "ZSRCH_USING";
+
+  case ZSRCH_DEFAULT :
+      return "ZSRCH_DEFAULT";
+  case ZSRCH_CURRENT :
+      return "ZSRCH_CURRENT";
+
 
   /* modifiers */
   case ZSRCH_TRANSLATE:

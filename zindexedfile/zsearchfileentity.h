@@ -131,7 +131,7 @@ public:
 
     ZStatus getFirst(ZSearchEntityContext &pSEC, zaddress_type &pAddress);
 
-    ZStatus getNext(ZSearchEntityContext& pSEC,long &pOutRank, zaddress_type &pAddress);
+    ZStatus getNext(ZSearchEntityContext &pSEC, zaddress_type &pAddress);
 
     ZStatus getByRank(ZSearchEntityContext &pSEC, const long pRank, zaddress_type &pAddress);
 

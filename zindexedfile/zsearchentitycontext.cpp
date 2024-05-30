@@ -7,44 +7,59 @@
 
 
 namespace zbs {
+
+CSECList SECList;
+
 ZSearchEntityContext::ZSearchEntityContext() {}
 
-ZSearchEntityContext
+std::shared_ptr <ZSearchEntityContext>
 ZSearchEntityContext::newEntityContext(std::shared_ptr<ZSearchEntity> pEntity)
 {
-    ZSearchEntityContext wCtx ;
-    wCtx.Entity = pEntity;
-    wCtx._URFParser.setDictionary(&pEntity->LocalMetaDic);
-    wCtx.ErrorLog = pEntity->ErrorLog;
+    std::shared_ptr <ZSearchEntityContext> wCtx=std::shared_ptr <ZSearchEntityContext>(new ZSearchEntityContext) ;
+    wCtx->Entity = pEntity;
+    wCtx->_URFParser.setDictionary(&pEntity->LocalMetaDic);
+    wCtx->ErrorLog = pEntity->ErrorLog;
     if (pEntity->isFile()) {
-        wCtx.BaseContext = new ZSearchEntityContext(ZSearchEntityContext::newEntityContext(pEntity->_FileEntity));
+ //       wCtx->BaseContext = new ZSearchEntityContext(ZSearchEntityContext::newEntityContext(pEntity->_FileEntity));
+        wCtx->BaseContext = ZSearchEntityContext::newEntityContext(pEntity->_FileEntity);
+
     }
+ /*
     if (pEntity->isCollection()) {
-        wCtx.BaseContext = new ZSearchEntityContext(ZSearchEntityContext::newEntityContext(pEntity->_BaseEntity));
+        wCtx->BaseContext = new ZSearchEntityContext(ZSearchEntityContext::newEntityContext(pEntity->_BaseEntity));
     }
     if (pEntity->isJoin()) {
-        wCtx.BaseContext = new ZSearchEntityContext(ZSearchEntityContext::newEntityContext(pEntity->_JoinList[0]));
-        wCtx.SlaveContext = new ZSearchEntityContext(ZSearchEntityContext::newEntityContext(pEntity->_JoinList[1]));
+        wCtx->BaseContext = new ZSearchEntityContext(ZSearchEntityContext::newEntityContext(pEntity->_JoinList[0]));
+        wCtx->SlaveContext = new ZSearchEntityContext(ZSearchEntityContext::newEntityContext(pEntity->_JoinList[1]));
+    }
+*/
+    if (pEntity->isCollection()) {
+        wCtx->BaseContext = ZSearchEntityContext::newEntityContext(pEntity->_BaseEntity);
+    }
+    if (pEntity->isJoin()) {
+        wCtx->BaseContext = ZSearchEntityContext::newEntityContext(pEntity->_JoinList[0]);
+        wCtx->SlaveContext = ZSearchEntityContext::newEntityContext(pEntity->_JoinList[1]);
     }
     return wCtx;
 }
-ZSearchEntityContext
-ZSearchEntityContext::newEntityContext(ZSearchMasterFile* pFileEntity)
+
+std::shared_ptr<ZSearchEntityContext>
+ZSearchEntityContext::newEntityContext(ZSearchMasterFile *pFileEntity)
 {
-    ZSearchEntityContext wCtx ;
-    wCtx.FileEntity = pFileEntity;
-    wCtx._URFParser.setDictionary(pFileEntity->getMetaDic());
-    wCtx.ErrorLog = pFileEntity->ErrorLog;
+    std::shared_ptr<ZSearchEntityContext> wCtx = std::shared_ptr<ZSearchEntityContext>(new ZSearchEntityContext) ;
+    wCtx->FileEntity = pFileEntity;
+    wCtx->_URFParser.setDictionary(pFileEntity->getMetaDic());
+    wCtx->ErrorLog = pFileEntity->ErrorLog;
 /*
     if (pEntity->isFile()) {
-        wCtx.BaseContext = new ZSearchEntityContext(ZSearchEntityContext::newEntityContext(pEntity->_FileEntity));
+        wCtx->BaseContext = new ZSearchEntityContext(ZSearchEntityContext::newEntityContext(pEntity->_FileEntity));
     }
     if (pEntity->isCollection()) {
-        wCtx.BaseContext = new ZSearchEntityContext(ZSearchEntityContext::newEntityContext(pEntity->_BaseEntity));
+        wCtx->BaseContext = new ZSearchEntityContext(ZSearchEntityContext::newEntityContext(pEntity->_BaseEntity));
     }
     if (pEntity->isJoin()) {
-        wCtx.BaseContext = new ZSearchEntityContext(ZSearchEntityContext::newEntityContext(pEntity->_JoinList[0]));
-        wCtx.SlaveContext = new ZSearchEntityContext(ZSearchEntityContext::newEntityContext(pEntity->_JoinList[1]));
+        wCtx->BaseContext = new ZSearchEntityContext(ZSearchEntityContext::newEntityContext(pEntity->_JoinList[0]));
+        wCtx->SlaveContext = new ZSearchEntityContext(ZSearchEntityContext::newEntityContext(pEntity->_JoinList[1]));
     }
 */
     return wCtx;
@@ -70,6 +85,7 @@ ZSearchEntityContext::_copyFrom(const ZSearchEntityContext& pIn)
     _URFParser = pIn._URFParser;
     CaptureTime = pIn.CaptureTime;
     ProcessTi = pIn.ProcessTi;
+    /*
     if (pIn.BaseContext!=nullptr)
         BaseContext = new ZSearchEntityContext(*pIn.BaseContext);
     else
@@ -78,6 +94,10 @@ ZSearchEntityContext::_copyFrom(const ZSearchEntityContext& pIn)
         SlaveContext = new ZSearchEntityContext(*pIn.SlaveContext);
     else
         SlaveContext = nullptr;
+*/
+    BaseContext=pIn.BaseContext ;
+    SlaveContext=pIn.SlaveContext ;
+
     ErrorLog = pIn.ErrorLog;
     return *this;
 }

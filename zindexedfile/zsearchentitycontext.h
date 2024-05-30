@@ -4,6 +4,7 @@
 #include "zmf_limits.h"
 #include <ztoolset/ztimer.h>
 #include <zcontentcommon/urfparser.h>
+#include "zsearchjoinaddress.h"
 
 class ZSearchField;
 
@@ -32,16 +33,18 @@ public:
     ZSearchEntityContext(const ZSearchEntityContext& pIn) {_copyFrom(pIn);}
     ~ZSearchEntityContext()
     {
+        /*
         if (BaseContext!=nullptr)
             delete BaseContext;
         if (SlaveContext!=nullptr)
             delete SlaveContext;
+        */
     }
 
     ZSearchEntityContext& _copyFrom(const ZSearchEntityContext& pIn) ;
 
-    static ZSearchEntityContext newEntityContext(std::shared_ptr<ZSearchEntity> pEntity);
-    static ZSearchEntityContext newEntityContext(ZSearchMasterFile* pFileEntity);
+    static std::shared_ptr <ZSearchEntityContext> newEntityContext(std::shared_ptr<ZSearchEntity> pEntity);
+    static std::shared_ptr <ZSearchEntityContext> newEntityContext(ZSearchMasterFile *pFileEntity);
 
     void setCaptureTime(bool pOnOff) { CaptureTime=pOnOff; }
 
@@ -63,15 +66,38 @@ public:
     ZStatus                 Status=ZS_SUCCESS;
     int                     CurrentRank=-1;
     zaddress_type           LastAddress=-1;
+    ZSearchJoinAddress      LastAddressJoin;
 //    EFST_Type               FetchState=EFST_Nothing;
     URFParser               _URFParser;
     bool                    CaptureTime=true;
     ZTimer                  ProcessTi;
-    ZSearchEntityContext*   BaseContext=nullptr;
-    ZSearchEntityContext*   SlaveContext=nullptr;
+    std::shared_ptr <ZSearchEntityContext>   BaseContext=nullptr;
+    std::shared_ptr <ZSearchEntityContext>   SlaveContext=nullptr;
     ZaiErrors*              ErrorLog=nullptr;
     long                    Counter=0;
 }; // ZSearchEntityContext
+
+class CSECList : public ZArray<std::shared_ptr <ZSearchEntityContext> >
+{
+public:
+    CSECList() = default ;
+    ~CSECList() {}
+
+    std::shared_ptr <ZSearchEntityContext>
+    getSEC(std::shared_ptr<ZSearchEntity> pSourceEntity) {
+        for (int wi=0;wi < count(); wi++) {
+            if (Tab(wi)->Entity == pSourceEntity) {
+                return  Tab(wi);
+            }
+        }
+        return nullptr;
+    }
+
+}  ;
+
+extern CSECList SECList;
+
+
 
 } // namespace zbs
 

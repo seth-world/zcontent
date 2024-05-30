@@ -4349,12 +4349,12 @@ uriString ZRawMasterFile::getURIIndex(long pIndexRank) {
     </record>
     </zmasterfilecontent>
 */
-ZStatus
-ZRawMasterFile::XmlExportOneRecord(__FILEHANDLE__ pFd,
-                                   const ZDataBuffer& pRecord,
-                                   int pLevel,
-                                   ZBlockHeader* pBlockHeader,
-                                   ZaiErrors *pErrorLog)
+ZStatus ZRawMasterFile::XmlExportOneRecord(__FILEHANDLE__ pFd,
+                                           const ZDataBuffer &pRecord,
+                                           int pLevel,
+                                           ZBlockHeader *pBlockHeader,
+                                           ZMetaDic *pMetaDic,
+                                           ZaiErrors *pErrorLog)
 {
     ZArray<URFField> wFieldList;
     utf8VaryingString wStr;
@@ -4410,6 +4410,26 @@ ZRawMasterFile::XmlExportOneRecord(__FILEHANDLE__ pFd,
         wSt=rawWriteText(pFd,fmtXMLnode("field",pLevel+1),wSizeWritten);
         if (wSt!=ZS_SUCCESS)
             return wSt;
+
+        if (pMetaDic!=nullptr) {
+            if (wi < pMetaDic->count()) {
+                wSt=rawWriteText(pFd, fmtXMLchar("name",pMetaDic->TabConst(wi).getName(),pLevel+2),wSizeWritten);
+
+                if (wFieldList[wi].ZType != pMetaDic->Tab(wi).ZType) {
+                    wStr.sprintf(" ***Warning*** dictionary field ZType <%s> does not match with file ZType <%s>",
+                                 decode_ZType(pMetaDic->TabConst(wi).ZType),
+                                 decode_ZType(wFieldList[wi].ZType ));
+                    wSt=rawWriteText(pFd, fmtXMLcomment(wStr,pLevel+2),wSizeWritten);
+                }
+            }
+            else {
+                wStr.sprintf("Field of rank %d is not in meta dictionary",wi);
+                wSt=rawWriteText(pFd, fmtXMLcomment(wStr,pLevel+2),wSizeWritten);
+            }
+        }
+
+
+
         wSt=rawWriteText(pFd,wFieldList[wi].toXml(pLevel+2),wSizeWritten);
         if (wSt!=ZS_SUCCESS)
             return wSt;
@@ -4421,125 +4441,6 @@ ZRawMasterFile::XmlExportOneRecord(__FILEHANDLE__ pFd,
     }// for
     return rawWriteText(pFd,fmtXMLendnode("record",pLevel),wSizeWritten);
 } // XmlExportOneRecord
-#ifdef __DEPRECATED__
-ZStatus
-ZRawMasterFile::XmlExportContent(const uriString& pContentFile,ZaiErrors* pErrorLog)
-{
-  ZArray<URFField> wFieldList;
-  bool wHasBeenOpened=false;
-  long wRank=0;
-  __FILEHANDLE__ wFd=-1;
-  utf8VaryingString wXmlString ;
-  ZStatus wSt=ZS_SUCCESS;
-  ZDataBuffer wZDB;
-
-  if (!isOpen()) {
-    if (pErrorLog!=nullptr)
-            pErrorLog->errorLog("Master file <%s> must be open with at least mode ZRB_ALL for importing data with XmlExportContent.",getURIContent().toString());
-    return ZS_FILENOTOPEN;
-  }// isOpen
-
-  uriStat wStats;
-  wSt=URIContent.getStatR(wStats); /* get dates for identification section */
-  if (wSt!=ZS_SUCCESS) {
-    if (pErrorLog!=nullptr)
-        pErrorLog->errorLog("Cannot stat master file <%s>.",getURIContent().toString());
-    return wSt ;
-  }
-  if (_progressSetupCallBack!=nullptr)
-    _progressSetupCallBack(int(getRecordCount()),"Exporting master file content");
-
-
-  if (_progressCallBack!=nullptr)
-    _progressCallBack(wRank,"Exporting identification");
-
-  wXmlString=fmtXMLdeclaration();
-  wXmlString += fmtXMLnode("zmasterfilecontent",0);
-  wXmlString += fmtXMLcomment(" identification section is there for audit purposes ",1);
-  wXmlString += fmtXMLnode("identification",1);
-  wXmlString += fmtXMLdatefull("creationdate",wStats.Created,2);
-  fmtXMLaddInlineComment(wXmlString," effective data creation date ");
-  wXmlString += fmtXMLdatefull("modificationdate",wStats.LastModified,2);
-   fmtXMLaddInlineComment(wXmlString," effective data last modification date ");
-  wXmlString += fmtXMLendnode("identification",1);
-
-  wSt=rawOpen(  wFd,pContentFile.toCChar(),O_CREAT|O_WRONLY|O_TRUNC);
-  if (wSt!=ZS_SUCCESS) {
-    if (wHasBeenOpened)
-            zclose();
-    return wSt;
-  }
-  size_t wSizeWritten=0;
-  wSt=rawWriteText(wFd,wXmlString,wSizeWritten);
-  if (wSt!=ZS_SUCCESS) {
-    goto ErrorExportContent;
-  }
-
-  if (_progressCallBack!=nullptr)
-    _progressCallBack(wRank,"Exporting file records");
-
-  wSt=zget(wZDB,wRank);
-  while (wSt==ZS_SUCCESS) {
-
-    if (_progressCallBack!=nullptr)
-            _progressCallBack(wRank,utf8VaryingString());  /* with null string */
-
-    sleepTimes(1);
-
-    wSt=rawWriteText(wFd,fmtXMLnode("record",1),wSizeWritten);
-    if (wSt!=ZS_SUCCESS)
-        goto ErrorExportContent;
-
-    wSt=URFParser::parse(wZDB,wFieldList);
-    if (wSt!=ZS_SUCCESS)
-        goto ErrorExportContent;
-
-
-    for (int wi=0; wi < wFieldList.count();wi++) {
-
-        wSt=rawWriteText(wFd,fmtXMLnode("field",2),wSizeWritten);
-        if (wSt!=ZS_SUCCESS)
-            goto ErrorExportContent;
-        wSt=rawWriteText(wFd,wFieldList[wi].toXml(3),wSizeWritten);
-        if (wSt!=ZS_SUCCESS)
-            goto ErrorExportContent;
-
-        wSt=rawWriteText(wFd,fmtXMLendnode("field",2),wSizeWritten);
-        if (wSt!=ZS_SUCCESS)
-            goto ErrorExportContent;
-
-    }// for
-    wSt=rawWriteText(wFd,fmtXMLendnode("record",1),wSizeWritten);
-    if (wSt!=ZS_SUCCESS) {
-            goto ErrorExportContent;
-    }
-    wSt=zget(wZDB,++wRank);
-  }// while ZS_SUCCESS
-
-  if (wSt!=ZS_SUCCESS) {
-    if (wSt==ZS_OUTBOUNDHIGH)
-            wSt=ZS_EOF;
-    else
-        goto ErrorExportContent;
-  }
-   wSt=rawWriteText(wFd,fmtXMLendnode("zmasterfilecontent",0),wSizeWritten);
-
-
-
-   if (_progressCallBack!=nullptr)
-    _progressCallBack(wRank,"End process");
-EndExportContent :
-  rawClose(wFd);
-  if (wHasBeenOpened)
-    zclose();
-  return wSt;
-ErrorExportContent :
-  if (_progressCallBack!=nullptr)
-    _progressCallBack(wRank,"Errored process");
-  goto EndExportContent;
-
-} //exportContent
-#endif // __DEPRECATED__
 ZStatus
 ZRawMasterFile::XmlExportContent(const uriString& pXmlContentFile,ZaiErrors* pErrorLog)
 {
@@ -4579,6 +4480,7 @@ ZRawMasterFile::XmlExportContent(const uriString& pXmlContentFile,ZaiErrors* pEr
     wXmlString += fmtXMLnode("zmasterfilecontent",0);
     wXmlString += fmtXMLcomment(" identification section is there for audit purposes ",1);
     wXmlString += fmtXMLnode("identification",1);
+    wXmlString += fmtXMLchar("source",getURIContent(),2);
     wXmlString += fmtXMLdatefull("creationdate",wStats.Created,2);
     fmtXMLaddInlineComment(wXmlString," effective data creation date ");
     wXmlString += fmtXMLdatefull("modificationdate",wStats.LastModified,2);
@@ -4600,14 +4502,22 @@ ZRawMasterFile::XmlExportContent(const uriString& pXmlContentFile,ZaiErrors* pEr
     if (_progressCallBack!=nullptr)
         _progressCallBack(wRank,"Exporting file records");
 
+    if (Dictionary!=nullptr) {
+        utf8VaryingString wStr;
+        wStr.sprintf(" A Dictionary named <%s> has been defined for this file.",Dictionary->DicName.toString());
+        wSt=rawWriteText(wFd,fmtXMLcomment(wStr.toCChar(),1),wSizeWritten);
+    }
+    else
+         wSt=rawWriteText(wFd,fmtXMLcomment(" No Dictionary has been defined for this file ",1),wSizeWritten);
+
     wSt=zget(wZDB,wRank);
     while (wSt==ZS_SUCCESS) {
 
         if (_progressCallBack!=nullptr)
             _progressCallBack(wRank,utf8VaryingString());  /* with null string */
 
-        sleepTimes(1);
-        wSt=XmlExportOneRecord(wFd,wZDB,1,nullptr,pErrorLog);
+//        sleepTimes(1);
+        wSt=XmlExportOneRecord(wFd,wZDB,1,nullptr,Dictionary,pErrorLog);
 
 
         if (wSt!=ZS_SUCCESS)
@@ -4633,6 +4543,12 @@ EndExportContent :
         zclose();
     return wSt;
 ErrorExportContent :
+    if (wSt==ZS_EOF) {
+        wSt=ZS_SUCCESS;
+        if (_progressCallBack!=nullptr)
+            _progressCallBack(wRank,"End process");
+        goto EndExportContent;
+    }
     if (_progressCallBack!=nullptr)
         _progressCallBack(wRank,"Errored process");
     goto EndExportContent;
@@ -4699,6 +4615,7 @@ ZRawMasterFile::XmlExportContentFromSurfaceScan(const uriString& pURIContentFile
     wXmlString += fmtXMLnode("zmasterfilecontent",0);
     wXmlString += fmtXMLcomment(" identification section is there for audit purposes ",1);
     wXmlString += fmtXMLnode("identification",1);
+    wXmlString += fmtXMLchar("source",pURIContentFile,2);
     wXmlString += fmtXMLdatefull("creationdate",wStats.Created,2);
     fmtXMLaddInlineComment(wXmlString," effective data creation date ");
     wXmlString += fmtXMLdatefull("modificationdate",wStats.LastModified,2);
@@ -4771,8 +4688,8 @@ ZRawMasterFile::XmlExportContentFromSurfaceScan(const uriString& pURIContentFile
                 pErrorLog->logZExceptionLast("ZRawMasterFile::XmlExportContentFromSurfaceScan");
             goto ErrorExportContentFSS;
         }
-        sleepTimes(1);
-        wSt=XmlExportOneRecord (wFdXml,wRecord,1,&wBlockDescriptor,pErrorLog);
+//        sleepTimes(1);
+        wSt=XmlExportOneRecord (wFdXml,wRecord,1,&wBlockDescriptor,nullptr,pErrorLog);
         if (wSt!=ZS_SUCCESS) {
             goto ErrorExportContentFSS;
         }
@@ -4824,6 +4741,11 @@ EndExportContentFSS:
     rawClose(wFdXml);
     return wSt;
 ErrorExportContentFSS:
+    if (wSt==ZS_EOF) {
+        if (_progressCallBack!=nullptr)
+            _progressCallBack(wProgress,"End process");
+        goto EndExportContentFSS;
+    }
     pErrorLog->logZExceptionLast("XmlExportContentFromSurfaceScan");
     pErrorLog->errorLog("Export from surface scan stopped at address %ld",wCurrentAddress);
     goto EndExportContentFSS;
@@ -4920,7 +4842,7 @@ ZRawMasterFile::XmlImportContentByChunk( const uriString& pXmlContentFile,ZaiErr
                          wIdentification.ModificationDate.toDMYhms().toString());
 
   _progressCallBack(wOffset,"identification imported");
-  sleepTimes(1);
+//  sleepTimes(1);
 
   wSt=XMLLoadEntity(wFd,"record",wXmlRecordContent,wOffset);
   if ((wSt!=ZS_SUCCESS)&&(wSt!=ZS_EOF))
@@ -4934,7 +4856,7 @@ ZRawMasterFile::XmlImportContentByChunk( const uriString& pXmlContentFile,ZaiErr
   while ((wSt==ZS_SUCCESS) || (wSt==ZS_EOF))
   {
     wRecordsRead++;
-    sleepTimes(1);
+//    sleepTimes(1);
     if (_progressCallBack!=nullptr)
         _progressCallBack(wOffset,utf8VaryingString());
 
@@ -4967,6 +4889,7 @@ XmlImportContentByChunkEnd:
 */
 XmlImportContentByChunkEnd_1:
   rawClose(wFd);
+
   pErrorLog->textLog("Record import report\n"
                      "Imported data creation date    %s\n"
                      "              Last modified    %s\n"
@@ -4976,9 +4899,15 @@ XmlImportContentByChunkEnd_1:
                      wIdentification.ModificationDate.toDMYhms().toString(),
                      wRecordsRead,wRecordsWritten);
 
-
+  if (wSt==ZS_EOF)
+      wSt=ZS_SUCCESS;
   return wSt;
 XmlImportContentByChunkErrored:
+  if (wSt==ZS_EOF) {
+        if (_progressCallBack!=nullptr)
+            _progressCallBack(wRank,"End process");
+        goto XmlImportContentByChunkEnd_1;
+  }
   if (_progressCallBack!=nullptr)
     _progressCallBack(wRank,"Processing errored");
   pErrorLog->errorLog("Importing record process is errored and interrupted.");

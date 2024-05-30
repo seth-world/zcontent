@@ -200,6 +200,7 @@ public:
     uint8_t  getFileType() {return ZHeader.FileType;}
 
     bool isMasterFile() { return (ZHeader.FileType & ZFT_ZRawMasterFile );}
+    bool isDicMasterFile() { return (ZHeader.FileType & ZFT_ZDicMasterFile )==ZFT_ZDicMasterFile ; }
 public:
     /**
      * @brief putTheMess randomly swaps ZBAT ranks for half of ZBAT count ranks

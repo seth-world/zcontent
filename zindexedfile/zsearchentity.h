@@ -19,9 +19,13 @@
 #include "zsearchdictionary.h"
 #include "zsearchentitycontext.h"
 
+#include "zsearchjoinaddress.h"
+
 //#include <zthread/zthread.h>
 #include <zthread/zmutex.h>
 #include <ztoolset/ztimer.h>
+
+
 
 using namespace std;
 using namespace zbs;
@@ -98,25 +102,25 @@ class ZSearchEntity;
 //class ZSearchLogicalOperand;
 class ZSearchLogicalTerm;
 class ZSearchMasterFile;
-
-class ZSearchJoinTuple {
+/*
+class ZSearchJoinAddress {
 public:
-    ZSearchJoinTuple() = default;
-    ZSearchJoinTuple(const ZSearchJoinTuple& pIn) { _copyFrom(pIn);}
+    ZSearchJoinAddress() = default;
+    ZSearchJoinAddress(const ZSearchJoinAddress& pIn) { _copyFrom(pIn);}
 
-    ZSearchJoinTuple(zaddress_type pMAddress,zaddress_type pSAddress)
+    ZSearchJoinAddress(zaddress_type pMAddress,zaddress_type pSAddress)
     {
         MasterAddress = pMAddress;
         SlaveAddress = pSAddress;
     }
-    ZSearchJoinTuple& _copyFrom(const ZSearchJoinTuple& pIn)
+    ZSearchJoinAddress& _copyFrom(const ZSearchJoinAddress& pIn)
     {
         MasterAddress=pIn.MasterAddress;
         SlaveAddress=pIn.SlaveAddress;
         return *this;
     }
 
-    ZSearchJoinTuple& operator = (const ZSearchJoinTuple& pIn) { return _copyFrom(pIn);}
+    ZSearchJoinAddress& operator = (const ZSearchJoinAddress& pIn) { return _copyFrom(pIn);}
 
     void setInvalid() { MasterAddress=-1 ; SlaveAddress=-1; }
 
@@ -125,7 +129,7 @@ public:
     zaddress_type MasterAddress=-1;
     zaddress_type SlaveAddress=-1;
 };
-
+*/
 
 /** a ZCollectionEntity is a single collection entit< with
  *  - an array of URFParser objects, one per entity in the entities set
@@ -247,18 +251,19 @@ public:
   ZStatus populateAllJoin(ZSearchEntityContext &pSEC);
 
   ZStatus populateFirstJoin(ZSearchEntityContext &pSEC,int pCount=1);
+  ZStatus _populateFirstJoin(ZSearchEntityContext &pSEC,int pCount=1);
   ZStatus populateNextJoin(ZSearchEntityContext &pSEC,int pCount=1);
 
-  ZStatus getFirstJoin(ZSearchEntityContext &pSEC,ZSearchJoinTuple& pAddress);
-  ZStatus getNextJoin(ZSearchEntityContext &pSEC,ZSearchJoinTuple& pAddress);
+  ZStatus getFirstJoin(ZSearchEntityContext &pSEC,ZSearchJoinAddress& pAddress);
+  ZStatus getNextJoin(ZSearchEntityContext &pSEC,ZSearchJoinAddress& pAddress);
 
-  ZStatus _getFirstJoin(ZSearchEntityContext &pSEC,ZSearchJoinTuple& pAddress);
-  ZStatus _getNextJoin(ZSearchEntityContext &pSEC,ZSearchJoinTuple& pAddress);
+  ZStatus _getFirstJoin(ZSearchEntityContext &pSEC,ZSearchJoinAddress& pAddress);
+  ZStatus _getNextJoin(ZSearchEntityContext &pSEC,ZSearchJoinAddress& pAddress);
 
-  ZStatus _getByAddressJoin(ZSearchEntityContext &pSEC,ZSearchJoinTuple &pAddress);
+  ZStatus _getByAddressJoin(ZSearchEntityContext &pSEC,ZSearchJoinAddress &pAddress);
 
-  ZStatus getByRankJoin(ZSearchEntityContext &pSEC,long pRank,ZSearchJoinTuple& pAddress);
-  ZStatus _getByRankJoin(ZSearchEntityContext &pSEC,long pRank,ZSearchJoinTuple& pAddress);
+  ZStatus getByRankJoin(ZSearchEntityContext &pSEC,long pRank,ZSearchJoinAddress& pAddress);
+  ZStatus _getByRankJoin(ZSearchEntityContext &pSEC,long pRank,ZSearchJoinAddress& pAddress);
 
 
   /* Populate operations : refers to FETCH */
@@ -271,13 +276,13 @@ public:
   /**
    * @brief populateFirst Initialize AddressList from base with at least pCount valid addresses
    */
-  ZStatus populateFirst(ZSearchEntityContext &pSEC,long pCount);
-  ZStatus _populateFirst(ZSearchEntityContext &pSEC,long pCount);
+  ZStatus populateFirst(ZSearchEntityContext &pSEC,long pCount=1);
+  ZStatus _populateFirst(ZSearchEntityContext &pSEC,long pCount=1);
   /**
    * @brief populateNext Feeds AddressList from base with at least pCount valid additional addresses
    *                   if pCount is equal or less than 0, then AddressList will be complemented until end of available records.
    */
-  ZStatus populateNext(ZSearchEntityContext &pSEC,long pCount);
+  ZStatus populateNext(ZSearchEntityContext &pSEC,long pCount=1);
 
   ZStatus _populateNext(ZSearchEntityContext &pSEC,long pCount);
 
@@ -307,7 +312,7 @@ public:
    * find next URF content from entity according current entity rank :
    *                            Entity AddressList is first searched for appropriate (Gives the first next selected rank of base entity)
    */
-  ZStatus _getNext(ZSearchEntityContext &pSEC,zaddress_type &pAddress);
+  ZStatus _getNext(ZSearchEntityContext &pSEC, zaddress_type &pAddress);
   /* effective access to entity first record (selected record) : ZSearchEntity::AddressList is not used even if available */
   ZStatus _getFirstHard(ZSearchEntityContext &pSEC,zaddress_type &pAddress);
 
@@ -318,7 +323,7 @@ public:
   ZStatus getByRank(ZSearchEntityContext &pSEC,long pRank,zaddress_type &pAddress);
   ZStatus _getByRank(ZSearchEntityContext &pSEC,long pRank,zaddress_type &pAddress);
 
-  ZStatus _getByAddress(ZSearchEntityContext &pSEC, zaddress_type pAddress);
+  ZStatus _getByAddressRaw(ZSearchEntityContext &pSEC, zaddress_type pAddress);
 
   /* Gets the whole raw record from the very base file entity (file effective record)
    * and returns it in raw format as pRecord ZDataBuffer as well as its file's address pAddress */
@@ -365,7 +370,9 @@ public:
       }
       if (isCollection())
           return _BaseEntity->getCount();
-      _DBGPRINT("ZSearchEntity::getMaxRecords Search entity is neither a file entity nor a collection entity.")
+      if (isJoin())
+          return _JoinList[0]->getCount();
+      _DBGPRINT("ZSearchEntity::getMaxRecords Search entity is neither a file entity nor a collection entity nor a join entity.\n")
       abort();
   }
 
@@ -434,6 +441,7 @@ public:
 //  void setCaptureTime(bool pOnOff) { CaptureTime=pOnOff; }
   long                                          CurrentRank=-1;
   zaddress_type                                 LastAddress=-1;
+  ZSearchJoinAddress                            LastAddressJoin= ZSearchJoinAddress(-1,-1);
 
   utf8VaryingString                             EntityName;
   utf8VaryingString                             EntityFullName;
@@ -450,7 +458,7 @@ public:
   /* base collection is not shared : only master file access and ZSearchEntity global entities are potentially shared */
   std::shared_ptr<ZSearchEntity>                _BaseEntity=nullptr;
   ZArray<std::shared_ptr<ZSearchEntity>>        _JoinList ;
-  ZArray<ZSearchJoinTuple>                      JoinAddressList;
+  ZArray<ZSearchJoinAddress>                      JoinAddressList;
   ZSearchLogicalTerm*                           _Using=nullptr;
   ZArray<zaddress_type>                         AddressList ;
   ZSearchLogicalTerm*                           LogicalTerm=nullptr;  /* entity selection phrase */
