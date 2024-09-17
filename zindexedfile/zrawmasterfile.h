@@ -83,6 +83,14 @@ enum ZIXMode : uint8_t {
   ZIXM_UpdateHeader = 4   /* systematically update header files after each operation */
 };
 
+typedef uint8_t ZEXOP_Type;
+enum ZExportOption : ZEXOP_Type
+{
+    ZEXOP_Nothing = 0,
+    ZEXOP_CheckName = 1,
+    ZEXOP_CheckZType = 2
+};
+
 
 
 namespace zbs //========================================================================
@@ -655,10 +663,15 @@ public:
   /*  raw master file must exist and be opened in mode ZRF_All. File is left open when returning.
  *  _progressSetupCallBack  and _progressCallBack must be set to appropriate routine
 */
-  ZStatus XmlImportContentByChunk(const uriString& pXmlContentFile, ZaiErrors *pErrorlog);
+  ZStatus XmlImportContentByChunk(const uriString &pXmlContentFile,
+                                  ZEXOP_Type pOption,
+                                  ZaiErrors *pErrorlog);
 
   ZStatus XmlImportIdentification(const utf8VaryingString& pXmlRecordContent, ZMFIdentification& pIdentification, ZaiErrors *pErrorLog);
-  ZStatus XmlImportRecordContent(const utf8VaryingString& pXmlRecordContent, ZDataBuffer& pRecord, ZaiErrors *pErrorLog);
+  ZStatus XmlImportRecordContent(const utf8VaryingString &pXmlRecordContent,
+                                 ZDataBuffer &pRecord,
+                                 ZEXOP_Type pOption,
+                                 ZaiErrors *pErrorLog);
 
   //-------- Stats-----------------------------------------------
 

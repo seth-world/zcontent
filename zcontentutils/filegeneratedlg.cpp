@@ -1306,7 +1306,7 @@ FileGenerateMWn::DataImport(){
   if (!MasterFile->isOpen())
     wSt=MasterFile->zopen(ZRF_All);
 
-  wSt=MasterFile->XmlImportContentByChunk( wURIImport, &ErrorLog);
+  wSt=MasterFile->XmlImportContentByChunk( wURIImport,ZEXOP_CheckName | ZEXOP_CheckZType, &ErrorLog);
 
   ProgressMWn->setDone(wSt!=ZS_SUCCESS);
 

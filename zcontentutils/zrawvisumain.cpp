@@ -1236,7 +1236,7 @@ ZRawVisuMain::actionMenuEvent(QAction* pAction)
   }
 
   if (pAction==ZMFQueryQAc) {
-    QueryMWd= new ZSearchQueryMWd(this);
+    QueryMWd= new ZSearchQueryMWd(&ErrorLog,this);
     QueryMWd->show();
     return;
   }
@@ -3763,7 +3763,7 @@ ZRawVisuMain::importZMF(QWidget* pParent, ZaiErrors *pErrorLog)
   wZMF->registerProgressSetupCallBack(std::bind(&ZMFProgressMWn::advanceSetupCallBack, ProgressMWn,std::placeholders::_1,std::placeholders::_2));
   wZMF->registerProgressCallBack(std::bind(&ZMFProgressMWn::advanceCallBack, ProgressMWn,std::placeholders::_1,std::placeholders::_2));
 
-  wSt=wZMF->XmlImportContentByChunk(wURIContentImport,pErrorLog);
+  wSt=wZMF->XmlImportContentByChunk(wURIContentImport,ZEXOP_CheckName | ZEXOP_CheckZType, pErrorLog);
 
   ProgressMWn->setDone(wSt!=ZS_SUCCESS);
 

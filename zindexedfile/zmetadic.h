@@ -101,8 +101,10 @@ public:
 
     ZStatus XmlLoadFromString(const utf8VaryingString &pXmlString, bool pCheckHash, ZaiErrors* pErrorLog);
 
-    ZStatus fromXml(zxmlNode* pMetaDicRootNode, bool pCheckHash, ZaiErrors* pErrorlog);
-
+    ZStatus fromXml(zxmlNode *pMetaDicRootNode,
+                    bool pCheckHash,
+                    bool pDeprecated,
+                    ZaiErrors *pErrorlog);
 
     ZDataBuffer& _exportAppendMetaDicFlat(ZDataBuffer& pZDBExport);
     ZStatus _importMetaDicFlat(const unsigned char *&pPtrIn);

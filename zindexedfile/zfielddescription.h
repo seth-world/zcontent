@@ -244,7 +244,12 @@ public:  md5                Hash;        //!< unique hashcode value for the fiel
    * ZS_XMLMISREQ some required node(s) is/are missing
    * ZS_XMLINVROOTNAME <field> root node is missing in pFieldRootNode
    */
-  ZStatus fromXml(zxmlNode* pFieldRootNode, bool pCheckHash, int &pErrored, int &pWarned, ZaiErrors* pErrorLog);
+  ZStatus fromXml(zxmlNode* pFieldRootNode,
+                  bool pCheckHash,
+                  bool pDeprecated,
+                  int &pErrored,
+                  int &pWarned,
+                  ZaiErrors* pErrorLog);
 
   FieldDesc_Export getFDExp();
 

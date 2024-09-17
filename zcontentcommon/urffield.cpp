@@ -1877,14 +1877,16 @@ URFField::fromXml(zxmlElement* pFieldNode,ZDataBuffer& pURFContent,ZaiErrors* pE
   ZType = 0;
 
   ZTypeBase wZType=0,wZTypeB=0;
-  ZStatus wSt=XMLgetChildZType(pFieldNode,"ztype",ZType,pErrorLog,ZAIES_Info);
+
+  ZStatus wSt=XMLgetChildText(pFieldNode,"name",Name,pErrorLog,ZAIES_Info);
+
+  wSt=XMLgetChildZType(pFieldNode,"ztype",ZType,pErrorLog,ZAIES_Info);
   if (wSt!=ZS_SUCCESS) {
     Present = false;
     FieldPtr = nullptr;
     Size = 0 ;
     return ZS_SUCCESS;
   }
-
   Present = true;
   wZTypeB = ZType;
   if (wZTypeB & ZType_Atomic)

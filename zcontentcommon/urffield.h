@@ -63,6 +63,7 @@ public:
   ZHash                 HashTime;
   size_t                Size=0;
   ZTypeBase             ZType=ZType_Nothing;
+  utf8VaryingString     Name;  // optional name
   URFParser*            _URFParser=nullptr;
 
   ZStatus setFromPtr(const ZDataBuffer& pRecord,

@@ -159,7 +159,12 @@ utf8VaryingString ZFieldDescription::toXml(int pLevel, bool pComment)
   return wReturn;
 }//toXml
 
-ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash,int &pErrored,int &pWarned, ZaiErrors* pErrorLog)
+ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode,
+                                   bool pCheckHash,
+                                   bool pDeprecated,
+                                   int &pErrored,
+                                   int &pWarned,
+                                   ZaiErrors* pErrorLog)
 {
   bool        wErrored=false, wWarned=false;
   bool        wHashismissing=false;
@@ -168,8 +173,8 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash,int
   utf8VaryingString wValue;
   utf8VaryingString wName;
   bool wBool;
-  unsigned int wInt;
-
+  unsigned int  wInt;
+  ZTypeBase     wZType;
   if (pFieldRootNode->getName()!="field")
     {
     pErrorLog->logZStatus(ZAIES_Error,
@@ -209,15 +214,26 @@ ZStatus ZFieldDescription::fromXml(zxmlNode* pFieldRootNode, bool pCheckHash,int
       wWarned=true;
     }
 
-  if (XMLgetChildUInt(wRootNode, "ztype", wInt, pErrorLog,ZAIES_Error)< 0) {
-    pErrorLog->errorLog(
-        "FieldDescription::fromXml-E-CNTFINDNOD Cannot find node <%s>.",
-        "ztype");
-    wErrored=true;
+  if (pDeprecated) {
+      if (XMLgetChildUInt(wRootNode, "ztype", wInt, pErrorLog,ZAIES_Error)< 0) {
+        pErrorLog->errorLog(
+            "FieldDescription::fromXml-E-CNTFINDNOD Cannot find node <%s>.",
+            "ztype");
+        wErrored=true;
+        pErrored++;
+      }
+      else
+        ZType = (ZTypeBase)wInt;
   }
-  else
-    ZType = (ZTypeBase)wInt;
-
+  else {
+      if (XMLgetChildUInt32Hexa(wRootNode, "ztype", ZType, pErrorLog,ZAIES_Error)< 0) {
+          pErrorLog->errorLog(
+              "FieldDescription::fromXml-E-CNTFINDNOD Cannot find node <%s>.",
+              "ztype");
+          wErrored=true;
+          pErrored++;
+      }
+   }
   if (XMLgetChildUInt(wRootNode, "capacity", wInt, pErrorLog,ZAIES_Error)< 0) {
     pErrorLog->errorLog(
         "FieldDescription::fromXml-E-CNTFINDNOD Cannot find node <%s>.",

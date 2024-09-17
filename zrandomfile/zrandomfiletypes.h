@@ -14,6 +14,8 @@
 #include <ztoolset/zmem.h>
 
 
+#define ZType_ZType uint32_t
+
 /** @namespace zbs */
 
 /**
@@ -159,6 +161,7 @@ uint8_t encode_ZFile_type(const utf8VaryingString &pType);
 utf8VaryingString getVersionStr (unsigned long pVersion); // defined in zrandomfile.cpp
 unsigned long getVersionNum (const utf8VaryingString& pVersion);// defined in zrandomfile.cpp
 
+#define __VERSION_MAX__ 9999999999
 
 /** @}  */ //  ZRandomFileGroup
 

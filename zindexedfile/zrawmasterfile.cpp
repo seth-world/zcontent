@@ -4441,8 +4441,7 @@ ZStatus ZRawMasterFile::XmlExportOneRecord(__FILEHANDLE__ pFd,
     }// for
     return rawWriteText(pFd,fmtXMLendnode("record",pLevel),wSizeWritten);
 } // XmlExportOneRecord
-ZStatus
-ZRawMasterFile::XmlExportContent(const uriString& pXmlContentFile,ZaiErrors* pErrorLog)
+ZStatus ZRawMasterFile::XmlExportContent(const uriString &pXmlContentFile,ZaiErrors *pErrorLog)
 {
     ZArray<URFField> wFieldList;
     bool wHasBeenOpened=false;
@@ -4504,7 +4503,7 @@ ZRawMasterFile::XmlExportContent(const uriString& pXmlContentFile,ZaiErrors* pEr
 
     if (Dictionary!=nullptr) {
         utf8VaryingString wStr;
-        wStr.sprintf(" A Dictionary named <%s> has been defined for this file.",Dictionary->DicName.toString());
+        wStr.sprintf(" A Dictionary named <%s> has been defined for this file.\n",Dictionary->DicName.toString());
         wSt=rawWriteText(wFd,fmtXMLcomment(wStr.toCChar(),1),wSizeWritten);
     }
     else
@@ -4757,7 +4756,7 @@ ErrorExportContentFSS:
 */
 
 ZStatus
-ZRawMasterFile::XmlImportContentByChunk( const uriString& pXmlContentFile,ZaiErrors* pErrorLog)
+ZRawMasterFile::XmlImportContentByChunk( const uriString& pXmlContentFile,ZEXOP_Type pOption,ZaiErrors* pErrorLog)
 {
   if (!pXmlContentFile.exists()) {
     pErrorLog->errorLog("Xml file <%s> does not exist",pXmlContentFile.toString());
@@ -4772,7 +4771,6 @@ ZRawMasterFile::XmlImportContentByChunk( const uriString& pXmlContentFile,ZaiErr
   pXmlContentFile.getStatR(wStats);
 
   ZMFIdentification wIdentification;
-  bool wHasBeenClosed=false;
   uriString wXmlRecord = "xmlrecordcontent.xml";
 
   size_t wOffset=0;
@@ -4813,13 +4811,43 @@ ZRawMasterFile::XmlImportContentByChunk( const uriString& pXmlContentFile,ZaiErr
                              decode_ZStatus(wSt));
     else
         fprintf(stderr,"Master file <%s> must be open with mode ZRB_ALL for importing data using XmlImportContentByChunk.\n",
-                 "Cannot open xml output file <%s> mode ZRF_All status is <%s>",
+                 "Cannot open xml output file <%s> mode ZRF_All status is <%s>\n",
                  pXmlContentFile.toCChar(),
                  decode_ZStatus(wSt));
 
  //   zclose();
     return  wSt;
   }
+  { // specific code segment to delete local variables later on
+      utf8VaryingString wMsg;
+      while (true) {
+      if (pOption==ZEXOP_Nothing) {
+          wMsg="No option";
+          break;
+      }
+      if (pOption & ZEXOP_CheckName) {
+          wMsg="Check Names";
+      }
+      if (pOption & ZEXOP_CheckZType) {
+          wMsg.addConditionalOR("Check ZType");
+          break;
+      }
+      break;
+      } // while true
+      if (pErrorLog!=nullptr)
+          pErrorLog->infoLog("Importing options  <%s>",
+                              wMsg.toString());
+      else
+          fprintf(stdout,"Importing options  <%s>\n",
+                  wMsg.toCChar());
+
+      if (Dictionary==nullptr) {
+          if (pErrorLog!=nullptr)
+              pErrorLog->errorLog(" File dictionary does not exist. This will prevent to use mentionned options.");
+          else
+              fprintf(stderr," File dictionary does not exist. This will prevent to use mentionned options.\n");
+      }
+  } // end code segment
 
   if (_progressSetupCallBack!=nullptr)
     _progressSetupCallBack(int(wStats.Size),"Importing master file content");
@@ -4865,7 +4893,7 @@ ZRawMasterFile::XmlImportContentByChunk( const uriString& pXmlContentFile,ZaiErr
 //    wXmlFullRecordContent += wXmlRecordContent ;
     wSt=wXmlRecord.writeContent(wXmlRecordContent);  /* just to debug-view content */
     wRecordsWritten++;
-    wSt = XmlImportRecordContent(wXmlRecordContent,wRecordToWrite,pErrorLog);
+    wSt = XmlImportRecordContent(wXmlRecordContent,wRecordToWrite,pOption,pErrorLog);
     if (wSt!=ZS_SUCCESS)
         goto XmlImportContentByChunkErrored ;
 
@@ -4964,8 +4992,10 @@ ZRawMasterFile::XmlImportIdentification(const utf8VaryingString& pXmlRecordConte
   return wSt;
 }
 
+
+
 ZStatus
-ZRawMasterFile::XmlImportRecordContent(const utf8VaryingString& pXmlRecordContent, ZDataBuffer& pRecord, ZaiErrors *pErrorLog)
+ZRawMasterFile::XmlImportRecordContent(const utf8VaryingString& pXmlRecordContent, ZDataBuffer& pRecord, ZEXOP_Type pOption,ZaiErrors *pErrorLog)
 {
   zxmlDoc     *wDoc = nullptr;
   zxmlElement *wRecordRoot = nullptr;
@@ -5002,11 +5032,40 @@ ZRawMasterFile::XmlImportRecordContent(const utf8VaryingString& pXmlRecordConten
   int wCount=0;
   wSt=wRecordRoot->getFirstChild(wFieldNode);
 
+  if (pErrorLog==nullptr)
+      pErrorLog = &ErrorLog;
+
   while (wSt==ZS_SUCCESS) {
     /* get one field */
     wSt = wField.fromXml((zxmlElement*)wFieldNode, wFieldZDB,pErrorLog);
     if (wSt!=ZS_SUCCESS)
         return wSt;
+
+    /* dictionary integrity check */
+
+    if  (Dictionary != nullptr) {
+        if (pOption & ZEXOP_CheckName) {
+            if (!wField.Name.isEmpty()) {
+                if (wField.Name != Dictionary->Tab(wCount).getName()) {
+                    pErrorLog->errorLog("ZRawMasterFile::XmlImportRecordContent-E-INVNAM Read field name <%s> does not match dictionary name <%s>",
+                                       wField.Name.toString(),
+                                       Dictionary->Tab(wCount).getName().toString());
+                }
+            }
+            else
+                pErrorLog->warningLog("ZRawMasterFile::XmlImportRecordContent-E-EMPTYNAM Read file name is empty and cannot be compared to dictionary name <%s>",
+                                    Dictionary->Tab(wCount).getName().toString());
+        } //ZEXOP_CheckName
+
+        if (pOption & ZEXOP_CheckZType) {
+            if (Dictionary->Tab(wCount).ZType != wField.ZType) {
+                pErrorLog->errorLog("ZRawMasterFile::XmlImportRecordContent-E-INVTYP Read field ZType <%X %s> does not match dictionary ZType <%X %s>",
+                                   wField.ZType, decode_ZType(wField.ZType),
+                                   Dictionary->Tab(wCount).ZType,decode_ZType(Dictionary->Tab(wCount).ZType) );
+            }
+        }// ZEXOP_CheckZType
+    } // Dictionary != nullptr)
+
     wCount++ ;
     wRecordZDB.appendData(wFieldZDB);
     wFieldList.push(wField);

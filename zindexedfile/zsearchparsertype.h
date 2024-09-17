@@ -176,6 +176,8 @@ enum ZSearchTokentype : ZSearchTokentype_type {
 
   ZSRCH_INSTRUCTION_MASK         = 0x00010300,
 
+  ZSRCH_HELP                     = 0x0001030F,   /* help  */
+
   ZSRCH_DECLARE                  = 0x000103A0,   /* declare { file , symbol } */
 
   ZSRCH_SAVE                     = 0x000103B0,   /* save symbol [ to <xml file path> ] */

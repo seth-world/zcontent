@@ -171,6 +171,7 @@ ZStatus ZGeneralParameters::XmlLoad(uriString& pXmlFile,ZaiErrors* pErrorLog)
     wSt=XMLgetChildText( wGenParamsNode,"defaultworkdirectory",WorkDirectory,pErrorLog,ZAIES_Warning);
     wSt=XMLgetChildText( wGenParamsNode,"defaultparamdirectory",ParamDirectory,pErrorLog,ZAIES_Error);
     wSt=XMLgetChildText( wGenParamsNode,"defaulticondirectory",IconDirectory,pErrorLog,ZAIES_Error);
+    wSt=XMLgetChildText( wGenParamsNode,"defaulthelpdirectory",HelpDirectory,pErrorLog,ZAIES_Error);
     wSt=XMLgetChildText( wGenParamsNode,"fixedfont",FixedFont,pErrorLog,ZAIES_Warning);
 
     XMLderegister(wGenParamsNode);

@@ -657,7 +657,7 @@ ZEntryPoint::actionMenuEvent(QAction* pAction)
   }
 
   if (pAction==ZMFQueryQAc) {
-    QueryMWd= new ZSearchQueryMWd(this);
+    QueryMWd= new ZSearchQueryMWd(&ErrorLog, this);
     QueryMWd->show();
     return;
   }
@@ -1602,11 +1602,15 @@ ZEntryPoint::exportZMF(QWidget* pParent,zbs::ZRawMasterFile* pRawMasterFile)
                                 "No record in file. Nothing to export.");
     return ZS_EMPTY;
   }
-
+/*
   uriString wCFName = GeneralParameters.getWorkDirectory().toCChar() ;
   wCFName.addConditionalDirectoryDelimiter();
   wCFName += pRawMasterFile->getURIContent().getRootname().toCChar() ;
   wCFName += "-content.xml" ;
+  */
+  uriString wCFName = GeneralParameters.getWorkDirectory().addConditionalDirectoryDelimiter() +
+                      pRawMasterFile->getURIContent().getRootname() +
+                      utf8VaryingString("-content.xml");
 
   QString wDir;
 //  wDir = QFileDialog::getSaveFileName(pParent,"Export content",GeneralParameters.getWorkDirectory().toCChar(),"Xml files (*.xml);;All (*.*)");
@@ -2236,7 +2240,7 @@ ZEntryPoint::importZMF(QWidget* pParent, ZaiErrors *pErrorLog)
   wZMF->registerProgressSetupCallBack(std::bind(&ZMFProgressMWn::advanceSetupCallBack, ProgressMWn,std::placeholders::_1,std::placeholders::_2));
   wZMF->registerProgressCallBack(std::bind(&ZMFProgressMWn::advanceCallBack, ProgressMWn,std::placeholders::_1,std::placeholders::_2));
 
-  wSt=wZMF->XmlImportContentByChunk(wURIContentImport,pErrorLog);
+  wSt=wZMF->XmlImportContentByChunk(wURIContentImport,ZEXOP_CheckName | ZEXOP_CheckZType, pErrorLog);
 
   ProgressMWn->setDone(wSt);
 

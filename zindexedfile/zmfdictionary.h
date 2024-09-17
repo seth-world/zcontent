@@ -153,8 +153,7 @@ public:
 
   /** @brief XmlSaveToString  loads the whole master dictionary (ZMFDictionary) including its defined keys */
   ZStatus XmlLoadFromString(const utf8VaryingString &pXmlString, bool pCheckHash, ZaiErrors* pErrorLog);
-  ZStatus fromXml(zxmlNode* pZmfDicNode, bool pCheckHash,ZaiErrors* pErrorlog);
-
+  ZStatus fromXml(zxmlNode *pZmfDicNode, bool pCheckHash, bool pDeprecated, ZaiErrors *pErrorlog);
 };
 /*                ----------------------------
                     Dictionary export schema

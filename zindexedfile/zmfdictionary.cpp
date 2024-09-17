@@ -298,16 +298,7 @@ ZStatus ZMFDictionary::XmlLoadFromString(const utf8VaryingString &pXmlString,boo
   pErrorLog->setContext("ZMFDictionary::XmlLoadFromString");
 
   wDoc = new zxmlDoc;
-  /*
-  wSt = wDoc->ParseXMLDocFromMemory(pXmlString.toCChar(), pXmlString.getUnitCount(), nullptr, 0);
-  if (wSt != ZS_SUCCESS) {
-    pErrorlog->logZExceptionLast();
-    pErrorlog->errorLog(
-        "ZMFDictionary::XmlloadFromString-E-PARSERR Xml parsing error for string <%s>",
-        pXmlString.subString(0, 25).toUtf());
-    return wSt;
-  }
-*/
+
   wSt = wDoc->XmlParseFromMemory(pXmlString,pErrorLog);
   if (wSt != ZS_SUCCESS) {
     return wSt;
@@ -324,6 +315,26 @@ ZStatus ZMFDictionary::XmlLoadFromString(const utf8VaryingString &pXmlString,boo
     return ZS_XMLINVROOTNAME;
   }
 
+  utf8VaryingString wVersionStr ;
+
+  unsigned long wVersion;
+  bool wDeprecated=false;
+  wSt=wRoot->getAttributeValue((const utf8_t*)"version",wVersionStr);
+  if (wSt != ZS_SUCCESS) {
+      pErrorLog->errorLog(
+          "ZMFDictionary::XmlLoadFromString-W-VERNUL cannot find attribute VERSION for root node <zmfdictionary>");
+//      return ZS_XMLINVROOTNAME;
+      wVersion = __VERSION_MAX__ ;
+  }
+  else {
+      wVersion = getVersionNum(wVersionStr);
+  }
+
+  if (wVersion <= __ZDIC_FORMER_VERSION__) {
+      pErrorLog->warningLog(
+          "ZMFDictionary::XmlLoadFromString-W-DEPRECATED Dictionary is stored under a deprecated version.");
+      wDeprecated = true;
+  }
 
   wSt=wRoot->getChildByName((zxmlNode*&)wMetaRootNode,"dictionary");
   if (wSt!=ZS_SUCCESS)
@@ -337,7 +348,7 @@ ZStatus ZMFDictionary::XmlLoadFromString(const utf8VaryingString &pXmlString,boo
     return wSt;
     }
 
-  wSt = fromXml(wMetaRootNode, pCheckHash,pErrorLog);
+  wSt = fromXml(wMetaRootNode, pCheckHash, wDeprecated, pErrorLog);
 
   XMLderegister((zxmlNode *&) wMetaRootNode);
   XMLderegister((zxmlNode *&) wRoot);
@@ -358,7 +369,7 @@ ZStatus ZMFDictionary::XmlLoadFromString(const utf8VaryingString &pXmlString,boo
 
 
 ZStatus
-ZMFDictionary::fromXml(zxmlNode* pDicNode, bool pCheckHash, ZaiErrors* pErrorlog)
+ZMFDictionary::fromXml(zxmlNode* pDicNode, bool pCheckHash, bool pDeprecated,ZaiErrors* pErrorlog)
 {
   zxmlElement *wRootNode=nullptr;
   zxmlElement *wMDicRootNode=nullptr;
@@ -431,7 +442,7 @@ ZMFDictionary::fromXml(zxmlNode* pDicNode, bool pCheckHash, ZaiErrors* pErrorlog
     return wSt;
   }
 
-  wSt=ZMetaDic::fromXml(wMDicRootNode,pCheckHash,pErrorlog);
+  wSt=ZMetaDic::fromXml(wMDicRootNode,pCheckHash,pDeprecated,pErrorlog);
 
 
 /*

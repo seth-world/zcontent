@@ -133,10 +133,10 @@ SOURCES += \
 #    $${ZQT_WIDGET}/zqpixlabelchecked.cpp \
     ../../zcppparser/zcppparsertype.cpp \
     ../../zqt/zqtwidget/zcombodelegate.cpp \
-    ../../zqt/zqtwidget/zhelp.cpp \
     ../../zqt/zqtwidget/zqgraphicscene.cpp \
     ../../zqt/zqtwidget/zqrectangle.cpp \
     ../../zqt/zqtwidget/zqtextbrowser.cpp \
+    ../../zqt/zqtwidget/ztextformattuple.cpp \
     ../zcontentcommon/urffield.cpp \
     ../zcontentcommon/urfparser.cpp \
 #    ../zcontentcommon/zgeneralparameters.cpp \
@@ -184,6 +184,8 @@ SOURCES += \
     zentrypoint.cpp \
     zfilegenerate.cpp \
     zgeneralparamsdlg.cpp \
+    zhelp.cpp \
+    zhelpfreetextsearchdlg.cpp \
     zkeylistdlg.cpp \
     zmfprogressmwn.cpp \
     zrawkeylistdlg.cpp \
@@ -211,12 +213,12 @@ HEADERS += \
 #    $${ZQT_WIDGET}/zqpixlabelchecked.h \
     ../../zcppparser/zcppparsertype.h \
     ../../zqt/zqtwidget/zcombodelegate.h \
-    ../../zqt/zqtwidget/zhelp.h \
     ../../zqt/zqtwidget/zqgraphicscene.h \
     ../../zqt/zqtwidget/zqrectangle.h \
     ../../zqt/zqtwidget/zqtextbrowser.h \
     ../../zqt/zqtwidget/zqtutils.h \
     ../../zqt/zqtwidget/zqtwidgets_release.h \
+    ../../zqt/zqtwidget/ztextformattuple.h \
     ../zcontentcommon/urffield.h \
     ../zcontentcommon/urfparser.h \
 #    ../zcontentcommon/zgeneralparameters.h \
@@ -264,6 +266,8 @@ HEADERS += \
     zentrypoint.h \
     zfilegenerate.h \
     zgeneralparamsdlg.h \
+    zhelp.h \
+    zhelpfreetextsearchdlg.h \
     zkeylistdlg.h \
     zmfprogressmwn.h \
     zrawkeylistdlg.h \

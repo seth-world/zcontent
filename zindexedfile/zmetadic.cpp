@@ -613,14 +613,14 @@ ZStatus ZMetaDic::XmlLoadFromString(const utf8VaryingString &pXmlString,bool pCh
     return ZS_XMLINVROOTNAME;
   }
 
-  wSt = fromXml(wRoot, pCheckHash, pErrorLog);
+  wSt = fromXml(wRoot, pCheckHash,false, pErrorLog);
 
   XMLderegister((zxmlNode *&) wRoot);
 
   return wSt;
 }//ZMetaDic::XmlLoadFromString
 
-ZStatus ZMetaDic::fromXml(zxmlNode* pMetaDicRootNode, bool pCheckHash,ZaiErrors* pErrorlog)
+ZStatus ZMetaDic::fromXml(zxmlNode* pMetaDicRootNode, bool pCheckHash,bool pDeprecated,ZaiErrors* pErrorlog)
 {
   zxmlElement *wMetaDicNode=nullptr;
   zxmlElement *wFieldsRootNode=nullptr;
@@ -661,7 +661,7 @@ ZStatus ZMetaDic::fromXml(zxmlNode* pMetaDicRootNode, bool pCheckHash,ZaiErrors*
   while (wSt==ZS_SUCCESS)
     {
     wFD.clear();
-    wSt=wFD.fromXml(wSingleFieldNode,pCheckHash,wErroredFields,wWarnedFields,pErrorlog);
+    wSt=wFD.fromXml(wSingleFieldNode,pCheckHash,false,wErroredFields,wWarnedFields,pErrorlog);
     if (wSt > 0) /* ZS_SUCCESS or ZS_WARNING  -> field is oK */
       push(wFD);
 

@@ -39,7 +39,7 @@
 
 #include "texteditmwn.h"
 
-#include <zqt/zqtwidget/zhelp.h>
+#include "zhelp.h"
 
 #include <zcontent/zindexedfile/zsearchparser.h>
 
@@ -52,7 +52,7 @@
 #include "zcollectionlist.h"
 #include "zmfprogressmwn.h"
 
-#include <zqtwidget/zhelp.h>
+#include "zhelp.h"
 
 #include <zcontent/zindexedfile/zsearchentitycontext.h>
 
@@ -69,9 +69,10 @@ setGParser(ZSearchParser* pParser) {
 const long StringDiplayMax = 64;
 using namespace zbs;
 
-ZSearchQueryMWd::ZSearchQueryMWd(QWidget *parent) : QMainWindow(parent)
+ZSearchQueryMWd::ZSearchQueryMWd(ZaiErrors *pErrorLog, QWidget *parent) : QMainWindow(parent)
 {
-  initLayout();
+    ErrorLog = pErrorLog;
+    initLayout();
 }
 
 ZSearchQueryMWd::~ZSearchQueryMWd()
@@ -282,11 +283,17 @@ void ZSearchQueryMWd::initLayout()
     QMenu* MainMenuMEn = new QMenu("General",this);
     menubar->addMenu(MainMenuMEn);
 
+    WizardQAc = new QAction("Query wizard" );
+    MainMenuMEn->addAction(WizardQAc);
+    wMainAGp->addAction(WizardQAc);
+
+    MainMenuMEn->addSeparator();
 
     ExecQAc=new QAction("Execute (F9)");
     ClearLogQAc= new QAction("Clear log");
     QuitQAc=new QAction("Quit");
     SaveInstructionsQAc=new QAction("Save instuctions");
+
 
     MainMenuMEn->addAction(ExecQAc);
     MainMenuMEn->addAction(SaveInstructionsQAc);
@@ -371,10 +378,11 @@ void
 ZSearchQueryMWd::help()
 {
     if (HelpMWn==nullptr) {
-        HelpMWn = new zbs::ZHelp(this,"Help");
+        HelpMWn = new zbs::ZHelp("Query help",this);
         HelpMWn->setCloseCallBack(std::bind(&ZSearchQueryMWd::helpClose,this,std::placeholders::_1));
+        HelpMWn->setup("query",ErrorLog);
     }
-    HelpMWn->setHtmlSource("file://home/gerard/Development/zbasetools/zqt/help/generalindex.html");
+//    HelpMWn->setHtmlSource("file://home/gerard/Development/zbasetools/zqt/help/generalindex.html");
 
     HelpMWn->show();
 
@@ -579,6 +587,11 @@ ZSearchQueryMWd::MenuTriggered(QAction* pAction)
     QuitLBlClicked();
     return;
   }
+  if (pAction == WizardQAc){
+      ExecuteClicked();
+      return;
+  }
+
   if (pAction == ExecQAc){
     ExecuteClicked();
     return;
@@ -642,6 +655,11 @@ ZSearchQueryMWd::ExecuteClicked ()
   LastStatusLBl->setText("");
 
   wSt=Parser->parse(wQuery,wSearchContext);
+
+  if (wSt==ZS_HELP)  {
+      help();
+      return ;
+  }
 
   if (LabelGoodPalette == QPalette()) {
       LabelGoodPalette=LabelBadPalette=LabelDefaultPalette = LastStatusLBl->palette();

@@ -50,7 +50,7 @@ class ZSearchQueryMWd : public QMainWindow
   Q_OBJECT
 
 public:
-  explicit ZSearchQueryMWd(QWidget *parent = nullptr);
+  explicit ZSearchQueryMWd(ZaiErrors* pErrorLog,QWidget *parent = nullptr);
   ~ZSearchQueryMWd();
 
   ZQLabel *createZButton(const utf8VaryingString &pIconName,
@@ -132,14 +132,18 @@ public:
 
 
 private:
-  zbs::ZHelp*  HelpMWn=nullptr;
-  QWidget     *CentralWidget=nullptr;
+  ZaiErrors*    ErrorLog=nullptr;
+  zbs::ZHelp*   HelpMWn=nullptr;
+  QWidget*      CentralWidget=nullptr;
   QWidget*     QueryWDg = nullptr;
   QWidget*     ExpWidget2 = nullptr;
   QWidget*     ForBackWDg = nullptr;
 
-  ZQPlainTextEdit   *QueryQTe=nullptr;
-  ZQTableView *ResultTBv=nullptr;
+  ZQPlainTextEdit*  QueryQTe=nullptr;
+  ZQTableView*      ResultTBv=nullptr;
+
+
+
 
   QLabel*     EntityNameLBl=nullptr;
   QLabel*     EntityTypeLBl=nullptr;
@@ -165,6 +169,9 @@ private:
   QAction* ExecQAc=nullptr;
   QAction* QuitQAc=nullptr;
   QAction* QuitIconQAc=nullptr;
+
+
+  QAction* WizardQAc=nullptr;
 
   QAction* SaveInstructionsQAc=nullptr;
 

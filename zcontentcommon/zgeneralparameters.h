@@ -55,6 +55,7 @@ public:
     const char* getWorkDirectoryChar() {return WorkDirectory.toCChar();}
     const char* getParamDirectoryChar() {return ParamDirectory.toCChar();}
     const char* getIconDirectoryChar() {return IconDirectory.toCChar();}
+    const char* getHelpDirectoryChar() {return HelpDirectory.toCChar();}
 
 
     void setVerbose (ZVerbose_Base pVerbose) {_BaseParameters->Verbose = pVerbose; }
@@ -83,6 +84,7 @@ public:
     uriString WorkDirectory;
     uriString ParamDirectory;
     uriString IconDirectory;
+    uriString HelpDirectory;
 
 
     utf8VaryingString FixedFont;

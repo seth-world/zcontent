@@ -39,6 +39,9 @@
 
 #include "zsearchsymbol.h"
 
+#include <ztoolset/utfmetafunctions.h>
+
+
 namespace zbs {
 
 
@@ -379,6 +382,8 @@ public:
 
   ZStatus _parseContextClear(ZSearchContext & pContext);
 
+  ZStatus _parseContextHelp(ZSearchContext & pContext);
+
   /* entry point for declare keyword parsing */
   ZStatus _parseContextDeclare(ZSearchContext & pContext);
   /* parse file entity */
@@ -682,6 +687,8 @@ searchSymbolApprox(const utf8VaryingString& pIn);
 utf8VaryingString
 searchKeywordApprox(const utf8VaryingString& pIn);
 
+
+#ifdef __COMMENT__
 class CMatchResult
 {
 public:
@@ -762,6 +769,7 @@ bool matchWeight(CMatchResult &pResult,
 
 utf8VaryingString
 leftPad(const utf8VaryingString& pString,int pSize,utf8_t pPadChar=' ');
+#endif // __COMMENT__
 
 }//namespace zbs
 

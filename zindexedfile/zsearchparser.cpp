@@ -5013,6 +5013,12 @@ ZStatus ZSearchParser::_parseContext(ZSearchContext& pContext)
     while (pContext.notEOF() && (pContext.Status == ZS_SUCCESS) ) {
 
       switch (pContext.CurrentToken->Type) {
+      case ZSRCH_HELP:
+      {
+          pContext.InstructionType = ZSITP_Nothing;
+          pContext.Status = _parseContextHelp(pContext);
+          return pContext.Status;
+      }// ZSRCH_DECLARE
 
       case ZSRCH_DECLARE:
       {
@@ -5831,6 +5837,15 @@ ZSearchParser::_parseContextFind(ZSearchContext & pContext)
     pContext.advanceIndex();
   return ZS_SUCCESS;
 }// ZSearchParser::_parseFind
+
+ZStatus
+ZSearchParser::_parseContextHelp(ZSearchContext& pContext)
+{
+    if (pContext.CurrentToken->Type!=ZSRCH_HELP)
+        return pContext.Status=ZS_INVTYPE;
+
+    return ZS_HELP;
+}
 
 
 ZStatus
@@ -7138,26 +7153,6 @@ ZStatus ZSearchParser::_DisplayEntityJoinDefault (ZSearchContext &pContext)
 
     return wSt;
 } // ZSearchParser::_DisplayEntityJoinDefault
-utf8VaryingString
-leftPad(const utf8VaryingString& pString,int pSize,utf8_t pPadChar)
-{
-    utf8VaryingString wReturn;
-    ssize_t wPad = ssize_t(pSize - pString.strlen());
-    if (wPad > 0)
-        wReturn.setChar(pPadChar,0,wPad);
-    wReturn += pString;
-    return wReturn;
-}
-
-utf8VaryingString
-rightPad(const utf8VaryingString& pString,int pSize,utf8_t pPadChar)
-{
-    utf8VaryingString wReturn = pString ;
-    ssize_t wPad = ssize_t(pSize - pString.strlen());
-    if (wPad > 0)
-        wReturn.addChar(pPadChar,wPad);
-    return wReturn;
-}
 
 #ifdef __COMMENT__
 QList<QStandardItem *> ZSearchParser::DisplayOneLine( ZDataBuffer &pRecord)
@@ -8934,7 +8929,7 @@ void ZParserError::warningLog(const char* pFormat,...)
 
 
 
-
+#ifdef __COMMENT__
 
 class CWeightList  WeightList ;
 
@@ -9017,6 +9012,7 @@ matchWeight(CMatchResult& pResult,const utf8VaryingString& pIn,const utf8Varying
     return true ;
 } // matchWeight
 
+
 utf8VaryingString
 searchAdHocWeighted_old(const utf8VaryingString& pIn, ZArray<utf8VaryingString>& pKeyArray)
 {
@@ -9096,7 +9092,7 @@ searchAdHocWeighted(const utf8VaryingString& pIn, ZArray<utf8VaryingString>& pKe
     return utf8VaryingString();
 }//searchAdHocWeighted
 
-
+#endif // __COMMENT__
 
 utf8VaryingString
 searchSymbolWeighted(const utf8VaryingString& pIn)

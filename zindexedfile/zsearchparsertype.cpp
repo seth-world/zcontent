@@ -9,6 +9,7 @@ using namespace zbs;
 
 
 ZArray<ZSearchKeyWord> KeywordList = {
+
     {"SET",ZSRCH_SET},
     {"DECLARE",ZSRCH_DECLARE},
     {"SAVE",ZSRCH_SAVE},
@@ -104,6 +105,8 @@ ZArray<ZSearchKeyWord> KeywordList = {
 
     {"TRANSLATE",ZSRCH_TRANSLATE},
     {"DECODETABLE",ZSRCH_DECODETABLE},
+
+    {"HELP",ZSRCH_HELP},
 
     {"DEFAULT",ZSRCH_DEFAULT},
     {"CURRENT",ZSRCH_CURRENT}
@@ -284,6 +287,9 @@ decode_SearchTokenType(ZSearchTokentype_type pType)
 
   case ZSRCH_SET:
     return "ZSRCH_SET";
+
+  case ZSRCH_HELP:
+  return "ZSRCH_HELP";
   case ZSRCH_DECLARE:
       return "ZSRCH_DECLARE";
   case ZSRCH_SAVE:
