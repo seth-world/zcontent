@@ -53,6 +53,7 @@
 #include "zmfprogressmwn.h"
 
 #include "zhelp.h"
+#include "zquerywizardmwd.h"
 
 #include <zcontent/zindexedfile/zsearchentitycontext.h>
 
@@ -137,6 +138,8 @@ void ZSearchQueryMWd::initLayout()
 {
     menubar = new QMenuBar(this);
     menubar->setGeometry(QRect(0, 0, 814, 20));
+
+    setWindowTitle("Content MasterFile Query");
 
     QHBoxLayout *ButtonBox=nullptr;
 
@@ -588,13 +591,14 @@ ZSearchQueryMWd::MenuTriggered(QAction* pAction)
     return;
   }
   if (pAction == WizardQAc){
-      ExecuteClicked();
+      ZQueryWizardMWd* wQW = new ZQueryWizardMWd(this);
+      wQW->show();
       return;
   }
 
   if (pAction == ExecQAc){
-    ExecuteClicked();
-    return;
+      ExecuteClicked();
+      return;
   }
   if (pAction == SaveInstructionsQAc){
     SaveInstructions();

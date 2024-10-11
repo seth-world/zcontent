@@ -3,9 +3,12 @@
 
 #include <ztoolset/zstatus.h>
 #include <ztoolset/zbaseparameters.h>
+#include <zcontent/zcontentcommon/zcontentobjectbroker.h>
 //#include "zarray.h"
 #include <ztoolset/utfvaryingstring.h>
 #include <ztoolset/uristring.h>
+
+#include "zdomainbroker.h"
 
 /*
 #define __PARSER_WORK_DIRECTORY__  "zparserworkdir"
@@ -25,6 +28,8 @@ class ZaiErrors;
 namespace zbs {
 //class ZCppGenerate;
 
+
+
 class ZGeneralParameters
 {
 public:
@@ -36,8 +41,10 @@ public:
 
     ZGeneralParameters& operator = (const ZGeneralParameters& pIn) {return _copyFrom(pIn);}
 
-    ZStatus XmlLoad(uriString& pXmlFile, ZaiErrors *pErrorLog=nullptr);
-    ZStatus XmlSave(uriString& pXmlFile,ZaiErrors* pErrorLog=nullptr);
+    ZStatus XmlLoad(uriString& pXmlFile, ZaiErrors *pErrorLog);
+    ZStatus XmlLoadString(utf8VaryingString& wXmlString,  ZaiErrors* pErrorLog);
+//    ZStatus XmlSave(uriString& pXmlFile,ZaiErrors* pErrorLog);  // Deprecated : see XmlSaveAllParameters()
+    utf8VaryingString XmlSaveToString( ZaiErrors* pErrorLog,ZDomainBroker &pDomainBroker=DomainBroker) ;
 
     bool isInit() {return Init;}
     void setInit(bool pInit=true)  {Init=pInit;}
@@ -80,6 +87,16 @@ public:
     bool VerboseFileEngine () {return _BaseParameters->VerboseFileEngine();}
     bool VerboseSearchEngine () {return _BaseParameters->VerboseSearchEngine();}
 
+    void clear()
+    {
+        currentXml.clear();
+        WorkDirectory.clear();
+        IconDirectory.clear();
+        HelpDirectory.clear();
+        setVerbose(ZVB_NoVerbose) ;
+        Init=false;
+    }
+
     uriString currentXml;
     uriString WorkDirectory;
     uriString ParamDirectory;
@@ -95,12 +112,24 @@ public:
 
 extern ZGeneralParameters GeneralParameters;
 
-} // namespace zbs
+
+ZStatus XmlSaveAllParameters(const uriString& pXmlFile,
+                             ZaiErrors* pErrorLog);
+
+ZStatus XmlSaveAllParameters(const uriString& pXmlFile,
+                             ZGeneralParameters &pGeneralParameters,
+                             ZDomainBroker &pDomainBroker,
+                             ZaiErrors* pErrorLog);
+
+ZStatus XmlLoadAllParameters(const uriString& pXmlFile,
+                             ZGeneralParameters &pGeneralParameters,
+                             ZDomainBroker &pDomainBroker,
+                             ZaiErrors* pErrorLog);
 
 utf8VaryingString decode_Verbose(ZVerbose_Base pVerbose);
 ZVerbose_Base encode_Verbose(const utf8VaryingString& pVerboseString);
 
-
+} // namespace zbs
 /*
 const char* getWorkDirectory();
 const char* getParamDirectory();

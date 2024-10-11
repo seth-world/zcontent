@@ -1,15 +1,20 @@
 #include "zgeneralparameters.h"
+#include "zdomainbroker.h"
+
 #include <ztoolset/zaierrors.h>
 #include <zxml/zxmlprimitives.h>
 #include <ztoolset/zexceptionmin.h>
 
 #include <zcontent/zindexedfile/zmf_limits.h>
 
-namespace zbs {
-ZGeneralParameters GeneralParameters;
-}
 
 using namespace zbs;
+
+namespace zbs {
+ZGeneralParameters GeneralParameters;
+
+
+
 
 
 
@@ -31,6 +36,9 @@ ZGeneralParameters::setFromArg(int argc, char *argv[])
         fprintf (stderr,"ZGeneralParameters::setFromArg-E-NOARG no argument given.");
         return ZS_NOTFOUND;
     }
+    ZaiErrors* ErrorLog=new ZaiErrors;
+    ErrorLog->setAutoPrintAll();
+
     uriString wURIGeneralParams;
     wURIGeneralParams = argv[1];
     if (!wURIGeneralParams.exists()) {
@@ -38,7 +46,9 @@ ZGeneralParameters::setFromArg(int argc, char *argv[])
                 argv[1]);
         return ZS_FILENOTEXIST;
     }
-    return XmlLoad(wURIGeneralParams,nullptr);
+    ZStatus wSt = XmlLoadAllParameters(wURIGeneralParams,GeneralParameters,DomainBroker,ErrorLog);
+    delete ErrorLog;
+    return wSt;
 }
 
 /*
@@ -52,35 +62,51 @@ ZGeneralParameters::setFromArg(int argc, char *argv[])
     </generalparameters>
  </zmasterfileparameters>
 */
+/* Deprecated : see XmlSaveAllParameters()
 ZStatus ZGeneralParameters::XmlSave(uriString& pXmlFile,ZaiErrors* pErrorLog)
 {
     ZStatus wSt;
     int wLevel=0;
     if (pErrorLog!=nullptr)
         pErrorLog->setAutoPrintOn(ZAIES_Text);
-
-    utf8VaryingString wReturn = fmtXMLdeclaration();
-    wReturn += fmtXMLmainVersion("zmasterfileparameters",__ZMF_VERSION__,0);
-    wLevel=1;
-    wReturn += fmtXMLnode("generalparameters",wLevel);
-    wLevel++;
-    wReturn += fmtXMLchar("verbose",decode_Verbose(getVerbose()),wLevel);
-    wReturn += fmtXMLchar("defaultworkdirectory",getWorkDirectory(),wLevel);
-    wReturn += fmtXMLchar("defaultparamdirectory",getParamDirectory(),wLevel);
-    wReturn += fmtXMLchar("defaulticondirectory",getIconDirectory(),wLevel);
-    if (!FixedFont.isEmpty())
-        wReturn += fmtXMLchar("fixedfont",getFixedFont(),wLevel);
-    wLevel--;
-    wReturn += fmtXMLendnode("generalparameters",wLevel);
-    wReturn += fmtXMLendnode("zmasterfileparameters",0);
+    utf8VaryingString wReturn = XmlSaveToString(pErrorLog);
 
     return pXmlFile.writeContent(wReturn);
 }//  XmlSave
+*/
+utf8VaryingString ZGeneralParameters::XmlSaveToString(ZaiErrors *pErrorLog, ZDomainBroker& pDomainBroker)
+{
+    ZStatus wSt;
+    utf8VaryingString pXmlString;
+    int wLevel=0;
+    if (pErrorLog!=nullptr)
+        pErrorLog->setAutoPrintOn(ZAIES_Text);
+
+    pXmlString = fmtXMLdeclaration();
+    pXmlString += fmtXMLmainVersion("zmasterfileparameters",__ZMF_VERSION__,0);
+    wLevel=1;
+    pXmlString += fmtXMLnode("generalparameters",wLevel);
+    wLevel++;
+    pXmlString += fmtXMLchar("verbose",decode_Verbose(getVerbose()),wLevel);
+    pXmlString += fmtXMLchar("defaultworkdirectory",getWorkDirectory(),wLevel);
+    pXmlString += fmtXMLchar("defaultparamdirectory",getParamDirectory(),wLevel);
+    pXmlString += fmtXMLchar("defaulticondirectory",getIconDirectory(),wLevel);
+    if (!FixedFont.isEmpty())
+        pXmlString += fmtXMLchar("fixedfont",getFixedFont(),wLevel);
+    wLevel--;
+    pXmlString += fmtXMLendnode("generalparameters",wLevel);
+
+    pXmlString += pDomainBroker.toXml(1,pErrorLog);
+
+    pXmlString += fmtXMLendnode("zmasterfileparameters",0);
+
+    return pXmlString;
+}//  XmlSaveString
 
 ZStatus ZGeneralParameters::XmlLoad(uriString& pXmlFile,ZaiErrors* pErrorLog)
 {
     utf8VaryingString wXmlString;
-
+    clear();
     ZStatus wSt;
     if (pErrorLog!=nullptr)
         pErrorLog->setAutoPrintOn(ZAIES_Text);
@@ -101,22 +127,21 @@ ZStatus ZGeneralParameters::XmlLoad(uriString& pXmlFile,ZaiErrors* pErrorLog)
         return wSt;
     }
 
+    wSt = XmlLoadString(wXmlString,pErrorLog);
+    currentXml = pXmlFile ;
+    return wSt;
+}
+
+
+ZStatus ZGeneralParameters::XmlLoadString(utf8VaryingString& wXmlString,ZaiErrors* pErrorLog)
+{
+    ZStatus wSt=ZS_SUCCESS;
+
     utf8VaryingString wVerbose;
     zxmlDoc     *wDoc = nullptr;
     zxmlElement *wRoot = nullptr;
     zxmlElement *wParamRootNode=nullptr;
     zxmlElement *wGenParamsNode=nullptr;
-    zxmlElement *wObjectNode=nullptr;
-    zxmlElement *wSwapNode=nullptr;
-
-    //  zxmlElement *wTypeNode=nullptr;
-    zxmlElement *wIncludeFileNode=nullptr;
-
-    utf8VaryingString wKeyword;
-
-    ZTypeBase             wZType;
-
-    utf8VaryingString     wIncludeFile;
 
     wDoc = new zxmlDoc;
     wSt = wDoc->ParseXMLDocFromMemory(wXmlString.toCChar(), wXmlString.getUnitCount(), nullptr, 0);
@@ -124,8 +149,8 @@ ZStatus ZGeneralParameters::XmlLoad(uriString& pXmlFile,ZaiErrors* pErrorLog)
         if (pErrorLog!=nullptr) {
             pErrorLog->logZExceptionLast();
             pErrorLog->errorLog(
-                "ZGeneralParameters::XMLLoad-E-PARSERR Xml parsing error for string <%s> ",
-                wXmlString.subString(0, 25).toString());
+                "ZGeneralParameters::XMLLoad-E-PARSERR Xml parsing error for string <%s> current file is <%s>",
+                wXmlString.subString(0, 25).toString(),currentXml.toCChar());
         }
         return wSt;
     }
@@ -140,22 +165,22 @@ ZStatus ZGeneralParameters::XmlLoad(uriString& pXmlFile,ZaiErrors* pErrorLog)
         ZException.setMessage("ZGeneralParameters::XMLLoad",
                               ZS_XMLINVROOTNAME,
                               Severity_Error,
-                              "Invalid root name <%s> expected <zmasterfileparameters> - file <%s>.",
-                              wRoot->getName().toString(),
-                              pXmlFile.toCChar());
+                              "Invalid root name <%s> expected <zmasterfileparameters>.",
+                              wRoot->getName().toString());
         if (pErrorLog!=nullptr)
             pErrorLog->errorLog(
-                "ZGeneralParameters::XMLLoad-E-INVROOT Invalid root node name <%s> expected <zmasterfileparameters> - file <%s>",
-                wRoot->getName().toString(),pXmlFile.toCChar());
+                "ZGeneralParameters::XMLLoad-E-INVROOT Invalid root node name <%s> expected <zmasterfileparameters>",
+                wRoot->getName().toString());
         return ZS_XMLINVROOTNAME;
     }
     /*------------------ various parameters -----------------------*/
     wSt=wRoot->getChildByName((zxmlNode*&)wGenParamsNode,"generalparameters");
     if (wSt!=ZS_SUCCESS) {
+        XMLderegister(wRoot);
         pErrorLog->logZStatus(
             ZAIES_Error,
             wSt,
-            "ZGeneralParameters::loadGenerateParameters-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
+            "ZGeneralParameters::XMLLoad-E-CNTFINDND Error cannot find node element with name <%s> status <%s>",
             "generalparameters",
             decode_ZStatus(wSt));
         return wSt;
@@ -168,6 +193,9 @@ ZStatus ZGeneralParameters::XmlLoad(uriString& pXmlFile,ZaiErrors* pErrorLog)
         _DBGPRINT("ZGeneralParameters::XmlLoad-I-VERBOSE Verbose is set to %s.\n", decode_Verbose(getVerbose()).toCChar())
     }
 
+
+
+
     wSt=XMLgetChildText( wGenParamsNode,"defaultworkdirectory",WorkDirectory,pErrorLog,ZAIES_Warning);
     wSt=XMLgetChildText( wGenParamsNode,"defaultparamdirectory",ParamDirectory,pErrorLog,ZAIES_Error);
     wSt=XMLgetChildText( wGenParamsNode,"defaulticondirectory",IconDirectory,pErrorLog,ZAIES_Error);
@@ -178,17 +206,13 @@ ZStatus ZGeneralParameters::XmlLoad(uriString& pXmlFile,ZaiErrors* pErrorLog)
 
     XMLderegister((zxmlNode *&) wParamRootNode);
 
-    currentXml = pXmlFile ;
 
-    if (wSt==ZS_EOF) {
+    if ((wSt==ZS_EOF)||(wSt==ZS_SUCCESS)) {
         Init=true;
         return ZS_SUCCESS;
     }
-    if (wSt==ZS_SUCCESS)
-        Init = true;
-
     return wSt;
-}//  XmlLoad
+}//  ZGeneralParameters::XmlLoadString
 
 
 
@@ -259,7 +283,55 @@ ZGeneralParameters::getFixedFont() {
     return FixedFont;
 }
 
+ZStatus XmlSaveAllParameters(const uriString& pXmlFile,
+                             ZaiErrors* pErrorLog)
+{
+    utf8VaryingString wXmlContent = GeneralParameters.XmlSaveToString(pErrorLog,DomainBroker);
+//    wXmlContent += DomainBroker.toXml(0,pErrorLog);
+    return pXmlFile.writeContent(wXmlContent);
+}
 
+ZStatus XmlSaveAllParameters(const uriString &pXmlFile,
+                             ZGeneralParameters &pGeneralParameters,
+                             ZDomainBroker &pDomainBroker,
+                             ZaiErrors *pErrorLog)
+{
+    utf8VaryingString wXmlContent = pGeneralParameters.XmlSaveToString(pErrorLog,pDomainBroker);
+//    wXmlContent += pDomainBroker.toXml(0,pErrorLog);
+    return pXmlFile.writeContent(wXmlContent);
+}
+
+ZStatus XmlLoadAllParameters(const uriString &pXmlFile,
+                             ZGeneralParameters &pGeneralParameters,
+                             ZDomainBroker &pDomainBroker,
+                             ZaiErrors *pErrorLog)
+{
+    utf8VaryingString wXmlContent;
+    ZStatus wSt=pXmlFile.loadUtf8(wXmlContent);
+    wSt = pGeneralParameters.XmlLoadString(wXmlContent,pErrorLog);
+    if (wSt!=ZS_SUCCESS)
+        return wSt;
+
+    pGeneralParameters.currentXml = pXmlFile;
+    wSt = pDomainBroker.XmlLoadString(wXmlContent,pErrorLog);
+    if (wSt!=ZS_SUCCESS)
+        return wSt;
+    ZDomainPath* wLocalPath = pDomainBroker._breakDomainPathName("local",pErrorLog);
+    if (wLocalPath == nullptr) {
+        wLocalPath = new ZDomainPath(ZDOM_Path | ZDOM_Absolute,"local",DomainBroker.getRoot(),0);
+        wLocalPath->Temporary = true;
+        wLocalPath->ToolTip = "This node is local to client and contains direct usable path elements.\n"
+                        "This node is marked temporary and is never saved within parameters xml file.\n"
+                        "Its content is defined by local symbols read at application launch";
+        ZDomainPath* wWdP = new ZDomainPath(ZDOM_Path | ZDOM_Absolute ,"workspace",wLocalPath);
+        wWdP->Content =  pGeneralParameters.WorkDirectory;
+        wWdP->ToolTip = "Space allocated for temporary work usage.\n";
+        wWdP->Temporary = true;
+        wWdP = new ZDomainPath(ZDOM_Path | ZDOM_Absolute ,"helpspace",wLocalPath);
+        wWdP->Content = pGeneralParameters.HelpDirectory ;
+    }
+    return ZS_SUCCESS;
+}
 utf8VaryingString
 decode_Verbose(ZVerbose_Base pVerbose)
 {
@@ -342,3 +414,4 @@ encode_Verbose(const utf8VaryingString& pVerboseString)
         wV |= ZVB_SearchEngine;
     return wV;
 }
+} // namespace zbs

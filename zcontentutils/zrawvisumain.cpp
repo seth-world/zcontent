@@ -1181,13 +1181,9 @@ ZRawVisuMain::actionMenuEvent(QAction* pAction)
   } //ParamLoadQAc
 
   if (pAction==ParamChangeQAc) {
-    ZGeneralParamsDLg* wParamDLg = new ZGeneralParamsDLg(this);
-    wParamDLg->setup(GeneralParameters);
+    ZGeneralParamsWNd* wParamDLg = new ZGeneralParamsWNd(&ErrorLog,this);
+    wParamDLg->setup(GeneralParameters,DomainBroker);
     wParamDLg->show();
-    int wRet=wParamDLg->exec();
-    if (wRet==QDialog::Rejected)
-      return;
-    return;
   }
     /* end general parameters */
 

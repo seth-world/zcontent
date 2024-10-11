@@ -158,15 +158,16 @@ ZEntryPoint::initLayout()
 
 
     /*----------Leading quit icon--------------*/
-
+/*
     uriString wQuitImg;
     wQuitImg = GeneralParameters.getIconDirectory();
     wQuitImg.addConditionalDirectoryDelimiter();
     wQuitImg += "system-shutdown.png";
     QIcon wQuitICn(wQuitImg.toCChar());
+ */
+    QIcon wQuitICn = ContentObjectBroker.iconFactory("general.iconfactory/system-shutdown.png",&ErrorLog);
 
-    QuitIconQAc = new QAction("",menubar);
-    QuitIconQAc->setIcon(wQuitICn);
+    QuitIconQAc = new QAction(wQuitICn,"",menubar);
 
     menubar->addAction(QuitIconQAc);
     mainQAg->addAction(QuitIconQAc);
@@ -180,13 +181,15 @@ ZEntryPoint::initLayout()
     ParametersQMe=new QMenu(QObject::tr("Parameters"),this);
     generalMEn->addMenu(ParametersQMe);
 
+    ParamChangeQAc=new QAction(QObject::tr("Change"),this);
+    ParametersQMe->addAction(ParamChangeQAc);
+    mainQAg->addAction(ParamChangeQAc);
+
     ParamLoadQAc=new QAction(QObject::tr("Load xml parameter file"),this);
     ParametersQMe->addAction(ParamLoadQAc);
     mainQAg->addAction(ParamLoadQAc);
 
-    ParamChangeQAc=new QAction(QObject::tr("Change current parameters"),this);
-    ParametersQMe->addAction(ParamChangeQAc);
-    mainQAg->addAction(ParamChangeQAc);
+
 
     TextFileVisuQAc = new QAction("Load text file",this);
     generalMEn->addAction(TextFileVisuQAc);
@@ -463,24 +466,40 @@ ZEntryPoint::actionMenuEvent(QAction* pAction)
       uriString wXmlParams= wFileName.toUtf8().data();
       if (!wXmlParams.exists())
           return;
-      wSt=GeneralParameters.XmlLoad(wXmlParams,nullptr);
+      ErrorLog.setAutoPrintAll();
+      wSt=GeneralParameters.XmlLoad(wXmlParams,&ErrorLog);
       if (wSt!=ZS_SUCCESS) {
-          utf8VaryingString wExcp = ZException.last().formatFullUserMessage().toString();
+/*          utf8VaryingString wExcp = ZException.last().formatFullUserMessage().toString();
           ZExceptionDLg::adhocMessage("Load parameters",Severity_Error,
-                                      nullptr,&wExcp,"Error while loading xml parameter file %s",wXmlParams.toString());
+                                      nullptr,&wExcp,"Error while loading/parsing General xml parameter file %s",wXmlParams.toString());
+*/
+        ZExceptionDLg::adhocMessageErrorLog("Load parameters",Severity_Error,&ErrorLog,
+                                    "Error while loading/parsing General xml parameter file %s",wXmlParams.toString());
+
+        return;
+      }
+      wSt=DomainBroker.XmlLoad(wXmlParams,&ErrorLog);
+      if (wSt!=ZS_SUCCESS) {
+ /*         utf8VaryingString wExcp = ZException.last().formatFullUserMessage().toString();
+          ZExceptionDLg::adhocMessage("Load parameters",Severity_Error,
+                                      nullptr,&wExcp,"Error while loading/parsing Domain xml parameter file %s",wXmlParams.toString());
+*/
+          ZExceptionDLg::adhocMessageErrorLog("Load parameters",Severity_Error,&ErrorLog,
+                                              "Error while loading/parsing loading/parsing Domains xml parameter file %s",wXmlParams.toString());
           return;
       }
+      if (ErrorLog.hasSomething()) {
+          ZExceptionDLg::adhocMessageErrorLog("Load parameters",Severity_Information,&ErrorLog,
+                                              "Some messages have been recorded for xml parameter file %s",wXmlParams.toString());
+      }
+
       return;
   } //ParamLoadQAc
 
   if (pAction==ParamChangeQAc) {
-      ZGeneralParamsDLg* wParamDLg = new ZGeneralParamsDLg(this);
-      wParamDLg->setup(GeneralParameters);
+      ZGeneralParamsWNd* wParamDLg = new ZGeneralParamsWNd(&ErrorLog,this);
+      wParamDLg->setup(GeneralParameters,DomainBroker);
       wParamDLg->show();
-      int wRet=wParamDLg->exec();
-      if (wRet==QDialog::Rejected)
-          return;
-      return;
   }
   /* end general parameters */
   if (pAction==TextFileVisuQAc)

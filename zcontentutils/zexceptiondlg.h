@@ -102,6 +102,15 @@ public:
   void setThirdButton(const utf8VaryingString& pButtonText);
 
   static int adhocMessage(const utf8VaryingString &pTitle, Severity_type pSeverity, const char *pFormat,...);
+  static int adhocMessageErrorLog(const utf8VaryingString& pTitle,
+                                  Severity_type pSeverity,
+                                  ZaiErrors* pErrorLog,
+                                  const char *pFormat,...);
+
+  static int adhocMessageErrorLogHtml(const utf8VaryingString& pTitle,
+                                  Severity_type pSeverity,
+                                  ZaiErrors* pErrorLog,
+                                  const char *pFormat,...);
   /**
    * @brief adhocMessage  displays an adhoc message(not dependant from ZException) with one button <close>
    * @param pTitle        displayed dialog title

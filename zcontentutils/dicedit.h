@@ -214,7 +214,7 @@ fieldTBv
    * Only attributes local to key are changed.
    * Control is made on key name that must not be a duplicate name.
    */
-  void keyChange(QModelIndex &pIdx);
+  bool keyChange(QModelIndex &pIdx);
 //  inline bool _keyChange(const QModelIndex &pIdx, ZKeyHeaderRow & pKHR);
 
   /** @brief DicEdit::_keyDelete deletes key field pointed by pIdx :
@@ -293,10 +293,10 @@ fieldTBv
   void KeyTRvFlexMenu(QContextMenuEvent *event);
   void FieldTBvFlexMenu(QContextMenuEvent *event);
 
-  void KeyTRvKeyFiltered(int pKey, QKeyEvent *pEvent);
-  void KeyTRvMouseFiltered(int pKey, QMouseEvent *pEvent);
-  void FieldTBvKeyFiltered(int pKey, QKeyEvent *pEvent);
-  void FieldTBvMouseFiltered(int pKey, QMouseEvent *pEvent);
+  bool KeyTRvKeyFiltered(int pKey, QKeyEvent *pEvent);
+  bool KeyTRvMouseFiltered(int pKey, QMouseEvent *pEvent);
+  bool FieldTBvKeyFiltered(int pKey, QKeyEvent *pEvent);
+  bool FieldTBvMouseFiltered(int pKey, QMouseEvent *pEvent);
 
   void KeyTRvRawStartDrag();
   bool KeyTRvRawDropEvent(QDropEvent *pTarget); /* only used raw drop event: low level managed drop */
