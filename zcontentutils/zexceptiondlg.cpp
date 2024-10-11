@@ -739,8 +739,8 @@ ZExceptionDLg::adhocMessage(const utf8VaryingString& pTitle,
 
 int
 ZExceptionDLg::adhocMessage(const utf8VaryingString& pTitle,
-    Severity_type pSeverity,
-    const char *pFormat,...) {
+                            Severity_type pSeverity,
+                            const char *pFormat,...) {
   utf8VaryingString wMessage;
   va_list arglist;
   va_start (arglist, pFormat);
@@ -750,7 +750,35 @@ ZExceptionDLg::adhocMessage(const utf8VaryingString& pTitle,
 
   return _adhocMessage(pTitle,pSeverity,nullptr,nullptr,false,wMessage);
 }
+int
+ZExceptionDLg::adhocMessageErrorLog(const utf8VaryingString& pTitle,
+                                        Severity_type pSeverity,
+                                        ZaiErrors* pErrorLog,
+                                        const char *pFormat,...) {
+    utf8VaryingString wMessage;
+    va_list arglist;
+    va_start (arglist, pFormat);
 
+    wMessage.vsnprintf(2000,pFormat,arglist);
+    va_end(arglist);
+
+    return _adhocMessage(pTitle,pSeverity,pErrorLog,nullptr,false,wMessage);
+}
+
+int
+ZExceptionDLg::adhocMessageErrorLogHtml(const utf8VaryingString& pTitle,
+                                    Severity_type pSeverity,
+                                    ZaiErrors* pErrorLog,
+                                    const char *pFormat,...) {
+    utf8VaryingString wMessage;
+    va_list arglist;
+    va_start (arglist, pFormat);
+
+    wMessage.vsnprintf(2000,pFormat,arglist);
+    va_end(arglist);
+
+    return _adhocMessage(pTitle,pSeverity,pErrorLog,nullptr,true,wMessage);
+}
 int
 ZExceptionDLg::adhocMessageHtml(const utf8VaryingString& pTitle,
                                 Severity_type pSeverity,

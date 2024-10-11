@@ -114,10 +114,12 @@ ZHelpFreetextSearchDLg::initLayout()
 void ZHelpFreetextSearchDLg::showKeywordsSetup(const utf8VaryingString& pDomain) {
     initLayout();
 
+    SearchFRm->setVisible(false);
+    /*
     KeywordSearchBTn->setVisible(false);
     ToSearch->setVisible(false);
     CaseSensitiveCHk->setVisible(false);
-
+    */
     ViewType = ZHFTSD_Keyword;
 
     DomainLBl->setText(pDomain.toCChar());
@@ -128,10 +130,12 @@ void ZHelpFreetextSearchDLg::showKeywordsSetup(const utf8VaryingString& pDomain)
 void ZHelpFreetextSearchDLg::freeTextSetup(const utf8VaryingString& pDomain) {
     initLayout();
 
+    SearchFRm->setVisible(true);
+    /*
     KeywordSearchBTn->setVisible(true);
     ToSearch->setVisible(true);
     CaseSensitiveCHk->setVisible(true);
-
+    */
     ViewType = ZHFTSD_Freetext;
 
     DomainLBl->setText(pDomain.toCChar());

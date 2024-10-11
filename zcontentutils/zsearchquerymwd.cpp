@@ -53,6 +53,7 @@
 #include "zmfprogressmwn.h"
 
 #include "zhelp.h"
+#include "zquerywizardmwd.h"
 
 #include <zcontent/zindexedfile/zsearchentitycontext.h>
 
@@ -588,13 +589,14 @@ ZSearchQueryMWd::MenuTriggered(QAction* pAction)
     return;
   }
   if (pAction == WizardQAc){
-      ExecuteClicked();
+      ZQueryWizardMWd* wQW = new ZQueryWizardMWd(this);
+      wQW->show();
       return;
   }
 
   if (pAction == ExecQAc){
-    ExecuteClicked();
-    return;
+      ExecuteClicked();
+      return;
   }
   if (pAction == SaveInstructionsQAc){
     SaveInstructions();

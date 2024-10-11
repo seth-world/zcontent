@@ -21,6 +21,8 @@ namespace zbs {
 
 using namespace zbs;
 
+class ZQueryWizardMWd;
+
 class QWidget;
 class QTextEdit;
 
@@ -50,6 +52,9 @@ class ZSearchQueryMWd : public QMainWindow
   Q_OBJECT
 
 public:
+  friend class ZQueryWizardMWd;
+
+
   explicit ZSearchQueryMWd(ZaiErrors* pErrorLog,QWidget *parent = nullptr);
   ~ZSearchQueryMWd();
 
