@@ -1,0 +1,32 @@
+\doxysection{ZRF Test plan}
+\hypertarget{group__test_plan}{}\label{group__test_plan}\index{ZRF Test plan@{ZRF Test plan}}
+fix sized records \begin{DoxyVerb}create records
+random access to records
+
+delete 3 consecutive records : verify grabFreeBlocks works fine
+verify insert
+\end{DoxyVerb}
+
+
+variable sized records create records done monitor time of load for huge files done
+
+random access to records
+
+delete 3 adjacent records \+: verify free pool status and verify state of physical file surface (VSPFS) done in growing order done
+
+recover from Free pool done
+
+create 3 records after deletion \+: verify space is correctly taken from free pool done
+
+\begin{DoxyVerb}   delete 3 adjacent records :  verify grabFreeBlocks works fine
+
+   delete record physical address 0
+   delete record last physical address
+   and create new records to fill in it
+   verify grab free space behaviour
+\end{DoxyVerb}
+
+
+Test history
+
+Test Journaling 

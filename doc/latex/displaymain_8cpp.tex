@@ -1,0 +1,65 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/displaymain.cpp File Reference}
+\hypertarget{displaymain_8cpp}{}\label{displaymain_8cpp}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/displaymain.cpp@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/displaymain.cpp}}
+{\ttfamily \#include "{}displaymain.\+h"{}}\newline
+{\ttfamily \#include "{}ui\+\_\+displaymain.\+h"{}}\newline
+{\ttfamily \#include $<$qmessagebox.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqstandarditem.\+h$>$}\newline
+{\ttfamily \#include $<$QStandard\+Item\+Model$>$}\newline
+{\ttfamily \#include $<$zrandomfile/zheadercontrolblock.\+h$>$}\newline
+{\ttfamily \#include $<$zrandomfile/zfilecontrolblock.\+h$>$}\newline
+{\ttfamily \#include $<$zindexedfile/zmastercontrolblock.\+h$>$}\newline
+{\ttfamily \#include $<$zexceptiondlg.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/uristring.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqtwidgettools.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zfunctions.\+h$>$}\newline
+{\ttfamily \#include $<$qevent.\+h$>$}\newline
+Include dependency graph for displaymain.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{displaymain_8cpp_ab2ca0663d398da37ffd2a27fe3d488de}{\+\_\+\+DISPLAY\+\_\+\+UINT32\+\_\+}}(\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Qt\+::\+Alignment\+Flag}} \mbox{\hyperlink{displaymain_8cpp_addc33e6c549a71eab402ebb1f54a940a}{Qt\+Alignment\+Flag}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{displaymain_8cpp_ab2ca0663d398da37ffd2a27fe3d488de}\label{displaymain_8cpp_ab2ca0663d398da37ffd2a27fe3d488de} 
+\index{displaymain.cpp@{displaymain.cpp}!\_DISPLAY\_UINT32\_@{\_DISPLAY\_UINT32\_}}
+\index{\_DISPLAY\_UINT32\_@{\_DISPLAY\_UINT32\_}!displaymain.cpp@{displaymain.cpp}}
+\doxysubsubsection{\texorpdfstring{\_DISPLAY\_UINT32\_}{\_DISPLAY\_UINT32\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+DISPLAY\+\_\+\+UINT32\+\_\+(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}} }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDumpRow}}.clear();\ \(\backslash\)}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDumpRow}}\ <<\ \textcolor{keyword}{new}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandardItem}}(\ \textcolor{stringliteral}{"{}"{}});\ \(\backslash\)}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDumpRow}}\ <<\ \textcolor{keyword}{new}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandardItem}}(\ \textcolor{stringliteral}{"{}\_\_NAME\_\_"{}});\ \(\backslash\)}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%08X"{}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMCBExport}}-\/>\_\_NAME\_\_);\ \(\backslash\)}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDumpRow}}\ <<\ \textcolor{keyword}{new}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandardItem}}(\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wFieldContent}}.toCChar());\ \(\backslash\)}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{reverseByteOrder\_Conditional}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMCBExport}}-\/>\_\_NAME\_\_));\ \(\backslash\)}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDumpRow}}\ <<\ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandardItem}}(\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wFieldContent}}.toCChar());\ \(\backslash\)}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDumpRow}}\ <<\ \ \textcolor{keyword}{new}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandardItem}}(\ \textcolor{stringliteral}{"{}"{}});\ \(\backslash\)}
+\DoxyCodeLine{displayItemModel-\/>appendRow(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDumpRow}});\ \(\backslash\)}
+\DoxyCodeLine{\(\backslash\)}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}0x\%8X"{}},\mbox{\hyperlink{namespacezbs_ae2e1a379ff5238ea25fac98f1d9fa2bd}{Offset}}+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{offsetof}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZSMCBOwnData\_Export}},\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\_\_NAME\_\_}}));\ \(\backslash\)}
+\DoxyCodeLine{displayItemModel-\/>setVerticalHeaderItem(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRow}}++,\textcolor{keyword}{new}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandardItem}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar()));}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00530}{530}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{displaymain_8cpp_addc33e6c549a71eab402ebb1f54a940a}\label{displaymain_8cpp_addc33e6c549a71eab402ebb1f54a940a} 
+\index{displaymain.cpp@{displaymain.cpp}!QtAlignmentFlag@{QtAlignmentFlag}}
+\index{QtAlignmentFlag@{QtAlignmentFlag}!displaymain.cpp@{displaymain.cpp}}
+\doxysubsubsection{\texorpdfstring{QtAlignmentFlag}{QtAlignmentFlag}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Qt\+::\+Alignment\+Flag}} Qt\+Alignment\+Flag\hspace{0.3cm}{\ttfamily [extern]}}
+

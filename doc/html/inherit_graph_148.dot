@@ -1,0 +1,11 @@
+digraph "Graphical Class Hierarchy"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node0 [id="Node000000",label="ZDocPhysical",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$class_z_doc_physical.html",tooltip="ZDocPhysical Physical document 1 key to be upgraded to 2 keys."];
+  Node0 -> Node1 [id="edge138_Node000000_Node000001",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node1 [id="Node000001",label="ZDocStored",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$class_z_doc_stored.html",tooltip=" "];
+}

@@ -1,0 +1,462 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/ztest\+\_\+zindexedfile/ztypetype\+\_\+old\+\_\+tobe\+\_\+deleted.h File Reference}
+\hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h}{}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h}\index{/home/gerard/Development/zbasetools/zcontent/ztest\_zindexedfile/ztypetype\_old\_tobe\_deleted.h@{/home/gerard/Development/zbasetools/zcontent/ztest\_zindexedfile/ztypetype\_old\_tobe\_deleted.h}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zerror.\+h$>$}\newline
+Include dependency graph for ztypetype\+\_\+old\+\_\+tobe\+\_\+deleted.\+h\+:
+% FIG 0
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\+\_\+t}} \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}}
+\begin{DoxyCompactList}\small\item\em The ZType\+\_\+type enum ZIndex key data type (component of ZIndex\+Item\+\_\+struct ) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8}{ZType\+\_\+type}} \+: ZType\+Base \{ \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abc92ffb8ad2a07162468fb7e20dcfed6}{ZType\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abf42bb9aa165c8e5c65b82fbd8f5399e}{ZType\+\_\+\+Atomic}} = 0x01000000
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a5cb05b82d99ee043b6744dbb79d7d924}{ZType\+\_\+\+Endian}} = 0x00100000
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6529638cfeba690e9a2c1e49c4ad8bf0}{ZType\+\_\+\+Signed}} = 0x00010000
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a29fde5635b789f3c8e710396cf7cfc1d}{ZType\+\_\+\+Pointer}} = 0x02000000
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3dfafdee7071468db6eb2860fe7ae305}{ZType\+\_\+\+Array}} = 0x04000000
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a756af97b757d0313224684a3f8cef156}{ZType\+\_\+\+Byte\+Seq}} = 0x10000000
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6aa3555d83b853aae64565e5aa6602a5}{ZType\+\_\+\+Atomic\+Mask}} = 0x00\+FF0\+FFF
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a7d833fb435a74ba661caf186dc050792}{ZType\+\_\+\+Varying\+Mask}} = 0x0000\+F000
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a5bbfd7ab3fec30a3bb87a236c962b243}{ZType\+\_\+\+Signed\+Mask}} = 0x000\+F0000
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6bb11bd253c99dd65b7b870a0b98148c}{ZType\+\_\+\+Endian\+Mask}} = 0x00\+F00000
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a1fddf6f40fd5ec4f5ccc541d01d057f5}{ZType\+\_\+\+Structure\+Mask}} = 0x\+FF000000
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8af83411d75bdfdbc8a6773ec6337cc6d6}{ZType\+\_\+\+Class}} = 0x20000000
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ac932cc14aa2d122825a8e5439860c8f8}{ZType\+\_\+\+Varying\+Length}} = 0x00001000
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab42c986c43bd1c57415451c7985a39b1}{ZType\+\_\+\+String}} = 0x40000000
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8add37ad335d67d59ec0829fa8569fe61e}{ZType\+\_\+\+Std\+String}} = 0x40101\+FF1
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a05a2dd36ce01b5ab8285c8a1ae24d93e}{ZType\+\_\+\+Std\+WString}} = 0x40101\+FF8
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aa799426b6e2af2bff899c786bc2e1f64}{ZType\+\_\+\+Blob}} = 0x10001000
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a2707cbb25980dee14e9d7fea23d6cf14}{ZType\+\_\+\+UChar}} = 0x00000202
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8addb54db0d259cc03752209254c654fa5}{ZType\+\_\+\+Char}} = 0x00000201
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ae6c36b6adedb80e769f5012f5f1dd8d5}{ZType\+\_\+\+U8}} = 0x00000004
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a41946127a4ac7ae97babb4cb07254223}{ZType\+\_\+\+S8}} = 0x00010004
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a9bf4b3a1056c0bb1a6a7472443f1d5df}{ZType\+\_\+\+U16}} = 0x00100008
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab4700f50282d25b999dcf7ca16bf4d0b}{ZType\+\_\+\+WChar}} = 0x00110208
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aadcd3f76272c80543cf747d4b839f55e}{ZType\+\_\+\+WUChar}} = 0x00100208
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a66f4ab6b4d7be5e3309e6563112c241d}{ZType\+\_\+\+S16}} = 0x00110008
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abed71a296a4f2978b021ac34e1143925}{ZType\+\_\+\+U32}} = 0x00100010
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a4dc7a51fd5ec2afed3fced7a99092be8}{ZType\+\_\+\+S32}} = 0x00110010
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab0327f6acedbbb7475f47e33142614b6}{ZType\+\_\+\+U64}} = 0x00100020
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a800918fb93b974e86f473628b081db71}{ZType\+\_\+\+S64}} = 0x00110020
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a0cba3ce50369a342d1e1e21aff13d753}{ZType\+\_\+\+Float}} = 0x00110040
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ac45c25670303ffd38e32ce942a42da5e}{ZType\+\_\+\+Double}} = 0x00110080
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a9034f6a43c222e740ec01ee763be7ecd}{ZType\+\_\+\+LDouble}} = 0x00110100
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ae4136cac4aefa8f2edafde522b2e83cc}{ZType\+\_\+\+Atomic\+UChar}} = 0x01000002
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a8d4dc1ecf86c82f3ec2e11e6a8f6a561}{ZType\+\_\+\+Atomic\+Char}} = 0x01000001
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a5d712e4336427b68158ce0e0c1f30aed}{ZType\+\_\+\+Atomic\+WUChar}} = 0x0110000A
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aa7c83eb12f339ebf1b0348030e1425c2}{ZType\+\_\+\+Atomic\+WChar}} = 0x01100009
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a7156da44b19e8f6d132a896610f774da}{ZType\+\_\+\+Atomic\+U8}} = 0x01000004
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ac43deb9d8373fa570a82cb82aa87a8cc}{ZType\+\_\+\+Atomic\+S8}} = 0x01010004
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ad9be89843fed4e754a52ec12c1e60e19}{ZType\+\_\+\+Atomic\+U16}} = 0x01100008
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ad703e4250083f85f8843f14373b92023}{ZType\+\_\+\+Atomic\+S16}} = 0x01110008
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aaa027e749a2cd01675b9b04ce689e54b}{ZType\+\_\+\+Atomic\+U32}} = 0x01100010
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6072791764ced7ece46e121cbc0b9e24}{ZType\+\_\+\+Atomic\+S32}} = 0x01110010
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a661e3a8f3ce6935f0f70b214c839096c}{ZType\+\_\+\+Atomic\+U64}} = 0x01100020
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3b34c414329b92de2098352f6498e040}{ZType\+\_\+\+Atomic\+S64}} = 0x01110020
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8add1358c629bcb0cc4f010a8be7a7bab4}{ZType\+\_\+\+Atomic\+Float}} = 0x01110040
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ae20a3c9e6b2707a0368cff7a67300c9c}{ZType\+\_\+\+Atomic\+Double}} = 0x01110080
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a0dba586ee25d0784bdec0f064504b560}{ZType\+\_\+\+Atomic\+LDouble}} = 0x01110100
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a012b20f4032b6dbe354fc87c13d25af4}{ZType\+\_\+\+Array\+Char}} = 0x04000001
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a2a1bba36b6329ca5a6195d4decb2b6f1}{ZType\+\_\+\+Array\+UChar}} = 0x04010002
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a4c2aeb17c5075e72162b392cd90d687a}{ZType\+\_\+bit}} = 0x00000400
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a0b6531b5508c8250edaf089a806d0c9a}{ZType\+\_\+bitset}} = 0x10000400
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ad62000e25d22f9ab9f1b0d050207d403}{ZType\+\_\+\+Char\+Varying\+String}} = ZType\+\_\+\+String\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+Varying\+Length\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+Char
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a1e5a9b0b53c2ec983e39737b7970ffca}{ZType\+\_\+\+Utf8\+Varying\+String}} = ZType\+\_\+\+String\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+Varying\+Length\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+U8
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab6cb860b103efe3d3bda65f2cf8dd114}{ZType\+\_\+\+Utf16\+Varying\+String}} = ZType\+\_\+\+String\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+Varying\+Length\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+U16
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab0e95862275fdf305e5b4438de597097}{ZType\+\_\+\+Utf32\+Varying\+String}} = ZType\+\_\+\+String\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+Varying\+Length\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+U32
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a1655365214da339d7faef655e1972997}{ZType\+\_\+\+Char\+Fixed\+String}} = ZType\+\_\+\+String\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+Char
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a8e62d64e3a98f524f7141699f8376f8a}{ZType\+\_\+\+Utf8\+Fixed\+String}} = ZType\+\_\+\+String\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+U8
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aa0a15302e555f710735f3dfefed920c9}{ZType\+\_\+\+Utf16\+Fixed\+String}} = ZType\+\_\+\+String\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+U16
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a57b6c41fae92597b12299ef02ebe6bed}{ZType\+\_\+\+Utf32\+Fixed\+String}} = ZType\+\_\+\+String\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+U32
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a9ca657795dbb0fa12e8a3c058a05d46f}{ZType\+\_\+\+Varying\+CString}} = ZType\+\_\+\+String\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+Varying\+Length\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+Char
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8afdd1fae57bf84d78ad5ee2b3ea3ddb5d}{ZType\+\_\+\+Varying\+WString}} = ZType\+\_\+\+String\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+Varying\+Length\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+WChar
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a077f137990784db761d44fbd1bebfd26}{ZType\+\_\+\+Fixed\+CString}} = ZType\+\_\+\+String\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+Char
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab7a11fef170cfadc2fb6073eb227a886}{ZType\+\_\+\+Fixed\+WString}} = ZType\+\_\+\+String\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+WChar
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6d2de4f71a290544b70a2b527c001687}{ZType\+\_\+\+Fixed\+WUString}} = ZType\+\_\+\+String\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+WUChar
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aaefc8eb562ce93c06423fd904edc2337}{ZType\+\_\+\+CString}} = ZType\+\_\+\+Pointer\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+Varying\+Length\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+Char
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3b48ea1f2d8404f1c9e828ab47a147fd}{ZType\+\_\+\+WString}} = ZType\+\_\+\+Pointer\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+Varying\+Length\texorpdfstring{$\vert$}{|}\+ZType\+\_\+\+WChar
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8af7281120fd8f06911844759e157367c0}{ZType\+\_\+\+ZDate}} = ZType\+\_\+\+Class \texorpdfstring{$\vert$}{|} ZType\+\_\+\+U32
+, \newline
+\mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ac455c7a6a3d453ce5c2145a1ad2d8ed3}{ZType\+\_\+\+ZDate\+Full}} = ZType\+\_\+\+Class \texorpdfstring{$\vert$}{|} ZType\+\_\+\+U64
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a08da51564354cd63f69c32850938874d}{ZType\+\_\+\+Check\+Sum}} = ZType\+\_\+\+Class \texorpdfstring{$\vert$}{|} ZType\+\_\+\+UChar
+, \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8afabd68e127b21c2981dd6df502cb211c}{ZType\+\_\+\+Unknown}} = 0x\+F00\+FFFFF
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_abe0f49a5bc8101a95f18f96c00147faf}{decode\+\_\+\+ZType}} (\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Type}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a96719a25ef02427b1f417cb2ed5f39fe}{encode\+ZType\+From\+String}} (\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZType}}, ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+String}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a} 
+\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZTypeBase@{ZTypeBase}}
+\index{ZTypeBase@{ZTypeBase}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}
+\doxysubsubsection{\texorpdfstring{ZTypeBase}{ZTypeBase}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\+\_\+t}} \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}}}
+
+
+
+The ZType\+\_\+type enum ZIndex key data type (component of ZIndex\+Item\+\_\+struct ) 
+
+This enum qualifies any data type that will be processed to build key dictionaries.
+
+
+\begin{DoxyImage}
+\includegraphics[width=10cm]{ztype_type.jpg}
+\doxyfigcaption{Data Type bit mask}
+\end{DoxyImage}
+ 
+
+Hereafter are the possible values of ZType\+\_\+type enum. \begin{DoxyVerb}                           +--------> type of storage : Atomic (01), Pointer(02), Array (04), enum (08), ByteSeq (10), Class (20), String (40)
+                           |
+                           | +------> subject to Endian conversion Yes(1) No(0) [if and only if system is Little Endian]
+                           | |+-----> signed( 1)/ unsigned (0)
+                           | ||+----> Varying length (1) or Fixed length (0)
+                           | ||| +--> Elementary value type (what data is composed of, i. e. Unsigned byte for example)
+                           | ||| |
+                           --|-|___
+  ZType_type(Hexadecimal)  XXxXxxxx
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00028}{28}} of file \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_source}{ztypetype\+\_\+old\+\_\+tobe\+\_\+deleted.\+h}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8} 
+\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_type@{ZType\_type}}
+\index{ZType\_type@{ZType\_type}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}
+\doxysubsubsection{\texorpdfstring{ZType\_type}{ZType\_type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8}{ZType\+\_\+type}} \+: \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Nothing@{ZType\_Nothing}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Nothing@{ZType\_Nothing}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abc92ffb8ad2a07162468fb7e20dcfed6}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abc92ffb8ad2a07162468fb7e20dcfed6} 
+ZType\+\_\+\+Nothing&NOP. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Atomic@{ZType\_Atomic}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Atomic@{ZType\_Atomic}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abf42bb9aa165c8e5c65b82fbd8f5399e}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abf42bb9aa165c8e5c65b82fbd8f5399e} 
+ZType\+\_\+\+Atomic&data type is elementary \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Endian@{ZType\_Endian}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Endian@{ZType\_Endian}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a5cb05b82d99ee043b6744dbb79d7d924}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a5cb05b82d99ee043b6744dbb79d7d924} 
+ZType\+\_\+\+Endian&data type is subject to little endian conversion see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZIndex\+Data\+Conversion} \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Signed@{ZType\_Signed}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Signed@{ZType\_Signed}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6529638cfeba690e9a2c1e49c4ad8bf0}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6529638cfeba690e9a2c1e49c4ad8bf0} 
+ZType\+\_\+\+Signed&data type is signed. Sign impacts of data conversion see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZIndex\+Data\+Conversion} \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Pointer@{ZType\_Pointer}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Pointer@{ZType\_Pointer}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a29fde5635b789f3c8e710396cf7cfc1d}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a29fde5635b789f3c8e710396cf7cfc1d} 
+ZType\+\_\+\+Pointer&data type is a pointer \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Array@{ZType\_Array}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Array@{ZType\_Array}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3dfafdee7071468db6eb2860fe7ae305}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3dfafdee7071468db6eb2860fe7ae305} 
+ZType\+\_\+\+Array&data type is an array (content has to be further described\} \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_ByteSeq@{ZType\_ByteSeq}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_ByteSeq@{ZType\_ByteSeq}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a756af97b757d0313224684a3f8cef156}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a756af97b757d0313224684a3f8cef156} 
+ZType\+\_\+\+Byte\+Seq&data type is a sequence of bytes regardless any type, only defined by a start address and a length. Warning data type is a pointer \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_AtomicMask@{ZType\_AtomicMask}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_AtomicMask@{ZType\_AtomicMask}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6aa3555d83b853aae64565e5aa6602a5}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6aa3555d83b853aae64565e5aa6602a5} 
+ZType\+\_\+\+Atomic\+Mask&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_VaryingMask@{ZType\_VaryingMask}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_VaryingMask@{ZType\_VaryingMask}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a7d833fb435a74ba661caf186dc050792}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a7d833fb435a74ba661caf186dc050792} 
+ZType\+\_\+\+Varying\+Mask&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_SignedMask@{ZType\_SignedMask}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_SignedMask@{ZType\_SignedMask}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a5bbfd7ab3fec30a3bb87a236c962b243}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a5bbfd7ab3fec30a3bb87a236c962b243} 
+ZType\+\_\+\+Signed\+Mask&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_EndianMask@{ZType\_EndianMask}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_EndianMask@{ZType\_EndianMask}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6bb11bd253c99dd65b7b870a0b98148c}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6bb11bd253c99dd65b7b870a0b98148c} 
+ZType\+\_\+\+Endian\+Mask&used to negate any preceeding data structure indication and keep atomic data type. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_StructureMask@{ZType\_StructureMask}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_StructureMask@{ZType\_StructureMask}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a1fddf6f40fd5ec4f5ccc541d01d057f5}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a1fddf6f40fd5ec4f5ccc541d01d057f5} 
+ZType\+\_\+\+Structure\+Mask&used to negate any preceeding data structure indication and keep atomic data type. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Class@{ZType\_Class}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Class@{ZType\_Class}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8af83411d75bdfdbc8a6773ec6337cc6d6}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8af83411d75bdfdbc8a6773ec6337cc6d6} 
+ZType\+\_\+\+Class&Field is a class or a struct (NON POLYMORPHIC class)\+: \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_VaryingLength@{ZType\_VaryingLength}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_VaryingLength@{ZType\_VaryingLength}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ac932cc14aa2d122825a8e5439860c8f8}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ac932cc14aa2d122825a8e5439860c8f8} 
+ZType\+\_\+\+Varying\+Length&NO CONTENT CONVERSION of the underneeth data will be made excepted for ZDate, ZDate\+Full etc. Use it carefully. By default any data structure is fixed sized. Varying length means it is not. Used with strings and pointers. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_String@{ZType\_String}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_String@{ZType\_String}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab42c986c43bd1c57415451c7985a39b1}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab42c986c43bd1c57415451c7985a39b1} 
+ZType\+\_\+\+String&generic string type \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_StdString@{ZType\_StdString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_StdString@{ZType\_StdString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8add37ad335d67d59ec0829fa8569fe61e}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8add37ad335d67d59ec0829fa8569fe61e} 
+ZType\+\_\+\+Std\+String&Field is a std\+::string class varying length \+: not used for storage, only for conversion. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_StdWString@{ZType\_StdWString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_StdWString@{ZType\_StdWString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a05a2dd36ce01b5ab8285c8a1ae24d93e}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a05a2dd36ce01b5ab8285c8a1ae24d93e} 
+ZType\+\_\+\+Std\+WString&Field is a std\+::wstring class varying length \+: not used for storage, only for conversion. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Blob@{ZType\_Blob}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Blob@{ZType\_Blob}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aa799426b6e2af2bff899c786bc2e1f64}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aa799426b6e2af2bff899c786bc2e1f64} 
+ZType\+\_\+\+Blob&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_UChar@{ZType\_UChar}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_UChar@{ZType\_UChar}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a2707cbb25980dee14e9d7fea23d6cf14}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a2707cbb25980dee14e9d7fea23d6cf14} 
+ZType\+\_\+\+UChar&blob \+: a varying sized content of bytes \+: See Byte\+Seq. Corresponds to ZData\+Buffer unsigned char -\/ mostly used for encoding/decoding \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Char@{ZType\_Char}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Char@{ZType\_Char}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8addb54db0d259cc03752209254c654fa5}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8addb54db0d259cc03752209254c654fa5} 
+ZType\+\_\+\+Char&char -\/ a single ascii character -\/ NOT SUBJECT to leading byte despite its signed status-\/ use int8\+\_\+t if a one byte numeric value is required \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_U8@{ZType\_U8}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_U8@{ZType\_U8}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ae6c36b6adedb80e769f5012f5f1dd8d5}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ae6c36b6adedb80e769f5012f5f1dd8d5} 
+ZType\+\_\+\+U8&arithmetic byte \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_S8@{ZType\_S8}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_S8@{ZType\_S8}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a41946127a4ac7ae97babb4cb07254223}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a41946127a4ac7ae97babb4cb07254223} 
+ZType\+\_\+\+S8&arithmetic signed byte \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_U16@{ZType\_U16}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_U16@{ZType\_U16}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a9bf4b3a1056c0bb1a6a7472443f1d5df}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a9bf4b3a1056c0bb1a6a7472443f1d5df} 
+ZType\+\_\+\+U16&arithmetic 2 bytes value unsigned (no leading sign byte) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_WChar@{ZType\_WChar}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_WChar@{ZType\_WChar}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab4700f50282d25b999dcf7ca16bf4d0b}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab4700f50282d25b999dcf7ca16bf4d0b} 
+ZType\+\_\+\+WChar&WChar is a char string based on uint16\+\_\+t wchar\+\_\+t (no leading sign byte) but subject to endian conversion. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_WUChar@{ZType\_WUChar}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_WUChar@{ZType\_WUChar}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aadcd3f76272c80543cf747d4b839f55e}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aadcd3f76272c80543cf747d4b839f55e} 
+ZType\+\_\+\+WUChar&WUChar is a char string based on uint16\+\_\+t unsigned wchar\+\_\+t subject to endian conversion. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_S16@{ZType\_S16}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_S16@{ZType\_S16}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a66f4ab6b4d7be5e3309e6563112c241d}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a66f4ab6b4d7be5e3309e6563112c241d} 
+ZType\+\_\+\+S16&arithmetic 2 bytes value signed (with leading sign byte) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_U32@{ZType\_U32}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_U32@{ZType\_U32}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abed71a296a4f2978b021ac34e1143925}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abed71a296a4f2978b021ac34e1143925} 
+ZType\+\_\+\+U32&arithmetic 4 bytes value unsigned (no leading sign byte) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_S32@{ZType\_S32}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_S32@{ZType\_S32}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a4dc7a51fd5ec2afed3fced7a99092be8}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a4dc7a51fd5ec2afed3fced7a99092be8} 
+ZType\+\_\+\+S32&arithmetic 4 bytes value signed (with leading sign byte) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_U64@{ZType\_U64}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_U64@{ZType\_U64}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab0327f6acedbbb7475f47e33142614b6}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab0327f6acedbbb7475f47e33142614b6} 
+ZType\+\_\+\+U64&arithmetic 8 bytes value unsigned (no leading sign byte) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_S64@{ZType\_S64}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_S64@{ZType\_S64}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a800918fb93b974e86f473628b081db71}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a800918fb93b974e86f473628b081db71} 
+ZType\+\_\+\+S64&arithmetic 8 bytes value signed (with leading sign byte) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Float@{ZType\_Float}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Float@{ZType\_Float}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a0cba3ce50369a342d1e1e21aff13d753}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a0cba3ce50369a342d1e1e21aff13d753} 
+ZType\+\_\+\+Float&floating point (therefore signed) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Double@{ZType\_Double}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Double@{ZType\_Double}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ac45c25670303ffd38e32ce942a42da5e}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ac45c25670303ffd38e32ce942a42da5e} 
+ZType\+\_\+\+Double&floating point double (therefore signed) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_LDouble@{ZType\_LDouble}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_LDouble@{ZType\_LDouble}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a9034f6a43c222e740ec01ee763be7ecd}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a9034f6a43c222e740ec01ee763be7ecd} 
+ZType\+\_\+\+LDouble&floating point long double (therefore signed) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_AtomicUChar@{ZType\_AtomicUChar}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_AtomicUChar@{ZType\_AtomicUChar}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ae4136cac4aefa8f2edafde522b2e83cc}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ae4136cac4aefa8f2edafde522b2e83cc} 
+ZType\+\_\+\+Atomic\+UChar&unsigned char -\/ mostly used for encoding/decoding \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_AtomicChar@{ZType\_AtomicChar}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_AtomicChar@{ZType\_AtomicChar}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a8d4dc1ecf86c82f3ec2e11e6a8f6a561}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a8d4dc1ecf86c82f3ec2e11e6a8f6a561} 
+ZType\+\_\+\+Atomic\+Char&char -\/ a single ascii character -\/ NOT SUBJECT to leading byte despite its signed status-\/ use int8\+\_\+t if a one byte numeric value is required \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_AtomicWUChar@{ZType\_AtomicWUChar}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_AtomicWUChar@{ZType\_AtomicWUChar}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a5d712e4336427b68158ce0e0c1f30aed}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a5d712e4336427b68158ce0e0c1f30aed} 
+ZType\+\_\+\+Atomic\+WUChar&unsigned wchar\+\_\+t (is a char and an uint16\+\_\+t \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_AtomicWChar@{ZType\_AtomicWChar}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_AtomicWChar@{ZType\_AtomicWChar}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aa7c83eb12f339ebf1b0348030e1425c2}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aa7c83eb12f339ebf1b0348030e1425c2} 
+ZType\+\_\+\+Atomic\+WChar&wchar\+\_\+t -\/ a single double character -\/ NOT SUBJECT to leading byte despite its signed status-\/ use int8\+\_\+t if a one byte numeric value is required \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_AtomicU8@{ZType\_AtomicU8}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_AtomicU8@{ZType\_AtomicU8}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a7156da44b19e8f6d132a896610f774da}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a7156da44b19e8f6d132a896610f774da} 
+ZType\+\_\+\+Atomic\+U8&arithmetic byte no Endian \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_AtomicS8@{ZType\_AtomicS8}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_AtomicS8@{ZType\_AtomicS8}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ac43deb9d8373fa570a82cb82aa87a8cc}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ac43deb9d8373fa570a82cb82aa87a8cc} 
+ZType\+\_\+\+Atomic\+S8&arithmetic signed byte no Endian \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_AtomicU16@{ZType\_AtomicU16}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_AtomicU16@{ZType\_AtomicU16}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ad9be89843fed4e754a52ec12c1e60e19}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ad9be89843fed4e754a52ec12c1e60e19} 
+ZType\+\_\+\+Atomic\+U16&arithmetic 2 bytes value unsigned (no leading sign byte) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_AtomicS16@{ZType\_AtomicS16}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_AtomicS16@{ZType\_AtomicS16}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ad703e4250083f85f8843f14373b92023}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ad703e4250083f85f8843f14373b92023} 
+ZType\+\_\+\+Atomic\+S16&arithmetic 2 bytes value signed (with leading sign byte) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_AtomicU32@{ZType\_AtomicU32}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_AtomicU32@{ZType\_AtomicU32}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aaa027e749a2cd01675b9b04ce689e54b}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aaa027e749a2cd01675b9b04ce689e54b} 
+ZType\+\_\+\+Atomic\+U32&arithmetic 4 bytes value unsigned (no leading sign byte) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_AtomicS32@{ZType\_AtomicS32}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_AtomicS32@{ZType\_AtomicS32}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6072791764ced7ece46e121cbc0b9e24}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6072791764ced7ece46e121cbc0b9e24} 
+ZType\+\_\+\+Atomic\+S32&arithmetic 4 bytes value signed (with leading sign byte) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_AtomicU64@{ZType\_AtomicU64}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_AtomicU64@{ZType\_AtomicU64}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a661e3a8f3ce6935f0f70b214c839096c}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a661e3a8f3ce6935f0f70b214c839096c} 
+ZType\+\_\+\+Atomic\+U64&arithmetic 8 bytes value unsigned (no leading sign byte) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_AtomicS64@{ZType\_AtomicS64}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_AtomicS64@{ZType\_AtomicS64}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3b34c414329b92de2098352f6498e040}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3b34c414329b92de2098352f6498e040} 
+ZType\+\_\+\+Atomic\+S64&arithmetic 8 bytes value signed (with leading sign byte) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_AtomicFloat@{ZType\_AtomicFloat}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_AtomicFloat@{ZType\_AtomicFloat}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8add1358c629bcb0cc4f010a8be7a7bab4}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8add1358c629bcb0cc4f010a8be7a7bab4} 
+ZType\+\_\+\+Atomic\+Float&floating point (therefore signed) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_AtomicDouble@{ZType\_AtomicDouble}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_AtomicDouble@{ZType\_AtomicDouble}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ae20a3c9e6b2707a0368cff7a67300c9c}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ae20a3c9e6b2707a0368cff7a67300c9c} 
+ZType\+\_\+\+Atomic\+Double&floating point double (therefore signed) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_AtomicLDouble@{ZType\_AtomicLDouble}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_AtomicLDouble@{ZType\_AtomicLDouble}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a0dba586ee25d0784bdec0f064504b560}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a0dba586ee25d0784bdec0f064504b560} 
+ZType\+\_\+\+Atomic\+LDouble&floating point long double (therefore signed) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_ArrayChar@{ZType\_ArrayChar}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_ArrayChar@{ZType\_ArrayChar}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a012b20f4032b6dbe354fc87c13d25af4}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a012b20f4032b6dbe354fc87c13d25af4} 
+ZType\+\_\+\+Array\+Char&this is a C string stored as a key value (CString must be fixed length, with variable length content) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_ArrayUChar@{ZType\_ArrayUChar}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_ArrayUChar@{ZType\_ArrayUChar}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a2a1bba36b6329ca5a6195d4decb2b6f1}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a2a1bba36b6329ca5a6195d4decb2b6f1} 
+ZType\+\_\+\+Array\+UChar&and also could be used by encoding (same as above, but may be used for encoding/decoding) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_bit@{ZType\_bit}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_bit@{ZType\_bit}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a4c2aeb17c5075e72162b392cd90d687a}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a4c2aeb17c5075e72162b392cd90d687a} 
+ZType\+\_\+bit&Deprecated -- not to be used ZType\+\_\+\+Enum\+Byte = 0x08110004, //!\texorpdfstring{$<$}{<} This is enum uses a long ZType\+\_\+\+Enum\+Word = 0x08110008, //!\texorpdfstring{$<$}{<} This is enum uses a long long ZType\+\_\+\+Enum\+Long = 0x08110010, //!\texorpdfstring{$<$}{<} This is enum uses a long ZType\+\_\+\+Enum\+Long\+Long = 0x08110020, //!\texorpdfstring{$<$}{<} This is enum uses a long long \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_bitset@{ZType\_bitset}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_bitset@{ZType\_bitset}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a0b6531b5508c8250edaf089a806d0c9a}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a0b6531b5508c8250edaf089a806d0c9a} 
+ZType\+\_\+bitset&bitset is a ZType\+\_\+\+Byte\+Seq with atomic data \textquotesingle{}bit\textquotesingle{} \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_CharVaryingString@{ZType\_CharVaryingString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_CharVaryingString@{ZType\_CharVaryingString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ad62000e25d22f9ab9f1b0d050207d403}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ad62000e25d22f9ab9f1b0d050207d403} 
+ZType\+\_\+\+Char\+Varying\+String&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Utf8VaryingString@{ZType\_Utf8VaryingString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Utf8VaryingString@{ZType\_Utf8VaryingString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a1e5a9b0b53c2ec983e39737b7970ffca}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a1e5a9b0b53c2ec983e39737b7970ffca} 
+ZType\+\_\+\+Utf8\+Varying\+String&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Utf16VaryingString@{ZType\_Utf16VaryingString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Utf16VaryingString@{ZType\_Utf16VaryingString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab6cb860b103efe3d3bda65f2cf8dd114}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab6cb860b103efe3d3bda65f2cf8dd114} 
+ZType\+\_\+\+Utf16\+Varying\+String&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Utf32VaryingString@{ZType\_Utf32VaryingString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Utf32VaryingString@{ZType\_Utf32VaryingString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab0e95862275fdf305e5b4438de597097}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab0e95862275fdf305e5b4438de597097} 
+ZType\+\_\+\+Utf32\+Varying\+String&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_CharFixedString@{ZType\_CharFixedString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_CharFixedString@{ZType\_CharFixedString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a1655365214da339d7faef655e1972997}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a1655365214da339d7faef655e1972997} 
+ZType\+\_\+\+Char\+Fixed\+String&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Utf8FixedString@{ZType\_Utf8FixedString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Utf8FixedString@{ZType\_Utf8FixedString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a8e62d64e3a98f524f7141699f8376f8a}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a8e62d64e3a98f524f7141699f8376f8a} 
+ZType\+\_\+\+Utf8\+Fixed\+String&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Utf16FixedString@{ZType\_Utf16FixedString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Utf16FixedString@{ZType\_Utf16FixedString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aa0a15302e555f710735f3dfefed920c9}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aa0a15302e555f710735f3dfefed920c9} 
+ZType\+\_\+\+Utf16\+Fixed\+String&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Utf32FixedString@{ZType\_Utf32FixedString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Utf32FixedString@{ZType\_Utf32FixedString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a57b6c41fae92597b12299ef02ebe6bed}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a57b6c41fae92597b12299ef02ebe6bed} 
+ZType\+\_\+\+Utf32\+Fixed\+String&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_VaryingCString@{ZType\_VaryingCString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_VaryingCString@{ZType\_VaryingCString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a9ca657795dbb0fa12e8a3c058a05d46f}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a9ca657795dbb0fa12e8a3c058a05d46f} 
+ZType\+\_\+\+Varying\+CString&data type is a C string \+: varying length of char ended with \textquotesingle{}\textbackslash{}0\textquotesingle{} \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_VaryingWString@{ZType\_VaryingWString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_VaryingWString@{ZType\_VaryingWString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8afdd1fae57bf84d78ad5ee2b3ea3ddb5d}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8afdd1fae57bf84d78ad5ee2b3ea3ddb5d} 
+ZType\+\_\+\+Varying\+WString&data type is a W string \+: varying length of char ended with L\textquotesingle{}\textbackslash{}0\textquotesingle{} \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_FixedCString@{ZType\_FixedCString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_FixedCString@{ZType\_FixedCString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a077f137990784db761d44fbd1bebfd26}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a077f137990784db761d44fbd1bebfd26} 
+ZType\+\_\+\+Fixed\+CString&a fixed length string containing a c string \+:template\+WString and derived \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_FixedWString@{ZType\_FixedWString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_FixedWString@{ZType\_FixedWString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab7a11fef170cfadc2fb6073eb227a886}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab7a11fef170cfadc2fb6073eb227a886} 
+ZType\+\_\+\+Fixed\+WString&a fixed length string containing a W string \+:template\+WString and derived \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_FixedWUString@{ZType\_FixedWUString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_FixedWUString@{ZType\_FixedWUString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6d2de4f71a290544b70a2b527c001687}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6d2de4f71a290544b70a2b527c001687} 
+ZType\+\_\+\+Fixed\+WUString&a fixed length string containing a unsigned W string \+:template\+WString and derived \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_CString@{ZType\_CString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_CString@{ZType\_CString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aaefc8eb562ce93c06423fd904edc2337}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aaefc8eb562ce93c06423fd904edc2337} 
+ZType\+\_\+\+CString&standard cstring (char\texorpdfstring{$\ast$}{*}) ZType\+\_\+\+Pointer \texorpdfstring{$\vert$}{|} ZType\+\_\+\+Char \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_WString@{ZType\_WString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_WString@{ZType\_WString}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3b48ea1f2d8404f1c9e828ab47a147fd}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3b48ea1f2d8404f1c9e828ab47a147fd} 
+ZType\+\_\+\+WString&standard cstring (wchar\+\_\+t\texorpdfstring{$\ast$}{*}) ZType\+\_\+\+Pointer \texorpdfstring{$\vert$}{|} ZType\+\_\+\+WChar \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_ZDate@{ZType\_ZDate}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_ZDate@{ZType\_ZDate}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8af7281120fd8f06911844759e157367c0}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8af7281120fd8f06911844759e157367c0} 
+ZType\+\_\+\+ZDate&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_ZDateFull@{ZType\_ZDateFull}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_ZDateFull@{ZType\_ZDateFull}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ac455c7a6a3d453ce5c2145a1ad2d8ed3}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ac455c7a6a3d453ce5c2145a1ad2d8ed3} 
+ZType\+\_\+\+ZDate\+Full&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_CheckSum@{ZType\_CheckSum}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_CheckSum@{ZType\_CheckSum}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a08da51564354cd63f69c32850938874d}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a08da51564354cd63f69c32850938874d} 
+ZType\+\_\+\+Check\+Sum&a struct containing fixed array of unsigned char \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZType\_Unknown@{ZType\_Unknown}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!ZType\_Unknown@{ZType\_Unknown}}}\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8afabd68e127b21c2981dd6df502cb211c}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8afabd68e127b21c2981dd6df502cb211c} 
+ZType\+\_\+\+Unknown&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00030}{30}} of file \mbox{\hyperlink{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_source}{ztypetype\+\_\+old\+\_\+tobe\+\_\+deleted.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_abe0f49a5bc8101a95f18f96c00147faf}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_abe0f49a5bc8101a95f18f96c00147faf} 
+\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!decode\_ZType@{decode\_ZType}}
+\index{decode\_ZType@{decode\_ZType}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}
+\doxysubsubsection{\texorpdfstring{decode\_ZType()}{decode\_ZType()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} decode\+\_\+\+ZType (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}}}]{p\+Type }\end{DoxyParamCaption})}
+
+\Hypertarget{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a96719a25ef02427b1f417cb2ed5f39fe}\label{ztest__zindexedfile_2ztypetype__old__tobe__deleted_8h_a96719a25ef02427b1f417cb2ed5f39fe} 
+\index{ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}!encodeZTypeFromString@{encodeZTypeFromString}}
+\index{encodeZTypeFromString@{encodeZTypeFromString}!ztypetype\_old\_tobe\_deleted.h@{ztypetype\_old\_tobe\_deleted.h}}
+\doxysubsubsection{\texorpdfstring{encodeZTypeFromString()}{encodeZTypeFromString()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} encode\+ZType\+From\+String (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}} \&}]{p\+ZType,  }\item[{ZData\+Buffer \&}]{p\+String }\end{DoxyParamCaption})}
+

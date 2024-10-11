@@ -1,0 +1,43 @@
+\doxysection{ZRandom\+File File and Block (record) locking mechanism}
+\hypertarget{group___z_r_f_lock_group}{}\label{group___z_r_f_lock_group}\index{ZRandomFile File and Block (record) locking mechanism@{ZRandomFile File and Block (record) locking mechanism}}
+\begin{DoxyParagraph}{Locks at open mode}
+
+\begin{DoxyItemize}
+\item Automatic lock mechanism \+:
+\begin{DoxyItemize}
+\item read locks block
+\item write unlocks blocks
+\item readnext unlocks current and locks next record
+\item close release all locks (unlocks all)
+\end{DoxyItemize}
+\item Exclusive lock \+: locks all file. This option will improve global access performance in the meaning that it will save access to read/write file header during file session.
+\end{DoxyItemize}
+\end{DoxyParagraph}
+\begin{DoxyParagraph}{Lock masks at open}
+\begin{DoxyVerb}            no lock   0x0000
+            exclusive 0x0010
+            automatic 0x0020
+\end{DoxyVerb}
+
+\end{DoxyParagraph}
+\hypertarget{group___z_r_f_lock_group_ZRFLockInternals}{}\doxysubsection{\texorpdfstring{record lock internals -\/ ZRandom\+File\+Lock}{record lock internals - ZRandomFileLock}}\label{group___z_r_f_lock_group_ZRFLockInternals}
+\doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} doesn\textquotesingle{}t allow to manage locks at record level. \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} has 3 structures for record locking. These structures are managed by \doxylink{class_z_random_lock_file}{ZRandom\+Lock\+File}, a class extension of \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}.
+
+
+\begin{DoxyItemize}
+\item Record block header \+:
+\begin{DoxyItemize}
+\item field Lock Contains the lock mask that currently locks the record
+\item field Pid Process id of lock owner
+\end{DoxyItemize}
+\item File header \+: Used blocks pool (ZBAT) at record rank level
+\begin{DoxyItemize}
+\item field Lock
+\item field Pid
+\end{DoxyItemize}
+\item \doxylink{classzbs_1_1_z_lock_pool}{ZLock\+Pool} \+: located within \doxylink{classzbs_1_1_z_file_descriptor}{ZFile\+Descriptor} and is particular to process. \doxylink{classzbs_1_1_z_file_descriptor}{ZFile\+Descriptor} holds in its private data a reference to any lock set to the file in a \doxylink{classzbs_1_1_z_lock_pool}{ZLock\+Pool} object that keeps memory of currently locks hold on records by current process. It contains \+:
+\begin{DoxyItemize}
+\item record address (only stable information for addressing records)
+\item lock mask 
+\end{DoxyItemize}
+\end{DoxyItemize}

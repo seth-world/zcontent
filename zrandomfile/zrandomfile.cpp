@@ -1824,8 +1824,15 @@ ZRandomFile::_importAllFileHeader()
 
   /* read whole content of header file */
   wSt=rawRead(HeaderFd,wZDB,(size_t)wOff);
-  if (wSt!=ZS_SUCCESS)
+  if (wSt!=ZS_SUCCESS) {
+    ZException.setMessage(_GET_FUNCTION_NAME_,
+          wSt,
+          Severity_Severe,
+          "Cannot load all or partial header from file  <%s> : size read %ld.",
+          URIHeader.toCChar(),
+          wOff, sizeof(ZHeaderControlBlock_Export));
     return wSt;
+  }
 
   if (wZDB.Size < sizeof(ZHeaderControlBlock_Export))
   {
@@ -5952,8 +5959,11 @@ ZStatus wSt=ZS_SUCCESS;
 
 //    setupFCB();  // update pDescriptor
   wSt=_importAllFileHeader();  // get header and force read pForceRead = true, whatever the open mode is
-  if (wSt!=ZS_SUCCESS)
-    {return  wSt;}
+  if (wSt!=ZS_SUCCESS) {
+      if (wSt==ZS_EOF)
+          wSt=ZS_CORRUPTED;
+      return  wSt;
+  }
   if (!pLockRegardless)
       {
         if (ZHeader.Lock & ZRF_Exclusive)

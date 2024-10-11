@@ -1,0 +1,61 @@
+
+
+Remarques Générales
+
+Comptabilisation des salaires, des charges et des paiements de salaire :
+
+Les salaires sont comptabilisés de façon détaillée, personne par personne.
+Si comptablement cela est parfaitement juste, cela ne se fait pas de cette façon :
+les salaires font l'objet d'une comptabilisation à part, 
+- soit dans un logiciel dédié de gestion des salaires qui de plus permet la gestion de la LPP, édition de la fiche de paie, etc...
+- soit, en l'absence de ce type de logiciel (ce qui est rare de nos jours) dans une compta auxiliaire avec son grand livre propre
+
+On parle alors de "centralisation des salaires" une fois par mois.
+De cette façon, il y a un regroupement des écritures de type "salaire" dans le grand livre général et non pas le détail personne par personne qui n'est sensé intéresser personne qui consulte les comptes de la société.
+
+D'une façon générale, la compabilité d'une société se communique assez aisément, et pour de multiples raisons.
+Il est bon de NE PAS AVOIR LE DETAIL DES SALAIRES de façon nomminative dans la comptabilité générale.
+
+Certains libellés sont à éviter :
+
+"..pas déclaré.." ne doit pas apparaître dans un libellé comptable, ou bien on justifie dans le même libellé : s'il y a un audit AVS ou fiscal, c'est la première chose qui va causer potentiellement des suspicions.
+
+
+
+
+Contenu
+
+Immobilisations Incorporelles
+
+- les dotations aux amortissements du matériel informatique et du logiciel de base affecté au développement du logiciel (développement qui est immobilisé) doit être immobilisé (IAS38 §66)
+
+Réévaluation du salaire des ingénieurs
+
+D'après ce que je peux voir au premier coup d'oeil sommaire, il ne s'agit en aucun cas d'une réévaluation mais de l'immobilisation des frais de personnels liés à l'immo incorporelle.
+
+Dans ces conditions, il me paraît étrange de le faire figurer en tant que résultat exceptionnel, car c'est lié à l'exploitation courante de la société.
+Néanmoins, je dois investiguer plus avant.
+Sur ce sujet, il me paraît indispensable de questionner la fiducière et demander des précisions sur ce que cela représente et dans quel but cela a été comptabilisé de cette façon.
+
+
+Prise en compte de l'amortissement
+
+Dans le document "bilan provisoire au 31-12/2016", je constate que les produits Genview immobilisés figurent à l'actif pour leur valeur nette.
+
+Il semble que la fiducière applique la méthode de l'amortissement "direct" : les amortissements sont directement déduits et seule reste la valeur résiduelle.
+
+Il est CRUCIAL d'appliquer la méthode indirecte.
+La valeur immobilisée se cummule, et les amortissements viennent se cumuler dans un compte de bilan séparé.
+Cette méthode est fiscalement reconnue par l'administration fiscale du canton de Vaud (Canton de Vaud-CIRCULAIRE AMORTISSEMENTS ET PROVISIONS §2.4).
+
+Ainsi, de cette façon, on conserve la trace du coût "d'établissement" de l'immobilisation de façon à l'évaluer en cas d'une éventuelle revente.
+
+
+
+
+
+
+
+
+
+ 

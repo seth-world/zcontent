@@ -1,0 +1,356 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/dicedit.cpp File Reference}
+\hypertarget{dicedit_8cpp}{}\label{dicedit_8cpp}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/dicedit.cpp@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/dicedit.cpp}}
+{\ttfamily \#include "{}dicedit.\+h"{}}\newline
+{\ttfamily \#include "{}ui\+\_\+dicedit.\+h"{}}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zcontentcommon/zgeneralparameters.\+h$>$}\newline
+{\ttfamily \#include $<$QStandard\+Item\+Model$>$}\newline
+{\ttfamily \#include $<$zrandomfile/zheadercontrolblock.\+h$>$}\newline
+{\ttfamily \#include $<$zrandomfile/zfilecontrolblock.\+h$>$}\newline
+{\ttfamily \#include $<$zindexedfile/zmastercontrolblock.\+h$>$}\newline
+{\ttfamily \#include $<$zindexedfile/zmfdictionary.\+h$>$}\newline
+{\ttfamily \#include $<$zexceptiondlg.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zpinboard.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqtreeview.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqtableview.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqstandarditem.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zdatareference.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqtwidgettools.\+h$>$}\newline
+{\ttfamily \#include $<$zentity.\+h$>$}\newline
+{\ttfamily \#include $<$zfielddlg.\+h$>$}\newline
+{\ttfamily \#include $<$zkeydlg.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zindexedfile/zfielddescription.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zindexedfile/zdictionaryfile.\+h$>$}\newline
+{\ttfamily \#include $<$qclipboard.\+h$>$}\newline
+{\ttfamily \#include $<$qmimedata.\+h$>$}\newline
+{\ttfamily \#include $<$qfiledialog.\+h$>$}\newline
+{\ttfamily \#include $<$qaction.\+h$>$}\newline
+{\ttfamily \#include $<$qactiongroup.\+h$>$}\newline
+{\ttfamily \#include $<$zindexedfile/zkeydictionary.\+h$>$}\newline
+{\ttfamily \#include $<$zindexedfile/zindexfield.\+h$>$}\newline
+{\ttfamily \#include $<$zindexedfile/zdataconversion.\+h$>$}\newline
+{\ttfamily \#include $<$texteditmwn.\+h$>$}\newline
+{\ttfamily \#include $<$QHBox\+Layout$>$}\newline
+{\ttfamily \#include $<$QLine\+Edit$>$}\newline
+{\ttfamily \#include $<$QPush\+Button$>$}\newline
+{\ttfamily \#include $<$zcppparser/zcppparserutils/rawfields.\+h$>$}\newline
+{\ttfamily \#include $<$zcppgenerate.\+h$>$}\newline
+{\ttfamily \#include $<$zstdlistdlg.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zcontentutils/zdisplayedfield.\+h$>$}\newline
+{\ttfamily \#include $<$filegeneratedlg.\+h$>$}\newline
+{\ttfamily \#include $<$zcppparser/zcppparsertype.\+h$>$}\newline
+{\ttfamily \#include $<$QVariant$>$}\newline
+{\ttfamily \#include $<$QMeta\+Type$>$}\newline
+{\ttfamily \#include $<$fcntl.\+h$>$}\newline
+{\ttfamily \#include $<$zxml/zxmlprimitives.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zindexedfile/zmasterfile.\+h$>$}\newline
+Include dependency graph for dicedit.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{dicedit_8cpp_aeeb1318c5a8d6969f4a3d336b9de4009}{control\+Field}} (\mbox{\hyperlink{classzbs_1_1_z_field_description}{ZField\+Description}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Field}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{dicedit_8cpp_ac17d64a5cda6bb9bab66c69596216ecd}{process\+Item}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Item}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Data\+Rank}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QList}}$<$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item}} \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{dicedit_8cpp_abe08f0007402897f44691e876a2b16b2}{create\+Key\+Dic\+Row}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_key_header_row}{ZKey\+Header\+Row}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+KHR}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QList}}$<$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item}} \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{dicedit_8cpp_a050884e766e0c28c1f99a6e99d8655d6}{create\+Key\+Field\+Row}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_key_field_row}{ZKey\+Field\+Row}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{w\+KFR}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QList}}$<$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item}} \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{dicedit_8cpp_a969de476509ad219a505b1c5e101c93e}{create\+Key\+Field\+Row\+From\+Field\+Item}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Field\+Item}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QList}}$<$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item}} \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{dicedit_8cpp_a1ffae31720e5282da7e768665bbc9521}{create\+Field\+Row\+From\+Field}} (\mbox{\hyperlink{classzbs_1_1_z_field_description}{ZField\+Description}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Field}})
+\begin{DoxyCompactList}\small\item\em create\+Row\+From\+Field\+Description creates an item list describing field desciption. infra data (ZField\+Description) is created and set by this routine. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{dicedit_8cpp_aebd5f9a6b89c73843b1e24fdd0d942db}{set\+Field\+Row\+From\+Field}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item\+Model}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Model}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Row}}, \mbox{\hyperlink{classzbs_1_1_z_field_description}{ZField\+Description}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Field}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{dicedit_8cpp_adca992d5c44418a18e557b80901a1b84}{cst\+\_\+\+Message\+Duration}} = 20000
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{dicedit_8cpp_ae107449de340e83e5d21c5483651acdc}{cst\+\_\+\+Key\+Name\+Column}} = 0
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{dicedit_8cpp_ae8e7cdef98cd98ebfe0c0556d43b1875}{cst\+\_\+\+Key\+Offset\+Column}} = 2
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{dicedit_8cpp_a7045c441d45b8c3d018f77af3c1186c1}{cst\+\_\+\+Key\+USize\+Column}} = 3
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{dicedit_8cpp_a0f4ec75e0f4a3538e18b04675bcd0521}{cst\+\_\+\+Duplicate\+Column}} = 4
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{dicedit_8cpp_a69c384ac6aa5b6d1ba84444a1ecb0a9e}{cst\+\_\+\+Tooltip\+Column}} = 5
+\item 
+\mbox{\hyperlink{class_file_generate_m_wn}{File\+Generate\+MWn}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{dicedit_8cpp_a5a30e61304ed866a288afef81e93afa6}{File\+Generate}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{class_z_search_query_m_wd}{ZSearch\+Query\+MWd}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{dicedit_8cpp_a7e56085f511ae57a458fed0eaacf2da9}{Query\+MWd}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPinboard}} \mbox{\hyperlink{dicedit_8cpp_a398290d02d5570151931eadc13ee3863}{Pinboard}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{dicedit_8cpp_abd33c9e344bc75e89951c060e6487122}{Use\+Mime\+Data}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{dicedit_8cpp_a4aff428604312f215c69bb4d53748708}{Drag\+Engaged}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{dicedit_8cpp_aeeb1318c5a8d6969f4a3d336b9de4009}\label{dicedit_8cpp_aeeb1318c5a8d6969f4a3d336b9de4009} 
+\index{dicedit.cpp@{dicedit.cpp}!controlField@{controlField}}
+\index{controlField@{controlField}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{controlField()}{controlField()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} control\+Field (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classzbs_1_1_z_field_description}{ZField\+Description}} \&}]{p\+Field }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l02546}{2546}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zfielddlg_8h_source_l00013}{\+\_\+\+\_\+\+NEW\+\_\+\+FIELDNAME\+\_\+\+\_\+}}, \mbox{\hyperlink{zindextype_8cpp_source_l01352}{decode\+\_\+\+ZType()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zdataconversion_8cpp_source_l00659}{get\+URFHeader\+Size()}}, \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00613}{ZException\+DLg\+::message()}}, \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00634}{ZException\+DLg\+::message2\+B()}}, \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_source_l00851}{w\+Ret}}, and \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00156}{ZType\+\_\+\+Unknown}}.
+
+\Hypertarget{dicedit_8cpp_a1ffae31720e5282da7e768665bbc9521}\label{dicedit_8cpp_a1ffae31720e5282da7e768665bbc9521} 
+\index{dicedit.cpp@{dicedit.cpp}!createFieldRowFromField@{createFieldRowFromField}}
+\index{createFieldRowFromField@{createFieldRowFromField}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{createFieldRowFromField()}{createFieldRowFromField()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QList}}$<$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item}} \texorpdfstring{$\ast$}{*} $>$ create\+Field\+Row\+From\+Field (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classzbs_1_1_z_field_description}{ZField\+Description}} \texorpdfstring{$\ast$}{*}}]{p\+Field }\end{DoxyParamCaption})}
+
+
+
+create\+Row\+From\+Field\+Description creates an item list describing field desciption. infra data (ZField\+Description) is created and set by this routine. 
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l04745}{4745}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindextype_8cpp_source_l01352}{decode\+\_\+\+ZType()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zcu__common_8cpp_source_l00019}{get\+New\+Resource()}}, \mbox{\hyperlink{zentity_8h_source_l00036}{ZEntity\+\_\+\+Dic\+Field}}, and \mbox{\hyperlink{zcontentutils_2zlayout_8h_source_l00042}{ZLayout\+\_\+\+Field\+TBv}}.
+
+
+
+Referenced by \mbox{\hyperlink{dicedit_8cpp_source_l02966}{Dic\+Edit\+MWn\+::\+\_\+field\+Append()}}, \mbox{\hyperlink{dicedit_8cpp_source_l03021}{Dic\+Edit\+MWn\+::\+\_\+field\+Insert\+After()}}, \mbox{\hyperlink{dicedit_8cpp_source_l03061}{Dic\+Edit\+MWn\+::\+\_\+field\+Insert\+New\+Before()}}, and \mbox{\hyperlink{dicedit_8cpp_source_l04383}{Dic\+Edit\+MWn\+::display\+ZMFDictionary()}}.
+
+\Hypertarget{dicedit_8cpp_abe08f0007402897f44691e876a2b16b2}\label{dicedit_8cpp_abe08f0007402897f44691e876a2b16b2} 
+\index{dicedit.cpp@{dicedit.cpp}!createKeyDicRow@{createKeyDicRow}}
+\index{createKeyDicRow@{createKeyDicRow}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{createKeyDicRow()}{createKeyDicRow()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QList}}$<$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item}} \texorpdfstring{$\ast$}{*} $>$ create\+Key\+Dic\+Row (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_key_header_row}{ZKey\+Header\+Row}} \&}]{p\+KHR }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l04588}{4588}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{create\+Item()}}, \mbox{\hyperlink{dicedit_8cpp_source_l00095}{cst\+\_\+\+Duplicate\+Column}}, \mbox{\hyperlink{dicedit_8cpp_source_l00092}{cst\+\_\+\+Key\+Name\+Column}}, \mbox{\hyperlink{dicedit_8cpp_source_l00094}{cst\+\_\+\+Key\+USize\+Column}}, \mbox{\hyperlink{dicedit_8cpp_source_l00096}{cst\+\_\+\+Tooltip\+Column}}, \mbox{\hyperlink{zcontentconstants_8cpp_source_l00059}{decode\+\_\+\+ZST()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zcu__common_8cpp_source_l00019}{get\+New\+Resource()}}, \mbox{\hyperlink{zentity_8h_source_l00032}{ZEntity\+\_\+\+Key\+Dic}}, and \mbox{\hyperlink{zcontentutils_2zlayout_8h_source_l00043}{ZLayout\+\_\+\+Key\+TRv}}.
+
+
+
+Referenced by \mbox{\hyperlink{dicedit_8cpp_source_l01849}{Dic\+Edit\+MWn\+::append\+New\+Key()}}, \mbox{\hyperlink{dicedit_8cpp_source_l04439}{Dic\+Edit\+MWn\+::display\+Key\+Dictionaries()}}, and \mbox{\hyperlink{dicedit_8cpp_source_l01737}{Dic\+Edit\+MWn\+::insert\+New\+Key()}}.
+
+\Hypertarget{dicedit_8cpp_a050884e766e0c28c1f99a6e99d8655d6}\label{dicedit_8cpp_a050884e766e0c28c1f99a6e99d8655d6} 
+\index{dicedit.cpp@{dicedit.cpp}!createKeyFieldRow@{createKeyFieldRow}}
+\index{createKeyFieldRow@{createKeyFieldRow}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{createKeyFieldRow()}{createKeyFieldRow()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QList}}$<$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item}} \texorpdfstring{$\ast$}{*} $>$ create\+Key\+Field\+Row (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_key_field_row}{ZKey\+Field\+Row}} \&}]{w\+KFR }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l04710}{4710}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{create\+Item()}}, \mbox{\hyperlink{dicedit_8cpp_source_l00093}{cst\+\_\+\+Key\+Offset\+Column}}, \mbox{\hyperlink{zindextype_8cpp_source_l01352}{decode\+\_\+\+ZType()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zcu__common_8cpp_source_l00019}{get\+New\+Resource()}}, \mbox{\hyperlink{zentity_8h_source_l00034}{ZEntity\+\_\+\+Key\+Field}}, and \mbox{\hyperlink{zcontentutils_2zlayout_8h_source_l00043}{ZLayout\+\_\+\+Key\+TRv}}.
+
+
+
+Referenced by \mbox{\hyperlink{dicedit_8cpp_source_l04732}{create\+Key\+Field\+Row\+From\+Field\+Item()}}, \mbox{\hyperlink{dicedit_8cpp_source_l04439}{Dic\+Edit\+MWn\+::display\+Key\+Dictionaries()}}, and \mbox{\hyperlink{dicedit_8cpp_source_l03508}{Dic\+Edit\+MWn\+::key\+TRv\+Insert\+From\+Pinboard()}}.
+
+\Hypertarget{dicedit_8cpp_a969de476509ad219a505b1c5e101c93e}\label{dicedit_8cpp_a969de476509ad219a505b1c5e101c93e} 
+\index{dicedit.cpp@{dicedit.cpp}!createKeyFieldRowFromFieldItem@{createKeyFieldRowFromFieldItem}}
+\index{createKeyFieldRowFromFieldItem@{createKeyFieldRowFromFieldItem}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{createKeyFieldRowFromFieldItem()}{createKeyFieldRowFromFieldItem()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QList}}$<$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item}} \texorpdfstring{$\ast$}{*} $>$ create\+Key\+Field\+Row\+From\+Field\+Item (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item}} \texorpdfstring{$\ast$}{*}}]{p\+Field\+Item }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l04732}{4732}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{dicedit_8cpp_source_l04710}{create\+Key\+Field\+Row()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zdisplayedfield_8cpp_source_l00045}{zbs\+::\+ZKey\+Field\+Row\+::set\+From\+QItem()}}.
+
+\Hypertarget{dicedit_8cpp_ac17d64a5cda6bb9bab66c69596216ecd}\label{dicedit_8cpp_ac17d64a5cda6bb9bab66c69596216ecd} 
+\index{dicedit.cpp@{dicedit.cpp}!processItem@{processItem}}
+\index{processItem@{processItem}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{processItem()}{processItem()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} process\+Item (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item}} \texorpdfstring{$\ast$}{*}}]{p\+Item,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Data\+Rank }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l02579}{2579}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{dicedit_8cpp_aebd5f9a6b89c73843b1e24fdd0d942db}\label{dicedit_8cpp_aebd5f9a6b89c73843b1e24fdd0d942db} 
+\index{dicedit.cpp@{dicedit.cpp}!setFieldRowFromField@{setFieldRowFromField}}
+\index{setFieldRowFromField@{setFieldRowFromField}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{setFieldRowFromField()}{setFieldRowFromField()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item}} \texorpdfstring{$\ast$}{*} set\+Field\+Row\+From\+Field (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item\+Model}} \texorpdfstring{$\ast$}{*}}]{p\+Model,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Row,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_field_description}{ZField\+Description}} \&}]{p\+Field }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l04794}{4794}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zfielddescription_8cpp_source_l00021}{zbs\+::\+ZField\+Description\+::\+\_\+copy\+From()}}, \mbox{\hyperlink{zindextype_8cpp_source_l01352}{decode\+\_\+\+ZType()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{dicedit_8cpp_source_l03228}{Dic\+Edit\+MWn\+::accept\+Field\+Change()}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{dicedit_8cpp_a0f4ec75e0f4a3538e18b04675bcd0521}\label{dicedit_8cpp_a0f4ec75e0f4a3538e18b04675bcd0521} 
+\index{dicedit.cpp@{dicedit.cpp}!cst\_DuplicateColumn@{cst\_DuplicateColumn}}
+\index{cst\_DuplicateColumn@{cst\_DuplicateColumn}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{cst\_DuplicateColumn}{cst\_DuplicateColumn}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} cst\+\_\+\+Duplicate\+Column = 4}
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l00095}{95}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{dicedit_8cpp_source_l04588}{create\+Key\+Dic\+Row()}}, and \mbox{\hyperlink{dicedit_8cpp_source_l01863}{Dic\+Edit\+MWn\+::key\+Change()}}.
+
+\Hypertarget{dicedit_8cpp_ae107449de340e83e5d21c5483651acdc}\label{dicedit_8cpp_ae107449de340e83e5d21c5483651acdc} 
+\index{dicedit.cpp@{dicedit.cpp}!cst\_KeyNameColumn@{cst\_KeyNameColumn}}
+\index{cst\_KeyNameColumn@{cst\_KeyNameColumn}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{cst\_KeyNameColumn}{cst\_KeyNameColumn}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} cst\+\_\+\+Key\+Name\+Column = 0}
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l00092}{92}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{dicedit_8cpp_source_l04588}{create\+Key\+Dic\+Row()}}, and \mbox{\hyperlink{dicedit_8cpp_source_l01863}{Dic\+Edit\+MWn\+::key\+Change()}}.
+
+\Hypertarget{dicedit_8cpp_ae8e7cdef98cd98ebfe0c0556d43b1875}\label{dicedit_8cpp_ae8e7cdef98cd98ebfe0c0556d43b1875} 
+\index{dicedit.cpp@{dicedit.cpp}!cst\_KeyOffsetColumn@{cst\_KeyOffsetColumn}}
+\index{cst\_KeyOffsetColumn@{cst\_KeyOffsetColumn}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{cst\_KeyOffsetColumn}{cst\_KeyOffsetColumn}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} cst\+\_\+\+Key\+Offset\+Column = 2}
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l00093}{93}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{dicedit_8cpp_source_l02096}{Dic\+Edit\+MWn\+::\+\_\+recompute\+Key\+Values()}}, and \mbox{\hyperlink{dicedit_8cpp_source_l04710}{create\+Key\+Field\+Row()}}.
+
+\Hypertarget{dicedit_8cpp_a7045c441d45b8c3d018f77af3c1186c1}\label{dicedit_8cpp_a7045c441d45b8c3d018f77af3c1186c1} 
+\index{dicedit.cpp@{dicedit.cpp}!cst\_KeyUSizeColumn@{cst\_KeyUSizeColumn}}
+\index{cst\_KeyUSizeColumn@{cst\_KeyUSizeColumn}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{cst\_KeyUSizeColumn}{cst\_KeyUSizeColumn}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} cst\+\_\+\+Key\+USize\+Column = 3}
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l00094}{94}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{dicedit_8cpp_source_l02096}{Dic\+Edit\+MWn\+::\+\_\+recompute\+Key\+Values()}}, \mbox{\hyperlink{dicedit_8cpp_source_l04588}{create\+Key\+Dic\+Row()}}, and \mbox{\hyperlink{dicedit_8cpp_source_l01863}{Dic\+Edit\+MWn\+::key\+Change()}}.
+
+\Hypertarget{dicedit_8cpp_adca992d5c44418a18e557b80901a1b84}\label{dicedit_8cpp_adca992d5c44418a18e557b80901a1b84} 
+\index{dicedit.cpp@{dicedit.cpp}!cst\_MessageDuration@{cst\_MessageDuration}}
+\index{cst\_MessageDuration@{cst\_MessageDuration}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{cst\_MessageDuration}{cst\_MessageDuration}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} cst\+\_\+\+Message\+Duration = 20000}
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l00091}{91}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{dicedit_8cpp_source_l03021}{Dic\+Edit\+MWn\+::\+\_\+field\+Insert\+After()}}, \mbox{\hyperlink{dicedit_8cpp_source_l03061}{Dic\+Edit\+MWn\+::\+\_\+field\+Insert\+New\+Before()}}, \mbox{\hyperlink{dicedit_8cpp_source_l03228}{Dic\+Edit\+MWn\+::accept\+Field\+Change()}}, \mbox{\hyperlink{dicedit_8cpp_source_l00348}{Dic\+Edit\+MWn\+::display\+Error\+Call\+Back()}}, \mbox{\hyperlink{dicedit_8cpp_source_l00357}{Dic\+Edit\+MWn\+::display\+Error\+Color\+CB()}}, \mbox{\hyperlink{dicedit_8cpp_source_l00826}{Dic\+Edit\+MWn\+::field\+Action\+Event()}}, \mbox{\hyperlink{dicedit_8cpp_source_l02416}{Dic\+Edit\+MWn\+::field\+Delete()}}, \mbox{\hyperlink{dicedit_8cpp_source_l02991}{Dic\+Edit\+MWn\+::field\+Insert\+After\+From\+Pinboard()}}, \mbox{\hyperlink{dicedit_8cpp_source_l03290}{Dic\+Edit\+MWn\+::\+Field\+TBv\+Mouse\+Filtered()}}, \mbox{\hyperlink{dicedit_8cpp_source_l03798}{Dic\+Edit\+MWn\+::\+Field\+TBv\+Raw\+Drop\+Event()}}, \mbox{\hyperlink{dicedit_8cpp_source_l01069}{Dic\+Edit\+MWn\+::key\+Action\+Event()}}, \mbox{\hyperlink{dicedit_8cpp_source_l03508}{Dic\+Edit\+MWn\+::key\+TRv\+Insert\+From\+Pinboard()}}, \mbox{\hyperlink{dicedit_8cpp_source_l04333}{Dic\+Edit\+MWn\+::load\+Xml\+Dictionary()}}, \mbox{\hyperlink{dicedit_8cpp_source_l03970}{Dic\+Edit\+MWn\+::manage\+Dictionary\+Files()}}, \mbox{\hyperlink{dicedit_8cpp_source_l01431}{Dic\+Edit\+MWn\+::read\+Write\+Action\+Event()}}, \mbox{\hyperlink{dicedit_8cpp_source_l01718}{Dic\+Edit\+MWn\+::status\+Bar\+Message()}}, \mbox{\hyperlink{poolvisu_8cpp_source_l02593}{pool\+Visu\+::status\+Bar\+Message()}}, and \mbox{\hyperlink{dicedit_8cpp_source_l04251}{Dic\+Edit\+MWn\+::update\+Embedded()}}.
+
+\Hypertarget{dicedit_8cpp_a69c384ac6aa5b6d1ba84444a1ecb0a9e}\label{dicedit_8cpp_a69c384ac6aa5b6d1ba84444a1ecb0a9e} 
+\index{dicedit.cpp@{dicedit.cpp}!cst\_TooltipColumn@{cst\_TooltipColumn}}
+\index{cst\_TooltipColumn@{cst\_TooltipColumn}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{cst\_TooltipColumn}{cst\_TooltipColumn}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} cst\+\_\+\+Tooltip\+Column = 5}
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{dicedit_8cpp_source_l04588}{create\+Key\+Dic\+Row()}}, and \mbox{\hyperlink{dicedit_8cpp_source_l01863}{Dic\+Edit\+MWn\+::key\+Change()}}.
+
+\Hypertarget{dicedit_8cpp_a4aff428604312f215c69bb4d53748708}\label{dicedit_8cpp_a4aff428604312f215c69bb4d53748708} 
+\index{dicedit.cpp@{dicedit.cpp}!DragEngaged@{DragEngaged}}
+\index{DragEngaged@{DragEngaged}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{DragEngaged}{DragEngaged}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} Drag\+Engaged\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{zcu__common_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{zcu__common_8cpp_source}{zcu\+\_\+common.\+cpp}}.
+
+\Hypertarget{dicedit_8cpp_a5a30e61304ed866a288afef81e93afa6}\label{dicedit_8cpp_a5a30e61304ed866a288afef81e93afa6} 
+\index{dicedit.cpp@{dicedit.cpp}!FileGenerate@{FileGenerate}}
+\index{FileGenerate@{FileGenerate}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{FileGenerate}{FileGenerate}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_file_generate_m_wn}{File\+Generate\+MWn}}\texorpdfstring{$\ast$}{*} File\+Generate =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l00098}{98}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{dicedit_8cpp_source_l00450}{Dic\+Edit\+MWn\+::general\+Action\+Event()}}.
+
+\Hypertarget{dicedit_8cpp_a398290d02d5570151931eadc13ee3863}\label{dicedit_8cpp_a398290d02d5570151931eadc13ee3863} 
+\index{dicedit.cpp@{dicedit.cpp}!Pinboard@{Pinboard}}
+\index{Pinboard@{Pinboard}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{Pinboard}{Pinboard}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPinboard}} Pinboard\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{zcu__common_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{zcu__common_8cpp_source}{zcu\+\_\+common.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{dicedit_8cpp_source_l00826}{Dic\+Edit\+MWn\+::field\+Action\+Event()}}, \mbox{\hyperlink{dicedit_8cpp_source_l03198}{Dic\+Edit\+MWn\+::field\+Append\+From\+Pinboard()}}, \mbox{\hyperlink{dicedit_8cpp_source_l02991}{Dic\+Edit\+MWn\+::field\+Insert\+After\+From\+Pinboard()}}, \mbox{\hyperlink{dicedit_8cpp_source_l03798}{Dic\+Edit\+MWn\+::\+Field\+TBv\+Raw\+Drop\+Event()}}, \mbox{\hyperlink{dicedit_8cpp_source_l03781}{Dic\+Edit\+MWn\+::\+Field\+TBv\+Raw\+Start\+Drag()}}, \mbox{\hyperlink{dicedit_8cpp_source_l03508}{Dic\+Edit\+MWn\+::key\+TRv\+Insert\+From\+Pinboard()}}, and \mbox{\hyperlink{dicedit_8cpp_source_l03451}{Dic\+Edit\+MWn\+::\+Key\+TRv\+Raw\+Start\+Drag()}}.
+
+\Hypertarget{dicedit_8cpp_a7e56085f511ae57a458fed0eaacf2da9}\label{dicedit_8cpp_a7e56085f511ae57a458fed0eaacf2da9} 
+\index{dicedit.cpp@{dicedit.cpp}!QueryMWd@{QueryMWd}}
+\index{QueryMWd@{QueryMWd}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{QueryMWd}{QueryMWd}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_z_search_query_m_wd}{ZSearch\+Query\+MWd}}\texorpdfstring{$\ast$}{*} Query\+MWd =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l00099}{99}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+
+\Hypertarget{dicedit_8cpp_abd33c9e344bc75e89951c060e6487122}\label{dicedit_8cpp_abd33c9e344bc75e89951c060e6487122} 
+\index{dicedit.cpp@{dicedit.cpp}!UseMimeData@{UseMimeData}}
+\index{UseMimeData@{UseMimeData}!dicedit.cpp@{dicedit.cpp}}
+\doxysubsubsection{\texorpdfstring{UseMimeData}{UseMimeData}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} Use\+Mime\+Data\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{zcu__common_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{zcu__common_8cpp_source}{zcu\+\_\+common.\+cpp}}.
+

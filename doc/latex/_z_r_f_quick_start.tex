@@ -1,0 +1,521 @@
+\chapter{Starting up using ZRandom\+File}
+\hypertarget{_z_r_f_quick_start}{}\label{_z_r_f_quick_start}\index{Starting up using ZRandomFile@{Starting up using ZRandomFile}}
+ 
+\startcontents[mainsections]
+\printcontents[mainsections]{l}{1}{\section*{Main Sections}\setcounter{tocdepth}{2}}
+\clearpage
+\hypertarget{_z_r_f_quick_start_ZRFQSIntro}{}\doxysection{\texorpdfstring{Introduction -\/ Example presentation}{Introduction - Example presentation}}\label{_z_r_f_quick_start_ZRFQSIntro}
+This chapter is a user\textquotesingle{}s guide concerning the use of \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}.
+
+We will follow an example all accross this chapter with a simple data definition. Indeed this example is silly, and not realistic. But this is for the purpose of showing usage and possibilities of \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} methods.
+
+In this example, we will
+\begin{DoxyItemize}
+\item load in a ZRF a mix of structured data and informal, varying length data with various format.
+\item feed ZRF with data
+\item remove records
+\item search for data using field definition capabilities and \doxylink{classzbs_1_1_z_r_f_collection}{ZRFCollection} object
+\item use some ZRF utilities
+\end{DoxyItemize}\hypertarget{_z_r_f_quick_start_ZRFQSRequired}{}\doxysubsection{\texorpdfstring{Required include files}{Required include files}}\label{_z_r_f_quick_start_ZRFQSRequired}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/\ for\ ZBaseSytem-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <config/zconfig.h>}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <ztoolset/ZArray.h>}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <ztoolset/zerror.h>}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zrandomfile_8h}{zrandomfile/zrandomfile.h}}>}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zrfcollection_8h}{zrandomfile/zrfcollection.h}}>}\ \textcolor{comment}{//\ for\ using\ ZRFCollection\ objects}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/\ for\ data\ types\ handling-\/-\/-\/-\/-\/}}
+
+\end{DoxyCode}
+\hypertarget{_z_r_f_quick_start_ZRFQSDataDef}{}\doxysubsection{\texorpdfstring{Data definitions}{Data definitions}}\label{_z_r_f_quick_start_ZRFQSDataDef}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ an\ enum\ for\ qualifying\ content\ :\ indeed\ we\ should\ better\ use\ Mime\ type.}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096}{Doc\_type}}\ :\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\_t}}\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ =\ 0,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a075d71ccc01cc1350c2febfc453ff916}{DT\_Pdf}}\ =\ 1,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096abb063dcd429504bd3acb539911c8cf2e}{DT\_Jpeg}}\ =\ 2,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a83c044fa7ffd7e9130c766f2f3e7e3df}{DT\_Html}}\ =\ 3,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096ac0e9a60b51a82914a55bf115d58abfd6}{DT\_Mp4}}\ =\ 4,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a49d6fa9ddccc2e9fef9def07d745567d}{DT\_Mail}}\ =\ 5,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a51c9b5166139024b94384c1278709449}{DT\_Other}}\ =\ 6}
+\DoxyCodeLine{\ \ \ \ \};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ our\ structured\ 'meta\ data'\ for\ document\ records}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_t3}{T3}}\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordtype}{char}\ \ \ \ \ \ String1\ [50];}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordtype}{float}\ \ \ \ \ NumericField\ [3]\ \ ;}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096}{Doc\_type}}\ \ Type;}
+\DoxyCodeLine{\ \ \ \ \};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ our\ constants\ to\ feed\ the\ file\ with}}
+\DoxyCodeLine{\textcolor{comment}{//\ Note\ that\ DT\_Nothing\ will\ be\ updated\ later}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_t3}{T3}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{T3Cst}}[]\ =}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}my\ heart\ beats"{}}\ \ \ \ \ \ \ \ ,\ \ \{110\ ,-\/155\ ,1\}\ ,\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}my\ heart\ beats\ for\ you"{}},\ \ \{110\ ,-\/1024,1\},\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}and\ so\ beats\ my\ skin"{}},\ \ \ \ \{110\ ,-\/152,\ 1\},\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \ \}\ ,}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}xxxx"{}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{110,\ 110\ ,1\}\ ,\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}this\ is\ one"{}},\ \ \ \ \ \ \ \ \ \ \ \ \ \{1\ ,\ 110\ ,1\ \},\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}aaaa\ \ \ "{}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{34\ ,\ 110\ ,1\},\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}eer"{}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{5,\ 110\ ,1\ \},\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}\ \ \ dddd"{}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{250,\ 110\ ,1\ \},\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}jkfdlsakfj"{}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \{2025,\ 110\ ,1\ \},\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}egadfk"{}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{25,\ 110\ ,1\ \},\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}aaaa\ \ \ "{}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{12045,\ 110\ ,1\ \}\ ,\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \}}
+\DoxyCodeLine{\ \ \ \ \};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ some\ files\ with\ various\ format\ :\ in\ fact\ the\ main\ file's\ content}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{PictureFiles}}\ []\ =\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/DSC\_01231.jpg"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/DSC\_01232.jpg"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/DSC\_0123.JPG"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/DSC\_0146.JPG"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/DSC\_0394.JPG"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/DSC\_0414.JPG"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/Gelato.mp4"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/invoice2016-\/04-\/26.pdf"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/QItemDelegate\ Class\ |\ Qt\ Widgets\ 5.7.html"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Documents/DSC\_0265.JPG"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Documents/DSC\_0267.JPG"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Documents/DSCN0971.JPG"{}}}
+\DoxyCodeLine{\ \ \ \ \};}
+
+\end{DoxyCode}
+\hypertarget{_z_r_f_quick_start_ZRFQSInstantiate}{}\doxysection{\texorpdfstring{Instantiating ZRandom\+File}{Instantiating ZRandomFile}}\label{_z_r_f_quick_start_ZRFQSInstantiate}
+Instantiating \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} object doen\textquotesingle{}t create anything on storage.
+
+It simply creates an object with the memory structure within the process ready to be used either to create a ZRF or to open a ZRF.
+
+You may specify a file path at this stage with an uri\+String, but this is not mandatory. At anytime BEFORE having opened ZRF you may set or change this path using \doxylink{classzbs_1_1_z_random_file_a097cbb67f4928d593dbb852f7b417ba0}{ZRandom\+File\+::set\+Path()}.\hypertarget{_z_r_f_quick_start_ZRFQSInsV1}{}\doxysubsection{\texorpdfstring{version 1}{version 1}}\label{_z_r_f_quick_start_ZRFQSInsV1}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{uriString\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPath}};}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPath}}\ =\ \textcolor{stringliteral}{"{}/home/gerard/testindexedpictures.zrf"{}};}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_random_file}{ZRandomFile}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPath}});}
+
+\end{DoxyCode}
+
+
+The main file path should already have been tested and stored.
+
+This can be done using uri\+String facilities.
+
+But in this case, if the path is not a valid path, then \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} constructor aborts application.
+
+So, we do prefer the following.\hypertarget{_z_r_f_quick_start_ZRFQSInsV2}{}\doxysubsection{\texorpdfstring{version 2}{version 2}}\label{_z_r_f_quick_start_ZRFQSInsV2}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{classzbs_1_1_z_random_file}{ZRandomFile}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}\ ;}
+
+\end{DoxyCode}
+\hypertarget{_z_r_f_quick_start_ZRFQSCreating}{}\doxysection{\texorpdfstring{Creating a ZRandom\+File}{Creating a ZRandomFile}}\label{_z_r_f_quick_start_ZRFQSCreating}
+We will create an empty \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} structure with a free available space (contiguous best try) of 100000 bytes.
+
+This is the most simpler way to create a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} structure.
+
+Excepted mandatory data, meaning file path and initial file space, all other parameters are defaulted.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ we\ do\ not\ want\ to\ leave\ the\ file\ open\ (pLeaveOpen\ is\ defaulted\ to\ false)}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}.zcreate(\textcolor{stringliteral}{"{}/home/gerard/testindexedpictures.zrf"{}},100000\ );}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();\ \ \textcolor{comment}{//\ stop\ processing\ and\ dump\ exception\ stack}}
+
+\end{DoxyCode}
+
+
+we chose an extension name of "{}.\+zrf"{} but this is NOT mandatory. Any extension is valid excepted the reserved ones. see\+:\doxysectlink{group___z_m_f_file_naming_FNPZRFName}{Naming conventions for ZRandom\+File}{2}.\hypertarget{_z_r_f_quick_start_ZRFQSSetting}{}\doxysection{\texorpdfstring{Setting ZRandom\+File options}{Setting ZRandomFile options}}\label{_z_r_f_quick_start_ZRFQSSetting}
+At this stage, \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} structure is created including on storage, with all necessary infra-\/data to work with (mostly set to their default values).
+
+By default, grab\+Free\+Space is set to on (true), and high\+Water\+Marking is set to off (false).
+
+Allocated\+Blocks and Block\+Extent\+Quota,the pool tables size parameters, are set to their defaulted parameters (\+\_\+cst\+\_\+default\+\_\+allocation and \+\_\+cst\+\_\+realloc\+\_\+quota) see\+: ZArray
+
+We could change that (see further).
+
+But one rather important parameter is Block\+Target\+Size. We will set it to a value (this is not mandatory, but wishable).
+
+\begin{DoxyNote}{Note}
+We remark that zcreate method has set up internal \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} data structure. Even if the file has been closed, this data remains available and does not need to be mentionned again. Using this facility, the first time we create or open a file, we have to mention required infradata for the given file. Successive sessions (open/close) could be done without mentionning again this infradata.
+\end{DoxyNote}
+\hypertarget{_z_r_f_quick_start_ZRFQSSetParams}{}\doxysubsection{\texorpdfstring{Setting some options and openning the file}{Setting some options and openning the file}}\label{_z_r_f_quick_start_ZRFQSSetParams}
+We will now set two optional parameters of the file \+: Blcok\+Target\+Size and Grab\+Free\+Space. When it has been done, we will open the file for writing.
+
+\begin{DoxyNote}{Note}
+Setting an option after the file has been created may be done while the file is open or close, it has no importance. However, if the file is closed it may point to a valid file path \+: file path may have been previous set using set\+Path() method. During parameter(s) setting, file will be openned in ZRF\+\_\+\+Exclusive mode. This means that if file is accessed by another user and/or process, this action will fail. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}.setBlockTargetSize(\ 100000\ );\ \textcolor{comment}{//\ it\ can\ be\ done\ while\ file\ is\ closed.\ File\ is\ opened\ then\ closed\ once\ finished}}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Warning\ for\ eventuality\ of\ file\ lock\ in\ between}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}.setGrabFreeSpace(\textcolor{keyword}{true})!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})\ \ \ \ \ \ \ \ \textcolor{comment}{//\ opens\ the\ file\ with\ exclusive\ access\ and\ closes\ it\ once\ finished}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+
+\end{DoxyCode}
+
+\end{DoxyNote}
+\hypertarget{_z_r_f_quick_start_ZRFQSLoad}{}\doxysubsection{\texorpdfstring{Loading documents and meta data into ZRandom\+File}{Loading documents and meta data into ZRandomFile}}\label{_z_r_f_quick_start_ZRFQSLoad}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}.zopen(\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748ab8adf897035f8d600f6c798c40d53105}{ZRF\_Write}}|\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748aaa47984d6359356b25a1d49b72155e55}{ZRF\_Exclusive}}))!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})\ \textcolor{comment}{//\ open\ to\ load\ documents\ :\ exclusive\ write.\ Not\ really\ necessary\ here.\ Only\ ZRF\_Write\ is\ required.}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}\ =\ 0;\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}\ <\ 11;\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}++)}
+\DoxyCodeLine{\ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{memmove}}(\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT3}}\ ,\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{T3Cst}}[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}],\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{struct_t3}{T3}}));\ \ \ \ \ \textcolor{comment}{//\ get\ the\ occurrence\ of\ T3Cst}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIPicture}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{PictureFiles}}[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}];\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ set\ document\ file\ path}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/Hereafter\ :\ test\ the\ extension\ file\ to\ define\ the\ content\ format\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ NB:\ this\ is\ very\ raw\ and\ not\ corresponding\ to\ real\ world\ (see\ Mime\ types)}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIPicture}}.getFileExtension()==\textcolor{stringliteral}{"{}jpg"{}})||(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIPicture}}.getFileExtension()==\textcolor{stringliteral}{"{}JPG"{}}))}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT3}}.Type\ =\ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096abb063dcd429504bd3acb539911c8cf2e}{DT\_Jpeg}}\ ;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIPicture}}.getFileExtension()==\textcolor{stringliteral}{"{}mp4"{}})||(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIPicture}}.getFileExtension()==\textcolor{stringliteral}{"{}MP4"{}}))}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT3}}.Type\ =\ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096ac0e9a60b51a82914a55bf115d58abfd6}{DT\_Mp4}}\ ;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIPicture}}.getFileExtension()==\textcolor{stringliteral}{"{}pdf"{}})||(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIPicture}}.getFileExtension()==\textcolor{stringliteral}{"{}PDF"{}}))}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT3}}.Type\ =\ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a075d71ccc01cc1350c2febfc453ff916}{DT\_Pdf}}\ ;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIPicture}}.getFileExtension()==\textcolor{stringliteral}{"{}html"{}})||(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIPicture}}.getFileExtension()==\textcolor{stringliteral}{"{}HTML"{}}))}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT3}}.Type\ =\ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a83c044fa7ffd7e9130c766f2f3e7e3df}{DT\_Html}}\ ;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT3}}.Type\ =\ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a51c9b5166139024b94384c1278709449}{DT\_Other}}\ ;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRecord}}.setData(\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT3}},\textcolor{keyword}{sizeof}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT3}}));\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ move\ it\ to\ our\ user's\ record\ ZDataBuffer}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIPicture}}.loadContent(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPicture}}))!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})\ \textcolor{comment}{//\ load\ document\ (must\ exist!)}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}.zclose();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRecord}}\ +=\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPicture}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ append\ document\ content\ to\ record\ buffer}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}.zadd(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRecord}}))!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})\ \textcolor{comment}{//\ load\ document}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}.zclose();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\ \ \ \ \ \}\textcolor{comment}{//\ for}}
+
+\end{DoxyCode}
+\hypertarget{_z_r_f_quick_start_ZRFQSSearching}{}\doxysection{\texorpdfstring{Searching for content using adhoc defined fields}{Searching for content using adhoc defined fields}}\label{_z_r_f_quick_start_ZRFQSSearching}
+The masterpiece of free sequential selection and access on a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} is \doxylink{classzbs_1_1_z_r_f_collection}{ZRFCollection} object. We will so define a \doxylink{classzbs_1_1_z_r_f_collection}{ZRFCollection} that will hold and manage our request.
+
+This collection will be recursively used and refined in changing the selection criterias.
+
+This will be done for
+\begin{DoxyItemize}
+\item a string selection
+\item a selection on a float
+\end{DoxyItemize}\hypertarget{_z_r_f_quick_start_ZRFQSSearchString}{}\doxysubsection{\texorpdfstring{Selection on adhoc fields considered as Cstring}{Selection on adhoc fields considered as Cstring}}\label{_z_r_f_quick_start_ZRFQSSearchString}
+We will take advantage of field String1 from \doxylink{struct_t3}{T3} structure, and search as a string a certain substring contained somewhere in the defined field.
+
+Then we will refine this search using another substring.\hypertarget{_z_r_f_quick_start_ZRFQSStr1}{}\doxysubsubsection{\texorpdfstring{Establish the first collection of records ranks}{Establish the first collection of records ranks}}\label{_z_r_f_quick_start_ZRFQSStr1}
+The first search will be a global search, searching at once for all occurrence of record ranks satisfying the selection criteria.
+
+\begin{DoxyNote}{Note}
+In the code below, we may imagine that the opened file is a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}. A \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} could be opened as a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} under the condition that the open mode is ZRF\+\_\+\+Read\+Only. The reason is \+:
+\begin{DoxyItemize}
+\item \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} preserves ZHeader\+::\+ZReserved\+Block into which \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} infra data is written.
+\item But no change to data is allowed since change to data content will induce a discrepence into \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} defined indexes
+\end{DoxyItemize}
+\end{DoxyNote}
+see \doxylink{group___z_r_f_z_file__type}{Opening a file as an other file type than the native one}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{struct_t3}{T3}}\ *\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}};}
+\DoxyCodeLine{\textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRank}};}
+\DoxyCodeLine{ZDataBuffer\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRecord}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{ZDataBuffer\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSearchSequence}};\ \ \ \ \textcolor{comment}{//\ will\ contain\ byte\ sequence\ to\ search\ for}}
+\DoxyCodeLine{\mbox{\hyperlink{classzbs_1_1_z_r_f_collection}{ZRFCollection}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}};\ \textcolor{comment}{//\ Collection\ object}}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSearchSequence}}\ =\ \textcolor{stringliteral}{"{}BeAt"{}};\ \ \ \ \ \ \ \textcolor{comment}{//\ set\ the\ search\ sequence\ with\ compount\ upper/lower\ letters}}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\_t}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wOffset}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{offsetof}}\ (\mbox{\hyperlink{struct_t3}{T3}},String1);\ \ \ \ \textcolor{comment}{//\ define\ offset\ for\ adhoc\ field\ to\ search\ into}}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\_t}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wLength}}\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{struct_t3_aecd09e9376af4d9d5048b521e64b9395}{T3::String1}});\ \ \ \ \ \ \textcolor{comment}{//\ idem\ for\ length}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{classzbs_1_1_z_random_file}{ZRandomFile}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZRFPicture}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZRFPicture}}.\mbox{\hyperlink{group___z_random_file_group_ga2596cf308ac6fc2c61f63a565bdfa07b}{zopen}}(\textcolor{stringliteral}{"{}/home/gerard/testindexedpictures.zrf"{}},\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748abb6657690bc2f95e822b2b3866b59105}{ZRF\_Read\_Only}});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ establish\ a\ first\ collection\ :\ records\ with\ String1\ containing\ the\ string\ "{}BeAt"{}\ Case\ regardless.}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZRFPicture}}.zsearchFieldAllCollection\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wOffset}},\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wLength}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSearchSequence}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}},\mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a89d15e29bd1b49572fa72e3710485968}{ZRFContains}}|\mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a26d15ddb890c5f27e2da74d059b4cd7e}{ZRFString}}|\mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656ab6e0dbda6e3124a92971f0f703974bbb}{ZRFCaseRegardless}});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{fprintf}}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ idx\ \ \ Rank\ \ \ \ String1\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Numeric\ \ \ \ \ \ Type\(\backslash\)n"{}});}
+\DoxyCodeLine{\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}=0;\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}<\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}}.size();\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}++)}
+\DoxyCodeLine{\ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZRFPicture}}.zget(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRecord}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}}[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}],\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\_Nolock}});}
+\DoxyCodeLine{\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}\ =\ (\mbox{\hyperlink{struct_t3}{T3}}*)\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRecord}}.Data\ ;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{fprintf}}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \%3ld\ >\ \%3ld\ :\ <\%50s>\ <\%f>\ <\%f>\ <\%f>\ <\%d>\(\backslash\)n"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}}[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}],}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>String1,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>NumericField[0],}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>NumericField[1],}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>NumericField[2],}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{int})\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>Type);}
+\DoxyCodeLine{\ \ \ \}\textcolor{comment}{//for}}
+
+\end{DoxyCode}
+
+
+The following comes out \+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{idx}}\ \ \ Rank\ \ \ \ String1\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Numeric}}\ \ \ \ \ \ Type}
+\DoxyCodeLine{\ \ \ 0\ >\ \ \ 0\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{my}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{heart}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{beats}}>\ <110.000000>\ <-\/155.000000>\ <1.000000>\ <2>}
+\DoxyCodeLine{\ \ \ 1\ >\ \ \ 1\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{my}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{heart}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{beats}}\ \textcolor{keywordflow}{for}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{you}}>\ <110.000000>\ <-\/1024.000000>\ <1.000000>\ <2>}
+\DoxyCodeLine{\ \ \ 2\ >\ \ \ 2\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{and}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{so}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{beats}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{my}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{skin}}>\ <110.000000>\ <-\/152.000000>\ <1.000000>\ <2>}
+
+\end{DoxyCode}
+\hypertarget{_z_r_f_quick_start_ZRFQSStr2}{}\doxysubsubsection{\texorpdfstring{Refine the search}{Refine the search}}\label{_z_r_f_quick_start_ZRFQSStr2}
+In this example, we will use the same adhoc field to refine the search using another substring to search for. But it is possible to change even the adhoc field definition, pointing to another zone of the record.
+
+This second search will be a dynamic search, searching one per one record ranks satisfying the selection criteria, and giving back control to calling procedure each time a new rank has been found.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSearchSequence}}\ =\ \textcolor{stringliteral}{"{}HeaRt"{}};\ \textcolor{comment}{//\ a\ new\ substring\ to\ find\ out}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{fprintf}}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ idx\ \ \ Rank\ \ \ \ String1\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Numeric\ \ \ \ \ \ Type\(\backslash\)n"{}});}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ the\ two\ instructions\ below\ are\ equivalent\ to\ ZRandomFile::zsearchFieldFirstCollection(...)}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}}.reset();\ \ \ \ \textcolor{comment}{//\ partial\ reset\ (Keeping\ ranks\ collection)}}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRank}}=\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZRFPicture}}.zsearchFieldNextCollection\ \ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wOffset}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wLength}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSearchSequence}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a89d15e29bd1b49572fa72e3710485968}{ZRFContains}}|\mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a26d15ddb890c5f27e2da74d059b4cd7e}{ZRFString}}|\mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656ab6e0dbda6e3124a92971f0f703974bbb}{ZRFCaseRegardless}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}});}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}\ =0;}
+\DoxyCodeLine{\ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRank}}>-\/1)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZRFPicture}}.zget(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRecord}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRank}},\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\_Nolock}});\ \ \textcolor{comment}{//\ get\ the\ corresponding\ record}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}\ =\ (\mbox{\hyperlink{struct_t3}{T3}}*)\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRecord}}.Data\ ;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{fprintf}}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ report\ content}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \%3ld\ >\ \%3ld\ :\ <\%50s>\ <\%f>\ <\%f>\ <\%f>\ <\%d>\(\backslash\)n"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}}.last(),}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>String1,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>NumericField[0],}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>NumericField[1],}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>NumericField[2],}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{int})\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>Type);}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRank}}=\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZRFPicture}}.zsearchFieldNextCollection\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wOffset}},\ \ \textcolor{comment}{//\ search\ for\ next\ record\ rank}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wLength}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSearchSequence}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a89d15e29bd1b49572fa72e3710485968}{ZRFContains}}|\mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a26d15ddb890c5f27e2da74d059b4cd7e}{ZRFString}}|\mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656ab6e0dbda6e3124a92971f0f703974bbb}{ZRFCaseRegardless}},}
+\DoxyCodeLine{\textcolor{comment}{//\ we\ may\ mention\ wCollection\ here\ above\ as\ there\ is\ a\ safe\ copy\ made\ during\ initialisation\ of\ request}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}});}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}\ ++;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \}\textcolor{comment}{//while}}
+
+\end{DoxyCode}
+
+
+The following comes out \+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{idx}}\ \ \ Rank\ \ \ \ String1\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Numeric}}\ \ \ \ \ \ Type}
+\DoxyCodeLine{\ \ 0\ >\ \ \ 0\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{my}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{heart}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{beats}}>\ <110.000000>\ <-\/155.000000>\ <1.000000>\ <2>}
+\DoxyCodeLine{\ \ 1\ >\ \ \ 1\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{my}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{heart}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{beats}}\ \textcolor{keywordflow}{for}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{you}}>\ <110.000000>\ <-\/1024.000000>\ <1.000000>\ <2>}
+
+\end{DoxyCode}
+\hypertarget{_z_r_f_quick_start_ZRFQSSearchFloat}{}\doxysubsection{\texorpdfstring{Selection on adhoc binary fields}{Selection on adhoc binary fields}}\label{_z_r_f_quick_start_ZRFQSSearchFloat}
+By default, any adhoc field is considered as a binary set of bytes. We will now search for a float value, then refine this search.\hypertarget{_z_r_f_quick_start_ZRFQSFloat1}{}\doxysubsubsection{\texorpdfstring{Establish the first collection of records ranks}{Establish the first collection of records ranks}}\label{_z_r_f_quick_start_ZRFQSFloat1}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wOffset}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{offsetof}}\ (\mbox{\hyperlink{struct_t3}{T3}},NumericField);}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wLength}}\ =\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{float}})*3;}
+\DoxyCodeLine{\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wValueToSearch}}\ =\ 110;}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSearchSequence}}.setData(\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wValueToSearch}},\ \textcolor{keyword}{sizeof}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wValueToSearch}}));}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Note\ :\ searching\ all\ fields\ start\ with\ an\ initialisation\ of\ ZRFCollection}}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZRFPicture}}.zsearchFieldAllCollection\ \ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wOffset}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wLength}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSearchSequence}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a89d15e29bd1b49572fa72e3710485968}{ZRFContains}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{\textcolor{comment}{//\ hopefully\ all\ records\ will\ be\ selected}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{fprintf}}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ idx\ \ \ Rank\ \ \ \ String1\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Numeric\ \ \ \ \ \ Type\(\backslash\)n"{}});}
+\DoxyCodeLine{\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}=0;\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}<\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}}.size();\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}++)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZRFPicture}}.zget(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRecord}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}}[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}],\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\_Nolock}});}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}\ =\ (\mbox{\hyperlink{struct_t3}{T3}}*)\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRecord}}.Data\ ;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{fprintf}}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \%3ld\ >\ \%3ld\ :\ <\%50s>\ <\%f>\ <\%f>\ <\%f>\ <\%d>\(\backslash\)n"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}}[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}],}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>String1,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>NumericField[0],}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>NumericField[1],}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>NumericField[2],}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{int})\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>Type);}
+\DoxyCodeLine{\ \ \ \ \ \ \ \}\textcolor{comment}{//for}}
+
+\end{DoxyCode}
+ The following comes out \+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{idx}}\ \ \ Rank\ \ \ \ String1\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Numeric}}\ \ \ \ \ \ Type}
+\DoxyCodeLine{\ \ 0\ >\ \ \ 0\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{my}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{heart}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{beats}}>\ <110.000000>\ <-\/155.000000>\ <1.000000>\ <2>}
+\DoxyCodeLine{\ \ 1\ >\ \ \ 1\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{my}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{heart}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{beats}}\ \textcolor{keywordflow}{for}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{you}}>\ <110.000000>\ <-\/1024.000000>\ <1.000000>\ <2>}
+\DoxyCodeLine{\ \ 2\ >\ \ \ 2\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{and}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{so}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{beats}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{my}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{skin}}>\ <110.000000>\ <-\/152.000000>\ <1.000000>\ <2>}
+\DoxyCodeLine{\ \ 3\ >\ \ \ 3\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{xxxx}}>\ <110.000000>\ <110.000000>\ <1.000000>\ <2>}
+\DoxyCodeLine{\ \ 4\ >\ \ \ 4\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{this}\ is\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{one}}>\ <1.000000>\ <110.000000>\ <1.000000>\ <2>}
+\DoxyCodeLine{\ \ 5\ >\ \ \ 5\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{aaaa}}\ \ \ >\ <34.000000>\ <110.000000>\ <1.000000>\ <2>}
+\DoxyCodeLine{\ \ 6\ >\ \ \ 6\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{eer}}>\ <5.000000>\ <110.000000>\ <1.000000>\ <4>}
+\DoxyCodeLine{\ \ 7\ >\ \ \ 7\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{dddd}}>\ <250.000000>\ <110.000000>\ <1.000000>\ <1>}
+\DoxyCodeLine{\ \ 8\ >\ \ \ 8\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{jkfdlsakfj}}>\ <2025.000000>\ <110.000000>\ <1.000000>\ <6>}
+\DoxyCodeLine{\ \ 9\ >\ \ \ 9\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{egadfk}}>\ <25.000000>\ <110.000000>\ <1.000000>\ <2>}
+\DoxyCodeLine{\ 10\ >\ \ 10\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{aaaa}}\ \ \ >\ <12045.000000>\ <110.000000>\ <1.000000>\ <2>}
+
+\end{DoxyCode}
+
+
+As all records have somewhere in their array of floats the requested value, we have all records rank selected in the collection.\hypertarget{_z_r_f_quick_start_ZRFQSFloat2}{}\doxysubsubsection{\texorpdfstring{Refine the search}{Refine the search}}\label{_z_r_f_quick_start_ZRFQSFloat2}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wValueToSearch}}\ =\ -\/1024;}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSearchSequence}}.setData(\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wValueToSearch}},\ \textcolor{keyword}{sizeof}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wValueToSearch}}));}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSearchSequence}}.Dump();\ \ \textcolor{comment}{//\ just\ Dump\ ZDataBuffer\ content\ to\ have\ an\ idea\ of\ internal\ representation}}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZRFPicture}}.zsearchFieldAllCollection\ \ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wOffset}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wLength}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSearchSequence}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a89d15e29bd1b49572fa72e3710485968}{ZRFContains}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}});\ \textcolor{comment}{//\ again\ here\ we\ may\ use\ wCollection\ for\ a\ recursive\ search}}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{fprintf}}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ idx\ \ \ Rank\ \ \ \ String1\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Numeric\ \ \ \ \ \ Type\(\backslash\)n"{}});}
+\DoxyCodeLine{\textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}=0;\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}<\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}}.size();\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}++)}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZRFPicture}}.zget(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRecord}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}}[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}],\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\_Nolock}});}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}\ =\ (\mbox{\hyperlink{struct_t3}{T3}}*)\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRecord}}.Data\ ;}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{fprintf}}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \%3ld\ >\ \%3ld\ :\ <\%50s>\ <\%f>\ <\%f>\ <\%f>\ <\%d>\(\backslash\)n"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCollection}}[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}],}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>String1,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>NumericField[0],}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>NumericField[1],}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>NumericField[2],}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\textcolor{keywordtype}{int})\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wT31}}-\/>Type);}
+\DoxyCodeLine{\ \ \ \ \}\textcolor{comment}{//for}}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZRFPicture}}.zclose();}
+
+\end{DoxyCode}
+ The following comes out \+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{namespacezbs_ae2e1a379ff5238ea25fac98f1d9fa2bd}{Offset}}\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_HexaDecimal\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_}}\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_\_\_\_\_Ascii\_\_\_\_\_\_}}}
+\DoxyCodeLine{\ \ \ \ \ 0\ |00\ 00\ 80\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{C4}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |....\ \ \ \ \ \ \ \ \ \ \ \ |}
+\DoxyCodeLine{ZArray::allocate-\/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{E}}-\/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ERRALLOC}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{requested}}\ \textcolor{keyword}{new}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{allocation\ <10>}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{greater}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{than}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{existing}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{number}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{of}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{elements}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{within}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZArray\ <11>}}\ .}
+\DoxyCodeLine{You\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{should}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{suppress}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{elements}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{from}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{the}}\ \mbox{\hyperlink{classzbs_1_1_z_array}{ZArray}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{and}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{use}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{trimming}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{facility}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{to}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{reduce}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{the}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{memory}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{allocated}}\ (ZArray::trim).}
+\DoxyCodeLine{\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{idx}}\ \ \ Rank\ \ \ \ String1\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Numeric}}\ \ \ \ \ \ Type}
+\DoxyCodeLine{\ \ \ 0\ >\ \ \ 1\ :\ <\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{my}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{heart}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{beats}}\ \textcolor{keywordflow}{for}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{you}}>\ <110.000000>\ <-\/1024.000000>\ <1.000000>\ <2>}
+
+\end{DoxyCode}
+
+
+\begin{DoxyNote}{Note}
+\doxylink{classzbs_1_1_z_array}{ZArray} complains \+:
+\begin{DoxyItemize}
+\item because {\bfseries{ZRFVERBOSE}} have been set to another value than ZVB\+\_\+\+No\+Verbose
+\item because while copying the collection the defaulted allocation values are set with a value less than \doxylink{classzbs_1_1_z_array}{ZArray} actual content. \doxylink{classzbs_1_1_z_array}{ZArray} refuses to adjust the space as it is requested to do.
+\end{DoxyItemize}
+\end{DoxyNote}
+\begin{DoxyWarning}{Warning}
+This example is obviously not usable in real world \+: searching for a float value in an array of float considered as a binary sequence of bytes may be fooled and subject to hazardeous match.
+\end{DoxyWarning}
+\hypertarget{_z_r_f_quick_start_ZRFQSGetXML}{}\doxysubsection{\texorpdfstring{Getting file\textquotesingle{}s infra-\/data in XML format}{Getting file's infra-data in XML format}}\label{_z_r_f_quick_start_ZRFQSGetXML}
+This is a wise policy to generate and keep an xml definition of \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} infra-\/data, as soon as it has been created. This definition may evolve, and then it is recommended to keep versions of these definitions.
+
+We will now get XML infra-\/data definition for the file. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}.zwriteXML\_FileHeader();\ \textcolor{comment}{//\ leave\ ZRandomFile\ generate\ its\ own\ file\ according\ xml\ file\ name\ generation\ rules}}
+
+\end{DoxyCode}
+
+
+This routine works either as a static routine, or could be invoked to generate the currently open \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} as a non static routine.
+
+In the working directory, we can find a file called \texorpdfstring{$<$}{<}testindexedpictures.\+xml\texorpdfstring{$>$}{>}
+
+It contains our \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} infra-\/data definition in xml format.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{<?\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{xml}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{version}}=\textcolor{stringliteral}{'1.0'}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{encoding}}=\textcolor{stringliteral}{'UTF-\/8'}?>}
+\DoxyCodeLine{<\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zicm}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{version}}=\textcolor{stringliteral}{"{}2.00"{}}>}
+\DoxyCodeLine{<\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{File}}>}
+\DoxyCodeLine{\ \ <\mbox{\hyperlink{classzbs_1_1_z_file_descriptor}{ZFileDescriptor}}>}
+\DoxyCodeLine{\ \ \ \ \ \ <URIContent>/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{home}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{gerard}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{testindexedpictures}}.ZRF</URIContent>}
+\DoxyCodeLine{\ \ \ \ \ \ <URIHeader>/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{home}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{gerard}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{testindexedpictures}}.zrh</URIHeader>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{generated}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{by}}\ \mbox{\hyperlink{classzbs_1_1_z_random_file}{ZRandomFile}}-\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ <URIDirectoryPath>/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{home}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{gerard}}/</URIDirectoryPath>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{generated}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{by}}\ \mbox{\hyperlink{classzbs_1_1_z_random_file}{ZRandomFile}}-\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ <\mbox{\hyperlink{class_z_header_control_block}{ZHeaderControlBlock}}>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ <FileType>\mbox{\hyperlink{group___z_random_file_group_ggad35b4a162ff06536b78d246d301b346da3d3b5088be2309acc85f74d7b961a5f2}{ZFT\_ZRandomFile}}</FileType>\ \ <!-\/-\/\ \textcolor{keywordflow}{do}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modify}}\ :\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{could}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{cause}}\ data\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{loss}}\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{see}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{documentation}}-\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ <ZRFVersion>2000</ZRFVersion>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ <OffsetFCB>4698</OffsetFCB>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ <OffsetReserved>64</OffsetReserved>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ <SizeReserved>4634</SizeReserved>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ </\mbox{\hyperlink{class_z_header_control_block}{ZHeaderControlBlock}}>}
+\DoxyCodeLine{\ \ \ <\mbox{\hyperlink{class_z_file_control_block}{ZFileControlBlock}}>}
+\DoxyCodeLine{\ \ \ \ \ \ <AllocatedBlocks>15</AllocatedBlocks>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ <BlockExtentQuota>5</BlockExtentQuota>}
+\DoxyCodeLine{\ \ \ \ \ \ <InitialSize>100000</InitialSize>}
+\DoxyCodeLine{\ \ \ \ \ \ <BlockTargetSize>1</BlockTargetSize>}
+\DoxyCodeLine{\ \ \ \ \ \ <HighwaterMarking>\textcolor{keyword}{false}</HighwaterMarking>}
+\DoxyCodeLine{\ \ \ \ \ \ <GrabFreeSpace>\textcolor{keyword}{true}</GrabFreeSpace>}
+\DoxyCodeLine{\ \ \ </\mbox{\hyperlink{class_z_file_control_block}{ZFileControlBlock}}>}
+\DoxyCodeLine{\ \ </\mbox{\hyperlink{classzbs_1_1_z_file_descriptor}{ZFileDescriptor}}>}
+\DoxyCodeLine{</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{File}}>}
+\DoxyCodeLine{</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zicm}}>}
+
+\end{DoxyCode}
+\hypertarget{_z_r_f_quick_start_ZRFQSRemoving}{}\doxysection{\texorpdfstring{Removing content from ZRandom\+File}{Removing content from ZRandomFile}}\label{_z_r_f_quick_start_ZRFQSRemoving}
+\hypertarget{_z_r_f_quick_start_ZRFQSGetStat}{}\doxysection{\texorpdfstring{Getting statistical data}{Getting statistical data}}\label{_z_r_f_quick_start_ZRFQSGetStat}
+@copy ZRFStats\hypertarget{_z_r_f_quick_start_ZRFQSConverting}{}\doxysection{\texorpdfstring{Converting an existing ZRandom\+File to a ZMaster\+File.}{Converting an existing ZRandomFile to a ZMasterFile.}}\label{_z_r_f_quick_start_ZRFQSConverting}
+At any moment, it is possible to upgrade a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} to a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}. Why do such a conversion ?
+\begin{DoxyItemize}
+\item because a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} is not capable of maintaining Journaling facilities.
+\item because you may create indexes.
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+creating indexes for a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} is not mandatory. It is always possible to continue using it a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} while taking benefit from Journaling. 
+\end{DoxyNote}
+\hypertarget{_z_r_f_quick_start_ZRFQSMaintenance}{}\doxysection{\texorpdfstring{Making some maintenance operations on file}{Making some maintenance operations on file}}\label{_z_r_f_quick_start_ZRFQSMaintenance}
+ 
+\stopcontents[mainsections]
+ 

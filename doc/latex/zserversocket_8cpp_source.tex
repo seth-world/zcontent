@@ -1,0 +1,31 @@
+\doxysection{zserversocket.\+cpp}
+\hypertarget{zserversocket_8cpp_source}{}\label{zserversocket_8cpp_source}\index{/home/gerard/Development/zbasetools/znet/zbasenet/zserversocket.cpp@{/home/gerard/Development/zbasetools/znet/zbasenet/zserversocket.cpp}}
+\mbox{\hyperlink{zserversocket_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZSERVERSOCKET\_CPP}}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00002}\mbox{\hyperlink{zserversocket_8cpp_a4bc60a85dd14ef3b0532c6efd1324087}{00002}}\ \textcolor{preprocessor}{\#define\ ZSERVERSOCKET\_CPP}}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zserversocket_8h}{zbasenet/zserversocket.h}}>}}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00006}00006\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00007}\mbox{\hyperlink{class_z_server_socket_a5dc3168ec1f396f52015f3e0928c8c40}{00007}}\ \mbox{\hyperlink{class_z_server_socket_a5dc3168ec1f396f52015f3e0928c8c40}{ZServerSocket::zlisten}}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMaxConnect}})}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00008}00008\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00009}00009\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMaxConnectionQueue}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SOMAXCONN}},\ \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_a2c56c55b930f51337c2f5ab19ec02240}{wRet}}=0;}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00010}00010\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMaxConnect}}>0)}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00011}00011\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMaxConnectionQueue}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMaxConnect}};}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00012}00012\ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{znet_2znetconsole_2main_8cpp_a2c56c55b930f51337c2f5ab19ec02240}{wRet}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{listen}}(Fd\ ,\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMaxConnectionQueue}}))<0)}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00013}00013\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.getErrno(-\/1,}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00015}00015\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_GET\_FUNCTION\_NAME\_}},}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SOCKLISTEN}},}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00017}00017\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Severity\_Error}},}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Error\ while\ server\ is\ listening"{}});}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SOCKLISTEN}};}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00021}00021\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}};}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00022}00022\ \}}
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{zserversocket_8cpp_source_l00025}00025\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//ZSERVERSOCKET\_CPP}}
+
+\end{DoxyCode}

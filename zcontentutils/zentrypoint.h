@@ -199,6 +199,8 @@ public:
 
   QAction*      QuitIconQAc=nullptr;
 
+  QAction*      ObjectSearchQAc=nullptr;
+
 /*----------------------------------*/
   QMenu *rawMEn=nullptr;
   QAction *rawDumpQAc=nullptr;
@@ -254,6 +256,7 @@ public:
    /*----------------------------------*/
 
   QAction*      ZMFQueryQAc=nullptr;
+  QAction*      QueryWizardQAc=nullptr;
    /*----------------------------------*/
   QAction*      ZCopyQAc=nullptr;
    /*----------------------------------*/
@@ -291,7 +294,7 @@ public:
 private slots:
 
   void actionMenuEvent(QAction* pAction);
-  void actionClose(bool pChecked=true);
+  void Quit();
 
 private:
 

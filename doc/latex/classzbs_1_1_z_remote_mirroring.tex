@@ -1,0 +1,183 @@
+\doxysection{zbs\+::ZRemote\+Mirroring Class Reference}
+\hypertarget{classzbs_1_1_z_remote_mirroring}{}\label{classzbs_1_1_z_remote_mirroring}\index{zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}}
+
+
+{\ttfamily \#include $<$zsjournalcontrolblock.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{classzbs_1_1_z_remote_mirroring_aaf059bd513dcc164c6cda206ae8c6b87}{to\+Xml}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Level}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_remote_mirroring_a50bad3495802d3a91c726ff9c65f4ff0}{from\+Xml}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zxml\+Node}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Root\+Node}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Errorlog}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Zai\+E\+\_\+\+Severity}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Severity}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int8\+\_\+t}} \mbox{\hyperlink{classzbs_1_1_z_remote_mirroring_ab7f99a67ecdae5423abc6cef1ffcd654}{Protocol}}
+\item 
+\mbox{\hyperlink{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3}{ZHost\+Address\+Type}} \mbox{\hyperlink{classzbs_1_1_z_remote_mirroring_a6fe99ba97d705ea621a7a4d0ba9af4c0}{Address\+Type}} =\mbox{\hyperlink{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3a0c2b9368646542ed0f31e910690ac757}{ZHAT\+\_\+\+IPV4}}
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{classzbs_1_1_z_remote_mirroring_a69d8c4d048e90fbf3b0d308994c0fc6b}{Host}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{classzbs_1_1_z_remote_mirroring_af6ae871684d03dc70137aad3f1b38b13}{Port}}
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{classzbs_1_1_z_remote_mirroring_ae00625715ca84ee4884952d5962a2180}{Authenticate}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZCrypt\+Key\+AES256}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_remote_mirroring_a5194cbbe51606398f62857473a6de725}{SSLKey}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZCrypt\+Vector\+AES256}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_remote_mirroring_abd54b787c44cff02d52e074b57204fe8}{SSLVector}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00015}{15}} of file \mbox{\hyperlink{zsjournalcontrolblock_8h_source}{zsjournalcontrolblock.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classzbs_1_1_z_remote_mirroring_a50bad3495802d3a91c726ff9c65f4ff0}\label{classzbs_1_1_z_remote_mirroring_a50bad3495802d3a91c726ff9c65f4ff0} 
+\index{zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}!fromXml@{fromXml}}
+\index{fromXml@{fromXml}!zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}}
+\doxysubsubsection{\texorpdfstring{fromXml()}{fromXml()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRemote\+Mirroring\+::from\+Xml (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zxml\+Node}} \texorpdfstring{$\ast$}{*}}]{p\+Root\+Node,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Errorlog,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Zai\+E\+\_\+\+Severity}}}]{p\+Severity }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00479}{479}} of file \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source}{zsjournalcontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00019}{Address\+Type}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00022}{Authenticate}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00020}{Host}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00021}{Port}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00018}{Protocol}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00025}{SSLKey}}, and \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00026}{SSLVector}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00379}{zbs\+::\+ZJournal\+Control\+Block\+::from\+Xml()}}.
+
+\Hypertarget{classzbs_1_1_z_remote_mirroring_aaf059bd513dcc164c6cda206ae8c6b87}\label{classzbs_1_1_z_remote_mirroring_aaf059bd513dcc164c6cda206ae8c6b87} 
+\index{zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}!toXml@{toXml}}
+\index{toXml@{toXml}!zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}}
+\doxysubsubsection{\texorpdfstring{toXml()}{toXml()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} ZRemote\+Mirroring\+::to\+Xml (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Level }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00447}{447}} of file \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source}{zsjournalcontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00019}{Address\+Type}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00022}{Authenticate}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00020}{Host}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00021}{Port}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00018}{Protocol}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00025}{SSLKey}}, and \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00026}{SSLVector}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00349}{zbs\+::\+ZJournal\+Control\+Block\+::to\+Xml()}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classzbs_1_1_z_remote_mirroring_a6fe99ba97d705ea621a7a4d0ba9af4c0}\label{classzbs_1_1_z_remote_mirroring_a6fe99ba97d705ea621a7a4d0ba9af4c0} 
+\index{zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}!AddressType@{AddressType}}
+\index{AddressType@{AddressType}!zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}}
+\doxysubsubsection{\texorpdfstring{AddressType}{AddressType}}
+{\footnotesize\ttfamily \mbox{\hyperlink{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3}{ZHost\+Address\+Type}} zbs\+::\+ZRemote\+Mirroring\+::\+Address\+Type =\mbox{\hyperlink{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3a0c2b9368646542ed0f31e910690ac757}{ZHAT\+\_\+\+IPV4}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00019}{19}} of file \mbox{\hyperlink{zsjournalcontrolblock_8h_source}{zsjournalcontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00020}{zbs\+::\+ZJournal\+Control\+Block\+::\+\_\+is\+Same\+As()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00479}{from\+Xml()}}, and \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00447}{to\+Xml()}}.
+
+\Hypertarget{classzbs_1_1_z_remote_mirroring_ae00625715ca84ee4884952d5962a2180}\label{classzbs_1_1_z_remote_mirroring_ae00625715ca84ee4884952d5962a2180} 
+\index{zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}!Authenticate@{Authenticate}}
+\index{Authenticate@{Authenticate}!zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}}
+\doxysubsubsection{\texorpdfstring{Authenticate}{Authenticate}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} zbs\+::\+ZRemote\+Mirroring\+::\+Authenticate}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00022}{22}} of file \mbox{\hyperlink{zsjournalcontrolblock_8h_source}{zsjournalcontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00020}{zbs\+::\+ZJournal\+Control\+Block\+::\+\_\+is\+Same\+As()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00479}{from\+Xml()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00299}{zbs\+::\+ZJournal\+Control\+Block\+::set\+Remote\+Mirroring()}}, and \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00447}{to\+Xml()}}.
+
+\Hypertarget{classzbs_1_1_z_remote_mirroring_a69d8c4d048e90fbf3b0d308994c0fc6b}\label{classzbs_1_1_z_remote_mirroring_a69d8c4d048e90fbf3b0d308994c0fc6b} 
+\index{zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}!Host@{Host}}
+\index{Host@{Host}!zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}}
+\doxysubsubsection{\texorpdfstring{Host}{Host}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} zbs\+::\+ZRemote\+Mirroring\+::\+Host}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00020}{20}} of file \mbox{\hyperlink{zsjournalcontrolblock_8h_source}{zsjournalcontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00020}{zbs\+::\+ZJournal\+Control\+Block\+::\+\_\+is\+Same\+As()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00479}{from\+Xml()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00299}{zbs\+::\+ZJournal\+Control\+Block\+::set\+Remote\+Mirroring()}}, and \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00447}{to\+Xml()}}.
+
+\Hypertarget{classzbs_1_1_z_remote_mirroring_af6ae871684d03dc70137aad3f1b38b13}\label{classzbs_1_1_z_remote_mirroring_af6ae871684d03dc70137aad3f1b38b13} 
+\index{zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}!Port@{Port}}
+\index{Port@{Port}!zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}}
+\doxysubsubsection{\texorpdfstring{Port}{Port}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} zbs\+::\+ZRemote\+Mirroring\+::\+Port}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00021}{21}} of file \mbox{\hyperlink{zsjournalcontrolblock_8h_source}{zsjournalcontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00020}{zbs\+::\+ZJournal\+Control\+Block\+::\+\_\+is\+Same\+As()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00479}{from\+Xml()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00299}{zbs\+::\+ZJournal\+Control\+Block\+::set\+Remote\+Mirroring()}}, and \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00447}{to\+Xml()}}.
+
+\Hypertarget{classzbs_1_1_z_remote_mirroring_ab7f99a67ecdae5423abc6cef1ffcd654}\label{classzbs_1_1_z_remote_mirroring_ab7f99a67ecdae5423abc6cef1ffcd654} 
+\index{zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}!Protocol@{Protocol}}
+\index{Protocol@{Protocol}!zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}}
+\doxysubsubsection{\texorpdfstring{Protocol}{Protocol}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int8\+\_\+t}} zbs\+::\+ZRemote\+Mirroring\+::\+Protocol}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00018}{18}} of file \mbox{\hyperlink{zsjournalcontrolblock_8h_source}{zsjournalcontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00020}{zbs\+::\+ZJournal\+Control\+Block\+::\+\_\+is\+Same\+As()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00479}{from\+Xml()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00299}{zbs\+::\+ZJournal\+Control\+Block\+::set\+Remote\+Mirroring()}}, and \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00447}{to\+Xml()}}.
+
+\Hypertarget{classzbs_1_1_z_remote_mirroring_a5194cbbe51606398f62857473a6de725}\label{classzbs_1_1_z_remote_mirroring_a5194cbbe51606398f62857473a6de725} 
+\index{zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}!SSLKey@{SSLKey}}
+\index{SSLKey@{SSLKey}!zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}}
+\doxysubsubsection{\texorpdfstring{SSLKey}{SSLKey}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZCrypt\+Key\+AES256}}\texorpdfstring{$\ast$}{*} zbs\+::\+ZRemote\+Mirroring\+::\+SSLKey =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00025}{25}} of file \mbox{\hyperlink{zsjournalcontrolblock_8h_source}{zsjournalcontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00020}{zbs\+::\+ZJournal\+Control\+Block\+::\+\_\+is\+Same\+As()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00479}{from\+Xml()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00299}{zbs\+::\+ZJournal\+Control\+Block\+::set\+Remote\+Mirroring()}}, and \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00447}{to\+Xml()}}.
+
+\Hypertarget{classzbs_1_1_z_remote_mirroring_abd54b787c44cff02d52e074b57204fe8}\label{classzbs_1_1_z_remote_mirroring_abd54b787c44cff02d52e074b57204fe8} 
+\index{zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}!SSLVector@{SSLVector}}
+\index{SSLVector@{SSLVector}!zbs::ZRemoteMirroring@{zbs::ZRemoteMirroring}}
+\doxysubsubsection{\texorpdfstring{SSLVector}{SSLVector}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZCrypt\+Vector\+AES256}}\texorpdfstring{$\ast$}{*} zbs\+::\+ZRemote\+Mirroring\+::\+SSLVector =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00026}{26}} of file \mbox{\hyperlink{zsjournalcontrolblock_8h_source}{zsjournalcontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00020}{zbs\+::\+ZJournal\+Control\+Block\+::\+\_\+is\+Same\+As()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00479}{from\+Xml()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00299}{zbs\+::\+ZJournal\+Control\+Block\+::set\+Remote\+Mirroring()}}, and \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00447}{to\+Xml()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zsjournalcontrolblock_8h}{zsjournalcontrolblock.\+h}}\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zsjournalcontrolblock_8cpp}{zsjournalcontrolblock.\+cpp}}\end{DoxyCompactItemize}

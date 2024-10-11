@@ -1,0 +1,71 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/zjournal.cpp File Reference}
+\hypertarget{zjournal_8cpp}{}\label{zjournal_8cpp}\index{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zjournal.cpp@{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zjournal.cpp}}
+{\ttfamily \#include $<$zindexedfile/zjournal.\+h$>$}\newline
+{\ttfamily \#include $<$zindexedfile/zrawmasterfile.\+h$>$}\newline
+{\ttfamily \#include $<$zindexedfile/zsjournalcontrolblock.\+h$>$}\newline
+Include dependency graph for zjournal.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zjournal_8cpp_a704056753a6333107e0418386a5c6e9f}{ZSJOURNAL\+\_\+\+CPP}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{zjournal_8cpp_a59f95c851fe25be006ce6be758cb1675}{generate\+Journal\+Name}} (uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZMFName}}, uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Journaling\+Path}}, uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Journal\+Name}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zjournal_8cpp_a53405591a135ef9e78edda696fbc5fb9}{decode\+\_\+\+ZJOP}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3c}{ZJOperation}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Operation}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{zjournal_8cpp_a704056753a6333107e0418386a5c6e9f}\label{zjournal_8cpp_a704056753a6333107e0418386a5c6e9f} 
+\index{zjournal.cpp@{zjournal.cpp}!ZSJOURNAL\_CPP@{ZSJOURNAL\_CPP}}
+\index{ZSJOURNAL\_CPP@{ZSJOURNAL\_CPP}!zjournal.cpp@{zjournal.cpp}}
+\doxysubsubsection{\texorpdfstring{ZSJOURNAL\_CPP}{ZSJOURNAL\_CPP}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} ZSJOURNAL\+\_\+\+CPP}
+
+
+
+Definition at line \mbox{\hyperlink{zjournal_8cpp_source_l00002}{2}} of file \mbox{\hyperlink{zjournal_8cpp_source}{zjournal.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{zjournal_8cpp_a53405591a135ef9e78edda696fbc5fb9}\label{zjournal_8cpp_a53405591a135ef9e78edda696fbc5fb9} 
+\index{zjournal.cpp@{zjournal.cpp}!decode\_ZJOP@{decode\_ZJOP}}
+\index{decode\_ZJOP@{decode\_ZJOP}!zjournal.cpp@{zjournal.cpp}}
+\doxysubsubsection{\texorpdfstring{decode\_ZJOP()}{decode\_ZJOP()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} decode\+\_\+\+ZJOP (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3c}{ZJOperation}}}]{p\+Operation }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zjournal_8cpp_source_l00599}{599}} of file \mbox{\hyperlink{zjournal_8cpp_source}{zjournal.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zjournal_8h_source_l00015}{ZJOP\+\_\+\+Add}}, \mbox{\hyperlink{zjournal_8h_source_l00019}{ZJOP\+\_\+\+Chg\+Fld}}, \mbox{\hyperlink{zjournal_8h_source_l00021}{ZJOP\+\_\+\+Close}}, \mbox{\hyperlink{zjournal_8h_source_l00016}{ZJOP\+\_\+\+Insert}}, \mbox{\hyperlink{zjournal_8h_source_l00014}{ZJOP\+\_\+\+Nothing}}, \mbox{\hyperlink{zjournal_8h_source_l00018}{ZJOP\+\_\+\+Remove\+By\+Address}}, \mbox{\hyperlink{zjournal_8h_source_l00017}{ZJOP\+\_\+\+Remove\+By\+Rank}}, and \mbox{\hyperlink{zjournal_8h_source_l00020}{ZJOP\+\_\+\+Roll\+Back}}.
+
+
+
+Referenced by \mbox{\hyperlink{zjournal_8cpp_source_l00499}{zbs\+::\+ZSJournal\+::report()}}.
+
+\Hypertarget{zjournal_8cpp_a59f95c851fe25be006ce6be758cb1675}\label{zjournal_8cpp_a59f95c851fe25be006ce6be758cb1675} 
+\index{zjournal.cpp@{zjournal.cpp}!generateJournalName@{generateJournalName}}
+\index{generateJournalName@{generateJournalName}!zjournal.cpp@{zjournal.cpp}}
+\doxysubsubsection{\texorpdfstring{generateJournalName()}{generateJournalName()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} generate\+Journal\+Name (\begin{DoxyParamCaption}\item[{uri\+String \&}]{p\+ZMFName,  }\item[{uri\+String \&}]{p\+Journaling\+Path,  }\item[{uri\+String \&}]{p\+Journal\+Name }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zjournal_8cpp_source_l00572}{572}} of file \mbox{\hyperlink{zjournal_8cpp_source}{zjournal.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zjournal_8h_source_l00010}{\+\_\+\+\_\+\+JOURNAL\+\_\+\+EXT\+\_\+\+\_\+}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zjournal_8cpp_source_l00200}{zbs\+::\+ZSJournal\+::set\+Journal\+Local\+Directory\+Path()}}.
+

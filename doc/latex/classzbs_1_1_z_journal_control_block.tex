@@ -1,0 +1,391 @@
+\doxysection{zbs\+::ZJournal\+Control\+Block Class Reference}
+\hypertarget{classzbs_1_1_z_journal_control_block}{}\label{classzbs_1_1_z_journal_control_block}\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+
+
+{\ttfamily \#include $<$zsjournalcontrolblock.\+h$>$}
+
+
+
+Inheritance diagram for zbs\+::ZJournal\+Control\+Block\+:
+% FIG 0
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_journal_control_block_a7a41f2c3b43e6b1a2663ec4264415a0e}{ZJournal\+Control\+Block}} ()
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_journal_control_block_a6b8e83ad74d35f630207feeecbf1c3ee}{\texorpdfstring{$\sim$}{\string~}\+ZJournal\+Control\+Block}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_journal_control_block_a0317a35151c1858d9278d7a614ea7fee}{ZJournal\+Control\+Block}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block}{ZJournal\+Control\+Block}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_journal_control_block}{ZJournal\+Control\+Block}} \& \mbox{\hyperlink{classzbs_1_1_z_journal_control_block_ad9736f5331aaf6d0c96145ed51ac6a6e}{\+\_\+copy\+From}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block}{ZJournal\+Control\+Block}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block_aa3564550dc954e4002d530569aac9da4}{clear}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+ZData\+Buffer \& \mbox{\hyperlink{classzbs_1_1_z_journal_control_block_a180c8f84f438c2b13bf369a849f4692b}{\+\_\+export\+Append}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZDB}})
+\item 
+ZData\+Buffer \& \mbox{\hyperlink{classzbs_1_1_z_journal_control_block_ad529dd0aa04ca3f1e2ec25b2e13862a1}{\+\_\+export\+JCB}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+JCBContent}})
+\begin{DoxyCompactList}\small\item\em ZSJournal\+Control\+Block\+::\+\_\+export\+JCB exports ZSJournal\+Control\+Block content to a flat ZData\+Buffer. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block_a9f5540cba9b1e3855a7b1117ba6899f9}{\+\_\+get\+Export\+Size}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block_a342bc1ffbf7e294791875edfec109c97}{\+\_\+import}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}})
+\begin{DoxyCompactList}\small\item\em ZSJournal\+Control\+Block\+::\+\_\+import\+JCB imports (rebuild) a ZSJournal\+Control\+Block from a ZData\+Buffer containing flat raw data to import. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block_ab73b5b5566b32765fedf15217f7ac8a0}{\+\_\+is\+Same\+As}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block}{ZJournal\+Control\+Block}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+JCB}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block_a804eb372ededbe94775e3e889344b606}{report}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{FILE}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Output}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block_ab5e482f864e22805660faff191003712}{set\+Parameters}} (uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Journal\+Path}})
+\begin{DoxyCompactList}\small\item\em ZSJournal\+Control\+Block\+::set\+Parameters sets the local journaling parameters (actually only Journal\+Directory\+Path) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block_a3b0e36586860e1afcfdab8df664a5b94}{set\+Remote\+Mirroring}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int8\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Protocol}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Host}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Port}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Authenticate}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZCrypt\+Key\+AES256}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+SSLKey}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZCrypt\+Vector\+AES256}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+SSLVector}})
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block_a972513ce37d775137069377dde66523f}{to\+Xml}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Level}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Comment}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block_a764e3b341f29bbbc9d3a20b30b452a54}{from\+Xml}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zxml\+Node}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Root\+Node}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Errorlog}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Zai\+E\+\_\+\+Severity}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Severity}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZAIES\+\_\+\+Error}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block_af6132387b320023fe5a68b867a873eb1}{purge}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Keep\+Ranks}}=-\/1)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classzbs_1_1_z_s_j_c_b_own_data}{zbs\+::\+ZSJCBOwn\+Data}}}
+\begin{DoxyCompactItemize}
+\item 
+ZData\+Buffer \& \mbox{\hyperlink{classzbs_1_1_z_s_j_c_b_own_data_ab49d7d11d023f31583e729729fdddc07}{\+\_\+export\+Append}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZDBExport}})
+\item 
+ZData\+Buffer \mbox{\hyperlink{classzbs_1_1_z_s_j_c_b_own_data_a4f6ec29f308cd88a7fb2fb0a5df57187}{\+\_\+export}} ()
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_s_j_c_b_own_data}{ZSJCBOwn\+Data}} \& \mbox{\hyperlink{classzbs_1_1_z_s_j_c_b_own_data_a97876544de22d5096cb3261470d0f009}{\+\_\+import}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_s_journal}{ZSJournal}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block_a134a9400df4afc1b6c10e2750f8d0b2f}{Journal}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_remote_mirroring}{ZRemote\+Mirroring}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block_a98c2dec996c7f0e894be6975fd3bb9cc}{Remote}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{classzbs_1_1_z_s_j_c_b_own_data}{zbs\+::\+ZSJCBOwn\+Data}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} \mbox{\hyperlink{classzbs_1_1_z_s_j_c_b_own_data_af1c7da4a613ee282b847a747ffec939a}{Journaling\+On}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}
+\begin{DoxyCompactList}\small\item\em Journaling is started (true) or not (false) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} \mbox{\hyperlink{classzbs_1_1_z_s_j_c_b_own_data_adeb6bfb6d8cc609508a4feb914fa1db9}{Keep}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{classzbs_1_1_z_s_j_c_b_own_data_a1b22badff7bc613be51cdc88b94dbb15}{Depth}} =-\/1
+\item 
+uri\+String \mbox{\hyperlink{classzbs_1_1_z_s_j_c_b_own_data_a3b14cdf26df32b4983aa1f01406482fd}{Journal\+Local\+Directory\+Path}}
+\begin{DoxyCompactList}\small\item\em Directory path for journal file. If empty, then directory path of main content file is taken. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block_af6c5165dc42a0d37c2cb1f32ccd9f0f7}{ZSJournal}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00112}{112}} of file \mbox{\hyperlink{zsjournalcontrolblock_8h_source}{zsjournalcontrolblock.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classzbs_1_1_z_journal_control_block_a7a41f2c3b43e6b1a2663ec4264415a0e}\label{classzbs_1_1_z_journal_control_block_a7a41f2c3b43e6b1a2663ec4264415a0e} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!ZJournalControlBlock@{ZJournalControlBlock}}
+\index{ZJournalControlBlock@{ZJournalControlBlock}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZJournalControlBlock()}{ZJournalControlBlock()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily ZJournal\+Control\+Block\+::\+ZJournal\+Control\+Block (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00078}{78}} of file \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source}{zsjournalcontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00090}{clear()}}.
+
+\Hypertarget{classzbs_1_1_z_journal_control_block_a6b8e83ad74d35f630207feeecbf1c3ee}\label{classzbs_1_1_z_journal_control_block_a6b8e83ad74d35f630207feeecbf1c3ee} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!````~ZJournalControlBlock@{\texorpdfstring{$\sim$}{\string~}ZJournalControlBlock}}
+\index{````~ZJournalControlBlock@{\texorpdfstring{$\sim$}{\string~}ZJournalControlBlock}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ZJournalControlBlock()}{\string~ZJournalControlBlock()}}
+{\footnotesize\ttfamily ZJournal\+Control\+Block\+::\texorpdfstring{$\sim$}{\string~}\+ZJournal\+Control\+Block (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00082}{82}} of file \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source}{zsjournalcontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00150}{Journal}}.
+
+\Hypertarget{classzbs_1_1_z_journal_control_block_a0317a35151c1858d9278d7a614ea7fee}\label{classzbs_1_1_z_journal_control_block_a0317a35151c1858d9278d7a614ea7fee} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!ZJournalControlBlock@{ZJournalControlBlock}}
+\index{ZJournalControlBlock@{ZJournalControlBlock}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZJournalControlBlock()}{ZJournalControlBlock()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily zbs\+::\+ZJournal\+Control\+Block\+::\+ZJournal\+Control\+Block (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block}{ZJournal\+Control\+Block}} \&}]{p\+In }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00119}{119}} of file \mbox{\hyperlink{zsjournalcontrolblock_8h_source}{zsjournalcontrolblock.\+h}}.
+
+
+
+References \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00009}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classzbs_1_1_z_journal_control_block_ad9736f5331aaf6d0c96145ed51ac6a6e}\label{classzbs_1_1_z_journal_control_block_ad9736f5331aaf6d0c96145ed51ac6a6e} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!\_copyFrom@{\_copyFrom}}
+\index{\_copyFrom@{\_copyFrom}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{\_copyFrom()}{\_copyFrom()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_journal_control_block}{ZJournal\+Control\+Block}} \& ZJournal\+Control\+Block\+::\+\_\+copy\+From (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block}{ZJournal\+Control\+Block}} \&}]{p\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00009}{9}} of file \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source}{zsjournalcontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00099}{zbs\+::\+ZSJCBOwn\+Data\+::\+Depth}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00150}{Journal}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00097}{zbs\+::\+ZSJCBOwn\+Data\+::\+Journaling\+On}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00100}{zbs\+::\+ZSJCBOwn\+Data\+::\+Journal\+Local\+Directory\+Path}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00098}{zbs\+::\+ZSJCBOwn\+Data\+::\+Keep}}, and \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00151}{Remote}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00119}{ZJournal\+Control\+Block()}}.
+
+\Hypertarget{classzbs_1_1_z_journal_control_block_a180c8f84f438c2b13bf369a849f4692b}\label{classzbs_1_1_z_journal_control_block_a180c8f84f438c2b13bf369a849f4692b} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!\_exportAppend@{\_exportAppend}}
+\index{\_exportAppend@{\_exportAppend}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{\_exportAppend()}{\_exportAppend()}}
+{\footnotesize\ttfamily ZData\+Buffer \& zbs\+::\+ZJournal\+Control\+Block\+::\+\_\+export\+Append (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+ZDB }\end{DoxyParamCaption})}
+
+\Hypertarget{classzbs_1_1_z_journal_control_block_ad529dd0aa04ca3f1e2ec25b2e13862a1}\label{classzbs_1_1_z_journal_control_block_ad529dd0aa04ca3f1e2ec25b2e13862a1} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!\_exportJCB@{\_exportJCB}}
+\index{\_exportJCB@{\_exportJCB}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{\_exportJCB()}{\_exportJCB()}}
+{\footnotesize\ttfamily ZData\+Buffer \& ZJournal\+Control\+Block\+::\+\_\+export\+JCB (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+JCBContent }\end{DoxyParamCaption})}
+
+
+
+ZSJournal\+Control\+Block\+::\+\_\+export\+JCB exports ZSJournal\+Control\+Block content to a flat ZData\+Buffer. 
+
+\begin{DoxyReturn}{Returns}
+a ZData\+Buffer containing the flat raw data exported from ZJCB 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00217}{217}} of file \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source}{zsjournalcontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00171}{zbs\+::\+ZSJCBOwn\+Data\+::\+\_\+export\+Append()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00430}{zbs\+::\+ZMaster\+Control\+Block\+::\+\_\+export\+Append()}}.
+
+\Hypertarget{classzbs_1_1_z_journal_control_block_a9f5540cba9b1e3855a7b1117ba6899f9}\label{classzbs_1_1_z_journal_control_block_a9f5540cba9b1e3855a7b1117ba6899f9} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!\_getExportSize@{\_getExportSize}}
+\index{\_getExportSize@{\_getExportSize}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{\_getExportSize()}{\_getExportSize()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} ZJournal\+Control\+Block\+::\+\_\+get\+Export\+Size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00224}{224}} of file \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source}{zsjournalcontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00100}{zbs\+::\+ZSJCBOwn\+Data\+::\+Journal\+Local\+Directory\+Path}}.
+
+\Hypertarget{classzbs_1_1_z_journal_control_block_a342bc1ffbf7e294791875edfec109c97}\label{classzbs_1_1_z_journal_control_block_a342bc1ffbf7e294791875edfec109c97} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!\_import@{\_import}}
+\index{\_import@{\_import}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{\_import()}{\_import()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZJournal\+Control\+Block\+::\+\_\+import (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Ptr\+In }\end{DoxyParamCaption})}
+
+
+
+ZSJournal\+Control\+Block\+::\+\_\+import\+JCB imports (rebuild) a ZSJournal\+Control\+Block from a ZData\+Buffer containing flat raw data to import. 
+
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00235}{235}} of file \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source}{zsjournalcontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmasterfiletype_8h_source_l00008}{\+\_\+\+\_\+\+ZMF\+\_\+\+VERSION\+\_\+\+\_\+}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00090}{clear()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00594}{zbs\+::\+ZMaster\+Control\+Block\+::\+\_\+import()}}.
+
+\Hypertarget{classzbs_1_1_z_journal_control_block_ab73b5b5566b32765fedf15217f7ac8a0}\label{classzbs_1_1_z_journal_control_block_ab73b5b5566b32765fedf15217f7ac8a0} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!\_isSameAs@{\_isSameAs}}
+\index{\_isSameAs@{\_isSameAs}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{\_isSameAs()}{\_isSameAs()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} ZJournal\+Control\+Block\+::\+\_\+is\+Same\+As (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_journal_control_block}{ZJournal\+Control\+Block}} \texorpdfstring{$\ast$}{*}}]{p\+JCB }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source}{zsjournalcontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00019}{zbs\+::\+ZRemote\+Mirroring\+::\+Address\+Type}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00022}{zbs\+::\+ZRemote\+Mirroring\+::\+Authenticate}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00099}{zbs\+::\+ZSJCBOwn\+Data\+::\+Depth}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00717}{zbs\+::\+ZSJournal\+::get\+URIContent()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00722}{zbs\+::\+ZSJournal\+::get\+URIHeader()}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00020}{zbs\+::\+ZRemote\+Mirroring\+::\+Host}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00150}{Journal}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00097}{zbs\+::\+ZSJCBOwn\+Data\+::\+Journaling\+On}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00100}{zbs\+::\+ZSJCBOwn\+Data\+::\+Journal\+Local\+Directory\+Path}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00098}{zbs\+::\+ZSJCBOwn\+Data\+::\+Keep}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00021}{zbs\+::\+ZRemote\+Mirroring\+::\+Port}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00018}{zbs\+::\+ZRemote\+Mirroring\+::\+Protocol}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00151}{Remote}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00025}{zbs\+::\+ZRemote\+Mirroring\+::\+SSLKey}}, and \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00026}{zbs\+::\+ZRemote\+Mirroring\+::\+SSLVector}}.
+
+\Hypertarget{classzbs_1_1_z_journal_control_block_aa3564550dc954e4002d530569aac9da4}\label{classzbs_1_1_z_journal_control_block_aa3564550dc954e4002d530569aac9da4} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!clear@{clear}}
+\index{clear@{clear}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZJournal\+Control\+Block\+::clear (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source}{zsjournalcontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00100}{zbs\+::\+ZSJCBOwn\+Data\+::\+Journal\+Local\+Directory\+Path}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00235}{\+\_\+import()}}, and \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00078}{ZJournal\+Control\+Block()}}.
+
+\Hypertarget{classzbs_1_1_z_journal_control_block_a764e3b341f29bbbc9d3a20b30b452a54}\label{classzbs_1_1_z_journal_control_block_a764e3b341f29bbbc9d3a20b30b452a54} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!fromXml@{fromXml}}
+\index{fromXml@{fromXml}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{fromXml()}{fromXml()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZJournal\+Control\+Block\+::from\+Xml (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zxml\+Node}} \texorpdfstring{$\ast$}{*}}]{p\+Root\+Node,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Errorlog,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Zai\+E\+\_\+\+Severity}}}]{p\+Severity = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZAIES\+\_\+\+Error}}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00379}{379}} of file \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source}{zsjournalcontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00099}{zbs\+::\+ZSJCBOwn\+Data\+::\+Depth}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00479}{zbs\+::\+ZRemote\+Mirroring\+::from\+Xml()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00097}{zbs\+::\+ZSJCBOwn\+Data\+::\+Journaling\+On}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00100}{zbs\+::\+ZSJCBOwn\+Data\+::\+Journal\+Local\+Directory\+Path}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00098}{zbs\+::\+ZSJCBOwn\+Data\+::\+Keep}}, and \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00151}{Remote}}.
+
+\Hypertarget{classzbs_1_1_z_journal_control_block_af6132387b320023fe5a68b867a873eb1}\label{classzbs_1_1_z_journal_control_block_af6132387b320023fe5a68b867a873eb1} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!purge@{purge}}
+\index{purge@{purge}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{purge()}{purge()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZJournal\+Control\+Block\+::purge (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}}}]{p\+Keep\+Ranks = {\ttfamily -\/1} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00280}{280}} of file \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source}{zsjournalcontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00150}{Journal}}, and \mbox{\hyperlink{zjournal_8cpp_source_l00385}{zbs\+::\+ZSJournal\+::purge()}}.
+
+\Hypertarget{classzbs_1_1_z_journal_control_block_a804eb372ededbe94775e3e889344b606}\label{classzbs_1_1_z_journal_control_block_a804eb372ededbe94775e3e889344b606} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!report@{report}}
+\index{report@{report}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{report()}{report()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZJournal\+Control\+Block\+::report (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{FILE}} \texorpdfstring{$\ast$}{*}}]{p\+Output = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}}} }\end{DoxyParamCaption})}
+
+\Hypertarget{classzbs_1_1_z_journal_control_block_ab5e482f864e22805660faff191003712}\label{classzbs_1_1_z_journal_control_block_ab5e482f864e22805660faff191003712} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!setParameters@{setParameters}}
+\index{setParameters@{setParameters}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{setParameters()}{setParameters()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZJournal\+Control\+Block\+::set\+Parameters (\begin{DoxyParamCaption}\item[{uri\+String \&}]{p\+Journal\+Path }\end{DoxyParamCaption})}
+
+
+
+ZSJournal\+Control\+Block\+::set\+Parameters sets the local journaling parameters (actually only Journal\+Directory\+Path) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Journal\+Path} & \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00293}{293}} of file \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source}{zsjournalcontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00100}{zbs\+::\+ZSJCBOwn\+Data\+::\+Journal\+Local\+Directory\+Path}}.
+
+\Hypertarget{classzbs_1_1_z_journal_control_block_a3b0e36586860e1afcfdab8df664a5b94}\label{classzbs_1_1_z_journal_control_block_a3b0e36586860e1afcfdab8df664a5b94} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!setRemoteMirroring@{setRemoteMirroring}}
+\index{setRemoteMirroring@{setRemoteMirroring}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{setRemoteMirroring()}{setRemoteMirroring()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZJournal\+Control\+Block\+::set\+Remote\+Mirroring (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int8\+\_\+t}}}]{p\+Protocol,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Host,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Port,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Authenticate,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZCrypt\+Key\+AES256}} \texorpdfstring{$\ast$}{*}}]{p\+SSLKey,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZCrypt\+Vector\+AES256}} \texorpdfstring{$\ast$}{*}}]{p\+SSLVector }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00299}{299}} of file \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source}{zsjournalcontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00022}{zbs\+::\+ZRemote\+Mirroring\+::\+Authenticate}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00020}{zbs\+::\+ZRemote\+Mirroring\+::\+Host}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00021}{zbs\+::\+ZRemote\+Mirroring\+::\+Port}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00018}{zbs\+::\+ZRemote\+Mirroring\+::\+Protocol}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00151}{Remote}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00025}{zbs\+::\+ZRemote\+Mirroring\+::\+SSLKey}}, and \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00026}{zbs\+::\+ZRemote\+Mirroring\+::\+SSLVector}}.
+
+\Hypertarget{classzbs_1_1_z_journal_control_block_a972513ce37d775137069377dde66523f}\label{classzbs_1_1_z_journal_control_block_a972513ce37d775137069377dde66523f} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!toXml@{toXml}}
+\index{toXml@{toXml}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{toXml()}{toXml()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} ZJournal\+Control\+Block\+::to\+Xml (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Level,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Comment = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00349}{349}} of file \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source}{zsjournalcontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00099}{zbs\+::\+ZSJCBOwn\+Data\+::\+Depth}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00097}{zbs\+::\+ZSJCBOwn\+Data\+::\+Journaling\+On}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00100}{zbs\+::\+ZSJCBOwn\+Data\+::\+Journal\+Local\+Directory\+Path}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00098}{zbs\+::\+ZSJCBOwn\+Data\+::\+Keep}}, \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00151}{Remote}}, and \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00447}{zbs\+::\+ZRemote\+Mirroring\+::to\+Xml()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00208}{zbs\+::\+ZMaster\+Control\+Block\+::to\+Xml()}}.
+
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classzbs_1_1_z_journal_control_block_af6c5165dc42a0d37c2cb1f32ccd9f0f7}\label{classzbs_1_1_z_journal_control_block_af6c5165dc42a0d37c2cb1f32ccd9f0f7} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!ZSJournal@{ZSJournal}}
+\index{ZSJournal@{ZSJournal}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZSJournal}{ZSJournal}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{friend}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{classzbs_1_1_z_s_journal}{ZSJournal}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00115}{115}} of file \mbox{\hyperlink{zsjournalcontrolblock_8h_source}{zsjournalcontrolblock.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classzbs_1_1_z_journal_control_block_a134a9400df4afc1b6c10e2750f8d0b2f}\label{classzbs_1_1_z_journal_control_block_a134a9400df4afc1b6c10e2750f8d0b2f} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!Journal@{Journal}}
+\index{Journal@{Journal}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{Journal}{Journal}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_s_journal}{ZSJournal}}\texorpdfstring{$\ast$}{*} zbs\+::\+ZJournal\+Control\+Block\+::\+Journal =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00150}{150}} of file \mbox{\hyperlink{zsjournalcontrolblock_8h_source}{zsjournalcontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00009}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00020}{\+\_\+is\+Same\+As()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00280}{purge()}}, and \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00082}{\texorpdfstring{$\sim$}{\string~}\+ZJournal\+Control\+Block()}}.
+
+\Hypertarget{classzbs_1_1_z_journal_control_block_a98c2dec996c7f0e894be6975fd3bb9cc}\label{classzbs_1_1_z_journal_control_block_a98c2dec996c7f0e894be6975fd3bb9cc} 
+\index{zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}!Remote@{Remote}}
+\index{Remote@{Remote}!zbs::ZJournalControlBlock@{zbs::ZJournalControlBlock}}
+\doxysubsubsection{\texorpdfstring{Remote}{Remote}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_remote_mirroring}{ZRemote\+Mirroring}}\texorpdfstring{$\ast$}{*} zbs\+::\+ZJournal\+Control\+Block\+::\+Remote =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsjournalcontrolblock_8h_source_l00151}{151}} of file \mbox{\hyperlink{zsjournalcontrolblock_8h_source}{zsjournalcontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00009}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00020}{\+\_\+is\+Same\+As()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00379}{from\+Xml()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00299}{set\+Remote\+Mirroring()}}, and \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00349}{to\+Xml()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zsjournalcontrolblock_8h}{zsjournalcontrolblock.\+h}}\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zsjournalcontrolblock_8cpp}{zsjournalcontrolblock.\+cpp}}\end{DoxyCompactItemize}

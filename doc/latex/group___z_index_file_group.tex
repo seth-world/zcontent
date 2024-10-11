@@ -1,0 +1,125 @@
+\doxysection{ZIndex\+File -\/ Key Type management (definition, extraction \& packing, depacking)}
+\hypertarget{group___z_index_file_group}{}\label{group___z_index_file_group}\index{ZIndexFile -\/ Key Type management (definition, extraction \& packing, depacking)@{ZIndexFile -\/ Key Type management (definition, extraction \& packing, depacking)}}
+\doxysubsubsection*{Modules}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{group___dictionary_group}{Key dictionary}}
+\item 
+\mbox{\hyperlink{group___data_field_group}{Key data fields management}}
+\item 
+\mbox{\hyperlink{group___endian_conversion}{Endianness imposes a special processing for key data.}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_file_group_ga7fe3537fb1986bcfb91db1884e78b5b9}{get\+Atomic\+ZType\+\_\+\+Sizes}} (\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Type}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint64\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Natural\+Size}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint64\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Universal\+Size}})
+\begin{DoxyCompactList}\small\item\em \+\_\+get\+Atomic\+ZType\+\_\+\+Sizes returns Natural and Internal sizes for an Atomic ZType\+\_\+type given by p\+Type \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+ZIndex\+File is the instance that manages one key for a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} to which it relates. key definition is stored into a Key dictionary . It is a collection of ZIndex\+Field\+\_\+struct describing each field composing the key.
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{CZKey\+Dictionary} 
+
+\doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZIndex\+Field\+\_\+struct} 
+
+ZIndex\+File 
+
+\doxylink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8}{ZType\+\_\+type}
+\end{DoxySeeAlso}
+\begin{DoxyParagraph}{ZIndex\+File Key definition}
+A key may be composed of several fields, possibly not contiguous, of \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} record. Key fields definition is stored in the dictionary that contains any single field definition of the elements composing the index key.
+\end{DoxyParagraph}
+A dictionary is a collection of fields definition (ZIndex\+Field\+\_\+struct) dedicated to one and only one ZIndex\+File. \begin{DoxySeeAlso}{See also}
+\doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZIndex\+Field\+\_\+struct} 
+
+\doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey\+Utilities}
+\end{DoxySeeAlso}
+Each field definition contains its data type and information about the way its value is extracted from \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} record.
+
+\begin{DoxyParagraph}{What if a key field points out of a varying record boundaries ?}
+
+\end{DoxyParagraph}
+As \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} has a varying record size, from case to case, a field may point to outside the Master\+File record highest boundary. In this case, the field is taken (as if it has been extracted) as a binary zeroed field, whatever its data type could be. In case of signed numeric arithmetic data type, this means \textquotesingle{}negative zero\textquotesingle{} value, which is not a correct key data format (arithmetic zero is considered as positive).
+
+\begin{DoxyParagraph}{Using keys with ZMaster\+Files}
+
+\end{DoxyParagraph}
+Any ZIndex\+File relates to a (father) \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} from which it gets its index data. A key structure must be defined using a Key dictionary and then will be populated transparently as soon as there will be an action done on \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} its relates to.
+
+Key is used to search \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} content using a key value, total value or partial value.
+
+\begin{DoxyParagraph}{Key Dictionary definition}
+
+\end{DoxyParagraph}
+
+\begin{DoxyItemize}
+\item Key dictionary creation \+: fields composing key are analyzed, validated and stored into Key dictionary CZKey\+Dictionary
+\item Dictionary list \+: Key definition may be printed out.
+\begin{DoxyItemize}
+\item Key-\/\+Insert Key insertion \+: extracts a key from a raw \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} record and generates a \textquotesingle{}valid for index\textquotesingle{} key content. They key is inserted (or rejected if duplicate collision) into index file
+\item Key-\/\+Search \+: key value must be composed, then used to search.
+\begin{DoxyItemize}
+\item composing a key value \+:
+\item searching for the composed key value ·
+\end{DoxyItemize}
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\begin{DoxyParagraph}{Key registration for a ZMaster\+File}
+
+\end{DoxyParagraph}
+Once it has been defined, it is necessary to registrate this key within \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}. This can be done using ZMaster\+File\+::\+Create\+ZIndex\+File method.
+
+
+\begin{DoxyItemize}
+\item The key definition is then stored within \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} header infra-\/data.
+\item ZIndex\+File files structure are created.
+\item Index values are then built from \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} existing content.
+\end{DoxyItemize}
+
+\begin{DoxyParagraph}{Key usage}
+
+\begin{DoxyItemize}
+\item key update from ZMaster file \+: Defined ZIndex keys are transparently added / removed / updated according the operation done on \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}. User does not have to take care of index, except in analyzing the returned status which could show key errors (the most probable one is ZS\+\_\+\+DUPLICATEKEY that shows a duplicate key value on an index defined as ZST\+\_\+\+NODUPLICATES)
+\item search on key \+: user can search \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} content using key values per index, either total or partial key values.
+\item remove from key \+: it is always possible to remove \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} content that matches key values (total or partial). 
+\end{DoxyItemize}
+\end{DoxyParagraph}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{group___z_index_file_group_ga7fe3537fb1986bcfb91db1884e78b5b9}\label{group___z_index_file_group_ga7fe3537fb1986bcfb91db1884e78b5b9} 
+\index{ZIndexFile -\/ Key Type management (definition, extraction \& packing, depacking)@{ZIndexFile -\/ Key Type management (definition, extraction \& packing, depacking)}!getAtomicZType\_Sizes@{getAtomicZType\_Sizes}}
+\index{getAtomicZType\_Sizes@{getAtomicZType\_Sizes}!ZIndexFile -\/ Key Type management (definition, extraction \& packing, depacking)@{ZIndexFile -\/ Key Type management (definition, extraction \& packing, depacking)}}
+\doxysubsubsection{\texorpdfstring{getAtomicZType\_Sizes()}{getAtomicZType\_Sizes()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} get\+Atomic\+ZType\+\_\+\+Sizes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}}}]{p\+Type,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint64\+\_\+t}} \&}]{p\+Natural\+Size,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint64\+\_\+t}} \&}]{p\+Universal\+Size }\end{DoxyParamCaption})}
+
+
+
+\+\_\+get\+Atomic\+ZType\+\_\+\+Sizes returns Natural and Internal sizes for an Atomic ZType\+\_\+type given by p\+Type 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Type} & \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+Natural\+Size} & \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+Key\+Field\+Size} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zindextype_8cpp_source_l01240}{1240}} of file \mbox{\hyperlink{zindextype_8cpp_source}{zindextype.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindextype_8cpp_source_l01352}{decode\+\_\+\+ZType()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00042}{ZType\+\_\+\+Atomic\+Mask}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00066}{ZType\+\_\+\+Char}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00082}{ZType\+\_\+\+Double}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00081}{ZType\+\_\+\+Float}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00083}{ZType\+\_\+\+LDouble}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00075}{ZType\+\_\+\+S16}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00077}{ZType\+\_\+\+S32}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00079}{ZType\+\_\+\+S64}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00069}{ZType\+\_\+\+S8}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00070}{ZType\+\_\+\+U16}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00076}{ZType\+\_\+\+U32}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00078}{ZType\+\_\+\+U64}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00068}{ZType\+\_\+\+U8}}, and \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00065}{ZType\+\_\+\+UChar}}.
+
+\input{group___dictionary_group}
+\input{group___data_field_group}
+\input{group___endian_conversion}

@@ -1,0 +1,56 @@
+\doxysection{/home/gerard/\+Development/zbasetools/znet/zbasenet/znetcommon.cpp File Reference}
+\hypertarget{znetcommon_8cpp}{}\label{znetcommon_8cpp}\index{/home/gerard/Development/zbasetools/znet/zbasenet/znetcommon.cpp@{/home/gerard/Development/zbasetools/znet/zbasenet/znetcommon.cpp}}
+{\ttfamily \#include $<$zbasenet/znetcommon.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zerror.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zexceptionmin.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$zbasenet/zsocket.\+h$>$}\newline
+{\ttfamily \#include $<$openssl/md5.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$limits.\+h$>$}\newline
+{\ttfamily \#include $<$pwd.\+h$>$}\newline
+{\ttfamily \#include $<$shadow.\+h$>$}\newline
+Include dependency graph for znetcommon.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{znetcommon_8cpp_acb9141555245977f7ccf35bcc424a6bf}{ZNETCOMMON\+\_\+\+CPP}}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{znetcommon_8cpp_ad3d8a3bd0c0b677acef144f2c2ef6d73}{\+\_\+\+BSD\+\_\+\+SOURCE}}~/\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Get}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{getpass}}() \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{declaration}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{from}} $<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unistd.\+h}}$>$ \texorpdfstring{$\ast$}{*}/
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{znetcommon_8cpp_a78c99ffd76a7bb3c8c74db76207e9ab4}{\+\_\+\+XOPEN\+\_\+\+SOURCE}}~/\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Get}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{crypt}}() \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{declaration}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{from}} $<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unistd.\+h}}$>$ \texorpdfstring{$\ast$}{*}/
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{znetcommon_8cpp_ad3d8a3bd0c0b677acef144f2c2ef6d73}\label{znetcommon_8cpp_ad3d8a3bd0c0b677acef144f2c2ef6d73} 
+\index{znetcommon.cpp@{znetcommon.cpp}!\_BSD\_SOURCE@{\_BSD\_SOURCE}}
+\index{\_BSD\_SOURCE@{\_BSD\_SOURCE}!znetcommon.cpp@{znetcommon.cpp}}
+\doxysubsubsection{\texorpdfstring{\_BSD\_SOURCE}{\_BSD\_SOURCE}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+BSD\+\_\+\+SOURCE~/\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Get}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{getpass}}() \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{declaration}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{from}} $<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unistd.\+h}}$>$ \texorpdfstring{$\ast$}{*}/}
+
+
+
+Definition at line \mbox{\hyperlink{znetcommon_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{znetcommon_8cpp_source}{znetcommon.\+cpp}}.
+
+\Hypertarget{znetcommon_8cpp_a78c99ffd76a7bb3c8c74db76207e9ab4}\label{znetcommon_8cpp_a78c99ffd76a7bb3c8c74db76207e9ab4} 
+\index{znetcommon.cpp@{znetcommon.cpp}!\_XOPEN\_SOURCE@{\_XOPEN\_SOURCE}}
+\index{\_XOPEN\_SOURCE@{\_XOPEN\_SOURCE}!znetcommon.cpp@{znetcommon.cpp}}
+\doxysubsubsection{\texorpdfstring{\_XOPEN\_SOURCE}{\_XOPEN\_SOURCE}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+XOPEN\+\_\+\+SOURCE~/\texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Get}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{crypt}}() \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{declaration}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{from}} $<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unistd.\+h}}$>$ \texorpdfstring{$\ast$}{*}/}
+
+
+
+Definition at line \mbox{\hyperlink{znetcommon_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{znetcommon_8cpp_source}{znetcommon.\+cpp}}.
+
+\Hypertarget{znetcommon_8cpp_acb9141555245977f7ccf35bcc424a6bf}\label{znetcommon_8cpp_acb9141555245977f7ccf35bcc424a6bf} 
+\index{znetcommon.cpp@{znetcommon.cpp}!ZNETCOMMON\_CPP@{ZNETCOMMON\_CPP}}
+\index{ZNETCOMMON\_CPP@{ZNETCOMMON\_CPP}!znetcommon.cpp@{znetcommon.cpp}}
+\doxysubsubsection{\texorpdfstring{ZNETCOMMON\_CPP}{ZNETCOMMON\_CPP}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} ZNETCOMMON\+\_\+\+CPP}
+
+
+
+Definition at line \mbox{\hyperlink{znetcommon_8cpp_source_l00002}{2}} of file \mbox{\hyperlink{znetcommon_8cpp_source}{znetcommon.\+cpp}}.
+

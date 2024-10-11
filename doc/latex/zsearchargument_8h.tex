@@ -1,0 +1,145 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zrandomfile/zsearchargument.h File Reference}
+\hypertarget{zsearchargument_8h}{}\label{zsearchargument_8h}\index{/home/gerard/Development/zbasetools/zcontent/zrandomfile/zsearchargument.h@{/home/gerard/Development/zbasetools/zcontent/zrandomfile/zsearchargument.h}}
+{\ttfamily \#include $<$ztoolset/zarray.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zbasedatatypes.\+h$>$}\newline
+{\ttfamily \#include $<$zrandomfile/zrandomfiletypes.\+h$>$}\newline
+Include dependency graph for zsearchargument.\+h\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classzbs_1_1_free_field_search}{zbs\+::\+Free\+Field\+Search}}
+\item 
+class \mbox{\hyperlink{classzbs_1_1_z_search_argument}{zbs\+::\+ZSearch\+Argument}}
+\begin{DoxyCompactList}\small\item\em The ZSSearch\+Argument class holds and manages the matching rules for a collection in order. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacezbs}{zbs}}
+\begin{DoxyCompactList}\small\item\em ZSIndex\+Field\+\_\+struct Dictionary single field definition \+: one key may be composed of many single fields not necessarily contiguous in the master file\textquotesingle{}s data structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zsearchargument_8h_ae6f8dc60c7f7145b1c18fdac343120d8}{ZRFSEARCH}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{group___z_r_f_free_search_gaf64b6cef70fbbf38fa4caa789b790656}{zbs\+::\+ZRFSearch\+\_\+type}} \+: uint16\+\_\+t \{ \newline
+\mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656acd96627bb351ca5189373f733530bec8}{zbs\+::\+ZRFEquals\+To}} = 0x01
+, \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a30fac18c28e3a47ed0958b01530d965b}{zbs\+::\+ZRFStarts\+With}} = 0x02
+, \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656ad14ab10ca4c2c31c6c6409bf6ff8fd73}{zbs\+::\+ZRFEnds\+With}} = 0x04
+, \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a89d15e29bd1b49572fa72e3710485968}{zbs\+::\+ZRFContains}} = 0x08
+, \newline
+\mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a9690335cdb245bf362e85c910a2fb869}{zbs\+::\+ZRFGreater\+Than}} = 0x10
+, \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656aef1e4f653972b37edcbe030b9a7c54ea}{zbs\+::\+ZRFLess\+Than}} = 0x20
+, \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656ab6e0dbda6e3124a92971f0f703974bbb}{zbs\+::\+ZRFCase\+Regardless}} = 0x0100
+, \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a26d15ddb890c5f27e2da74d059b4cd7e}{zbs\+::\+ZRFString}} = 0x0200
+, \newline
+\mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a56c168e22e3823c7f7f4d94a8a850aca}{zbs\+::\+ZRFTrimspace}} = 0x0300
+ \}
+\begin{DoxyCompactList}\small\item\em The ZRFSearch\+\_\+type enum option to free search within a ZRandom\+File. \end{DoxyCompactList}\item 
+enum \mbox{\hyperlink{namespacezbs_aecca7a2743f0c73470a18838542dcc2f}{zbs\+::\+Free\+Field\+Search\+\_\+type}} \+: uint8\+\_\+t \{ \newline
+\mbox{\hyperlink{namespacezbs_aecca7a2743f0c73470a18838542dcc2fa4f0565a69a7dbad115f4fd2112eb61d3}{zbs\+::\+FFS\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{namespacezbs_aecca7a2743f0c73470a18838542dcc2fa6eea2f55918893902890d7918ab8b015}{zbs\+::\+FFS\+\_\+\+OR}} = 1
+, \mbox{\hyperlink{namespacezbs_aecca7a2743f0c73470a18838542dcc2fa95823f6f650fbacc9b68ca39c0fe4c0b}{zbs\+::\+FFS\+\_\+\+Case\+Regardless}} = 2
+, \mbox{\hyperlink{namespacezbs_aecca7a2743f0c73470a18838542dcc2faad4c9c95d818a191930870415373c906}{zbs\+::\+FFS\+\_\+\+String}} = 4
+, \newline
+\mbox{\hyperlink{namespacezbs_aecca7a2743f0c73470a18838542dcc2fa0f982fe5f472b5730b20225c600d309e}{zbs\+::\+FFS\+\_\+\+Trim\+Space}} = 8
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zsearchargument_8h_ad7d068de612d41fc390edf8ebb908ae7}{\+\_\+test\+Sequence}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{w\+Field\+Content}}, ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Sequence}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{w\+Sequence\+Size}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{w\+Search\+Type}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+FFS}})
+\begin{DoxyCompactList}\small\item\em ZRandom\+File\+::\+\_\+test\+Sequence test wether a Field content is selected (ZS\+\_\+\+FOUND) or not (ZS\+\_\+\+NOTFOUND) according the given selection criterias. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{zsearchargument_8h_ab734b293866e2dda456d49029dfbdd45}{decode\+\_\+\+ZSearch\+Type}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Search\+Type}})
+\begin{DoxyCompactList}\small\item\em decode\+\_\+\+ZSearch\+Type translates ZSearch type in clear text \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{zsearchargument_8h_ae6f8dc60c7f7145b1c18fdac343120d8}\label{zsearchargument_8h_ae6f8dc60c7f7145b1c18fdac343120d8} 
+\index{zsearchargument.h@{zsearchargument.h}!ZRFSEARCH@{ZRFSEARCH}}
+\index{ZRFSEARCH@{ZRFSEARCH}!zsearchargument.h@{zsearchargument.h}}
+\doxysubsubsection{\texorpdfstring{ZRFSEARCH}{ZRFSEARCH}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} ZRFSEARCH}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchargument_8h_source_l00009}{9}} of file \mbox{\hyperlink{zsearchargument_8h_source}{zsearchargument.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{zsearchargument_8h_ad7d068de612d41fc390edf8ebb908ae7}\label{zsearchargument_8h_ad7d068de612d41fc390edf8ebb908ae7} 
+\index{zsearchargument.h@{zsearchargument.h}!\_testSequence@{\_testSequence}}
+\index{\_testSequence@{\_testSequence}!zsearchargument.h@{zsearchargument.h}}
+\doxysubsubsection{\texorpdfstring{\_testSequence()}{\_testSequence()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \+\_\+test\+Sequence (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{w\+Field\+Content,  }\item[{ZData\+Buffer \&}]{p\+Sequence,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}}}]{w\+Sequence\+Size,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\+\_\+t}}}]{w\+Search\+Type,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}}}]{p\+FFS }\end{DoxyParamCaption})}
+
+
+
+ZRandom\+File\+::\+\_\+test\+Sequence test wether a Field content is selected (ZS\+\_\+\+FOUND) or not (ZS\+\_\+\+NOTFOUND) according the given selection criterias. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em w\+Field\+Content} & Field (Record segment) to explore \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Sequence} & Sequence to find \\
+\hline
+\mbox{\texttt{ in}}  & {\em w\+Sequence\+Size} & real sequence size according ZRFString conditions or not \\
+\hline
+\mbox{\texttt{ in}}  & {\em FString} & Are we looking for a string (true) or binary sequence (false) \\
+\hline
+\mbox{\texttt{ in}}  & {\em FTrim\+Space} & Request to trim leading and trailing spaces (true) \\
+\hline
+\mbox{\texttt{ in}}  & {\em FCaseregardless} & Should we disregard case (true) or not (false) \\
+\hline
+\mbox{\texttt{ in}}  & {\em } & \\
+\hline
+\end{DoxyParams}
+Expurged ZSearch\+\_\+type (no ZRFString , no ZRFCaseregardless, no ZRFTrimspace) \begin{DoxyReturn}{Returns}
+true if the w\+Field\+Content matches the rule condition -\/ false if not 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zsearchargument_8cpp_source_l00212}{212}} of file \mbox{\hyperlink{zsearchargument_8cpp_source}{zsearchargument.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchargument_8h_source_l00034}{zbs\+::\+FFS\+\_\+\+Case\+Regardless}}, \mbox{\hyperlink{zsearchargument_8h_source_l00035}{zbs\+::\+FFS\+\_\+\+String}}, \mbox{\hyperlink{zsearchargument_8h_source_l00036}{zbs\+::\+FFS\+\_\+\+Trim\+Space}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsearchargument_8h_source_l00019}{zbs\+::\+ZRFContains}}, \mbox{\hyperlink{zsearchargument_8h_source_l00018}{zbs\+::\+ZRFEnds\+With}}, \mbox{\hyperlink{zsearchargument_8h_source_l00016}{zbs\+::\+ZRFEquals\+To}}, \mbox{\hyperlink{zsearchargument_8h_source_l00020}{zbs\+::\+ZRFGreater\+Than}}, \mbox{\hyperlink{zsearchargument_8h_source_l00021}{zbs\+::\+ZRFLess\+Than}}, and \mbox{\hyperlink{zsearchargument_8h_source_l00017}{zbs\+::\+ZRFStarts\+With}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchargument_8cpp_source_l00132}{zbs\+::\+ZSearch\+Argument\+::evaluate()}}.
+
+\Hypertarget{zsearchargument_8h_ab734b293866e2dda456d49029dfbdd45}\label{zsearchargument_8h_ab734b293866e2dda456d49029dfbdd45} 
+\index{zsearchargument.h@{zsearchargument.h}!decode\_ZSearchType@{decode\_ZSearchType}}
+\index{decode\_ZSearchType@{decode\_ZSearchType}!zsearchargument.h@{zsearchargument.h}}
+\doxysubsubsection{\texorpdfstring{decode\_ZSearchType()}{decode\_ZSearchType()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} decode\+\_\+\+ZSearch\+Type (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\+\_\+t}}}]{p\+Search\+Type }\end{DoxyParamCaption})}
+
+
+
+decode\+\_\+\+ZSearch\+Type translates ZSearch type in clear text 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Search\+Type} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zsearchargument_8cpp_source_l00347}{347}} of file \mbox{\hyperlink{zsearchargument_8cpp_source}{zsearchargument.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_source_l00851}{w\+Ret}}, \mbox{\hyperlink{zsearchargument_8h_source_l00023}{zbs\+::\+ZRFCase\+Regardless}}, \mbox{\hyperlink{zsearchargument_8h_source_l00019}{zbs\+::\+ZRFContains}}, \mbox{\hyperlink{zsearchargument_8h_source_l00018}{zbs\+::\+ZRFEnds\+With}}, \mbox{\hyperlink{zsearchargument_8h_source_l00016}{zbs\+::\+ZRFEquals\+To}}, \mbox{\hyperlink{zsearchargument_8h_source_l00020}{zbs\+::\+ZRFGreater\+Than}}, \mbox{\hyperlink{zsearchargument_8h_source_l00021}{zbs\+::\+ZRFLess\+Than}}, \mbox{\hyperlink{zsearchargument_8h_source_l00017}{zbs\+::\+ZRFStarts\+With}}, \mbox{\hyperlink{zsearchargument_8h_source_l00024}{zbs\+::\+ZRFString}}, and \mbox{\hyperlink{zsearchargument_8h_source_l00025}{zbs\+::\+ZRFTrimspace}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchoperand_8cpp_source_l01735}{zbs\+::\+ZSearch\+Arithmetic\+Term\+::\+\_\+report()}}, \mbox{\hyperlink{zsearchoperand_8cpp_source_l01329}{zbs\+::\+ZSearch\+Logical\+Operand\+::\+\_\+report\+Detailed()}}, and \mbox{\hyperlink{zsearchargument_8cpp_source_l00165}{zbs\+::\+ZSearch\+Argument\+::report()}}.
+

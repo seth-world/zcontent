@@ -1,0 +1,742 @@
+\doxysection{zbs\+::ZSearch\+Context Class Reference}
+\hypertarget{classzbs_1_1_z_search_context}{}\label{classzbs_1_1_z_search_context}\index{zbs::ZSearchContext@{zbs::ZSearchContext}}
+
+
+{\ttfamily \#include $<$zsearchcontext.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_search_context_aace4402fffdf5550755522e7776b0b33}{ZSearch\+Context}} ()
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_search_context_ada2e3c39c2ccffffb02b65aaefa9db7d}{ZSearch\+Context}} (\mbox{\hyperlink{classzbs_1_1_z_search_parser}{ZSearch\+Parser}} \texorpdfstring{$\ast$}{*}p\+Parser)
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_search_context_a3fa654f78c6dcfe475a9f5ba36eeeb23}{ZSearch\+Context}} (\mbox{\hyperlink{classzbs_1_1_z_search_parser}{ZSearch\+Parser}} \texorpdfstring{$\ast$}{*}p\+Parser, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Main\+Phrase}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_search_context_ae65645f41a84c0fc33fc8b07df47f04c}{ZSearch\+Context}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_search_context}{ZSearch\+Context}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_search_context_a6c47d4c41481ac02af36201261aba8ec}{\texorpdfstring{$\sim$}{\string~}\+ZSearch\+Context}} ()
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_search_context}{ZSearch\+Context}} \& \mbox{\hyperlink{classzbs_1_1_z_search_context_a3eac3ca6408dbf0d861b8b7c328ebf15}{\+\_\+copy\+From}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_search_context}{ZSearch\+Context}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_search_context_a219659a80e419f97cf3a5a795b409f65}{set\+Main\+Phrase}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Main\+Phrase}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_search_context_a83ac48a29ea6d0f734a28ae73a9d855e}{clear}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_search_context_ab5cd40d6fa1105aa049d6861b8621249}{clear\+Entities}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_search_context_a31239869e66797abe7a8b55988e9a077}{is\+Nested\+Field}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_search_context_afc21b56484f177e38bc94bf917a8bde6}{is\+Nested\+All}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_search_context_a8d44c4ab4af13c3f2a34b843246559d1}{is\+Nested}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_search_context_a5e52acc8ed32aa251bbea6ce005a0718}{is\+Invalid}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_search_context_a3b76b54bd5584ba89888212c335de303}{has\+Current}} (\mbox{\hyperlink{namespacezbs_a7b24002fcbd76d17142ab760ec7fcac0}{ZSearch\+Tokentype\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Type}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_search_context_aae58d04823a3f348c63a2720b29b3ce3}{not\+EOF}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_search_context_a50ba52cf364f22b293fa34ba87aaf4ac}{is\+EOF}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_search_context_aec3d6e4cf4aa2494f3a0e773f12aaafa}{set\+Entity}} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classzbs_1_1_z_search_entity}{ZSearch\+Entity}} $>$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Entity}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_search_context_ac12a94495c9b2a18e51d845a60ada4da}{set\+Index}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_search_context_a153da8aa372b37d513bb4f7355456740}{push\+Index}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_search_context_a490b17c25e8fb79a988f715f2599cf40}{pop\+Index}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_search_context_a89fe105bbf01dcafcfb47153bc1c77f2}{advance\+Index}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Signal\+EOF}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_search_context_a399fda02a069a46d7ccad672b32ef7f0}{begin\+Context}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_search_context_ab8abedafc65be36841b5fd95605a53e2}{Token\+Report}} ()
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearch\+Token}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_search_context_a04a3c72e484eaabeb8a82641a8e03909}{next\+Token}} ()
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearch\+Token}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_search_context_a3f7c84d4491cbe47abb4d57fd3b7a4d2}{previous\+Token}} ()
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearch\+Token}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_search_context_a686cfdd648d3c27b19e269f5e3745700}{last\+Token}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classzbs_1_1_z_search_entity}{ZSearch\+Entity}} $>$ \mbox{\hyperlink{classzbs_1_1_z_search_context_a80810412f31e8733e786c2c052d1714e}{Source\+Entity}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classzbs_1_1_z_search_entity}{ZSearch\+Entity}} $>$ \mbox{\hyperlink{classzbs_1_1_z_search_context_a70b392cc4bc321ee0097645b7ae2854c}{Target\+Entity}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classzbs_1_1_z_search_entity_context}{ZSearch\+Entity\+Context}} $>$ \mbox{\hyperlink{classzbs_1_1_z_search_context_a42016fd5c9b50b1a953af477763841c6}{SEC}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{classzbs_1_1_z_search_context_ae97904d0bab9c41cececae765ed59900}{Instruction\+Type}} = \mbox{\hyperlink{namespacezbs_a110c9d7d77d2d54ac9112d37647b0cd9a8fd5bf81ff228e3e9a3078b104a9a500}{ZSITP\+\_\+\+Nothing}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{classzbs_1_1_z_search_context_ac4bee4e97a70cc35538e986eabeb30d3}{Number}} = -\/1
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_search_parser}{ZSearch\+Parser}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_search_context_a1ccc5b60ab244eec2d4b429a90e2fcd8}{Parser}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{classzbs_1_1_z_search_context_ac768232bb89b66a6f829ba613195885f}{Index}} =0
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_array}{ZArray}}$<$ \mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearch\+Token}} \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{classzbs_1_1_z_search_context_af96607883743247c5c24e4336a50d373}{Current\+Token\+List}}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_array}{ZArray}}$<$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} $>$ \mbox{\hyperlink{classzbs_1_1_z_search_context_a5e7cc761ebb28b0d180ac4bd6b23160c}{Index\+Stack}}
+\item 
+\mbox{\hyperlink{namespacezbs_a49a7c1da6c08bdb0644c8fd6c705a1a3}{Instruction\+Flag\+\_\+type}} \mbox{\hyperlink{classzbs_1_1_z_search_context_a343b6a625d500776e2b19c6bec5bc8bd}{Store}} =\mbox{\hyperlink{classzbs_1_1_z_search_history_a8f082a9d08967796b0dfd86fb9b06d11a9c494bdfc2bc89e54cf7366e62754ac3}{ZSearch\+History\+::\+Forget}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_search_context_aa319dde36217690ece3e9082537254b6}{Has\+Instruction}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearch\+Token}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_search_context_a6f21334b1356550197ebe77eb311bc06}{Token\+Start}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearch\+Token}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_search_context_acb1ed21c03331407771361126f536096}{Current\+Token}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearch\+Token}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_search_context_ae91f0a7fab90b9bd82fffe4c263d4415}{Last\+Errored\+Token}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearch\+Token}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_search_context_ada46c827ff0ff8678ad1f7fe14f11826}{Token\+Identifier}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{classzbs_1_1_z_search_context_a21ed9d02759ba0b44cf75d8b6b9cb9c9}{Phrase}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_search_context_aad485d9e0ea26daca504d0d2780ba4f1}{Main\+Phrase}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_search_context_a2e064d78b16555339ebbaa9a7e5a3ad7}{Status}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\+\_\+\+SUCCESS}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00072}{72}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classzbs_1_1_z_search_context_aace4402fffdf5550755522e7776b0b33}\label{classzbs_1_1_z_search_context_aace4402fffdf5550755522e7776b0b33} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!ZSearchContext@{ZSearchContext}}
+\index{ZSearchContext@{ZSearchContext}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{ZSearchContext()}{ZSearchContext()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily zbs\+::\+ZSearch\+Context\+::\+ZSearch\+Context (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00075}{75}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_ada2e3c39c2ccffffb02b65aaefa9db7d}\label{classzbs_1_1_z_search_context_ada2e3c39c2ccffffb02b65aaefa9db7d} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!ZSearchContext@{ZSearchContext}}
+\index{ZSearchContext@{ZSearchContext}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{ZSearchContext()}{ZSearchContext()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily zbs\+::\+ZSearch\+Context\+::\+ZSearch\+Context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classzbs_1_1_z_search_parser}{ZSearch\+Parser}} \texorpdfstring{$\ast$}{*}}]{p\+Parser }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00076}{76}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a3fa654f78c6dcfe475a9f5ba36eeeb23}\label{classzbs_1_1_z_search_context_a3fa654f78c6dcfe475a9f5ba36eeeb23} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!ZSearchContext@{ZSearchContext}}
+\index{ZSearchContext@{ZSearchContext}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{ZSearchContext()}{ZSearchContext()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily zbs\+::\+ZSearch\+Context\+::\+ZSearch\+Context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classzbs_1_1_z_search_parser}{ZSearch\+Parser}} \texorpdfstring{$\ast$}{*}}]{p\+Parser,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \texorpdfstring{$\ast$}{*}}]{p\+Main\+Phrase }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00077}{77}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_ae65645f41a84c0fc33fc8b07df47f04c}\label{classzbs_1_1_z_search_context_ae65645f41a84c0fc33fc8b07df47f04c} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!ZSearchContext@{ZSearchContext}}
+\index{ZSearchContext@{ZSearchContext}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{ZSearchContext()}{ZSearchContext()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily zbs\+::\+ZSearch\+Context\+::\+ZSearch\+Context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_search_context}{ZSearch\+Context}} \&}]{p\+In }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00078}{78}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+References \mbox{\hyperlink{zsearchcontext_8cpp_source_l00025}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a6c47d4c41481ac02af36201261aba8ec}\label{classzbs_1_1_z_search_context_a6c47d4c41481ac02af36201261aba8ec} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!````~ZSearchContext@{\texorpdfstring{$\sim$}{\string~}ZSearchContext}}
+\index{````~ZSearchContext@{\texorpdfstring{$\sim$}{\string~}ZSearchContext}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ZSearchContext()}{\string~ZSearchContext()}}
+{\footnotesize\ttfamily zbs\+::\+ZSearch\+Context\+::\texorpdfstring{$\sim$}{\string~}\+ZSearch\+Context (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classzbs_1_1_z_search_context_a3eac3ca6408dbf0d861b8b7c328ebf15}\label{classzbs_1_1_z_search_context_a3eac3ca6408dbf0d861b8b7c328ebf15} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!\_copyFrom@{\_copyFrom}}
+\index{\_copyFrom@{\_copyFrom}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{\_copyFrom()}{\_copyFrom()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_search_context}{ZSearch\+Context}} \& zbs\+::\+ZSearch\+Context\+::\+\_\+copy\+From (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_search_context}{ZSearch\+Context}} \&}]{p\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchcontext_8cpp_source_l00156}{clear\+Entities()}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00157}{Current\+Token}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00155}{Has\+Instruction}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00148}{Index}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00143}{Instruction\+Type}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00161}{Main\+Phrase}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00144}{Number}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00147}{Parser}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00160}{Phrase}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00141}{SEC}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00138}{Source\+Entity}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00165}{Status}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00154}{Store}}, and \mbox{\hyperlink{zsearchcontext_8h_source_l00156}{Token\+Start}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8h_source_l00078}{ZSearch\+Context()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a89fe105bbf01dcafcfb47153bc1c77f2}\label{classzbs_1_1_z_search_context_a89fe105bbf01dcafcfb47153bc1c77f2} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!advanceIndex@{advanceIndex}}
+\index{advanceIndex@{advanceIndex}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{advanceIndex()}{advanceIndex()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZSearch\+Context\+::advance\+Index (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Signal\+EOF = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00231}{231}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchcontext_8h_source_l00157}{Current\+Token}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00150}{Current\+Token\+List}}, \mbox{\hyperlink{zsearchtokenizer_8h_source_l00084}{zbs\+::\+ZSearch\+Tokenizer\+::\+Error\+Log}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00148}{Index}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00080}{is\+EOF()}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00158}{Last\+Errored\+Token}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00072}{not\+EOF()}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00147}{Parser}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00165}{Status}}, \mbox{\hyperlink{zsearchtoken_8h_source_l00044}{zbs\+::\+ZSearch\+Token\+::\+Type}}, \mbox{\hyperlink{zsearchparsertype_8h_source_l00086}{zbs\+::\+ZSRCH\+\_\+\+MAYBE\+\_\+\+COMMENT}}, and \mbox{\hyperlink{zsearchparsertype_8h_source_l00042}{zbs\+::\+ZSRCH\+\_\+\+SPACE}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00207}{begin\+Context()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a399fda02a069a46d7ccad672b32ef7f0}\label{classzbs_1_1_z_search_context_a399fda02a069a46d7ccad672b32ef7f0} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!beginContext@{beginContext}}
+\index{beginContext@{beginContext}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{beginContext()}{beginContext()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZSearch\+Context\+::begin\+Context (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00207}{207}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchcontext_8cpp_source_l00231}{advance\+Index()}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00157}{Current\+Token}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00150}{Current\+Token\+List}}, \mbox{\hyperlink{zsearchtokenizer_8h_source_l00084}{zbs\+::\+ZSearch\+Tokenizer\+::\+Error\+Log}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00148}{Index}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00158}{Last\+Errored\+Token}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00072}{not\+EOF()}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00147}{Parser}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00165}{Status}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00156}{Token\+Start}}, \mbox{\hyperlink{zsearchtoken_8h_source_l00044}{zbs\+::\+ZSearch\+Token\+::\+Type}}, and \mbox{\hyperlink{zsearchparsertype_8h_source_l00042}{zbs\+::\+ZSRCH\+\_\+\+SPACE}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a83ac48a29ea6d0f734a28ae73a9d855e}\label{classzbs_1_1_z_search_context_a83ac48a29ea6d0f734a28ae73a9d855e} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!clear@{clear}}
+\index{clear@{clear}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZSearch\+Context\+::clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00137}{137}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchtokenizer_8h_source_l00033}{zbs\+::\+ZSearch\+Tokenizer\+::clear()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00156}{clear\+Entities()}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00157}{Current\+Token}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00150}{Current\+Token\+List}}, \mbox{\hyperlink{zsearchhistory_8h_source_l00021}{zbs\+::\+ZSearch\+History\+::\+Forget}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00155}{Has\+Instruction}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00143}{Instruction\+Type}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00161}{Main\+Phrase}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00147}{Parser}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00165}{Status}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00154}{Store}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00159}{Token\+Identifier}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00156}{Token\+Start}}, and \mbox{\hyperlink{zsearchcontext_8h_source_l00017}{zbs\+::\+ZSITP\+\_\+\+Nothing}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_ab5cd40d6fa1105aa049d6861b8621249}\label{classzbs_1_1_z_search_context_ab5cd40d6fa1105aa049d6861b8621249} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!clearEntities@{clearEntities}}
+\index{clearEntities@{clearEntities}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{clearEntities()}{clearEntities()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZSearch\+Context\+::clear\+Entities (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00156}{156}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchcontext_8h_source_l00138}{Source\+Entity}}, and \mbox{\hyperlink{zsearchcontext_8h_source_l00139}{Target\+Entity}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00025}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zsearchcontext_8cpp_source_l00137}{clear()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a3b76b54bd5584ba89888212c335de303}\label{classzbs_1_1_z_search_context_a3b76b54bd5584ba89888212c335de303} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!hasCurrent@{hasCurrent}}
+\index{hasCurrent@{hasCurrent}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{hasCurrent()}{hasCurrent()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZSearch\+Context\+::has\+Current (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacezbs_a7b24002fcbd76d17142ab760ec7fcac0}{ZSearch\+Tokentype\+\_\+type}}}]{p\+Type }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00131}{131}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchcontext_8h_source_l00157}{Current\+Token}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zsearchtoken_8h_source_l00044}{zbs\+::\+ZSearch\+Token\+::\+Type}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a50ba52cf364f22b293fa34ba87aaf4ac}\label{classzbs_1_1_z_search_context_a50ba52cf364f22b293fa34ba87aaf4ac} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!isEOF@{isEOF}}
+\index{isEOF@{isEOF}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{isEOF()}{isEOF()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZSearch\+Context\+::is\+EOF (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00080}{80}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchcontext_8h_source_l00150}{Current\+Token\+List}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00148}{Index}}, and \mbox{\hyperlink{zsearchparsertype_8h_source_l00150}{zbs\+::\+ZSRCH\+\_\+\+SEMICOLON}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00231}{advance\+Index()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00117}{is\+Nested()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00103}{is\+Nested\+All()}}, and \mbox{\hyperlink{zsearchcontext_8cpp_source_l00089}{is\+Nested\+Field()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a5e52acc8ed32aa251bbea6ce005a0718}\label{classzbs_1_1_z_search_context_a5e52acc8ed32aa251bbea6ce005a0718} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!isInvalid@{isInvalid}}
+\index{isInvalid@{isInvalid}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{isInvalid()}{isInvalid()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZSearch\+Context\+::is\+Invalid (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00092}{92}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+References \mbox{\hyperlink{zsearchcontext_8h_source_l00147}{Parser}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a8d44c4ab4af13c3f2a34b843246559d1}\label{classzbs_1_1_z_search_context_a8d44c4ab4af13c3f2a34b843246559d1} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!isNested@{isNested}}
+\index{isNested@{isNested}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{isNested()}{isNested()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZSearch\+Context\+::is\+Nested (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00117}{117}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchparser_8h_source_l00010}{\+\_\+\+\_\+\+SEARCH\+\_\+\+ENTITY\+\_\+\+SEPARATOR\+\_\+\+\_\+}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00157}{Current\+Token}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00150}{Current\+Token\+List}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00148}{Index}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00080}{is\+EOF()}}, \mbox{\hyperlink{zsearchtoken_8h_source_l00044}{zbs\+::\+ZSearch\+Token\+::\+Type}}, and \mbox{\hyperlink{zsearchparsertype_8h_source_l00167}{zbs\+::\+ZSRCH\+\_\+\+IDENTIFIER}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_afc21b56484f177e38bc94bf917a8bde6}\label{classzbs_1_1_z_search_context_afc21b56484f177e38bc94bf917a8bde6} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!isNestedAll@{isNestedAll}}
+\index{isNestedAll@{isNestedAll}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{isNestedAll()}{isNestedAll()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZSearch\+Context\+::is\+Nested\+All (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00103}{103}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchparser_8h_source_l00010}{\+\_\+\+\_\+\+SEARCH\+\_\+\+ENTITY\+\_\+\+SEPARATOR\+\_\+\+\_\+}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00157}{Current\+Token}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00150}{Current\+Token\+List}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00148}{Index}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00080}{is\+EOF()}}, \mbox{\hyperlink{zsearchtoken_8h_source_l00044}{zbs\+::\+ZSearch\+Token\+::\+Type}}, \mbox{\hyperlink{zsearchparsertype_8h_source_l00167}{zbs\+::\+ZSRCH\+\_\+\+IDENTIFIER}}, and \mbox{\hyperlink{zsearchparsertype_8h_source_l00125}{zbs\+::\+ZSRCH\+\_\+\+WILDCARD}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a31239869e66797abe7a8b55988e9a077}\label{classzbs_1_1_z_search_context_a31239869e66797abe7a8b55988e9a077} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!isNestedField@{isNestedField}}
+\index{isNestedField@{isNestedField}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{isNestedField()}{isNestedField()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZSearch\+Context\+::is\+Nested\+Field (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchparser_8h_source_l00010}{\+\_\+\+\_\+\+SEARCH\+\_\+\+ENTITY\+\_\+\+SEPARATOR\+\_\+\+\_\+}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00157}{Current\+Token}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00150}{Current\+Token\+List}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00148}{Index}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00080}{is\+EOF()}}, \mbox{\hyperlink{zsearchtoken_8h_source_l00044}{zbs\+::\+ZSearch\+Token\+::\+Type}}, and \mbox{\hyperlink{zsearchparsertype_8h_source_l00167}{zbs\+::\+ZSRCH\+\_\+\+IDENTIFIER}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a686cfdd648d3c27b19e269f5e3745700}\label{classzbs_1_1_z_search_context_a686cfdd648d3c27b19e269f5e3745700} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!lastToken@{lastToken}}
+\index{lastToken@{lastToken}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{lastToken()}{lastToken()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearch\+Token}} \texorpdfstring{$\ast$}{*} zbs\+::\+ZSearch\+Context\+::last\+Token (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00290}{290}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchcontext_8h_source_l00150}{Current\+Token\+List}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a04a3c72e484eaabeb8a82641a8e03909}\label{classzbs_1_1_z_search_context_a04a3c72e484eaabeb8a82641a8e03909} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!nextToken@{nextToken}}
+\index{nextToken@{nextToken}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{nextToken()}{nextToken()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearch\+Token}} \texorpdfstring{$\ast$}{*} zbs\+::\+ZSearch\+Context\+::next\+Token (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00276}{276}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchcontext_8h_source_l00150}{Current\+Token\+List}}, and \mbox{\hyperlink{zsearchcontext_8h_source_l00148}{Index}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_aae58d04823a3f348c63a2720b29b3ce3}\label{classzbs_1_1_z_search_context_aae58d04823a3f348c63a2720b29b3ce3} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!notEOF@{notEOF}}
+\index{notEOF@{notEOF}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{notEOF()}{notEOF()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZSearch\+Context\+::not\+EOF (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00072}{72}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchcontext_8h_source_l00150}{Current\+Token\+List}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00148}{Index}}, and \mbox{\hyperlink{zsearchparsertype_8h_source_l00150}{zbs\+::\+ZSRCH\+\_\+\+SEMICOLON}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00231}{advance\+Index()}}, and \mbox{\hyperlink{zsearchcontext_8cpp_source_l00207}{begin\+Context()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a490b17c25e8fb79a988f715f2599cf40}\label{classzbs_1_1_z_search_context_a490b17c25e8fb79a988f715f2599cf40} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!popIndex@{popIndex}}
+\index{popIndex@{popIndex}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{popIndex()}{popIndex()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZSearch\+Context\+::pop\+Index (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00061}{61}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchcontext_8h_source_l00157}{Current\+Token}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00150}{Current\+Token\+List}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00148}{Index}}, and \mbox{\hyperlink{zsearchcontext_8h_source_l00152}{Index\+Stack}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a3f7c84d4491cbe47abb4d57fd3b7a4d2}\label{classzbs_1_1_z_search_context_a3f7c84d4491cbe47abb4d57fd3b7a4d2} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!previousToken@{previousToken}}
+\index{previousToken@{previousToken}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{previousToken()}{previousToken()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearch\+Token}} \texorpdfstring{$\ast$}{*} zbs\+::\+ZSearch\+Context\+::previous\+Token (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00283}{283}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchcontext_8h_source_l00150}{Current\+Token\+List}}, and \mbox{\hyperlink{zsearchcontext_8h_source_l00148}{Index}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a153da8aa372b37d513bb4f7355456740}\label{classzbs_1_1_z_search_context_a153da8aa372b37d513bb4f7355456740} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!pushIndex@{pushIndex}}
+\index{pushIndex@{pushIndex}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{pushIndex()}{pushIndex()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZSearch\+Context\+::push\+Index (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchcontext_8h_source_l00157}{Current\+Token}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00150}{Current\+Token\+List}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00148}{Index}}, and \mbox{\hyperlink{zsearchcontext_8h_source_l00152}{Index\+Stack}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_aec3d6e4cf4aa2494f3a0e773f12aaafa}\label{classzbs_1_1_z_search_context_aec3d6e4cf4aa2494f3a0e773f12aaafa} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!setEntity@{setEntity}}
+\index{setEntity@{setEntity}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{setEntity()}{setEntity()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZSearch\+Context\+::set\+Entity (\begin{DoxyParamCaption}\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classzbs_1_1_z_search_entity}{ZSearch\+Entity}} $>$}]{p\+Entity }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00113}{113}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zsearchcontext_8h_source_l00138}{Source\+Entity}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_ac12a94495c9b2a18e51d845a60ada4da}\label{classzbs_1_1_z_search_context_ac12a94495c9b2a18e51d845a60ada4da} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!setIndex@{setIndex}}
+\index{setIndex@{setIndex}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{setIndex()}{setIndex()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZSearch\+Context\+::set\+Index (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Index }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchcontext_8h_source_l00157}{Current\+Token}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00150}{Current\+Token\+List}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsearchcontext_8h_source_l00148}{Index}}, and \mbox{\hyperlink{zsearchcontext_8h_source_l00152}{Index\+Stack}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a219659a80e419f97cf3a5a795b409f65}\label{classzbs_1_1_z_search_context_a219659a80e419f97cf3a5a795b409f65} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!setMainPhrase@{setMainPhrase}}
+\index{setMainPhrase@{setMainPhrase}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{setMainPhrase()}{setMainPhrase()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZSearch\+Context\+::set\+Main\+Phrase (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \texorpdfstring{$\ast$}{*}}]{p\+Main\+Phrase }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00084}{84}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zsearchcontext_8h_source_l00161}{Main\+Phrase}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_ab8abedafc65be36841b5fd95605a53e2}\label{classzbs_1_1_z_search_context_ab8abedafc65be36841b5fd95605a53e2} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!TokenReport@{TokenReport}}
+\index{TokenReport@{TokenReport}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{TokenReport()}{TokenReport()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZSearch\+Context\+::\+Token\+Report (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8cpp_source_l00224}{224}} of file \mbox{\hyperlink{zsearchcontext_8cpp_source}{zsearchcontext.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsearchcontext_8h_source_l00150}{Current\+Token\+List}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classzbs_1_1_z_search_context_acb1ed21c03331407771361126f536096}\label{classzbs_1_1_z_search_context_acb1ed21c03331407771361126f536096} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!CurrentToken@{CurrentToken}}
+\index{CurrentToken@{CurrentToken}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{CurrentToken}{CurrentToken}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearch\+Token}}\texorpdfstring{$\ast$}{*} zbs\+::\+ZSearch\+Context\+::\+Current\+Token =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00157}{157}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00025}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00231}{advance\+Index()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00207}{begin\+Context()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00137}{clear()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00131}{has\+Current()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00117}{is\+Nested()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00103}{is\+Nested\+All()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00089}{is\+Nested\+Field()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00061}{pop\+Index()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00057}{push\+Index()}}, and \mbox{\hyperlink{zsearchcontext_8cpp_source_l00050}{set\+Index()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_af96607883743247c5c24e4336a50d373}\label{classzbs_1_1_z_search_context_af96607883743247c5c24e4336a50d373} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!CurrentTokenList@{CurrentTokenList}}
+\index{CurrentTokenList@{CurrentTokenList}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{CurrentTokenList}{CurrentTokenList}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_array}{ZArray}}$<$\mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearch\+Token}}\texorpdfstring{$\ast$}{*}$>$ zbs\+::\+ZSearch\+Context\+::\+Current\+Token\+List}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00150}{150}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00231}{advance\+Index()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00207}{begin\+Context()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00137}{clear()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00080}{is\+EOF()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00117}{is\+Nested()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00103}{is\+Nested\+All()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00089}{is\+Nested\+Field()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00290}{last\+Token()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00276}{next\+Token()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00072}{not\+EOF()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00061}{pop\+Index()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00283}{previous\+Token()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00057}{push\+Index()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00050}{set\+Index()}}, and \mbox{\hyperlink{zsearchcontext_8cpp_source_l00224}{Token\+Report()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_aa319dde36217690ece3e9082537254b6}\label{classzbs_1_1_z_search_context_aa319dde36217690ece3e9082537254b6} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!HasInstruction@{HasInstruction}}
+\index{HasInstruction@{HasInstruction}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{HasInstruction}{HasInstruction}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZSearch\+Context\+::\+Has\+Instruction =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00155}{155}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00025}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zsearchcontext_8cpp_source_l00137}{clear()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_ac768232bb89b66a6f829ba613195885f}\label{classzbs_1_1_z_search_context_ac768232bb89b66a6f829ba613195885f} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!Index@{Index}}
+\index{Index@{Index}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{Index}{Index}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} zbs\+::\+ZSearch\+Context\+::\+Index =0}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00148}{148}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00025}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00231}{advance\+Index()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00207}{begin\+Context()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00080}{is\+EOF()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00117}{is\+Nested()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00103}{is\+Nested\+All()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00089}{is\+Nested\+Field()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00276}{next\+Token()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00072}{not\+EOF()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00061}{pop\+Index()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00283}{previous\+Token()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00057}{push\+Index()}}, and \mbox{\hyperlink{zsearchcontext_8cpp_source_l00050}{set\+Index()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a5e7cc761ebb28b0d180ac4bd6b23160c}\label{classzbs_1_1_z_search_context_a5e7cc761ebb28b0d180ac4bd6b23160c} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!IndexStack@{IndexStack}}
+\index{IndexStack@{IndexStack}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{IndexStack}{IndexStack}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_array}{ZArray}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}$>$ zbs\+::\+ZSearch\+Context\+::\+Index\+Stack}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00152}{152}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00061}{pop\+Index()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00057}{push\+Index()}}, and \mbox{\hyperlink{zsearchcontext_8cpp_source_l00050}{set\+Index()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_ae97904d0bab9c41cececae765ed59900}\label{classzbs_1_1_z_search_context_ae97904d0bab9c41cececae765ed59900} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!InstructionType@{InstructionType}}
+\index{InstructionType@{InstructionType}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{InstructionType}{InstructionType}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} zbs\+::\+ZSearch\+Context\+::\+Instruction\+Type = \mbox{\hyperlink{namespacezbs_a110c9d7d77d2d54ac9112d37647b0cd9a8fd5bf81ff228e3e9a3078b104a9a500}{ZSITP\+\_\+\+Nothing}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00143}{143}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00025}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zsearchcontext_8cpp_source_l00137}{clear()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_ae91f0a7fab90b9bd82fffe4c263d4415}\label{classzbs_1_1_z_search_context_ae91f0a7fab90b9bd82fffe4c263d4415} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!LastErroredToken@{LastErroredToken}}
+\index{LastErroredToken@{LastErroredToken}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{LastErroredToken}{LastErroredToken}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearch\+Token}}\texorpdfstring{$\ast$}{*} zbs\+::\+ZSearch\+Context\+::\+Last\+Errored\+Token =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00158}{158}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00231}{advance\+Index()}}, and \mbox{\hyperlink{zsearchcontext_8cpp_source_l00207}{begin\+Context()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_aad485d9e0ea26daca504d0d2780ba4f1}\label{classzbs_1_1_z_search_context_aad485d9e0ea26daca504d0d2780ba4f1} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!MainPhrase@{MainPhrase}}
+\index{MainPhrase@{MainPhrase}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{MainPhrase}{MainPhrase}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}}\texorpdfstring{$\ast$}{*} zbs\+::\+ZSearch\+Context\+::\+Main\+Phrase =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00161}{161}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00025}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00137}{clear()}}, and \mbox{\hyperlink{zsearchcontext_8h_source_l00084}{set\+Main\+Phrase()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_ac4bee4e97a70cc35538e986eabeb30d3}\label{classzbs_1_1_z_search_context_ac4bee4e97a70cc35538e986eabeb30d3} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!Number@{Number}}
+\index{Number@{Number}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{Number}{Number}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} zbs\+::\+ZSearch\+Context\+::\+Number = -\/1}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00144}{144}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00025}{\+\_\+copy\+From()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a1ccc5b60ab244eec2d4b429a90e2fcd8}\label{classzbs_1_1_z_search_context_a1ccc5b60ab244eec2d4b429a90e2fcd8} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!Parser@{Parser}}
+\index{Parser@{Parser}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{Parser}{Parser}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_search_parser}{ZSearch\+Parser}}\texorpdfstring{$\ast$}{*} zbs\+::\+ZSearch\+Context\+::\+Parser =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00147}{147}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00025}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00231}{advance\+Index()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00207}{begin\+Context()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00137}{clear()}}, and \mbox{\hyperlink{zsearchcontext_8h_source_l00092}{is\+Invalid()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a21ed9d02759ba0b44cf75d8b6b9cb9c9}\label{classzbs_1_1_z_search_context_a21ed9d02759ba0b44cf75d8b6b9cb9c9} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!Phrase@{Phrase}}
+\index{Phrase@{Phrase}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{Phrase}{Phrase}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} zbs\+::\+ZSearch\+Context\+::\+Phrase}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00160}{160}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00025}{\+\_\+copy\+From()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a42016fd5c9b50b1a953af477763841c6}\label{classzbs_1_1_z_search_context_a42016fd5c9b50b1a953af477763841c6} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!SEC@{SEC}}
+\index{SEC@{SEC}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{SEC}{SEC}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classzbs_1_1_z_search_entity_context}{ZSearch\+Entity\+Context}}$>$ zbs\+::\+ZSearch\+Context\+::\+SEC =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00141}{141}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00025}{\+\_\+copy\+From()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a80810412f31e8733e786c2c052d1714e}\label{classzbs_1_1_z_search_context_a80810412f31e8733e786c2c052d1714e} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!SourceEntity@{SourceEntity}}
+\index{SourceEntity@{SourceEntity}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{SourceEntity}{SourceEntity}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classzbs_1_1_z_search_entity}{ZSearch\+Entity}}$>$ zbs\+::\+ZSearch\+Context\+::\+Source\+Entity =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00138}{138}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00025}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00156}{clear\+Entities()}}, \mbox{\hyperlink{zsearchquerymwd_8cpp_source_l00899}{ZSearch\+Query\+MWd\+::\+Display\+Current\+Entity()}}, and \mbox{\hyperlink{zsearchcontext_8h_source_l00113}{set\+Entity()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a2e064d78b16555339ebbaa9a7e5a3ad7}\label{classzbs_1_1_z_search_context_a2e064d78b16555339ebbaa9a7e5a3ad7} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!Status@{Status}}
+\index{Status@{Status}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{Status}{Status}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} zbs\+::\+ZSearch\+Context\+::\+Status =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\+\_\+\+SUCCESS}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00165}{165}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00025}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00231}{advance\+Index()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00207}{begin\+Context()}}, and \mbox{\hyperlink{zsearchcontext_8cpp_source_l00137}{clear()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a343b6a625d500776e2b19c6bec5bc8bd}\label{classzbs_1_1_z_search_context_a343b6a625d500776e2b19c6bec5bc8bd} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!Store@{Store}}
+\index{Store@{Store}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{Store}{Store}}
+{\footnotesize\ttfamily \mbox{\hyperlink{namespacezbs_a49a7c1da6c08bdb0644c8fd6c705a1a3}{Instruction\+Flag\+\_\+type}} zbs\+::\+ZSearch\+Context\+::\+Store =\mbox{\hyperlink{classzbs_1_1_z_search_history_a8f082a9d08967796b0dfd86fb9b06d11a9c494bdfc2bc89e54cf7366e62754ac3}{ZSearch\+History\+::\+Forget}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00154}{154}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00025}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zsearchcontext_8cpp_source_l00137}{clear()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a70b392cc4bc321ee0097645b7ae2854c}\label{classzbs_1_1_z_search_context_a70b392cc4bc321ee0097645b7ae2854c} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!TargetEntity@{TargetEntity}}
+\index{TargetEntity@{TargetEntity}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{TargetEntity}{TargetEntity}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classzbs_1_1_z_search_entity}{ZSearch\+Entity}}$>$ zbs\+::\+ZSearch\+Context\+::\+Target\+Entity =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00139}{139}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00156}{clear\+Entities()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_ada46c827ff0ff8678ad1f7fe14f11826}\label{classzbs_1_1_z_search_context_ada46c827ff0ff8678ad1f7fe14f11826} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!TokenIdentifier@{TokenIdentifier}}
+\index{TokenIdentifier@{TokenIdentifier}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{TokenIdentifier}{TokenIdentifier}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearch\+Token}}\texorpdfstring{$\ast$}{*} zbs\+::\+ZSearch\+Context\+::\+Token\+Identifier =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00159}{159}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00137}{clear()}}.
+
+\Hypertarget{classzbs_1_1_z_search_context_a6f21334b1356550197ebe77eb311bc06}\label{classzbs_1_1_z_search_context_a6f21334b1356550197ebe77eb311bc06} 
+\index{zbs::ZSearchContext@{zbs::ZSearchContext}!TokenStart@{TokenStart}}
+\index{TokenStart@{TokenStart}!zbs::ZSearchContext@{zbs::ZSearchContext}}
+\doxysubsubsection{\texorpdfstring{TokenStart}{TokenStart}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearch\+Token}}\texorpdfstring{$\ast$}{*} zbs\+::\+ZSearch\+Context\+::\+Token\+Start =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchcontext_8h_source_l00156}{156}} of file \mbox{\hyperlink{zsearchcontext_8h_source}{zsearchcontext.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchcontext_8cpp_source_l00025}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zsearchcontext_8cpp_source_l00207}{begin\+Context()}}, and \mbox{\hyperlink{zsearchcontext_8cpp_source_l00137}{clear()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zsearchcontext_8h}{zsearchcontext.\+h}}\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zsearchcontext_8cpp}{zsearchcontext.\+cpp}}\end{DoxyCompactItemize}

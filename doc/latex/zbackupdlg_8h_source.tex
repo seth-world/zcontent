@@ -1,0 +1,83 @@
+\doxysection{zbackupdlg.\+h}
+\hypertarget{zbackupdlg_8h_source}{}\label{zbackupdlg_8h_source}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zbackupdlg.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zbackupdlg.h}}
+\mbox{\hyperlink{zbackupdlg_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZMFBCKDLG\_H}}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ ZMFBCKDLG\_H}}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <QDialog>}}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <ztoolset/uristring.h>}}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zmasterfile_8h}{zcontent/zindexedfile/zmasterfile.h}}>}}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{zindexedfile_2bckelement_8h}{bckelement.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00012}00012\ \textcolor{keyword}{class\ }QLabel;}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00013}00013\ \textcolor{keyword}{class\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QLineEdit}};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00014}00014\ \textcolor{keyword}{class\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZQTableView}};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00015}00015\ \textcolor{keyword}{class\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QProgressBar}};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00017}00017\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtext_edit_m_wn}{textEditMWn}};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00022}\mbox{\hyperlink{class_z_backup_d_lg}{00022}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_z_backup_d_lg}{ZBackupDLg}}\ :\ \textcolor{keyword}{public}\ QDialog}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00023}00023\ \{}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00024}00024\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Q\_OBJECT}}}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00026}00026\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00027}00027\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{class_z_backup_d_lg}{ZBackupDLg}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QWidget}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pParent}});}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00028}00028\ \ \ \mbox{\hyperlink{class_z_backup_d_lg_a92724cf8f68be71c5b11d00aee728be2}{\string~ZBackupDLg}}();}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00030}00030\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_backup_d_lg_afdebe08370d29fd166ae8c94a13dd395}{initLayout}}();}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00032}00032\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_backup_d_lg_accb2aaa1c1482494688d836504b66017}{dataSetup}}(uriString\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pURIMaster}},\ \textcolor{keyword}{const}\ uriString\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pTargetDir}}=\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00034}00034\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_backup_d_lg_a8846b77f869887d0a291cf2530614bd3}{XmlSaveBackupset}}(uriString\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pXmlFile}},\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pComment}}=\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00035}00035\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_backup_d_lg_ae8db1580c57bb716628e70a5d1431038}{XmlLoadBackupset}}(\textcolor{keyword}{const}\ uriString\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pXmlFile}},\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZDateFull}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pBackupDate}});}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00037}00037\ \ \ \mbox{\hyperlink{class_bck_element}{BckElement}}\ \mbox{\hyperlink{class_z_backup_d_lg_ac1ae18a272652cc247aaa4c7faa4ed93}{getElt}}(\textcolor{keyword}{const}\ uriString\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pSource}},\ \textcolor{keyword}{const}\ uriString\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pTargetDir}}=uriString());}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00039}00039\ \textcolor{keyword}{private}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{slots}}:}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00040}00040\ \ \ \textcolor{keywordtype}{bool}\ searchFileClicked()\ ;}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00041}00041\ \ \ \textcolor{keywordtype}{void}\ searchDirClicked()\ ;}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00042}00042\ \ \ \textcolor{keywordtype}{void}\ bckextChanged();}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00044}00044\ \ \ \textcolor{keywordtype}{void}\ doBackup();}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00046}00046\ \ \ \textcolor{keywordtype}{size\_t}\ computeAllSizes();}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00048}00048\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00049}00049\ \ \ \mbox{\hyperlink{classzbs_1_1_z_master_file}{ZMasterFile}}\ \ \ \ \ \ \ MasterFile;}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00051}00051\ \ \ \mbox{\hyperlink{classzbs_1_1_z_array}{ZArray<BckElement>}}\ Files;}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00053}00053\ \ \ uriString\ \ \ \ \ \ \ \ \ URIMasterFile;}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00054}00054\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ MasterBaseName;}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00055}00055\ \ \ uriString\ \ \ \ \ \ \ \ \ SourceDirPath;}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00056}00056\ \ \ uriString\ \ \ \ \ \ \ \ \ BckRootDirectory;}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00058}00058\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ BckName=\textcolor{stringliteral}{"{}bck"{}};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00059}00059\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ BckNumber=1;}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00061}00061\ \ \ QLabel*\ \ \ \ \ \ \ URIMasterFileLBl=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00062}00062\ \ \ QLabel*\ \ \ \ \ \ \ IndexPathLBl=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00063}00063\ \ \ QLabel*\ \ \ \ \ \ \ BckRootDirectoryLBl=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00064}00064\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QLineEdit}}*\ \ \ \ BckNameLEd=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00065}00065\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZQTableView}}*\ \ BckTBv=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00066}00066\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QProgressBar}}*\ ProgressPBr=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00069}00069\ \ \ QPushButton*\ SearchZMFBTn=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00070}00070\ \ \ QPushButton*\ BckDirBTn=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00071}00071\ \ \ QPushButton*\ OkBTn=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00072}00072\ \ \ QPushButton*\ CancelBTn=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00074}00074\ \ \ \mbox{\hyperlink{classtext_edit_m_wn}{textEditMWn}}*\ ComLog=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00075}00075\ \};}
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{zbackupdlg_8h_source_l00077}00077\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZMFBCKDLG\_H}}
+
+\end{DoxyCode}

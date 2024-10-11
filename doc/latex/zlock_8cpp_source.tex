@@ -1,0 +1,90 @@
+\doxysection{zlock.\+cpp}
+\hypertarget{zlock_8cpp_source}{}\label{zlock_8cpp_source}\index{/home/gerard/Development/zbasetools/zcontent/zcontentcommon/zlock.cpp@{/home/gerard/Development/zbasetools/zcontent/zcontentcommon/zlock.cpp}}
+\mbox{\hyperlink{zlock_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZLOCK\_CPP}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00002}\mbox{\hyperlink{zlock_8cpp_a86cb00ccfd43e84b7924e43002fa4b33}{00002}}\ \textcolor{preprocessor}{\#define\ ZLOCK\_CPP}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <ztoolset/charman.h>}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zlock_8h}{zcontentcommon/zlock.h}}>}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00006}00006\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00007}00007\ \textcolor{comment}{const\ char\ *decode\_ZLockReason(ZLock\_Reason\ pReason)}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00008}00008\ \textcolor{comment}{\{}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00009}00009\ \textcolor{comment}{\ \ \ \ switch\ (pReason)}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00010}00010\ \textcolor{comment}{\ \ \ \ \{}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00011}00011\ \textcolor{comment}{\ \ \ \ case\ ZReason\_Nothing:}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00012}00012\ \textcolor{comment}{\ \ \ \ \ \ \ \ return\ "{}ZReason\_Nothing"{};}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00013}00013\ \textcolor{comment}{\ \ \ \ case\ ZReason\_Read:}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00014}00014\ \textcolor{comment}{\ \ \ \ \ \ \ \ return\ "{}ZReason\_Read"{};}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00015}00015\ \textcolor{comment}{\ \ \ \ case\ ZReason\_Modify:}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00016}00016\ \textcolor{comment}{\ \ \ \ \ \ \ \ return\ "{}ZReason\_Modify"{};}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00017}00017\ \textcolor{comment}{\ \ \ \ case\ ZReason\_Delete:}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00018}00018\ \textcolor{comment}{\ \ \ \ \ \ \ \ return\ "{}ZReason\_Delete"{};}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00019}00019\ \textcolor{comment}{\ \ \ \ case\ ZReason\_Create:}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00020}00020\ \textcolor{comment}{\ \ \ \ \ \ \ \ return\ "{}ZReason\_Create"{};}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00021}00021\ \textcolor{comment}{\ \ \ \ case\ ZReason\_Other:}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00022}00022\ \textcolor{comment}{\ \ \ \ \ \ \ \ return\ "{}ZReason\_Other"{};}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00023}00023\ \textcolor{comment}{\ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00024}00024\ \textcolor{comment}{\}}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00025}00025\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00026}\mbox{\hyperlink{struct_z_lockid_a46302264f9060f5fb4a45b2c472b59a1}{00026}}\ \mbox{\hyperlink{struct_z_lockid}{ZLockid}}\ \&\ \mbox{\hyperlink{struct_z_lockid_a46302264f9060f5fb4a45b2c472b59a1}{ZLockid::\_copyFrom}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{struct_z_lockid}{ZLockid}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIn}})}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00027}00027\ \{}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00028}00028\ \ \ \textcolor{keywordtype}{id}=\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIn}}.\mbox{\hyperlink{struct_z_lockid_a142af9cdd94ffe82ff14ae5998e91dce}{id}};}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00029}00029\ \ \ \mbox{\hyperlink{struct_z_lockid_ad80d61a7c920ef344788e10ad83ff2a8}{Owner}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIn}}.Owner;}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00030}00030\ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00031}00031\ \}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00033}\mbox{\hyperlink{struct_z_lockid_a7c999869552ec0d5471e694606d31990}{00033}}\ ZDataBuffer\ \mbox{\hyperlink{struct_z_lockid_a7c999869552ec0d5471e694606d31990}{ZLockid::\_export}}()\textcolor{keyword}{\ const}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00034}00034\ \textcolor{keyword}{}\{}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00035}00035\ \ \ ZDataBuffer\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReturn}};}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00036}00036\ \ \ \mbox{\hyperlink{zlock_8h_ad222e8e591a70f53e4832e26c511cbe5}{ZLockid\_type}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wId}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{reverseByteOrder\_Conditional<ZLockid\_type>}}(\textcolor{keywordtype}{id});}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00037}00037\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReturn}}.setData(\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wId}},\textcolor{keyword}{sizeof}(\mbox{\hyperlink{zlock_8h_ad222e8e591a70f53e4832e26c511cbe5}{ZLockid\_type}}));}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00038}00038\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReturn}}+=\ \mbox{\hyperlink{struct_z_lockid_ad80d61a7c920ef344788e10ad83ff2a8}{Owner}}.\mbox{\hyperlink{class_z_resource_a9f151c5413cb52768fbe6fbaf8b3f083}{\_export}}();}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00039}00039\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReturn}};}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00040}00040\ \}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00042}\mbox{\hyperlink{struct_z_lockid_aeb6ffe4b40d59145309b523a37a2a088}{00042}}\ \textcolor{keywordtype}{size\_t}\ \ \ \ \ \mbox{\hyperlink{struct_z_lockid_aeb6ffe4b40d59145309b523a37a2a088}{ZLockid::\_import}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pUniversalPtr}})}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00043}00043\ \{}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00044}00044\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPtrIn}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pUniversalPtr}};}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00045}00045\ \ \ \mbox{\hyperlink{zlock_8h_ad222e8e591a70f53e4832e26c511cbe5}{ZLockid\_type}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wId}};}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00046}00046\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{memmove}}(\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wId}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPtrIn}},\textcolor{keyword}{sizeof}(\mbox{\hyperlink{zlock_8h_ad222e8e591a70f53e4832e26c511cbe5}{ZLockid\_type}}));}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00047}00047\ \ \ \textcolor{keywordtype}{id}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{reverseByteOrder\_Conditional<ZLockid\_type>}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wId}});}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00048}00048\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pUniversalPtr}}\ +=\ \textcolor{keyword}{sizeof}(\mbox{\hyperlink{zlock_8h_ad222e8e591a70f53e4832e26c511cbe5}{ZLockid\_type}});}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00049}00049\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wLen}}=\textcolor{keyword}{sizeof}(\mbox{\hyperlink{zlock_8h_ad222e8e591a70f53e4832e26c511cbe5}{ZLockid\_type}});}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00050}00050\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wLen}}\ +=\ \mbox{\hyperlink{struct_z_lockid_ad80d61a7c920ef344788e10ad83ff2a8}{Owner}}.\mbox{\hyperlink{class_z_resource_af7bdc1444c5466a6a9acbbc56aa3e7b1}{\_import}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pUniversalPtr}});}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00051}00051\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wLen}};}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00052}00052\ \}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00055}\mbox{\hyperlink{zlock_8cpp_a0e1b1a6a55ab723d3610e4f44f98c0d6}{00055}}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zlock_8cpp_a0e1b1a6a55ab723d3610e4f44f98c0d6}{decode\_ZLockMask}}(\mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\_type}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pLock}})}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00056}00056\ \{}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00057}00057\ \ \ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCh}};}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00058}00058\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pLock}}\ ==\ \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\_Nolock}})}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}(\textcolor{stringliteral}{"{}ZLock\_Nolock"{}});}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00060}00060\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pLock}}\ ==\ \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a37e8b1c5cb41e32ed0815918a23afe53}{ZLock\_All}})}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00061}00061\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}ZLock\_All"{}};}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00063}00063\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pLock}}\ \&\ \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a4adc3b190f36b3a5659f1f992c511a52}{ZLock\_Exclusive}})\ \{}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00064}00064\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCh}}.addConditionalOR(\textcolor{stringliteral}{"{}ZLock\_Exclusive\ "{}});}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00065}00065\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00066}00066\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pLock}}\ \&\ \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a671ab03a7c7c2c69b20b322dd1df50dd}{ZLock\_Delete}})\ \{}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00067}00067\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCh}}.addConditionalOR(\ \textcolor{stringliteral}{"{}ZLock\_Delete\ "{}});}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00068}00068\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00069}00069\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pLock}}\ \&\ \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60af7ea2fcf19a23d77c15ed5b103a14d2c}{ZLock\_Read}})\ \{}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCh}}.addConditionalOR(\ \textcolor{stringliteral}{"{}ZLock\_Read\ "{}});}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00071}00071\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00072}00072\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pLock}}\ \&\ \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60af25650eb0b3545ce80c26b544361a242}{ZLock\_Modify}})\ \{}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCh}}.addConditionalOR(\textcolor{stringliteral}{"{}ZLock\_Modify\ "{}});}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00074}00074\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00075}00075\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pLock}}\ \&\ \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60af7ea2fcf19a23d77c15ed5b103a14d2c}{ZLock\_Read}})\ \{}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCh}}.addConditionalOR(\textcolor{stringliteral}{"{}ZLock\_Read\ "{}});}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00077}00077\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00078}00078\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCh}}[0]\ ==\ 0)\ \{}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}(\textcolor{stringliteral}{"{}Unknown\ lock\ code"{}});}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00080}00080\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00081}00081\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCh}};}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00082}00082\ \}\ \textcolor{comment}{//decode\_ZLockMask}}
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{zlock_8cpp_source_l00084}00084\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//ZLOCK\_CPP}}
+
+\end{DoxyCode}

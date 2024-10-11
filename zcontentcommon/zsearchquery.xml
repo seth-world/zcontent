@@ -1,0 +1,608 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<indexing>
+ <paragraph index="11" node_type="writer">    {&quot;SET&quot;,ZSRCH_SET},</paragraph>
+ <paragraph index="12" node_type="writer">    {&quot;FILE&quot;,ZSRCH_FILE},</paragraph>
+ <paragraph index="14" node_type="writer">    {&quot;MODE&quot;,ZSRCH_MODE},</paragraph>
+ <paragraph index="15" node_type="writer">    {&quot;READONLY&quot;,ZSRCH_READONLY},</paragraph>
+ <paragraph index="16" node_type="writer">    {&quot;MODIFY&quot;,ZSRCH_MODIFY},</paragraph>
+ <paragraph index="18" node_type="writer">    {&quot;FINISH&quot;,ZSRCH_FINISH},</paragraph>
+ <paragraph index="20" node_type="writer">    {&quot;FIND&quot;,ZSRCH_FIND},</paragraph>
+ <paragraph index="21" node_type="writer">    {&quot;IN&quot;,ZSRCH_IN},</paragraph>
+ <paragraph index="22" node_type="writer">    {&quot;ALL&quot;,ZSRCH_ALL},</paragraph>
+ <paragraph index="23" node_type="writer">    {&quot;FIRST&quot;,ZSRCH_FIRST},</paragraph>
+ <paragraph index="24" node_type="writer">    {&quot;LAST&quot;,ZSRCH_LAST},</paragraph>
+ <paragraph index="25" node_type="writer">    {&quot;AT&quot;,ZSRCH_AT},</paragraph>
+ <paragraph index="27" node_type="writer">    {&quot;WITH&quot;,ZSRCH_WITH},</paragraph>
+ <paragraph index="28" node_type="writer">    {&quot;AS&quot;,ZSRCH_AS},</paragraph>
+ <paragraph index="30" node_type="writer">    {&quot;INDEX&quot;,ZSRCH_INDEX},</paragraph>
+ <paragraph index="31" node_type="writer">    {&quot;FOR&quot;,ZSRCH_FOR},</paragraph>
+ <paragraph index="33" node_type="writer">    {&quot;SHOW&quot;,ZSRCH_SHOW},</paragraph>
+ <paragraph index="34" node_type="writer">    {&quot;CLEAR&quot;,ZSRCH_CLEAR},</paragraph>
+ <paragraph index="35" node_type="writer">    {&quot;HISTORY&quot;,ZSRCH_HISTORY},</paragraph>
+ <paragraph index="37" node_type="writer">    {&quot;ENTITY&quot;,ZSRCH_ENTITY},</paragraph>
+ <paragraph index="38" node_type="writer">    {&quot;ENTITIES&quot;,ZSRCH_ENTITY},</paragraph>
+ <paragraph index="40" node_type="writer">    {&quot;SYMBOL&quot;,ZSRCH_SYMBOL},</paragraph>
+ <paragraph index="41" node_type="writer">    {&quot;SYMBOLS&quot;,ZSRCH_SYMBOL},</paragraph>
+ <paragraph index="43" node_type="writer">    {&quot;MAXIMUM&quot;,ZSRCH_MAXIMUM},</paragraph>
+ <paragraph index="45" node_type="writer">    {&quot;DISPLAY&quot;,ZSRCH_DISPLAY},</paragraph>
+ <paragraph index="48" node_type="writer">    {&quot;AND&quot;,ZSRCH_OPERATOR_AND},</paragraph>
+ <paragraph index="49" node_type="writer">    {&quot;OR&quot;,ZSRCH_OPERATOR_OR},</paragraph>
+ <paragraph index="52" node_type="writer">    {&quot;CONTAINS&quot;,ZSRCH_CONTAINS},</paragraph>
+ <paragraph index="53" node_type="writer">    {&quot;STARTS&quot;,ZSRCH_MAYBE_STARTS_WITH},</paragraph>
+ <paragraph index="54" node_type="writer">    {&quot;ENDS&quot;,ZSRCH_MAYBE_ENDS_WITH},</paragraph>
+ <paragraph index="55" node_type="writer">    {&quot;SUBSTRING&quot;,ZSRCH_SUBSTRING},</paragraph>
+ <paragraph index="58" node_type="writer">    {&quot;YEAR&quot;,ZSRCH_YEAR},</paragraph>
+ <paragraph index="59" node_type="writer">    {&quot;MONTH&quot;,ZSRCH_MONTH},</paragraph>
+ <paragraph index="60" node_type="writer">    {&quot;DAY&quot;,ZSRCH_DAY},</paragraph>
+ <paragraph index="61" node_type="writer">    {&quot;HOUR&quot;,ZSRCH_HOUR},</paragraph>
+ <paragraph index="62" node_type="writer">    {&quot;MIN&quot;,ZSRCH_MIN},</paragraph>
+ <paragraph index="63" node_type="writer">    {&quot;SEC&quot;,ZSRCH_SEC},</paragraph>
+ <paragraph index="65" node_type="writer">    {&quot;ZRESOURCE&quot;,ZSRCH_RESOURCE_LITERAL},</paragraph>
+ <paragraph index="67" node_type="writer">    {&quot;ZENTITY&quot;,ZSRCH_ZENTITY},</paragraph>
+ <paragraph index="68" node_type="writer">    {&quot;ID&quot;,ZSRCH_ID},</paragraph>
+ <paragraph index="70" node_type="writer">    {&quot;ZDATE&quot;,ZSRCH_ZDATE_LITERAL},</paragraph>
+ <paragraph index="72" node_type="writer">    {&quot;CHECKSUM&quot;,ZSRCH_CHECKSUM_LITERAL},</paragraph>
+ <paragraph index="73" node_type="writer">    {&quot;MD5&quot;,ZSRCH_MD5_LITERAL},</paragraph>
+ <paragraph index="75" node_type="writer">    /* uriString modifiers */</paragraph>
+ <paragraph index="77" node_type="writer">    {&quot;PATH&quot;,ZSRCH_PATH},</paragraph>
+ <paragraph index="78" node_type="writer">    {&quot;EXTENSION&quot;,ZSRCH_EXTENSION},</paragraph>
+ <paragraph index="79" node_type="writer">    {&quot;BASENAME&quot;,ZSRCH_BASENAME},</paragraph>
+ <paragraph index="80" node_type="writer">    {&quot;ROOTNAME&quot;,ZSRCH_ROOTNAME},</paragraph>
+ <paragraph index="82" node_type="writer">    {&quot;INT&quot;,ZSRCH_INTEGER},</paragraph>
+ <paragraph index="83" node_type="writer">    {&quot;INTEGER&quot;,ZSRCH_INTEGER}</paragraph>
+ <paragraph index="85" node_type="writer">    /*</paragraph>
+ <paragraph index="86" node_type="writer">  enum ShowEnum {</paragraph>
+ <paragraph index="87" node_type="writer">    SHENUM_NOTHING = 0,</paragraph>
+ <paragraph index="88" node_type="writer">    SHENUM_ENTITY = 1,</paragraph>
+ <paragraph index="89" node_type="writer">    SHENUM_ENTITYFIELDS = 2,</paragraph>
+ <paragraph index="90" node_type="writer">    SHENUM_MASTER = 3,</paragraph>
+ <paragraph index="91" node_type="writer">    SHENUM_ZENTITY = 4,</paragraph>
+ <paragraph index="92" node_type="writer">    SHENUM_SYMBOL = 5,</paragraph>
+ <paragraph index="93" node_type="writer">    SHENUM_HISTORY = 6,</paragraph>
+ <paragraph index="94" node_type="writer">  } wShowEnum=SHENUM_NOTHING;</paragraph>
+ <paragraph index="95" node_type="writer">    */</paragraph>
+ <paragraph index="98" node_type="writer">                                          &lt;-----selection phrase---------&gt;&lt;---alias------------&gt;\n&quot;;</paragraph>
+ <paragraph index="99" node_type="writer">  find  [all,first]  &lt;entity name&gt; with   &lt;entity name&gt;.&lt;field name&gt; .... [as &lt;collection name&gt;] ;  NB: by default, find first is executed \n</paragraph>
+ <paragraph index="100" node_type="writer">\n</paragraph>
+ <paragraph index="101" node_type="writer">                      &lt;--------------- assignment phrase ------------&gt;</paragraph>
+ <paragraph index="102" node_type="writer">for &lt;entity&gt; with [all,first] &lt;selection phrase &gt; set [&lt;entity name&gt;.]&lt;field name&gt; = &lt;value&gt; , [&lt;entity name&gt;.]&lt;field name&gt; = &lt;value&gt; ... ;</paragraph>
+ <paragraph index="104" node_type="writer">for &lt;collection name&gt; set &lt;fieldname&gt;=&lt;value&gt; , &lt;fieldname&gt;=&lt;value&gt; ... ;</paragraph>
+ <paragraph index="106" node_type="writer">display {&lt;collection name&gt;.&lt;field&gt;, &lt;collection name&gt;.&lt;field&gt;,... | &lt;collection name&gt;.all | &lt;collection name&gt;.* } ;</paragraph>
+ <paragraph index="108" node_type="writer">/*                  &lt;---field selection clause ----&gt;                         &lt;-------record selection clause-------------------&gt;</paragraph>
+ <paragraph index="109" node_type="writer">                    [&lt;entity name&gt;.]&lt;field name&gt;,...</paragraph>
+ <paragraph index="110" node_type="writer">  find  [all,first]                                     in &lt;entity name&gt; with &lt;entity name&gt;.&lt;field name&gt; == &lt;value&gt; [and,or] ... [as &lt;collection name&gt;] ;</paragraph>
+ <paragraph index="111" node_type="writer">                    [ &lt;entity name&gt;.]*</paragraph>
+ <paragraph index="113" node_type="writer">    all = all records corresponding to selection clause</paragraph>
+ <paragraph index="114" node_type="writer">    first = first record corresponding to selection clause</paragraph>
+ <paragraph index="117" node_type="writer">field selection :</paragraph>
+ <paragraph index="118" node_type="writer">&lt;field name&gt;</paragraph>
+ <paragraph index="119" node_type="writer">decode (&lt;field name 0&gt;,&lt;entity name 1&gt;,&lt;field name 1&gt;,&lt;field name 2&gt;)</paragraph>
+ <paragraph index="121" node_type="writer">&lt;field name&gt;.DECODE(&lt;entity name&gt;,&lt;match field name&gt;,&lt;result field name&gt;)</paragraph>
+ <paragraph index="123" node_type="writer">&lt;field name&gt; content is replaced with &lt;result field name&gt; </paragraph>
+ <paragraph index="124" node_type="writer">after searching in &lt;entity name&gt; for value of &lt;field name&gt; first match with &lt;entity name&gt;.&lt;match field name&gt;</paragraph>
+ <paragraph index="129" node_type="writer">decode clause :</paragraph>
+ <paragraph index="131" node_type="writer">search within already declared and stored &lt;entity name 1&gt;</paragraph>
+ <paragraph index="132" node_type="writer">        for value fo &lt;field name 0&gt; from current selection to be equal to &lt;field name 1&gt;</paragraph>
+ <paragraph index="133" node_type="writer">                then returns &lt;field name 2&gt;</paragraph>
+ <paragraph index="136" node_type="writer">-------- Dictionary display -----------------------------------------</paragraph>
+ <paragraph index="138" node_type="writer">  show entities;                                  -&gt; list all entities and collections available</paragraph>
+ <paragraph index="139" node_type="writer">  show ZEntity;                                   -&gt; list all ZEntity symbols (used for ZResource)</paragraph>
+ <paragraph index="140" node_type="writer">  show symbols ;                                  -&gt; list all symbols available : a symbol is a shortcut to a filename</paragraph>
+ <paragraph index="141" node_type="writer">  show {&lt;entity&gt; | &lt;collection name&gt;} fields ;</paragraph>
+ <paragraph index="142" node_type="writer">  show {&lt;entity&gt; | &lt;collection name&gt;} &lt;fieldname&gt; ; // exact field name</paragraph>
+ <paragraph index="143" node_type="writer">  show {&lt;entity&gt; | &lt;collection name&gt;} sss* ; // field name starting with 'sss'</paragraph>
+ <paragraph index="144" node_type="writer">  show {&lt;entity&gt; | &lt;collection name&gt;} *sss ; // field name ending with 'sss'</paragraph>
+ <paragraph index="145" node_type="writer">  show {&lt;entity&gt; | &lt;collection name&gt;} *sss* ; // field name containing 'sss'</paragraph>
+ <paragraph index="149" node_type="writer">Instruction history</paragraph>
+ <paragraph index="151" node_type="writer">  set history maximum nn ;  -&gt; set the maximum instruction lines to keep in history log. Default is 40</paragraph>
+ <paragraph index="153" node_type="writer">  show history ;  -&gt; display all instruction lines in history log</paragraph>
+ <paragraph index="156" node_type="writer">  clear history ;       -&gt; removes ALL instruction lines from the history. History is then empty.</paragraph>
+ <paragraph index="158" node_type="writer">  clear history first 5; -&gt; removes the 5 FIRST instruction lines in the history or removes all the first lines until 3.</paragraph>
+ <paragraph index="160" node_type="writer">  clear history last 3;  -&gt; removes the 3 LAST instruction lines in the history or removes all the last lines until 3.</paragraph>
+ <paragraph index="162" node_type="writer">  clear history at 3 ; -&gt; removes the third instruction line in the history. If rank 3 does not exist in history, nothing is done.</paragraph>
+ <paragraph index="163" node_type="writer">                            NB: rank is counted from 1 (and not from 0)</paragraph>
+ <paragraph index="167" node_type="writer">  finish ;  // release resources flush and close open files</paragraph>
+ <paragraph index="170" node_type="writer">Symbols</paragraph>
+ <paragraph index="172" node_type="writer">Symbols are named literals of any data type (Uri, String, Integer, Float, Date, Resource, Checksum).</paragraph>
+ <paragraph index="173" node_type="writer">Symbols may be used in expressions : selection clauses, arithmetic expressions, logical expressions etc.</paragraph>
+ <paragraph index="175" node_type="writer">declare &lt;symbol name&gt; = &lt;literal value&gt; ;</paragraph>
+ <paragraph index="177" node_type="writer">Creates a symbol with name &lt;symbol name&gt; and set its value content to &lt;literal value&gt;.</paragraph>
+ <paragraph index="178" node_type="writer">&lt;literal value&gt; is </paragraph>
+ <paragraph index="179" node_type="writer">of any data type , </paragraph>
+ <paragraph index="180" node_type="writer">may be an  arithmetic expression composed of literals and other defined symbols. 
+Entity fields are not allowed</paragraph>
+ <paragraph index="181" node_type="writer">a logical expression composed of literals and other defined symbols.
+Entity fields are not allowed</paragraph>
+ <paragraph index="183" node_type="writer">set &lt;symbol name&gt; = &lt;literal value&gt; ;</paragraph>
+ <paragraph index="185" node_type="writer">Changes actual value of symbol with name &lt;symbol name&gt; with &lt;literal value&gt;.</paragraph>
+ <paragraph index="186" node_type="writer">&lt;literal value&gt; may be of any data type regardless symbol actual content data type.</paragraph>
+ <paragraph index="188" node_type="writer">Changes the content value of symbol &lt;symbol name&gt; to &lt;literal value&gt;.</paragraph>
+ <paragraph index="189" node_type="writer">Remark : &lt;literal value&gt; may be of any data type regardless what actual symbol content is.</paragraph>
+ <paragraph index="191" node_type="writer">clear &lt;symbol name&gt; ;</paragraph>
+ <paragraph index="193" node_type="writer">Removes &lt;symbol name&gt; from the list of symbols and releases symbol associated resources from memory.</paragraph>
+ <paragraph index="194" node_type="writer">After this instruction, symbol &lt;symbol name&gt; is not known anymore.</paragraph>
+ <paragraph index="196" node_type="writer">save symbols to &lt;xml file path&gt; ;</paragraph>
+ <paragraph index="198" node_type="writer">Saves the whole symbol list containing symbols already declared (and not cleared).</paragraph>
+ <paragraph index="199" node_type="writer">List is saved in xml format within file with path &lt;xml file path&gt;.</paragraph>
+ <paragraph index="200" node_type="writer">If this file already exists, then it is simply replaced without any backup.</paragraph>
+ <paragraph index="202" node_type="writer">If no file name extension is mentioned in &lt;xml file path&gt; , then &lt;.xml&gt; extension will be automatically added.  </paragraph>
+ <paragraph index="205" node_type="writer">save symbols ;</paragraph>
+ <paragraph index="207" node_type="writer">If no file path is mentioned, then symbols are saved in default symbol name.</paragraph>
+ <paragraph index="210" node_type="writer">load symbols from &lt;xml file path&gt; ;</paragraph>
+ <paragraph index="212" node_type="writer">load symbols ;</paragraph>
+ <paragraph index="217" node_type="writer">FINISH</paragraph>
+ <paragraph index="219" node_type="writer">FINISH ;</paragraph>
+ <paragraph index="220" node_type="writer">Releases all resources, closes all open files.</paragraph>
+ <paragraph index="222" node_type="writer">Clear instruction set</paragraph>
+ <paragraph index="224" node_type="writer">CLEAR HISTORY ;       </paragraph>
+ <paragraph index="225" node_type="writer"> Removes ALL instruction lines from the instructions history. </paragraph>
+ <paragraph index="226" node_type="writer">After operation History is empty.</paragraph>
+ <paragraph index="228" node_type="writer">CLEAR HISTORY FIRST &lt;nn&gt;; </paragraph>
+ <paragraph index="229" node_type="writer">Removes the &lt;nn&gt; FIRST instruction lines in the history or removes all the first lines up to &lt;nn&gt; if there is not enough lines in the instruction history.</paragraph>
+ <paragraph index="231" node_type="writer">CLEAR HISTORY LAST &lt;nn&gt;; </paragraph>
+ <paragraph index="232" node_type="writer">Removes the &lt;nn&gt; LAST (trailing) instruction lines in the history or removes all the last lines up to &lt;nn&gt; if there is not enough lines in the instruction history.</paragraph>
+ <paragraph index="234" node_type="writer">CLEAR HISTORY AT  &lt;nn&gt; ; </paragraph>
+ <paragraph index="235" node_type="writer">Removes the instruction line at rank &lt;nn&gt; in the history. </paragraph>
+ <paragraph index="236" node_type="writer">If rank &lt;nn&gt; does not exist in history, nothing is done.</paragraph>
+ <paragraph index="237" node_type="writer">NB: rank is counted from 1 (and not from 0).</paragraph>
+ <paragraph index="239" node_type="writer">See SHOW HISTORY</paragraph>
+ <paragraph index="240" node_type="writer">SHOW instruction set </paragraph>
+ <paragraph index="242" node_type="writer">SHOW HISTORY ;</paragraph>
+ <paragraph index="244" node_type="writer">List instructions history</paragraph>
+ <paragraph index="246" node_type="writer">SHOW HISTORY MAXIMUM ;</paragraph>
+ <paragraph index="247" node_type="writer">Displays the maximum number of instruction lines to be stored in history.</paragraph>
+ <paragraph index="249" node_type="writer">SHOW ZENTITY ;</paragraph>
+ <paragraph index="250" node_type="writer">List all ZEntity symbols. </paragraph>
+ <paragraph index="252" node_type="writer">SHOW  { ENTITY , ENTITIES }  ;</paragraph>
+ <paragraph index="253" node_type="writer">list all active entities whatever their type is (either File or Collection).</paragraph>
+ <paragraph index="255" node_type="writer">SHOW { SYMBOL , SYMBOLS } ;</paragraph>
+ <paragraph index="256" node_type="writer">Displays all symbols.</paragraph>
+ <paragraph index="257" node_type="writer">A symbol is a shortcut to a file path.</paragraph>
+ <paragraph index="259" node_type="writer">SHOW MASTERFILES ;</paragraph>
+ <paragraph index="260" node_type="writer">List all active file entities.</paragraph>
+ <paragraph index="262" node_type="writer">SHOW &lt;entity name&gt; FIELDS ;</paragraph>
+ <paragraph index="263" node_type="writer">for  &lt;entity name&gt; list its dictionary;</paragraph>
+ <paragraph index="265" node_type="writer">SHOW &lt;entity name&gt; FORMULA ;</paragraph>
+ <paragraph index="266" node_type="writer">for  &lt;entity name&gt; list its selection formula;</paragraph>
+ <paragraph index="268" node_type="writer">SHOW &lt;entity name&gt; [ALL] ;</paragraph>
+ <paragraph index="270" node_type="writer">Full list of &lt;entity name&gt; entity. Entity must be current.</paragraph>
+ <paragraph index="273" node_type="writer">See CLEAR HISTORY</paragraph>
+ <paragraph index="276" node_type="writer">SET instruction set</paragraph>
+ <paragraph index="277" node_type="writer"> </paragraph>
+ <paragraph index="278" node_type="writer">SET FILE &lt;path&gt; [ MODE { READONLY , MODIFY } ] AS &lt;entity name&gt; ;  </paragraph>
+ <paragraph index="280" node_type="writer">Creates a new entity as file entity accessing master file described by &lt;path&gt; using access mode given by mode clause and stores its reference as &lt;entity name&gt;.</paragraph>
+ <paragraph index="281" node_type="writer">By default mode is read only.</paragraph>
+ <paragraph index="283" node_type="writer">SET HISTORY MAXIMUM &lt;nn&gt; ;</paragraph>
+ <paragraph index="285" node_type="writer">Defines the maximum number of instructions (not lines) stored within history object.</paragraph>
+ <paragraph index="296" node_type="writer">Export </paragraph>
+ <paragraph index="299" node_type="writer">Export &lt;entity name&gt; </paragraph>
+ <paragraph index="302" node_type="writer">Create</paragraph>
+ <paragraph index="304" node_type="writer">Create &lt;entity name&gt; &lt;path name&gt;  </paragraph>
+ <paragraph index="305" node_type="writer">MEANRECORDSIZE = &lt;nn&gt; , </paragraph>
+ <paragraph index="306" node_type="writer">ALLOCATED = &lt;nn&gt; ,</paragraph>
+ <paragraph index="307" node_type="writer">EXTENTQUOTA =  &lt;nn&gt; ,  </paragraph>
+ <paragraph index="308" node_type="writer">GRABFREESPACE = { ON,OFF }  ,</paragraph>
+ <paragraph index="309" node_type="writer">JOURNALING =    { ON,OFF  }</paragraph>
+ <paragraph index="313" node_type="writer">field specifier</paragraph>
+ <paragraph index="315" node_type="writer">Field descriptor</paragraph>
+ <paragraph index="317" node_type="writer">&lt;field name&gt;</paragraph>
+ <paragraph index="318" node_type="writer">A field is designated by its dictionary name or by an integer number representing its rank in the expression where it is invocated.</paragraph>
+ <paragraph index="320" node_type="writer">&lt;entity name&gt;.&lt;field name&gt;</paragraph>
+ <paragraph index="321" node_type="writer">a field may be prefixed by the name of the entity it belongs to.</paragraph>
+ <paragraph index="323" node_type="writer">Field modifiers</paragraph>
+ <paragraph index="325" node_type="writer">A modifier changes the field according to its content and gives a result with potentially another type.</paragraph>
+ <paragraph index="327" node_type="writer">Notation</paragraph>
+ <paragraph index="329" node_type="writer">A modifier is a trailer that changes expression value.</paragraph>
+ <paragraph index="331" node_type="writer">&lt;field name&gt;.&lt;modifier&gt;</paragraph>
+ <paragraph index="333" node_type="writer">&lt;literal&gt;.&lt;modifier&gt;</paragraph>
+ <paragraph index="335" node_type="writer">&lt;arithmetic expression&gt;.&lt;modifier&gt;</paragraph>
+ <paragraph index="337" node_type="writer">Example :</paragraph>
+ <paragraph index="339" node_type="writer">ZDATE(10/01/2025).MONTH ;</paragraph>
+ <paragraph index="341" node_type="writer">gives a field with type ZSTO_LITERALINTEGER of value 1.</paragraph>
+ <paragraph index="343" node_type="writer">&lt;arithmetic expression&gt;.&lt;modifier&gt;</paragraph>
+ <paragraph index="349" node_type="writer">Strings</paragraph>
+ <paragraph index="350" node_type="writer">Candidates are string fields, string literals.</paragraph>
+ <paragraph index="351" node_type="writer">SUBSTRING ( &lt;nn&gt;,&lt;mm&gt;)</paragraph>
+ <paragraph index="353" node_type="writer">extracts a substring starting at offset &lt;nn&gt; with a length of &lt;mm&gt;.</paragraph>
+ <paragraph index="354" node_type="writer">Offset is zero based.</paragraph>
+ <paragraph index="356" node_type="writer">LEFT ( &lt;nn&gt; )</paragraph>
+ <paragraph index="357" node_type="writer">extracts the left &lt;nn&gt; characters from the string.</paragraph>
+ <paragraph index="360" node_type="writer">RIGHT ( &lt;nn&gt;)</paragraph>
+ <paragraph index="362" node_type="writer">extracts the rightest &lt;nn&gt; characters from the string.</paragraph>
+ <paragraph index="365" node_type="writer">Result is a field of type string,</paragraph>
+ <paragraph index="367" node_type="writer">uriString</paragraph>
+ <paragraph index="368" node_type="writer">Candidates are uriString fields and literals,</paragraph>
+ <paragraph index="369" node_type="writer">BASENAME </paragraph>
+ <paragraph index="370" node_type="writer">PATH</paragraph>
+ <paragraph index="371" node_type="writer">EXTENSION</paragraph>
+ <paragraph index="372" node_type="writer">ROOTNAME</paragraph>
+ <paragraph index="375" node_type="writer">resulting fields are of type string,</paragraph>
+ <paragraph index="379" node_type="writer">Resource</paragraph>
+ <paragraph index="381" node_type="writer">A resource defines a unique identifier for any object across the application framework.</paragraph>
+ <paragraph index="382" node_type="writer">It is allocated by lockmanager.</paragraph>
+ <paragraph index="384" node_type="writer">ZResource(ZEntity,id);</paragraph>
+ <paragraph index="386" node_type="writer">where : </paragraph>
+ <paragraph index="388" node_type="writer">ZEntity represents a resource class that could be :</paragraph>
+ <paragraph index="389" node_type="writer">	a ZEntity symbol</paragraph>
+ <paragraph index="390" node_type="writer">	an hexadecimal number </paragraph>
+ <paragraph index="391" node_type="writer">	a decimal number </paragraph>
+ <paragraph index="392" node_type="writer">	later numbers both corresponding to an object class value.</paragraph>
+ <paragraph index="394" node_type="writer">id is a sequential number delivered by LockManager according ZEntity object class value.</paragraph>
+ <paragraph index="395" node_type="writer">This number may be either decimal or hexadecimal.</paragraph>
+ <paragraph index="398" node_type="writer">Examples :</paragraph>
+ <paragraph index="400" node_type="writer">ZResource(ZDocPhysical,2)  : unique resource for class ZdocPhysical with id 2</paragraph>
+ <paragraph index="402" node_type="writer">ZResource( ZEntity_URI  , 0x1AF7 )  : unique resource for class ZEntity_URI with id 0x1AF7 (10’503 decimal)</paragraph>
+ <paragraph index="404" node_type="writer">ZResource( ZEntity_URI  , 10503 ) : same object as previous</paragraph>
+ <paragraph index="405" node_type="writer">  </paragraph>
+ <paragraph index="408" node_type="writer">ZEntity symbols are defined on a per application basis in xml file zsearchparserzentity.xml.</paragraph>
+ <paragraph index="409" node_type="writer">(See file zsearchparserzentity.xml)</paragraph>
+ <paragraph index="411" node_type="writer">ZEntity symbols corresponding values are either system or user defined :</paragraph>
+ <paragraph index="413" node_type="writer">value range ] 0, 0xFFFFF] is reserved for user usage.</paragraph>
+ <paragraph index="414" node_type="writer">Values above 0x100000 are reserved for system usage.</paragraph>
+ <paragraph index="419" node_type="writer">Special case : DECODE</paragraph>
+ <paragraph index="420" node_type="writer">DECODE modifier may be applied to any field, literal, expression result.</paragraph>
+ <paragraph index="422" node_type="writer">It consists in translating field, literal expression result by a match with an entity.</paragraph>
+ <paragraph index="424" node_type="writer">Syntax </paragraph>
+ <paragraph index="426" node_type="writer">&lt;field name&gt;.DECODE  ( &lt;entity name&gt;,&lt;key field&gt;,&lt;resulting field&gt;  [ , &lt;match operator&gt; = ZSOP_EQUAL  ] )</paragraph>
+ <paragraph index="428" node_type="writer">&lt;key field&gt; is a valid field from &lt;entity name&gt;</paragraph>
+ <paragraph index="429" node_type="writer">&lt;resulting field&gt; is a valid field from &lt;entity name&gt;</paragraph>
+ <paragraph index="431" node_type="writer">&lt;match operator&gt; is one of { == ,  &gt; , &lt; . &gt;= , &lt;= }</paragraph>
+ <paragraph index="433" node_type="writer">By default (if &lt;match operator&gt; is omitted) operator == (equal) is taken.</paragraph>
+ <paragraph index="435" node_type="writer">field name content is compared to &lt;entity name&gt;.&lt;key field&gt; using compare operator.</paragraph>
+ <paragraph index="436" node_type="writer">&lt;resulting field&gt; is returned for the first match of logical expression.</paragraph>
+ <paragraph index="438" node_type="writer">Resulting field type</paragraph>
+ <paragraph index="440" node_type="writer">resulting field type is the type of &lt;resulting field&gt;</paragraph>
+ <paragraph index="444" node_type="writer">Field selection clause</paragraph>
+ <paragraph index="446" node_type="writer">This clause sets the fields to be returned from entity.</paragraph>
+ <paragraph index="447" node_type="writer">It may mix pure fields from base entity, arithmetic expressions or resulting fields from DECODE clause.</paragraph>
+ <paragraph index="448" node_type="writer">Field selection clause is a set of field expressions separated by COMMA sign.</paragraph>
+ <paragraph index="450" node_type="writer">Field expression</paragraph>
+ <paragraph index="451" node_type="writer"> &lt;entity&gt;.&lt;field&gt;.&lt;modifier&gt;</paragraph>
+ <paragraph index="453" node_type="writer">  &lt;entity&gt;.&lt;field&gt;</paragraph>
+ <paragraph index="455" node_type="writer">  &lt;field&gt;.&lt;modifier&gt;</paragraph>
+ <paragraph index="456" node_type="writer">  &lt;field&gt;</paragraph>
+ <paragraph index="458" node_type="writer">  NB: &lt;modifer&gt; itself and its possible arguments will be extracted by callee routine (i. e. _parseOperandField())</paragraph>
+ <paragraph index="460" node_type="writer">  &lt;arithmetic expression&gt;</paragraph>
+ <paragraph index="462" node_type="writer">        &lt;literal&gt; \          / &lt;literal&gt;</paragraph>
+ <paragraph index="463" node_type="writer">           or      &lt;operator&gt;    or</paragraph>
+ <paragraph index="464" node_type="writer">        &lt;field&gt;   /          \  &lt;field&gt; </paragraph>
+ <paragraph index="474" node_type="writer">Xml Parameter Files</paragraph>
+ <paragraph index="477" node_type="writer">General parameters xml filename</paragraph>
+ <paragraph index="480" node_type="writer">This file name defines the main parameters for ZBaseTool system.
+In particular, it defines location for parameters files, icons, and the work space for application.</paragraph>
+ <paragraph index="481" node_type="writer">By default, the file name is zgeneralparameters.xml.</paragraph>
+ <paragraph index="483" node_type="writer">File name is passed to application as first argument of command line that launches application.</paragraph>
+ <paragraph index="484" node_type="writer">Full file path must be mentioned.</paragraph>
+ <paragraph index="488" node_type="writer">&lt;zmasterfileparameters version=&quot;'2.3-1'&quot;&gt;</paragraph>
+ <paragraph index="489" node_type="writer">&lt;generalparameters&gt;</paragraph>
+ <paragraph index="490" node_type="writer">&lt;verbose&gt;</paragraph>
+ <paragraph index="491" node_type="writer">ZVB_Basic | ZVB_Net | ZVB_MemEngine | ZVB_FileEngine | ZVB_SearchEngine | ZVB_Net</paragraph>
+ <paragraph index="492" node_type="writer">&lt;/verbose&gt;</paragraph>
+ <paragraph index="493" node_type="writer">&lt;defaultworkdirectory&gt;/home/gerard/Development/zmftest&lt;/defaultworkdirectory&gt;</paragraph>
+ <paragraph index="494" node_type="writer">&lt;defaultparamdirectory&gt;</paragraph>
+ <paragraph index="495" node_type="writer">/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata</paragraph>
+ <paragraph index="496" node_type="writer">&lt;/defaultparamdirectory&gt;</paragraph>
+ <paragraph index="497" node_type="writer">&lt;defaulticondirectory&gt;/home/gerard/Development/zbasetools/zqt/icons&lt;/defaulticondirectory&gt;</paragraph>
+ <paragraph index="498" node_type="writer">&lt;fixedfont&gt;Courier 10 Pitch&lt;/fixedfont&gt;</paragraph>
+ <paragraph index="499" node_type="writer">&lt;/generalparameters&gt;</paragraph>
+ <paragraph index="500" node_type="writer">&lt;/zmasterfileparameters&gt;</paragraph>
+ <paragraph index="501" node_type="writer"> </paragraph>
+ <paragraph index="503" node_type="writer">Query History log file</paragraph>
+ <paragraph index="504" node_type="writer">This file is not an Xml file and its format is internally and cannot be accessed by application user.</paragraph>
+ <paragraph index="505" node_type="writer">It gathers the instructions history for Query utility.</paragraph>
+ <paragraph index="506" node_type="writer">It is located in parameters directory as defined in general parameters Xml file.</paragraph>
+ <paragraph index="507" node_type="writer">Its name is hardcoded to be zqueryhistory.log</paragraph>
+ <paragraph index="511" node_type="writer">Application general parameters : zcppgenerateparameters.xml</paragraph>
+ <paragraph index="513" node_type="writer">This file name is hardcoded and resides within parameters directory as defined in general parameters. </paragraph>
+ <paragraph index="515" node_type="writer">&lt;zcppparserrules version=&quot;'0.30-0'&quot;&gt;</paragraph>
+ <paragraph index="516" node_type="writer">&lt;skip&gt;</paragraph>
+ <paragraph index="517" node_type="writer">&lt;skiplist&gt;</paragraph>
+ <paragraph index="518" node_type="writer">&lt;!--</paragraph>
+ <paragraph index="519" node_type="writer">  this list contains single keywords (and only single keywords- not clauses) that may be skipped while parsing without impact  </paragraph>
+ <paragraph index="520" node_type="writer">--&gt;</paragraph>
+ <paragraph index="521" node_type="writer">&lt;keyword&gt;</paragraph>
+ <paragraph index="522" node_type="writer">&lt;name&gt;static&lt;/name&gt;</paragraph>
+ <paragraph index="523" node_type="writer">&lt;/keyword&gt;</paragraph>
+ <paragraph index="524" node_type="writer">&lt;keyword&gt;</paragraph>
+ <paragraph index="525" node_type="writer">&lt;name&gt;explicit&lt;/name&gt;</paragraph>
+ <paragraph index="526" node_type="writer">&lt;/keyword&gt;</paragraph>
+ <paragraph index="527" node_type="writer">&lt;keyword&gt;</paragraph>
+ <paragraph index="528" node_type="writer">&lt;name&gt;virtual&lt;/name&gt;</paragraph>
+ <paragraph index="529" node_type="writer">&lt;/keyword&gt;</paragraph>
+ <paragraph index="530" node_type="writer">&lt;keyword&gt;</paragraph>
+ <paragraph index="531" node_type="writer">&lt;name&gt;const&lt;/name&gt;</paragraph>
+ <paragraph index="532" node_type="writer">&lt;/keyword&gt;</paragraph>
+ <paragraph index="533" node_type="writer">&lt;keyword&gt;</paragraph>
+ <paragraph index="534" node_type="writer">&lt;name&gt;Q_OBJECT&lt;/name&gt;</paragraph>
+ <paragraph index="535" node_type="writer">&lt;/keyword&gt;</paragraph>
+ <paragraph index="536" node_type="writer">&lt;keyword&gt;</paragraph>
+ <paragraph index="537" node_type="writer">&lt;name&gt;Q_SLOT&lt;/name&gt;</paragraph>
+ <paragraph index="538" node_type="writer">&lt;/keyword&gt;</paragraph>
+ <paragraph index="539" node_type="writer">&lt;/skiplist&gt;</paragraph>
+ <paragraph index="540" node_type="writer">&lt;skipclause&gt;</paragraph>
+ <paragraph index="541" node_type="writer">&lt;!--</paragraph>
+ <paragraph index="542" node_type="writer">  this list contains clauses that may be skipped starting at &lt;identifier&gt; until &lt;endtoken&gt; included  </paragraph>
+ <paragraph index="543" node_type="writer">--&gt;</paragraph>
+ <paragraph index="544" node_type="writer">&lt;!--</paragraph>
+ <paragraph index="545" node_type="writer">            </paragraph>
+ <paragraph index="546" node_type="writer">            Do not include these clauses : they are processed by parsing main engine.</paragraph>
+ <paragraph index="547" node_type="writer">            Including them will induce an ill behavior</paragraph>
+ <paragraph index="548" node_type="writer">            </paragraph>
+ <paragraph index="549" node_type="writer">            &lt;clause&gt;</paragraph>
+ <paragraph index="550" node_type="writer">                &lt;identifier&gt;public&lt;/identifier&gt;</paragraph>
+ <paragraph index="551" node_type="writer">                &lt;endtoken&gt;:&lt;/endtoken&gt;</paragraph>
+ <paragraph index="552" node_type="writer">            &lt;/clause&gt;</paragraph>
+ <paragraph index="553" node_type="writer">            &lt;clause&gt;</paragraph>
+ <paragraph index="554" node_type="writer">                &lt;identifier&gt;private&lt;/identifier&gt;</paragraph>
+ <paragraph index="555" node_type="writer">                &lt;endtoken&gt;:&lt;/endtoken&gt;</paragraph>
+ <paragraph index="556" node_type="writer">            &lt;/clause&gt;</paragraph>
+ <paragraph index="557" node_type="writer">            &lt;clause&gt;</paragraph>
+ <paragraph index="558" node_type="writer">                &lt;identifier&gt;protected&lt;/identifier&gt;</paragraph>
+ <paragraph index="559" node_type="writer">                &lt;endtoken&gt;:&lt;/endtoken&gt;</paragraph>
+ <paragraph index="560" node_type="writer">            &lt;/clause&gt;</paragraph>
+ <paragraph index="561" node_type="writer">            </paragraph>
+ <paragraph index="562" node_type="writer">--&gt;</paragraph>
+ <paragraph index="563" node_type="writer">&lt;clause&gt;</paragraph>
+ <paragraph index="564" node_type="writer">&lt;identifier&gt;Q_SLOT&lt;/identifier&gt;</paragraph>
+ <paragraph index="565" node_type="writer">&lt;endtoken&gt;:&lt;/endtoken&gt;</paragraph>
+ <paragraph index="566" node_type="writer">&lt;/clause&gt;</paragraph>
+ <paragraph index="567" node_type="writer">&lt;clause&gt;</paragraph>
+ <paragraph index="568" node_type="writer">&lt;identifier&gt;slots&lt;/identifier&gt;</paragraph>
+ <paragraph index="569" node_type="writer">&lt;endtoken&gt;:&lt;/endtoken&gt;</paragraph>
+ <paragraph index="570" node_type="writer">&lt;/clause&gt;</paragraph>
+ <paragraph index="571" node_type="writer">&lt;/skipclause&gt;</paragraph>
+ <paragraph index="572" node_type="writer">&lt;/skip&gt;</paragraph>
+ <paragraph index="573" node_type="writer">&lt;!--</paragraph>
+ <paragraph index="574" node_type="writer">  apart from builtin conversions there are possible conversions </paragraph>
+ <paragraph index="575" node_type="writer">    either directly </paragraph>
+ <paragraph index="576" node_type="writer">    - from a given source type tokentype (ZTTP_URISTRING by example) without syntax </paragraph>
+ <paragraph index="577" node_type="writer">    - without source type tokentype (ZTTP_UNKNOWN by example) but with a given syntax (i.e.DataRank_type)  </paragraph>
+ <paragraph index="578" node_type="writer">    - with tokentype  (ZTTP_UNKNOWN by example) and with a syntax </paragraph>
+ <paragraph index="579" node_type="writer">    </paragraph>
+ <paragraph index="580" node_type="writer">    to a ZType (i,e, ZType_AtomicS64) </paragraph>
+ <paragraph index="581" node_type="writer">--&gt;</paragraph>
+ <paragraph index="582" node_type="writer">&lt;typeconversiontable&gt;</paragraph>
+ <paragraph index="583" node_type="writer">&lt;typeconversion&gt;</paragraph>
+ <paragraph index="584" node_type="writer">&lt;tokentype&gt;ZTTP_ZRESOURCE&lt;/tokentype&gt;</paragraph>
+ <paragraph index="585" node_type="writer">&lt;ztype&gt;ZType_Resource&lt;/ztype&gt;</paragraph>
+ <paragraph index="586" node_type="writer">&lt;/typeconversion&gt;</paragraph>
+ <paragraph index="587" node_type="writer">&lt;typeconversion&gt;</paragraph>
+ <paragraph index="588" node_type="writer">&lt;tokentype&gt;ZTTP_ZRESOURCECODE&lt;/tokentype&gt;</paragraph>
+ <paragraph index="589" node_type="writer">&lt;ztype&gt;ZType_Resource&lt;/ztype&gt;</paragraph>
+ <paragraph index="590" node_type="writer">&lt;/typeconversion&gt;</paragraph>
+ <paragraph index="591" node_type="writer">&lt;typeconversion&gt;</paragraph>
+ <paragraph index="592" node_type="writer">&lt;tokentype&gt;ZTTP_UNKNOWN_TYPE&lt;/tokentype&gt;</paragraph>
+ <paragraph index="593" node_type="writer">&lt;syntax&gt;DataRank_type&lt;/syntax&gt;</paragraph>
+ <paragraph index="594" node_type="writer">&lt;ztype&gt;ZType_AtomicS64&lt;/ztype&gt;</paragraph>
+ <paragraph index="595" node_type="writer">&lt;capacity/&gt;</paragraph>
+ <paragraph index="596" node_type="writer">&lt;/typeconversion&gt;</paragraph>
+ <paragraph index="597" node_type="writer">&lt;typeconversion&gt;</paragraph>
+ <paragraph index="598" node_type="writer">&lt;tokentype&gt;ZTTP_UNKNOWN_TYPE&lt;/tokentype&gt;</paragraph>
+ <paragraph index="599" node_type="writer">&lt;syntax&gt;Storage_t&lt;/syntax&gt;</paragraph>
+ <paragraph index="600" node_type="writer">&lt;ztype&gt;ZType_AtomicS64&lt;/ztype&gt;</paragraph>
+ <paragraph index="601" node_type="writer">&lt;capacity/&gt;</paragraph>
+ <paragraph index="602" node_type="writer">&lt;/typeconversion&gt;</paragraph>
+ <paragraph index="603" node_type="writer">&lt;typeconversion&gt;</paragraph>
+ <paragraph index="604" node_type="writer">&lt;tokentype&gt;ZTTP_UNKNOWN_TYPE&lt;/tokentype&gt;</paragraph>
+ <paragraph index="605" node_type="writer">&lt;syntax&gt;DocumentMetaType&lt;/syntax&gt;</paragraph>
+ <paragraph index="606" node_type="writer">&lt;ztype&gt;ZType_AtomicS64&lt;/ztype&gt;</paragraph>
+ <paragraph index="607" node_type="writer">&lt;capacity&gt;1&lt;/capacity&gt;</paragraph>
+ <paragraph index="608" node_type="writer">&lt;universalsize&gt;0&lt;/universalsize&gt;</paragraph>
+ <paragraph index="609" node_type="writer">&lt;naturalsize&gt;0&lt;/naturalsize&gt;</paragraph>
+ <paragraph index="610" node_type="writer">&lt;/typeconversion&gt;</paragraph>
+ <paragraph index="611" node_type="writer">&lt;/typeconversiontable&gt;</paragraph>
+ <paragraph index="612" node_type="writer">&lt;/zcppparserrules&gt;</paragraph>
+ <paragraph index="614" node_type="writer">zcppparserrules.xml</paragraph>
+ <paragraph index="616" node_type="writer">Cpp parser conversion rules.</paragraph>
+ <paragraph index="617" node_type="writer">Adds user defined data types corresponding to their corresponding native type.</paragraph>
+ <paragraph index="619" node_type="writer">&lt;zcppparserrules version=&quot;0.30-0&quot;&gt;</paragraph>
+ <paragraph index="620" node_type="writer">&lt;!--</paragraph>
+ <paragraph index="621" node_type="writer">   apart from builtin conversions </paragraph>
+ <paragraph index="622" node_type="writer"> there are possible adhoc conversions with with a given syntax to a ZType (i,e, &quot;DocumentMetaType&quot; gives ZType_AtomicS64)  </paragraph>
+ <paragraph index="623" node_type="writer">--&gt;</paragraph>
+ <paragraph index="624" node_type="writer">&lt;typeconversiontable&gt;</paragraph>
+ <paragraph index="625" node_type="writer">&lt;typeconversion&gt;</paragraph>
+ <paragraph index="626" node_type="writer">&lt;syntax&gt;ZAccessRight_t&lt;/syntax&gt;</paragraph>
+ <paragraph index="627" node_type="writer">&lt;ztype&gt;ZType_AtomicU32 &lt;/ztype&gt;</paragraph>
+ <paragraph index="628" node_type="writer">&lt;capacity&gt;1&lt;/capacity&gt;</paragraph>
+ <paragraph index="629" node_type="writer">&lt;headersize&gt;4&lt;/headersize&gt;</paragraph>
+ <paragraph index="630" node_type="writer">&lt;universalsize&gt;4&lt;/universalsize&gt;</paragraph>
+ <paragraph index="631" node_type="writer">&lt;naturalsize&gt;4&lt;/naturalsize&gt;</paragraph>
+ <paragraph index="632" node_type="writer">&lt;/typeconversion&gt;</paragraph>
+ <paragraph index="633" node_type="writer">&lt;typeconversion&gt;</paragraph>
+ <paragraph index="634" node_type="writer">&lt;syntax&gt;utfdescString&lt;/syntax&gt;</paragraph>
+ <paragraph index="635" node_type="writer">&lt;ztype&gt;ZType_Utf8FixedString&lt;/ztype&gt;</paragraph>
+ <paragraph index="636" node_type="writer">&lt;capacity&gt;250&lt;/capacity&gt;</paragraph>
+ <paragraph index="637" node_type="writer">&lt;headersize&gt;4&lt;/headersize&gt;</paragraph>
+ <paragraph index="638" node_type="writer">&lt;universalsize&gt;250&lt;/universalsize&gt;</paragraph>
+ <paragraph index="639" node_type="writer">&lt;naturalsize&gt;250&lt;/naturalsize&gt;</paragraph>
+ <paragraph index="640" node_type="writer">&lt;/typeconversion&gt;</paragraph>
+ <paragraph index="641" node_type="writer">&lt;typeconversion&gt;</paragraph>
+ <paragraph index="642" node_type="writer">&lt;syntax&gt;DataRank_type&lt;/syntax&gt;</paragraph>
+ <paragraph index="643" node_type="writer">&lt;ztype&gt;ZType_AtomicU64 &lt;/ztype&gt;</paragraph>
+ <paragraph index="644" node_type="writer">&lt;capacity&gt;1&lt;/capacity&gt;</paragraph>
+ <paragraph index="645" node_type="writer">&lt;headersize&gt;4&lt;/headersize&gt;</paragraph>
+ <paragraph index="646" node_type="writer">&lt;universalsize&gt;8&lt;/universalsize&gt;</paragraph>
+ <paragraph index="647" node_type="writer">&lt;naturalsize&gt;8&lt;/naturalsize&gt;</paragraph>
+ <paragraph index="648" node_type="writer">&lt;/typeconversion&gt;</paragraph>
+ <paragraph index="650" node_type="writer">zcppparserclauses.xml</paragraph>
+ <paragraph index="652" node_type="writer">Cpp parser skip list.</paragraph>
+ <paragraph index="653" node_type="writer">Defines instructions and simple keywords to ignore while parsing Cpp header files.</paragraph>
+ <paragraph index="656" node_type="writer">&lt;zcppparserclauses version=&quot;'0.30-0'&quot;&gt;</paragraph>
+ <paragraph index="657" node_type="writer">&lt;skip&gt;</paragraph>
+ <paragraph index="658" node_type="writer">&lt;skiplist&gt;</paragraph>
+ <paragraph index="659" node_type="writer">&lt;!--</paragraph>
+ <paragraph index="660" node_type="writer">  this list contains single keywords (and only single keywords- not clauses) that may be skipped while parsing without impact  </paragraph>
+ <paragraph index="661" node_type="writer">--&gt;</paragraph>
+ <paragraph index="662" node_type="writer">&lt;keyword&gt;</paragraph>
+ <paragraph index="663" node_type="writer">&lt;name&gt;static&lt;/name&gt;</paragraph>
+ <paragraph index="664" node_type="writer">&lt;/keyword&gt;</paragraph>
+ <paragraph index="665" node_type="writer">&lt;keyword&gt;</paragraph>
+ <paragraph index="666" node_type="writer">&lt;name&gt;explicit&lt;/name&gt;</paragraph>
+ <paragraph index="667" node_type="writer">&lt;/keyword&gt;</paragraph>
+ <paragraph index="668" node_type="writer">&lt;keyword&gt;</paragraph>
+ <paragraph index="669" node_type="writer">&lt;name&gt;virtual&lt;/name&gt;</paragraph>
+ <paragraph index="670" node_type="writer">&lt;/keyword&gt;</paragraph>
+ <paragraph index="671" node_type="writer">&lt;keyword&gt;</paragraph>
+ <paragraph index="672" node_type="writer">&lt;name&gt;const&lt;/name&gt;</paragraph>
+ <paragraph index="673" node_type="writer">&lt;/keyword&gt;</paragraph>
+ <paragraph index="674" node_type="writer">&lt;keyword&gt;</paragraph>
+ <paragraph index="675" node_type="writer">&lt;name&gt;Q_OBJECT&lt;/name&gt;</paragraph>
+ <paragraph index="676" node_type="writer">&lt;/keyword&gt;</paragraph>
+ <paragraph index="677" node_type="writer">&lt;keyword&gt;</paragraph>
+ <paragraph index="678" node_type="writer">&lt;name&gt;Q_SLOT&lt;/name&gt;</paragraph>
+ <paragraph index="679" node_type="writer">&lt;/keyword&gt;</paragraph>
+ <paragraph index="680" node_type="writer">&lt;/skiplist&gt;</paragraph>
+ <paragraph index="681" node_type="writer">&lt;skipclause&gt;</paragraph>
+ <paragraph index="682" node_type="writer">&lt;!--</paragraph>
+ <paragraph index="683" node_type="writer">  this list contains clauses that may be skipped starting at &lt;identifier&gt; until &lt;endtoken&gt; included  </paragraph>
+ <paragraph index="684" node_type="writer">--&gt;</paragraph>
+ <paragraph index="685" node_type="writer">&lt;!--</paragraph>
+ <paragraph index="686" node_type="writer">--&gt;</paragraph>
+ <paragraph index="687" node_type="writer">&lt;clause&gt;</paragraph>
+ <paragraph index="688" node_type="writer">&lt;identifier&gt;Q_SLOT&lt;/identifier&gt;</paragraph>
+ <paragraph index="689" node_type="writer">&lt;endtoken&gt;:&lt;/endtoken&gt;</paragraph>
+ <paragraph index="690" node_type="writer">&lt;/clause&gt;</paragraph>
+ <paragraph index="691" node_type="writer">&lt;clause&gt;</paragraph>
+ <paragraph index="692" node_type="writer">&lt;identifier&gt;slots&lt;/identifier&gt;</paragraph>
+ <paragraph index="693" node_type="writer">&lt;endtoken&gt;:&lt;/endtoken&gt;</paragraph>
+ <paragraph index="694" node_type="writer">&lt;/clause&gt;</paragraph>
+ <paragraph index="695" node_type="writer">&lt;/skipclause&gt;</paragraph>
+ <paragraph index="696" node_type="writer">&lt;/skip&gt;</paragraph>
+ <paragraph index="697" node_type="writer">&lt;/zcppparserclauses&gt;</paragraph>
+ <paragraph index="703" node_type="writer">File zsearchparsersymbol.xml</paragraph>
+ <paragraph index="705" node_type="writer">defines a symbol as a correspondence with a valid file path.</paragraph>
+ <paragraph index="706" node_type="writer">Such symbols may be used in replacement of any file path.</paragraph>
+ <paragraph index="708" node_type="writer">&lt;zsearchparsersymbol version=&quot;'0.1-0'&quot;&gt;</paragraph>
+ <paragraph index="709" node_type="writer">&lt;!--</paragraph>
+ <paragraph index="710" node_type="writer">  Symbols table : defines symbols that points to a valid full file path </paragraph>
+ <paragraph index="711" node_type="writer">--&gt;</paragraph>
+ <paragraph index="712" node_type="writer">&lt;symboltable&gt;</paragraph>
+ <paragraph index="713" node_type="writer">&lt;symbolitem&gt;</paragraph>
+ <paragraph index="714" node_type="writer">&lt;path&gt;/home/gerard/Development/zmftest/zdocphysical.zmf&lt;/path&gt;</paragraph>
+ <paragraph index="715" node_type="writer">&lt;symbol&gt;zdocphysical&lt;/symbol&gt;</paragraph>
+ <paragraph index="716" node_type="writer">&lt;/symbolitem&gt;</paragraph>
+ <paragraph index="717" node_type="writer">&lt;/symboltable&gt;</paragraph>
+ <paragraph index="718" node_type="writer">&lt;/zsearchparsersymbol&gt;</paragraph>
+ <paragraph index="723" node_type="writer">File zsearchparserzentity.xml</paragraph>
+ <paragraph index="725" node_type="writer">Defines ZEntity list for application.</paragraph>
+ <paragraph index="726" node_type="writer">This object associates a ZEntity symbol to a system value.</paragraph>
+ <paragraph index="727" node_type="writer">It is used to defines resources classes.</paragraph>
+ <paragraph index="728" node_type="writer">Some of these are reserved to system.</paragraph>
+ <paragraph index="731" node_type="writer">&lt;zsearchparserzentity version=&quot;'0.1-0'&quot;&gt;</paragraph>
+ <paragraph index="732" node_type="writer">&lt;!--</paragraph>
+ <paragraph index="733" node_type="writer">  ZEntity table : defines application dependant ZEntity values. Values are expressed in hexadecimal format </paragraph>
+ <paragraph index="734" node_type="writer">--&gt;</paragraph>
+ <paragraph index="735" node_type="writer">&lt;zentitytable&gt;</paragraph>
+ <paragraph index="736" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="737" node_type="writer">&lt;zentity&gt;ZEntity_MasterDoc&lt;/zentity&gt;</paragraph>
+ <paragraph index="738" node_type="writer">&lt;value&gt;0x0000091&lt;/value&gt;</paragraph>
+ <paragraph index="739" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="740" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="741" node_type="writer">&lt;zentity&gt;ZEntity_Version&lt;/zentity&gt;</paragraph>
+ <paragraph index="742" node_type="writer">&lt;value&gt;0x00000A1&lt;/value&gt;</paragraph>
+ <paragraph index="743" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="744" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="745" node_type="writer">&lt;zentity&gt;ZEntity_MasterLink&lt;/zentity&gt;</paragraph>
+ <paragraph index="746" node_type="writer">&lt;value&gt;0x00000B1&lt;/value&gt;</paragraph>
+ <paragraph index="747" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="748" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="749" node_type="writer">&lt;zentity&gt;ZEntity_ObjectLink&lt;/zentity&gt;</paragraph>
+ <paragraph index="750" node_type="writer">&lt;value&gt;0x00000C1&lt;/value&gt;</paragraph>
+ <paragraph index="751" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="752" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="753" node_type="writer">&lt;zentity&gt;ZEntity_Memo&lt;/zentity&gt;</paragraph>
+ <paragraph index="754" node_type="writer">&lt;value&gt;0x00100D1&lt;/value&gt;</paragraph>
+ <paragraph index="755" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="756" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="757" node_type="writer">&lt;zentity&gt;ZEntity_Tag&lt;/zentity&gt;</paragraph>
+ <paragraph index="758" node_type="writer">&lt;value&gt;0x000000E1&lt;/value&gt;</paragraph>
+ <paragraph index="759" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="760" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="761" node_type="writer">&lt;zentity&gt;ZEntity_MimeClass&lt;/zentity&gt;</paragraph>
+ <paragraph index="762" node_type="writer">&lt;value&gt;0x000000F1&lt;/value&gt;</paragraph>
+ <paragraph index="763" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="764" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="765" node_type="writer">&lt;zentity&gt;ZEntity_DocPhysical&lt;/zentity&gt;</paragraph>
+ <paragraph index="766" node_type="writer">&lt;value&gt;0x00001001&lt;/value&gt;</paragraph>
+ <paragraph index="767" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="768" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="769" node_type="writer">&lt;zentity&gt;ZEntity_DocFilespec&lt;/zentity&gt;</paragraph>
+ <paragraph index="770" node_type="writer">&lt;value&gt;0x00100000&lt;/value&gt;</paragraph>
+ <paragraph index="771" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="772" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="773" node_type="writer">&lt;zentity&gt;ZEntity_URI&lt;/zentity&gt;</paragraph>
+ <paragraph index="774" node_type="writer">&lt;value&gt;0x00100000&lt;/value&gt;</paragraph>
+ <paragraph index="775" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="776" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="777" node_type="writer">&lt;zentity&gt;ZEntity_Image&lt;/zentity&gt;</paragraph>
+ <paragraph index="778" node_type="writer">&lt;value&gt;0x00200000&lt;/value&gt;</paragraph>
+ <paragraph index="779" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="780" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="781" node_type="writer">&lt;zentity&gt;ZEntity_MimeData&lt;/zentity&gt;</paragraph>
+ <paragraph index="782" node_type="writer">&lt;value&gt;0x01000000&lt;/value&gt;</paragraph>
+ <paragraph index="783" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="784" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="785" node_type="writer">&lt;zentity&gt;ZEntity_Mime_Image&lt;/zentity&gt;</paragraph>
+ <paragraph index="786" node_type="writer">&lt;value&gt;0x05000000&lt;/value&gt;</paragraph>
+ <paragraph index="787" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="788" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="789" node_type="writer">&lt;zentity&gt;ZEntity_Mime_URI&lt;/zentity&gt;</paragraph>
+ <paragraph index="790" node_type="writer">&lt;value&gt;ZEntity_URI&lt;/value&gt;</paragraph>
+ <paragraph index="791" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="792" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="793" node_type="writer">&lt;zentity&gt;ZEntity_Mime_Html&lt;/zentity&gt;</paragraph>
+ <paragraph index="794" node_type="writer">&lt;value&gt;0x09000000&lt;/value&gt;</paragraph>
+ <paragraph index="795" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="796" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="797" node_type="writer">&lt;zentity&gt;ZEntity_Mime_PlainText&lt;/zentity&gt;</paragraph>
+ <paragraph index="798" node_type="writer">&lt;value&gt;0x11000000&lt;/value&gt;</paragraph>
+ <paragraph index="799" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="800" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="801" node_type="writer">&lt;zentity&gt;ZEntity_Mime_OtherText&lt;/zentity&gt;</paragraph>
+ <paragraph index="802" node_type="writer">&lt;value&gt;0x21000000&lt;/value&gt;</paragraph>
+ <paragraph index="803" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="804" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="805" node_type="writer">&lt;zentity&gt;ZEntity_AppData&lt;/zentity&gt;</paragraph>
+ <paragraph index="806" node_type="writer">&lt;value&gt;0x100000000000&lt;/value&gt;</paragraph>
+ <paragraph index="807" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="808" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="809" node_type="writer">&lt;zentity&gt;ZEntity_Pinboard&lt;/zentity&gt;</paragraph>
+ <paragraph index="810" node_type="writer">&lt;value&gt;0x101000000010&lt;/value&gt;</paragraph>
+ <paragraph index="811" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="812" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="813" node_type="writer">&lt;zentity&gt;ZEntity_Trashbin&lt;/zentity&gt;</paragraph>
+ <paragraph index="814" node_type="writer">&lt;value&gt;0x101000000020&lt;/value&gt;</paragraph>
+ <paragraph index="815" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="816" node_type="writer">&lt;!-- Admin entities --&gt;</paragraph>
+ <paragraph index="817" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="818" node_type="writer">&lt;zentity&gt;ZEntity_VaultDataBase&lt;/zentity&gt;</paragraph>
+ <paragraph index="819" node_type="writer">&lt;value&gt;0x100100000000&lt;/value&gt;</paragraph>
+ <paragraph index="820" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="821" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="822" node_type="writer">&lt;zentity&gt;ZEntity_Vault&lt;/zentity&gt;</paragraph>
+ <paragraph index="823" node_type="writer">&lt;value&gt;0x100100000001&lt;/value&gt;</paragraph>
+ <paragraph index="824" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="825" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="826" node_type="writer">&lt;zentity&gt;ZEntity_User&lt;/zentity&gt;</paragraph>
+ <paragraph index="827" node_type="writer">&lt;value&gt;0x300000001002&lt;/value&gt;</paragraph>
+ <paragraph index="828" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="829" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="830" node_type="writer">&lt;zentity&gt;ZEntity_Group&lt;/zentity&gt;</paragraph>
+ <paragraph index="831" node_type="writer">&lt;value&gt;0x300000001004&lt;/value&gt;</paragraph>
+ <paragraph index="832" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="833" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="834" node_type="writer">&lt;zentity&gt;ZEntity_SystemUser&lt;/zentity&gt;</paragraph>
+ <paragraph index="835" node_type="writer">&lt;value&gt;0x000000000FF2&lt;/value&gt;</paragraph>
+ <paragraph index="836" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="837" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="838" node_type="writer">&lt;zentity&gt;ZEntity_AuthMan&lt;/zentity&gt;</paragraph>
+ <paragraph index="839" node_type="writer">&lt;value&gt;0x100400000001&lt;/value&gt;</paragraph>
+ <paragraph index="840" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="841" node_type="writer">&lt;zentityitem&gt;</paragraph>
+ <paragraph index="842" node_type="writer">&lt;zentity&gt;ZEntity_LockManager&lt;/zentity&gt;</paragraph>
+ <paragraph index="843" node_type="writer">&lt;value&gt;0x100400000000&lt;/value&gt;</paragraph>
+ <paragraph index="844" node_type="writer">&lt;/zentityitem&gt;</paragraph>
+ <paragraph index="845" node_type="writer">&lt;/zentitytable&gt;</paragraph>
+ <paragraph index="846" node_type="writer">&lt;/zsearchparserzentity&gt;</paragraph>
+</indexing>

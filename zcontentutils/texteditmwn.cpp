@@ -63,12 +63,8 @@ textEditMWn::_init(uint32_t pOptions) {
     searchBTn = new QPushButton(verticalLayoutWidget);
     searchBTn->setObjectName("searchBTn");
 
-    uriString wIcon = GeneralParameters.getIconDirectory() ;
-    wIcon.addConditionalDirectoryDelimiter();
-    wIcon += "magnifyingglass.png";
+    QIcon icon = ContentObjectBroker.iconFactory("general.iconfactory.iconview",ErrorLog);
 
-    QIcon icon;
-    icon.addFile(QString::fromUtf8(wIcon.toCChar()), QSize(), QIcon::Normal, QIcon::Off);
     searchBTn->setIcon(icon);
 
     horizontalLayout_2->addWidget(searchBTn);
@@ -86,27 +82,33 @@ textEditMWn::_init(uint32_t pOptions) {
 #if QT_CONFIG(tooltip)
     searchMainBTn->setToolTip(QString::fromUtf8("set search on/off"));
 #endif // QT_CONFIG(tooltip)
-
+/*
     wIcon = GeneralParameters.getIconDirectory() ;
     wIcon.addConditionalDirectoryDelimiter();
     wIcon += "strigi.png";
 
     QIcon icon1;
     icon1.addFile(QString::fromUtf8(wIcon.toCChar()), QSize(), QIcon::Normal, QIcon::Off);
+*/
+    QIcon icon1 = ContentObjectBroker.iconFactory("general.iconfactory/strigi.png",ErrorLog);
     searchMainBTn->setIcon(icon1);
 
     horizontalLayout->addWidget(searchMainBTn);
 
     filterBTn = new QPushButton(verticalLayoutWidget);
     filterBTn->setObjectName("filterBTn");
-
+    /*
     wIcon = GeneralParameters.getIconDirectory() ;
     wIcon.addConditionalDirectoryDelimiter();
     wIcon += "funel.png";
 
     QIcon icon2;
     icon2.addFile(QString::fromUtf8(wIcon.toCChar()), QSize(), QIcon::Normal, QIcon::Off);
+
     filterBTn->setIcon(icon2);
+    */
+    QIcon wIcon2 = ContentObjectBroker.iconFactory("general.iconfactory/funel.png",ErrorLog);
+    filterBTn->setIcon(wIcon2);
 
     horizontalLayout->addWidget(filterBTn);
 

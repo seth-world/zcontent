@@ -1,0 +1,164 @@
+\doxysection{/home/gerard/\+Development/zbasetools/znet/zbasenet/zconsolecommand.h File Reference}
+\hypertarget{zconsolecommand_8h}{}\label{zconsolecommand_8h}\index{/home/gerard/Development/zbasetools/znet/zbasenet/zconsolecommand.h@{/home/gerard/Development/zbasetools/znet/zbasenet/zconsolecommand.h}}
+{\ttfamily \#include $<$cstdint$>$}\newline
+Include dependency graph for zconsolecommand.\+h\+:
+% FIG 0
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{zconsolecommand_8h_a26e029daea301cad4079319353d872a5}{ZConsole\+Header\+\_\+type}} \{ \mbox{\hyperlink{zconsolecommand_8h_a26e029daea301cad4079319353d872a5a5c7b642894d7df96fa4bd105b5a33e4e}{ZCHD\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{zconsolecommand_8h_a26e029daea301cad4079319353d872a5a31d9a1731516c55b7b4a9d4373550cc9}{ZCHD\+\_\+\+Exception}} = 1
+, \mbox{\hyperlink{zconsolecommand_8h_a26e029daea301cad4079319353d872a5a904d13f7d8d483a280e555677097c18c}{ZCHD\+\_\+\+Data}} = 2
+, \mbox{\hyperlink{zconsolecommand_8h_a26e029daea301cad4079319353d872a5ab4df4339102f06e3ffdcf0e8e14e1d47}{ZCHD\+\_\+\+Endof\+Data}} = -\/1
+ \}
+\item 
+enum \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92}{ZConsole\+Command\+\_\+type}} \+: uint32\+\_\+t \{ \newline
+\mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a7d475a00e4487ac3398e96edd61d3717}{ZCMD\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92ab36d7c80322cf41574f2ddf1906d38f6}{ZCMD\+\_\+list\+Clients}} = 0x0100
+, \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a427333825c5c729cf457a1b1026fa7fa}{ZCMD\+\_\+cancel\+Client}} = 0x0200
+, \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92ac9cb348961ec206122a387ec3ffed2be}{ZCMD\+\_\+set\+Client\+Sleep}} = 0x0400
+, \newline
+\mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92abb17d643cc3d7abeb674ab1dd45e8f9f}{ZCMD\+\_\+set\+Client\+Execute}} = 0x0800
+, \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a8596b32ddf2271c4b33586c846d19b4e}{ZCMD\+\_\+send\+Server\+PMS}} = 0x1000
+, \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92aa6257e21b20f0ae8fc1fa8873ed8e3f1}{ZCMD\+\_\+send\+All\+PMS}} = 0x2000
+, \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a90ae2456599bc8a7e3545e592a7a7864}{ZCMD\+\_\+send\+Client\+PMS}} = 0x4000
+, \newline
+\mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a9d92ba6c8f02a996f1d3936147d6a61c}{ZCMD\+\_\+send\+Console\+Client\+PMS}} = 0x4001
+, \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92ab125ec2d40acdae00fd71c76ad907161}{ZCMD\+\_\+send\+Console\+Server\+PMS}} = 0x1001
+, \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a4e92582073333c60b101b76e03174877}{ZCMD\+\_\+exit\+Console}} = 0x8000
+, \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a84285feab5e82099488f6986c587f582}{ZCMD\+\_\+shutdown}} = 0x\+FFFF
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zconsolecommand_8h_ac77b3073bf51e53862943d3fd23993fa}{decode\+\_\+\+ZCMD}} (\mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92}{ZConsole\+Command\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZTSG}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int32\+\_\+t}} \mbox{\hyperlink{zconsolecommand_8h_a2157c778acf0a1263d8fa44c32d3baf2}{encode\+\_\+\+ZCMD}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+String}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92}\label{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92} 
+\index{zconsolecommand.h@{zconsolecommand.h}!ZConsoleCommand\_type@{ZConsoleCommand\_type}}
+\index{ZConsoleCommand\_type@{ZConsoleCommand\_type}!zconsolecommand.h@{zconsolecommand.h}}
+\doxysubsubsection{\texorpdfstring{ZConsoleCommand\_type}{ZConsoleCommand\_type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92}{ZConsole\+Command\+\_\+type}} \+: \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\+\_\+t}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCMD\_Nothing@{ZCMD\_Nothing}!zconsolecommand.h@{zconsolecommand.h}}\index{zconsolecommand.h@{zconsolecommand.h}!ZCMD\_Nothing@{ZCMD\_Nothing}}}\Hypertarget{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a7d475a00e4487ac3398e96edd61d3717}\label{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a7d475a00e4487ac3398e96edd61d3717} 
+ZCMD\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCMD\_listClients@{ZCMD\_listClients}!zconsolecommand.h@{zconsolecommand.h}}\index{zconsolecommand.h@{zconsolecommand.h}!ZCMD\_listClients@{ZCMD\_listClients}}}\Hypertarget{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92ab36d7c80322cf41574f2ddf1906d38f6}\label{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92ab36d7c80322cf41574f2ddf1906d38f6} 
+ZCMD\+\_\+list\+Clients&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCMD\_cancelClient@{ZCMD\_cancelClient}!zconsolecommand.h@{zconsolecommand.h}}\index{zconsolecommand.h@{zconsolecommand.h}!ZCMD\_cancelClient@{ZCMD\_cancelClient}}}\Hypertarget{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a427333825c5c729cf457a1b1026fa7fa}\label{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a427333825c5c729cf457a1b1026fa7fa} 
+ZCMD\+\_\+cancel\+Client&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCMD\_setClientSleep@{ZCMD\_setClientSleep}!zconsolecommand.h@{zconsolecommand.h}}\index{zconsolecommand.h@{zconsolecommand.h}!ZCMD\_setClientSleep@{ZCMD\_setClientSleep}}}\Hypertarget{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92ac9cb348961ec206122a387ec3ffed2be}\label{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92ac9cb348961ec206122a387ec3ffed2be} 
+ZCMD\+\_\+set\+Client\+Sleep&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCMD\_setClientExecute@{ZCMD\_setClientExecute}!zconsolecommand.h@{zconsolecommand.h}}\index{zconsolecommand.h@{zconsolecommand.h}!ZCMD\_setClientExecute@{ZCMD\_setClientExecute}}}\Hypertarget{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92abb17d643cc3d7abeb674ab1dd45e8f9f}\label{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92abb17d643cc3d7abeb674ab1dd45e8f9f} 
+ZCMD\+\_\+set\+Client\+Execute&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCMD\_sendServerPMS@{ZCMD\_sendServerPMS}!zconsolecommand.h@{zconsolecommand.h}}\index{zconsolecommand.h@{zconsolecommand.h}!ZCMD\_sendServerPMS@{ZCMD\_sendServerPMS}}}\Hypertarget{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a8596b32ddf2271c4b33586c846d19b4e}\label{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a8596b32ddf2271c4b33586c846d19b4e} 
+ZCMD\+\_\+send\+Server\+PMS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCMD\_sendAllPMS@{ZCMD\_sendAllPMS}!zconsolecommand.h@{zconsolecommand.h}}\index{zconsolecommand.h@{zconsolecommand.h}!ZCMD\_sendAllPMS@{ZCMD\_sendAllPMS}}}\Hypertarget{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92aa6257e21b20f0ae8fc1fa8873ed8e3f1}\label{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92aa6257e21b20f0ae8fc1fa8873ed8e3f1} 
+ZCMD\+\_\+send\+All\+PMS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCMD\_sendClientPMS@{ZCMD\_sendClientPMS}!zconsolecommand.h@{zconsolecommand.h}}\index{zconsolecommand.h@{zconsolecommand.h}!ZCMD\_sendClientPMS@{ZCMD\_sendClientPMS}}}\Hypertarget{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a90ae2456599bc8a7e3545e592a7a7864}\label{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a90ae2456599bc8a7e3545e592a7a7864} 
+ZCMD\+\_\+send\+Client\+PMS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCMD\_sendConsoleClientPMS@{ZCMD\_sendConsoleClientPMS}!zconsolecommand.h@{zconsolecommand.h}}\index{zconsolecommand.h@{zconsolecommand.h}!ZCMD\_sendConsoleClientPMS@{ZCMD\_sendConsoleClientPMS}}}\Hypertarget{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a9d92ba6c8f02a996f1d3936147d6a61c}\label{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a9d92ba6c8f02a996f1d3936147d6a61c} 
+ZCMD\+\_\+send\+Console\+Client\+PMS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCMD\_sendConsoleServerPMS@{ZCMD\_sendConsoleServerPMS}!zconsolecommand.h@{zconsolecommand.h}}\index{zconsolecommand.h@{zconsolecommand.h}!ZCMD\_sendConsoleServerPMS@{ZCMD\_sendConsoleServerPMS}}}\Hypertarget{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92ab125ec2d40acdae00fd71c76ad907161}\label{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92ab125ec2d40acdae00fd71c76ad907161} 
+ZCMD\+\_\+send\+Console\+Server\+PMS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCMD\_exitConsole@{ZCMD\_exitConsole}!zconsolecommand.h@{zconsolecommand.h}}\index{zconsolecommand.h@{zconsolecommand.h}!ZCMD\_exitConsole@{ZCMD\_exitConsole}}}\Hypertarget{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a4e92582073333c60b101b76e03174877}\label{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a4e92582073333c60b101b76e03174877} 
+ZCMD\+\_\+exit\+Console&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCMD\_shutdown@{ZCMD\_shutdown}!zconsolecommand.h@{zconsolecommand.h}}\index{zconsolecommand.h@{zconsolecommand.h}!ZCMD\_shutdown@{ZCMD\_shutdown}}}\Hypertarget{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a84285feab5e82099488f6986c587f582}\label{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a84285feab5e82099488f6986c587f582} 
+ZCMD\+\_\+shutdown&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{zconsolecommand_8h_source_l00012}{12}} of file \mbox{\hyperlink{zconsolecommand_8h_source}{zconsolecommand.\+h}}.
+
+\Hypertarget{zconsolecommand_8h_a26e029daea301cad4079319353d872a5}\label{zconsolecommand_8h_a26e029daea301cad4079319353d872a5} 
+\index{zconsolecommand.h@{zconsolecommand.h}!ZConsoleHeader\_type@{ZConsoleHeader\_type}}
+\index{ZConsoleHeader\_type@{ZConsoleHeader\_type}!zconsolecommand.h@{zconsolecommand.h}}
+\doxysubsubsection{\texorpdfstring{ZConsoleHeader\_type}{ZConsoleHeader\_type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{zconsolecommand_8h_a26e029daea301cad4079319353d872a5}{ZConsole\+Header\+\_\+type}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCHD\_Nothing@{ZCHD\_Nothing}!zconsolecommand.h@{zconsolecommand.h}}\index{zconsolecommand.h@{zconsolecommand.h}!ZCHD\_Nothing@{ZCHD\_Nothing}}}\Hypertarget{zconsolecommand_8h_a26e029daea301cad4079319353d872a5a5c7b642894d7df96fa4bd105b5a33e4e}\label{zconsolecommand_8h_a26e029daea301cad4079319353d872a5a5c7b642894d7df96fa4bd105b5a33e4e} 
+ZCHD\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCHD\_Exception@{ZCHD\_Exception}!zconsolecommand.h@{zconsolecommand.h}}\index{zconsolecommand.h@{zconsolecommand.h}!ZCHD\_Exception@{ZCHD\_Exception}}}\Hypertarget{zconsolecommand_8h_a26e029daea301cad4079319353d872a5a31d9a1731516c55b7b4a9d4373550cc9}\label{zconsolecommand_8h_a26e029daea301cad4079319353d872a5a31d9a1731516c55b7b4a9d4373550cc9} 
+ZCHD\+\_\+\+Exception&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCHD\_Data@{ZCHD\_Data}!zconsolecommand.h@{zconsolecommand.h}}\index{zconsolecommand.h@{zconsolecommand.h}!ZCHD\_Data@{ZCHD\_Data}}}\Hypertarget{zconsolecommand_8h_a26e029daea301cad4079319353d872a5a904d13f7d8d483a280e555677097c18c}\label{zconsolecommand_8h_a26e029daea301cad4079319353d872a5a904d13f7d8d483a280e555677097c18c} 
+ZCHD\+\_\+\+Data&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCHD\_EndofData@{ZCHD\_EndofData}!zconsolecommand.h@{zconsolecommand.h}}\index{zconsolecommand.h@{zconsolecommand.h}!ZCHD\_EndofData@{ZCHD\_EndofData}}}\Hypertarget{zconsolecommand_8h_a26e029daea301cad4079319353d872a5ab4df4339102f06e3ffdcf0e8e14e1d47}\label{zconsolecommand_8h_a26e029daea301cad4079319353d872a5ab4df4339102f06e3ffdcf0e8e14e1d47} 
+ZCHD\+\_\+\+Endof\+Data&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{zconsolecommand_8h_source_l00006}{6}} of file \mbox{\hyperlink{zconsolecommand_8h_source}{zconsolecommand.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{zconsolecommand_8h_ac77b3073bf51e53862943d3fd23993fa}\label{zconsolecommand_8h_ac77b3073bf51e53862943d3fd23993fa} 
+\index{zconsolecommand.h@{zconsolecommand.h}!decode\_ZCMD@{decode\_ZCMD}}
+\index{decode\_ZCMD@{decode\_ZCMD}!zconsolecommand.h@{zconsolecommand.h}}
+\doxysubsubsection{\texorpdfstring{decode\_ZCMD()}{decode\_ZCMD()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} decode\+\_\+\+ZCMD (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92}{ZConsole\+Command\+\_\+type}}}]{p\+ZTSG }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zconsolecommand_8cpp_source_l00008}{8}} of file \mbox{\hyperlink{zconsolecommand_8cpp_source}{zconsolecommand.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00015}{ZCMD\+\_\+cancel\+Client}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00023}{ZCMD\+\_\+exit\+Console}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00014}{ZCMD\+\_\+list\+Clients}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00019}{ZCMD\+\_\+send\+All\+PMS}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00020}{ZCMD\+\_\+send\+Client\+PMS}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00021}{ZCMD\+\_\+send\+Console\+Client\+PMS}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00022}{ZCMD\+\_\+send\+Console\+Server\+PMS}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00018}{ZCMD\+\_\+send\+Server\+PMS}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00017}{ZCMD\+\_\+set\+Client\+Execute}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00016}{ZCMD\+\_\+set\+Client\+Sleep}}, and \mbox{\hyperlink{zconsolecommand_8h_source_l00024}{ZCMD\+\_\+shutdown}}.
+
+
+
+Referenced by \mbox{\hyperlink{zconsole_8cpp_source_l00402}{zbs\+::\+ZConsole\+::do\+Console()}}, and \mbox{\hyperlink{zsslconsole_8cpp_source_l00403}{zbs\+::\+ZSSLConsole\+::do\+Console()}}.
+
+\Hypertarget{zconsolecommand_8h_a2157c778acf0a1263d8fa44c32d3baf2}\label{zconsolecommand_8h_a2157c778acf0a1263d8fa44c32d3baf2} 
+\index{zconsolecommand.h@{zconsolecommand.h}!encode\_ZCMD@{encode\_ZCMD}}
+\index{encode\_ZCMD@{encode\_ZCMD}!zconsolecommand.h@{zconsolecommand.h}}
+\doxysubsubsection{\texorpdfstring{encode\_ZCMD()}{encode\_ZCMD()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int32\+\_\+t}} encode\+\_\+\+ZCMD (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+String }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zconsolecommand_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{zconsolecommand_8cpp_source}{zconsolecommand.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00015}{ZCMD\+\_\+cancel\+Client}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00014}{ZCMD\+\_\+list\+Clients}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00013}{ZCMD\+\_\+\+Nothing}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00019}{ZCMD\+\_\+send\+All\+PMS}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00020}{ZCMD\+\_\+send\+Client\+PMS}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00018}{ZCMD\+\_\+send\+Server\+PMS}}, \mbox{\hyperlink{zconsolecommand_8h_source_l00017}{ZCMD\+\_\+set\+Client\+Execute}}, and \mbox{\hyperlink{zconsolecommand_8h_source_l00016}{ZCMD\+\_\+set\+Client\+Sleep}}.
+

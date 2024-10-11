@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+ <zcppparserclauses version = "'0.30-0'">
+     <skip>
+        <skiplist> <!--  this list contains single keywords (and only single keywords- not clauses) that may be skipped while parsing without impact  -->
+            <keyword>
+                <name>static</name>
+            </keyword>
+            <keyword>
+                <name>explicit</name>
+            </keyword>
+            <keyword>
+                <name>virtual</name>
+            </keyword>
+            <keyword>
+                <name>const</name>
+            </keyword>
+            <keyword>
+                <name>Q_OBJECT</name>
+            </keyword>
+            <keyword>
+                <name>Q_SLOT</name>
+            </keyword>
+        </skiplist>
+        
+        <skipclause> <!--  this list contains clauses that may be skipped starting at <identifier> until <endtoken> included  -->
+<!--            
+            Do not include these clauses : they are processed by parsing main engine.
+            Including them will induce an ill behavior
+            
+            <clause>
+                <identifier>public</identifier>
+                <endtoken>:</endtoken>
+            </clause>
+            <clause>
+                <identifier>private</identifier>
+                <endtoken>:</endtoken>
+            </clause>
+            <clause>
+                <identifier>protected</identifier>
+                <endtoken>:</endtoken>
+            </clause>
+            -->
+            <clause>
+                <identifier>Q_SLOT</identifier>
+                <endtoken>:</endtoken>
+            </clause>
+            <clause>
+                <identifier>slots</identifier>
+                <endtoken>:</endtoken>
+            </clause>
+        </skipclause>
+    </skip>
+    
+</zcppparserclauses>
+ 
+ 

@@ -1,0 +1,473 @@
+\doxysection{zbs\+::ZMaster\+Control\+Block Class Reference}
+\hypertarget{classzbs_1_1_z_master_control_block}{}\label{classzbs_1_1_z_master_control_block}\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+
+
+{\ttfamily \#include $<$zmastercontrolblock.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_master_control_block_af3857f91d30e9da5e63b8f783196770b}{ZMaster\+Control\+Block}} (ZRaw\+Master\+File \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Master\+File}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_master_control_block_a2c24e41cd4784efde348ab7ada6e604c}{\texorpdfstring{$\sim$}{\string~}\+ZMaster\+Control\+Block}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_a49ddc26eaa0f943bf214dfb84537f72a}{pop\+Index}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_ae4ef34d7a72a510cb6556888d78d3724}{clear}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_ad85bc6e123af3ef88c1a09b774fc3448}{to\+Xml}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Level}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Comment}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_ad4013e17eb5f6cef9e5a7290217e84b7}{from\+Xml}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zxml\+Node}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Root\+Node}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Errorlog}})
+\begin{DoxyCompactList}\small\item\em from\+Xml loads master control block from its xml definition and return 0 when successfull. When errors returns ZS\+\_\+\+XMLERROR or appropriate status and p\+Errlog contains appropriate error messages. p\+Header\+Root\+Node xml node root for the hcb, typically $<$headercontrolblock$>$ tag. No validation is made on root node for its name value. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_ad4d344dfbad95d61365cea4432208834}{\+\_\+export\+Append}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+MCBContent}})
+\begin{DoxyCompactList}\small\item\em ZSMaster\+File\+Control\+Block\+::\+\_\+export\+MCB exports ZSMaster\+File\+Control\+Block content to a flat ZData\+Buffer. Updates values (offset and size) for ZJournaling\+Control\+Block if ever journaling exists. Both values are set to -\/1 if journaling does not exist. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_a35b592167d536efea2954539d1161052}{\+\_\+import}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}})
+\begin{DoxyCompactList}\small\item\em \+\_\+import imports a full MCB to an existing Master control block. Eventually, adds indexes whenever required. When added, index file remains empty, only Index Control Block is feeded. Index\+Presence returned array shows what indexes have been added. Pointer to input data p\+Ptr\+In is updated by this operation. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_a7cc1c4f686a593134b4ecf2912648fe1}{report}} (Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\begin{DoxyCompactList}\small\item\em ZMaster\+Control\+Block\+::print Reports the whole content of ZMCB \+: indexes definitions and dictionaries. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_a24c02c629f026182af7465679835a0ee}{set\+Engine\+Mode}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+SE}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_abac8b58545fbec305539f802df0b5025}{get\+Engine\+Mode}} ()
+\item 
+uri\+String \mbox{\hyperlink{classzbs_1_1_z_master_control_block_ad1bb65caa1486c68e59f6c51283d85df}{get\+URIDictionary}} ()
+\begin{DoxyCompactList}\small\item\em ZSMCBOwn\+Data\+::\+\_\+export Exports Master Control Block own data Index\+File\+Path, a fixed length uri\+String, is stored using its varying Universal Format (VUniversal) -\/\texorpdfstring{$>$}{>} uint16\+\_\+t size of string content WITHOUT ending \textquotesingle{}\textbackslash{}0\textquotesingle{} char -\/\texorpdfstring{$>$}{>} string content Index\+File\+Path is then added under this format at the end of MCB own data export format. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_ac737b55ac664088f7895374a5fed9d7f}{has\+Dictionary}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_a91084531c654c7dbebc1619bcbf7c33d}{load\+Dictionary}} (Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Errorlog}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_a45dd592001d0fe24aa15519d97d8ae3d}{load\+Dictionary\+\_\+bin}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_a050a2b814d394238b4fd7536722d49b9}{History\+On}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}
+\item 
+uri\+String \mbox{\hyperlink{classzbs_1_1_z_master_control_block_a23684df3c30b4330eddc15aad69efb96}{Index\+File\+Path}}
+\item 
+uri\+String \mbox{\hyperlink{classzbs_1_1_z_master_control_block_aff0d0fb0b313808f4ddf7303eecb440b}{Dictionary\+Path}}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_dictionary_file}{ZDictionary\+File}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_ab673d4bee4c1c1b2977149d54ae4c7cb}{Dictionary}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_index_table}{ZIndex\+Table}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_aa7c440df1d208ddd217d2a2883935793}{Index\+Table}}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_journal_control_block}{ZJournal\+Control\+Block}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_a73b6c047ed1c50ab323f3977d8e5401c}{ZJCB}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+ZRaw\+Master\+File \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_a8fbdf13dc957bae2a824605411d022d6}{Raw\+Master\+File}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_a99a60cb6d234d8f7b6a601da2e61c6fe}{Health\+Status}} = 0
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_a48680999668ead7cc737eba4ef2fff72}{Engine\+Mode}} = 0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{classzbs_1_1_z_master_control_block_af6c5165dc42a0d37c2cb1f32ccd9f0f7}{ZSJournal}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8h_source_l00099}{99}} of file \mbox{\hyperlink{zmastercontrolblock_8h_source}{zmastercontrolblock.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classzbs_1_1_z_master_control_block_af3857f91d30e9da5e63b8f783196770b}\label{classzbs_1_1_z_master_control_block_af3857f91d30e9da5e63b8f783196770b} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!ZMasterControlBlock@{ZMasterControlBlock}}
+\index{ZMasterControlBlock@{ZMasterControlBlock}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZMasterControlBlock()}{ZMasterControlBlock()}}
+{\footnotesize\ttfamily ZMaster\+Control\+Block\+::\+ZMaster\+Control\+Block (\begin{DoxyParamCaption}\item[{ZRaw\+Master\+File \texorpdfstring{$\ast$}{*}}]{p\+Master\+File }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{zmastercontrolblock_8cpp_source}{zmastercontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00052}{clear()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zmastercontrolblock_8h_source_l00155}{Raw\+Master\+File}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_a2c24e41cd4784efde348ab7ada6e604c}\label{classzbs_1_1_z_master_control_block_a2c24e41cd4784efde348ab7ada6e604c} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!````~ZMasterControlBlock@{\texorpdfstring{$\sim$}{\string~}ZMasterControlBlock}}
+\index{````~ZMasterControlBlock@{\texorpdfstring{$\sim$}{\string~}ZMasterControlBlock}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ZMasterControlBlock()}{\string~ZMasterControlBlock()}}
+{\footnotesize\ttfamily ZMaster\+Control\+Block\+::\texorpdfstring{$\sim$}{\string~}\+ZMaster\+Control\+Block (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{zmastercontrolblock_8cpp_source}{zmastercontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmastercontrolblock_8h_source_l00150}{Dictionary}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00152}{Index\+Table}}, \mbox{\hyperlink{zindextable_8cpp_source_l00035}{zbs\+::\+ZIndex\+Table\+::pop()}}, and \mbox{\hyperlink{zmastercontrolblock_8h_source_l00153}{ZJCB}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classzbs_1_1_z_master_control_block_ad4d344dfbad95d61365cea4432208834}\label{classzbs_1_1_z_master_control_block_ad4d344dfbad95d61365cea4432208834} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!\_exportAppend@{\_exportAppend}}
+\index{\_exportAppend@{\_exportAppend}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{\_exportAppend()}{\_exportAppend()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} ZMaster\+Control\+Block\+::\+\_\+export\+Append (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+MCBContent }\end{DoxyParamCaption})}
+
+
+
+ZSMaster\+File\+Control\+Block\+::\+\_\+export\+MCB exports ZSMaster\+File\+Control\+Block content to a flat ZData\+Buffer. Updates values (offset and size) for ZJournaling\+Control\+Block if ever journaling exists. Both values are set to -\/1 if journaling does not exist. 
+
+\begin{DoxyReturn}{Returns}
+a ZData\+Buffer containing the flat raw data exported from ZMCB 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00430}{430}} of file \mbox{\hyperlink{zmastercontrolblock_8cpp_source}{zmastercontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00217}{zbs\+::\+ZJournal\+Control\+Block\+::\+\_\+export\+JCB()}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00148}{Dictionary\+Path}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00158}{Engine\+Mode}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00157}{Health\+Status}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00143}{History\+On}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00144}{Index\+File\+Path}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00152}{Index\+Table}}, \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_source_l00851}{w\+Ret}}, and \mbox{\hyperlink{zmastercontrolblock_8h_source_l00153}{ZJCB}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_a35b592167d536efea2954539d1161052}\label{classzbs_1_1_z_master_control_block_a35b592167d536efea2954539d1161052} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!\_import@{\_import}}
+\index{\_import@{\_import}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{\_import()}{\_import()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZMaster\+Control\+Block\+::\+\_\+import (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Ptr\+In }\end{DoxyParamCaption})}
+
+
+
+\+\_\+import imports a full MCB to an existing Master control block. Eventually, adds indexes whenever required. When added, index file remains empty, only Index Control Block is feeded. Index\+Presence returned array shows what indexes have been added. Pointer to input data p\+Ptr\+In is updated by this operation. 
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00594}{594}} of file \mbox{\hyperlink{zmastercontrolblock_8cpp_source}{zmastercontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00122}{zbs\+::\+ZMCB\+\_\+\+Export\+::\+\_\+import()}}, \mbox{\hyperlink{zmfdictionary_8cpp_source_l00145}{zbs\+::\+ZMFDictionary\+::\+\_\+import()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00235}{zbs\+::\+ZJournal\+Control\+Block\+::\+\_\+import()}}, \mbox{\hyperlink{zindextable_8cpp_source_l00067}{zbs\+::\+ZIndex\+Table\+::clear()}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00150}{Dictionary}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00148}{Dictionary\+Path}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00144}{Index\+File\+Path}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00152}{Index\+Table}}, \mbox{\hyperlink{zindextable_8cpp_source_l00124}{zbs\+::\+ZIndex\+Table\+::push()}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00155}{Raw\+Master\+File}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00059}{zbs\+::\+ZMFDictionary\+::search\+Key\+Case()}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00153}{ZJCB}}, and \mbox{\hyperlink{zindexdata_8h_source_l00021}{ZPRES\+\_\+\+Unchanged}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_ae4ef34d7a72a510cb6556888d78d3724}\label{classzbs_1_1_z_master_control_block_ae4ef34d7a72a510cb6556888d78d3724} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!clear@{clear}}
+\index{clear@{clear}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZMaster\+Control\+Block\+::clear (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00052}{52}} of file \mbox{\hyperlink{zmastercontrolblock_8cpp_source}{zmastercontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindextable_8cpp_source_l00067}{zbs\+::\+ZIndex\+Table\+::clear()}}, \mbox{\hyperlink{zmetadic_8h_source_l00112}{zbs\+::\+ZMeta\+Dic\+::clear()}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00150}{Dictionary}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00148}{Dictionary\+Path}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00143}{History\+On}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00144}{Index\+File\+Path}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00152}{Index\+Table}}, and \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00043}{pop\+Index()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00017}{ZMaster\+Control\+Block()}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_ad4013e17eb5f6cef9e5a7290217e84b7}\label{classzbs_1_1_z_master_control_block_ad4013e17eb5f6cef9e5a7290217e84b7} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!fromXml@{fromXml}}
+\index{fromXml@{fromXml}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{fromXml()}{fromXml()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZMaster\+Control\+Block\+::from\+Xml (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zxml\+Node}} \texorpdfstring{$\ast$}{*}}]{p\+Root\+Node,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Errorlog }\end{DoxyParamCaption})}
+
+
+
+from\+Xml loads master control block from its xml definition and return 0 when successfull. When errors returns ZS\+\_\+\+XMLERROR or appropriate status and p\+Errlog contains appropriate error messages. p\+Header\+Root\+Node xml node root for the hcb, typically $<$headercontrolblock$>$ tag. No validation is made on root node for its name value. 
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00277}{277}} of file \mbox{\hyperlink{zmastercontrolblock_8cpp_source}{zmastercontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmastercontrolblock_8h_source_l00158}{Engine\+Mode}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00157}{Health\+Status}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00143}{History\+On}}, and \mbox{\hyperlink{zmastercontrolblock_8h_source_l00144}{Index\+File\+Path}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_abac8b58545fbec305539f802df0b5025}\label{classzbs_1_1_z_master_control_block_abac8b58545fbec305539f802df0b5025} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!getEngineMode@{getEngineMode}}
+\index{getEngineMode@{getEngineMode}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{getEngineMode()}{getEngineMode()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} zbs\+::\+ZMaster\+Control\+Block\+::get\+Engine\+Mode (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8h_source_l00132}{132}} of file \mbox{\hyperlink{zmastercontrolblock_8h_source}{zmastercontrolblock.\+h}}.
+
+
+
+References \mbox{\hyperlink{zmastercontrolblock_8h_source_l00158}{Engine\+Mode}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_ad1bb65caa1486c68e59f6c51283d85df}\label{classzbs_1_1_z_master_control_block_ad1bb65caa1486c68e59f6c51283d85df} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!getURIDictionary@{getURIDictionary}}
+\index{getURIDictionary@{getURIDictionary}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{getURIDictionary()}{getURIDictionary()}}
+{\footnotesize\ttfamily uri\+String ZMaster\+Control\+Block\+::get\+URIDictionary (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+ZSMCBOwn\+Data\+::\+\_\+export Exports Master Control Block own data Index\+File\+Path, a fixed length uri\+String, is stored using its varying Universal Format (VUniversal) -\/\texorpdfstring{$>$}{>} uint16\+\_\+t size of string content WITHOUT ending \textquotesingle{}\textbackslash{}0\textquotesingle{} char -\/\texorpdfstring{$>$}{>} string content Index\+File\+Path is then added under this format at the end of MCB own data export format. 
+
+Size of exported MCB is then sizeof(\+ZZSMCBOwn\+Data\+\_\+\+Export)+size of VUFormat of string This size is stored in MCBSize. Nota Bene \+: MDic\+Offset is equal to MCBSize.
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+ZDBExport} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00193}{193}} of file \mbox{\hyperlink{zmastercontrolblock_8cpp_source}{zmastercontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmastercontrolblock_8h_source_l00150}{Dictionary}}, and \mbox{\hyperlink{zdictionaryfile_8h_source_l00120}{zbs\+::\+ZDictionary\+File\+::\+URIDictionary}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_ac737b55ac664088f7895374a5fed9d7f}\label{classzbs_1_1_z_master_control_block_ac737b55ac664088f7895374a5fed9d7f} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!hasDictionary@{hasDictionary}}
+\index{hasDictionary@{hasDictionary}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{hasDictionary()}{hasDictionary()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZMaster\+Control\+Block\+::has\+Dictionary (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8h_source_l00136}{136}} of file \mbox{\hyperlink{zmastercontrolblock_8h_source}{zmastercontrolblock.\+h}}.
+
+
+
+References \mbox{\hyperlink{zmastercontrolblock_8h_source_l00150}{Dictionary}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_a91084531c654c7dbebc1619bcbf7c33d}\label{classzbs_1_1_z_master_control_block_a91084531c654c7dbebc1619bcbf7c33d} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!loadDictionary@{loadDictionary}}
+\index{loadDictionary@{loadDictionary}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{loadDictionary()}{loadDictionary()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZMaster\+Control\+Block\+::load\+Dictionary (\begin{DoxyParamCaption}\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Errorlog }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00815}{815}} of file \mbox{\hyperlink{zmastercontrolblock_8cpp_source}{zmastercontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmastercontrolblock_8h_source_l00150}{Dictionary}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zdictionaryfile_8cpp_source_l00095}{zbs\+::\+ZDictionary\+File\+::load\+\_\+xml()}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_a45dd592001d0fe24aa15519d97d8ae3d}\label{classzbs_1_1_z_master_control_block_a45dd592001d0fe24aa15519d97d8ae3d} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!loadDictionary\_bin@{loadDictionary\_bin}}
+\index{loadDictionary\_bin@{loadDictionary\_bin}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{loadDictionary\_bin()}{loadDictionary\_bin()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} zbs\+::\+ZMaster\+Control\+Block\+::load\+Dictionary\+\_\+bin (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\Hypertarget{classzbs_1_1_z_master_control_block_a49ddc26eaa0f943bf214dfb84537f72a}\label{classzbs_1_1_z_master_control_block_a49ddc26eaa0f943bf214dfb84537f72a} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!popIndex@{popIndex}}
+\index{popIndex@{popIndex}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{popIndex()}{popIndex()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} ZMaster\+Control\+Block\+::pop\+Index (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{zmastercontrolblock_8cpp_source}{zmastercontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmastercontrolblock_8h_source_l00152}{Index\+Table}}, and \mbox{\hyperlink{zindextable_8cpp_source_l00035}{zbs\+::\+ZIndex\+Table\+::pop()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00052}{clear()}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_a7cc1c4f686a593134b4ecf2912648fe1}\label{classzbs_1_1_z_master_control_block_a7cc1c4f686a593134b4ecf2912648fe1} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!report@{report}}
+\index{report@{report}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{report()}{report()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZMaster\+Control\+Block\+::report (\begin{DoxyParamCaption}\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})}
+
+
+
+ZMaster\+Control\+Block\+::print Reports the whole content of ZMCB \+: indexes definitions and dictionaries. 
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00735}{735}} of file \mbox{\hyperlink{zmastercontrolblock_8cpp_source}{zmastercontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zcontentconstants_8cpp_source_l00059}{decode\+\_\+\+ZST()}}, \mbox{\hyperlink{zindextype_8cpp_source_l01352}{decode\+\_\+\+ZType()}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00150}{Dictionary}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00144}{Index\+File\+Path}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00152}{Index\+Table}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{zbs\+::\+ZMFDictionary\+::\+Key\+Dic}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_a24c02c629f026182af7465679835a0ee}\label{classzbs_1_1_z_master_control_block_a24c02c629f026182af7465679835a0ee} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!setEngineMode@{setEngineMode}}
+\index{setEngineMode@{setEngineMode}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{setEngineMode()}{setEngineMode()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZMaster\+Control\+Block\+::set\+Engine\+Mode (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}}}]{p\+SE }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00825}{825}} of file \mbox{\hyperlink{zmastercontrolblock_8cpp_source}{zmastercontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmastercontrolblock_8h_source_l00158}{Engine\+Mode}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_ad85bc6e123af3ef88c1a09b774fc3448}\label{classzbs_1_1_z_master_control_block_ad85bc6e123af3ef88c1a09b774fc3448} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!toXml@{toXml}}
+\index{toXml@{toXml}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{toXml()}{toXml()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} ZMaster\+Control\+Block\+::to\+Xml (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Level,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Comment = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00208}{208}} of file \mbox{\hyperlink{zmastercontrolblock_8cpp_source}{zmastercontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmastercontrolblock_8h_source_l00150}{Dictionary}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00158}{Engine\+Mode}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00157}{Health\+Status}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00143}{History\+On}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00144}{Index\+File\+Path}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00152}{Index\+Table}}, \mbox{\hyperlink{zindextable_8cpp_source_l00185}{zbs\+::\+ZIndex\+Table\+::to\+Xml()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00208}{to\+Xml()}}, \mbox{\hyperlink{zsjournalcontrolblock_8cpp_source_l00349}{zbs\+::\+ZJournal\+Control\+Block\+::to\+Xml()}}, and \mbox{\hyperlink{zmastercontrolblock_8h_source_l00153}{ZJCB}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00208}{to\+Xml()}}.
+
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{classzbs_1_1_z_master_control_block_af6c5165dc42a0d37c2cb1f32ccd9f0f7}\label{classzbs_1_1_z_master_control_block_af6c5165dc42a0d37c2cb1f32ccd9f0f7} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!ZSJournal@{ZSJournal}}
+\index{ZSJournal@{ZSJournal}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZSJournal}{ZSJournal}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{friend}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{classzbs_1_1_z_s_journal}{ZSJournal}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8h_source_l00102}{102}} of file \mbox{\hyperlink{zmastercontrolblock_8h_source}{zmastercontrolblock.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classzbs_1_1_z_master_control_block_ab673d4bee4c1c1b2977149d54ae4c7cb}\label{classzbs_1_1_z_master_control_block_ab673d4bee4c1c1b2977149d54ae4c7cb} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!Dictionary@{Dictionary}}
+\index{Dictionary@{Dictionary}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{Dictionary}{Dictionary}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_dictionary_file}{ZDictionary\+File}}\texorpdfstring{$\ast$}{*} zbs\+::\+ZMaster\+Control\+Block\+::\+Dictionary =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8h_source_l00150}{150}} of file \mbox{\hyperlink{zmastercontrolblock_8h_source}{zmastercontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00594}{\+\_\+import()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00052}{clear()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00193}{get\+URIDictionary()}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00136}{has\+Dictionary()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00815}{load\+Dictionary()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00735}{report()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00208}{to\+Xml()}}, and \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00027}{\texorpdfstring{$\sim$}{\string~}\+ZMaster\+Control\+Block()}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_aff0d0fb0b313808f4ddf7303eecb440b}\label{classzbs_1_1_z_master_control_block_aff0d0fb0b313808f4ddf7303eecb440b} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!DictionaryPath@{DictionaryPath}}
+\index{DictionaryPath@{DictionaryPath}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{DictionaryPath}{DictionaryPath}}
+{\footnotesize\ttfamily uri\+String zbs\+::\+ZMaster\+Control\+Block\+::\+Dictionary\+Path}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8h_source_l00148}{148}} of file \mbox{\hyperlink{zmastercontrolblock_8h_source}{zmastercontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00430}{\+\_\+export\+Append()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00594}{\+\_\+import()}}, and \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00052}{clear()}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_a48680999668ead7cc737eba4ef2fff72}\label{classzbs_1_1_z_master_control_block_a48680999668ead7cc737eba4ef2fff72} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!EngineMode@{EngineMode}}
+\index{EngineMode@{EngineMode}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{EngineMode}{EngineMode}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} zbs\+::\+ZMaster\+Control\+Block\+::\+Engine\+Mode = 0}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8h_source_l00158}{158}} of file \mbox{\hyperlink{zmastercontrolblock_8h_source}{zmastercontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00430}{\+\_\+export\+Append()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00277}{from\+Xml()}}, \mbox{\hyperlink{zmastercontrolblock_8h_source_l00132}{get\+Engine\+Mode()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00825}{set\+Engine\+Mode()}}, and \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00208}{to\+Xml()}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_a99a60cb6d234d8f7b6a601da2e61c6fe}\label{classzbs_1_1_z_master_control_block_a99a60cb6d234d8f7b6a601da2e61c6fe} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!HealthStatus@{HealthStatus}}
+\index{HealthStatus@{HealthStatus}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{HealthStatus}{HealthStatus}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} zbs\+::\+ZMaster\+Control\+Block\+::\+Health\+Status = 0}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8h_source_l00157}{157}} of file \mbox{\hyperlink{zmastercontrolblock_8h_source}{zmastercontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00430}{\+\_\+export\+Append()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00277}{from\+Xml()}}, and \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00208}{to\+Xml()}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_a050a2b814d394238b4fd7536722d49b9}\label{classzbs_1_1_z_master_control_block_a050a2b814d394238b4fd7536722d49b9} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!HistoryOn@{HistoryOn}}
+\index{HistoryOn@{HistoryOn}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{HistoryOn}{HistoryOn}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} zbs\+::\+ZMaster\+Control\+Block\+::\+History\+On =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8h_source_l00143}{143}} of file \mbox{\hyperlink{zmastercontrolblock_8h_source}{zmastercontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00430}{\+\_\+export\+Append()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00052}{clear()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00277}{from\+Xml()}}, and \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00208}{to\+Xml()}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_a23684df3c30b4330eddc15aad69efb96}\label{classzbs_1_1_z_master_control_block_a23684df3c30b4330eddc15aad69efb96} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!IndexFilePath@{IndexFilePath}}
+\index{IndexFilePath@{IndexFilePath}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{IndexFilePath}{IndexFilePath}}
+{\footnotesize\ttfamily uri\+String zbs\+::\+ZMaster\+Control\+Block\+::\+Index\+File\+Path}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8h_source_l00144}{144}} of file \mbox{\hyperlink{zmastercontrolblock_8h_source}{zmastercontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00430}{\+\_\+export\+Append()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00594}{\+\_\+import()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00052}{clear()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00277}{from\+Xml()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00735}{report()}}, and \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00208}{to\+Xml()}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_aa7c440df1d208ddd217d2a2883935793}\label{classzbs_1_1_z_master_control_block_aa7c440df1d208ddd217d2a2883935793} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!IndexTable@{IndexTable}}
+\index{IndexTable@{IndexTable}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{IndexTable}{IndexTable}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_index_table}{ZIndex\+Table}} zbs\+::\+ZMaster\+Control\+Block\+::\+Index\+Table}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8h_source_l00152}{152}} of file \mbox{\hyperlink{zmastercontrolblock_8h_source}{zmastercontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00430}{\+\_\+export\+Append()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00594}{\+\_\+import()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00052}{clear()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00043}{pop\+Index()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00735}{report()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00208}{to\+Xml()}}, and \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00027}{\texorpdfstring{$\sim$}{\string~}\+ZMaster\+Control\+Block()}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_a8fbdf13dc957bae2a824605411d022d6}\label{classzbs_1_1_z_master_control_block_a8fbdf13dc957bae2a824605411d022d6} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!RawMasterFile@{RawMasterFile}}
+\index{RawMasterFile@{RawMasterFile}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{RawMasterFile}{RawMasterFile}}
+{\footnotesize\ttfamily ZRaw\+Master\+File\texorpdfstring{$\ast$}{*} zbs\+::\+ZMaster\+Control\+Block\+::\+Raw\+Master\+File =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8h_source_l00155}{155}} of file \mbox{\hyperlink{zmastercontrolblock_8h_source}{zmastercontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00594}{\+\_\+import()}}, and \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00017}{ZMaster\+Control\+Block()}}.
+
+\Hypertarget{classzbs_1_1_z_master_control_block_a73b6c047ed1c50ab323f3977d8e5401c}\label{classzbs_1_1_z_master_control_block_a73b6c047ed1c50ab323f3977d8e5401c} 
+\index{zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}!ZJCB@{ZJCB}}
+\index{ZJCB@{ZJCB}!zbs::ZMasterControlBlock@{zbs::ZMasterControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZJCB}{ZJCB}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_journal_control_block}{ZJournal\+Control\+Block}}\texorpdfstring{$\ast$}{*} zbs\+::\+ZMaster\+Control\+Block\+::\+ZJCB =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zmastercontrolblock_8h_source_l00153}{153}} of file \mbox{\hyperlink{zmastercontrolblock_8h_source}{zmastercontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00430}{\+\_\+export\+Append()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00594}{\+\_\+import()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00208}{to\+Xml()}}, and \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00027}{\texorpdfstring{$\sim$}{\string~}\+ZMaster\+Control\+Block()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zmastercontrolblock_8h}{zmastercontrolblock.\+h}}\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zmastercontrolblock_8cpp}{zmastercontrolblock.\+cpp}}\end{DoxyCompactItemize}

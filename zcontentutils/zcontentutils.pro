@@ -133,14 +133,24 @@ SOURCES += \
 #    $${ZQT_WIDGET}/zqpixlabelchecked.cpp \
     ../../zcppparser/zcppparsertype.cpp \
     ../../zqt/zqtwidget/zcombodelegate.cpp \
+    ../../zqt/zqtwidget/zfakebtn.cpp \
     ../../zqt/zqtwidget/zqgraphicscene.cpp \
     ../../zqt/zqtwidget/zqrectangle.cpp \
+    ../../zqt/zqtwidget/zqstatusbar.cpp \
     ../../zqt/zqtwidget/zqtextbrowser.cpp \
+    ../../zqt/zqtwidget/zqtreewidget.cpp \
     ../../zqt/zqtwidget/ztextformattuple.cpp \
     ../zcontentcommon/urffield.cpp \
     ../zcontentcommon/urfparser.cpp \
 #    ../zcontentcommon/zgeneralparameters.cpp \
+    ../zcontentcommon/zcontentobjectbroker.cpp \
+    ../zcontentcommon/zdomain.cpp \
+    ../zcontentcommon/zdomainbroker.cpp \
+    ../zcontentcommon/zdomainobject.cpp \
+    ../zcontentcommon/zdomainpath.cpp \
+    ../zcontentcommon/zdomaintype.cpp \
     ../zcontentcommon/zgeneralparameters.cpp \
+    ../zcontentcommon/zviewers.cpp \
 \
     $${ZCONTENT_ROOT}/zcontentcommon/zresource.cpp \
     $${ZCONTENT_ROOT}/zindexedfile/zfielddescription.cpp \
@@ -181,6 +191,9 @@ SOURCES += \
     zcollectionlist.cpp \
     zcopydlg.cpp \
     zcppgenerate.cpp \
+    zdomainclipboardelement.cpp \
+    zdomaindlg.cpp \
+    zdomainobjectfinder.cpp \
     zentrypoint.cpp \
     zfilegenerate.cpp \
     zgeneralparamsdlg.cpp \
@@ -188,6 +201,10 @@ SOURCES += \
     zhelpfreetextsearchdlg.cpp \
     zkeylistdlg.cpp \
     zmfprogressmwn.cpp \
+    zobjectfileselector.cpp \
+    zobjectselector.cpp \
+    zoperanddlg.cpp \
+    zquerywizardmwd.cpp \
     zrawkeylistdlg.cpp \
     zrawmasterfilevisu.cpp \
     zrawvisumain.cpp \
@@ -213,16 +230,26 @@ HEADERS += \
 #    $${ZQT_WIDGET}/zqpixlabelchecked.h \
     ../../zcppparser/zcppparsertype.h \
     ../../zqt/zqtwidget/zcombodelegate.h \
+    ../../zqt/zqtwidget/zfakebtn.h \
     ../../zqt/zqtwidget/zqgraphicscene.h \
     ../../zqt/zqtwidget/zqrectangle.h \
+    ../../zqt/zqtwidget/zqstatusbar.h \
     ../../zqt/zqtwidget/zqtextbrowser.h \
+    ../../zqt/zqtwidget/zqtreewidget.h \
     ../../zqt/zqtwidget/zqtutils.h \
     ../../zqt/zqtwidget/zqtwidgets_release.h \
     ../../zqt/zqtwidget/ztextformattuple.h \
     ../zcontentcommon/urffield.h \
     ../zcontentcommon/urfparser.h \
 #    ../zcontentcommon/zgeneralparameters.h \
+    ../zcontentcommon/zcontentobjectbroker.h \
+    ../zcontentcommon/zdomain.h \
+    ../zcontentcommon/zdomainbroker.h \
+    ../zcontentcommon/zdomainobject.h \
+    ../zcontentcommon/zdomainpath.h \
+    ../zcontentcommon/zdomaintype.h \
     ../zcontentcommon/zgeneralparameters.h \
+    ../zcontentcommon/zviewers.h \
 \
     $${ZCONTENT_ROOT}/zcontentcommon/zresource.h \
     $${ZCONTENT_ROOT}/zindexedfile/zfielddescription.h \
@@ -263,6 +290,9 @@ HEADERS += \
     zcontentutils_release.h \
     zcopydlg.h \
     zcppgenerate.h \
+    zdomainclipboardelement.h \
+    zdomaindlg.h \
+    zdomainobjectfinder.h \
     zentrypoint.h \
     zfilegenerate.h \
     zgeneralparamsdlg.h \
@@ -270,6 +300,10 @@ HEADERS += \
     zhelpfreetextsearchdlg.h \
     zkeylistdlg.h \
     zmfprogressmwn.h \
+    zobjectfileselector.h \
+    zobjectselector.h \
+    zoperanddlg.h \
+    zquerywizardmwd.h \
     zrawkeylistdlg.h \
     zrawmasterfilevisu.h \
     zrawvisumain.h \

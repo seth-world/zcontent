@@ -1,0 +1,141 @@
+\doxysection{zsmtp.\+h}
+\hypertarget{zsmtp_8h_source}{}\label{zsmtp_8h_source}\index{/home/gerard/Development/zbasetools/znet/zmail/zsmtp.h@{/home/gerard/Development/zbasetools/znet/zmail/zsmtp.h}}
+\mbox{\hyperlink{zsmtp_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZSMTP\_H}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ ZSMTP\_H}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <stdarg.h>}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <stdio.h>}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <stdlib.h>}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <string.h>}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <ztoolset/utfvaryingstring.h>}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zmailcommon_8h}{zmail/zmailcommon.h}}>}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00015}00015\ \textcolor{comment}{//\#include\ <zbasenet/zsslabstract.h>}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00016}00016\ \textcolor{comment}{//\#include\ <zbasenet/zclientsocket.h>}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zmailabstract_8h}{zmail/zmailabstract.h}}>}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00023}\mbox{\hyperlink{class_z_smtp}{00023}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_z_smtp}{ZSmtp}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_z_mail_abstract}{ZMailAbstract}}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00024}00024\ \{}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00025}00025\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00026}00026\ \ \ \mbox{\hyperlink{class_z_smtp_aa5e0f7e475f730392078dea3956a9cff}{ZSmtp}}();}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00027}00027\ \ \ \mbox{\hyperlink{class_z_smtp_a00fc6d047c7914029fca442f564c71d1}{\string~ZSmtp}}();}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00030}00030\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_smtp_a547ec17a1d3fd37b91e7f8966293f16a}{smtpSSLAuthenticate}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pUsername}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00031}00031\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pPassword}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00032}00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zsslfunctions_8h_a385e54dce5150985c17f825b907ee906}{SSLFileFormat\_type}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pFormat}}=\mbox{\hyperlink{zsslfunctions_8h_a385e54dce5150985c17f825b907ee906abdc3eb2e93cbc8983d387717de1f8efc}{SFF\_PEM}});}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00034}00034\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_smtp_a5e97786b5e4760727893a404a6724fbd}{sendSimpleMail}}(\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMailBody}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00035}00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pSubject}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pFrom}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00037}00037\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pTo}});}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00039}00039\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_smtp_af9fafb02281bcdbc97b9dc65c097a04b}{sendMimeMail}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pFrom}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00040}00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pTo}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pSubject}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMailBody}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uriString\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pAttachmentFile}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pOptions}});}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00045}00045\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_smtp_a02b238faf7b098776d32228e099bf064}{sendMimeMailOld}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pFrom}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pTo}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pSubject}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMailBody}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uriString\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pAttachmentFile}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pOptions}});}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00052}00052\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_smtp_a164256d5d926bcef27823e23dddd19c7}{sendMimeMailMulti}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pFrom}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00053}00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_array}{zbs::ZArray<utf8VaryingString>}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pTos}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00054}00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pSubject}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00055}00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMailBody}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00056}00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_array}{zbs::ZArray<uriString>}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pAttachments}},}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00057}00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pOptions}});}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00058}00058\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_smtp_a569cd96b7976adee31bce4ce223eb814}{smtpSendAttachement}}(\textcolor{keyword}{const}\ uriString\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pAttachmentFile}});}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00060}00060\ \textcolor{comment}{//\ \ \ \ ZStatus\ readFromSocket(char\ *wBuffer,size\_t\ wBufSize);}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00061}00061\ \textcolor{comment}{//\ \ \ \ ZStatus\ setup(const\ utf8VaryingString\ \&pHostName,\ int\ pPort\ =\ 465,\ bool\ pNonBlocking=false,\ int\ pTimeout\ =\ 30000);}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00063}00063\ \textcolor{comment}{/*\ \ \ \ ZStatus\ setup(const\ utf8VaryingString\ \&pHostName,}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00064}00064\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int\ pZSMOP,}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00065}00065\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int\ pPort\ ,}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00066}00066\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ char*\ pLogFile=nullptr,}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00067}00067\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bool\ pNonBlocking=false,}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00068}00068\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ int\ pTimeout\ =\ 30000);}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00069}00069\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00070}00070\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_smtp_ad5ea291e440cea96dab43c5149b9f9fc}{smtpQuit}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00071}\mbox{\hyperlink{class_z_smtp_a4586c0c367a77ac04f1969511278f739}{00071}}\ \ \ \ \ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{class_z_smtp_a4586c0c367a77ac04f1969511278f739}{getLastSmtpMessage}}\ (\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00075}00075\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_smtp_ac1e10ba55554dd4699db0848d1417627}{smtpSendInstruction}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pCommand}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pExpected}});}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00076}00076\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_smtp_aa6211c192a2f1e62ee78ff2db3e3eaaf}{smtpSSLSendWithReply}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pCommand}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pExpected}},\ \textcolor{keywordtype}{int}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pResponse}});}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00077}00077\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_smtp_a06f19961778d1991cb0f199d5cd513a1}{smtpSSLReadResponse}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pExpected}},\ \textcolor{keywordtype}{int}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pResponse}});}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00079}00079\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_smtp_aca7dfd3f7fb2a1163c0200c7cd870c20}{analyzeEHLO}}(\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pResponse}});}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00081}00081\ \ \textcolor{comment}{/*\ \ \ ZStatus\ smtpSSLSend(const\ utf8VaryingString\&\ pCommand);}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00082}00082\ \textcolor{comment}{\ \ \ \ ZStatus\ smtpSSLSendHugeByChunks(ZDataBuffer\&\ pContent);}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00083}00083\ \textcolor{comment}{\ \ \ \ ZStatus\ smtpSSLSendHuge(ZDataBuffer\&\ pContent);}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00084}00084\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00085}00085\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00086}00086\ \textcolor{comment}{\ \ \ \ ZStatus\ openLog(const\ char*\ pLogname);}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00087}00087\ \textcolor{comment}{\ \ \ \ void\ log(const\ char*\ pMessage,...);}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00088}00088\ \textcolor{comment}{\ \ \ \ void\ logServer(const\ char*\ pMessage);}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00089}00089\ \textcolor{comment}{\ \ \ \ void\ logClient(const\ char*\ pMessage);}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00090}00090\ \textcolor{comment}{\ \ \ \ void\ logError(const\ char*\ pMessage,...);}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00091}00091\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00092}00092\ \textcolor{comment}{\ \ \ \ uriString\ generateLogfilename();}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00093}00093\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00094}00094\ \textcolor{comment}{\ \ \ \ void\ setPerformanceTracking\ (bool\ pPerf);}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00095}00095\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00097}00097\ \textcolor{comment}{//\ \ \ \ void\ displayPerformanceReport(FILE*pOutput=stdout);}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00100}\mbox{\hyperlink{class_z_smtp_a1d7949f8b257651095ff01a9723e09db}{00100}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_smtp_a1d7949f8b257651095ff01a9723e09db}{setAttachmentChunkSize}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\_t}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pChunk}})\ \{\mbox{\hyperlink{class_z_smtp_a6f7ab6fd05bd660a51d60e6c802c07bc}{ChunkSize}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pChunk}};\}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00101}00101\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00102}00102\ \textcolor{comment}{//signals:}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00103}00103\ \textcolor{comment}{//\ \ \ \ void\ status(\ const\ QString\ \&);}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00105}00105\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00106}\mbox{\hyperlink{class_z_smtp_a356b4e5a5d5e31545cecf35e3e429c4f}{00106}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{class_z_smtp_a356b4e5a5d5e31545cecf35e3e429c4f}{TotalSize}}=0;}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00107}\mbox{\hyperlink{class_z_smtp_a28e66a2f3760397b382bf107a52b620f}{00107}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{class_z_smtp_a28e66a2f3760397b382bf107a52b620f}{CurrentSize}}=0;}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00109}\mbox{\hyperlink{class_z_smtp_a6f7ab6fd05bd660a51d60e6c802c07bc}{00109}}\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\_t}}\ \mbox{\hyperlink{class_z_smtp_a6f7ab6fd05bd660a51d60e6c802c07bc}{ChunkSize}}=-\/1;}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00111}\mbox{\hyperlink{class_z_smtp_ad4b4ea410558a14bcc811ce5d85dea53}{00111}}\ \ \ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{class_z_smtp_ad4b4ea410558a14bcc811ce5d85dea53}{ServerResponse}};}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00112}\mbox{\hyperlink{class_z_smtp_a55cfd745749e38059cd65e97029e2f71}{00112}}\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{class_z_smtp_a55cfd745749e38059cd65e97029e2f71}{ServerMaxSize}}=65635;}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00113}\mbox{\hyperlink{class_z_smtp_a9527f39f79033ae493a004e23b3fc4f4}{00113}}\ \ \ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{class_z_smtp_a9527f39f79033ae493a004e23b3fc4f4}{ServerAddress}};}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00114}\mbox{\hyperlink{class_z_smtp_a24f9c070fd036e121d460197c1f8e2b2}{00114}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \mbox{\hyperlink{class_z_smtp_a24f9c070fd036e121d460197c1f8e2b2}{ServerUtf8Capable}}=\textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00117}00117\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00118}00118\ \ \ \ \ \textcolor{keyword}{enum}\ states\{Tls,\ HandShake\ ,Auth,User,Pass,rcpt,Mail,Data,Init,Body,Quit,Close\};}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00119}00119\ \ \ \ \ \textcolor{keywordtype}{int}\ State;}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00121}00121\ \ \ \ \ \textcolor{keywordtype}{bool}\ Authenticated\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00123}00123\ \ \ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ Command;}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00124}00124\ \ \ \ \ \textcolor{keywordtype}{int}\ SmtpCode=0;}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00125}00125\ \ \ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ SmtpMessage;}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00127}00127\ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ PerformanceTrack\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00128}00128\ \ \ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \ \ \ \ ZSMOP\ =\ \mbox{\hyperlink{zmailabstract_8h_a113c69042ba052bd95022efa082f1fdeaa1530011de8014b6bfde235507454093}{ZSMOP\_Nothing}};\ \ \textcolor{comment}{//\ refer\ to\ ZSmtpOption}}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00129}00129\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{FILE}}*\ \ \ \ \ \ \ SmtpLog=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00130}00130\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00131}00131\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00132}00132\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ MIMEBoundary\ =\textcolor{stringliteral}{"{}kkKKmimeboundaryKKkk"{}};}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00134}00134\ \};}
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00137}00137\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{zsmtp_8h_source_l00139}00139\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZSMTP\_H}}
+
+\end{DoxyCode}

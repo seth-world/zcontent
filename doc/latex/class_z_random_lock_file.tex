@@ -1,0 +1,524 @@
+\doxysection{ZRandom\+Lock\+File Class Reference}
+\hypertarget{class_z_random_lock_file}{}\label{class_z_random_lock_file}\index{ZRandomLockFile@{ZRandomLockFile}}
+
+
+{\ttfamily \#include $<$zrandomlockfile.\+h$>$}
+
+
+
+Inheritance diagram for ZRandom\+Lock\+File\+:
+% FIG 0
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_z_random_lock_file_ad78c4bbc714735ef96741cf175a0b641}{ZRandom\+Lock\+File}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_a57393370eb0ff09e8f1bb18183a8b74d}{zget}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}}, \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}=\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_afdae706db3f13f65d96ff6b79a0354c5}{zget}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}}, \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}=\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_ab1d547abf972a89ebd97c0810e52d26f}{zget\+Next}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+User\+Record}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size}}, \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}=\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_abc0ba25c71fcfa172bbaa83d50785957}{zget\+Next}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+User\+Record}}, \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}=\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_a2a1faf0a4bf32065a5b9f1a6302d60b5}{zget\+By\+Address}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}}, \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_ab72dc8a0f4a4fe3ac794e915a57c8530}{zget\+WAddress}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}}, \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}}, \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}=\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_af50ad00942d6b0cf1f6db88817d0c405}{zget\+Next\+WAddress}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}}, \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}}, \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}}, \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}=\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_a73ba76581f8f75e462fc9bf59d41b097}{zget\+Last\+WAddress}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}}, \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}}, \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}}, \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}=\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_a0db16fc89181094674a15285df8f8be0}{zget\+Previous\+WAddress}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}}, \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}}, \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}}, \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}=\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{class_z_random_lock_file_a46a4568ea74bf3f2773d233bfd3e923a}{search\+Block\+By\+Address}} (ZFile\+Descriptor \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Descriptor}}, \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_a17a9e2977aad46fe92276237c2ee68fa}{zadd\+With\+Address}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}}, \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}=0)
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_a439a341344d5f2319d5db607de73d8bb}{zget\+Last}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}=0)
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_a5ba8822ea93cba912e9d965766900e7a}{zget\+Previous}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}=0)
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_a7ffa2adf1f8eb9814bca09d898223f45}{zlock}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}})
+\begin{DoxyCompactList}\small\item\em zlock\+By\+Address locks a record pointed by its address with a lock mask given by p\+Lock see \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZLock\+Mask\+\_\+type} File descriptor is updated in file header if file is not opened in ZRF\+\_\+\+Exclusive mode \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_aee5d502ff99547a3a2ec4a9941f9cd72}{zlock\+By\+Address}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{class_z_random_lock_file_ac1557a1e52306a6d14af720f2cf5f3c9}{\+\_\+is\+Locked\+By\+Address}} (ZFile\+Descriptor \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Descriptor}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_aec700009df51e354a83bd19a64eeec6c}{\+\_\+get\+Lock\+Status\+By\+Address}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}}, \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pid\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Pid}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_a358011a1998e2b007cada14ba6fb3a16}{zunlock\+By\+Address}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}})
+\begin{DoxyCompactList}\small\item\em zunlock\+By\+Address Unlocks a record pointed by its address. File descriptor is updated in file header if file is not opened in ZRF\+\_\+\+Exclusive mode \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_a9db1799095ee5ede69642ab567fd6fef}{zunlock}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_afb73a28c366d29ecb5a1922e17e3a901}{zunlock\+All}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\begin{DoxyCompactList}\small\item\em zunlock\+All Unlocks all locks for the process for the file File descriptor is updated in file header if file is not opened in ZRF\+\_\+\+Exclusive mode \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_a486d0e462f4db115464a150a1d8538bc}{\+\_\+unlock\+All}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Force\+Write}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}})
+\begin{DoxyCompactList}\small\item\em \+\_\+unlock\+All Unlocks all locks for the process for the file pointed by p\+Descriptor File descriptor is updated in file header. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_a662f40bd54495fc7bd9d771dd9709e74}{\+\_\+unlock}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Force\+Write}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}})
+\begin{DoxyCompactList}\small\item\em \+\_\+unlock Releases the lock set to block of rank p\+Rank This routine writes the file descriptor to header \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_adefc78a290a64d86249f96fb077d2b2b}{\+\_\+unlock\+ZBAT}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}})
+\begin{DoxyCompactList}\small\item\em \+\_\+unlock\+ZBAT Low level unlock routine \+: mark ZBAT block on file to clear lock to ZLock\+\_\+\+Nolock (release lock) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_a72810d31a79c84c7cf1b0e41ccd8a0d8}{\+\_\+get\+Status\+From\+Lock}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_a7e34b69c6eb30e4e029cc8bc5e59abdf}{\+\_\+lock\+ZBAT}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}})
+\begin{DoxyCompactList}\small\item\em \+\_\+lock\+ZBAT Low level lock routine \+: mark ZBAT block on file with lock p\+Lock Block header is written on file with lock information \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_aded12b603eb63d225ddd607951b9b852}{\+\_\+lock}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Force\+Write}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}})
+\begin{DoxyCompactList}\small\item\em \+\_\+lock Locks the block of address p\+Address with lock mask p\+Lock. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{static}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_random_lock_file_aa07549384813110ed71f045bfc674ef7}{\+\_\+getlock}} (ZFile\+Descriptor \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Descriptor}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}}, \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}})
+\begin{DoxyCompactList}\small\item\em \+\_\+getlock gets the lock status and mask (p\+Lock) for the block pointed by its rank p\+Rank. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zrandomlockfile_8h_source_l00006}{6}} of file \mbox{\hyperlink{zrandomlockfile_8h_source}{zrandomlockfile.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_z_random_lock_file_ad78c4bbc714735ef96741cf175a0b641}\label{class_z_random_lock_file_ad78c4bbc714735ef96741cf175a0b641} 
+\index{ZRandomLockFile@{ZRandomLockFile}!ZRandomLockFile@{ZRandomLockFile}}
+\index{ZRandomLockFile@{ZRandomLockFile}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{ZRandomLockFile()}{ZRandomLockFile()}}
+{\footnotesize\ttfamily ZRandom\+Lock\+File\+::\+ZRandom\+Lock\+File (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrandomlockfile_8cpp_source_l00006}{6}} of file \mbox{\hyperlink{zrandomlockfile_8cpp_source}{zrandomlockfile.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_z_random_lock_file_aa07549384813110ed71f045bfc674ef7}\label{class_z_random_lock_file_aa07549384813110ed71f045bfc674ef7} 
+\index{ZRandomLockFile@{ZRandomLockFile}!\_getlock@{\_getlock}}
+\index{\_getlock@{\_getlock}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{\_getlock()}{\_getlock()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{static}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::\+\_\+getlock (\begin{DoxyParamCaption}\item[{ZFile\+Descriptor \&}]{p\+Descriptor,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Rank,  }\item[{\mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \&}]{p\+Lock }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+\+\_\+getlock gets the lock status and mask (p\+Lock) for the block pointed by its rank p\+Rank. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Descriptor} & file descriptor \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Rank} & rank of block to get lock information \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+Lock} & lock mask \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+ZS\+\_\+\+SUCCESS if no lock found \+: p\+Lock is then set to ZLock\+\_\+\+Nolock. If a lock is found returns ZS\+\_\+\+LOCKED and p\+Lock is set with the lock mask found 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomlockfile_8h_source_l00206}{206}} of file \mbox{\hyperlink{zrandomlockfile_8h_source}{zrandomlockfile.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zlock_8h_source_l00116}{ZLock\+\_\+\+Nolock}}.
+
+\Hypertarget{class_z_random_lock_file_aec700009df51e354a83bd19a64eeec6c}\label{class_z_random_lock_file_aec700009df51e354a83bd19a64eeec6c} 
+\index{ZRandomLockFile@{ZRandomLockFile}!\_getLockStatusByAddress@{\_getLockStatusByAddress}}
+\index{\_getLockStatusByAddress@{\_getLockStatusByAddress}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{\_getLockStatusByAddress()}{\_getLockStatusByAddress()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::\+\_\+get\+Lock\+Status\+By\+Address (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+Address,  }\item[{\mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \&}]{p\+Lock,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pid\+\_\+t}} \&}]{p\+Pid }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrandomlockfile_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{zrandomlockfile_8cpp_source}{zrandomlockfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomlockfile_8h_source_l00171}{\+\_\+get\+Status\+From\+Lock()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_z_random_lock_file_a72810d31a79c84c7cf1b0e41ccd8a0d8}\label{class_z_random_lock_file_a72810d31a79c84c7cf1b0e41ccd8a0d8} 
+\index{ZRandomLockFile@{ZRandomLockFile}!\_getStatusFromLock@{\_getStatusFromLock}}
+\index{\_getStatusFromLock@{\_getStatusFromLock}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{\_getStatusFromLock()}{\_getStatusFromLock()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::\+\_\+get\+Status\+From\+Lock (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zrandomlockfile_8h_source_l00171}{171}} of file \mbox{\hyperlink{zrandomlockfile_8h_source}{zrandomlockfile.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zlock_8h_source_l00117}{ZLock\+\_\+\+Delete}}, \mbox{\hyperlink{zlock_8h_source_l00121}{ZLock\+\_\+\+Read}}, and \mbox{\hyperlink{zlock_8h_source_l00122}{ZLock\+\_\+\+Write}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomlockfile_8cpp_source_l00012}{\+\_\+get\+Lock\+Status\+By\+Address()}}, and \mbox{\hyperlink{zrandomlockfile_8cpp_source_l00030}{\+\_\+lock\+ZBAT()}}.
+
+\Hypertarget{class_z_random_lock_file_ac1557a1e52306a6d14af720f2cf5f3c9}\label{class_z_random_lock_file_ac1557a1e52306a6d14af720f2cf5f3c9} 
+\index{ZRandomLockFile@{ZRandomLockFile}!\_isLockedByAddress@{\_isLockedByAddress}}
+\index{\_isLockedByAddress@{\_isLockedByAddress}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{\_isLockedByAddress()}{\_isLockedByAddress()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} ZRandom\+Lock\+File\+::\+\_\+is\+Locked\+By\+Address (\begin{DoxyParamCaption}\item[{ZFile\+Descriptor \&}]{p\+Descriptor,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+Address }\end{DoxyParamCaption})}
+
+\Hypertarget{class_z_random_lock_file_aded12b603eb63d225ddd607951b9b852}\label{class_z_random_lock_file_aded12b603eb63d225ddd607951b9b852} 
+\index{ZRandomLockFile@{ZRandomLockFile}!\_lock@{\_lock}}
+\index{\_lock@{\_lock}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{\_lock()}{\_lock()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::\+\_\+lock (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+Address,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Force\+Write = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}}} }\end{DoxyParamCaption})}
+
+
+
+\+\_\+lock Locks the block of address p\+Address with lock mask p\+Lock. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+ & {\em \mbox{[}in-\/out\mbox{]}} & p\+Descriptor file descriptor \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Address} & Address of block to lock \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Lock} & lock mask \\
+\hline
+ & {\em p\+Force\+Write} & if false \+: ZFile\+Descriptor is not updated to file. if true\+: force to update ZFile\+Descriptor to file. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message. see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomlockfile_8cpp_source_l00082}{82}} of file \mbox{\hyperlink{zrandomlockfile_8cpp_source}{zrandomlockfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomlockfile_8cpp_source_l00030}{\+\_\+lock\+ZBAT()}}, \mbox{\hyperlink{zlock_8cpp_source_l00055}{decode\+\_\+\+ZLock\+Mask()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zlock_8h_source_l00117}{ZLock\+\_\+\+Delete}}, \mbox{\hyperlink{zlock_8h_source_l00116}{ZLock\+\_\+\+Nolock}}, \mbox{\hyperlink{zlock_8h_source_l00121}{ZLock\+\_\+\+Read}}, and \mbox{\hyperlink{zlock_8h_source_l00122}{ZLock\+\_\+\+Write}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomlockfile_8h_source_l00045}{zlock()}}, and \mbox{\hyperlink{zrandomlockfile_8h_source_l00050}{zlock\+By\+Address()}}.
+
+\Hypertarget{class_z_random_lock_file_a7e34b69c6eb30e4e029cc8bc5e59abdf}\label{class_z_random_lock_file_a7e34b69c6eb30e4e029cc8bc5e59abdf} 
+\index{ZRandomLockFile@{ZRandomLockFile}!\_lockZBAT@{\_lockZBAT}}
+\index{\_lockZBAT@{\_lockZBAT}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{\_lockZBAT()}{\_lockZBAT()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::\+\_\+lock\+ZBAT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+Address,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\+\_\+lock\+ZBAT Low level lock routine \+: mark ZBAT block on file with lock p\+Lock Block header is written on file with lock information 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Descriptor} & file descriptor \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Rank} & rank of block to lock \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Lock} & lock mask \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomlockfile_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{zrandomlockfile_8cpp_source}{zrandomlockfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomlockfile_8h_source_l00171}{\+\_\+get\+Status\+From\+Lock()}}, \mbox{\hyperlink{zlock_8cpp_source_l00055}{decode\+\_\+\+ZLock\+Mask()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zlock_8h_source_l00116}{ZLock\+\_\+\+Nolock}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomlockfile_8cpp_source_l00082}{\+\_\+lock()}}.
+
+\Hypertarget{class_z_random_lock_file_a662f40bd54495fc7bd9d771dd9709e74}\label{class_z_random_lock_file_a662f40bd54495fc7bd9d771dd9709e74} 
+\index{ZRandomLockFile@{ZRandomLockFile}!\_unlock@{\_unlock}}
+\index{\_unlock@{\_unlock}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{\_unlock()}{\_unlock()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::\+\_\+unlock (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+Address,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Force\+Write = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}}} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\+\_\+unlock Releases the lock set to block of rank p\+Rank This routine writes the file descriptor to header 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in,out}}  & {\em p\+Descriptor} & file descriptor \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Rank} & rank of the record to be unlocked \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Force\+Write} & if this option is set to true, then it forces File Descriptor to be written on file \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomlockfile_8h_source_l00126}{126}} of file \mbox{\hyperlink{zrandomlockfile_8h_source}{zrandomlockfile.\+h}}.
+
+
+
+References \mbox{\hyperlink{zrandomlockfile_8h_source_l00157}{\+\_\+unlock\+ZBAT()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomlockfile_8h_source_l00084}{zunlock()}}, and \mbox{\hyperlink{zrandomlockfile_8h_source_l00072}{zunlock\+By\+Address()}}.
+
+\Hypertarget{class_z_random_lock_file_a486d0e462f4db115464a150a1d8538bc}\label{class_z_random_lock_file_a486d0e462f4db115464a150a1d8538bc} 
+\index{ZRandomLockFile@{ZRandomLockFile}!\_unlockAll@{\_unlockAll}}
+\index{\_unlockAll@{\_unlockAll}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{\_unlockAll()}{\_unlockAll()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::\+\_\+unlock\+All (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Force\+Write = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}}} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\+\_\+unlock\+All Unlocks all locks for the process for the file pointed by p\+Descriptor File descriptor is updated in file header. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Descriptor} & file descriptor \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Force\+Write} & if this option is set to true, then it forces File Descriptor to be written on file \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomlockfile_8h_source_l00106}{106}} of file \mbox{\hyperlink{zrandomlockfile_8h_source}{zrandomlockfile.\+h}}.
+
+
+
+References \mbox{\hyperlink{zrandomlockfile_8h_source_l00157}{\+\_\+unlock\+ZBAT()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomlockfile_8h_source_l00093}{zunlock\+All()}}.
+
+\Hypertarget{class_z_random_lock_file_adefc78a290a64d86249f96fb077d2b2b}\label{class_z_random_lock_file_adefc78a290a64d86249f96fb077d2b2b} 
+\index{ZRandomLockFile@{ZRandomLockFile}!\_unlockZBAT@{\_unlockZBAT}}
+\index{\_unlockZBAT@{\_unlockZBAT}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{\_unlockZBAT()}{\_unlockZBAT()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::\+\_\+unlock\+ZBAT (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+Address }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\+\_\+unlock\+ZBAT Low level unlock routine \+: mark ZBAT block on file to clear lock to ZLock\+\_\+\+Nolock (release lock) 
+
+\begin{DoxyWarning}{Warning}
+this is not the appropriate user routine to unlock a block 
+\end{DoxyWarning}
+\begin{DoxySeeAlso}{See also}
+\doxylink{class_z_random_lock_file_a662f40bd54495fc7bd9d771dd9709e74}{\+\_\+unlock} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Descriptor} & file descriptor \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Rank} & rank of block to unlock in ZBAT \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomlockfile_8h_source_l00157}{157}} of file \mbox{\hyperlink{zrandomlockfile_8h_source}{zrandomlockfile.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zlock_8h_source_l00115}{ZLock\+\_\+\+Nothing}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomlockfile_8h_source_l00126}{\+\_\+unlock()}}, and \mbox{\hyperlink{zrandomlockfile_8h_source_l00106}{\+\_\+unlock\+All()}}.
+
+\Hypertarget{class_z_random_lock_file_a46a4568ea74bf3f2773d233bfd3e923a}\label{class_z_random_lock_file_a46a4568ea74bf3f2773d233bfd3e923a} 
+\index{ZRandomLockFile@{ZRandomLockFile}!searchBlockByAddress@{searchBlockByAddress}}
+\index{searchBlockByAddress@{searchBlockByAddress}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{searchBlockByAddress()}{searchBlockByAddress()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} ZRandom\+Lock\+File\+::search\+Block\+By\+Address (\begin{DoxyParamCaption}\item[{ZFile\+Descriptor \&}]{p\+Descriptor,  }\item[{\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+Address }\end{DoxyParamCaption})}
+
+\Hypertarget{class_z_random_lock_file_a17a9e2977aad46fe92276237c2ee68fa}\label{class_z_random_lock_file_a17a9e2977aad46fe92276237c2ee68fa} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zaddWithAddress@{zaddWithAddress}}
+\index{zaddWithAddress@{zaddWithAddress}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zaddWithAddress()}{zaddWithAddress()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zadd\+With\+Address (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Record,  }\item[{\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \&}]{p\+Address,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Lock = {\ttfamily 0} }\end{DoxyParamCaption})}
+
+\Hypertarget{class_z_random_lock_file_a57393370eb0ff09e8f1bb18183a8b74d}\label{class_z_random_lock_file_a57393370eb0ff09e8f1bb18183a8b74d} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zget@{zget}}
+\index{zget@{zget}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zget()}{zget()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zget (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}}]{p\+Record,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \&}]{p\+Size,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}}}]{p\+Rank,  }\item[{\mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock = {\ttfamily \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}}} }\end{DoxyParamCaption})}
+
+\Hypertarget{class_z_random_lock_file_afdae706db3f13f65d96ff6b79a0354c5}\label{class_z_random_lock_file_afdae706db3f13f65d96ff6b79a0354c5} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zget@{zget}}
+\index{zget@{zget}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zget()}{zget()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zget (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Record,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}}}]{p\+Rank,  }\item[{\mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock = {\ttfamily \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}}} }\end{DoxyParamCaption})}
+
+\Hypertarget{class_z_random_lock_file_a2a1faf0a4bf32065a5b9f1a6302d60b5}\label{class_z_random_lock_file_a2a1faf0a4bf32065a5b9f1a6302d60b5} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zgetByAddress@{zgetByAddress}}
+\index{zgetByAddress@{zgetByAddress}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zgetByAddress()}{zgetByAddress()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zget\+By\+Address (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Record,  }\item[{\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+Address }\end{DoxyParamCaption})}
+
+\Hypertarget{class_z_random_lock_file_a439a341344d5f2319d5db607de73d8bb}\label{class_z_random_lock_file_a439a341344d5f2319d5db607de73d8bb} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zgetLast@{zgetLast}}
+\index{zgetLast@{zgetLast}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zgetLast()}{zgetLast()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zget\+Last (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Record,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Lock = {\ttfamily 0} }\end{DoxyParamCaption})}
+
+\Hypertarget{class_z_random_lock_file_a73ba76581f8f75e462fc9bf59d41b097}\label{class_z_random_lock_file_a73ba76581f8f75e462fc9bf59d41b097} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zgetLastWAddress@{zgetLastWAddress}}
+\index{zgetLastWAddress@{zgetLastWAddress}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zgetLastWAddress()}{zgetLastWAddress()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zget\+Last\+WAddress (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Record,  }\item[{\mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \&}]{p\+Rank,  }\item[{\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \&}]{p\+Address,  }\item[{\mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock = {\ttfamily \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}}} }\end{DoxyParamCaption})}
+
+\Hypertarget{class_z_random_lock_file_ab1d547abf972a89ebd97c0810e52d26f}\label{class_z_random_lock_file_ab1d547abf972a89ebd97c0810e52d26f} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zgetNext@{zgetNext}}
+\index{zgetNext@{zgetNext}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zgetNext()}{zgetNext()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zget\+Next (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}}]{p\+User\+Record,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \&}]{p\+Size,  }\item[{\mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock = {\ttfamily \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}}} }\end{DoxyParamCaption})}
+
+\Hypertarget{class_z_random_lock_file_abc0ba25c71fcfa172bbaa83d50785957}\label{class_z_random_lock_file_abc0ba25c71fcfa172bbaa83d50785957} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zgetNext@{zgetNext}}
+\index{zgetNext@{zgetNext}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zgetNext()}{zgetNext()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zget\+Next (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+User\+Record,  }\item[{\mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock = {\ttfamily \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}}} }\end{DoxyParamCaption})}
+
+\Hypertarget{class_z_random_lock_file_af50ad00942d6b0cf1f6db88817d0c405}\label{class_z_random_lock_file_af50ad00942d6b0cf1f6db88817d0c405} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zgetNextWAddress@{zgetNextWAddress}}
+\index{zgetNextWAddress@{zgetNextWAddress}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zgetNextWAddress()}{zgetNextWAddress()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zget\+Next\+WAddress (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Record,  }\item[{\mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \&}]{p\+Rank,  }\item[{\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \&}]{p\+Address,  }\item[{\mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock = {\ttfamily \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}}} }\end{DoxyParamCaption})}
+
+\Hypertarget{class_z_random_lock_file_a5ba8822ea93cba912e9d965766900e7a}\label{class_z_random_lock_file_a5ba8822ea93cba912e9d965766900e7a} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zgetPrevious@{zgetPrevious}}
+\index{zgetPrevious@{zgetPrevious}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zgetPrevious()}{zgetPrevious()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zget\+Previous (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Record,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Lock = {\ttfamily 0} }\end{DoxyParamCaption})}
+
+\Hypertarget{class_z_random_lock_file_a0db16fc89181094674a15285df8f8be0}\label{class_z_random_lock_file_a0db16fc89181094674a15285df8f8be0} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zgetPreviousWAddress@{zgetPreviousWAddress}}
+\index{zgetPreviousWAddress@{zgetPreviousWAddress}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zgetPreviousWAddress()}{zgetPreviousWAddress()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zget\+Previous\+WAddress (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Record,  }\item[{\mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \&}]{p\+Rank,  }\item[{\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \&}]{p\+Address,  }\item[{\mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock = {\ttfamily \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}}} }\end{DoxyParamCaption})}
+
+\Hypertarget{class_z_random_lock_file_ab72dc8a0f4a4fe3ac794e915a57c8530}\label{class_z_random_lock_file_ab72dc8a0f4a4fe3ac794e915a57c8530} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zgetWAddress@{zgetWAddress}}
+\index{zgetWAddress@{zgetWAddress}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zgetWAddress()}{zgetWAddress()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zget\+WAddress (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Record,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}}}]{p\+Rank,  }\item[{\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \&}]{p\+Address,  }\item[{\mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock = {\ttfamily \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}}} }\end{DoxyParamCaption})}
+
+\Hypertarget{class_z_random_lock_file_a7ffa2adf1f8eb9814bca09d898223f45}\label{class_z_random_lock_file_a7ffa2adf1f8eb9814bca09d898223f45} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zlock@{zlock}}
+\index{zlock@{zlock}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zlock()}{zlock()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zlock (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Rank,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+zlock\+By\+Address locks a record pointed by its address with a lock mask given by p\+Lock see \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZLock\+Mask\+\_\+type} File descriptor is updated in file header if file is not opened in ZRF\+\_\+\+Exclusive mode 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Address} & ZRandom\+File record (block) address to unlock \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomlockfile_8h_source_l00045}{45}} of file \mbox{\hyperlink{zrandomlockfile_8h_source}{zrandomlockfile.\+h}}.
+
+
+
+References \mbox{\hyperlink{zrandomlockfile_8cpp_source_l00082}{\+\_\+lock()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00087}{ZRF\+\_\+\+Exclusive}}.
+
+\Hypertarget{class_z_random_lock_file_aee5d502ff99547a3a2ec4a9941f9cd72}\label{class_z_random_lock_file_aee5d502ff99547a3a2ec4a9941f9cd72} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zlockByAddress@{zlockByAddress}}
+\index{zlockByAddress@{zlockByAddress}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zlockByAddress()}{zlockByAddress()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zlock\+By\+Address (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+Address,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zrandomlockfile_8h_source_l00050}{50}} of file \mbox{\hyperlink{zrandomlockfile_8h_source}{zrandomlockfile.\+h}}.
+
+
+
+References \mbox{\hyperlink{zrandomlockfile_8cpp_source_l00082}{\+\_\+lock()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00087}{ZRF\+\_\+\+Exclusive}}.
+
+\Hypertarget{class_z_random_lock_file_a9db1799095ee5ede69642ab567fd6fef}\label{class_z_random_lock_file_a9db1799095ee5ede69642ab567fd6fef} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zunlock@{zunlock}}
+\index{zunlock@{zunlock}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zunlock()}{zunlock()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zunlock (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Rank }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zrandomlockfile_8h_source_l00084}{84}} of file \mbox{\hyperlink{zrandomlockfile_8h_source}{zrandomlockfile.\+h}}.
+
+
+
+References \mbox{\hyperlink{zrandomlockfile_8h_source_l00126}{\+\_\+unlock()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00087}{ZRF\+\_\+\+Exclusive}}.
+
+\Hypertarget{class_z_random_lock_file_afb73a28c366d29ecb5a1922e17e3a901}\label{class_z_random_lock_file_afb73a28c366d29ecb5a1922e17e3a901} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zunlockAll@{zunlockAll}}
+\index{zunlockAll@{zunlockAll}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zunlockAll()}{zunlockAll()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zunlock\+All (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+zunlock\+All Unlocks all locks for the process for the file File descriptor is updated in file header if file is not opened in ZRF\+\_\+\+Exclusive mode 
+
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomlockfile_8h_source_l00093}{93}} of file \mbox{\hyperlink{zrandomlockfile_8h_source}{zrandomlockfile.\+h}}.
+
+
+
+References \mbox{\hyperlink{zrandomlockfile_8h_source_l00106}{\+\_\+unlock\+All()}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00087}{ZRF\+\_\+\+Exclusive}}.
+
+\Hypertarget{class_z_random_lock_file_a358011a1998e2b007cada14ba6fb3a16}\label{class_z_random_lock_file_a358011a1998e2b007cada14ba6fb3a16} 
+\index{ZRandomLockFile@{ZRandomLockFile}!zunlockByAddress@{zunlockByAddress}}
+\index{zunlockByAddress@{zunlockByAddress}!ZRandomLockFile@{ZRandomLockFile}}
+\doxysubsubsection{\texorpdfstring{zunlockByAddress()}{zunlockByAddress()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+Lock\+File\+::zunlock\+By\+Address (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+Address }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+zunlock\+By\+Address Unlocks a record pointed by its address. File descriptor is updated in file header if file is not opened in ZRF\+\_\+\+Exclusive mode 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Address} & ZRandom\+File record (block) address to unlock \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomlockfile_8h_source_l00072}{72}} of file \mbox{\hyperlink{zrandomlockfile_8h_source}{zrandomlockfile.\+h}}.
+
+
+
+References \mbox{\hyperlink{zrandomlockfile_8h_source_l00126}{\+\_\+unlock()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00087}{ZRF\+\_\+\+Exclusive}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/zcontent/zrandomfile/\mbox{\hyperlink{zrandomlockfile_8h}{zrandomlockfile.\+h}}\item 
+/home/gerard/\+Development/zbasetools/zcontent/zrandomfile/\mbox{\hyperlink{zrandomlockfile_8cpp}{zrandomlockfile.\+cpp}}\end{DoxyCompactItemize}

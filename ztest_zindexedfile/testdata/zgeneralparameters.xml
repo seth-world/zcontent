@@ -1,0 +1,262 @@
+<?xml version='1.0' encoding='UTF-8'?>
+ <zmasterfileparameters version = "'2.3-1'">
+   <generalparameters>
+      <verbose>ZVB_Basic | ZVB_Net | ZVB_MemEngine | ZVB_FileEngine | ZVB_SearchEngine | ZVB_Net</verbose>
+      <defaultworkdirectory>/home/gerard/Development/zmftest</defaultworkdirectory>
+      <defaultparamdirectory>/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata</defaultparamdirectory>
+      <defaulticondirectory>/home/gerard/Development/zbasetools/zqt/icons</defaulticondirectory>
+      <fixedfont>Courier 10 Pitch</fixedfont>
+   </generalparameters>
+   <domain>
+      <domain-item>
+         <name>local</name>
+         <tooltip>This node is local to client and contains direct usable path elements.
+This node is marked temporary and is never saved within parameters xml file.
+Its content is defined by local symbols read at application launch</tooltip>
+         <type>102</type><!-- ZDOM_Absolute | ZDOM_Path -->
+         <domain-item>
+            <name>workspace</name>
+            <content>/home/gerard/Development/zmftest</content>
+            <tooltip>Space allocated for temporary work usage.
+</tooltip>
+            <type>102</type><!-- ZDOM_Absolute | ZDOM_Path -->
+         </domain-item>
+         <domain-item>
+            <name>helpspace</name>
+            <type>102</type><!-- ZDOM_Absolute | ZDOM_Path -->
+         </domain-item>
+      </domain-item>
+      <domain-item>
+         <name>general</name>
+         <tooltip>General repository for all system/application matters</tooltip>
+         <type>103</type><!-- ZDOM_Remote | ZDOM_Absolute | ZDOM_Path -->
+         <domain-item>
+            <name>iconfactory</name>
+            <content>/home/gerard/Development/zbasetools/zqt/icons</content>
+            <tooltip>Repository of images for building icons using iconfactory.</tooltip>
+            <type>103</type><!-- ZDOM_Remote | ZDOM_Absolute | ZDOM_Path -->
+            <domain-item>
+               <name>iconquit</name>
+               <content>system-shutdown.png</content>
+               <type>204</type><!-- ZDOM_Icon -->
+            </domain-item>
+            <domain-item>
+               <name>iconrightarrow</name>
+               <content>rightArrow.png</content>
+               <type>200</type><!-- ZDOM_Icon -->
+            </domain-item>
+            <domain-item>
+               <name>iconcurvedarrowdownright</name>
+               <content>curvedarrowdownright.gif</content>
+               <type>200</type><!-- ZDOM_Icon -->
+            </domain-item>
+            <domain-item>
+               <name>iconlight</name>
+               <content>iconLight.gif</content>
+               <type>204</type><!-- ZDOM_Icon -->
+            </domain-item>
+            <domain-item>
+               <name>iconview</name>
+               <content>magnifyingglass.png</content>
+               <type>204</type><!-- ZDOM_Icon -->
+            </domain-item>
+            <domain-item>
+               <name>iconhierarchy</name>
+               <content>hierarchy.png</content>
+               <type>204</type><!-- ZDOM_Icon -->
+            </domain-item>
+            <domain-item>
+               <name>iconcheck</name>
+               <content>check50.png</content>
+               <type>204</type><!-- ZDOM_Icon -->
+            </domain-item>
+            <domain-item>
+               <name>iconedit</name>
+               <content>pen-only.png</content>
+               <type>200</type><!-- ZDOM_Icon -->
+            </domain-item>
+            <domain-item>
+               <name>iconbackward</name>
+               <content>backward.gif</content>
+               <type>201</type><!-- ZDOM_Remote | ZDOM_Icon -->
+            </domain-item>
+            <domain-item>
+               <name>iconforward</name>
+               <content>forward.gif</content>
+               <type>201</type><!-- ZDOM_Remote | ZDOM_Icon -->
+            </domain-item>
+            <domain-item>
+               <name>iconnew</name>
+               <content>brandnew.gif</content>
+               <type>201</type><!-- ZDOM_Remote | ZDOM_Icon -->
+            </domain-item>
+            <domain-item>
+               <name>iconfolder</name>
+               <content>folder.png</content>
+               <type>201</type><!-- ZDOM_Remote | ZDOM_Icon -->
+            </domain-item>
+            <domain-item>
+               <name>iconfolderopen</name>
+               <content>folderopen.png</content>
+               <type>201</type><!-- ZDOM_Remote | ZDOM_Icon -->
+            </domain-item>
+            <domain-item>
+               <name>comboboxbtn</name>
+               <content>comboboxbtn.png</content>
+               <type>201</type><!-- ZDOM_Remote | ZDOM_Icon -->
+            </domain-item>
+         </domain-item>
+         <domain-item>
+            <name>viewer</name>
+            <type>100</type><!-- ZDOM_Path -->
+            <domain-item>
+               <name>linux</name>
+               <type>104</type><!-- ZDOM_Path -->
+               <domain-item>
+                  <name>ZDOM_Path</name>
+                  <content>dolphin</content>
+                  <type>802</type><!-- ZDOM_Absolute | ZDOM_Executable -->
+               </domain-item>
+               <domain-item>
+                  <name>ZDOM_PdfFile</name>
+                  <content>okular</content>
+                  <type>802</type><!-- ZDOM_Absolute | ZDOM_Executable -->
+               </domain-item>
+               <domain-item>
+                  <name>ZDOM_TextFile</name>
+                  <content>kate</content>
+                  <type>802</type><!-- ZDOM_Absolute | ZDOM_Executable -->
+               </domain-item>
+               <domain-item>
+                  <name>ZDOM_OdfFile</name>
+                  <content>libreoffice</content>
+                  <type>802</type><!-- ZDOM_Absolute | ZDOM_Executable -->
+               </domain-item>
+               <domain-item>
+                  <name>ZDOM_Executable</name>
+                  <content>dolphin</content>
+                  <type>802</type><!-- ZDOM_Absolute | ZDOM_Executable -->
+               </domain-item>
+            </domain-item>
+         </domain-item>
+         <domain-item>
+            <name>editor</name>
+            <type>100</type><!-- ZDOM_Path -->
+            <domain-item>
+               <name>linux</name>
+               <type>100</type><!-- ZDOM_Path -->
+               <domain-item>
+                  <name>ZDOM_Path</name>
+                  <content>dolphin</content>
+                  <type>802</type><!-- ZDOM_Absolute | ZDOM_Executable -->
+               </domain-item>
+               <domain-item>
+                  <name>ZDOM_PdfFile</name>
+                  <content>okular</content>
+                  <type>802</type><!-- ZDOM_Absolute | ZDOM_Executable -->
+               </domain-item>
+               <domain-item>
+                  <name>ZDOM_TextFile</name>
+                  <content>kate</content>
+                  <type>802</type><!-- ZDOM_Absolute | ZDOM_Executable -->
+               </domain-item>
+               <domain-item>
+                  <name>ZDOM_OdfFile</name>
+                  <content>libreoffice</content>
+                  <type>802</type><!-- ZDOM_Absolute | ZDOM_Executable -->
+               </domain-item>
+               <domain-item>
+                  <name>ZDOM_Icon</name>
+                  <content>gimp</content>
+                  <type>802</type><!-- ZDOM_Absolute | ZDOM_Executable -->
+               </domain-item>
+               <domain-item>
+                  <name>ZDOM_Image</name>
+                  <content>gimp</content>
+                  <type>802</type><!-- ZDOM_Absolute | ZDOM_Executable -->
+               </domain-item>
+               <domain-item>
+                  <name>ZDOM_HtmlFile</name>
+                  <content>kate</content>
+                  <type>802</type><!-- ZDOM_Absolute | ZDOM_Executable -->
+               </domain-item>
+            </domain-item>
+         </domain-item>
+         <domain-item>
+            <name>fixedfont</name>
+            <content>Courier 10 Picth</content>
+            <type>200000002</type><!-- ZDOM_Absolute | ZDOM_Font -->
+         </domain-item>
+         <domain-item>
+            <name>xmlstore</name>
+            <content>/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata</content>
+            <type>103</type><!-- ZDOM_Remote | ZDOM_Absolute | ZDOM_Path -->
+         </domain-item>
+      </domain-item>
+      <domain-item>
+         <name>test</name>
+         <type>103</type><!-- ZDOM_Remote | ZDOM_Absolute | ZDOM_Path -->
+         <domain-item>
+            <name>data</name>
+            <content>/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata</content>
+            <type>101</type><!-- ZDOM_Remote | ZDOM_Path -->
+         </domain-item>
+         <domain-item>
+            <name>images</name>
+            <content>images</content>
+            <type>105</type><!-- ZDOM_Remote | ZDOM_Path -->
+         </domain-item>
+         <domain-item>
+            <name>text</name>
+            <content>/home/gerard/Development/documentation/</content>
+            <tooltip>Directory for document viewing tests purposes</tooltip>
+            <type>103</type><!-- ZDOM_Remote | ZDOM_Absolute | ZDOM_Path -->
+            <domain-item>
+               <name>pdfsample</name>
+               <content>unicode-documentation.pdf</content>
+               <type>14000</type><!-- ZDOM_Nothing -->
+            </domain-item>
+            <domain-item>
+               <name>textsample</name>
+               <content>zrandomfile</content>
+               <type>11000</type><!-- ZDOM_Nothing -->
+            </domain-item>
+            <domain-item>
+               <name>odfsample</name>
+               <content>ZSearchDataMap.odg</content>
+               <type>18000</type><!-- ZDOM_Nothing -->
+            </domain-item>
+            <domain-item>
+               <name>htmlsample</name>
+               <content>zflow10.html</content>
+               <type>12000</type><!-- ZDOM_Nothing -->
+            </domain-item>
+         </domain-item>
+      </domain-item>
+      <domain-item>
+         <name>content</name>
+         <content>/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata</content>
+         <type>103</type><!-- ZDOM_Remote | ZDOM_Absolute | ZDOM_Path -->
+         <domain-item>
+            <name>data</name>
+            <content>/home/gerard/Development/zmftest</content>
+            <type>103</type><!-- ZDOM_Remote | ZDOM_Absolute | ZDOM_Path -->
+            <domain-item>
+               <name>badzdocphysical</name>
+               <content>zdocphysical.zmf</content>
+               <type>1000001</type><!-- ZDOM_Remote | ZDOM_MasterFile -->
+            </domain-item>
+            <domain-item>
+               <name>newdpnokey</name>
+               <content>newdpnokey.zmf</content>
+               <type>1000001</type><!-- ZDOM_Remote | ZDOM_MasterFile -->
+            </domain-item>
+         </domain-item>
+         <domain-item>
+            <name>images</name>
+            <content>images</content>
+            <type>105</type><!-- ZDOM_Remote | ZDOM_Path -->
+         </domain-item>
+      </domain-item>
+   </domain>
+ </zmasterfileparameters>

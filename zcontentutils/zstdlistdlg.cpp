@@ -159,41 +159,42 @@ void ZStdListDLg::DeleteLine( int pRow ){
 }
 
 
-void
+bool
 ZStdListDLg::KeyFiltered(int pKey, QKeyEvent *pEvent)
 {
   if(pKey == Qt::Key_Escape) {
     reject();
-    return;
+    return true;
   }
 
   if(pKey == Qt::Key_Insert) {
     if (!TableView->currentIndex().isValid())
-      return;
+      return false;
     InsertCurrent(TableView->currentIndex().row());
-    return;
+    return true;
   }
   if(pKey == Qt::Key_Delete) {
     if (!TableView->currentIndex().isValid())
-      return;
+      return false;
     DeleteCurrent(TableView->currentIndex().row());
-    return;
+    return true;
   }
-  return;
+  return false;
 }
-void
-ZStdListDLg::MouseFiltered(int pKey,QMouseEvent* pEvent)
+bool ZStdListDLg::MouseFiltered(int pKey,QMouseEvent* pEvent)
 {
   switch (pKey) {
     case ZEF_DoubleClickLeft:
     {
-      if (TableView->currentIndex().isValid())
+      if (TableView->currentIndex().isValid()) {
         AcceptCurrent(TableView->currentIndex().row());
-      return;
+        return true;
+      }
+      return false;
     }
   }// switch
 
-  return;
+  return false;
 }
 
 void

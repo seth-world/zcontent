@@ -35,6 +35,14 @@
 
 #include <zcontentcommon/zgeneralparameters.h>
 
+
+#include <zcontent/zcontentcommon/zdomainobject.h>
+#include <zcontent/zcontentcommon/zmfobject.h>
+#include <zcontent/zcontentcommon/zcontentobjectbroker.h>
+
+
+
+
 using namespace zbs;
 
 namespace zbs {
@@ -54,7 +62,15 @@ const char* ZSearchQueryHelp =
 
 Entities declarations
 
-  declare <entity name> as file <path> [mode readonly,modify] [;]  // by default mode is read only
+  declare <entity name> as file <path> [mode readonly,modify] [;]  // by default mode is read only  -> ZMasterFile
+
+  declare <entity name> as object <domain chain> [mode {readonly,modify} ] [;]
+  Domain chain :
+    Either resulting object is local to the query server :
+    -> resulting entity is a file entity (ZMasterFile) whose path is given by <domain chain>
+    Or resulting object is remote to the query server :
+    -> resulting entity is an ZMF object entity (ZMFObject)
+
 
   creates an entity definition with name <entity name>.
   This entity refers to a master file described by <path> that must point to a valid, existing master file.
@@ -3143,7 +3159,7 @@ ZSearchParser::_parseLiteral(ZSearchLiteral* & pOperand,ZSearchContext& pContext
     }
 
     if(pContext.CurrentToken->Type!=ZSRCH_CLOSEPARENTHESIS) {
-      ErrorLog.errorLog("ZResource literal : wrong syntax. Expecting close parenthesis. Found <%s> at line %d column %d.",
+      ErrorLog.errorLog("checkSum literal : wrong syntax. Expecting close parenthesis. Found <%s> at line %d column %d.",
           pContext.CurrentToken->Text.toString(),
           pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
         pContext.LastErroredToken = pContext.CurrentToken;
@@ -3171,7 +3187,94 @@ ZSearchParser::_parseLiteral(ZSearchLiteral* & pOperand,ZSearchContext& pContext
 
     pOperand = wLit;
     return pContext.Status=ZS_SUCCESS;
-  } // ZSRCH_RESOURCE_LITERAL
+  } // ZSRCH_CHECKSUM_LITERAL
+
+
+  case ZSRCH_DOMAIN: {
+
+    ZSearchLiteral *wLit=new ZSearchLiteral;
+    wLit->setZSTO( ZSTO_Literal | ZSTO_Domain );
+
+    if (!pContext.advanceIndex()) {
+      delete wLit;
+      return pContext.Status=ZS_SYNTAX_ERROR;
+    }
+    if(pContext.CurrentToken->Type!=ZSRCH_OPENPARENTHESIS) {
+      ErrorLog.errorLog("domain literal : wrong syntax. Expecting open parenthesis. Found <%s> at line %d column %d.",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
+      delete wLit;
+      return pContext.Status=ZS_MISS_PUNCTSIGN ;
+    }
+
+//    wLit->TokenList.push(pContext.CurrentToken);
+    if (!pContext.advanceIndex()) {
+      delete wLit;
+      return pContext.Status=ZS_SYNTAX_ERROR;
+    }
+
+    if(pContext.CurrentToken->Type != ZSRCH_STRING_LITERAL ) {
+      ErrorLog.errorLog("domain literal : missing domain chain as string literal (alphanumeric characters within double quotes) . Found <%s> at line %d column %d",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
+      delete wLit;
+      return pContext.Status=ZS_MISS_LITERAL ;
+    }
+
+    utf8VaryingString wDomainChain = pContext.CurrentToken->Text;
+
+    ZDomainPath* wDO=DomainBroker.getFromDomainChain(wDomainChain);
+
+    if (wDO==nullptr) {
+      ErrorLog.errorLog("domain literal : invalid domain chain as litteral : domain chain <%s> does not exist. at line %d column %d",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
+      delete wLit;
+      return pContext.Status=ZS_MISS_LITERAL ;
+    }
+    wLit->setDomain(wDO);
+//    wLit->TokenList.push(pContext.CurrentToken);
+
+    if (!pContext.advanceIndex()) {
+      delete wLit;
+      return pContext.Status=ZS_SYNTAX_ERROR;
+    }
+
+    if(pContext.CurrentToken->Type!=ZSRCH_CLOSEPARENTHESIS) {
+      ErrorLog.errorLog("domain literal : wrong syntax. Expecting close parenthesis. Found <%s> at line %d column %d.",
+          pContext.CurrentToken->Text.toString(),
+          pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn);
+        pContext.LastErroredToken = pContext.CurrentToken;
+      delete wLit;
+      return pContext.Status=ZS_MISS_PUNCTSIGN ;
+    }
+//    wLit->TokenList.push(pContext.CurrentToken);
+
+    _DBGPRINT("ZSearchParser::_parseLiteral Found domain literal <%s>\n",wLit->getChecksum().toHexa().toCChar())
+
+
+    if (!pContext.advanceIndex()) {
+      delete wLit;
+      return pContext.Status=ZS_SYNTAX_ERROR;
+    }
+
+    if (!OperandTypeCheck(pRequestedType,pContext,wLit->getOperandBase(), wStartOperandIndex)) {
+        delete wLit;
+        ErrorLog.errorLog("Operand type check failed at token <%s> at line %d column %d.",
+                 pContext.CurrentTokenList.Tab(wStartOperandIndex)->Text.toString(),
+                 pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenLine,pContext.CurrentTokenList.Tab(wStartOperandIndex)->TokenColumn );
+        pContext.LastErroredToken = pContext.CurrentTokenList.Tab(wStartOperandIndex);
+        return pContext.Status=ZS_INVTYPE ;
+    }
+
+    pOperand = wLit;
+    return pContext.Status=ZS_SUCCESS;
+  } // ZSRCH_DOMAIN
+
+
 
   default:
     ErrorLog.errorLog("Wrong literal syntax. Expecting literal, found <%s> at line %d column %d.",
@@ -5034,7 +5137,7 @@ ZStatus ZSearchParser::_parseContext(ZSearchContext& pContext)
           pContext.Status = _parseContextSave(pContext);
           break;
 //          return pContext.Status;
-      }// ZSRCH_DECLARE
+      }// ZSRCH_SAVE
 
       case ZSRCH_SET:
         {
@@ -5077,27 +5180,16 @@ ZStatus ZSearchParser::_parseContext(ZSearchContext& pContext)
               return pContext.Status=ZS_SUCCESS;
           } //   ZSRCH_HISTORY
 
-          if (pContext.CurrentToken->Type == ZSRCH_DISPLAY) {
-              return pContext.Status=_parseSetDisplay(pContext);
-          } //   ZSRCH_DISPLAY
-
-          if (pContext.CurrentToken->Type !=ZSRCH_FILE) {
-              ErrorLog.errorLog("Missing required word one of { <HISTORY> , <FILE> , <DISPLAY> } at line %d column %d. Found <%s>.",
+          if (pContext.CurrentToken->Type != ZSRCH_DISPLAY) {
+              ErrorLog.errorLog("Missing required word one of { <HISTORY> ,  <DISPLAY> } at line %d column %d. Found <%s>.",
                                 pContext.CurrentToken->TokenLine,
                                 pContext.CurrentToken->TokenColumn,
                                 pContext.CurrentToken->Text.toString() );
               pContext.LastErroredToken = pContext.CurrentToken;
               return pContext.Status=ZS_MISS_KEYWORD;
           }
+          return pContext.Status=_parseSetDisplay(pContext);
 
-          if (!pContext.advanceIndex())
-              return pContext.Status=ZS_SYNTAX_ERROR;
-
-          pContext.Status=_parseContextDeclareFile(pContext);
-          if (pContext.Status!=ZS_SUCCESS)
-              return pContext.Status;
-          pContext.HasInstruction=true;
-          return pContext.Status;
         }// ZSRCH_SET
 
       case ZSRCH_SHOW:
@@ -5189,11 +5281,11 @@ ZStatus ZSearchParser::_parseContext(ZSearchContext& pContext)
       }// switch
     }//while
 
-    if (pContext.isEOF()) {
+    if ((pContext.Status==ZS_SUCCESS)&&pContext.isEOF()) {
       if (ZSearchTokenizer::_progressCallBack!=nullptr) {
         ZSearchTokenizer::_progressCallBack(pContext.CurrentTokenList.count());
       }
-      return pContext.Status=ZS_SUCCESS;
+      return pContext.Status ;
     }
 
     if (ZSearchTokenizer::_progressCallBack!=nullptr) {
@@ -5202,8 +5294,8 @@ ZStatus ZSearchParser::_parseContext(ZSearchContext& pContext)
 
  // }// main while
 
-  if (!pContext.HasInstruction) {
-    ErrorLog.warningLog("Sentence has no valid instruction." );
+  if ((pContext.Status == ZS_SUCCESS) && !pContext.HasInstruction) {
+    ErrorLog.warningLog("Sentence has no executable instruction." );
   }
   pContext.Phrase = pContext.MainPhrase->subString(pContext.TokenStart->TokenOffset,
                                                    pContext.CurrentToken->TokenOffset + 1 - pContext.TokenStart->TokenOffset);
@@ -5891,6 +5983,10 @@ ZSearchParser::_parseContextDeclare(ZSearchContext& pContext)
             pContext.advanceIndex(false);
             return _parseContextDeclareFile(pContext);
 
+        case ZSRCH_STRING_LITERAL:
+            pContext.advanceIndex(false);
+            return _parseContextDeclareDomainObject(pContext);
+
         case ZSRCH_IDENTIFIER:
         case ZSRCH_WILDCARD:
             return _parseContextDeclareEntity(pContext);
@@ -5950,11 +6046,11 @@ ZStatus ZSearchParser::_parseContextDeclareFile(ZSearchContext &pContext)
 //        wPath.eliminateChar('"');
         wSt=wPath.check();
         if (wSt!=ZS_SUCCESS) {
-          ErrorLog.logZStatus(ZAIES_Error,wSt,"Path <%s> does not point to a valid, existing file.");
+          ErrorLog.logZStatus(ZAIES_Error,wSt,"Path <%s> does not point to a valid, existing file.",pContext.CurrentToken->Text.toString());
           ErrorLog.errorLog("Invalid file path <%s> at line %d column %d.",
+                            pContext.CurrentToken->Text.toString(),
                             pContext.CurrentToken->TokenLine,
-                            pContext.CurrentToken->TokenColumn,
-                            pContext.CurrentToken->Text.toString() );
+                            pContext.CurrentToken->TokenColumn);
           pContext.LastErroredToken = pContext.CurrentToken;
           return pContext.Status = ZS_FILEERROR ;
         }
@@ -5990,7 +6086,8 @@ ZStatus ZSearchParser::_parseContextDeclareFile(ZSearchContext &pContext)
               pContext.LastErroredToken = pContext.CurrentToken;
               return pContext.Status = ZS_INVTYPE ;
           }
-          if (wPath.check()!=ZS_SUCCESS) {
+
+          if ((wSt=wPath.check())!=ZS_SUCCESS) {
 //          if (wSt!=ZS_SUCCESS) {
               ErrorLog.errorLog("Invalid file path <%s> deduced from symbol <%s> at line %d column %d.",
                                 wPath.toString(),
@@ -6079,10 +6176,10 @@ ZStatus ZSearchParser::_parseContextDeclareFile(ZSearchContext &pContext)
     }
     if (wSt!=ZS_SUCCESS) {
         ErrorLog.logZExceptionLast("ZSearchParser::_parse");
-        ErrorLog.logZStatus(ZAIES_Error,wSt,"ZSearchParser::_parse-E-ERROPEN Cannot access file <%s> mode <%s>.",
+        ErrorLog.logZStatus(ZAIES_Error,wSt,"ZSearchParser::_parse-E-ERROPEN Cannot open file <%s> mode <%s>.",
                    wPath.toString(),
                    pContext.InstructionType & ZSITP_Modify?"Modify":"Readonly");
-      return pContext.Status =wSt;
+      return pContext.Status = wSt;
     }
     ZMasterFileItem wZMFI(pContext.TokenIdentifier->Text,wMF);
     MasterFileList.push(wZMFI);
@@ -6118,6 +6215,241 @@ ZStatus ZSearchParser::_parseContextDeclareFile(ZSearchContext &pContext)
 
   return pContext.Status =ZS_SUCCESS;
 } //_parseContextDeclareFile
+
+/*
+    declare <name> as "<object domain path>" { readonly , readwrite } ;
+*/
+ZStatus ZSearchParser::_parseContextDeclareDomainObject(ZSearchContext &pContext)
+{
+//  pContext.clear();
+
+  ZStatus wSt=ZS_SUCCESS;
+  uriString wPath;
+  ZDomainPath* wDP=nullptr;
+  ZDomainObject wDO;
+  pContext.InstructionType = ZSITP_Declare;
+
+  while (pContext.notEOF()) {
+
+    while (true) {
+    if(pContext.CurrentToken->Type==ZSRCH_STRING_LITERAL)
+      {
+        if(!ContentObjectBroker.check(pContext.CurrentToken->Text)) {
+            ErrorLog.errorLog("Invalid object domain chain <%s> at line %d column %d.",
+                              pContext.CurrentToken->Text.toString(),
+                              pContext.CurrentToken->TokenLine,
+                              pContext.CurrentToken->TokenColumn);
+            return pContext.Status = ZS_BADFILEDESC ;
+        }
+        wDP=DomainBroker.getFromDomainChain(pContext.CurrentToken->Text);
+//        wDO = ContentObjectBroker.getObjetFromDomain(pContext.CurrentToken->Text,&ErrorLog);
+        if (wDP==nullptr) {
+            ErrorLog.errorLog("Object <%s> is not a master file but has type <%s>. At line %d column %d.",
+                              pContext.CurrentToken->Text.toString(),
+                              decode_ZDomain_type(wDO.Type).toString(),
+                              pContext.CurrentToken->TokenLine,
+                              pContext.CurrentToken->TokenColumn);
+            return pContext.Status = ZS_INVTYPE ;
+        }
+        if (!wDP->isMasterFile()) {
+            ErrorLog.errorLog("Domain chain <%s> is not a master file but has type <%s>. At line %d column %d.",
+                              pContext.CurrentToken->Text.toString(),
+                              decode_ZDomain_type(wDP->Type).toString(),
+                              pContext.CurrentToken->TokenLine,
+                              pContext.CurrentToken->TokenColumn);
+            return pContext.Status = ZS_INVTYPE ;
+        }
+
+        ErrorLog.infoLog("Object <%s> is valid at line %d column %d.",
+                         pContext.CurrentToken->Text.toString(),
+                         pContext.CurrentToken->TokenLine,
+                         pContext.CurrentToken->TokenColumn );
+        break;
+      } // while ZSRCH_STRING_LITERAL
+
+
+      if(pContext.CurrentToken->Type==ZSRCH_IDENTIFIER)  /* pre-defined path  <symbol> <path> */
+      {
+          ZSearchSymbol wSymbol=SymbolList.getSymbol(pContext.CurrentToken->Text);
+          if (wSymbol.isNull()) {
+              ErrorLog.errorLog("Expected symbol : invalid symbol name <%s>  at line %d column %d.",
+                                pContext.CurrentToken->Text.toString(),
+                                pContext.CurrentToken->TokenLine,
+                                pContext.CurrentToken->TokenColumn );
+              pContext.LastErroredToken = pContext.CurrentToken;
+              utf8VaryingString wApprox = searchSymbolWeighted(pContext.CurrentToken->Text);
+              if (!wApprox.isEmpty()) {
+                  ErrorLog.textLog("Do you mean <%s> ?", wApprox.toString() );
+              }
+              return pContext.Status = ZS_INVNAME ;
+          }
+          if (wSymbol.ZSTO != (ZSTO_Literal | ZSTO_Domain) ) {
+              ErrorLog.errorLog("Symbol <%s> is not a domain literal. at line %d column %d.",
+                                pContext.CurrentToken->Text.toString(),
+                                pContext.CurrentToken->TokenLine,
+                                pContext.CurrentToken->TokenColumn );
+              pContext.LastErroredToken = pContext.CurrentToken;
+              utf8VaryingString wApprox = searchSymbolWeighted(pContext.CurrentToken->Text);
+              return pContext.Status = ZS_INVTYPE ;
+          }
+
+          wDP = wSymbol.getDomain();
+
+          if (wDP->isRemote()) {
+              ErrorLog.errorLog("Domain <%s> is remote. This type of domain is not yet managed. at line %d column %d.",
+                                pContext.CurrentToken->Text.toString(),
+                                pContext.CurrentToken->TokenLine,
+                                pContext.CurrentToken->TokenColumn );
+              pContext.LastErroredToken = pContext.CurrentToken;
+              utf8VaryingString wApprox = searchSymbolWeighted(pContext.CurrentToken->Text);
+              return pContext.Status = ZS_INVTYPE ;
+          }
+
+          wPath = wDP->constructFullPhysicalPath();
+
+          if (wPath.isEmpty()) {
+              ErrorLog.errorLog("Symbol name <%s> is not a valid domain symbol.  at line %d column %d.",
+                                pContext.CurrentToken->Text.toString(),
+                                pContext.CurrentToken->TokenLine,
+                                pContext.CurrentToken->TokenColumn );
+              pContext.LastErroredToken = pContext.CurrentToken;
+              return pContext.Status = ZS_INVTYPE ;
+          }
+          if ((wSt=wPath.check())!=ZS_SUCCESS) {
+//          if (wSt!=ZS_SUCCESS) {
+              ErrorLog.errorLog("Invalid file path <%s> deduced from domain symbol <%s> at line %d column %d.",
+                                wPath.toString(),
+                                pContext.CurrentToken->Text.toString(),
+                                pContext.CurrentToken->TokenLine,
+                                pContext.CurrentToken->TokenColumn );
+              pContext.LastErroredToken = pContext.CurrentToken;
+              return pContext.Status = wSt ;
+          }
+      break;
+      }// ZSRCH_IDENTIFIER
+
+      ErrorLog.errorLog("Syntax error: Expected a valid object domain chain. Found <%s> at line %d column %d.",
+                        pContext.CurrentToken->Text.toString(),
+                        pContext.CurrentToken->TokenLine,
+                        pContext.CurrentToken->TokenColumn );
+      pContext.LastErroredToken = pContext.CurrentToken;
+      return ZS_SYNTAX_ERROR ;
+      }// while true
+
+    pContext.advanceIndex(false);
+    if (pContext.isEOF() || (pContext.CurrentToken->Type!= ZSRCH_MODE)) {
+        ErrorLog.warningLog("Expecting MODE keyword at line %d column %d. Found <%s>. Mode is set to READONLY.",
+            pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+          pContext.InstructionType |= ZSITP_ReadOnly;
+        break;
+    }
+    pContext.advanceIndex(false);
+    if (pContext.isEOF() || ((pContext.CurrentToken->Type!= ZSRCH_READONLY)&&pContext.CurrentToken->Type!= ZSRCH_MODIFY)) {
+        ErrorLog.errorLog("Expecting mode as one of [READONLY,MODIFY] at line %d column %d. Found <%s>.",
+            pContext.CurrentToken->TokenLine,pContext.CurrentToken->TokenColumn,pContext.CurrentToken->Text.toString() );
+        pContext.LastErroredToken = pContext.CurrentToken;
+        return pContext.Status =ZS_INVPARAMS ;
+    }
+
+    if (pContext.CurrentToken->Type==ZSRCH_READONLY) {
+            pContext.InstructionType |= ZSITP_ReadOnly;
+    } else if (pContext.CurrentToken->Type==ZSRCH_MODIFY) {
+            pContext.InstructionType |= ZSITP_Modify;
+    }
+
+    pContext.advanceIndex(false);
+    break;
+  }//while (pContext.notEOF())
+
+  /* here we have a ZMF object whose description is wDO */
+
+  pContext.Store = ZSearchHistory::DataExecute;
+
+  std::shared_ptr<ZMFObject> wZMFO = std::shared_ptr<ZMFObject>(new ZMFObject(wDO.getDomainPath(),&ErrorLog));
+
+  ZMFObjectList.push(wZMFO);
+
+  wPath = wDP->constructFullPhysicalPath();
+
+
+  std::shared_ptr <ZMasterFile> wMF=nullptr;
+  ZSearchMasterFile* wZSRCHMF=nullptr;
+  int wi=0;
+  for (;wi < MasterFileList.count();wi++){
+    if (wPath==MasterFileList[wi]->getURIContent()) {
+      wMF = MasterFileList[wi] ;
+        if (!wMF->isOpen()) {
+            ErrorLog.errorLog("File <%s> is not open.", wPath.toString());
+            return pContext.Status =ZS_FILENOTOPEN;
+        }
+      if (pContext.InstructionType & ZSITP_Modify) {
+            if (wMF->getOpenMode()>=ZRF_Modify) {
+            ErrorLog.errorLog("File <%s> is already is use with access mode <%s> and cannot use mode <ZRF_Modify>.",
+                wPath.toString(), decode_ZRFMode(wMF->getOpenMode()));
+            return pContext.Status =ZS_MODEINVALID;
+            }
+            break;
+      }// ZSPA_Modify
+      if (wMF->getOpenMode()>ZRF_Read_Only) {
+        ErrorLog.errorLog("File <%s> is already is use with access mode <%s> cannot use mode <ZRF_Read_Only>.",
+            wPath.toString(), decode_ZRFMode(wMF->getOpenMode()));
+
+        return pContext.Status =ZS_MODEINVALID;
+      }
+      break;
+    } // if (wPath==MasterFileList[wi]->MasterFile.getURIContent())
+  } // for
+
+  if (wi == MasterFileList.count())  {  /* not found in master file list : create one in list */
+    wMF=std::shared_ptr<ZMasterFile>(new ZMasterFile);
+    wZSRCHMF = new ZSearchMasterFile(wMF,pContext.TokenIdentifier->Text);
+    if (pContext.InstructionType & ZSITP_Modify) {
+        wSt=wZSRCHMF->openModify(wPath);
+    }
+    else {
+        wSt=wZSRCHMF->openReadOnly(wPath);
+    }
+    if (wSt!=ZS_SUCCESS) {
+        ErrorLog.logZExceptionLast("ZSearchParser::_parse");
+        ErrorLog.logZStatus(ZAIES_Error,wSt,"ZSearchParser::_parse-E-ERROPEN Cannot open file <%s> mode <%s>.",
+                   wPath.toString(),
+                   pContext.InstructionType & ZSITP_Modify?"Modify":"Readonly");
+      return pContext.Status = wSt;
+    }
+    ZMasterFileItem wZMFI(pContext.TokenIdentifier->Text,wMF);
+    MasterFileList.push(wZMFI);
+  }// not found
+
+  /* search if an entity with same name already exists */
+
+  if (EntityList.getEntityByName(pContext.TokenIdentifier->Text)!=nullptr) {
+    ErrorLog.errorLog("An entity with name <%s> has already been registrated previously.",
+        pContext.TokenIdentifier->Text.toString());
+    return pContext.Status =ZS_INVNAME;
+  }
+
+  pContext.TargetEntity = std::shared_ptr<ZSearchEntity>(new ZSearchEntity(wZSRCHMF,pContext.TokenIdentifier->Text));
+
+  pContext.TargetEntity->BuildDic.addMetaDic(wZSRCHMF->getDictionary());
+  for (int wi=0; wi < wZSRCHMF->getDictionary()->count(); wi++) {
+      pContext.TargetEntity->BuildDic.push(ZSearchField(pContext.TargetEntity,wZSRCHMF->getDictionary(),wi));
+  }
+
+
+  EntityList.push(pContext.TargetEntity);
+
+  ErrorLog.textLog("File <%s> has been opened with mode <%s> as <%s> ",
+      wPath.toString(),pContext.InstructionType & ZSITP_Modify?"Modify":"Readonly",pContext.TargetEntity->getEntityName().toString());
+
+
+//  pContext.setMessage("Entity <%s> has been created and registered.", pContext.TargetEntity->getEntityName().toString());
+  ErrorLog.textLog("Entity <%s> has been created and registered.", pContext.TargetEntity->getEntityName().toString());
+
+  pContext.HasInstruction=true;
+
+  return pContext.Status =ZS_SUCCESS;
+} //_parseContextDeclareDomainObject
+
 
 ZStatus
 ZSearchParser::_parseContextDeclareEntity(ZSearchContext & pContext)

@@ -1,0 +1,786 @@
+\doxysection{zbs\+::ZGeneral\+Parameters Class Reference}
+\hypertarget{classzbs_1_1_z_general_parameters}{}\label{classzbs_1_1_z_general_parameters}\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+
+
+{\ttfamily \#include $<$zgeneralparameters.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_general_parameters_a96b91ce93e3572b6ea4b9177eae12a5b}{ZGeneral\+Parameters}} ()
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_general_parameters_af5750f90d381cdfaf6ad39183e140ba5}{ZGeneral\+Parameters}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{argc}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{argv}}\mbox{[}$\,$\mbox{]})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_general_parameters_aa52d29fbf4f2ff57d12d123224af6d75}{ZGeneral\+Parameters}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters}{ZGeneral\+Parameters}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_general_parameters_aaa5d548aae1054a907a79b7112327154}{ZGeneral\+Parameters}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBase\+Parameters}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Base}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_general_parameters}{ZGeneral\+Parameters}} \& \mbox{\hyperlink{classzbs_1_1_z_general_parameters_ae4245b34ab20a3121df30a5fe5f95a22}{\+\_\+copy\+From}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters}{ZGeneral\+Parameters}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_general_parameters}{ZGeneral\+Parameters}} \& \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a7deb2f4d0df562127405810588ae986f}{operator=}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters}{ZGeneral\+Parameters}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a5a6056e6615415eabefeb0d71517677c}{Xml\+Load}} (uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Xml\+File}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_ab15a0fef77ee8cd9b75fe2f049687362}{Xml\+Save}} (uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Xml\+File}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a71b25db6c8dccd1114e251c12fec70df}{is\+Init}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_abb194c02b474ddffcee062328022b713}{set\+Init}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Init}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a03b9557f0398e533a9338fa6fbef1450}{set\+From\+Arg}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{argc}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{argv}}\mbox{[}$\,$\mbox{]})
+\item 
+uri\+String \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a245b0d75a542dbb216eaf7ec309087e9}{get\+Work\+Directory}} ()
+\item 
+uri\+String \mbox{\hyperlink{classzbs_1_1_z_general_parameters_ae99c14ba8d4854d230e00c0ba3750ec3}{get\+Param\+Directory}} ()
+\item 
+uri\+String \mbox{\hyperlink{classzbs_1_1_z_general_parameters_adabd3261d38747c2c4c64380bbd8ff77}{get\+Icon\+Directory}} ()
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a3e43249a060c1b771084fae2f381e87b}{get\+Fixed\+Font}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZVerbose\+\_\+\+Base}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_ab59260ce594d6814c1eb158872a8f2b2}{get\+Verbose}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a9942ea356160d5f2bd256786376112eb}{get\+Work\+Directory\+Char}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a4433703b4534965124ee09f29cb618f2}{get\+Param\+Directory\+Char}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a1f24f84cfd3f08ad05d0853df4080186}{get\+Icon\+Directory\+Char}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a45f238065f4ae3c6029fadeed48dafe8}{get\+Help\+Directory\+Char}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_acfbdfd2a14530247efb7740642ca3470}{set\+Verbose}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZVerbose\+\_\+\+Base}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Verbose}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a94ccd00a7cb43275994ad6f47b6be43d}{add\+Verbose}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZVerbose\+\_\+\+Base}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Verbose}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a8893f2c7a96a9099b3c6e24d9035136f}{remove\+Verbose}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZVerbose\+\_\+\+Base}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Verbose}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a7c0b646aa670b05e8ec6e5b32a90261f}{clear\+Verbose}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZVerbose\+\_\+\+Base}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Verbose}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_ac3815bd307c14f2a6cbe4eda5716ae8c}{Verbose\+Basic}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_ad110fe130fffcdf67cbccad6d85d94eb}{Verbose\+Stat}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a0133914c6846e839dfdc064137e7d991}{Verbose\+Thread}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a48db51d5238c1057adefba707bbb7d5a}{Verbose\+Net}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_ace4a282d868360a9242026067e96abae}{Verbose\+Net\+Stats}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a090e6eca942be03062beadc665be2861}{Verbose\+Mutex}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_ae1d6d8a4c9bb356a21d6c26a7881d23a}{Verbose\+Xml}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_af103c86fbeae4e76911bdb54303e15d8}{Verbose\+ZRF}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_aa60269ae1f77dd2f89d9021d513ee4b3}{Verbose\+ZMF}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a14f6b9090242b3526ee4385e88d993d8}{Verbose\+ZIF}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a3aeda3fdcc4bfb20cea9513452aa6105}{Verbose\+Mem\+Engine}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_afcc66e9d8968c85d12773b377a9f79a2}{Verbose\+File\+Engine}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_aab24ff9ea22492726ad3e11e18a0cd9a}{Verbose\+Search\+Engine}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+uri\+String \mbox{\hyperlink{classzbs_1_1_z_general_parameters_aeac8f1fc77428577acc6f44a65c21272}{current\+Xml}}
+\item 
+uri\+String \mbox{\hyperlink{classzbs_1_1_z_general_parameters_ac0d8a3a23cc0e431f92f523d55b4bb6b}{Work\+Directory}}
+\item 
+uri\+String \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a18fac0a2692d93eff4ca0471ef724c4b}{Param\+Directory}}
+\item 
+uri\+String \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a7370dd21b60fd20c1292577c02683e27}{Icon\+Directory}}
+\item 
+uri\+String \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a748e6ffa39abb1937ab12dd57a5a9636}{Help\+Directory}}
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a43619e212f99a425ef84772155aab21b}{Fixed\+Font}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a49627d6d30616c78930abe923beb7b17}{Init}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBase\+Parameters}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_general_parameters_a690d31c57dfe06e1bfc73de8376a223a}{\+\_\+\+Base\+Parameters}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00028}{28}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classzbs_1_1_z_general_parameters_a96b91ce93e3572b6ea4b9177eae12a5b}\label{classzbs_1_1_z_general_parameters_a96b91ce93e3572b6ea4b9177eae12a5b} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!ZGeneralParameters@{ZGeneralParameters}}
+\index{ZGeneralParameters@{ZGeneralParameters}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{ZGeneralParameters()}{ZGeneralParameters()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily ZGeneral\+Parameters\+::\+ZGeneral\+Parameters (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00016}{16}} of file \mbox{\hyperlink{zgeneralparameters_8cpp_source}{zgeneralparameters.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_af5750f90d381cdfaf6ad39183e140ba5}\label{classzbs_1_1_z_general_parameters_af5750f90d381cdfaf6ad39183e140ba5} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!ZGeneralParameters@{ZGeneralParameters}}
+\index{ZGeneralParameters@{ZGeneralParameters}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{ZGeneralParameters()}{ZGeneralParameters()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily ZGeneral\+Parameters\+::\+ZGeneral\+Parameters (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{argc,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{zgeneralparameters_8cpp_source}{zgeneralparameters.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00028}{set\+From\+Arg()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_aa52d29fbf4f2ff57d12d123224af6d75}\label{classzbs_1_1_z_general_parameters_aa52d29fbf4f2ff57d12d123224af6d75} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!ZGeneralParameters@{ZGeneralParameters}}
+\index{ZGeneralParameters@{ZGeneralParameters}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{ZGeneralParameters()}{ZGeneralParameters()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily zbs\+::\+ZGeneral\+Parameters\+::\+ZGeneral\+Parameters (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters}{ZGeneral\+Parameters}} \&}]{p\+In }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00033}{33}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00196}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_aaa5d548aae1054a907a79b7112327154}\label{classzbs_1_1_z_general_parameters_aaa5d548aae1054a907a79b7112327154} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!ZGeneralParameters@{ZGeneralParameters}}
+\index{ZGeneralParameters@{ZGeneralParameters}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{ZGeneralParameters()}{ZGeneralParameters()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily zbs\+::\+ZGeneral\+Parameters\+::\+ZGeneral\+Parameters (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBase\+Parameters}} \texorpdfstring{$\ast$}{*}}]{p\+Base }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00034}{34}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classzbs_1_1_z_general_parameters_ae4245b34ab20a3121df30a5fe5f95a22}\label{classzbs_1_1_z_general_parameters_ae4245b34ab20a3121df30a5fe5f95a22} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!\_copyFrom@{\_copyFrom}}
+\index{\_copyFrom@{\_copyFrom}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{\_copyFrom()}{\_copyFrom()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_general_parameters}{ZGeneral\+Parameters}} \& ZGeneral\+Parameters\+::\+\_\+copy\+From (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters}{ZGeneral\+Parameters}} \&}]{p\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00196}{196}} of file \mbox{\hyperlink{zgeneralparameters_8cpp_source}{zgeneralparameters.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00083}{current\+Xml}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00090}{Fixed\+Font}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00086}{Icon\+Directory}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00091}{Init}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00085}{Param\+Directory}}, and \mbox{\hyperlink{zgeneralparameters_8h_source_l00084}{Work\+Directory}}.
+
+
+
+Referenced by \mbox{\hyperlink{zgeneralparameters_8h_source_l00037}{operator=()}}, and \mbox{\hyperlink{zgeneralparameters_8h_source_l00033}{ZGeneral\+Parameters()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a94ccd00a7cb43275994ad6f47b6be43d}\label{classzbs_1_1_z_general_parameters_a94ccd00a7cb43275994ad6f47b6be43d} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!addVerbose@{addVerbose}}
+\index{addVerbose@{addVerbose}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{addVerbose()}{addVerbose()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZGeneral\+Parameters\+::add\+Verbose (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZVerbose\+\_\+\+Base}}}]{p\+Verbose }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00062}{62}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a7c0b646aa670b05e8ec6e5b32a90261f}\label{classzbs_1_1_z_general_parameters_a7c0b646aa670b05e8ec6e5b32a90261f} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!clearVerbose@{clearVerbose}}
+\index{clearVerbose@{clearVerbose}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{clearVerbose()}{clearVerbose()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZGeneral\+Parameters\+::clear\+Verbose (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZVerbose\+\_\+\+Base}}}]{p\+Verbose }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00064}{64}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a3e43249a060c1b771084fae2f381e87b}\label{classzbs_1_1_z_general_parameters_a3e43249a060c1b771084fae2f381e87b} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!getFixedFont@{getFixedFont}}
+\index{getFixedFont@{getFixedFont}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{getFixedFont()}{getFixedFont()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} ZGeneral\+Parameters\+::get\+Fixed\+Font (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00258}{258}} of file \mbox{\hyperlink{zgeneralparameters_8cpp_source}{zgeneralparameters.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00090}{Fixed\+Font}}.
+
+
+
+Referenced by \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00055}{Xml\+Save()}}, \mbox{\hyperlink{zcontentvisumain_8cpp_source_l00101}{ZContent\+Visu\+Main\+::\+ZContent\+Visu\+Main()}}, and \mbox{\hyperlink{zrawvisumain_8cpp_source_l00101}{ZRaw\+Visu\+Main\+::\+ZRaw\+Visu\+Main()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a45f238065f4ae3c6029fadeed48dafe8}\label{classzbs_1_1_z_general_parameters_a45f238065f4ae3c6029fadeed48dafe8} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!getHelpDirectoryChar@{getHelpDirectoryChar}}
+\index{getHelpDirectoryChar@{getHelpDirectoryChar}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{getHelpDirectoryChar()}{getHelpDirectoryChar()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} zbs\+::\+ZGeneral\+Parameters\+::get\+Help\+Directory\+Char (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00058}{58}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00087}{Help\+Directory}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_adabd3261d38747c2c4c64380bbd8ff77}\label{classzbs_1_1_z_general_parameters_adabd3261d38747c2c4c64380bbd8ff77} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!getIconDirectory@{getIconDirectory}}
+\index{getIconDirectory@{getIconDirectory}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{getIconDirectory()}{getIconDirectory()}}
+{\footnotesize\ttfamily uri\+String ZGeneral\+Parameters\+::get\+Icon\+Directory (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00242}{242}} of file \mbox{\hyperlink{zgeneralparameters_8cpp_source}{zgeneralparameters.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zgeneralparameters_8h_source_l00086}{Icon\+Directory}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawmasterfilevisu_8cpp_source_l00150}{ZRaw\+Master\+File\+Visu\+::\+\_\+setup()}}, \mbox{\hyperlink{zsearchquerymwd_8cpp_source_l00087}{ZSearch\+Query\+MWd\+::create\+Bi\+State\+ZButton()}}, \mbox{\hyperlink{zsearchquerymwd_8cpp_source_l00116}{ZSearch\+Query\+MWd\+::create\+ZButton()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l00098}{File\+Generate\+MWn\+::init\+Layout()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l00144}{ZEntry\+Point\+::init\+Layout()}}, \mbox{\hyperlink{zsearchquerymwd_8cpp_source_l00136}{ZSearch\+Query\+MWd\+::init\+Layout()}}, and \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00055}{Xml\+Save()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a1f24f84cfd3f08ad05d0853df4080186}\label{classzbs_1_1_z_general_parameters_a1f24f84cfd3f08ad05d0853df4080186} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!getIconDirectoryChar@{getIconDirectoryChar}}
+\index{getIconDirectoryChar@{getIconDirectoryChar}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{getIconDirectoryChar()}{getIconDirectoryChar()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} zbs\+::\+ZGeneral\+Parameters\+::get\+Icon\+Directory\+Char (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00057}{57}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00086}{Icon\+Directory}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_ae99c14ba8d4854d230e00c0ba3750ec3}\label{classzbs_1_1_z_general_parameters_ae99c14ba8d4854d230e00c0ba3750ec3} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!getParamDirectory@{getParamDirectory}}
+\index{getParamDirectory@{getParamDirectory}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{getParamDirectory()}{getParamDirectory()}}
+{\footnotesize\ttfamily uri\+String ZGeneral\+Parameters\+::get\+Param\+Directory (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00226}{226}} of file \mbox{\hyperlink{zgeneralparameters_8cpp_source}{zgeneralparameters.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zgeneralparameters_8h_source_l00085}{Param\+Directory}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchquerymwd_8cpp_source_l00136}{ZSearch\+Query\+MWd\+::init\+Layout()}}, \mbox{\hyperlink{zcppgenerate_8cpp_source_l00615}{zbs\+::\+ZCpp\+Generate\+::load\+Generate\+Parameters()}}, and \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00055}{Xml\+Save()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a4433703b4534965124ee09f29cb618f2}\label{classzbs_1_1_z_general_parameters_a4433703b4534965124ee09f29cb618f2} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!getParamDirectoryChar@{getParamDirectoryChar}}
+\index{getParamDirectoryChar@{getParamDirectoryChar}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{getParamDirectoryChar()}{getParamDirectoryChar()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} zbs\+::\+ZGeneral\+Parameters\+::get\+Param\+Directory\+Char (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00056}{56}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00085}{Param\+Directory}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_ab59260ce594d6814c1eb158872a8f2b2}\label{classzbs_1_1_z_general_parameters_ab59260ce594d6814c1eb158872a8f2b2} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!getVerbose@{getVerbose}}
+\index{getVerbose@{getVerbose}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{getVerbose()}{getVerbose()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZVerbose\+\_\+\+Base}} zbs\+::\+ZGeneral\+Parameters\+::get\+Verbose (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00053}{53}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}.
+
+
+
+Referenced by \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00080}{Xml\+Load()}}, and \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00055}{Xml\+Save()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a245b0d75a542dbb216eaf7ec309087e9}\label{classzbs_1_1_z_general_parameters_a245b0d75a542dbb216eaf7ec309087e9} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!getWorkDirectory@{getWorkDirectory}}
+\index{getWorkDirectory@{getWorkDirectory}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{getWorkDirectory()}{getWorkDirectory()}}
+{\footnotesize\ttfamily uri\+String ZGeneral\+Parameters\+::get\+Work\+Directory (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00211}{211}} of file \mbox{\hyperlink{zgeneralparameters_8cpp_source}{zgeneralparameters.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zcontent_2test__zrawfile_2main_8cpp_source_l00029}{\+\_\+\+\_\+\+PARSER\+\_\+\+WORK\+\_\+\+DIRECTORY\+\_\+\+\_\+}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zgeneralparameters_8h_source_l00084}{Work\+Directory}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomfile_8cpp_source_l08144}{zbs\+::\+ZRandom\+File\+::\+\_\+get\+URIReorg\+Clone()}}, \mbox{\hyperlink{zsearchparser_8cpp_source_l05215}{zbs\+::\+ZSearch\+Parser\+::\+\_\+parse\+Set\+Display()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01662}{ZEntry\+Point\+::clear\+ZMF()}}, \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03591}{ZContent\+Visu\+Main\+::clear\+ZMF()}}, \mbox{\hyperlink{zrawvisumain_8cpp_source_l03422}{ZRaw\+Visu\+Main\+::clear\+ZMF()}}, \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03647}{ZContent\+Visu\+Main\+::clear\+ZRF()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01723}{ZEntry\+Point\+::clear\+ZRF()}}, \mbox{\hyperlink{zrawvisumain_8cpp_source_l03478}{ZRaw\+Visu\+Main\+::clear\+ZRF()}}, \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03705}{ZContent\+Visu\+Main\+::clone\+ZRF()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01781}{ZEntry\+Point\+::clone\+ZRF()}}, \mbox{\hyperlink{zrawvisumain_8cpp_source_l03536}{ZRaw\+Visu\+Main\+::clone\+ZRF()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l01270}{File\+Generate\+MWn\+::\+Data\+Import()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l00943}{ZEntry\+Point\+::dowdgrade()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01592}{ZEntry\+Point\+::export\+ZMF()}}, \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03533}{ZContent\+Visu\+Main\+::export\+ZMF()}}, \mbox{\hyperlink{zrawvisumain_8cpp_source_l03365}{ZRaw\+Visu\+Main\+::export\+ZMF()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01541}{ZEntry\+Point\+::export\+ZMFFrom\+Surface()}}, \mbox{\hyperlink{zcppgenerate_8cpp_source_l01190}{zbs\+::\+ZCpp\+Generate\+::generate\+Interface()}}, \mbox{\hyperlink{zcontentvisumain_8cpp_source_l02000}{ZContent\+Visu\+Main\+::get\+Raw()}}, \mbox{\hyperlink{zrawvisumain_8cpp_source_l01905}{ZRaw\+Visu\+Main\+::get\+Raw()}}, \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03872}{ZContent\+Visu\+Main\+::import\+ZMF()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l02187}{ZEntry\+Point\+::import\+ZMF()}}, \mbox{\hyperlink{zrawvisumain_8cpp_source_l03705}{ZRaw\+Visu\+Main\+::import\+ZMF()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l00098}{File\+Generate\+MWn\+::init\+Layout()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l02502}{File\+Generate\+MWn\+::load\+External\+Dic\+File()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l02448}{File\+Generate\+MWn\+::load\+External\+Xml\+Dic()}}, \mbox{\hyperlink{zcontent_2test__zrawfile_2main_8cpp_source_l00148}{main()}}, \mbox{\hyperlink{dicedit_8cpp_source_l03970}{Dic\+Edit\+MWn\+::manage\+Dictionary\+Files()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l01839}{File\+Generate\+MWn\+::\+Menu\+Action()}}, \mbox{\hyperlink{zcontentvisumain_8cpp_source_l01798}{ZContent\+Visu\+Main\+::open\+ZRF()}}, \mbox{\hyperlink{zrawvisumain_8cpp_source_l01701}{ZRaw\+Visu\+Main\+::open\+ZRF()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01094}{ZEntry\+Point\+::open\+ZRH()}}, \mbox{\hyperlink{dicedit_8cpp_source_l01431}{Dic\+Edit\+MWn\+::read\+Write\+Action\+Event()}}, \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03799}{ZContent\+Visu\+Main\+::rebuild\+Header\+ZRF()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l00959}{ZEntry\+Point\+::reorganize\+ZMF()}}, \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03755}{ZContent\+Visu\+Main\+::reorganize\+ZRF()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l00882}{ZEntry\+Point\+::repair\+Indexes()}}, \mbox{\hyperlink{dicedit_8cpp_source_l04026}{Dic\+Edit\+MWn\+::save\+Or\+Create\+Dictionary\+File()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l01212}{File\+Generate\+MWn\+::\+Search\+Dir()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l02414}{File\+Generate\+MWn\+::setup\+From\+Xml\+Def()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l02369}{File\+Generate\+MWn\+::setup\+From\+Zmf\+File()}}, \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03841}{ZContent\+Visu\+Main\+::surface\+Scan\+ZRF()}}, \mbox{\hyperlink{zrawvisumain_8cpp_source_l03674}{ZRaw\+Visu\+Main\+::surface\+Scan\+ZRF()}}, \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00055}{Xml\+Save()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l02061}{ZEntry\+Point\+::\+ZMFdowngradeto\+ZRF()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01001}{ZEntry\+Point\+::\+ZRFAccess\+By\+Pool()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01889}{ZEntry\+Point\+::\+ZRFPutthemessin\+ZBAT()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01951}{ZEntry\+Point\+::\+ZRFrebuild\+Header()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01831}{ZEntry\+Point\+::\+ZRFReorganize()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01044}{ZEntry\+Point\+::\+ZRFSurface\+Access()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l02002}{ZEntry\+Point\+::\+ZRFSurface\+Scan()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l00976}{ZEntry\+Point\+::\+ZRFUnlock()}}, and \mbox{\hyperlink{zentrypoint_8cpp_source_l02101}{ZEntry\+Point\+::\+ZRFupgradeto\+ZMF()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a9942ea356160d5f2bd256786376112eb}\label{classzbs_1_1_z_general_parameters_a9942ea356160d5f2bd256786376112eb} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!getWorkDirectoryChar@{getWorkDirectoryChar}}
+\index{getWorkDirectoryChar@{getWorkDirectoryChar}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{getWorkDirectoryChar()}{getWorkDirectoryChar()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} zbs\+::\+ZGeneral\+Parameters\+::get\+Work\+Directory\+Char (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00055}{55}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00084}{Work\+Directory}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a71b25db6c8dccd1114e251c12fec70df}\label{classzbs_1_1_z_general_parameters_a71b25db6c8dccd1114e251c12fec70df} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!isInit@{isInit}}
+\index{isInit@{isInit}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{isInit()}{isInit()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZGeneral\+Parameters\+::is\+Init (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00042}{42}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00091}{Init}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a7deb2f4d0df562127405810588ae986f}\label{classzbs_1_1_z_general_parameters_a7deb2f4d0df562127405810588ae986f} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!operator=@{operator=}}
+\index{operator=@{operator=}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_general_parameters}{ZGeneral\+Parameters}} \& zbs\+::\+ZGeneral\+Parameters\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_general_parameters}{ZGeneral\+Parameters}} \&}]{p\+In }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00037}{37}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00196}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a8893f2c7a96a9099b3c6e24d9035136f}\label{classzbs_1_1_z_general_parameters_a8893f2c7a96a9099b3c6e24d9035136f} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!removeVerbose@{removeVerbose}}
+\index{removeVerbose@{removeVerbose}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{removeVerbose()}{removeVerbose()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZGeneral\+Parameters\+::remove\+Verbose (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZVerbose\+\_\+\+Base}}}]{p\+Verbose }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00063}{63}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a03b9557f0398e533a9338fa6fbef1450}\label{classzbs_1_1_z_general_parameters_a03b9557f0398e533a9338fa6fbef1450} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!setFromArg@{setFromArg}}
+\index{setFromArg@{setFromArg}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{setFromArg()}{setFromArg()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZGeneral\+Parameters\+::set\+From\+Arg (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{argc,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{zgeneralparameters_8cpp_source}{zgeneralparameters.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00080}{Xml\+Load()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcontent_2test__zrawfile_2main_8cpp_source_l00148}{main()}}, and \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00021}{ZGeneral\+Parameters()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_abb194c02b474ddffcee062328022b713}\label{classzbs_1_1_z_general_parameters_abb194c02b474ddffcee062328022b713} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!setInit@{setInit}}
+\index{setInit@{setInit}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{setInit()}{setInit()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZGeneral\+Parameters\+::set\+Init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Init = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}}} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00043}{43}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zgeneralparameters_8h_source_l00091}{Init}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_acfbdfd2a14530247efb7740642ca3470}\label{classzbs_1_1_z_general_parameters_acfbdfd2a14530247efb7740642ca3470} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!setVerbose@{setVerbose}}
+\index{setVerbose@{setVerbose}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{setVerbose()}{setVerbose()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZGeneral\+Parameters\+::set\+Verbose (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZVerbose\+\_\+\+Base}}}]{p\+Verbose }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00061}{61}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_ac3815bd307c14f2a6cbe4eda5716ae8c}\label{classzbs_1_1_z_general_parameters_ac3815bd307c14f2a6cbe4eda5716ae8c} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!VerboseBasic@{VerboseBasic}}
+\index{VerboseBasic@{VerboseBasic}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{VerboseBasic()}{VerboseBasic()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZGeneral\+Parameters\+::\+Verbose\+Basic (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00066}{66}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_afcc66e9d8968c85d12773b377a9f79a2}\label{classzbs_1_1_z_general_parameters_afcc66e9d8968c85d12773b377a9f79a2} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!VerboseFileEngine@{VerboseFileEngine}}
+\index{VerboseFileEngine@{VerboseFileEngine}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{VerboseFileEngine()}{VerboseFileEngine()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZGeneral\+Parameters\+::\+Verbose\+File\+Engine (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00080}{80}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a3aeda3fdcc4bfb20cea9513452aa6105}\label{classzbs_1_1_z_general_parameters_a3aeda3fdcc4bfb20cea9513452aa6105} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!VerboseMemEngine@{VerboseMemEngine}}
+\index{VerboseMemEngine@{VerboseMemEngine}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{VerboseMemEngine()}{VerboseMemEngine()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZGeneral\+Parameters\+::\+Verbose\+Mem\+Engine (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00079}{79}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a090e6eca942be03062beadc665be2861}\label{classzbs_1_1_z_general_parameters_a090e6eca942be03062beadc665be2861} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!VerboseMutex@{VerboseMutex}}
+\index{VerboseMutex@{VerboseMutex}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{VerboseMutex()}{VerboseMutex()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZGeneral\+Parameters\+::\+Verbose\+Mutex (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00071}{71}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a48db51d5238c1057adefba707bbb7d5a}\label{classzbs_1_1_z_general_parameters_a48db51d5238c1057adefba707bbb7d5a} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!VerboseNet@{VerboseNet}}
+\index{VerboseNet@{VerboseNet}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{VerboseNet()}{VerboseNet()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZGeneral\+Parameters\+::\+Verbose\+Net (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00069}{69}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_ace4a282d868360a9242026067e96abae}\label{classzbs_1_1_z_general_parameters_ace4a282d868360a9242026067e96abae} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!VerboseNetStats@{VerboseNetStats}}
+\index{VerboseNetStats@{VerboseNetStats}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{VerboseNetStats()}{VerboseNetStats()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZGeneral\+Parameters\+::\+Verbose\+Net\+Stats (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00070}{70}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_aab24ff9ea22492726ad3e11e18a0cd9a}\label{classzbs_1_1_z_general_parameters_aab24ff9ea22492726ad3e11e18a0cd9a} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!VerboseSearchEngine@{VerboseSearchEngine}}
+\index{VerboseSearchEngine@{VerboseSearchEngine}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{VerboseSearchEngine()}{VerboseSearchEngine()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZGeneral\+Parameters\+::\+Verbose\+Search\+Engine (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00081}{81}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_ad110fe130fffcdf67cbccad6d85d94eb}\label{classzbs_1_1_z_general_parameters_ad110fe130fffcdf67cbccad6d85d94eb} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!VerboseStat@{VerboseStat}}
+\index{VerboseStat@{VerboseStat}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{VerboseStat()}{VerboseStat()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZGeneral\+Parameters\+::\+Verbose\+Stat (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00067}{67}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a0133914c6846e839dfdc064137e7d991}\label{classzbs_1_1_z_general_parameters_a0133914c6846e839dfdc064137e7d991} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!VerboseThread@{VerboseThread}}
+\index{VerboseThread@{VerboseThread}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{VerboseThread()}{VerboseThread()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZGeneral\+Parameters\+::\+Verbose\+Thread (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00068}{68}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_ae1d6d8a4c9bb356a21d6c26a7881d23a}\label{classzbs_1_1_z_general_parameters_ae1d6d8a4c9bb356a21d6c26a7881d23a} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!VerboseXml@{VerboseXml}}
+\index{VerboseXml@{VerboseXml}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{VerboseXml()}{VerboseXml()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZGeneral\+Parameters\+::\+Verbose\+Xml (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00073}{73}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a14f6b9090242b3526ee4385e88d993d8}\label{classzbs_1_1_z_general_parameters_a14f6b9090242b3526ee4385e88d993d8} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!VerboseZIF@{VerboseZIF}}
+\index{VerboseZIF@{VerboseZIF}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{VerboseZIF()}{VerboseZIF()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZGeneral\+Parameters\+::\+Verbose\+ZIF (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00077}{77}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_aa60269ae1f77dd2f89d9021d513ee4b3}\label{classzbs_1_1_z_general_parameters_aa60269ae1f77dd2f89d9021d513ee4b3} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!VerboseZMF@{VerboseZMF}}
+\index{VerboseZMF@{VerboseZMF}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{VerboseZMF()}{VerboseZMF()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZGeneral\+Parameters\+::\+Verbose\+ZMF (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00076}{76}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_af103c86fbeae4e76911bdb54303e15d8}\label{classzbs_1_1_z_general_parameters_af103c86fbeae4e76911bdb54303e15d8} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!VerboseZRF@{VerboseZRF}}
+\index{VerboseZRF@{VerboseZRF}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{VerboseZRF()}{VerboseZRF()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZGeneral\+Parameters\+::\+Verbose\+ZRF (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00075}{75}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a5a6056e6615415eabefeb0d71517677c}\label{classzbs_1_1_z_general_parameters_a5a6056e6615415eabefeb0d71517677c} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!XmlLoad@{XmlLoad}}
+\index{XmlLoad@{XmlLoad}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{XmlLoad()}{XmlLoad()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZGeneral\+Parameters\+::\+Xml\+Load (\begin{DoxyParamCaption}\item[{uri\+String \&}]{p\+Xml\+File,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00080}{80}} of file \mbox{\hyperlink{zgeneralparameters_8cpp_source}{zgeneralparameters.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{\+\_\+\+Base\+Parameters}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00083}{current\+Xml}}, \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00264}{decode\+\_\+\+Verbose()}}, \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00315}{encode\+\_\+\+Verbose()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00090}{Fixed\+Font}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00053}{get\+Verbose()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00087}{Help\+Directory}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00086}{Icon\+Directory}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00091}{Init}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00085}{Param\+Directory}}, and \mbox{\hyperlink{zgeneralparameters_8h_source_l00084}{Work\+Directory}}.
+
+
+
+Referenced by \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00028}{set\+From\+Arg()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_ab15a0fef77ee8cd9b75fe2f049687362}\label{classzbs_1_1_z_general_parameters_ab15a0fef77ee8cd9b75fe2f049687362} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!XmlSave@{XmlSave}}
+\index{XmlSave@{XmlSave}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{XmlSave()}{XmlSave()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZGeneral\+Parameters\+::\+Xml\+Save (\begin{DoxyParamCaption}\item[{uri\+String \&}]{p\+Xml\+File,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00055}{55}} of file \mbox{\hyperlink{zgeneralparameters_8cpp_source}{zgeneralparameters.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmasterfiletype_8h_source_l00008}{\+\_\+\+\_\+\+ZMF\+\_\+\+VERSION\+\_\+\+\_\+}}, \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00264}{decode\+\_\+\+Verbose()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00090}{Fixed\+Font}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00258}{get\+Fixed\+Font()}}, \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00242}{get\+Icon\+Directory()}}, \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00226}{get\+Param\+Directory()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00053}{get\+Verbose()}}, and \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00211}{get\+Work\+Directory()}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classzbs_1_1_z_general_parameters_a690d31c57dfe06e1bfc73de8376a223a}\label{classzbs_1_1_z_general_parameters_a690d31c57dfe06e1bfc73de8376a223a} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!\_BaseParameters@{\_BaseParameters}}
+\index{\_BaseParameters@{\_BaseParameters}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{\_BaseParameters}{\_BaseParameters}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBase\+Parameters}}\texorpdfstring{$\ast$}{*} zbs\+::\+ZGeneral\+Parameters\+::\+\_\+\+Base\+Parameters =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00093}{93}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00196}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00062}{add\+Verbose()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00064}{clear\+Verbose()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00053}{get\+Verbose()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00063}{remove\+Verbose()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00061}{set\+Verbose()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00066}{Verbose\+Basic()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00080}{Verbose\+File\+Engine()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00079}{Verbose\+Mem\+Engine()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00071}{Verbose\+Mutex()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00069}{Verbose\+Net()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00070}{Verbose\+Net\+Stats()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00081}{Verbose\+Search\+Engine()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00067}{Verbose\+Stat()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00068}{Verbose\+Thread()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00073}{Verbose\+Xml()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00077}{Verbose\+ZIF()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00076}{Verbose\+ZMF()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00075}{Verbose\+ZRF()}}, \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00080}{Xml\+Load()}}, \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00016}{ZGeneral\+Parameters()}}, \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00021}{ZGeneral\+Parameters()}}, and \mbox{\hyperlink{zgeneralparameters_8h_source_l00034}{ZGeneral\+Parameters()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_aeac8f1fc77428577acc6f44a65c21272}\label{classzbs_1_1_z_general_parameters_aeac8f1fc77428577acc6f44a65c21272} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!currentXml@{currentXml}}
+\index{currentXml@{currentXml}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{currentXml}{currentXml}}
+{\footnotesize\ttfamily uri\+String zbs\+::\+ZGeneral\+Parameters\+::current\+Xml}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00083}{83}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00196}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00080}{Xml\+Load()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a43619e212f99a425ef84772155aab21b}\label{classzbs_1_1_z_general_parameters_a43619e212f99a425ef84772155aab21b} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!FixedFont@{FixedFont}}
+\index{FixedFont@{FixedFont}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{FixedFont}{FixedFont}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} zbs\+::\+ZGeneral\+Parameters\+::\+Fixed\+Font}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00090}{90}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00196}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00258}{get\+Fixed\+Font()}}, \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00080}{Xml\+Load()}}, and \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00055}{Xml\+Save()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a748e6ffa39abb1937ab12dd57a5a9636}\label{classzbs_1_1_z_general_parameters_a748e6ffa39abb1937ab12dd57a5a9636} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!HelpDirectory@{HelpDirectory}}
+\index{HelpDirectory@{HelpDirectory}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{HelpDirectory}{HelpDirectory}}
+{\footnotesize\ttfamily uri\+String zbs\+::\+ZGeneral\+Parameters\+::\+Help\+Directory}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00087}{87}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zgeneralparameters_8h_source_l00058}{get\+Help\+Directory\+Char()}}, and \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00080}{Xml\+Load()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a7370dd21b60fd20c1292577c02683e27}\label{classzbs_1_1_z_general_parameters_a7370dd21b60fd20c1292577c02683e27} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!IconDirectory@{IconDirectory}}
+\index{IconDirectory@{IconDirectory}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{IconDirectory}{IconDirectory}}
+{\footnotesize\ttfamily uri\+String zbs\+::\+ZGeneral\+Parameters\+::\+Icon\+Directory}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00086}{86}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00196}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00242}{get\+Icon\+Directory()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00057}{get\+Icon\+Directory\+Char()}}, and \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00080}{Xml\+Load()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a49627d6d30616c78930abe923beb7b17}\label{classzbs_1_1_z_general_parameters_a49627d6d30616c78930abe923beb7b17} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!Init@{Init}}
+\index{Init@{Init}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{Init}{Init}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZGeneral\+Parameters\+::\+Init =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00091}{91}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00196}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00042}{is\+Init()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00043}{set\+Init()}}, and \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00080}{Xml\+Load()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_a18fac0a2692d93eff4ca0471ef724c4b}\label{classzbs_1_1_z_general_parameters_a18fac0a2692d93eff4ca0471ef724c4b} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!ParamDirectory@{ParamDirectory}}
+\index{ParamDirectory@{ParamDirectory}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{ParamDirectory}{ParamDirectory}}
+{\footnotesize\ttfamily uri\+String zbs\+::\+ZGeneral\+Parameters\+::\+Param\+Directory}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00085}{85}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00196}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00226}{get\+Param\+Directory()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00056}{get\+Param\+Directory\+Char()}}, and \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00080}{Xml\+Load()}}.
+
+\Hypertarget{classzbs_1_1_z_general_parameters_ac0d8a3a23cc0e431f92f523d55b4bb6b}\label{classzbs_1_1_z_general_parameters_ac0d8a3a23cc0e431f92f523d55b4bb6b} 
+\index{zbs::ZGeneralParameters@{zbs::ZGeneralParameters}!WorkDirectory@{WorkDirectory}}
+\index{WorkDirectory@{WorkDirectory}!zbs::ZGeneralParameters@{zbs::ZGeneralParameters}}
+\doxysubsubsection{\texorpdfstring{WorkDirectory}{WorkDirectory}}
+{\footnotesize\ttfamily uri\+String zbs\+::\+ZGeneral\+Parameters\+::\+Work\+Directory}
+
+
+
+Definition at line \mbox{\hyperlink{zgeneralparameters_8h_source_l00084}{84}} of file \mbox{\hyperlink{zgeneralparameters_8h_source}{zgeneralparameters.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00196}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00211}{get\+Work\+Directory()}}, \mbox{\hyperlink{zgeneralparameters_8h_source_l00055}{get\+Work\+Directory\+Char()}}, and \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00080}{Xml\+Load()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/zcontent/zcontentcommon/\mbox{\hyperlink{zgeneralparameters_8h}{zgeneralparameters.\+h}}\item 
+/home/gerard/\+Development/zbasetools/zcontent/zcontentcommon/\mbox{\hyperlink{zgeneralparameters_8cpp}{zgeneralparameters.\+cpp}}\end{DoxyCompactItemize}

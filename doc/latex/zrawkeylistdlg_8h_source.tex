@@ -1,0 +1,45 @@
+\doxysection{zrawkeylistdlg.\+h}
+\hypertarget{zrawkeylistdlg_8h_source}{}\label{zrawkeylistdlg_8h_source}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zrawkeylistdlg.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zrawkeylistdlg.h}}
+\mbox{\hyperlink{zrawkeylistdlg_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZRAWKEYLISTDLG\_H}}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ ZRAWKEYLISTDLG\_H}}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <QDialog>}}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <ztoolset/uristring.h>}}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zmasterfile_8h}{zcontent/zindexedfile/zmasterfile.h}}>}}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00008}00008\ \textcolor{keyword}{class\ \ \ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZQTableView}};}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00011}\mbox{\hyperlink{class_z_raw_key_list_d_lg}{00011}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_z_raw_key_list_d_lg}{ZRawKeyListDLg}}\ :\ \textcolor{keyword}{public}\ QDialog}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00012}00012\ \{}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00013}00013\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00014}00014\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{class_z_raw_key_list_d_lg}{ZRawKeyListDLg}}(\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QWidget}}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{parent}}\ =\ \textcolor{keyword}{nullptr}\ )\ \ ;}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00015}\mbox{\hyperlink{class_z_raw_key_list_d_lg_af03a61ad96479965dbac5e9f1be3758a}{00015}}\ \ \ \mbox{\hyperlink{class_z_raw_key_list_d_lg_af03a61ad96479965dbac5e9f1be3758a}{\string~ZRawKeyListDLg}}()\ \{}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00016}00016\ \ \ \ \ \textcolor{keywordflow}{if}\ (locallyCreated\ \&\&\ (MasterFile!=\textcolor{keyword}{nullptr}))\{}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00017}00017\ \ \ \ \ \ \ MasterFile-\/>zclose();}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00018}00018\ \ \ \ \ \ \ \textcolor{keyword}{delete}\ MasterFile;}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00019}00019\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00020}00020\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00022}00022\ \textcolor{keyword}{private}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{slots}}:}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00023}00023\ \ \ \textcolor{keywordtype}{void}\ KeyListQuitBTnClicked(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pChecked}});}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00024}00024\ \ \ \textcolor{keywordtype}{void}\ KeyListwSelectBTnClicked(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pChecked}});}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00025}00025\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00026}\mbox{\hyperlink{class_z_raw_key_list_d_lg_ac10948e79919a9f1414e7e1de2392351}{00026}}\ \ \ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{class_z_raw_key_list_d_lg_ac10948e79919a9f1414e7e1de2392351}{getCurrentIndexRank}}()\ \{\textcolor{keywordflow}{return}\ CurrentIndexRank;\}}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00027}00027\ \ \ \textcolor{comment}{/*\ opens\ ZMasterFile\ pointed\ by\ pURIMasterFile.\ */}}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00028}00028\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_raw_key_list_d_lg_a30f159ed71f047b3999e864a5057fc8d}{set}}(\textcolor{keyword}{const}\ uriString\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pURIMasterFile}});}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00029}00029\ \ \ \textcolor{comment}{/*\ uses\ pMasterFile.\ it\ must\ be\ opend\ prior\ calling\ */}}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00030}00030\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_raw_key_list_d_lg_a30f159ed71f047b3999e864a5057fc8d}{set}}(\mbox{\hyperlink{classzbs_1_1_z_master_file}{ZMasterFile}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMasterFile}});}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00032}00032\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00033}00033\ \ \ \textcolor{keywordtype}{bool}\ locallyCreated=\textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00034}00034\ \ \ \textcolor{keywordtype}{long}\ CurrentIndexRank=-\/1;}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00035}00035\ \ \ \mbox{\hyperlink{classzbs_1_1_z_master_file}{zbs::ZMasterFile}}*\ MasterFile=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00036}00036\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZQTableView}}*\ KeyListTBv=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00037}00037\ \};}
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{zrawkeylistdlg_8h_source_l00039}00039\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZRAWKEYLISTDLG\_H}}
+
+\end{DoxyCode}

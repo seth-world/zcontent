@@ -1,0 +1,48 @@
+\doxysection{Recovering a damaged ZMaster\+File structure}
+\hypertarget{group___z_m_f_recovery}{}\label{group___z_m_f_recovery}\index{Recovering a damaged ZMasterFile structure@{Recovering a damaged ZMasterFile structure}}
+\hypertarget{group___z_m_f_recovery_ZMFRecSec}{}\doxysubsection{\texorpdfstring{Recovering a damaged ZMaster\+File structure}{Recovering a damaged ZMasterFile structure}}\label{group___z_m_f_recovery_ZMFRecSec}
+\hypertarget{group___z_m_f_recovery_ZMFRecCasesZMF}{}\doxysubsubsection{\texorpdfstring{ZMaster\+File itself has been damaged}{ZMasterFile itself has been damaged}}\label{group___z_m_f_recovery_ZMFRecCasesZMF}
+\begin{DoxyParagraph}{Main Content Data file is damaged or missing}
+
+\end{DoxyParagraph}
+
+\begin{DoxyEnumerate}
+\item Restore a backup of the main content files
+\begin{DoxyItemize}
+\item \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} Main content file
+\item \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} Main header file
+\end{DoxyItemize}
+\item And then restore each of its index(es)
+\begin{DoxyItemize}
+\item ZIndex\+File content file
+\item ZIndex\+File data file
+\end{DoxyItemize}
+\end{DoxyEnumerate}
+
+OR
+
+
+\begin{DoxyEnumerate}
+\item You may generate any defined index within \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}\textquotesingle{}s \doxylink{classzbs_1_1_z_master_control_block}{ZMaster\+Control\+Block} using index repair utility (see further)
+\end{DoxyEnumerate}
+
+\begin{DoxyParagraph}{Main Header file is damaged or missing}
+
+\end{DoxyParagraph}
+
+\begin{DoxyEnumerate}
+\item Cautiously delete \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} Header file (important \+: AND NOT Content file)
+\item Run zheader\+Rebuild() on this file, so that a header file will be created for this file \doxylink{group___z_r_f_utilities_ga4b3b04378233ab242f5d5d75ed0d8036}{ZRandom\+File\+::zheader\+Rebuild()} You then have a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} with all your recovered content (ZMF content file plus ZMF header file)
+\item Upgrade this \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} to a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} structure (with no Index yet) see ZMaster\+File\+::zupgrade\+ZRFto\+ZMF
+\item Generate Index keys using either
+\begin{DoxyItemize}
+\item your initial program defining index content and dictionary
+\item the XML definition file you already have, describing all your \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} structure, parameters and indexes definitions.
+\end{DoxyItemize}
+\end{DoxyEnumerate}
+
+\begin{DoxyNote}{Note}
+This is the reason why it is utmost important to save your file / index definition to an xml file as soon as they have been set to \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}\textquotesingle{}s header.
+\end{DoxyNote}
+Your \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} is up and ready to be used.\hypertarget{group___z_m_f_recovery_ZMFRecCasesZIF}{}\doxysubsubsection{\texorpdfstring{Index(es) files are damaged or missing}{Index(es) files are damaged or missing}}\label{group___z_m_f_recovery_ZMFRecCasesZIF}
+As index(es) definition is stored in both \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} and ZIndex\+Files, it is quite straight forward, using ZMaster\+File\+::zrepair\+Indexes static routine. This utility may run as diagnose tools without modifying the existing file (option p\+Repair = false ) or may diagnose then correct the dammaged indexes and rebuild them. An additional option (p\+Rebuild\+All=true) offers the possibility to rebuild all indexes from scratch, even those which are healthy indexes. 

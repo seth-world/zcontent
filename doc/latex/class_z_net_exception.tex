@@ -1,0 +1,227 @@
+\doxysection{ZNet\+Exception Class Reference}
+\hypertarget{class_z_net_exception}{}\label{class_z_net_exception}\index{ZNetException@{ZNetException}}
+
+
+The \doxylink{class_z_net_exception}{ZNet\+Exception} struct exception content sent over a net connection (TCP, RPC, etc..)  
+
+
+
+
+{\ttfamily \#include $<$znetexception.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_z_net_exception_acb8a087d8cea6cd4a4519961c415bd33}{clear}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_z_net_exception_a40c0446ad2257874742a0b17c0af9b8b}{set\+Message}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Status}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Severity\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Severity}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Format}},...)
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_z_net_exception_afe86aad9fda18ae385e01ef83b766c91}{set\+From\+ZException}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException\+Base}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZException}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_z_net_exception_afa201061e9cfa40a84ae1ba0f0959e77}{set\+ZException}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Module}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{static}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_z_net_exception_a32bb6c2eb0c7dc639bd5c3ed14c96dc4}{get\+SSLError}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Module}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Status}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Severity\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Severity}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Format}},...)
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{static}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException\+Base}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_z_net_exception_a2b37600e22e01c67be4b9099915ed51d}{\+\_\+get\+SSLError}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Module}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Status}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Severity\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Severity}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Format}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{va\+\_\+list}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{arglist}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_net_exception_a183522e0c6a9a6cbcf983eee6b70700e}{Status}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Severity\+\_\+type}} \mbox{\hyperlink{class_z_net_exception_a5acb969fd174165723c2e34f5573a71b}{Severity}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{class_z_net_exception_a0c318ead72edc5d7e5d39ba714ff4399}{Error}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \mbox{\hyperlink{class_z_net_exception_a3e261c0db5a41119502482e5947ee22f}{Message}} \mbox{[}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{cst\+\_\+messagelen}}\mbox{]}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \mbox{\hyperlink{class_z_net_exception_a2ca5591fb03a46fe866b289c23228e1f}{Complement}} \mbox{[}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{cst\+\_\+messagelen}}\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The \doxylink{class_z_net_exception}{ZNet\+Exception} struct exception content sent over a net connection (TCP, RPC, etc..) 
+
+Definition at line \mbox{\hyperlink{znetexception_8h_source_l00025}{25}} of file \mbox{\hyperlink{znetexception_8h_source}{znetexception.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_z_net_exception_a2b37600e22e01c67be4b9099915ed51d}\label{class_z_net_exception_a2b37600e22e01c67be4b9099915ed51d} 
+\index{ZNetException@{ZNetException}!\_getSSLError@{\_getSSLError}}
+\index{\_getSSLError@{\_getSSLError}!ZNetException@{ZNetException}}
+\doxysubsubsection{\texorpdfstring{\_getSSLError()}{\_getSSLError()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException\+Base}} \texorpdfstring{$\ast$}{*} ZNet\+Exception\+::\+\_\+get\+SSLError (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Module,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}}]{p\+Status,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Severity\+\_\+type}}}]{p\+Severity,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Format,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{va\+\_\+list}}}]{arglist }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{znetexception_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{znetexception_8cpp_source}{znetexception.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{znetexception_8cpp_source_l00066}{get\+SSLError()}}.
+
+\Hypertarget{class_z_net_exception_acb8a087d8cea6cd4a4519961c415bd33}\label{class_z_net_exception_acb8a087d8cea6cd4a4519961c415bd33} 
+\index{ZNetException@{ZNetException}!clear@{clear}}
+\index{clear@{clear}!ZNetException@{ZNetException}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZNet\+Exception\+::clear (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{znetexception_8h_source_l00032}{32}} of file \mbox{\hyperlink{znetexception_8h_source}{znetexception.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_z_net_exception_a32bb6c2eb0c7dc639bd5c3ed14c96dc4}\label{class_z_net_exception_a32bb6c2eb0c7dc639bd5c3ed14c96dc4} 
+\index{ZNetException@{ZNetException}!getSSLError@{getSSLError}}
+\index{getSSLError@{getSSLError}!ZNetException@{ZNetException}}
+\doxysubsubsection{\texorpdfstring{getSSLError()}{getSSLError()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZNet\+Exception\+::get\+SSLError (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Module,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}}]{p\+Status,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Severity\+\_\+type}}}]{p\+Severity,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Format,  }\item[{}]{... }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{znetexception_8cpp_source_l00066}{66}} of file \mbox{\hyperlink{znetexception_8cpp_source}{znetexception.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{znetexception_8cpp_source_l00015}{\+\_\+get\+SSLError()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslabstract_8cpp_source_l00480}{ZSSLAbstract\+::\+\_\+\+SSLread()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00616}{ZSSLAbstract\+::\+\_\+\+SSLwrite()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00048}{ZSSLAbstract\+::create\+Client\+Context()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00024}{ZSSLAbstract\+::create\+Server\+Context()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00369}{ZSSLAbstract\+::init\+Client\+Hand\+Shake()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00420}{ZSSLAbstract\+::init\+Server\+Hand\+Shake()}}, and \mbox{\hyperlink{zsslabstract_8cpp_source_l00140}{ZSSLAbstract\+::set\+Default\+Certificate\+Path()}}.
+
+\Hypertarget{class_z_net_exception_afe86aad9fda18ae385e01ef83b766c91}\label{class_z_net_exception_afe86aad9fda18ae385e01ef83b766c91} 
+\index{ZNetException@{ZNetException}!setFromZException@{setFromZException}}
+\index{setFromZException@{setFromZException}!ZNetException@{ZNetException}}
+\doxysubsubsection{\texorpdfstring{setFromZException()}{setFromZException()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZNet\+Exception\+::set\+From\+ZException (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException\+Base}} \&}]{p\+ZException }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{znetexception_8cpp_source_l00088}{88}} of file \mbox{\hyperlink{znetexception_8cpp_source}{znetexception.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{znetexception_8h_source_l00031}{Complement}}, \mbox{\hyperlink{znetexception_8h_source_l00029}{Error}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{znetexception_8h_source_l00030}{Message}}, \mbox{\hyperlink{znetexception_8h_source_l00028}{Severity}}, and \mbox{\hyperlink{znetexception_8h_source_l00027}{Status}}.
+
+
+
+Referenced by \mbox{\hyperlink{zconsole_8h_source_l00075}{zbs\+::write\+Exception()}}.
+
+\Hypertarget{class_z_net_exception_a40c0446ad2257874742a0b17c0af9b8b}\label{class_z_net_exception_a40c0446ad2257874742a0b17c0af9b8b} 
+\index{ZNetException@{ZNetException}!setMessage@{setMessage}}
+\index{setMessage@{setMessage}!ZNetException@{ZNetException}}
+\doxysubsubsection{\texorpdfstring{setMessage()}{setMessage()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZNet\+Exception\+::set\+Message (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}}]{p\+Status,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Severity\+\_\+type}}}]{p\+Severity,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Format,  }\item[{}]{... }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{znetexception_8cpp_source_l00099}{99}} of file \mbox{\hyperlink{znetexception_8cpp_source}{znetexception.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{znetexception_8h_source_l00030}{Message}}, \mbox{\hyperlink{znetexception_8h_source_l00028}{Severity}}, and \mbox{\hyperlink{znetexception_8h_source_l00027}{Status}}.
+
+\Hypertarget{class_z_net_exception_afa201061e9cfa40a84ae1ba0f0959e77}\label{class_z_net_exception_afa201061e9cfa40a84ae1ba0f0959e77} 
+\index{ZNetException@{ZNetException}!setZException@{setZException}}
+\index{setZException@{setZException}!ZNetException@{ZNetException}}
+\doxysubsubsection{\texorpdfstring{setZException()}{setZException()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZNet\+Exception\+::set\+ZException (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Module }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{znetexception_8cpp_source_l00112}{112}} of file \mbox{\hyperlink{znetexception_8cpp_source}{znetexception.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{znetexception_8h_source_l00031}{Complement}}, \mbox{\hyperlink{znetexception_8h_source_l00029}{Error}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{znetexception_8h_source_l00030}{Message}}, \mbox{\hyperlink{znetexception_8h_source_l00028}{Severity}}, and \mbox{\hyperlink{znetexception_8h_source_l00027}{Status}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_z_net_exception_a2ca5591fb03a46fe866b289c23228e1f}\label{class_z_net_exception_a2ca5591fb03a46fe866b289c23228e1f} 
+\index{ZNetException@{ZNetException}!Complement@{Complement}}
+\index{Complement@{Complement}!ZNetException@{ZNetException}}
+\doxysubsubsection{\texorpdfstring{Complement}{Complement}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} ZNet\+Exception\+::\+Complement\mbox{[}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{cst\+\_\+messagelen}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{znetexception_8h_source_l00031}{31}} of file \mbox{\hyperlink{znetexception_8h_source}{znetexception.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{znetexception_8cpp_source_l00088}{set\+From\+ZException()}}, and \mbox{\hyperlink{znetexception_8cpp_source_l00112}{set\+ZException()}}.
+
+\Hypertarget{class_z_net_exception_a0c318ead72edc5d7e5d39ba714ff4399}\label{class_z_net_exception_a0c318ead72edc5d7e5d39ba714ff4399} 
+\index{ZNetException@{ZNetException}!Error@{Error}}
+\index{Error@{Error}!ZNetException@{ZNetException}}
+\doxysubsubsection{\texorpdfstring{Error}{Error}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} ZNet\+Exception\+::\+Error}
+
+
+
+Definition at line \mbox{\hyperlink{znetexception_8h_source_l00029}{29}} of file \mbox{\hyperlink{znetexception_8h_source}{znetexception.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{znetexception_8cpp_source_l00088}{set\+From\+ZException()}}, and \mbox{\hyperlink{znetexception_8cpp_source_l00112}{set\+ZException()}}.
+
+\Hypertarget{class_z_net_exception_a3e261c0db5a41119502482e5947ee22f}\label{class_z_net_exception_a3e261c0db5a41119502482e5947ee22f} 
+\index{ZNetException@{ZNetException}!Message@{Message}}
+\index{Message@{Message}!ZNetException@{ZNetException}}
+\doxysubsubsection{\texorpdfstring{Message}{Message}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} ZNet\+Exception\+::\+Message\mbox{[}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{cst\+\_\+messagelen}}\mbox{]}}
+
+
+
+Definition at line \mbox{\hyperlink{znetexception_8h_source_l00030}{30}} of file \mbox{\hyperlink{znetexception_8h_source}{znetexception.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{znetexception_8cpp_source_l00088}{set\+From\+ZException()}}, \mbox{\hyperlink{znetexception_8cpp_source_l00099}{set\+Message()}}, and \mbox{\hyperlink{znetexception_8cpp_source_l00112}{set\+ZException()}}.
+
+\Hypertarget{class_z_net_exception_a5acb969fd174165723c2e34f5573a71b}\label{class_z_net_exception_a5acb969fd174165723c2e34f5573a71b} 
+\index{ZNetException@{ZNetException}!Severity@{Severity}}
+\index{Severity@{Severity}!ZNetException@{ZNetException}}
+\doxysubsubsection{\texorpdfstring{Severity}{Severity}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Severity\+\_\+type}} ZNet\+Exception\+::\+Severity}
+
+
+
+Definition at line \mbox{\hyperlink{znetexception_8h_source_l00028}{28}} of file \mbox{\hyperlink{znetexception_8h_source}{znetexception.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{znetexception_8cpp_source_l00088}{set\+From\+ZException()}}, \mbox{\hyperlink{znetexception_8cpp_source_l00099}{set\+Message()}}, and \mbox{\hyperlink{znetexception_8cpp_source_l00112}{set\+ZException()}}.
+
+\Hypertarget{class_z_net_exception_a183522e0c6a9a6cbcf983eee6b70700e}\label{class_z_net_exception_a183522e0c6a9a6cbcf983eee6b70700e} 
+\index{ZNetException@{ZNetException}!Status@{Status}}
+\index{Status@{Status}!ZNetException@{ZNetException}}
+\doxysubsubsection{\texorpdfstring{Status}{Status}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZNet\+Exception\+::\+Status}
+
+
+
+Definition at line \mbox{\hyperlink{znetexception_8h_source_l00027}{27}} of file \mbox{\hyperlink{znetexception_8h_source}{znetexception.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{znetexception_8cpp_source_l00088}{set\+From\+ZException()}}, \mbox{\hyperlink{znetexception_8cpp_source_l00099}{set\+Message()}}, and \mbox{\hyperlink{znetexception_8cpp_source_l00112}{set\+ZException()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/znet/zbasenet/\mbox{\hyperlink{znetexception_8h}{znetexception.\+h}}\item 
+/home/gerard/\+Development/zbasetools/znet/zbasenet/\mbox{\hyperlink{znetexception_8cpp}{znetexception.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,64 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/zmetadic.h File Reference}
+\hypertarget{zmetadic_8h}{}\label{zmetadic_8h}\index{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zmetadic.h@{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zmetadic.h}}
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$zindexedfile/zdatatype.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zarray.\+h$>$}\newline
+{\ttfamily \#include $<$zindexedfile/zfielddescription.\+h$>$}\newline
+{\ttfamily \#include $<$zindexedfile/zkeydictionary.\+h$>$}\newline
+Include dependency graph for zmetadic.\+h\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classzbs_1_1_z_meta_dic}{zbs\+::\+ZMeta\+Dic}}
+\begin{DoxyCompactList}\small\item\em The \doxylink{classzbs_1_1_z_meta_dic}{ZMeta\+Dic} class this class holds and manage the data definition for a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacezbs}{zbs}}
+\begin{DoxyCompactList}\small\item\em ZSIndex\+Field\+\_\+struct Dictionary single field definition \+: one key may be composed of many single fields not necessarily contiguous in the master file\textquotesingle{}s data structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zmetadic_8h_a8422c3c4ed4b25ff2324d616b78dc1e7}{get\+Field\+By\+Hash}}~search\+Field\+By\+Hash
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zmetadic_8h_a193e6be1d15747569afefbf6426beb1d}{get\+Field\+By\+Name}}~search\+Field\+By\+Name
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{CFUNCTOR}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{namespacezbs_a5a2e600e34c7e9c601facae3a0fa08c7}{zbs\+::delete\+ZMetadic\+All}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{APICEXPORT}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacezbs_a49aee3c3cfc2213c2119c6ead7f62066}{zbs\+::create\+ZMeta\+Dic}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Meta\+Dic}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{APICEXPORT}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{namespacezbs_a8a5aeef23c20fb2f6512b9e47dc06153}{zbs\+::delete\+ZMeta\+Dic}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZRecord}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{APICEXPORT}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{namespacezbs_a32f06a790818623824e0f2e2369808b1}{zbs\+::set\+Field\+Value\+By\+Rank}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record\+CTX}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Value}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Type}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{APICEXPORT}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{namespacezbs_a346123dfd6a9c2cedd3b93494c5ce237}{zbs\+::set\+Field\+Value\+By\+Rank\+\_\+\+Array}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record\+CTX}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Value}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Type}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{APICEXPORT}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{namespacezbs_aa60d6d68555bdea9f3f11c823a5d14ce}{zbs\+::set\+Field\+Value\+By\+Name}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record\+CTX}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Value}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Type}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{zmetadic_8h_a8422c3c4ed4b25ff2324d616b78dc1e7}\label{zmetadic_8h_a8422c3c4ed4b25ff2324d616b78dc1e7} 
+\index{zmetadic.h@{zmetadic.h}!getFieldByHash@{getFieldByHash}}
+\index{getFieldByHash@{getFieldByHash}!zmetadic.h@{zmetadic.h}}
+\doxysubsubsection{\texorpdfstring{getFieldByHash}{getFieldByHash}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} get\+Field\+By\+Hash~search\+Field\+By\+Hash}
+
+
+
+Definition at line \mbox{\hyperlink{zmetadic_8h_source_l00094}{94}} of file \mbox{\hyperlink{zmetadic_8h_source}{zmetadic.\+h}}.
+
+\Hypertarget{zmetadic_8h_a193e6be1d15747569afefbf6426beb1d}\label{zmetadic_8h_a193e6be1d15747569afefbf6426beb1d} 
+\index{zmetadic.h@{zmetadic.h}!getFieldByName@{getFieldByName}}
+\index{getFieldByName@{getFieldByName}!zmetadic.h@{zmetadic.h}}
+\doxysubsubsection{\texorpdfstring{getFieldByName}{getFieldByName}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} get\+Field\+By\+Name~search\+Field\+By\+Name}
+
+
+
+Definition at line \mbox{\hyperlink{zmetadic_8h_source_l00095}{95}} of file \mbox{\hyperlink{zmetadic_8h_source}{zmetadic.\+h}}.
+

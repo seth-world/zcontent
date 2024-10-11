@@ -1,0 +1,47 @@
+\doxysection{zsearchdictionary.\+h}
+\hypertarget{zsearchdictionary_8h_source}{}\label{zsearchdictionary_8h_source}\index{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zsearchdictionary.h@{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zsearchdictionary.h}}
+\mbox{\hyperlink{zsearchdictionary_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZSEARCHDICTIONARY\_H}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ ZSEARCHDICTIONARY\_H}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <ztoolset/zstatus.h>}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{zsearchfield_8h}{zsearchfield.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00008}\mbox{\hyperlink{class_z_search_dictionary}{00008}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_z_search_dictionary}{ZSearchDictionary}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classzbs_1_1_z_array}{ZArray}}\ <ZSearchField>}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00009}00009\ \{}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00010}00010\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00011}00011\ \ \ \ \ \mbox{\hyperlink{class_z_search_dictionary_a0baf113a3e2cdc57af9f0a904b6f1fc6}{ZSearchDictionary}}();}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00013}\mbox{\hyperlink{class_z_search_dictionary_aba7702db9837955cb9362003f3f1d858}{00013}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_search_dictionary_aba7702db9837955cb9362003f3f1d858}{addMetaDic}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classzbs_1_1_z_meta_dic}{ZMetaDic}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMetaDic}})}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00014}00014\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00015}00015\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_z_search_dictionary_a94b760c8b6e860054a2977332ebf556c}{BaseMetaDic}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMetaDic}};}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00016}00016\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00018}00018\ \textcolor{comment}{//\ \ \ \ ZStatus\ addByRank(long\ pFieldRank);}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00019}00019\ \textcolor{comment}{//\ \ \ \ void\ addAll(const\ ZMetaDic*\ pMetaDic);\ \ \ //\ Meta\ dictionary\ must\ be\ defined\ when\ constructing\ ZSearchEntity}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00022}00022\ \ \ \ \ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{class_z_search_dictionary_a645975e46f8d720c8e4661d9540ed66b}{getFieldRankByName}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pFieldName}})\ \textcolor{keyword}{const}\ ;}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00024}00024\ \ \textcolor{comment}{/*\ Deprecated}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00025}00025\ \textcolor{comment}{\ \ \ \ \ void\ setEqualTo(std::shared\_ptr<ZSearchEntity>\ pSourceEntity,\ const\ ZMetaDic\ *pMetaDic);}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00026}00026\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00027}00027\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_search_dictionary_ab665c3f3fc52cb4f6a47cbbbe6a267a0}{setEqualTo}}(std::shared\_ptr<ZSearchEntity>\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pSourceEntity}});}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00028}00028\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00029}00029\ \textcolor{comment}{\ \ \ \ long\ getDicRank(long\ pRank)\ \{return\ Tab(pRank).dicRank();\}}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00030}00030\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00031}\mbox{\hyperlink{class_z_search_dictionary_a860f712f74616c7fc28f6735b92b5524}{00031}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classzbs_1_1_z_meta_dic}{ZMetaDic}}*\ \mbox{\hyperlink{class_z_search_dictionary_a860f712f74616c7fc28f6735b92b5524}{getBaseMetaDic}}()\ \{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_z_search_dictionary_a94b760c8b6e860054a2977332ebf556c}{BaseMetaDic}};\}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00033}\mbox{\hyperlink{class_z_search_dictionary_ab05e2cd069d47f435e1b923d9b880b6c}{00033}}\ \ \ \ \ \mbox{\hyperlink{namespacezbs_ad2c4220007795ef7ba72669ef883ebb9}{ZCFMT\_Type}}\ \mbox{\hyperlink{class_z_search_dictionary_ab05e2cd069d47f435e1b923d9b880b6c}{getGlobalCellFormat}}()\ \{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_z_search_dictionary_a96c854e047daf64501669a417caa9474}{CellFormat}};\}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00034}\mbox{\hyperlink{class_z_search_dictionary_aef37cf2326e4bc2ad6ccf0537b2d79f1}{00034}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_search_dictionary_aef37cf2326e4bc2ad6ccf0537b2d79f1}{setGlobalCellFormat}}(\mbox{\hyperlink{namespacezbs_ad2c4220007795ef7ba72669ef883ebb9}{ZCFMT\_Type}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pCellFormat}})\ \{\mbox{\hyperlink{class_z_search_dictionary_a96c854e047daf64501669a417caa9474}{CellFormat}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pCellFormat}};\}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00036}\mbox{\hyperlink{class_z_search_dictionary_a96c854e047daf64501669a417caa9474}{00036}}\ \ \ \ \ \mbox{\hyperlink{namespacezbs_ad2c4220007795ef7ba72669ef883ebb9}{ZCFMT\_Type}}\ \ \ \ \ \ \mbox{\hyperlink{class_z_search_dictionary_a96c854e047daf64501669a417caa9474}{CellFormat}}=\mbox{\hyperlink{namespacezbs_a09ce017b918e0773f330cece711aaa25ab4b96f6be59c2d83b894ce060cc4c12f}{ZCFMT\_Nothing}};\ \ \ \textcolor{comment}{/*\ generic\ cell\ display\ format\ for\ all\ entity\ fields\ */}}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00037}\mbox{\hyperlink{class_z_search_dictionary_a94b760c8b6e860054a2977332ebf556c}{00037}}\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{classzbs_1_1_z_meta_dic}{ZMetaDic}}*\ \mbox{\hyperlink{class_z_search_dictionary_a94b760c8b6e860054a2977332ebf556c}{BaseMetaDic}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00038}\mbox{\hyperlink{class_z_search_dictionary_ae7233fab026bbc9ad5037533609b444e}{00038}}\ \ \ \ \ std::shared\_ptr<ZSearchEntity>\ \ \mbox{\hyperlink{class_z_search_dictionary_ae7233fab026bbc9ad5037533609b444e}{Entity}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00039}00039\ \};}
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{zsearchdictionary_8h_source_l00041}00041\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZSEARCHDICTIONARY\_H}}
+
+\end{DoxyCode}

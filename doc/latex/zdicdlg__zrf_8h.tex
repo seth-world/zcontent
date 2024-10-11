@@ -1,0 +1,58 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/zdicdlg\+\_\+zrf.h File Reference}
+\hypertarget{zdicdlg__zrf_8h}{}\label{zdicdlg__zrf_8h}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zdicdlg\_zrf.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zdicdlg\_zrf.h}}
+{\ttfamily \#include $<$QObject$>$}\newline
+{\ttfamily \#include $<$QDialog$>$}\newline
+{\ttfamily \#include $<$qcheckbox.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqtableview.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqtwidgettools.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/ztypetype.\+h$>$}\newline
+{\ttfamily \#include $<$zindexedfile/zdictionaryfile.\+h$>$}\newline
+Include dependency graph for zdicdlg\+\_\+zrf.\+h\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_z_dic_event}{ZDic\+Event}}
+\item 
+class \mbox{\hyperlink{class_z_dic_d_lg}{ZDic\+DLg}}
+\begin{DoxyCompactList}\small\item\em The \doxylink{class_z_dic_d_lg}{ZDic\+DLg} class manage list of dictionaries contained in a selected dictionary file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{zdicdlg__zrf_8h_acba15b980f637bdbc02f24fe6467ab28}{ZDic\+Event\+\_\+type}} \+: uint8\+\_\+t \{ \mbox{\hyperlink{zdicdlg__zrf_8h_acba15b980f637bdbc02f24fe6467ab28a346e880658e37c90fe02bfb26ff2ad63}{ZDET\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{zdicdlg__zrf_8h_acba15b980f637bdbc02f24fe6467ab28a41e28dbcfc30c540ed35ee7ebe05414d}{ZDET\+\_\+\+Deleted}} = 1
+, \mbox{\hyperlink{zdicdlg__zrf_8h_acba15b980f637bdbc02f24fe6467ab28a42c50e332458b8e8d925546d4278174f}{ZDET\+\_\+\+Change}} = 2
+, \mbox{\hyperlink{zdicdlg__zrf_8h_acba15b980f637bdbc02f24fe6467ab28ad654982fb8da6015f4f3c1d6810ea14f}{ZDET\+\_\+\+Created}} = 4
+ \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{zdicdlg__zrf_8h_acba15b980f637bdbc02f24fe6467ab28}\label{zdicdlg__zrf_8h_acba15b980f637bdbc02f24fe6467ab28} 
+\index{zdicdlg\_zrf.h@{zdicdlg\_zrf.h}!ZDicEvent\_type@{ZDicEvent\_type}}
+\index{ZDicEvent\_type@{ZDicEvent\_type}!zdicdlg\_zrf.h@{zdicdlg\_zrf.h}}
+\doxysubsubsection{\texorpdfstring{ZDicEvent\_type}{ZDicEvent\_type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{zdicdlg__zrf_8h_acba15b980f637bdbc02f24fe6467ab28}{ZDic\+Event\+\_\+type}} \+: \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZDET\_Nothing@{ZDET\_Nothing}!zdicdlg\_zrf.h@{zdicdlg\_zrf.h}}\index{zdicdlg\_zrf.h@{zdicdlg\_zrf.h}!ZDET\_Nothing@{ZDET\_Nothing}}}\Hypertarget{zdicdlg__zrf_8h_acba15b980f637bdbc02f24fe6467ab28a346e880658e37c90fe02bfb26ff2ad63}\label{zdicdlg__zrf_8h_acba15b980f637bdbc02f24fe6467ab28a346e880658e37c90fe02bfb26ff2ad63} 
+ZDET\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZDET\_Deleted@{ZDET\_Deleted}!zdicdlg\_zrf.h@{zdicdlg\_zrf.h}}\index{zdicdlg\_zrf.h@{zdicdlg\_zrf.h}!ZDET\_Deleted@{ZDET\_Deleted}}}\Hypertarget{zdicdlg__zrf_8h_acba15b980f637bdbc02f24fe6467ab28a41e28dbcfc30c540ed35ee7ebe05414d}\label{zdicdlg__zrf_8h_acba15b980f637bdbc02f24fe6467ab28a41e28dbcfc30c540ed35ee7ebe05414d} 
+ZDET\+\_\+\+Deleted&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZDET\_Change@{ZDET\_Change}!zdicdlg\_zrf.h@{zdicdlg\_zrf.h}}\index{zdicdlg\_zrf.h@{zdicdlg\_zrf.h}!ZDET\_Change@{ZDET\_Change}}}\Hypertarget{zdicdlg__zrf_8h_acba15b980f637bdbc02f24fe6467ab28a42c50e332458b8e8d925546d4278174f}\label{zdicdlg__zrf_8h_acba15b980f637bdbc02f24fe6467ab28a42c50e332458b8e8d925546d4278174f} 
+ZDET\+\_\+\+Change&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZDET\_Created@{ZDET\_Created}!zdicdlg\_zrf.h@{zdicdlg\_zrf.h}}\index{zdicdlg\_zrf.h@{zdicdlg\_zrf.h}!ZDET\_Created@{ZDET\_Created}}}\Hypertarget{zdicdlg__zrf_8h_acba15b980f637bdbc02f24fe6467ab28ad654982fb8da6015f4f3c1d6810ea14f}\label{zdicdlg__zrf_8h_acba15b980f637bdbc02f24fe6467ab28ad654982fb8da6015f4f3c1d6810ea14f} 
+ZDET\+\_\+\+Created&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{zdicdlg__zrf_8h_source_l00019}{19}} of file \mbox{\hyperlink{zdicdlg__zrf_8h_source}{zdicdlg\+\_\+zrf.\+h}}.
+

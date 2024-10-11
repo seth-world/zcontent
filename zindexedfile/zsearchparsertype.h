@@ -346,6 +346,7 @@ enum ZSearchTokentype : ZSearchTokentype_type {
   ZSRCH_UTF32VARYINGSTRING= 0x10000013,
 
   ZSRCH_URISTRING         = 0x10000031,
+  ZSRCH_DOMAIN            = 0x10000032,
 
   ZSRCH_UTF8FIXEDSTRING   = 0x10000001,
   ZSRCH_UTF16FIXEDSTRING  = 0x10000002,
@@ -368,22 +369,23 @@ enum ZSearchTokentype : ZSearchTokentype_type {
 };
 
 
-typedef  uint16_t ZSearchOperandType_type;
+typedef  uint32_t ZSearchOperandType_type;
 enum ZSearchOperandType : ZSearchOperandType_type
 {
-  ZSTO_Nothing          = 0,
-  ZSTO_String           = 0x0001,
-  ZSTO_Integer          = 0x0002,
-  ZSTO_Float            = 0x0004,
-  ZSTO_Date             = 0x0008,
-  ZSTO_Checksum         = 0x0010,
-  ZSTO_Resource         = 0x0020,
-  ZSTO_UriString        = 0x0040,
-  ZSTO_Bool             = 0x0080,
+  ZSTO_Nothing          =       0,
+  ZSTO_String           =       0x0001,
+  ZSTO_Integer          =       0x0002,
+  ZSTO_Float            =       0x0004,
+  ZSTO_Date             =       0x0008,
+  ZSTO_Checksum         =       0x0010,
+  ZSTO_Resource         =       0x0020,
+  ZSTO_UriString        =       0x0040,
+  ZSTO_Bool             =       0x0080,
+  ZSTO_Domain           =       0x0100,
 
-  ZSTO_BaseMask         = 0x00FF,
+  ZSTO_BaseMask         =       0xFFFF,
 
-  ZSTO_Field            = 0x0100,
+  ZSTO_Field            =       0x10000,
 
   ZSTO_FieldString      = ZSTO_Field|ZSTO_String,
   ZSTO_FieldInteger     = ZSTO_Field|ZSTO_Integer,
@@ -394,7 +396,7 @@ enum ZSearchOperandType : ZSearchOperandType_type
   ZSTO_FieldUriString   = ZSTO_Field|ZSTO_UriString,
   ZSTO_FieldBool        = ZSTO_Field|ZSTO_Bool,
 
-  ZSTO_Literal          = 0x0200,
+  ZSTO_Literal          =       0x20000,
   ZSTO_LiteralString    = ZSTO_Literal|ZSTO_String,
   ZSTO_LiteralInteger   = ZSTO_Literal|ZSTO_Integer,
   ZSTO_LiteralFloat     = ZSTO_Literal|ZSTO_Float,
@@ -404,9 +406,9 @@ enum ZSearchOperandType : ZSearchOperandType_type
   ZSTO_LiteralUriString = ZSTO_Literal|ZSTO_UriString,
   ZSTO_LiteralBool      = ZSTO_Literal|ZSTO_Bool,
 
-  ZSTO_Logical          = 0x0400,
+  ZSTO_Logical          =       0x40000,
 
-  ZSTO_Arithmetic       = 0x0800,
+  ZSTO_Arithmetic       =       0x80000,
 
   ZSTO_ArithFieldString     = ZSTO_Arithmetic|ZSTO_FieldString,
   ZSTO_ArithFieldInteger    = ZSTO_Arithmetic|ZSTO_FieldInteger,
@@ -426,7 +428,7 @@ enum ZSearchOperandType : ZSearchOperandType_type
   ZSTO_ArithLiteralUriString  = ZSTO_Arithmetic|ZSTO_LiteralUriString,
   ZSTO_ArithLiteralBool       = ZSTO_Arithmetic|ZSTO_LiteralBool,
 
-  ZSTO_Symbol            = 0x1000
+  ZSTO_Symbol            =          0x100000
 
 };
 

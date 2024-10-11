@@ -1,0 +1,135 @@
+\doxysection{zbs\+::ZJEvent Class Reference}
+\hypertarget{classzbs_1_1_z_j_event}{}\label{classzbs_1_1_z_j_event}\index{zbs::ZJEvent@{zbs::ZJEvent}}
+
+
+{\ttfamily \#include $<$zjournal.\+h$>$}
+
+
+
+Inheritance diagram for zbs\+::ZJEvent\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structzbs_1_1_z_j_event_1_1_z_j_e___header}{ZJE\+\_\+\+Header}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_j_event_a8aa185cc011b640f4be86eae51652d3b}{ZJEvent}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_j_event_a687e26f8529314f4e36e3cf8b04745e0}{ZJEvent}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3c}{ZJOperation}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Operation}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pid\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Pid}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZSystem\+User\+Id}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Uid}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Offset}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_j_event_a465ca70394981d62ac9eed16e285570a}{get\+Record\+From\+Event}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_j_event_a1a2a661faa5d5180843a191abf303420}{get\+Event\+From\+Record}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_j_event_ad41ea8a4f67442ade1b5e626948c6e12}{get\+Field\+Change}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Field\+Before}}, ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Field\+After}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{struct}} \mbox{\hyperlink{structzbs_1_1_z_j_event_1_1_z_j_e___header}{zbs\+::\+ZJEvent\+::\+ZJE\+\_\+\+Header}} \mbox{\hyperlink{classzbs_1_1_z_j_event_ad15017b6953728ef822f8dd93d1166ad}{Header}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zjournal_8h_source_l00104}{104}} of file \mbox{\hyperlink{zjournal_8h_source}{zjournal.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classzbs_1_1_z_j_event_a8aa185cc011b640f4be86eae51652d3b}\label{classzbs_1_1_z_j_event_a8aa185cc011b640f4be86eae51652d3b} 
+\index{zbs::ZJEvent@{zbs::ZJEvent}!ZJEvent@{ZJEvent}}
+\index{ZJEvent@{ZJEvent}!zbs::ZJEvent@{zbs::ZJEvent}}
+\doxysubsubsection{\texorpdfstring{ZJEvent()}{ZJEvent()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily zbs\+::\+ZJEvent\+::\+ZJEvent (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zjournal_8h_source_l00107}{107}} of file \mbox{\hyperlink{zjournal_8h_source}{zjournal.\+h}}.
+
+\Hypertarget{classzbs_1_1_z_j_event_a687e26f8529314f4e36e3cf8b04745e0}\label{classzbs_1_1_z_j_event_a687e26f8529314f4e36e3cf8b04745e0} 
+\index{zbs::ZJEvent@{zbs::ZJEvent}!ZJEvent@{ZJEvent}}
+\index{ZJEvent@{ZJEvent}!zbs::ZJEvent@{zbs::ZJEvent}}
+\doxysubsubsection{\texorpdfstring{ZJEvent()}{ZJEvent()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily zbs\+::\+ZJEvent\+::\+ZJEvent (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3c}{ZJOperation}}}]{p\+Operation,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pid\+\_\+t}}}]{p\+Pid,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZSystem\+User\+Id}} \&}]{p\+Uid,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Record,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}}}]{p\+Rank,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+Address,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}}}]{p\+Offset }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zjournal_8h_source_l00108}{108}} of file \mbox{\hyperlink{zjournal_8h_source}{zjournal.\+h}}.
+
+
+
+References \mbox{\hyperlink{zjournal_8h_source_l00143}{zbs\+::\+ZJEvent\+::\+ZJE\+\_\+\+Header\+::\+Address}}, \mbox{\hyperlink{zjournal_8h_source_l00141}{zbs\+::\+ZJEvent\+::\+ZJE\+\_\+\+Header\+::\+Date\+Time}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{classzbs_1_1_z_j_event_ad15017b6953728ef822f8dd93d1166ad}{Header}}, \mbox{\hyperlink{zjournal_8h_source_l00144}{zbs\+::\+ZJEvent\+::\+ZJE\+\_\+\+Header\+::\+Offset}}, \mbox{\hyperlink{zjournal_8h_source_l00136}{zbs\+::\+ZJEvent\+::\+ZJE\+\_\+\+Header\+::\+Operation}}, \mbox{\hyperlink{zjournal_8h_source_l00138}{zbs\+::\+ZJEvent\+::\+ZJE\+\_\+\+Header\+::\+Pid}}, \mbox{\hyperlink{zjournal_8h_source_l00142}{zbs\+::\+ZJEvent\+::\+ZJE\+\_\+\+Header\+::\+Rank}}, \mbox{\hyperlink{zjournal_8h_source_l00137}{zbs\+::\+ZJEvent\+::\+ZJE\+\_\+\+Header\+::\+State}}, \mbox{\hyperlink{zjournal_8h_source_l00139}{zbs\+::\+ZJEvent\+::\+ZJE\+\_\+\+Header\+::\+Uid}}, and \mbox{\hyperlink{zjournal_8h_source_l00030}{ZJS\+\_\+\+Created}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classzbs_1_1_z_j_event_a1a2a661faa5d5180843a191abf303420}\label{classzbs_1_1_z_j_event_a1a2a661faa5d5180843a191abf303420} 
+\index{zbs::ZJEvent@{zbs::ZJEvent}!getEventFromRecord@{getEventFromRecord}}
+\index{getEventFromRecord@{getEventFromRecord}!zbs::ZJEvent@{zbs::ZJEvent}}
+\doxysubsubsection{\texorpdfstring{getEventFromRecord()}{getEventFromRecord()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZJEvent\+::get\+Event\+From\+Record (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Record }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zjournal_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{zjournal_8cpp_source}{zjournal.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{classzbs_1_1_z_j_event_ad15017b6953728ef822f8dd93d1166ad}{Header}}.
+
+
+
+Referenced by \mbox{\hyperlink{zjournal_8cpp_source_l00385}{zbs\+::\+ZSJournal\+::purge()}}.
+
+\Hypertarget{classzbs_1_1_z_j_event_ad41ea8a4f67442ade1b5e626948c6e12}\label{classzbs_1_1_z_j_event_ad41ea8a4f67442ade1b5e626948c6e12} 
+\index{zbs::ZJEvent@{zbs::ZJEvent}!getFieldChange@{getFieldChange}}
+\index{getFieldChange@{getFieldChange}!zbs::ZJEvent@{zbs::ZJEvent}}
+\doxysubsubsection{\texorpdfstring{getFieldChange()}{getFieldChange()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZJEvent\+::get\+Field\+Change (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Field\+Before,  }\item[{ZData\+Buffer \&}]{p\+Field\+After }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zjournal_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{zjournal_8cpp_source}{zjournal.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_j_event_a465ca70394981d62ac9eed16e285570a}\label{classzbs_1_1_z_j_event_a465ca70394981d62ac9eed16e285570a} 
+\index{zbs::ZJEvent@{zbs::ZJEvent}!getRecordFromEvent@{getRecordFromEvent}}
+\index{getRecordFromEvent@{getRecordFromEvent}!zbs::ZJEvent@{zbs::ZJEvent}}
+\doxysubsubsection{\texorpdfstring{getRecordFromEvent()}{getRecordFromEvent()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZJEvent\+::get\+Record\+From\+Event (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Record }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zjournal_8cpp_source_l00042}{42}} of file \mbox{\hyperlink{zjournal_8cpp_source}{zjournal.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{classzbs_1_1_z_j_event_ad15017b6953728ef822f8dd93d1166ad}{Header}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classzbs_1_1_z_j_event_ad15017b6953728ef822f8dd93d1166ad}\label{classzbs_1_1_z_j_event_ad15017b6953728ef822f8dd93d1166ad} 
+\index{zbs::ZJEvent@{zbs::ZJEvent}!Header@{Header}}
+\index{Header@{Header}!zbs::ZJEvent@{zbs::ZJEvent}}
+\doxysubsubsection{\texorpdfstring{Header}{Header}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{struct}} \mbox{\hyperlink{structzbs_1_1_z_j_event_1_1_z_j_e___header}{zbs\+::\+ZJEvent\+::\+ZJE\+\_\+\+Header}} zbs\+::\+ZJEvent\+::\+Header}
+
+
+
+Referenced by \mbox{\hyperlink{zjournal_8cpp_source_l00225}{zbs\+::\+ZSJournal\+::create\+File()}}, \mbox{\hyperlink{zjournal_8cpp_source_l00034}{get\+Event\+From\+Record()}}, \mbox{\hyperlink{zjournal_8cpp_source_l00042}{get\+Record\+From\+Event()}}, and \mbox{\hyperlink{zjournal_8h_source_l00108}{ZJEvent()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zjournal_8h}{zjournal.\+h}}\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zjournal_8cpp}{zjournal.\+cpp}}\end{DoxyCompactItemize}

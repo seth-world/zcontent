@@ -626,6 +626,40 @@ void ZOperandContent::replaceWithURI(uriString pValue)
 
 }
 
+ZDomainPath* ZOperandContent::getDomain()
+{
+    if ((OperandZSTO&ZSTO_BaseMask)!=ZSTO_Domain) {
+        _DBGPRINT("ZOperandContent::getDomain-E Invalid operand content type 0x%X %s while expecting one of ZSTO_Domain.\n",
+                  OperandZSTO , decode_OperandType(OperandZSTO))
+        return nullptr;
+    }
+    if (Value==nullptr)
+        return nullptr;
+    return static_cast<ZDomainPath*>(Value);
+}
+
+ZStatus ZOperandContent::setDomain(ZDomainPath* pValue)
+{
+    if ((OperandZSTO&ZSTO_BaseMask)!=ZSTO_UriString) {
+        _DBGPRINT("ZOperandContent::getDomain-E Invalid operand content type 0x%X %s while expecting one of ZSTO_Domain.\n",
+                  OperandZSTO , decode_OperandType(OperandZSTO))
+        return ZS_INVTYPE ;
+    }
+    Value = pValue;
+    return ZS_SUCCESS ;
+}
+
+void ZOperandContent::replaceWithDomain(ZDomainPath* pValue)
+{
+    ZSearchOperandType_type wBase = OperandZSTO & ~ ZSTO_BaseMask; /* keep operand class type */
+    clear();
+    Value = pValue;
+    OperandZSTO = wBase | ZSTO_Domain;  /* change ZSTO to appropriate */
+
+    return;
+
+}
+
 ZDateFull ZOperandContent::getDate()
 {
     if ((OperandZSTO&ZSTO_BaseMask)!=ZSTO_Date) {

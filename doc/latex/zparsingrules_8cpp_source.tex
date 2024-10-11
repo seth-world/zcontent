@@ -1,0 +1,124 @@
+\doxysection{zparsingrules.\+cpp}
+\hypertarget{zparsingrules_8cpp_source}{}\label{zparsingrules_8cpp_source}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zparsingrules.cpp@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zparsingrules.cpp}}
+\mbox{\hyperlink{zparsingrules_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{zparsingrules_8h}{zparsingrules.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{zcontentutils_2ui__zparsingrulesdlg_8h}{ui\_zparsingrulesdlg.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <zcppparser/zcppparsertype.h>}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zexceptiondlg_8h}{zexceptiondlg.h}}>}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zdatatype_8h}{zcontent/zindexedfile/zdatatype.h}}>}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zparsingrulesdlg_8h}{zcontent/zcontentutils/zparsingrulesdlg.h}}>}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00009}00009\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacezbs}{zbs}};}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00011}00011\ \textcolor{comment}{//ZParsingRulesList::\string~ZParsingRulesList()\ \{\}}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00013}00013\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00014}00014\ \textcolor{comment}{\ \ \ \ \ \ \ \ <typeconversion>}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00015}00015\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ <tokentype>ZTTP\_UNKNOWN\_TYPE</tokentype>}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00016}00016\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ <syntax>DocumentMetaType</syntax>}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00017}00017\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ <ztype>ZType\_AtomicS64</ztype>}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00018}00018\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ <capacity>1</capacity>}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00019}00019\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ <universalsize>0</universalsize>}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00020}00020\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ <naturalsize>0</naturalsize>}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00021}00021\ \textcolor{comment}{\ \ \ \ \ \ \ \ </typeconversion>}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00022}00022\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00023}\mbox{\hyperlink{class_z_parsing_rules_list_a3c5bcd4cb881a41f5eef2c318422db72}{00023}}\ \mbox{\hyperlink{class_z_parsing_rules_list_a3c5bcd4cb881a41f5eef2c318422db72}{ZParsingRulesList::ZParsingRulesList}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZCppParser}}*\ pParser,\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QWidget}}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{parent}}\ ):\mbox{\hyperlink{class_z_std_list_d_lg}{ZStdListDLg}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{parent}})\{}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00025}00025\ \ \ Parser=pParser;}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00027}00027\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{setWindowTitle}}(\textcolor{stringliteral}{"{}Parsing\ rules\ list"{}});}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00028}00028\ \ \ \mbox{\hyperlink{class_z_std_list_d_lg_line}{ZStdListHeaders}}\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wHeaders}};}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00029}00029\ \ \ \mbox{\hyperlink{class_z_std_list_d_lg_content}{ZStdListDLgContent}}\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContent}};}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00031}00031\ \textcolor{comment}{//\ \ wHeaders.add\ ("{}Token\ type"{});}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00032}00032\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wHeaders}}.add\ (\textcolor{stringliteral}{"{}Syntax"{}});}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00033}00033\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wHeaders}}.add\ (\textcolor{stringliteral}{"{}Target\ ZType"{}});}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00034}00034\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wHeaders}}.add\ (\textcolor{stringliteral}{"{}Target\ Capacity"{}});}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00035}00035\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wHeaders}}.add\ (\textcolor{stringliteral}{"{}Universal\ Size"{}});}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00036}00036\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wHeaders}}.add\ (\textcolor{stringliteral}{"{}Natural\ Size"{}});}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00038}00038\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}=0;\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}\ <\ pParser-\/>ConversionRules.count();\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}++)\ \{}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00039}00039\ \ \ \ \ \mbox{\hyperlink{class_z_std_list_d_lg_line}{ZStdListDLgLine}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContentLine}};}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00040}00040\ \ \ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}};}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00042}00042\ \textcolor{comment}{//\ \ \ \ wContentLine.add\ (\ decode\_TokenType(pParser-\/>ConversionRules[wi].TokenType).toCChar())\ ;}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00043}00043\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContentLine}}.\mbox{\hyperlink{class_z_std_list_d_lg_line_a2fe5c863d7a01c50d4549588ade71bf1}{add}}\ (\ pParser-\/>ConversionRules[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}].Syntax.toCChar())\ ;}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00044}00044\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContentLine}}.add\ (\ \mbox{\hyperlink{zindextype_8cpp_ad6f3108f2578cb9401cc43f94e9fd46c}{decode\_ZType}}(pParser-\/>ConversionRules[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}].ZType))\ ;}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00045}00045\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%d"{}},pParser-\/>ConversionRules[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}].Capacity);}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00046}00046\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContentLine}}.add\ (\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar())\ ;}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},pParser-\/>ConversionRules[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}].UniversalSize);}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00048}00048\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContentLine}}.add\ (\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar())\ ;}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00049}00049\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},pParser-\/>ConversionRules[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}].NaturalSize);}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00050}00050\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContentLine}}.add\ (\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar())\ ;}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00051}00051\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContent}}.push(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContentLine}});}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00052}00052\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00054}00054\ \ \ \mbox{\hyperlink{class_z_std_list_d_lg_a21a04ba50f296d841fb9fe8ff6b4599a}{dataSetup}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wHeaders}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContent}});}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00055}00055\ \}\textcolor{comment}{//ZParsingRulesList\ CTOR}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00056}00056\ \mbox{\hyperlink{class_z_std_list_d_lg_line}{ZStdListDLgLine}}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00057}\mbox{\hyperlink{class_z_parsing_rules_list_a0c31d236460f26940d2863b1bef2a231}{00057}}\ \mbox{\hyperlink{class_z_parsing_rules_list_a0c31d236460f26940d2863b1bef2a231}{ZParsingRulesList::formatLine}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classzbs_1_1_z_conversion_element}{ZConversionElement}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pElt}})\{}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00058}00058\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}};}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00059}00059\ \ \ \mbox{\hyperlink{class_z_std_list_d_lg_line}{ZStdListDLgLine}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContentLine}};}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00060}00060\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContentLine}}.\mbox{\hyperlink{class_z_std_list_d_lg_line_a2fe5c863d7a01c50d4549588ade71bf1}{add}}\ (\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pElt}}.Syntax.toCChar())\ ;}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00061}00061\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContentLine}}.add\ (\ \mbox{\hyperlink{zindextype_8cpp_ad6f3108f2578cb9401cc43f94e9fd46c}{decode\_ZType}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pElt}}.ZType))\ ;}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00062}00062\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%d"{}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pElt}}.Capacity);}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00063}00063\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContentLine}}.add\ (\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar())\ ;}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00064}00064\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pElt}}.UniversalSize);}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00065}00065\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContentLine}}.add\ (\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar())\ ;}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00066}00066\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pElt}}.NaturalSize);}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00067}00067\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContentLine}}.add\ (\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00068}00068\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContentLine}};}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00069}00069\ \}\textcolor{comment}{//formatLine}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00072}\mbox{\hyperlink{class_z_parsing_rules_list_a347f63a37784118de169df39245ab2a8}{00072}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_parsing_rules_list_a347f63a37784118de169df39245ab2a8}{ZParsingRulesList::AcceptCurrent}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRow}})\ \{}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00074}00074\ \ \ \mbox{\hyperlink{class_z_parsing_rules_list_a58fcf045018c610e27ce9d0dd2bf1331}{ChangeCurrent}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRow}});}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00075}00075\ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00076}00076\ \}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00077}\mbox{\hyperlink{class_z_parsing_rules_list_a58fcf045018c610e27ce9d0dd2bf1331}{00077}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_parsing_rules_list_a58fcf045018c610e27ce9d0dd2bf1331}{ZParsingRulesList::ChangeCurrent}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRow}})\ \{}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00079}00079\ \ \ \mbox{\hyperlink{class_z_parsing_rules_d_lg}{ZParsingRulesDLg}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRuleDlg}}=\textcolor{keyword}{new}\ \mbox{\hyperlink{class_z_parsing_rules_d_lg}{ZParsingRulesDLg}}(Parser,\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00080}00080\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRuleDlg}}-\/>setup(Parser-\/>ConversionRules[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRow}}]);}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00081}00081\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_a2c56c55b930f51337c2f5ab19ec02240}{wRet}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRuleDlg}}-\/>exec();}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00082}00082\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{znet_2znetconsole_2main_8cpp_a2c56c55b930f51337c2f5ab19ec02240}{wRet}}==QDialog::Accepted)\ \{}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00083}00083\ \ \ \ \ Parser-\/>ConversionRules[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRow}}]\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRuleDlg}}-\/>getConversionElt();}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00084}00084\ \ \ \ \ \mbox{\hyperlink{class_z_std_list_d_lg_a1e30ef884774082ae1e0ccdc44be0df4}{ZStdListDLg::ReplaceLine}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRow}},\mbox{\hyperlink{class_z_parsing_rules_list_a0c31d236460f26940d2863b1bef2a231}{formatLine}}(Parser-\/>ConversionRules[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRow}}]));}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00085}00085\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00086}00086\ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRuleDlg}};}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00087}00087\ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00088}00088\ \}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00089}\mbox{\hyperlink{class_z_parsing_rules_list_a4275cc48c47f7f663374ffe4432f886f}{00089}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_parsing_rules_list_a4275cc48c47f7f663374ffe4432f886f}{ZParsingRulesList::AppendCurrent}}()\ \{}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00091}00091\ \ \ \mbox{\hyperlink{class_z_parsing_rules_d_lg}{ZParsingRulesDLg}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRuleDlg}}=\textcolor{keyword}{new}\ \mbox{\hyperlink{class_z_parsing_rules_d_lg}{ZParsingRulesDLg}}(Parser,\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00092}00092\ \textcolor{comment}{//\ \ wRuleDlg-\/>setup(Parser-\/>ConversionRules[pRow]);}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00093}00093\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_a2c56c55b930f51337c2f5ab19ec02240}{wRet}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRuleDlg}}-\/>exec();}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00094}00094\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{znet_2znetconsole_2main_8cpp_a2c56c55b930f51337c2f5ab19ec02240}{wRet}}==QDialog::Accepted)\ \{}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00095}00095\ \ \ \ \ Parser-\/>ConversionRules.push(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRuleDlg}}-\/>getConversionElt());}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00096}00096\ \ \ \ \ \mbox{\hyperlink{class_z_std_list_d_lg_aa41180a9a20d3de1b06156761e97ff36}{ZStdListDLg::AppendLine}}(\mbox{\hyperlink{class_z_parsing_rules_list_a0c31d236460f26940d2863b1bef2a231}{formatLine}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRuleDlg}}-\/>getConversionElt()));}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00097}00097\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00098}00098\ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRuleDlg}};}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00099}00099\ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00100}00100\ \}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00101}\mbox{\hyperlink{class_z_parsing_rules_list_a82280fd1046f0c829a49895e4115a9c9}{00101}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_parsing_rules_list_a82280fd1046f0c829a49895e4115a9c9}{ZParsingRulesList::DeleteCurrent}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRow}})\ \{}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00103}00103\ \ \ Parser-\/>ConversionRules.erase(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRow}});}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00104}00104\ \ \ \mbox{\hyperlink{class_z_std_list_d_lg_a275a737de13b236f73271b5566c03ff5}{ZStdListDLg::DeleteLine}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRow}});}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00105}00105\ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00106}00106\ \}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00107}\mbox{\hyperlink{class_z_parsing_rules_list_ac61686c124e678931428ef79a32f780d}{00107}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_parsing_rules_list_ac61686c124e678931428ef79a32f780d}{ZParsingRulesList::InsertCurrent}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRow}})\ \{}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00109}00109\ \ \ \mbox{\hyperlink{class_z_parsing_rules_d_lg}{ZParsingRulesDLg}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRuleDlg}}=\textcolor{keyword}{new}\ \mbox{\hyperlink{class_z_parsing_rules_d_lg}{ZParsingRulesDLg}}(Parser,\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00110}00110\ \ \ \textcolor{comment}{//\ \ wRuleDlg-\/>setup(Parser-\/>ConversionRules[pRow]);}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00111}00111\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_a2c56c55b930f51337c2f5ab19ec02240}{wRet}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRuleDlg}}-\/>exec();}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00112}00112\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{znet_2znetconsole_2main_8cpp_a2c56c55b930f51337c2f5ab19ec02240}{wRet}}==QDialog::Accepted)\ \{}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00113}00113\ \ \ \ \ Parser-\/>ConversionRules.insert(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRuleDlg}}-\/>getConversionElt(),\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRow}});}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00114}00114\ \ \ \ \ \mbox{\hyperlink{class_z_std_list_d_lg_ac94eb751fdbcb902f2e95715528fdf86}{ZStdListDLg::InsertLine}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRow}},\mbox{\hyperlink{class_z_parsing_rules_list_a0c31d236460f26940d2863b1bef2a231}{formatLine}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRuleDlg}}-\/>getConversionElt()));}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00115}00115\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00116}00116\ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRuleDlg}};}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00117}00117\ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{zparsingrules_8cpp_source_l00118}00118\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,68 @@
+\doxysection{zlayout.\+h}
+\hypertarget{zcontentutils_2zlayout_8h_source}{}\label{zcontentutils_2zlayout_8h_source}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zlayout.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zlayout.h}}
+\mbox{\hyperlink{zcontentutils_2zlayout_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZLAYOUT\_H}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ ZLAYOUT\_H}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00015}\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02}{00015}}\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02}{ZLayout\_type}}\ :\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\_t}}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00016}00016\ \{}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00017}\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a366c150ba517bee61f342d0e24f88c8b}{00017}}\ \ \ \mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a366c150ba517bee61f342d0e24f88c8b}{ZLayout\_Nothing}}\ \ \ \ \ \ \ \ \ =\ \ \ 0,}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00018}\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a18277be3fffe438f9d291fadb634bbf7}{00018}}\ \ \ \mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a18277be3fffe438f9d291fadb634bbf7}{ZLayout\_NoLayout}}\ \ \ \ \ \ \ \ =\ \ \ 0\ ,}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00019}00019\ \textcolor{comment}{/*\ \ ZLayout\_TaskMain\ \ \ \ \ \ \ \ =\ \ \ 0x01,}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00020}00020\ \textcolor{comment}{\ \ ZLayout\_PerDomain\ \ \ \ \ \ \ =\ \ \ 0x02,}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00021}00021\ \textcolor{comment}{\ \ ZLayout\_Generic\ \ \ \ \ \ \ \ \ =\ \ \ 0x03,}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00022}00022\ \textcolor{comment}{\ \ ZLayout\_PerProject\ \ \ \ \ \ =\ \ \ 0x08\ ,}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00023}00023\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00024}00024\ \textcolor{comment}{\ \ ZLayout\_DomainMain\ \ \ \ \ \ =\ \ \ 0x000010,}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00025}00025\ \textcolor{comment}{\ \ ZLayout\_SubDomainMain\ \ \ =\ \ \ 0x000020,}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00026}00026\ \textcolor{comment}{\ \ ZLayout\_ProjectMain\ \ \ \ \ =\ \ \ 0x000040,}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00027}00027\ \textcolor{comment}{\ \ ZLayout\_SubProjectMain\ \ =\ \ \ 0x000080,}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00028}00028\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00029}00029\ \textcolor{comment}{\ \ ZLayout\_ActivityMain\ \ \ \ =\ 0x00000100,}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00030}00030\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00031}00031\ \textcolor{comment}{\ \ ZLayout\_DocumentMain\ \ \ \ =\ 0x00001000,}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00032}00032\ \textcolor{comment}{\ \ ZLayout\_DocumentList\ \ \ \ =\ 0x00001000,\ //\ same\ as\ ZLayout\_DocumentMain\ do\ not\ confuse\ with\ Master}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00033}00033\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00034}00034\ \textcolor{comment}{\ \ ZLayout\_DocPhysical\ \ \ \ \ =\ 0x00002000,}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00035}00035\ \textcolor{comment}{\ \ ZLayout\_MasterDocumentMain\ \ =\ 0x00004000,}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00036}00036\ \textcolor{comment}{\ \ ZLayout\_Version\ \ \ \ \ \ \ \ \ =\ 0x00008000,}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00037}00037\ \textcolor{comment}{\ \ ZLayout\_MasterList\ \ \ \ \ \ =\ 0x00010000,\ \ //\ MasterList\ dialog}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00038}00038\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00039}00039\ \textcolor{comment}{\ \ ZLayout\_MemoMain\ \ \ \ \ \ \ \ =\ 0x01000000,}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00040}00040\ \textcolor{comment}{\ \ ZLayout\_MemoList\ \ \ \ \ \ \ \ =\ 0x02000000,\ //\ memo\ list\ dialog}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00041}00041\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00042}\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02ac04ca989dac6cca871f621b915d8165a}{00042}}\ \ \ \ \mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02ac04ca989dac6cca871f621b915d8165a}{ZLayout\_FieldTBv}}\ \ \ \ \ \ =\ \ \ 0x01,}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00043}\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a09e3bf9b1657e5dfbf95020c9efb1299}{00043}}\ \ \ \ \mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a09e3bf9b1657e5dfbf95020c9efb1299}{ZLayout\_KeyTRv}}\ \ \ \ \ \ \ \ =\ \ \ 0x02,}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00044}\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02aa7cf42a8c780a8bf338fc13db0d61a22}{00044}}\ \ \ \ \mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02aa7cf42a8c780a8bf338fc13db0d61a22}{ZLayout\_TypeDLg}}\ \ \ \ \ \ \ =\ \ \ 0x04,}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00046}\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02ac7153068a4432f480f20db7f8bd83557}{00046}}\ \ \ \ \mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02ac7153068a4432f480f20db7f8bd83557}{ZLayout\_ParsingResultTRv}}\ \ \ =\ \ \ 0x08,}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00047}\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a3c5746bbd0ee495e8098dda8e0d32342}{00047}}\ \ \ \ \mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a3c5746bbd0ee495e8098dda8e0d32342}{ZLayout\_ParsingFieldTBv}}\ \ \ =\ \ \ 0x10,}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00049}\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a23fdf8d24bf72beea9aa4778ad51d20e}{00049}}\ \ \ \ \ \mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a23fdf8d24bf72beea9aa4778ad51d20e}{ZLayout\_FileBlock}}\ =\ 0x20,}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00052}00052\ \ \ \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/Admin\ layouts-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00053}00053\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00054}\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a6bc8aee09a697f2f3acc866e6a0e1d1d}{00054}}\ \ \ \mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a6bc8aee09a697f2f3acc866e6a0e1d1d}{ZLayout\_VaultList}}\ \ \ \ \ \ \ =\ 0x00010000,\ \textcolor{comment}{//\ Administrator\ Vault\ list}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00055}\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02abd02fb1d51a5c177bfc02093bac115f2}{00055}}\ \ \ \mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02abd02fb1d51a5c177bfc02093bac115f2}{ZLayout\_UserList}}\ \ \ \ \ \ \ \ =\ 0x00020000,\ \textcolor{comment}{//\ Administrator\ User\ list}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00057}00057\ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/Following\ must\ stay\ and\ not\ be\ changed-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00059}\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a3e25060108f35e1c9d521ca2acec3557}{00059}}\ \ \ \mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a3e25060108f35e1c9d521ca2acec3557}{ZLayout\_TrashbinMain}}\ \ \ \ =\ 0x00200000,}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00060}\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02ae58190dcf324a4f60d4bba24e3693404}{00060}}\ \ \ \mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02ae58190dcf324a4f60d4bba24e3693404}{ZLayout\_PinboardMain}}\ \ \ \ =\ 0x00220000,}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00062}\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a3d28a7aca545408c8a6b79f3dd0f0a70}{00062}}\ \ \ \mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a3d28a7aca545408c8a6b79f3dd0f0a70}{ZLayout\_Mime}}\ \ \ \ \ \ \ \ \ \ \ \ =\ 0x01000000,}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00063}\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a22f40de39be1b7cfb92f72ff72f9de04}{00063}}\ \ \ \mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a22f40de39be1b7cfb92f72ff72f9de04}{ZLayout\_Clipboard}}\ \ \ \ \ \ \ =\ 0x03000000,}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00064}00064\ \ \ \mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a2e5abb58dc3a6b04c36f36cd574136c0}{ZLayout\_External}}\ \ \ \ \ \ \ \ =\ 0x11000000\ \ \textcolor{comment}{//\ when\ a\ drop\ occurs\ from\ outside\ :\ a\ file\ selection,\ an\ html\ content\ etc...}}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00066}\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02a2e5abb58dc3a6b04c36f36cd574136c0}{00066}}\ \};}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00068}00068\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\ \mbox{\hyperlink{zcontentutils_2zlayout_8h_ae4a9089928ab74e9248eb933f5de1ed0}{decode\_ZLayout}}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\_t}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pLayout}});}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00069}\mbox{\hyperlink{zcontentutils_2zlayout_8h_a7aa36b7f838da1b9a58b10fd586a0f38}{00069}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\ \mbox{\hyperlink{zcontentutils_2zlayout_8h_a7aa36b7f838da1b9a58b10fd586a0f38}{display\_ZLayout}}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\_t}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pLayout}});}
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{zcontentutils_2zlayout_8h_source_l00071}00071\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZLAYOUT\_H}}
+
+\end{DoxyCode}

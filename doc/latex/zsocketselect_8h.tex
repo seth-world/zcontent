@@ -1,0 +1,10 @@
+\doxysection{/home/gerard/\+Development/zbasetools/znet/zbasenet/zsocketselect.h File Reference}
+\hypertarget{zsocketselect_8h}{}\label{zsocketselect_8h}\index{/home/gerard/Development/zbasetools/znet/zbasenet/zsocketselect.h@{/home/gerard/Development/zbasetools/znet/zbasenet/zsocketselect.h}}
+{\ttfamily \#include $<$zbasenet/zbasesocket.\+h$>$}\newline
+Include dependency graph for zsocketselect.\+h\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_z_socket_select}{ZSocket\+Select}}
+\begin{DoxyCompactList}\small\item\em The \doxylink{class_z_socket_select}{ZSocket\+Select} class This socket class is created by the server when a ZBASE client connection is requested. This object uses ZBase protocol. Usage of this socket class is intended to be done within a ZThread thread. Each read operation is conditionned by a \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wait()} putting the thread in dormant state, waiting a wakeup. Before any read operation, Thread event queue is scanned and events are processed. Then read operation occurs. \end{DoxyCompactList}\end{DoxyCompactItemize}

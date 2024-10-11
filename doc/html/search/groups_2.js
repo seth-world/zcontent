@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['a_20damaged_20zmasterfile_20structure_0',['Recovering a damaged ZMasterFile structure',['../group___z_m_f_recovery.html',1,'']]],
+  ['a_20file_20as_20an_20other_20file_20type_20than_20the_20native_20one_1',['Opening a file as an other file type than the native one',['../group___z_r_f_z_file__type.html',1,'']]],
+  ['a_20file_20session_2',['what is a file session',['../group___z_r_f_session.html',1,'']]],
+  ['a_20record_20for_20a_20zrandomfile_20or_20zmasterfile_3',['Relative rank of a record for a ZRandomFile or ZMasterFile.',['../group__recordranks.html',1,'']]],
+  ['a_20special_20processing_20for_20key_20data_4',['Endianness imposes a special processing for key data.',['../group___endian_conversion.html',1,'']]],
+  ['a_20zrandomfile_20by_20field_20segment_20of_20record_5',['Accessing a ZRandomFile by Field (Segment of record)',['../group___z_r_f_field_access.html',1,'']]],
+  ['access_20file_20for_20content_20storage_6',['access file for content storage',['../group___z_master_file_group.html',1,'ZMasterFile : Indexed Random Access File for content storage'],['../group___z_random_file_group.html',1,'ZRandomFile Random Access File for content storage']]],
+  ['access_20information_20table_20fait_7',['File access information table  (FAIT)',['../group___main_file_access.html',1,'']]],
+  ['accessing_20a_20zrandomfile_20by_20field_20segment_20of_20record_8',['Accessing a ZRandomFile by Field (Segment of record)',['../group___z_r_f_field_access.html',1,'']]],
+  ['accessing_20zmasterfile_20and_20its_20indexes_9',['Accessing ZMasterFile and its indexes',['../group___z_master_file_access.html',1,'']]],
+  ['an_20average_20size_20of_20record_20length_10',['BlockTargetSize : an average size of record length',['../group___z_r_f_block_target_size.html',1,'']]],
+  ['an_20other_20file_20type_20than_20the_20native_20one_11',['Opening a file as an other file type than the native one',['../group___z_r_f_z_file__type.html',1,'']]],
+  ['and_20block_20record_20locking_20mechanism_12',['ZRandomFile File and Block (record) locking mechanism',['../group___z_r_f_lock_group.html',1,'']]],
+  ['and_20conversions_20for_20file_20record_20storage_20and_20indexing_13',['Data types and conversions for file record storage and indexing',['../group___d_a_t_a_f_o_r_m_a_t_g_r_o_u_p.html',1,'']]],
+  ['and_20from_20universal_20format_14',['Low level routines : templates for conversion to and from Universal format ========================',['../group___l_l_r_t_c.html',1,'']]],
+  ['and_20history_20management_15',['Journaling and History management',['../group___z_journaling.html',1,'']]],
+  ['and_20holes_20to_20compact_20the_20file_20structure_16',['Grabbing free space blocks and holes to compact the file structure',['../group___z_r_f_grab_free_space.html',1,'']]],
+  ['and_20its_20indexes_17',['Accessing ZMasterFile and its indexes',['../group___z_master_file_access.html',1,'']]],
+  ['and_20statistical_20tools_20for_20zrandomfile_18',['Dump utilities and Statistical tools for ZRandomFile',['../group___z_r_f_s_t_a_t_s.html',1,'']]],
+  ['and_20zmasterfile_20zindexfile_19',['Tests plans for ZRandomFile and ZMasterFile ZIndexFile',['../group___z_r_f_z_m_f_test_plan.html',1,'']]],
+  ['as_20an_20other_20file_20type_20than_20the_20native_20one_20',['Opening a file as an other file type than the native one',['../group___z_r_f_z_file__type.html',1,'']]],
+  ['average_20size_20of_20record_20length_21',['BlockTargetSize : an average size of record length',['../group___z_r_f_block_target_size.html',1,'']]]
+];

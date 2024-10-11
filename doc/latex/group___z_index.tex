@@ -1,0 +1,1005 @@
+\doxysection{ZIndex}
+\hypertarget{group___z_index}{}\label{group___z_index}\index{ZIndex@{ZIndex}}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacezbs}{zbs}}
+\begin{DoxyCompactList}\small\item\em ZSIndex\+Field\+\_\+struct Dictionary single field definition \+: one key may be composed of many single fields not necessarily contiguous in the master file\textquotesingle{}s data structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_ga08c9954a6e1cdb989f35a131900fe662}{skip\+URFUntil\+Position}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Position}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBitset}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Field\+Presence}})
+\begin{DoxyCompactList}\small\item\em skip\+URFUntil\+Position parse an URF formatted record pointed by p\+Ptr\+In and skip URF fields (present or not present vs p\+Field\+Presence) until position p\+Position. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_gab998bd64b0af900a31521f254de112d6}{extract\+URF\+\_\+\+Append}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URFOut}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}})
+\begin{DoxyCompactList}\small\item\em URFCompare Compare two buffers composed each of one or many URF fields, each field potentially of variable length. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{group___z_index_ga05bfe1b476825b0426668ef3d5da617c}{display\+URFCompare}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pR}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr1}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr2}})
+\begin{DoxyCompactList}\small\item\em URFCompare Compare two buffers composed each of one or many URF fields, each field potentially of variable length. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} \mbox{\hyperlink{group___z_index_ga27dd9dc688ebf40331000ce79ed6bb10}{zbs\+::\+ZRaw\+Index\+File\+::get\+Run\+Mode}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{group___z_index_gafe7c4f449c677a6ae57778b82fea65b1}{zbs\+::\+ZRaw\+Index\+File\+::is\+Search\+Dycho}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{group___z_index_ga943952f50cac3ec34e2d7d2776c40b69}{zbs\+::\+ZRaw\+Index\+File\+::is\+Debug}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{group___z_index_ga313af01d0c6004662a5d3b7aad411099}{zbs\+::\+ZRaw\+Index\+File\+::is\+Update\+Header}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{group___z_index_gaea36d4b902ad7f0265d4e7168e578c6b}{zbs\+::\+ZRaw\+Index\+File\+::show\+Run\+Mode}} ()
+\item 
+\mbox{\hyperlink{group___z_index_gac9392f7d3ef02b243f1e9545b5492f3c}{zbs\+::\+ZRaw\+Index\+File\+::\+ZRaw\+Index\+File}} (\mbox{\hyperlink{classzbs_1_1_z_raw_index_file_a0946fce639f2f019f7f893cf1aa8a82f}{ZRaw\+Master\+File}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Father}})
+\begin{DoxyCompactList}\small\item\em ZIndex\+File first constructor version \+: the common one. It sets up the ZIndex\+File parameters AND rebuild the index if p\+Auto\+Rebuild is set to true (default value is true). If ZIX rebuild is done, there must not be any ZS\+\_\+\+DUPLICATEKEY during the rebuild if ZIndex\+File duplicates option is set to ZST\+\_\+\+NODUPLICATES. If so, \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{abort()} will be called (after having appropriately destroyed objects on father ZAM side). \end{DoxyCompactList}\item 
+\mbox{\hyperlink{group___z_index_ga87afc0d9faa4723d1da7f9eedd1b3551}{zbs\+::\+ZRaw\+Index\+File\+::\+ZRaw\+Index\+File}} (\mbox{\hyperlink{classzbs_1_1_z_raw_index_file_a0946fce639f2f019f7f893cf1aa8a82f}{ZRaw\+Master\+File}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Father}}, \mbox{\hyperlink{classzbs_1_1_z_index_control_block}{ZIndex\+Control\+Block}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZICB}})
+\item 
+\mbox{\hyperlink{group___z_index_gacc0b6b7e04a2170128380dfde75b9f2b}{zbs\+::\+ZRaw\+Index\+File\+::\+ZRaw\+Index\+File}} (\mbox{\hyperlink{classzbs_1_1_z_raw_index_file_a0946fce639f2f019f7f893cf1aa8a82f}{ZRaw\+Master\+File}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Father}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pkeyguessedsize}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Name}}, \mbox{\hyperlink{zcontentconstants_8h_a3b02d1f4a8007be50cd643b65bb0cdce}{ZSort\+\_\+\+Type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Duplicates}}=\mbox{\hyperlink{zcontentconstants_8h_a3b02d1f4a8007be50cd643b65bb0cdceaa6da478ad26e3ef61b7009d726945de1}{ZST\+\_\+\+No\+Duplicates}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_ga2711fe4235025121991cc8efe5d29123}{zbs\+::\+ZRaw\+Index\+File\+::set\+Index\+URI}} (uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Uri}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{group___z_index_gae46ccea04d68b3c48784ffbca56d124b}{zbs\+::\+ZRaw\+Index\+File\+::set\+Index\+Name}} (\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Name}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_ga3cf78b7f487ed1b27bbd94e07568b829}{zbs\+::\+ZRaw\+Index\+File\+::remove\+Index\+Files}} (Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}})
+\begin{DoxyCompactList}\small\item\em \doxylink{group___z_index_ga3cf78b7f487ed1b27bbd94e07568b829}{ZRaw\+Index\+File\+::remove\+Index\+Files} Removes all files composing current index (before index remove at \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} level) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_gae00198ba8d83b0b6cbe8b58651a7ab2e}{zbs\+::\+ZRaw\+Index\+File\+::zcreate\+Index\+File}} (\mbox{\hyperlink{classzbs_1_1_z_index_control_block}{ZIndex\+Control\+Block}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ICB}}, uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Uri}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Allocated\+Blocks}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Block\+Extent\+Quota}}, \mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Initial\+Size}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Highwater\+Marking}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Grab\+Free\+Space}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Backup}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Leave\+Open}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}})
+\begin{DoxyCompactList}\small\item\em zcreate\+Index\+File creates a new index file corresponding to the given specification ICB and ZRF parameters \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_gada1eb47358b9762a69d58f3c153c8486}{zbs\+::\+ZRaw\+Index\+File\+::zcreate\+Index\+File}} (\mbox{\hyperlink{classzbs_1_1_z_index_control_block}{ZIndex\+Control\+Block}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ICB}}, uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Uri}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Allocated\+Blocks}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Block\+Extent\+Quota}}, \mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Initial\+Size}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Block\+Target\+Size}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Highwater\+Marking}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Grab\+Free\+Space}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Backup}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Leave\+Open}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}})
+\begin{DoxyCompactList}\small\item\em ZIndex\+File\+::zcreate\+Index creates a new index file corresponding to the given specification ICB and ZRF parameters same as previous but with explicit p\+Block\+Target\+Size. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_ga6ab8b62d58314d11fe3874ffa309876d}{zbs\+::\+ZRaw\+Index\+File\+::open\+Index\+File}} (uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Uri}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Rank}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Mode}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_ga4206ed3ef2026fa3f60567515820bb57}{zbs\+::\+ZRaw\+Index\+File\+::close\+Index\+File}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_gac4ce4346bbb05218824e4db581ea0be8}{zbs\+::\+ZRaw\+Index\+File\+::write\+Index\+Control\+Block}} ()
+\begin{DoxyCompactList}\small\item\em ZIndex\+File\+::write\+Index\+Control\+Block. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_ga5fe2c7afb713770bc022e49ca28bdb0d}{zbs\+::\+ZRaw\+Index\+File\+::extract\+All\+URFKey\+Fields}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+Content}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_array}{ZArray}}$<$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} $>$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Position}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBitset}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Field\+Presence}})
+\begin{DoxyCompactList}\small\item\em search\+URFField searches for a record field in p\+Ptr\+In, extracts its URF value and appends it to p\+Key\+Content. record field is searched using its position given by p\+Position. A control is made with p\+Field\+Presence \+: field must be present. If not, ZS\+\_\+\+OMITTED is returned. When found and set, ZS\+\_\+\+SUCCESS is returned. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_gaa41762741207b55a52d8f4c49a05c054}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+Dycho\+Unique}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+To\+Search}}, \mbox{\hyperlink{classzbs_1_1_z_index_item}{ZIndex\+Item}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Out\+Index\+Item}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}=\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}})
+\begin{DoxyCompactList}\small\item\em \doxylink{group___z_index_ga925bf2668c3b041753d63902034df170}{ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+Unique} Searches for a UNIQUE value for a given index without duplicates and in any cases sets p\+Out\+Index\+Item with accurate values \+: \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_gaa4c7fb4198539485bec6609422677856}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFtest\+Rank}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+To\+Search}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Rank}}, \mbox{\hyperlink{classzbs_1_1_z_index_item}{ZIndex\+Item}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Item}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Return}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_ga925bf2668c3b041753d63902034df170}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+Unique}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+To\+Search}}, \mbox{\hyperlink{classzbs_1_1_z_index_item}{ZIndex\+Item}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Item}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}=\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_ga7d696bcc8a934c01fc3b7bb0b9a9735a}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+All}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+To\+Search}}, \mbox{\hyperlink{classzbs_1_1_z_index_collection}{ZIndex\+Collection}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Collection}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}=\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_ga77efa003e349396c99a4587a29778ae9}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+All}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key}}, \mbox{\hyperlink{classzbs_1_1_z_index_collection}{ZIndex\+Collection}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Collection}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{namespacezbs_aee464cc6188e7e60204b2778aa1a51d9}{ZMatch\+Size\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZMS}}=\mbox{\hyperlink{namespacezbs_aee464cc6188e7e60204b2778aa1a51d9a0f05de5fcc6321bf8122b09f7e1aa953}{ZMS\+\_\+\+Match\+Index\+Size}})
+\begin{DoxyCompactList}\small\item\em ZRaw\+Index\+File\+::\+\_\+\+Rawsearch Searches for a FIRST or UNIQUE value for a given index. This search may be EXACT or PARTIAL. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_gaa0270cfbe4167c02a37651023ed35447}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+First}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+Content}}, \mbox{\hyperlink{classzbs_1_1_z_index_collection}{ZIndex\+Collection}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Collection}}, \mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZIR}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{namespacezbs_aee464cc6188e7e60204b2778aa1a51d9}{ZMatch\+Size\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZMS}})
+\begin{DoxyCompactList}\small\item\em ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+First search ZIndex\+File p\+ZIF for a first match of p\+Key (first in key order) and return s a ZSIndex\+Result. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_gae21b734d530e7254afc9561d5f6ffb82}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+Next}} (\mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZIR}}, \mbox{\hyperlink{classzbs_1_1_z_index_collection}{ZIndex\+Collection}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Collection}})
+\begin{DoxyCompactList}\small\item\em ZIndex\+File\+::\+\_\+\+Rawsearch\+Next. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{static}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_ga60279bdd7c5d4bf9feb13f7c1045aff9}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+Interval\+All}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+Low}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+High}}, \mbox{\hyperlink{classzbs_1_1_z_raw_index_file}{ZRaw\+Index\+File}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZIF}}, \mbox{\hyperlink{classzbs_1_1_z_index_collection}{ZIndex\+Collection}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Collection}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Exclude}})
+\begin{DoxyCompactList}\small\item\em \doxylink{group___z_index_ga60279bdd7c5d4bf9feb13f7c1045aff9}{ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+Interval\+All} searches all index key value from ZIndex\+File p\+ZIF corresponding to Interval given by p\+Key\+Low as lowest value for range and p\+Key\+High as highest value for range. p\+Key\+Low and p\+Key\+High may be included in range if p\+Exclude is false, or exclude from range if p\+Exclude is true. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{static}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_gaf34b3d0ddf1dc39f5df155a7eaa02fc0}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+Interval\+First}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+Low}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+High}}, \mbox{\hyperlink{classzbs_1_1_z_raw_index_file}{ZRaw\+Index\+File}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZIF}}, \mbox{\hyperlink{classzbs_1_1_z_index_collection}{ZIndex\+Collection}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Collection}}, \mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZIR}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Exclude}})
+\begin{DoxyCompactList}\small\item\em ZIndex\+File\+::\+\_\+\+Rawsearch\+Interval\+First. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{static}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_ga16bcbfeb18fc3168f17259efcb259f03}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+Interval\+Next}} (\mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZIR}}, \mbox{\hyperlink{classzbs_1_1_z_index_collection}{ZIndex\+Collection}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Collection}})
+\begin{DoxyCompactList}\small\item\em ZIndex\+File\+::\+\_\+\+Rawsearch\+Interval\+Next. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{group___z_index_ga5eb263c505dbb8ec5574eb469ce00483}{zbs\+::\+ZRaw\+Index\+File\+::to\+Xml}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Level}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Comment}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_index_gaaa35db7cc8798e8dc893cebdcb43d607}{zbs\+::\+ZRaw\+Index\+File\+::from\+Xml}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zxml\+Node}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Node}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Errorlog}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{group___z_index_ga60279bdd7c5d4bf9feb13f7c1045aff9}\label{group___z_index_ga60279bdd7c5d4bf9feb13f7c1045aff9} 
+\index{ZIndex@{ZIndex}!\_RawsearchIntervalAll@{\_RawsearchIntervalAll}}
+\index{\_RawsearchIntervalAll@{\_RawsearchIntervalAll}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{\_RawsearchIntervalAll()}{\_RawsearchIntervalAll()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+Interval\+All (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Key\+Low,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Key\+High,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_raw_index_file}{ZRaw\+Index\+File}} \&}]{p\+ZIF,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_index_collection}{ZIndex\+Collection}} \texorpdfstring{$\ast$}{*}}]{p\+Collection,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Exclude }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+\doxylink{group___z_index_ga60279bdd7c5d4bf9feb13f7c1045aff9}{ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+Interval\+All} searches all index key value from ZIndex\+File p\+ZIF corresponding to Interval given by p\+Key\+Low as lowest value for range and p\+Key\+High as highest value for range. p\+Key\+Low and p\+Key\+High may be included in range if p\+Exclude is false, or exclude from range if p\+Exclude is true. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Key\+Low} & Lowest key content value to find out in index \mbox{[}stored in collection\textquotesingle{}s context\mbox{]} \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Key\+High} & Highest key content value to find out in index \mbox{[}stored in collection\textquotesingle{}s context\mbox{]} \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+ZIF} & ZIndex\+File object \mbox{[}stored in collection\mbox{]} \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+Collection} & ZSIndex\+Collection object created by the routine. It stores the resulting set of reference to found ZIndex\+File-\/\+ZMaster\+File records. \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+ZIR} & ZSIndex\+Result giving the result of the first search if any \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Exclude} & Exclude Key\+Low and Key\+High value from selection (i. e. \texorpdfstring{$>$}{>} p\+Key\+Low and \texorpdfstring{$<$}{<} p\+Key\+High) this option is stored within Collection context using operation code \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Lock} & Lock mask to apply to found records \mbox{[}stored in collection\textquotesingle{}s context\mbox{]}\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError}
+\begin{DoxyItemize}
+\item ZS\+\_\+\+FOUND in case of success (And NOT ZS\+\_\+\+SUCCESS)
+\item ZS\+\_\+\+OUTBOUNDLOW if key value in lower than the lowest (first) index value
+\item ZS\+\_\+\+OUTBOUNDHIGH if key value is higher than the highest (last) index value
+\item ZS\+\_\+\+NOTFOUND if key value is not found in the middle of index values set 
+\end{DoxyItemize}
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l03710}{3710}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrawindexfile_8cpp_source_l03750}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+Interval\+First()}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l03989}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+Interval\+Next()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{group___z_index_gaf34b3d0ddf1dc39f5df155a7eaa02fc0}\label{group___z_index_gaf34b3d0ddf1dc39f5df155a7eaa02fc0} 
+\index{ZIndex@{ZIndex}!\_RawsearchIntervalFirst@{\_RawsearchIntervalFirst}}
+\index{\_RawsearchIntervalFirst@{\_RawsearchIntervalFirst}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{\_RawsearchIntervalFirst()}{\_RawsearchIntervalFirst()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+Interval\+First (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Key\+Low,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Key\+High,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_raw_index_file}{ZRaw\+Index\+File}} \&}]{p\+ZIF,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_index_collection}{ZIndex\+Collection}} \texorpdfstring{$\ast$}{*}}]{p\+Collection,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&}]{p\+ZIR,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Exclude }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+ZIndex\+File\+::\+\_\+\+Rawsearch\+Interval\+First. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Key\+Low} & Lowest key content value to find out in index \mbox{[}stored in collection\textquotesingle{}s context\mbox{]} \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Key\+High} & Highest key content value to find out in index \mbox{[}stored in collection\textquotesingle{}s context\mbox{]} \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+ZIF} & ZIndex\+File object \mbox{[}stored in collection\mbox{]} \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+Collection} & ZSIndex\+Collection object created by the routine. \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+ZIR} & ZSIndex\+Result giving the result of the first search if any \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Exclude} & Exclude Key\+Low and Key\+High value from selection (i. e. \texorpdfstring{$>$}{>} p\+Key\+Low and \texorpdfstring{$<$}{<} p\+Key\+High) this option is stored within Collection context using operation code \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Lock} & Lock mask to apply to found records \mbox{[}stored in collection\textquotesingle{}s context\mbox{]} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l03750}{3750}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindexitem_8h_source_l00047}{zbs\+::\+ZIndex\+Item\+::clear()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{urfparser_8cpp_source_l01963}{URFCompare\+Ptr()}}, \mbox{\hyperlink{zindexcollection_8h_source_l00037}{zbs\+::\+ZCOP\+\_\+\+Exclude}}, \mbox{\hyperlink{zindexcollection_8h_source_l00039}{zbs\+::\+ZCOP\+\_\+\+Get\+First}}, \mbox{\hyperlink{zindexcollection_8h_source_l00036}{zbs\+::\+ZCOP\+\_\+\+Interval}}, \mbox{\hyperlink{zrawindexfile_8h_source_l00101}{zbs\+::\+ZRaw\+Index\+File\+::\+ZIndex\+Collection}}, and \mbox{\hyperlink{zlock_8h_source_l00116}{ZLock\+\_\+\+Nolock}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawindexfile_8cpp_source_l03710}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+Interval\+All()}}.
+
+\Hypertarget{group___z_index_ga16bcbfeb18fc3168f17259efcb259f03}\label{group___z_index_ga16bcbfeb18fc3168f17259efcb259f03} 
+\index{ZIndex@{ZIndex}!\_RawsearchIntervalNext@{\_RawsearchIntervalNext}}
+\index{\_RawsearchIntervalNext@{\_RawsearchIntervalNext}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{\_RawsearchIntervalNext()}{\_RawsearchIntervalNext()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+Interval\+Next (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&}]{p\+ZIR,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_index_collection}{ZIndex\+Collection}} \texorpdfstring{$\ast$}{*}}]{p\+Collection }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+ZIndex\+File\+::\+\_\+\+Rawsearch\+Interval\+Next. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em p\+ZIR} & \\
+\hline
+ & {\em \mbox{[}in-\/out\mbox{]}} & p\+Collection \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l03989}{3989}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindexitem_8cpp_source_l00046}{zbs\+::\+ZIndex\+Item\+::from\+File\+Key()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexitem_8h_source_l00040}{zbs\+::\+ZIndex\+Item\+::\+Index\+Address}}, \mbox{\hyperlink{urfparser_8cpp_source_l01963}{URFCompare\+Ptr()}}, \mbox{\hyperlink{zindexcollection_8h_source_l00037}{zbs\+::\+ZCOP\+\_\+\+Exclude}}, \mbox{\hyperlink{zindexcollection_8h_source_l00040}{zbs\+::\+ZCOP\+\_\+\+Get\+Next}}, and \mbox{\hyperlink{zindexcollection_8h_source_l00036}{zbs\+::\+ZCOP\+\_\+\+Interval}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawindexfile_8cpp_source_l03710}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+Interval\+All()}}.
+
+\Hypertarget{group___z_index_ga77efa003e349396c99a4587a29778ae9}\label{group___z_index_ga77efa003e349396c99a4587a29778ae9} 
+\index{ZIndex@{ZIndex}!\_URFsearchAll@{\_URFsearchAll}}
+\index{\_URFsearchAll@{\_URFsearchAll}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{\_URFsearchAll()}{\_URFsearchAll()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+All (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Key,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_index_collection}{ZIndex\+Collection}} \&}]{p\+Collection,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{namespacezbs_aee464cc6188e7e60204b2778aa1a51d9}{ZMatch\+Size\+\_\+type}}}]{p\+ZMS = {\ttfamily \mbox{\hyperlink{namespacezbs_aee464cc6188e7e60204b2778aa1a51d9a0f05de5fcc6321bf8122b09f7e1aa953}{ZMS\+\_\+\+Match\+Index\+Size}}} }\end{DoxyParamCaption})}
+
+
+
+ZRaw\+Index\+File\+::\+\_\+\+Rawsearch Searches for a FIRST or UNIQUE value for a given index. This search may be EXACT or PARTIAL. 
+
+Size of comparison is given by the Size field fo p\+Key (ZData\+Buffer) \+: if partial key Size will be shorter than Index key size.
+\begin{DoxyItemize}
+\item Exact is when comparizon size is the whole index key internal size
+\item Partial is when comparison is made on the size of the given key (may be a fragment of index key)
+\item Exact \+: means that both content (Key content and index content) much match exactly in terms of size AND content.
+\item First or Unique \+: means that a unique index rank is returned corresponding to the unique index content value if found or the first index value matching in case of multiple values found in index (ZST\+\_\+\+Duplicates).
+\item Exact search with duplicate key index \+: the first matching value found is returned. What is returned is not the first matching value in Index order but the first found value according the search algorithm.
+\item Partial search \+: the first matching value found is returned. What is returned is not the first matching value in Index order but the first found value according the search algorithm.
+\item Exact search with no duplicate key index \+: the unique found value is returned
+\end{DoxyItemize}
+
+Returns a ZSIndex\+Result structure for the unique index reference if found \+: Index record rank ; \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} corresponding address see \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZSIndex\+Result}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Key} & key content to find. Key has to be in Key internal format to be compared \+: formatted using \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+format\+Key\+Content()} routine \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+ZIF} & ZIndex\+File object to search on\\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+ZIR} & a ZSIndex\+Result object with ZIndex\+File relative key position (rank within index file) corresponding to key content if found associated to \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} corresponding record (block) address. \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+ZIFCompare} & comparizon routine. Either \doxylink{namespacezbs_a606087edde1d3e51fc9cef0bf788122e}{ZKey\+Compare\+Alpha()} or \doxylink{namespacezbs_a95832962cabb653b5034ee79f2b56008}{ZKey\+Compare\+Binary()}. \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Lock} & a zlock\+\_\+type mask build using ZLock\+Mask\+\_\+type containing the lock mask to apply onto the found records. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+this lock mask applies to \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} records. Indexes are never locked.
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError}
+\begin{DoxyItemize}
+\item ZS\+\_\+\+FOUND in case of success (And NOT ZS\+\_\+\+SUCCESS)
+\item ZS\+\_\+\+OUTBOUNDLOW if key value in lower than the lowest (first) index value
+\item ZS\+\_\+\+OUTBOUNDHIGH if key value is higher than the highest (last) index value
+\item ZS\+\_\+\+NOTFOUND if key value is not found in the middle of index values set
+\end{DoxyItemize}
+\end{DoxyReturn}
+ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+All Search for ALL index ranks matching EXACTLY a certain key value. Key value cannot be partial. The size of Index key value defines the length to compare with given key value p\+Key.
+
+\begin{DoxyParagraph}{return s}
+
+\begin{DoxyItemize}
+\item a ZSIndex\+Collection gathering a collection of ZSIndex\+Result\+\_\+struct i. e. \+:
+\begin{DoxyItemize}
+\item ZIndex\+File ranks of indexes matching key value
+\item \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} corresponding address
+\end{DoxyItemize}
+\end{DoxyItemize}
+\end{DoxyParagraph}
+\begin{DoxyParagraph}{Record lock (RFFU-\/not yet implemented)}
+
+\end{DoxyParagraph}
+Record locking is done \textquotesingle{}All at once\textquotesingle{}
+
+
+\begin{DoxyItemize}
+\item Key index values are first searched with no lock.
+\item When collection has been found, then whole collection is locked if necessary (p\+Lock != ZLock\+\_\+\+Nolock)
+\item Locks do not appy on indexes by on \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} main content
+\item In case of error (may be already locked), already locked collection items are unlocked before return ing errored ZStatus.
+\end{DoxyItemize}
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Key} & key content to find. Key has to be formatted using \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+format\+Key\+Content()} routine \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+ZIF} & ZIndex\+File object to search on \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+Collection} & contains the resulting collection of ZSIndex\+Result objects \{Index rank ; ZMF blockaddress\} for the matched elements\\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+ZMS} & defines whether comparison is Exact or Partial see \doxylink{namespacezbs_aee464cc6188e7e60204b2778aa1a51d9}{ZMatch\+Size\+\_\+type}. Defaulted to ZMS\+\_\+\+Match\+Key\+Size
+\begin{DoxyItemize}
+\item ZSC\+\_\+\+Match\+Key\+Size then comparizon is partial \+: comparizon size is made on Key size and key may be partial
+\item ZSC\+\_\+\+Match\+Index\+Size then comparison is exact \+: comparison is made on the whole index key size
+\end{DoxyItemize}\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError}
+\begin{DoxyItemize}
+\item ZS\+\_\+\+FOUND in case of success (And NOT ZS\+\_\+\+SUCCESS)
+\item ZS\+\_\+\+OUTBOUNDLOW if key value in lower than the lowest (first) index value
+\item ZS\+\_\+\+OUTBOUNDHIGH if key value is higher than the highest (last) index value
+\item ZS\+\_\+\+NOTFOUND if key value is not found in the middle of index values set
+\item ZS\+\_\+\+INVSIZE if search is requested on exact key and given key size is not equal to index key size 
+\end{DoxyItemize}
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l02644}{2644}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindexitem_8h_source_l00047}{zbs\+::\+ZIndex\+Item\+::clear()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrawindexfile_8h_source_l00219}{zbs\+::\+ZRaw\+Index\+File\+::get\+Current\+Rank()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00800}{zbs\+::\+ZRaw\+Index\+File\+::get\+Size()}}, \mbox{\hyperlink{zmfstats_8h_source_l00027}{ZMFStats\+::\+Iterations}}, \mbox{\hyperlink{zrandomfile_8h_source_l00795}{zbs\+::\+ZRaw\+Index\+File\+::last\+Idx()}}, \mbox{\hyperlink{zmfstats_8h_source_l00029}{ZMFStats\+::\+Reads}}, \mbox{\hyperlink{urfparser_8cpp_source_l01963}{URFCompare\+Ptr()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l05329}{zbs\+::\+ZRaw\+Index\+File\+::zget()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l05427}{zbs\+::\+ZRaw\+Index\+File\+::zget\+Next()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l05736}{zbs\+::\+ZRandom\+File\+::zget\+Previous()}}, \mbox{\hyperlink{zlock_8h_source_l00116}{ZLock\+\_\+\+Nolock}}, and \mbox{\hyperlink{zrawindexfile_8h_source_l00117}{zbs\+::\+ZRaw\+Index\+File\+::\+ZPMSStats}}.
+
+\Hypertarget{group___z_index_ga7d696bcc8a934c01fc3b7bb0b9a9735a}\label{group___z_index_ga7d696bcc8a934c01fc3b7bb0b9a9735a} 
+\index{ZIndex@{ZIndex}!\_URFsearchAll@{\_URFsearchAll}}
+\index{\_URFsearchAll@{\_URFsearchAll}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{\_URFsearchAll()}{\_URFsearchAll()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+All (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Key\+To\+Search,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_index_collection}{ZIndex\+Collection}} \&}]{p\+Index\+Collection,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock = {\ttfamily \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l02344}{2344}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrawindexfile_8cpp_source_l02246}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFtest\+Rank()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexitem_8h_source_l00040}{zbs\+::\+ZIndex\+Item\+::\+Index\+Address}}, \mbox{\hyperlink{zindexcontrolblock_8h_source_l00085}{zbs\+::\+ZICBOwn\+Data\+::\+Index\+Name}}, and \mbox{\hyperlink{zrandomfile_8h_source_l00795}{zbs\+::\+ZRaw\+Index\+File\+::last\+Idx()}}.
+
+\Hypertarget{group___z_index_gaa41762741207b55a52d8f4c49a05c054}\label{group___z_index_gaa41762741207b55a52d8f4c49a05c054} 
+\index{ZIndex@{ZIndex}!\_URFsearchDychoUnique@{\_URFsearchDychoUnique}}
+\index{\_URFsearchDychoUnique@{\_URFsearchDychoUnique}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{\_URFsearchDychoUnique()}{\_URFsearchDychoUnique()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+Dycho\+Unique (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Key\+To\+Search,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_index_item}{ZIndex\+Item}} \&}]{p\+Out\+Index\+Item,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock = {\ttfamily \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}}} }\end{DoxyParamCaption})}
+
+
+
+\doxylink{group___z_index_ga925bf2668c3b041753d63902034df170}{ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+Unique} Searches for a UNIQUE value for a given index without duplicates and in any cases sets p\+Out\+Index\+Item with accurate values \+: 
+
+
+\begin{DoxyItemize}
+\item key content,
+\item master file address ,
+\item last accessed index record address,
+\item last accessed index record rank
+
+This search may be EXACT or PARTIAL.
+\end{DoxyItemize}
+
+Size of comparison is given by the Size field fo p\+Key (ZData\+Buffer) \+: if partial key Size will be shorter than Index key size.
+\begin{DoxyItemize}
+\item Exact is when comparizon size is the whole index key internal size
+\item Partial is when comparison is made on the size of the given key (may be a fragment of index key)
+\item Exact \+: means that both content (Key content and index content) much match exactly in terms of size AND content.
+\item First or Unique \+: means that a unique index rank is returned corresponding to the unique index content value if found or the first index value matching in case of multiple values found in index (ZST\+\_\+\+Duplicates).
+\item Exact search with duplicate key index \+: the first matching value found is returned. What is returned is not the first matching value in Index order but the first found value according the search algorithm.
+\item Partial search \+: the first matching value found is returned. What is returned is not the first matching value in Index order but the first found value according the search algorithm.
+\item Exact search with no duplicate key index \+: the unique found value is returned
+\end{DoxyItemize}
+
+Returns a ZSIndex\+Result structure for the unique index reference if found \+: Index record rank ; \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} corresponding address see \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZSIndex\+Result}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Key\+To\+Search} & key content to find \+: one or more URF formatted fields\\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+Out\+Index\+Item} & a \doxylink{classzbs_1_1_z_index_item}{ZIndex\+Item} object with ZIndex\+File relative key position (rank within index file) corresponding to key content if found associated to \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} corresponding record (block) address and many other informations. \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Lock} & a zlock\+\_\+type mask build using ZLock\+Mask\+\_\+type containing the lock mask to apply onto the found records. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+this lock mask applies to Master File record. Indexes are never locked. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError}
+\begin{DoxyItemize}
+\item ZS\+\_\+\+FOUND in case of success (And NOT ZS\+\_\+\+SUCCESS). p\+Out\+Index\+Item is filled with found index record values.
+\item ZS\+\_\+\+OUTBOUNDLOW if key value in lower than the lowest (first) index value. p\+Out\+Index\+Item is filled with last processed index record values.
+\item ZS\+\_\+\+OUTBOUNDHIGH if key value is higher than the highest (last) index value. p\+Out\+Index\+Item is filled with last processed index record values.
+\item ZS\+\_\+\+NOTFOUND if key value is not found in the middle of index values set. p\+Out\+Index\+Item is filled with last processed index record values i. e. exact index to insert key if necessary. other status \+: any status that may be given by underneeth ZRandow\+File access routines. These are severe errors. 
+\end{DoxyItemize}
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l02092}{2092}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrawindexfile_8cpp_source_l02246}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFtest\+Rank()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00800}{zbs\+::\+ZRaw\+Index\+File\+::get\+Size()}}, \mbox{\hyperlink{zmfstats_8h_source_l00027}{ZMFStats\+::\+Iterations}}, \mbox{\hyperlink{zrandomfile_8h_source_l00795}{zbs\+::\+ZRaw\+Index\+File\+::last\+Idx()}}, and \mbox{\hyperlink{zrawindexfile_8h_source_l00117}{zbs\+::\+ZRaw\+Index\+File\+::\+ZPMSStats}}.
+
+\Hypertarget{group___z_index_gaa0270cfbe4167c02a37651023ed35447}\label{group___z_index_gaa0270cfbe4167c02a37651023ed35447} 
+\index{ZIndex@{ZIndex}!\_URFsearchFirst@{\_URFsearchFirst}}
+\index{\_URFsearchFirst@{\_URFsearchFirst}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{\_URFsearchFirst()}{\_URFsearchFirst()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+First (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Key\+Content,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_index_collection}{ZIndex\+Collection}} \texorpdfstring{$\ast$}{*}}]{p\+Collection,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&}]{p\+ZIR,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{namespacezbs_aee464cc6188e7e60204b2778aa1a51d9}{ZMatch\+Size\+\_\+type}}}]{p\+ZMS }\end{DoxyParamCaption})}
+
+
+
+ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+First search ZIndex\+File p\+ZIF for a first match of p\+Key (first in key order) and return s a ZSIndex\+Result. 
+
+
+\begin{DoxyItemize}
+\item ZIndex\+File rank \+: index file relative position of key found
+\item \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} corresponding record (block) address
+\end{DoxyItemize}
+
+\begin{DoxyParagraph}{Accessing collection of selected records}
+
+\end{DoxyParagraph}
+ZIndex\+File\+::\+\_\+\+Rawsearch\+First() and ZIndex\+File\+::\+\_\+\+Rawsearch\+Next() works using a search context ( ZIndex\+Search\+Context )that maintains a collection of found records (ZSIndex\+Collection)
+
+To get access to this collection, you may use the following syntax $<$search context name$>$-\/\texorpdfstring{$>$}{>}Collection-\/\texorpdfstring{$>$}{>}$<$function to use$>$
+
+You may then use collection to
+\begin{DoxyItemize}
+\item refine the search with sequential adhoc fields matches
+\item use mass operations (lock\+All, unlock\+All, remove\+All)
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+sequential adhoc field rules will apply on \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}\textquotesingle{}s record content and NOT to ZIndex\+File Index key values. This means that data to compare is RAW data, and NOT data formatted for index sorting. see ZIndex\+File\+::\+\_\+add\+Key\+Value\+\_\+\+Prepare() for more on internal key data format vs natural record data format.
+\end{DoxyNote}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Key} & a ZData\+Buffer with key value to search for. \mbox{[}stored in collection\textquotesingle{}s context\mbox{]} Key value could be partial or exact, depending on ZData\+Buffer Size and p\+ZMS value \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+ZIF} & ZIndex\+File object to search on \mbox{[}stored in collection\mbox{]} \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+Collection} & A pointer to the contextual meta-\/data from the search created by \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Rawsearch\+First()} routine.\\
+\hline
+\end{DoxyParams}
+It contains
+\begin{DoxyItemize}
+\item a \doxylink{classzbs_1_1_z_array}{ZArray} of ZSIndex\+Result objects, enriched with successive \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Rawsearch\+Next()} calls
+\item Contextual meta-\/data for the search (an ZSIndex\+Collection\+Context embeded object holds this data)
+\end{DoxyItemize}
+
+As it is created by \textquotesingle{}new\textquotesingle{} instruction, it has to be deleted by caller later on
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em p\+ZIR} & result of the \+\_\+\+Rawsearch\+Next operation, if any, as a ZSIndex\+Result with appropriate Index references (Index file rank ; ZMF record address)\\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+ZMS} & defines whether comparison is Exact or Partial see \doxylink{namespacezbs_aee464cc6188e7e60204b2778aa1a51d9}{ZMatch\+Size\+\_\+type}. Defaulted to ZMS\+\_\+\+Match\+Key\+Size
+\begin{DoxyItemize}
+\item ZSC\+\_\+\+Match\+Key\+Size then comparizon is partial \+: comparizon size is made on Key size and key may be partial
+\item ZSC\+\_\+\+Match\+Index\+Size then comparison is exact \+: comparison is made on the whole index key size
+\end{DoxyItemize}\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError}
+\begin{DoxyItemize}
+\item ZS\+\_\+\+FOUND in case of success (And NOT ZS\+\_\+\+SUCCESS)
+\item ZS\+\_\+\+OUTBOUNDLOW if key value in lower than the lowest (first) index value
+\item ZS\+\_\+\+OUTBOUNDHIGH if key value is higher than the highest (last) index value
+\item ZS\+\_\+\+NOTFOUND if key value is not found in the middle of index values set
+\item ZS\+\_\+\+INVSIZE if search is requested on exact key and given key size is not equal to index key size 
+\end{DoxyItemize}
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l03130}{3130}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrawindexfile_8h_source_l00219}{zbs\+::\+ZRaw\+Index\+File\+::get\+Current\+Rank()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00800}{zbs\+::\+ZRaw\+Index\+File\+::get\+Size()}}, \mbox{\hyperlink{zmfstats_8h_source_l00027}{ZMFStats\+::\+Iterations}}, \mbox{\hyperlink{zindexcontrolblock_8h_source_l00084}{zbs\+::\+ZICBOwn\+Data\+::\+Key\+Guessed\+Size}}, \mbox{\hyperlink{zrandomfile_8h_source_l00795}{zbs\+::\+ZRaw\+Index\+File\+::last\+Idx()}}, \mbox{\hyperlink{zmfstats_8h_source_l00029}{ZMFStats\+::\+Reads}}, \mbox{\hyperlink{urfparser_8cpp_source_l01963}{URFCompare\+Ptr()}}, \mbox{\hyperlink{zindexcollection_8h_source_l00039}{zbs\+::\+ZCOP\+\_\+\+Get\+First}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l05329}{zbs\+::\+ZRaw\+Index\+File\+::zget()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l05736}{zbs\+::\+ZRandom\+File\+::zget\+Previous()}}, \mbox{\hyperlink{zrawindexfile_8h_source_l00101}{zbs\+::\+ZRaw\+Index\+File\+::\+ZIndex\+Collection}}, \mbox{\hyperlink{zlock_8h_source_l00116}{ZLock\+\_\+\+Nolock}}, \mbox{\hyperlink{zindexcollection_8h_source_l00057}{zbs\+::\+ZMS\+\_\+\+Match\+Index\+Size}}, and \mbox{\hyperlink{zrawindexfile_8h_source_l00117}{zbs\+::\+ZRaw\+Index\+File\+::\+ZPMSStats}}.
+
+\Hypertarget{group___z_index_gae21b734d530e7254afc9561d5f6ffb82}\label{group___z_index_gae21b734d530e7254afc9561d5f6ffb82} 
+\index{ZIndex@{ZIndex}!\_URFsearchNext@{\_URFsearchNext}}
+\index{\_URFsearchNext@{\_URFsearchNext}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{\_URFsearchNext()}{\_URFsearchNext()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+Next (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&}]{p\+ZIR,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_index_collection}{ZIndex\+Collection}} \texorpdfstring{$\ast$}{*}}]{p\+Collection }\end{DoxyParamCaption})}
+
+
+
+ZIndex\+File\+::\+\_\+\+Rawsearch\+Next. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \mbox{[}in-\/out\mbox{]}} & p\+Collection A pointer to the contextual meta-\/data from the search created by \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Rawsearch\+First()} routine.\\
+\hline
+\end{DoxyParams}
+It contains
+\begin{DoxyItemize}
+\item a \doxylink{classzbs_1_1_z_array}{ZArray} of ZSIndex\+Result objects, enriched with successive \+\_\+\+Rawsearch\+Next calls
+\item Contextual meta-\/data for the search.
+\end{DoxyItemize}
+
+As it is created by \textquotesingle{}new\textquotesingle{} instruction, it has to be deleted by caller later on. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em p\+ZIR} & result of the \+\_\+\+Rawsearch\+Next operation, if any, as a ZSIndex\+Result with appropriate Index references (Index file rank ; ZMF record address)\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError}
+\begin{DoxyItemize}
+\item ZS\+\_\+\+FOUND in case of success (And NOT ZS\+\_\+\+SUCCESS)
+\item ZS\+\_\+\+OUTBOUNDLOW if key value in lower than the lowest (first) index value
+\item ZS\+\_\+\+OUTBOUNDHIGH if key value is higher than the highest (last) index value
+\item ZS\+\_\+\+NOTFOUND if key value is not found in the middle of index values set 
+\end{DoxyItemize}
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l03543}{3543}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindexitem_8cpp_source_l00046}{zbs\+::\+ZIndex\+Item\+::from\+File\+Key()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexitem_8h_source_l00040}{zbs\+::\+ZIndex\+Item\+::\+Index\+Address}}, \mbox{\hyperlink{urfparser_8cpp_source_l01963}{URFCompare\+Ptr()}}, and \mbox{\hyperlink{zindexcollection_8h_source_l00040}{zbs\+::\+ZCOP\+\_\+\+Get\+Next}}.
+
+\Hypertarget{group___z_index_ga925bf2668c3b041753d63902034df170}\label{group___z_index_ga925bf2668c3b041753d63902034df170} 
+\index{ZIndex@{ZIndex}!\_URFsearchUnique@{\_URFsearchUnique}}
+\index{\_URFsearchUnique@{\_URFsearchUnique}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{\_URFsearchUnique()}{\_URFsearchUnique()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+Unique (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Key\+To\+Search,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_index_item}{ZIndex\+Item}} \&}]{p\+Index\+Item,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock = {\ttfamily \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a0355c6514d08bd5bf6a889765fc3c0ef}{ZLock\+\_\+\+Nolock}}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l02289}{2289}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrawindexfile_8cpp_source_l02246}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFtest\+Rank()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexcontrolblock_8h_source_l00085}{zbs\+::\+ZICBOwn\+Data\+::\+Index\+Name}}, and \mbox{\hyperlink{zrandomfile_8h_source_l00795}{zbs\+::\+ZRaw\+Index\+File\+::last\+Idx()}}.
+
+\Hypertarget{group___z_index_gaa4c7fb4198539485bec6609422677856}\label{group___z_index_gaa4c7fb4198539485bec6609422677856} 
+\index{ZIndex@{ZIndex}!\_URFtestRank@{\_URFtestRank}}
+\index{\_URFtestRank@{\_URFtestRank}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{\_URFtestRank()}{\_URFtestRank()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::\+\_\+\+URFtest\+Rank (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Key\+To\+Search,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Index\+Rank,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_index_item}{ZIndex\+Item}} \&}]{p\+Index\+Item,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \&}]{p\+Return,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l02246}{2246}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrawindexfile_8cpp_source_l02027}{display\+URFCompare()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00800}{zbs\+::\+ZRaw\+Index\+File\+::get\+Size()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00717}{zbs\+::\+ZRaw\+Index\+File\+::get\+URIContent()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00795}{zbs\+::\+ZRaw\+Index\+File\+::last\+Idx()}}, \mbox{\hyperlink{zmfstats_8h_source_l00029}{ZMFStats\+::\+Reads}}, \mbox{\hyperlink{urfparser_8cpp_source_l01963}{URFCompare\+Ptr()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l05384}{zbs\+::\+ZRaw\+Index\+File\+::zget\+WAddress()}}, and \mbox{\hyperlink{zrawindexfile_8h_source_l00117}{zbs\+::\+ZRaw\+Index\+File\+::\+ZPMSStats}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawindexfile_8cpp_source_l02344}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+All()}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l02092}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+Dycho\+Unique()}}, and \mbox{\hyperlink{zrawindexfile_8cpp_source_l02289}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+Unique()}}.
+
+\Hypertarget{group___z_index_ga4206ed3ef2026fa3f60567515820bb57}\label{group___z_index_ga4206ed3ef2026fa3f60567515820bb57} 
+\index{ZIndex@{ZIndex}!closeIndexFile@{closeIndexFile}}
+\index{closeIndexFile@{closeIndexFile}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{closeIndexFile()}{closeIndexFile()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::close\+Index\+File (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00475}{475}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindexcontrolblock_8cpp_source_l00239}{zbs\+::\+ZIndex\+Control\+Block\+::\+\_\+export\+Append()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00204}{zbs\+::\+ZRandom\+File\+::get\+Mode()}}, \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_source_l00851}{w\+Ret}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_aa7ddb770c232d732548d2bf6b4aa378a}{zbs\+::\+ZRandom\+File\+::zclose()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00122}{zbs\+::\+ZFDOwn\+Data\+::\+ZReserved}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00082}{ZRF\+\_\+\+Not\+Open}}.
+
+\Hypertarget{group___z_index_ga05bfe1b476825b0426668ef3d5da617c}\label{group___z_index_ga05bfe1b476825b0426668ef3d5da617c} 
+\index{ZIndex@{ZIndex}!displayURFCompare@{displayURFCompare}}
+\index{displayURFCompare@{displayURFCompare}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{displayURFCompare()}{displayURFCompare()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} display\+URFCompare (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Rank,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{pR,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Ptr1,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Ptr2 }\end{DoxyParamCaption})}
+
+
+
+URFCompare Compare two buffers composed each of one or many URF fields, each field potentially of variable length. 
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l02027}{2027}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{urfparser_8cpp_source_l01613}{URFParser\+::display\+One\+URFField()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawindexfile_8cpp_source_l02246}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFtest\+Rank()}}.
+
+\Hypertarget{group___z_index_ga5fe2c7afb713770bc022e49ca28bdb0d}\label{group___z_index_ga5fe2c7afb713770bc022e49ca28bdb0d} 
+\index{ZIndex@{ZIndex}!extractAllURFKeyFields@{extractAllURFKeyFields}}
+\index{extractAllURFKeyFields@{extractAllURFKeyFields}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{extractAllURFKeyFields()}{extractAllURFKeyFields()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::extract\+All\+URFKey\+Fields (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Key\+Content,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Ptr\+In,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_array}{ZArray}}$<$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} $>$}]{p\+Position,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBitset}} \&}]{p\+Field\+Presence }\end{DoxyParamCaption})}
+
+
+
+search\+URFField searches for a record field in p\+Ptr\+In, extracts its URF value and appends it to p\+Key\+Content. record field is searched using its position given by p\+Position. A control is made with p\+Field\+Presence \+: field must be present. If not, ZS\+\_\+\+OMITTED is returned. When found and set, ZS\+\_\+\+SUCCESS is returned. 
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00807}{807}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrawindexfile_8cpp_source_l00656}{extract\+URF\+\_\+\+Append()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zrawindexfile_8cpp_source_l00626}{skip\+URFUntil\+Position()}}.
+
+\Hypertarget{group___z_index_gab998bd64b0af900a31521f254de112d6}\label{group___z_index_gab998bd64b0af900a31521f254de112d6} 
+\index{ZIndex@{ZIndex}!extractURF\_Append@{extractURF\_Append}}
+\index{extractURF\_Append@{extractURF\_Append}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{extractURF\_Append()}{extractURF\_Append()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} extract\+URF\+\_\+\+Append (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+URFOut,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Ptr\+In }\end{DoxyParamCaption})}
+
+
+
+URFCompare Compare two buffers composed each of one or many URF fields, each field potentially of variable length. 
+
+extract\+URF\+\_\+\+Append \begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00656}{656}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindextype_8cpp_source_l01352}{decode\+\_\+\+ZType()}}, \mbox{\hyperlink{zdatatype_8cpp_source_l00020}{get\+Atomic\+Universal\+Size()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00034}{ZType\+\_\+\+Atomic}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00154}{ZType\+\_\+\+Check\+Sum}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00132}{ZType\+\_\+\+Utf16\+Fixed\+String}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00126}{ZType\+\_\+\+Utf16\+Varying\+String}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00133}{ZType\+\_\+\+Utf32\+Fixed\+String}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00127}{ZType\+\_\+\+Utf32\+Varying\+String}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00131}{ZType\+\_\+\+Utf8\+Fixed\+String}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00125}{ZType\+\_\+\+Utf8\+Varying\+String}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00151}{ZType\+\_\+\+ZDate}}, and \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00152}{ZType\+\_\+\+ZDate\+Full}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawindexfile_8cpp_source_l00807}{zbs\+::\+ZRaw\+Index\+File\+::extract\+All\+URFKey\+Fields()}}.
+
+\Hypertarget{group___z_index_gaaa35db7cc8798e8dc893cebdcb43d607}\label{group___z_index_gaaa35db7cc8798e8dc893cebdcb43d607} 
+\index{ZIndex@{ZIndex}!fromXml@{fromXml}}
+\index{fromXml@{fromXml}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{fromXml()}{fromXml()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::from\+Xml (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zxml\+Node}} \texorpdfstring{$\ast$}{*}}]{p\+Index\+Node,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Errorlog }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l04093}{4093}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindexcontrolblock_8h_source_l00083}{zbs\+::\+ZICBOwn\+Data\+::\+Duplicates}}, \mbox{\hyperlink{zcontentconstants_8cpp_source_l00083}{encode\+\_\+\+ZST()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexcontrolblock_8h_source_l00085}{zbs\+::\+ZICBOwn\+Data\+::\+Index\+Name}}, \mbox{\hyperlink{zindexcontrolblock_8h_source_l00084}{zbs\+::\+ZICBOwn\+Data\+::\+Key\+Guessed\+Size}}, \mbox{\hyperlink{zcontentconstants_8h_source_l00059}{ZST\+\_\+\+No\+Duplicates}}, and \mbox{\hyperlink{zcontentconstants_8h_source_l00058}{ZST\+\_\+\+Nothing}}.
+
+\Hypertarget{group___z_index_ga27dd9dc688ebf40331000ce79ed6bb10}\label{group___z_index_ga27dd9dc688ebf40331000ce79ed6bb10} 
+\index{ZIndex@{ZIndex}!getRunMode@{getRunMode}}
+\index{getRunMode@{getRunMode}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{getRunMode()}{getRunMode()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} ZRaw\+Index\+File\+::get\+Run\+Mode (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrawindexfile_8h_source_l00443}{zbs\+::\+ZRaw\+Index\+File\+::\+ZMFFather}}.
+
+\Hypertarget{group___z_index_ga943952f50cac3ec34e2d7d2776c40b69}\label{group___z_index_ga943952f50cac3ec34e2d7d2776c40b69} 
+\index{ZIndex@{ZIndex}!isDebug@{isDebug}}
+\index{isDebug@{isDebug}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{isDebug()}{isDebug()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} ZRaw\+Index\+File\+::is\+Debug (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00034}{34}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zrawindexfile_8h_source_l00443}{zbs\+::\+ZRaw\+Index\+File\+::\+ZMFFather}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawindexfile_8cpp_source_l00045}{zbs\+::\+ZRaw\+Index\+File\+::show\+Run\+Mode()}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l00113}{zbs\+::\+ZRaw\+Index\+File\+::\+ZRaw\+Index\+File()}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l00151}{zbs\+::\+ZRaw\+Index\+File\+::\+ZRaw\+Index\+File()}}, and \mbox{\hyperlink{zrawindexfile_8cpp_source_l00133}{zbs\+::\+ZRaw\+Index\+File\+::\+ZRaw\+Index\+File()}}.
+
+\Hypertarget{group___z_index_gafe7c4f449c677a6ae57778b82fea65b1}\label{group___z_index_gafe7c4f449c677a6ae57778b82fea65b1} 
+\index{ZIndex@{ZIndex}!isSearchDycho@{isSearchDycho}}
+\index{isSearchDycho@{isSearchDycho}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{isSearchDycho()}{isSearchDycho()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} ZRaw\+Index\+File\+::is\+Search\+Dycho (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zrawindexfile_8h_source_l00443}{zbs\+::\+ZRaw\+Index\+File\+::\+ZMFFather}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawindexfile_8cpp_source_l00045}{zbs\+::\+ZRaw\+Index\+File\+::show\+Run\+Mode()}}.
+
+\Hypertarget{group___z_index_ga313af01d0c6004662a5d3b7aad411099}\label{group___z_index_ga313af01d0c6004662a5d3b7aad411099} 
+\index{ZIndex@{ZIndex}!isUpdateHeader@{isUpdateHeader}}
+\index{isUpdateHeader@{isUpdateHeader}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{isUpdateHeader()}{isUpdateHeader()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} ZRaw\+Index\+File\+::is\+Update\+Header (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00035}{35}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zrawindexfile_8h_source_l00443}{zbs\+::\+ZRaw\+Index\+File\+::\+ZMFFather}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawindexfile_8cpp_source_l00045}{zbs\+::\+ZRaw\+Index\+File\+::show\+Run\+Mode()}}.
+
+\Hypertarget{group___z_index_ga6ab8b62d58314d11fe3874ffa309876d}\label{group___z_index_ga6ab8b62d58314d11fe3874ffa309876d} 
+\index{ZIndex@{ZIndex}!openIndexFile@{openIndexFile}}
+\index{openIndexFile@{openIndexFile}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{openIndexFile()}{openIndexFile()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::open\+Index\+File (\begin{DoxyParamCaption}\item[{uri\+String \&}]{p\+Index\+Uri,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Index\+Rank,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Mode }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00356}{356}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{classzbs_1_1_z_random_file_a3254754b6034379dbcdf1caa146bc21d}{zbs\+::\+ZRandom\+File\+::\+\_\+get\+Reserved\+Header()}}, \mbox{\hyperlink{zindexcontrolblock_8cpp_source_l00160}{zbs\+::\+ZIndex\+Control\+Block\+::\+\_\+import()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_abacd58b5a5a0ccf4f3e1764012280a4f}{zbs\+::\+ZRandom\+File\+::\+\_\+\+ZRFopen()}}, \mbox{\hyperlink{zcontentconstants_8cpp_source_l00059}{decode\+\_\+\+ZST()}}, \mbox{\hyperlink{zindexcontrolblock_8h_source_l00083}{zbs\+::\+ZICBOwn\+Data\+::\+Duplicates}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexcontrolblock_8h_source_l00085}{zbs\+::\+ZICBOwn\+Data\+::\+Index\+Name}}, \mbox{\hyperlink{zindexcontrolblock_8h_source_l00087}{zbs\+::\+ZICBOwn\+Data\+::\+Index\+Rank}}, \mbox{\hyperlink{zfiledescriptor_8cpp_source_l00386}{zbs\+::\+ZRandom\+File\+::set\+Path()}}, \mbox{\hyperlink{zindexcontrolblock_8h_source_l00086}{zbs\+::\+ZICBOwn\+Data\+::\+URIIndex}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00115}{ZFT\+\_\+\+ZIndex\+File}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00177}{zbs\+::\+ZFile\+Descriptor\+::\+ZPMS}}, \mbox{\hyperlink{zrawindexfile_8h_source_l00117}{zbs\+::\+ZRaw\+Index\+File\+::\+ZPMSStats}}, and \mbox{\hyperlink{zfiledescriptor_8h_source_l00122}{zbs\+::\+ZFDOwn\+Data\+::\+ZReserved}}.
+
+\Hypertarget{group___z_index_ga3cf78b7f487ed1b27bbd94e07568b829}\label{group___z_index_ga3cf78b7f487ed1b27bbd94e07568b829} 
+\index{ZIndex@{ZIndex}!removeIndexFiles@{removeIndexFiles}}
+\index{removeIndexFiles@{removeIndexFiles}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{removeIndexFiles()}{removeIndexFiles()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::remove\+Index\+Files (\begin{DoxyParamCaption}\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}} }\end{DoxyParamCaption})}
+
+
+
+\doxylink{group___z_index_ga3cf78b7f487ed1b27bbd94e07568b829}{ZRaw\+Index\+File\+::remove\+Index\+Files} Removes all files composing current index (before index remove at \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} level) 
+
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00196}{196}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomfile_8cpp_source_l00601}{zbs\+::\+ZRandom\+File\+::\+\_\+remove\+File()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{group___z_index_gae46ccea04d68b3c48784ffbca56d124b}\label{group___z_index_gae46ccea04d68b3c48784ffbca56d124b} 
+\index{ZIndex@{ZIndex}!setIndexName@{setIndexName}}
+\index{setIndexName@{setIndexName}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{setIndexName()}{setIndexName()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZRaw\+Index\+File\+::set\+Index\+Name (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Name }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00180}{180}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zindexcontrolblock_8h_source_l00085}{zbs\+::\+ZICBOwn\+Data\+::\+Index\+Name}}.
+
+\Hypertarget{group___z_index_ga2711fe4235025121991cc8efe5d29123}\label{group___z_index_ga2711fe4235025121991cc8efe5d29123} 
+\index{ZIndex@{ZIndex}!setIndexURI@{setIndexURI}}
+\index{setIndexURI@{setIndexURI}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{setIndexURI()}{setIndexURI()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::set\+Index\+URI (\begin{DoxyParamCaption}\item[{uri\+String \&}]{p\+Uri }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00173}{173}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zfiledescriptor_8cpp_source_l00386}{zbs\+::\+ZRandom\+File\+::set\+Path()}}, and \mbox{\hyperlink{zindexcontrolblock_8h_source_l00086}{zbs\+::\+ZICBOwn\+Data\+::\+URIIndex}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawindexfile_8cpp_source_l00219}{zbs\+::\+ZRaw\+Index\+File\+::zcreate\+Index\+File()}}, and \mbox{\hyperlink{zrawindexfile_8cpp_source_l00289}{zbs\+::\+ZRaw\+Index\+File\+::zcreate\+Index\+File()}}.
+
+\Hypertarget{group___z_index_gaea36d4b902ad7f0265d4e7168e578c6b}\label{group___z_index_gaea36d4b902ad7f0265d4e7168e578c6b} 
+\index{ZIndex@{ZIndex}!showRunMode@{showRunMode}}
+\index{showRunMode@{showRunMode}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{showRunMode()}{showRunMode()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZRaw\+Index\+File\+::show\+Run\+Mode (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l00034}{zbs\+::\+ZRaw\+Index\+File\+::is\+Debug()}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l00033}{zbs\+::\+ZRaw\+Index\+File\+::is\+Search\+Dycho()}}, and \mbox{\hyperlink{zrawindexfile_8cpp_source_l00035}{zbs\+::\+ZRaw\+Index\+File\+::is\+Update\+Header()}}.
+
+\Hypertarget{group___z_index_ga08c9954a6e1cdb989f35a131900fe662}\label{group___z_index_ga08c9954a6e1cdb989f35a131900fe662} 
+\index{ZIndex@{ZIndex}!skipURFUntilPosition@{skipURFUntilPosition}}
+\index{skipURFUntilPosition@{skipURFUntilPosition}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{skipURFUntilPosition()}{skipURFUntilPosition()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} skip\+URFUntil\+Position (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Ptr\+In,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Position,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBitset}} \&}]{p\+Field\+Presence }\end{DoxyParamCaption})}
+
+
+
+skip\+URFUntil\+Position parse an URF formatted record pointed by p\+Ptr\+In and skip URF fields (present or not present vs p\+Field\+Presence) until position p\+Position. 
+
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00626}{626}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{urfparser_8cpp_source_l00819}{URFParser\+::get\+URFType\+And\+Size()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawindexfile_8cpp_source_l00807}{zbs\+::\+ZRaw\+Index\+File\+::extract\+All\+URFKey\+Fields()}}.
+
+\Hypertarget{group___z_index_ga5eb263c505dbb8ec5574eb469ce00483}\label{group___z_index_ga5eb263c505dbb8ec5574eb469ce00483} 
+\index{ZIndex@{ZIndex}!toXml@{toXml}}
+\index{toXml@{toXml}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{toXml()}{toXml()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} ZRaw\+Index\+File\+::to\+Xml (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Level,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Comment }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l04077}{4077}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexcontrolblock_8cpp_source_l00264}{zbs\+::\+ZIndex\+Control\+Block\+::to\+Xml()}}, and \mbox{\hyperlink{zrandomfile_8cpp_source_l06605}{zbs\+::\+ZRandom\+File\+::to\+Xml()}}.
+
+\Hypertarget{group___z_index_gac4ce4346bbb05218824e4db581ea0be8}\label{group___z_index_gac4ce4346bbb05218824e4db581ea0be8} 
+\index{ZIndex@{ZIndex}!writeIndexControlBlock@{writeIndexControlBlock}}
+\index{writeIndexControlBlock@{writeIndexControlBlock}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{writeIndexControlBlock()}{writeIndexControlBlock()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::write\+Index\+Control\+Block (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+ZIndex\+File\+::write\+Index\+Control\+Block. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Check\+Sum} & a pointer to a pointer on check\+Sum field. If nullptr, no check\+Sum is returned if not nullptr, new check\+Sum on Index\+Control\+Block raw data is computed and pointer is returned. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+ZStatus 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00510}{510}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindexcontrolblock_8cpp_source_l00239}{zbs\+::\+ZIndex\+Control\+Block\+::\+\_\+export\+Append()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_af34d1a6f3e3325b93dd18072cba359d2}{zbs\+::\+ZRandom\+File\+::\+\_\+write\+All\+File\+Header()}}, \mbox{\hyperlink{zheadercontrolblock_8h_source_l00105}{ZHeader\+Control\+Block\+::\+File\+Type}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexcontrolblock_8h_source_l00127}{zbs\+::\+ZIndex\+Control\+Block\+::\+Idx\+Key\+Dic}}, \mbox{\hyperlink{zindexcontrolblock_8h_source_l00086}{zbs\+::\+ZICBOwn\+Data\+::\+URIIndex}}, \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_source_l00851}{w\+Ret}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00115}{ZFT\+\_\+\+ZIndex\+File}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00112}{zbs\+::\+ZFDOwn\+Data\+::\+ZHeader}}, and \mbox{\hyperlink{zfiledescriptor_8h_source_l00122}{zbs\+::\+ZFDOwn\+Data\+::\+ZReserved}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawindexfile_8cpp_source_l00219}{zbs\+::\+ZRaw\+Index\+File\+::zcreate\+Index\+File()}}, and \mbox{\hyperlink{zrawindexfile_8cpp_source_l00289}{zbs\+::\+ZRaw\+Index\+File\+::zcreate\+Index\+File()}}.
+
+\Hypertarget{group___z_index_gae00198ba8d83b0b6cbe8b58651a7ab2e}\label{group___z_index_gae00198ba8d83b0b6cbe8b58651a7ab2e} 
+\index{ZIndex@{ZIndex}!zcreateIndexFile@{zcreateIndexFile}}
+\index{zcreateIndexFile@{zcreateIndexFile}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{zcreateIndexFile()}{zcreateIndexFile()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::zcreate\+Index\+File (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classzbs_1_1_z_index_control_block}{ZIndex\+Control\+Block}} \&}]{p\+ICB,  }\item[{uri\+String \&}]{p\+Index\+Uri,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Allocated\+Blocks,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Block\+Extent\+Quota,  }\item[{\mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}}}]{p\+Initial\+Size,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Highwater\+Marking = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}},  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Grab\+Free\+Space = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}},  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Backup = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}},  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Leave\+Open = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}}} }\end{DoxyParamCaption})}
+
+
+
+zcreate\+Index\+File creates a new index file corresponding to the given specification ICB and ZRF parameters 
+
+ZRaw\+Index\+File\+::zcreate\+Index creates a new index file corresponding to the given specification ICB and ZRF parameters.
+
+\begin{DoxyNote}{Note}
+This could be NOT a good idea to set Grab\+Free\+Space option \+: Indexes are fixed length then search in Free Pool are only made with the same size.
+\end{DoxyNote}
+Block\+Target\+Size is computed with
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+ICB} & pointer to \doxylink{classzbs_1_1_z_index_control_block}{ZIndex\+Control\+Block} of indexfile to create \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Index\+Uri} & uri\+String with index file name \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Allocated\+Blocks} & \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Block\+Extent\+Quota} & \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Initial\+Size} & \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Highwater\+Marking} & \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Grab\+Free\+Space} & \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Leave\+Open} & Option \+: true leave the index file open as (ZRF\+\_\+\+Exclusive \texorpdfstring{$\vert$}{|} ZRF\+\_\+\+All) false\+: close index file right after creation \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError}
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+This could be NOT a good idea to set Grab\+Free\+Space option \+: Indexes are fixed length then search in Free Pool are only made with the same size.
+\end{DoxyNote}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+ICB} & pointer to \doxylink{classzbs_1_1_z_index_control_block}{ZIndex\+Control\+Block} of indexfile to create \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Index\+Uri} & uri\+String with index file name \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Allocated\+Blocks} & \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Block\+Extent\+Quota} & \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Initial\+Size} & \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Highwater\+Marking} & \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Grab\+Free\+Space} & \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Leave\+Open} & Option \+: true leave the index file open as (ZRF\+\_\+\+Exclusive \texorpdfstring{$\vert$}{|} ZRF\+\_\+\+All) false\+: close index file right after creation \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00219}{219}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindexcontrolblock_8cpp_source_l00346}{zbs\+::\+ZIndex\+Control\+Block\+::\+\_\+copy\+From()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_ae27923713204865ba50d825904d1b375}{zbs\+::\+ZRandom\+File\+::\+\_\+create()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_abacd58b5a5a0ccf4f3e1764012280a4f}{zbs\+::\+ZRandom\+File\+::\+\_\+\+ZRFopen()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00897}{zbs\+::\+ZRandom\+File\+::set\+Create\+Maximum()}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l00173}{zbs\+::\+ZRaw\+Index\+File\+::set\+Index\+URI()}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l00510}{zbs\+::\+ZRaw\+Index\+File\+::write\+Index\+Control\+Block()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_aa7ddb770c232d732548d2bf6b4aa378a}{zbs\+::\+ZRandom\+File\+::zclose()}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00115}{ZFT\+\_\+\+ZIndex\+File}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00105}{ZRF\+\_\+\+All}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00087}{ZRF\+\_\+\+Exclusive}}.
+
+\Hypertarget{group___z_index_gada1eb47358b9762a69d58f3c153c8486}\label{group___z_index_gada1eb47358b9762a69d58f3c153c8486} 
+\index{ZIndex@{ZIndex}!zcreateIndexFile@{zcreateIndexFile}}
+\index{zcreateIndexFile@{zcreateIndexFile}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{zcreateIndexFile()}{zcreateIndexFile()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRaw\+Index\+File\+::zcreate\+Index\+File (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classzbs_1_1_z_index_control_block}{ZIndex\+Control\+Block}} \&}]{p\+ICB,  }\item[{uri\+String \&}]{p\+Index\+Uri,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Allocated\+Blocks,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Block\+Extent\+Quota,  }\item[{\mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}}}]{p\+Initial\+Size,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Block\+Target\+Size,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Highwater\+Marking = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}},  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Grab\+Free\+Space = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}},  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Backup = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}},  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Leave\+Open = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}}} }\end{DoxyParamCaption})}
+
+
+
+ZIndex\+File\+::zcreate\+Index creates a new index file corresponding to the given specification ICB and ZRF parameters same as previous but with explicit p\+Block\+Target\+Size. 
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00289}{289}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindexcontrolblock_8cpp_source_l00346}{zbs\+::\+ZIndex\+Control\+Block\+::\+\_\+copy\+From()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_ae27923713204865ba50d825904d1b375}{zbs\+::\+ZRandom\+File\+::\+\_\+create()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_abacd58b5a5a0ccf4f3e1764012280a4f}{zbs\+::\+ZRandom\+File\+::\+\_\+\+ZRFopen()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00897}{zbs\+::\+ZRandom\+File\+::set\+Create\+Maximum()}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l00173}{zbs\+::\+ZRaw\+Index\+File\+::set\+Index\+URI()}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l00510}{zbs\+::\+ZRaw\+Index\+File\+::write\+Index\+Control\+Block()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_aa7ddb770c232d732548d2bf6b4aa378a}{zbs\+::\+ZRandom\+File\+::zclose()}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00115}{ZFT\+\_\+\+ZIndex\+File}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00105}{ZRF\+\_\+\+All}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00087}{ZRF\+\_\+\+Exclusive}}.
+
+\Hypertarget{group___z_index_gac9392f7d3ef02b243f1e9545b5492f3c}\label{group___z_index_gac9392f7d3ef02b243f1e9545b5492f3c} 
+\index{ZIndex@{ZIndex}!ZRawIndexFile@{ZRawIndexFile}}
+\index{ZRawIndexFile@{ZRawIndexFile}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{ZRawIndexFile()}{ZRawIndexFile()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily ZRaw\+Index\+File\+::\+ZRaw\+Index\+File (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classzbs_1_1_z_raw_index_file_a0946fce639f2f019f7f893cf1aa8a82f}{ZRaw\+Master\+File}} \texorpdfstring{$\ast$}{*}}]{p\+Father }\end{DoxyParamCaption})}
+
+
+
+ZIndex\+File first constructor version \+: the common one. It sets up the ZIndex\+File parameters AND rebuild the index if p\+Auto\+Rebuild is set to true (default value is true). If ZIX rebuild is done, there must not be any ZS\+\_\+\+DUPLICATEKEY during the rebuild if ZIndex\+File duplicates option is set to ZST\+\_\+\+NODUPLICATES. If so, \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{abort()} will be called (after having appropriately destroyed objects on father ZAM side). 
+
+ZIndex\+Control\+Block\+::\+\_\+import\+ICB Imports an \doxylink{classzbs_1_1_z_index_control_block}{ZIndex\+Control\+Block} from its flats structure(unsigned char\texorpdfstring{$\ast$}{*}) and load it to current ZICB.
+
+\begin{DoxyNote}{Note}
+if you want to create a ZIX without knowing in advance if there will be duplicates on key or not \+: you should set p\+Duplicates to ZST\+\_\+\+Duplicates. Do not create ZIndex\+Filees with rejected key values \+: you will have holes into your index tables that will induce an impredictable result as soon as you will update any part of the hierarchy (ZAM and other dependant ZIXs).
+\end{DoxyNote}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Father} & mandatory ZMF to which the ZIX refers or may be nullptr if debug mode is set \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Debug\+Mode} & optional switch to authorize using \doxylink{classzbs_1_1_z_raw_index_file}{ZRaw\+Index\+File} as a standalone object withous its ZMF father\\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+p\+Buffer pointer is not freed by this routine 
+\end{DoxyNote}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Buffer} & \\
+\hline
+\mbox{\texttt{ out}}  & {\em Imported} & data size \+: note this represents the amount of space imported from p\+Buffer since its beginning. p\+Buffer may contain more than one ZICB. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00113}{113}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l00034}{zbs\+::\+ZRaw\+Index\+File\+::is\+Debug()}}, \mbox{\hyperlink{zrawindexfile_8h_source_l00443}{zbs\+::\+ZRaw\+Index\+File\+::\+ZMFFather}}, and \mbox{\hyperlink{zrawindexfile_8h_source_l00135}{zbs\+::\+ZRaw\+Index\+File\+::\texorpdfstring{$\sim$}{\string~}\+ZRaw\+Index\+File()}}.
+
+\Hypertarget{group___z_index_gacc0b6b7e04a2170128380dfde75b9f2b}\label{group___z_index_gacc0b6b7e04a2170128380dfde75b9f2b} 
+\index{ZIndex@{ZIndex}!ZRawIndexFile@{ZRawIndexFile}}
+\index{ZRawIndexFile@{ZRawIndexFile}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{ZRawIndexFile()}{ZRawIndexFile()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily ZRaw\+Index\+File\+::\+ZRaw\+Index\+File (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classzbs_1_1_z_raw_index_file_a0946fce639f2f019f7f893cf1aa8a82f}{ZRaw\+Master\+File}} \texorpdfstring{$\ast$}{*}}]{p\+Father,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{pkeyguessedsize,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Index\+Name,  }\item[{\mbox{\hyperlink{zcontentconstants_8h_a3b02d1f4a8007be50cd643b65bb0cdce}{ZSort\+\_\+\+Type}}}]{p\+Duplicates = {\ttfamily \mbox{\hyperlink{zcontentconstants_8h_a3b02d1f4a8007be50cd643b65bb0cdceaa6da478ad26e3ef61b7009d726945de1}{ZST\+\_\+\+No\+Duplicates}}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00151}{151}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindexcontrolblock_8h_source_l00083}{zbs\+::\+ZICBOwn\+Data\+::\+Duplicates}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexcontrolblock_8h_source_l00085}{zbs\+::\+ZICBOwn\+Data\+::\+Index\+Name}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l00034}{zbs\+::\+ZRaw\+Index\+File\+::is\+Debug()}}, \mbox{\hyperlink{zindexcontrolblock_8h_source_l00084}{zbs\+::\+ZICBOwn\+Data\+::\+Key\+Guessed\+Size}}, \mbox{\hyperlink{zrawindexfile_8h_source_l00443}{zbs\+::\+ZRaw\+Index\+File\+::\+ZMFFather}}, and \mbox{\hyperlink{zrawindexfile_8h_source_l00135}{zbs\+::\+ZRaw\+Index\+File\+::\texorpdfstring{$\sim$}{\string~}\+ZRaw\+Index\+File()}}.
+
+\Hypertarget{group___z_index_ga87afc0d9faa4723d1da7f9eedd1b3551}\label{group___z_index_ga87afc0d9faa4723d1da7f9eedd1b3551} 
+\index{ZIndex@{ZIndex}!ZRawIndexFile@{ZRawIndexFile}}
+\index{ZRawIndexFile@{ZRawIndexFile}!ZIndex@{ZIndex}}
+\doxysubsubsection{\texorpdfstring{ZRawIndexFile()}{ZRawIndexFile()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily ZRaw\+Index\+File\+::\+ZRaw\+Index\+File (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classzbs_1_1_z_raw_index_file_a0946fce639f2f019f7f893cf1aa8a82f}{ZRaw\+Master\+File}} \texorpdfstring{$\ast$}{*}}]{p\+Father,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_index_control_block}{ZIndex\+Control\+Block}} \&}]{p\+ZICB }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawindexfile_8cpp_source_l00133}{133}} of file \mbox{\hyperlink{zrawindexfile_8cpp_source}{zrawindexfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l00034}{zbs\+::\+ZRaw\+Index\+File\+::is\+Debug()}}, \mbox{\hyperlink{zrawindexfile_8h_source_l00443}{zbs\+::\+ZRaw\+Index\+File\+::\+ZMFFather}}, and \mbox{\hyperlink{zrawindexfile_8h_source_l00135}{zbs\+::\+ZRaw\+Index\+File\+::\texorpdfstring{$\sim$}{\string~}\+ZRaw\+Index\+File()}}.
+

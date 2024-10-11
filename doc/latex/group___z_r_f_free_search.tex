@@ -1,0 +1,323 @@
+\doxysection{Searching in free sequential mode}
+\hypertarget{group___z_r_f_free_search}{}\label{group___z_r_f_free_search}\index{Searching in free sequential mode@{Searching in free sequential mode}}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{group___z_r_f_free_search_gaf64b6cef70fbbf38fa4caa789b790656}{zbs\+::\+ZRFSearch\+\_\+type}} \+: uint16\+\_\+t \{ \newline
+\mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656acd96627bb351ca5189373f733530bec8}{zbs\+::\+ZRFEquals\+To}} = 0x01
+, \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a30fac18c28e3a47ed0958b01530d965b}{zbs\+::\+ZRFStarts\+With}} = 0x02
+, \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656ad14ab10ca4c2c31c6c6409bf6ff8fd73}{zbs\+::\+ZRFEnds\+With}} = 0x04
+, \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a89d15e29bd1b49572fa72e3710485968}{zbs\+::\+ZRFContains}} = 0x08
+, \newline
+\mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a9690335cdb245bf362e85c910a2fb869}{zbs\+::\+ZRFGreater\+Than}} = 0x10
+, \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656aef1e4f653972b37edcbe030b9a7c54ea}{zbs\+::\+ZRFLess\+Than}} = 0x20
+, \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656ab6e0dbda6e3124a92971f0f703974bbb}{zbs\+::\+ZRFCase\+Regardless}} = 0x0100
+, \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a26d15ddb890c5f27e2da74d059b4cd7e}{zbs\+::\+ZRFString}} = 0x0200
+, \newline
+\mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a56c168e22e3823c7f7f4d94a8a850aca}{zbs\+::\+ZRFTrimspace}} = 0x0300
+ \}
+\begin{DoxyCompactList}\small\item\em The ZRFSearch\+\_\+type enum option to free search within a ZRandom\+File. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_r_f_free_search_ga0d1109b5a8066fdaa08dbbbe888f3495}{zbs\+::\+ZRandom\+File\+::zsearch\+Field\+All\+Collection}} (\mbox{\hyperlink{classzbs_1_1_z_r_f_collection}{ZRFCollection}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Collection}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}=\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a25827b44741ec3b1bd038310f31bc15f}{ZLock\+\_\+\+Omitted}}, \mbox{\hyperlink{classzbs_1_1_z_r_f_collection}{ZRFCollection}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Input\+Collection}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}})
+\begin{DoxyCompactList}\small\item\em \doxylink{group___z_r_f_free_search_ga0d1109b5a8066fdaa08dbbbe888f3495}{ZRandom\+File\+::zsearch\+Field\+All\+Collection} Sequential search on a given collection of records (All records of the collection) for a given sequence (p\+Search) into a field defined by its offset from beginning of record If p\+Collection is omitted, then the search is made on all active records of the \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} (ZBlock\+Access\+Table -\/ ZBAT) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_r_f_free_search_ga4afe5f1051b94274fc2dc134740da409}{zbs\+::\+ZRandom\+File\+::zsearch\+Field\+First\+Collection}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record\+Content}}, \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZRFRank}}, \mbox{\hyperlink{classzbs_1_1_z_r_f_collection}{ZRFCollection}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Collection}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Lock}}=\mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a25827b44741ec3b1bd038310f31bc15f}{ZLock\+\_\+\+Omitted}}, \mbox{\hyperlink{classzbs_1_1_z_r_f_collection}{ZRFCollection}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Input\+Collection}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}})
+\begin{DoxyCompactList}\small\item\em \doxylink{group___z_r_f_free_search_ga4afe5f1051b94274fc2dc134740da409}{ZRandom\+File\+::zsearch\+Field\+First\+Collection}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_r_f_free_search_ga9a4486437a4982aa14f8861bff66a021}{zbs\+::\+ZRandom\+File\+::zsearch\+Field\+Next\+Collection}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record\+Content}}, \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZRFRank}}, \mbox{\hyperlink{classzbs_1_1_z_r_f_collection}{ZRFCollection}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Collection}})
+\begin{DoxyCompactList}\small\item\em \doxylink{group___z_r_f_free_search_ga9a4486437a4982aa14f8861bff66a021}{ZRandom\+File\+::zsearch\+Field\+Next\+Collection}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} and \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} offer the possibility of a free sequential search for all or part of the file\textquotesingle{}s records content. The resulting structure is a collection of \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} records ranks (see \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZRFRanks}) that will match given sequence(s) of bytes (text or binary data) according given rules. Free search is done using user defined fields per rule. A field is defined by
+\begin{DoxyItemize}
+\item a field offset from the beginning of user\textquotesingle{}s record (starting from zero)
+\item a field length \begin{DoxyNote}{Note}
+length could be ommitted in giving a negative or null value (reference to a zero long). In this case, the field length will be adjusted to given sequence ZData\+Buffer\+::\+Size attribute.
+\end{DoxyNote}
+The masterpiece of this free search facility is ZCollection\+\_\+\+Rank that will store matching rules see Z\+::add()
+\end{DoxyItemize}
+
+Resulting to this search, a collection of records\textquotesingle{} ranks is given, and may be refined using successive searches that will apply to a previous collection optionally given in input.
+
+As the optional collection to base the search on is safely copied during search initialisation, it is then possible to recursively search on the same collection of records and refine search criterias.
+
+This could be used by example for \+:
+\begin{DoxyItemize}
+\item searching a first selection giving a first collection of row within ZRFResult\+::\+ZTab\+Idx array
+\item then restrict the collection with a new search in passing reference of this array as \doxylink{classzbs_1_1_z_array}{ZArray$<$long$>$} as p\+Collection.
+\end{DoxyItemize}
+
+Search will return a \doxylink{classzbs_1_1_z_r_f_collection}{ZRFCollection} object with a collection of record ranks. see \doxylink{classzbs_1_1_z_r_f_collection}{ZRFCollection}.\hypertarget{group___z_r_f_free_search_ZRFFreeModes}{}\doxysubsubsection{\texorpdfstring{Searching modes}{Searching modes}}\label{group___z_r_f_free_search_ZRFFreeModes}
+\begin{DoxyParagraph}{Searching all at once in the whole file or a whole record collection}
+
+\end{DoxyParagraph}
+\doxylink{group___z_r_f_free_search_ga0d1109b5a8066fdaa08dbbbe888f3495}{ZRandom\+File\+::zsearch\+Field\+All\+Collection()}
+
+This routine searches all record set for matching fields values and returns the whole collection of records.
+
+\begin{DoxyParagraph}{Searching dynamically by successive calls}
+
+\end{DoxyParagraph}
+\doxylink{group___z_r_f_free_search_ga4afe5f1051b94274fc2dc134740da409}{ZRandom\+File\+::zsearch\+Field\+First\+Collection()} \doxylink{group___z_r_f_free_search_ga9a4486437a4982aa14f8861bff66a021}{ZRandom\+File\+::zsearch\+Field\+Next\+Collection()}
+
+These two routines gets dynamically the corresponding records rank, enriching the records\textquotesingle{} collection ranks with matching records during successive calls.
+
+The first one initialize the search and gets the first matching record.
+
+The second one successively gets the next record matching the given sequence.\hypertarget{group___z_r_f_free_search_ZRFFreeSearchType}{}\doxysubsubsection{\texorpdfstring{Search rules processing options}{Search rules processing options}}\label{group___z_r_f_free_search_ZRFFreeSearchType}
+By default, the search is made assuming binary search. However it is possible to specify using optional mask that search should consider field and search sequence as CString (meaning ended with \textquotesingle{}\textbackslash{}0\textquotesingle{}). In this case, this allows to \textquotesingle{}trim\textquotesingle{} leading and trailing spaces.
+
+You may use the following options, depending on ZRFSearch\+\_\+type enum, when searching in free sequential mode in a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} \+:
+
+Enum code is given by \doxylink{group___z_r_f_free_search_gaf64b6cef70fbbf38fa4caa789b790656}{ZRFSearch\+\_\+type}
+
+\begin{DoxyParagraph}{Main mask values}
+
+\end{DoxyParagraph}
+
+\begin{DoxyItemize}
+\item ZRFEquals\+To equal \+: exact search (the whole fields is the whole sequence)
+\item ZRFStarts\+With starts with \+: Field starts with Sequence
+\item ZRFEnds\+With ends with \+: Field ends with Sequence
+\item ZRFContains contains \+: Sequence is contained somewhere within Field
+\end{DoxyItemize}
+
+\begin{DoxyParagraph}{optional ORed mask}
+
+\end{DoxyParagraph}
+The following masks have to be ORED with one of the previous value to refine the search comparizon behavior.
+\begin{DoxyItemize}
+\item ZRFString the search sequence AND the read fields are to be processed as CString (string size is given by \textquotesingle{}\textbackslash{}0\textquotesingle{} character)
+\item ZRFTrim\+Space indicates that leading and trailing space characters have to be suppressed before comparing values
+\item ZRFCase\+Regardles indicates that comparizon must not take care of upper or lower case
+\end{DoxyItemize}\hypertarget{group___z_r_f_free_search_ZRFFreeError}{}\doxysubsubsection{\texorpdfstring{Size error cases}{Size error cases}}\label{group___z_r_f_free_search_ZRFFreeError}
+When searching with ZEquals\+To option set (default option), the size of Sequence ZData\+Buffer must be equal to the field Length, otherwise an error status will be returned before any search operation and a ZException will be set with appropriate message.
+
+Sequence size must be in any case less than or equal to field length.
+
+Hereafter are the cases of incoherence between both ZData\+Buffer\+::\+Size Sequence data and field length \+:
+
+
+\begin{DoxyItemize}
+\item ZEquals\+To size of Sequence ZDatabuffer does not equal search field length.
+\item ZStarts\+With Field length is smaller that ZData\+Buffer\+::\+Size.
+\item ZEnds\+With Field length is smaller that ZData\+Buffer\+::\+Size.
+\item ZContains Field length is smaller that ZData\+Buffer\+::\+Size.
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+if Field Length equals ZData\+Buffer\+::\+Size this is equivalent to a ZEquals\+To option. 
+\end{DoxyNote}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{group___z_r_f_free_search_gaf64b6cef70fbbf38fa4caa789b790656}\label{group___z_r_f_free_search_gaf64b6cef70fbbf38fa4caa789b790656} 
+\index{Searching in free sequential mode@{Searching in free sequential mode}!ZRFSearch\_type@{ZRFSearch\_type}}
+\index{ZRFSearch\_type@{ZRFSearch\_type}!Searching in free sequential mode@{Searching in free sequential mode}}
+\doxysubsubsection{\texorpdfstring{ZRFSearch\_type}{ZRFSearch\_type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{group___z_r_f_free_search_gaf64b6cef70fbbf38fa4caa789b790656}{zbs\+::\+ZRFSearch\+\_\+type}} \+: \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\+\_\+t}}}
+
+
+
+The ZRFSearch\+\_\+type enum option to free search within a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZRFEqualsTo@{ZRFEqualsTo}!Searching in free sequential mode@{Searching in free sequential mode}}\index{Searching in free sequential mode@{Searching in free sequential mode}!ZRFEqualsTo@{ZRFEqualsTo}}}\Hypertarget{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656acd96627bb351ca5189373f733530bec8}\label{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656acd96627bb351ca5189373f733530bec8} 
+ZRFEquals\+To&exact search (the whole fields is the whole given sequence of bytes) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZRFStartsWith@{ZRFStartsWith}!Searching in free sequential mode@{Searching in free sequential mode}}\index{Searching in free sequential mode@{Searching in free sequential mode}!ZRFStartsWith@{ZRFStartsWith}}}\Hypertarget{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a30fac18c28e3a47ed0958b01530d965b}\label{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a30fac18c28e3a47ed0958b01530d965b} 
+ZRFStarts\+With&Field must starts with given sequence of bytes. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZRFEndsWith@{ZRFEndsWith}!Searching in free sequential mode@{Searching in free sequential mode}}\index{Searching in free sequential mode@{Searching in free sequential mode}!ZRFEndsWith@{ZRFEndsWith}}}\Hypertarget{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656ad14ab10ca4c2c31c6c6409bf6ff8fd73}\label{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656ad14ab10ca4c2c31c6c6409bf6ff8fd73} 
+ZRFEnds\+With&Field must end with given sequence of bytes. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZRFContains@{ZRFContains}!Searching in free sequential mode@{Searching in free sequential mode}}\index{Searching in free sequential mode@{Searching in free sequential mode}!ZRFContains@{ZRFContains}}}\Hypertarget{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a89d15e29bd1b49572fa72e3710485968}\label{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a89d15e29bd1b49572fa72e3710485968} 
+ZRFContains&The given bytes sequence must be found once inside the field. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZRFGreaterThan@{ZRFGreaterThan}!Searching in free sequential mode@{Searching in free sequential mode}}\index{Searching in free sequential mode@{Searching in free sequential mode}!ZRFGreaterThan@{ZRFGreaterThan}}}\Hypertarget{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a9690335cdb245bf362e85c910a2fb869}\label{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a9690335cdb245bf362e85c910a2fb869} 
+ZRFGreater\+Than&Find anything greater than bytes sequence. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZRFLessThan@{ZRFLessThan}!Searching in free sequential mode@{Searching in free sequential mode}}\index{Searching in free sequential mode@{Searching in free sequential mode}!ZRFLessThan@{ZRFLessThan}}}\Hypertarget{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656aef1e4f653972b37edcbe030b9a7c54ea}\label{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656aef1e4f653972b37edcbe030b9a7c54ea} 
+ZRFLess\+Than&Find anything lower than bytes sequence. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZRFCaseRegardless@{ZRFCaseRegardless}!Searching in free sequential mode@{Searching in free sequential mode}}\index{Searching in free sequential mode@{Searching in free sequential mode}!ZRFCaseRegardless@{ZRFCaseRegardless}}}\Hypertarget{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656ab6e0dbda6e3124a92971f0f703974bbb}\label{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656ab6e0dbda6e3124a92971f0f703974bbb} 
+ZRFCase\+Regardless&Do not take care of case. Must be ORED with other Search instruction. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZRFString@{ZRFString}!Searching in free sequential mode@{Searching in free sequential mode}}\index{Searching in free sequential mode@{Searching in free sequential mode}!ZRFString@{ZRFString}}}\Hypertarget{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a26d15ddb890c5f27e2da74d059b4cd7e}\label{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a26d15ddb890c5f27e2da74d059b4cd7e} 
+ZRFString&A cstring is processed (char + ends with \textquotesingle{}\textbackslash{}0\textquotesingle{}char ) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZRFTrimspace@{ZRFTrimspace}!Searching in free sequential mode@{Searching in free sequential mode}}\index{Searching in free sequential mode@{Searching in free sequential mode}!ZRFTrimspace@{ZRFTrimspace}}}\Hypertarget{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a56c168e22e3823c7f7f4d94a8a850aca}\label{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a56c168e22e3823c7f7f4d94a8a850aca} 
+ZRFTrimspace&For a cstring \+: request to trim leading and trailing spaces before test evaluation. \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{zsearchargument_8h_source_l00014}{14}} of file \mbox{\hyperlink{zsearchargument_8h_source}{zsearchargument.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{group___z_r_f_free_search_ga0d1109b5a8066fdaa08dbbbe888f3495}\label{group___z_r_f_free_search_ga0d1109b5a8066fdaa08dbbbe888f3495} 
+\index{Searching in free sequential mode@{Searching in free sequential mode}!zsearchFieldAllCollection@{zsearchFieldAllCollection}}
+\index{zsearchFieldAllCollection@{zsearchFieldAllCollection}!Searching in free sequential mode@{Searching in free sequential mode}}
+\doxysubsubsection{\texorpdfstring{zsearchFieldAllCollection()}{zsearchFieldAllCollection()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+File\+::zsearch\+Field\+All\+Collection (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classzbs_1_1_z_r_f_collection}{ZRFCollection}} \&}]{p\+Collection,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock = {\ttfamily \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a25827b44741ec3b1bd038310f31bc15f}{ZLock\+\_\+\+Omitted}}},  }\item[{\mbox{\hyperlink{classzbs_1_1_z_r_f_collection}{ZRFCollection}} \texorpdfstring{$\ast$}{*}}]{p\+Input\+Collection = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}} }\end{DoxyParamCaption})}
+
+
+
+\doxylink{group___z_r_f_free_search_ga0d1109b5a8066fdaa08dbbbe888f3495}{ZRandom\+File\+::zsearch\+Field\+All\+Collection} Sequential search on a given collection of records (All records of the collection) for a given sequence (p\+Search) into a field defined by its offset from beginning of record If p\+Collection is omitted, then the search is made on all active records of the \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} (ZBlock\+Access\+Table -\/ ZBAT) 
+
+You should first defines a field (a segment of user\textquotesingle{}s record) from beginning of user\textquotesingle{}s record (offset) and its length in bytes for searching in the entire file
+
+Search is made on a collection of records ranks given by p\+Collection (ZArray$<$ssize\+\_\+t$>$).
+
+As Search can be made recursively using each time \doxylink{classzbs_1_1_z_r_f_collection}{ZRFCollection} as collection of records ranks to find. (A safe copy is made in the routine)
+
+Then searches if the content of Sequence matches somewhere in this field for the set or selected records.
+
+Returns a \doxylink{classzbs_1_1_z_r_f_collection}{ZRFCollection} containing
+\begin{DoxyItemize}
+\item the status of the operation
+\item a \doxylink{classzbs_1_1_z_array}{ZArray} with the ranks of found records
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+If p\+Search as a sequence is a string
+\begin{DoxyItemize}
+\item Either keep in mind that the ending character \textquotesingle{}\textbackslash{}0´ must be excluded. Example 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{ZDataBuffer\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSearch}};}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSearch}}\ =\ \textcolor{stringliteral}{"{}string\ to\ search"{}};}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSearch}}.Size\ -\/-\/\ ;\ \textcolor{comment}{//\ mandatory\ because\ must\ exclude\ trailing\ '\(\backslash\)0'\ char,\ while\ operator\ '='\ includes\ it\ into\ ZDataBuffer's\ size.}}
+
+\end{DoxyCode}
+
+\item or you should use ZRFString as a search mask for \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Search\+Type}. In this case, trailing \textquotesingle{}\textbackslash{}0\textquotesingle{} char will be automatically omitted.
+\end{DoxyItemize}
+\end{DoxyNote}
+Additionally, trailing \textquotesingle{}\textbackslash{}0\textquotesingle{} from fields read from file will also be omitted when comparing key to record field extraction.
+
+Example \+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uchar}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSearchType}}\ =\ \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656ad14ab10ca4c2c31c6c6409bf6ff8fd73}{ZRFEndsWith}}\ |\ \mbox{\hyperlink{group___z_r_f_free_search_ggaf64b6cef70fbbf38fa4caa789b790656a26d15ddb890c5f27e2da74d059b4cd7e}{ZRFString}}}
+
+\end{DoxyCode}
+
+
+\begin{DoxyWarning}{Warning}
+As it is a sequential search for records, it may induce performance issues
+\end{DoxyWarning}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Offset} & offset of field from start of user record to search within \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Length} & length of field to search within\\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Sequence} & ZData\+Buffer containing the binary sequence or the string sequence to find (depending on p\+Search\+Type).\\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+MRes} & a pointer to a newly created \doxylink{classzbs_1_1_z_r_f_collection}{ZRFCollection} object that will contain in return the result of the search.\\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Search\+Type} & a ZRFSearch\+\_\+type that indicates how to search within field (defaulted to ZStarts\+With)\\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Collection} & a pointer to a ZArray$<$ssize\+\_\+t$>$ (Base of \doxylink{classzbs_1_1_z_r_f_collection}{ZRFCollection}) containing the ranks of records to search for value in defined field. Defaulted to nullptr. If omitted (nullptr), then the whole active records set for the \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} is taken as input for testing fields values.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus that gives the result of the operation (equals to ZRFCollection\+::\+ZSt) if at least one record is found, this status is set to ZS\+\_\+\+FOUND. In case of error(mostly file error), this status is set to appropriate status while ZException contains the error exception messages. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomfile_8cpp_source_l09670}{9670}} of file \mbox{\hyperlink{zrandomfile_8cpp_source}{zrandomfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00418}{zbs\+::\+ZRandom\+File\+::is\+Open()}}, and \mbox{\hyperlink{zfiledescriptor_8h_source_l00172}{zbs\+::\+ZFile\+Descriptor\+::\+URIContent}}.
+
+\Hypertarget{group___z_r_f_free_search_ga4afe5f1051b94274fc2dc134740da409}\label{group___z_r_f_free_search_ga4afe5f1051b94274fc2dc134740da409} 
+\index{Searching in free sequential mode@{Searching in free sequential mode}!zsearchFieldFirstCollection@{zsearchFieldFirstCollection}}
+\index{zsearchFieldFirstCollection@{zsearchFieldFirstCollection}!Searching in free sequential mode@{Searching in free sequential mode}}
+\doxysubsubsection{\texorpdfstring{zsearchFieldFirstCollection()}{zsearchFieldFirstCollection()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+File\+::zsearch\+Field\+First\+Collection (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Record\+Content,  }\item[{\mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \&}]{p\+ZRFRank,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_r_f_collection}{ZRFCollection}} \&}]{p\+Collection,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}}}]{p\+Lock = {\ttfamily \mbox{\hyperlink{zlock_8h_aa9fab91c54ba18aa708bebec12b51e60a25827b44741ec3b1bd038310f31bc15f}{ZLock\+\_\+\+Omitted}}},  }\item[{\mbox{\hyperlink{classzbs_1_1_z_r_f_collection}{ZRFCollection}} \texorpdfstring{$\ast$}{*}}]{p\+Input\+Collection = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}} }\end{DoxyParamCaption})}
+
+
+
+\doxylink{group___z_r_f_free_search_ga4afe5f1051b94274fc2dc134740da409}{ZRandom\+File\+::zsearch\+Field\+First\+Collection}. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em p\+MRes} & Collection of ranks to build \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Collection} & Collection of ranks in input to base the search on \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomfile_8cpp_source_l09701}{9701}} of file \mbox{\hyperlink{zrandomfile_8cpp_source}{zrandomfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00418}{zbs\+::\+ZRandom\+File\+::is\+Open()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00172}{zbs\+::\+ZFile\+Descriptor\+::\+URIContent}}, and \mbox{\hyperlink{zrandomfile_8cpp_source_l09745}{zbs\+::\+ZRandom\+File\+::zsearch\+Field\+Next\+Collection()}}.
+
+\Hypertarget{group___z_r_f_free_search_ga9a4486437a4982aa14f8861bff66a021}\label{group___z_r_f_free_search_ga9a4486437a4982aa14f8861bff66a021} 
+\index{Searching in free sequential mode@{Searching in free sequential mode}!zsearchFieldNextCollection@{zsearchFieldNextCollection}}
+\index{zsearchFieldNextCollection@{zsearchFieldNextCollection}!Searching in free sequential mode@{Searching in free sequential mode}}
+\doxysubsubsection{\texorpdfstring{zsearchFieldNextCollection()}{zsearchFieldNextCollection()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+File\+::zsearch\+Field\+Next\+Collection (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Record\+Content,  }\item[{\mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \&}]{p\+ZRFRank,  }\item[{\mbox{\hyperlink{classzbs_1_1_z_r_f_collection}{ZRFCollection}} \&}]{p\+Collection }\end{DoxyParamCaption})}
+
+
+
+\doxylink{group___z_r_f_free_search_ga9a4486437a4982aa14f8861bff66a021}{ZRandom\+File\+::zsearch\+Field\+Next\+Collection}. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em p\+MRes} & Collection of ranks to build \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Collection} & Collection of ranks in input to base the search on \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\doxylink{group___z_r_f_free_search_ga9a4486437a4982aa14f8861bff66a021}{ZRandom\+File\+::zsearch\+Field\+Next\+Collection} gets next selected \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} record and rank using store Argument rules. Populates collection with found record. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em p\+Record\+Content} & matched \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} record content if successfull. \doxylink{classzbs_1_1_z_file_descriptor_af685521d33c0b438c3b60e3dcf4d6397}{clear()} if not \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+ZRFRank} & matched \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} rank if successfull or -\/1 if not \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+Collection} & a pointer to the collection to feed with next matched rank \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus with the following possible values
+\begin{DoxyItemize}
+\item ZS\+\_\+\+FOUND a matching record has been found, its record content is returned in p\+Record\+Content and its rank is returned in p\+ZRFRank
+\item ZS\+\_\+\+EOF no matching records have been found till the end of \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}. p\+Record\+Content is cleared and p\+ZRFRank is set to -\/1
+\item ZS\+\_\+\+LOCKED mask (ZS\+\_\+\+LOCKREAD, etc.) if accessed \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} record is locked (see ZRFCollection\+::zget\+Next\+Retry() )
+\item Other file errors in case of severe file error. ZException is set with appropriate message. 
+\end{DoxyItemize}
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomfile_8cpp_source_l09745}{9745}} of file \mbox{\hyperlink{zrandomfile_8cpp_source}{zrandomfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00418}{zbs\+::\+ZRandom\+File\+::is\+Open()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00172}{zbs\+::\+ZFile\+Descriptor\+::\+URIContent}}, and \mbox{\hyperlink{zlock_8h_source_l00116}{ZLock\+\_\+\+Nolock}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomfile_8cpp_source_l09701}{zbs\+::\+ZRandom\+File\+::zsearch\+Field\+First\+Collection()}}.
+

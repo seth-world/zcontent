@@ -1,0 +1,506 @@
+\chapter{Starting up using ZMaster\+File}
+\hypertarget{_z_m_f_quick_start}{}\label{_z_m_f_quick_start}\index{Starting up using ZMasterFile@{Starting up using ZMasterFile}}
+ 
+\startcontents[mainsections]
+\printcontents[mainsections]{l}{1}{\section*{Main Sections}\setcounter{tocdepth}{2}}
+\clearpage
+\hypertarget{_z_m_f_quick_start_ZMFQSIntro}{}\doxysection{\texorpdfstring{Introduction -\/ Example presentation}{Introduction - Example presentation}}\label{_z_m_f_quick_start_ZMFQSIntro}
+This chapter is a user\textquotesingle{}s guide concerning the use of \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}.
+
+We will follow an example all accross this chapter with a simple data definition. Indeed this example is silly, and not realistic. But this is for the purpose of showing usage and possibilities of \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} methods.
+
+In this example, we will
+\begin{DoxyItemize}
+\item load in a ZMF a mix of structured data and informal, varying length data with various format.
+\item define two indexes
+\item feed ZMF with data
+\item remove records
+\item search for data in multiple ways
+\item use some ZMF utilities
+\end{DoxyItemize}\hypertarget{_z_m_f_quick_start_ZMFQSRequired}{}\doxysubsection{\texorpdfstring{Required include files}{Required include files}}\label{_z_m_f_quick_start_ZMFQSRequired}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/\ for\ ZBaseSytem-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <config/zconfig.h>}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <ztoolset/ZArray.h>}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <ztoolset/zerror.h>}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zmasterfile_8h}{zindexedfile/zmasterfile.h}}>}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/\ for\ data\ types\ handling-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ <typeinfo>}}
+
+\end{DoxyCode}
+\hypertarget{_z_m_f_quick_start_ZMFQSDataDef}{}\doxysubsection{\texorpdfstring{Data definitions}{Data definitions}}\label{_z_m_f_quick_start_ZMFQSDataDef}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ an\ enum\ for\ qualifying\ content\ :\ indeed\ we\ should\ better\ use\ Mime\ type.}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096}{Doc\_type}}\ :\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\_t}}\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ =\ 0,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a075d71ccc01cc1350c2febfc453ff916}{DT\_Pdf}}\ =\ 1,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096abb063dcd429504bd3acb539911c8cf2e}{DT\_Jpeg}}\ =\ 2,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a83c044fa7ffd7e9130c766f2f3e7e3df}{DT\_Html}}\ =\ 3,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096ac0e9a60b51a82914a55bf115d58abfd6}{DT\_Mp4}}\ =\ 4,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a49d6fa9ddccc2e9fef9def07d745567d}{DT\_Mail}}\ =\ 5,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a51c9b5166139024b94384c1278709449}{DT\_Other}}\ =\ 6}
+\DoxyCodeLine{\ \ \ \ \};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ our\ structured\ data\ for\ records}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_t3}{T3}}\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordtype}{char}\ \ \ \ \ \ String1\ [50];}
+\DoxyCodeLine{\ \ \ \ \ \ \textcolor{keywordtype}{float}\ \ \ \ \ NumericField\ [3]\ \ ;}
+\DoxyCodeLine{\ \ \ \ \ \ \mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096}{Doc\_type}}\ \ Type;}
+\DoxyCodeLine{\ \ \ \ \};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ our\ constants\ to\ feed\ the\ file\ with}}
+\DoxyCodeLine{\textcolor{comment}{//\ Note\ that\ DT\_Nothing\ will\ be\ updated\ later}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_t3}{T3}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{T3Cst}}[]\ =}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}my\ heart\ beats"{}}\ \ \ \ \ \ \ \ ,\ \ \{110\ ,-\/155\ ,1\}\ ,\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}my\ heart\ beats\ for\ you"{}},\ \ \{110\ ,-\/1024,1\},\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}and\ so\ beats\ my\ skin"{}},\ \ \ \ \{110\ ,-\/152,\ 1\},\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \ \}\ ,}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}xxxx"{}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{110,\ 110\ ,1\}\ ,\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}this\ is\ one"{}},\ \ \ \ \ \ \ \ \ \ \ \ \ \{1\ ,\ 110\ ,1\ \},\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}aaaa\ \ \ "{}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{34\ ,\ 110\ ,1\},\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}eer"{}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{5,\ 110\ ,1\ \},\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}\ \ \ dddd"{}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{250,\ 110\ ,1\ \},\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}jkfdlsakfj"{}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \{2025,\ 110\ ,1\ \},\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}egadfk"{}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{25,\ 110\ ,1\ \},\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \},}
+\DoxyCodeLine{\ \ \ \ \{\textcolor{stringliteral}{"{}aaaa\ \ \ "{}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{12045,\ 110\ ,1\ \}\ ,\mbox{\hyperlink{main__console_8cpp_a9f6fa8900c00756f7875c94b6565e096a042604c49f67d0011111b2cb30c66319}{DT\_Nothing}}\ \}}
+\DoxyCodeLine{\ \ \ \ \};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ some\ files\ with\ various\ format\ :\ in\ fact\ the\ main\ file's\ content}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{PictureFiles}}\ []\ =\ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/DSC\_01231.jpg"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/DSC\_01232.jpg"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/DSC\_0123.JPG"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/DSC\_0146.JPG"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/DSC\_0394.JPG"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/DSC\_0414.JPG"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/Gelato.mp4"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/invoice2016-\/04-\/26.pdf"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Pictures/QItemDelegate\ Class\ |\ Qt\ Widgets\ 5.7.html"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Documents/DSC\_0265.JPG"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Documents/DSC\_0267.JPG"{}},}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}/home/gerard/Documents/DSCN0971.JPG"{}}}
+\DoxyCodeLine{\ \ \ \ \};}
+
+\end{DoxyCode}
+\hypertarget{_z_m_f_quick_start_ZMFQSInstantiate}{}\doxysection{\texorpdfstring{Instantiating ZMaster\+File}{Instantiating ZMasterFile}}\label{_z_m_f_quick_start_ZMFQSInstantiate}
+Instantiating \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} object doen\textquotesingle{}t create anything on storage.
+
+It simply creates an object with the memory structure within the process ready to be used either to create a ZMF or to open a ZMF.
+
+You may specify a file path at this stage with an uri\+String, but this is not mandatory. At anytime BEFORE having opened ZMF you may set or change this path using ZMaster\+File\+::set\+Path().\hypertarget{_z_m_f_quick_start_ZMFQSInsV1}{}\doxysubsection{\texorpdfstring{version 1}{version 1}}\label{_z_m_f_quick_start_ZMFQSInsV1}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{uriString\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPath}};}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPath}}\ =\ \textcolor{stringliteral}{"{}/home/gerard/testindexedpictures.zmf"{}};}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_master_file}{ZMasterFile}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPath}});}
+
+\end{DoxyCode}
+
+
+The main file path should already have been tested and stored.
+
+This can be done using uri\+String facilities.
+
+But in this case, if the path is not a valid path, then \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} constructor aborts application.
+
+So, we do prefer the following.\hypertarget{_z_m_f_quick_start_ZMFQSInsV2}{}\doxysubsection{\texorpdfstring{version 2}{version 2}}\label{_z_m_f_quick_start_ZMFQSInsV2}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{classzbs_1_1_z_master_file}{ZMasterFile}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}\ ;}
+
+\end{DoxyCode}
+\hypertarget{_z_m_f_quick_start_ZMFQSCreating}{}\doxysection{\texorpdfstring{Creating a ZMaster\+File}{Creating a ZMasterFile}}\label{_z_m_f_quick_start_ZMFQSCreating}
+We will create an empty \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} structure with a free available space (contiguous best try) of 100000 bytes.
+
+This is the most simpler way to create a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} structure.
+
+Excepted mandatory data, meaning file path and initial file space, all other parameters are defaulted.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ we\ do\ not\ want\ to\ leave\ the\ file\ open\ (pLeaveOpen\ is\ defaulted\ to\ false)}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}.zcreate(\textcolor{stringliteral}{"{}/home/gerard/testindexedpictures.zmf"{}},100000\ );}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+
+\end{DoxyCode}
+
+
+we chose an extension name of "{}.\+zmf"{} but this is NOT mandatory. Any extension is valid excepted the reserved ones. see\+:\doxysectlink{group___z_m_f_file_naming_FNPZMFName}{Naming conventions for ZMaster\+File}{2}.\hypertarget{_z_m_f_quick_start_ZMFQSSetting}{}\doxysection{\texorpdfstring{Setting ZMaster\+File options}{Setting ZMasterFile options}}\label{_z_m_f_quick_start_ZMFQSSetting}
+By default, grab\+Free\+Space is set to on (true), and high\+Water\+Marking is set to off (false).
+
+Allocated\+Blocks and Block\+Extent\+Quota,the pool tables size parameters, are set to their defaulted parameters (\+\_\+cst\+\_\+default\+\_\+allocation and \+\_\+cst\+\_\+realloc\+\_\+quota) see\+: ZArray
+
+We could change that at this stage.
+
+But one rather important parameter is Block\+Target\+Size. We will set it to a value (this is not mandatory, but wishable). 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}.setBlockTargetSize(\ 100000\ );\ \textcolor{comment}{//\ it\ can\ be\ done\ while\ file\ is\ closed.\ File\ is\ opened\ then\ closed}}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Warning\ for\ eventuality\ of\ file\ lock\ in\ between}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+
+\end{DoxyCode}
+\hypertarget{_z_m_f_quick_start_ZMFQSCreatIdx}{}\doxysection{\texorpdfstring{Creating Indexes}{Creating Indexes}}\label{_z_m_f_quick_start_ZMFQSCreatIdx}
+At this stage, \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} structure is created including on storage, with all necessary infra-\/data to work with.
+
+It\textquotesingle{}s time to create indexes.
+
+For this example, we will create two indexes, among which one is "{}silly"{}, but necessary to show capabilities.
+
+For creating an index the underneeth process is
+
+
+\begin{DoxyItemize}
+\item create a key dictionary CZDictionary \+: upload fields in their key order (key rank)
+\item create the Index structure using this dictionary
+\end{DoxyItemize}
+
+This dictionary will store any field in the key order we define to interpret, extract, convert whenever necessary data.\hypertarget{_z_m_f_quick_start_ZMFQSCreatIdxFirst}{}\doxysubsection{\texorpdfstring{First index}{First index}}\label{_z_m_f_quick_start_ZMFQSCreatIdxFirst}
+Its name will be "{}\+First Index"{}, with a touch of originality.
+
+
+\begin{DoxyItemize}
+\item String1 as first rank (an array of char)
+\item Numeric\+Field as second rank (this is an array of float data type)
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+Index names must be at maximum 15 characters. 
+
+I am conscious that the first field may be strictly enough. But, I want to show how we can manage multiple fields indexes.
+\end{DoxyNote}
+The process is \+:
+\begin{DoxyItemize}
+\item define fields in a key dictionary
+\item control by printing fields definitions if you whish
+\item create index within \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{CZKeyDictionary}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDic}};\ \ \ \ \ \ \ \textcolor{comment}{//\ the\ dictionary\ for\ the\ created\ index}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ define\ index\ keys}}
+\DoxyCodeLine{\textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ one\ index\ key\ on\ String1\ then\ NumericField}}
+\DoxyCodeLine{\textcolor{comment}{//}}
+\DoxyCodeLine{\ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{decltype}\ (\mbox{\hyperlink{struct_t3_aecd09e9376af4d9d5048b521e64b9395}{T3::String1}})\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{T3String1}};}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDic}}.zaddField<\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{T3String1}}>\ (\textcolor{stringliteral}{"{}String1"{}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{offsetof}}\ (\mbox{\hyperlink{struct_t3}{T3}},String1));}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{decltype}\ (\mbox{\hyperlink{struct_t3_a1f4ae1f878e115e2866d6f2dacb9dcd5}{T3::NumericField}})\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{T3Numeric}};}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDic}}.zaddField<\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{T3Numeric}}>(\textcolor{stringliteral}{"{}NumericField"{}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{offsetof}}\ (\mbox{\hyperlink{struct_t3}{T3}},NumericField));}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDic}}.print(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}});\ \textcolor{comment}{//\ dumping\ field\ list\ content}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}.zcreateIndex(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDic}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ key\ Dictionary\ that\ just\ has\ been\ set}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}First\ Index"{}},\ \ \ \ \ \ \ \ \textcolor{comment}{//\ user\ defined\ name\ (not\ used\ internally)}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZST\_NODUPLICATES}});\ \ \ \ \textcolor{comment}{//\ Allowing\ duplicates\ or\ not\ :\ not\ allowing\ duplicates}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();;}
+
+\end{DoxyCode}
+
+
+As a result, we have, listed to stdout 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKeyFieldList}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{content}}-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{rank}}\ \ \ \mbox{\hyperlink{namespacezbs_ae2e1a379ff5238ea25fac98f1d9fa2bd}{Offset}}\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Natural}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Internal}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Array}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nb}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ Name\ ZType}
+\DoxyCodeLine{\ <\ 0>\ \ \ \ \ \ \ \ 0\ \ \ \ \ \ \ 50\ \ \ \ \ \ \ 50\ \ \ \ \ \ \ 50\ <\ \ \ \ \ \ \ \ String1>\ <\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3dfafdee7071468db6eb2860fe7ae305}{ZType\_Array}}\ |\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8addb54db0d259cc03752209254c654fa5}{ZType\_Char}}>}
+\DoxyCodeLine{\ <\ 1>\ \ \ \ \ \ \ 52\ \ \ \ \ \ \ 12\ \ \ \ \ \ \ 15\ \ \ \ \ \ \ \ 3\ <\ \ \ NumericField>\ <\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3dfafdee7071468db6eb2860fe7ae305}{ZType\_Array}}\ |\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6529638cfeba690e9a2c1e49c4ad8bf0}{ZType\_Signed}}\ |\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a5cb05b82d99ee043b6744dbb79d7d924}{ZType\_Endian}}\ |\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a0cba3ce50369a342d1e1e21aff13d753}{ZType\_Float}}>}
+\DoxyCodeLine{-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+
+\end{DoxyCode}
+
+
+We can then verify that data type analysis has been correctly done.
+
+The column entitled \textquotesingle{}Natural\textquotesingle{} gives the natural total size of the field, while the one entitle \textquotesingle{}Internal\textquotesingle{} gives the size ZIndex\+File will store after its conversion. Array\+Nb gives the number of occurrences for an array (for an atomic data type this value is 1).
+
+And to stderr, it appears
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ -\/-\/-\/-\/-\/-\/-\/-\/-\/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Rebuilding}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Index\ <First\ Index>}}-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{File}}\ is\ /\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{home}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{gerard}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{testindexedpictures}}-\/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{FirstIndex}}-\/00.\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zix}}}
+\DoxyCodeLine{\ Index\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{file}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size}}\ is\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{computed}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{to}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{be}}\ 0}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Clearing}}\ index\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{file}}}
+\DoxyCodeLine{\ -\/-\/-\/-\/-\/-\/-\/-\/-\/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Successfull}}\ end\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{rebuilding}}\ process\ \textcolor{keywordflow}{for}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Index\ <First\ Index>}}-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+
+\end{DoxyCode}
+
+
+With that message, we know that \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} tried to rebuild the index file from its father\textquotesingle{}s content. We have the mention of the index main content file that have been generated from the name we gave initially to \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}, here /home/gerard/testindexedpictures-\/\+First\+Index-\/00.zix.
+
+This will be systematically the case \+: when a new index is created, Master\+File could be populated, then it tries to rebuild the index from its content in order to keep indexes aligned.
+
+So that, creating new indexes on an existing file could take some time and consume some resources.\hypertarget{_z_m_f_quick_start_ZMFQSCreatIdxSecond}{}\doxysubsection{\texorpdfstring{Second index}{Second index}}\label{_z_m_f_quick_start_ZMFQSCreatIdxSecond}
+Its name will be "{}\+Second Index"{}.
+
+
+\begin{DoxyItemize}
+\item Type will be the one and unique field (an enum type, yes it works also)
+\end{DoxyItemize}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDic}}.clear();\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ reset\ work\ dictionary}}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{typedef}\ \textcolor{keyword}{decltype}\ (\mbox{\hyperlink{struct_t3_a9dd079189ca03ccbf42128e63e1e03de}{T3::Type}})\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{T3Type}};}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDic}}.zaddField<\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{T3Type}}>\ (\textcolor{stringliteral}{"{}Type"{}},\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{offsetof}}(\mbox{\hyperlink{struct_t3}{T3}},Type));}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{comment}{//\ Then\ create\ index\ within\ ZMasterFile}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}.zcreateIndex(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDic}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ the\ key\ Dictionary\ that\ just\ has\ been\ set}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Second\ Index"{}},\ \ \ \ \ \ \ \ \textcolor{comment}{//\ user\ defined\ name\ (not\ used\ internally)}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zcontentconstants_8h_a3b02d1f4a8007be50cd643b65bb0cdceaf489af4cb28ebe4f0ca1835d63d0c751}{ZST\_Duplicates}});\ \ \ \ \ \textcolor{comment}{//\ Allowing\ duplicates}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDic}}.print(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}});\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ control\ for\ fun\ :\ see\ what\ comes\ out\ of\ an\ enum}}
+
+\end{DoxyCode}
+ \begin{DoxyVerb}@subsection ZMFQSSetParams Setting some options and openning the file
+\end{DoxyVerb}
+ We will now set an optional parameter of the file \+: set\+Grab\+Free\+Space, and when it has been done, open the file for writing.
+
+\begin{DoxyNote}{Note}
+Setting an option after the file has been created may be done while the file is open or close, it has no importance. However, if the file is closed it may point to a valid file path \+: file path may have been previous set using set\+Path() method. During parameter(s) setting, file will be openned in ZRF\+\_\+\+Exclusive mode. This means that if file is accessed by another user and/or process, this action will fail.
+\end{DoxyNote}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}.setGrabFreeSpace(\textcolor{keyword}{true})!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+\DoxyCodeLine{}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}.zopen(\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748ab8adf897035f8d600f6c798c40d53105}{ZRF\_Write}}|\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748aaa47984d6359356b25a1d49b72155e55}{ZRF\_Exclusive}}))!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})\ \textcolor{comment}{//\ load\ document}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \}}
+
+\end{DoxyCode}
+\hypertarget{_z_m_f_quick_start_ZMFQSGetXML}{}\doxysubsection{\texorpdfstring{Getting file\textquotesingle{}s infra-\/data in XML format}{Getting file's infra-data in XML format}}\label{_z_m_f_quick_start_ZMFQSGetXML}
+We will now get XML infra-\/data definition for the file. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZPicture}}.zwriteXML\_FileDescriptor();}
+
+\end{DoxyCode}
+
+
+In the working directory, we can find a file called \texorpdfstring{$<$}{<}testindexedpictures.\+xml\texorpdfstring{$>$}{>}
+
+It contains our \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} infra-\/data definition in xml format.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{<?\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{xml}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{version}}=\textcolor{stringliteral}{'1.0'}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{encoding}}=\textcolor{stringliteral}{'UTF-\/8'}?>}
+\DoxyCodeLine{<\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zicm}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{version}}=\textcolor{stringliteral}{"{}2.00"{}}>}
+\DoxyCodeLine{<\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{File}}>}
+\DoxyCodeLine{\ \ <\mbox{\hyperlink{classzbs_1_1_z_file_descriptor}{ZFileDescriptor}}>}
+\DoxyCodeLine{\ \ \ \ \ \ <URIContent>/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{home}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{gerard}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{testindexedpictures}}.zmf</URIContent>}
+\DoxyCodeLine{\ \ \ \ \ \ <URIHeader>/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{home}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{gerard}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{testindexedpictures}}.zrh</URIHeader>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{generated}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{by}}\ \mbox{\hyperlink{classzbs_1_1_z_random_file}{ZRandomFile}}-\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ <URIDirectoryPath>/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{home}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{gerard}}/</URIDirectoryPath>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{generated}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{by}}\ \mbox{\hyperlink{classzbs_1_1_z_random_file}{ZRandomFile}}-\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ <\mbox{\hyperlink{class_z_header_control_block}{ZHeaderControlBlock}}>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ <FileType>\mbox{\hyperlink{group___z_random_file_group_ggad35b4a162ff06536b78d246d301b346da6912325aa71380727e1f037db09b76c1}{ZFT\_ZMasterFile}}</FileType>\ \ <!-\/-\/\ \textcolor{keywordflow}{do}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modify}}\ :\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{could}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{cause}}\ data\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{loss}}\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{see}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{documentation}}-\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ <ZRFVersion>2000</ZRFVersion>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ <OffsetFCB>4698</OffsetFCB>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ <OffsetReserved>64</OffsetReserved>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ <SizeReserved>4634</SizeReserved>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ </\mbox{\hyperlink{class_z_header_control_block}{ZHeaderControlBlock}}>}
+\DoxyCodeLine{\ \ \ <\mbox{\hyperlink{class_z_file_control_block}{ZFileControlBlock}}>}
+\DoxyCodeLine{\ \ \ \ \ \ <AllocatedBlocks>15</AllocatedBlocks>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ <BlockExtentQuota>5</BlockExtentQuota>}
+\DoxyCodeLine{\ \ \ \ \ \ <InitialSize>100000</InitialSize>}
+\DoxyCodeLine{\ \ \ \ \ \ <BlockTargetSize>1</BlockTargetSize>}
+\DoxyCodeLine{\ \ \ \ \ \ <HighwaterMarking>\textcolor{keyword}{false}</HighwaterMarking>}
+\DoxyCodeLine{\ \ \ \ \ \ <GrabFreeSpace>\textcolor{keyword}{true}</GrabFreeSpace>}
+\DoxyCodeLine{\ \ \ </\mbox{\hyperlink{class_z_file_control_block}{ZFileControlBlock}}>}
+\DoxyCodeLine{\ \ </\mbox{\hyperlink{classzbs_1_1_z_file_descriptor}{ZFileDescriptor}}>}
+\DoxyCodeLine{\ \ <\mbox{\hyperlink{classzbs_1_1_z_master_control_block}{ZMasterControlBlock}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ <HistoryOn>\textcolor{keyword}{false}</HistoryOn>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ <JournalingOn>\textcolor{keyword}{true}</JournalingOn>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{IndexFileDirectoryPath}}></\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{IndexFileDirectoryPath}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Changing}}\ IndexRank\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{position}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{in}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{a}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{file}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{description}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{will}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{imply}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{huge}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifications}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ <Index>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ <IndexRank>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ <Rank>0</Rank>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{significant}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ <Name>\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{First}}\ Index</Name>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{warning}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modification}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{of}}\ \textcolor{keyword}{this}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{field}}\ is\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{dangerous}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{see}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{documentation}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ <Duplicates>\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZST\_NODUPLICATES}}</Duplicates>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{warning}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modification}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{of}}\ \textcolor{keyword}{this}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{field}}\ is\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{dangerous}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{see}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{documentation}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{AutoRebuild}}>\textcolor{keyword}{false}</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{AutoRebuild}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKDic}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <NaturalSize>62</NaturalSize>\ \ \ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{InternalSize}}>65</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{InternalSize}}>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{KeyField}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <Rank>0</Rank>\ \ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{significant}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <Name>String1</Name>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <NaturalSize>50</NaturalSize>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{InternalSize}}>50</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{InternalSize}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ArraySize}}>50</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ArraySize}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <ZType>\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3dfafdee7071468db6eb2860fe7ae305}{ZType\_Array}}\ |\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8addb54db0d259cc03752209254c654fa5}{ZType\_Char}}</ZType>\ \ \ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{see}}\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8}{ZType\_type}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{definition}}\ :\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{beware}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{the}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typos}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{RecordOffset}}>0</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{RecordOffset}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ </\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{KeyField}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{KeyField}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <Rank>1</Rank>\ \ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{significant}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <Name>NumericField</Name>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <NaturalSize>12</NaturalSize>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{InternalSize}}>15</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{InternalSize}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ArraySize}}>3</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ArraySize}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <ZType>\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3dfafdee7071468db6eb2860fe7ae305}{ZType\_Array}}\ |\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6529638cfeba690e9a2c1e49c4ad8bf0}{ZType\_Signed}}\ |\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a5cb05b82d99ee043b6744dbb79d7d924}{ZType\_Endian}}\ |\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a0cba3ce50369a342d1e1e21aff13d753}{ZType\_Float}}</ZType>\ \ \ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{see}}\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8}{ZType\_type}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{definition}}\ :\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{beware}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{the}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typos}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{RecordOffset}}>52</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{RecordOffset}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ </\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{KeyField}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ </\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKDic}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ </IndexRank>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ <IndexRank>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ <Rank>1</Rank>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{significant}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ <Name>\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Second}}\ Index</Name>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{warning}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modification}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{of}}\ \textcolor{keyword}{this}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{field}}\ is\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{dangerous}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{see}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{documentation}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ <Duplicates>\mbox{\hyperlink{zcontentconstants_8h_a3b02d1f4a8007be50cd643b65bb0cdceaf489af4cb28ebe4f0ca1835d63d0c751}{ZST\_Duplicates}}</Duplicates>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{warning}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modification}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{of}}\ \textcolor{keyword}{this}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{field}}\ is\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{dangerous}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{see}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{documentation}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{AutoRebuild}}>\textcolor{keyword}{false}</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{AutoRebuild}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKDic}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <NaturalSize>4</NaturalSize>\ \ \ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{InternalSize}}>5</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{InternalSize}}>\ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{modifiable}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{KeyField}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <Rank>0</Rank>\ \ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{not}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{significant}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <Name>Type</Name>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <NaturalSize>4</NaturalSize>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{InternalSize}}>5</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{InternalSize}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ArraySize}}>1</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ArraySize}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <ZType>\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZType\_Enum}}|\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6529638cfeba690e9a2c1e49c4ad8bf0}{ZType\_Signed}}\ |\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a5cb05b82d99ee043b6744dbb79d7d924}{ZType\_Endian}}\ |\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a4dc7a51fd5ec2afed3fced7a99092be8}{ZType\_S32}}</ZType>\ \ \ <!-\/-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{see}}\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8}{ZType\_type}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{definition}}\ :\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{beware}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{the}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typos}}\ -\/-\/>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{RecordOffset}}>64</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{RecordOffset}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ </\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{KeyField}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ </\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKDic}}>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ </IndexRank>}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ </Index>}
+\DoxyCodeLine{\ \ </\mbox{\hyperlink{classzbs_1_1_z_master_control_block}{ZMasterControlBlock}}>}
+\DoxyCodeLine{</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{File}}>}
+\DoxyCodeLine{</\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zicm}}>}
+
+\end{DoxyCode}
+\hypertarget{_z_m_f_quick_start_ZMFQSSetIdx}{}\doxysection{\texorpdfstring{Setting indexes option}{Setting indexes option}}\label{_z_m_f_quick_start_ZMFQSSetIdx}
+
+\begin{DoxyItemize}
+\item separating physical index files from Main \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} location.
+\item changing indexes parameters value
+\end{DoxyItemize}\hypertarget{_z_m_f_quick_start_ZMFQSOpening}{}\doxysection{\texorpdfstring{Opening and closing ZMaster\+File}{Opening and closing ZMasterFile}}\label{_z_m_f_quick_start_ZMFQSOpening}
+
+\begin{DoxyItemize}
+\item session
+\item open modes
+\end{DoxyItemize}\hypertarget{_z_m_f_quick_start_ZMFQSFeeding}{}\doxysection{\texorpdfstring{Feeding ZMaster\+File}{Feeding ZMasterFile}}\label{_z_m_f_quick_start_ZMFQSFeeding}
+You do not have to take care of indexes while feeding \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}. You can use a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} as a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}. Once having being defined, indexes will transparently be updated at any single update operation (check return status however).
+
+
+\begin{DoxyItemize}
+\item testing the return status \+:
+\end{DoxyItemize}
+
+Apart from system errors, that are severe errors, you may encounter the status ZS\+\_\+\+DUPLICATE. This error status indicates that one index has a duplicate value on its key and the index has been defined as ZST\+\_\+\+No\+Duplicates.\hypertarget{_z_m_f_quick_start_ZMFQSAddIdx}{}\doxysection{\texorpdfstring{Adding indexes once file has been populated}{Adding indexes once file has been populated}}\label{_z_m_f_quick_start_ZMFQSAddIdx}
+\hypertarget{_z_m_f_quick_start_ZMFQSModIdx}{}\doxysection{\texorpdfstring{Modifying Indexes}{Modifying Indexes}}\label{_z_m_f_quick_start_ZMFQSModIdx}
+\hypertarget{_z_m_f_quick_start_ZMFQSSearching}{}\doxysection{\texorpdfstring{Searching for content with a ZMaster\+File}{Searching for content with a ZMasterFile}}\label{_z_m_f_quick_start_ZMFQSSearching}
+\doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} offers the possibility to define and use indexes\hypertarget{_z_m_f_quick_start_ZMFQSSearchTypes}{}\doxysubsection{\texorpdfstring{Index searches and free sequential searches}{Index searches and free sequential searches}}\label{_z_m_f_quick_start_ZMFQSSearchTypes}
+\doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} allows the same free sequential search facilities than its base object \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}. It is then possible to fully use these facilities.
+
+Additionnally, \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} offers a search based upon index key values. Accessing key values using indexes saves drastically time and file accesses compared to free sequential search. However, there is an priority order between access types to respect \+:
+\begin{DoxyItemize}
+\item first access indexes and establish a collection
+\item restrict collection using free sequential search (that will only scroll the existing collection content).
+\end{DoxyItemize}
+
+So that, there is a medium term to find between the capabilities of free sequential search and speed of access of indexed search.\hypertarget{_z_m_f_quick_start_ZMFQSIndexAccess}{}\doxysubsection{\texorpdfstring{Access ZMaster\+File using its indexes.}{Access ZMasterFile using its indexes.}}\label{_z_m_f_quick_start_ZMFQSIndexAccess}
+It is possible to search for
+\begin{DoxyItemize}
+\item a single key value or for multiple key values i. e. a collection of values
+\item using an exact key value or a partial key value
+\end{DoxyItemize}\hypertarget{_z_m_f_quick_start_ZMFQSPartialKey}{}\doxysubsection{\texorpdfstring{Exact key value or partial key value in a search operation}{Exact key value or partial key value in a search operation}}\label{_z_m_f_quick_start_ZMFQSPartialKey}
+A search may be made with a partial key value, this means that requested key size will represent a partial segment of index key. In this case, the search operation is made on the partial value of given key content and
+\begin{DoxyItemize}
+\item if a simple search operation is invoked, then the first found key value is returned
+\item if a multiple search operation giving a collection of records ( either zsearch\+All or zsearch\+First, zsearch\+Next )
+\end{DoxyItemize}\hypertarget{_z_m_f_quick_start_ZMFQSZKey}{}\doxysubsection{\texorpdfstring{Using ZKey object}{Using ZKey object}}\label{_z_m_f_quick_start_ZMFQSZKey}
+ZKey is an object dedicated to index key search (see \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey}). It allows to
+\begin{DoxyItemize}
+\item store index description (\doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} index number, Key dictionary)
+\item format and load key value using field dictionary Field(s) content are then formatted to appropriate key \textquotesingle{}internal\textquotesingle{} format in order to be appropriatedly used.
+\item create a partial key value in order to search multiple results, or collection of results, from a single partial key value.
+\end{DoxyItemize}\hypertarget{_z_m_f_quick_start_ZMFQSCollection}{}\doxysubsection{\texorpdfstring{Using collection of records}{Using collection of records}}\label{_z_m_f_quick_start_ZMFQSCollection}
+Searches with potentially multiple results are using collection of results see \doxylink{classzbs_1_1_z_index_collection}{ZIndex\+Collection}.
+
+\doxylink{classzbs_1_1_z_index_collection}{ZIndex\+Collection} is always defined from a ZIndex\+File of a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}, and holds the references from index ranks that have currently been found using a search operation. It may hold the whole index file if no key selection have been mentionned. (IMPLEMENT)
+
+It consists, for its base object, of a \doxylink{classzbs_1_1_z_array}{ZArray} of \doxylink{classzbs_1_1_z_index_result}{ZIndex\+Result} objects mentionning
+\begin{DoxyItemize}
+\item the Index rank (ZIndex\+File relative position) matching the given key content (either exact or partial),
+\item the related \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} record address given by index that allows to get directly ZMF record using ZMaster\+File\+::zget\+By\+Address() method.
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+\doxylink{classzbs_1_1_z_index_collection}{ZIndex\+Collection} is a snapshot of selected ZMasterfile records that correspond at one moment to selection criterias. As it is not a dynamic object, collection is NOT modified accordingly when the \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} to which collection refers to is himself modified
+\begin{DoxyItemize}
+\item record content modification
+\item record suppression
+\item record add So that, in order to preserve collection integrity while other processes are capable of accessing Master\+File origin of the collection, it is utmostly important to lock selected records with the appropriate lock mask using ZIndex\+Collection\+::zlock\+All() or, more simply, in mentionning the appropriate lock mask while creating collection see \doxysectlink{_z_m_f_quick_start_ZMFCollLock}{Collection and record locks}{3}
+\end{DoxyItemize}
+\end{DoxyNote}
+\hypertarget{_z_m_f_quick_start_ZMFCollCreate}{}\doxysubsubsection{\texorpdfstring{Creation and destruction of a collection}{Creation and destruction of a collection}}\label{_z_m_f_quick_start_ZMFCollCreate}
+A collection object is generated during the first time of search operation \+:
+\begin{DoxyItemize}
+\item search all operations \+: the whole collection object is created and populated
+\item search first operation and search next operation \+: the collection object is created during search first operation, therefore feeded on the flow by successive searches until key content value (exact or partial) is no more found in index.
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+A pointer to the generated collection object is returned (created by \textquotesingle{}new\textquotesingle{}). It is up to the caller to delete this object after having used it.
+\end{DoxyNote}
+\hypertarget{_z_m_f_quick_start_ZMFCollRecursive}{}\doxysubsubsection{\texorpdfstring{Recursive use of collection of records}{Recursive use of collection of records}}\label{_z_m_f_quick_start_ZMFCollRecursive}
+Collections of records may be used recursively, so that you may for instance \+:
+\begin{DoxyItemize}
+\item first generate a collection of records using an interval search on a key values range,
+\item refine this collection of records (and only this collection of record) using free search In this case, collection is mentionned as input collection for the selection method.
+\end{DoxyItemize}\hypertarget{_z_m_f_quick_start_ZMFCollLock}{}\doxysubsubsection{\texorpdfstring{Collection and record locks}{Collection and record locks}}\label{_z_m_f_quick_start_ZMFCollLock}
+If collection is used in a potential multi-\/access (\doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} not opened in an Exclusive access mode) then it could be wise to lock selected records. This could be done either
+\begin{DoxyItemize}
+\item in specifying the appropriate lock mask using ZIndex\+Collection\+::zlock\+All()
+\item in mentionning the appropriate lock mask while creating collection (see ZIndex\+Collection\+::get\+All\+Selected() or ZIndex\+Collection\+::get\+First\+Selected() ).
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+As collection could be recursively refined with several rules, lock on \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} records are released as soon as they are rejected from current selection (IMPLEMENT).
+\end{DoxyNote}
+\hypertarget{_z_m_f_quick_start_ZMFCollMass}{}\doxysubsubsection{\texorpdfstring{Mass operations using collections of record}{Mass operations using collections of record}}\label{_z_m_f_quick_start_ZMFCollMass}
+Once a collection has been created and populated with a set of record, it is possible to use mass operations on established collections.
+
+This means that collection offers methods that allow to process \textquotesingle{}all records at once\textquotesingle{} for specific operations. Basically, main operations are \+:
+\begin{DoxyItemize}
+\item get a whole collection of records \doxylink{classzbs_1_1_z_index_collection_aca3366000a917ee9538f367f0d0ef739}{ZIndex\+Collection\+::zget\+All\+Selected()}
+\item mass deletion of selected records \doxylink{classzbs_1_1_z_index_collection_ab25907b2fe9d8acd8339cd8751cc1d5a}{ZIndex\+Collection\+::zremove\+All()}
+\item mass lock selected records ZIndex\+Collection\+::zlock\+All() Apply a given lock mask to the whole set of selected records
+\item mass unlock selected records ZIndex\+Collection\+::zunlock\+All()
+\item mass change an adhoc field value on all records ZIndex\+Collection\+::zchange\+Field() Ad hoc field must neither be part of a defined key nor even be a subfield or an overlapping field.
+\end{DoxyItemize}\hypertarget{_z_m_f_quick_start_ZMFCollRetry}{}\doxysubsubsection{\texorpdfstring{Retry operations on collection after status failure ( lock retry management )}{Retry operations on collection after status failure ( lock retry management )}}\label{_z_m_f_quick_start_ZMFCollRetry}
+Collection embeds the capability to retry last attempted operation for continuing the engaged mass operation that fails with a locked status on the remaining set of unprocessed records. When retrying, has to be mentionned
+\begin{DoxyItemize}
+\item a number of times to retry
+\item a number of millisecond to wait after each retry If operation is still not successfull, returned status is
+\item ZS\+\_\+\+LOCKED is sent back if record cannot be access because it is still locked
+\item appropriate low level file access status is sent back in case of other error and ZException is set with appropriate message
+\end{DoxyItemize}\hypertarget{_z_m_f_quick_start_ZMFQSInterval}{}\doxysubsection{\texorpdfstring{Searching index with a range of key values -\/ or Interval search}{Searching index with a range of key values - or Interval search}}\label{_z_m_f_quick_start_ZMFQSInterval}
+It is possible to search an index for a range of value. We must then mention the lowest key value to select index values for and the highest value\hypertarget{_z_m_f_quick_start_ZMFQSRemoving}{}\doxysection{\texorpdfstring{Removing content from ZMaster\+File}{Removing content from ZMasterFile}}\label{_z_m_f_quick_start_ZMFQSRemoving}
+\hypertarget{_z_m_f_quick_start_ZMFQSRemoveSingle}{}\doxysubsection{\texorpdfstring{Removing a single record}{Removing a single record}}\label{_z_m_f_quick_start_ZMFQSRemoveSingle}
+\hypertarget{_z_m_f_quick_start_ZMFQSRemoveMass}{}\doxysubsection{\texorpdfstring{Removing a set (collection) of records}{Removing a set (collection) of records}}\label{_z_m_f_quick_start_ZMFQSRemoveMass}
+\hypertarget{_z_m_f_quick_start_ZMFQSGetStat}{}\doxysection{\texorpdfstring{Getting statistical data}{Getting statistical data}}\label{_z_m_f_quick_start_ZMFQSGetStat}
+\hypertarget{_z_m_f_quick_start_ZMFQSConverting}{}\doxysection{\texorpdfstring{Converting an existing ZRandom\+File to a ZMaster\+File.}{Converting an existing ZRandomFile to a ZMasterFile.}}\label{_z_m_f_quick_start_ZMFQSConverting}
+\hypertarget{_z_m_f_quick_start_ZMFQSMaintenance}{}\doxysection{\texorpdfstring{Making some maintenance operations on file}{Making some maintenance operations on file}}\label{_z_m_f_quick_start_ZMFQSMaintenance}
+ 
+\stopcontents[mainsections]
+ 

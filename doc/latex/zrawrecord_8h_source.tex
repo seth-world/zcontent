@@ -1,0 +1,123 @@
+\doxysection{zrawrecord.\+h}
+\hypertarget{zrawrecord_8h_source}{}\label{zrawrecord_8h_source}\index{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zrawrecord.h@{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zrawrecord.h}}
+\mbox{\hyperlink{zrawrecord_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZRAWRECORD\_H}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ ZRAWRECORD\_H}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <ztoolset/zstatus.h>}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <ztoolset/zarray.h>}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <ztoolset/zbitset.h>}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zindexitem_8h}{zindexedfile/zindexitem.h}}>}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00009}00009\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00010}00010\ \textcolor{comment}{\ *\ \ Content\ :\ must\ hold\ the\ genuine\ record\ content}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00011}00011\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00012}00012\ \textcolor{comment}{\ *\ \ KeyValue[0..n]-\/>KeyContent\ \ Array\ that\ must\ hold\ the\ genuine\ key\ value\ (0\ for\ primary\ key\ up\ to\ n\ )}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00013}00013\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00014}00014\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00015}00015\ \textcolor{comment}{\ *\ FieldPresence\ bitset\ is\ set\ by\ ZSMasterFile.}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00016}00016\ \textcolor{comment}{\ *\ Raw\ master\ file\ does\ not\ use\ FieldPresence\ :}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00017}00017\ \textcolor{comment}{\ *\ \ all\ fields\ are\ managed\ by\ application\ and\ therefore\ :}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00018}00018\ \textcolor{comment}{\ *\ \ -\/\ fieldPresence\ is\ set\ to\ nullptr}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00019}00019\ \textcolor{comment}{\ *\ \ -\/\ all\ fields\ are\ reputated\ to\ be\ present\ within\ record.}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00020}00020\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00021}00021\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00022}00022\ \textcolor{comment}{\ *\ This\ setup\ is\ done\ using\ :}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00023}00023\ \textcolor{comment}{\ *\ \ ZRawRecord::Content\ :\ this\ ZDataBuffer\ contains\ record\ data\ in\ universal\ format}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00024}00024\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00025}00025\ \textcolor{comment}{\ *\ \ ZRawRecord::KeyValue\ [0..n]\ -\/>\ KeyContent\ :\ for\ each\ defined\ key,\ contains\ Key\ content\ as\ it\ will\ be\ written\ to\ index\ file.}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00026}00026\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00027}00027\ \textcolor{comment}{\ *\ This\ routine\ returns\ a\ ZDataBuffer,\ ready\ to\ be\ written\ to\ main\ file,\ with\ the\ following\ structure\ :}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00028}00028\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00029}00029\ \textcolor{comment}{\ *\ \ cst\_ZBLOCKSTART\ \ (uint32\_t)\ |\ Added\ by\ ZRandom\ Block\ routine\ :}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00030}00030\ \textcolor{comment}{\ *\ \ ZBID\_Data\ \ \ \ \ \ \ \ \ 0x10\ \ \ \ \ \ |}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00031}00031\ \textcolor{comment}{\ *\ \ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00032}00032\ \textcolor{comment}{\ *\ \ |}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00033}00033\ \textcolor{comment}{\ *\ \ |\ \ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00034}00034\ \textcolor{comment}{\ *\ \ |\ \ \ \ FieldPresence\ (ZType\_bitset)\ \ (bitset\ in\ URF\ format)}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00035}00035\ \textcolor{comment}{\ *\ \ |\ \ or}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00036}00036\ \textcolor{comment}{\ *\ \ |\ \ \ \ ZType\_bitsetFull\ (uint32\_t)}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00037}00037\ \textcolor{comment}{\ *\ \ |\ \ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00038}00038\ \textcolor{comment}{\ *\ \ |\ \ Record\ raw\ content\ size\ \ \ \ \ (uint64\_t)}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00039}00039\ \textcolor{comment}{\ *\ \ |\ \ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00040}00040\ \textcolor{comment}{\ *\ \ |\ \ Record\ raw\ content\ (universal\ values\ (not\ URF))}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00041}00041\ \textcolor{comment}{\ *\ \ |\ \ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00042}00042\ \textcolor{comment}{\ *\ \ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00043}00043\ \textcolor{comment}{\ *\ \ uint32\_t\ number\ of\ keys}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00044}00044\ \textcolor{comment}{\ *\ \ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00045}00045\ \textcolor{comment}{\ *\ \ Key\ 0\ content}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00046}00046\ \textcolor{comment}{\ *\ \ \ \ key\ canonical\ size\ \ (uint32\_t)}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00047}00047\ \textcolor{comment}{\ *\ \ \ \ key\ content\ (pure\ universal\ values\ (not\ URF)\ :\ values\ we\ can\ sort\ on\ )}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00048}00048\ \textcolor{comment}{\ *\ \ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00049}00049\ \textcolor{comment}{\ *\ \ Key\ 1\ content}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00050}00050\ \textcolor{comment}{\ *\ \ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00051}00051\ \textcolor{comment}{\ *\ \ ...}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00052}00052\ \textcolor{comment}{\ *\ \ Key\ n\ content}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00053}00053\ \textcolor{comment}{\ *\ \ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00054}00054\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00055}00055\ \textcolor{comment}{\ *\ cst\_ZBLOCKEND\ \ (uint32\_t)}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00056}00056\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00057}00057\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00060}00060\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacezbs}{zbs}}\ \{}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00062}00062\ \textcolor{keyword}{class\ }ZRawMasterFile;}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00066}\mbox{\hyperlink{classzbs_1_1_z_raw_record}{00066}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classzbs_1_1_z_raw_record}{ZRawRecord}}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00067}00067\ \{}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00068}00068\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00069}00069\ \ \ \mbox{\hyperlink{classzbs_1_1_z_raw_record}{ZRawRecord}}(ZRawMasterFile\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pFather}});}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00071}00071\ \ \ \mbox{\hyperlink{classzbs_1_1_z_raw_record_a4e80491125a12ec02720729d893f294c}{\string~ZRawRecord}}();}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00073}00073\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classzbs_1_1_z_raw_record_aa746a35da449fb6cca2484be4b83e21b}{setup}}();}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00076}00076\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_raw_record_a3b12b4e5e725b4dd61dde0990cd19e26}{setRawKeyContent}}(\textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIdx}},\textcolor{keyword}{const}\ ZDataBuffer\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pKeyContent}});}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00077}00077\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_raw_record_a30a7fce78f44e35944eb892de9cf7d2d}{getRawKeyContent}}(\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pKeyIdx}},\ ZDataBuffer\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pKeyContent}});}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00081}00081\ \ \ ZDataBuffer\ \mbox{\hyperlink{classzbs_1_1_z_raw_record_ad74348b8c41db8f4e56e489fbadddf2d}{prepareForWrite}}(ZDataBuffer\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pContent}});}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00126}00126\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_raw_record_a77faa4aa035e56dd8b0690fdd940f7ab}{getContentFromRaw}}(ZDataBuffer\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pContent}},\ ZDataBuffer\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRaw}});}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00128}00128\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{class}\ \_Entity>}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00129}\mbox{\hyperlink{classzbs_1_1_z_raw_record_a83eef9261a99542a107a46667e574948}{00129}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_Entity}}\ \mbox{\hyperlink{classzbs_1_1_z_raw_record_a83eef9261a99542a107a46667e574948}{getEntityFromRaw}}()}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00130}00130\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00131}00131\ \ \ \ \ \textcolor{keywordflow}{return}\ \_Entity::getEntityFromRaw(\mbox{\hyperlink{classzbs_1_1_z_raw_record_a52b9883970bac6042f806071da8b33ec}{Content}});}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00132}00132\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00134}00134\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{class}\ \_Entity>}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00135}\mbox{\hyperlink{classzbs_1_1_z_raw_record_aa4762e04009f898179e4b6e66e566c4d}{00135}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_raw_record_aa4762e04009f898179e4b6e66e566c4d}{setContent}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_Entity}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pEntity}})}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00136}00136\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00137}00137\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pEntity}}.setContent(\mbox{\hyperlink{classzbs_1_1_z_raw_record_ae26df7225b04da6c1d9aeed48fdd61ac}{RawContent}},\mbox{\hyperlink{classzbs_1_1_z_raw_record_ac2cad9b3c011764f2168d2e465f7cef3}{KeyValue}});}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00138}00138\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00141}00141\ \ \ \textcolor{comment}{/*\ reset\ all\ containers\ :\ raw\ record\ content,\ record\ content,\ keys\ content\ */}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00142}00142\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_raw_record_a2584e1324b35d36ff9fc67581a1cd0af}{resetAll}}();}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00144}\mbox{\hyperlink{classzbs_1_1_z_raw_record_a3dc1e39590f5752920466a0bddcb5d55}{00144}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBitset}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_raw_record_a3dc1e39590f5752920466a0bddcb5d55}{FieldPresence}};}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00145}\mbox{\hyperlink{classzbs_1_1_z_raw_record_ae26df7225b04da6c1d9aeed48fdd61ac}{00145}}\ \ \ ZDataBuffer\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_raw_record_ae26df7225b04da6c1d9aeed48fdd61ac}{RawContent}};\ \ \textcolor{comment}{/*\ what\ is\ written\ on\ the\ file\ :\ bitset,\ content,\ keys\ */}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00146}\mbox{\hyperlink{classzbs_1_1_z_raw_record_a52b9883970bac6042f806071da8b33ec}{00146}}\ \ \ ZDataBuffer\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_raw_record_a52b9883970bac6042f806071da8b33ec}{Content}};\ \ \ \ \ \textcolor{comment}{/*\ the\ record\ content\ */}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00147}\mbox{\hyperlink{classzbs_1_1_z_raw_record_ac2cad9b3c011764f2168d2e465f7cef3}{00147}}\ \ \ \mbox{\hyperlink{classzbs_1_1_z_index_item_list}{ZIndexItemList}}\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_raw_record_ac2cad9b3c011764f2168d2e465f7cef3}{KeyValue}};\ \ \ \textcolor{comment}{/*\ key\ values\ to\ be\ written\ in\ RawContent\ and\ in\ index\ files\ */}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00148}00148\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00149}\mbox{\hyperlink{classzbs_1_1_z_raw_record_ae9551def7f80f598a9ab127f551927d8}{00149}}\ \ \ \textcolor{keywordtype}{long}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_raw_record_ae9551def7f80f598a9ab127f551927d8}{Rank}}=0\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{L}};\ \ \ \ \ \ \textcolor{comment}{/*\ ZBAT\ rank\ */}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00150}\mbox{\hyperlink{classzbs_1_1_z_raw_record_a870d662b8ca1913fddc025fc2daf4040}{00150}}\ \ \ \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\_type}}\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_raw_record_a870d662b8ca1913fddc025fc2daf4040}{Address}}=0\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{L}};\ \ \ \textcolor{comment}{/*\ logical\ address\ (used\ with\ ZRandomFile::zget)\ */}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00151}00151\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00152}\mbox{\hyperlink{classzbs_1_1_z_raw_record_a1b8ee5741198f7d4141a14896ccd9fae}{00152}}\ \ \ ZRawMasterFile*\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_raw_record_a1b8ee5741198f7d4141a14896ccd9fae}{RawMasterFile}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00153}00153\ \};}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00155}00155\ \}\ \textcolor{comment}{//\ namespace\ zbs}}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00157}00157\ \mbox{\hyperlink{classzbs_1_1_z_raw_record}{ZRawRecord}}*\ \mbox{\hyperlink{zrawrecord_8h_a58dd46af4570f0629cdc837cdd4e695b}{generateRawRecord}}(ZRawMasterFile*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMasterFile}});}
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00159}00159\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{zrawrecord_8h_source_l00162}00162\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZRAWRECORD\_H}}
+
+\end{DoxyCode}

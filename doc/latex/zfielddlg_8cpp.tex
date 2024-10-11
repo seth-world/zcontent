@@ -1,0 +1,60 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/zfielddlg.cpp File Reference}
+\hypertarget{zfielddlg_8cpp}{}\label{zfielddlg_8cpp}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zfielddlg.cpp@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zfielddlg.cpp}}
+{\ttfamily \#include "{}zfielddlg.\+h"{}}\newline
+{\ttfamily \#include "{}ui\+\_\+zfielddlg.\+h"{}}\newline
+{\ttfamily \#include "{}ztypedlg.\+h"{}}\newline
+{\ttfamily \#include $<$zcontent/zcontentutils/ztypelistbutton.\+h$>$}\newline
+{\ttfamily \#include $<$zexceptiondlg.\+h$>$}\newline
+{\ttfamily \#include $<$qevent.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqstandarditemmodel.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqstandarditem.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqtwidgettools.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/ztypetype.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zindexedfile/zdatatype.\+h$>$}\newline
+{\ttfamily \#include $<$QStatus\+Bar$>$}\newline
+{\ttfamily \#include $<$qtooltip.\+h$>$}\newline
+{\ttfamily \#include $<$zindexedfile/zdataconversion.\+h$>$}\newline
+Include dependency graph for zfielddlg.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zfielddlg_8cpp_a63e04438a464110df813286c756d2a84}{\+\_\+\+\_\+\+ICON\+\_\+\+PATH\+\_\+\+\_\+}}~"{}/home/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{gerard}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Development}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zbasetools}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zqt}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{icons}}/"{}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zfielddlg_8cpp_addf30b83d4ea675296fc86f3912daf36}{\+\_\+\+\_\+\+HASH\+\_\+\+OK\+\_\+\+ICON\+\_\+\+\_\+}}~"{}Hashcode\+Ok.\+png"{}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zfielddlg_8cpp_aed0d5c4e302eec935a363a3ec1dca65e}{\+\_\+\+\_\+\+HASH\+\_\+\+WRONG\+\_\+\+ICON\+\_\+\+\_\+}}~"{}Hashcode\+Wrong.\+png"{}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{zfielddlg_8cpp_addf30b83d4ea675296fc86f3912daf36}\label{zfielddlg_8cpp_addf30b83d4ea675296fc86f3912daf36} 
+\index{zfielddlg.cpp@{zfielddlg.cpp}!\_\_HASH\_OK\_ICON\_\_@{\_\_HASH\_OK\_ICON\_\_}}
+\index{\_\_HASH\_OK\_ICON\_\_@{\_\_HASH\_OK\_ICON\_\_}!zfielddlg.cpp@{zfielddlg.cpp}}
+\doxysubsubsection{\texorpdfstring{\_\_HASH\_OK\_ICON\_\_}{\_\_HASH\_OK\_ICON\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+HASH\+\_\+\+OK\+\_\+\+ICON\+\_\+\+\_\+~"{}Hashcode\+Ok.\+png"{}}
+
+
+
+Definition at line \mbox{\hyperlink{zfielddlg_8cpp_source_l00023}{23}} of file \mbox{\hyperlink{zfielddlg_8cpp_source}{zfielddlg.\+cpp}}.
+
+\Hypertarget{zfielddlg_8cpp_aed0d5c4e302eec935a363a3ec1dca65e}\label{zfielddlg_8cpp_aed0d5c4e302eec935a363a3ec1dca65e} 
+\index{zfielddlg.cpp@{zfielddlg.cpp}!\_\_HASH\_WRONG\_ICON\_\_@{\_\_HASH\_WRONG\_ICON\_\_}}
+\index{\_\_HASH\_WRONG\_ICON\_\_@{\_\_HASH\_WRONG\_ICON\_\_}!zfielddlg.cpp@{zfielddlg.cpp}}
+\doxysubsubsection{\texorpdfstring{\_\_HASH\_WRONG\_ICON\_\_}{\_\_HASH\_WRONG\_ICON\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+HASH\+\_\+\+WRONG\+\_\+\+ICON\+\_\+\+\_\+~"{}Hashcode\+Wrong.\+png"{}}
+
+
+
+Definition at line \mbox{\hyperlink{zfielddlg_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{zfielddlg_8cpp_source}{zfielddlg.\+cpp}}.
+
+\Hypertarget{zfielddlg_8cpp_a63e04438a464110df813286c756d2a84}\label{zfielddlg_8cpp_a63e04438a464110df813286c756d2a84} 
+\index{zfielddlg.cpp@{zfielddlg.cpp}!\_\_ICON\_PATH\_\_@{\_\_ICON\_PATH\_\_}}
+\index{\_\_ICON\_PATH\_\_@{\_\_ICON\_PATH\_\_}!zfielddlg.cpp@{zfielddlg.cpp}}
+\doxysubsubsection{\texorpdfstring{\_\_ICON\_PATH\_\_}{\_\_ICON\_PATH\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+ICON\+\_\+\+PATH\+\_\+\+\_\+~"{}/home/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{gerard}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Development}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zbasetools}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zqt}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{icons}}/"{}}
+
+
+
+Definition at line \mbox{\hyperlink{zfielddlg_8cpp_source_l00022}{22}} of file \mbox{\hyperlink{zfielddlg_8cpp_source}{zfielddlg.\+cpp}}.
+

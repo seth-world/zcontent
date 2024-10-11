@@ -1,0 +1,717 @@
+\doxysection{ZFile\+Control\+Block Class Reference}
+\hypertarget{class_z_file_control_block}{}\label{class_z_file_control_block}\index{ZFileControlBlock@{ZFileControlBlock}}
+
+
+The \doxylink{class_z_file_control_block}{ZFile\+Control\+Block} class contains all operational information of a ZRandom\+File.  
+
+
+
+
+{\ttfamily \#include $<$zfilecontrolblock.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_z_file_control_block_a057c6df883f746a8d49eaf9ee3a7579e}{ZFile\+Control\+Block}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{class_z_file_control_block_ae18f88cbeffc0060fcd0785a289a1d51}{ZFile\+Control\+Block}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_file_control_block}{ZFile\+Control\+Block}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{class_z_file_control_block_ab0fd7c3a0e21a0305d4fe3dc20d88ddf}{ZFile\+Control\+Block}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_file_control_block}{ZFile\+Control\+Block}} \&\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{class_z_file_control_block}{ZFile\+Control\+Block}} \& \mbox{\hyperlink{class_z_file_control_block_a59c17e5d572f8072663ff1dce7815e23}{\+\_\+copy\+From}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_file_control_block}{ZFile\+Control\+Block}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{class_z_file_control_block}{ZFile\+Control\+Block}} \& \mbox{\hyperlink{class_z_file_control_block_aed7f6045b7d8314fd09c1a41dc181c2a}{operator=}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_file_control_block}{ZFile\+Control\+Block}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_z_file_control_block_a1c81cb6bd8434398e6fd837b191965a2}{clear}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{class_f_c_b_params}{FCBParams}} \mbox{\hyperlink{class_z_file_control_block_a583b4b5416f71b82263661ac5d773da6}{get\+Useable\+Params}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_z_file_control_block_a1ada67e7d6e586a046199c94457ebcfe}{set\+Useable\+Params}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_f_c_b_params}{FCBParams}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_z_file_control_block_a26465539ae5bfe765aa4f84812826c77}{report}} (Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{class_z_file_control_block_a427b93be2fe2ee663fa727e9dc223fcd}{to\+Xml}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Level}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Comment}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{class_z_file_control_block_a9b9968f6181266f1951584272e81660d}{from\+Xml}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zxml\+Node}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+FCBRoot\+Node}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Errorlog}})
+\begin{DoxyCompactList}\small\item\em from\+Xml loads header control block from its xml definition and return 0 when successfull. When errors returns \texorpdfstring{$<$}{<}\texorpdfstring{$>$}{>}0 and p\+Errlog contains appropriate error messages. p\+Header\+Root\+Node xml node root for the hcb, typically $<$headercontrolblock$>$ tag. No validation is made on root node for its name value. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{class_z_file_control_block_a5343b47a13b633acc229c1a9ac057520}{\+\_\+export\+Append}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZDBExport}})
+\item 
+ZData\+Buffer \mbox{\hyperlink{class_z_file_control_block_adc8ba3221528423c95228d21d313e444}{\+\_\+export}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_file_control_block_a0defe498bd31c17ab77ff4c3573437a9}{\+\_\+import}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZDBImport\+\_\+\+Ptr}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{class_z_file_control_block_a761bd788dded1b3f07288d0291fb302d}{Start\+Of\+Data}} =0L
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{class_z_file_control_block_ae5971e9c9024ab75ae5024bbc6bda845}{Allocated\+Blocks}} =0
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{class_z_file_control_block_abc804b1478e12ede62078b6e3579f598}{Block\+Extent\+Quota}} =0
+\item 
+\mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}} \mbox{\hyperlink{class_z_file_control_block_a4eaedce6913a9e9ff5055e6388c3df47}{Initial\+Size}} =0
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{class_z_file_control_block_a40c6195556fe6bacc969acb7a9be1a0f}{Block\+Target\+Size}} =0
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} \mbox{\hyperlink{class_z_file_control_block_a4d8a62bde87f03d08492c572bb0170db}{Highwater\+Marking}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBool}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} \mbox{\hyperlink{class_z_file_control_block_acf0830d462dc01e137c4839ef05ce58f}{Grab\+Free\+Space}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBool}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{class_z_file_control_block_ac9f57f681ad5af522bf686bc7d24ab08}{ZBAT\+\_\+\+Data\+Offset}} =0
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{class_z_file_control_block_af6beee15967f98d41bd0652b4ca2160a}{ZBAT\+\_\+\+Export\+Size}} =0
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{class_z_file_control_block_a6156aa30ffc04ec0d25df9b0359fa0a4}{ZFBT\+\_\+\+Data\+Offset}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{class_z_file_control_block_a2e9d0b836ebade8275a2e98d1ee3ca8c}{ZFBT\+\_\+\+Export\+Size}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{class_z_file_control_block_aa5f54a59b53bce17829d287b50f0fe61}{ZHOT\+\_\+\+Data\+Offset}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{class_z_file_control_block_a0edcffbbf59418eb34c8c07a645411fd}{ZHOT\+\_\+\+Export\+Size}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{class_z_file_control_block_a07547599d4b52058237148d3f4139b71}{ZReserved\+\_\+\+Data\+Offset}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{class_z_file_control_block_af0e1236e06b8d060ba253c68ed09275b}{ZReserved\+\_\+\+Export\+Size}}
+\item 
+\mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}} \mbox{\hyperlink{class_z_file_control_block_a2a0384bddff79597cf5ba17d340b721f}{Allocated\+Size}}
+\item 
+\mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}} \mbox{\hyperlink{class_z_file_control_block_a5d46fb63379884f96283f89d7710a79f}{Used\+Size}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{class_z_file_control_block_acd8074c36bdc7fc424e9bafaac37b0f0}{Min\+Size}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{class_z_file_control_block_af2c3ac65d5f2d8297ce6a8999ea719fb}{Max\+Size}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{class_z_file_control_block_a688b85356f20c2e2a2f8c2be86190a8e}{ZFile\+Descriptor}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{class_z_file_control_block_a43630ce9266faf5bb2307dc1cfc92b78}{ZRandom\+File}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{class_z_file_control_block_a59269baabc7f6ee469eb9c9cef5778e9}{ZMaster\+File}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{class_z_file_control_block_acc7728912067f76aaccdb26897f75cae}{ZIndex\+File}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The \doxylink{class_z_file_control_block}{ZFile\+Control\+Block} class contains all operational information of a ZRandom\+File. 
+
+This block is written in header file.
+
+It contains in particular the 3 block pools \+:
+\begin{DoxyItemize}
+\item ZBlock\+Access\+Table (ZBAT)\+: block pool that gives for a used block its address within the file using its rank number
+\item ZFree\+Block\+Pool (ZFBT)\+: block pool of free/deleted blocks available for usage in record creation process
+\begin{DoxyItemize}
+\item ZHOT \+: block pool of holes deprecated \mbox{[}-\/ ZDeleted\+Block\+Pool (ZDBT)\+: pool of deleted block before they could have been grabbed by grab mechanism\mbox{]}
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\begin{DoxyParagraph}{ZFile\+Descriptor simplified map}
+\begin{DoxyVerb}        each pool size is calculated using ZArray<>::getExportSize() method
+
+0L                                                                                              Expansion
++-------Variables---------------+-----------------------+--------------------------+-------------------------->
+
+xxxx @ZBAT  @ZFBT xxxxxxxxxxxxxxx......ZBAT content......,,,,,,,,,,ZFBT content.....,,,,,,,,,,ZDBT content.....\end{DoxyVerb}
+
+\end{DoxyParagraph}
+\begin{DoxyParagraph}{Block\+Target\+Size}
+Foreseen medium size of blocks in a varying block context. This value is a important value used for allocation of free blocks as well as searches for physical block headers 
+\end{DoxyParagraph}
+\begin{DoxySeeAlso}{See also}
+ZRandom\+File\+::\+\_\+get\+Free\+Block() ZRandom\+File\+::\+\_\+search\+Next\+Physical\+Block() ZRandom\+File\+::\+\_\+search\+Previous\+Physical\+Block() ZRandom\+File\+::\+\_\+surface\+Scan()
+\end{DoxySeeAlso}
+\begin{DoxyParagraph}{Start\+Of\+Data}
+Offset from the beginning of the content file where data blocks start to be stored. This value cannot be changed by user
+\end{DoxyParagraph}
+\begin{DoxyParagraph}{Allocated\+Blocks}
+for ZBAT \& ZFBT \+: initial number of available allocated slots in ZBAT and ZFBT
+\end{DoxyParagraph}
+\begin{DoxyParagraph}{Block\+Extent\+Quota}
+for ZBAT \& ZFBT \+: initial extension quota
+\end{DoxyParagraph}
+\begin{DoxyParagraph}{Initial\+Size}
+This is the initial space the file has been created with. This value is used when ZRandom\+File\+::zclear() \+: file size is kept at this minimum.
+\end{DoxyParagraph}
+\begin{DoxyParagraph}{Allocated\+Size}
+Total current allocated size in bytes for file.
+\end{DoxyParagraph}
+\begin{DoxyParagraph}{Used\+Size}
+Total of currently used size within file in bytes (Meaning \+: sum of user record sizes for ZBlock\+Access\+Table pool )
+\end{DoxyParagraph}
+\begin{DoxyParagraph}{Statistical values}
+
+\end{DoxyParagraph}
+
+\begin{DoxyItemize}
+\item Min\+Size minimum length of block record in file (existing statistic)
+\item Max\+Size maximum length of block record in file (existing statistic)
+
+These values are not dynamic values. They are updated via different tools and are not systematically accurate. \begin{DoxySeeAlso}{See also}
+ZRandom\+File\+::\+ZRFstat ZRandom\+File\+::zreorg\+File
+\end{DoxySeeAlso}
+\begin{DoxyParagraph}{Highwater\+Marking (Option)}
+When this option is set, freed blocks are marked to binary zero.
+\end{DoxyParagraph}
+\begin{DoxyParagraph}{Grab\+Free\+Space (Option)}
+When this option is set, ZRandom\+File will try to gather adjacent free blocks and holes together when a \+\_\+free\+Block is invoked. 
+\end{DoxyParagraph}
+
+\end{DoxyItemize}
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00183}{183}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_z_file_control_block_a057c6df883f746a8d49eaf9ee3a7579e}\label{class_z_file_control_block_a057c6df883f746a8d49eaf9ee3a7579e} 
+\index{ZFileControlBlock@{ZFileControlBlock}!ZFileControlBlock@{ZFileControlBlock}}
+\index{ZFileControlBlock@{ZFileControlBlock}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZFileControlBlock()}{ZFileControlBlock()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily ZFile\+Control\+Block\+::\+ZFile\+Control\+Block (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00005}{5}} of file \mbox{\hyperlink{zfilecontrolblock_8cpp_source}{zfilecontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00010}{clear()}}.
+
+\Hypertarget{class_z_file_control_block_ae18f88cbeffc0060fcd0785a289a1d51}\label{class_z_file_control_block_ae18f88cbeffc0060fcd0785a289a1d51} 
+\index{ZFileControlBlock@{ZFileControlBlock}!ZFileControlBlock@{ZFileControlBlock}}
+\index{ZFileControlBlock@{ZFileControlBlock}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZFileControlBlock()}{ZFileControlBlock()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily ZFile\+Control\+Block\+::\+ZFile\+Control\+Block (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_file_control_block}{ZFile\+Control\+Block}} \&}]{p\+In }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00240}{240}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+References \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_z_file_control_block_ab0fd7c3a0e21a0305d4fe3dc20d88ddf}\label{class_z_file_control_block_ab0fd7c3a0e21a0305d4fe3dc20d88ddf} 
+\index{ZFileControlBlock@{ZFileControlBlock}!ZFileControlBlock@{ZFileControlBlock}}
+\index{ZFileControlBlock@{ZFileControlBlock}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZFileControlBlock()}{ZFileControlBlock()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily ZFile\+Control\+Block\+::\+ZFile\+Control\+Block (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_file_control_block}{ZFile\+Control\+Block}} \&\&}]{p\+In }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00241}{241}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+References \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_z_file_control_block_a59c17e5d572f8072663ff1dce7815e23}\label{class_z_file_control_block_a59c17e5d572f8072663ff1dce7815e23} 
+\index{ZFileControlBlock@{ZFileControlBlock}!\_copyFrom@{\_copyFrom}}
+\index{\_copyFrom@{\_copyFrom}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{\_copyFrom()}{\_copyFrom()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_z_file_control_block}{ZFile\+Control\+Block}} \& ZFile\+Control\+Block\+::\+\_\+copy\+From (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_file_control_block}{ZFile\+Control\+Block}} \&}]{p\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{zfilecontrolblock_8cpp_source}{zfilecontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zfilecontrolblock_8h_source_l00195}{Allocated\+Blocks}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00225}{Allocated\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00196}{Block\+Extent\+Quota}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00198}{Block\+Target\+Size}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00201}{Grab\+Free\+Space}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00200}{Highwater\+Marking}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00197}{Initial\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00230}{Max\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00229}{Min\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00192}{Start\+Of\+Data}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00226}{Used\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00205}{ZBAT\+\_\+\+Data\+Offset}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00206}{ZBAT\+\_\+\+Export\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00208}{ZFBT\+\_\+\+Data\+Offset}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00209}{ZFBT\+\_\+\+Export\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00211}{ZHOT\+\_\+\+Data\+Offset}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00212}{ZHOT\+\_\+\+Export\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00218}{ZReserved\+\_\+\+Data\+Offset}}, and \mbox{\hyperlink{zfilecontrolblock_8h_source_l00219}{ZReserved\+\_\+\+Export\+Size}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfilecontrolblock_8h_source_l00244}{operator=()}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00241}{ZFile\+Control\+Block()}}, and \mbox{\hyperlink{zfilecontrolblock_8h_source_l00240}{ZFile\+Control\+Block()}}.
+
+\Hypertarget{class_z_file_control_block_adc8ba3221528423c95228d21d313e444}\label{class_z_file_control_block_adc8ba3221528423c95228d21d313e444} 
+\index{ZFileControlBlock@{ZFileControlBlock}!\_export@{\_export}}
+\index{\_export@{\_export}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{\_export()}{\_export()}}
+{\footnotesize\ttfamily ZData\+Buffer ZFile\+Control\+Block\+::\+\_\+export (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00099}{99}} of file \mbox{\hyperlink{zfilecontrolblock_8cpp_source}{zfilecontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00340}{ZFCB\+\_\+\+Export\+::serialize()}}, and \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00181}{ZFCB\+\_\+\+Export\+::set()}}.
+
+\Hypertarget{class_z_file_control_block_a5343b47a13b633acc229c1a9ac057520}\label{class_z_file_control_block_a5343b47a13b633acc229c1a9ac057520} 
+\index{ZFileControlBlock@{ZFileControlBlock}!\_exportAppend@{\_exportAppend}}
+\index{\_exportAppend@{\_exportAppend}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{\_exportAppend()}{\_exportAppend()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} ZFile\+Control\+Block\+::\+\_\+export\+Append (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+ZDBExport }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00087}{87}} of file \mbox{\hyperlink{zfilecontrolblock_8cpp_source}{zfilecontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00340}{ZFCB\+\_\+\+Export\+::serialize()}}, and \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00181}{ZFCB\+\_\+\+Export\+::set()}}.
+
+\Hypertarget{class_z_file_control_block_a0defe498bd31c17ab77ff4c3573437a9}\label{class_z_file_control_block_a0defe498bd31c17ab77ff4c3573437a9} 
+\index{ZFileControlBlock@{ZFileControlBlock}!\_import@{\_import}}
+\index{\_import@{\_import}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{\_import()}{\_import()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZFile\+Control\+Block\+::\+\_\+import (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+ZDBImport\+\_\+\+Ptr }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00109}{109}} of file \mbox{\hyperlink{zfilecontrolblock_8cpp_source}{zfilecontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00353}{ZFCB\+\_\+\+Export\+::deserialize()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfiledescriptor_8cpp_source_l00068}{zbs\+::\+ZFile\+Descriptor\+::\+\_\+import\+FCB()}}.
+
+\Hypertarget{class_z_file_control_block_a1c81cb6bd8434398e6fd837b191965a2}\label{class_z_file_control_block_a1c81cb6bd8434398e6fd837b191965a2} 
+\index{ZFileControlBlock@{ZFileControlBlock}!clear@{clear}}
+\index{clear@{clear}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZFile\+Control\+Block\+::clear (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00010}{10}} of file \mbox{\hyperlink{zfilecontrolblock_8cpp_source}{zfilecontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zfilecontrolblock_8h_source_l00192}{Start\+Of\+Data}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfiledescriptor_8cpp_source_l00278}{zbs\+::\+ZFile\+Descriptor\+::clear\+FCB()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00421}{from\+Xml()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00897}{zbs\+::\+ZRandom\+File\+::set\+Create\+Maximum()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00874}{zbs\+::\+ZRandom\+File\+::set\+Create\+Minimum()}}, and \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00005}{ZFile\+Control\+Block()}}.
+
+\Hypertarget{class_z_file_control_block_a9b9968f6181266f1951584272e81660d}\label{class_z_file_control_block_a9b9968f6181266f1951584272e81660d} 
+\index{ZFileControlBlock@{ZFileControlBlock}!fromXml@{fromXml}}
+\index{fromXml@{fromXml}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{fromXml()}{fromXml()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} ZFile\+Control\+Block\+::from\+Xml (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zxml\+Node}} \texorpdfstring{$\ast$}{*}}]{p\+FCBRoot\+Node,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Errorlog }\end{DoxyParamCaption})}
+
+
+
+from\+Xml loads header control block from its xml definition and return 0 when successfull. When errors returns \texorpdfstring{$<$}{<}\texorpdfstring{$>$}{>}0 and p\+Errlog contains appropriate error messages. p\+Header\+Root\+Node xml node root for the hcb, typically $<$headercontrolblock$>$ tag. No validation is made on root node for its name value. 
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00421}{421}} of file \mbox{\hyperlink{zfilecontrolblock_8cpp_source}{zfilecontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zfilecontrolblock_8h_source_l00225}{Allocated\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00196}{Block\+Extent\+Quota}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00198}{Block\+Target\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00010}{clear()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00201}{Grab\+Free\+Space}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00200}{Highwater\+Marking}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00197}{Initial\+Size}}, and \mbox{\hyperlink{zfilecontrolblock_8h_source_l00226}{Used\+Size}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfiledescriptor_8cpp_source_l00155}{zbs\+::\+ZFDOwn\+Data\+::from\+Xml()}}, and \mbox{\hyperlink{zfiledescriptor_8cpp_source_l00209}{zbs\+::\+ZFile\+Descriptor\+::from\+Xml()}}.
+
+\Hypertarget{class_z_file_control_block_a583b4b5416f71b82263661ac5d773da6}\label{class_z_file_control_block_a583b4b5416f71b82263661ac5d773da6} 
+\index{ZFileControlBlock@{ZFileControlBlock}!getUseableParams@{getUseableParams}}
+\index{getUseableParams@{getUseableParams}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{getUseableParams()}{getUseableParams()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_f_c_b_params}{FCBParams}} ZFile\+Control\+Block\+::get\+Useable\+Params (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{zfilecontrolblock_8cpp_source}{zfilecontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zfilecontrolblock_8h_source_l00036}{FCBParams\+::\+Allocated\+Blocks}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00195}{Allocated\+Blocks}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00196}{Block\+Extent\+Quota}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00198}{Block\+Target\+Size}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00201}{Grab\+Free\+Space}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00200}{Highwater\+Marking}}, and \mbox{\hyperlink{zfilecontrolblock_8h_source_l00197}{Initial\+Size}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawindexfile_8h_source_l00177}{zbs\+::\+ZRaw\+Index\+File\+::get\+Index\+Data()}}.
+
+\Hypertarget{class_z_file_control_block_aed7f6045b7d8314fd09c1a41dc181c2a}\label{class_z_file_control_block_aed7f6045b7d8314fd09c1a41dc181c2a} 
+\index{ZFileControlBlock@{ZFileControlBlock}!operator=@{operator=}}
+\index{operator=@{operator=}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_z_file_control_block}{ZFile\+Control\+Block}} \& ZFile\+Control\+Block\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_file_control_block}{ZFile\+Control\+Block}} \&}]{p\+In }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00244}{244}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+References \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_z_file_control_block_a26465539ae5bfe765aa4f84812826c77}\label{class_z_file_control_block_a26465539ae5bfe765aa4f84812826c77} 
+\index{ZFileControlBlock@{ZFileControlBlock}!report@{report}}
+\index{report@{report}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{report()}{report()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZFile\+Control\+Block\+::report (\begin{DoxyParamCaption}\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00566}{566}} of file \mbox{\hyperlink{zfilecontrolblock_8cpp_source}{zfilecontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zfilecontrolblock_8h_source_l00195}{Allocated\+Blocks}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00196}{Block\+Extent\+Quota}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00198}{Block\+Target\+Size}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00201}{Grab\+Free\+Space}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00200}{Highwater\+Marking}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00197}{Initial\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00230}{Max\+Size}}, and \mbox{\hyperlink{zfilecontrolblock_8h_source_l00229}{Min\+Size}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomfile_8h_source_l00786}{zbs\+::\+ZRandom\+File\+::\+FCBReport()}}.
+
+\Hypertarget{class_z_file_control_block_a1ada67e7d6e586a046199c94457ebcfe}\label{class_z_file_control_block_a1ada67e7d6e586a046199c94457ebcfe} 
+\index{ZFileControlBlock@{ZFileControlBlock}!setUseableParams@{setUseableParams}}
+\index{setUseableParams@{setUseableParams}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{setUseableParams()}{setUseableParams()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZFile\+Control\+Block\+::set\+Useable\+Params (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_f_c_b_params}{FCBParams}} \&}]{p\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00071}{71}} of file \mbox{\hyperlink{zfilecontrolblock_8cpp_source}{zfilecontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zfilecontrolblock_8h_source_l00195}{Allocated\+Blocks}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00196}{Block\+Extent\+Quota}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00198}{Block\+Target\+Size}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00201}{Grab\+Free\+Space}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00200}{Highwater\+Marking}}, and \mbox{\hyperlink{zfilecontrolblock_8h_source_l00197}{Initial\+Size}}.
+
+\Hypertarget{class_z_file_control_block_a427b93be2fe2ee663fa727e9dc223fcd}\label{class_z_file_control_block_a427b93be2fe2ee663fa727e9dc223fcd} 
+\index{ZFileControlBlock@{ZFileControlBlock}!toXml@{toXml}}
+\index{toXml@{toXml}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{toXml()}{toXml()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} ZFile\+Control\+Block\+::to\+Xml (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Level,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Comment = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00368}{368}} of file \mbox{\hyperlink{zfilecontrolblock_8cpp_source}{zfilecontrolblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zfilecontrolblock_8h_source_l00195}{Allocated\+Blocks}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00225}{Allocated\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00196}{Block\+Extent\+Quota}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00198}{Block\+Target\+Size}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00201}{Grab\+Free\+Space}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00200}{Highwater\+Marking}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00197}{Initial\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00230}{Max\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00229}{Min\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00192}{Start\+Of\+Data}}, and \mbox{\hyperlink{zfilecontrolblock_8h_source_l00226}{Used\+Size}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfiledescriptor_8cpp_source_l00435}{zbs\+::\+ZFile\+Descriptor\+::to\+Xml()}}.
+
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_z_file_control_block_a688b85356f20c2e2a2f8c2be86190a8e}\label{class_z_file_control_block_a688b85356f20c2e2a2f8c2be86190a8e} 
+\index{ZFileControlBlock@{ZFileControlBlock}!ZFileDescriptor@{ZFileDescriptor}}
+\index{ZFileDescriptor@{ZFileDescriptor}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZFileDescriptor}{ZFileDescriptor}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{friend}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} ZFile\+Descriptor\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00185}{185}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+\Hypertarget{class_z_file_control_block_acc7728912067f76aaccdb26897f75cae}\label{class_z_file_control_block_acc7728912067f76aaccdb26897f75cae} 
+\index{ZFileControlBlock@{ZFileControlBlock}!ZIndexFile@{ZIndexFile}}
+\index{ZIndexFile@{ZIndexFile}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZIndexFile}{ZIndexFile}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{friend}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} ZIndex\+File\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00188}{188}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+\Hypertarget{class_z_file_control_block_a59269baabc7f6ee469eb9c9cef5778e9}\label{class_z_file_control_block_a59269baabc7f6ee469eb9c9cef5778e9} 
+\index{ZFileControlBlock@{ZFileControlBlock}!ZMasterFile@{ZMasterFile}}
+\index{ZMasterFile@{ZMasterFile}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZMasterFile}{ZMasterFile}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{friend}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} ZMaster\+File\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00187}{187}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+\Hypertarget{class_z_file_control_block_a43630ce9266faf5bb2307dc1cfc92b78}\label{class_z_file_control_block_a43630ce9266faf5bb2307dc1cfc92b78} 
+\index{ZFileControlBlock@{ZFileControlBlock}!ZRandomFile@{ZRandomFile}}
+\index{ZRandomFile@{ZRandomFile}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZRandomFile}{ZRandomFile}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{friend}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} ZRandom\+File\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00186}{186}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_z_file_control_block_ae5971e9c9024ab75ae5024bbc6bda845}\label{class_z_file_control_block_ae5971e9c9024ab75ae5024bbc6bda845} 
+\index{ZFileControlBlock@{ZFileControlBlock}!AllocatedBlocks@{AllocatedBlocks}}
+\index{AllocatedBlocks@{AllocatedBlocks}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{AllocatedBlocks}{AllocatedBlocks}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} ZFile\+Control\+Block\+::\+Allocated\+Blocks =0}
+
+for ZBAT \& ZFBT \+: initial number of available allocated slots in ZBAT and ZFBT 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00195}{195}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomfile_8cpp_source_l08162}{zbs\+::\+ZRandom\+File\+::\+\_\+clone\+File()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l07722}{zbs\+::\+ZRandom\+File\+::\+\_\+header\+Dump()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00330}{zbs\+::\+ZFile\+Descriptor\+::get\+Allocated\+Blocks()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00058}{get\+Useable\+Params()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00566}{report()}}, \mbox{\hyperlink{zrawindexfile_8h_source_l00095}{zbs\+::\+ZRaw\+Index\+File\+::set\+Allocated\+Blocks()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00897}{zbs\+::\+ZRandom\+File\+::set\+Create\+Maximum()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00071}{set\+Useable\+Params()}}, and \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00368}{to\+Xml()}}.
+
+\Hypertarget{class_z_file_control_block_a2a0384bddff79597cf5ba17d340b721f}\label{class_z_file_control_block_a2a0384bddff79597cf5ba17d340b721f} 
+\index{ZFileControlBlock@{ZFileControlBlock}!AllocatedSize@{AllocatedSize}}
+\index{AllocatedSize@{AllocatedSize}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{AllocatedSize}{AllocatedSize}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}} ZFile\+Control\+Block\+::\+Allocated\+Size}
+
+Total current allocated size in bytes for file 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00225}{225}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00421}{from\+Xml()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00315}{zbs\+::\+ZFile\+Descriptor\+::get\+File\+Size()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00311}{zbs\+::\+ZFile\+Descriptor\+::invalid\+Address()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00897}{zbs\+::\+ZRandom\+File\+::set\+Create\+Maximum()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00874}{zbs\+::\+ZRandom\+File\+::set\+Create\+Minimum()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00368}{to\+Xml()}}, and \mbox{\hyperlink{zrandomfile_8cpp_source_l08420}{zbs\+::\+ZRandom\+File\+::ztruncate\+File()}}.
+
+\Hypertarget{class_z_file_control_block_abc804b1478e12ede62078b6e3579f598}\label{class_z_file_control_block_abc804b1478e12ede62078b6e3579f598} 
+\index{ZFileControlBlock@{ZFileControlBlock}!BlockExtentQuota@{BlockExtentQuota}}
+\index{BlockExtentQuota@{BlockExtentQuota}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{BlockExtentQuota}{BlockExtentQuota}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} ZFile\+Control\+Block\+::\+Block\+Extent\+Quota =0}
+
+for ZBAT \& ZFBT \+: initial extension quota 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00196}{196}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomfile_8cpp_source_l08162}{zbs\+::\+ZRandom\+File\+::\+\_\+clone\+File()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l07722}{zbs\+::\+ZRandom\+File\+::\+\_\+header\+Dump()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00329}{zbs\+::\+ZRandom\+File\+::\+\_\+set\+Parameters()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00421}{from\+Xml()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00335}{zbs\+::\+ZFile\+Descriptor\+::get\+Block\+Extent\+Quota()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00058}{get\+Useable\+Params()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00566}{report()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00532}{zbs\+::\+ZRandom\+File\+::set\+Block\+Extent\+Quota()}}, \mbox{\hyperlink{zrawindexfile_8h_source_l00096}{zbs\+::\+ZRaw\+Index\+File\+::set\+Block\+Extent\+Quota()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00897}{zbs\+::\+ZRandom\+File\+::set\+Create\+Maximum()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00071}{set\+Useable\+Params()}}, and \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00368}{to\+Xml()}}.
+
+\Hypertarget{class_z_file_control_block_a40c6195556fe6bacc969acb7a9be1a0f}\label{class_z_file_control_block_a40c6195556fe6bacc969acb7a9be1a0f} 
+\index{ZFileControlBlock@{ZFileControlBlock}!BlockTargetSize@{BlockTargetSize}}
+\index{BlockTargetSize@{BlockTargetSize}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{BlockTargetSize}{BlockTargetSize}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} ZFile\+Control\+Block\+::\+Block\+Target\+Size =0}
+
+Block target size (user defined value) Foreseen medium size of blocks in a varying block context. 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00198}{198}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomfile_8cpp_source_l08162}{zbs\+::\+ZRandom\+File\+::\+\_\+clone\+File()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l07722}{zbs\+::\+ZRandom\+File\+::\+\_\+header\+Dump()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l08957}{zbs\+::\+ZRandom\+File\+::\+\_\+reorg\+File\+Internals()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00329}{zbs\+::\+ZRandom\+File\+::\+\_\+set\+Parameters()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00421}{from\+Xml()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00340}{zbs\+::\+ZFile\+Descriptor\+::get\+Block\+Target\+Size()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00058}{get\+Useable\+Params()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00566}{report()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00488}{zbs\+::\+ZRandom\+File\+::set\+Block\+Target\+Size()}}, \mbox{\hyperlink{zrawindexfile_8h_source_l00097}{zbs\+::\+ZRaw\+Index\+File\+::set\+Block\+Target\+Size()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00897}{zbs\+::\+ZRandom\+File\+::set\+Create\+Maximum()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00874}{zbs\+::\+ZRandom\+File\+::set\+Create\+Minimum()}}, \mbox{\hyperlink{zclearfiledlg_8cpp_source_l00153}{ZClear\+File\+DLg\+::setup()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00071}{set\+Useable\+Params()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00368}{to\+Xml()}}, and \mbox{\hyperlink{zrandomfile_8cpp_source_l08420}{zbs\+::\+ZRandom\+File\+::ztruncate\+File()}}.
+
+\Hypertarget{class_z_file_control_block_acf0830d462dc01e137c4839ef05ce58f}\label{class_z_file_control_block_acf0830d462dc01e137c4839ef05ce58f} 
+\index{ZFileControlBlock@{ZFileControlBlock}!GrabFreeSpace@{GrabFreeSpace}}
+\index{GrabFreeSpace@{GrabFreeSpace}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{GrabFreeSpace}{GrabFreeSpace}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} ZFile\+Control\+Block\+::\+Grab\+Free\+Space =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBool}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}})}
+
+attempts to grab free space and holes at each block free operation 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00201}{201}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomfile_8cpp_source_l08162}{zbs\+::\+ZRandom\+File\+::\+\_\+clone\+File()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l07722}{zbs\+::\+ZRandom\+File\+::\+\_\+header\+Dump()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00329}{zbs\+::\+ZRandom\+File\+::\+\_\+set\+Parameters()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00421}{from\+Xml()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00355}{zbs\+::\+ZFile\+Descriptor\+::get\+Grab\+Free\+Space()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00058}{get\+Useable\+Params()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00566}{report()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00897}{zbs\+::\+ZRandom\+File\+::set\+Create\+Maximum()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00071}{set\+Useable\+Params()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00368}{to\+Xml()}}, and \mbox{\hyperlink{zrandomfile_8cpp_source_l08896}{zbs\+::\+ZRandom\+File\+::zreorg\+File()}}.
+
+\Hypertarget{class_z_file_control_block_a4d8a62bde87f03d08492c572bb0170db}\label{class_z_file_control_block_a4d8a62bde87f03d08492c572bb0170db} 
+\index{ZFileControlBlock@{ZFileControlBlock}!HighwaterMarking@{HighwaterMarking}}
+\index{HighwaterMarking@{HighwaterMarking}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{HighwaterMarking}{HighwaterMarking}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} ZFile\+Control\+Block\+::\+Highwater\+Marking =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBool}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}})}
+
+mark to zero the whole deleted block content when removed 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00200}{200}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomfile_8cpp_source_l08162}{zbs\+::\+ZRandom\+File\+::\+\_\+clone\+File()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l07722}{zbs\+::\+ZRandom\+File\+::\+\_\+header\+Dump()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00329}{zbs\+::\+ZRandom\+File\+::\+\_\+set\+Parameters()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00421}{from\+Xml()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00350}{zbs\+::\+ZFile\+Descriptor\+::get\+Highwater\+Marking()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00058}{get\+Useable\+Params()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00566}{report()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00897}{zbs\+::\+ZRandom\+File\+::set\+Create\+Maximum()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00874}{zbs\+::\+ZRandom\+File\+::set\+Create\+Minimum()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00392}{zbs\+::\+ZRandom\+File\+::set\+Highwater\+Marking()}}, \mbox{\hyperlink{zclearfiledlg_8cpp_source_l00153}{ZClear\+File\+DLg\+::setup()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00071}{set\+Useable\+Params()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00368}{to\+Xml()}}, and \mbox{\hyperlink{zrandomfile_8cpp_source_l08572}{zbs\+::\+ZRandom\+File\+::zclear\+File()}}.
+
+\Hypertarget{class_z_file_control_block_a4eaedce6913a9e9ff5055e6388c3df47}\label{class_z_file_control_block_a4eaedce6913a9e9ff5055e6388c3df47} 
+\index{ZFileControlBlock@{ZFileControlBlock}!InitialSize@{InitialSize}}
+\index{InitialSize@{InitialSize}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{InitialSize}{InitialSize}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}} ZFile\+Control\+Block\+::\+Initial\+Size =0}
+
+Initial Size allocated to file during creation \+: file is created to this size then truncated to size 0 to reserve allocation on disk 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00197}{197}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00421}{from\+Xml()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00345}{zbs\+::\+ZFile\+Descriptor\+::get\+Initial\+Size()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00058}{get\+Useable\+Params()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00566}{report()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00897}{zbs\+::\+ZRandom\+File\+::set\+Create\+Maximum()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00071}{set\+Useable\+Params()}}, and \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00368}{to\+Xml()}}.
+
+\Hypertarget{class_z_file_control_block_af2c3ac65d5f2d8297ce6a8999ea719fb}\label{class_z_file_control_block_af2c3ac65d5f2d8297ce6a8999ea719fb} 
+\index{ZFileControlBlock@{ZFileControlBlock}!MaxSize@{MaxSize}}
+\index{MaxSize@{MaxSize}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{MaxSize}{MaxSize}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} ZFile\+Control\+Block\+::\+Max\+Size}
+
+statistical value \+: maximum length of block record in file (existing statistic ) 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00230}{230}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l08957}{zbs\+::\+ZRandom\+File\+::\+\_\+reorg\+File\+Internals()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00566}{report()}}, and \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00368}{to\+Xml()}}.
+
+\Hypertarget{class_z_file_control_block_acd8074c36bdc7fc424e9bafaac37b0f0}\label{class_z_file_control_block_acd8074c36bdc7fc424e9bafaac37b0f0} 
+\index{ZFileControlBlock@{ZFileControlBlock}!MinSize@{MinSize}}
+\index{MinSize@{MinSize}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{MinSize}{MinSize}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} ZFile\+Control\+Block\+::\+Min\+Size}
+
+statistical value \+: minimum length of block record in file (existing statistic) 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00229}{229}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l08957}{zbs\+::\+ZRandom\+File\+::\+\_\+reorg\+File\+Internals()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00566}{report()}}, and \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00368}{to\+Xml()}}.
+
+\Hypertarget{class_z_file_control_block_a761bd788dded1b3f07288d0291fb302d}\label{class_z_file_control_block_a761bd788dded1b3f07288d0291fb302d} 
+\index{ZFileControlBlock@{ZFileControlBlock}!StartOfData@{StartOfData}}
+\index{StartOfData@{StartOfData}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{StartOfData}{StartOfData}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} ZFile\+Control\+Block\+::\+Start\+Of\+Data =0L}
+
+offset where Data storage starts \+: 0L 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00192}{192}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l07722}{zbs\+::\+ZRandom\+File\+::\+\_\+header\+Dump()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l08957}{zbs\+::\+ZRandom\+File\+::\+\_\+reorg\+File\+Internals()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00010}{clear()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00238}{zbs\+::\+ZFile\+Descriptor\+::get\+Current\+Logical\+Address()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00300}{zbs\+::\+ZFile\+Descriptor\+::reset\+Position()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00259}{zbs\+::\+ZFile\+Descriptor\+::set\+Logical\+From\+Physical()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00261}{zbs\+::\+ZFile\+Descriptor\+::set\+Physical\+From\+Logical()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00321}{zbs\+::\+ZFile\+Descriptor\+::set\+Physical\+Position()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00368}{to\+Xml()}}, and \mbox{\hyperlink{zrandomfile_8cpp_source_l08572}{zbs\+::\+ZRandom\+File\+::zclear\+File()}}.
+
+\Hypertarget{class_z_file_control_block_a5d46fb63379884f96283f89d7710a79f}\label{class_z_file_control_block_a5d46fb63379884f96283f89d7710a79f} 
+\index{ZFileControlBlock@{ZFileControlBlock}!UsedSize@{UsedSize}}
+\index{UsedSize@{UsedSize}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{UsedSize}{UsedSize}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}} ZFile\+Control\+Block\+::\+Used\+Size}
+
+Total of currently used size within file in bytes 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00226}{226}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomfile_8cpp_source_l04296}{zbs\+::\+ZRandom\+File\+::\+\_\+add2\+Phases\+\_\+\+Commit()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l08162}{zbs\+::\+ZRandom\+File\+::\+\_\+clone\+File()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l07722}{zbs\+::\+ZRandom\+File\+::\+\_\+header\+Dump()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l08957}{zbs\+::\+ZRandom\+File\+::\+\_\+reorg\+File\+Internals()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00421}{from\+Xml()}}, \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00368}{to\+Xml()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00797}{zbs\+::\+ZRandom\+File\+::\+Used\+Size()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l08572}{zbs\+::\+ZRandom\+File\+::zclear\+File()}}, and \mbox{\hyperlink{zrandomfile_8h_source_l00736}{zbs\+::\+ZRandom\+File\+::zget\+Used\+Size()}}.
+
+\Hypertarget{class_z_file_control_block_ac9f57f681ad5af522bf686bc7d24ab08}\label{class_z_file_control_block_ac9f57f681ad5af522bf686bc7d24ab08} 
+\index{ZFileControlBlock@{ZFileControlBlock}!ZBAT\_DataOffset@{ZBAT\_DataOffset}}
+\index{ZBAT\_DataOffset@{ZBAT\_DataOffset}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZBAT\_DataOffset}{ZBAT\_DataOffset}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} ZFile\+Control\+Block\+::\+ZBAT\+\_\+\+Data\+Offset =0}
+
+Written on file header \+: Offset to Blocks Access Table array since begining of ZFCB 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00205}{205}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zfiledescriptor_8cpp_source_l00025}{zbs\+::\+ZFile\+Descriptor\+::\+\_\+export\+FCB()}}.
+
+\Hypertarget{class_z_file_control_block_af6beee15967f98d41bd0652b4ca2160a}\label{class_z_file_control_block_af6beee15967f98d41bd0652b4ca2160a} 
+\index{ZFileControlBlock@{ZFileControlBlock}!ZBAT\_ExportSize@{ZBAT\_ExportSize}}
+\index{ZBAT\_ExportSize@{ZBAT\_ExportSize}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZBAT\_ExportSize}{ZBAT\_ExportSize}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} ZFile\+Control\+Block\+::\+ZBAT\+\_\+\+Export\+Size =0}
+
+Written on file header \+: size in bytes of ZBAT \+: to be written on file. This size is the global ZArray size in bytes 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00206}{206}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zfiledescriptor_8cpp_source_l00025}{zbs\+::\+ZFile\+Descriptor\+::\+\_\+export\+FCB()}}.
+
+\Hypertarget{class_z_file_control_block_a6156aa30ffc04ec0d25df9b0359fa0a4}\label{class_z_file_control_block_a6156aa30ffc04ec0d25df9b0359fa0a4} 
+\index{ZFileControlBlock@{ZFileControlBlock}!ZFBT\_DataOffset@{ZFBT\_DataOffset}}
+\index{ZFBT\_DataOffset@{ZFBT\_DataOffset}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZFBT\_DataOffset}{ZFBT\_DataOffset}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} ZFile\+Control\+Block\+::\+ZFBT\+\_\+\+Data\+Offset}
+
+offset to Free Blocks Table array since begining of ZFCB 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00208}{208}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zfiledescriptor_8cpp_source_l00025}{zbs\+::\+ZFile\+Descriptor\+::\+\_\+export\+FCB()}}.
+
+\Hypertarget{class_z_file_control_block_a2e9d0b836ebade8275a2e98d1ee3ca8c}\label{class_z_file_control_block_a2e9d0b836ebade8275a2e98d1ee3ca8c} 
+\index{ZFileControlBlock@{ZFileControlBlock}!ZFBT\_ExportSize@{ZFBT\_ExportSize}}
+\index{ZFBT\_ExportSize@{ZFBT\_ExportSize}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZFBT\_ExportSize}{ZFBT\_ExportSize}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} ZFile\+Control\+Block\+::\+ZFBT\+\_\+\+Export\+Size}
+
+size in bytes of ZFBT \+: to be written on file 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00209}{209}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zfiledescriptor_8cpp_source_l00025}{zbs\+::\+ZFile\+Descriptor\+::\+\_\+export\+FCB()}}.
+
+\Hypertarget{class_z_file_control_block_aa5f54a59b53bce17829d287b50f0fe61}\label{class_z_file_control_block_aa5f54a59b53bce17829d287b50f0fe61} 
+\index{ZFileControlBlock@{ZFileControlBlock}!ZHOT\_DataOffset@{ZHOT\_DataOffset}}
+\index{ZHOT\_DataOffset@{ZHOT\_DataOffset}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZHOT\_DataOffset}{ZHOT\_DataOffset}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} ZFile\+Control\+Block\+::\+ZHOT\+\_\+\+Data\+Offset}
+
+offset to Holes Table array since begining of ZFCB 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00211}{211}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}.
+
+\Hypertarget{class_z_file_control_block_a0edcffbbf59418eb34c8c07a645411fd}\label{class_z_file_control_block_a0edcffbbf59418eb34c8c07a645411fd} 
+\index{ZFileControlBlock@{ZFileControlBlock}!ZHOT\_ExportSize@{ZHOT\_ExportSize}}
+\index{ZHOT\_ExportSize@{ZHOT\_ExportSize}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZHOT\_ExportSize}{ZHOT\_ExportSize}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} ZFile\+Control\+Block\+::\+ZHOT\+\_\+\+Export\+Size}
+
+size in bytes of ZHOT \+: to be written on file 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00212}{212}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}.
+
+\Hypertarget{class_z_file_control_block_a07547599d4b52058237148d3f4139b71}\label{class_z_file_control_block_a07547599d4b52058237148d3f4139b71} 
+\index{ZFileControlBlock@{ZFileControlBlock}!ZReserved\_DataOffset@{ZReserved\_DataOffset}}
+\index{ZReserved\_DataOffset@{ZReserved\_DataOffset}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZReserved\_DataOffset}{ZReserved\_DataOffset}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} ZFile\+Control\+Block\+::\+ZReserved\+\_\+\+Data\+Offset}
+
+Written on file header \+: Reserved space address . Must be 0L 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00218}{218}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}.
+
+\Hypertarget{class_z_file_control_block_af0e1236e06b8d060ba253c68ed09275b}\label{class_z_file_control_block_af0e1236e06b8d060ba253c68ed09275b} 
+\index{ZFileControlBlock@{ZFileControlBlock}!ZReserved\_ExportSize@{ZReserved\_ExportSize}}
+\index{ZReserved\_ExportSize@{ZReserved\_ExportSize}!ZFileControlBlock@{ZFileControlBlock}}
+\doxysubsubsection{\texorpdfstring{ZReserved\_ExportSize}{ZReserved\_ExportSize}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} ZFile\+Control\+Block\+::\+ZReserved\+\_\+\+Export\+Size}
+
+given by \+\_\+get\+Reserved\+Size 
+
+Definition at line \mbox{\hyperlink{zfilecontrolblock_8h_source_l00219}{219}} of file \mbox{\hyperlink{zfilecontrolblock_8h_source}{zfilecontrolblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zfilecontrolblock_8cpp_source_l00020}{\+\_\+copy\+From()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/zcontent/zrandomfile/\mbox{\hyperlink{zfilecontrolblock_8h}{zfilecontrolblock.\+h}}\item 
+/home/gerard/\+Development/zbasetools/zcontent/zrandomfile/\mbox{\hyperlink{zfilecontrolblock_8cpp}{zfilecontrolblock.\+cpp}}\end{DoxyCompactItemize}

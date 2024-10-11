@@ -1,0 +1,57 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/zsearchtoken.h File Reference}
+\hypertarget{zsearchtoken_8h}{}\label{zsearchtoken_8h}\index{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zsearchtoken.h@{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zsearchtoken.h}}
+{\ttfamily \#include $<$ztoolset/zarray.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/utfvaryingstring.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zaierrors.\+h$>$}\newline
+{\ttfamily \#include "{}zsearchparsertype.\+h"{}}\newline
+Include dependency graph for zsearchtoken.\+h\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classzbs_1_1_z_search_token}{zbs\+::\+ZSearch\+Token}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacezbs}{zbs}}
+\begin{DoxyCompactList}\small\item\em ZSIndex\+Field\+\_\+struct Dictionary single field definition \+: one key may be composed of many single fields not necessarily contiguous in the master file\textquotesingle{}s data structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zsearchtoken_8h_a44fdbf40a2b53439e554eb9a4cb46d2b}{\+\_\+\+\_\+\+DISPLAYCALLBACK\+\_\+\+\_\+}}(\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}})~\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}}\&)$>$ \mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zsearchtoken_8h_a64b290f29e5879fc108371adf1b94d35}{\+\_\+\+\_\+progress\+Call\+Back\+\_\+\+\_\+}}(\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}})~\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}})$>$ \mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{namespacezbs_a09e6693be93d4d0517136e28f35e8025}{zbs\+::\+Line}} =1
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{namespacezbs_a5f124a0e19515e48b3361a4689d3f727}{zbs\+::\+Column}} =1
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{namespacezbs_ae2e1a379ff5238ea25fac98f1d9fa2bd}{zbs\+::\+Offset}} =0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{zsearchtoken_8h_a44fdbf40a2b53439e554eb9a4cb46d2b}\label{zsearchtoken_8h_a44fdbf40a2b53439e554eb9a4cb46d2b} 
+\index{zsearchtoken.h@{zsearchtoken.h}!\_\_DISPLAYCALLBACK\_\_@{\_\_DISPLAYCALLBACK\_\_}}
+\index{\_\_DISPLAYCALLBACK\_\_@{\_\_DISPLAYCALLBACK\_\_}!zsearchtoken.h@{zsearchtoken.h}}
+\doxysubsubsection{\texorpdfstring{\_\_DISPLAYCALLBACK\_\_}{\_\_DISPLAYCALLBACK\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+DISPLAYCALLBACK\+\_\+\+\_\+(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}} }\end{DoxyParamCaption})~\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}}\&)$>$ \mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchtoken_8h_source_l00011}{11}} of file \mbox{\hyperlink{zsearchtoken_8h_source}{zsearchtoken.\+h}}.
+
+\Hypertarget{zsearchtoken_8h_a64b290f29e5879fc108371adf1b94d35}\label{zsearchtoken_8h_a64b290f29e5879fc108371adf1b94d35} 
+\index{zsearchtoken.h@{zsearchtoken.h}!\_\_progressCallBack\_\_@{\_\_progressCallBack\_\_}}
+\index{\_\_progressCallBack\_\_@{\_\_progressCallBack\_\_}!zsearchtoken.h@{zsearchtoken.h}}
+\doxysubsubsection{\texorpdfstring{\_\_progressCallBack\_\_}{\_\_progressCallBack\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+progress\+Call\+Back\+\_\+\+\_\+(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}} }\end{DoxyParamCaption})~\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}})$>$ \mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsearchtoken_8h_source_l00012}{12}} of file \mbox{\hyperlink{zsearchtoken_8h_source}{zsearchtoken.\+h}}.
+

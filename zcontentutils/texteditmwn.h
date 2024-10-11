@@ -115,6 +115,11 @@ public:
   void displayColorCallBack(uint8_t pSeverity, const utf8VaryingString &pMessage);
   void displayCallBack(const utf8VaryingString &pMessage);
 
+  void setErrorLog(ZaiErrors* pErrorLog)
+  {
+      ErrorLog=pErrorLog;
+  }
+
   void registerDisplayColorCallBack(ZaiErrors* pErrorLog)
   {
       ErrorLog=pErrorLog;

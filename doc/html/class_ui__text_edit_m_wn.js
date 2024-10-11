@@ -1,0 +1,26 @@
+var class_ui__text_edit_m_wn =
+[
+    [ "retranslateUi", "class_ui__text_edit_m_wn.html#ae63efb32232aa05eeecbca0522fa2aeb", null ],
+    [ "retranslateUi", "class_ui__text_edit_m_wn.html#ae63efb32232aa05eeecbca0522fa2aeb", null ],
+    [ "retranslateUi", "class_ui__text_edit_m_wn.html#ae63efb32232aa05eeecbca0522fa2aeb", null ],
+    [ "setupUi", "class_ui__text_edit_m_wn.html#a1c02eb31a81da19dc3121cd4de15b17c", null ],
+    [ "setupUi", "class_ui__text_edit_m_wn.html#a1c02eb31a81da19dc3121cd4de15b17c", null ],
+    [ "setupUi", "class_ui__text_edit_m_wn.html#a1c02eb31a81da19dc3121cd4de15b17c", null ],
+    [ "centralwidget", "class_ui__text_edit_m_wn.html#a9b78bc9a220dae2e73ad065d63091411", null ],
+    [ "closeBTn", "class_ui__text_edit_m_wn.html#a321733781fcb2be3a81bf18fc8838e67", null ],
+    [ "ClosedLBl", "class_ui__text_edit_m_wn.html#a706057c229ddcd3ad906f2a898bb3095", null ],
+    [ "filterBTn", "class_ui__text_edit_m_wn.html#a5e0faa1cd38254664970685df643da2d", null ],
+    [ "horizontalLayout", "class_ui__text_edit_m_wn.html#ab81f1a8d6c1a08dd0db1d7c3d2073342", null ],
+    [ "horizontalLayout_2", "class_ui__text_edit_m_wn.html#af8317b5f5bcf689d8d85c0a14c20dbd5", null ],
+    [ "horizontalSpacer", "class_ui__text_edit_m_wn.html#a146ba0a94072815538ba5c87894607e3", null ],
+    [ "lineNumbersBTn", "class_ui__text_edit_m_wn.html#a8f28894712c868d3d9f56d5ef7bbcfc7", null ],
+    [ "menubar", "class_ui__text_edit_m_wn.html#a49d447f6cf290d97c5347e5b4f070156", null ],
+    [ "searchBTn", "class_ui__text_edit_m_wn.html#a3e9a1a9e7c665b4bf66a2fdb6237a74b", null ],
+    [ "searchLEd", "class_ui__text_edit_m_wn.html#a6a55907333bdb015b38174cbad4227a3", null ],
+    [ "searchMainBTn", "class_ui__text_edit_m_wn.html#a3da894ccd0d56d5d33d04ed5bb3da2da", null ],
+    [ "statusbar", "class_ui__text_edit_m_wn.html#a935d8b9dfa98f6517eae5959ffc1431d", null ],
+    [ "textPTe", "class_ui__text_edit_m_wn.html#afa5446c6c9df69711cb7d73b0293a5c9", null ],
+    [ "verticalLayout", "class_ui__text_edit_m_wn.html#a85d85a1c3870e84ace1c544e716e13a9", null ],
+    [ "verticalLayoutWidget", "class_ui__text_edit_m_wn.html#ad23ed78dcb1fc66d043842eb333c52aa", null ],
+    [ "wrapBTn", "class_ui__text_edit_m_wn.html#a91bbd034d4a052cc5c1207686ab098e8", null ]
+];

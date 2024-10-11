@@ -1,0 +1,280 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentcommon/urfparser.h File Reference}
+\hypertarget{urfparser_8h}{}\label{urfparser_8h}\index{/home/gerard/Development/zbasetools/zcontent/zcontentcommon/urfparser.h@{/home/gerard/Development/zbasetools/zcontent/zcontentcommon/urfparser.h}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zstatus.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zdatabuffer.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zbitset.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zexceptionmin.\+h$>$}\newline
+{\ttfamily \#include "{}urffield.\+h"{}}\newline
+Include dependency graph for urfparser.\+h\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_u_r_f_parser}{URFParser}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacezbs}{zbs}}
+\begin{DoxyCompactList}\small\item\em ZSIndex\+Field\+\_\+struct Dictionary single field definition \+: one key may be composed of many single fields not necessarily contiguous in the master file\textquotesingle{}s data structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{urfparser_8h_af8547973d552070a177bb343c6ddcc9a}{Compare\+Options}} \+: uint8\+\_\+t \{ \mbox{\hyperlink{urfparser_8h_af8547973d552070a177bb343c6ddcc9aa8077eae95e3281a9cb6e107cea9b0fd1}{COPT\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{urfparser_8h_af8547973d552070a177bb343c6ddcc9aa04ff428462183944a97ffe41ef16d084}{COPT\+\_\+\+Drop\+Accute}} = 1
+, \mbox{\hyperlink{urfparser_8h_af8547973d552070a177bb343c6ddcc9aaf007c205a2bf3fd0a6e9b969aebc0980}{COPT\+\_\+\+Up\+Case}} = 2
+, \mbox{\hyperlink{urfparser_8h_af8547973d552070a177bb343c6ddcc9aa2faab3e35d48aaa80054857fa633cb12}{COPT\+\_\+\+Default}} = COPT\+\_\+\+Drop\+Accute \texorpdfstring{$\vert$}{|} COPT\+\_\+\+Up\+Case
+ \}
+\item 
+enum \mbox{\hyperlink{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424}{URFParser\+State}} \{ \mbox{\hyperlink{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424aea2b4dd9cf8f94c1544fac68593b8200}{URFPS\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424afef71f11632fb0cd9d16c80eb61d1dd9}{URFPS\+\_\+\+Record\+Set}} = 1
+, \mbox{\hyperlink{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424aeae6b39bd3ced86f53c831c6bc95617b}{URFPS\+\_\+\+Partially\+Parsed}} = 2
+, \mbox{\hyperlink{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424aceb146e9b49989e65719487a2811d055}{URFPS\+\_\+\+Totally\+Parsed}} = 3
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{urfparser_8h_acb5daa3a1c80932032d7c1ccb5b3064c}{decode\+\_\+\+URFPS}} (\mbox{\hyperlink{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424}{URFParser\+State}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URFPS}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{urfparser_8h_a949a97bd20fc157f5173bfc1dc21b8d5}{URFCompare\+Ptr}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key1}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size1}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key2}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size2}})
+\begin{DoxyCompactList}\small\item\em URFCompare Compare two buffers composed each of one or many URF fields, each field potentially of variable length. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{urfparser_8h_adf2aa6943de8b8b8221923256bc4ff1b}{URFCompare\+Values}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URF1}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size1}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URF2}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size2}})
+\begin{DoxyCompactList}\small\item\em URFCompare\+Values binary compares two contents returns 0 equality in both content and size -\/1 if p\+URF1 content is less than p\+URF2 1 if p\+URF1 content is greater than p\+URF2. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{urfparser_8h_a48cd57529a6cc28fd4fa3d0993781e45}{UTF8\+Compare}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key1}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size1}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key2}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size2}})
+\begin{DoxyCompactList}\small\item\em compare\+Ut8 compares two utf8 strings after having converted string to uppercase, droped accutes Strings remains the same and are not affected by operation. returns 0 equality in both content and size -\/1 if p\+Key1 content is less than p\+Key2 1 if p\+Key1 content is greater than p\+Key2 After routine ran, p\+Key1 and p\+Key2 points respectively to the end of their string \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{urfparser_8h_a4653c26e2866a84e70e2696aa0639c96}{UTF16\+Compare}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key1}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size1}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key2}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size2}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{urfparser_8h_ac841d3d0aa128a429e7d6b2f52fcdb1e}{UTF32\+Compare}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key1}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size1}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key2}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size2}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{urfparser_8h_a972024a5b9a8000d68def596cbc6ef38}{ZType\+Exists}} (\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Type}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{urfparser_8h_aa4671baa578be2187ce8b9079f4b5f24}{search\+Next\+Valid\+ZType}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+End}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{urfparser_8h_a8ff6882ab9ca839f469fb093c4f8fc10}{Type\+Exists}} (\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Type}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Utf}} $>$ }\\\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Utf}} \mbox{\hyperlink{urfparser_8h_a8d495e6c714f5c48fc9ffec3fe6e10de}{Key\+Char\+Convert}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Utf}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Char}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Utf}} $>$ }\\\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{urfparser_8h_aee43da8fe42d83beec7bb11e86eb51a8}{UTFCompare}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key1}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size1}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key2}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size2}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{urfparser_8h_af8547973d552070a177bb343c6ddcc9a}\label{urfparser_8h_af8547973d552070a177bb343c6ddcc9a} 
+\index{urfparser.h@{urfparser.h}!CompareOptions@{CompareOptions}}
+\index{CompareOptions@{CompareOptions}!urfparser.h@{urfparser.h}}
+\doxysubsubsection{\texorpdfstring{CompareOptions}{CompareOptions}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{urfparser_8h_af8547973d552070a177bb343c6ddcc9a}{Compare\+Options}} \+: \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{COPT\_Nothing@{COPT\_Nothing}!urfparser.h@{urfparser.h}}\index{urfparser.h@{urfparser.h}!COPT\_Nothing@{COPT\_Nothing}}}\Hypertarget{urfparser_8h_af8547973d552070a177bb343c6ddcc9aa8077eae95e3281a9cb6e107cea9b0fd1}\label{urfparser_8h_af8547973d552070a177bb343c6ddcc9aa8077eae95e3281a9cb6e107cea9b0fd1} 
+COPT\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{COPT\_DropAccute@{COPT\_DropAccute}!urfparser.h@{urfparser.h}}\index{urfparser.h@{urfparser.h}!COPT\_DropAccute@{COPT\_DropAccute}}}\Hypertarget{urfparser_8h_af8547973d552070a177bb343c6ddcc9aa04ff428462183944a97ffe41ef16d084}\label{urfparser_8h_af8547973d552070a177bb343c6ddcc9aa04ff428462183944a97ffe41ef16d084} 
+COPT\+\_\+\+Drop\+Accute&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{COPT\_UpCase@{COPT\_UpCase}!urfparser.h@{urfparser.h}}\index{urfparser.h@{urfparser.h}!COPT\_UpCase@{COPT\_UpCase}}}\Hypertarget{urfparser_8h_af8547973d552070a177bb343c6ddcc9aaf007c205a2bf3fd0a6e9b969aebc0980}\label{urfparser_8h_af8547973d552070a177bb343c6ddcc9aaf007c205a2bf3fd0a6e9b969aebc0980} 
+COPT\+\_\+\+Up\+Case&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{COPT\_Default@{COPT\_Default}!urfparser.h@{urfparser.h}}\index{urfparser.h@{urfparser.h}!COPT\_Default@{COPT\_Default}}}\Hypertarget{urfparser_8h_af8547973d552070a177bb343c6ddcc9aa2faab3e35d48aaa80054857fa633cb12}\label{urfparser_8h_af8547973d552070a177bb343c6ddcc9aa2faab3e35d48aaa80054857fa633cb12} 
+COPT\+\_\+\+Default&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{urfparser_8h_source_l00015}{15}} of file \mbox{\hyperlink{urfparser_8h_source}{urfparser.\+h}}.
+
+\Hypertarget{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424}\label{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424} 
+\index{urfparser.h@{urfparser.h}!URFParserState@{URFParserState}}
+\index{URFParserState@{URFParserState}!urfparser.h@{urfparser.h}}
+\doxysubsubsection{\texorpdfstring{URFParserState}{URFParserState}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424}{URFParser\+State}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{URFPS\_Nothing@{URFPS\_Nothing}!urfparser.h@{urfparser.h}}\index{urfparser.h@{urfparser.h}!URFPS\_Nothing@{URFPS\_Nothing}}}\Hypertarget{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424aea2b4dd9cf8f94c1544fac68593b8200}\label{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424aea2b4dd9cf8f94c1544fac68593b8200} 
+URFPS\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{URFPS\_RecordSet@{URFPS\_RecordSet}!urfparser.h@{urfparser.h}}\index{urfparser.h@{urfparser.h}!URFPS\_RecordSet@{URFPS\_RecordSet}}}\Hypertarget{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424afef71f11632fb0cd9d16c80eb61d1dd9}\label{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424afef71f11632fb0cd9d16c80eb61d1dd9} 
+URFPS\+\_\+\+Record\+Set&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{URFPS\_PartiallyParsed@{URFPS\_PartiallyParsed}!urfparser.h@{urfparser.h}}\index{urfparser.h@{urfparser.h}!URFPS\_PartiallyParsed@{URFPS\_PartiallyParsed}}}\Hypertarget{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424aeae6b39bd3ced86f53c831c6bc95617b}\label{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424aeae6b39bd3ced86f53c831c6bc95617b} 
+URFPS\+\_\+\+Partially\+Parsed&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{URFPS\_TotallyParsed@{URFPS\_TotallyParsed}!urfparser.h@{urfparser.h}}\index{urfparser.h@{urfparser.h}!URFPS\_TotallyParsed@{URFPS\_TotallyParsed}}}\Hypertarget{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424aceb146e9b49989e65719487a2811d055}\label{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424aceb146e9b49989e65719487a2811d055} 
+URFPS\+\_\+\+Totally\+Parsed&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{urfparser_8h_source_l00056}{56}} of file \mbox{\hyperlink{urfparser_8h_source}{urfparser.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{urfparser_8h_acb5daa3a1c80932032d7c1ccb5b3064c}\label{urfparser_8h_acb5daa3a1c80932032d7c1ccb5b3064c} 
+\index{urfparser.h@{urfparser.h}!decode\_URFPS@{decode\_URFPS}}
+\index{decode\_URFPS@{decode\_URFPS}!urfparser.h@{urfparser.h}}
+\doxysubsubsection{\texorpdfstring{decode\_URFPS()}{decode\_URFPS()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} decode\+\_\+\+URFPS (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{urfparser_8h_a59e2e3aa4d31b4cb4737dfe17d301424}{URFParser\+State}}}]{p\+URFPS }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{urfparser_8cpp_source_l02096}{2096}} of file \mbox{\hyperlink{urfparser_8cpp_source}{urfparser.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{urfparser_8h_source_l00058}{URFPS\+\_\+\+Nothing}}, \mbox{\hyperlink{urfparser_8h_source_l00060}{URFPS\+\_\+\+Partially\+Parsed}}, \mbox{\hyperlink{urfparser_8h_source_l00059}{URFPS\+\_\+\+Record\+Set}}, and \mbox{\hyperlink{urfparser_8h_source_l00061}{URFPS\+\_\+\+Totally\+Parsed}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsearchentity__shared_8cpp_source_l00819}{zbs\+::\+ZSearch\+Entity\+::construct\+URF()}}, and \mbox{\hyperlink{zsearchentity_8cpp_source_l00788}{zbs\+::\+ZSearch\+Entity\+::construct\+URF()}}.
+
+\Hypertarget{urfparser_8h_a8d495e6c714f5c48fc9ffec3fe6e10de}\label{urfparser_8h_a8d495e6c714f5c48fc9ffec3fe6e10de} 
+\index{urfparser.h@{urfparser.h}!KeyCharConvert@{KeyCharConvert}}
+\index{KeyCharConvert@{KeyCharConvert}!urfparser.h@{urfparser.h}}
+\doxysubsubsection{\texorpdfstring{KeyCharConvert()}{KeyCharConvert()}}
+{\footnotesize\ttfamily template$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Utf}} $>$ \\
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Utf}} Key\+Char\+Convert (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Utf}}}]{p\+Char }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{urfparser_8h_source_l00227}{227}} of file \mbox{\hyperlink{urfparser_8h_source}{urfparser.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{urfparser_8h_aa4671baa578be2187ce8b9079f4b5f24}\label{urfparser_8h_aa4671baa578be2187ce8b9079f4b5f24} 
+\index{urfparser.h@{urfparser.h}!searchNextValidZType@{searchNextValidZType}}
+\index{searchNextValidZType@{searchNextValidZType}!urfparser.h@{urfparser.h}}
+\doxysubsubsection{\texorpdfstring{searchNextValidZType()}{searchNextValidZType()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} search\+Next\+Valid\+ZType (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Ptr,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Ptr\+End }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{urfparser_8cpp_source_l00729}{729}} of file \mbox{\hyperlink{urfparser_8cpp_source}{urfparser.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{urfparser_8cpp_source_l00751}{ZType\+Exists()}}.
+
+
+
+Referenced by \mbox{\hyperlink{urfparser_8cpp_source_l00673}{URFParser\+::\+\_\+get\+URFField\+By\+Rank()}}, \mbox{\hyperlink{urfparser_8cpp_source_l00546}{URFParser\+::append\+URFField\+By\+Rank()}}, and \mbox{\hyperlink{urfparser_8cpp_source_l00602}{URFParser\+::get\+URFField\+By\+Rank\+Incremental()}}.
+
+\Hypertarget{urfparser_8h_a8ff6882ab9ca839f469fb093c4f8fc10}\label{urfparser_8h_a8ff6882ab9ca839f469fb093c4f8fc10} 
+\index{urfparser.h@{urfparser.h}!TypeExists@{TypeExists}}
+\index{TypeExists@{TypeExists}!urfparser.h@{urfparser.h}}
+\doxysubsubsection{\texorpdfstring{TypeExists()}{TypeExists()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} Type\+Exists (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}}}]{p\+Type }\end{DoxyParamCaption})}
+
+\Hypertarget{urfparser_8h_a949a97bd20fc157f5173bfc1dc21b8d5}\label{urfparser_8h_a949a97bd20fc157f5173bfc1dc21b8d5} 
+\index{urfparser.h@{urfparser.h}!URFComparePtr@{URFComparePtr}}
+\index{URFComparePtr@{URFComparePtr}!urfparser.h@{urfparser.h}}
+\doxysubsubsection{\texorpdfstring{URFComparePtr()}{URFComparePtr()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} URFCompare\+Ptr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Key1,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Size1,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Key2,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Size2 }\end{DoxyParamCaption})}
+
+
+
+URFCompare Compare two buffers composed each of one or many URF fields, each field potentially of variable length. 
+
+URFCompare Compare two buffers composed each of one or many URF fields, each field potentially of variable length. 
+
+Definition at line \mbox{\hyperlink{urfparser_8cpp_source_l01963}{1963}} of file \mbox{\hyperlink{urfparser_8cpp_source}{urfparser.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindextype_8cpp_source_l01352}{decode\+\_\+\+ZType()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{urfparser_8cpp_source_l01014}{URFParser\+::get\+URFField\+All\+Sizes()}}, \mbox{\hyperlink{urfparser_8cpp_source_l02044}{URFCompare\+Values()}}, \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_source_l00851}{w\+Ret}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00070}{ZType\+\_\+\+U16}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00076}{ZType\+\_\+\+U32}}, and \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00068}{ZType\+\_\+\+U8}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawindexfile_8cpp_source_l03750}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+Interval\+First()}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l03989}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+Rawsearch\+Interval\+Next()}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l02644}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+All()}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l03130}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+First()}}, \mbox{\hyperlink{zrawindexfile_8cpp_source_l03543}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFsearch\+Next()}}, and \mbox{\hyperlink{zrawindexfile_8cpp_source_l02246}{zbs\+::\+ZRaw\+Index\+File\+::\+\_\+\+URFtest\+Rank()}}.
+
+\Hypertarget{urfparser_8h_adf2aa6943de8b8b8221923256bc4ff1b}\label{urfparser_8h_adf2aa6943de8b8b8221923256bc4ff1b} 
+\index{urfparser.h@{urfparser.h}!URFCompareValues@{URFCompareValues}}
+\index{URFCompareValues@{URFCompareValues}!urfparser.h@{urfparser.h}}
+\doxysubsubsection{\texorpdfstring{URFCompareValues()}{URFCompareValues()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} URFCompare\+Values (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+URF1,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Size1,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+URF2,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Size2 }\end{DoxyParamCaption})}
+
+
+
+URFCompare\+Values binary compares two contents returns 0 equality in both content and size -\/1 if p\+URF1 content is less than p\+URF2 1 if p\+URF1 content is greater than p\+URF2. 
+
+After routine ran, p\+URF1 and p\+URF2 points respectively to the end of their size \begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{urfparser_8cpp_source_l02044}{2044}} of file \mbox{\hyperlink{urfparser_8cpp_source}{urfparser.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_source_l00851}{w\+Ret}}.
+
+
+
+Referenced by \mbox{\hyperlink{urfparser_8cpp_source_l01963}{URFCompare\+Ptr()}}.
+
+\Hypertarget{urfparser_8h_a4653c26e2866a84e70e2696aa0639c96}\label{urfparser_8h_a4653c26e2866a84e70e2696aa0639c96} 
+\index{urfparser.h@{urfparser.h}!UTF16Compare@{UTF16Compare}}
+\index{UTF16Compare@{UTF16Compare}!urfparser.h@{urfparser.h}}
+\doxysubsubsection{\texorpdfstring{UTF16Compare()}{UTF16Compare()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} UTF16\+Compare (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Key1,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Size1,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Key2,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Size2 }\end{DoxyParamCaption})}
+
+\Hypertarget{urfparser_8h_ac841d3d0aa128a429e7d6b2f52fcdb1e}\label{urfparser_8h_ac841d3d0aa128a429e7d6b2f52fcdb1e} 
+\index{urfparser.h@{urfparser.h}!UTF32Compare@{UTF32Compare}}
+\index{UTF32Compare@{UTF32Compare}!urfparser.h@{urfparser.h}}
+\doxysubsubsection{\texorpdfstring{UTF32Compare()}{UTF32Compare()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} UTF32\+Compare (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Key1,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Size1,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Key2,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Size2 }\end{DoxyParamCaption})}
+
+\Hypertarget{urfparser_8h_a48cd57529a6cc28fd4fa3d0993781e45}\label{urfparser_8h_a48cd57529a6cc28fd4fa3d0993781e45} 
+\index{urfparser.h@{urfparser.h}!UTF8Compare@{UTF8Compare}}
+\index{UTF8Compare@{UTF8Compare}!urfparser.h@{urfparser.h}}
+\doxysubsubsection{\texorpdfstring{UTF8Compare()}{UTF8Compare()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} UTF8\+Compare (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Key1,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Size1,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Key2,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Size2 }\end{DoxyParamCaption})}
+
+
+
+compare\+Ut8 compares two utf8 strings after having converted string to uppercase, droped accutes Strings remains the same and are not affected by operation. returns 0 equality in both content and size -\/1 if p\+Key1 content is less than p\+Key2 1 if p\+Key1 content is greater than p\+Key2 After routine ran, p\+Key1 and p\+Key2 points respectively to the end of their string 
+
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\Hypertarget{urfparser_8h_aee43da8fe42d83beec7bb11e86eb51a8}\label{urfparser_8h_aee43da8fe42d83beec7bb11e86eb51a8} 
+\index{urfparser.h@{urfparser.h}!UTFCompare@{UTFCompare}}
+\index{UTFCompare@{UTFCompare}!urfparser.h@{urfparser.h}}
+\doxysubsubsection{\texorpdfstring{UTFCompare()}{UTFCompare()}}
+{\footnotesize\ttfamily template$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Utf}} $>$ \\
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} UTFCompare (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Key1,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Size1,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Key2,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Size2 }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{urfparser_8h_source_l00238}{238}} of file \mbox{\hyperlink{urfparser_8h_source}{urfparser.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_source_l00851}{w\+Ret}}.
+
+\Hypertarget{urfparser_8h_a972024a5b9a8000d68def596cbc6ef38}\label{urfparser_8h_a972024a5b9a8000d68def596cbc6ef38} 
+\index{urfparser.h@{urfparser.h}!ZTypeExists@{ZTypeExists}}
+\index{ZTypeExists@{ZTypeExists}!urfparser.h@{urfparser.h}}
+\doxysubsubsection{\texorpdfstring{ZTypeExists()}{ZTypeExists()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} ZType\+Exists (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}}}]{p\+Type }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{urfparser_8cpp_source_l00751}{751}} of file \mbox{\hyperlink{urfparser_8cpp_source}{urfparser.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{urfparser_8cpp_source_l00252}{URFParser\+::parse()}}, and \mbox{\hyperlink{urfparser_8cpp_source_l00379}{URFParser\+::raw\+Parse()}}.
+

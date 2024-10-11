@@ -1,0 +1,789 @@
+\doxysection{zrawmasterfileutils.\+cpp}
+\hypertarget{zrawmasterfileutils_8cpp_source}{}\label{zrawmasterfileutils_8cpp_source}\index{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zrawmasterfileutils.cpp@{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zrawmasterfileutils.cpp}}
+\mbox{\hyperlink{zrawmasterfileutils_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00001}00001\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zrawmasterfileutils_8h}{zindexedfile/zrawmasterfileutils.h}}>}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zmasterfile_8h}{zcontent/zindexedfile/zmasterfile.h}}>}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00025}\mbox{\hyperlink{group___z_m_f_physical_gae9c12eee0caa10b3173406bd9c8050fa}{00025}}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{group___z_m_f_physical_gae9c12eee0caa10b3173406bd9c8050fa}{generateIndexRootName}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMasterRootName}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIndexName}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00027}00027\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00028}00028\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexRootName}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00029}00029\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexRootName}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMasterRootName}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00030}00030\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexRootName}}.addUtfUnit(\textcolor{charliteral}{'-\/'});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00031}00031\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIndexName}}.isEmpty())}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00032}00032\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00033}00033\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexRootName}}+=\textcolor{stringliteral}{"{}index"{}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00034}00034\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00035}00035\ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00036}00036\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00037}00037\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexRootName}}\ +=\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIndexName}}.toCChar();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00038}00038\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00039}00039\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexRootName}}.eliminateChar(\textcolor{charliteral}{'\ '});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00040}00040\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexRootName}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexRootName}}.toLower();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00041}00041\ \textcolor{comment}{//\ \ wIndexRootName\ +=\ \_\_ZINDEX\_FILEEXTENSION\_\_;}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00042}00042\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexRootName}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00043}00043\ \}\ \textcolor{comment}{//\ generateIndexRootName}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00045}\mbox{\hyperlink{group___z_m_f_physical_ga4d4e1846439dd32c8e66ccaa77307430}{00045}}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{group___z_m_f_physical_ga4d4e1846439dd32c8e66ccaa77307430}{generateIndexBaseName}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMasterRootName}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00046}00046\ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIndexName}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00047}00047\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00048}00048\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexRootName}}\ =\ \mbox{\hyperlink{group___z_m_f_physical_gae9c12eee0caa10b3173406bd9c8050fa}{generateIndexRootName}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMasterRootName}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIndexName}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00049}00049\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexRootName}}\ +=\ \mbox{\hyperlink{group___z_random_file_group_ga0ed7a7f0733986ea362bfa903df114e3}{\_\_ZINDEX\_FILEEXTENSION\_\_}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00050}00050\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexRootName}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00051}00051\ \}\ \textcolor{comment}{//\ generateIndexBaseName}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00070}00070\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00071}\mbox{\hyperlink{group___z_m_f_physical_gab0b54916a293df3727a67c829bdc7db1}{00071}}\ \mbox{\hyperlink{group___z_m_f_physical_gab0b54916a293df3727a67c829bdc7db1}{generateIndexURI}}(\ uriString\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIndexFileUri}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uriString\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMasterFileUri}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00073}00073\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uriString\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pDirectory}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIndexName}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00075}00075\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00076}00076\ \ \ uriString\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPath\_Uri}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00077}00077\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterRoot}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00078}00078\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterExt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00081}00081\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pDirectory}}.isEmpty())}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00082}00082\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPath\_Uri}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMasterFileUri}}.getDirectoryPath();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00083}00083\ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00084}00084\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPath\_Uri}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pDirectory}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00086}00086\ \textcolor{comment}{//\ \ QUrl\ wUrl(wPath\_Uri.toCChar());}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00087}00087\ \textcolor{comment}{//\ \ pIndexFileUri.fromQString(wUrl.toString(QUrl::PreferLocalFile));}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00088}00088\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIndexFileUri}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPath\_Uri}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00089}00089\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIndexFileUri}}.addConditionalDirectoryDelimiter()\ ;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00091}00091\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterRoot}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMasterFileUri}}.getRootname();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00092}00092\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterExt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMasterFileUri}}.getFileExtension().toCChar();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00093}00093\ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\_t}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wExt}}=(\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\_t}}*)\mbox{\hyperlink{group___z_random_file_group_ga0ed7a7f0733986ea362bfa903df114e3}{\_\_ZINDEX\_FILEEXTENSION\_\_}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00094}00094\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wExt}}++;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ skip\ the\ '.'\ char}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00095}00095\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterExt}}==\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wExt}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00096}00096\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00097}00097\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.setMessage\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_GET\_FUNCTION\_NAME\_}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00098}00098\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_INVNAME}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00099}00099\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Severity\_Error}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00100}00100\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ Invalid\ ZSMasterFile\ name\ extension\ \%s\ for\ name\ \%s"{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00101}00101\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterExt}}.toCChar(),}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00102}00102\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMasterFileUri}}.toCChar()}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00103}00103\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00104}00104\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_INVNAME}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00105}00105\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00106}00106\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00107}00107\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wM}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00109}00109\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wM}}=\mbox{\hyperlink{group___z_m_f_physical_ga4d4e1846439dd32c8e66ccaa77307430}{generateIndexBaseName}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterRoot}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIndexName}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00110}00110\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIndexFileUri}}\ +=\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wM}}.toString();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00111}00111\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00112}00112\ \ \ \textcolor{keywordflow}{return}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00113}00113\ \}\ \textcolor{comment}{//generateIndexURI}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00114}00114\ }
+ \textcolor{comment}{// ingroup ZMFPhysical}\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00118}\mbox{\hyperlink{zrawmasterfileutils_8cpp_ae1c8b2ad8c13adb157b7c428ebd3c629}{00118}}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zrawmasterfileutils_8cpp_ae1c8b2ad8c13adb157b7c428ebd3c629}{ZStringBuffer2}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00119}\mbox{\hyperlink{zmasterfile__utilities_8h_a6e11fd3bcbf00c7f1f6bc181deeb09b7}{00119}}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{namespacezbs_a971447864250a54b968da78287c7dae4}{decode\_ZCOP}}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\_t}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZCOP}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00120}00120\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00121}00121\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZCOP}}==\mbox{\hyperlink{namespacezbs_a646e7e410e68e8ca7dda189d65c3644ea43d2d8421799966448b9bc278d584ec0}{ZCOP\_Nothing}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00122}00122\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}ZCOP\_Nothing"{}}\ ;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00124}00124\ \ \ \mbox{\hyperlink{zrawmasterfileutils_8cpp_ae1c8b2ad8c13adb157b7c428ebd3c629}{ZStringBuffer2}}.clear();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00126}00126\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZCOP}}\ \&\ \mbox{\hyperlink{namespacezbs_a646e7e410e68e8ca7dda189d65c3644eadf1db39898f5e963d4873631bcd2788d}{ZCOP\_Interval}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00127}00127\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00128}00128\ \ \ \ \ \mbox{\hyperlink{zrawmasterfileutils_8cpp_ae1c8b2ad8c13adb157b7c428ebd3c629}{ZStringBuffer2}}=(\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\_t}}*)\textcolor{stringliteral}{"{}ZCOP\_Interval\ |"{}}\ ;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00130}00130\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00131}00131\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZCOP}}\ \&\ \mbox{\hyperlink{namespacezbs_a646e7e410e68e8ca7dda189d65c3644ea586c3bd05113bdbe328e7fc914d035b3}{ZCOP\_Exclude}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00132}00132\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00133}00133\ \ \ \ \ \mbox{\hyperlink{zrawmasterfileutils_8cpp_ae1c8b2ad8c13adb157b7c428ebd3c629}{ZStringBuffer2}}\ +=\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\_t}}*)\textcolor{stringliteral}{"{}\ ZCOP\_Exclude\ |"{}}\ ;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00134}00134\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00136}00136\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZCOP}}\ \&\ \mbox{\hyperlink{namespacezbs_a646e7e410e68e8ca7dda189d65c3644ea56237a4af38cd96017f82fd3621f43cc}{ZCOP\_GetFirst}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00137}00137\ \ \ \ \ \mbox{\hyperlink{zrawmasterfileutils_8cpp_ae1c8b2ad8c13adb157b7c428ebd3c629}{ZStringBuffer2}}\ +=\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\_t}}*)\textcolor{stringliteral}{"{}\ ZCOP\_GetFirst"{}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00138}00138\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZCOP}}\ \&\ \mbox{\hyperlink{namespacezbs_a646e7e410e68e8ca7dda189d65c3644eade5f7825f901cf5508245ead5d3b9f34}{ZCOP\_GetNext}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00139}00139\ \ \ \ \ \mbox{\hyperlink{zrawmasterfileutils_8cpp_ae1c8b2ad8c13adb157b7c428ebd3c629}{ZStringBuffer2}}\ +=\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\_t}}*)\textcolor{stringliteral}{"{}\ ZCOP\_GetNext"{}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00140}00140\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZCOP}}\ \&\ \mbox{\hyperlink{namespacezbs_a646e7e410e68e8ca7dda189d65c3644eade9ba7437ebe6723cee604fd2218a0f8}{ZCOP\_GetAll}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00141}00141\ \ \ \ \ \mbox{\hyperlink{zrawmasterfileutils_8cpp_ae1c8b2ad8c13adb157b7c428ebd3c629}{ZStringBuffer2}}\ +=\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\_t}}*)\textcolor{stringliteral}{"{}\ ZCOP\_GetAll"{}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00142}00142\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZCOP}}\ \&\ \mbox{\hyperlink{namespacezbs_a646e7e410e68e8ca7dda189d65c3644eadf1508eed72ba1b437b748ec84d47722}{ZCOP\_RemoveAll}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00143}00143\ \ \ \ \ \mbox{\hyperlink{zrawmasterfileutils_8cpp_ae1c8b2ad8c13adb157b7c428ebd3c629}{ZStringBuffer2}}\ +=\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\_t}}*)\textcolor{stringliteral}{"{}\ ZCOP\_RemoveAll"{}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00144}00144\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZCOP}}\ \&\ \mbox{\hyperlink{namespacezbs_a646e7e410e68e8ca7dda189d65c3644ea0bb0c45a04c77200297357b2dd350f88}{ZCOP\_LockAll}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00145}00145\ \ \ \ \ \mbox{\hyperlink{zrawmasterfileutils_8cpp_ae1c8b2ad8c13adb157b7c428ebd3c629}{ZStringBuffer2}}\ +=\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\_t}}*)\textcolor{stringliteral}{"{}\ ZCOP\_LockAll"{}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00148}00148\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zrawmasterfileutils_8cpp_ae1c8b2ad8c13adb157b7c428ebd3c629}{ZStringBuffer2}}.toCString\_Strait()\ ;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00149}00149\ \}\ \textcolor{comment}{//\ decode\_ZCOP}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00150}00150\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00179}\mbox{\hyperlink{group___z_m_f_utilities_ga2d03c2b81b6cf0ad0e9348144cdea750}{00179}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{group___z_m_f_utilities_ga2d03c2b81b6cf0ad0e9348144cdea750}{zrepairIndexes}}\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZMFPath}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00180}00180\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRepair}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRebuildAll}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ZaiErrors*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00183}00183\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00184}00184\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00185}00185\ \textcolor{comment}{\ \ \ \ pErrorLog-\/>setAutoPrintOn(ZAIES\_Text);}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00186}00186\ \textcolor{comment}{\ \ \ \ pErrorLog-\/>setStoreMinSeverity(ZAIES\_Warning);}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00187}00187\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00188}00188\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00189}00189\ \ \ ZRawMasterFile\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00190}00190\ \ \ \mbox{\hyperlink{classzbs_1_1_z_random_file}{ZRandomFile}}\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00192}00192\ \ \ \mbox{\hyperlink{classzbs_1_1_z_index_control_block}{ZIndexControlBlock}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZICB}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00193}00193\ \ \ \mbox{\hyperlink{classzbs_1_1_z_raw_index_file}{ZRawIndexFile}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexFile}}(\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00194}00194\ \ \ \mbox{\hyperlink{classzbs_1_1_z_random_file}{ZRandomFile}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexZRF}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00195}00195\ \ \ uriString\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIContent}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00196}00196\ \ \ uriString\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexUri}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00197}00197\ \ \ ZDataBuffer\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReservedBlock}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00198}00198\ \ \ \textcolor{keywordtype}{size\_t}\ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wImportSize}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00199}00199\ \ \ \mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\_type}}\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexAllocatedSize}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00200}00200\ \ \ ZDataBuffer\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wICBContent}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00202}00202\ \ \ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}=0,\ IndexRank=0;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00203}00203\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00204}00204\ \textcolor{comment}{\ \ FILE*\ wOutput=nullptr;}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00205}00205\ \textcolor{comment}{\ \ bool\ FOutput=false;}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00206}00206\ \textcolor{comment}{\ \ utfdescString\ wBase;}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00207}00207\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00208}00208\ \ \ \mbox{\hyperlink{classzbs_1_1_z_array}{ZArray<char>}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{IndexPresence}}\ ;\ \textcolor{comment}{//\ 0\ :\ Index\ to\ be\ deleted\ \ \ \ \ 1\ :\ Index\ present\ but\ not\ to\ be\ rebuilt\ \ \ \ 2\ :\ Index\ to\ be\ built\ or\ rebuilt}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00210}00210\ \ \ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexProcessed}}\ =\ 0,\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMissIndexFile}}\ =\ 0,\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCorruptZICB}}\ =\ 0,\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCreatedIndex}}\ =\ 0,\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRebuiltIndex}}\ =\ 0\ ;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00212}00212\ \ \ \mbox{\hyperlink{classzbs_1_1_z_master_control_block}{ZMasterControlBlock}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMCB}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00213}00213\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPtrIn}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00216}00216\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIContent}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZMFPath}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00217}00217\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00218}00218\ \textcolor{comment}{\ \ wOutput=pOutput;}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00219}00219\ \textcolor{comment}{\ \ if\ (pOutput==nullptr)}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00220}00220\ \textcolor{comment}{\ \ \{}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00221}00221\ \textcolor{comment}{\ \ \ \ //\ \ \ \ \ \ \ utfdescString\ wDInfo;}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00222}00222\ \textcolor{comment}{\ \ \ \ wBase=wURIContent.getBasename().toCChar();}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00223}00223\ \textcolor{comment}{\ \ \ \ wBase+="{}.repairlog"{};}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00224}00224\ \textcolor{comment}{\ \ \ \ wOutput=fopen(wBase.toCChar(),"{}w"{});}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00225}00225\ \textcolor{comment}{\ \ \ \ if\ (wOutput==nullptr)}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00226}00226\ \textcolor{comment}{\ \ \ \ \{}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00227}00227\ \textcolor{comment}{\ \ \ \ \ \ wOutput=stdout;}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00228}00228\ \textcolor{comment}{\ \ \ \ \ \ fprintf(wOutput,}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00229}00229\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ "{}\%s>>\ \ cannot\ open\ file\ <\%s>\ redirected\ to\ stdout\(\backslash\)n"{},}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00230}00230\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \_GET\_FUNCTION\_NAME\_,}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00231}00231\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ wBase.toString());}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00232}00232\ \textcolor{comment}{\ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00233}00233\ \textcolor{comment}{\ \ \ \ else}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00234}00234\ \textcolor{comment}{\ \ \ \ \{}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00235}00235\ \textcolor{comment}{\ \ \ \ \ \ FOutput=true;}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00236}00236\ \textcolor{comment}{\ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00237}00237\ \textcolor{comment}{\ \ \}\ //\ if\ nullptr}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00238}00238\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00239}00239\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\ \textcolor{stringliteral}{"{}\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00240}00240\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ starting\ repairing\ indexes\ for\ ZSMasterFile\ <\%s>"{}},\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZMFPath}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00242}00242\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00243}00243\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.setPath(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIContent}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00244}00244\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00245}00245\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>logZExceptionLast(\textcolor{stringliteral}{"{}zrepairIndexes"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00246}00246\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00247}00247\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00248}00248\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.\_ZRFopen\ (\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748aaa47984d6359356b25a1d49b72155e55}{ZRF\_Exclusive}}\ |\ \mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748a0743866dd41df202fe6bd7e46739603d}{ZRF\_All}},\mbox{\hyperlink{group___z_random_file_group_ggad35b4a162ff06536b78d246d301b346da6912325aa71380727e1f037db09b76c1}{ZFT\_ZMasterFile}},\textcolor{keyword}{true});\ \ \textcolor{comment}{//\ open\ ZMF\ using\ ZRandomFile\ routines}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00249}00249\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00250}00250\ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ErrorRepairIndexes}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00251}00251\ \ \ \textcolor{comment}{//\ \ Must\ be\ a\ ZFT\_ZRawMasterFile}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00252}00252\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00253}00253\ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.getFileType()!=\mbox{\hyperlink{group___z_random_file_group_ggad35b4a162ff06536b78d246d301b346da6b98ace13d9161acf81e900f3d8ec692}{ZFT\_ZRawMasterFile}})||(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.getFileType()!=\mbox{\hyperlink{group___z_random_file_group_ggad35b4a162ff06536b78d246d301b346da6912325aa71380727e1f037db09b76c1}{ZFT\_ZMasterFile}}))\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00254}00254\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ ****\ Fatal\ error\ :\ file\ is\ not\ of\ mandatory\ type\ Master\ file\ (either\ raw\ or\ with\ dictionary)\ but\ is\ <\%s>\ ******"{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00255}00255\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{group___z_random_file_group_gae4ee29d250cb0386b636889c5567e40d}{decode\_ZFile\_type}}(\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.getFileType()));}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00256}00256\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_INVTYPE}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00257}00257\ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ErrorRepairIndexes}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00258}00258\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00259}00259\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00260}00260\ \ \ \textcolor{comment}{//wMasterFile.ZMFURI\ =\ wMasterZRF.getURIContent();\ \ \ \ \ //\ align\ uris:\ ZMFURI\ is\ getting\ redundant.\ Only\ using\ ZRandomFile\ URIContent}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00261}00261\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00262}00262\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ getting\ ZReservedBlock\ content\ and\ load\ ZMasterControlBlock"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00263}00263\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00264}00264\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.\_getReservedHeader(\textcolor{keyword}{true});\ \ \ \ \ \textcolor{comment}{//\ get\ reserved\ block\ content}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00265}00265\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00266}00266\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00267}00267\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00268}00268\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00269}00269\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPtrIn}}=\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.getFileDescriptor().ZReserved.Data;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00270}00270\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.\_import(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPtrIn}});\ \ \ \ \ \textcolor{comment}{//\ load\ ZMCB\ from\ reserved\ block\ content}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00271}00271\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00272}00272\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00273}00273\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.exit\_abort();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00274}00274\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00276}00276\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00277}00277\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ existing\ ZSMasterFile\ index(es)\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00278}00278\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ <\%ld>\ \ defined\ index(es)\ in\ ZMasterControlBlock"{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00279}00279\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.IndexTable.size());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00280}00280\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00281}00281\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.MCBreport(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00282}00282\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00283}00283\ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00284}00284\ \textcolor{comment}{\ *\ \ for\ each\ index}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00285}00285\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00286}00286\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{IndexPresence}}.setAllocation(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.IndexTable.size());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00287}00287\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}=0;\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}\ <\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.IndexTable.size();\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}++)\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00288}00288\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{IndexPresence}}[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}]=0;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00289}00289\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00290}00290\ \textcolor{comment}{//\ \ IndexPresence.bzero();}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00291}00291\ \ \ IndexRank=0;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00292}00292\ \ \ \textcolor{keywordflow}{for}\ (IndexRank=0;IndexRank<\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.IndexTable.size();IndexRank++)}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00293}00293\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00294}00294\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{group___z_m_f_physical_gab0b54916a293df3727a67c829bdc7db1}{generateIndexURI}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexUri}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00295}00295\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.getURIContent(),}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00296}00296\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.IndexFilePath,}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00297}00297\ \textcolor{comment}{//\ \ \ \ \ \ \ \ IndexRank,}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00298}00298\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.IndexTable[IndexRank]-\/>IndexName);}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00299}00299\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00300}00300\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00301}00301\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};\textcolor{comment}{//\ Beware\ return\ \ is\ multiple\ instructions\ in\ debug\ mode}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00302}00302\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00303}00303\ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00304}00304\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ .....rank\ <\%ld>\ processing\ index\ file\ <\%s>\ "{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00305}00305\ \ \ \ \ \ \ \ \ IndexRank,}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00306}00306\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexUri}}.toString());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00307}00307\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexUri}}.exists())}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00308}00308\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ \ \ \ \ \ \ Index\ file\ has\ been\ found"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00309}00309\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00310}00310\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00311}00311\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ ****Error\ Index\ file\ <\%s>\ is\ missing\ ****\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Index\ will\ be\ created\ then\ rebuilt\(\backslash\)n"{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexUri}}.toString());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00315}00315\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00316}00316\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMissIndexFile}}++;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00318}00318\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{IndexPresence}}[IndexRank]=\ 1;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00319}00319\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRepair}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00320}00320\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00321}00321\ \ \ \ \ \ \ \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/Create\ a\ new\ ZIndexFile-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00322}00322\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00324}00324\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ creating\ index\ file"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00325}00325\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00326}00326\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexAllocatedSize}}=0;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00327}00327\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.getBlockTargetSize()>0)}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00328}00328\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.getAllocatedBlocks()>0)}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexAllocatedSize}}\ =\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.getAllocatedBlocks()\ *\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.IndexTable[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}]-\/>IndexRecordSize();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00331}00331\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}\ =\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexFile}}.zcreateIndexFile((\mbox{\hyperlink{classzbs_1_1_z_index_control_block}{ZIndexControlBlock}}\&)*\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.IndexTable[IndexRank],\ \ \textcolor{comment}{//\ pointer\ to\ index\ control\ block\ because\ ZIndexFile\ stores\ pointer\ to\ Father's\ ICB}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00332}00332\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexUri}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.getAllocatedBlocks(),}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.getBlockExtentQuota(),}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00335}00335\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexAllocatedSize}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.getHighwaterMarking(),}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false},\ \ \ \ \ \ \ \ \textcolor{comment}{//\ grabfreespace\ is\ set\ to\ false\ :\ not\ necessary\ for\ an\ index}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00338}00338\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{true},\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ replace\ existing\ file}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00339}00339\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{false}\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ do\ not\ leave\ it\ open}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00340}00340\ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00341}00341\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00342}00342\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00343}00343\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ErrorRepairIndexes}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00344}00344\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00345}00345\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}index\ file\ has\ been\ created"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00346}00346\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCreatedIndex}}++;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00347}00347\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00348}00348\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ ......rebuilding\ created\ index\ file"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00349}00349\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00350}00350\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexFile}}.openIndexFile(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexUri}},IndexRank,\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748aaa47984d6359356b25a1d49b72155e55}{ZRF\_Exclusive}}|\ \mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748a0743866dd41df202fe6bd7e46739603d}{ZRF\_All}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00351}00351\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00352}00352\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00353}00353\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>logZExceptionLast(\textcolor{stringliteral}{"{}RepairIndexes"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00354}00354\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00355}00355\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ ****Error:\ Unexpected\ Fatal\ Error\ while\ opening\ ZIndexFile\ index\ rank\ <\%ld>\ path\ <\%s>\ ****"{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00356}00356\ \ \ \ \ \ \ \ \ \ \ \ \ IndexRank,}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00357}00357\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexUri}}.toString());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00358}00358\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexFile}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00359}00359\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ErrorRepairIndexes}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00360}00360\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00361}00361\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00362}00362\ \ \ \ \ \ \ \textcolor{comment}{/*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ wSt\ =\ wIndexFile.zrebuildRawIndex(ZMFStatistics,wOutput);*/}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00363}00363\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00364}00364\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00365}00365\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>logZExceptionLast(\textcolor{stringliteral}{"{}RepairIndexes"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00366}00366\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00367}00367\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ ****Unexpected\ Fatal\ Error\ while\ rebuilding\ ZIndexFile\ index\ rank\ <\%ld>\ path\ <\%s>\ *******\(\backslash\)n"{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00368}00368\ \ \ \ \ \ \ \ \ \ \ \ \ IndexRank,}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00369}00369\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexUri}}.toString());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00370}00370\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexFile}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00371}00371\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ErrorRepairIndexes}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00372}00372\ \ \ \ \ \ \ \}\ \textcolor{comment}{//\ !\ ZS\_SUCCESS}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00373}00373\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00374}00374\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexFile}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00375}00375\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ \ Index\ file\ has\ been\ rebuilt\ successfully"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00376}00376\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00377}00377\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{IndexPresence}}[IndexRank]\ =\ 1;\ \textcolor{comment}{//\ Index\ file\ is\ now\ present\ and\ does\ not\ need\ to\ be\ rebuilt}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00378}00378\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRebuiltIndex}}\ ++;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00379}00379\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00380}00380\ \ \ \ \ \ \ \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/End\ Create\ a\ new\ ZIndexFile-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00381}00381\ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00382}00382\ \ \ \ \ \}\ \ \textcolor{comment}{//\ IndexUri\ does\ not\ exist}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00383}00383\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00384}00384\ \ \ \ \ \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ wIndexUri\ exists-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00385}00385\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ \ Opening\ ZIndexFile"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00386}00386\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00387}00387\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00388}00388\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexZRF}}.setPath(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexUri}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00389}00389\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00390}00390\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00391}00391\ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ErrorRepairIndexes}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00392}00392\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00393}00393\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexZRF}}.\_ZRFopen(\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748aaa47984d6359356b25a1d49b72155e55}{ZRF\_Exclusive}}\ |\ \mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748a0743866dd41df202fe6bd7e46739603d}{ZRF\_All}},\mbox{\hyperlink{group___z_random_file_group_ggad35b4a162ff06536b78d246d301b346da936ff2d597965e40bf6aa74eb92b8879}{ZFT\_ZIndexFile}},\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00394}00394\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00395}00395\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00396}00396\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00397}00397\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ ******Error:\ rank\ <\%ld>\ cannot\ open\ index\ file\ <\%s>.\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00398}00398\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Status\ is\ <\%s>\ Check\ <IndexFileDirectoryPath>\ parameter\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00399}00399\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ ...continuing..."{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00400}00400\ \ \ \ \ \ \ \ \ \ \ IndexRank,}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00401}00401\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{decode\_ZStatus}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}),}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00402}00402\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexUri}}.toString());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00403}00403\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRepair}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00404}00404\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00405}00405\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00406}00406\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Repare\ option\ has\ been\ chosen\ "{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00407}00407\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Trying\ to\ delete\ file\ and\ reprocess\ it\ as\ missing\ file."{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00408}00408\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00409}00409\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexZRF}}.\_removeFile(\textcolor{keyword}{true},\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.ErrorLog);\ \textcolor{comment}{//\ may\ be\ not\ necessary\ :\ to\ be\ checked}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00410}00410\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00411}00411\ \ \ \ \ \ \ \ \ IndexRank-\/-\/;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00412}00412\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00413}00413\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00414}00414\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00415}00415\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00416}00416\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReservedBlock}}.clear();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00417}00417\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00418}00418\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ \ getting\ ZReservedBlock\ content\ and\ load\ ZICB\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00419}00419\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00420}00420\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexZRF}}.getReservedBlock(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReservedBlock}},\textcolor{keyword}{true});\ \ \ \ \ \textcolor{comment}{//\ get\ reserved\ block\ content}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00421}00421\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00422}00422\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00423}00423\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00424}00424\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ ******Error:\ Index\ file\ rank\ <\%ld>\ file\ \ <\%s>.\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00425}00425\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Status\ is\ <\%s>\ Cannot\ get\ ZReservedBlock\ from\ header\ file.\ \(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00426}00426\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ ...continuing...\(\backslash\)n"{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00427}00427\ \ \ \ \ \ \ \ \ \ \ IndexRank,}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00428}00428\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexUri}}.toString(),}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00429}00429\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{decode\_ZStatus}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}));}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00430}00430\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00431}00431\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRepair}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00432}00432\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00433}00433\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Repare\ option\ has\ been\ chosen\ \(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00435}00435\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Trying\ to\ delete\ file\ and\ reprocess\ it\ as\ missing\ file."{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00436}00436\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00437}00437\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexZRF}}.\_removeFile(\textcolor{keyword}{true},\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.ErrorLog);\ \textcolor{comment}{//\ may\ be\ not\ necessary\ :\ to\ be\ checked}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00438}00438\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00439}00439\ \ \ \ \ \ \ \ \ IndexRank-\/-\/;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00440}00440\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00441}00441\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00442}00442\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00443}00443\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00444}00444\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPtrIn}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReservedBlock}}.Data;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00445}00445\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMCB}}.\_import(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPtrIn}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00446}00446\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00447}00447\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ wSt=wZICB-\/>\_importICB(\&wMasterFile.MetaDic,wReservedBlock,wMCBOwn.ICBSize,wMCBOwn.ICBOffset);\ \ //\ load\ ZICB\ from\ reserved\ block\ content}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00448}00448\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00449}00449\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZICB}}=\textcolor{keyword}{new}\ \mbox{\hyperlink{classzbs_1_1_z_index_control_block}{ZIndexControlBlock}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00450}00450\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZICB}}-\/>\mbox{\hyperlink{classzbs_1_1_z_index_control_block_a9704f98b1b26e44f708df1a836968bde}{\_import}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPtrIn}});\ \ \textcolor{comment}{//\ load\ ZICB\ from\ reserved\ block\ content}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00451}00451\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00452}00452\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00453}00453\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00454}00454\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00455}00455\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ ******Error:\ Index\ file\ rank\ <\%ld>\ file\ \ <\%s>.\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Status\ is\ <\%s>\ Cannot\ import\ ZIndexControlBlock\ \(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00457}00457\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ ...continuing..."{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00458}00458\ \ \ \ \ \ \ \ \ \ \ IndexRank,}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00459}00459\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexUri}}.toString(),}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00460}00460\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{decode\_ZStatus}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}));}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00461}00461\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00462}00462\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRepair}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00463}00463\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00464}00464\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00465}00465\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Repare\ option\ has\ been\ chosen\ \(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00466}00466\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Trying\ to\ delete\ file\ and\ reprocess\ it\ as\ missing\ file."{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00467}00467\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00468}00468\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexZRF}}.\_removeFile(\textcolor{keyword}{true},\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.ErrorLog);\ \textcolor{comment}{//\ may\ be\ not\ necessary\ :\ to\ be\ checked}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00469}00469\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00470}00470\ \ \ \ \ \ \ \ \ IndexRank-\/-\/;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00471}00471\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00472}00472\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00473}00473\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00474}00474\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ \ checking\ ZICB\ content\ alignment\ with\ master\ file"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00475}00475\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00476}00476\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_a2c56c55b930f51337c2f5ab19ec02240}{wRet}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.IndexTable[IndexRank]-\/>\_exportAppend(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wICBContent}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00477}00477\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{memcmp}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReservedBlock}}.Data,\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wICBContent}}.Data,\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReservedBlock}}.Size)==0)}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00478}00478\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00479}00479\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00480}00480\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ ZICB\ content\ is\ aligned\ with\ its\ ZSMasterFile\ for\ index\ rank\ <\%ld>\ path\ <\%s>\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00481}00481\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ To\ rebuild\ ZIndexFile\ content\ (zrebuid)\ use\ Option\ rebuildAll"{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00482}00482\ \ \ \ \ \ \ \ \ \ \ IndexRank,}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00483}00483\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexUri}}.toString());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00484}00484\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00485}00485\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRebuildAll}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00486}00486\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00487}00487\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00488}00488\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ Option\ <RebuildAll>\ :\ healthy\ index\ file\ is\ marked\ for\ rebuilt"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00489}00489\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00490}00490\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{IndexPresence}}[IndexRank]=2;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00491}00491\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00492}00492\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00493}00493\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00494}00494\ \ \ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00495}00495\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00496}00496\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00497}00497\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ ****Error:\ ZICB\ content\ is\ NOT\ aligned\ with\ its\ ZSMasterFile\ index\ rank\ <\%ld>\ path\ <\%s>\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00498}00498\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ Need\ to\ be\ realigned\ and\ rebuilt\ rebuildAll"{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00499}00499\ \ \ \ \ \ \ \ \ \ \ IndexRank,}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexUri}}.toString());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00501}00501\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00502}00502\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCorruptZICB}}\ ++;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00503}00503\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00504}00504\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{IndexPresence}}[IndexRank]=\ 2;\ \ \textcolor{comment}{//\ need\ to\ be\ either\ realigned\ (ZICB)\ and\ rebuilt\ OR\ destroyed\ .\ recreated\ and\ rebuilt.}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00505}00505\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00506}00506\ \ \ \ \ \ \ \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00507}00507\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00508}00508\ \ \ \ \ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRepair}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00509}00509\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00510}00510\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00511}00511\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ removing\ corrupted\ index\ file."{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00512}00512\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00513}00513\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexZRF}}.\_removeFile(\textcolor{keyword}{true},\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.ErrorLog);}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00514}00514\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00515}00515\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ reprocessing\ index\ as\ missing\ index\ file"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00516}00516\ \ \ \ \ \ \ \ \ IndexRank\ -\/-\/;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00517}00517\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00518}00518\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00519}00519\ \ \ \ \ \ \ \}\textcolor{comment}{//\ if\ pRepare}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00520}00520\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00521}00521\ \ \ \ \ \ \ \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00522}00522\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00523}00523\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00524}00524\ \ \ \ \ \}\textcolor{comment}{//\ else}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00525}00525\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00526}00526\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00527}00527\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexZRF}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00528}00528\ \ \ \}\textcolor{comment}{//\ main\ for\ loop}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00529}00529\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00530}00530\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexProcessed}}=\ IndexRank;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00531}00531\ \ \ \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/Post\ processing\ check\ index\ files\ to\ be\ rebuilt-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00532}00532\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00533}00533\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00534}00534\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00535}00535\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.zopen(\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748aaa47984d6359356b25a1d49b72155e55}{ZRF\_Exclusive}}\ |\ \mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748a0743866dd41df202fe6bd7e46739603d}{ZRF\_All}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00536}00536\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00537}00537\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ \ \ Rebuilding\ indexes\ to\ be\ rebuilt\ "{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00538}00538\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00539}00539\ \ \ \textcolor{keywordflow}{for}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}=0;\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}<\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{IndexPresence}}.size();\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}\ ++)}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00540}00540\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00541}00541\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{IndexPresence}}[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}]==2)}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00542}00542\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00543}00543\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ \ \ Rebuilding\ index\ rank\ <\%ld>\ <\%s>\ "{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00544}00544\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00545}00545\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.IndexTable[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}]-\/>IndexName.toCChar());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00546}00546\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00547}00547\ \ \ \ \ \ \ \textcolor{comment}{/*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ wSt=wMasterFile.zindexRebuild(wi,ZMFStatistics,wOutput);\ */}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00548}00548\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00549}00549\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00550}00550\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00551}00551\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ ****Error\ while\ rebuilding\ index\ rank\ <\%ld>\ <\%s>\ \(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00552}00552\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ Status\ is\ <\%s>"{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00553}00553\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00554}00554\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.IndexTable[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}]-\/>IndexName.toCChar(),}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00555}00555\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{decode\_ZStatus}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}));}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00556}00556\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ErrorRepairIndexes}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00557}00557\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00558}00558\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ \ \ \ \ \ rebuilt\ done\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00559}00559\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRebuiltIndex}}\ ++;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00560}00560\ \ \ \ \ \}\textcolor{comment}{//\ if\ IndexPresence\ ==\ 2}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00561}00561\ \ \ \}\textcolor{comment}{//\ for}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00562}00562\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00563}00563\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{EndRepairIndexes}}:}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00564}00564\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00565}00565\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ Closing\ ZSMasterFile\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00566}00566\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00567}00567\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00568}00568\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00569}00569\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00570}00570\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00571}00571\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00572}00572\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ Report\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00573}00573\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ Index(es)\ processed\ \ \ \ \ \ \ \ \ \%ld\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00574}00574\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ Index\ file(s)\ missing\ \ \ \ \ \ \ \%ld\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00575}00575\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ Index\ ZICB\ corrupted\ \ \ \ \ \ \ \ \%ld\(\backslash\)n\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00576}00576\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ Index(es)\ rebuilt\ \ \ \ \ \ \ \ \ \ \ \%ld\(\backslash\)n"{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00577}00577\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexProcessed}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00578}00578\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMissIndexFile}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00579}00579\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCorruptZICB}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00580}00580\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRebuiltIndex}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00581}00581\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00582}00582\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00583}00583\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00584}00584\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}==\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00585}00585\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.clearStack();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00586}00586\ \ \ \textcolor{keywordflow}{return}\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00587}00587\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00588}00588\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ErrorRepairIndexes}}:}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00589}00589\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ \ ****\ Index\ repair\ ended\ with\ error\ ***"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00590}00590\ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{EndRepairIndexes}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00591}00591\ \}\textcolor{comment}{//zrepairIndexes}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00592}00592\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00593}00593\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00594}00594\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00605}\mbox{\hyperlink{group___z_m_f_utilities_gaff7eba04ae5501dc48b24d43ddc83268}{00605}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{group___z_m_f_utilities_gaff7eba04ae5501dc48b24d43ddc83268}{zdowngradeZMFtoZRF}}\ (\textcolor{keyword}{const}\ uriString\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZMFPath}},\ ZaiErrors\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00606}00606\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00607}00607\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00608}00608\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00609}00609\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00610}00610\ \ \ ZRawMasterFile\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00611}00611\ \ \ \mbox{\hyperlink{classzbs_1_1_z_random_file}{ZRandomFile}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00612}00612\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00613}00613\ \ \ uriString\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIContent}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00614}00614\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00615}00615\ \ \ ZDataBuffer\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReservedBlock}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00616}00616\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00617}00617\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIContent}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZMFPath}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00618}00618\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00619}00619\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00620}00620\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ starting\ downgrading\ ZRawMasterFile\ to\ ZRandomFile\ <\%s>"{}},\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZMFPath}}.toString());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00621}00621\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00622}00622\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00623}00623\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00624}00624\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.\mbox{\hyperlink{group___z_random_file_group_ga2596cf308ac6fc2c61f63a565bdfa07b}{zopen}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIContent}},(\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748aaa47984d6359356b25a1d49b72155e55}{ZRF\_Exclusive}}|\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748a0743866dd41df202fe6bd7e46739603d}{ZRF\_All}}));}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00625}00625\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00626}00626\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ getting\ ZReservedBlock\ content\ and\ load\ ZMasterControlBlock"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00627}00627\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00628}00628\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00629}00629\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00630}00630\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ clearing\ ZMCB\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00631}00631\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ <\%ld>\ \ defined\ index(es)\ in\ ZMasterControlBlock.\ Destroying\ all\ index\ files\ \&\ definitions\ from\ ZMasterControlBlock\(\backslash\)n"{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00632}00632\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_GET\_FUNCTION\_NAME\_}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00633}00633\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.IndexTable.size());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00634}00634\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00635}00635\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.zclearMCB(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00636}00636\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00637}00637\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>logZExceptionLast(\textcolor{stringliteral}{"{}zupgradeZRFtoZMF"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00638}00638\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00639}00639\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00640}00640\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00641}00641\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00642}00642\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}Master\ Control\ Block\ cleared\ successfully"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00643}00643\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00644}00644\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00645}00645\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00646}00646\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ \ Converting\ to\ ZRandomFile\(\backslash\)n"{}}\ );}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00647}00647\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.setPath(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIContent}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00648}00648\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00649}00649\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>logZExceptionLast(\textcolor{stringliteral}{"{}zupgradeZRFtoZMF"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00650}00650\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00651}00651\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00652}00652\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00653}00653\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.\_ZRFopen\ (\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748aaa47984d6359356b25a1d49b72155e55}{ZRF\_Exclusive}}\ |\ \mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748a0743866dd41df202fe6bd7e46739603d}{ZRF\_All}},\mbox{\hyperlink{group___z_random_file_group_ggad35b4a162ff06536b78d246d301b346da6912325aa71380727e1f037db09b76c1}{ZFT\_ZMasterFile}});\ \ \textcolor{comment}{//\ open\ ZMF\ using\ ZRandomFile\ routines}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00654}00654\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00655}00655\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>logZExceptionLast(\textcolor{stringliteral}{"{}zupgradeZRFtoZMF"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00656}00656\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00657}00657\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00658}00658\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00659}00659\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.setFileType\ (\ \mbox{\hyperlink{group___z_random_file_group_ggad35b4a162ff06536b78d246d301b346da3d3b5088be2309acc85f74d7b961a5f2}{ZFT\_ZRandomFile}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00660}00660\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReservedBlock}}.clear();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00661}00661\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.setReservedContent(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReservedBlock}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00662}00662\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00663}00663\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ \ Writing\ new\ header\ to\ file"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00664}00664\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00665}00665\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.\_writeAllFileHeader();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00666}00666\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00667}00667\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00668}00668\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>logZExceptionLast(\textcolor{stringliteral}{"{}zupgradeZRFtoZMF"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00669}00669\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00670}00670\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00671}00671\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00672}00672\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00673}00673\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00674}00674\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ File\ <\%s>\ has\ been\ successfully\ converted\ from\ ZRawMasterFile\ to\ ZRandomFile"{}},\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIContent}}.toString());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00675}00675\ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00676}00676\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00677}00677\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00678}00678\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.clearStack();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00679}00679\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00680}00680\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00681}00681\ \}\textcolor{comment}{//zdowngradeZMFtoZRF}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00682}00682\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00691}\mbox{\hyperlink{group___z_m_f_utilities_ga742ca5a8bdf4c73877f0558cf27858ed}{00691}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{group___z_m_f_utilities_ga742ca5a8bdf4c73877f0558cf27858ed}{zupgradeZRFtoZMF}}(\textcolor{keyword}{const}\ uriString\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZRFPath}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00692}00692\ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ uriString\ \&pZMFPath,}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00693}00693\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uriString\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pDictionaryFile}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00694}00694\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ZaiErrors\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00695}00695\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00696}00696\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00697}00697\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00698}00698\ \ \ ZRawMasterFile\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00699}00699\ \ \ \mbox{\hyperlink{classzbs_1_1_z_dictionary_file}{ZDictionaryFile}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDictionary}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00700}00700\ \ \ \mbox{\hyperlink{classzbs_1_1_z_random_file}{ZRandomFile}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00701}00701\ \ \ \mbox{\hyperlink{group___z_random_file_group_gad35b4a162ff06536b78d246d301b346d}{ZFile\_type}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wFileType}}=\ \mbox{\hyperlink{group___z_random_file_group_ggad35b4a162ff06536b78d246d301b346da6b98ace13d9161acf81e900f3d8ec692}{ZFT\_ZRawMasterFile}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00702}00702\ \ \ uriString\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIContent}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00703}00703\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00704}00704\ \ \ ZDataBuffer\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReservedBlock}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00705}00705\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00706}00706\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wBase}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00707}00707\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00708}00708\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIContent}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZRFPath}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00709}00709\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00710}00710\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00711}00711\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00712}00712\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ starting\ upgrading\ ZRandomFile\ <\%s>"{}},\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZRFPath}}.toString());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00713}00713\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00714}00714\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pDictionaryFile}}.isEmpty())\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00715}00715\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ ZRandomFile\ will\ be\ upgraded\ to\ a\ simple\ ZRawMasterFile\ with\ no\ embedded\ dictionary."{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00716}00716\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00717}00717\ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00718}00718\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ ZRandomFile\ will\ be\ upgraded\ to\ ZMasterFile\ with\ embedded\ dictionary\ <\%s>"{}},\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pDictionaryFile}}.toString());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00719}00719\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wFileType}}\ =\ \mbox{\hyperlink{group___z_random_file_group_ggad35b4a162ff06536b78d246d301b346da6912325aa71380727e1f037db09b76c1}{ZFT\_ZMasterFile}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00720}00720\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00721}00721\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00722}00722\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00723}00723\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.\mbox{\hyperlink{group___z_random_file_group_ga2596cf308ac6fc2c61f63a565bdfa07b}{zopen}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIContent}},(\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748aaa47984d6359356b25a1d49b72155e55}{ZRF\_Exclusive}}|\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748a0743866dd41df202fe6bd7e46739603d}{ZRF\_All}}));}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00724}00724\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00725}00725\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>logZExceptionLast(\textcolor{stringliteral}{"{}zupgradeZRFtoZMF"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00726}00726\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00727}00727\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00728}00728\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00729}00729\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.getFileType()\ !=\ \mbox{\hyperlink{group___z_random_file_group_ggad35b4a162ff06536b78d246d301b346da3d3b5088be2309acc85f74d7b961a5f2}{ZFT\_ZRandomFile}})\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00730}00730\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>errorLog(\textcolor{stringliteral}{"{}\ Input\ file\ is\ not\ a\ ZRandomFile.\ Its\ file\ type\ is\ \ <\%s>\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00731}00731\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ Processing\ is\ interrupted.\ "{}},\ \mbox{\hyperlink{group___z_random_file_group_gae4ee29d250cb0386b636889c5567e40d}{decode\_ZFile\_type}}(\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.getFileType()));}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00732}00732\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_INVTYPE}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00733}00733\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00734}00734\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00735}00735\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ Creating\ ZReservedBlock\ content\ "{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00736}00736\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00737}00737\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.setPath(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIContent}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00738}00738\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00739}00739\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>logZExceptionLast(\textcolor{stringliteral}{"{}zupgradeZRFtoZMF"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00740}00740\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00741}00741\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00742}00742\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00743}00743\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00744}00744\ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pDictionaryFile}}.isEmpty())\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00745}00745\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ Loading\ dictionary\ to\ embed\ <\%s>."{}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pDictionaryFile}}.toString());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00746}00746\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDictionary}}.loadDictionary(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pDictionaryFile}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00747}00747\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00748}00748\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>logZExceptionLast(\textcolor{stringliteral}{"{}zupgradeZRFtoZMF"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00749}00749\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00750}00750\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00751}00751\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00752}00752\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00753}00753\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ Embedding\ dictionary\ <\%s>."{}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDictionary}}.DicName.toString());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00754}00754\ \ \ \ \ \ \ \textcolor{comment}{/*\ see\ ZMasterFile::setDictionary\ */}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00755}00755\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.Dictionary\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{classzbs_1_1_z_dictionary_file}{ZDictionaryFile}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00756}00756\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.Dictionary-\/>\mbox{\hyperlink{classzbs_1_1_z_dictionary_file_a379bad652e3792d313f3e2354d2b43ff}{setDictionary}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDictionary}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00757}00757\ \ \ \ \ \ \ uriString\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIdic}}\ =\ \mbox{\hyperlink{classzbs_1_1_z_dictionary_file_adf2f26b5c798c5a6a7a682a5a7efeaa1}{ZDictionaryFile::generateDicFileName}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.getURIContent());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00758}00758\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00759}00759\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.Dictionary-\/>saveToDicFile(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIdic}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00760}00760\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00761}00761\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>logZExceptionLast(\textcolor{stringliteral}{"{}zupgradeZRFtoZMF"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00762}00762\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00763}00763\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00764}00764\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00765}00765\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00766}00766\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>infoLog(\textcolor{stringliteral}{"{}\ Dictionary\ <\%s>\ embedded."{}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDictionary}}.DicName.toString());}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00767}00767\ \ \ \}\ \textcolor{comment}{//\ if\ (!pDictionaryFile.isEmpty())}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00768}00768\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00769}00769\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00770}00770\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}\ Writing\ ZReservedBlock\ content\ to\ file."{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00771}00771\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00772}00772\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.\_exportAppend(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReservedBlock}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00773}00773\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.setReservedContent(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReservedBlock}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00774}00774\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.setFileType(\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wFileType}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00775}00775\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.\_writeAllFileHeader();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00776}00776\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00777}00777\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>logZExceptionLast(\textcolor{stringliteral}{"{}zupgradeZRFtoZMF"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00778}00778\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00779}00779\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00780}00780\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00781}00781\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00782}00782\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterZRF}}.zclose();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00783}00783\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(\textcolor{stringliteral}{"{}File\ <\%s>\ has\ been\ successfully\ converted\ from\ ZRandomFile\ to\ \%s."{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00784}00784\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wURIContent}}.toString(),\ \mbox{\hyperlink{group___z_random_file_group_gae4ee29d250cb0386b636889c5567e40d}{decode\_ZFile\_type}}(\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wMasterFile}}.getFileType()));}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00785}00785\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00786}00786\ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00787}00787\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00788}00788\ \ \ \textcolor{comment}{//\ \ if\ (wSt==ZS\_SUCCESS)}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00789}00789\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.clearStack();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00790}00790\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00791}00791\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00792}00792\ \}\textcolor{comment}{//zupgradeZRFtoZMF}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00793}00793\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00794}00794\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00795}\mbox{\hyperlink{group___z_m_f_utilities_gac9fd1f5a830c2b0926a4c9dcb4b29da9}{00795}}\ \mbox{\hyperlink{group___z_m_f_utilities_gac9fd1f5a830c2b0926a4c9dcb4b29da9}{zreorgMasterFile}}\ (\textcolor{keyword}{const}\ uriString\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pURIRawMF}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00796}00796\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRequestedFreeBlocks}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00797}00797\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ bool\ pDump,}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00798}00798\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ZaiErrors*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00799}00799\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00800}00800\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00801}00801\ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_master_file}{ZMasterFile}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZMF}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00802}00802\ \ \ \ \ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00803}00803\ \ \ \ \ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexRank}}=0;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00804}00804\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00805}00805\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wgrabFreeSpaceSet}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00806}00806\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00807}00807\ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZMF}}.zopen(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pURIRawMF}},\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748a0743866dd41df202fe6bd7e46739603d}{ZRF\_All}}))!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00808}00808\ \ \ \ \ \{\ \ \textcolor{keywordflow}{return}\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};\}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00809}00809\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00810}00810\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00811}00811\ \ \ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZMF}}.getFCB()-\/>GrabFreeSpace)\ \ \ \ \ \ \ \ \textcolor{comment}{//\ activate\ grabFreeSpace\ if\ it\ has\ been\ set\ on}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00812}00812\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00813}00813\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZMF}}.getFCB()-\/>GrabFreeSpace=\textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00814}00814\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wgrabFreeSpaceSet}}\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00815}00815\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00816}00816\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00817}00817\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZMF}}.zstartPMSMonitoring();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00818}00818\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00819}00819\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZMF}}.\_reorgFileInternals(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRequestedFreeBlocks}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00820}00820\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00821}00821\ \ \ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}\ <\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZMF}}.IndexTable.size())\ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00822}00822\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00823}00823\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZMF}}.\mbox{\hyperlink{classzbs_1_1_z_master_file_a477acede404d4eb4a644ba7d49be51dc}{rebuildIndex}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}},\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIndexRank}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00824}00824\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00825}00825\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00826}00826\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ZException\_sv\ =\ ZException;\ //\ in\ case\ of\ error\ :\ store\ the\ exception\ but\ continue\ rolling\ back\ other\ indexes}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00827}00827\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.addToLast(\textcolor{stringliteral}{"{}\ during\ Index\ rebuild\ on\ index\ <\%s>\ number\ <\%02ld>\ "{}},}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00828}00828\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZMF}}.IndexTable[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}]-\/>IndexName.toCChar(),}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00829}00829\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00830}00830\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00831}00831\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>logZExceptionLast(\textcolor{stringliteral}{"{}zreorgMasterFile"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00832}00832\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00833}00833\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00834}00834\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00835}00835\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}++;}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00836}00836\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00837}00837\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00838}00838\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZMF}}.zendPMSMonitoring\ ();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00839}00839\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>textLog(}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00840}00840\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/End\ of\ ZRawMasterFile\ reorganization\ process-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\(\backslash\)n"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00841}00841\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00842}00842\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZMF}}.zreportPMSMonitoring(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00843}00843\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00844}00844\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZException}}.getLastStatus()!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00845}00845\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00846}00846\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ ZException=ZException\_sv;}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00847}00847\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{error\_zreorgMasterFile}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00848}00848\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00849}00849\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00850}00850\ \textcolor{comment}{//\ \ \ \ ZException.getLastStatus()\ =\ ZS\_SUCCESS;}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00851}00851\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00852}00852\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{end\_zreorgMasterFile}}:}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00853}00853\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00854}00854\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wgrabFreeSpaceSet}})\ \ \ \ \ \ \ \ \textcolor{comment}{//\ restore\ grabFreeSpace\ if\ it\ was\ off\ and\ has\ been\ set\ on}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00855}00855\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00856}00856\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZMF}}.getFCB()-\/>GrabFreeSpace=\textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00857}00857\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00858}00858\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZMF}}.zclose\ ();}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00859}00859\ \ \ \ \ \textcolor{keywordflow}{return}\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00860}00860\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00861}00861\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{error\_zreorgMasterFile}}:}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00862}00862\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}}-\/>logZExceptionLast(\textcolor{stringliteral}{"{}zreorgRawMasterFile"{}});}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00863}00863\ \ \ \ \ \textcolor{keywordflow}{goto}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{end\_zreorgMasterFile}};}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00864}00864\ }
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00865}00865\ \}}
+\DoxyCodeLine{\Hypertarget{zrawmasterfileutils_8cpp_source_l00866}00866\ }
+ \textcolor{comment}{// ZMFUtilities}
+\end{DoxyCode}

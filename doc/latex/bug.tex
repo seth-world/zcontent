@@ -1,0 +1,14 @@
+\chapter{Bug List}
+\hypertarget{bug}{}\label{bug}\index{Bug List@{Bug List}}
+
+\begin{DoxyRefList}
+\item[Member \doxylink{zdataconversion_8h_aac7aee31f155632d1e1e8931f24cbce5}{zget\+Universal\+From\+Natural} (auto p\+Value, ZData\+Buffer \&p\+Universal, long \&p\+Array\+Size)]\label{bug__bug000001}%
+\Hypertarget{bug__bug000001}%
+the default value of -\/1 for p\+Array\+Size does not work with GNU compiler because of the use of \textquotesingle{}auto\textquotesingle{} clause. so that, p\+Array\+Size should systematically be mentionned 
+\item[Module \doxylink{group___z_key_correspondence}{ZKey\+Correspondence} ]\label{bug__bug000003}%
+\Hypertarget{bug__bug000003}%
+arrays as input value generates compilation error due to a mismatch of types during compilation.
+\begin{DoxyItemize}
+\item pointer to same atomic data type (there could be a data conversion). You must mention p\+Array\+Size parameter defining how much atomic values pointer points to.
+\end{DoxyItemize}
+\end{DoxyRefList}

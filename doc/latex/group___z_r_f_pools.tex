@@ -1,0 +1,16 @@
+\doxysubsection{ZRandom\+File Blocks Pools}
+\hypertarget{group___z_r_f_pools}{}\label{group___z_r_f_pools}\index{ZRandomFile Blocks Pools@{ZRandomFile Blocks Pools}}
+\doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} is organized by blocks. \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} manages 3 blocks pools, among which 2 are fundamental. These pools are maintained and located within \doxylink{class_z_file_control_block}{ZFile\+Control\+Block} in the header file.
+
+\begin{DoxyParagraph}{ZBlock\+Access\+Table (abbreviated ZBAT)}
+This primary pool contains all references to active blocks(State = ZBS\+\_\+\+Used). The order of blocks within this pool defines the relative position of the access to blocks within \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}. 
+\end{DoxyParagraph}
+\begin{DoxySeeAlso}{See also}
+\doxylink{group__recordranks}{Relative rank of a record for a ZRandom\+File or ZMaster\+File.} \doxylink{group___z_random_file_group_gaeff3dcb5d58e5eb83b4a5ad6410dbd79}{ZBlock\+State\+\_\+type}
+\end{DoxySeeAlso}
+\begin{DoxyParagraph}{ZFree\+Block\+Pool (abbreviated ZFBT)}
+This primary pool contains all references to freed (logically deleted) blocks within the file (State=ZBS\+\_\+\+Free). So that, use of \doxylink{group___z_random_file_group_ga45a6d65b8860755dc62ae3c75e50f568}{ZRandom\+File\+::zremove} will not physically suppress the block. The removed block is simply removed from ZBAT and added as a new entry within ZFBT. It is then available for being allocated to a newly created record thru ZRandom\+File\+::\+\_\+get\+Free\+Block routine.
+\end{DoxyParagraph}
+\begin{DoxyParagraph}{ZDeleted\+Block\+Table (abbreviated ZDBT)}
+This secondary pool is maintained by grabbing process and free block allocation process. when a free block is grabbed to be agglomerated to another free block in the grabbing algorithm, then its track is not lost (excepted when using option Highwater\+Marking). This block is a set as a new entry to ZDBT. when the container block will be allocated, then all ZDBT reference to blocks included within the allocated block will be suppressed. 
+\end{DoxyParagraph}

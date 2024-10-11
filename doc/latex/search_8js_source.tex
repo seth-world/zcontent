@@ -1,0 +1,846 @@
+\doxysection{search.\+js}
+\hypertarget{search_8js_source}{}\label{search_8js_source}\index{html/search/search.js@{html/search/search.js}}
+\mbox{\hyperlink{search_8js}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00001}00001\ /*}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00002}00002\ \ @licstart\ \ The\ following\ is\ the\ entire\ license\ notice\ for\ the\ JavaScript\ code\ in\ this\ file.}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00004}00004\ \ The\ MIT\ License\ (MIT)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00006}00006\ \ Copyright\ (C)\ 1997-\/2020\ by\ Dimitri\ van\ Heesch}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00008}00008\ \ Permission\ is\ hereby\ granted,\ free\ of\ charge,\ to\ any\ person\ obtaining\ a\ copy\ of\ this\ software}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00009}00009\ \ and\ associated\ documentation\ files\ (the\ "{}Software"{}),\ to\ deal\ in\ the\ Software\ without\ restriction,}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00010}00010\ \ including\ without\ limitation\ the\ rights\ to\ use,\ copy,\ modify,\ merge,\ publish,\ distribute,}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00011}00011\ \ sublicense,\ and/or\ sell\ copies\ of\ the\ Software,\ and\ to\ permit\ persons\ to\ whom\ the\ Software\ is}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00012}00012\ \ furnished\ to\ do\ so,\ subject\ to\ the\ following\ conditions:}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00014}00014\ \ The\ above\ copyright\ notice\ and\ this\ permission\ notice\ shall\ be\ included\ in\ all\ copies\ or}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00015}00015\ \ substantial\ portions\ of\ the\ Software.}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00017}00017\ \ THE\ SOFTWARE\ IS\ PROVIDED\ "{}AS\ IS"{},\ WITHOUT\ WARRANTY\ OF\ ANY\ KIND,\ EXPRESS\ OR\ IMPLIED,\ INCLUDING}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00018}00018\ \ BUT\ NOT\ LIMITED\ TO\ THE\ WARRANTIES\ OF\ MERCHANTABILITY,\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE\ AND}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00019}00019\ \ NONINFRINGEMENT.\ IN\ NO\ EVENT\ SHALL\ THE\ AUTHORS\ OR\ COPYRIGHT\ HOLDERS\ BE\ LIABLE\ FOR\ ANY\ CLAIM,}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00020}00020\ \ DAMAGES\ OR\ OTHER\ LIABILITY,\ WHETHER\ IN\ AN\ ACTION\ OF\ CONTRACT,\ TORT\ OR\ OTHERWISE,\ ARISING\ FROM,}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00021}00021\ \ OUT\ OF\ OR\ IN\ CONNECTION\ WITH\ THE\ SOFTWARE\ OR\ THE\ USE\ OR\ OTHER\ DEALINGS\ IN\ THE\ SOFTWARE.}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00023}00023\ \ @licend\ \ The\ above\ is\ the\ entire\ license\ notice\ for\ the\ JavaScript\ code\ in\ this\ file}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00024}00024\ \ */}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00025}00025\ function\ convertToId(search)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00026}00026\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00027}00027\ \ \ var\ result\ =\ '';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00028}00028\ \ \ for\ (i=0;i<search.length;i++)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00029}00029\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00030}00030\ \ \ \ \ var\ c\ =\ search.charAt(i);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00031}00031\ \ \ \ \ var\ cn\ =\ c.charCodeAt(0);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00032}00032\ \ \ \ \ if\ (c.match(/[a-\/z0-\/9\(\backslash\)u0080-\/\(\backslash\)uFFFF]/))}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00033}00033\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00034}00034\ \ \ \ \ \ \ result+=c;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00035}00035\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00036}00036\ \ \ \ \ else\ if\ (cn<16)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00037}00037\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00038}00038\ \ \ \ \ \ \ result+="{}\_0"{}+cn.toString(16);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00039}00039\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00040}00040\ \ \ \ \ else}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00041}00041\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00042}00042\ \ \ \ \ \ \ result+="{}\_"{}+cn.toString(16);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00043}00043\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00044}00044\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00045}00045\ \ \ return\ result;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00046}00046\ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00048}00048\ function\ getXPos(item)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00049}00049\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00050}00050\ \ \ var\ x\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00051}00051\ \ \ if\ (item.offsetWidth)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00052}00052\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00053}00053\ \ \ \ \ while\ (item\ \&\&\ item!=document.body)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00054}00054\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00055}00055\ \ \ \ \ \ \ x\ \ \ +=\ item.offsetLeft;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00056}00056\ \ \ \ \ \ \ item\ =\ item.offsetParent;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00057}00057\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00058}00058\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00059}00059\ \ \ return\ x;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00060}00060\ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00062}00062\ function\ getYPos(item)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00063}00063\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00064}00064\ \ \ var\ y\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00065}00065\ \ \ if\ (item.offsetWidth)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00066}00066\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00067}00067\ \ \ \ \ \ while\ (item\ \&\&\ item!=document.body)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00068}00068\ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00069}00069\ \ \ \ \ \ \ \ y\ \ \ +=\ item.offsetTop;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00070}00070\ \ \ \ \ \ \ \ item\ =\ item.offsetParent;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00071}00071\ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00072}00072\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00073}00073\ \ \ return\ y;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00074}00074\ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00076}00076\ var\ searchResults\ =\ new\ SearchResults("{}searchResults"{});}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00078}00078\ /*\ A\ class\ handling\ everything\ associated\ with\ the\ search\ panel.}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00080}00080\ \ \ \ Parameters:}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00081}00081\ \ \ \ name\ -\/\ The\ name\ of\ the\ global\ variable\ that\ will\ be}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00082}00082\ \ \ \ \ \ \ \ \ \ \ storing\ this\ instance.\ \ Is\ needed\ to\ be\ able\ to\ set\ timeouts.}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00083}00083\ \ \ \ resultPath\ -\/\ path\ to\ use\ for\ external\ files}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00084}00084\ */}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00085}00085\ function\ SearchBox(name,\ resultsPath,\ extension)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00086}00086\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00087}00087\ \ \ if\ (!name\ ||\ !resultsPath)\ \{\ \ alert("{}Missing\ parameters\ to\ SearchBox."{});\ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00088}00088\ \ \ if\ (!extension\ ||\ extension\ ==\ "{}"{})\ \{\ extension\ =\ "{}.html"{};\ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00090}00090\ \ \ //\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ Instance\ variables}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00091}00091\ \ \ this.name\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ name;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00092}00092\ \ \ this.resultsPath\ \ \ \ \ \ \ \ \ \ \ =\ resultsPath;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00093}00093\ \ \ this.keyTimeout\ \ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00094}00094\ \ \ this.keyTimeoutLength\ \ \ \ \ \ =\ 500;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00095}00095\ \ \ this.closeSelectionTimeout\ =\ 300;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00096}00096\ \ \ this.lastSearchValue\ \ \ \ \ \ \ =\ "{}"{};}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00097}00097\ \ \ this.lastResultsPage\ \ \ \ \ \ \ =\ "{}"{};}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00098}00098\ \ \ this.hideTimeout\ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00099}00099\ \ \ this.searchIndex\ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00100}00100\ \ \ this.searchActive\ \ \ \ \ \ \ \ \ \ =\ false;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00101}00101\ \ \ this.extension\ \ \ \ \ \ \ \ \ \ \ \ \ =\ extension;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00103}00103\ \ \ //\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ DOM\ Elements}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00105}00105\ \ \ this.DOMSearchField\ =\ function()}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00106}00106\ \ \ \{\ \ return\ document.getElementById("{}MSearchField"{});\ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00108}00108\ \ \ this.DOMSearchSelect\ =\ function()}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00109}00109\ \ \ \{\ \ return\ document.getElementById("{}MSearchSelect"{});\ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00111}00111\ \ \ this.DOMSearchSelectWindow\ =\ function()}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00112}00112\ \ \ \{\ \ return\ document.getElementById("{}MSearchSelectWindow"{});\ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00113}00113\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00114}00114\ \ \ this.DOMPopupSearchResults\ =\ function()}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00115}00115\ \ \ \{\ \ return\ document.getElementById("{}MSearchResults"{});\ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00116}00116\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00117}00117\ \ \ this.DOMPopupSearchResultsWindow\ =\ function()}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00118}00118\ \ \ \{\ \ return\ document.getElementById("{}MSearchResultsWindow"{});\ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00120}00120\ \ \ this.DOMSearchClose\ =\ function()}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00121}00121\ \ \ \{\ \ return\ document.getElementById("{}MSearchClose"{});\ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00123}00123\ \ \ this.DOMSearchBox\ =\ function()}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00124}00124\ \ \ \{\ \ return\ document.getElementById("{}MSearchBox"{});\ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00126}00126\ \ \ //\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ Event\ Handlers}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00128}00128\ \ \ //\ Called\ when\ focus\ is\ added\ or\ removed\ from\ the\ search\ field.}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00129}00129\ \ \ this.OnSearchFieldFocus\ =\ function(isActive)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00130}00130\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00131}00131\ \ \ \ \ this.Activate(isActive);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00132}00132\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00134}00134\ \ \ this.OnSearchSelectShow\ =\ function()}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00135}00135\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00136}00136\ \ \ \ \ var\ searchSelectWindow\ =\ this.DOMSearchSelectWindow();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00137}00137\ \ \ \ \ var\ searchField\ \ \ \ \ \ \ \ =\ this.DOMSearchSelect();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00139}00139\ \ \ \ \ var\ left\ =\ getXPos(searchField);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00140}00140\ \ \ \ \ var\ top\ \ =\ getYPos(searchField);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00141}00141\ \ \ \ \ top\ +=\ searchField.offsetHeight;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00143}00143\ \ \ \ \ //\ show\ search\ selection\ popup}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00144}00144\ \ \ \ \ searchSelectWindow.style.display='block';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00145}00145\ \ \ \ \ searchSelectWindow.style.left\ =\ \ left\ +\ 'px';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00146}00146\ \ \ \ \ searchSelectWindow.style.top\ \ =\ \ top\ \ +\ 'px';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00147}00147\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00148}00148\ \ \ \ \ //\ stop\ selection\ hide\ timer}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00149}00149\ \ \ \ \ if\ (this.hideTimeout)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00150}00150\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00151}00151\ \ \ \ \ \ \ clearTimeout(this.hideTimeout);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00152}00152\ \ \ \ \ \ \ this.hideTimeout=0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00153}00153\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00154}00154\ \ \ \ \ return\ false;\ //\ to\ avoid\ "{}image\ drag"{}\ default\ event}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00155}00155\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00157}00157\ \ \ this.OnSearchSelectHide\ =\ function()}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00158}00158\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00159}00159\ \ \ \ \ this.hideTimeout\ =\ setTimeout(this.CloseSelectionWindow.bind(this),}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00160}00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this.closeSelectionTimeout);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00161}00161\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00163}00163\ \ \ //\ Called\ when\ the\ content\ of\ the\ search\ field\ is\ changed.}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00164}00164\ \ \ this.OnSearchFieldChange\ =\ function(evt)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00165}00165\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00166}00166\ \ \ \ \ if\ (this.keyTimeout)\ //\ kill\ running\ timer}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00167}00167\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00168}00168\ \ \ \ \ \ \ clearTimeout(this.keyTimeout);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00169}00169\ \ \ \ \ \ \ this.keyTimeout\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00170}00170\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00171}00171\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00172}00172\ \ \ \ \ var\ e\ \ =\ (evt)\ ?\ evt\ :\ window.event;\ //\ for\ IE}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00173}00173\ \ \ \ \ if\ (e.keyCode==40\ ||\ e.keyCode==13)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00174}00174\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00175}00175\ \ \ \ \ \ \ if\ (e.shiftKey==1)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00176}00176\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00177}00177\ \ \ \ \ \ \ \ \ this.OnSearchSelectShow();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00178}00178\ \ \ \ \ \ \ \ \ var\ win=this.DOMSearchSelectWindow();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00179}00179\ \ \ \ \ \ \ \ \ for\ (i=0;i<win.childNodes.length;i++)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00180}00180\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00181}00181\ \ \ \ \ \ \ \ \ \ \ var\ child\ =\ win.childNodes[i];\ //\ get\ span\ within\ a}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00182}00182\ \ \ \ \ \ \ \ \ \ \ if\ (child.className=='SelectItem')}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00183}00183\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ child.focus();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00185}00185\ \ \ \ \ \ \ \ \ \ \ \ \ return;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00187}00187\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00188}00188\ \ \ \ \ \ \ \ \ return;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00189}00189\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00190}00190\ \ \ \ \ \ \ else}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00191}00191\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00192}00192\ \ \ \ \ \ \ \ \ var\ elem\ =\ searchResults.NavNext(0);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00193}00193\ \ \ \ \ \ \ \ \ if\ (elem)\ elem.focus();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00194}00194\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00195}00195\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00196}00196\ \ \ \ \ else\ if\ (e.keyCode==27)\ //\ Escape\ out\ of\ the\ search\ field}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00197}00197\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00198}00198\ \ \ \ \ \ \ e.stopPropagation();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00199}00199\ \ \ \ \ \ \ this.DOMSearchField().blur();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00200}00200\ \ \ \ \ \ \ this.DOMPopupSearchResultsWindow().style.display\ =\ 'none';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00201}00201\ \ \ \ \ \ \ this.DOMSearchClose().style.display\ =\ 'none';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00202}00202\ \ \ \ \ \ \ this.lastSearchValue\ =\ '';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00203}00203\ \ \ \ \ \ \ this.Activate(false);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00204}00204\ \ \ \ \ \ \ return;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00205}00205\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00207}00207\ \ \ \ \ //\ strip\ whitespaces}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00208}00208\ \ \ \ \ var\ searchValue\ =\ this.DOMSearchField().value.replace(/\ +/g,\ "{}"{});}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00209}00209\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00210}00210\ \ \ \ \ if\ (searchValue\ !=\ this.lastSearchValue)\ //\ search\ value\ has\ changed}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00211}00211\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00212}00212\ \ \ \ \ \ \ if\ (searchValue\ !=\ "{}"{})\ //\ non-\/empty\ search}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00213}00213\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00214}00214\ \ \ \ \ \ \ \ \ //\ set\ timer\ for\ search\ update}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00215}00215\ \ \ \ \ \ \ \ \ this.keyTimeout\ =\ setTimeout(this.Search.bind(this),}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ this.keyTimeoutLength);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00217}00217\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00218}00218\ \ \ \ \ \ \ else\ //\ empty\ search\ field}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00219}00219\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00220}00220\ \ \ \ \ \ \ \ \ this.DOMPopupSearchResultsWindow().style.display\ =\ 'none';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00221}00221\ \ \ \ \ \ \ \ \ this.DOMSearchClose().style.display\ =\ 'none';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00222}00222\ \ \ \ \ \ \ \ \ this.lastSearchValue\ =\ '';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00223}00223\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00224}00224\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00225}00225\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00226}00226\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00227}00227\ \ \ this.SelectItemCount\ =\ function(id)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00228}00228\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00229}00229\ \ \ \ \ var\ count=0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00230}00230\ \ \ \ \ var\ win=this.DOMSearchSelectWindow();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00231}00231\ \ \ \ \ for\ (i=0;i<win.childNodes.length;i++)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00232}00232\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00233}00233\ \ \ \ \ \ \ var\ child\ =\ win.childNodes[i];\ //\ get\ span\ within\ a}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00234}00234\ \ \ \ \ \ \ if\ (child.className=='SelectItem')}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00235}00235\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00236}00236\ \ \ \ \ \ \ \ \ count++;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00237}00237\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00238}00238\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00239}00239\ \ \ \ \ return\ count;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00240}00240\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00242}00242\ \ \ this.SelectItemSet\ =\ function(id)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00243}00243\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00244}00244\ \ \ \ \ var\ i,j=0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00245}00245\ \ \ \ \ var\ win=this.DOMSearchSelectWindow();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00246}00246\ \ \ \ \ for\ (i=0;i<win.childNodes.length;i++)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00247}00247\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00248}00248\ \ \ \ \ \ \ var\ child\ =\ win.childNodes[i];\ //\ get\ span\ within\ a}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00249}00249\ \ \ \ \ \ \ if\ (child.className=='SelectItem')}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00250}00250\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00251}00251\ \ \ \ \ \ \ \ \ var\ node\ =\ child.firstChild;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00252}00252\ \ \ \ \ \ \ \ \ if\ (j==id)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00253}00253\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00254}00254\ \ \ \ \ \ \ \ \ \ \ node.innerHTML='\&\#8226;';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00255}00255\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00256}00256\ \ \ \ \ \ \ \ \ else}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00257}00257\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ node.innerHTML='\&\#160;';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00259}00259\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00260}00260\ \ \ \ \ \ \ \ \ j++;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00261}00261\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00262}00262\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00263}00263\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00264}00264\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00265}00265\ \ \ //\ Called\ when\ an\ search\ filter\ selection\ is\ made.}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00266}00266\ \ \ //\ set\ item\ with\ index\ id\ as\ the\ active\ item}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00267}00267\ \ \ this.OnSelectItem\ =\ function(id)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00268}00268\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00269}00269\ \ \ \ \ this.searchIndex\ =\ id;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00270}00270\ \ \ \ \ this.SelectItemSet(id);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00271}00271\ \ \ \ \ var\ searchValue\ =\ this.DOMSearchField().value.replace(/\ +/g,\ "{}"{});}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00272}00272\ \ \ \ \ if\ (searchValue!="{}"{}\ \&\&\ this.searchActive)\ //\ something\ was\ found\ -\/>\ do\ a\ search}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00273}00273\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00274}00274\ \ \ \ \ \ \ this.Search();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00275}00275\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00276}00276\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00277}00277\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00278}00278\ \ \ this.OnSearchSelectKey\ =\ function(evt)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00279}00279\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00280}00280\ \ \ \ \ var\ e\ =\ (evt)\ ?\ evt\ :\ window.event;\ //\ for\ IE}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00281}00281\ \ \ \ \ if\ (e.keyCode==40\ \&\&\ this.searchIndex<this.SelectItemCount())\ //\ Down}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00282}00282\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00283}00283\ \ \ \ \ \ \ this.searchIndex++;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00284}00284\ \ \ \ \ \ \ this.OnSelectItem(this.searchIndex);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00285}00285\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00286}00286\ \ \ \ \ else\ if\ (e.keyCode==38\ \&\&\ this.searchIndex>0)\ //\ Up}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00287}00287\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00288}00288\ \ \ \ \ \ \ this.searchIndex-\/-\/;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00289}00289\ \ \ \ \ \ \ this.OnSelectItem(this.searchIndex);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00290}00290\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00291}00291\ \ \ \ \ else\ if\ (e.keyCode==13\ ||\ e.keyCode==27)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00292}00292\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00293}00293\ \ \ \ \ \ \ e.stopPropagation();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00294}00294\ \ \ \ \ \ \ this.OnSelectItem(this.searchIndex);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00295}00295\ \ \ \ \ \ \ this.CloseSelectionWindow();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00296}00296\ \ \ \ \ \ \ this.DOMSearchField().focus();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00297}00297\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00298}00298\ \ \ \ \ return\ false;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00299}00299\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00301}00301\ \ \ //\ -\/-\/-\/-\/-\/-\/-\/-\/-\/\ Actions}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00303}00303\ \ \ //\ Closes\ the\ results\ window.}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00304}00304\ \ \ this.CloseResultsWindow\ =\ function()}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00305}00305\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00306}00306\ \ \ \ \ this.DOMPopupSearchResultsWindow().style.display\ =\ 'none';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00307}00307\ \ \ \ \ this.DOMSearchClose().style.display\ =\ 'none';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00308}00308\ \ \ \ \ this.Activate(false);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00309}00309\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00310}00310\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00311}00311\ \ \ this.CloseSelectionWindow\ =\ function()}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00312}00312\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00313}00313\ \ \ \ \ this.DOMSearchSelectWindow().style.display\ =\ 'none';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00314}00314\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00315}00315\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00316}00316\ \ \ //\ Performs\ a\ search.}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00317}00317\ \ \ this.Search\ =\ function()}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00318}00318\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00319}00319\ \ \ \ \ this.keyTimeout\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00320}00320\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00321}00321\ \ \ \ \ //\ strip\ leading\ whitespace}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00322}00322\ \ \ \ \ var\ searchValue\ =\ this.DOMSearchField().value.replace(/\string^\ +/,\ "{}"{});}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00324}00324\ \ \ \ \ var\ code\ =\ searchValue.toLowerCase().charCodeAt(0);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00325}00325\ \ \ \ \ var\ idxChar\ =\ searchValue.substr(0,\ 1).toLowerCase();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00326}00326\ \ \ \ \ if\ (\ 0xD800\ <=\ code\ \&\&\ code\ <=\ 0xDBFF\ \&\&\ searchValue\ >\ 1)\ //\ surrogate\ pair}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00327}00327\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00328}00328\ \ \ \ \ \ \ idxChar\ =\ searchValue.substr(0,\ 2);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00329}00329\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00330}00330\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00331}00331\ \ \ \ \ var\ jsFile;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00332}00332\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00333}00333\ \ \ \ \ var\ idx\ =\ indexSectionsWithContent[this.searchIndex].indexOf(idxChar);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00334}00334\ \ \ \ \ if\ (idx!=-\/1)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00335}00335\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00336}00336\ \ \ \ \ \ \ \ var\ hexCode=idx.toString(16);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00337}00337\ \ \ \ \ \ \ \ jsFile\ =\ this.resultsPath\ +\ indexSectionNames[this.searchIndex]\ +\ '\_'\ +\ hexCode\ +\ '.js';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00338}00338\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00340}00340\ \ \ \ \ var\ loadJS\ =\ function(url,\ impl,\ loc)\{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00341}00341\ \ \ \ \ \ \ var\ scriptTag\ =\ document.createElement('script');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00342}00342\ \ \ \ \ \ \ scriptTag.src\ =\ url;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00343}00343\ \ \ \ \ \ \ scriptTag.onload\ =\ impl;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00344}00344\ \ \ \ \ \ \ scriptTag.onreadystatechange\ =\ impl;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00345}00345\ \ \ \ \ \ \ loc.appendChild(scriptTag);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00346}00346\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00347}00347\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00348}00348\ \ \ \ \ var\ domPopupSearchResultsWindow\ =\ this.DOMPopupSearchResultsWindow();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00349}00349\ \ \ \ \ var\ domSearchBox\ =\ this.DOMSearchBox();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00350}00350\ \ \ \ \ var\ domPopupSearchResults\ =\ this.DOMPopupSearchResults();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00351}00351\ \ \ \ \ var\ domSearchClose\ =\ this.DOMSearchClose();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00352}00352\ \ \ \ \ var\ resultsPath\ =\ this.resultsPath;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00353}00353\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00354}00354\ \ \ \ \ var\ handleResults\ =\ function()\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00355}00355\ \ \ \ \ \ \ document.getElementById("{}Loading"{}).style.display="{}none"{};}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00356}00356\ \ \ \ \ \ \ if\ (typeof\ searchData\ !==\ 'undefined')\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00357}00357\ \ \ \ \ \ \ \ \ createResults(resultsPath);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00358}00358\ \ \ \ \ \ \ \ \ document.getElementById("{}NoMatches"{}).style.display="{}none"{};}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00359}00359\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00360}00360\ \ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00361}00361\ \ \ \ \ \ \ if\ (idx!=-\/1)\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00362}00362\ \ \ \ \ \ \ \ \ searchResults.Search(searchValue);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00363}00363\ \ \ \ \ \ \ \}\ else\ \{\ //\ no\ file\ with\ search\ results\ =>\ force\ empty\ search\ results}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00364}00364\ \ \ \ \ \ \ \ \ searchResults.Search('====');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00365}00365\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00366}00366\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00367}00367\ \ \ \ \ \ \ if\ (domPopupSearchResultsWindow.style.display!='block')}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00368}00368\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00369}00369\ \ \ \ \ \ \ \ \ domSearchClose.style.display\ =\ 'inline-\/block';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00370}00370\ \ \ \ \ \ \ \ \ var\ left\ =\ getXPos(domSearchBox)\ +\ 150;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00371}00371\ \ \ \ \ \ \ \ \ var\ top\ \ =\ getYPos(domSearchBox)\ +\ 20;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00372}00372\ \ \ \ \ \ \ \ \ domPopupSearchResultsWindow.style.display\ =\ 'block';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00373}00373\ \ \ \ \ \ \ \ \ left\ -\/=\ domPopupSearchResults.offsetWidth;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00374}00374\ \ \ \ \ \ \ \ \ var\ maxWidth\ \ =\ document.body.clientWidth;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00375}00375\ \ \ \ \ \ \ \ \ var\ maxHeight\ =\ document.body.clientHeight;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00376}00376\ \ \ \ \ \ \ \ \ var\ width\ =\ 300;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00377}00377\ \ \ \ \ \ \ \ \ if\ (left<10)\ left=10;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00378}00378\ \ \ \ \ \ \ \ \ if\ (width+left+8>maxWidth)\ width=maxWidth-\/left-\/8;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00379}00379\ \ \ \ \ \ \ \ \ var\ height\ =\ 400;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00380}00380\ \ \ \ \ \ \ \ \ if\ (height+top+8>maxHeight)\ height=maxHeight-\/top-\/8;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00381}00381\ \ \ \ \ \ \ \ \ domPopupSearchResultsWindow.style.top\ \ \ \ \ =\ top\ \ +\ 'px';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00382}00382\ \ \ \ \ \ \ \ \ domPopupSearchResultsWindow.style.left\ \ \ \ =\ left\ +\ 'px';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00383}00383\ \ \ \ \ \ \ \ \ domPopupSearchResultsWindow.style.width\ \ \ =\ width\ +\ 'px';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00384}00384\ \ \ \ \ \ \ \ \ domPopupSearchResultsWindow.style.height\ \ =\ height\ +\ 'px';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00385}00385\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00386}00386\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00387}00387\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00388}00388\ \ \ \ \ if\ (jsFile)\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00389}00389\ \ \ \ \ \ \ loadJS(jsFile,\ handleResults,\ this.DOMPopupSearchResultsWindow());}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00390}00390\ \ \ \ \ \}\ else\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00391}00391\ \ \ \ \ \ \ handleResults();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00392}00392\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00393}00393\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00394}00394\ \ \ \ \ this.lastSearchValue\ =\ searchValue;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00395}00395\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00396}00396\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00397}00397\ \ \ //\ -\/-\/-\/-\/-\/-\/-\/-\/\ Activation\ Functions}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00398}00398\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00399}00399\ \ \ //\ Activates\ or\ deactivates\ the\ search\ panel,\ resetting\ things\ to}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00400}00400\ \ \ //\ their\ default\ values\ if\ necessary.}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00401}00401\ \ \ this.Activate\ =\ function(isActive)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00402}00402\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00403}00403\ \ \ \ \ if\ (isActive\ ||\ //\ open\ it}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00404}00404\ \ \ \ \ \ \ \ \ this.DOMPopupSearchResultsWindow().style.display\ ==\ 'block'}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00405}00405\ \ \ \ \ \ \ \ )}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00406}00406\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00407}00407\ \ \ \ \ \ \ this.DOMSearchBox().className\ =\ 'MSearchBoxActive';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00408}00408\ \ \ \ \ \ \ this.searchActive\ =\ true;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00409}00409\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00410}00410\ \ \ \ \ else\ if\ (!isActive)\ //\ directly\ remove\ the\ panel}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00411}00411\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00412}00412\ \ \ \ \ \ \ this.DOMSearchBox().className\ =\ 'MSearchBoxInactive';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00413}00413\ \ \ \ \ \ \ this.searchActive\ \ \ \ \ \ \ \ \ \ \ \ \ =\ false;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00414}00414\ \ \ \ \ \ \ this.lastSearchValue\ \ \ \ \ \ \ \ \ \ =\ ''}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00415}00415\ \ \ \ \ \ \ this.lastResultsPage\ \ \ \ \ \ \ \ \ \ =\ '';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00416}00416\ \ \ \ \ \ \ this.DOMSearchField().value\ \ \ =\ '';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00417}00417\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00418}00418\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00419}00419\ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00420}00420\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00421}00421\ //\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00422}00422\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00423}00423\ //\ The\ class\ that\ handles\ everything\ on\ the\ search\ results\ page.}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00424}00424\ function\ SearchResults(name)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00425}00425\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00426}00426\ \ \ \ \ //\ The\ number\ of\ matches\ from\ the\ last\ run\ of\ <Search()>.}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00427}00427\ \ \ \ \ this.lastMatchCount\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00428}00428\ \ \ \ \ this.lastKey\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00429}00429\ \ \ \ \ this.repeatOn\ =\ false;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00430}00430\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00431}00431\ \ \ \ \ //\ Toggles\ the\ visibility\ of\ the\ passed\ element\ ID.}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00432}00432\ \ \ \ \ this.FindChildElement\ =\ function(id)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00433}00433\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00434}00434\ \ \ \ \ \ \ var\ parentElement\ =\ document.getElementById(id);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00435}00435\ \ \ \ \ \ \ var\ element\ =\ parentElement.firstChild;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00436}00436\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00437}00437\ \ \ \ \ \ \ while\ (element\ \&\&\ element!=parentElement)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00438}00438\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00439}00439\ \ \ \ \ \ \ \ \ if\ (element.nodeName.toLowerCase()\ ==\ 'div'\ \&\&\ element.className\ ==\ 'SRChildren')}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00440}00440\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00441}00441\ \ \ \ \ \ \ \ \ \ \ return\ element;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00442}00442\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00443}00443\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00444}00444\ \ \ \ \ \ \ \ \ if\ (element.nodeName.toLowerCase()\ ==\ 'div'\ \&\&\ element.hasChildNodes())}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00445}00445\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00446}00446\ \ \ \ \ \ \ \ \ \ \ \ element\ =\ element.firstChild;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00447}00447\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00448}00448\ \ \ \ \ \ \ \ \ else\ if\ (element.nextSibling)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00449}00449\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00450}00450\ \ \ \ \ \ \ \ \ \ \ \ element\ =\ element.nextSibling;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00451}00451\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00452}00452\ \ \ \ \ \ \ \ \ else}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00453}00453\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00454}00454\ \ \ \ \ \ \ \ \ \ \ do}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00455}00455\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ \ \ element\ =\ element.parentNode;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00457}00457\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00458}00458\ \ \ \ \ \ \ \ \ \ \ while\ (element\ \&\&\ element!=parentElement\ \&\&\ !element.nextSibling);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00459}00459\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00460}00460\ \ \ \ \ \ \ \ \ \ \ if\ (element\ \&\&\ element!=parentElement)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00461}00461\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00462}00462\ \ \ \ \ \ \ \ \ \ \ \ \ element\ =\ element.nextSibling;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00463}00463\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00464}00464\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00465}00465\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00466}00466\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00467}00467\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00468}00468\ \ \ \ \ this.Toggle\ =\ function(id)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00469}00469\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00470}00470\ \ \ \ \ \ \ var\ element\ =\ this.FindChildElement(id);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00471}00471\ \ \ \ \ \ \ if\ (element)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00472}00472\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00473}00473\ \ \ \ \ \ \ \ \ if\ (element.style.display\ ==\ 'block')}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00474}00474\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00475}00475\ \ \ \ \ \ \ \ \ \ \ element.style.display\ =\ 'none';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00476}00476\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00477}00477\ \ \ \ \ \ \ \ \ else}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00478}00478\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ element.style.display\ =\ 'block';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00480}00480\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00481}00481\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00482}00482\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00483}00483\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00484}00484\ \ \ \ \ //\ Searches\ for\ the\ passed\ string.\ \ If\ there\ is\ no\ parameter,}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00485}00485\ \ \ \ \ //\ it\ takes\ it\ from\ the\ URL\ query.}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00486}00486\ \ \ \ \ //}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00487}00487\ \ \ \ \ //\ Always\ returns\ true,\ since\ other\ documents\ may\ try\ to\ call\ it}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00488}00488\ \ \ \ \ //\ and\ that\ may\ or\ may\ not\ be\ possible.}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00489}00489\ \ \ \ \ this.Search\ =\ function(search)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00490}00490\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00491}00491\ \ \ \ \ \ \ if\ (!search)\ //\ get\ search\ word\ from\ URL}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00492}00492\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00493}00493\ \ \ \ \ \ \ \ \ search\ =\ window.location.search;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00494}00494\ \ \ \ \ \ \ \ \ search\ =\ search.substring(1);\ \ //\ Remove\ the\ leading\ '?'}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00495}00495\ \ \ \ \ \ \ \ \ search\ =\ unescape(search);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00496}00496\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00497}00497\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00498}00498\ \ \ \ \ \ \ search\ =\ search.replace(/\string^\ +/,\ "{}"{});\ //\ strip\ leading\ spaces}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00499}00499\ \ \ \ \ \ \ search\ =\ search.replace(/\ +\$/,\ "{}"{});\ //\ strip\ trailing\ spaces}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00500}00500\ \ \ \ \ \ \ search\ =\ search.toLowerCase();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00501}00501\ \ \ \ \ \ \ search\ =\ convertToId(search);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00502}00502\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00503}00503\ \ \ \ \ \ \ var\ resultRows\ =\ document.getElementsByTagName("{}div"{});}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00504}00504\ \ \ \ \ \ \ var\ matches\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00505}00505\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00506}00506\ \ \ \ \ \ \ var\ i\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00507}00507\ \ \ \ \ \ \ while\ (i\ <\ resultRows.length)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00508}00508\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00509}00509\ \ \ \ \ \ \ \ \ var\ row\ =\ resultRows.item(i);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00510}00510\ \ \ \ \ \ \ \ \ if\ (row.className\ ==\ "{}SRResult"{})}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00511}00511\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00512}00512\ \ \ \ \ \ \ \ \ \ \ var\ rowMatchName\ =\ row.id.toLowerCase();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ rowMatchName\ =\ rowMatchName.replace(/\string^sr\(\backslash\)d*\_/,\ '');\ //\ strip\ 'sr123\_'}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00514}00514\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00515}00515\ \ \ \ \ \ \ \ \ \ \ if\ (search.length<=rowMatchName.length\ \&\&}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00516}00516\ \ \ \ \ \ \ \ \ \ \ \ \ \ rowMatchName.substr(0,\ search.length)==search)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00517}00517\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00518}00518\ \ \ \ \ \ \ \ \ \ \ \ \ row.style.display\ =\ 'block';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00519}00519\ \ \ \ \ \ \ \ \ \ \ \ \ matches++;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00520}00520\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00521}00521\ \ \ \ \ \ \ \ \ \ \ else}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00522}00522\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00523}00523\ \ \ \ \ \ \ \ \ \ \ \ \ row.style.display\ =\ 'none';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00524}00524\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00525}00525\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00526}00526\ \ \ \ \ \ \ \ \ i++;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00527}00527\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00528}00528\ \ \ \ \ \ \ document.getElementById("{}Searching"{}).style.display='none';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00529}00529\ \ \ \ \ \ \ if\ (matches\ ==\ 0)\ //\ no\ results}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00530}00530\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00531}00531\ \ \ \ \ \ \ \ \ document.getElementById("{}NoMatches"{}).style.display='block';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00532}00532\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00533}00533\ \ \ \ \ \ \ else\ //\ at\ least\ one\ result}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00534}00534\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00535}00535\ \ \ \ \ \ \ \ \ document.getElementById("{}NoMatches"{}).style.display='none';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00536}00536\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00537}00537\ \ \ \ \ \ \ this.lastMatchCount\ =\ matches;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00538}00538\ \ \ \ \ \ \ return\ true;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00539}00539\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00540}00540\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00541}00541\ \ \ \ \ //\ return\ the\ first\ item\ with\ index\ index\ or\ higher\ that\ is\ visible}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00542}00542\ \ \ \ \ this.NavNext\ =\ function(index)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00543}00543\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00544}00544\ \ \ \ \ \ \ var\ focusItem;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00545}00545\ \ \ \ \ \ \ while\ (1)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00546}00546\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00547}00547\ \ \ \ \ \ \ \ \ var\ focusName\ =\ 'Item'+index;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00548}00548\ \ \ \ \ \ \ \ \ focusItem\ =\ document.getElementById(focusName);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00549}00549\ \ \ \ \ \ \ \ \ if\ (focusItem\ \&\&\ focusItem.parentNode.parentNode.style.display=='block')}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00550}00550\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00551}00551\ \ \ \ \ \ \ \ \ \ \ break;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00552}00552\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00553}00553\ \ \ \ \ \ \ \ \ else\ if\ (!focusItem)\ //\ last\ element}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00554}00554\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00555}00555\ \ \ \ \ \ \ \ \ \ \ break;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00556}00556\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00557}00557\ \ \ \ \ \ \ \ \ focusItem=null;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00558}00558\ \ \ \ \ \ \ \ \ index++;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00559}00559\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00560}00560\ \ \ \ \ \ \ return\ focusItem;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00561}00561\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00562}00562\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00563}00563\ \ \ \ \ this.NavPrev\ =\ function(index)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00564}00564\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00565}00565\ \ \ \ \ \ \ var\ focusItem;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00566}00566\ \ \ \ \ \ \ while\ (1)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00567}00567\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00568}00568\ \ \ \ \ \ \ \ \ var\ focusName\ =\ 'Item'+index;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00569}00569\ \ \ \ \ \ \ \ \ focusItem\ =\ document.getElementById(focusName);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00570}00570\ \ \ \ \ \ \ \ \ if\ (focusItem\ \&\&\ focusItem.parentNode.parentNode.style.display=='block')}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00571}00571\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00572}00572\ \ \ \ \ \ \ \ \ \ \ break;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00573}00573\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00574}00574\ \ \ \ \ \ \ \ \ else\ if\ (!focusItem)\ //\ last\ element}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00575}00575\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00576}00576\ \ \ \ \ \ \ \ \ \ \ break;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00577}00577\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00578}00578\ \ \ \ \ \ \ \ \ focusItem=null;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00579}00579\ \ \ \ \ \ \ \ \ index-\/-\/;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00580}00580\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00581}00581\ \ \ \ \ \ \ return\ focusItem;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00582}00582\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00583}00583\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00584}00584\ \ \ \ \ this.ProcessKeys\ =\ function(e)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00585}00585\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00586}00586\ \ \ \ \ \ \ if\ (e.type\ ==\ "{}keydown"{})}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00587}00587\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00588}00588\ \ \ \ \ \ \ \ \ this.repeatOn\ =\ false;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00589}00589\ \ \ \ \ \ \ \ \ this.lastKey\ =\ e.keyCode;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00590}00590\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00591}00591\ \ \ \ \ \ \ else\ if\ (e.type\ ==\ "{}keypress"{})}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00592}00592\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00593}00593\ \ \ \ \ \ \ \ \ if\ (!this.repeatOn)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00594}00594\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00595}00595\ \ \ \ \ \ \ \ \ \ \ if\ (this.lastKey)\ this.repeatOn\ =\ true;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00596}00596\ \ \ \ \ \ \ \ \ \ \ return\ false;\ //\ ignore\ first\ keypress\ after\ keydown}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00597}00597\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00598}00598\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00599}00599\ \ \ \ \ \ \ else\ if\ (e.type\ ==\ "{}keyup"{})}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00600}00600\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00601}00601\ \ \ \ \ \ \ \ \ this.lastKey\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00602}00602\ \ \ \ \ \ \ \ \ this.repeatOn\ =\ false;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00603}00603\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00604}00604\ \ \ \ \ \ \ return\ this.lastKey!=0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00605}00605\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00606}00606\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00607}00607\ \ \ \ \ this.Nav\ =\ function(evt,itemIndex)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00608}00608\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00609}00609\ \ \ \ \ \ \ var\ e\ \ =\ (evt)\ ?\ evt\ :\ window.event;\ //\ for\ IE}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00610}00610\ \ \ \ \ \ \ if\ (e.keyCode==13)\ return\ true;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00611}00611\ \ \ \ \ \ \ if\ (!this.ProcessKeys(e))\ return\ false;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00612}00612\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00613}00613\ \ \ \ \ \ \ if\ (this.lastKey==38)\ //\ Up}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00614}00614\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00615}00615\ \ \ \ \ \ \ \ \ var\ newIndex\ =\ itemIndex-\/1;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00616}00616\ \ \ \ \ \ \ \ \ var\ focusItem\ =\ this.NavPrev(newIndex);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00617}00617\ \ \ \ \ \ \ \ \ if\ (focusItem)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00618}00618\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00619}00619\ \ \ \ \ \ \ \ \ \ \ var\ child\ =\ this.FindChildElement(focusItem.parentNode.parentNode.id);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00620}00620\ \ \ \ \ \ \ \ \ \ \ if\ (child\ \&\&\ child.style.display\ ==\ 'block')\ //\ children\ visible}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00621}00621\ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00622}00622\ \ \ \ \ \ \ \ \ \ \ \ \ var\ n=0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00623}00623\ \ \ \ \ \ \ \ \ \ \ \ \ var\ tmpElem;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00624}00624\ \ \ \ \ \ \ \ \ \ \ \ \ while\ (1)\ //\ search\ for\ last\ child}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00625}00625\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00626}00626\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tmpElem\ =\ document.getElementById('Item'+newIndex+'\_c'+n);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00627}00627\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (tmpElem)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00628}00628\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00629}00629\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ focusItem\ =\ tmpElem;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00630}00630\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00631}00631\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ else\ //\ found\ it!}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00632}00632\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00633}00633\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ break;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00634}00634\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00635}00635\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ n++;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00636}00636\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00637}00637\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00638}00638\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00639}00639\ \ \ \ \ \ \ \ \ if\ (focusItem)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00640}00640\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00641}00641\ \ \ \ \ \ \ \ \ \ \ focusItem.focus();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00642}00642\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00643}00643\ \ \ \ \ \ \ \ \ else\ //\ return\ focus\ to\ search\ field}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00644}00644\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00645}00645\ \ \ \ \ \ \ \ \ \ \ \ document.getElementById("{}MSearchField"{}).focus();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00646}00646\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00647}00647\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00648}00648\ \ \ \ \ \ \ else\ if\ (this.lastKey==40)\ //\ Down}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00649}00649\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00650}00650\ \ \ \ \ \ \ \ \ var\ newIndex\ =\ itemIndex+1;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00651}00651\ \ \ \ \ \ \ \ \ var\ focusItem;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00652}00652\ \ \ \ \ \ \ \ \ var\ item\ =\ document.getElementById('Item'+itemIndex);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00653}00653\ \ \ \ \ \ \ \ \ var\ elem\ =\ this.FindChildElement(item.parentNode.parentNode.id);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00654}00654\ \ \ \ \ \ \ \ \ if\ (elem\ \&\&\ elem.style.display\ ==\ 'block')\ //\ children\ visible}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00655}00655\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00656}00656\ \ \ \ \ \ \ \ \ \ \ focusItem\ =\ document.getElementById('Item'+itemIndex+'\_c0');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00657}00657\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00658}00658\ \ \ \ \ \ \ \ \ if\ (!focusItem)\ focusItem\ =\ this.NavNext(newIndex);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00659}00659\ \ \ \ \ \ \ \ \ if\ (focusItem)\ \ focusItem.focus();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00660}00660\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00661}00661\ \ \ \ \ \ \ else\ if\ (this.lastKey==39)\ //\ Right}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00662}00662\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00663}00663\ \ \ \ \ \ \ \ \ var\ item\ =\ document.getElementById('Item'+itemIndex);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00664}00664\ \ \ \ \ \ \ \ \ var\ elem\ =\ this.FindChildElement(item.parentNode.parentNode.id);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00665}00665\ \ \ \ \ \ \ \ \ if\ (elem)\ elem.style.display\ =\ 'block';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00666}00666\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00667}00667\ \ \ \ \ \ \ else\ if\ (this.lastKey==37)\ //\ Left}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00668}00668\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00669}00669\ \ \ \ \ \ \ \ \ var\ item\ =\ document.getElementById('Item'+itemIndex);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00670}00670\ \ \ \ \ \ \ \ \ var\ elem\ =\ this.FindChildElement(item.parentNode.parentNode.id);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00671}00671\ \ \ \ \ \ \ \ \ if\ (elem)\ elem.style.display\ =\ 'none';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00672}00672\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00673}00673\ \ \ \ \ \ \ else\ if\ (this.lastKey==27)\ //\ Escape}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00674}00674\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00675}00675\ \ \ \ \ \ \ \ \ e.stopPropagation();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00676}00676\ \ \ \ \ \ \ \ \ searchBox.CloseResultsWindow();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00677}00677\ \ \ \ \ \ \ \ \ document.getElementById("{}MSearchField"{}).focus();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00678}00678\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00679}00679\ \ \ \ \ \ \ else\ if\ (this.lastKey==13)\ //\ Enter}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00680}00680\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00681}00681\ \ \ \ \ \ \ \ \ return\ true;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00682}00682\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00683}00683\ \ \ \ \ \ \ return\ false;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00684}00684\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00685}00685\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00686}00686\ \ \ \ \ this.NavChild\ =\ function(evt,itemIndex,childIndex)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00687}00687\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00688}00688\ \ \ \ \ \ \ var\ e\ \ =\ (evt)\ ?\ evt\ :\ window.event;\ //\ for\ IE}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00689}00689\ \ \ \ \ \ \ if\ (e.keyCode==13)\ return\ true;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00690}00690\ \ \ \ \ \ \ if\ (!this.ProcessKeys(e))\ return\ false;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00691}00691\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00692}00692\ \ \ \ \ \ \ if\ (this.lastKey==38)\ //\ Up}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00693}00693\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00694}00694\ \ \ \ \ \ \ \ \ if\ (childIndex>0)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00695}00695\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00696}00696\ \ \ \ \ \ \ \ \ \ \ var\ newIndex\ =\ childIndex-\/1;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00697}00697\ \ \ \ \ \ \ \ \ \ \ document.getElementById('Item'+itemIndex+'\_c'+newIndex).focus();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00698}00698\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00699}00699\ \ \ \ \ \ \ \ \ else\ //\ already\ at\ first\ child,\ jump\ to\ parent}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00700}00700\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00701}00701\ \ \ \ \ \ \ \ \ \ \ document.getElementById('Item'+itemIndex).focus();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00702}00702\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00703}00703\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00704}00704\ \ \ \ \ \ \ else\ if\ (this.lastKey==40)\ //\ Down}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00705}00705\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00706}00706\ \ \ \ \ \ \ \ \ var\ newIndex\ =\ childIndex+1;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00707}00707\ \ \ \ \ \ \ \ \ var\ elem\ =\ document.getElementById('Item'+itemIndex+'\_c'+newIndex);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00708}00708\ \ \ \ \ \ \ \ \ if\ (!elem)\ //\ last\ child,\ jump\ to\ parent\ next\ parent}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00709}00709\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00710}00710\ \ \ \ \ \ \ \ \ \ \ elem\ =\ this.NavNext(itemIndex+1);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00711}00711\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00712}00712\ \ \ \ \ \ \ \ \ if\ (elem)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00713}00713\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00714}00714\ \ \ \ \ \ \ \ \ \ \ elem.focus();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00715}00715\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00716}00716\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00717}00717\ \ \ \ \ \ \ else\ if\ (this.lastKey==27)\ //\ Escape}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00718}00718\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00719}00719\ \ \ \ \ \ \ \ \ e.stopPropagation();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00720}00720\ \ \ \ \ \ \ \ \ searchBox.CloseResultsWindow();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00721}00721\ \ \ \ \ \ \ \ \ document.getElementById("{}MSearchField"{}).focus();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00722}00722\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00723}00723\ \ \ \ \ \ \ else\ if\ (this.lastKey==13)\ //\ Enter}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00724}00724\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00725}00725\ \ \ \ \ \ \ \ \ return\ true;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00726}00726\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00727}00727\ \ \ \ \ \ \ return\ false;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00728}00728\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00729}00729\ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00730}00730\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00731}00731\ function\ setKeyActions(elem,action)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00732}00732\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00733}00733\ \ \ elem.setAttribute('onkeydown',action);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00734}00734\ \ \ elem.setAttribute('onkeypress',action);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00735}00735\ \ \ elem.setAttribute('onkeyup',action);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00736}00736\ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00737}00737\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00738}00738\ function\ setClassAttr(elem,attr)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00739}00739\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00740}00740\ \ \ elem.setAttribute('class',attr);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00741}00741\ \ \ elem.setAttribute('className',attr);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00742}00742\ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00743}00743\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00744}00744\ function\ createResults(resultsPath)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00745}00745\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00746}00746\ \ \ var\ results\ =\ document.getElementById("{}SRResults"{});}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00747}00747\ \ \ results.innerHTML\ =\ '';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00748}00748\ \ \ for\ (var\ e=0;\ e<searchData.length;\ e++)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00749}00749\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00750}00750\ \ \ \ \ var\ id\ =\ searchData[e][0];}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00751}00751\ \ \ \ \ var\ srResult\ =\ document.createElement('div');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00752}00752\ \ \ \ \ srResult.setAttribute('id','SR\_'+id);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00753}00753\ \ \ \ \ setClassAttr(srResult,'SRResult');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00754}00754\ \ \ \ \ var\ srEntry\ =\ document.createElement('div');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00755}00755\ \ \ \ \ setClassAttr(srEntry,'SREntry');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00756}00756\ \ \ \ \ var\ srLink\ =\ document.createElement('a');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00757}00757\ \ \ \ \ srLink.setAttribute('id','Item'+e);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00758}00758\ \ \ \ \ setKeyActions(srLink,'return\ searchResults.Nav(event,'+e+')');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00759}00759\ \ \ \ \ setClassAttr(srLink,'SRSymbol');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00760}00760\ \ \ \ \ srLink.innerHTML\ =\ searchData[e][1][0];}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00761}00761\ \ \ \ \ srEntry.appendChild(srLink);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00762}00762\ \ \ \ \ if\ (searchData[e][1].length==2)\ //\ single\ result}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00763}00763\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00764}00764\ \ \ \ \ \ \ srLink.setAttribute('href',resultsPath+searchData[e][1][1][0]);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00765}00765\ \ \ \ \ \ \ srLink.setAttribute('onclick','searchBox.CloseResultsWindow()');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00766}00766\ \ \ \ \ \ \ if\ (searchData[e][1][1][1])}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00767}00767\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00768}00768\ \ \ \ \ \ \ \ srLink.setAttribute('target','\_parent');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00769}00769\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00770}00770\ \ \ \ \ \ \ else}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00771}00771\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00772}00772\ \ \ \ \ \ \ \ srLink.setAttribute('target','\_blank');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00773}00773\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00774}00774\ \ \ \ \ \ \ var\ srScope\ =\ document.createElement('span');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00775}00775\ \ \ \ \ \ \ setClassAttr(srScope,'SRScope');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00776}00776\ \ \ \ \ \ \ srScope.innerHTML\ =\ searchData[e][1][1][2];}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00777}00777\ \ \ \ \ \ \ srEntry.appendChild(srScope);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00778}00778\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00779}00779\ \ \ \ \ else\ //\ multiple\ results}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00780}00780\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00781}00781\ \ \ \ \ \ \ srLink.setAttribute('href','javascript:searchResults.Toggle("{}SR\_'+id+'"{})');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00782}00782\ \ \ \ \ \ \ var\ srChildren\ =\ document.createElement('div');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00783}00783\ \ \ \ \ \ \ setClassAttr(srChildren,'SRChildren');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00784}00784\ \ \ \ \ \ \ for\ (var\ c=0;\ c<searchData[e][1].length-\/1;\ c++)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00785}00785\ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00786}00786\ \ \ \ \ \ \ \ \ var\ srChild\ =\ document.createElement('a');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00787}00787\ \ \ \ \ \ \ \ \ srChild.setAttribute('id','Item'+e+'\_c'+c);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00788}00788\ \ \ \ \ \ \ \ \ setKeyActions(srChild,'return\ searchResults.NavChild(event,'+e+','+c+')');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00789}00789\ \ \ \ \ \ \ \ \ setClassAttr(srChild,'SRScope');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00790}00790\ \ \ \ \ \ \ \ \ srChild.setAttribute('href',resultsPath+searchData[e][1][c+1][0]);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00791}00791\ \ \ \ \ \ \ \ \ srChild.setAttribute('onclick','searchBox.CloseResultsWindow()');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00792}00792\ \ \ \ \ \ \ \ \ if\ (searchData[e][1][c+1][1])}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00793}00793\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00794}00794\ \ \ \ \ \ \ \ \ \ srChild.setAttribute('target','\_parent');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00795}00795\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00796}00796\ \ \ \ \ \ \ \ \ else}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00797}00797\ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00798}00798\ \ \ \ \ \ \ \ \ \ srChild.setAttribute('target','\_blank');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00799}00799\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00800}00800\ \ \ \ \ \ \ \ \ srChild.innerHTML\ =\ searchData[e][1][c+1][2];}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00801}00801\ \ \ \ \ \ \ \ \ srChildren.appendChild(srChild);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00802}00802\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00803}00803\ \ \ \ \ \ \ srEntry.appendChild(srChildren);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00804}00804\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00805}00805\ \ \ \ \ srResult.appendChild(srEntry);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00806}00806\ \ \ \ \ results.appendChild(srResult);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00807}00807\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00808}00808\ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00809}00809\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00810}00810\ function\ init\_search()}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00811}00811\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00812}00812\ \ \ var\ results\ =\ document.getElementById("{}MSearchSelectWindow"{});}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00813}00813\ \ \ results.tabIndex=0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00814}00814\ \ \ for\ (var\ key\ in\ indexSectionLabels)}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00815}00815\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00816}00816\ \ \ \ \ var\ link\ =\ document.createElement('a');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00817}00817\ \ \ \ \ link.setAttribute('class','SelectItem');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00818}00818\ \ \ \ \ link.setAttribute('onclick','searchBox.OnSelectItem('+key+')');}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00819}00819\ \ \ \ \ link.href='javascript:void(0)';}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00820}00820\ \ \ \ \ link.innerHTML='<span\ class="{}SelectionMark"{}>\&\#160;</span>'+indexSectionLabels[key];}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00821}00821\ \ \ \ \ results.appendChild(link);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00822}00822\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00823}00823\ \ \ searchBox.OnSelectItem(0);}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00824}00824\ }
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00825}00825\ \ \ var\ input\ =\ document.getElementById("{}MSearchSelect"{});}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00826}00826\ \ \ var\ searchSelectWindow\ =\ document.getElementById("{}MSearchSelectWindow"{});}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00827}00827\ \ \ input.tabIndex=0;}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00828}00828\ \ \ input.addEventListener("{}keydown"{},\ function(event)\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00829}00829\ \ \ \ \ if\ (event.keyCode==13\ ||\ event.keyCode==40)\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00830}00830\ \ \ \ \ \ \ event.preventDefault();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00831}00831\ \ \ \ \ \ \ if\ (searchSelectWindow.style.display\ ==\ 'block')\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00832}00832\ \ \ \ \ \ \ \ \ searchBox.CloseSelectionWindow();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00833}00833\ \ \ \ \ \ \ \}\ else\ \{}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00834}00834\ \ \ \ \ \ \ \ \ searchBox.OnSearchSelectShow();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00835}00835\ \ \ \ \ \ \ \ \ searchBox.DOMSearchSelectWindow().focus();}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00836}00836\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00837}00837\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00838}00838\ \ \ \});}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00839}00839\ \}}
+\DoxyCodeLine{\Hypertarget{search_8js_source_l00840}00840\ /*\ @license-\/end\ */}
+
+\end{DoxyCode}

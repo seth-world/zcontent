@@ -1859,7 +1859,7 @@ DicEditMWn::appendNewKey () {
 }//appendNewKey
 
 
-void
+bool
 DicEditMWn::keyChange(QModelIndex &pIdx) {
   QVariant wV;
   ZDataReference wDRef;
@@ -1875,7 +1875,7 @@ DicEditMWn::keyChange(QModelIndex &pIdx) {
   wV=wIdx.data(ZQtDataReference);
   if (wV.isNull()) {
     statusBarMessage("DicEditMWn::keyChange-E-INVDATA No infradata found for key at row <%d> ",pIdx.row());
-    return;
+    return false ;
   }
   wDRef = wV.value<ZDataReference>();
 
@@ -1883,7 +1883,7 @@ DicEditMWn::keyChange(QModelIndex &pIdx) {
     wIdx=wIdx.parent();  /* if field, jump to key item */
   } else if (wDRef.getZEntity()!=ZEntity_KeyDic) {
     statusBarMessage("DicEdit::_keyCopy-E-INVTYP Invalid infradata entity type <%s> ",decode_ZEntity(wDRef.getZEntity()).toCChar());
-    return ;
+    return false ;
   } /*else {
     wIdx = pIdx; // index points to a key item (at column 0)
   }*/
@@ -1891,12 +1891,12 @@ DicEditMWn::keyChange(QModelIndex &pIdx) {
   wV=wIdx.data(ZQtDataReference);
   if (wV.isNull()) {
     fprintf(stderr,"DicEditMWn::keyChange-E-INVDATA Invalid infra data for key at row %d (QVariant)\n",wIdx.row());
-    return;
+    return false;
   }
   wDRef = wV.value<ZDataReference>();
   if (wDRef.isInvalid()) {
     fprintf(stderr,"DicEditMWn::keyChange-E-INVDATA Invalid infra data for key at row %d (ZDataReference)\n",wIdx.row());
-    return;
+    return false;
   }
   wKHR=wDRef.getPtr<ZKeyHeaderRow>();
 //  ZKeyHeaderRow wKeyHeaderRow(wKHR);
@@ -1911,7 +1911,7 @@ DicEditMWn::keyChange(QModelIndex &pIdx) {
     int wRet=wKeyDLg->exec();
     if (wRet==QDialog::Rejected) {
       wKeyDLg->deleteLater();
-      return ;
+      return true;
     }
 
     wKeyHeaderRow._copyFrom(wKeyDLg->get());
@@ -1940,7 +1940,7 @@ DicEditMWn::keyChange(QModelIndex &pIdx) {
                                          "Please change." , wRow);
     if (wRet==QDialog::Rejected) {
       wKeyDLg->deleteLater();
-      return ;
+      return  true;
     }
   }// while true
 
@@ -1971,7 +1971,7 @@ DicEditMWn::keyChange(QModelIndex &pIdx) {
     keyTRv->ItemModel->item(wRow,cst_TooltipColumn)->setText(wKHR->ToolTip.toCChar());
     keyTRv->ItemModel->item(wRow,cst_TooltipColumn)->setTextAlignment(Qt::AlignLeft);
   }
-  return ;
+  return true;
 }//keyChange
 
 
@@ -2355,59 +2355,59 @@ DicEditMWn::keyfieldMovedown() {
 
 
 
-void
+bool
 DicEditMWn::KeyTRvKeyFiltered(int pKey,QKeyEvent* pEvent)
 {
 
   if(pKey == Qt::Key_Escape) {
     Quit();
-    return;
+    return true;
   }
   if(pKey == Qt::Key_Insert)
   {
     insertNewKey();
-    return;
+    return true;
   }
   if(pKey == Qt::Key_Delete)
   {
     QModelIndex wIdx=keyTRv->currentIndex();
     if (!wIdx.isValid())
-      return;
+      return true;
     if (wIdx.column()!=0)
       wIdx=wIdx.siblingAtColumn(0);
     QVariant wV=wIdx.data(ZQtDataReference);
     if (wV.isNull())
-      return;
+      return true;
     ZDataReference wDRef = wV.value<ZDataReference>();
     if (wDRef.isInvalid())
-      return;
+      return true;
 
     if (wDRef.getZEntity()==ZEntity_KeyDic) {
       _keyDelete(wIdx);
-      return;
+      return true;
     }
     if (wDRef.getZEntity()!=ZEntity_KeyField) {
-      return;
+      return true;
     }
     _keyfieldDelete(wIdx);
-    return;
+    return true;
   }//Qt::Key_Delete
 
-  return;
+  return true;
 }//KeyTReKeyFiltered
 
-void
+bool
 DicEditMWn::KeyTRvMouseFiltered(int pKey,QMouseEvent* pEvent)
 {
   if (pKey==ZEF_DoubleClickLeft) {
     QModelIndex wIdx= keyTRv->currentIndex();
 
     if(!wIdx.isValid())
-      return;
+      return false;
 
-    keyChange(wIdx);
+    return keyChange(wIdx);
   }
-
+  return false;
 }
 /* deleting a field : must care about field used within key
  *  search for all key field item linked with current field item
@@ -3255,13 +3255,13 @@ void DicEditMWn::acceptFieldChange(ZFieldDescription& pField,QModelIndex &wIdx)
 } //acceptFieldChange
 
 
-void
+bool
 DicEditMWn::FieldTBvKeyFiltered(int pKey, QKeyEvent *pEvent)
 {
 
   if(pKey == Qt::Key_Escape) {
     Quit();
-    return;
+    return true;
   }
 
   if(pKey == Qt::Key_Insert)
@@ -3274,19 +3274,19 @@ DicEditMWn::FieldTBvKeyFiltered(int pKey, QKeyEvent *pEvent)
     if (wIdx.isValid())
       fieldInsertNewBefore(wIdx);
 //    createEvent(WR);
-    return;
+    return true;
   }
   if(pKey == Qt::Key_Delete)
   {
     fieldDelete();
-    return;
+    return true;
   }
 
-  return;
+  return false;
 
 }//KeyTReKeyFiltered
 
-void
+bool
 DicEditMWn::FieldTBvMouseFiltered(int pKey, QMouseEvent *pEvent)
 {
   switch (pKey)
@@ -3297,15 +3297,15 @@ DicEditMWn::FieldTBvMouseFiltered(int pKey, QMouseEvent *pEvent)
     if(!wIdx.isValid())
     {
       statusBar()->showMessage(QObject::tr("No row element selected","DicEdit"),cst_MessageDuration);
-      return;
+      return false;
     }
     fieldChange(wIdx);
-    break;
+    return true;
   }
     //  case ZEF_SingleClickLeft:
   }
 
-  return;
+  return false;
 }
 
 

@@ -1,0 +1,41 @@
+\doxysection{zcollectionlist.\+h}
+\hypertarget{zcollectionlist_8h_source}{}\label{zcollectionlist_8h_source}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zcollectionlist.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zcollectionlist.h}}
+\mbox{\hyperlink{zcollectionlist_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZCOLLECTIONLIST\_H}}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ ZCOLLECTIONLIST\_H}}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <QDialog>}}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zsearchentity_8h}{zcontent/zindexedfile/zsearchentity.h}}>}}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00007}00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacezbs}{zbs}}\ \{}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00008}00008\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classzbs_1_1_z_search_parser}{ZSearchParser}};}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00009}00009\ \}}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00011}00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespace_ui}{Ui}}\ \{}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00012}00012\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_z_collection_list}{ZCollectionList}};}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00013}00013\ \}}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00016}00016\ \textcolor{keyword}{class\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZQTableView}};}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00018}\mbox{\hyperlink{class_z_collection_list}{00018}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_z_collection_list}{ZCollectionList}}\ :\ \textcolor{keyword}{public}\ QDialog}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00019}00019\ \{}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00020}00020\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Q\_OBJECT}}}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00022}00022\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00023}00023\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{class_z_collection_list}{ZCollectionList}}(\mbox{\hyperlink{classzbs_1_1_z_search_parser}{zbs::ZSearchParser}}\ *pParser,\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QWidget}}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{parent}}\ =\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00024}00024\ \ \ \mbox{\hyperlink{class_z_collection_list_aaaa5ee4a5c03568118a15ec4712c8328}{\string~ZCollectionList}}();}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00025}00025\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_collection_list_a192a5a9cbfe683fe00eda2afae5eae90}{setup}}();}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00027}00027\ \ \ std::shared\_ptr<ZSearchEntity>\ \mbox{\hyperlink{class_z_collection_list_abd3b218590b3d0c753570d80396b6ea8}{get}}();}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00029}\mbox{\hyperlink{class_z_collection_list_aca31fd0eeb5b3219560a7de6d88d0f7b}{00029}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZQTableView}}*\ \mbox{\hyperlink{class_z_collection_list_aca31fd0eeb5b3219560a7de6d88d0f7b}{CollectionListTBv}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00030}00030\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00031}00031\ \ \ \mbox{\hyperlink{classzbs_1_1_z_search_parser}{zbs::ZSearchParser}}*\ Parser=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00032}00032\ \ \ \mbox{\hyperlink{class_ui_1_1_z_collection_list}{Ui::ZCollectionList}}\ *ui;}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00033}00033\ \};}
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{zcollectionlist_8h_source_l00035}00035\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZCOLLECTIONLIST\_H}}
+
+\end{DoxyCode}

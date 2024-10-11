@@ -1,0 +1,197 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/poolvisu.h File Reference}
+\hypertarget{poolvisu_8h}{}\label{poolvisu_8h}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/poolvisu.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/poolvisu.h}}
+{\ttfamily \#include $<$QMain\+Window$>$}\newline
+{\ttfamily \#include $<$ztoolset/zstatus.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zdatabuffer.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zrandomfile/zfiledescriptor.\+h$>$}\newline
+{\ttfamily \#include $<$zio/zioutils.\+h$>$}\newline
+{\ttfamily \#include $<$QVariant$>$}\newline
+{\ttfamily \#include $<$QBrush$>$}\newline
+{\ttfamily \#include $<$QContext\+Menu\+Event$>$}\newline
+Include dependency graph for poolvisu.\+h\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classpool_visu}{pool\+Visu}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_ui}{Ui}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{poolvisu_8h_ac251021cd5f229219a1b025ef1569006}{ZPool\+Repair}} \+: uint8\+\_\+t \{ \newline
+\mbox{\hyperlink{poolvisu_8h_ac251021cd5f229219a1b025ef1569006ad39528609a3fb100841dab9bface239d}{ZPOR\+\_\+\+Test\+Run}} = 0
+, \mbox{\hyperlink{poolvisu_8h_ac251021cd5f229219a1b025ef1569006add0264a27ec1bd7b3ed4f8f45dd92e52}{ZPOR\+\_\+\+Fix\+State}} = 1
+, \mbox{\hyperlink{poolvisu_8h_ac251021cd5f229219a1b025ef1569006a5f8fd0e522d1267e1d7888c94e593ca6}{ZPOR\+\_\+\+Fix\+Size}} = 2
+, \mbox{\hyperlink{poolvisu_8h_ac251021cd5f229219a1b025ef1569006a903b226890e16da0833e6fa61761bd1d}{ZPOR\+\_\+\+Fix\+Orphan}} = 4
+, \newline
+\mbox{\hyperlink{poolvisu_8h_ac251021cd5f229219a1b025ef1569006a4ceb2b4331338642464b57e7c1a02cc3}{ZPOR\+\_\+\+Unknown}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{poolvisu_8h_ada9adf0b46e62c4d4f658a175370dcf5}{grab\+Free\+Forward}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URIContent}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Fd\+Content}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+File\+Size}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Start\+Data}}, \mbox{\hyperlink{class_z_block_pool}{ZBlock\+Pool}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZFBT}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Free\+Rank}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}(\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&)$>$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Display}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{poolvisu_8h_add8b28f2153c95f07d6409cb9ed85084}{position\+Text}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZQGraphic\+Scene}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Scene}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QGraphics\+Rect\+Item}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Item}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Text}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QFont}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Font}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QBrush}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Brush}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{poolvisu_8h_a8d6129f0cc8850c03987f970f67e00af}{position\+Value}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZQGraphic\+Scene}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Scene}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QGraphics\+Rect\+Item}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Item}}, \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Value}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QFont}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Font}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QBrush}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Brush}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{poolvisu_8h_aa0aa8294b6c98e54359de498033f21c8}{ZException\+Display\+All}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}(\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&)$>$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Display}})
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{poolvisu_8h_a4286a81efe396f8f97582c02a58e6114}{decode\+\_\+\+ZBEx}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+BEx}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{poolvisu_8h_adca992d5c44418a18e557b80901a1b84}{cst\+\_\+\+Message\+Duration}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{poolvisu_8h_ac251021cd5f229219a1b025ef1569006}\label{poolvisu_8h_ac251021cd5f229219a1b025ef1569006} 
+\index{poolvisu.h@{poolvisu.h}!ZPoolRepair@{ZPoolRepair}}
+\index{ZPoolRepair@{ZPoolRepair}!poolvisu.h@{poolvisu.h}}
+\doxysubsubsection{\texorpdfstring{ZPoolRepair}{ZPoolRepair}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{poolvisu_8h_ac251021cd5f229219a1b025ef1569006}{ZPool\+Repair}} \+: \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZPOR\_TestRun@{ZPOR\_TestRun}!poolvisu.h@{poolvisu.h}}\index{poolvisu.h@{poolvisu.h}!ZPOR\_TestRun@{ZPOR\_TestRun}}}\Hypertarget{poolvisu_8h_ac251021cd5f229219a1b025ef1569006ad39528609a3fb100841dab9bface239d}\label{poolvisu_8h_ac251021cd5f229219a1b025ef1569006ad39528609a3fb100841dab9bface239d} 
+ZPOR\+\_\+\+Test\+Run&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZPOR\_FixState@{ZPOR\_FixState}!poolvisu.h@{poolvisu.h}}\index{poolvisu.h@{poolvisu.h}!ZPOR\_FixState@{ZPOR\_FixState}}}\Hypertarget{poolvisu_8h_ac251021cd5f229219a1b025ef1569006add0264a27ec1bd7b3ed4f8f45dd92e52}\label{poolvisu_8h_ac251021cd5f229219a1b025ef1569006add0264a27ec1bd7b3ed4f8f45dd92e52} 
+ZPOR\+\_\+\+Fix\+State&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZPOR\_FixSize@{ZPOR\_FixSize}!poolvisu.h@{poolvisu.h}}\index{poolvisu.h@{poolvisu.h}!ZPOR\_FixSize@{ZPOR\_FixSize}}}\Hypertarget{poolvisu_8h_ac251021cd5f229219a1b025ef1569006a5f8fd0e522d1267e1d7888c94e593ca6}\label{poolvisu_8h_ac251021cd5f229219a1b025ef1569006a5f8fd0e522d1267e1d7888c94e593ca6} 
+ZPOR\+\_\+\+Fix\+Size&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZPOR\_FixOrphan@{ZPOR\_FixOrphan}!poolvisu.h@{poolvisu.h}}\index{poolvisu.h@{poolvisu.h}!ZPOR\_FixOrphan@{ZPOR\_FixOrphan}}}\Hypertarget{poolvisu_8h_ac251021cd5f229219a1b025ef1569006a903b226890e16da0833e6fa61761bd1d}\label{poolvisu_8h_ac251021cd5f229219a1b025ef1569006a903b226890e16da0833e6fa61761bd1d} 
+ZPOR\+\_\+\+Fix\+Orphan&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZPOR\_Unknown@{ZPOR\_Unknown}!poolvisu.h@{poolvisu.h}}\index{poolvisu.h@{poolvisu.h}!ZPOR\_Unknown@{ZPOR\_Unknown}}}\Hypertarget{poolvisu_8h_ac251021cd5f229219a1b025ef1569006a4ceb2b4331338642464b57e7c1a02cc3}\label{poolvisu_8h_ac251021cd5f229219a1b025ef1569006a4ceb2b4331338642464b57e7c1a02cc3} 
+ZPOR\+\_\+\+Unknown&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{poolvisu_8h_source_l00032}{32}} of file \mbox{\hyperlink{poolvisu_8h_source}{poolvisu.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{poolvisu_8h_a4286a81efe396f8f97582c02a58e6114}\label{poolvisu_8h_a4286a81efe396f8f97582c02a58e6114} 
+\index{poolvisu.h@{poolvisu.h}!decode\_ZBEx@{decode\_ZBEx}}
+\index{decode\_ZBEx@{decode\_ZBEx}!poolvisu.h@{poolvisu.h}}
+\doxysubsubsection{\texorpdfstring{decode\_ZBEx()}{decode\_ZBEx()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} decode\+\_\+\+ZBEx (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\+\_\+t}}}]{p\+BEx }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrfutilities_8cpp_source_l00830}{830}} of file \mbox{\hyperlink{zrfutilities_8cpp_source}{zrfutilities.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrfutilities_8h_source_l00018}{ZBEX\+\_\+\+Content\+Zero\+Size}}, \mbox{\hyperlink{zrfutilities_8h_source_l00012}{ZBEX\+\_\+\+Correct}}, \mbox{\hyperlink{zrfutilities_8h_source_l00023}{ZBEX\+\_\+\+Lock\+Not\+Same}}, \mbox{\hyperlink{zrfutilities_8h_source_l00020}{ZBEX\+\_\+\+Must\+Be\+Free\+Or\+Deleted}}, \mbox{\hyperlink{zrfutilities_8h_source_l00019}{ZBEX\+\_\+\+Must\+Be\+Used}}, \mbox{\hyperlink{zrfutilities_8h_source_l00014}{ZBEX\+\_\+\+Orphan}}, \mbox{\hyperlink{zrfutilities_8h_source_l00024}{ZBEX\+\_\+\+Pid\+Not\+Same}}, \mbox{\hyperlink{zrfutilities_8h_source_l00017}{ZBEX\+\_\+\+Pool\+Zero\+Size}}, \mbox{\hyperlink{zrfutilities_8h_source_l00021}{ZBEX\+\_\+\+Size\+Not\+Same}}, \mbox{\hyperlink{zrfutilities_8h_source_l00022}{ZBEX\+\_\+\+State\+Not\+Same}}, and \mbox{\hyperlink{zrfutilities_8h_source_l00013}{ZBEX\+\_\+\+Sys\+Bad\+Address}}.
+
+
+
+Referenced by \mbox{\hyperlink{poolvisu_8cpp_source_l00749}{pool\+Visu\+::data\+Setup()}}, \mbox{\hyperlink{poolvisu_8cpp_source_l01875}{fix\+Pool()}}, and \mbox{\hyperlink{editblockdlg_8cpp_source_l00021}{edit\+Block\+DLg\+::setup()}}.
+
+\Hypertarget{poolvisu_8h_ada9adf0b46e62c4d4f658a175370dcf5}\label{poolvisu_8h_ada9adf0b46e62c4d4f658a175370dcf5} 
+\index{poolvisu.h@{poolvisu.h}!grabFreeForward@{grabFreeForward}}
+\index{grabFreeForward@{grabFreeForward}!poolvisu.h@{poolvisu.h}}
+\doxysubsubsection{\texorpdfstring{grabFreeForward()}{grabFreeForward()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} grab\+Free\+Forward (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+URIContent,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Fd\+Content,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+File\+Size,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Start\+Data,  }\item[{\mbox{\hyperlink{class_z_block_pool}{ZBlock\+Pool}} \&}]{p\+ZFBT,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \&}]{p\+Free\+Rank,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}(\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&)$>$}]{p\+Display = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{poolvisu_8cpp_source_l01998}{1998}} of file \mbox{\hyperlink{poolvisu_8cpp_source}{poolvisu.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomfile_8cpp_source_l09870}{decode\+\_\+\+ZBS()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zblock_8cpp_source_l00058}{ZBlock\+Header\+\_\+\+Export\+::serialize()}}, \mbox{\hyperlink{zblock_8cpp_source_l00018}{ZBlock\+Header\+\_\+\+Export\+::set()}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00133}{ZBS\+\_\+\+Free}}.
+
+
+
+Referenced by \mbox{\hyperlink{poolvisu_8cpp_source_l02209}{pool\+Visu\+::repair()}}.
+
+\Hypertarget{poolvisu_8h_add8b28f2153c95f07d6409cb9ed85084}\label{poolvisu_8h_add8b28f2153c95f07d6409cb9ed85084} 
+\index{poolvisu.h@{poolvisu.h}!positionText@{positionText}}
+\index{positionText@{positionText}!poolvisu.h@{poolvisu.h}}
+\doxysubsubsection{\texorpdfstring{positionText()}{positionText()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} position\+Text (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZQGraphic\+Scene}} \texorpdfstring{$\ast$}{*}}]{p\+Scene,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QGraphics\+Rect\+Item}} \texorpdfstring{$\ast$}{*}}]{p\+Item,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Text,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QFont}} \&}]{p\+Font,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QBrush}} \texorpdfstring{$\ast$}{*}}]{p\+Brush = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{poolvisu_8cpp_source_l01213}{1213}} of file \mbox{\hyperlink{poolvisu_8cpp_source}{poolvisu.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{poolvisu_8cpp_source_l00062}{cst\+\_\+\+GAddr\+Pos\+XNudge}}, \mbox{\hyperlink{poolvisu_8cpp_source_l00063}{cst\+\_\+\+GAddr\+Pos\+YNudge}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{poolvisu_8cpp_source_l01230}{position\+Value()}}.
+
+\Hypertarget{poolvisu_8h_a8d6129f0cc8850c03987f970f67e00af}\label{poolvisu_8h_a8d6129f0cc8850c03987f970f67e00af} 
+\index{poolvisu.h@{poolvisu.h}!positionValue@{positionValue}}
+\index{positionValue@{positionValue}!poolvisu.h@{poolvisu.h}}
+\doxysubsubsection{\texorpdfstring{positionValue()}{positionValue()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} position\+Value (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZQGraphic\+Scene}} \texorpdfstring{$\ast$}{*}}]{p\+Scene,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QGraphics\+Rect\+Item}} \texorpdfstring{$\ast$}{*}}]{p\+Item,  }\item[{\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+Value,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QFont}} \&}]{p\+Font,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QBrush}} \texorpdfstring{$\ast$}{*}}]{p\+Brush = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{poolvisu_8cpp_source_l01230}{1230}} of file \mbox{\hyperlink{poolvisu_8cpp_source}{poolvisu.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{poolvisu_8cpp_source_l01213}{position\+Text()}}.
+
+
+
+Referenced by \mbox{\hyperlink{poolvisu_8cpp_source_l00749}{pool\+Visu\+::data\+Setup()}}.
+
+\Hypertarget{poolvisu_8h_aa0aa8294b6c98e54359de498033f21c8}\label{poolvisu_8h_aa0aa8294b6c98e54359de498033f21c8} 
+\index{poolvisu.h@{poolvisu.h}!ZExceptionDisplayAll@{ZExceptionDisplayAll}}
+\index{ZExceptionDisplayAll@{ZExceptionDisplayAll}!poolvisu.h@{poolvisu.h}}
+\doxysubsubsection{\texorpdfstring{ZExceptionDisplayAll()}{ZExceptionDisplayAll()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZException\+Display\+All (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}(\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&)$>$}]{p\+Display }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{poolvisu_8cpp_source_l02188}{2188}} of file \mbox{\hyperlink{poolvisu_8cpp_source}{poolvisu.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{poolvisu_8cpp_source_l02209}{pool\+Visu\+::repair()}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{poolvisu_8h_adca992d5c44418a18e557b80901a1b84}\label{poolvisu_8h_adca992d5c44418a18e557b80901a1b84} 
+\index{poolvisu.h@{poolvisu.h}!cst\_MessageDuration@{cst\_MessageDuration}}
+\index{cst\_MessageDuration@{cst\_MessageDuration}!poolvisu.h@{poolvisu.h}}
+\doxysubsubsection{\texorpdfstring{cst\_MessageDuration}{cst\_MessageDuration}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} cst\+\_\+\+Message\+Duration\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l00091}{91}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{poolvisu_8cpp_source_l02593}{pool\+Visu\+::status\+Bar\+Message()}}.
+

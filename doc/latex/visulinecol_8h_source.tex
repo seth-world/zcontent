@@ -1,0 +1,43 @@
+\doxysection{visulinecol.\+h}
+\hypertarget{visulinecol_8h_source}{}\label{visulinecol_8h_source}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/visulinecol.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/visulinecol.h}}
+\mbox{\hyperlink{visulinecol_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ VISULINECOL\_H}}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ VISULINECOL\_H}}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <QModelIndex>}}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00006}\mbox{\hyperlink{class_visu_line_col}{00006}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_visu_line_col}{VisuLineCol}}\ \{}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00007}00007\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00008}00008\ \ \ \mbox{\hyperlink{class_visu_line_col_aa2e8771c6bb323326016df40322d4884}{VisuLineCol}}();}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00009}\mbox{\hyperlink{class_visu_line_col_a582b3831bbf31f11a4420599bb7204d1}{00009}}\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_visu_line_col_a582b3831bbf31f11a4420599bb7204d1}{line}}=0;}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00010}\mbox{\hyperlink{class_visu_line_col_ad5755a1c892eef1517c4aae6b5bd871d}{00010}}\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_visu_line_col_ad5755a1c892eef1517c4aae6b5bd871d}{col}}=0;}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00011}\mbox{\hyperlink{class_visu_line_col_a914e8dc4375834b5f3c4ca5af45e8acc}{00011}}\ \ \ \mbox{\hyperlink{class_visu_line_col}{VisuLineCol}}\&\ \mbox{\hyperlink{class_visu_line_col_a914e8dc4375834b5f3c4ca5af45e8acc}{compute}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\_t}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wOffset}})\ \{}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00012}00012\ \ \ \ \ \textcolor{comment}{/*\ highlight\ searched\ result\ in\ table\ view}}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00013}00013\ \textcolor{comment}{\ \ \ *\ start\ block\ :}}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00014}00014\ \textcolor{comment}{\ \ \ \ \ offset\ /\ 16\ -\/>\ gives\ the\ line}}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00015}00015\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00016}00016\ \textcolor{comment}{\ \ \ \ offset\ -\/\ (offset\ /\ 16)\ gives\ the\ column}}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00017}00017\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wOf}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wOffset}};}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00020}00020\ \ \ \ \ \mbox{\hyperlink{class_visu_line_col_a582b3831bbf31f11a4420599bb7204d1}{line}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wOf}}\ /\ 16.0);}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00022}00022\ \ \ \ \ \mbox{\hyperlink{class_visu_line_col_ad5755a1c892eef1517c4aae6b5bd871d}{col}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wOf}}\ -\/\ (\textcolor{keywordtype}{double}\ (\mbox{\hyperlink{class_visu_line_col_a582b3831bbf31f11a4420599bb7204d1}{line}})*\ 16.0));}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00024}00024\ \ \ \ \ \mbox{\hyperlink{class_visu_line_col_ad5755a1c892eef1517c4aae6b5bd871d}{col}}\ =\ \mbox{\hyperlink{class_visu_line_col_ad5755a1c892eef1517c4aae6b5bd871d}{col}}\ +\ (\mbox{\hyperlink{class_visu_line_col_ad5755a1c892eef1517c4aae6b5bd871d}{col}}\ /\ 4);}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00026}00026\ \ \ \ \ \textcolor{keywordflow}{return}\ *\textcolor{keyword}{this};}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00027}00027\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00028}\mbox{\hyperlink{class_visu_line_col_ae58b71f80be496f13b9ae53e0cda6f34}{00028}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QModelIndex}}\ \mbox{\hyperlink{class_visu_line_col_ae58b71f80be496f13b9ae53e0cda6f34}{getIndex}}()\ \{}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00029}00029\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QModelIndex}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReturn}};}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00030}00030\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReturn}}.sibling(\mbox{\hyperlink{class_visu_line_col_a582b3831bbf31f11a4420599bb7204d1}{line}},\mbox{\hyperlink{class_visu_line_col_ad5755a1c892eef1517c4aae6b5bd871d}{col}});}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00031}00031\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wReturn}};}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00032}00032\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00033}00033\ \};}
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00036}00036\ }
+\DoxyCodeLine{\Hypertarget{visulinecol_8h_source_l00037}00037\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ VISULINECOL\_H}}
+
+\end{DoxyCode}

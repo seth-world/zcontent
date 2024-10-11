@@ -1,0 +1,161 @@
+\doxysection{resize.\+js}
+\hypertarget{resize_8js_source}{}\label{resize_8js_source}\index{html/resize.js@{html/resize.js}}
+\mbox{\hyperlink{resize_8js}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00001}00001\ /*}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00002}00002\ \ @licstart\ \ The\ following\ is\ the\ entire\ license\ notice\ for\ the\ JavaScript\ code\ in\ this\ file.}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00004}00004\ \ The\ MIT\ License\ (MIT)}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00006}00006\ \ Copyright\ (C)\ 1997-\/2020\ by\ Dimitri\ van\ Heesch}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00008}00008\ \ Permission\ is\ hereby\ granted,\ free\ of\ charge,\ to\ any\ person\ obtaining\ a\ copy\ of\ this\ software}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00009}00009\ \ and\ associated\ documentation\ files\ (the\ "{}Software"{}),\ to\ deal\ in\ the\ Software\ without\ restriction,}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00010}00010\ \ including\ without\ limitation\ the\ rights\ to\ use,\ copy,\ modify,\ merge,\ publish,\ distribute,}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00011}00011\ \ sublicense,\ and/or\ sell\ copies\ of\ the\ Software,\ and\ to\ permit\ persons\ to\ whom\ the\ Software\ is}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00012}00012\ \ furnished\ to\ do\ so,\ subject\ to\ the\ following\ conditions:}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00014}00014\ \ The\ above\ copyright\ notice\ and\ this\ permission\ notice\ shall\ be\ included\ in\ all\ copies\ or}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00015}00015\ \ substantial\ portions\ of\ the\ Software.}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00017}00017\ \ THE\ SOFTWARE\ IS\ PROVIDED\ "{}AS\ IS"{},\ WITHOUT\ WARRANTY\ OF\ ANY\ KIND,\ EXPRESS\ OR\ IMPLIED,\ INCLUDING}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00018}00018\ \ BUT\ NOT\ LIMITED\ TO\ THE\ WARRANTIES\ OF\ MERCHANTABILITY,\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE\ AND}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00019}00019\ \ NONINFRINGEMENT.\ IN\ NO\ EVENT\ SHALL\ THE\ AUTHORS\ OR\ COPYRIGHT\ HOLDERS\ BE\ LIABLE\ FOR\ ANY\ CLAIM,}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00020}00020\ \ DAMAGES\ OR\ OTHER\ LIABILITY,\ WHETHER\ IN\ AN\ ACTION\ OF\ CONTRACT,\ TORT\ OR\ OTHERWISE,\ ARISING\ FROM,}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00021}00021\ \ OUT\ OF\ OR\ IN\ CONNECTION\ WITH\ THE\ SOFTWARE\ OR\ THE\ USE\ OR\ OTHER\ DEALINGS\ IN\ THE\ SOFTWARE.}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00023}00023\ \ @licend\ \ The\ above\ is\ the\ entire\ license\ notice\ for\ the\ JavaScript\ code\ in\ this\ file}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00024}00024\ \ */}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00025}00025\ var\ once=1;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00026}00026\ function\ initResizable()}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00027}00027\ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00028}00028\ \ \ var\ cookie\_namespace\ =\ 'doxygen';}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00029}00029\ \ \ var\ sidenav,navtree,content,header,barWidth=6,desktop\_vp=768,titleHeight;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00031}00031\ \ \ function\ readSetting(cookie)}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00032}00032\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00033}00033\ \ \ \ \ if\ (window.chrome)\ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00034}00034\ \ \ \ \ \ \ var\ val\ =\ localStorage.getItem(cookie\_namespace+'\_width');}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00035}00035\ \ \ \ \ \ \ if\ (val)\ return\ val;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00036}00036\ \ \ \ \ \}\ else\ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00037}00037\ \ \ \ \ \ \ var\ myCookie\ =\ cookie\_namespace+"{}\_"{}+cookie+"{}="{};}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00038}00038\ \ \ \ \ \ \ if\ (document.cookie)\ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00039}00039\ \ \ \ \ \ \ \ \ var\ index\ =\ document.cookie.indexOf(myCookie);}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00040}00040\ \ \ \ \ \ \ \ \ if\ (index\ !=\ -\/1)\ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00041}00041\ \ \ \ \ \ \ \ \ \ \ var\ valStart\ =\ index\ +\ myCookie.length;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00042}00042\ \ \ \ \ \ \ \ \ \ \ var\ valEnd\ =\ document.cookie.indexOf("{};"{},\ valStart);}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ if\ (valEnd\ ==\ -\/1)\ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ valEnd\ =\ document.cookie.length;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ var\ val\ =\ document.cookie.substring(valStart,\ valEnd);}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ return\ val;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00048}00048\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00049}00049\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00050}00050\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00051}00051\ \ \ \ \ return\ 250;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00052}00052\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00054}00054\ \ \ function\ writeSetting(cookie,\ val)}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00055}00055\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00056}00056\ \ \ \ \ if\ (window.chrome)\ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00057}00057\ \ \ \ \ \ \ localStorage.setItem(cookie\_namespace+"{}\_width"{},val);}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00058}00058\ \ \ \ \ \}\ else\ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00059}00059\ \ \ \ \ \ \ var\ date\ =\ new\ Date();}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00060}00060\ \ \ \ \ \ \ date.setTime(date.getTime()+(10*365*24*60*60*1000));\ //\ default\ expiration\ is\ one\ week}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00061}00061\ \ \ \ \ \ \ expiration\ =\ date.toGMTString();}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00062}00062\ \ \ \ \ \ \ document.cookie\ =\ cookie\_namespace\ +\ "{}\_"{}\ +\ cookie\ +\ "{}="{}\ +\ val\ +\ "{};\ SameSite=Lax;\ expires="{}\ +\ expiration+"{};\ path=/"{};}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00063}00063\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00064}00064\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00066}00066\ \ \ function\ resizeWidth()}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00067}00067\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00068}00068\ \ \ \ \ var\ windowWidth\ =\ \$(window).width()\ +\ "{}px"{};}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00069}00069\ \ \ \ \ var\ sidenavWidth\ =\ \$(sidenav).outerWidth();}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00070}00070\ \ \ \ \ content.css(\{marginLeft:parseInt(sidenavWidth)+"{}px"{}\});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00071}00071\ \ \ \ \ if\ (typeof\ page\_layout!=='undefined'\ \&\&\ page\_layout==1)\ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00072}00072\ \ \ \ \ \ \ footer.css(\{marginLeft:parseInt(sidenavWidth)+"{}px"{}\});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00073}00073\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00074}00074\ \ \ \ \ writeSetting('width',sidenavWidth-\/barWidth);}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00075}00075\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00076}00076\ }
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00077}00077\ \ \ function\ restoreWidth(navWidth)}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00078}00078\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00079}00079\ \ \ \ \ var\ windowWidth\ =\ \$(window).width()\ +\ "{}px"{};}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00080}00080\ \ \ \ \ content.css(\{marginLeft:parseInt(navWidth)+barWidth+"{}px"{}\});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00081}00081\ \ \ \ \ if\ (typeof\ page\_layout!=='undefined'\ \&\&\ page\_layout==1)\ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00082}00082\ \ \ \ \ \ \ footer.css(\{marginLeft:parseInt(navWidth)+barWidth+"{}px"{}\});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00083}00083\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00084}00084\ \ \ \ \ sidenav.css(\{width:navWidth\ +\ "{}px"{}\});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00085}00085\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00087}00087\ \ \ function\ resizeHeight()}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00088}00088\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00089}00089\ \ \ \ \ var\ headerHeight\ =\ header.outerHeight();}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00090}00090\ \ \ \ \ var\ footerHeight\ =\ footer.outerHeight();}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00091}00091\ \ \ \ \ var\ windowHeight\ =\ \$(window).height();}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00092}00092\ \ \ \ \ var\ contentHeight,navtreeHeight,sideNavHeight;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00093}00093\ \ \ \ \ if\ (typeof\ page\_layout==='undefined'\ ||\ page\_layout==0)\ \{\ /*\ DISABLE\_INDEX=NO\ */}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00094}00094\ \ \ \ \ \ \ contentHeight\ =\ windowHeight\ -\/\ headerHeight\ -\/\ footerHeight;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00095}00095\ \ \ \ \ \ \ navtreeHeight\ =\ contentHeight;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00096}00096\ \ \ \ \ \ \ sideNavHeight\ =\ contentHeight;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00097}00097\ \ \ \ \ \}\ else\ if\ (page\_layout==1)\ \{\ /*\ DISABLE\_INDEX=YES\ */}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00098}00098\ \ \ \ \ \ \ contentHeight\ =\ windowHeight\ -\/\ footerHeight;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00099}00099\ \ \ \ \ \ \ navtreeHeight\ =\ windowHeight\ -\/\ headerHeight;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00100}00100\ \ \ \ \ \ \ sideNavHeight\ =\ windowHeight;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00101}00101\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00102}00102\ \ \ \ \ content.css(\{height:contentHeight\ +\ "{}px"{}\});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00103}00103\ \ \ \ \ navtree.css(\{height:navtreeHeight\ +\ "{}px"{}\});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00104}00104\ \ \ \ \ sidenav.css(\{height:sideNavHeight\ +\ "{}px"{}\});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00105}00105\ \ \ \ \ if\ (location.hash.slice(1))\ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00106}00106\ \ \ \ \ \ \ (document.getElementById(location.hash.slice(1))||document.body).scrollIntoView();}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00107}00107\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00108}00108\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00110}00110\ \ \ function\ collapseExpand()}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00111}00111\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00112}00112\ \ \ \ \ var\ newWidth;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00113}00113\ \ \ \ \ if\ (sidenav.width()>0)\ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00114}00114\ \ \ \ \ \ \ newWidth=0;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00115}00115\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00116}00116\ \ \ \ \ else\ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00117}00117\ \ \ \ \ \ \ var\ width\ =\ readSetting('width');}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00118}00118\ \ \ \ \ \ \ newWidth\ =\ (width>250\ \&\&\ width<\$(window).width())\ ?\ width\ :\ 250;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00119}00119\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00120}00120\ \ \ \ \ restoreWidth(newWidth);}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00121}00121\ \ \ \ \ var\ sidenavWidth\ =\ \$(sidenav).outerWidth();}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00122}00122\ \ \ \ \ writeSetting('width',sidenavWidth-\/barWidth);}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00123}00123\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00124}00124\ }
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00125}00125\ \ \ header\ \ =\ \$("{}\#top"{});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00126}00126\ \ \ sidenav\ =\ \$("{}\#side-\/nav"{});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00127}00127\ \ \ content\ =\ \$("{}\#doc-\/content"{});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00128}00128\ \ \ navtree\ =\ \$("{}\#nav-\/tree"{});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00129}00129\ \ \ footer\ \ =\ \$("{}\#nav-\/path"{});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00130}00130\ \ \ \$("{}.side-\/nav-\/resizable"{}).resizable(\{resize:\ function(e,\ ui)\ \{\ resizeWidth();\ \}\ \});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00131}00131\ \ \ \$(sidenav).resizable(\{\ minWidth:\ 0\ \});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00132}00132\ \ \ \$(window).resize(function()\ \{\ resizeHeight();\ \});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00133}00133\ \ \ var\ device\ =\ navigator.userAgent.toLowerCase();}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00134}00134\ \ \ var\ touch\_device\ =\ device.match(/(iphone|ipod|ipad|android)/);}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00135}00135\ \ \ if\ (touch\_device)\ \{\ /*\ wider\ split\ bar\ for\ touch\ only\ devices\ */}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00136}00136\ \ \ \ \ \$(sidenav).css(\{\ paddingRight:'20px'\ \});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00137}00137\ \ \ \ \ \$('.ui-\/resizable-\/e').css(\{\ width:'20px'\ \});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00138}00138\ \ \ \ \ \$('\#nav-\/sync').css(\{\ right:'34px'\ \});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00139}00139\ \ \ \ \ barWidth=20;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00140}00140\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00141}00141\ \ \ var\ width\ =\ readSetting('width');}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00142}00142\ \ \ if\ (width)\ \{\ restoreWidth(width);\ \}\ else\ \{\ resizeWidth();\ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00143}00143\ \ \ resizeHeight();}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00144}00144\ \ \ var\ url\ =\ location.href;}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00145}00145\ \ \ var\ i=url.indexOf("{}\#"{});}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00146}00146\ \ \ if\ (i>=0)\ window.location.hash=url.substr(i);}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00147}00147\ \ \ var\ \_preventDefault\ =\ function(evt)\ \{\ evt.preventDefault();\ \};}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00148}00148\ \ \ \$("{}\#splitbar"{}).bind("{}dragstart"{},\ \_preventDefault).bind("{}selectstart"{},\ \_preventDefault);}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00149}00149\ \ \ if\ (once)\ \{}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00150}00150\ \ \ \ \ \$("{}.ui-\/resizable-\/handle"{}).dblclick(collapseExpand);}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00151}00151\ \ \ \ \ once=0}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00152}00152\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00153}00153\ \ \ \$(window).on('load',resizeHeight);}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00154}00154\ \}}
+\DoxyCodeLine{\Hypertarget{resize_8js_source_l00155}00155\ /*\ @license-\/end\ */}
+
+\end{DoxyCode}

@@ -1,0 +1,298 @@
+\doxysection{zbs\+::ZIndex\+Result Class Reference}
+\hypertarget{classzbs_1_1_z_index_result}{}\label{classzbs_1_1_z_index_result}\index{zbs::ZIndexResult@{zbs::ZIndexResult}}
+
+
+The ZSIndex\+Result class single element resulting of a search operation using indexes. It gives the Index relative position (rank) and its corresponding \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} record address (Index is not sensible to \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} ranks, but only addresses).  
+
+
+
+
+{\ttfamily \#include $<$zindexcollection.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_index_result_a55bd5da2fd1771580bbb10af4763082e}{ZIndex\+Result}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_index_result_a1e8f69c83f6f1f29475f339dba4ee322}{ZIndex\+Result}} (\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZMFAddress}}, \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Address}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_index_result_a178f7a58f5c4752adcb85f47053a7e94}{ZIndex\+Result}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_index_result_a4b493c159af61e5124f55f0987e12812}{\texorpdfstring{$\sim$}{\string~}\+ZIndex\+Result}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \& \mbox{\hyperlink{classzbs_1_1_z_index_result_a716a56ca986cfd8749b9fc1600118c97}{\+\_\+copy\+From}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_index_result_ac8d4354510899550afe22e87f607030e}{reset}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\begin{DoxyCompactList}\small\item\em reset resets ZSIndex\+Result to is \textquotesingle{}null\textquotesingle{} value \{-\/1 ; -\/1 \} \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_index_result_a00564ac7fd6f948803d262bffb077a67}{is\+Null}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}) \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_index_result_ae5bc09fab0da395dcb07aac39e27ae65}{is\+Invalid}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}) \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \& \mbox{\hyperlink{classzbs_1_1_z_index_result_a624b77d3988f20d6839ed448e74c61f7}{operator=}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZIR}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_index_result_a62aa2a0b698241aaf78936b7629555b6}{operator==}} (\mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZIR}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_index_result_ad380bdc6c168bff1a0f1c22312c48437}{operator$>$}} (\mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZIR}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_index_result_a5aec80f6e5de022ba4c07b544bbc5895}{operator$<$}} (\mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZIR}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{static}} \mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \mbox{\hyperlink{classzbs_1_1_z_index_result_a2a978ac464b7c9bb7d4e68e102ba23fc}{create}} (\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZMFAddress}}, \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Rank}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{classzbs_1_1_z_index_result_a8c58ff202bca27d573c256994b23f83d}{Index\+Address}} =-\/1
+\begin{DoxyCompactList}\small\item\em ZIndex\+File address. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{classzbs_1_1_z_index_result_a01a4a62c7e968bb5b2908bd9db61b705}{ZMFAddress}} =-\/1
+\begin{DoxyCompactList}\small\item\em Corresponding \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} address. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The ZSIndex\+Result class single element resulting of a search operation using indexes. It gives the Index relative position (rank) and its corresponding \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} record address (Index is not sensible to \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} ranks, but only addresses). 
+
+Definition at line \mbox{\hyperlink{zindexcollection_8h_source_l00066}{66}} of file \mbox{\hyperlink{zindexcollection_8h_source}{zindexcollection.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classzbs_1_1_z_index_result_a55bd5da2fd1771580bbb10af4763082e}\label{classzbs_1_1_z_index_result_a55bd5da2fd1771580bbb10af4763082e} 
+\index{zbs::ZIndexResult@{zbs::ZIndexResult}!ZIndexResult@{ZIndexResult}}
+\index{ZIndexResult@{ZIndexResult}!zbs::ZIndexResult@{zbs::ZIndexResult}}
+\doxysubsubsection{\texorpdfstring{ZIndexResult()}{ZIndexResult()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily zbs\+::\+ZIndex\+Result\+::\+ZIndex\+Result (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zindexcollection_8h_source_l00072}{72}} of file \mbox{\hyperlink{zindexcollection_8h_source}{zindexcollection.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexcollection_8h_source_l00069}{Index\+Address}}, and \mbox{\hyperlink{zindexcollection_8h_source_l00070}{ZMFAddress}}.
+
+\Hypertarget{classzbs_1_1_z_index_result_a1e8f69c83f6f1f29475f339dba4ee322}\label{classzbs_1_1_z_index_result_a1e8f69c83f6f1f29475f339dba4ee322} 
+\index{zbs::ZIndexResult@{zbs::ZIndexResult}!ZIndexResult@{ZIndexResult}}
+\index{ZIndexResult@{ZIndexResult}!zbs::ZIndexResult@{zbs::ZIndexResult}}
+\doxysubsubsection{\texorpdfstring{ZIndexResult()}{ZIndexResult()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily ZIndex\+Result\+::\+ZIndex\+Result (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+ZMFAddress,  }\item[{\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+Index\+Address }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zindexcollection_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{zindexcollection_8cpp_source}{zindexcollection.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexcollection_8h_source_l00069}{Index\+Address}}, and \mbox{\hyperlink{zindexcollection_8h_source_l00070}{ZMFAddress}}.
+
+\Hypertarget{classzbs_1_1_z_index_result_a178f7a58f5c4752adcb85f47053a7e94}\label{classzbs_1_1_z_index_result_a178f7a58f5c4752adcb85f47053a7e94} 
+\index{zbs::ZIndexResult@{zbs::ZIndexResult}!ZIndexResult@{ZIndexResult}}
+\index{ZIndexResult@{ZIndexResult}!zbs::ZIndexResult@{zbs::ZIndexResult}}
+\doxysubsubsection{\texorpdfstring{ZIndexResult()}{ZIndexResult()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily ZIndex\+Result\+::\+ZIndex\+Result (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&}]{p\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zindexcollection_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{zindexcollection_8cpp_source}{zindexcollection.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindexcollection_8cpp_source_l00026}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_index_result_a4b493c159af61e5124f55f0987e12812}\label{classzbs_1_1_z_index_result_a4b493c159af61e5124f55f0987e12812} 
+\index{zbs::ZIndexResult@{zbs::ZIndexResult}!````~ZIndexResult@{\texorpdfstring{$\sim$}{\string~}ZIndexResult}}
+\index{````~ZIndexResult@{\texorpdfstring{$\sim$}{\string~}ZIndexResult}!zbs::ZIndexResult@{zbs::ZIndexResult}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ZIndexResult()}{\string~ZIndexResult()}}
+{\footnotesize\ttfamily zbs\+::\+ZIndex\+Result\+::\texorpdfstring{$\sim$}{\string~}\+ZIndex\+Result (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zindexcollection_8h_source_l00075}{75}} of file \mbox{\hyperlink{zindexcollection_8h_source}{zindexcollection.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classzbs_1_1_z_index_result_a716a56ca986cfd8749b9fc1600118c97}\label{classzbs_1_1_z_index_result_a716a56ca986cfd8749b9fc1600118c97} 
+\index{zbs::ZIndexResult@{zbs::ZIndexResult}!\_copyFrom@{\_copyFrom}}
+\index{\_copyFrom@{\_copyFrom}!zbs::ZIndexResult@{zbs::ZIndexResult}}
+\doxysubsubsection{\texorpdfstring{\_copyFrom()}{\_copyFrom()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \& ZIndex\+Result\+::\+\_\+copy\+From (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&}]{p\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zindexcollection_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{zindexcollection_8cpp_source}{zindexcollection.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexcollection_8h_source_l00069}{Index\+Address}}, and \mbox{\hyperlink{zindexcollection_8h_source_l00070}{ZMFAddress}}.
+
+
+
+Referenced by \mbox{\hyperlink{zindexcollection_8h_source_l00087}{operator=()}}, and \mbox{\hyperlink{zindexcollection_8cpp_source_l00017}{ZIndex\+Result()}}.
+
+\Hypertarget{classzbs_1_1_z_index_result_a2a978ac464b7c9bb7d4e68e102ba23fc}\label{classzbs_1_1_z_index_result_a2a978ac464b7c9bb7d4e68e102ba23fc} 
+\index{zbs::ZIndexResult@{zbs::ZIndexResult}!create@{create}}
+\index{create@{create}!zbs::ZIndexResult@{zbs::ZIndexResult}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} ZIndex\+Result\+::create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+ZMFAddress,  }\item[{\mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}}}]{p\+Index\+Rank }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zindexcollection_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{zindexcollection_8cpp_source}{zindexcollection.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zindexcollection_8h_source_l00070}{ZMFAddress}}.
+
+\Hypertarget{classzbs_1_1_z_index_result_ae5bc09fab0da395dcb07aac39e27ae65}\label{classzbs_1_1_z_index_result_ae5bc09fab0da395dcb07aac39e27ae65} 
+\index{zbs::ZIndexResult@{zbs::ZIndexResult}!isInvalid@{isInvalid}}
+\index{isInvalid@{isInvalid}!zbs::ZIndexResult@{zbs::ZIndexResult}}
+\doxysubsubsection{\texorpdfstring{isInvalid()}{isInvalid()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZIndex\+Result\+::is\+Invalid (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zindexcollection_8h_source_l00085}{85}} of file \mbox{\hyperlink{zindexcollection_8h_source}{zindexcollection.\+h}}.
+
+
+
+References \mbox{\hyperlink{zindexcollection_8h_source_l00070}{ZMFAddress}}.
+
+\Hypertarget{classzbs_1_1_z_index_result_a00564ac7fd6f948803d262bffb077a67}\label{classzbs_1_1_z_index_result_a00564ac7fd6f948803d262bffb077a67} 
+\index{zbs::ZIndexResult@{zbs::ZIndexResult}!isNull@{isNull}}
+\index{isNull@{isNull}!zbs::ZIndexResult@{zbs::ZIndexResult}}
+\doxysubsubsection{\texorpdfstring{isNull()}{isNull()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZIndex\+Result\+::is\+Null (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zindexcollection_8h_source_l00084}{84}} of file \mbox{\hyperlink{zindexcollection_8h_source}{zindexcollection.\+h}}.
+
+
+
+References \mbox{\hyperlink{zindexcollection_8h_source_l00069}{Index\+Address}}.
+
+\Hypertarget{classzbs_1_1_z_index_result_a5aec80f6e5de022ba4c07b544bbc5895}\label{classzbs_1_1_z_index_result_a5aec80f6e5de022ba4c07b544bbc5895} 
+\index{zbs::ZIndexResult@{zbs::ZIndexResult}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!zbs::ZIndexResult@{zbs::ZIndexResult}}
+\doxysubsubsection{\texorpdfstring{operator$<$()}{operator<()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZIndex\+Result\+::operator$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&}]{p\+ZIR }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zindexcollection_8h_source_l00092}{92}} of file \mbox{\hyperlink{zindexcollection_8h_source}{zindexcollection.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_index_result_a624b77d3988f20d6839ed448e74c61f7}\label{classzbs_1_1_z_index_result_a624b77d3988f20d6839ed448e74c61f7} 
+\index{zbs::ZIndexResult@{zbs::ZIndexResult}!operator=@{operator=}}
+\index{operator=@{operator=}!zbs::ZIndexResult@{zbs::ZIndexResult}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \& zbs\+::\+ZIndex\+Result\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&}]{p\+ZIR }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zindexcollection_8h_source_l00087}{87}} of file \mbox{\hyperlink{zindexcollection_8h_source}{zindexcollection.\+h}}.
+
+
+
+References \mbox{\hyperlink{zindexcollection_8cpp_source_l00026}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_index_result_a62aa2a0b698241aaf78936b7629555b6}\label{classzbs_1_1_z_index_result_a62aa2a0b698241aaf78936b7629555b6} 
+\index{zbs::ZIndexResult@{zbs::ZIndexResult}!operator==@{operator==}}
+\index{operator==@{operator==}!zbs::ZIndexResult@{zbs::ZIndexResult}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZIndex\+Result\+::operator== (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&}]{p\+ZIR }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zindexcollection_8h_source_l00089}{89}} of file \mbox{\hyperlink{zindexcollection_8h_source}{zindexcollection.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_index_result_ad380bdc6c168bff1a0f1c22312c48437}\label{classzbs_1_1_z_index_result_ad380bdc6c168bff1a0f1c22312c48437} 
+\index{zbs::ZIndexResult@{zbs::ZIndexResult}!operator$>$@{operator$>$}}
+\index{operator$>$@{operator$>$}!zbs::ZIndexResult@{zbs::ZIndexResult}}
+\doxysubsubsection{\texorpdfstring{operator$>$()}{operator>()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZIndex\+Result\+::operator$>$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classzbs_1_1_z_index_result}{ZIndex\+Result}} \&}]{p\+ZIR }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zindexcollection_8h_source_l00091}{91}} of file \mbox{\hyperlink{zindexcollection_8h_source}{zindexcollection.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_index_result_ac8d4354510899550afe22e87f607030e}\label{classzbs_1_1_z_index_result_ac8d4354510899550afe22e87f607030e} 
+\index{zbs::ZIndexResult@{zbs::ZIndexResult}!reset@{reset}}
+\index{reset@{reset}!zbs::ZIndexResult@{zbs::ZIndexResult}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZIndex\+Result\+::reset (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+reset resets ZSIndex\+Result to is \textquotesingle{}null\textquotesingle{} value \{-\/1 ; -\/1 \} 
+
+
+
+Definition at line \mbox{\hyperlink{zindexcollection_8h_source_l00083}{83}} of file \mbox{\hyperlink{zindexcollection_8h_source}{zindexcollection.\+h}}.
+
+
+
+References \mbox{\hyperlink{zindexcollection_8h_source_l00069}{Index\+Address}}, and \mbox{\hyperlink{zindexcollection_8h_source_l00070}{ZMFAddress}}.
+
+
+
+Referenced by \mbox{\hyperlink{zindexcollection_8cpp_source_l00081}{zbs\+::\+ZIndex\+Collection\+Context\+::clear()}}, \mbox{\hyperlink{zindexcollection_8cpp_source_l00400}{zbs\+::\+ZIndex\+Collection\+::get\+Current\+Raw\+Rank()}}, \mbox{\hyperlink{zindexcollection_8cpp_source_l00729}{zbs\+::\+ZIndex\+Collection\+::get\+Current\+Selected\+Rank()}}, \mbox{\hyperlink{zindexcollection_8cpp_source_l00263}{zbs\+::\+ZIndex\+Collection\+::get\+First\+Raw\+Rank()}}, \mbox{\hyperlink{zindexcollection_8cpp_source_l00463}{zbs\+::\+ZIndex\+Collection\+::get\+First\+Selected\+Rank()}}, \mbox{\hyperlink{zindexcollection_8cpp_source_l00317}{zbs\+::\+ZIndex\+Collection\+::get\+Next\+Raw\+Rank()}}, \mbox{\hyperlink{zindexcollection_8cpp_source_l00363}{zbs\+::\+ZIndex\+Collection\+::get\+Previous\+Raw\+Rank()}}, \mbox{\hyperlink{zindexcollection_8cpp_source_l00701}{zbs\+::\+ZIndex\+Collection\+::get\+Previous\+Selected\+Rank()}}, \mbox{\hyperlink{zindexcollection_8cpp_source_l00210}{zbs\+::\+ZIndex\+Collection\+::get\+ZIRfrom\+ZIF()}}, and \mbox{\hyperlink{zindexcollection_8cpp_source_l00066}{zbs\+::\+ZIndex\+Collection\+Context\+::reset()}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classzbs_1_1_z_index_result_a8c58ff202bca27d573c256994b23f83d}\label{classzbs_1_1_z_index_result_a8c58ff202bca27d573c256994b23f83d} 
+\index{zbs::ZIndexResult@{zbs::ZIndexResult}!IndexAddress@{IndexAddress}}
+\index{IndexAddress@{IndexAddress}!zbs::ZIndexResult@{zbs::ZIndexResult}}
+\doxysubsubsection{\texorpdfstring{IndexAddress}{IndexAddress}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} zbs\+::\+ZIndex\+Result\+::\+Index\+Address =-\/1}
+
+
+
+ZIndex\+File address. 
+
+
+
+Definition at line \mbox{\hyperlink{zindexcollection_8h_source_l00069}{69}} of file \mbox{\hyperlink{zindexcollection_8h_source}{zindexcollection.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zindexcollection_8cpp_source_l00026}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zindexcollection_8cpp_source_l00210}{zbs\+::\+ZIndex\+Collection\+::get\+ZIRfrom\+ZIF()}}, \mbox{\hyperlink{zindexcollection_8h_source_l00084}{is\+Null()}}, \mbox{\hyperlink{zindexcollection_8h_source_l00083}{reset()}}, \mbox{\hyperlink{zindexcollection_8h_source_l00072}{ZIndex\+Result()}}, and \mbox{\hyperlink{zindexcollection_8cpp_source_l00021}{ZIndex\+Result()}}.
+
+\Hypertarget{classzbs_1_1_z_index_result_a01a4a62c7e968bb5b2908bd9db61b705}\label{classzbs_1_1_z_index_result_a01a4a62c7e968bb5b2908bd9db61b705} 
+\index{zbs::ZIndexResult@{zbs::ZIndexResult}!ZMFAddress@{ZMFAddress}}
+\index{ZMFAddress@{ZMFAddress}!zbs::ZIndexResult@{zbs::ZIndexResult}}
+\doxysubsubsection{\texorpdfstring{ZMFAddress}{ZMFAddress}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} zbs\+::\+ZIndex\+Result\+::\+ZMFAddress =-\/1}
+
+
+
+Corresponding \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} address. 
+
+
+
+Definition at line \mbox{\hyperlink{zindexcollection_8h_source_l00070}{70}} of file \mbox{\hyperlink{zindexcollection_8h_source}{zindexcollection.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zindexcollection_8cpp_source_l00026}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zindexcollection_8cpp_source_l00033}{create()}}, \mbox{\hyperlink{zindexcollection_8cpp_source_l00210}{zbs\+::\+ZIndex\+Collection\+::get\+ZIRfrom\+ZIF()}}, \mbox{\hyperlink{zindexcollection_8h_source_l00085}{is\+Invalid()}}, \mbox{\hyperlink{zindexcollection_8h_source_l00083}{reset()}}, \mbox{\hyperlink{zindexcollection_8h_source_l00072}{ZIndex\+Result()}}, and \mbox{\hyperlink{zindexcollection_8cpp_source_l00021}{ZIndex\+Result()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zindexcollection_8h}{zindexcollection.\+h}}\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zindexcollection_8cpp}{zindexcollection.\+cpp}}\end{DoxyCompactItemize}

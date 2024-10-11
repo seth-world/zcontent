@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8'?>
+ <zsearchparserzentity version = "'0.1-0'">
+    <!--  ZEntity table : defines application dependant ZEntity values. Values are expressed in hexadecimal format -->
+    <zentitytable>
+        <zentityitem>
+            <zentity>ZEntity_MasterDoc</zentity>
+            <value>0x0000091</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_Version</zentity>
+            <value>0x00000A1</value>
+        </zentityitem>
+        <zentityitem>
+        <zentity>ZEntity_MasterLink</zentity>
+            <value>0x00000B1</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_ObjectLink</zentity>
+            <value>0x00000C1</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_Memo</zentity>
+            <value>0x00100D1</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_Tag</zentity>
+            <value>0x000000E1</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_MimeClass</zentity>
+            <value>0x000000F1</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_DocPhysical</zentity>
+            <value>0x00001001</value>    
+        </zentityitem>
+        
+        <zentityitem>
+            <zentity>ZEntity_DocFilespec</zentity>
+            <value>0x00100000</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_URI</zentity>
+            <value>0x00100000</value>
+        </zentityitem>
+        
+        <zentityitem>
+            <zentity>ZEntity_Image</zentity>
+            <value>0x00200000</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_MimeData</zentity>
+            <value>0x01000000</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_Mime_Image</zentity>
+            <value>0x05000000</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_Mime_URI</zentity>
+            <value>ZEntity_URI</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_Mime_Html</zentity>
+            <value>0x09000000</value>
+        </zentityitem>
+        
+        <zentityitem>
+            <zentity>ZEntity_Mime_PlainText</zentity>
+            <value>0x11000000</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_Mime_OtherText</zentity>
+            <value>0x21000000</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_AppData</zentity>
+            <value>0x100000000000</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_Pinboard</zentity>
+            <value>0x101000000010</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_Trashbin</zentity>
+            <value>0x101000000020</value>
+        </zentityitem>
+        
+       <!-- Admin entities -->
+        
+        <zentityitem>
+            <zentity>ZEntity_VaultDataBase</zentity>
+            <value>0x100100000000</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_Vault</zentity>
+            <value>0x100100000001</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_User</zentity>
+            <value>0x300000001002</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_Group</zentity>
+            <value>0x300000001004</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_SystemUser</zentity>
+            <value>0x000000000FF2</value>
+        </zentityitem>
+        
+        
+        <zentityitem>
+            <zentity>ZEntity_AuthMan</zentity>
+            <value>0x100400000001</value>
+        </zentityitem>
+        <zentityitem>
+            <zentity>ZEntity_LockManager</zentity>
+            <value>0x100400000000</value>
+        </zentityitem>
+    </zentitytable>
+
+</zsearchparserzentity>
+

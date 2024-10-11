@@ -1,0 +1,217 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/zcontentvisumain.cpp File Reference}
+\hypertarget{zcontentvisumain_8cpp}{}\label{zcontentvisumain_8cpp}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zcontentvisumain.cpp@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zcontentvisumain.cpp}}
+{\ttfamily \#include "{}zcontentvisumain.\+h"{}}\newline
+{\ttfamily \#include $<$zio/zdir.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$fcntl.\+h$>$}\newline
+{\ttfamily \#include $<$zcontentcommon/zgeneralparameters.\+h$>$}\newline
+{\ttfamily \#include $<$zio/zioutils.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/utfutils.\+h$>$}\newline
+{\ttfamily \#include $<$QStandard\+Item\+Model$>$}\newline
+{\ttfamily \#include $<$qaction.\+h$>$}\newline
+{\ttfamily \#include $<$qactiongroup.\+h$>$}\newline
+{\ttfamily \#include $<$qfiledialog.\+h$>$}\newline
+{\ttfamily \#include $<$qmessagebox.\+h$>$}\newline
+{\ttfamily \#include $<$QVBox\+Layout$>$}\newline
+{\ttfamily \#include $<$QLabel$>$}\newline
+{\ttfamily \#include $<$QAction$>$}\newline
+{\ttfamily \#include $<$QAction\+Group$>$}\newline
+{\ttfamily \#include $<$QPush\+Button$>$}\newline
+{\ttfamily \#include $<$QMenu$>$}\newline
+{\ttfamily \#include $<$QLine\+Edit$>$}\newline
+{\ttfamily \#include $<$QCombo\+Box$>$}\newline
+{\ttfamily \#include $<$QStatus\+Bar$>$}\newline
+{\ttfamily \#include $<$QMenu\+Bar$>$}\newline
+{\ttfamily \#include $<$QFrame$>$}\newline
+{\ttfamily \#include $<$QCore\+Application$>$}\newline
+{\ttfamily \#include $<$QProgress\+Bar$>$}\newline
+{\ttfamily \#include $<$zcontent/zrandomfile/zrandomfile.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zindexedfile/zrawmasterfile.\+h$>$}\newline
+{\ttfamily \#include "{}displaymain.\+h"{}}\newline
+{\ttfamily \#include "{}zscan.\+h"{}}\newline
+{\ttfamily \#include $<$zexceptiondlg.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zindexedfile/zmfdictionary.\+h$>$}\newline
+{\ttfamily \#include $<$dicedit.\+h$>$}\newline
+{\ttfamily \#include $<$texteditmwn.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqtableview.\+h$>$}\newline
+{\ttfamily \#include $<$functional$>$}\newline
+{\ttfamily \#include $<$QGroup\+Box$>$}\newline
+{\ttfamily \#include "{}zrawmasterfilevisu.\+h"{}}\newline
+{\ttfamily \#include "{}visulinecol.\+h"{}}\newline
+{\ttfamily \#include "{}poolvisu.\+h"{}}\newline
+{\ttfamily \#include "{}filegeneratedlg.\+h"{}}\newline
+{\ttfamily \#include "{}zrawkeylistdlg.\+h"{}}\newline
+{\ttfamily \#include "{}visuraw.\+h"{}}\newline
+{\ttfamily \#include "{}zbackupdlg.\+h"{}}\newline
+{\ttfamily \#include "{}zrestoredlg.\+h"{}}\newline
+{\ttfamily \#include "{}zsearchquerymwd.\+h"{}}\newline
+{\ttfamily \#include "{}zmfprogressmwn.\+h"{}}\newline
+{\ttfamily \#include "{}zgeneralparamsdlg.\+h"{}}\newline
+{\ttfamily \#include $<$ztoolset/zexceptionmin.\+h$>$}\newline
+{\ttfamily \#include $<$zclearfiledlg.\+h$>$}\newline
+{\ttfamily \#include $<$QApplication$>$}\newline
+{\ttfamily \#include $<$zcontent/zrandomfile/zrfutilities.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqtwidgettools.\+h$>$}\newline
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_scan_block_count}{Scan\+Block\+Count}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\+String}} \mbox{\hyperlink{zcontentvisumain_8cpp_ac6b7d8bafb0a9987a0bd7fb737a76179}{displayt\+Scan\+Block}} (\mbox{\hyperlink{class_scan_block}{Scan\+Block}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+SB}}, \mbox{\hyperlink{struct_scan_block_count}{Scan\+Block\+Count}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+SBCount}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{zcontentvisumain_8cpp_a265f4e949a8f634e9f16c7b359bece9f}{set\+Load\+Max}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Load\+Max}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{zcontentvisumain_8cpp_ab81afb02613308a1262693982eb07ba1}{\+\_\+search\+Block\+Start}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+\_\+\+FILEHANDLE\+\_\+\+\_\+}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Content\+Fd}}, \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Begin\+Address}}, \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Next\+Address}}, ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Block\+Content}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Payload}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Count}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+File\+Size}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Begin\+Content}})
+\begin{DoxyCompactList}\small\item\em \+\_\+search\+Block\+Start scans file pointed by p\+Content\+Fd since p\+Begin\+Address for a start mark (cst\+\_\+\+ZBLOCKSTART 0x\+F5\+F5\+F5\+F5) and returns . address of found mark in p\+Next\+Address (pointing to first byte of start mark), . ZData\+Buffer containing the file space between two start mark or until end of file. Each read access loads p\+Payload bytes from file. p\+Payload is adjusted progressively to block sizes. When found p\+Next\+Address points to the first byte of start mark. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{zcontentvisumain_8cpp_a6b50e3400123fa1e5a9ad211179fca57}{compute\+Offset\+From\+Coord}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Row}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Col}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zcontentvisumain_8cpp_a68ff5dd059a4d74e955297f9fec1c2b8}{cst\+\_\+maxraisonablevalue}} = 100000
+\item 
+\mbox{\hyperlink{class_dic_edit_m_wn}{Dic\+Edit\+MWn}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcontentvisumain_8cpp_ab80092763c69672e6f44bfdf86538c34}{Dic\+Edit}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_array}{zbs\+::\+ZArray}}$<$ \mbox{\hyperlink{class_scan_block}{Scan\+Block}} $>$ \mbox{\hyperlink{zcontentvisumain_8cpp_ae5d2ebfa7e0076d4835b73b4e558a76a}{Block\+List}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{zcontentvisumain_8cpp_a23eab0afd22d421ca1a3c17986502bdc}{Load\+Max}} =100000
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{zcontentvisumain_8cpp_ab81afb02613308a1262693982eb07ba1}\label{zcontentvisumain_8cpp_ab81afb02613308a1262693982eb07ba1} 
+\index{zcontentvisumain.cpp@{zcontentvisumain.cpp}!\_searchBlockStart@{\_searchBlockStart}}
+\index{\_searchBlockStart@{\_searchBlockStart}!zcontentvisumain.cpp@{zcontentvisumain.cpp}}
+\doxysubsubsection{\texorpdfstring{\_searchBlockStart()}{\_searchBlockStart()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \+\_\+search\+Block\+Start (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+\_\+\+FILEHANDLE\+\_\+\+\_\+}}}]{p\+Content\+Fd,  }\item[{\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+Begin\+Address,  }\item[{\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \&}]{p\+Next\+Address,  }\item[{ZData\+Buffer \&}]{p\+Block\+Content,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \&}]{p\+Payload,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \&}]{p\+Count,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \&}]{p\+File\+Size,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{p\+Begin\+Content = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}} }\end{DoxyParamCaption})}
+
+
+
+\+\_\+search\+Block\+Start scans file pointed by p\+Content\+Fd since p\+Begin\+Address for a start mark (cst\+\_\+\+ZBLOCKSTART 0x\+F5\+F5\+F5\+F5) and returns . address of found mark in p\+Next\+Address (pointing to first byte of start mark), . ZData\+Buffer containing the file space between two start mark or until end of file. Each read access loads p\+Payload bytes from file. p\+Payload is adjusted progressively to block sizes. When found p\+Next\+Address points to the first byte of start mark. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Content\+Fd} & File descriptor to search. File must be opened with READ capabilities (O\+\_\+\+RDONLY) \\
+\hline
+{\em p\+Begin\+Address} & address to begin the search. WARNING\+: if p\+Begin\+Address points to a cst\+\_\+\+ZBLOCKSTART block, then this address will be returned as p\+Next\+Address. \\
+\hline
+{\em p\+Next\+Address} & address of first byte of found cst\+\_\+\+START \\
+\hline
+{\em p\+Payload} & number of bytes to read at each read operation \\
+\hline
+{\em p\+File\+Size} & total number of bytes for the file to be scanned \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus
+\begin{DoxyItemize}
+\item ZS\+\_\+\+FOUND start mark has been found. p\+Next\+Address points to first byte of start mark. p\+Block\+Content contains block data since p\+Begin\+Address until next start mark (excluded).
+\item ZS\+\_\+\+EOF no more to read and start mark has not been found since p\+Begin\+Address. p\+Next\+Address is set to the last address processed. p\+Block\+Content contains data since p\+Begin\+Address until Endof\+File.
+\item ZS\+\_\+\+READERROR a low level error has been encountered. ZException is set with appropriate message. p\+Next\+Address is set to the last address processed.
+\item ZS\+\_\+\+FILEERROR a seek operation failed with a low level error. ZException is set with appropriate message. p\+Next\+Address is set to the last address processed. 
+\end{DoxyItemize}
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03379}{3379}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawvisumain_8cpp_source_l03119}{ZRaw\+Visu\+Main\+::surface\+Scan\+Raw()}}.
+
+\Hypertarget{zcontentvisumain_8cpp_a6b50e3400123fa1e5a9ad211179fca57}\label{zcontentvisumain_8cpp_a6b50e3400123fa1e5a9ad211179fca57} 
+\index{zcontentvisumain.cpp@{zcontentvisumain.cpp}!computeOffsetFromCoord@{computeOffsetFromCoord}}
+\index{computeOffsetFromCoord@{computeOffsetFromCoord}!zcontentvisumain.cpp@{zcontentvisumain.cpp}}
+\doxysubsubsection{\texorpdfstring{computeOffsetFromCoord()}{computeOffsetFromCoord()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} compute\+Offset\+From\+Coord (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Row,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Col }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03958}{3958}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+
+\Hypertarget{zcontentvisumain_8cpp_ac6b7d8bafb0a9987a0bd7fb737a76179}\label{zcontentvisumain_8cpp_ac6b7d8bafb0a9987a0bd7fb737a76179} 
+\index{zcontentvisumain.cpp@{zcontentvisumain.cpp}!displaytScanBlock@{displaytScanBlock}}
+\index{displaytScanBlock@{displaytScanBlock}!zcontentvisumain.cpp@{zcontentvisumain.cpp}}
+\doxysubsubsection{\texorpdfstring{displaytScanBlock()}{displaytScanBlock()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\+String}} displayt\+Scan\+Block (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_scan_block}{Scan\+Block}} \&}]{p\+SB,  }\item[{\mbox{\hyperlink{struct_scan_block_count}{Scan\+Block\+Count}} \&}]{p\+SBCount }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03087}{3087}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomfile_8cpp_source_l09870}{decode\+\_\+\+ZBS()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03072}{Scan\+Block\+Count\+::\+Total\+Blocks}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00134}{ZBS\+\_\+\+Deleted}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00133}{ZBS\+\_\+\+Free}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00143}{ZBS\+\_\+\+Invalid}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00132}{ZBS\+\_\+\+Used}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03207}{ZContent\+Visu\+Main\+::surface\+Scan\+Raw()}}, and \mbox{\hyperlink{zrawvisumain_8cpp_source_l03119}{ZRaw\+Visu\+Main\+::surface\+Scan\+Raw()}}.
+
+\Hypertarget{zcontentvisumain_8cpp_a265f4e949a8f634e9f16c7b359bece9f}\label{zcontentvisumain_8cpp_a265f4e949a8f634e9f16c7b359bece9f} 
+\index{zcontentvisumain.cpp@{zcontentvisumain.cpp}!setLoadMax@{setLoadMax}}
+\index{setLoadMax@{setLoadMax}!zcontentvisumain.cpp@{zcontentvisumain.cpp}}
+\doxysubsubsection{\texorpdfstring{setLoadMax()}{setLoadMax()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} set\+Load\+Max (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}}}]{p\+Load\+Max }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03376}{3376}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03375}{Load\+Max}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{zcontentvisumain_8cpp_ae5d2ebfa7e0076d4835b73b4e558a76a}\label{zcontentvisumain_8cpp_ae5d2ebfa7e0076d4835b73b4e558a76a} 
+\index{zcontentvisumain.cpp@{zcontentvisumain.cpp}!BlockList@{BlockList}}
+\index{BlockList@{BlockList}!zcontentvisumain.cpp@{zcontentvisumain.cpp}}
+\doxysubsubsection{\texorpdfstring{BlockList}{BlockList}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_array}{zbs\+::\+ZArray}}$<$\mbox{\hyperlink{class_scan_block}{Scan\+Block}}$>$ Block\+List}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03069}{3069}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+
+\Hypertarget{zcontentvisumain_8cpp_a68ff5dd059a4d74e955297f9fec1c2b8}\label{zcontentvisumain_8cpp_a68ff5dd059a4d74e955297f9fec1c2b8} 
+\index{zcontentvisumain.cpp@{zcontentvisumain.cpp}!cst\_maxraisonablevalue@{cst\_maxraisonablevalue}}
+\index{cst\_maxraisonablevalue@{cst\_maxraisonablevalue}!zcontentvisumain.cpp@{zcontentvisumain.cpp}}
+\doxysubsubsection{\texorpdfstring{cst\_maxraisonablevalue}{cst\_maxraisonablevalue}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} cst\+\_\+maxraisonablevalue = 100000}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+
+\Hypertarget{zcontentvisumain_8cpp_ab80092763c69672e6f44bfdf86538c34}\label{zcontentvisumain_8cpp_ab80092763c69672e6f44bfdf86538c34} 
+\index{zcontentvisumain.cpp@{zcontentvisumain.cpp}!DicEdit@{DicEdit}}
+\index{DicEdit@{DicEdit}!zcontentvisumain.cpp@{zcontentvisumain.cpp}}
+\doxysubsubsection{\texorpdfstring{DicEdit}{DicEdit}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_dic_edit_m_wn}{Dic\+Edit\+MWn}}\texorpdfstring{$\ast$}{*} Dic\+Edit =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+
+\Hypertarget{zcontentvisumain_8cpp_a23eab0afd22d421ca1a3c17986502bdc}\label{zcontentvisumain_8cpp_a23eab0afd22d421ca1a3c17986502bdc} 
+\index{zcontentvisumain.cpp@{zcontentvisumain.cpp}!LoadMax@{LoadMax}}
+\index{LoadMax@{LoadMax}!zcontentvisumain.cpp@{zcontentvisumain.cpp}}
+\doxysubsubsection{\texorpdfstring{LoadMax}{LoadMax}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} Load\+Max =100000}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03375}{3375}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03376}{set\+Load\+Max()}}.
+

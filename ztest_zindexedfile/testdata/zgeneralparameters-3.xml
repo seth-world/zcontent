@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8'?>
+ <zmasterfileparameters version = "'2.3-1'">
+   <generalparameters>
+      <verbose>ZVB_Basic | ZVB_Net | ZVB_MemEngine | ZVB_FileEngine | ZVB_SearchEngine | ZVB_Net</verbose>
+      <defaultworkdirectory>/home/gerard/Development/zmftest</defaultworkdirectory>
+      <defaultparamdirectory>/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata</defaultparamdirectory>
+      <defaulticondirectory>/home/gerard/Development/zbasetools/zqt/icons</defaulticondirectory>
+      <fixedfont>Courier 10 Pitch</fixedfont>
+   </generalparameters>
+ </zmasterfileparameters>
+ <domain>
+   <domain-item>
+      <name>generalparameters</name>
+      <path>/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata</path>
+      <type>ZDOM_Path | ZDOM_Remote | ZDOM_Absolute</type>
+      <domain-item>
+         <name>iconfactory</name>
+         <path>/home/gerard/Development/zbasetools/zqt/icons</path>
+         <tooltip>Repository of images for building icons using iconfactory.</tooltip>
+         <type>ZDOM_Path | ZDOM_Remote | ZDOM_Absolute</type>
+      </domain-item>
+   </domain-item>
+   <domain-item>
+      <name>test</name>
+      <path>/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata</path>
+      <type>ZDOM_Path | ZDOM_Remote | ZDOM_Absolute</type>
+      <domain-item>
+         <name>data</name>
+         <path>data</path>
+         <type>ZDOM_Path | ZDOM_Remote | ZDOM_Relative</type>
+      </domain-item>
+      <domain-item>
+         <name>images</name>
+         <path>images</path>
+         <type>ZDOM_Path | ZDOM_Remote | ZDOM_Relative</type>
+      </domain-item>
+   </domain-item>
+   <domain-item>
+      <name>content</name>
+      <path>/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata</path>
+      <type>ZDOM_Path | ZDOM_Remote | ZDOM_Absolute</type>
+      <domain-item>
+         <name>data</name>
+         <path>data</path>
+         <type>ZDOM_Path | ZDOM_Remote | ZDOM_Relative</type>
+      </domain-item>
+      <domain-item>
+         <name>images</name>
+         <path>images</path>
+         <type>ZDOM_Path | ZDOM_Remote | ZDOM_Relative</type>
+      </domain-item>
+   </domain-item>
+ </domain>

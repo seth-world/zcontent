@@ -1,0 +1,31 @@
+\doxysection{zsslserversocket.\+h}
+\hypertarget{zsslserversocket_8h_source}{}\label{zsslserversocket_8h_source}\index{/home/gerard/Development/zbasetools/znet/zbasenet/zsslserversocket.h@{/home/gerard/Development/zbasetools/znet/zbasenet/zsslserversocket.h}}
+\mbox{\hyperlink{zsslserversocket_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZSSLSERVERSOCKET\_H}}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ ZSSLSERVERSOCKET\_H}}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zserversocket_8h}{zbasenet/zserversocket.h}}>}}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zsslabstract_8h}{zbasenet/zsslabstract.h}}>}}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zsslsocketselect_8h}{zbasenet/zsslsocketselect.h}}>}}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00012}\mbox{\hyperlink{class_z_s_s_l_server_socket}{00012}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_z_s_s_l_server_socket}{ZSSLServerSocket}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_z_s_s_l_abstract}{ZSSLAbstract}},\ \textcolor{keyword}{protected}\ \mbox{\hyperlink{class_z_server_socket}{ZServerSocket}}}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00013}00013\ \{}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00014}00014\ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00015}00015\ }
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00016}\mbox{\hyperlink{class_z_s_s_l_server_socket_a0902672f25467a48254df57876317e95}{00016}}\ \ \ \ \mbox{\hyperlink{class_z_s_s_l_server_socket_a0902672f25467a48254df57876317e95}{ZSSLServerSocket}}()\ \{\}}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00017}\mbox{\hyperlink{class_z_s_s_l_server_socket_aea814bc6e279f507ad824811741bdca2}{00017}}\ \ \ \ \mbox{\hyperlink{class_z_s_s_l_server_socket_aea814bc6e279f507ad824811741bdca2}{\string~ZSSLServerSocket}}()\ \{\textcolor{keywordflow}{if}\ (isActive())\ \mbox{\hyperlink{class_z_s_s_l_server_socket_a4f38029fee08f30c8462d4d97a936318}{zclose}}();\}}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00018}\mbox{\hyperlink{class_z_s_s_l_server_socket_a7fa05424d15cf3f1ec2bb4cae65751c9}{00018}}\ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_s_s_l_server_socket_a7fa05424d15cf3f1ec2bb4cae65751c9}{createServerContext}}(\textcolor{keywordtype}{void})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_z_s_s_l_abstract_aef8300153c85ffa62309c4c5bbdeeaba}{ZSSLAbstract::createServerContext}}();\ \}}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00021}\mbox{\hyperlink{class_z_s_s_l_server_socket_a84ce99766e9f3a50a215ecce4aba698a}{00021}}\ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_s_s_l_server_socket_a84ce99766e9f3a50a215ecce4aba698a}{zlisten}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMaxConnections}})\ \{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_z_server_socket_a5dc3168ec1f396f52015f3e0928c8c40}{ZServerSocket::zlisten}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMaxConnections}});\}}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00022}00022\ \ \ \ \mbox{\hyperlink{class_z_s_s_l_socket_select}{ZSSLSocketSelect}}*\ \mbox{\hyperlink{class_z_s_s_l_server_socket_a2f3ec3072f008f564d4392f9323f7740}{zaccept}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00024}\mbox{\hyperlink{class_z_s_s_l_server_socket_a4f38029fee08f30c8462d4d97a936318}{00024}}\ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_s_s_l_server_socket_a4f38029fee08f30c8462d4d97a936318}{zclose}}(\textcolor{keywordtype}{void})\ \{\mbox{\hyperlink{class_z_s_s_l_abstract_abe224645c91c3b52fe15caa300a6fd75}{ZSSLAbstract::cleanup\_openssl}}();\textcolor{keywordflow}{return}\ ZServerSocket::zclose();\}}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00025}\mbox{\hyperlink{class_z_s_s_l_server_socket_aa0f011fa8f81da8a1b06c5ce3a2c5b1f}{00025}}\ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_s_s_l_server_socket_aa0f011fa8f81da8a1b06c5ce3a2c5b1f}{zshutdown}}(\textcolor{keywordtype}{void})\ \{\mbox{\hyperlink{class_z_s_s_l_abstract_abe224645c91c3b52fe15caa300a6fd75}{ZSSLAbstract::cleanup\_openssl}}();\textcolor{keywordflow}{return}\ ZServerSocket::zshutdown();\ \}}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00027}00027\ \};}
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{zsslserversocket_8h_source_l00029}00029\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZSSLSERVERSOCKET\_H}}
+
+\end{DoxyCode}

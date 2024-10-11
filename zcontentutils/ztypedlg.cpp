@@ -152,57 +152,56 @@ ZTypeDLg::RejectClicked() {
   reject();
 }
 
-void ZTypeDLg::AcceptCurrent() {
+bool ZTypeDLg::AcceptCurrent() {
   QModelIndex wIdx= TreeView->currentIndex();
   if(!wIdx.isValid())
-    return;
+    return false ;
   if (wIdx.column()!=0)
     wIdx=wIdx.siblingAtColumn(0);
   //      wIdx=ItemModel->index(currentIndex().row(),0);
   if(!wIdx.isValid())
-    return;
+    return false ;
   if (getValueFromItem<ZTypeBase>(wIdx,ZType)) {
     accept();
   }
-  return;
+  return true;
 }
 
 
-void
+bool
 ZTypeDLg::KeyFiltered(int pKey, QKeyEvent *pEvent)
 {
   if(pKey == Qt::Key_Escape)
   {
     reject();
-    return;
+    return true;
   }
 
   if(pKey == Qt::Key_Insert)
   {
-    return;
+    return true;;
   }
   if(pKey == Qt::Key_Delete)
   {
     //    deleteGeneric();
-    return;
+    return true;;
   }
 
-  return;
+  return true;;
 }
-void
+bool
 ZTypeDLg::MouseFiltered(int pKey,QMouseEvent* pEvent)
 {
   switch (pKey)
   {
   case ZEF_DoubleClickLeft:
   {
-    AcceptCurrent();
-    return;
+    return AcceptCurrent();
   }
     //  case ZEF_SingleClickLeft:
   }
 
-  return;
+  return false;
 }
 
 void ZTypeDLg::setupTableView(bool pColumnAutoAdjust, int pColumns)

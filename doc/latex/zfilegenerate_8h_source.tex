@@ -1,0 +1,41 @@
+\doxysection{zfilegenerate.\+h}
+\hypertarget{zfilegenerate_8h_source}{}\label{zfilegenerate_8h_source}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zfilegenerate.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zfilegenerate.h}}
+\mbox{\hyperlink{zfilegenerate_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZFILEGENERATE\_H}}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ ZFILEGENERATE\_H}}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <ztoolset/zstatus.h>}}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <ztoolset/zdatabuffer.h>}}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <ztoolset/uristring.h>}}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <ztoolset/ztypetype.h>}}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <ztoolset/zarray.h>}}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <ztoolset/utfvaryingstring.h>}}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <ztoolset/zaierrors.h>}}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zmfdictionary_8h}{zcontent/zindexedfile/zmfdictionary.h}}>}}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00013}\mbox{\hyperlink{zfilegenerate_8h_a8b920b4294118b0e74bd79e305000762}{00013}}\ \textcolor{preprocessor}{\#define\ \_\_GENERATE\_PARAMETER\_FILE\_\_\ "{}zcppgenerateparameters.xml"{}}}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacezbs}{zbs}}\ \{}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00017}00017\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classzbs_1_1_z_dictionary_file}{ZDictionaryFile}};}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00019}\mbox{\hyperlink{classzbs_1_1_z_file_generate}{00019}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classzbs_1_1_z_file_generate}{ZFileGenerate}}}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00020}00020\ \{}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00021}00021\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00022}00022\ \ \ \mbox{\hyperlink{classzbs_1_1_z_file_generate}{ZFileGenerate}}(\mbox{\hyperlink{classzbs_1_1_z_dictionary_file}{ZDictionaryFile}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pDictionaryFile}});}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00024}\mbox{\hyperlink{classzbs_1_1_z_file_generate_ae030bb02e8b19518126ffa595214dc0d}{00024}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_file_generate_ae030bb02e8b19518126ffa595214dc0d}{toXmlFileDefinition}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pDictionary}},uriString\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pXmlFile}});}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00026}\mbox{\hyperlink{classzbs_1_1_z_file_generate_a46cbae11ded6b98a47b9c6b845627b83}{00026}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_file_generate_a46cbae11ded6b98a47b9c6b845627b83}{fileGenerate}}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pDictionary}},\textcolor{keyword}{const}\ uriString\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pOutMasterFile}});}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00027}\mbox{\hyperlink{classzbs_1_1_z_file_generate_a09811db9528422b59eabf9af31c9c2f7}{00027}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_file_generate_a09811db9528422b59eabf9af31c9c2f7}{fileGenerate}}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pXmlFileDefinition}},\textcolor{keyword}{const}\ uriString\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pOutMasterFile}});}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00030}00030\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00031}00031\ \ \ \mbox{\hyperlink{classzbs_1_1_z_dictionary_file}{ZDictionaryFile}}*\ DictionaryFile=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00032}00032\ \};}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00034}00034\ \}\ \textcolor{comment}{//\ namespace\ zbs}}
+\DoxyCodeLine{\Hypertarget{zfilegenerate_8h_source_l00035}00035\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZFILEGENERATE\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,60 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentcommon/urffield.cpp File Reference}
+\hypertarget{urffield_8cpp}{}\label{urffield_8cpp}\index{/home/gerard/Development/zbasetools/zcontent/zcontentcommon/urffield.cpp@{/home/gerard/Development/zbasetools/zcontent/zcontentcommon/urffield.cpp}}
+{\ttfamily \#include "{}urffield.\+h"{}}\newline
+{\ttfamily \#include "{}urfparser.\+h"{}}\newline
+{\ttfamily \#include $<$ztoolset/utfvaryingstring.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/utffixedstring.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/ztypetype.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zexceptionmin.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zdatabuffer.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zcontentutils/zentity.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zcontentcommon/zresource.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zindexedfile/zsearchparser.\+h$>$}\newline
+{\ttfamily \#include $<$zxml/zxmlprimitives.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zdatefull.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zbitset.\+h$>$}\newline
+{\ttfamily \#include $<$zcrypt/checksum.\+h$>$}\newline
+{\ttfamily \#include $<$zcrypt/md5.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zaierrors.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zarray.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zindexedfile/zsearchfileentity.\+h$>$}\newline
+Include dependency graph for urffield.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacezbs}{zbs}}
+\begin{DoxyCompactList}\small\item\em ZSIndex\+Field\+\_\+struct Dictionary single field definition \+: one key may be composed of many single fields not necessarily contiguous in the master file\textquotesingle{}s data structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_u_r_f_field}{URFField}} \mbox{\hyperlink{urffield_8cpp_a225ef8b71e7bdac93c3803c2d9f15209}{get\+URFField}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{classzbs_1_1_z_search_parser}{ZSearch\+Parser}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacezbs_a1a00b3f7f63011c3ada71dd561c23ad9}{zbs\+::\+GParser}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_array}{ZArray}}$<$ \mbox{\hyperlink{classzbs_1_1_z_entity_symbol}{ZEntity\+Symbol}} $>$ \mbox{\hyperlink{namespacezbs_aeb9f18ad012c0da0cae4805cdd72b526}{zbs\+::\+ZEntity\+Symbol\+List}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{urffield_8cpp_a225ef8b71e7bdac93c3803c2d9f15209}\label{urffield_8cpp_a225ef8b71e7bdac93c3803c2d9f15209} 
+\index{urffield.cpp@{urffield.cpp}!getURFField@{getURFField}}
+\index{getURFField@{getURFField}!urffield.cpp@{urffield.cpp}}
+\doxysubsubsection{\texorpdfstring{getURFField()}{getURFField()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_u_r_f_field}{URFField}} get\+URFField (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Record,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Ptr\+In,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{urffield_8cpp_source_l02271}{2271}} of file \mbox{\hyperlink{urffield_8cpp_source}{urffield.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{urffield_8cpp_source_l00050}{URFField\+::set\+From\+Ptr()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmasterfile_8cpp_source_l00262}{zbs\+::\+ZMaster\+File\+::extract\+Field\+Value()}}, \mbox{\hyperlink{zmasterfile_8cpp_source_l00180}{zbs\+::\+ZMaster\+File\+::extract\+Key\+Values()}}, and \mbox{\hyperlink{zmasterfile_8cpp_source_l00330}{zbs\+::\+ZMaster\+File\+::get\+URFField\+By\+Rank()}}.
+

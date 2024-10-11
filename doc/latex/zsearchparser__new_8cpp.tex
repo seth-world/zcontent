@@ -1,0 +1,74 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/zsearchparser\+\_\+new.cpp File Reference}
+\hypertarget{zsearchparser__new_8cpp}{}\label{zsearchparser__new_8cpp}\index{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zsearchparser\_new.cpp@{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zsearchparser\_new.cpp}}
+{\ttfamily \#include "{}zsearchparser.\+h"{}}\newline
+{\ttfamily \#include "{}zsearchparsertype.\+h"{}}\newline
+{\ttfamily \#include "{}zsearchentity.\+h"{}}\newline
+{\ttfamily \#include $<$ztoolset/zexceptionmin.\+h$>$}\newline
+{\ttfamily \#include "{}zmasterfile.\+h"{}}\newline
+{\ttfamily \#include $<$zio/zioutils.\+h$>$}\newline
+{\ttfamily \#include $<$fcntl.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/ztimer.\+h$>$}\newline
+{\ttfamily \#include $<$zxml/zxmldoc.\+h$>$}\newline
+{\ttfamily \#include $<$zxml/zxmlnode.\+h$>$}\newline
+{\ttfamily \#include $<$zxml/zxmlprimitives.\+h$>$}\newline
+{\ttfamily \#include "{}zsearchoperand.\+h"{}}\newline
+{\ttfamily \#include "{}zsearchlogicalterm.\+h"{}}\newline
+{\ttfamily \#include "{}zsearcharithmeticterm.\+h"{}}\newline
+{\ttfamily \#include "{}zsearchcontext.\+h"{}}\newline
+{\ttfamily \#include $<$ztoolset/utfutils.\+h$>$}\newline
+Include dependency graph for zsearchparser\+\_\+new.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacezbs}{zbs}}
+\begin{DoxyCompactList}\small\item\em ZSIndex\+Field\+\_\+struct Dictionary single field definition \+: one key may be composed of many single fields not necessarily contiguous in the master file\textquotesingle{}s data structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{namespacezbs_ad1ffc21dd8821bc7d3738187858fa634}{zbs\+::entity\+Type}} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classzbs_1_1_z_search_entity}{ZSearch\+Entity}} $>$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Entity}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{namespacezbs_ab68375f1946c25c1d9c79d2b689452e4}{zbs\+::analyze\+Search\+Field}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Field\+Name}}, \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+To\+Search}})
+\item 
+\mbox{\hyperlink{namespacezbs_a3dfb485fafb8f98b66d8f5fefce270ad}{ZSearch\+Operand\+Type\+\_\+type}} \mbox{\hyperlink{namespacezbs_a0c0ff7852c83ed60137ea21f51e27076}{zbs\+::get\+Main\+Operand\+Type}} (\mbox{\hyperlink{classzbs_1_1_z_search_logical_operand}{ZSearch\+Logical\+Operand}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Operand}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{namespacezbs_a8e3691239193248bc00fe8b73d5a845f}{zbs\+::extract\+URIfrom\+Literal}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Path\+Literal}}, uri\+String \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URIOut}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{namespacezbs_a9adfe708e164361b09f070596f63ea6c}{zbs\+::match\+Weight}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{CMatch\+Result}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Result}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+To\+Match}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Match\+Min}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Radix\+Min}})
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{namespacezbs_a9443d9c6b2374e9c30914c2303138105}{zbs\+::search\+Ad\+Hoc\+Weighted\+\_\+old}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}}, \mbox{\hyperlink{classzbs_1_1_z_array}{ZArray}}$<$ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} $>$ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+Array}})
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{namespacezbs_af8ea0b82deedd61710c322f2c444f1d0}{zbs\+::search\+Ad\+Hoc\+Weighted}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}}, \mbox{\hyperlink{classzbs_1_1_z_array}{ZArray}}$<$ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} $>$ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+Array}})
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{namespacezbs_a9e8ae45d55176ff3b0e4e44ebcfede8e}{zbs\+::search\+Symbol\+Weighted}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{namespacezbs_a62bca9b0dbba829a8582f3c0cab4e76f}{zbs\+::search\+Keyword\+Weighted}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{namespacezbs_ab5e396d2b136662d5211b75caf001ad7}{zbs\+::\+Display\+Entity\+Default}} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classzbs_1_1_z_search_entity}{ZSearch\+Entity}} $>$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Entity}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zsearchparser__new_8cpp_a5107dfcdda194aec0b3b78b570c0764b}{ZSearch\+Query\+Help}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{zsearchparser__new_8cpp_a5107dfcdda194aec0b3b78b570c0764b}\label{zsearchparser__new_8cpp_a5107dfcdda194aec0b3b78b570c0764b} 
+\index{zsearchparser\_new.cpp@{zsearchparser\_new.cpp}!ZSearchQueryHelp@{ZSearchQueryHelp}}
+\index{ZSearchQueryHelp@{ZSearchQueryHelp}!zsearchparser\_new.cpp@{zsearchparser\_new.cpp}}
+\doxysubsubsection{\texorpdfstring{ZSearchQueryHelp}{ZSearchQueryHelp}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} ZSearch\+Query\+Help}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\textcolor{stringliteral}{"{}\ help\ </b>"{}}}
+\DoxyCodeLine{\textcolor{stringliteral}{"{}\ set\ file\ <path>\ [mode\ readonly,modify]\ as\ <entity\ name>\ ;\ \ //\ by\ default\ mode\ is\ read\ only<br>"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/selection\ phrase-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/>\ <br>"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zsearchparser__new_8cpp_source_l00039}{39}} of file \mbox{\hyperlink{zsearchparser__new_8cpp_source}{zsearchparser\+\_\+new.\+cpp}}.
+

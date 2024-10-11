@@ -21,6 +21,8 @@ namespace zbs {
 
 using namespace zbs;
 
+class ZQueryWizardMWd;
+
 class QWidget;
 class QTextEdit;
 
@@ -50,6 +52,9 @@ class ZSearchQueryMWd : public QMainWindow
   Q_OBJECT
 
 public:
+  friend class ZQueryWizardMWd;
+
+
   explicit ZSearchQueryMWd(ZaiErrors* pErrorLog,QWidget *parent = nullptr);
   ~ZSearchQueryMWd();
 
@@ -65,6 +70,11 @@ public:
                                 QWidget* pParent);
 
   void initLayout();
+
+  void setQueryWizard(ZQueryWizardMWd* pQueryWizard)
+  {
+      QueryWizardMWd = pQueryWizard;
+  }
 
 
   void help();
@@ -109,6 +119,11 @@ public:
 
   void ClearLog();
 
+  void displayColorErrorLog(uint8_t pSeverity,const utf8VaryingString& pMessage);
+
+  signals:
+  void instructionHasBeenExecuted(ZSearchContext* pContext);
+
   private slots:
 
 //  void QuitBTnClicked(bool pChecked);
@@ -135,14 +150,12 @@ private:
   ZaiErrors*    ErrorLog=nullptr;
   zbs::ZHelp*   HelpMWn=nullptr;
   QWidget*      CentralWidget=nullptr;
-  QWidget*     QueryWDg = nullptr;
+  ZQueryWizardMWd*     QueryWizardMWd = nullptr;
   QWidget*     ExpWidget2 = nullptr;
   QWidget*     ForBackWDg = nullptr;
 
   ZQPlainTextEdit*  QueryQTe=nullptr;
   ZQTableView*      ResultTBv=nullptr;
-
-
 
 
   QLabel*     EntityNameLBl=nullptr;
@@ -169,7 +182,6 @@ private:
   QAction* ExecQAc=nullptr;
   QAction* QuitQAc=nullptr;
   QAction* QuitIconQAc=nullptr;
-
 
   QAction* WizardQAc=nullptr;
 

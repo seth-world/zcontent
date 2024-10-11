@@ -1,0 +1,67 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/zdicdlg\+\_\+zrf.cpp File Reference}
+\hypertarget{zdicdlg__zrf_8cpp}{}\label{zdicdlg__zrf_8cpp}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zdicdlg\_zrf.cpp@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zdicdlg\_zrf.cpp}}
+{\ttfamily \#include "{}zdicdlg.\+h"{}}\newline
+{\ttfamily \#include "{}zfielddlg.\+h"{}}\newline
+{\ttfamily \#include $<$qevent.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqstandarditemmodel.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqstandarditem.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqtwidgettools.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zcontentutils/ztypelistbutton.\+h$>$}\newline
+{\ttfamily \#include $<$QPush\+Button$>$}\newline
+{\ttfamily \#include $<$zexceptiondlg.\+h$>$}\newline
+{\ttfamily \#include $<$QLayout$>$}\newline
+{\ttfamily \#include $<$QHBox\+Layout$>$}\newline
+{\ttfamily \#include $<$QLine\+Edit$>$}\newline
+{\ttfamily \#include $<$QLabel$>$}\newline
+Include dependency graph for zdicdlg\+\_\+zrf.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdicdlg__zrf_8cpp_a5ece5fbb53a212d81df8435c35b459dd}{cst\+\_\+\+Active\+Flag}} = 1
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdicdlg__zrf_8cpp_a5b4259d8c951b420299d0a752cdcc3b8}{cst\+\_\+\+Creation\+Date}} = 4
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdicdlg__zrf_8cpp_a0952bbae5c45859a7d13800ccd933626}{cst\+\_\+\+Modification\+Date}} = 5
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{zdicdlg__zrf_8cpp_a5ece5fbb53a212d81df8435c35b459dd}\label{zdicdlg__zrf_8cpp_a5ece5fbb53a212d81df8435c35b459dd} 
+\index{zdicdlg\_zrf.cpp@{zdicdlg\_zrf.cpp}!cst\_ActiveFlag@{cst\_ActiveFlag}}
+\index{cst\_ActiveFlag@{cst\_ActiveFlag}!zdicdlg\_zrf.cpp@{zdicdlg\_zrf.cpp}}
+\doxysubsubsection{\texorpdfstring{cst\_ActiveFlag}{cst\_ActiveFlag}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} cst\+\_\+\+Active\+Flag = 1}
+
+
+
+Definition at line \mbox{\hyperlink{zdicdlg__zrf_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{zdicdlg__zrf_8cpp_source}{zdicdlg\+\_\+zrf.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zdicdlg__zrf_8cpp_source_l00198}{ZDic\+DLg\+::get\+Dic\+Active()}}.
+
+\Hypertarget{zdicdlg__zrf_8cpp_a5b4259d8c951b420299d0a752cdcc3b8}\label{zdicdlg__zrf_8cpp_a5b4259d8c951b420299d0a752cdcc3b8} 
+\index{zdicdlg\_zrf.cpp@{zdicdlg\_zrf.cpp}!cst\_CreationDate@{cst\_CreationDate}}
+\index{cst\_CreationDate@{cst\_CreationDate}!zdicdlg\_zrf.cpp@{zdicdlg\_zrf.cpp}}
+\doxysubsubsection{\texorpdfstring{cst\_CreationDate}{cst\_CreationDate}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} cst\+\_\+\+Creation\+Date = 4}
+
+
+
+Definition at line \mbox{\hyperlink{zdicdlg__zrf_8cpp_source_l00019}{19}} of file \mbox{\hyperlink{zdicdlg__zrf_8cpp_source}{zdicdlg\+\_\+zrf.\+cpp}}.
+
+\Hypertarget{zdicdlg__zrf_8cpp_a0952bbae5c45859a7d13800ccd933626}\label{zdicdlg__zrf_8cpp_a0952bbae5c45859a7d13800ccd933626} 
+\index{zdicdlg\_zrf.cpp@{zdicdlg\_zrf.cpp}!cst\_ModificationDate@{cst\_ModificationDate}}
+\index{cst\_ModificationDate@{cst\_ModificationDate}!zdicdlg\_zrf.cpp@{zdicdlg\_zrf.cpp}}
+\doxysubsubsection{\texorpdfstring{cst\_ModificationDate}{cst\_ModificationDate}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} cst\+\_\+\+Modification\+Date = 5}
+
+
+
+Definition at line \mbox{\hyperlink{zdicdlg__zrf_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{zdicdlg__zrf_8cpp_source}{zdicdlg\+\_\+zrf.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zdicdlg__zrf_8cpp_source_l00198}{ZDic\+DLg\+::get\+Dic\+Active()}}.
+

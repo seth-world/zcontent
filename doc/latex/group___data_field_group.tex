@@ -1,0 +1,28 @@
+\doxysubsection{Key data fields management}
+\hypertarget{group___data_field_group}{}\label{group___data_field_group}\index{Key data fields management@{Key data fields management}}
+Data fields type need to be recognized while aggregating them to make an index key because there may be some conversion to be done. Data field type is defined using ZType\+\_\+type enum. \begin{DoxySeeAlso}{See also}
+\doxylink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8}{ZType\+\_\+type} 
+
+\doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zget\+ZType()}
+\end{DoxySeeAlso}
+
+\begin{DoxyItemize}
+\item Atomic data -\/ i. e. unitary data (numeric data) \+: Excepted for byte (int8\+\_\+t or char -\/ unsigned char), most systems use little endian internal representation. This memory representation of a multi-\/byte number reverses the order of bytes, so that putting it as is in a key will fool index searches and index creation. \begin{DoxySeeAlso}{See also}
+\doxylink{group___endian_conversion}{Endianness imposes a special processing for key data.}
+\end{DoxySeeAlso}
+
+\item Array \+: Array storage is considered as a collection of Atomic data fields, excepted for arrays of Char, considered as a fixed length CString.
+\item Class \+: a Class field may be a class or a struct that will contain underneeth data fields. No distinction/serialization is made for underneeth data and user has to take into account the little endian \& sign conversion by himself.
+\item Pointer \+: Pointers are only allowed for temporary, query fields definition (when using seek facilities). \begin{DoxyWarning}{Warning}
+Pointers are not allowed for defining a key structure. 
+\end{DoxyWarning}
+\begin{DoxySeeAlso}{See also}
+ZIndex\+File\+::zget\+ZType()
+\end{DoxySeeAlso}
+ 
+\begin{DoxyImage}
+\includegraphics[width=10cm]{ztype_type.jpg}
+\doxyfigcaption{ZType\+\_\+type}
+\end{DoxyImage}
+ 
+\end{DoxyItemize}

@@ -1,0 +1,282 @@
+\doxysection{zbs\+::ZBase\+Socket Class Reference}
+\hypertarget{classzbs_1_1_z_base_socket}{}\label{classzbs_1_1_z_base_socket}\index{zbs::ZBaseSocket@{zbs::ZBaseSocket}}
+
+
+{\ttfamily \#include $<$zbasesocket.\+h$>$}
+
+
+
+Inheritance diagram for zbs\+::ZBase\+Socket\+:
+% FIG 0
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_base_socket_a207e1de13a069ce6837b238d664f08e2}{ZBase\+Socket}} ()
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_base_socket_a1b0428d81c2867453fc3460bfbfd55ed}{\texorpdfstring{$\sim$}{\string~}\+ZBase\+Socket}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_base_socket_a9b5482a60b0c6193bcef9409205cb733}{zbaseread}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}})
+\begin{DoxyCompactList}\small\item\em \doxylink{classzbs_1_1_z_socket_aafbc8a744aa24712c834709ba0df1bb7}{zread()} read socket according ZBase protocol and put result within p\+Buffer \+: \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_base_socket_a4cce11ada93be43386254bf75de68b1c}{zbaseread}} (\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_base_socket_a0068f85a4e380aaa32f053b37e55ea74}{zbasewrite}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}})
+\begin{DoxyCompactList}\small\item\em \doxylink{classzbs_1_1_z_base_socket_a0068f85a4e380aaa32f053b37e55ea74}{ZBase\+Socket\+::zbasewrite} writes a ZData\+Buffer content to a socket according ZBase protocol first the size is sent (ssize\+\_\+t) then ZData\+Buffer full content Data is always prefixed with size of following data In case of error, ZException is set with appropriate error content. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_base_socket_a4dde7495c1cc5ef6ee65d4745612c15e}{zbasewrite}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}})
+\begin{DoxyCompactList}\small\item\em \doxylink{classzbs_1_1_z_socket_a3bd93415774323b8e8672c41273c0187}{ZBase\+Socket\+::zwrite} writes an utf8\+Varying\+String content to a socket according zbase protocol first the size is sent (ssize\+\_\+t) then ZData\+Buffer full content Data is always prefixed with size of following data. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classzbs_1_1_z_socket}{zbs\+::\+ZSocket}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_socket_af10beb781aae5f7a69b30a9958329d36}{ZSocket}} ()
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_socket_af52c9494b7058775713c9f25e662dfce}{\texorpdfstring{$\sim$}{\string~}\+ZSocket}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_socket_a826eb945b113f3bcccfd07264a109f4c}{\+\_\+single\+Setup}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{sockaddr\+\_\+in6}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address\+Bulk}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address\+Len}})
+\begin{DoxyCompactList}\small\item\em ZSocket\+::\+\_\+setup. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_socket_aa557374ded73e58ac5cd65496b4599db}{zsetup}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Node}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Port}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Family}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Flag}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Non\+Blocking}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Read\+Timeout}}=-\/1, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Write\+Timeout}}=-\/1)
+\begin{DoxyCompactList}\small\item\em \doxylink{classzbs_1_1_z_socket_aa557374ded73e58ac5cd65496b4599db}{ZSocket\+::zsetup}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{classzbs_1_1_z_socket_a2be28ac23f6c04c9175b00342b70efc5}{search\+Port}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Base\+Port}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Max\+Port}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_socket_aa87d6782c7acdc69f7982af2b276df63}{zconnect}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_socket_a8c0e266d2338837ca8e39e792f9d5eab}{\+\_\+read}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buf}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size\+To\+Read}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size\+Read}})
+\begin{DoxyCompactList}\small\item\em \doxylink{classzbs_1_1_z_socket_aafbc8a744aa24712c834709ba0df1bb7}{zread()} read from socket p\+Size\+To\+Read bytes and put them into p\+Buf. p\+Buf must have been allocated with p\+Size\+To\+Read bytes before calling this routine. Effective number of bytes read is returned into p\+Size\+Read. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_socket_aafbc8a744aa24712c834709ba0df1bb7}{zread}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size\+To\+Read}})
+\begin{DoxyCompactList}\small\item\em \doxylink{classzbs_1_1_z_socket_aafbc8a744aa24712c834709ba0df1bb7}{zread()} read from socket p\+Size\+To\+Read characters and sets p\+Buffer with result. if number of bytes are less than p\+Size\+To\+Read, p\+Buffer is truncated to size read \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_socket_ad70bcd95d626899c505cf8b9fe4063ae}{zread}} (\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size\+To\+Read}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_socket_a6852348aabdff55c759ea3ae7cbc9b40}{\+\_\+write}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buf}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size\+To\+Write}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size\+Written}})
+\begin{DoxyCompactList}\small\item\em \doxylink{classzbs_1_1_z_socket_a6852348aabdff55c759ea3ae7cbc9b40}{ZSocket\+::\+\_\+write}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_socket_a3bd93415774323b8e8672c41273c0187}{zwrite}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size\+Written}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_socket_a20c445f1f2b6ee4f77538c79e1f51b1a}{zwrite}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size\+Written}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_socket_a62f1bc5c371c0a888c8c875cfe17f370}{zclose}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_socket_a3e9f6bd1947d47203984875d1f22aa47}{zshutdown}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_socket_ab52159100df6db1575b96cd64d442202}{is\+Active}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{struct}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{sockaddr\+\_\+in6}} \mbox{\hyperlink{classzbs_1_1_z_socket_af94522727fc23c988065b8c6e783f7c7}{\+\_\+get\+Address\+Bulk}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{classzbs_1_1_z_socket_a5eb4da8bcc83b75d4cd83986e0305b82}{\+\_\+get\+Address\+Len}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_socket_a497778fa2dea7d5cbee0456babf83967}{register\+Broken\+Pipe}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+\_\+sighandler\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Catch\+Broken\+Pipe}})
+\begin{DoxyCompactList}\small\item\em register\+Broken\+Pipe this routine registers a handler for SIGPIPE (broken pipe) signal with an optional cancellation routine that will be called when a SIGPIPE is emitted. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{classzbs_1_1_z_socket_affac8a5f82e1de9fc291eaf1ea13c36a}{get\+Effective\+Host\+Name}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utfdesc\+String}} \mbox{\hyperlink{classzbs_1_1_z_socket_ab0d210194e3cb6e0d29d12b8c29107ac}{get\+Effective\+IPAddress}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{classzbs_1_1_z_socket_a5802d1a7c6d3f9260bda3a6d4a28e4af}{get\+Effective\+Port}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utfdesc\+String}} \mbox{\hyperlink{classzbs_1_1_z_socket_a15751f61b83584f0309276564b268ca2}{get\+Effective\+Service\+Name}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_socket_a610385f99fd64d62515b4caf98e611c9}{set\+Non\+Blocking}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Option}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_socket_af79969f75ebce3544a5b1f267cb8a05e}{set\+Socket\+Performance}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+On\+Off}})
+\begin{DoxyCompactList}\small\item\em set\+Socket\+Performance sets socket performance monitoring on/off \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{classzbs_1_1_z_socket}{zbs\+::\+ZSocket}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zserverselectabstract_8h_aaff3cae1b3a2437d375d507e990bbdc0}{SOCKET\+\_\+\+DESCRIPTOR\+\_\+\+TYPE}} \mbox{\hyperlink{classzbs_1_1_z_socket_aa5af47ede766537d398b3c581f82b047}{Fd}} =-\/1
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{in\+\_\+port\+\_\+t}} \mbox{\hyperlink{classzbs_1_1_z_socket_a8312ca69998f42c2ca89ebbfb31b0c1e}{Net\+Port}} =-\/1
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{classzbs_1_1_z_socket_aac9fe553ea50f3aa040b683ce5874ca1}{Family}} =-\/1
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{in\+\_\+addr\+\_\+t}} \mbox{\hyperlink{classzbs_1_1_z_socket_a80aad71cad607105a8515ea9e5a2cf50}{Net\+Address}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{classzbs_1_1_z_socket_a75bde288d93a1908797a89233f782d19}{Address\+Len}} =-\/1
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{struct}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{sockaddr\+\_\+in6}} \mbox{\hyperlink{classzbs_1_1_z_socket_a0e03231ed21a82f0fda4fe6b9cb8255f}{Address\+Bulk}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{struct}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{sockaddr\+\_\+in}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_socket_aa219d08ab0b7c426ad976a7ebf33d1c5}{Address\+IPV4}} =(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{sockaddr\+\_\+in}}\texorpdfstring{$\ast$}{*})\&\mbox{\hyperlink{classzbs_1_1_z_socket_a0e03231ed21a82f0fda4fe6b9cb8255f}{Address\+Bulk}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{struct}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{sockaddr\+\_\+in6}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_socket_a755d23a5c68f3fe4b456a609968340b7}{Address\+IPV6}} =\&\mbox{\hyperlink{classzbs_1_1_z_socket_a0e03231ed21a82f0fda4fe6b9cb8255f}{Address\+Bulk}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{struct}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{sockaddr}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_socket_aa55059424d33aa9d0ea80fa11b94811f}{Sock\+Addr}} = (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{struct}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{sockaddr}}\texorpdfstring{$\ast$}{*})\&\mbox{\hyperlink{classzbs_1_1_z_socket_a0e03231ed21a82f0fda4fe6b9cb8255f}{Address\+Bulk}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_socket_a4aa1466277a2e675241dacea33d69f31}{Perf\+Flag}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}
+\item 
+\mbox{\hyperlink{class_z_socket_p_m_s}{ZSocket\+PMS}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_socket_a98d11527b3eef985310297a810491ae3}{Socket\+PMS}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{classzbs_1_1_z_socket_abee77d343d13bb838c55c7e862e55279}{Port}}
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{classzbs_1_1_z_socket_a38b139a9e22a41443de8c0464477fd6d}{Host\+Name}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zbasesocket_8h_source_l00062}{62}} of file \mbox{\hyperlink{zbasesocket_8h_source}{zbasesocket.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classzbs_1_1_z_base_socket_a207e1de13a069ce6837b238d664f08e2}\label{classzbs_1_1_z_base_socket_a207e1de13a069ce6837b238d664f08e2} 
+\index{zbs::ZBaseSocket@{zbs::ZBaseSocket}!ZBaseSocket@{ZBaseSocket}}
+\index{ZBaseSocket@{ZBaseSocket}!zbs::ZBaseSocket@{zbs::ZBaseSocket}}
+\doxysubsubsection{\texorpdfstring{ZBaseSocket()}{ZBaseSocket()}}
+{\footnotesize\ttfamily ZBase\+Socket\+::\+ZBase\+Socket (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zbasesocket_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{zbasesocket_8cpp_source}{zbasesocket.\+cpp}}.
+
+\Hypertarget{classzbs_1_1_z_base_socket_a1b0428d81c2867453fc3460bfbfd55ed}\label{classzbs_1_1_z_base_socket_a1b0428d81c2867453fc3460bfbfd55ed} 
+\index{zbs::ZBaseSocket@{zbs::ZBaseSocket}!````~ZBaseSocket@{\texorpdfstring{$\sim$}{\string~}ZBaseSocket}}
+\index{````~ZBaseSocket@{\texorpdfstring{$\sim$}{\string~}ZBaseSocket}!zbs::ZBaseSocket@{zbs::ZBaseSocket}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ZBaseSocket()}{\string~ZBaseSocket()}}
+{\footnotesize\ttfamily zbs\+::\+ZBase\+Socket\+::\texorpdfstring{$\sim$}{\string~}\+ZBase\+Socket (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zbasesocket_8h_source_l00066}{66}} of file \mbox{\hyperlink{zbasesocket_8h_source}{zbasesocket.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classzbs_1_1_z_base_socket_a4cce11ada93be43386254bf75de68b1c}\label{classzbs_1_1_z_base_socket_a4cce11ada93be43386254bf75de68b1c} 
+\index{zbs::ZBaseSocket@{zbs::ZBaseSocket}!zbaseread@{zbaseread}}
+\index{zbaseread@{zbaseread}!zbs::ZBaseSocket@{zbs::ZBaseSocket}}
+\doxysubsubsection{\texorpdfstring{zbaseread()}{zbaseread()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZBase\+Socket\+::zbaseread (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Buffer }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zbasesocket_8cpp_source_l00126}{126}} of file \mbox{\hyperlink{zbasesocket_8cpp_source}{zbasesocket.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsocket_8cpp_source_l00382}{zbs\+::\+ZSocket\+::\+\_\+read()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_base_socket_a9b5482a60b0c6193bcef9409205cb733}\label{classzbs_1_1_z_base_socket_a9b5482a60b0c6193bcef9409205cb733} 
+\index{zbs::ZBaseSocket@{zbs::ZBaseSocket}!zbaseread@{zbaseread}}
+\index{zbaseread@{zbaseread}!zbs::ZBaseSocket@{zbs::ZBaseSocket}}
+\doxysubsubsection{\texorpdfstring{zbaseread()}{zbaseread()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZBase\+Socket\+::zbaseread (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Buffer }\end{DoxyParamCaption})}
+
+
+
+\doxylink{classzbs_1_1_z_socket_aafbc8a744aa24712c834709ba0df1bb7}{zread()} read socket according ZBase protocol and put result within p\+Buffer \+: 
+
+\doxylink{classzbs_1_1_z_socket_aa557374ded73e58ac5cd65496b4599db}{ZBase\+Socket\+::zsetup}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Node} & node description \+: node name or ip addess to set the socket for. If empty, socket is set with address == nullptr \+: that means local hostname will be taken \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Port} & service name or port number \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Family} & AF\+\_\+\+INET for IPV4 -\/ AF\+\_\+\+INET6 for IPV6 -\/ AF\+\_\+\+UNSPEC for either IPV4 or IPV6 \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Flag} & p\+Flag values and usage (netdb.\+h)\\
+\hline
+\end{DoxyParams}
+AI\+\_\+\+PASSIVE The socket address will be used in a call to the bind function.
+
+AI\+\_\+\+CANONNAME The canonical name is returned in the first ai\+\_\+canonname member.
+
+AI\+\_\+\+NUMERICHOST The nodename parameter passed to the getaddrinfo function must be a numeric string.
+
+AI\+\_\+\+ALL If this bit is set, a request is made for IPv6 addresses and IPv4 addresses with AI\+\_\+\+V4\+MAPPED. This option is supported on Windows Vista and later.
+
+AI\+\_\+\+ADDRCONFIG The getaddrinfo will resolve only if a global address is configured. The IPv6 and IPv4 loopback address is not considered a valid global address. This option is supported on Windows Vista and later.
+
+AI\+\_\+\+V4\+MAPPED If the getaddrinfo request for IPv6 addresses fails, a name service request is made for IPv4 addresses and these addresses are converted to IPv4-\/mapped IPv6 address format. This option is supported on Windows Vista and later.
+
+-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/---Following values are Windows only flag values-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/---
+
+AI\+\_\+\+NON\+\_\+\+AUTHORITATIVE The address information can be from a non-\/authoritative namespace provider. This option is only supported on Windows Vista and later for the NS\+\_\+\+EMAIL namespace.
+
+AI\+\_\+\+SECURE The address information is from a secure channel. This option is only supported on Windows Vista and later for the NS\+\_\+\+EMAIL namespace.
+
+AI\+\_\+\+RETURN\+\_\+\+PREFERRED\+\_\+\+NAMES The address information is for a preferred name for a user. This option is only supported on Windows Vista and later for the NS\+\_\+\+EMAIL namespace.
+
+AI\+\_\+\+FQDN If a flat name (single label) is specified, getaddrinfo will return the fully qualified domain name that the name eventually resolved to. The fully qualified domain name is returned in the ai\+\_\+canonname member. This is different than AI\+\_\+\+CANONNAME bit flag that returns the canonical name registered in DNS which may be different than the fully qualified domain name that the flat name resolved to. Only one of the AI\+\_\+\+FQDN and AI\+\_\+\+CANONNAME bits can be set. The getaddrinfo function will fail if both flags are present with EAI\+\_\+\+BADFLAGS. This option is supported on Windows 7, Windows Server 2008 R2, and later.
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Non\+Blocking} & defines wether socket has to be blocking (false) or non blocking (true) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\doxylink{classzbs_1_1_z_socket_aafbc8a744aa24712c834709ba0df1bb7}{ZBase\+Socket\+::zread} reads the socket according ZBase protocol and returns a ZData\+Buffer containing the read content. NB\+: each socket read or write is prefixed with a ssize\+\_\+t with the length of the data content. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em p\+Buffer} & data read \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus set to ZS\+\_\+\+SUCCESS if OK or ZS\+\_\+\+READERROR in case of IO error (ZException is positionned) 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zbasesocket_8cpp_source_l00075}{75}} of file \mbox{\hyperlink{zbasesocket_8cpp_source}{zbasesocket.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsocket_8cpp_source_l00382}{zbs\+::\+ZSocket\+::\+\_\+read()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_base_socket_a4dde7495c1cc5ef6ee65d4745612c15e}\label{classzbs_1_1_z_base_socket_a4dde7495c1cc5ef6ee65d4745612c15e} 
+\index{zbs::ZBaseSocket@{zbs::ZBaseSocket}!zbasewrite@{zbasewrite}}
+\index{zbasewrite@{zbasewrite}!zbs::ZBaseSocket@{zbs::ZBaseSocket}}
+\doxysubsubsection{\texorpdfstring{zbasewrite()}{zbasewrite()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZBase\+Socket\+::zbasewrite (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Buffer }\end{DoxyParamCaption})}
+
+
+
+\doxylink{classzbs_1_1_z_socket_a3bd93415774323b8e8672c41273c0187}{ZBase\+Socket\+::zwrite} writes an utf8\+Varying\+String content to a socket according zbase protocol first the size is sent (ssize\+\_\+t) then ZData\+Buffer full content Data is always prefixed with size of following data. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Buffer} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus set to ZS\+\_\+\+SUCCESS if OK or ZS\+\_\+\+WRITEERROR in case of IO error or if size written does not match size to write 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zbasesocket_8cpp_source_l00200}{200}} of file \mbox{\hyperlink{zbasesocket_8cpp_source}{zbasesocket.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsocket_8cpp_source_l00481}{zbs\+::\+ZSocket\+::\+\_\+write()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_base_socket_a0068f85a4e380aaa32f053b37e55ea74}\label{classzbs_1_1_z_base_socket_a0068f85a4e380aaa32f053b37e55ea74} 
+\index{zbs::ZBaseSocket@{zbs::ZBaseSocket}!zbasewrite@{zbasewrite}}
+\index{zbasewrite@{zbasewrite}!zbs::ZBaseSocket@{zbs::ZBaseSocket}}
+\doxysubsubsection{\texorpdfstring{zbasewrite()}{zbasewrite()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZBase\+Socket\+::zbasewrite (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Buffer }\end{DoxyParamCaption})}
+
+
+
+\doxylink{classzbs_1_1_z_base_socket_a0068f85a4e380aaa32f053b37e55ea74}{ZBase\+Socket\+::zbasewrite} writes a ZData\+Buffer content to a socket according ZBase protocol first the size is sent (ssize\+\_\+t) then ZData\+Buffer full content Data is always prefixed with size of following data In case of error, ZException is set with appropriate error content. 
+
+\doxylink{classzbs_1_1_z_base_socket_a0068f85a4e380aaa32f053b37e55ea74}{ZBase\+Socket\+::zbasewrite} writes a ZData\+Buffer content to a socket according zbase protocol first the size is sent (ssize\+\_\+t) then ZData\+Buffer full content Data is always prefixed with size of following data.
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Buffer} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus set to ZS\+\_\+\+SUCCESS if OK or ZS\+\_\+\+WRITEERROR in case of IO error or if size written does not match size to write 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zbasesocket_8cpp_source_l00174}{174}} of file \mbox{\hyperlink{zbasesocket_8cpp_source}{zbasesocket.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsocket_8cpp_source_l00481}{zbs\+::\+ZSocket\+::\+\_\+write()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/znet/zbasenet/\mbox{\hyperlink{zbasesocket_8h}{zbasesocket.\+h}}\item 
+/home/gerard/\+Development/zbasetools/znet/zbasenet/\mbox{\hyperlink{zbasesocket_8cpp}{zbasesocket.\+cpp}}\end{DoxyCompactItemize}

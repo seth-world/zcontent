@@ -1,0 +1,28 @@
+var classzbs_1_1_z_master_control_block =
+[
+    [ "ZMasterControlBlock", "classzbs_1_1_z_master_control_block.html#af3857f91d30e9da5e63b8f783196770b", null ],
+    [ "~ZMasterControlBlock", "classzbs_1_1_z_master_control_block.html#a2c24e41cd4784efde348ab7ada6e604c", null ],
+    [ "_exportAppend", "classzbs_1_1_z_master_control_block.html#ad4d344dfbad95d61365cea4432208834", null ],
+    [ "_import", "classzbs_1_1_z_master_control_block.html#a35b592167d536efea2954539d1161052", null ],
+    [ "clear", "classzbs_1_1_z_master_control_block.html#ae4ef34d7a72a510cb6556888d78d3724", null ],
+    [ "fromXml", "classzbs_1_1_z_master_control_block.html#ad4013e17eb5f6cef9e5a7290217e84b7", null ],
+    [ "getEngineMode", "classzbs_1_1_z_master_control_block.html#abac8b58545fbec305539f802df0b5025", null ],
+    [ "getURIDictionary", "classzbs_1_1_z_master_control_block.html#ad1bb65caa1486c68e59f6c51283d85df", null ],
+    [ "hasDictionary", "classzbs_1_1_z_master_control_block.html#ac737b55ac664088f7895374a5fed9d7f", null ],
+    [ "loadDictionary", "classzbs_1_1_z_master_control_block.html#a91084531c654c7dbebc1619bcbf7c33d", null ],
+    [ "loadDictionary_bin", "classzbs_1_1_z_master_control_block.html#a45dd592001d0fe24aa15519d97d8ae3d", null ],
+    [ "popIndex", "classzbs_1_1_z_master_control_block.html#a49ddc26eaa0f943bf214dfb84537f72a", null ],
+    [ "report", "classzbs_1_1_z_master_control_block.html#a7cc1c4f686a593134b4ecf2912648fe1", null ],
+    [ "setEngineMode", "classzbs_1_1_z_master_control_block.html#a24c02c629f026182af7465679835a0ee", null ],
+    [ "toXml", "classzbs_1_1_z_master_control_block.html#ad85bc6e123af3ef88c1a09b774fc3448", null ],
+    [ "ZSJournal", "classzbs_1_1_z_master_control_block.html#af6c5165dc42a0d37c2cb1f32ccd9f0f7", null ],
+    [ "Dictionary", "classzbs_1_1_z_master_control_block.html#ab673d4bee4c1c1b2977149d54ae4c7cb", null ],
+    [ "DictionaryPath", "classzbs_1_1_z_master_control_block.html#aff0d0fb0b313808f4ddf7303eecb440b", null ],
+    [ "EngineMode", "classzbs_1_1_z_master_control_block.html#a48680999668ead7cc737eba4ef2fff72", null ],
+    [ "HealthStatus", "classzbs_1_1_z_master_control_block.html#a99a60cb6d234d8f7b6a601da2e61c6fe", null ],
+    [ "HistoryOn", "classzbs_1_1_z_master_control_block.html#a050a2b814d394238b4fd7536722d49b9", null ],
+    [ "IndexFilePath", "classzbs_1_1_z_master_control_block.html#a23684df3c30b4330eddc15aad69efb96", null ],
+    [ "IndexTable", "classzbs_1_1_z_master_control_block.html#aa7c440df1d208ddd217d2a2883935793", null ],
+    [ "RawMasterFile", "classzbs_1_1_z_master_control_block.html#a8fbdf13dc957bae2a824605411d022d6", null ],
+    [ "ZJCB", "classzbs_1_1_z_master_control_block.html#a73b6c047ed1c50ab323f3977d8e5401c", null ]
+];

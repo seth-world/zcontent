@@ -1,0 +1,27 @@
+\doxysubsection{Endianness imposes a special processing for key data.}
+\hypertarget{group___endian_conversion}{}\label{group___endian_conversion}\index{Endianness imposes a special processing for key data.@{Endianness imposes a special processing for key data.}}
+Endianness of numeric data imposes a special conversion while processing this kind of data for sorting it.
+
+The problem concerns Atomic data -\/ i. e. unitary data (numeric data) \+: Excepted for byte (int8\+\_\+t or char -\/ unsigned char), most systems use little endian internal representation. The memory representation of a multi-\/byte number reverses the order of bytes, so that putting it as is in a key will fool index searches and index creation.
+
+\begin{DoxyNote}{Note}
+What is Endian ?
+\begin{DoxyItemize}
+\item Big Endian \+: multi-\/byte numbers are stored left to right \+: from most significant to least significant. So this is a correct index representation\+: only sign must be treated (if signed data).
+\item Little Endian \+: multi-\/byte numbers are stored in reverse byte order \+: from least significant to most significant (reverse order). This has to be reversed before creating or reading index key.
+\end{DoxyItemize}
+\end{DoxyNote}
+In addition, sign management (minus sets the very most significant bit to 1) induces that a negative number looks greater than a positive number.
+
+These two elements (Endian and sign) will fool the index key search algorithms so that data has prior to be structured in a more logical way for sorting data.
+
+Sign has to be neutralized within the number itself and a \textquotesingle{}sign byte\textquotesingle{} is added with values \+:
+\begin{DoxyItemize}
+\item 0 for negative number (so that any negative number is sorted before a positive number
+\item 1 for positive number Negative values are then complemented to their absolute value with 0x\+FF (as many bytes as the data size is long ) in order to get the effective value to be sorted by Key algorithms (and searched).
+
+ZIndex\+File key content has its own data storage (called internal format). So that ZIndex Key content values are not \textquotesingle{}human readable\textquotesingle{}. This is the reason, why there is an utility to print out ZIndex key content. \begin{DoxySeeAlso}{See also}
+ZMaster\+File\+::zprint\+Index\+Field\+Values() ZIndex\+File\+::zprint\+Key\+Fields\+Values() 
+\end{DoxySeeAlso}
+
+\end{DoxyItemize}

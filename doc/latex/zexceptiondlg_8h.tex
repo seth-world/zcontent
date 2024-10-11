@@ -1,0 +1,168 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/zexceptiondlg.h File Reference}
+\hypertarget{zexceptiondlg_8h}{}\label{zexceptiondlg_8h}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zexceptiondlg.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zexceptiondlg.h}}
+{\ttfamily \#include $<$QDialog$>$}\newline
+{\ttfamily \#include $<$ztoolset/utfvaryingstring.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/uristring.\+h$>$}\newline
+Include dependency graph for zexceptiondlg.\+h\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_z_exception_d_lg_options}{ZException\+DLg\+Options}}
+\item 
+class \mbox{\hyperlink{class_z_exception_d_lg}{ZException\+DLg}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf16\+Varying\+String}} \mbox{\hyperlink{zexceptiondlg_8h_a745ecc2258ce1dd202fdeb8bace8ff3c}{utf16\+String}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf32\+Varying\+String}} \mbox{\hyperlink{zexceptiondlg_8h_af6aafb4c5ed57681810c888564fd15dc}{utf32\+String}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884}{ZException\+Dlg\+\_\+type}} \+: uint16\+\_\+t \{ \newline
+\mbox{\hyperlink{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884aa3fceeea5f7b8da37ec1461344648b4c}{ZEXDLG\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884aff0b91213611f7bdb3aaa1f12233a61d}{ZEXDLG\+\_\+\+Yes\+No}} = 1
+, \mbox{\hyperlink{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a3205bfb51e7ade4758957c6e40f88206}{ZEXDLG\+\_\+\+Ok\+Cancel}} = 2
+, \mbox{\hyperlink{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a957922ce66157d579de1711021b986e5}{ZEXDLG\+\_\+\+Other}} = 4
+, \newline
+\mbox{\hyperlink{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884af2ec94f351175ea1e0faaffb8edfa367}{ZEXDLG\+\_\+\+Button\+Mask}} =0x00\+FF
+, \mbox{\hyperlink{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884ae7e03ccc36b83b2c76a166a04bccac6d}{ZEXDLG\+\_\+\+Info}} = 0x0100
+, \mbox{\hyperlink{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a9093b190ca3ef3758b5bf243e3f1094d}{ZEXDLG\+\_\+\+Warning}} = 0x0200
+, \mbox{\hyperlink{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884ad9816178f4f20ac607360b2fbaec55d5}{ZEXDLG\+\_\+\+Error}} = 0x0300
+, \newline
+\mbox{\hyperlink{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a52ca7071837b145864d953b42088ba4e}{ZEXDLG\+\_\+\+Severe}} = 0x0400
+, \mbox{\hyperlink{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884ae805766bfa76651139fc9ff4b585816e}{ZEXDLG\+\_\+\+Fatal}} = 0x0500
+, \mbox{\hyperlink{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a07463c5512252ac3bfe4cd770347006b}{ZEXDLG\+\_\+\+Highest}} =0x0600
+, \mbox{\hyperlink{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a1596cc0db37975834cdfa5b6016bed6c}{ZEXDLG\+\_\+\+Severity\+Mask}} =0x\+FF00
+ \}
+\item 
+enum \mbox{\hyperlink{zexceptiondlg_8h_ad1866b5140ec75254f3d6f93e839483a}{ZEDLGReturn}} \+: int \{ \mbox{\hyperlink{zexceptiondlg_8h_ad1866b5140ec75254f3d6f93e839483aa0e4ee61d9c07ede2874a0c8df27c4d56}{ZEDLG\+\_\+\+Rejected}} = QDialog\+::Rejected
+, \mbox{\hyperlink{zexceptiondlg_8h_ad1866b5140ec75254f3d6f93e839483aa4c12296d1df12d07144fb28b7ed470e6}{ZEDLG\+\_\+\+Accepted}} = QDialog\+::Accepted
+, \mbox{\hyperlink{zexceptiondlg_8h_ad1866b5140ec75254f3d6f93e839483aa24bbdde5da48e8bddfc2e8e624e06f57}{ZEDLG\+\_\+\+Third}} = 0x\+FF
+ \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{zexceptiondlg_8h_a745ecc2258ce1dd202fdeb8bace8ff3c}\label{zexceptiondlg_8h_a745ecc2258ce1dd202fdeb8bace8ff3c} 
+\index{zexceptiondlg.h@{zexceptiondlg.h}!utf16String@{utf16String}}
+\index{utf16String@{utf16String}!zexceptiondlg.h@{zexceptiondlg.h}}
+\doxysubsubsection{\texorpdfstring{utf16String}{utf16String}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf16\+Varying\+String}} \mbox{\hyperlink{zexceptiondlg_8h_a745ecc2258ce1dd202fdeb8bace8ff3c}{utf16\+String}}}
+
+
+
+Definition at line \mbox{\hyperlink{zexceptiondlg_8h_source_l00008}{8}} of file \mbox{\hyperlink{zexceptiondlg_8h_source}{zexceptiondlg.\+h}}.
+
+\Hypertarget{zexceptiondlg_8h_af6aafb4c5ed57681810c888564fd15dc}\label{zexceptiondlg_8h_af6aafb4c5ed57681810c888564fd15dc} 
+\index{zexceptiondlg.h@{zexceptiondlg.h}!utf32String@{utf32String}}
+\index{utf32String@{utf32String}!zexceptiondlg.h@{zexceptiondlg.h}}
+\doxysubsubsection{\texorpdfstring{utf32String}{utf32String}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf32\+Varying\+String}} \mbox{\hyperlink{zexceptiondlg_8h_af6aafb4c5ed57681810c888564fd15dc}{utf32\+String}}}
+
+
+
+Definition at line \mbox{\hyperlink{zexceptiondlg_8h_source_l00009}{9}} of file \mbox{\hyperlink{zexceptiondlg_8h_source}{zexceptiondlg.\+h}}.
+
+\Hypertarget{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}\label{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838} 
+\index{zexceptiondlg.h@{zexceptiondlg.h}!utf8VaryingString@{utf8VaryingString}}
+\index{utf8VaryingString@{utf8VaryingString}!zexceptiondlg.h@{zexceptiondlg.h}}
+\doxysubsubsection{\texorpdfstring{utf8VaryingString}{utf8VaryingString}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}}}
+
+
+
+Definition at line \mbox{\hyperlink{zexceptiondlg_8h_source_l00007}{7}} of file \mbox{\hyperlink{zexceptiondlg_8h_source}{zexceptiondlg.\+h}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{zexceptiondlg_8h_ad1866b5140ec75254f3d6f93e839483a}\label{zexceptiondlg_8h_ad1866b5140ec75254f3d6f93e839483a} 
+\index{zexceptiondlg.h@{zexceptiondlg.h}!ZEDLGReturn@{ZEDLGReturn}}
+\index{ZEDLGReturn@{ZEDLGReturn}!zexceptiondlg.h@{zexceptiondlg.h}}
+\doxysubsubsection{\texorpdfstring{ZEDLGReturn}{ZEDLGReturn}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{zexceptiondlg_8h_ad1866b5140ec75254f3d6f93e839483a}{ZEDLGReturn}} \+: \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZEDLG\_Rejected@{ZEDLG\_Rejected}!zexceptiondlg.h@{zexceptiondlg.h}}\index{zexceptiondlg.h@{zexceptiondlg.h}!ZEDLG\_Rejected@{ZEDLG\_Rejected}}}\Hypertarget{zexceptiondlg_8h_ad1866b5140ec75254f3d6f93e839483aa0e4ee61d9c07ede2874a0c8df27c4d56}\label{zexceptiondlg_8h_ad1866b5140ec75254f3d6f93e839483aa0e4ee61d9c07ede2874a0c8df27c4d56} 
+ZEDLG\+\_\+\+Rejected&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZEDLG\_Accepted@{ZEDLG\_Accepted}!zexceptiondlg.h@{zexceptiondlg.h}}\index{zexceptiondlg.h@{zexceptiondlg.h}!ZEDLG\_Accepted@{ZEDLG\_Accepted}}}\Hypertarget{zexceptiondlg_8h_ad1866b5140ec75254f3d6f93e839483aa4c12296d1df12d07144fb28b7ed470e6}\label{zexceptiondlg_8h_ad1866b5140ec75254f3d6f93e839483aa4c12296d1df12d07144fb28b7ed470e6} 
+ZEDLG\+\_\+\+Accepted&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZEDLG\_Third@{ZEDLG\_Third}!zexceptiondlg.h@{zexceptiondlg.h}}\index{zexceptiondlg.h@{zexceptiondlg.h}!ZEDLG\_Third@{ZEDLG\_Third}}}\Hypertarget{zexceptiondlg_8h_ad1866b5140ec75254f3d6f93e839483aa24bbdde5da48e8bddfc2e8e624e06f57}\label{zexceptiondlg_8h_ad1866b5140ec75254f3d6f93e839483aa24bbdde5da48e8bddfc2e8e624e06f57} 
+ZEDLG\+\_\+\+Third&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{zexceptiondlg_8h_source_l00055}{55}} of file \mbox{\hyperlink{zexceptiondlg_8h_source}{zexceptiondlg.\+h}}.
+
+\Hypertarget{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884}\label{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884} 
+\index{zexceptiondlg.h@{zexceptiondlg.h}!ZExceptionDlg\_type@{ZExceptionDlg\_type}}
+\index{ZExceptionDlg\_type@{ZExceptionDlg\_type}!zexceptiondlg.h@{zexceptiondlg.h}}
+\doxysubsubsection{\texorpdfstring{ZExceptionDlg\_type}{ZExceptionDlg\_type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884}{ZException\+Dlg\+\_\+type}} \+: \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\+\_\+t}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZEXDLG\_Nothing@{ZEXDLG\_Nothing}!zexceptiondlg.h@{zexceptiondlg.h}}\index{zexceptiondlg.h@{zexceptiondlg.h}!ZEXDLG\_Nothing@{ZEXDLG\_Nothing}}}\Hypertarget{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884aa3fceeea5f7b8da37ec1461344648b4c}\label{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884aa3fceeea5f7b8da37ec1461344648b4c} 
+ZEXDLG\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZEXDLG\_YesNo@{ZEXDLG\_YesNo}!zexceptiondlg.h@{zexceptiondlg.h}}\index{zexceptiondlg.h@{zexceptiondlg.h}!ZEXDLG\_YesNo@{ZEXDLG\_YesNo}}}\Hypertarget{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884aff0b91213611f7bdb3aaa1f12233a61d}\label{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884aff0b91213611f7bdb3aaa1f12233a61d} 
+ZEXDLG\+\_\+\+Yes\+No&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZEXDLG\_OkCancel@{ZEXDLG\_OkCancel}!zexceptiondlg.h@{zexceptiondlg.h}}\index{zexceptiondlg.h@{zexceptiondlg.h}!ZEXDLG\_OkCancel@{ZEXDLG\_OkCancel}}}\Hypertarget{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a3205bfb51e7ade4758957c6e40f88206}\label{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a3205bfb51e7ade4758957c6e40f88206} 
+ZEXDLG\+\_\+\+Ok\+Cancel&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZEXDLG\_Other@{ZEXDLG\_Other}!zexceptiondlg.h@{zexceptiondlg.h}}\index{zexceptiondlg.h@{zexceptiondlg.h}!ZEXDLG\_Other@{ZEXDLG\_Other}}}\Hypertarget{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a957922ce66157d579de1711021b986e5}\label{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a957922ce66157d579de1711021b986e5} 
+ZEXDLG\+\_\+\+Other&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZEXDLG\_ButtonMask@{ZEXDLG\_ButtonMask}!zexceptiondlg.h@{zexceptiondlg.h}}\index{zexceptiondlg.h@{zexceptiondlg.h}!ZEXDLG\_ButtonMask@{ZEXDLG\_ButtonMask}}}\Hypertarget{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884af2ec94f351175ea1e0faaffb8edfa367}\label{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884af2ec94f351175ea1e0faaffb8edfa367} 
+ZEXDLG\+\_\+\+Button\+Mask&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZEXDLG\_Info@{ZEXDLG\_Info}!zexceptiondlg.h@{zexceptiondlg.h}}\index{zexceptiondlg.h@{zexceptiondlg.h}!ZEXDLG\_Info@{ZEXDLG\_Info}}}\Hypertarget{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884ae7e03ccc36b83b2c76a166a04bccac6d}\label{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884ae7e03ccc36b83b2c76a166a04bccac6d} 
+ZEXDLG\+\_\+\+Info&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZEXDLG\_Warning@{ZEXDLG\_Warning}!zexceptiondlg.h@{zexceptiondlg.h}}\index{zexceptiondlg.h@{zexceptiondlg.h}!ZEXDLG\_Warning@{ZEXDLG\_Warning}}}\Hypertarget{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a9093b190ca3ef3758b5bf243e3f1094d}\label{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a9093b190ca3ef3758b5bf243e3f1094d} 
+ZEXDLG\+\_\+\+Warning&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZEXDLG\_Error@{ZEXDLG\_Error}!zexceptiondlg.h@{zexceptiondlg.h}}\index{zexceptiondlg.h@{zexceptiondlg.h}!ZEXDLG\_Error@{ZEXDLG\_Error}}}\Hypertarget{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884ad9816178f4f20ac607360b2fbaec55d5}\label{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884ad9816178f4f20ac607360b2fbaec55d5} 
+ZEXDLG\+\_\+\+Error&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZEXDLG\_Severe@{ZEXDLG\_Severe}!zexceptiondlg.h@{zexceptiondlg.h}}\index{zexceptiondlg.h@{zexceptiondlg.h}!ZEXDLG\_Severe@{ZEXDLG\_Severe}}}\Hypertarget{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a52ca7071837b145864d953b42088ba4e}\label{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a52ca7071837b145864d953b42088ba4e} 
+ZEXDLG\+\_\+\+Severe&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZEXDLG\_Fatal@{ZEXDLG\_Fatal}!zexceptiondlg.h@{zexceptiondlg.h}}\index{zexceptiondlg.h@{zexceptiondlg.h}!ZEXDLG\_Fatal@{ZEXDLG\_Fatal}}}\Hypertarget{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884ae805766bfa76651139fc9ff4b585816e}\label{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884ae805766bfa76651139fc9ff4b585816e} 
+ZEXDLG\+\_\+\+Fatal&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZEXDLG\_Highest@{ZEXDLG\_Highest}!zexceptiondlg.h@{zexceptiondlg.h}}\index{zexceptiondlg.h@{zexceptiondlg.h}!ZEXDLG\_Highest@{ZEXDLG\_Highest}}}\Hypertarget{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a07463c5512252ac3bfe4cd770347006b}\label{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a07463c5512252ac3bfe4cd770347006b} 
+ZEXDLG\+\_\+\+Highest&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZEXDLG\_SeverityMask@{ZEXDLG\_SeverityMask}!zexceptiondlg.h@{zexceptiondlg.h}}\index{zexceptiondlg.h@{zexceptiondlg.h}!ZEXDLG\_SeverityMask@{ZEXDLG\_SeverityMask}}}\Hypertarget{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a1596cc0db37975834cdfa5b6016bed6c}\label{zexceptiondlg_8h_a0434a9fe87ac18b2490cac869b500884a1596cc0db37975834cdfa5b6016bed6c} 
+ZEXDLG\+\_\+\+Severity\+Mask&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{zexceptiondlg_8h_source_l00016}{16}} of file \mbox{\hyperlink{zexceptiondlg_8h_source}{zexceptiondlg.\+h}}.
+

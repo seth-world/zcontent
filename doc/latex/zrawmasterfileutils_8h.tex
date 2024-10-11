@@ -1,0 +1,181 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/zrawmasterfileutils.h File Reference}
+\hypertarget{zrawmasterfileutils_8h}{}\label{zrawmasterfileutils_8h}\index{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zrawmasterfileutils.h@{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zrawmasterfileutils.h}}
+{\ttfamily \#include $<$zindexedfile/zrawmasterfile.\+h$>$}\newline
+{\ttfamily \#include $<$zindexedfile/zrawindexfile.\+h$>$}\newline
+Include dependency graph for zrawmasterfileutils.\+h\+:
+% FIG 0
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_m_f_utilities_ga2d03c2b81b6cf0ad0e9348144cdea750}{zrepair\+Indexes}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZMFPath}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Repair}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rebuild\+All}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\begin{DoxyCompactList}\small\item\em ZRaw\+Master\+File\+::zrepair\+Indexes Scans and Repairs indexes of a ZSMaster\+File. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_m_f_utilities_gaff7eba04ae5501dc48b24d43ddc83268}{zdowngrade\+ZMFto\+ZRF}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZMFPath}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\begin{DoxyCompactList}\small\item\em ZRaw\+Master\+File\+::zdowngrade\+ZMFto\+ZRF downgrades a ZRaw\+Master\+File structure to a ZRandom\+File structure. Content data is not impacted. This is a static method. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_m_f_utilities_ga742ca5a8bdf4c73877f0558cf27858ed}{zupgrade\+ZRFto\+ZMF}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZRFPath}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Dictionary\+File}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\begin{DoxyCompactList}\small\item\em ZRaw\+Master\+File\+::zupgrade\+ZRFto\+ZMF upgrades a ZRandom\+File structure to an empty ZRaw\+Master\+File structure. Content data is not impacted. This is a static method. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{group___z_m_f_physical_gae9c12eee0caa10b3173406bd9c8050fa}{generate\+Index\+Root\+Name}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Master\+Root\+Name}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Name}})
+\begin{DoxyCompactList}\small\item\em generate\+Index\+Root\+Name generates a ZIndex\+File root name from its father ZSMaster\+File\textquotesingle{}s root name \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{zrawmasterfileutils_8h_a4d4e1846439dd32c8e66ccaa77307430}{generate\+Index\+Base\+Name}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Master\+Root\+Name}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Name}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{zrawmasterfileutils_8h_ab0b54916a293df3727a67c829bdc7db1}{generate\+Index\+URI}} (uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+File\+Uri}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Master\+File\+Uri}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Directory}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Name}})
+\begin{DoxyCompactList}\small\item\em generate\+Index\+URI generates the index uri full base name (including directory path) but without any extension (and without \textquotesingle{}.\textquotesingle{} char) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zrawmasterfileutils_8h_a6e11fd3bcbf00c7f1f6bc181deeb09b7}{decode\+\_\+\+ZCOP}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZCOP}})
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Record\+Class}} $>$ }\\\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{zrawmasterfileutils_8h_a32528e15d47fb3b900761ddb03b12c80}{zrebuild\+Raw\+Index}} (ZRaw\+Master\+File \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Master\+File}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Rank}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Stat}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\begin{DoxyCompactList}\small\item\em ZIndex\+File\+::zrebuild\+Index rebuilds the current index. \end{DoxyCompactList}\item 
+{\footnotesize template$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Record\+Class}} $>$ }\\\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{zrawmasterfileutils_8h_af41ff45f3788ba186fc99b3d22264dd2}{zreorg\+Raw\+Master\+File}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URIRaw\+MF}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Requested\+Free\+Blocks}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\begin{DoxyCompactList}\small\item\em ZRaw\+Master\+File\+::zreorg\+File reorder the base file for ZRaw\+Master\+File and rebuild all indexes. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_m_f_utilities_gac9fd1f5a830c2b0926a4c9dcb4b29da9}{zreorg\+Master\+File}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URIRaw\+MF}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Requested\+Free\+Blocks}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{zrawmasterfileutils_8h_a6e11fd3bcbf00c7f1f6bc181deeb09b7}\label{zrawmasterfileutils_8h_a6e11fd3bcbf00c7f1f6bc181deeb09b7} 
+\index{zrawmasterfileutils.h@{zrawmasterfileutils.h}!decode\_ZCOP@{decode\_ZCOP}}
+\index{decode\_ZCOP@{decode\_ZCOP}!zrawmasterfileutils.h@{zrawmasterfileutils.h}}
+\doxysubsubsection{\texorpdfstring{decode\_ZCOP()}{decode\_ZCOP()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} decode\+\_\+\+ZCOP (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\+\_\+t}}}]{p\+ZCOP }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawmasterfileutils_8cpp_source_l00119}{119}} of file \mbox{\hyperlink{zrawmasterfileutils_8cpp_source}{zrawmasterfileutils.\+cpp}}.
+
+\Hypertarget{zrawmasterfileutils_8h_a4d4e1846439dd32c8e66ccaa77307430}\label{zrawmasterfileutils_8h_a4d4e1846439dd32c8e66ccaa77307430} 
+\index{zrawmasterfileutils.h@{zrawmasterfileutils.h}!generateIndexBaseName@{generateIndexBaseName}}
+\index{generateIndexBaseName@{generateIndexBaseName}!zrawmasterfileutils.h@{zrawmasterfileutils.h}}
+\doxysubsubsection{\texorpdfstring{generateIndexBaseName()}{generateIndexBaseName()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} generate\+Index\+Base\+Name (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Master\+Root\+Name,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Index\+Name }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawmasterfileutils_8cpp_source_l00045}{45}} of file \mbox{\hyperlink{zrawmasterfileutils_8cpp_source}{zrawmasterfileutils.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomfiletypes_8h_source_l00030}{\+\_\+\+\_\+\+ZINDEX\+\_\+\+FILEEXTENSION\+\_\+\+\_\+}}, \mbox{\hyperlink{zrawmasterfileutils_8cpp_source_l00025}{generate\+Index\+Root\+Name()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawmasterfileutils_8cpp_source_l00071}{generate\+Index\+URI()}}.
+
+\Hypertarget{zrawmasterfileutils_8h_ab0b54916a293df3727a67c829bdc7db1}\label{zrawmasterfileutils_8h_ab0b54916a293df3727a67c829bdc7db1} 
+\index{zrawmasterfileutils.h@{zrawmasterfileutils.h}!generateIndexURI@{generateIndexURI}}
+\index{generateIndexURI@{generateIndexURI}!zrawmasterfileutils.h@{zrawmasterfileutils.h}}
+\doxysubsubsection{\texorpdfstring{generateIndexURI()}{generateIndexURI()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} generate\+Index\+URI (\begin{DoxyParamCaption}\item[{uri\+String \&}]{p\+Index\+File\+Uri,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \&}]{p\+Master\+File\+Uri,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \&}]{p\+Directory,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Index\+Name }\end{DoxyParamCaption})}
+
+
+
+generate\+Index\+URI generates the index uri full base name (including directory path) but without any extension (and without \textquotesingle{}.\textquotesingle{} char) 
+
+If no directory is mentionned in p\+Master\+Name path, then the current directory is taken. returns a ZS\+\_\+\+INVNAME status if ZSMaster\+File\textquotesingle{}s extension is {\bfseries{ZINDEX\+\_\+\+FILEEXTENSION}} returns ZS\+\_\+\+SUCCESS otherwise.
+
+For base name generation \begin{DoxySeeAlso}{See also}
+\doxylink{group___z_m_f_physical_gae9c12eee0caa10b3173406bd9c8050fa}{generate\+Index\+Root\+Name}
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em p\+ZIndex\+File\+Uri} & Resulting ZIndex\+File name \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Master\+File\+Uri} & Base name for ZSMaster\+File to create ZIndex\+File name for \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Path\+Dir} & Directory path to create the ZIndex\+File in \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Rank} & Index rank for the ZSMaster\+File \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Index\+Name} & Index name (given by user) for the Index \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrawmasterfileutils_8cpp_source_l00071}{71}} of file \mbox{\hyperlink{zrawmasterfileutils_8cpp_source}{zrawmasterfileutils.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomfiletypes_8h_source_l00030}{\+\_\+\+\_\+\+ZINDEX\+\_\+\+FILEEXTENSION\+\_\+\+\_\+}}, \mbox{\hyperlink{zrawmasterfileutils_8cpp_source_l00045}{generate\+Index\+Base\+Name()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{filegeneratedlg_8cpp_source_l02558}{File\+Generate\+MWn\+::apply\+Changes\+Zmf()}}, and \mbox{\hyperlink{zrawmasterfileutils_8cpp_source_l00179}{zrepair\+Indexes()}}.
+
+\Hypertarget{zrawmasterfileutils_8h_a32528e15d47fb3b900761ddb03b12c80}\label{zrawmasterfileutils_8h_a32528e15d47fb3b900761ddb03b12c80} 
+\index{zrawmasterfileutils.h@{zrawmasterfileutils.h}!zrebuildRawIndex@{zrebuildRawIndex}}
+\index{zrebuildRawIndex@{zrebuildRawIndex}!zrawmasterfileutils.h@{zrawmasterfileutils.h}}
+\doxysubsubsection{\texorpdfstring{zrebuildRawIndex()}{zrebuildRawIndex()}}
+{\footnotesize\ttfamily template$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Record\+Class}} $>$ \\
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} zrebuild\+Raw\+Index (\begin{DoxyParamCaption}\item[{ZRaw\+Master\+File \&}]{p\+Master\+File,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Index\+Rank,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Stat,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})}
+
+
+
+ZIndex\+File\+::zrebuild\+Index rebuilds the current index. 
+
+NB\+: this routine does not open nor close the files
+
+
+\begin{DoxyItemize}
+\item Clears the index file using ZRandom\+File\+::\+Clear()
+\item Re-\/create each index rank from father\textquotesingle{}s records content
+\item Optionally displays statistical information when p\+Stat is set to true and p\+Output is assigned to a valid FILE\texorpdfstring{$\ast$}{*} value
+\end{DoxyItemize}
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Stat} & a flag mentionning if statistics will be produced (true) or not (false) during index rebuild \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Output} & a FILE\texorpdfstring{$\ast$}{*} pointer where the reporting will be made. Defaulted to stdout. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrawmasterfileutils_8h_source_l00049}{49}} of file \mbox{\hyperlink{zrawmasterfileutils_8h_source}{zrawmasterfileutils.\+h}}.
+
+
+
+References \mbox{\hyperlink{zrandomfile_8cpp_source_l09976}{decode\+\_\+\+ZRFMode()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zmfstats_8cpp_source_l00071}{ZMFStats\+::init()}}, \mbox{\hyperlink{zrawindexfile_8h_source_l00117}{zbs\+::\+ZRaw\+Index\+File\+::\+ZPMSStats}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00105}{ZRF\+\_\+\+All}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00087}{ZRF\+\_\+\+Exclusive}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00082}{ZRF\+\_\+\+Not\+Open}}.
+
+\Hypertarget{zrawmasterfileutils_8h_af41ff45f3788ba186fc99b3d22264dd2}\label{zrawmasterfileutils_8h_af41ff45f3788ba186fc99b3d22264dd2} 
+\index{zrawmasterfileutils.h@{zrawmasterfileutils.h}!zreorgRawMasterFile@{zreorgRawMasterFile}}
+\index{zreorgRawMasterFile@{zreorgRawMasterFile}!zrawmasterfileutils.h@{zrawmasterfileutils.h}}
+\doxysubsubsection{\texorpdfstring{zreorgRawMasterFile()}{zreorgRawMasterFile()}}
+{\footnotesize\ttfamily template$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Record\+Class}} $>$ \\
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} zreorg\+Raw\+Master\+File (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \&}]{p\+URIRaw\+MF,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Requested\+Free\+Blocks,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})}
+
+
+
+ZRaw\+Master\+File\+::zreorg\+File reorder the base file for ZRaw\+Master\+File and rebuild all indexes. 
+
+superseeds ZRandom\+File\+::zreorg\+File as an method overload.
+
+As ZRandom\+File\+::zreorg\+File() changes physical block addresses in reorganizing file structure, it is necessary to rebuild any defined index after having done a zreorg\+File process.
+
+ZRaw\+Master\+File\+::zreorg\+File() does the whole stuff \+:
+\begin{DoxyItemize}
+\item base file reorganization
+\item rebuild for all defined indexes for the ZRaw\+Master\+File \begin{DoxySeeAlso}{See also}
+ZIndex\+File\+::zrebuild\+Index()
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Dump} & this boolean sets (true) the option of having surface\+Scan during the progression of reorganization. Omitted by default (false) \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Output} & a FILE\texorpdfstring{$\ast$}{*} pointer where the reporting will be made. Defaulted to stdout. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+\end{DoxyItemize}
+
+Definition at line \mbox{\hyperlink{zrawmasterfileutils_8h_source_l00160}{160}} of file \mbox{\hyperlink{zrawmasterfileutils_8h_source}{zrawmasterfileutils.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00105}{ZRF\+\_\+\+All}}.
+

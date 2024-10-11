@@ -1,0 +1,170 @@
+\doxysection{ZServer\+Socket Class Reference}
+\hypertarget{class_z_server_socket}{}\label{class_z_server_socket}\index{ZServerSocket@{ZServerSocket}}
+
+
+The \doxylink{class_z_server_socket}{ZServer\+Socket} class This socket is the main ZBASE server socket with which server reads the net and accepts connections. This object uses ZBase protocol.  
+
+
+
+
+{\ttfamily \#include $<$zserversocket.\+h$>$}
+
+
+
+Inheritance diagram for ZServer\+Socket\+:
+% FIG 0
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} ZSocket \mbox{\hyperlink{class_z_server_socket_a9e0f6893a8624c49fd96d5c0dd568e01}{\+\_\+\+Base}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_z_server_socket_a1dbaa559a03465331963500a5f901383}{ZServer\+Socket}} ()
+\item 
+\mbox{\hyperlink{class_z_server_socket_a4dd1a27bcd628217f252faa65168396f}{ZServer\+Socket}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZThread}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Thread}})
+\item 
+\mbox{\hyperlink{class_z_server_socket_a1ff414709b10afde14c7a738e3eb9bb3}{\texorpdfstring{$\sim$}{\string~}\+ZServer\+Socket}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_server_socket_a5dc3168ec1f396f52015f3e0928c8c40}{zlisten}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Max\+Connect}}=-\/1)
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Client\+Socket\+Type}} $>$ }\\\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Client\+Socket\+Type}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_z_server_socket_ac3726c760fc922121ab32e83a88812fd}{zaccept\+Template}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{class_z_socket_select}{ZSocket\+Select}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_z_server_socket_a2ebe3ec20540cfce7c2186e9c68b1443}{zaccept}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZThread}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_z_server_socket_a2736112defe7e18b3a6dc938960b7085}{Thread}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The \doxylink{class_z_server_socket}{ZServer\+Socket} class This socket is the main ZBASE server socket with which server reads the net and accepts connections. This object uses ZBase protocol. 
+
+Definition at line \mbox{\hyperlink{zserversocket_8h_source_l00013}{13}} of file \mbox{\hyperlink{zserversocket_8h_source}{zserversocket.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_z_server_socket_a9e0f6893a8624c49fd96d5c0dd568e01}\label{class_z_server_socket_a9e0f6893a8624c49fd96d5c0dd568e01} 
+\index{ZServerSocket@{ZServerSocket}!\_Base@{\_Base}}
+\index{\_Base@{\_Base}!ZServerSocket@{ZServerSocket}}
+\doxysubsubsection{\texorpdfstring{\_Base}{\_Base}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} ZSocket \mbox{\hyperlink{class_z_server_socket_a9e0f6893a8624c49fd96d5c0dd568e01}{ZServer\+Socket\+::\+\_\+\+Base}}}
+
+
+
+Definition at line \mbox{\hyperlink{zserversocket_8h_source_l00016}{16}} of file \mbox{\hyperlink{zserversocket_8h_source}{zserversocket.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_z_server_socket_a1dbaa559a03465331963500a5f901383}\label{class_z_server_socket_a1dbaa559a03465331963500a5f901383} 
+\index{ZServerSocket@{ZServerSocket}!ZServerSocket@{ZServerSocket}}
+\index{ZServerSocket@{ZServerSocket}!ZServerSocket@{ZServerSocket}}
+\doxysubsubsection{\texorpdfstring{ZServerSocket()}{ZServerSocket()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily ZServer\+Socket\+::\+ZServer\+Socket (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zserversocket_8h_source_l00017}{17}} of file \mbox{\hyperlink{zserversocket_8h_source}{zserversocket.\+h}}.
+
+\Hypertarget{class_z_server_socket_a4dd1a27bcd628217f252faa65168396f}\label{class_z_server_socket_a4dd1a27bcd628217f252faa65168396f} 
+\index{ZServerSocket@{ZServerSocket}!ZServerSocket@{ZServerSocket}}
+\index{ZServerSocket@{ZServerSocket}!ZServerSocket@{ZServerSocket}}
+\doxysubsubsection{\texorpdfstring{ZServerSocket()}{ZServerSocket()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily ZServer\+Socket\+::\+ZServer\+Socket (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZThread}} \texorpdfstring{$\ast$}{*}}]{p\+Thread }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zserversocket_8h_source_l00018}{18}} of file \mbox{\hyperlink{zserversocket_8h_source}{zserversocket.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zserversocket_8h_source_l00030}{Thread}}.
+
+\Hypertarget{class_z_server_socket_a1ff414709b10afde14c7a738e3eb9bb3}\label{class_z_server_socket_a1ff414709b10afde14c7a738e3eb9bb3} 
+\index{ZServerSocket@{ZServerSocket}!````~ZServerSocket@{\texorpdfstring{$\sim$}{\string~}ZServerSocket}}
+\index{````~ZServerSocket@{\texorpdfstring{$\sim$}{\string~}ZServerSocket}!ZServerSocket@{ZServerSocket}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ZServerSocket()}{\string~ZServerSocket()}}
+{\footnotesize\ttfamily ZServer\+Socket\+::\texorpdfstring{$\sim$}{\string~}\+ZServer\+Socket (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zserversocket_8h_source_l00019}{19}} of file \mbox{\hyperlink{zserversocket_8h_source}{zserversocket.\+h}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_z_server_socket_a2ebe3ec20540cfce7c2186e9c68b1443}\label{class_z_server_socket_a2ebe3ec20540cfce7c2186e9c68b1443} 
+\index{ZServerSocket@{ZServerSocket}!zaccept@{zaccept}}
+\index{zaccept@{zaccept}!ZServerSocket@{ZServerSocket}}
+\doxysubsubsection{\texorpdfstring{zaccept()}{zaccept()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_z_socket_select}{ZSocket\+Select}} \texorpdfstring{$\ast$}{*} ZServer\+Socket\+::zaccept (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zserversocket_8h_source_l00026}{26}} of file \mbox{\hyperlink{zserversocket_8h_source}{zserversocket.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_z_server_socket_ac3726c760fc922121ab32e83a88812fd}\label{class_z_server_socket_ac3726c760fc922121ab32e83a88812fd} 
+\index{ZServerSocket@{ZServerSocket}!zacceptTemplate@{zacceptTemplate}}
+\index{zacceptTemplate@{zacceptTemplate}!ZServerSocket@{ZServerSocket}}
+\doxysubsubsection{\texorpdfstring{zacceptTemplate()}{zacceptTemplate()}}
+{\footnotesize\ttfamily template$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Client\+Socket\+Type}} $>$ \\
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Client\+Socket\+Type}} \texorpdfstring{$\ast$}{*} ZServer\+Socket\+::zaccept\+Template (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zserversocket_8h_source_l00035}{35}} of file \mbox{\hyperlink{zserversocket_8h_source}{zserversocket.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_z_server_socket_a5dc3168ec1f396f52015f3e0928c8c40}\label{class_z_server_socket_a5dc3168ec1f396f52015f3e0928c8c40} 
+\index{ZServerSocket@{ZServerSocket}!zlisten@{zlisten}}
+\index{zlisten@{zlisten}!ZServerSocket@{ZServerSocket}}
+\doxysubsubsection{\texorpdfstring{zlisten()}{zlisten()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZServer\+Socket\+::zlisten (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Max\+Connect = {\ttfamily -\/1} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zserversocket_8cpp_source_l00007}{7}} of file \mbox{\hyperlink{zserversocket_8cpp_source}{zserversocket.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_source_l00851}{w\+Ret}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslserversocket_8h_source_l00021}{ZSSLServer\+Socket\+::zlisten()}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_z_server_socket_a2736112defe7e18b3a6dc938960b7085}\label{class_z_server_socket_a2736112defe7e18b3a6dc938960b7085} 
+\index{ZServerSocket@{ZServerSocket}!Thread@{Thread}}
+\index{Thread@{Thread}!ZServerSocket@{ZServerSocket}}
+\doxysubsubsection{\texorpdfstring{Thread}{Thread}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZThread}}\texorpdfstring{$\ast$}{*} ZServer\+Socket\+::\+Thread =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zserversocket_8h_source_l00030}{30}} of file \mbox{\hyperlink{zserversocket_8h_source}{zserversocket.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zserversocket_8h_source_l00018}{ZServer\+Socket()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/znet/zbasenet/\mbox{\hyperlink{zserversocket_8h}{zserversocket.\+h}}\item 
+/home/gerard/\+Development/zbasetools/znet/zbasenet/\mbox{\hyperlink{zserversocket_8cpp}{zserversocket.\+cpp}}\end{DoxyCompactItemize}

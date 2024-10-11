@@ -1,0 +1,260 @@
+\doxysection{zbs\+::ZMaster\+File Class Reference}
+\hypertarget{classzbs_1_1_z_master_file}{}\label{classzbs_1_1_z_master_file}\index{zbs::ZMasterFile@{zbs::ZMasterFile}}
+
+
+{\ttfamily \#include $<$zmasterfile.\+h$>$}
+
+
+
+Inheritance diagram for zbs\+::ZMaster\+File\+:
+% FIG 0
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_master_file_a3446f1c645e270fba4ae8a98f6bfbe9b}{ZMaster\+File}} ()
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_master_file_abe795c65829c7655987b86e2e66f6bff}{\texorpdfstring{$\sim$}{\string~}\+ZMaster\+File}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_master_file_a60538950fe01943983711da4f62acb93}{zopen}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URI}}, \mbox{\hyperlink{group___z_random_file_group_ga56eb3fcb4ae8195c33bd0a42f8347700}{zmode\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Mode}}=\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748a0743866dd41df202fe6bd7e46739603d}{ZRF\+\_\+\+All}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_master_file_ae09f98e736f2c729405431b9b3229aaa}{zopen}} (\mbox{\hyperlink{group___z_random_file_group_ga56eb3fcb4ae8195c33bd0a42f8347700}{zmode\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Mode}}=\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748a0743866dd41df202fe6bd7e46739603d}{ZRF\+\_\+\+All}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_master_file_a7365eeb7aeddd8da7a0478ce3541126a}{load\+Dictionary}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_master_file_a2d5f5d5cb17bf9b2af8a88c9a0cb2910}{set\+Dictionary}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Dictionary}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_master_file_a7793d2a9e8284a831a96e3b2730b0307}{set\+Extern\+Dictionary}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Dic\+Path}})
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{classzbs_1_1_z_master_file_afd10dfbb4b71de83d5163524ee6e86f6}{get\+Dictionary\+Name}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_master_file_a477acede404d4eb4a644ba7d49be51dc}{rebuild\+Index}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Rank}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\begin{DoxyCompactList}\small\item\em rebuild\+Index For index key of rank p\+Index\+Rank\+:~\newline
+ Clears index file. Re-\/create sequentially from master file content, record per record, index key records using \doxylink{classzbs_1_1_z_master_file_ae0e998f4d59e300cf1aa473b2525ff95}{extract\+Key\+Values()} routine. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_master_file_ae0e998f4d59e300cf1aa473b2525ff95}{extract\+Key\+Values}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}}, ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+Content}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Index\+Rank}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_master_file_aec6fe0b09192354ae82f1a629555fcae}{extract\+Field\+Value}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}}, ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+Value}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_master_file_a77f93edcd2f8f6b3c6fa8c1f810bd20e}{get\+URFField\+By\+Rank}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Record}}, \mbox{\hyperlink{class_u_r_f_field}{URFField}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URFField}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_master_file_aa4f32c694a58ecfcd6780f01ec965cdf}{search\+For\+Value}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Search\+Phrase}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zmasterfile_8h_source_l00017}{17}} of file \mbox{\hyperlink{zmasterfile_8h_source}{zmasterfile.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classzbs_1_1_z_master_file_a3446f1c645e270fba4ae8a98f6bfbe9b}\label{classzbs_1_1_z_master_file_a3446f1c645e270fba4ae8a98f6bfbe9b} 
+\index{zbs::ZMasterFile@{zbs::ZMasterFile}!ZMasterFile@{ZMasterFile}}
+\index{ZMasterFile@{ZMasterFile}!zbs::ZMasterFile@{zbs::ZMasterFile}}
+\doxysubsubsection{\texorpdfstring{ZMasterFile()}{ZMasterFile()}}
+{\footnotesize\ttfamily ZMaster\+File\+::\+ZMaster\+File (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmasterfile_8cpp_source_l00007}{7}} of file \mbox{\hyperlink{zmasterfile_8cpp_source}{zmasterfile.\+cpp}}.
+
+\Hypertarget{classzbs_1_1_z_master_file_abe795c65829c7655987b86e2e66f6bff}\label{classzbs_1_1_z_master_file_abe795c65829c7655987b86e2e66f6bff} 
+\index{zbs::ZMasterFile@{zbs::ZMasterFile}!````~ZMasterFile@{\texorpdfstring{$\sim$}{\string~}ZMasterFile}}
+\index{````~ZMasterFile@{\texorpdfstring{$\sim$}{\string~}ZMasterFile}!zbs::ZMasterFile@{zbs::ZMasterFile}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ZMasterFile()}{\string~ZMasterFile()}}
+{\footnotesize\ttfamily ZMaster\+File\+::\texorpdfstring{$\sim$}{\string~}\+ZMaster\+File (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmasterfile_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{zmasterfile_8cpp_source}{zmasterfile.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classzbs_1_1_z_master_file_aec6fe0b09192354ae82f1a629555fcae}\label{classzbs_1_1_z_master_file_aec6fe0b09192354ae82f1a629555fcae} 
+\index{zbs::ZMasterFile@{zbs::ZMasterFile}!extractFieldValue@{extractFieldValue}}
+\index{extractFieldValue@{extractFieldValue}!zbs::ZMasterFile@{zbs::ZMasterFile}}
+\doxysubsubsection{\texorpdfstring{extractFieldValue()}{extractFieldValue()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZMaster\+File\+::extract\+Field\+Value (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Record,  }\item[{ZData\+Buffer \&}]{p\+Key\+Value,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Rank,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmasterfile_8cpp_source_l00262}{262}} of file \mbox{\hyperlink{zmasterfile_8cpp_source}{zmasterfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindextype_8cpp_source_l01352}{decode\+\_\+\+ZType()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{urffield_8cpp_source_l02271}{get\+URFField()}}, and \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00121}{ZType\+\_\+bitset}}.
+
+\Hypertarget{classzbs_1_1_z_master_file_ae0e998f4d59e300cf1aa473b2525ff95}\label{classzbs_1_1_z_master_file_ae0e998f4d59e300cf1aa473b2525ff95} 
+\index{zbs::ZMasterFile@{zbs::ZMasterFile}!extractKeyValues@{extractKeyValues}}
+\index{extractKeyValues@{extractKeyValues}!zbs::ZMasterFile@{zbs::ZMasterFile}}
+\doxysubsubsection{\texorpdfstring{extractKeyValues()}{extractKeyValues()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZMaster\+File\+::extract\+Key\+Values (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Record,  }\item[{ZData\+Buffer \&}]{p\+Key\+Content,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Index\+Rank,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmasterfile_8cpp_source_l00180}{180}} of file \mbox{\hyperlink{zmasterfile_8cpp_source}{zmasterfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindextype_8cpp_source_l01352}{decode\+\_\+\+ZType()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{urffield_8cpp_source_l02271}{get\+URFField()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{zbs\+::\+ZMFDictionary\+::\+Key\+Dic}}, and \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00121}{ZType\+\_\+bitset}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmasterfile_8cpp_source_l00092}{rebuild\+Index()}}, and \mbox{\hyperlink{filegeneratedlg_8cpp_source_l03074}{File\+Generate\+MWn\+::rebuild\+Index()}}.
+
+\Hypertarget{classzbs_1_1_z_master_file_afd10dfbb4b71de83d5163524ee6e86f6}\label{classzbs_1_1_z_master_file_afd10dfbb4b71de83d5163524ee6e86f6} 
+\index{zbs::ZMasterFile@{zbs::ZMasterFile}!getDictionaryName@{getDictionaryName}}
+\index{getDictionaryName@{getDictionaryName}!zbs::ZMasterFile@{zbs::ZMasterFile}}
+\doxysubsubsection{\texorpdfstring{getDictionaryName()}{getDictionaryName()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} ZMaster\+File\+::get\+Dictionary\+Name (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmasterfile_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{zmasterfile_8cpp_source}{zmasterfile.\+cpp}}.
+
+\Hypertarget{classzbs_1_1_z_master_file_a77f93edcd2f8f6b3c6fa8c1f810bd20e}\label{classzbs_1_1_z_master_file_a77f93edcd2f8f6b3c6fa8c1f810bd20e} 
+\index{zbs::ZMasterFile@{zbs::ZMasterFile}!getURFFieldByRank@{getURFFieldByRank}}
+\index{getURFFieldByRank@{getURFFieldByRank}!zbs::ZMasterFile@{zbs::ZMasterFile}}
+\doxysubsubsection{\texorpdfstring{getURFFieldByRank()}{getURFFieldByRank()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZMaster\+File\+::get\+URFField\+By\+Rank (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Record,  }\item[{\mbox{\hyperlink{class_u_r_f_field}{URFField}} \&}]{p\+URFField,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Rank,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmasterfile_8cpp_source_l00330}{330}} of file \mbox{\hyperlink{zmasterfile_8cpp_source}{zmasterfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindextype_8cpp_source_l01352}{decode\+\_\+\+ZType()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{urffield_8cpp_source_l02271}{get\+URFField()}}, and \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00121}{ZType\+\_\+bitset}}.
+
+\Hypertarget{classzbs_1_1_z_master_file_a7365eeb7aeddd8da7a0478ce3541126a}\label{classzbs_1_1_z_master_file_a7365eeb7aeddd8da7a0478ce3541126a} 
+\index{zbs::ZMasterFile@{zbs::ZMasterFile}!loadDictionary@{loadDictionary}}
+\index{loadDictionary@{loadDictionary}!zbs::ZMasterFile@{zbs::ZMasterFile}}
+\doxysubsubsection{\texorpdfstring{loadDictionary()}{loadDictionary()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZMaster\+File\+::load\+Dictionary (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmasterfile_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{zmasterfile_8cpp_source}{zmasterfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zcontent_2test__zrawfile_2main_8cpp_source_l00146}{Error\+Log}}, \mbox{\hyperlink{zdictionaryfile_8cpp_source_l00164}{zbs\+::\+ZDictionary\+File\+::generate\+Dic\+File\+Name()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmasterfile_8cpp_source_l00017}{zopen()}}.
+
+\Hypertarget{classzbs_1_1_z_master_file_a477acede404d4eb4a644ba7d49be51dc}\label{classzbs_1_1_z_master_file_a477acede404d4eb4a644ba7d49be51dc} 
+\index{zbs::ZMasterFile@{zbs::ZMasterFile}!rebuildIndex@{rebuildIndex}}
+\index{rebuildIndex@{rebuildIndex}!zbs::ZMasterFile@{zbs::ZMasterFile}}
+\doxysubsubsection{\texorpdfstring{rebuildIndex()}{rebuildIndex()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZMaster\+File\+::rebuild\+Index (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Index\+Rank,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \texorpdfstring{$\ast$}{*}}]{p\+Rank,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})}
+
+
+
+rebuild\+Index For index key of rank p\+Index\+Rank\+:~\newline
+ Clears index file. Re-\/create sequentially from master file content, record per record, index key records using \doxylink{classzbs_1_1_z_master_file_ae0e998f4d59e300cf1aa473b2525ff95}{extract\+Key\+Values()} routine. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Index\+Rank} & rank of index to rebuild \\
+\hline
+{\em p\+Rank} & Optional (omitted if nullptr) \+: if mentionned, currently processed ZMF rank is updated there. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus \+: ZS\+\_\+\+SUCCESS if OK, otherwise the faulty status is returned and ZException is set with appropriate message data. 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zmasterfile_8cpp_source_l00092}{92}} of file \mbox{\hyperlink{zmasterfile_8cpp_source}{zmasterfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomfile_8cpp_source_l09976}{decode\+\_\+\+ZRFMode()}}, \mbox{\hyperlink{zmasterfile_8cpp_source_l00180}{extract\+Key\+Values()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00105}{ZRF\+\_\+\+All}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawmasterfileutils_8cpp_source_l00795}{zreorg\+Master\+File()}}.
+
+\Hypertarget{classzbs_1_1_z_master_file_aa4f32c694a58ecfcd6780f01ec965cdf}\label{classzbs_1_1_z_master_file_aa4f32c694a58ecfcd6780f01ec965cdf} 
+\index{zbs::ZMasterFile@{zbs::ZMasterFile}!searchForValue@{searchForValue}}
+\index{searchForValue@{searchForValue}!zbs::ZMasterFile@{zbs::ZMasterFile}}
+\doxysubsubsection{\texorpdfstring{searchForValue()}{searchForValue()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} zbs\+::\+ZMaster\+File\+::search\+For\+Value (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Search\+Phrase }\end{DoxyParamCaption})}
+
+\Hypertarget{classzbs_1_1_z_master_file_a2d5f5d5cb17bf9b2af8a88c9a0cb2910}\label{classzbs_1_1_z_master_file_a2d5f5d5cb17bf9b2af8a88c9a0cb2910} 
+\index{zbs::ZMasterFile@{zbs::ZMasterFile}!setDictionary@{setDictionary}}
+\index{setDictionary@{setDictionary}!zbs::ZMasterFile@{zbs::ZMasterFile}}
+\doxysubsubsection{\texorpdfstring{setDictionary()}{setDictionary()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZMaster\+File\+::set\+Dictionary (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}} \&}]{p\+Dictionary }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmasterfile_8cpp_source_l00060}{60}} of file \mbox{\hyperlink{zmasterfile_8cpp_source}{zmasterfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdictionaryfile_8cpp_source_l00164}{zbs\+::\+ZDictionary\+File\+::generate\+Dic\+File\+Name()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zdictionaryfile_8cpp_source_l00127}{zbs\+::\+ZDictionary\+File\+::set\+Dictionary()}}.
+
+
+
+Referenced by \mbox{\hyperlink{filegeneratedlg_8cpp_source_l01839}{File\+Generate\+MWn\+::\+Menu\+Action()}}, and \mbox{\hyperlink{dicedit_8cpp_source_l04251}{Dic\+Edit\+MWn\+::update\+Embedded()}}.
+
+\Hypertarget{classzbs_1_1_z_master_file_a7793d2a9e8284a831a96e3b2730b0307}\label{classzbs_1_1_z_master_file_a7793d2a9e8284a831a96e3b2730b0307} 
+\index{zbs::ZMasterFile@{zbs::ZMasterFile}!setExternDictionary@{setExternDictionary}}
+\index{setExternDictionary@{setExternDictionary}!zbs::ZMasterFile@{zbs::ZMasterFile}}
+\doxysubsubsection{\texorpdfstring{setExternDictionary()}{setExternDictionary()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZMaster\+File\+::set\+Extern\+Dictionary (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \&}]{p\+Dic\+Path }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmasterfile_8cpp_source_l00072}{72}} of file \mbox{\hyperlink{zmasterfile_8cpp_source}{zmasterfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zcontent_2test__zrawfile_2main_8cpp_source_l00146}{Error\+Log}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zdictionaryfile_8h_source_l00120}{zbs\+::\+ZDictionary\+File\+::\+URIDictionary}}.
+
+\Hypertarget{classzbs_1_1_z_master_file_a60538950fe01943983711da4f62acb93}\label{classzbs_1_1_z_master_file_a60538950fe01943983711da4f62acb93} 
+\index{zbs::ZMasterFile@{zbs::ZMasterFile}!zopen@{zopen}}
+\index{zopen@{zopen}!zbs::ZMasterFile@{zbs::ZMasterFile}}
+\doxysubsubsection{\texorpdfstring{zopen()}{zopen()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZMaster\+File\+::zopen (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \&}]{p\+URI,  }\item[{\mbox{\hyperlink{group___z_random_file_group_ga56eb3fcb4ae8195c33bd0a42f8347700}{zmode\+\_\+type}}}]{p\+Mode = {\ttfamily \mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748a0743866dd41df202fe6bd7e46739603d}{ZRF\+\_\+\+All}}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmasterfile_8cpp_source_l00017}{17}} of file \mbox{\hyperlink{zmasterfile_8cpp_source}{zmasterfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zmasterfile_8cpp_source_l00037}{load\+Dictionary()}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00116}{ZFT\+\_\+\+ZRaw\+Master\+File}}.
+
+
+
+Referenced by \mbox{\hyperlink{filegeneratedlg_8cpp_source_l02558}{File\+Generate\+MWn\+::apply\+Changes\+Zmf()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01662}{ZEntry\+Point\+::clear\+ZMF()}}, \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03591}{ZContent\+Visu\+Main\+::clear\+ZMF()}}, \mbox{\hyperlink{zrawvisumain_8cpp_source_l03422}{ZRaw\+Visu\+Main\+::clear\+ZMF()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l01270}{File\+Generate\+MWn\+::\+Data\+Import()}}, \mbox{\hyperlink{zbackupdlg_8cpp_source_l00163}{ZBackup\+DLg\+::data\+Setup()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l00709}{File\+Generate\+MWn\+::data\+Setup\+From\+Master\+File()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l03304}{File\+Generate\+MWn\+::\+Gen\+File()}}, \mbox{\hyperlink{main__console_8cpp_source_l00364}{main()}}, \mbox{\hyperlink{zcontent_2test__zrawfile_2main_8cpp_source_l00317}{populate()}}, \mbox{\hyperlink{zrawkeylistdlg_8cpp_source_l00055}{ZRaw\+Key\+List\+DLg\+::set()}}, \mbox{\hyperlink{zcontent_2test__zrawfile_2main_8cpp_source_l01577}{test\+Random\+Search\+All\+Exact()}}, \mbox{\hyperlink{zcontent_2test__zrawfile_2main_8cpp_source_l01716}{test\+Random\+Search\+All\+Partial()}}, \mbox{\hyperlink{zcontent_2test__zrawfile_2main_8cpp_source_l01442}{test\+Random\+Search\+Unique()}}, and \mbox{\hyperlink{zcontent_2test__zrawfile_2main_8cpp_source_l01855}{test\+Sequential\+Key()}}.
+
+\Hypertarget{classzbs_1_1_z_master_file_ae09f98e736f2c729405431b9b3229aaa}\label{classzbs_1_1_z_master_file_ae09f98e736f2c729405431b9b3229aaa} 
+\index{zbs::ZMasterFile@{zbs::ZMasterFile}!zopen@{zopen}}
+\index{zopen@{zopen}!zbs::ZMasterFile@{zbs::ZMasterFile}}
+\doxysubsubsection{\texorpdfstring{zopen()}{zopen()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} zbs\+::\+ZMaster\+File\+::zopen (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{group___z_random_file_group_ga56eb3fcb4ae8195c33bd0a42f8347700}{zmode\+\_\+type}}}]{p\+Mode = {\ttfamily \mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748a0743866dd41df202fe6bd7e46739603d}{ZRF\+\_\+\+All}}} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmasterfile_8h_source_l00024}{24}} of file \mbox{\hyperlink{zmasterfile_8h_source}{zmasterfile.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zmasterfile_8h_source_l00024}{zopen()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmasterfile_8h_source_l00024}{zopen()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zmasterfile_8h}{zmasterfile.\+h}}\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zmasterfile_8cpp}{zmasterfile.\+cpp}}\end{DoxyCompactItemize}

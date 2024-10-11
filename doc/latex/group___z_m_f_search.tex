@@ -1,0 +1,39 @@
+\doxysection{Searching ZMaster\+File for content}
+\hypertarget{group___z_m_f_search}{}\label{group___z_m_f_search}\index{Searching ZMasterFile for content@{Searching ZMasterFile for content}}
+\hypertarget{group___z_m_f_search_ZMFSearchSection}{}\doxysubsection{\texorpdfstring{Searching ZMaster\+File for content}{Searching ZMasterFile for content}}\label{group___z_m_f_search_ZMFSearchSection}
+\hypertarget{group___z_m_f_search_ZMFSearchTypes}{}\doxysubsubsection{\texorpdfstring{Index searches and free sequential searches}{Index searches and free sequential searches}}\label{group___z_m_f_search_ZMFSearchTypes}
+\doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} allows the same free sequential search facilities than its base object \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}. It is then possible to fully use these facilities.
+
+Additionnally, \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} offers a search based upon index key values. Accessing key values using indexes saves drastically time and file accesses compared to free sequential search. However, there is an priority order between access types to respect \+:
+\begin{DoxyItemize}
+\item first access indexes and establish a collection
+\item restrict collection using free sequential search (that will only scroll the existing collection content).
+\end{DoxyItemize}
+
+So that, there is a medium term to find between the capabilities of free sequential search and speed of access of indexed search.\hypertarget{group___z_m_f_search_ZMFIndexAccess}{}\doxysubsubsection{\texorpdfstring{Access ZMaster\+File using its indexes.}{Access ZMasterFile using its indexes.}}\label{group___z_m_f_search_ZMFIndexAccess}
+It is possible to search for
+\begin{DoxyItemize}
+\item a single key value or for multiple key values i. e. a collection of values
+\item using an exact key value or a partial key value
+\end{DoxyItemize}\hypertarget{group___z_m_f_search_ZMFPartialKey}{}\doxysubsubsection{\texorpdfstring{Exact key value or partial key value in a search operation}{Exact key value or partial key value in a search operation}}\label{group___z_m_f_search_ZMFPartialKey}
+A search may be made with a partial key value, this means that requested key size will represent a partial segment of index key. In this case, the search operation is made on the partial value of given key content and
+\begin{DoxyItemize}
+\item if a simple search operation is invoked, then the first found key value is returned
+\item if a multiple search operation giving a collection of records ( either zsearch\+All or zsearch\+First, zsearch\+Next )
+\end{DoxyItemize}\hypertarget{group___z_m_f_search_ZMFZKey}{}\doxysubsubsection{\texorpdfstring{Using ZKey object}{Using ZKey object}}\label{group___z_m_f_search_ZMFZKey}
+ZKey is an object dedicated to index key search (see \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey}). It allows to
+\begin{DoxyItemize}
+\item store index description (\doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} index number, Key dictionary)
+\item format and load key value using field dictionary Field(s) content are then formatted to appropriate key \textquotesingle{}internal\textquotesingle{} format in order to be appropriatedly used.
+\item create a partial key value in order to search multiple results, or collection of results, from a single partial key value.
+\end{DoxyItemize}
+
+ZKey is designed to manage ad\+Hoc key accesses to ZIndex\+File-\/\+ZMaster\+File structure.
+
+It gathers the necessary routines and methods to build up a key content, to control coherence of key field data types, and to access and select \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} records.
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey} 
+
+\doxylink{group___z_key_correspondence}{Using ZKey \+: Correspondence between data types} 
+\end{DoxySeeAlso}

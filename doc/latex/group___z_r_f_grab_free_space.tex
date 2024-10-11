@@ -1,0 +1,18 @@
+\doxysubsection{Grabbing free space blocks and holes to compact the file structure}
+\hypertarget{group___z_r_f_grab_free_space}{}\label{group___z_r_f_grab_free_space}\index{Grabbing free space blocks and holes to compact the file structure@{Grabbing free space blocks and holes to compact the file structure}}
+Grab\+Free\+Space is an on-\/flow process that consist in agglomerating free blocks before and free blocks after the current block being free. So that the deleted block grabs the available space around him. It reduces the eventuality \+:
+\begin{DoxyItemize}
+\item to have holes between blocks
+\item to have a huge number of atomized free blocks
+\end{DoxyItemize}
+
+As grab\+Free\+Space will weight a little bit on resource consumption, it should be carefully used.
+
+grab\+Free\+Space will offer its best when \+:
+\begin{DoxyItemize}
+\item using varying size record content
+\item standard deviation of record size is important compared to block target size (average size of blocks existing in file-\/ or forced value)\+: \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} offers statistical tools to study the records/blocks population and to take appropriate decisions. \begin{DoxyNote}{Note}
+block target size is a statistical value that is computed to be the average size of existing blocks withing the file.
+\end{DoxyNote}
+This means that \+: in case of fixed length record, grad\+Free\+Space option is not appropriate (even if it may be used without any problem), because it may induce a (small) waste of computing time. 
+\end{DoxyItemize}

@@ -1,0 +1,375 @@
+\chapter{zcontent}
+\hypertarget{index}{}\label{index}\index{zcontent@{zcontent}}
+\begin{DoxyAuthor}{Author}
+Gerard POLO \href{mailto:gerard.polo@gmail.com}{\texttt{ gerard.\+polo@gmail.\+com}} 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+GNU Public License
+\end{DoxyCopyright}
+\hypertarget{index_MainIntroduction}{}\doxysection{\texorpdfstring{Introduction}{Introduction}}\label{index_MainIntroduction}
+The objective is to provide a set of tools, simple, light, fast, well architectured that allows to manage unstructured contents. No sql access is required. Access is made thru relative positionning, or direct content access either through defined keys or even in the unstructured content itself.
+
+Nowadays a maximum of content, documents, mails, images, are
+\begin{DoxyItemize}
+\item stored remotely on servers and accessed through the net,
+\item then loaded in local memory, and stay resident most of the time.
+\end{DoxyItemize}
+
+Even if memory tends to be huger and huger, we face strong limitations in terms of resources either network resources and local resources.
+
+The proposed tools are designed to manage contents with the following main advantages \+:
+\begin{DoxyItemize}
+\item they can be embedded directly in applications \+: these tools may perfectly work on a mobile phone, as well as a linux or windows server.
+\item so that they can run locally and store locally documents in a private
+\item usage of these documents does not consume network bandwidth and can even be done off-\/line
+\item the same application may run on various operating system without change
+\item they are "{}\+QT compatible"{} even if they do not require QT to work fine (no QT libraries are required)
+\item they are very few resources consumming
+\item they are quick because written in C++
+\item they are "{}manageable"{}, with a set of tools to analyse, maintain, migrate and recover
+\end{DoxyItemize}\hypertarget{index_MainWhat}{}\doxysection{\texorpdfstring{What content management are we talking about ?}{What content management are we talking about ?}}\label{index_MainWhat}
+The idea is to store locally the content we do need the most, in order to skip the gap of network, and this, without degrading local performance for applications that finally may "{}starve"{} from lack of local resources.
+
+Additionally, it is safer because we all know that transitting by the net is not very safe, and the network encoding itself consumes as well pretty much resources.
+
+Purpose of this tool set is to provide two main functionalities that will be exposed below.\hypertarget{index_MainContent}{}\doxysubsection{\texorpdfstring{Huge contents management with ZRandom\+File}{Huge contents management with ZRandomFile}}\label{index_MainContent}
+We intend to manage huge contents, with a varying size, with an optimized space management.
+
+Access is done per relative position of each content block (record).
+
+But it offers at this stage, full search capabilities using its "{}field"{} definition. What is proposed here is not only "{}full text"{} search, but a search on a byte sequence in part of a file (collection of records), or in the total file content. When can then, for example, search for set of pixel values in various image documents, or a even a machine code segment, if content is executable.
+
+This layer is based on \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} concept. \begin{DoxySeeAlso}{See also}
+\doxysectlink{_z_random_file_page}{ZRandom\+File Reference Documentation}{0}
+\end{DoxySeeAlso}
+\hypertarget{index_MainIndex}{}\doxysubsection{\texorpdfstring{Index key search with ZMaster\+File}{Index key search with ZMasterFile}}\label{index_MainIndex}
+As an extension of \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}, \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} offers the possibility to define index keys using dictionaries that are handled and managed by \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}. \begin{DoxySeeAlso}{See also}
+\doxylink{group___dictionary_group}{Key dictionary}
+\end{DoxySeeAlso}
+Using specific algorithms, it allows fast search thru indexes.
+
+\begin{DoxySeeAlso}{See also}
+\doxysectlink{_z_master_file_page}{ZMaster\+File Reference Documentation}{0}
+\end{DoxySeeAlso}
+It takes into account Endian (big endian/little endian), for a transparent conversion. \begin{DoxySeeAlso}{See also}
+\doxylink{group___endian_conversion}{Endianness imposes a special processing for key data.}
+\end{DoxySeeAlso}
+\hypertarget{index_MainStat}{}\doxysubsection{\texorpdfstring{Statistical and dump tools}{Statistical and dump tools}}\label{index_MainStat}
+This set of tools offers its own statistical and dump tools to analyze and optimize files behavior, using the numerous options that are provided. \begin{DoxySeeAlso}{See also}
+\doxylink{group___z_r_f_s_t_a_t_s}{Dump utilities and Statistical tools for ZRandom\+File} 
+
+\doxylink{group___z_m_f_s_t_a_t_s}{ZMaster\+File Performance statistics}
+\end{DoxySeeAlso}
+\hypertarget{index_MainRepair}{}\doxysubsection{\texorpdfstring{Maintenance and repair tools}{Maintenance and repair tools}}\label{index_MainRepair}
+Tool set offers maintenance tools that allow to manage disk space, as well as to recover damaged file structure. \begin{DoxySeeAlso}{See also}
+\doxylink{group___z_r_f_utilities}{ZRandom\+File Surface management utilities} 
+
+\doxylink{group___z_m_f_utilities}{ZMaster\+File utilities}
+\end{DoxySeeAlso}
+\hypertarget{index_MainArchitecture}{}\doxysection{\texorpdfstring{Software architecture}{Software architecture}}\label{index_MainArchitecture}
+It is always utmost complicated to make a tool simple and effective. This was the challenge I faced.
+
+I tried to make it in designing an architecture that was technically obvious, effective in terms of response times.\hypertarget{index_MainZBSToolset}{}\doxysubsection{\texorpdfstring{zbasesystem toolset}{zbasesystem toolset}}\label{index_MainZBSToolset}
+This toolset is based on zbasesystem toolset (Open\+Source library.\+Author\+: Gerard POLO). This toolset allows us, among other numerous usefull objects, to \+:
+\begin{DoxyItemize}
+\item \doxylink{classzbs_1_1_z_array}{ZArray} \+:manipulate Arrays in a very usefull way, with embedded capabilities to export and import arrays to store them as flat content in a file\textquotesingle{}s record.
+\item ZData\+Buffer \+: manipulate any content as a piece of memory, with its own safer memory allocation/extension/deallocation, as well as encoding/decoding facilities. \begin{DoxySeeAlso}{See also}
+\doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBase\+System\+Page} 
+\end{DoxySeeAlso}
+\begin{DoxyNote}{Note}
+Open\+SSL library software is required, specifically for encoding
+\end{DoxyNote}
+
+\end{DoxyItemize}\hypertarget{index_MainZRFArch}{}\doxysubsection{\texorpdfstring{ZRandom\+File Architecture}{ZRandomFile Architecture}}\label{index_MainZRFArch}
+For performance purposes, \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} is composed of 2 physical files that may strictly stay aligned \+:
+\begin{DoxyItemize}
+\item Content file This is the main file that will contain user data. This is the file that is named by used to handle a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}. The name of this file is left to user\textquotesingle{}s choice, despite some restrictions(see below). This name will actually be the name of the \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} itself.
+\item Header file This file contains infradata that is mandatory to the \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} behavior. The name of this file is deduced from the content file and is stored in the same path that content file.
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+\doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} users do not have to care about this duality, excepted when ZRandom\+Files are backuped or moved. Header file name is transparently deduced from the content file name (uri\+String). In a normal usage case, user does not see header file. He only addresses the main \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} content file, the one he named.
+\end{DoxyNote}
+\begin{DoxyWarning}{Warning}
+This implies that header file is absolutely necessary for a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} to be recognized and to be read. Users should never ever modify directly, or even delete, such files, nor move them without moving the main ZRF content file. In such cases, damages could stay non recoverable. However, there is an utility routine to rebuild a header file in case of damaged header file \doxysectlink{group___z_r_f_utilities_ZRFUtilHRebuild}{ZRF header rebuild}{2}
+\end{DoxyWarning}
+\begin{DoxySeeAlso}{See also}
+\doxylink{group___z_m_f_file_naming}{Physical files naming conventions}
+
+\doxylink{group___z_r_f_physical_gafb2867db4fd1d1b7bdd45bd7324fe644}{generate\+URIHeader} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{for} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{functions} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{list} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{for} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{details}
+\end{DoxySeeAlso}
+ 
+\begin{DoxyImage}
+\includegraphics[width=10cm]{zrfphysical.jpg}
+\doxyfigcaption{ZRandom\+File physical layer}
+\end{DoxyImage}
+
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{group___z_m_f_s_t_a_t_s}{ZMaster\+File Performance statistics} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{for} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{an} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{example} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{of} \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{physical} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{layer} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{applied} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{to} \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZIndex\+Files}  
+\end{DoxySeeAlso}
+\hypertarget{index_MainZMFArch}{}\doxysubsection{\texorpdfstring{ZMaster\+File Architecture}{ZMasterFile Architecture}}\label{index_MainZMFArch}
+\doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} physical layer is based on \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} physical layer. We may distinguish
+\begin{DoxyItemize}
+\item Main content file
+\end{DoxyItemize}
+
+This is based on a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} base structure that embeds \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} infra-\/data extension.
+
+
+\begin{DoxyItemize}
+\item Indexes (ZIndex\+File)
+\end{DoxyItemize}
+
+Each defined index is stored and managed through its own \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} structure that embeds ZIndex\+File infra-\/data extension.
+
+\begin{DoxyNote}{Note}
+\doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} user does not have to care about this file structure, as he will address anything through \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}. However for some operations
+\begin{DoxyItemize}
+\item statistical data
+\item split ZIndexes from \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}\textquotesingle{}s location it is good to known this architecture, as well as file\textquotesingle{}s naming conventions. 
+\end{DoxyItemize}
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See also}
+
+\end{DoxySeeAlso}
+ 
+\begin{DoxyImage}
+\includegraphics[width=10cm]{zmfphysical.jpg}
+\doxyfigcaption{ZMaster\+File physical layer}
+\end{DoxyImage}
+
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{group___z_m_f_file_naming}{Physical files naming conventions}  
+\end{DoxySeeAlso}
+\hypertarget{index_MainLock}{}\doxysubsection{\texorpdfstring{ZICM Locks management and usage}{ZICM Locks management and usage}}\label{index_MainLock}
+\hypertarget{group___main_lock_group_MLockFile}{}\doxysubsection{\texorpdfstring{File locking}{File locking}}\label{group___main_lock_group_MLockFile}
+The whole file could be locked using its file header using one of the lock mask. This lock will apply to the entire file.
+
+Only one user-\/process can own a lock on a whole file at a time.\hypertarget{group___main_lock_group_MLockRecord}{}\doxysubsection{\texorpdfstring{ZMF record locking}{ZMF record locking}}\label{group___main_lock_group_MLockRecord}
+
+\begin{DoxyItemize}
+\item Adding, suppressing, Modifying indexes File must be open in exclusive mode with read write capabilities \+: ZRF\+\_\+\+Exclusive \texorpdfstring{$\vert$}{|} ZRF\+\_\+\+Write No lock is necessary. Must take care of processes opening the file in file header ZReserved
+\item Creating a ZMF record no special lock
+\item removing ZMF record
+\begin{DoxyItemize}
+\item prepare \+: main file\textquotesingle{}s record is locked at ZLock\+\_\+\+Write \texorpdfstring{$\vert$}{|} ZLock\+\_\+\+Delete
+\item rollback \+: lock is released on the record in the end of rollback and lock is destroyed in the file header\textquotesingle{}s lock table
+\item commit \+: lock is destroyed in the file header\textquotesingle{}s lock table. while marking free block lock is cleared on block.
+\end{DoxyItemize}
+\item modifying a record \+:
+\begin{DoxyItemize}
+\item get \+: an exclusive lock is put on record \+: ZLock\+\_\+\+All
+\item rollback lock is released on the record in the end of rollback and lock is destroyed in the file header\textquotesingle{}s lock table
+\item commit lock is released on the record in the end of rollback and lock is destroyed in the file header\textquotesingle{}s lock table
+\end{DoxyItemize}
+\item Additionally locks can be manually put on records using zlock , zunlock \+: users manages the lock / unlock
+\item in case of failure \+: a full unlock frees all locks for a file
+\item restart after error \+: locks may be destroyed.  
+\end{DoxyItemize}\hypertarget{index_MainZRFZMFToDoList}{}\doxysection{\texorpdfstring{To Do list for ZRandom\+File and ZMaster\+File ZIndex\+File}{To Do list for ZRandomFile and ZMasterFile ZIndexFile}}\label{index_MainZRFZMFToDoList}
+-\/ xml file definition
+\begin{DoxyItemize}
+\item export from existing file
+\item create empty files structure from xml definition (parse and control, then create)
+\end{DoxyItemize}
+
+create a command line utility project $<$zicmcmd$>$
+\begin{DoxyItemize}
+\item export xml definition
+\item zreorg
+\item zheader rebuild
+\item zcreate
+\item ztrunctate
+\item zextend
+\item Dump and reports
+\end{DoxyItemize}
+
+migrate a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} to a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}  \hypertarget{index_MainZRFToDoList}{}\doxysubsection{\texorpdfstring{ZRandom\+File Todo list}{ZRandomFile Todo list}}\label{index_MainZRFToDoList}
+-\/ Implement zreorg (done) {$\surd$}
+\begin{DoxyItemize}
+\item zreorg static (done) {$\surd$}
+\item test zreorg
+\item Implement option zmode exclusive \+: impacts on rewrite of file header \+: (done){$\surd$} No access to file header when it is open in exclusive mode. Access is only done in 2 times \+: at open time (read file header) at close time (write file header) This should be transparent \+: in \+\_\+get\+File\+Header and in \+\_\+write\+File\+Header. (add a boolean for effective read and effective write)
+\item Implement ztruncate (done) {$\surd$}
+\item Implement posix\+\_\+fallocate at creation time (done) {$\surd$}
+\item implement zclone\+File (done) {$\surd$} duplicates the file structure and the data
+\item same structure, same parameters
+\item however copy is done in reorganizing blocks in the order of relative ranks
+\item size is set using \+: used size + p\+Free\+Block (fallocate) Only one free block of size p\+Free\+Block is added at the end of physical file if p\+Free\+Blocks = -\/1 (default) then Block\+Target\+Size is taken.
+\item implement zreog\+External \+: of no use, zclone\+File is better
+\item implement zheader\+Rebuild (done) {$\surd$}
+\begin{DoxyItemize}
+\item scan surface for content file and report
+\item create header file
+\item search physical block after physical block \+:
+\begin{DoxyItemize}
+\item block is ZBS\+\_\+\+Used create an entry in ZBAT
+\item block is ZBS\+\_\+\+Free create an entry in ZFBT
+\item block is ZBS\+\_\+\+Hole create an entry in ZHOT DEPRECATED \mbox{[}-\/ block is ZBS\+\_\+\+Deleted create an entry in ZDBT\mbox{]}
+\end{DoxyItemize}
+\item test it (done) {$\surd$}  
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{index_MainZMFToDoList}{}\doxysubsection{\texorpdfstring{ZRandom\+File Todo list}{ZRandomFile Todo list}}\label{index_MainZMFToDoList}
+-\/ implement ZIndex zrebuild\+Index (done) {$\surd$}
+
+
+\begin{DoxyItemize}
+\item implement zreorg\+File for \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} (done) {$\surd$}
+\item test it (done) {$\surd$}
+\item implement ZPMS as a pointer to zstatistics
+\item implement ZKey facitilies
+\begin{DoxyItemize}
+\item ZKey field extraction for query
+\begin{DoxyItemize}
+\item ZType analyzis for fields (done) {$\surd$}
+\item fields value extraction and key setup with content (done) {$\surd$}
+\item define partial key capabilities
+\end{DoxyItemize}
+\item ZKey integration into \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} ZIndex\+File usage
+\end{DoxyItemize}
+\item implement in ZType\+\_\+type "{}\+Byte sequence"{} \+: Byte\+Seq
+\item implement zsearch Search the first occurrence of a key value and return the corresponding ZMF address
+\item zget\+By\+Key (index rank, key value) returns the first occurrence of ZMF record that matches the given key value for fiven index rank
+\item implement zsearch\+All (done) {$\surd$} searches all occurrences of key value and return a \doxylink{classzbs_1_1_z_array}{ZArray} with the matching ZMF addresses
+\item implement zget\+By\+Address(done) {$\surd$} returns a ZMF record using its address
+\item implement zsearch\+All\+Partial \& zsearch\+Next\+Partial
+\begin{DoxyItemize}
+\item raw with ZData\+Buffer
+\item using ZKey \+: implement operators
+\end{DoxyItemize}
+\item implement zsearch\+Next\+Par
+\item implement \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} to \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} conversion immediate conversion \+: no need of special conversion.
+\item implement zremove\+By\+Key Remove a record or a set of records using a key value
+\item implement zremove\+By\+Address
+\item 
+\item journaling for ZMF
+\begin{DoxyItemize}
+\item define journaling class as \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}
+\item define journaling life cycle \+: creation, storage, purge
+\end{DoxyItemize}
+\item remote mirroring for ZMF (from journaling)
+\begin{DoxyItemize}
+\item store mirroring info in ZReserved.
+\item define parameters \+: port, host, username, password
+\item define ZMF mirroring service on target host.  
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{index_MainTest}{}\doxysection{\texorpdfstring{Tests plans}{Tests plans}}\label{index_MainTest}
+\hypertarget{index_MainZRFTestPlan}{}\doxysubsection{\texorpdfstring{ZRandom\+File Tests plan}{ZRandomFile Tests plan}}\label{index_MainZRFTestPlan}
+\begin{DoxyParagraph}{fixed size records}
+
+\end{DoxyParagraph}
+
+\begin{DoxyItemize}
+\item create records (done) {$\surd$}
+\item random access to records by relative position (done) {$\surd$}
+\item delete 3 consecutive records (done) {$\surd$} verify grab\+Free\+Blocks works fine (done) {$\surd$}
+\item verify insert (done) {$\surd$}
+\end{DoxyItemize}
+
+\begin{DoxyParagraph}{variable sized records}
+
+\end{DoxyParagraph}
+
+\begin{DoxyItemize}
+\item create records (done) {$\surd$}
+\item monitor time of load for huge files (done) {$\surd$}
+\item test file structure dump (done) {$\surd$}
+\item random access to records (done) {$\surd$}
+\item delete 3 adjacent records verify free pool status and verify state of physical file surface (VSPFS) (done) {$\surd$}
+\begin{DoxyItemize}
+\item in growing order (done) {$\surd$}
+\item in random order (done) {$\surd$}
+\end{DoxyItemize}
+\item recover from Free pool (done) {$\surd$}
+\item create 3 records after deletion verify space is correctly taken from free pool (done) {$\surd$}
+\item delete 3 adjacent records \+: (verify grab\+Free\+Blocks works fine)
+\begin{DoxyItemize}
+\item delete record physical address 0 (done) {$\surd$}
+\item delete record last physical address (done) {$\surd$}
+\item and create new records to fill in it (done) {$\surd$}
+\item verify grab free space behaviour (done) {$\surd$}
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\begin{DoxyParagraph}{Dump and Statistical tools}
+
+\end{DoxyParagraph}
+
+\begin{DoxyItemize}
+\item Test all content dump tools (done) {$\surd$}
+\item Test surface scan (done) {$\surd$}
+\item Test ZRFstat (done) {$\surd$}
+\end{DoxyItemize}
+
+\begin{DoxyParagraph}{Utilities and Highwater\+Marking}
+
+\end{DoxyParagraph}
+
+\begin{DoxyItemize}
+\item zclear\+File without highwater (done) {$\surd$}
+\item zclearfile with highwater (multiple modulos) (done) {$\surd$}
+\item zreorg
+\begin{DoxyItemize}
+\item create a test data set with unorganized blocks, and with holes (done) {$\surd$}
+\item test zreorg\+File
+\begin{DoxyItemize}
+\item without grab\+Free\+Space (done) {$\surd$}
+\item with grab\+Free\+Space (done) {$\surd$}
+\item with highwater\+Marking (done) {$\surd$}
+\item performance tests (done) {$\surd$}
+\end{DoxyItemize}
+\item zheader\+Rebuild (done) {$\surd$}
+\item export xml definition
+\begin{DoxyItemize}
+\item for \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} (done) {$\surd$}
+\item for \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} (done) {$\surd$}
+\end{DoxyItemize}
+\item export xml content
+\item create from xml (done) {$\surd$}  
+\end{DoxyItemize}
+\end{DoxyItemize}\hypertarget{index_MainZMFTestPlan}{}\doxysubsection{\texorpdfstring{ZMaster\+File Tests plan}{ZMasterFile Tests plan}}\label{index_MainZMFTestPlan}
+-\/ implement ZIndex zrebuild\+Index (done) {$\surd$}
+
+
+\begin{DoxyItemize}
+\item implement zreorg\+File for \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} (done) {$\surd$}
+\item test it (done) {$\surd$}
+\item implement ZPMS as a pointer to zstatistics
+\item implement ZKey facitilies
+\begin{DoxyItemize}
+\item ZKey field extraction for query
+\begin{DoxyItemize}
+\item ZType analyzis for fields (done) {$\surd$}
+\item fields value extraction and key setup with content (done) {$\surd$}
+\item define partial key capabilities
+\end{DoxyItemize}
+\item ZKey integration into \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} ZIndex\+File usage
+\end{DoxyItemize}
+\item implement in ZType\+\_\+type "{}\+Byte sequence"{} \+: Byte\+Seq
+\item implement zsearch Search the first occurrence of a key value and return the corresponding ZMF address
+\item zget\+By\+Key (index rank, key value) returns the first occurrence of ZMF record that matches the given key value for fiven index rank
+\item implement zsearch\+All (done) {$\surd$} searches all occurrences of key value and return a \doxylink{classzbs_1_1_z_array}{ZArray} with the matching ZMF addresses
+\item implement zget\+By\+Address(done) {$\surd$} returns a ZMF record using its address
+\item implement zsearch\+All\+Partial \& zsearch\+Next\+Partial
+\begin{DoxyItemize}
+\item raw with ZData\+Buffer
+\item using ZKey \+: implement operators
+\end{DoxyItemize}
+\item implement zsearch\+Next\+Par
+\item implement \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} to \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} conversion immediate conversion \+: no need of special conversion.
+\item implement zremove\+By\+Key Remove a record or a set of records using a key value
+\item implement zremove\+By\+Address
+\item 
+\item journaling for ZMF
+\begin{DoxyItemize}
+\item define journaling class as \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}
+\item define journaling life cycle \+: creation, storage, purge
+\end{DoxyItemize}
+\item remote mirroring for ZMF (from journaling)
+\begin{DoxyItemize}
+\item store mirroring info in ZReserved.
+\item define parameters \+: port, host, username, password
+\item define ZMF mirroring service on target host.   
+\end{DoxyItemize}
+\end{DoxyItemize}

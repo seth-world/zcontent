@@ -1,0 +1,760 @@
+\doxysection{ZSSLAbstract Class Reference}
+\hypertarget{class_z_s_s_l_abstract}{}\label{class_z_s_s_l_abstract}\index{ZSSLAbstract@{ZSSLAbstract}}
+
+
+The \doxylink{class_z_s_s_l_abstract}{ZSSLAbstract} class contains all data and routines for SSL support. Socket is managed within ZSocket class family. It has to be added to a ZSocket (and derived) class.  
+
+
+
+
+{\ttfamily \#include $<$zsslabstract.\+h$>$}
+
+
+
+Inheritance diagram for ZSSLAbstract\+:
+% FIG 0
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_z_s_s_l_abstract_a2b29236dabd25c80c761ab923ededf34}{ZSSLAbstract}} ()
+\item 
+\mbox{\hyperlink{class_z_s_s_l_abstract_adc54f2c1c21d1ec01014c3783c8b55e3}{\texorpdfstring{$\sim$}{\string~}\+ZSSLAbstract}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_z_s_s_l_abstract_ac54af48786f2c72911e6d6b819beda44}{SSL\+\_\+init}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_z_s_s_l_abstract_abe224645c91c3b52fe15caa300a6fd75}{cleanup\+\_\+openssl}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_a7fbba74c160f68c38a431bd46b693e8a}{create\+Client\+Context}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_aeca88309b615029c1322e437e5a3e99e}{create\+TLSClient\+Context}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_aef8300153c85ffa62309c4c5bbdeeaba}{create\+Server\+Context}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_z_s_s_l_abstract_a292c0b19ca01517953e37060bf5b5225}{print\+Certificate}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{X509}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Certificate}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{FILE}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Output}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_a8ef589a996266651051d8e91d974998d}{get\+Peer\+Certificate}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{X509}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{X509\+\_\+\+Certificate}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_a6b5b56430d7540407005b4d017c0310d}{print\+SSLServer\+Information}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{FILE}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{w\+Output}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_a4bd11cc7cb5debd65058167b293f6f46}{verify\+Peer\+Certificate}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Certificate\+Path}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zsslfunctions_8h_a385e54dce5150985c17f825b907ee906}{SSLFile\+Format\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Format}}=\mbox{\hyperlink{zsslfunctions_8h_a385e54dce5150985c17f825b907ee906abdc3eb2e93cbc8983d387717de1f8efc}{SFF\+\_\+\+PEM}})
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{class_z_s_s_l_abstract_a7a17e28255ae172f172ef3bd07ed9d21}{get\+SSLServer\+Information}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_a356c2d08fbf907f34ed2685cb7c8c2cd}{verify\+Cert\+Public\+Key}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{X509}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Certificate}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Cert\+File}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Cert\+Dir}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_afb79e612b4b1e5e4d44a6d5d8d495050}{init\+Client\+Hand\+Shake}} (ZSocket \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Socket}})
+\begin{DoxyCompactList}\small\item\em ZSSLBase\+::init\+Hand\+Shake initiates the SSL handshake IMPORTANT \+: socket must be connected prior to call this routine and a valid socket fd must be given as parameter. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_a00030e4b2dbdaf9a06a47a2921167e67}{init\+Server\+Hand\+Shake}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Socket\+Id}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_a33391c1b376542a69c3c3db1007a06df}{\+\_\+\+SSLread}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buf}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size\+To\+Read}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size\+Read}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_acfce0f4834c286e05757c1f5d6e84064}{\+\_\+\+SSLwrite}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buf}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size\+To\+Write}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size\+Written}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_a36a57e5972e6c66356abba4240e9eaee}{zread}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size\+To\+Read}})
+\begin{DoxyCompactList}\small\item\em ZSocket\+::zread simple read of the socket in p\+Buffer ~\newline
+ \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_a640f29d4158307acd415f3fa4d1bc981}{zread}} (\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size\+To\+Read}})
+\begin{DoxyCompactList}\small\item\em ZSocket\+::zread simple read of the socket in p\+Buffer ~\newline
+ \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_a5085218601b5e01dd0fe2fe71cf34921}{zbaseread}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}})
+\begin{DoxyCompactList}\small\item\em ZSocket\+::zbaseread reads the socket in p\+Buffer according ZBase protocol ~\newline
+ \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_a2add260cbd4919fe0be73e6efc03f10c}{zbaseread}} (\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_a536670ac9704378d4f1469bfa7668449}{zbasewrite}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}})
+\begin{DoxyCompactList}\small\item\em ZSocket\+::zbasewrite writes p\+Buffer to the socket according ZBase protocol ~\newline
+ \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_abf595c24820000099870c913e364bcd7}{zbasewrite}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}})
+\begin{DoxyCompactList}\small\item\em ZSSLSocket\+::\+ZSSLwrite writes a ZData\+Buffer content to a socket first the size is sent (ssize\+\_\+t) then ZData\+Buffer full content Data is always prefixed with size of following data. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_ab282ed3c1dd1259e61d0d741f646c19d}{zbasewrite}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_a1203ef05af8d6cd76fc096401f680679}{zbasewrite}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_a219168e4576c452ea4b92ff6277ad4f1}{zwrite}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size\+Written}})
+\begin{DoxyCompactList}\small\item\em ZSocket\+::zbasewrite Simple write of p\+Buffer to the socket. Returned written size is set to p\+Size\+Written. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_a1899381259ea48d2515b66d5d3db55db}{zwrite}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size\+Written}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_s_s_l_abstract_afa78890bee5e2bc95e08cd4f74850c13}{set\+Default\+Certificate\+Path}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Certname}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Cert\+Path}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_z_s_s_l_abstract_a194d74b62eaa3fc04da6c307d544249b}{ZSSL\+\_\+set\+\_\+password}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Password}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{static}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{class_z_s_s_l_abstract_a42178ccd9dd2608804cec0a6158ec236}{ZSSL\+\_\+password\+\_\+callback}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{buf}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{rwflag}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Password}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SSL\+\_\+\+METHOD}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_z_s_s_l_abstract_a292ffd14e244aef211d353472b52f5c0}{Method}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SSL\+\_\+\+CTX}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_z_s_s_l_abstract_a6d26a71b352290159a06a51454827bd4}{Context}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+uri\+String \mbox{\hyperlink{class_z_s_s_l_abstract_a02aeaf795a8307ba8bf5cd88f3ff8255}{Cert\+Path}}
+\item 
+uri\+String \mbox{\hyperlink{class_z_s_s_l_abstract_ad2e41ce33cb30cc73a88aac83a8ec94c}{Key\+Path}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SSL}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_z_s_s_l_abstract_a63ecb7f6ae65bbfa96704c2e56cbd44a}{SSLObject}} = \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+ZSocket \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_z_s_s_l_abstract_a13eab9b152a68c7b93f25d4a3627fcd5}{Socket}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The \doxylink{class_z_s_s_l_abstract}{ZSSLAbstract} class contains all data and routines for SSL support. Socket is managed within ZSocket class family. It has to be added to a ZSocket (and derived) class. 
+
+Definition at line \mbox{\hyperlink{zsslabstract_8h_source_l00025}{25}} of file \mbox{\hyperlink{zsslabstract_8h_source}{zsslabstract.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_z_s_s_l_abstract_a2b29236dabd25c80c761ab923ededf34}\label{class_z_s_s_l_abstract_a2b29236dabd25c80c761ab923ededf34} 
+\index{ZSSLAbstract@{ZSSLAbstract}!ZSSLAbstract@{ZSSLAbstract}}
+\index{ZSSLAbstract@{ZSSLAbstract}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{ZSSLAbstract()}{ZSSLAbstract()}}
+{\footnotesize\ttfamily ZSSLAbstract\+::\+ZSSLAbstract (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00466}{466}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+\Hypertarget{class_z_s_s_l_abstract_adc54f2c1c21d1ec01014c3783c8b55e3}\label{class_z_s_s_l_abstract_adc54f2c1c21d1ec01014c3783c8b55e3} 
+\index{ZSSLAbstract@{ZSSLAbstract}!````~ZSSLAbstract@{\texorpdfstring{$\sim$}{\string~}ZSSLAbstract}}
+\index{````~ZSSLAbstract@{\texorpdfstring{$\sim$}{\string~}ZSSLAbstract}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ZSSLAbstract()}{\string~ZSSLAbstract()}}
+{\footnotesize\ttfamily ZSSLAbstract\+::\texorpdfstring{$\sim$}{\string~}\+ZSSLAbstract (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8h_source_l00029}{29}} of file \mbox{\hyperlink{zsslabstract_8h_source}{zsslabstract.\+h}}.
+
+
+
+References \mbox{\hyperlink{zsslabstract_8cpp_source_l00011}{cleanup\+\_\+openssl()}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_z_s_s_l_abstract_a33391c1b376542a69c3c3db1007a06df}\label{class_z_s_s_l_abstract_a33391c1b376542a69c3c3db1007a06df} 
+\index{ZSSLAbstract@{ZSSLAbstract}!\_SSLread@{\_SSLread}}
+\index{\_SSLread@{\_SSLread}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{\_SSLread()}{\_SSLread()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::\+\_\+\+SSLread (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}}]{p\+Buf,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}}}]{p\+Size\+To\+Read,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \&}]{p\+Size\+Read }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00480}{480}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{znetexception_8cpp_source_l00066}{ZNet\+Exception\+::get\+SSLError()}}, \mbox{\hyperlink{zsslabstract_8h_source_l00092}{Socket}}, and \mbox{\hyperlink{zsslabstract_8h_source_l00090}{SSLObject}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslabstract_8cpp_source_l00557}{zbaseread()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00536}{zbaseread()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00598}{zread()}}, and \mbox{\hyperlink{zsslabstract_8cpp_source_l00579}{zread()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_acfce0f4834c286e05757c1f5d6e84064}\label{class_z_s_s_l_abstract_acfce0f4834c286e05757c1f5d6e84064} 
+\index{ZSSLAbstract@{ZSSLAbstract}!\_SSLwrite@{\_SSLwrite}}
+\index{\_SSLwrite@{\_SSLwrite}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{\_SSLwrite()}{\_SSLwrite()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::\+\_\+\+SSLwrite (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}}]{p\+Buf,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}}}]{p\+Size\+To\+Write,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \&}]{p\+Size\+Written }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00616}{616}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{znetexception_8cpp_source_l00066}{ZNet\+Exception\+::get\+SSLError()}}, \mbox{\hyperlink{zsslabstract_8h_source_l00092}{Socket}}, and \mbox{\hyperlink{zsslabstract_8h_source_l00090}{SSLObject}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsmtp_8cpp_source_l00336}{ZSmtp\+::smtp\+SSLSend\+With\+Reply()}}, \mbox{\hyperlink{zmailabstract_8cpp_source_l00106}{ZMail\+Abstract\+::\+SSLSend()}}, \mbox{\hyperlink{zmailabstract_8cpp_source_l00163}{ZMail\+Abstract\+::\+SSLSend\+Huge()}}, \mbox{\hyperlink{zmailabstract_8cpp_source_l00121}{ZMail\+Abstract\+::\+SSLSend\+Huge\+By\+Chunks()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00673}{zbasewrite()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00662}{zbasewrite()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00694}{zwrite()}}, and \mbox{\hyperlink{zsslabstract_8cpp_source_l00688}{zwrite()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_abe224645c91c3b52fe15caa300a6fd75}\label{class_z_s_s_l_abstract_abe224645c91c3b52fe15caa300a6fd75} 
+\index{ZSSLAbstract@{ZSSLAbstract}!cleanup\_openssl@{cleanup\_openssl}}
+\index{cleanup\_openssl@{cleanup\_openssl}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{cleanup\_openssl()}{cleanup\_openssl()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZSSLAbstract\+::cleanup\+\_\+openssl (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsslabstract_8h_source_l00087}{Context}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsslabstract_8h_a26cb2210d448421a713e5a84f7c3bc83}{SSLLibraries\+\_\+initialized}}, and \mbox{\hyperlink{zsslabstract_8h_source_l00090}{SSLObject}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslabstract_8cpp_source_l00369}{init\+Client\+Hand\+Shake()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00420}{init\+Server\+Hand\+Shake()}}, \mbox{\hyperlink{zsmtp_8cpp_source_l01386}{ZSmtp\+::smtp\+Quit()}}, \mbox{\hyperlink{zsslclientsocket_8h_source_l00124}{ZSSLClient\+Socket\+::zclose()}}, \mbox{\hyperlink{zsslclientsocket_8h_source_l00234}{ZBase\+SSLClient\+Socket\+::zclose()}}, \mbox{\hyperlink{zsslsocketselect_8h_source_l00040}{ZSSLSocket\+Select\+::zclose()}}, \mbox{\hyperlink{zsslserversocket_8h_source_l00024}{ZSSLServer\+Socket\+::zclose()}}, \mbox{\hyperlink{zsslserverselect_8cpp_source_l00255}{ZSSLServer\+Select\+::zserver\+Close()}}, \mbox{\hyperlink{zsslserverselect_8cpp_source_l00269}{ZSSLServer\+Select\+::zserver\+Shutdown()}}, \mbox{\hyperlink{zsslclientsocket_8h_source_l00129}{ZSSLClient\+Socket\+::zshutdown()}}, \mbox{\hyperlink{zsslclientsocket_8h_source_l00239}{ZBase\+SSLClient\+Socket\+::zshutdown()}}, \mbox{\hyperlink{zsslsocketselect_8h_source_l00045}{ZSSLSocket\+Select\+::zshutdown()}}, \mbox{\hyperlink{zsslserversocket_8h_source_l00025}{ZSSLServer\+Socket\+::zshutdown()}}, and \mbox{\hyperlink{zsslabstract_8h_source_l00029}{\texorpdfstring{$\sim$}{\string~}\+ZSSLAbstract()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a7fbba74c160f68c38a431bd46b693e8a}\label{class_z_s_s_l_abstract_a7fbba74c160f68c38a431bd46b693e8a} 
+\index{ZSSLAbstract@{ZSSLAbstract}!createClientContext@{createClientContext}}
+\index{createClientContext@{createClientContext}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{createClientContext()}{createClientContext()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::create\+Client\+Context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00048}{48}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsslabstract_8h_source_l00087}{Context}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{znetexception_8cpp_source_l00066}{ZNet\+Exception\+::get\+SSLError()}}, \mbox{\hyperlink{zsslabstract_8h_source_l00086}{Method}}, and \mbox{\hyperlink{zsslabstract_8cpp_source_l00097}{SSL\+\_\+init()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslclientsocket_8cpp_source_l00010}{ZSSLClient\+Socket\+::\+SSLclient\+Setup()}}, and \mbox{\hyperlink{zsslclientsocket_8cpp_source_l00191}{ZBase\+SSLClient\+Socket\+::\+SSLclient\+Setup()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_aef8300153c85ffa62309c4c5bbdeeaba}\label{class_z_s_s_l_abstract_aef8300153c85ffa62309c4c5bbdeeaba} 
+\index{ZSSLAbstract@{ZSSLAbstract}!createServerContext@{createServerContext}}
+\index{createServerContext@{createServerContext}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{createServerContext()}{createServerContext()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::create\+Server\+Context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00024}{24}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsslabstract_8h_source_l00087}{Context}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{znetexception_8cpp_source_l00066}{ZNet\+Exception\+::get\+SSLError()}}, \mbox{\hyperlink{zsslabstract_8h_source_l00086}{Method}}, and \mbox{\hyperlink{zsslabstract_8cpp_source_l00097}{SSL\+\_\+init()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslserversocket_8h_source_l00018}{ZSSLServer\+Socket\+::create\+Server\+Context()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_aeca88309b615029c1322e437e5a3e99e}\label{class_z_s_s_l_abstract_aeca88309b615029c1322e437e5a3e99e} 
+\index{ZSSLAbstract@{ZSSLAbstract}!createTLSClientContext@{createTLSClientContext}}
+\index{createTLSClientContext@{createTLSClientContext}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{createTLSClientContext()}{createTLSClientContext()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::create\+TLSClient\+Context (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00071}{71}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmailabstract_8cpp_source_l00031}{ZMail\+Abstract\+::setup()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a8ef589a996266651051d8e91d974998d}\label{class_z_s_s_l_abstract_a8ef589a996266651051d8e91d974998d} 
+\index{ZSSLAbstract@{ZSSLAbstract}!getPeerCertificate@{getPeerCertificate}}
+\index{getPeerCertificate@{getPeerCertificate}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{getPeerCertificate()}{getPeerCertificate()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::get\+Peer\+Certificate (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{X509}} \texorpdfstring{$\ast$}{*}\&}]{X509\+\_\+\+Certificate }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00271}{271}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zsslabstract_8h_source_l00090}{SSLObject}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslabstract_8cpp_source_l00247}{get\+SSLServer\+Information()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00229}{print\+SSLServer\+Information()}}, and \mbox{\hyperlink{zsslabstract_8cpp_source_l00291}{verify\+Peer\+Certificate()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a7a17e28255ae172f172ef3bd07ed9d21}\label{class_z_s_s_l_abstract_a7a17e28255ae172f172ef3bd07ed9d21} 
+\index{ZSSLAbstract@{ZSSLAbstract}!getSSLServerInformation@{getSSLServerInformation}}
+\index{getSSLServerInformation@{getSSLServerInformation}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{getSSLServerInformation()}{getSSLServerInformation()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} ZSSLAbstract\+::get\+SSLServer\+Information (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00247}{247}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00271}{get\+Peer\+Certificate()}}, \mbox{\hyperlink{zsslabstract_8h_source_l00090}{SSLObject}}, and \mbox{\hyperlink{zsslfunctions_8h_ae84189944f6b6b329396ebcdb0fccc68}{ZSSL\+\_\+display\+Certificate()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsmtp_8cpp_source_l00441}{ZSmtp\+::smtp\+SSLAuthenticate()}}, and \mbox{\hyperlink{zmailabstract_8cpp_source_l00071}{ZMail\+Abstract\+::\+SSLConnect()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_afb79e612b4b1e5e4d44a6d5d8d495050}\label{class_z_s_s_l_abstract_afb79e612b4b1e5e4d44a6d5d8d495050} 
+\index{ZSSLAbstract@{ZSSLAbstract}!initClientHandShake@{initClientHandShake}}
+\index{initClientHandShake@{initClientHandShake}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{initClientHandShake()}{initClientHandShake()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::init\+Client\+Hand\+Shake (\begin{DoxyParamCaption}\item[{ZSocket \texorpdfstring{$\ast$}{*}}]{p\+Socket }\end{DoxyParamCaption})}
+
+
+
+ZSSLBase\+::init\+Hand\+Shake initiates the SSL handshake IMPORTANT \+: socket must be connected prior to call this routine and a valid socket fd must be given as parameter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Socket\+Id} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00369}{369}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsslabstract_8cpp_source_l00011}{cleanup\+\_\+openssl()}}, \mbox{\hyperlink{zsslabstract_8h_source_l00087}{Context}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{znetexception_8cpp_source_l00066}{ZNet\+Exception\+::get\+SSLError()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00229}{print\+SSLServer\+Information()}}, \mbox{\hyperlink{zsslabstract_8h_source_l00092}{Socket}}, \mbox{\hyperlink{zsslabstract_8h_source_l00090}{SSLObject}}, and \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_source_l00851}{w\+Ret}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsmtp_8cpp_source_l00441}{ZSmtp\+::smtp\+SSLAuthenticate()}}, \mbox{\hyperlink{zsslclientsocket_8cpp_source_l00057}{ZSSLClient\+Socket\+::\+SSLclient\+Connect()}}, \mbox{\hyperlink{zsslclientsocket_8cpp_source_l00238}{ZBase\+SSLClient\+Socket\+::\+SSLclient\+Connect()}}, \mbox{\hyperlink{zsslclientsocket_8cpp_source_l00111}{ZSSLClient\+Socket\+::\+SSLclient\+Connect\+No\+Authentication()}}, \mbox{\hyperlink{zsslclientsocket_8cpp_source_l00318}{ZBase\+SSLClient\+Socket\+::\+SSLclient\+Connect\+No\+Authentication()}}, and \mbox{\hyperlink{zmailabstract_8cpp_source_l00071}{ZMail\+Abstract\+::\+SSLConnect()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a00030e4b2dbdaf9a06a47a2921167e67}\label{class_z_s_s_l_abstract_a00030e4b2dbdaf9a06a47a2921167e67} 
+\index{ZSSLAbstract@{ZSSLAbstract}!initServerHandShake@{initServerHandShake}}
+\index{initServerHandShake@{initServerHandShake}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{initServerHandShake()}{initServerHandShake()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::init\+Server\+Hand\+Shake (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Socket\+Id }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00420}{420}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsslabstract_8cpp_source_l00011}{cleanup\+\_\+openssl()}}, \mbox{\hyperlink{zsslabstract_8h_source_l00087}{Context}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{znetexception_8cpp_source_l00066}{ZNet\+Exception\+::get\+SSLError()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00229}{print\+SSLServer\+Information()}}, \mbox{\hyperlink{zsslabstract_8h_source_l00090}{SSLObject}}, and \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_source_l00851}{w\+Ret}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a292c0b19ca01517953e37060bf5b5225}\label{class_z_s_s_l_abstract_a292c0b19ca01517953e37060bf5b5225} 
+\index{ZSSLAbstract@{ZSSLAbstract}!printCertificate@{printCertificate}}
+\index{printCertificate@{printCertificate}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{printCertificate()}{printCertificate()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZSSLAbstract\+::print\+Certificate (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{X509}} \texorpdfstring{$\ast$}{*}}]{p\+Certificate,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{FILE}} \texorpdfstring{$\ast$}{*}}]{p\+Output = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}}} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8h_source_l00040}{40}} of file \mbox{\hyperlink{zsslabstract_8h_source}{zsslabstract.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zsslfunctions_8h_aedd84615579f089a2095aee164de9d0a}{ZSSL\+\_\+print\+Certificate()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslabstract_8cpp_source_l00229}{print\+SSLServer\+Information()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a6b5b56430d7540407005b4d017c0310d}\label{class_z_s_s_l_abstract_a6b5b56430d7540407005b4d017c0310d} 
+\index{ZSSLAbstract@{ZSSLAbstract}!printSSLServerInformation@{printSSLServerInformation}}
+\index{printSSLServerInformation@{printSSLServerInformation}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{printSSLServerInformation()}{printSSLServerInformation()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::print\+SSLServer\+Information (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{FILE}} \texorpdfstring{$\ast$}{*}}]{w\+Output = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00229}{229}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00271}{get\+Peer\+Certificate()}}, \mbox{\hyperlink{zsslabstract_8h_source_l00040}{print\+Certificate()}}, and \mbox{\hyperlink{zsslabstract_8h_source_l00090}{SSLObject}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslabstract_8cpp_source_l00369}{init\+Client\+Hand\+Shake()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00420}{init\+Server\+Hand\+Shake()}}, \mbox{\hyperlink{zsslclientsocket_8cpp_source_l00057}{ZSSLClient\+Socket\+::\+SSLclient\+Connect()}}, \mbox{\hyperlink{zsslclientsocket_8cpp_source_l00238}{ZBase\+SSLClient\+Socket\+::\+SSLclient\+Connect()}}, \mbox{\hyperlink{zsslclientsocket_8cpp_source_l00111}{ZSSLClient\+Socket\+::\+SSLclient\+Connect\+No\+Authentication()}}, and \mbox{\hyperlink{zsslclientsocket_8cpp_source_l00318}{ZBase\+SSLClient\+Socket\+::\+SSLclient\+Connect\+No\+Authentication()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_afa78890bee5e2bc95e08cd4f74850c13}\label{class_z_s_s_l_abstract_afa78890bee5e2bc95e08cd4f74850c13} 
+\index{ZSSLAbstract@{ZSSLAbstract}!setDefaultCertificatePath@{setDefaultCertificatePath}}
+\index{setDefaultCertificatePath@{setDefaultCertificatePath}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{setDefaultCertificatePath()}{setDefaultCertificatePath()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::set\+Default\+Certificate\+Path (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Certname,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Cert\+Path }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00140}{140}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsslabstract_8h_source_l00088}{Cert\+Path}}, \mbox{\hyperlink{zsslabstract_8h_source_l00087}{Context}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{znetexception_8cpp_source_l00066}{ZNet\+Exception\+::get\+SSLError()}}, and \mbox{\hyperlink{zsslabstract_8h_source_l00089}{Key\+Path}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslserverselect_8h_source_l00052}{ZSSLServer\+Select\+::\+ZSSLServer\+Select()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_ac54af48786f2c72911e6d6b819beda44}\label{class_z_s_s_l_abstract_ac54af48786f2c72911e6d6b819beda44} 
+\index{ZSSLAbstract@{ZSSLAbstract}!SSL\_init@{SSL\_init}}
+\index{SSL\_init@{SSL\_init}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{SSL\_init()}{SSL\_init()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZSSLAbstract\+::\+SSL\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00097}{97}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsslfunctions_8h_af4805d3f15382a76ec9bd2a630cb3ea2}{ZSSL\+\_\+init()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslabstract_8cpp_source_l00048}{create\+Client\+Context()}}, and \mbox{\hyperlink{zsslabstract_8cpp_source_l00024}{create\+Server\+Context()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a356c2d08fbf907f34ed2685cb7c8c2cd}\label{class_z_s_s_l_abstract_a356c2d08fbf907f34ed2685cb7c8c2cd} 
+\index{ZSSLAbstract@{ZSSLAbstract}!verifyCertPublicKey@{verifyCertPublicKey}}
+\index{verifyCertPublicKey@{verifyCertPublicKey}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{verifyCertPublicKey()}{verifyCertPublicKey()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::verify\+Cert\+Public\+Key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{X509}} \texorpdfstring{$\ast$}{*}}]{p\+Certificate,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Cert\+File,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Cert\+Dir = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}} }\end{DoxyParamCaption})}
+
+\Hypertarget{class_z_s_s_l_abstract_a4bd11cc7cb5debd65058167b293f6f46}\label{class_z_s_s_l_abstract_a4bd11cc7cb5debd65058167b293f6f46} 
+\index{ZSSLAbstract@{ZSSLAbstract}!verifyPeerCertificate@{verifyPeerCertificate}}
+\index{verifyPeerCertificate@{verifyPeerCertificate}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{verifyPeerCertificate()}{verifyPeerCertificate()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::verify\+Peer\+Certificate (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Certificate\+Path,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zsslfunctions_8h_a385e54dce5150985c17f825b907ee906}{SSLFile\+Format\+\_\+type}}}]{p\+Format = {\ttfamily \mbox{\hyperlink{zsslfunctions_8h_a385e54dce5150985c17f825b907ee906abdc3eb2e93cbc8983d387717de1f8efc}{SFF\+\_\+\+PEM}}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00291}{291}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00271}{get\+Peer\+Certificate()}}, and \mbox{\hyperlink{zsslfunctions_8h_aaf67f28995790d8c6b48af923c056ea2}{ZSSL\+\_\+verify\+From\+Mem\+\_\+\+X509()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a2add260cbd4919fe0be73e6efc03f10c}\label{class_z_s_s_l_abstract_a2add260cbd4919fe0be73e6efc03f10c} 
+\index{ZSSLAbstract@{ZSSLAbstract}!zbaseread@{zbaseread}}
+\index{zbaseread@{zbaseread}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{zbaseread()}{zbaseread()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::zbaseread (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Buffer }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00557}{557}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsslabstract_8cpp_source_l00480}{\+\_\+\+SSLread()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a5085218601b5e01dd0fe2fe71cf34921}\label{class_z_s_s_l_abstract_a5085218601b5e01dd0fe2fe71cf34921} 
+\index{ZSSLAbstract@{ZSSLAbstract}!zbaseread@{zbaseread}}
+\index{zbaseread@{zbaseread}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{zbaseread()}{zbaseread()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::zbaseread (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Buffer }\end{DoxyParamCaption})}
+
+
+
+ZSocket\+::zbaseread reads the socket in p\+Buffer according ZBase protocol ~\newline
+ 
+
+ZSocket\+::zbaseread reads the socket according ZBase protocol and returns a ZData\+Buffer containing the read content. NB\+: each socket read or write is prefixed with a ssize\+\_\+t with the length of the data content.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em p\+Buffer} & data read \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus set to ZS\+\_\+\+SUCCESS if OK or ZS\+\_\+\+READERROR in case of IO error (ZException is positionned) 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00536}{536}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsslabstract_8cpp_source_l00480}{\+\_\+\+SSLread()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslsocketselect_8cpp_source_l00008}{ZSSLSocket\+Select\+::zbaseread()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_ab282ed3c1dd1259e61d0d741f646c19d}\label{class_z_s_s_l_abstract_ab282ed3c1dd1259e61d0d741f646c19d} 
+\index{ZSSLAbstract@{ZSSLAbstract}!zbasewrite@{zbasewrite}}
+\index{zbasewrite@{zbasewrite}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{zbasewrite()}{zbasewrite()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::zbasewrite (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\&}]{p\+Buffer }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8h_source_l00070}{70}} of file \mbox{\hyperlink{zsslabstract_8h_source}{zsslabstract.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zsslabstract_8h_source_l00065}{zbasewrite()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a1203ef05af8d6cd76fc096401f680679}\label{class_z_s_s_l_abstract_a1203ef05af8d6cd76fc096401f680679} 
+\index{ZSSLAbstract@{ZSSLAbstract}!zbasewrite@{zbasewrite}}
+\index{zbasewrite@{zbasewrite}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{zbasewrite()}{zbasewrite()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::zbasewrite (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Buffer }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00673}{673}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsslabstract_8cpp_source_l00616}{\+\_\+\+SSLwrite()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a536670ac9704378d4f1469bfa7668449}\label{class_z_s_s_l_abstract_a536670ac9704378d4f1469bfa7668449} 
+\index{ZSSLAbstract@{ZSSLAbstract}!zbasewrite@{zbasewrite}}
+\index{zbasewrite@{zbasewrite}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{zbasewrite()}{zbasewrite()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::zbasewrite (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&\&}]{p\+Buffer }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+ZSocket\+::zbasewrite writes p\+Buffer to the socket according ZBase protocol ~\newline
+ 
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8h_source_l00065}{65}} of file \mbox{\hyperlink{zsslabstract_8h_source}{zsslabstract.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zsslabstract_8h_source_l00065}{zbasewrite()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslabstract_8h_source_l00070}{zbasewrite()}}, \mbox{\hyperlink{zsslabstract_8h_source_l00065}{zbasewrite()}}, and \mbox{\hyperlink{zsslsocketselect_8h_source_l00039}{ZSSLSocket\+Select\+::zbasewrite()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_abf595c24820000099870c913e364bcd7}\label{class_z_s_s_l_abstract_abf595c24820000099870c913e364bcd7} 
+\index{ZSSLAbstract@{ZSSLAbstract}!zbasewrite@{zbasewrite}}
+\index{zbasewrite@{zbasewrite}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{zbasewrite()}{zbasewrite()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::zbasewrite (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Buffer }\end{DoxyParamCaption})}
+
+
+
+ZSSLSocket\+::\+ZSSLwrite writes a ZData\+Buffer content to a socket first the size is sent (ssize\+\_\+t) then ZData\+Buffer full content Data is always prefixed with size of following data. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Buffer} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus set to ZS\+\_\+\+SUCCESS if OK or ZS\+\_\+\+WRITEERROR in case of IO error or if size written does not match size to write 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00662}{662}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsslabstract_8cpp_source_l00616}{\+\_\+\+SSLwrite()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a640f29d4158307acd415f3fa4d1bc981}\label{class_z_s_s_l_abstract_a640f29d4158307acd415f3fa4d1bc981} 
+\index{ZSSLAbstract@{ZSSLAbstract}!zread@{zread}}
+\index{zread@{zread}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{zread()}{zread()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::zread (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Buffer,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Size\+To\+Read }\end{DoxyParamCaption})}
+
+
+
+ZSocket\+::zread simple read of the socket in p\+Buffer ~\newline
+ 
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00598}{598}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsslabstract_8cpp_source_l00480}{\+\_\+\+SSLread()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a36a57e5972e6c66356abba4240e9eaee}\label{class_z_s_s_l_abstract_a36a57e5972e6c66356abba4240e9eaee} 
+\index{ZSSLAbstract@{ZSSLAbstract}!zread@{zread}}
+\index{zread@{zread}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{zread()}{zread()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::zread (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Buffer,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Size\+To\+Read }\end{DoxyParamCaption})}
+
+
+
+ZSocket\+::zread simple read of the socket in p\+Buffer ~\newline
+ 
+
+ZSSLBase\+::zread.
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Buffer} & \\
+\hline
+{\em p\+Size\+To\+Read} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00579}{579}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsslabstract_8cpp_source_l00480}{\+\_\+\+SSLread()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsmtp_8cpp_source_l00231}{ZSmtp\+::smtp\+SSLRead\+Response()}}, \mbox{\hyperlink{zsslclientsocket_8h_source_l00112}{ZSSLClient\+Socket\+::zread()}}, and \mbox{\hyperlink{zsslclientsocket_8h_source_l00104}{ZSSLClient\+Socket\+::zread()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a42178ccd9dd2608804cec0a6158ec236}\label{class_z_s_s_l_abstract_a42178ccd9dd2608804cec0a6158ec236} 
+\index{ZSSLAbstract@{ZSSLAbstract}!ZSSL\_password\_callback@{ZSSL\_password\_callback}}
+\index{ZSSL\_password\_callback@{ZSSL\_password\_callback}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{ZSSL\_password\_callback()}{ZSSL\_password\_callback()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} ZSSLAbstract\+::\+ZSSL\+\_\+password\+\_\+callback (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{buf,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{size,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{rwflag,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}}]{p\+Password }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00120}{120}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslserverselect_8cpp_source_l00159}{ZSSLServer\+Select\+::\+SSLSetup()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a194d74b62eaa3fc04da6c307d544249b}\label{class_z_s_s_l_abstract_a194d74b62eaa3fc04da6c307d544249b} 
+\index{ZSSLAbstract@{ZSSLAbstract}!ZSSL\_set\_password@{ZSSL\_set\_password}}
+\index{ZSSL\_set\_password@{ZSSL\_set\_password}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{ZSSL\_set\_password()}{ZSSL\_set\_password()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZSSLAbstract\+::\+ZSSL\+\_\+set\+\_\+password (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Password }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00105}{105}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsslabstract_8h_source_l00087}{Context}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslserverselect_8cpp_source_l00159}{ZSSLServer\+Select\+::\+SSLSetup()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a1899381259ea48d2515b66d5d3db55db}\label{class_z_s_s_l_abstract_a1899381259ea48d2515b66d5d3db55db} 
+\index{ZSSLAbstract@{ZSSLAbstract}!zwrite@{zwrite}}
+\index{zwrite@{zwrite}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{zwrite()}{zwrite()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::zwrite (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Buffer,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \&}]{p\+Size\+Written }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00694}{694}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsslabstract_8cpp_source_l00616}{\+\_\+\+SSLwrite()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a219168e4576c452ea4b92ff6277ad4f1}\label{class_z_s_s_l_abstract_a219168e4576c452ea4b92ff6277ad4f1} 
+\index{ZSSLAbstract@{ZSSLAbstract}!zwrite@{zwrite}}
+\index{zwrite@{zwrite}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{zwrite()}{zwrite()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZSSLAbstract\+::zwrite (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} ZData\+Buffer \&}]{p\+Buffer,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \&}]{p\+Size\+Written }\end{DoxyParamCaption})}
+
+
+
+ZSocket\+::zbasewrite Simple write of p\+Buffer to the socket. Returned written size is set to p\+Size\+Written. 
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8cpp_source_l00688}{688}} of file \mbox{\hyperlink{zsslabstract_8cpp_source}{zsslabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zsslabstract_8cpp_source_l00616}{\+\_\+\+SSLwrite()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslclientsocket_8h_source_l00120}{ZSSLClient\+Socket\+::zwrite()}}, \mbox{\hyperlink{zsslclientsocket_8h_source_l00116}{ZSSLClient\+Socket\+::zwrite()}}, and \mbox{\hyperlink{zsslclientsocket_8h_source_l00108}{ZSSLClient\+Socket\+::zwrite()}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_z_s_s_l_abstract_a02aeaf795a8307ba8bf5cd88f3ff8255}\label{class_z_s_s_l_abstract_a02aeaf795a8307ba8bf5cd88f3ff8255} 
+\index{ZSSLAbstract@{ZSSLAbstract}!CertPath@{CertPath}}
+\index{CertPath@{CertPath}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{CertPath}{CertPath}}
+{\footnotesize\ttfamily uri\+String ZSSLAbstract\+::\+Cert\+Path}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8h_source_l00088}{88}} of file \mbox{\hyperlink{zsslabstract_8h_source}{zsslabstract.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslserverselect_8h_source_l00139}{ZSSLServer\+Select\+::get\+Cert\+Path()}}, and \mbox{\hyperlink{zsslabstract_8cpp_source_l00140}{set\+Default\+Certificate\+Path()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a6d26a71b352290159a06a51454827bd4}\label{class_z_s_s_l_abstract_a6d26a71b352290159a06a51454827bd4} 
+\index{ZSSLAbstract@{ZSSLAbstract}!Context@{Context}}
+\index{Context@{Context}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{Context}{Context}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SSL\+\_\+\+CTX}}\texorpdfstring{$\ast$}{*} ZSSLAbstract\+::\+Context =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8h_source_l00087}{87}} of file \mbox{\hyperlink{zsslabstract_8h_source}{zsslabstract.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslabstract_8cpp_source_l00011}{cleanup\+\_\+openssl()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00048}{create\+Client\+Context()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00024}{create\+Server\+Context()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00369}{init\+Client\+Hand\+Shake()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00420}{init\+Server\+Hand\+Shake()}}, \mbox{\hyperlink{zsslserverselect_8cpp_source_l00021}{ZSSLServer\+Select\+::load\+Certificates()}}, \mbox{\hyperlink{zsslserverselect_8cpp_source_l00093}{ZSSLServer\+Select\+::load\+Private\+Key()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00140}{set\+Default\+Certificate\+Path()}}, \mbox{\hyperlink{zsslserverselect_8cpp_source_l00159}{ZSSLServer\+Select\+::\+SSLSetup()}}, \mbox{\hyperlink{zsslserversocket_8cpp_source_l00009}{ZSSLServer\+Socket\+::zaccept()}}, and \mbox{\hyperlink{zsslabstract_8cpp_source_l00105}{ZSSL\+\_\+set\+\_\+password()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_ad2e41ce33cb30cc73a88aac83a8ec94c}\label{class_z_s_s_l_abstract_ad2e41ce33cb30cc73a88aac83a8ec94c} 
+\index{ZSSLAbstract@{ZSSLAbstract}!KeyPath@{KeyPath}}
+\index{KeyPath@{KeyPath}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{KeyPath}{KeyPath}}
+{\footnotesize\ttfamily uri\+String ZSSLAbstract\+::\+Key\+Path}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8h_source_l00089}{89}} of file \mbox{\hyperlink{zsslabstract_8h_source}{zsslabstract.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslserverselect_8h_source_l00140}{ZSSLServer\+Select\+::get\+Key\+Path()}}, and \mbox{\hyperlink{zsslabstract_8cpp_source_l00140}{set\+Default\+Certificate\+Path()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a292ffd14e244aef211d353472b52f5c0}\label{class_z_s_s_l_abstract_a292ffd14e244aef211d353472b52f5c0} 
+\index{ZSSLAbstract@{ZSSLAbstract}!Method@{Method}}
+\index{Method@{Method}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{Method}{Method}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SSL\+\_\+\+METHOD}}\texorpdfstring{$\ast$}{*} ZSSLAbstract\+::\+Method =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8h_source_l00086}{86}} of file \mbox{\hyperlink{zsslabstract_8h_source}{zsslabstract.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslabstract_8cpp_source_l00048}{create\+Client\+Context()}}, and \mbox{\hyperlink{zsslabstract_8cpp_source_l00024}{create\+Server\+Context()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a13eab9b152a68c7b93f25d4a3627fcd5}\label{class_z_s_s_l_abstract_a13eab9b152a68c7b93f25d4a3627fcd5} 
+\index{ZSSLAbstract@{ZSSLAbstract}!Socket@{Socket}}
+\index{Socket@{Socket}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{Socket}{Socket}}
+{\footnotesize\ttfamily ZSocket\texorpdfstring{$\ast$}{*} ZSSLAbstract\+::\+Socket =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8h_source_l00092}{92}} of file \mbox{\hyperlink{zsslabstract_8h_source}{zsslabstract.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslabstract_8cpp_source_l00480}{\+\_\+\+SSLread()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00616}{\+\_\+\+SSLwrite()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00369}{init\+Client\+Hand\+Shake()}}, and \mbox{\hyperlink{zsslsocketselect_8cpp_source_l00008}{ZSSLSocket\+Select\+::zbaseread()}}.
+
+\Hypertarget{class_z_s_s_l_abstract_a63ecb7f6ae65bbfa96704c2e56cbd44a}\label{class_z_s_s_l_abstract_a63ecb7f6ae65bbfa96704c2e56cbd44a} 
+\index{ZSSLAbstract@{ZSSLAbstract}!SSLObject@{SSLObject}}
+\index{SSLObject@{SSLObject}!ZSSLAbstract@{ZSSLAbstract}}
+\doxysubsubsection{\texorpdfstring{SSLObject}{SSLObject}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SSL}}\texorpdfstring{$\ast$}{*} ZSSLAbstract\+::\+SSLObject = \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zsslabstract_8h_source_l00090}{90}} of file \mbox{\hyperlink{zsslabstract_8h_source}{zsslabstract.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsslabstract_8cpp_source_l00480}{\+\_\+\+SSLread()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00616}{\+\_\+\+SSLwrite()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00011}{cleanup\+\_\+openssl()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00271}{get\+Peer\+Certificate()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00247}{get\+SSLServer\+Information()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00369}{init\+Client\+Hand\+Shake()}}, \mbox{\hyperlink{zsslabstract_8cpp_source_l00420}{init\+Server\+Hand\+Shake()}}, and \mbox{\hyperlink{zsslabstract_8cpp_source_l00229}{print\+SSLServer\+Information()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/znet/zbasenet/\mbox{\hyperlink{zsslabstract_8h}{zsslabstract.\+h}}\item 
+/home/gerard/\+Development/zbasetools/znet/zbasenet/\mbox{\hyperlink{zsslabstract_8cpp}{zsslabstract.\+cpp}}\end{DoxyCompactItemize}

@@ -1,0 +1,549 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/zcppgenerate.cpp File Reference}
+\hypertarget{zcppgenerate_8cpp}{}\label{zcppgenerate_8cpp}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zcppgenerate.cpp@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zcppgenerate.cpp}}
+{\ttfamily \#include "{}zcppgenerate.\+h"{}}\newline
+{\ttfamily \#include $<$zxml/zxmlprimitives.\+h$>$}\newline
+{\ttfamily \#include $<$zexceptiondlg.\+h$>$}\newline
+{\ttfamily \#include $<$zindexedfile/zdictionaryfile.\+h$>$}\newline
+{\ttfamily \#include $<$zcppparser/zcppparser.\+h$>$}\newline
+{\ttfamily \#include $<$zcontentcommon/zgeneralparameters.\+h$>$}\newline
+Include dependency graph for zcppgenerate.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{zcppgenerate_8cpp_a2613699e49448b50ab2d59e9517b10fd}{ZType\+To\+CType\+Definition}} (\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Type}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Capacity}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Name}}, \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Declaration}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_af63370fd15ffe27a3404229523d3f86d}{w\+Cpp\+Gen\+Comment}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_a22df315916fe83fda14f10465ef5d56d}{Generate\+Banner}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_a5bd88808b143388d326d6bcd53fb1f17}{Generate\+HBanner\+Errored}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_afd0259710b70c4278d4fadf1a12087ca}{Generate\+Cpp\+Banner\+Errored}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_ac26ee25b29145466a9baaf8f558a429b}{w\+HHeader}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_a170408cd985cf6352eb29eab89203ff1}{w\+HClass}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_adba56f6baf0524e95dbe045cf1009da4}{w\+HMethods}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_a80b82b064c6e8dbc9ec2723d9a9e1296}{w\+SCopy\+From\+Begin}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_a7fece383bfb1eaae0c56c2cea031f398}{w\+SCopy\+From\+Line}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_a04ed6029090055580781292f41f986a6}{w\+SCopy\+From\+Line\+Errored}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_afc92eda9354f2c976833bf51782a1805}{w\+SMethod\+End}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_a3ddcffecaee23eb7fd3a9af027a123e3}{w\+Cpp\+Deserialize}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_a0aa7b609ca6d9690b9f507915185a538}{w\+Cpp\+To\+Record\+Begin}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_af8612eb2e9037ba68a11912db4862258}{w\+Cpp\+To\+RSize\+Class\+Errored}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_ad7d05234ed5a4d1f66c089a4fc875d69}{w\+Cpp\+To\+RSize\+Class}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_a3d1e202fdd2d5101c8aea89bb078d0ba}{w\+Cpp\+To\+RSize\+Atomic}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_ad238e6b8049e187e3f08cad58a3cfe75}{w\+Cpp\+To\+Record\+Middle}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_a8a3871cf0723347746d27aa9cd11129c}{w\+Cpp\+To\+Record\+Move\+Errored}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_afd85e352ce05415868d44d179a064313}{w\+Cpp\+To\+Record\+Move\+Class}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_aaa2a5e7ad95c017ed121dabd040d4b8f}{w\+Cpp\+To\+Record\+Move\+Atomic}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcppgenerate_8cpp_af662502502ad51cdad4e98269cb183af}{w\+Cpp\+To\+Record\+End}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{zcppgenerate_8cpp_a2613699e49448b50ab2d59e9517b10fd}\label{zcppgenerate_8cpp_a2613699e49448b50ab2d59e9517b10fd} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!ZTypeToCTypeDefinition@{ZTypeToCTypeDefinition}}
+\index{ZTypeToCTypeDefinition@{ZTypeToCTypeDefinition}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{ZTypeToCTypeDefinition()}{ZTypeToCTypeDefinition()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZType\+To\+CType\+Definition (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}}}]{p\+Type,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Capacity,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Name,  }\item[{\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Declaration,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l01268}{1268}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00038}{ZType\+\_\+\+Array}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00042}{ZType\+\_\+\+Atomic\+Mask}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00032}{ZType\+\_\+\+Nothing}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00046}{ZType\+\_\+\+Structure\+Mask}}, and \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00156}{ZType\+\_\+\+Unknown}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00565}{zbs\+::\+ZCpp\+Generate\+::gen\+Header\+Fields()}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{zcppgenerate_8cpp_a22df315916fe83fda14f10465ef5d56d}\label{zcppgenerate_8cpp_a22df315916fe83fda14f10465ef5d56d} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!GenerateBanner@{GenerateBanner}}
+\index{GenerateBanner@{GenerateBanner}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{GenerateBanner}{GenerateBanner}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} Generate\+Banner}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}/**\ "{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ This\ file\ has\ been\ generated\ by\ zcontent\ utilities\ generator\ version\ \%s\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ using\ dictionary\ file\ \%s\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ Generation\ date\ \%s\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)nAttention:\ This\ file\ must\ not\ be\ manually\ changed\ in\ order\ to\ preserve\ the\ ability\ to\ change\ it\ using\ dictionary\ generation\ facilities.\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/\(\backslash\)n\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00097}{97}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00988}{zbs\+::\+ZCpp\+Generate\+::gen\+Cpp()}}, and \mbox{\hyperlink{zcppgenerate_8cpp_source_l00646}{zbs\+::\+ZCpp\+Generate\+::gen\+Header()}}.
+
+\Hypertarget{zcppgenerate_8cpp_afd0259710b70c4278d4fadf1a12087ca}\label{zcppgenerate_8cpp_afd0259710b70c4278d4fadf1a12087ca} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!GenerateCppBannerErrored@{GenerateCppBannerErrored}}
+\index{GenerateCppBannerErrored@{GenerateCppBannerErrored}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{GenerateCppBannerErrored}{GenerateCppBannerErrored}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} Generate\+Cpp\+Banner\+Errored}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}/**\ "{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ This\ file\ has\ been\ generated\ by\ zcontent\ utilities\ generator\ \%s\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ using\ dictionary\ file\ \%s\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ Generation\ date\ \%s\(\backslash\)n\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ IMPORTANT\ :\ generation\ errors\ have\ been\ detected.\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \%d\ instructions\ have\ not\ been\ generated\ due\ to\ errored\ fields.\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ */\(\backslash\)n\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00113}{113}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00988}{zbs\+::\+ZCpp\+Generate\+::gen\+Cpp()}}.
+
+\Hypertarget{zcppgenerate_8cpp_a5bd88808b143388d326d6bcd53fb1f17}\label{zcppgenerate_8cpp_a5bd88808b143388d326d6bcd53fb1f17} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!GenerateHBannerErrored@{GenerateHBannerErrored}}
+\index{GenerateHBannerErrored@{GenerateHBannerErrored}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{GenerateHBannerErrored}{GenerateHBannerErrored}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} Generate\+HBanner\+Errored}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}/**\ "{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ This\ file\ has\ been\ generated\ by\ zcontent\ utilities\ generator\ \%s\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ using\ dictionary\ file\ \%s\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ Generation\ date\ \%s\(\backslash\)n\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ IMPORTANT\ :\ generation\ errors\ have\ been\ detected.\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \%d\ field(s)\ are\ errored\ and\ are\ missing.\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)nAttention:\ This\ file\ must\ not\ be\ manually\ changed\ in\ order\ to\ preserve\ the\ ability\ to\ change\ it\ using\ dictionary\ generation\ facilities.\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/\(\backslash\)n\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00104}{104}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+\Hypertarget{zcppgenerate_8cpp_a3ddcffecaee23eb7fd3a9af027a123e3}\label{zcppgenerate_8cpp_a3ddcffecaee23eb7fd3a9af027a123e3} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wCppDeserialize@{wCppDeserialize}}
+\index{wCppDeserialize@{wCppDeserialize}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wCppDeserialize}{wCppDeserialize}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+Cpp\+Deserialize}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}void\ \%s::\_convert()\ \{\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ if\ (is\_big\_endian())\ \(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ return\ ;\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ /*\ StartSign\ EndSign(palyndromas)\ do\ not\ need\ to\ be\ reversed\ */\ "{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ if\ (isNotReversed())\ \{\ \(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ fprintf\ (stderr,\(\backslash\)"{}\%s::deserialize-\/W-\/ALRDY\ object\ <\%s>\ already\ deserialized.\ \(\backslash\)n\(\backslash\)"{});\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \ \ return;\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \}\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00184}{184}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+\Hypertarget{zcppgenerate_8cpp_af63370fd15ffe27a3404229523d3f86d}\label{zcppgenerate_8cpp_af63370fd15ffe27a3404229523d3f86d} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wCppGenComment@{wCppGenComment}}
+\index{wCppGenComment@{wCppGenComment}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wCppGenComment}{wCppGenComment}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+Cpp\+Gen\+Comment}
+
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+\Hypertarget{zcppgenerate_8cpp_a0aa7b609ca6d9690b9f507915185a538}\label{zcppgenerate_8cpp_a0aa7b609ca6d9690b9f507915185a538} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wCppToRecordBegin@{wCppToRecordBegin}}
+\index{wCppToRecordBegin@{wCppToRecordBegin}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wCppToRecordBegin}{wCppToRecordBegin}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+Cpp\+To\+Record\+Begin}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}ZDataBuffer\ \%s::toRecord()\ \{\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ ZDataBuffer\ wReturn;\(\backslash\)n\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ FieldPresence.\_allocate(\%d);\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ FieldPresence.setAll();\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ FieldPresence.\_exportURF(wReturn);\(\backslash\)n\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}/*\ \ \ \ \ \ \ \ \ User\ content\ size\ computation\ \ */\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ uint64\_t\ wURFSize=0;\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00208}{208}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00988}{zbs\+::\+ZCpp\+Generate\+::gen\+Cpp()}}.
+
+\Hypertarget{zcppgenerate_8cpp_af662502502ad51cdad4e98269cb183af}\label{zcppgenerate_8cpp_af662502502ad51cdad4e98269cb183af} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wCppToRecordEnd@{wCppToRecordEnd}}
+\index{wCppToRecordEnd@{wCppToRecordEnd}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wCppToRecordEnd}{wCppToRecordEnd}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+Cpp\+To\+Record\+End}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)n\ \ \ return\ wReturn;\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\}//toRecord\(\backslash\)n\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00243}{243}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+\Hypertarget{zcppgenerate_8cpp_ad238e6b8049e187e3f08cad58a3cfe75}\label{zcppgenerate_8cpp_ad238e6b8049e187e3f08cad58a3cfe75} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wCppToRecordMiddle@{wCppToRecordMiddle}}
+\index{wCppToRecordMiddle@{wCppToRecordMiddle}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wCppToRecordMiddle}{wCppToRecordMiddle}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+Cpp\+To\+Record\+Middle}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ unsigned\ char*\ wPtr\ =\ wReturn.extend(wURFSize);\(\backslash\)n"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}/*\ \ \ \ \ \ \ \ \ \ \ \ \ \ move\ of\ individual\ fields\ to\ record\ space\ */\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00227}{227}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00988}{zbs\+::\+ZCpp\+Generate\+::gen\+Cpp()}}.
+
+\Hypertarget{zcppgenerate_8cpp_aaa2a5e7ad95c017ed121dabd040d4b8f}\label{zcppgenerate_8cpp_aaa2a5e7ad95c017ed121dabd040d4b8f} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wCppToRecordMoveAtomic@{wCppToRecordMoveAtomic}}
+\index{wCppToRecordMoveAtomic@{wCppToRecordMoveAtomic}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wCppToRecordMoveAtomic}{wCppToRecordMoveAtomic}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+Cpp\+To\+Record\+Move\+Atomic}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ exportAtomicURF\_Ptr<\%s>(\%s,wPtr);\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00240}{240}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00988}{zbs\+::\+ZCpp\+Generate\+::gen\+Cpp()}}.
+
+\Hypertarget{zcppgenerate_8cpp_afd85e352ce05415868d44d179a064313}\label{zcppgenerate_8cpp_afd85e352ce05415868d44d179a064313} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wCppToRecordMoveClass@{wCppToRecordMoveClass}}
+\index{wCppToRecordMoveClass@{wCppToRecordMoveClass}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wCppToRecordMoveClass}{wCppToRecordMoveClass}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+Cpp\+To\+Record\+Move\+Class}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \%s.\_exportURF\_Ptr(wPtr);\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00237}{237}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00988}{zbs\+::\+ZCpp\+Generate\+::gen\+Cpp()}}.
+
+\Hypertarget{zcppgenerate_8cpp_a8a3871cf0723347746d27aa9cd11129c}\label{zcppgenerate_8cpp_a8a3871cf0723347746d27aa9cd11129c} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wCppToRecordMoveErrored@{wCppToRecordMoveErrored}}
+\index{wCppToRecordMoveErrored@{wCppToRecordMoveErrored}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wCppToRecordMoveErrored}{wCppToRecordMoveErrored}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+Cpp\+To\+Record\+Move\+Errored}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ /*\ Cannot\ move\ to\ record\ an\ errored\ field\ <\%s>\ \ \ */\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00234}{234}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00988}{zbs\+::\+ZCpp\+Generate\+::gen\+Cpp()}}.
+
+\Hypertarget{zcppgenerate_8cpp_a3d1e202fdd2d5101c8aea89bb078d0ba}\label{zcppgenerate_8cpp_a3d1e202fdd2d5101c8aea89bb078d0ba} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wCppToRSizeAtomic@{wCppToRSizeAtomic}}
+\index{wCppToRSizeAtomic@{wCppToRSizeAtomic}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wCppToRSizeAtomic}{wCppToRSizeAtomic}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+Cpp\+To\+RSize\+Atomic}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ wURFSize\ +=\ getAtomicURFSize<\%s>(\%s);\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00224}{224}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00988}{zbs\+::\+ZCpp\+Generate\+::gen\+Cpp()}}.
+
+\Hypertarget{zcppgenerate_8cpp_ad7d05234ed5a4d1f66c089a4fc875d69}\label{zcppgenerate_8cpp_ad7d05234ed5a4d1f66c089a4fc875d69} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wCppToRSizeClass@{wCppToRSizeClass}}
+\index{wCppToRSizeClass@{wCppToRSizeClass}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wCppToRSizeClass}{wCppToRSizeClass}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+Cpp\+To\+RSize\+Class}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ wURFSize\ +=\ \%s.getURFSize();\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00221}{221}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00988}{zbs\+::\+ZCpp\+Generate\+::gen\+Cpp()}}.
+
+\Hypertarget{zcppgenerate_8cpp_af8612eb2e9037ba68a11912db4862258}\label{zcppgenerate_8cpp_af8612eb2e9037ba68a11912db4862258} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wCppToRSizeClassErrored@{wCppToRSizeClassErrored}}
+\index{wCppToRSizeClassErrored@{wCppToRSizeClassErrored}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wCppToRSizeClassErrored}{wCppToRSizeClassErrored}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+Cpp\+To\+RSize\+Class\+Errored}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ /*\ Cannot\ evaluate\ size\ of\ an\ errored\ field\ <\%s>\ \ \ */\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00218}{218}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00988}{zbs\+::\+ZCpp\+Generate\+::gen\+Cpp()}}.
+
+\Hypertarget{zcppgenerate_8cpp_a170408cd985cf6352eb29eab89203ff1}\label{zcppgenerate_8cpp_a170408cd985cf6352eb29eab89203ff1} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wHClass@{wHClass}}
+\index{wHClass@{wHClass}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wHClass}{wHClass}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+HClass}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)n/**\ @brief\ \%s\ \%s"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ */\(\backslash\)n"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}class\ \%s\ \{\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}private:\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ ZBitset\ \ \ \ \ FieldPresence;\(\backslash\)n"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}public:\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00134}{134}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00646}{zbs\+::\+ZCpp\+Generate\+::gen\+Header()}}.
+
+\Hypertarget{zcppgenerate_8cpp_ac26ee25b29145466a9baaf8f558a429b}\label{zcppgenerate_8cpp_ac26ee25b29145466a9baaf8f558a429b} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wHHeader@{wHHeader}}
+\index{wHHeader@{wHHeader}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wHHeader}{wHHeader}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+HHeader}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\#ifndef\ \%s\_H\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\#define\ \%s\_H\(\backslash\)n\(\backslash\)n"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\#include\ <sys/types.h>\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\#include\ <ztoolset/zlimit.h>\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\#include\ <ztoolset/ztypetype.h>\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\#include\ <ztoolset/zdatabuffer.h>\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\#include\ <ztoolset/zarray.h>\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00122}{122}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00646}{zbs\+::\+ZCpp\+Generate\+::gen\+Header()}}.
+
+\Hypertarget{zcppgenerate_8cpp_adba56f6baf0524e95dbe045cf1009da4}\label{zcppgenerate_8cpp_adba56f6baf0524e95dbe045cf1009da4} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wHMethods@{wHMethods}}
+\index{wHMethods@{wHMethods}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wHMethods}{wHMethods}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+HMethods}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}/*\ Public\ methods\ */\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \%s()=default;\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \%s\&\ \_copyFrom(const\ \%s\&\ pIn);\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \%s\&\ operator\ =\ (const\ \%s\&\ pIn)\ \{\ return\ \_copyFrom(pIn);\ \}\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ void\ clear();\(\backslash\)n"{}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ ZDataBuffer\ toRecord();\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ ZStatus\ fromRecord(const\ ZDataBuffer\&\ pRecord);\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ zbs::ZArray<ZDataBuffer>\ getAllKeys();\(\backslash\)n"{}}}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ inline\ long\ getKeysNumber()\ \{\ return\ \%ld;\ \}\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00150}{150}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00646}{zbs\+::\+ZCpp\+Generate\+::gen\+Header()}}.
+
+\Hypertarget{zcppgenerate_8cpp_a80b82b064c6e8dbc9ec2723d9a9e1296}\label{zcppgenerate_8cpp_a80b82b064c6e8dbc9ec2723d9a9e1296} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wSCopyFromBegin@{wSCopyFromBegin}}
+\index{wSCopyFromBegin@{wSCopyFromBegin}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wSCopyFromBegin}{wSCopyFromBegin}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+SCopy\+From\+Begin}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \%s\&\ \%s::\_copyFrom(const\ \%s\&\ pIn)\ \{\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00168}{168}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00988}{zbs\+::\+ZCpp\+Generate\+::gen\+Cpp()}}.
+
+\Hypertarget{zcppgenerate_8cpp_a7fece383bfb1eaae0c56c2cea031f398}\label{zcppgenerate_8cpp_a7fece383bfb1eaae0c56c2cea031f398} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wSCopyFromLine@{wSCopyFromLine}}
+\index{wSCopyFromLine@{wSCopyFromLine}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wSCopyFromLine}{wSCopyFromLine}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+SCopy\+From\+Line}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ \%s\ =\ pIn.\%s\ ;\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00174}{174}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00988}{zbs\+::\+ZCpp\+Generate\+::gen\+Cpp()}}.
+
+\Hypertarget{zcppgenerate_8cpp_a04ed6029090055580781292f41f986a6}\label{zcppgenerate_8cpp_a04ed6029090055580781292f41f986a6} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wSCopyFromLineErrored@{wSCopyFromLineErrored}}
+\index{wSCopyFromLineErrored@{wSCopyFromLineErrored}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wSCopyFromLineErrored}{wSCopyFromLineErrored}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+SCopy\+From\+Line\+Errored}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \ \ \ \ /*\ Cannot\ copy\ errored\ field\ <\%s\ >\ \ */\(\backslash\)n"{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00177}{177}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00988}{zbs\+::\+ZCpp\+Generate\+::gen\+Cpp()}}.
+
+\Hypertarget{zcppgenerate_8cpp_afc92eda9354f2c976833bf51782a1805}\label{zcppgenerate_8cpp_afc92eda9354f2c976833bf51782a1805} 
+\index{zcppgenerate.cpp@{zcppgenerate.cpp}!wSMethodEnd@{wSMethodEnd}}
+\index{wSMethodEnd@{wSMethodEnd}!zcppgenerate.cpp@{zcppgenerate.cpp}}
+\doxysubsubsection{\texorpdfstring{wSMethodEnd}{wSMethodEnd}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} w\+SMethod\+End}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \textcolor{stringliteral}{"{}\ \}//\ \%s\(\backslash\)n\(\backslash\)n\ "{}}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zcppgenerate_8cpp_source_l00180}{180}} of file \mbox{\hyperlink{zcppgenerate_8cpp_source}{zcppgenerate.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcppgenerate_8cpp_source_l00988}{zbs\+::\+ZCpp\+Generate\+::gen\+Cpp()}}.
+

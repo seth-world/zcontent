@@ -1,0 +1,138 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/zrawmasterfilevisu.cpp File Reference}
+\hypertarget{zrawmasterfilevisu_8cpp}{}\label{zrawmasterfilevisu_8cpp}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zrawmasterfilevisu.cpp@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zrawmasterfilevisu.cpp}}
+{\ttfamily \#include "{}zrawmasterfilevisu.\+h"{}}\newline
+{\ttfamily \#include "{}ui\+\_\+zrawmasterfilevisu.\+h"{}}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqtutils.\+h$>$}\newline
+{\ttfamily \#include $<$zcontentcommon/zgeneralparameters.\+h$>$}\newline
+{\ttfamily \#include $<$qnamespace.\+h$>$}\newline
+{\ttfamily \#include $<$fcntl.\+h$>$}\newline
+{\ttfamily \#include $<$Qt\+Widgets/\+QApplication$>$}\newline
+{\ttfamily \#include $<$QPlain\+Text\+Edit$>$}\newline
+{\ttfamily \#include $<$QPush\+Button$>$}\newline
+{\ttfamily \#include $<$QStandard\+Item$>$}\newline
+{\ttfamily \#include $<$QStandard\+Item\+Model$>$}\newline
+{\ttfamily \#include $<$ztoolset/zlimit.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zindexedfile/zdataconversion.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqtableview.\+h$>$}\newline
+{\ttfamily \#include $<$zqt/zqtwidget/zqtwidgettools.\+h$>$}\newline
+{\ttfamily \#include $<$zexceptiondlg.\+h$>$}\newline
+{\ttfamily \#include $<$zio/zioutils.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/utfstringcommon.\+h$>$}\newline
+{\ttfamily \#include $<$zentity.\+h$>$}\newline
+{\ttfamily \#include $<$visulinecol.\+h$>$}\newline
+{\ttfamily \#include $<$QVBox\+Layout$>$}\newline
+{\ttfamily \#include $<$QLine\+Edit$>$}\newline
+{\ttfamily \#include $<$QMenu$>$}\newline
+{\ttfamily \#include $<$zcontent/zcontentcommon/urfparser.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zcontentcommon/urffield.\+h$>$}\newline
+{\ttfamily \#include "{}visuraw.\+h"{}}\newline
+Include dependency graph for zrawmasterfilevisu.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{zrawmasterfilevisu_8cpp_af94b782f74301bb75c01eb293935ef04}{add\+Cur\+Col}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Col}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Line}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zrawmasterfilevisu_8cpp_af3b9daa31e3a672548013173f71b552b}{String\+Diplay\+Max}} = 64
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zrawmasterfilevisu_8cpp_a68ff5dd059a4d74e955297f9fec1c2b8}{cst\+\_\+maxraisonablevalue}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zrawmasterfilevisu_8cpp_aaa6d573f4f7e7c9c9f9ff6b9e5b597fe}{cst\+\_\+\+File\+Nudge}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zrawmasterfilevisu_8cpp_a06e30c6afdcdd29b4cf66a7058880e4e}{Space\+Count}} =5
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zrawmasterfilevisu_8cpp_ac4765e5001e6560cff1dd7fc88a2c90e}{Max\+Col}} =19
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{zrawmasterfilevisu_8cpp_af94b782f74301bb75c01eb293935ef04}\label{zrawmasterfilevisu_8cpp_af94b782f74301bb75c01eb293935ef04} 
+\index{zrawmasterfilevisu.cpp@{zrawmasterfilevisu.cpp}!addCurCol@{addCurCol}}
+\index{addCurCol@{addCurCol}!zrawmasterfilevisu.cpp@{zrawmasterfilevisu.cpp}}
+\doxysubsubsection{\texorpdfstring{addCurCol()}{addCurCol()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} add\+Cur\+Col (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \&}]{p\+Col,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \&}]{p\+Line }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrawmasterfilevisu_8cpp_source_l00998}{998}} of file \mbox{\hyperlink{zrawmasterfilevisu_8cpp_source}{zrawmasterfilevisu.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrawmasterfilevisu_8cpp_source_l00997}{Max\+Col}}, and \mbox{\hyperlink{zrawmasterfilevisu_8cpp_source_l00996}{Space\+Count}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawmasterfilevisu_8cpp_source_l01010}{ZRaw\+Master\+File\+Visu\+::set\+Selection\+Back\+Ground()}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{zrawmasterfilevisu_8cpp_aaa6d573f4f7e7c9c9f9ff6b9e5b597fe}\label{zrawmasterfilevisu_8cpp_aaa6d573f4f7e7c9c9f9ff6b9e5b597fe} 
+\index{zrawmasterfilevisu.cpp@{zrawmasterfilevisu.cpp}!cst\_FileNudge@{cst\_FileNudge}}
+\index{cst\_FileNudge@{cst\_FileNudge}!zrawmasterfilevisu.cpp@{zrawmasterfilevisu.cpp}}
+\doxysubsubsection{\texorpdfstring{cst\_FileNudge}{cst\_FileNudge}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} cst\+\_\+\+File\+Nudge\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{zrawmasterfilevisu_8h_source_l00012}{12}} of file \mbox{\hyperlink{zrawmasterfilevisu_8h_source}{zrawmasterfilevisu.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{poolvisu_8cpp_source_l00749}{pool\+Visu\+::data\+Setup()}}.
+
+\Hypertarget{zrawmasterfilevisu_8cpp_a68ff5dd059a4d74e955297f9fec1c2b8}\label{zrawmasterfilevisu_8cpp_a68ff5dd059a4d74e955297f9fec1c2b8} 
+\index{zrawmasterfilevisu.cpp@{zrawmasterfilevisu.cpp}!cst\_maxraisonablevalue@{cst\_maxraisonablevalue}}
+\index{cst\_maxraisonablevalue@{cst\_maxraisonablevalue}!zrawmasterfilevisu.cpp@{zrawmasterfilevisu.cpp}}
+\doxysubsubsection{\texorpdfstring{cst\_maxraisonablevalue}{cst\_maxraisonablevalue}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} cst\+\_\+maxraisonablevalue\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+
+\Hypertarget{zrawmasterfilevisu_8cpp_ac4765e5001e6560cff1dd7fc88a2c90e}\label{zrawmasterfilevisu_8cpp_ac4765e5001e6560cff1dd7fc88a2c90e} 
+\index{zrawmasterfilevisu.cpp@{zrawmasterfilevisu.cpp}!MaxCol@{MaxCol}}
+\index{MaxCol@{MaxCol}!zrawmasterfilevisu.cpp@{zrawmasterfilevisu.cpp}}
+\doxysubsubsection{\texorpdfstring{MaxCol}{MaxCol}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} Max\+Col =19}
+
+
+
+Definition at line \mbox{\hyperlink{zrawmasterfilevisu_8cpp_source_l00997}{997}} of file \mbox{\hyperlink{zrawmasterfilevisu_8cpp_source}{zrawmasterfilevisu.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawmasterfilevisu_8cpp_source_l00998}{add\+Cur\+Col()}}.
+
+\Hypertarget{zrawmasterfilevisu_8cpp_a06e30c6afdcdd29b4cf66a7058880e4e}\label{zrawmasterfilevisu_8cpp_a06e30c6afdcdd29b4cf66a7058880e4e} 
+\index{zrawmasterfilevisu.cpp@{zrawmasterfilevisu.cpp}!SpaceCount@{SpaceCount}}
+\index{SpaceCount@{SpaceCount}!zrawmasterfilevisu.cpp@{zrawmasterfilevisu.cpp}}
+\doxysubsubsection{\texorpdfstring{SpaceCount}{SpaceCount}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} Space\+Count =5}
+
+
+
+Definition at line \mbox{\hyperlink{zrawmasterfilevisu_8cpp_source_l00996}{996}} of file \mbox{\hyperlink{zrawmasterfilevisu_8cpp_source}{zrawmasterfilevisu.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawmasterfilevisu_8cpp_source_l00998}{add\+Cur\+Col()}}.
+
+\Hypertarget{zrawmasterfilevisu_8cpp_af3b9daa31e3a672548013173f71b552b}\label{zrawmasterfilevisu_8cpp_af3b9daa31e3a672548013173f71b552b} 
+\index{zrawmasterfilevisu.cpp@{zrawmasterfilevisu.cpp}!StringDiplayMax@{StringDiplayMax}}
+\index{StringDiplayMax@{StringDiplayMax}!zrawmasterfilevisu.cpp@{zrawmasterfilevisu.cpp}}
+\doxysubsubsection{\texorpdfstring{StringDiplayMax}{StringDiplayMax}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} String\+Diplay\+Max = 64}
+
+
+
+Definition at line \mbox{\hyperlink{zrawmasterfilevisu_8cpp_source_l00044}{44}} of file \mbox{\hyperlink{zrawmasterfilevisu_8cpp_source}{zrawmasterfilevisu.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawmasterfilevisu_8cpp_source_l01356}{ZRaw\+Master\+File\+Visu\+::display\+One\+URFField()}}, and \mbox{\hyperlink{zsearchquerymwd_8cpp_source_l01019}{ZSearch\+Query\+MWd\+::\+Display\+One\+URFField\+From\+Surface()}}.
+

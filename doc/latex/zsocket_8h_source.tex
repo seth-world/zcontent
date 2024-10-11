@@ -1,0 +1,199 @@
+\doxysection{zsocket.\+h}
+\hypertarget{zsocket_8h_source}{}\label{zsocket_8h_source}\index{/home/gerard/Development/zbasetools/znet/zbasenet/zsocket.h@{/home/gerard/Development/zbasetools/znet/zbasenet/zsocket.h}}
+\mbox{\hyperlink{zsocket_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZSOCKET\_H}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ ZSOCKET\_H}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <config/zconfig\_network.h>}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include<stdio.h>}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include<string.h>}\ \ \ \ \textcolor{comment}{//strlen}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <netdb.h>}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00009}00009\ \textcolor{preprocessor}{\#include<arpa/inet.h>}\ \textcolor{comment}{//inet\_addr}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00010}00010\ \textcolor{preprocessor}{\#include<sys/socket.h>}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include<unistd.h>}\ \ \ \ \textcolor{comment}{//write}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <ztoolset/utfvaryingstring.h>}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <ztoolset/zarray.h>}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <zthread/zthread.h>}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{znetcommon_8h}{zbasenet/znetcommon.h}}>}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{znetpms_8h}{zbasenet/znetpms.h}}>}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00021}00021\ \textcolor{preprocessor}{\#include\ <ztoolset/ztimer.h>}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00023}00023\ \textcolor{preprocessor}{\#ifdef\ \_\_USE\_WINDOWS\_\_}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00024}00024\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{handle}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SOCKET}}\ \mbox{\hyperlink{zsocket_8h_aaff3cae1b3a2437d375d507e990bbdc0}{SOCKET\_DESCRIPTOR\_TYPE}};}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00025}00025\ \textcolor{preprocessor}{\#define\ \ EWOULDBLOCK\ WSAEWOULDBLOCK}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00026}00026\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00027}\mbox{\hyperlink{zsocket_8h_aaff3cae1b3a2437d375d507e990bbdc0}{00027}}\ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zsocket_8h_aaff3cae1b3a2437d375d507e990bbdc0}{SOCKET\_DESCRIPTOR\_TYPE}};}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00028}00028\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_\_USE\_WINDOWS\_\_}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00031}00031\ \textcolor{preprocessor}{\#ifndef\ ZSOCKET\_CPP}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00032}00032\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{zsocket_8h_ac8d86c333986e603951c04ba5999ea8e}{IPV4LoopBack}}\ ;}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00033}00033\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{zsocket_8h_a36de15d95d857e38a8506d74b91abbaa}{IPV6LoopBack}}\ ;}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00035}00035\ \textcolor{comment}{//const\ int\ ZFileServerPort\ =\ 36500;}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00036}00036\ \textcolor{comment}{//const\ int\ ZJournalPort\ =\ \ 36510;}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00037}00037\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{zsocket_8h_ab5247840a91f85e7560b33b59d2e13d3}{ZFileServerPort}};}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00038}00038\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{zsocket_8h_a635f448154d966477d282348c4e9901a}{ZJournalPort}}\ ;}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00039}00039\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{zsocket_8h_adf22575fbf9fc7b48c32e3783c82c74e}{IPV4Host}};}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00041}00041\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00042}00042\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00043}00043\ \textcolor{comment}{ZStatus}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00044}00044\ \textcolor{comment}{ZAuthenticate\_base(ZDataBuffer\ \&pUsername,ZDataBuffer\ \&pPassword);}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00045}00045\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00046}00046\ \textcolor{comment}{\#ifdef\ \_\_USE\_LDAP\_\_}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00047}00047\ \textcolor{comment}{ZStatus}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00048}00048\ \textcolor{comment}{ZAuthenticate\_LDAP(const\ char*\ pLDAPHostName,const\ int\ pLDAPPort,ZDataBuffer\&\ pDomain,ZDataBuffer\ \&pUsername,ZDataBuffer\ \&pPassword);}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00049}00049\ \textcolor{comment}{\#endif\ //\ \_\_USE\_LDAP\_\_}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00050}00050\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00052}00052\ \textcolor{comment}{/*\ Signals\ management}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00053}00053\ \textcolor{comment}{\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00054}00054\ \textcolor{comment}{\ @note\ with\ debug\ you\ have\ to\ tell\ gdb\ to\ pass\ signal\ to\ running\ processes\ using\ instructions\ :}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00055}00055\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00056}00056\ \textcolor{comment}{handle\ SIGUSER1\ pass\ nostop\ noprint}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00057}00057\ \textcolor{comment}{handle\ SIGUSER2\ pass\ nostop\ noprint}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00058}00058\ \textcolor{comment}{handle\ SIGPIPE\ pass\ nostop\ noprint}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00059}00059\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00060}00060\ \textcolor{comment}{For\ Qt\ Creator,\ these\ instructions\ are\ set\ in\ menu\ <tools><options><gdb>}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00061}00061\ \textcolor{comment}{then\ two\ windows}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00062}00062\ \textcolor{comment}{<additional\ startup\ commands>}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00063}00063\ \textcolor{comment}{or}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00064}00064\ \textcolor{comment}{<additional\ attach\ commands>\ if\ you\ attach\ to\ a\ gdbserver}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00065}00065\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00066}00066\ \textcolor{comment}{\ \ 3\ cases\ :}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00067}00067\ \textcolor{comment}{\ \ \ \ -\/\ SIGPIPE\ signal\ management\ (broken\ pipe):}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00068}00068\ \textcolor{comment}{\ \ \ \ signal\ must\ be\ inactivated\ using\ signal(SIGPIPE,SIG\_IGN)\ instruction\ in\ the\ main\ Process\ (not\ in\ a\ Thread).}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00069}00069\ \textcolor{comment}{\ \ \ \ Broken\ pipe\ error\ is\ managed\ during\ read/write\ operations\ managed\ with\ status\ returned.}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00070}00070\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00071}00071\ \textcolor{comment}{\ \ \ \ -\/\ 2\ user\ chosen\ signals\ (beware\ the\ nature\ of\ the\ chosen\ signal)\ :}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00072}00072\ \textcolor{comment}{\ \ \ \ \ \ \ \ .\ for\ sending\ a\ signal\ to\ server\ saying\ the\ whole\ server\ must\ cancel\ or\ shutdown.}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00073}00073\ \textcolor{comment}{\ \ \ \ \ \ \ \ by\ default\ server\ cancelling\ signal\ is\ SIGUSR1\ (user\ defined\ signal\ number\ 1)}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00074}00074\ \textcolor{comment}{\ \ \ \ \ \ \ \ .\ for\ sending\ a\ signal\ from\ server\ to\ client\ thread\ saying\ client\ thread\ must\ cancel\ or\ shutdown}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00075}00075\ \textcolor{comment}{\ \ \ \ \ \ \ \ by\ default\ client\ cancelling\ signal\ is\ SIGUSR2}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00076}00076\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00077}00077\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00079}\mbox{\hyperlink{zsocket_8h_a98560f50f31a5fa27de78d6bf9c9f960}{00079}}\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}\ (*\mbox{\hyperlink{zsocket_8h_a98560f50f31a5fa27de78d6bf9c9f960}{ZCancellationFunctor}})(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}})\ \ ;}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00081}00081\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00082}00082\ \textcolor{comment}{static\ int\ serverCancellationSignal=-\/1;}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00083}00083\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00084}00084\ \textcolor{comment}{static\ ZCancellationFunctor\ ZSocketCancellation=nullptr;}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00085}00085\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00086}00086\ \textcolor{comment}{//static\ ZStatus\ registerBrokenPipe(\_\_sighandler\_t\ userCatchBrokenPipe\ );}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00089}00089\ \textcolor{comment}{//static\ ZThread\_Id\ serverProcessid;}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00091}00091\ \textcolor{comment}{//static\ ZStatus\ cancelRequest\ (ZThread\_Id\_type\ pProcessid);}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00092}00092\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00093}00093\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{zsocket_8h_a46325d15808a4cbd89cab6bc42db991a}{resetSignals}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00095}00095\ \textcolor{preprocessor}{\#ifdef\ \_\_USE\_WINDOWS\_\_}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00096}00096\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{handle}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SOCKET}}\ \mbox{\hyperlink{zsocket_8h_aaff3cae1b3a2437d375d507e990bbdc0}{SOCKET\_DESCRIPTOR\_TYPE}};}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00097}00097\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00098}00098\ \textcolor{keyword}{typedef}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zsocket_8h_aaff3cae1b3a2437d375d507e990bbdc0}{SOCKET\_DESCRIPTOR\_TYPE}};}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00099}00099\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_\_USE\_WINDOWS\_\_}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00101}00101\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacezbs}{zbs}}\ \{}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00102}00102\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00103}\mbox{\hyperlink{classzbs_1_1_z_socket}{00103}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classzbs_1_1_z_socket}{ZSocket}}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00104}00104\ \{}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00105}00105\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00106}00106\ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_socket_af10beb781aae5f7a69b30a9958329d36}{ZSocket}}()\ ;}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00107}\mbox{\hyperlink{classzbs_1_1_z_socket_af52c9494b7058775713c9f25e662dfce}{00107}}\ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_socket_af52c9494b7058775713c9f25e662dfce}{\string~ZSocket}}(\textcolor{keywordtype}{void})}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00108}00108\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00109}00109\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classzbs_1_1_z_socket_aa5af47ede766537d398b3c581f82b047}{Fd}}!=-\/1)}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00110}00110\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_socket_a62f1bc5c371c0a888c8c875cfe17f370}{zclose}}();}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00111}00111\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classzbs_1_1_z_socket_a98d11527b3eef985310297a810491ae3}{SocketPMS}})}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00112}00112\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{classzbs_1_1_z_socket_a98d11527b3eef985310297a810491ae3}{SocketPMS}};}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00113}00113\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00114}00114\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00115}00115\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00116}00116\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_a826eb945b113f3bcccfd07264a109f4c}{\_singleSetup}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{sockaddr\_in6}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pAddressBulk}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\_t}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pAddressLen}});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00117}00117\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00118}00118\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_aa557374ded73e58ac5cd65496b4599db}{zsetup}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pNode}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pPort}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pFamily}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pFlag}},\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pNonBlocking}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pReadTimeout}}=-\/1,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pWriteTimeout}}=-\/1);}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00120}00120\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classzbs_1_1_z_socket_a2be28ac23f6c04c9175b00342b70efc5}{searchPort}}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pBasePort}}\ ,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMaxPort}});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00121}00121\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00122}00122\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_aa87d6782c7acdc69f7982af2b276df63}{zconnect}}();}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00128}00128\ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_a8c0e266d2338837ca8e39e792f9d5eab}{\_read}}\ (\textcolor{keywordtype}{void}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pBuf}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\_t}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pSizeToRead}},\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\_t}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pSizeRead}});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00133}00133\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_aafbc8a744aa24712c834709ba0df1bb7}{zread}}(ZDataBuffer\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pBuffer}},\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pSizeToRead}});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00135}00135\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_aafbc8a744aa24712c834709ba0df1bb7}{zread}}(\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pBuffer}},\textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pSizeToRead}});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00137}00137\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_a6852348aabdff55c759ea3ae7cbc9b40}{\_write}}\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pBuf}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\_t}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pSizeToWrite}},\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\_t}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pSizeWritten}});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00138}00138\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_a3bd93415774323b8e8672c41273c0187}{zwrite}}\ (\textcolor{keyword}{const}\ ZDataBuffer\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pBuffer}},\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\_t}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pSizeWritten}});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00139}00139\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_a3bd93415774323b8e8672c41273c0187}{zwrite}}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pBuffer}},\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\_t}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pSizeWritten}});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00141}00141\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_a62f1bc5c371c0a888c8c875cfe17f370}{zclose}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00142}00142\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_a3e9f6bd1947d47203984875d1f22aa47}{zshutdown}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00144}\mbox{\hyperlink{classzbs_1_1_z_socket_ab52159100df6db1575b96cd64d442202}{00144}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classzbs_1_1_z_socket_ab52159100df6db1575b96cd64d442202}{isActive}}(\textcolor{keywordtype}{void})\ \{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{classzbs_1_1_z_socket_aa5af47ede766537d398b3c581f82b047}{Fd}}!=-\/1;\}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00146}\mbox{\hyperlink{classzbs_1_1_z_socket_af94522727fc23c988065b8c6e783f7c7}{00146}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{sockaddr\_in6}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_af94522727fc23c988065b8c6e783f7c7}{\_getAddressBulk}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})\ \{\textcolor{keywordflow}{return}\ AddressBulk;\}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00147}\mbox{\hyperlink{classzbs_1_1_z_socket_a5eb4da8bcc83b75d4cd83986e0305b82}{00147}}\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\_t}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_a5eb4da8bcc83b75d4cd83986e0305b82}{\_getAddressLen}}(\textcolor{keywordtype}{void})\ \{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{classzbs_1_1_z_socket_a75bde288d93a1908797a89233f782d19}{AddressLen}};\}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00148}00148\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classzbs_1_1_z_socket_a497778fa2dea7d5cbee0456babf83967}{registerBrokenPipe}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_\_sighandler\_t}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{CatchBrokenPipe}});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00150}00150\ \textcolor{comment}{/*\ real\ values\ while\ requested\ values\ are\ store\ within\ HostName\ and\ Port\ */}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00151}00151\ \ \ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_affac8a5f82e1de9fc291eaf1ea13c36a}{getEffectiveHostName}}();}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00152}00152\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utfdescString}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_ab0d210194e3cb6e0d29d12b8c29107ac}{getEffectiveIPAddress}}();}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00153}00153\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classzbs_1_1_z_socket_a5802d1a7c6d3f9260bda3a6d4a28e4af}{getEffectivePort}}();}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00154}00154\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utfdescString}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_a15751f61b83584f0309276564b268ca2}{getEffectiveServiceName}}();}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00156}00156\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_a610385f99fd64d62515b4caf98e611c9}{setNonBlocking}}(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pOption}});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00157}00157\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00159}00159\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classzbs_1_1_z_socket_af79969f75ebce3544a5b1f267cb8a05e}{setSocketPerformance}}(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pOnOff}});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00160}00160\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00162}00162\ \textcolor{preprocessor}{\#ifdef\ \_\_USE\_LINUX\_\_}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00163}00163\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{setOption}}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pOption}});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00164}00164\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{addOption}}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pOption}});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00165}00165\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_\_USE\_LINUX\_\_}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00167}00167\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00168}\mbox{\hyperlink{classzbs_1_1_z_socket_aa5af47ede766537d398b3c581f82b047}{00168}}\ \ \ \ \ \ \mbox{\hyperlink{zserverselectabstract_8h_aaff3cae1b3a2437d375d507e990bbdc0}{SOCKET\_DESCRIPTOR\_TYPE}}\ \ \mbox{\hyperlink{classzbs_1_1_z_socket_aa5af47ede766537d398b3c581f82b047}{Fd}}=-\/1;}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00169}\mbox{\hyperlink{classzbs_1_1_z_socket_a8312ca69998f42c2ca89ebbfb31b0c1e}{00169}}\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{in\_port\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_socket_a8312ca69998f42c2ca89ebbfb31b0c1e}{NetPort}}=-\/1;}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00171}00171\ \textcolor{comment}{//\ \ \ \ ZHostAddressType\ \ \ \ HostAddressType=ZHAT\_Nothing\ ;}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00172}\mbox{\hyperlink{classzbs_1_1_z_socket_aac9fe553ea50f3aa040b683ce5874ca1}{00172}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_socket_aac9fe553ea50f3aa040b683ce5874ca1}{Family}}=-\/1;}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00173}\mbox{\hyperlink{classzbs_1_1_z_socket_a80aad71cad607105a8515ea9e5a2cf50}{00173}}\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{in\_addr\_t}}\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_socket_a80aad71cad607105a8515ea9e5a2cf50}{NetAddress}};}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00174}\mbox{\hyperlink{classzbs_1_1_z_socket_a75bde288d93a1908797a89233f782d19}{00174}}\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\_t}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_socket_a75bde288d93a1908797a89233f782d19}{AddressLen}}=-\/1;}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00175}00175\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00176}\mbox{\hyperlink{classzbs_1_1_z_socket_a0e03231ed21a82f0fda4fe6b9cb8255f}{00176}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{sockaddr\_in6}}\ \mbox{\hyperlink{classzbs_1_1_z_socket_a0e03231ed21a82f0fda4fe6b9cb8255f}{AddressBulk}};}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00177}\mbox{\hyperlink{classzbs_1_1_z_socket_aa219d08ab0b7c426ad976a7ebf33d1c5}{00177}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{sockaddr\_in}}\ \ *\mbox{\hyperlink{classzbs_1_1_z_socket_aa219d08ab0b7c426ad976a7ebf33d1c5}{AddressIPV4}}=(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{sockaddr\_in}}*)\&\mbox{\hyperlink{classzbs_1_1_z_socket_a0e03231ed21a82f0fda4fe6b9cb8255f}{AddressBulk}};}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00178}\mbox{\hyperlink{classzbs_1_1_z_socket_a755d23a5c68f3fe4b456a609968340b7}{00178}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{sockaddr\_in6}}\ *\mbox{\hyperlink{classzbs_1_1_z_socket_a755d23a5c68f3fe4b456a609968340b7}{AddressIPV6}}=\&\mbox{\hyperlink{classzbs_1_1_z_socket_a0e03231ed21a82f0fda4fe6b9cb8255f}{AddressBulk}};}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00179}\mbox{\hyperlink{classzbs_1_1_z_socket_aa55059424d33aa9d0ea80fa11b94811f}{00179}}\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{sockaddr}}\ *\mbox{\hyperlink{classzbs_1_1_z_socket_aa55059424d33aa9d0ea80fa11b94811f}{SockAddr}}\ =\ (\textcolor{keyword}{struct\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{sockaddr}}*)\&\mbox{\hyperlink{classzbs_1_1_z_socket_a0e03231ed21a82f0fda4fe6b9cb8255f}{AddressBulk}};}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00181}\mbox{\hyperlink{classzbs_1_1_z_socket_a4aa1466277a2e675241dacea33d69f31}{00181}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_socket_a4aa1466277a2e675241dacea33d69f31}{PerfFlag}}=\textcolor{keyword}{false};\ \textcolor{comment}{/*\ performance\ monitoring\ flag*/}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00182}\mbox{\hyperlink{classzbs_1_1_z_socket_a98d11527b3eef985310297a810491ae3}{00182}}\ \ \ \ \ \mbox{\hyperlink{class_z_socket_p_m_s}{ZSocketPMS}}*\ \mbox{\hyperlink{classzbs_1_1_z_socket_a98d11527b3eef985310297a810491ae3}{SocketPMS}}=\textcolor{keyword}{nullptr};\ \ \textcolor{comment}{/*\ performance\ monitor\ data\ */}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00184}\mbox{\hyperlink{classzbs_1_1_z_socket_abee77d343d13bb838c55c7e862e55279}{00184}}\ \ \ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_socket_abee77d343d13bb838c55c7e862e55279}{Port}};\ \ \ \ \ \textcolor{comment}{/*\ requested\ port\ */}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00185}\mbox{\hyperlink{classzbs_1_1_z_socket_a38b139a9e22a41443de8c0464477fd6d}{00185}}\ \ \ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_socket_a38b139a9e22a41443de8c0464477fd6d}{HostName}};\ \textcolor{comment}{/*\ requested\ host\ name\ */}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00186}00186\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00187}00187\ \textcolor{comment}{//\ \ \ \ ZSocketMetaType\ SocketType=ZSMT\_Other;\ /*\ protocol\ for\ socket\ :\ ZBase,\ smtp,\ none\ */}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00188}00188\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00189}00189\ \};\textcolor{comment}{//\ ZSocket}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00190}00190\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00193}00193\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00194}00194\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00195}00195\ \}\ \textcolor{comment}{//\ namespace\ zbs}}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00196}00196\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00197}00197\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{zsocket_8h_ace106f5b1fcf1ea49f4388e2cc7d43b6}{cleanAddrinfo\_chain}}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{addrinfo}}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pAddrinfo\_chain}});}
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{zsocket_8h_source_l00201}00201\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZSOCKET\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,580 @@
+\doxysection{ZRandom\+File Surface management utilities}
+\hypertarget{group___z_r_f_utilities}{}\label{group___z_r_f_utilities}\index{ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_r_f_utilities_ga4b3b04378233ab242f5d5d75ed0d8036}{zbs\+::\+ZRandom\+File\+::zheader\+Rebuild}} (uri\+String \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Content\+URI}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Dump}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\begin{DoxyCompactList}\small\item\em \doxylink{group___z_r_f_utilities_ga4b3b04378233ab242f5d5d75ed0d8036}{ZRandom\+File\+::zheader\+Rebuild} This static function rebuilds \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} header from an existing \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} content. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{static}} uri\+String \mbox{\hyperlink{group___z_r_f_utilities_ga1ad6c3385a6562913ecff2100c07c32e}{zbs\+::\+ZRandom\+File\+::\+\_\+get\+URIClone}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URIContent}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{static}} uri\+String \mbox{\hyperlink{group___z_r_f_utilities_ga7f7e676eef49cd67687e7dc1e1d0b13c}{zbs\+::\+ZRandom\+File\+::\+\_\+get\+URIReorg\+Clone}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URIContent}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_r_f_utilities_ga551a53b83d383ebe136346a41b1902fa}{zbs\+::\+ZRandom\+File\+::zclone\+File}} ()
+\begin{DoxyCompactList}\small\item\em \doxylink{group___z_r_f_utilities_ga6794de7cbfa69b1e4b023d92aa193fad}{ZRandom\+File\+::\+\_\+clone\+File} Clones the current \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} \+: duplicates anything concerning its file header and copies its data. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_r_f_utilities_ga6794de7cbfa69b1e4b023d92aa193fad}{zbs\+::\+ZRandom\+File\+::\+\_\+clone\+File}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Free\+Space}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Clone\+Name}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_r_f_utilities_gad670572a14bef4da4d6528f886a77b82}{zbs\+::\+ZRandom\+File\+::zextend\+File}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Free\+Space}})
+\begin{DoxyCompactList}\small\item\em \doxylink{group___z_r_f_utilities_ga551a53b83d383ebe136346a41b1902fa}{ZRandom\+File\+::zclone\+File} overload method for zclone\+File using current openned file. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_r_f_utilities_gacc8efce0bc83c4a42070fb249774c1aa}{zbs\+::\+ZRandom\+File\+::ztruncate\+File}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Free\+Space}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\begin{DoxyCompactList}\small\item\em \doxylink{group___z_r_f_utilities_gacc8efce0bc83c4a42070fb249774c1aa}{ZRandom\+File\+::ztruncate\+File} will truncate the file pointed by p\+Descriptor that must be a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} opened file to leave a free block of p\+Free\+Space at the physical end of the file. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_r_f_utilities_ga074c8ed537e9ec0b9f2338b875f83757}{zbs\+::\+ZRandom\+File\+::zremove\+All}} ()
+\begin{DoxyCompactList}\small\item\em zremove\+All delete all active records one by one without changing any record structure. Records are moved to free block pool with a deleted state. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_r_f_utilities_gaf070af3c9e8f96d2490fede363ce5fb8}{zbs\+::\+ZRandom\+File\+::zclear\+File}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Highwater}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\begin{DoxyCompactList}\small\item\em zclear\+File Clearing file content for the current opened \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_r_f_utilities_ga140af0f13d2364c1add73b52d957665a}{zbs\+::\+ZRandom\+File\+::zreorg\+File}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Requested\+Free\+Blocks}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Dump}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\begin{DoxyCompactList}\small\item\em \doxylink{group___z_r_f_utilities_ga140af0f13d2364c1add73b52d957665a}{ZRandom\+File\+::zreorg\+File} Will reorganize the current \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}\textquotesingle{}s file surface \+: eliminate remaining holes between holes and sort physical blocks according to their rank (logical position) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_r_f_utilities_ga6ecfe866a34e853e3a9a9b29601eb064}{zbs\+::\+ZRandom\+File\+::\+\_\+reorg\+File\+Internals}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Requested\+Free\+Blocks}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{group___z_r_f_utilities_ga407c34722551b6a7cf3fc82450ff3b6e}{zbs\+::\+ZRandom\+File\+::\+\_\+print}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Format}},...)
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{group___z_r_f_utilities_gaf738f27055a331509d66e5ad5b38695d}{zbs\+::\+ZRandom\+File\+::\+\_\+print}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Out}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} embeds a set of utilities for managing disk space.\hypertarget{group___z_r_f_utilities_ZRFUtilClearing}{}\doxysubsubsection{\texorpdfstring{Clearing ZRF file content}{Clearing ZRF file content}}\label{group___z_r_f_utilities_ZRFUtilClearing}
+If \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} contains records these records will be lost. If high\+Water\+Marking option has been selected and is on, the existing used file space will be marked to binary zero. File space remains allocated and is fully available as one free block with all available space to be used. see\+: \doxylink{group___z_r_f_utilities_gaf070af3c9e8f96d2490fede363ce5fb8}{ZRandom\+File\+::zclear\+File()}\hypertarget{group___z_r_f_utilities_ZRFUtilTrunc}{}\doxysubsubsection{\texorpdfstring{ZRF File truncation}{ZRF File truncation}}\label{group___z_r_f_utilities_ZRFUtilTrunc}
+File content could be truncated to a physical size whenever possible. The remaining space at the end of the file (belonging to Free blocks pool) is truncated. If no free block are available and the physical end of the content file, nothing happens. Existing content remains unchanged. see\+: \doxylink{group___z_r_f_utilities_gacc8efce0bc83c4a42070fb249774c1aa}{ZRandom\+File\+::ztruncate\+File()}\hypertarget{group___z_r_f_utilities_ZRFUtilExtend}{}\doxysubsubsection{\texorpdfstring{ZRF File extend}{ZRF File extend}}\label{group___z_r_f_utilities_ZRFUtilExtend}
+This utility artificially extend ZRF file space in adding a free block space at the physical end of the content file. see\+: \doxylink{group___z_r_f_utilities_gad670572a14bef4da4d6528f886a77b82}{ZRandom\+File\+::zextend\+File()}\hypertarget{group___z_r_f_utilities_ZRFUtilReorg}{}\doxysubsubsection{\texorpdfstring{ZRF File re-\/organization}{ZRF File re-organization}}\label{group___z_r_f_utilities_ZRFUtilReorg}
+This utility has two goals
+\begin{DoxyItemize}
+\item reorder physically the file Records will be physically reordered in their respective logical rank. There will be no appearing change for users.
+\item eliminate the possible holes between records At the end of the processing, the file\textquotesingle{}s content remains strictly unchanged, and records rank order is preserved. see\+: \doxylink{group___z_r_f_utilities_ga140af0f13d2364c1add73b52d957665a}{ZRandom\+File\+::zreorg\+File}
+\end{DoxyItemize}\hypertarget{group___z_r_f_utilities_ZRFUtilClone}{}\doxysubsubsection{\texorpdfstring{ZRF File cloning}{ZRF File cloning}}\label{group___z_r_f_utilities_ZRFUtilClone}
+This utility will duplicate the ZRF file. For doing this it will
+\begin{DoxyItemize}
+\item Create a new ZRF file with the same characteristics that the file to clone.
+\item Populate this new file with origin content
+\item Reorder physically the file in blocks\textquotesingle{} rank order
+\item Add a free space at the end of the cloned file. see\+: \doxylink{group___z_r_f_utilities_ga551a53b83d383ebe136346a41b1902fa}{ZRandom\+File\+::zclone\+File()}
+\end{DoxyItemize}\hypertarget{group___z_r_f_utilities_ZRFUtilHRebuild}{}\doxysubsubsection{\texorpdfstring{ZRF header rebuild}{ZRF header rebuild}}\label{group___z_r_f_utilities_ZRFUtilHRebuild}
+This utility generates -\/ or re-\/generates -\/ a header context from a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} well formed content file. This is usefull if a header file has been damaged or lost. see\+: \doxylink{group___z_r_f_utilities_ga4b3b04378233ab242f5d5d75ed0d8036}{ZRandom\+File\+::zheader\+Rebuild()}
+
+\begin{DoxyNote}{Note}
+this utility explores the file surface (surfacescan) of the file to detect start/end of blocks with a specific bytes marker. If ever there will be such a sequence in data, it will be detected as a start or end of block record and will induce a loss of data. 
+\end{DoxyNote}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{group___z_r_f_utilities_ga6794de7cbfa69b1e4b023d92aa193fad}\label{group___z_r_f_utilities_ga6794de7cbfa69b1e4b023d92aa193fad} 
+\index{ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}!\_cloneFile@{\_cloneFile}}
+\index{\_cloneFile@{\_cloneFile}!ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}}
+\doxysubsubsection{\texorpdfstring{\_cloneFile()}{\_cloneFile()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+File\+::\+\_\+clone\+File (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}}}]{p\+Free\+Space,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \&}]{p\+Clone\+Name,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrandomfile_8cpp_source_l08162}{8162}} of file \mbox{\hyperlink{zrandomfile_8cpp_source}{zrandomfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomfile_8cpp_source_l05770}{zbs\+::\+ZRandom\+File\+::\+\_\+get\+By\+Rank()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l08133}{zbs\+::\+ZRandom\+File\+::\+\_\+get\+URIClone()}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00195}{ZFile\+Control\+Block\+::\+Allocated\+Blocks}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00196}{ZFile\+Control\+Block\+::\+Block\+Extent\+Quota}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00198}{ZFile\+Control\+Block\+::\+Block\+Target\+Size}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00200}{zbs\+::\+ZRandom\+File\+::get\+File\+Type()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00422}{zbs\+::\+ZRandom\+File\+::get\+Open\+Mode()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00717}{zbs\+::\+ZRandom\+File\+::get\+URIContent()}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00201}{ZFile\+Control\+Block\+::\+Grab\+Free\+Space}}, \mbox{\hyperlink{zrandomfile_8h_source_l01289}{zbs\+::\+ZRandom\+File\+::has\+Progress\+Call\+Back()}}, \mbox{\hyperlink{zrandomfile_8h_source_l01290}{zbs\+::\+ZRandom\+File\+::has\+Progress\+Setup\+Call\+Back()}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00200}{ZFile\+Control\+Block\+::\+Highwater\+Marking}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00226}{ZFile\+Control\+Block\+::\+Used\+Size}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l09973}{w\+Mode}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00115}{zbs\+::\+ZFDOwn\+Data\+::\+ZBAT}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00131}{ZBS\+\_\+\+Nothing}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_aa7ddb770c232d732548d2bf6b4aa378a}{zbs\+::\+ZRandom\+File\+::zclose()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00114}{zbs\+::\+ZFDOwn\+Data\+::\+ZFCB}}, \mbox{\hyperlink{zlock_8h_source_l00116}{ZLock\+\_\+\+Nolock}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l02292}{zbs\+::\+ZRandom\+File\+::zopen()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00122}{zbs\+::\+ZFDOwn\+Data\+::\+ZReserved}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00087}{ZRF\+\_\+\+Exclusive}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00081}{ZRF\+\_\+\+Nothing}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00082}{ZRF\+\_\+\+Not\+Open}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00083}{ZRF\+\_\+\+Read\+\_\+\+Only}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00101}{ZRF\+\_\+\+Write}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomfile_8cpp_source_l08155}{zbs\+::\+ZRandom\+File\+::zclone\+File()}}, and \mbox{\hyperlink{zrandomfile_8cpp_source_l08896}{zbs\+::\+ZRandom\+File\+::zreorg\+File()}}.
+
+\Hypertarget{group___z_r_f_utilities_ga1ad6c3385a6562913ecff2100c07c32e}\label{group___z_r_f_utilities_ga1ad6c3385a6562913ecff2100c07c32e} 
+\index{ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}!\_getURIClone@{\_getURIClone}}
+\index{\_getURIClone@{\_getURIClone}!ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}}
+\doxysubsubsection{\texorpdfstring{\_getURIClone()}{\_getURIClone()}}
+{\footnotesize\ttfamily uri\+String ZRandom\+File\+::\+\_\+get\+URIClone (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String}]{p\+URIContent }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zrandomfile_8cpp_source_l08133}{8133}} of file \mbox{\hyperlink{zrandomfile_8cpp_source}{zrandomfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomfile_8h_source_l00569}{\+\_\+\+\_\+\+CLONE\+\_\+\+BASEEXTENSION\+\_\+\+\_\+}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomfile_8cpp_source_l08162}{zbs\+::\+ZRandom\+File\+::\+\_\+clone\+File()}}.
+
+\Hypertarget{group___z_r_f_utilities_ga7f7e676eef49cd67687e7dc1e1d0b13c}\label{group___z_r_f_utilities_ga7f7e676eef49cd67687e7dc1e1d0b13c} 
+\index{ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}!\_getURIReorgClone@{\_getURIReorgClone}}
+\index{\_getURIReorgClone@{\_getURIReorgClone}!ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}}
+\doxysubsubsection{\texorpdfstring{\_getURIReorgClone()}{\_getURIReorgClone()}}
+{\footnotesize\ttfamily uri\+String ZRandom\+File\+::\+\_\+get\+URIReorg\+Clone (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String}]{p\+URIContent }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zrandomfile_8cpp_source_l08144}{8144}} of file \mbox{\hyperlink{zrandomfile_8cpp_source}{zrandomfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00009}{zbs\+::\+General\+Parameters}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zgeneralparameters_8cpp_source_l00211}{zbs\+::\+ZGeneral\+Parameters\+::get\+Work\+Directory()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomfile_8cpp_source_l08896}{zbs\+::\+ZRandom\+File\+::zreorg\+File()}}.
+
+\Hypertarget{group___z_r_f_utilities_ga407c34722551b6a7cf3fc82450ff3b6e}\label{group___z_r_f_utilities_ga407c34722551b6a7cf3fc82450ff3b6e} 
+\index{ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}!\_print@{\_print}}
+\index{\_print@{\_print}!ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}}
+\doxysubsubsection{\texorpdfstring{\_print()}{\_print()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZRandom\+File\+::\+\_\+print (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Format,  }\item[{}]{... }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrandomfile_8cpp_source_l09399}{9399}} of file \mbox{\hyperlink{zrandomfile_8cpp_source}{zrandomfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomfile_8cpp_source_l09399}{zbs\+::\+ZRandom\+File\+::\+\_\+print()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomfile_8cpp_source_l06965}{zbs\+::\+ZRandom\+File\+::\+\_\+block\+Dump()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l07722}{zbs\+::\+ZRandom\+File\+::\+\_\+header\+Dump()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l09399}{zbs\+::\+ZRandom\+File\+::\+\_\+print()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l06781}{zbs\+::\+ZRandom\+File\+::\+ZRFPMSReport()}}, and \mbox{\hyperlink{zrandomfile_8cpp_source_l08420}{zbs\+::\+ZRandom\+File\+::ztruncate\+File()}}.
+
+\Hypertarget{group___z_r_f_utilities_gaf738f27055a331509d66e5ad5b38695d}\label{group___z_r_f_utilities_gaf738f27055a331509d66e5ad5b38695d} 
+\index{ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}!\_print@{\_print}}
+\index{\_print@{\_print}!ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}}
+\doxysubsubsection{\texorpdfstring{\_print()}{\_print()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZRandom\+File\+::\+\_\+print (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Out }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zrandomfile_8cpp_source_l09408}{9408}} of file \mbox{\hyperlink{zrandomfile_8cpp_source}{zrandomfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zrandomfile_8h_source_l01309}{zbs\+::\+ZRandom\+File\+::\+Output}}.
+
+\Hypertarget{group___z_r_f_utilities_ga6ecfe866a34e853e3a9a9b29601eb064}\label{group___z_r_f_utilities_ga6ecfe866a34e853e3a9a9b29601eb064} 
+\index{ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}!\_reorgFileInternals@{\_reorgFileInternals}}
+\index{\_reorgFileInternals@{\_reorgFileInternals}!ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}}
+\doxysubsubsection{\texorpdfstring{\_reorgFileInternals()}{\_reorgFileInternals()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+File\+::\+\_\+reorg\+File\+Internals (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Requested\+Free\+Blocks,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line \mbox{\hyperlink{zrandomfile_8cpp_source_l08957}{8957}} of file \mbox{\hyperlink{zrandomfile_8cpp_source}{zrandomfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zblockpool_8h_source_l00019}{ZBlock\+Pool\+::\+\_\+add\+Sorted()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_abf4efa34817f01522e6507c5a045a89c}{zbs\+::\+ZRandom\+File\+::\+\_\+get\+Free\+Block\+Engine()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_ab53e3a0a9529b841c471c016d0bd33e2}{zbs\+::\+ZRandom\+File\+::\+\_\+move\+Block()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_ac088c9575a9dc83d153889eca6ef6e13}{zbs\+::\+ZRandom\+File\+::\+\_\+write\+Block\+Header()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_a13ae1e056e316e5e8a8af058e816edc0}{zbs\+::\+ZRandom\+File\+::\+\_\+write\+File\+Header()}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00198}{ZFile\+Control\+Block\+::\+Block\+Target\+Size}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00104}{zbs\+::\+ZFDOwn\+Data\+::\+Content\+Fd}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00129}{zbs\+::\+ZFDOwn\+Data\+::\+Current\+Rank}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00216}{zbs\+::\+ZRandom\+File\+::get\+Allocated\+Size()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrandomfile_8h_source_l01289}{zbs\+::\+ZRandom\+File\+::has\+Progress\+Call\+Back()}}, \mbox{\hyperlink{zrandomfile_8h_source_l01290}{zbs\+::\+ZRandom\+File\+::has\+Progress\+Setup\+Call\+Back()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00128}{zbs\+::\+ZFDOwn\+Data\+::\+Logical\+Position}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00230}{ZFile\+Control\+Block\+::\+Max\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00229}{ZFile\+Control\+Block\+::\+Min\+Size}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00127}{zbs\+::\+ZFDOwn\+Data\+::\+Physical\+Position}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00192}{ZFile\+Control\+Block\+::\+Start\+Of\+Data}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00172}{zbs\+::\+ZFile\+Descriptor\+::\+URIContent}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00226}{ZFile\+Control\+Block\+::\+Used\+Size}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00115}{zbs\+::\+ZFDOwn\+Data\+::\+ZBAT}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00139}{ZBS\+\_\+\+Control}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00134}{ZBS\+\_\+\+Deleted}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00133}{ZBS\+\_\+\+Free}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00132}{ZBS\+\_\+\+Used}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l08405}{zbs\+::\+ZRandom\+File\+::zextend\+File()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00117}{zbs\+::\+ZFDOwn\+Data\+::\+ZFBT}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00114}{zbs\+::\+ZFDOwn\+Data\+::\+ZFCB}}, and \mbox{\hyperlink{zrandomfile_8cpp_source_l08420}{zbs\+::\+ZRandom\+File\+::ztruncate\+File()}}.
+
+\Hypertarget{group___z_r_f_utilities_gaf070af3c9e8f96d2490fede363ce5fb8}\label{group___z_r_f_utilities_gaf070af3c9e8f96d2490fede363ce5fb8} 
+\index{ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}!zclearFile@{zclearFile}}
+\index{zclearFile@{zclearFile}!ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}}
+\doxysubsubsection{\texorpdfstring{zclearFile()}{zclearFile()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+File\+::zclear\+File (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}}}]{p\+Size,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Highwater,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})}
+
+
+
+zclear\+File Clearing file content for the current opened \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} 
+
+zclear will consider any block and user record within the \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} as deleted and unexisting anymore (even in the ZDeleted\+Block\+Pool).
+
+For doing this, it will
+\begin{DoxyItemize}
+\item reset ZBlock\+Access\+Table pool (no more used blocks)
+\item create one unique free block in ZFree\+Block\+Pool with a size corresponding to Size of the Content File -\/ size of a Block\+Header -\/ start of data
+\item this block will be written as the first block of the content file (address start of data).
+\end{DoxyItemize}
+
+If highwater marking option has been selected, the freed space (size of free block as computed before) will be binary zeroed according highwater marking algorithm. \begin{DoxySeeAlso}{See also}
+\doxylink{classzbs_1_1_z_random_file_a13d8aae675fd9e22417449e60715fbac}{ZRandom\+File\+::\+\_\+highwater\+Mark\+\_\+\+Block}
+\end{DoxySeeAlso}
+If \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} contains records these records will be lost. Current Logical address will be 0L, meaning start of the file. If high\+Water\+Marking option has been selected and is on, the existing used file space will be marked to binary zero. File space remains allocated and is fully available as one free block with all available space to be used.
+
+File must be correctly setup (with appropriate path in various uri\+Strings ). If file is open then it will be closed before engaging the process. Once the process and been finished, will be re-\/opened for a later use with its previous open mode, if it was open, or left close if it was close while calling the method.
+
+\begin{DoxyNote}{Note}
+The whole file space remains allocated to \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} content file. If p\+Size mentions a value less than current file space, the file is not truncated and file space remains unchanged. if p\+Size is -\/1, then the existing space is kept. if p\+Size mentions a value greater than actual file space, then file is extended using posix\+\_\+fallocate and file size is adjusted to the given size.
+\end{DoxyNote}
+In order to reduce the amount of allocated disk space, it is required to use, after having used zclear\+File, \doxylink{group___z_r_f_utilities_gacc8efce0bc83c4a42070fb249774c1aa}{ZRandom\+File\+::ztruncate\+File}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Size} & number of bytes to be allocated to file. If -\/1, then existing size is kept. \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Highwater} & If set, all existing file space will be marked to binary zero before being released. \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Error\+Log} & Optional standard error reporting log. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError}
+\end{DoxyReturn}
+zclear will consider any block and user record within the \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} as deleted and unexisting anymore (even in the ZDeleted\+Block\+Pool).
+
+For doing this, it will
+\begin{DoxyItemize}
+\item reset ZBlock\+Access\+Table pool (no more used blocks)
+\item create one unique free block in ZFree\+Block\+Pool with a size corresponding to Size of the Content File -\/ size of a Block\+Header -\/ start of data
+\item this block will be written as the first block of the content file (address start of data).
+\end{DoxyItemize}
+
+If highwater marking option has been selected, the freed space (size of free block as computed before) will be binary zeroed according highwater marking algorithm. \begin{DoxySeeAlso}{See also}
+\doxylink{classzbs_1_1_z_random_file_a13d8aae675fd9e22417449e60715fbac}{ZRandom\+File\+::\+\_\+highwater\+Mark\+\_\+\+Block}
+\end{DoxySeeAlso}
+If \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} contains records these records will be lost. Current Logical address will be 0L, meaning start of the file. If high\+Water\+Marking option has been selected and is on, the existing used file space will be marked to binary zero. File space remains allocated and is fully available as one free block with all available space to be used.
+
+File must be correctly setup (with appropriate path in various uri\+Strings ). If file is open then it will be closed before engaging the process. Once the process and been finished, will be re-\/opened for a later use with its previous open mode, if it was open, or left close if it was close while calling the method.
+
+\begin{DoxyNote}{Note}
+The whole file space remains allocated to \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} content file. If p\+Size mentions a value less than current file space, the file is not truncated and file space remains unchanged. if p\+Size is -\/1, then the existing space is kept. if p\+Size mentions a value greater than actual file space, then file is extended using posix\+\_\+fallocate and file size is adjusted to the given size.
+\end{DoxyNote}
+In order to reduce the amount of allocated disk space, it is required to use, after having used zclear\+File, \doxylink{group___z_r_f_utilities_gacc8efce0bc83c4a42070fb249774c1aa}{ZRandom\+File\+::ztruncate\+File}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Size} & number of bytes to be allocated to file. If -\/1, then existing size is kept. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomfile_8cpp_source_l08572}{8572}} of file \mbox{\hyperlink{zrandomfile_8cpp_source}{zrandomfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zblockpool_8h_source_l00019}{ZBlock\+Pool\+::\+\_\+add\+Sorted()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_ad994829b0fd8fa0a9e309c8c458ee924}{zbs\+::\+ZRandom\+File\+::\+\_\+free\+Block\+\_\+\+Commit()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_a13d8aae675fd9e22417449e60715fbac}{zbs\+::\+ZRandom\+File\+::\+\_\+highwater\+Mark\+\_\+\+Block()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_af34d1a6f3e3325b93dd18072cba359d2}{zbs\+::\+ZRandom\+File\+::\+\_\+write\+All\+File\+Header()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_ac088c9575a9dc83d153889eca6ef6e13}{zbs\+::\+ZRandom\+File\+::\+\_\+write\+Block\+Header()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_abacd58b5a5a0ccf4f3e1764012280a4f}{zbs\+::\+ZRandom\+File\+::\+\_\+\+ZRFopen()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00104}{zbs\+::\+ZFDOwn\+Data\+::\+Content\+Fd}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00129}{zbs\+::\+ZFDOwn\+Data\+::\+Current\+Rank}}, \mbox{\hyperlink{zheadercontrolblock_8h_source_l00105}{ZHeader\+Control\+Block\+::\+File\+Type}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00196}{zbs\+::\+ZRandom\+File\+::get\+FCB()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00204}{zbs\+::\+ZRandom\+File\+::get\+Mode()}}, \mbox{\hyperlink{zrandomfile_8h_source_l01289}{zbs\+::\+ZRandom\+File\+::has\+Progress\+Call\+Back()}}, \mbox{\hyperlink{zrandomfile_8h_source_l01290}{zbs\+::\+ZRandom\+File\+::has\+Progress\+Setup\+Call\+Back()}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00200}{ZFile\+Control\+Block\+::\+Highwater\+Marking}}, \mbox{\hyperlink{zrandomfile_8h_source_l00418}{zbs\+::\+ZRandom\+File\+::is\+Open()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00128}{zbs\+::\+ZFDOwn\+Data\+::\+Logical\+Position}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00127}{zbs\+::\+ZFDOwn\+Data\+::\+Physical\+Position}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00300}{zbs\+::\+ZFile\+Descriptor\+::reset\+Position()}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00192}{ZFile\+Control\+Block\+::\+Start\+Of\+Data}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00172}{zbs\+::\+ZFile\+Descriptor\+::\+URIContent}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00226}{ZFile\+Control\+Block\+::\+Used\+Size}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l09973}{w\+Mode}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00115}{zbs\+::\+ZFDOwn\+Data\+::\+ZBAT}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00133}{ZBS\+\_\+\+Free}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_aa7ddb770c232d732548d2bf6b4aa378a}{zbs\+::\+ZRandom\+File\+::zclose()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00117}{zbs\+::\+ZFDOwn\+Data\+::\+ZFBT}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00114}{zbs\+::\+ZFDOwn\+Data\+::\+ZFCB}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00112}{ZFT\+\_\+\+Nothing}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00113}{ZFT\+\_\+\+ZRandom\+File}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00112}{zbs\+::\+ZFDOwn\+Data\+::\+ZHeader}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00119}{zbs\+::\+ZFDOwn\+Data\+::\+ZHOT}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00105}{ZRF\+\_\+\+All}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00087}{ZRF\+\_\+\+Exclusive}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00081}{ZRF\+\_\+\+Nothing}}.
+
+\Hypertarget{group___z_r_f_utilities_ga551a53b83d383ebe136346a41b1902fa}\label{group___z_r_f_utilities_ga551a53b83d383ebe136346a41b1902fa} 
+\index{ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}!zcloneFile@{zcloneFile}}
+\index{zcloneFile@{zcloneFile}!ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}}
+\doxysubsubsection{\texorpdfstring{zcloneFile()}{zcloneFile()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+File\+::zclone\+File (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxylink{group___z_r_f_utilities_ga6794de7cbfa69b1e4b023d92aa193fad}{ZRandom\+File\+::\+\_\+clone\+File} Clones the current \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} \+: duplicates anything concerning its file header and copies its data. 
+
+for simple/reduced access use \doxylink{group___z_r_f_utilities_ga551a53b83d383ebe136346a41b1902fa}{zclone\+File()} (all arguments are defaulted)
+
+This routine does also a logical reorganization of the random file that will be physically ordered by rank.
+
+\begin{DoxyParagraph}{Clone name generation-\/ standard conventions}
+name is composed as $<$path$>$$<$basename$>$\texorpdfstring{$<$}{<}{\bfseries{CLONE\+\_\+\+BASEEXTENSION}}\texorpdfstring{$>$}{>}.$<$extension$>$ {\bfseries{CLONE\+\_\+\+BASEEXTENSION}} is a preprocessor parameter that is added to \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} base name to clone. By default, {\bfseries{CLONE\+\_\+\+BASEEXTENSION}} is equal to $<$\+\_\+cln$>$. This base name extension is located right before the file name extension (before \texorpdfstring{$<$}{<}.\texorpdfstring{$>$}{>}).
+\end{DoxyParagraph}
+\begin{DoxyParagraph}{Clone process}
+Duplicates the file structure AND feed the new file with the actual file\textquotesingle{}s data
+\begin{DoxyItemize}
+\item same structure, same parameters
+\item however copy is done in reorganizing blocks in the order of relative ranks
+\item at creation time \+: file size is set using \+: used size + p\+Free\+Block (fallocate) Only one free block of size p\+Free\+Block is added at the end of physical file if p\+Free\+Blocks = -\/1 (default) then Block\+Target\+Size is taken (mean record size). 
+\end{DoxyItemize}
+\end{DoxyParagraph}
+\begin{DoxyParagraph}{Free blocks}
+As a result, all free blocks (and therefore all deleted blocks) from the source ZRF file will be eliminated for the cloned file surface. Only one free block, with a size equal to p\+Free\+Space bytes, will remain at the very top of physical address space.
+\end{DoxyParagraph}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Descriptor} & The current file descriptor read-\/only \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Free\+Space} & defaulted to -\/1 \+: free space to add at the top of file addresses when all used ranks are copied. by default(if -\/1), this value will be set to 1 record of average size Block\+Target\+Size. \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Clone\+Name} & optional clone file name. If omitted then created file will be name according standard clone naming conventions. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomfile_8cpp_source_l08155}{8155}} of file \mbox{\hyperlink{zrandomfile_8cpp_source}{zrandomfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomfile_8cpp_source_l08162}{zbs\+::\+ZRandom\+File\+::\+\_\+clone\+File()}}, and \mbox{\hyperlink{zcontent_2test__zrawfile_2main_8cpp_source_l00146}{Error\+Log}}.
+
+\Hypertarget{group___z_r_f_utilities_gad670572a14bef4da4d6528f886a77b82}\label{group___z_r_f_utilities_gad670572a14bef4da4d6528f886a77b82} 
+\index{ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}!zextendFile@{zextendFile}}
+\index{zextendFile@{zextendFile}!ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}}
+\doxysubsubsection{\texorpdfstring{zextendFile()}{zextendFile()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+File\+::zextend\+File (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}}}]{p\+Free\+Space }\end{DoxyParamCaption})}
+
+
+
+\doxylink{group___z_r_f_utilities_ga551a53b83d383ebe136346a41b1902fa}{ZRandom\+File\+::zclone\+File} overload method for zclone\+File using current openned file. 
+
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\doxylink{group___z_r_f_utilities_gad670572a14bef4da4d6528f886a77b82}{ZRandom\+File\+::zextend\+File} will extend the existing file space with p\+Free\+Space additional bytes.
+
+\doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} doe not need to have a manual management of its disk space, as it dynamically allocate new disk space using its extension algorithm. However, it could be smart to allocate so additional free space according the file operation we intend to make, in order to speed up the space allocation process.
+
+Additional space will be created as a Free block in free block pool, and will be available for being allocated to ZBAT. Disk space is physically allocated using posix\+\_\+fallocate, that will insure -\/best try-\/ to get contiguous disk space. \begin{DoxySeeAlso}{See also}
+\doxylink{group___z_r_f_pools}{ZRandom\+File Blocks Pools} 
+\end{DoxySeeAlso}
+\begin{DoxyNote}{Note}
+the file region that is extended is set to binary zero.
+\end{DoxyNote}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in,out}}  & {\em p\+Descriptor} & the current file descriptor for file to be extended \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Free\+Space} & additional space to extend the file with \\
+\hline
+ & {\em p\+Output} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomfile_8cpp_source_l08405}{8405}} of file \mbox{\hyperlink{zrandomfile_8cpp_source}{zrandomfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zblockpool_8h_source_l00019}{ZBlock\+Pool\+::\+\_\+add\+Sorted()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_a144d342899a9d6bd7cb3e6d1150e8765}{zbs\+::\+ZRandom\+File\+::\+\_\+get\+Extent()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_af8a119d0093390becb626461bb1a0a16}{zbs\+::\+ZRandom\+File\+::\+\_\+write\+FCB()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00133}{ZBS\+\_\+\+Free}}, and \mbox{\hyperlink{zfiledescriptor_8h_source_l00117}{zbs\+::\+ZFDOwn\+Data\+::\+ZFBT}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomfile_8cpp_source_l08957}{zbs\+::\+ZRandom\+File\+::\+\_\+reorg\+File\+Internals()}}.
+
+\Hypertarget{group___z_r_f_utilities_ga4b3b04378233ab242f5d5d75ed0d8036}\label{group___z_r_f_utilities_ga4b3b04378233ab242f5d5d75ed0d8036} 
+\index{ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}!zheaderRebuild@{zheaderRebuild}}
+\index{zheaderRebuild@{zheaderRebuild}!ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}}
+\doxysubsubsection{\texorpdfstring{zheaderRebuild()}{zheaderRebuild()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+File\+::zheader\+Rebuild (\begin{DoxyParamCaption}\item[{uri\+String}]{p\+Content\+URI,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Dump,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})}
+
+
+
+\doxylink{group___z_r_f_utilities_ga4b3b04378233ab242f5d5d75ed0d8036}{ZRandom\+File\+::zheader\+Rebuild} This static function rebuilds \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} header from an existing \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} content. 
+
+If Header is damaged or lost, \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} content cannot be accessed anymore. zheader\+Rebuild tries to create a new header from \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} content, and populate the 3 pools from existing blocks found \+:
+\begin{DoxyItemize}
+\item ZBlock\+Access\+Table \+: references all found blocks with State field as ZBS\+\_\+\+Used
+\item ZFree\+Block\+Pool \+: references all found blocks with State field as ZBS\+\_\+\+Free
+\item ZDeleted\+Block\+Pool \+: references all block headers found with state as ZBS\+\_\+\+Deleted
+\end{DoxyItemize}
+
+The previous relative order of record in absolutely not garanteed, as ZBAT is populated in the physical block order.
+
+At the end of the process, \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} header is saved to file to create the new file header. Both content file and header file are closed.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Content\+URI} & path of the \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} file\textquotesingle{}s content to rebuild the header for \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Dump} & Option if set (true) a surface scan of the file will be made before processing the file \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Output} & a FILE\texorpdfstring{$\ast$}{*} pointer where the reporting will be made. Defaulted to stdout. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+get first physical block of the file
+
+Definition at line \mbox{\hyperlink{zrandomfile_8cpp_source_l07926}{7926}} of file \mbox{\hyperlink{zrandomfile_8cpp_source}{zrandomfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomfile_8cpp_source_l09870}{decode\+\_\+\+ZBS()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrandomfile_8h_source_l01289}{zbs\+::\+ZRandom\+File\+::has\+Progress\+Call\+Back()}}, \mbox{\hyperlink{zrandomfile_8h_source_l01290}{zbs\+::\+ZRandom\+File\+::has\+Progress\+Setup\+Call\+Back()}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00134}{ZBS\+\_\+\+Deleted}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00133}{ZBS\+\_\+\+Free}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00132}{ZBS\+\_\+\+Used}}.
+
+\Hypertarget{group___z_r_f_utilities_ga074c8ed537e9ec0b9f2338b875f83757}\label{group___z_r_f_utilities_ga074c8ed537e9ec0b9f2338b875f83757} 
+\index{ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}!zremoveAll@{zremoveAll}}
+\index{zremoveAll@{zremoveAll}!ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}}
+\doxysubsubsection{\texorpdfstring{zremoveAll()}{zremoveAll()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+File\+::zremove\+All (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+zremove\+All delete all active records one by one without changing any record structure. Records are moved to free block pool with a deleted state. 
+
+
+
+Definition at line \mbox{\hyperlink{zrandomfile_8cpp_source_l08526}{8526}} of file \mbox{\hyperlink{zrandomfile_8cpp_source}{zrandomfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomfile_8cpp_source_l04453}{zbs\+::\+ZRandom\+File\+::\+\_\+remove()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00801}{zbs\+::\+ZRandom\+File\+::get\+Record\+Count()}}, and \mbox{\hyperlink{zrandomfile_8h_source_l00717}{zbs\+::\+ZRandom\+File\+::get\+URIContent()}}.
+
+\Hypertarget{group___z_r_f_utilities_ga140af0f13d2364c1add73b52d957665a}\label{group___z_r_f_utilities_ga140af0f13d2364c1add73b52d957665a} 
+\index{ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}!zreorgFile@{zreorgFile}}
+\index{zreorgFile@{zreorgFile}!ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}}
+\doxysubsubsection{\texorpdfstring{zreorgFile()}{zreorgFile()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+File\+::zreorg\+File (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Requested\+Free\+Blocks,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Dump,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})}
+
+
+
+\doxylink{group___z_r_f_utilities_ga140af0f13d2364c1add73b52d957665a}{ZRandom\+File\+::zreorg\+File} Will reorganize the current \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}\textquotesingle{}s file surface \+: eliminate remaining holes between holes and sort physical blocks according to their rank (logical position) 
+
+ZRandom\+File\+::zreorg\+Uri\+File Will reorganize \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}\textquotesingle{}s file surface for the file corresponding to the path mentionned in p\+URI \+: eliminate remaining holes between holes and sort physical blocks according to their rank (logical position)
+
+using this routine, content file is reorganized internally to the existing file using \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} capabilities \+:
+\begin{DoxyItemize}
+\item existing freeblocks allocations
+\item content file space temporary extensions
+\end{DoxyItemize}
+
+\begin{DoxyParagraph}{Result}
+As a result to this routine \+:
+\begin{DoxyItemize}
+\item holes will be eliminated
+\item no free block AND no holes will physically remain between used blocks
+\item only one free block gathering all available space will take place physically at the end of the file
+\item rank of active records is not changed.
+\end{DoxyItemize}
+\end{DoxyParagraph}
+So that, at the end of the process, file may be used as it was used previously.
+
+\begin{DoxyParagraph}{File size and extensions}
+During reorganization process, content file will most probably be extended. To this purpose, there will be a need of disk space during extension \+:
+\begin{DoxyItemize}
+\item depending to the file structure and specifically to the maximum blocksize (\doxylink{class_z_file_control_block_af2c3ac65d5f2d8297ce6a8999ea719fb}{ZFile\+Control\+Block\+::\+Max\+Size}) that could be evaluated with routines like \doxylink{group___z_r_f_s_t_a_t_s_gade4559c81b020e0b98e4758557b424e0}{ZRandom\+File\+::\+ZRFstat}, we can however state that one third of the file space will be used as an extension.
+\item this disk space will be freed at the end of the reorganization process, and content file size will be readjusted to the size it had before the start of the process.
+\end{DoxyItemize}
+\end{DoxyParagraph}
+\begin{DoxyWarning}{Warning}
+this routine cannot be used in a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} / ZIndexed\+File context. If such a processing is done, integrity of Key indexes is totally lost. Why? Because the main link between index keys and record content is block addresses. zreorg\+File changes addresses for blocks, then it will totally mess up index key orders. 
+\end{DoxyWarning}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Dump} & a FILE\texorpdfstring{$\ast$}{*} pointer where the reporting will be made. Defaulted to stdout. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError}
+\end{DoxyReturn}
+The file mentionned in p\+URI is appropriately opened and closed. Current \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} context (hold by \doxylink{classzbs_1_1_z_file_descriptor}{ZFile\+Descriptor}) is not impacted by this operation.
+
+\begin{DoxyNote}{Note}
+This is a static method. It opens for reading and close appropriately the given \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}. If this method is used from an object that holds an already opened \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}, then it reopens it for reading. Using it from an active object instance might induce lock problems.
+\end{DoxyNote}
+using this routine, content file is reorganized internally to the existing file using \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} capabilities \+:
+\begin{DoxyItemize}
+\item existing freeblocks allocations
+\item content file space temporary extensions
+\end{DoxyItemize}
+
+\begin{DoxyParagraph}{Result}
+As a result to this routine \+:
+\begin{DoxyItemize}
+\item holes will be eliminated
+\item no free block AND no holes will physically remain between used blocks
+\item only one free block gathering all available space will take place physically at the end of the file
+\item rank of active records is not changed.
+\end{DoxyItemize}
+\end{DoxyParagraph}
+So that, at the end of the process, file may be used as it was used previously.
+
+\begin{DoxyParagraph}{File size and extensions}
+During reorganization process, content file will most probably be extended. To this purpose, there will be a need of disk space during extension \+:
+\begin{DoxyItemize}
+\item depending to the file structure and specifically to the maximum blocksize (\doxylink{class_z_file_control_block_af2c3ac65d5f2d8297ce6a8999ea719fb}{ZFile\+Control\+Block\+::\+Max\+Size}) that could be evaluated with routines like \doxylink{group___z_r_f_s_t_a_t_s_gade4559c81b020e0b98e4758557b424e0}{ZRandom\+File\+::\+ZRFstat}, we can however state that one third of the file space will be used as an extension.
+\item this disk space will be freed at the end of the reorganization process, and content file size will be readjusted to the size it had before the start of the process.
+\end{DoxyItemize}
+\end{DoxyParagraph}
+\begin{DoxyWarning}{Warning}
+this routine cannot be used in a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} / ZIndexed\+File context. If such a processing is done, integrity of Key indexes is totally lost. Why? Because the main link between index keys and record content is block addresses. zreorg\+File changes addresses for blocks, then it will totally mess up index key orders.
+\end{DoxyWarning}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em an} & uri\+String containing the path for the file to be reorganized \\
+\hline
+\mbox{\texttt{ in}}  & {\em a} & FILE\texorpdfstring{$\ast$}{*} pointer where the reporting will be made. Defaulted to stdout. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError}
+\end{DoxyReturn}
+ZRandom\+File\+::\+\_\+reorg\+File Will reorganize the file surface \+: eliminate remaining holes between holes and sort physical blocks according to their rank (logical position)
+
+using this routine, content file is reorganized internally to the existing file using \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} capabilities \+:
+\begin{DoxyItemize}
+\item existing freeblocks allocations
+\item content file space temporary extensions
+\end{DoxyItemize}
+
+\begin{DoxyParagraph}{Result}
+As a result to this routine \+:
+\begin{DoxyItemize}
+\item holes will be eliminated
+\item no free block AND no holes will physically remain between used blocks
+\item only one free block gathering all available space will take place physically at the end of the file
+\item rank of active records is not changed.
+\end{DoxyItemize}
+\end{DoxyParagraph}
+So that, at the end of the process, file may be used as it was used previously.
+
+\begin{DoxyParagraph}{File size and extensions}
+During reorganization process, content file will most probably be extended. To this purpose, there will be a need of disk space during extension \+:
+\begin{DoxyItemize}
+\item depending to the file structure and specifically to the maximum blocksize (\doxylink{class_z_file_control_block_af2c3ac65d5f2d8297ce6a8999ea719fb}{ZFile\+Control\+Block\+::\+Max\+Size}) that could be evaluated with routines like \doxylink{group___z_r_f_s_t_a_t_s_gade4559c81b020e0b98e4758557b424e0}{ZRandom\+File\+::\+ZRFstat}, we can however state that one third of the file space will be used as an extension.
+\item this disk space will be freed at the end of the reorganization process, and content file size will be readjusted to the size it had before the start of the process.
+\end{DoxyItemize}
+\end{DoxyParagraph}
+\begin{DoxyWarning}{Warning}
+this routine cannot be used in a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} / ZIndexed\+File context. If such a processing is done, integrity of Key indexes is totally lost.
+\end{DoxyWarning}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Descriptor} & The current \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} to be reorganized. \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Dump} & this boolean sets (true) the option of having surface\+Scan during the progression of reorganization. Omitted by default (false) \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Output} & a FILE\texorpdfstring{$\ast$}{*} pointer where the reporting will be made. Defaulted to stdout. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomfile_8cpp_source_l08896}{8896}} of file \mbox{\hyperlink{zrandomfile_8cpp_source}{zrandomfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomfile_8cpp_source_l08162}{zbs\+::\+ZRandom\+File\+::\+\_\+clone\+File()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l08144}{zbs\+::\+ZRandom\+File\+::\+\_\+get\+URIReorg\+Clone()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00109}{zbs\+::\+ZFDOwn\+Data\+::\+\_\+is\+Open}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00601}{zbs\+::\+ZRandom\+File\+::\+\_\+remove\+File()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_abacd58b5a5a0ccf4f3e1764012280a4f}{zbs\+::\+ZRandom\+File\+::\+\_\+\+ZRFopen()}}, \mbox{\hyperlink{zheadercontrolblock_8h_source_l00105}{ZHeader\+Control\+Block\+::\+File\+Type}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00204}{zbs\+::\+ZRandom\+File\+::get\+Mode()}}, \mbox{\hyperlink{zrandomfile_8h_source_l00717}{zbs\+::\+ZRandom\+File\+::get\+URIContent()}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00201}{ZFile\+Control\+Block\+::\+Grab\+Free\+Space}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l00775}{zbs\+::\+ZRandom\+File\+::rename\+To()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l09973}{w\+Mode}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_aa7ddb770c232d732548d2bf6b4aa378a}{zbs\+::\+ZRandom\+File\+::zclose()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00114}{zbs\+::\+ZFDOwn\+Data\+::\+ZFCB}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00113}{ZFT\+\_\+\+ZRandom\+File}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00112}{zbs\+::\+ZFDOwn\+Data\+::\+ZHeader}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00087}{ZRF\+\_\+\+Exclusive}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00081}{ZRF\+\_\+\+Nothing}}, and \mbox{\hyperlink{zrandomfiletypes_8h_source_l00083}{ZRF\+\_\+\+Read\+\_\+\+Only}}.
+
+\Hypertarget{group___z_r_f_utilities_gacc8efce0bc83c4a42070fb249774c1aa}\label{group___z_r_f_utilities_gacc8efce0bc83c4a42070fb249774c1aa} 
+\index{ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}!ztruncateFile@{ztruncateFile}}
+\index{ztruncateFile@{ztruncateFile}!ZRandomFile Surface management utilities@{ZRandomFile Surface management utilities}}
+\doxysubsubsection{\texorpdfstring{ztruncateFile()}{ztruncateFile()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZRandom\+File\+::ztruncate\+File (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}}}]{p\+Free\+Space,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})}
+
+
+
+\doxylink{group___z_r_f_utilities_gacc8efce0bc83c4a42070fb249774c1aa}{ZRandom\+File\+::ztruncate\+File} will truncate the file pointed by p\+Descriptor that must be a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} opened file to leave a free block of p\+Free\+Space at the physical end of the file. 
+
+\begin{DoxyNote}{Note}
+ztruncate\+File may only reduce the amount of file space that is declared as "{}free"{}, that mean \+: space allocated to
+\begin{DoxyItemize}
+\item free block in Free\+Block\+Pool
+\item the highest address of the file In other words, it should be the last physical block in the file, and this block must be in the Free pool. 
+\end{DoxyItemize}
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See also}
+\doxylink{group___z_r_f_pools}{ZRandom\+File Blocks Pools}
+\end{DoxySeeAlso}
+Before truncating file, it could be required to \+:
+\begin{DoxyItemize}
+\item use zreorg\+File to free as much file space as possible and to put it at the highest address in a free block
+\item OR to use zclear\+File \+: Warning \+: In this case (using zclear\+File), all records are lost.
+\end{DoxyItemize}
+
+If you mention a desired free space equal to -\/1, then ztruncate\+File will take a last block equal to \doxylink{class_z_file_control_block_a40c6195556fe6bacc969acb7a9be1a0f}{ZFile\+Control\+Block\+::\+Block\+Target\+Size}, under the condition that this value is greater than size of a \doxylink{class_z_block_header}{ZBlock\+Header}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Free\+Space} & Minimum amount of free space to be left in a last free block at the physical end of the file. If a value of -\/1 is mentionned (default value) then a space of \doxylink{class_z_file_control_block_a40c6195556fe6bacc969acb7a9be1a0f}{ZFile\+Control\+Block\+::\+Block\+Target\+Size} will be allocated. \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Output} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus. In case of error, ZStatus is returned and ZException is set with appropriate message.\+see\+: \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZBSError} 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zrandomfile_8cpp_source_l08420}{8420}} of file \mbox{\hyperlink{zrandomfile_8cpp_source}{zrandomfile.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomfile_8cpp_source_l09399}{zbs\+::\+ZRandom\+File\+::\+\_\+print()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_ac088c9575a9dc83d153889eca6ef6e13}{zbs\+::\+ZRandom\+File\+::\+\_\+write\+Block\+Header()}}, \mbox{\hyperlink{classzbs_1_1_z_random_file_af8a119d0093390becb626461bb1a0a16}{zbs\+::\+ZRandom\+File\+::\+\_\+write\+FCB()}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00225}{ZFile\+Control\+Block\+::\+Allocated\+Size}}, \mbox{\hyperlink{zfilecontrolblock_8h_source_l00198}{ZFile\+Control\+Block\+::\+Block\+Target\+Size}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00104}{zbs\+::\+ZFDOwn\+Data\+::\+Content\+Fd}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00129}{zbs\+::\+ZFDOwn\+Data\+::\+Current\+Rank}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l09870}{decode\+\_\+\+ZBS()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00128}{zbs\+::\+ZFDOwn\+Data\+::\+Logical\+Position}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00127}{zbs\+::\+ZFDOwn\+Data\+::\+Physical\+Position}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00172}{zbs\+::\+ZFile\+Descriptor\+::\+URIContent}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00115}{zbs\+::\+ZFDOwn\+Data\+::\+ZBAT}}, \mbox{\hyperlink{zrandomfiletypes_8h_source_l00133}{ZBS\+\_\+\+Free}}, \mbox{\hyperlink{zfiledescriptor_8h_source_l00117}{zbs\+::\+ZFDOwn\+Data\+::\+ZFBT}}, and \mbox{\hyperlink{zfiledescriptor_8h_source_l00114}{zbs\+::\+ZFDOwn\+Data\+::\+ZFCB}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrandomfile_8cpp_source_l08957}{zbs\+::\+ZRandom\+File\+::\+\_\+reorg\+File\+Internals()}}.
+

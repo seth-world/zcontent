@@ -1,0 +1,105 @@
+\doxysection{/home/gerard/\+Development/zbasetools/znet/zbasenet/zsocket.cpp File Reference}
+\hypertarget{zsocket_8cpp}{}\label{zsocket_8cpp}\index{/home/gerard/Development/zbasetools/znet/zbasenet/zsocket.cpp@{/home/gerard/Development/zbasetools/znet/zbasenet/zsocket.cpp}}
+{\ttfamily \#include $<$config/zconfig\+\_\+network.\+h$>$}\newline
+{\ttfamily \#include $<$zbasenet/zsocket.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zexceptionmin.\+h$>$}\newline
+Include dependency graph for zsocket.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zsocket_8cpp_ada53525522ffd6062b6ea225bc14e6c7}{ZSOCKET\+\_\+\+CPP}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{zsocket_8cpp_a71c2f51ec87b0d72a100b5f06d90ce28}{catch\+Broken\+Pipe}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Signal}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{zsocket_8cpp_a46325d15808a4cbd89cab6bc42db991a}{reset\+Signals}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\begin{DoxyCompactList}\small\item\em reset\+Signals reset signals handlers to their default \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{zsocket_8cpp_a2070e52195511cff4d245da0222f9fb0}{clean\+Addrinfo\+\_\+chain}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{struct}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{addrinfo}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Addrinfo\+\_\+chain}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zsocket_8cpp_a81003a34cb0f54dc29c8652592aa4ddc}{cst\+\_\+outbuf}} =1024
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{zsocket_8cpp_ada53525522ffd6062b6ea225bc14e6c7}\label{zsocket_8cpp_ada53525522ffd6062b6ea225bc14e6c7} 
+\index{zsocket.cpp@{zsocket.cpp}!ZSOCKET\_CPP@{ZSOCKET\_CPP}}
+\index{ZSOCKET\_CPP@{ZSOCKET\_CPP}!zsocket.cpp@{zsocket.cpp}}
+\doxysubsubsection{\texorpdfstring{ZSOCKET\_CPP}{ZSOCKET\_CPP}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} ZSOCKET\+\_\+\+CPP}
+
+
+
+Definition at line \mbox{\hyperlink{zsocket_8cpp_source_l00002}{2}} of file \mbox{\hyperlink{zsocket_8cpp_source}{zsocket.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{zsocket_8cpp_a71c2f51ec87b0d72a100b5f06d90ce28}\label{zsocket_8cpp_a71c2f51ec87b0d72a100b5f06d90ce28} 
+\index{zsocket.cpp@{zsocket.cpp}!catchBrokenPipe@{catchBrokenPipe}}
+\index{catchBrokenPipe@{catchBrokenPipe}!zsocket.cpp@{zsocket.cpp}}
+\doxysubsubsection{\texorpdfstring{catchBrokenPipe()}{catchBrokenPipe()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} catch\+Broken\+Pipe (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Signal }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsocket_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{zsocket_8cpp_source}{zsocket.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{zsocket_8cpp_a2070e52195511cff4d245da0222f9fb0}\label{zsocket_8cpp_a2070e52195511cff4d245da0222f9fb0} 
+\index{zsocket.cpp@{zsocket.cpp}!cleanAddrinfo\_chain@{cleanAddrinfo\_chain}}
+\index{cleanAddrinfo\_chain@{cleanAddrinfo\_chain}!zsocket.cpp@{zsocket.cpp}}
+\doxysubsubsection{\texorpdfstring{cleanAddrinfo\_chain()}{cleanAddrinfo\_chain()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} clean\+Addrinfo\+\_\+chain (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{struct}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{addrinfo}} \texorpdfstring{$\ast$}{*}}]{p\+Addrinfo\+\_\+chain }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsocket_8cpp_source_l00656}{656}} of file \mbox{\hyperlink{zsocket_8cpp_source}{zsocket.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zserverepoll_8cpp_source_l00023}{ZServer\+Epoll\+::server\+Setup()}}, and \mbox{\hyperlink{zsocket_8cpp_source_l00084}{zbs\+::\+ZSocket\+::zsetup()}}.
+
+\Hypertarget{zsocket_8cpp_a46325d15808a4cbd89cab6bc42db991a}\label{zsocket_8cpp_a46325d15808a4cbd89cab6bc42db991a} 
+\index{zsocket.cpp@{zsocket.cpp}!resetSignals@{resetSignals}}
+\index{resetSignals@{resetSignals}!zsocket.cpp@{zsocket.cpp}}
+\doxysubsubsection{\texorpdfstring{resetSignals()}{resetSignals()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} reset\+Signals (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})}
+
+
+
+reset\+Signals reset signals handlers to their default 
+
+
+
+Definition at line \mbox{\hyperlink{zsocket_8cpp_source_l00644}{644}} of file \mbox{\hyperlink{zsocket_8cpp_source}{zsocket.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{zsocket_8cpp_a81003a34cb0f54dc29c8652592aa4ddc}\label{zsocket_8cpp_a81003a34cb0f54dc29c8652592aa4ddc} 
+\index{zsocket.cpp@{zsocket.cpp}!cst\_outbuf@{cst\_outbuf}}
+\index{cst\_outbuf@{cst\_outbuf}!zsocket.cpp@{zsocket.cpp}}
+\doxysubsubsection{\texorpdfstring{cst\_outbuf}{cst\_outbuf}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} cst\+\_\+outbuf =1024}
+
+
+
+Definition at line \mbox{\hyperlink{zsocket_8cpp_source_l00018}{18}} of file \mbox{\hyperlink{zsocket_8cpp_source}{zsocket.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zserverselectabstract_8h_source_l01784}{zbs\+::\+ZServer\+Select\+Abstract$<$ \+\_\+\+Client\+Socket\+Type, \+\_\+\+Server\+Socket\+Type $>$\+::get\+PMSreport\+All()}}, \mbox{\hyperlink{zserverselectabstract_8h_source_l01816}{zbs\+::\+ZServer\+Select\+Abstract$<$ \+\_\+\+Client\+Socket\+Type, \+\_\+\+Server\+Socket\+Type $>$\+::get\+PMSreport\+Client()}}, \mbox{\hyperlink{znetpms_8cpp_source_l00196}{ZServer\+PMS\+::get\+Server\+Report()}}, and \mbox{\hyperlink{znetpms_8cpp_source_l00054}{ZSocket\+PMS\+::get\+Socket\+Report()}}.
+

@@ -1,0 +1,312 @@
+\doxysection{zentrypoint.\+h}
+\hypertarget{zentrypoint_8h_source}{}\label{zentrypoint_8h_source}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zentrypoint.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zentrypoint.h}}
+\mbox{\hyperlink{zentrypoint_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZEntryPoint\_H}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ ZEntryPoint\_H}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <config/zconfig.h>}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <QMainWindow>}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <ztoolset/zstatus.h>}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <ztoolset/uristring.h>}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <ztoolset/zarray.h>}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00012}00012\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zrandomfiletypes_8h}{zcontent/zrandomfile/zrandomfiletypes.h}}>}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zblock_8h}{zcontent/zrandomfile/zblock.h}}>}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zrandomfile_8h}{zcontent/zrandomfile/zrandomfile.h}}>}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <QModelIndex>}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00018}00018\ \textcolor{preprocessor}{\#include\ <ztoolset/zaierrors.h>}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00020}00020\ \textcolor{keyword}{extern}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zentrypoint_8h_a68ff5dd059a4d74e955297f9fec1c2b8}{cst\_maxraisonablevalue}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00022}00022\ \textcolor{keyword}{class\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZQTableView}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00023}00023\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_visu_raw}{VisuRaw}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00024}00024\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00025}\mbox{\hyperlink{zentrypoint_8h_a44fdbf40a2b53439e554eb9a4cb46d2b}{00025}}\ \textcolor{preprocessor}{\#define\ \_\_DISPLAYCALLBACK\_\_(\_\_NAME\_\_)\ \ std::function<void\ (const\ utf8VaryingString\&)>\ \_\_NAME\_\_}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00026}\mbox{\hyperlink{zentrypoint_8h_a4de69cc1826a585669b8b6f020d7006c}{00026}}\ \textcolor{preprocessor}{\#define\ \_\_PROGRESSCALLBACK\_\_(\_\_NAME\_\_)\ \ std::function<void\ (int)>\ \_\_NAME\_\_}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00028}00028\ \textcolor{preprocessor}{\#ifndef\ \_\_VISUMODE\_\_}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00029}\mbox{\hyperlink{zentrypoint_8h_abf1988bd8ae1f33619177cc04d24e534}{00029}}\ \textcolor{preprocessor}{\#define\ \_\_VISUMODE\_\_}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00030}\mbox{\hyperlink{zentrypoint_8h_a0a9f0a2bdc43550c41659d899d024fc5}{00030}}\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{zentrypoint_8h_a0a9f0a2bdc43550c41659d899d024fc5}{VisuMode\_type}}\ :\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\_t}}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00031}00031\ \{}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00032}\mbox{\hyperlink{zentrypoint_8h_a0a9f0a2bdc43550c41659d899d024fc5a6d94841cabe507209df5c66729da64a8}{00032}}\ \ \ \ \ \mbox{\hyperlink{zentrypoint_8h_a0a9f0a2bdc43550c41659d899d024fc5a6d94841cabe507209df5c66729da64a8}{VMD\_Nothing}}\ =\ 0,}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00033}\mbox{\hyperlink{zentrypoint_8h_a0a9f0a2bdc43550c41659d899d024fc5af8af97914ef5ea9aa7032ac3b66eac2a}{00033}}\ \ \ \ \ \mbox{\hyperlink{zentrypoint_8h_a0a9f0a2bdc43550c41659d899d024fc5af8af97914ef5ea9aa7032ac3b66eac2a}{VMD\_RawSequential}}\ =\ 1,}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00034}\mbox{\hyperlink{zentrypoint_8h_a0a9f0a2bdc43550c41659d899d024fc5a6a71c5b566b9808148486dbe5350bab9}{00034}}\ \ \ \ \ \mbox{\hyperlink{zentrypoint_8h_a0a9f0a2bdc43550c41659d899d024fc5a6a71c5b566b9808148486dbe5350bab9}{VMD\_RawRandom}}\ \ \ \ \ =\ 2,}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00035}\mbox{\hyperlink{zentrypoint_8h_a0a9f0a2bdc43550c41659d899d024fc5a098240f5a64cb87b0d7586deed5b2930}{00035}}\ \ \ \ \ \mbox{\hyperlink{zentrypoint_8h_a0a9f0a2bdc43550c41659d899d024fc5a098240f5a64cb87b0d7586deed5b2930}{VMD\_Random}}\ \ \ \ \ \ \ \ =\ 3,}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00036}\mbox{\hyperlink{zentrypoint_8h_a0a9f0a2bdc43550c41659d899d024fc5acc51fb2bb8382e72ee3bf7c702ef2002}{00036}}\ \ \ \ \ \mbox{\hyperlink{zentrypoint_8h_a0a9f0a2bdc43550c41659d899d024fc5acc51fb2bb8382e72ee3bf7c702ef2002}{VMD\_Master}}\ \ \ \ \ \ \ \ =\ 4,}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00037}00037\ \ \ \ \ \mbox{\hyperlink{zentrypoint_8h_a0a9f0a2bdc43550c41659d899d024fc5ab6d1505c66395595bf490631c9db6aa3}{VMD\_Header}}\ \ \ \ \ \ \ \ =\ 5}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00038}\mbox{\hyperlink{zentrypoint_8h_a0a9f0a2bdc43550c41659d899d024fc5ab6d1505c66395595bf490631c9db6aa3}{00038}}\ \};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00039}00039\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00040}00040\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00041}00041\ \textcolor{comment}{namespace\ Ui\ \{}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00042}00042\ \textcolor{comment}{class\ ZEntryPoint;}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00043}00043\ \textcolor{comment}{\}}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00044}00044\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00048}00048\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00049}00049\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacezbs}{zbs}}\ \{}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00050}00050\ \textcolor{comment}{//class\ ZRandomFile;}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00051}00051\ \textcolor{keyword}{class\ }ZRawMasterFile;}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00052}00052\ \}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00056}00056\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_display_main}{DisplayMain}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00057}00057\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classtext_edit_m_wn}{textEditMWn}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00058}00058\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_dic_edit_m_wn}{DicEditMWn}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00060}00060\ \textcolor{keyword}{class\ }QLabel;}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00061}00061\ \textcolor{keyword}{class\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00062}00062\ \textcolor{keyword}{class\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QActionGroup}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00063}00063\ \textcolor{keyword}{class\ }QPushButton;}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00064}00064\ \textcolor{keyword}{class\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QMenu}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00065}00065\ \textcolor{keyword}{class\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStatusBar}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00066}00066\ \textcolor{keyword}{class\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QMenuBar}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00068}00068\ \textcolor{keyword}{class\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QVBoxLayout}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00069}00069\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00071}00071\ \textcolor{keyword}{extern}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_dic_edit_m_wn}{DicEditMWn}}*\ \mbox{\hyperlink{zentrypoint_8h_ad6ccf9b97101d2a125b68f248d2f7dd5}{DicEdit}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00072}00072\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00075}\mbox{\hyperlink{class_z_entry_point}{00075}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_z_entry_point}{ZEntryPoint}}\ :\ \textcolor{keyword}{public}\ QMainWindow}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00076}00076\ \{}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00077}00077\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Q\_OBJECT}}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00079}00079\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00080}00080\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{class_z_entry_point}{ZEntryPoint}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QWidget}}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{parent}}\ =\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00081}00081\ \ \ \mbox{\hyperlink{class_z_entry_point_aeaaf9ce58ce3a0af62553bf25172d416}{\string~ZEntryPoint}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00084}00084\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_a6f8714cc5a7467a7093e22acda38bcd2}{ZRFAccessByPool}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00085}00085\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_a86c5eed2c6f68748a580dd1f7cb5af42}{ZRFSurfaceAccess}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00086}00086\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00087}00087\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_a53ed34a02a8e0bf76431f511b83cd855}{openZRH}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00088}00088\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00089}\mbox{\hyperlink{class_z_entry_point_a2d0a9e0afc582e1677689ff706444163}{00089}}\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_z_entry_point_a2d0a9e0afc582e1677689ff706444163}{displayWidgetBlockOnce}}=\textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00090}\mbox{\hyperlink{class_z_entry_point_abdec6071301796ab67475de0871518f1}{00090}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_abdec6071301796ab67475de0871518f1}{displayOneLine}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRow}},\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPtr}},\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wPtrEnd}});}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00091}00091\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00092}\mbox{\hyperlink{class_z_entry_point_aa679399f7c7f025590cd3f79526662f3}{00092}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_aa679399f7c7f025590cd3f79526662f3}{displayBlockData}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00093}00093\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00094}00094\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_a7ec9ec3a3320dc87942aab64a03d5b9a}{ZRFUnlock}}();\ \ \textcolor{comment}{/*\ uses\ header\ unlock\ but\ access\ is\ made\ thru\ content\ file\ uri\ */}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00095}00095\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00096}00096\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00097}00097\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_z_entry_point_a2de2c8bc25a8866abf0ef76b0c67df04}{testRequestedSize}}(\textcolor{keyword}{const}\ uriString\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pURI}},\ ZDataBuffer\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRawData}},\ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRequestedSize}});}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00098}00098\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00099}00099\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_a5ab166156aec58f25cad062deaa3dbe1}{displayHCB}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00100}00100\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_a13c34b0fe487abb0359367e956fedd15}{displayFCB}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00101}00101\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_a4833e4a6d5e074025134494980a79090}{displayMCB}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00102}00102\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_a2e2dae32e1001ae658e9ed019b952c0b}{displayICBs}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00104}00104\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_a052eeffe34df09ed6f68d09d4b982650}{exportZMF}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QWidget}}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pParent}},\ zbs::ZRawMasterFile\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRawMasterFile}});}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00105}00105\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_a9ab9857f4d048ac377c5e6f0173125f0}{exportZMFFromSurface}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00106}00106\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_a5b815f63eeaae38986622aacccdd5071}{importZMF}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QWidget}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pParent}},\ \ ZaiErrors\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}});}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00107}00107\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_a6080ff2fbf9e51969a67f4e02eba70e1}{clearZMF}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QWidget}}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pParent}});}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00109}00109\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_a7e71cf19222614493b827ad4558c1890}{cloneZRF}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00110}00110\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_a2c8da66d9cc510c49327efbfc37c335f}{clearZRF}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00111}00111\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_a4ee1ba05ddbec2d3adc4a594524ddc51}{ZRFrebuildHeader}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00112}00112\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_aa43a9209fbbdb0b8e298de7915df336d}{ZRFSurfaceScan}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00113}00113\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_a798b072462ba337cde684dcbb9044971}{ZRFupgradetoZMF}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00114}00114\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_a070227c6433b34811bcb0276f5cd5cb3}{ZMFdowngradetoZRF}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00115}00115\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_ae5532e7715c060581ebaf6f7acdfa4b3}{ZRFReorganize}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00116}00116\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_af58cf005a19fdee2ed7ac207bf23bba5}{ZRFPutthemessinZBAT}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00117}00117\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_a97f8cd416089441f69d403db46b16aaf}{ZRFCopy}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00118}\mbox{\hyperlink{class_z_entry_point_a5387b557ef1d089dd624fba3e1a772d5}{00118}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{class_z_entry_point_a5387b557ef1d089dd624fba3e1a772d5}{ZRFRemove}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00120}00120\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_a1a38baf0b8a97a3d887349c44e0fa281}{displayPool}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pPtr}},}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00121}00121\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\_type}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pOffset}},}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00122}00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pTitle}});}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00124}00124\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_a9f44c89aedbcae302f4be6fd54591908}{displayZBAT}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00125}00125\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_ac2e71cb517dc0db8c69adffe01f6d7c1}{displayZFBT}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00126}00126\ \textcolor{comment}{//\ \ void\ displayZDBT();\ \ //\ Deprecated}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00128}00128\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_ab714cf274434c0a51a7cb2f30f6cf080}{repairIndexes}}(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pTestRun}},\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRebuildAll}});}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00129}00129\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_a6b1dfac69fcf2cbf4410f32dc6f654b3}{removeIndex}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00130}00130\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_a38c489e6d58d124f0809838ecae3375f}{addIndex}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00131}00131\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_ac5ceebe579e200714f1aa11cf059cfcd}{rebuildIndex}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00132}00132\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_a4bd92d55dae0193b643c95822c1f25c6}{extractIndex}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00133}00133\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_ae5f19e969db9a6833527b3575bd7f9bc}{dowdgrade}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00134}00134\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_aca813bf8a4829e54d02b0628737f1162}{reorganizeZMF}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00137}00137\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_a3505f1f2197292ded96e7a811117b890}{initLayout}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00138}00138\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00139}00139\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_a09e4c337278bbe796a027b6a7d22c132}{textEditMorePressed}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00140}00140\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_ae5d27822dbc04fb8a732fee901ca0261}{closeMCBCB}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QEvent}}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pEvent}});}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00141}00141\ \textcolor{comment}{//\ \ void\ closeGenlogCB(const\ QEvent\ *pEvent);}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00143}00143\ \textcolor{comment}{//\ \ textEditMWn*\ openGenLogWin();}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00144}00144\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00145}00145\ \textcolor{comment}{\ \ void\ GenlogWindisplayErrorCallBack(const\ utf8VaryingString\&\ pMessage)\ ;}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00146}00146\ \textcolor{comment}{\ \ void\ GenlogWindisplayErrorColorCB(uint8\_t\ pSeverity,const\ utf8VaryingString\&\ pMessage);}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00147}00147\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00148}00148\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_a3e0b2dc85137ff452830cf341c34c99b}{initLogWindow}}();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00150}00150\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_aae29f9a3969fe9ba7a6a0589b31f635f}{showStatusBar}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pString}});}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00151}00151\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_entry_point_aae29f9a3969fe9ba7a6a0589b31f635f}{showStatusBar}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pFormat}},...);}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00153}\mbox{\hyperlink{class_z_entry_point_a9e764ae6974c3d0e6e89b12bb7388094}{00153}}\ \ \ \mbox{\hyperlink{class_display_main}{DisplayMain}}*\ \mbox{\hyperlink{class_z_entry_point_a9e764ae6974c3d0e6e89b12bb7388094}{entityWnd}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00154}\mbox{\hyperlink{class_z_entry_point_a5e7ed5a345e437533a2d99380d9cf63a}{00154}}\ \ \ \mbox{\hyperlink{class_dic_edit_m_wn}{DicEditMWn}}*\ \mbox{\hyperlink{class_z_entry_point_a5e7ed5a345e437533a2d99380d9cf63a}{DicEdit}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00155}\mbox{\hyperlink{class_z_entry_point_a34ba7e3e03523db5681eebf180d1909a}{00155}}\ \ \ \mbox{\hyperlink{classtext_edit_m_wn}{textEditMWn}}*\ \mbox{\hyperlink{class_z_entry_point_a34ba7e3e03523db5681eebf180d1909a}{MCBWin}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00157}\mbox{\hyperlink{class_z_entry_point_aa7ea4ce19be57efa6cfce490e8493406}{00157}}\ \ \ ZaiErrors\ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_aa7ea4ce19be57efa6cfce490e8493406}{ErrorLog}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00158}00158\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00159}00159\ \textcolor{comment}{//\ \ zbs::ZRandomFile*\ \ \ \ \ RandomFile=nullptr;}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00160}\mbox{\hyperlink{class_z_entry_point_af6468b165bdd86cb43bcadf7eb9e3bf5}{00160}}\ \ \ zbs::ZRawMasterFile*\ \ \mbox{\hyperlink{class_z_entry_point_af6468b165bdd86cb43bcadf7eb9e3bf5}{RawMasterFile}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00161}00161\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00162}00162\ \textcolor{comment}{//\ \ \_\_FILEHANDLE\_\_\ \ \ \ Fd=-\/1;}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00163}\mbox{\hyperlink{class_z_entry_point_a5ea9a060401ce233f261aa29ad281788}{00163}}\ \ \ \textcolor{keywordtype}{long}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a5ea9a060401ce233f261aa29ad281788}{FileOffset}}=0;}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00164}\mbox{\hyperlink{class_z_entry_point_a8c2d40cb4c8bf989946f327db7a91f52}{00164}}\ \ \ \textcolor{keywordtype}{long}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a8c2d40cb4c8bf989946f327db7a91f52}{BlockSize}}=64;}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00165}\mbox{\hyperlink{class_z_entry_point_a99cc292b8c3b68aa6cff2a2ec815dc23}{00165}}\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a99cc292b8c3b68aa6cff2a2ec815dc23}{Width}}=16;}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00167}\mbox{\hyperlink{class_z_entry_point_ab3dc5f568adc1e496e516008c41b2257}{00167}}\ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_ab3dc5f568adc1e496e516008c41b2257}{AllFileLoaded}}=\textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00168}\mbox{\hyperlink{class_z_entry_point_a9093a2f8f2b87f3ea4ab9b66af2274d6}{00168}}\ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a9093a2f8f2b87f3ea4ab9b66af2274d6}{HeaderFile}}\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00169}00169\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00170}\mbox{\hyperlink{class_z_entry_point_a90f55519ed8b7132091363044fba3c5d}{00170}}\ \ \ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{class_z_entry_point_a90f55519ed8b7132091363044fba3c5d}{RecordNumber}}=0;}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00171}\mbox{\hyperlink{class_z_entry_point_a9fa4ea951269b695997e591cfb16e4e2}{00171}}\ \ \ \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\_type}}\ \mbox{\hyperlink{class_z_entry_point_a9fa4ea951269b695997e591cfb16e4e2}{Address}}=0;}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00173}\mbox{\hyperlink{class_z_entry_point_abaede9b7381766bef5b9fea2f0bb0ed5}{00173}}\ \ \ \mbox{\hyperlink{class_z_block}{ZBlock}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_abaede9b7381766bef5b9fea2f0bb0ed5}{Block}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00175}\mbox{\hyperlink{class_z_entry_point_a63ce2edeb7ee5acfb6aae37f2b17f02a}{00175}}\ \ \ ZArray<long>\ \ \mbox{\hyperlink{class_z_entry_point_a63ce2edeb7ee5acfb6aae37f2b17f02a}{Addresses}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00177}\mbox{\hyperlink{class_z_entry_point_af1188b252272c150da1d295a33d316a5}{00177}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\_t}}\ \mbox{\hyperlink{class_z_entry_point_af1188b252272c150da1d295a33d316a5}{OpenMode}}\ =\ \mbox{\hyperlink{zentrypoint_8h_a0a9f0a2bdc43550c41659d899d024fc5a6d94841cabe507209df5c66729da64a8}{VMD\_Nothing}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00179}\mbox{\hyperlink{class_z_entry_point_adbd22c44d735098e41134431350bff47}{00179}}\ \ \ uriString\ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_adbd22c44d735098e41134431350bff47}{URICurrent}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00181}\mbox{\hyperlink{class_z_entry_point_a76c693e852191657008326dfc7fce9a7}{00181}}\ \ \ uriString\ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a76c693e852191657008326dfc7fce9a7}{URIHeader}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00182}\mbox{\hyperlink{class_z_entry_point_a15fdfc9c54abe8710a1a71f2dd49d8ff}{00182}}\ \ \ ZDataBuffer\ \ \ \mbox{\hyperlink{class_z_entry_point_a15fdfc9c54abe8710a1a71f2dd49d8ff}{HeaderData}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00183}00183\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00184}\mbox{\hyperlink{class_z_entry_point_a2747b4dccda7f9498e5be9a510d49bd8}{00184}}\ \ \ ZDataBuffer\ \ \ \mbox{\hyperlink{class_z_entry_point_a2747b4dccda7f9498e5be9a510d49bd8}{RawData}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00186}00186\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00188}\mbox{\hyperlink{class_z_entry_point_a0536d71306540c1ce1e9a8eb4a8aad0f}{00188}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QMenuBar}}\ *\mbox{\hyperlink{class_z_entry_point_a0536d71306540c1ce1e9a8eb4a8aad0f}{menubar}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00190}00190\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00191}\mbox{\hyperlink{class_z_entry_point_a5c784d1ee2ffdc909543abf5b8f23f5b}{00191}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QMenu}}\ *\mbox{\hyperlink{class_z_entry_point_a5c784d1ee2ffdc909543abf5b8f23f5b}{generalMEn}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00192}00192\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00193}\mbox{\hyperlink{class_z_entry_point_a01144d64c8b4cb2732e74766557a93a7}{00193}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QMenu}}*\ \ \ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a01144d64c8b4cb2732e74766557a93a7}{ParametersQMe}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00194}\mbox{\hyperlink{class_z_entry_point_a4c7168f7845878271f335ecafea78882}{00194}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a4c7168f7845878271f335ecafea78882}{ParamLoadQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00195}\mbox{\hyperlink{class_z_entry_point_aedebe0a7569016849af9318340d309ae}{00195}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_aedebe0a7569016849af9318340d309ae}{ParamChangeQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00196}\mbox{\hyperlink{class_z_entry_point_ad86a51db7c54da754faf1d5986c1f0bb}{00196}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_ad86a51db7c54da754faf1d5986c1f0bb}{QuitQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00198}\mbox{\hyperlink{class_z_entry_point_a52ae582e845a4e4ef356e328c137551e}{00198}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a52ae582e845a4e4ef356e328c137551e}{TextFileVisuQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00200}\mbox{\hyperlink{class_z_entry_point_a5c91e047e90e0a8de78c497dc811862e}{00200}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a5c91e047e90e0a8de78c497dc811862e}{QuitIconQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00201}00201\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00202}00202\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00203}\mbox{\hyperlink{class_z_entry_point_adee1020c14c644be33a82c16cae84a49}{00203}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QMenu}}\ *\mbox{\hyperlink{class_z_entry_point_adee1020c14c644be33a82c16cae84a49}{rawMEn}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00204}\mbox{\hyperlink{class_z_entry_point_aa277b8c267b7b49a9b8460d68cf2ce5c}{00204}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_aa277b8c267b7b49a9b8460d68cf2ce5c}{rawDumpQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00205}\mbox{\hyperlink{class_z_entry_point_a69e785477a8da5399c001dc8fceb8800}{00205}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_a69e785477a8da5399c001dc8fceb8800}{surfaceScanRawQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00206}00206\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00207}00207\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00208}\mbox{\hyperlink{class_z_entry_point_abe52efb312b984d268bdbc8357465a59}{00208}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QMenu}}\ *\mbox{\hyperlink{class_z_entry_point_abe52efb312b984d268bdbc8357465a59}{headerMEn}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00209}\mbox{\hyperlink{class_z_entry_point_a00aa10183ab956ec8b52ea13e05986e9}{00209}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_a00aa10183ab956ec8b52ea13e05986e9}{openZRHQAc}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00210}\mbox{\hyperlink{class_z_entry_point_a911aa9e3481f02a453f9bda4f227b2fd}{00210}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_a911aa9e3481f02a453f9bda4f227b2fd}{displayFCBQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00211}\mbox{\hyperlink{class_z_entry_point_a74ed173ae673ecb093adae0fafce33dd}{00211}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_a74ed173ae673ecb093adae0fafce33dd}{displayHCBQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00212}\mbox{\hyperlink{class_z_entry_point_a66f49d44433407933e0d480e3eef0598}{00212}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_a66f49d44433407933e0d480e3eef0598}{displayMCBQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00213}\mbox{\hyperlink{class_z_entry_point_a781565454ef153af24e5b7afedc1c23a}{00213}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \mbox{\hyperlink{class_z_entry_point_a781565454ef153af24e5b7afedc1c23a}{displayICBQAc}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00214}00214\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00215}\mbox{\hyperlink{class_z_entry_point_a37785b8e2cae6b58d0f3ecbe65769c0a}{00215}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QMenu}}\ *\mbox{\hyperlink{class_z_entry_point_a37785b8e2cae6b58d0f3ecbe65769c0a}{viewpoolMEn}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00216}\mbox{\hyperlink{class_z_entry_point_ab806c40d4c722538d890e9380dc4e524}{00216}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_ab806c40d4c722538d890e9380dc4e524}{displayZBATQAc}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00217}00217\ \ \ \textcolor{comment}{//\ \ QAction\ *displayZDBTQAc\ =\ nullptr;}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00218}\mbox{\hyperlink{class_z_entry_point_a3af565c4c07f2fc2b738ff36ed79d462}{00218}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_a3af565c4c07f2fc2b738ff36ed79d462}{displayZFBTQAc}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00220}00220\ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00221}\mbox{\hyperlink{class_z_entry_point_af545080d08855ae1b1dd79b7c1d6cbd4}{00221}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QMenu}}*\ \ \ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_af545080d08855ae1b1dd79b7c1d6cbd4}{RandomFileMEn}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00223}\mbox{\hyperlink{class_z_entry_point_a1591ef66fc8c7a0e32eff4fd06286f52}{00223}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a1591ef66fc8c7a0e32eff4fd06286f52}{ZRFPoolAccessQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00224}\mbox{\hyperlink{class_z_entry_point_a4848c6bfa1f8dae558122ef6c943841e}{00224}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a4848c6bfa1f8dae558122ef6c943841e}{ZRFSurfaceAccessQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00225}\mbox{\hyperlink{class_z_entry_point_a1e89ccb66d4e9d7fb0802e7ab3bb3eef}{00225}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a1e89ccb66d4e9d7fb0802e7ab3bb3eef}{ZRFCloneQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00226}\mbox{\hyperlink{class_z_entry_point_ae293803dcc0a87ea50a6c8642ffed278}{00226}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_ae293803dcc0a87ea50a6c8642ffed278}{ZRFClearQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00227}\mbox{\hyperlink{class_z_entry_point_ae4f982899a42612352633f9b5216cb9b}{00227}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_ae4f982899a42612352633f9b5216cb9b}{ZRFReorgQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00228}\mbox{\hyperlink{class_z_entry_point_a53069e8a7c5b1ca74eea10a497695d42}{00228}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a53069e8a7c5b1ca74eea10a497695d42}{ZRFRebuildHeaderQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00229}\mbox{\hyperlink{class_z_entry_point_a076cff2213a4fdfa9d50449458501ddd}{00229}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a076cff2213a4fdfa9d50449458501ddd}{ZRFtruncateQAc}}=\textcolor{keyword}{nullptr};\textcolor{comment}{/*\ not\ implemented\ yet\ */}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00230}\mbox{\hyperlink{class_z_entry_point_a650b66a1f9627d4bb3f053af782cb613}{00230}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a650b66a1f9627d4bb3f053af782cb613}{ZRFextendQAc}}=\textcolor{keyword}{nullptr};\ \ \textcolor{comment}{/*\ not\ implemented\ yet\ */}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00231}\mbox{\hyperlink{class_z_entry_point_a61bdb724f425873f762ba3fd53208e8c}{00231}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a61bdb724f425873f762ba3fd53208e8c}{ZRFunlockQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00233}\mbox{\hyperlink{class_z_entry_point_ac1fcc56d67c282129c5cbffd7c93409b}{00233}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_ac1fcc56d67c282129c5cbffd7c93409b}{ZRFSurfaceScanQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00235}\mbox{\hyperlink{class_z_entry_point_a9383ebab338474e895dfa33ba1182d04}{00235}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_a9383ebab338474e895dfa33ba1182d04}{ZRFupgradetoZMFQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00236}00236\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00237}00237\ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00238}\mbox{\hyperlink{class_z_entry_point_a34d12ab2b9a763b99a49ffeaf403b823}{00238}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QMenu}}\ *\ \ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a34d12ab2b9a763b99a49ffeaf403b823}{MasterFileMEn}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00239}00239\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00240}\mbox{\hyperlink{class_z_entry_point_a3979cebf1990dd35ecc90a6373054181}{00240}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_a3979cebf1990dd35ecc90a6373054181}{dictionaryQAc}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00241}\mbox{\hyperlink{class_z_entry_point_acd6e7d6306b3a63339dd9d5f772572c1}{00241}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_acd6e7d6306b3a63339dd9d5f772572c1}{ZMFdowngradetoZRFQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00242}\mbox{\hyperlink{class_z_entry_point_a30b94c8bb7f60f72b2d5c5403cb48f7f}{00242}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_a30b94c8bb7f60f72b2d5c5403cb48f7f}{ZMFreorganizeQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00243}\mbox{\hyperlink{class_z_entry_point_a242b87b865704ffe9272227ffad9d9a9}{00243}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a242b87b865704ffe9272227ffad9d9a9}{ZmfDefQAc}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00244}\mbox{\hyperlink{class_z_entry_point_a3afb164891d26b58cf7a9addb069e793}{00244}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a3afb164891d26b58cf7a9addb069e793}{IndexRebuildQAc}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00245}\mbox{\hyperlink{class_z_entry_point_ac13c779d0155de550297574c1a6f5139}{00245}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_ac13c779d0155de550297574c1a6f5139}{ZMFBackupQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00246}\mbox{\hyperlink{class_z_entry_point_afa2bb1e4a126824b6e89fe16290632ad}{00246}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_afa2bb1e4a126824b6e89fe16290632ad}{ZMFRestoreQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00247}\mbox{\hyperlink{class_z_entry_point_abc56c1c8ce05a3571914ff209f94a021}{00247}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_abc56c1c8ce05a3571914ff209f94a021}{ZMFExportQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00248}\mbox{\hyperlink{class_z_entry_point_a162eaa442dd1d6f68b3bc12b120497f2}{00248}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a162eaa442dd1d6f68b3bc12b120497f2}{ZMFExportFromSurfaceQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00249}\mbox{\hyperlink{class_z_entry_point_aa1e235662db4eff0bf3a1f6ce0bb1b6b}{00249}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_aa1e235662db4eff0bf3a1f6ce0bb1b6b}{ZMFImportQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00250}\mbox{\hyperlink{class_z_entry_point_a6bc996bc1b3473bacd05fb4e0bed355f}{00250}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a6bc996bc1b3473bacd05fb4e0bed355f}{ZMFClearQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00251}\mbox{\hyperlink{class_z_entry_point_acb8cee746014b6d44a209843087ebb9b}{00251}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_acb8cee746014b6d44a209843087ebb9b}{ZMFtruncateQAc}}=\textcolor{keyword}{nullptr};\ \textcolor{comment}{/*\ not\ implemented\ yet\ */}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00252}\mbox{\hyperlink{class_z_entry_point_a54653d8b3dc871e954a612c477064135}{00252}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a54653d8b3dc871e954a612c477064135}{ZMFextendQAc}}=\textcolor{keyword}{nullptr};\ \ \textcolor{comment}{/*\ not\ implemented\ yet\ */}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00253}00253\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00254}00254\ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00256}\mbox{\hyperlink{class_z_entry_point_a531390e6949a5c170f5e78922e422619}{00256}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a531390e6949a5c170f5e78922e422619}{ZMFQueryQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00257}00257\ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00258}\mbox{\hyperlink{class_z_entry_point_a1903b0f95e73729e6e4780d51a58703f}{00258}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_a1903b0f95e73729e6e4780d51a58703f}{ZCopyQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00259}00259\ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00261}\mbox{\hyperlink{class_z_entry_point_aea1cdb983d505248db6532182f4a1eb8}{00261}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_aea1cdb983d505248db6532182f4a1eb8}{extractIndexQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00262}\mbox{\hyperlink{class_z_entry_point_ad5cecb62e2d284da850d3c0c7ff187c3}{00262}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_ad5cecb62e2d284da850d3c0c7ff187c3}{extractAllIndexesQAc}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00263}\mbox{\hyperlink{class_z_entry_point_a9c3484a3ca185d4e374235be909d9011}{00263}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_a9c3484a3ca185d4e374235be909d9011}{testRunQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00264}\mbox{\hyperlink{class_z_entry_point_aeb6439367f006fa34b8398a671926cc6}{00264}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_aeb6439367f006fa34b8398a671926cc6}{rebuilAllQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00265}\mbox{\hyperlink{class_z_entry_point_ab3eec307e965e6e8945659e2e3756639}{00265}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_ab3eec307e965e6e8945659e2e3756639}{runRepairQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00266}\mbox{\hyperlink{class_z_entry_point_a239332123aee9000ad391a23627d4cbf}{00266}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_a239332123aee9000ad391a23627d4cbf}{DictionaryQAc}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00267}\mbox{\hyperlink{class_z_entry_point_a434087382a31def221b16c812db8991d}{00267}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}\ *\mbox{\hyperlink{class_z_entry_point_a434087382a31def221b16c812db8991d}{cppparserQAc}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00268}00268\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00269}\mbox{\hyperlink{class_z_entry_point_a3f5116a6e6fe3938aeb11079d15107de}{00269}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QActionGroup}}*\ \mbox{\hyperlink{class_z_entry_point_a3f5116a6e6fe3938aeb11079d15107de}{mainQAg}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00270}00270\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00271}\mbox{\hyperlink{class_z_entry_point_af8fec05221e204e43fc07cc1984b655b}{00271}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \ \ \ \ \ \mbox{\hyperlink{class_z_entry_point_af8fec05221e204e43fc07cc1984b655b}{ZRFPutthemessQAc}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00273}00273\ \ \ \textcolor{comment}{//\ QAction*\ \ \ \ \ \ openZRFQAc=nullptr;}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00274}00274\ \textcolor{comment}{//\ \ VisuRaw*\ \ \ \ \ \ VizuRaw=nullptr;}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00276}\mbox{\hyperlink{class_z_entry_point_a4242f2a90404706523c09a6485270a67}{00276}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QWidget}}\ *\mbox{\hyperlink{class_z_entry_point_a4242f2a90404706523c09a6485270a67}{centralwidget}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00277}00277\ \textcolor{comment}{/*\ \ QLabel\ *OpenModeLbl;}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00278}00278\ \textcolor{comment}{\ \ QLabel\ *FileTypeLBl;}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00279}00279\ \textcolor{comment}{\ \ QLabel\ *FullPathLbl;}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00280}00280\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00281}\mbox{\hyperlink{class_z_entry_point_a97e594702dd401f87d9def2fcd1a7355}{00281}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStatusBar}}\ *\mbox{\hyperlink{class_z_entry_point_a97e594702dd401f87d9def2fcd1a7355}{statusbar}};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00282}00282\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00283}00283\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00285}00285\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00286}00286\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00287}00287\ \ \textcolor{comment}{//\ void\ resizeEvent(QResizeEvent*)\ override;}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00288}00288\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00289}\mbox{\hyperlink{class_z_entry_point_a96e85c0c0f51e2c7a5a00ea81a98aea4}{00289}}\ \ \ \mbox{\hyperlink{classtext_edit_m_wn}{textEditMWn}}*\ \mbox{\hyperlink{class_z_entry_point_a96e85c0c0f51e2c7a5a00ea81a98aea4}{TEMWn}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00290}00290\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00291}00291\ \textcolor{keyword}{private}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{slots}}:}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00292}00292\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00293}00293\ \ \ \textcolor{keywordtype}{void}\ actionMenuEvent(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QAction}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pAction}});}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00294}00294\ \ \ \textcolor{keywordtype}{void}\ actionClose(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pChecked}}=\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00295}00295\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00296}00296\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00298}00298\ \ \ \textcolor{keywordtype}{void}\ DicEditQuitCallback();}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00299}00299\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00300}00300\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00301}00301\ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ \ FResizeInitial=\textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00302}00302\ \ \textcolor{comment}{//\ Ui::ZEntryPoint\ *ui;}}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00303}00303\ \};}
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00305}00305\ }
+\DoxyCodeLine{\Hypertarget{zentrypoint_8h_source_l00306}00306\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZEntryPoint\_H}}
+
+\end{DoxyCode}

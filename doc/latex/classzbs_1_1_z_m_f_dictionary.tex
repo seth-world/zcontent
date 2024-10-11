@@ -1,0 +1,734 @@
+\doxysection{zbs\+::ZMFDictionary Class Reference}
+\hypertarget{classzbs_1_1_z_m_f_dictionary}{}\label{classzbs_1_1_z_m_f_dictionary}\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+
+
+{\ttfamily \#include $<$zmfdictionary.\+h$>$}
+
+
+
+Inheritance diagram for zbs\+::ZMFDictionary\+:
+% FIG 0
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}} \& \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a36bf2ca14843a126177c142865bc2b29}{\+\_\+copy\+From}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a7ddbbe0af7e3fcae27aed290a0fb793f}{ZMFDictionary}} ()
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_ab2d5dea8de8e098d968d71bc937b8de5}{ZMFDictionary}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_abd8932d1e6921a593d38cd760c2a7f00}{ZMFDictionary}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}} \&\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_ab238bde83203385e0f6f904464b06d15}{ZMFDictionary}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_meta_dic}{ZMeta\+Dic}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a5d863959307c6d61408ba2053cd085fe}{\texorpdfstring{$\sim$}{\string~}\+ZMFDictionary}} ()
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}} \& \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_abcb4cfa2aa73f94dbb0b3a0e78eebe16}{operator=}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a4448c69bf16c747736a5bbe0a9c076cd}{set\+Modified}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_ad2ea3ea2ed828de2eff944d13120e716}{clear\+Data}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey\+Dictionary}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a940fed9e33065643eb07b84685345d64}{search\+Key}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+Name}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey\+Dictionary}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a6a4f1dafe7f67fd2f3afe97d8050d67d}{search\+Key\+Case}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+Name}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a891e910255a4d6e4b84e47afb58ef27c}{search\+Key\+Rank}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+Name}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a085c9391a6b76d531300a0792b43a5b2}{search\+Key\+Rank\+Case}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+Name}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_index_field}{ZIndex\+Field}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a6ef88a39538a9fd2781f685b38a24f25}{search\+Key\+Field\+Case}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+Field\+Name}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a01e34201e1ff1d038a77b14f1170e615}{add\+Key}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey\+Dictionary}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Out\+Key\+Rank}})
+\begin{DoxyCompactList}\small\item\em add\+Key add index key definition p\+In to current \doxylink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}. ZSKey\+Dictionary\+::\+Dic\+Key\+Name is given by p\+In Dic\+Key\+Name. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_ae25e981f15742e740102a7a5c376faf5}{add\+Key}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey\+Dictionary}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+Name}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Out\+Key\+Rank}})
+\begin{DoxyCompactList}\small\item\em add\+Key add index key definition p\+In to current \doxylink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}. ZSKey\+Dictionary\+::\+Dic\+Key\+Name is replaced with p\+Key\+Name. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a513f5655b11b97956a7bda741f3ed20b}{remove\+Key}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Name}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a14b06acba02a73e61091b2f3795260b8}{remove\+Key}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key\+Rank}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a339217fe496ef8cc1b19b165536436e0}{remove\+Key}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey\+Dictionary}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Key}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_ad1e0b5f9b96bda076c0b78a64563c9c5}{set\+Dic\+Name}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Name}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_af1e89d091127bc98d9c9a383126ee47f}{set\+Version}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Version}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Major}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Minor}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{check\+Sum}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a3c636343490f42a876b9dce823bf91bb}{get\+Check\+Sum}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_aa1bb2cd1e9b0e3e7bab54ee7e2262e0d}{generate\+Check\+Sum}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+ZData\+Buffer \& \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_ad77520292429754bb16f4d857aa7d7a6}{\+\_\+export\+Append}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZDB}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_aae73a6985c3966552d4b70677d04a8cd}{\+\_\+import}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}})
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_aadf6451961157609c1d721ecbc4dd4a3}{Xml\+Save\+To\+String}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Comment}})
+\begin{DoxyCompactList}\small\item\em Xml\+Save\+To\+String saves the whole master dictionary (\doxylink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}) including its defined keys. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_aff70767c354be9475180b08604bc30e5}{to\+Xml}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Level}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Comment}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_ae03eb2e7d24badb842a0ba4f9955f7ca}{Xml\+Load\+From\+String}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Xml\+String}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Check\+Hash}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\begin{DoxyCompactList}\small\item\em Xml\+Save\+To\+String loads the whole master dictionary (\doxylink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}) including its defined keys. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a0ab213e0cbbc09f3c7b667c5cb8eb1f6}{from\+Xml}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zxml\+Node}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Zmf\+Dic\+Node}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Check\+Hash}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Deprecated}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Errorlog}})
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classzbs_1_1_z_meta_dic}{zbs\+::\+ZMeta\+Dic}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_meta_dic_a51512a17e36971bfe83b1b1026a62a08}{ZMeta\+Dic}} ()
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_meta_dic_ab3251603939d336d77194e34f15de1df}{\texorpdfstring{$\sim$}{\string~}\+ZMeta\+Dic}} ()
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_meta_dic}{ZMeta\+Dic}} \& \mbox{\hyperlink{group___z_meta_dic_group_gaee7de029f2cb17ec368bb0a0a2fb39a9}{\+\_\+copy\+From}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_meta_dic}{ZMeta\+Dic}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_meta_dic_a3bd3734c88886346b30aba2b48bfe5c8}{ZMeta\+Dic}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_meta_dic}{ZMeta\+Dic}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_meta_dic_ae7b15526254a9e81608d1b79dd6a29ad}{ZMeta\+Dic}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_meta_dic}{ZMeta\+Dic}} \&\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_meta_dic}{ZMeta\+Dic}} \& \mbox{\hyperlink{classzbs_1_1_z_meta_dic_aa5b30718dce26820c0c6639d13df5f9b}{operator=}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_meta_dic}{ZMeta\+Dic}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_meta_dic_a895bb824a8cbe812addbff18bb76ca17}{insert\+Field}} (\mbox{\hyperlink{classzbs_1_1_z_field_description}{ZField\+Description}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Field\+Def}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Rank}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_meta_dic_a44f15c788706a6f6e468100a7b204ffd}{add\+Field}} (\mbox{\hyperlink{classzbs_1_1_z_field_description}{ZField\+Description}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Field\+Def}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_meta_dic_a8f988084089565dedaa7984c64429c4d}{set\+Modified}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{group___z_meta_dic_group_ga1c422f2181d706c4444838db64f8b268}{print}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{FILE}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Output}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}})
+\begin{DoxyCompactList}\small\item\em \doxylink{group___z_meta_dic_group_ga1c422f2181d706c4444838db64f8b268}{ZMeta\+Dic\+::print} Reports the content of \doxylink{classzbs_1_1_z_meta_dic}{ZMeta\+Dic} for all fields. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_meta_dic_a48d9dd18bed61bef7277792531bf232b}{add\+Field}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Field\+Name}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Type}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Natural\+Size}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Universal\+Size}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{URF\+\_\+\+Array\+\_\+\+Count\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Array\+Count}})
+\begin{DoxyCompactList}\small\item\em \doxylink{classzbs_1_1_z_meta_dic_a44f15c788706a6f6e468100a7b204ffd}{ZMeta\+Dic\+::add\+Field} Main routine for adding dictionary field. All parameters are input. \end{DoxyCompactList}\item 
+{\footnotesize template$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+Tp}} $>$ }\\\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{classzbs_1_1_z_meta_dic_a850269d04388bc1698c22d41ee92afaa}{add\+Field\+\_\+T}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Field\+Name}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_meta_dic_group_ga9fd644d4868010e3ddb14caa97933ae3}{remove\+Field\+By\+Name}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Field\+Name}})
+\begin{DoxyCompactList}\small\item\em ZMeta\+Dic\+::zremove\+Field removes a field which name corresponds to p\+Field\+Name from the current key dictionary. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_meta_dic_group_ga54663190c0a7691f6990f4b8638944cf}{remove\+Field\+By\+Rank}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Field\+Rank}})
+\item 
+\mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \mbox{\hyperlink{group___z_meta_dic_group_ga6a66f1339221ff21cce1895f040992dd}{search\+Field\+By\+Name}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Field\+Name}}) \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}}
+\begin{DoxyCompactList}\small\item\em ZMeta\+Dic\+::zsearch\+Field\+By\+Name gets a field position (rank) in the dictionary using its field name. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \mbox{\hyperlink{group___z_meta_dic_group_ga96316cc9c4312f1169c2a3ef5de6562c}{search\+Field\+By\+Hash}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{md5}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Hash}}) \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}}
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{group___z_meta_dic_group_ga812faac955c087b046e4102f4e23c819}{Xml\+Save\+To\+String}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Comment}})
+\begin{DoxyCompactList}\small\item\em Xml\+Save\+To\+String saves the meta dictionary alone without defined keys. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{group___z_meta_dic_group_ga9cd2a9bd3e9083028d4952516072b9f7}{to\+Xml}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Level}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Comment}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_meta_dic_group_ga8f4dd26e58a207e986c723f3d023adc9}{Xml\+Load\+From\+String}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Xml\+String}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Check\+Hash}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Error\+Log}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_meta_dic_group_gaaeef3a3c733377f610141c1ba8145696}{from\+Xml}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zxml\+Node}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Meta\+Dic\+Root\+Node}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Check\+Hash}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Deprecated}}, Zai\+Errors \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Errorlog}})
+\item 
+ZData\+Buffer \& \mbox{\hyperlink{group___z_meta_dic_group_gade35c705c05823919ebcb17c336c7dbc}{\+\_\+export\+Append\+Meta\+Dic\+Flat}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZDBExport}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{group___z_meta_dic_group_ga34f3340fb4a07d4b744dac8de042b328}{\+\_\+import\+Meta\+Dic\+Flat}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_meta_dic_a8f18574ba2ffa0b5c6fbd7506bce382b}{clear}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{group___z_meta_dic_group_gaac987c01704615157aeee3f14c00931c}{write\+XML}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{FILE}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Output}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stdout}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_af1cc27c42b65d3812674bb363b485f4f}{Active}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_abc0aff0119e44bfe53fa17d7bf76b130}{Version}} = 1000000\+UL
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZDate\+Full}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_aa06016f751f5f8169494f61673ba509a}{Creation\+Date}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZDate\+Full}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_af34061dcb86390446f05d6f22b9ea69c}{Modification\+Date}}
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a881fa1193b7e622679b61b04c2008f98}{Dic\+Name}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{check\+Sum}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a17eb8780e80b272fa24826b6cdacdc37}{Check\+Sum}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_array}{ZArray}}$<$ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey\+Dictionary}} \texorpdfstring{$\ast$}{*} $>$ \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary_a523fa9a70ab50ad91904be6fee459a1f}{Key\+Dic}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Types inherited from \mbox{\hyperlink{classzbs_1_1_z_meta_dic}{zbs\+::\+ZMeta\+Dic}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} \mbox{\hyperlink{classzbs_1_1_z_array}{ZArray}}$<$ \mbox{\hyperlink{classzbs_1_1_z_field_description}{ZField\+Description}} $>$ \mbox{\hyperlink{classzbs_1_1_z_meta_dic_a255519dbc802c8d2ae34d8957d704bb1}{\+\_\+\+Base}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{classzbs_1_1_z_meta_dic}{zbs\+::\+ZMeta\+Dic}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{static}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{classzbs_1_1_z_meta_dic_a5b6032d7cb624c097bec6b314f828002}{\+\_\+compute\+Field\+Header\+Size}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Type}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00011}{11}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a7ddbbe0af7e3fcae27aed290a0fb793f}\label{classzbs_1_1_z_m_f_dictionary_a7ddbbe0af7e3fcae27aed290a0fb793f} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!ZMFDictionary@{ZMFDictionary}}
+\index{ZMFDictionary@{ZMFDictionary}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{ZMFDictionary()}{ZMFDictionary()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily ZMFDictionary\+::\+ZMFDictionary (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8cpp_source_l00008}{8}} of file \mbox{\hyperlink{zmfdictionary_8cpp_source}{zmfdictionary.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zdictionaryfile__zrf_8cpp_source_l00315}{zbs\+::\+ZDictionary\+File\+::get\+All\+Dictionaries()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_ab2d5dea8de8e098d968d71bc937b8de5}\label{classzbs_1_1_z_m_f_dictionary_ab2d5dea8de8e098d968d71bc937b8de5} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!ZMFDictionary@{ZMFDictionary}}
+\index{ZMFDictionary@{ZMFDictionary}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{ZMFDictionary()}{ZMFDictionary()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily ZMFDictionary\+::\+ZMFDictionary (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}} \&}]{p\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8cpp_source_l00011}{11}} of file \mbox{\hyperlink{zmfdictionary_8cpp_source}{zmfdictionary.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmfdictionary_8cpp_source_l00026}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_abd8932d1e6921a593d38cd760c2a7f00}\label{classzbs_1_1_z_m_f_dictionary_abd8932d1e6921a593d38cd760c2a7f00} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!ZMFDictionary@{ZMFDictionary}}
+\index{ZMFDictionary@{ZMFDictionary}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{ZMFDictionary()}{ZMFDictionary()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily ZMFDictionary\+::\+ZMFDictionary (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}} \&\&}]{p\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8cpp_source_l00015}{15}} of file \mbox{\hyperlink{zmfdictionary_8cpp_source}{zmfdictionary.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmfdictionary_8cpp_source_l00026}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_ab238bde83203385e0f6f904464b06d15}\label{classzbs_1_1_z_m_f_dictionary_ab238bde83203385e0f6f904464b06d15} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!ZMFDictionary@{ZMFDictionary}}
+\index{ZMFDictionary@{ZMFDictionary}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{ZMFDictionary()}{ZMFDictionary()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily ZMFDictionary\+::\+ZMFDictionary (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_meta_dic}{ZMeta\+Dic}} \&}]{p\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8cpp_source_l00020}{20}} of file \mbox{\hyperlink{zmfdictionary_8cpp_source}{zmfdictionary.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmetadic_8cpp_source_l00451}{zbs\+::\+ZMeta\+Dic\+::\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a5d863959307c6d61408ba2053cd085fe}\label{classzbs_1_1_z_m_f_dictionary_a5d863959307c6d61408ba2053cd085fe} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!````~ZMFDictionary@{\texorpdfstring{$\sim$}{\string~}ZMFDictionary}}
+\index{````~ZMFDictionary@{\texorpdfstring{$\sim$}{\string~}ZMFDictionary}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ZMFDictionary()}{\string~ZMFDictionary()}}
+{\footnotesize\ttfamily zbs\+::\+ZMFDictionary\+::\texorpdfstring{$\sim$}{\string~}\+ZMFDictionary (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00023}{23}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+References \mbox{\hyperlink{zmfdictionary_8h_source_l00042}{clear\+Data()}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a36bf2ca14843a126177c142865bc2b29}\label{classzbs_1_1_z_m_f_dictionary_a36bf2ca14843a126177c142865bc2b29} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!\_copyFrom@{\_copyFrom}}
+\index{\_copyFrom@{\_copyFrom}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{\_copyFrom()}{\_copyFrom()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}} \& ZMFDictionary\+::\+\_\+copy\+From (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}} \&}]{p\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{zmfdictionary_8cpp_source}{zmfdictionary.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmetadic_8cpp_source_l00451}{zbs\+::\+ZMeta\+Dic\+::\+\_\+copy\+From()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00027}{Active}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00034}{Check\+Sum}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00042}{clear\+Data()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00030}{Creation\+Date}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00033}{Dic\+Name}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{Key\+Dic}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00031}{Modification\+Date}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00029}{Version}}.
+
+
+
+Referenced by \mbox{\hyperlink{zdictionaryfile_8cpp_source_l00015}{zbs\+::\+ZDictionary\+File\+::\+\_\+copy\+From()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00036}{operator=()}}, \mbox{\hyperlink{zdictionaryfile_8cpp_source_l00127}{zbs\+::\+ZDictionary\+File\+::set\+Dictionary()}}, \mbox{\hyperlink{zdictionaryfile__zrf_8h_source_l00096}{zbs\+::\+ZDictionary\+File\+::set\+Dictionary()}}, \mbox{\hyperlink{zmfdictionary_8cpp_source_l00015}{ZMFDictionary()}}, and \mbox{\hyperlink{zmfdictionary_8cpp_source_l00011}{ZMFDictionary()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_ad77520292429754bb16f4d857aa7d7a6}\label{classzbs_1_1_z_m_f_dictionary_ad77520292429754bb16f4d857aa7d7a6} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!\_exportAppend@{\_exportAppend}}
+\index{\_exportAppend@{\_exportAppend}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{\_exportAppend()}{\_exportAppend()}}
+{\footnotesize\ttfamily ZData\+Buffer \& ZMFDictionary\+::\+\_\+export\+Append (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+ZDB }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8cpp_source_l00127}{127}} of file \mbox{\hyperlink{zmfdictionary_8cpp_source}{zmfdictionary.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmetadic_8cpp_source_l00337}{zbs\+::\+ZMeta\+Dic\+::\+\_\+export\+Append\+Meta\+Dic\+Flat()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{Key\+Dic}}, and \mbox{\hyperlink{zmfdictionary_8cpp_source_l00510}{zbs\+::\+ZMFDic\+Export\+Header\+::set()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmfdictionary_8h_source_l00136}{generate\+Check\+Sum()}}, \mbox{\hyperlink{zdictionaryfile__zrf_8cpp_source_l00202}{zbs\+::\+ZDictionary\+File\+::search\+And\+Write()}}, and \mbox{\hyperlink{zdictionaryfile__zrf_8cpp_source_l00013}{zbs\+::\+ZDictionary\+File\+::zinitalize()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_aae73a6985c3966552d4b70677d04a8cd}\label{classzbs_1_1_z_m_f_dictionary_aae73a6985c3966552d4b70677d04a8cd} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!\_import@{\_import}}
+\index{\_import@{\_import}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{\_import()}{\_import()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZMFDictionary\+::\+\_\+import (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Ptr\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8cpp_source_l00145}{145}} of file \mbox{\hyperlink{zmfdictionary_8cpp_source}{zmfdictionary.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmfdictionary_8cpp_source_l00563}{zbs\+::\+ZMFDic\+Export\+Header\+::\+\_\+import()}}, \mbox{\hyperlink{zmetadic_8cpp_source_l00361}{zbs\+::\+ZMeta\+Dic\+::\+\_\+import\+Meta\+Dic\+Flat()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{Key\+Dic}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00594}{zbs\+::\+ZMaster\+Control\+Block\+::\+\_\+import()}}, \mbox{\hyperlink{zdictionaryfile__zrf_8cpp_source_l00358}{zbs\+::\+ZDictionary\+File\+::find\+Dictionary\+By\+Name()}}, and \mbox{\hyperlink{zdictionaryfile__zrf_8cpp_source_l00202}{zbs\+::\+ZDictionary\+File\+::search\+And\+Write()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_ae25e981f15742e740102a7a5c376faf5}\label{classzbs_1_1_z_m_f_dictionary_ae25e981f15742e740102a7a5c376faf5} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!addKey@{addKey}}
+\index{addKey@{addKey}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{addKey()}{addKey()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZMFDictionary\+::add\+Key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey\+Dictionary}} \texorpdfstring{$\ast$}{*}}]{p\+In,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Key\+Name,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \&}]{p\+Out\+Key\+Rank }\end{DoxyParamCaption})}
+
+
+
+add\+Key add index key definition p\+In to current \doxylink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}. ZSKey\+Dictionary\+::\+Dic\+Key\+Name is replaced with p\+Key\+Name. 
+
+\begin{DoxyReturn}{Returns}
+Key rank or -\/1 if errored 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8cpp_source_l00087}{87}} of file \mbox{\hyperlink{zmfdictionary_8cpp_source}{zmfdictionary.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{Key\+Dic}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a01e34201e1ff1d038a77b14f1170e615}\label{classzbs_1_1_z_m_f_dictionary_a01e34201e1ff1d038a77b14f1170e615} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!addKey@{addKey}}
+\index{addKey@{addKey}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{addKey()}{addKey()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZMFDictionary\+::add\+Key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey\+Dictionary}} \texorpdfstring{$\ast$}{*}}]{p\+In,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \&}]{p\+Out\+Key\+Rank }\end{DoxyParamCaption})}
+
+
+
+add\+Key add index key definition p\+In to current \doxylink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}. ZSKey\+Dictionary\+::\+Dic\+Key\+Name is given by p\+In Dic\+Key\+Name. 
+
+\begin{DoxyReturn}{Returns}
+Key rank or -\/1 if errored 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8cpp_source_l00058}{58}} of file \mbox{\hyperlink{zmfdictionary_8cpp_source}{zmfdictionary.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{Key\+Dic}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_ad2ea3ea2ed828de2eff944d13120e716}\label{classzbs_1_1_z_m_f_dictionary_ad2ea3ea2ed828de2eff944d13120e716} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!clearData@{clearData}}
+\index{clearData@{clearData}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{clearData()}{clearData()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZMFDictionary\+::clear\+Data (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00042}{42}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+References \mbox{\hyperlink{zmfdictionary_8h_source_l00034}{Check\+Sum}}, \mbox{\hyperlink{zmetadic_8h_source_l00112}{zbs\+::\+ZMeta\+Dic\+::clear()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{Key\+Dic}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmfdictionary_8cpp_source_l00026}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00023}{\texorpdfstring{$\sim$}{\string~}\+ZMFDictionary()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a0ab213e0cbbc09f3c7b667c5cb8eb1f6}\label{classzbs_1_1_z_m_f_dictionary_a0ab213e0cbbc09f3c7b667c5cb8eb1f6} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!fromXml@{fromXml}}
+\index{fromXml@{fromXml}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{fromXml()}{fromXml()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZMFDictionary\+::from\+Xml (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zxml\+Node}} \texorpdfstring{$\ast$}{*}}]{p\+Zmf\+Dic\+Node,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Check\+Hash,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Deprecated,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Errorlog }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8cpp_source_l00372}{372}} of file \mbox{\hyperlink{zmfdictionary_8cpp_source}{zmfdictionary.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmfdictionary_8h_source_l00027}{Active}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00030}{Creation\+Date}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00033}{Dic\+Name}}, \mbox{\hyperlink{zmetadic_8cpp_source_l00623}{zbs\+::\+ZMeta\+Dic\+::from\+Xml()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{Key\+Dic}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00031}{Modification\+Date}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00029}{Version}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmfdictionary_8cpp_source_l00290}{Xml\+Load\+From\+String()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_aa1bb2cd1e9b0e3e7bab54ee7e2262e0d}\label{classzbs_1_1_z_m_f_dictionary_aa1bb2cd1e9b0e3e7bab54ee7e2262e0d} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!generateCheckSum@{generateCheckSum}}
+\index{generateCheckSum@{generateCheckSum}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{generateCheckSum()}{generateCheckSum()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZMFDictionary\+::generate\+Check\+Sum (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00136}{136}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+References \mbox{\hyperlink{zmfdictionary_8cpp_source_l00127}{\+\_\+export\+Append()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00034}{Check\+Sum}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a3c636343490f42a876b9dce823bf91bb}\label{classzbs_1_1_z_m_f_dictionary_a3c636343490f42a876b9dce823bf91bb} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!getCheckSum@{getCheckSum}}
+\index{getCheckSum@{getCheckSum}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{getCheckSum()}{getCheckSum()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{check\+Sum}} \texorpdfstring{$\ast$}{*} zbs\+::\+ZMFDictionary\+::get\+Check\+Sum (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00135}{135}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+References \mbox{\hyperlink{zmfdictionary_8h_source_l00034}{Check\+Sum}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_abcb4cfa2aa73f94dbb0b3a0e78eebe16}\label{classzbs_1_1_z_m_f_dictionary_abcb4cfa2aa73f94dbb0b3a0e78eebe16} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!operator=@{operator=}}
+\index{operator=@{operator=}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}} \& zbs\+::\+ZMFDictionary\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}} \&}]{p\+In }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00036}{36}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+References \mbox{\hyperlink{zmfdictionary_8cpp_source_l00026}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a14b06acba02a73e61091b2f3795260b8}\label{classzbs_1_1_z_m_f_dictionary_a14b06acba02a73e61091b2f3795260b8} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!removeKey@{removeKey}}
+\index{removeKey@{removeKey}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{removeKey()}{removeKey()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} zbs\+::\+ZMFDictionary\+::remove\+Key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Key\+Rank }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00112}{112}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{Key\+Dic}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a513f5655b11b97956a7bda741f3ed20b}\label{classzbs_1_1_z_m_f_dictionary_a513f5655b11b97956a7bda741f3ed20b} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!removeKey@{removeKey}}
+\index{removeKey@{removeKey}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{removeKey()}{removeKey()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} zbs\+::\+ZMFDictionary\+::remove\+Key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Name }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00104}{104}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{Key\+Dic}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a339217fe496ef8cc1b19b165536436e0}\label{classzbs_1_1_z_m_f_dictionary_a339217fe496ef8cc1b19b165536436e0} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!removeKey@{removeKey}}
+\index{removeKey@{removeKey}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{removeKey()}{removeKey()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} zbs\+::\+ZMFDictionary\+::remove\+Key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey\+Dictionary}} \texorpdfstring{$\ast$}{*}}]{p\+Key }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00119}{119}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{Key\+Dic}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a940fed9e33065643eb07b84685345d64}\label{classzbs_1_1_z_m_f_dictionary_a940fed9e33065643eb07b84685345d64} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!searchKey@{searchKey}}
+\index{searchKey@{searchKey}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{searchKey()}{searchKey()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey\+Dictionary}} \texorpdfstring{$\ast$}{*} zbs\+::\+ZMFDictionary\+::search\+Key (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Key\+Name }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00052}{52}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{Key\+Dic}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a6a4f1dafe7f67fd2f3afe97d8050d67d}\label{classzbs_1_1_z_m_f_dictionary_a6a4f1dafe7f67fd2f3afe97d8050d67d} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!searchKeyCase@{searchKeyCase}}
+\index{searchKeyCase@{searchKeyCase}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{searchKeyCase()}{searchKeyCase()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey\+Dictionary}} \texorpdfstring{$\ast$}{*} zbs\+::\+ZMFDictionary\+::search\+Key\+Case (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Key\+Name }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00059}{59}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{Key\+Dic}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00594}{zbs\+::\+ZMaster\+Control\+Block\+::\+\_\+import()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a6ef88a39538a9fd2781f685b38a24f25}\label{classzbs_1_1_z_m_f_dictionary_a6ef88a39538a9fd2781f685b38a24f25} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!searchKeyFieldCase@{searchKeyFieldCase}}
+\index{searchKeyFieldCase@{searchKeyFieldCase}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{searchKeyFieldCase()}{searchKeyFieldCase()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_index_field}{ZIndex\+Field}} \texorpdfstring{$\ast$}{*} zbs\+::\+ZMFDictionary\+::search\+Key\+Field\+Case (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Key\+Field\+Name }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00081}{81}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{Key\+Dic}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a891e910255a4d6e4b84e47afb58ef27c}\label{classzbs_1_1_z_m_f_dictionary_a891e910255a4d6e4b84e47afb58ef27c} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!searchKeyRank@{searchKeyRank}}
+\index{searchKeyRank@{searchKeyRank}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{searchKeyRank()}{searchKeyRank()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} zbs\+::\+ZMFDictionary\+::search\+Key\+Rank (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Key\+Name }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00066}{66}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{Key\+Dic}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a085c9391a6b76d531300a0792b43a5b2}\label{classzbs_1_1_z_m_f_dictionary_a085c9391a6b76d531300a0792b43a5b2} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!searchKeyRankCase@{searchKeyRankCase}}
+\index{searchKeyRankCase@{searchKeyRankCase}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{searchKeyRankCase()}{searchKeyRankCase()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} zbs\+::\+ZMFDictionary\+::search\+Key\+Rank\+Case (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Key\+Name }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00073}{73}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{Key\+Dic}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_ad1e0b5f9b96bda076c0b78a64563c9c5}\label{classzbs_1_1_z_m_f_dictionary_ad1e0b5f9b96bda076c0b78a64563c9c5} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!setDicName@{setDicName}}
+\index{setDicName@{setDicName}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{setDicName()}{setDicName()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZMFDictionary\+::set\+Dic\+Name (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Name }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00127}{127}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+References \mbox{\hyperlink{zmfdictionary_8h_source_l00033}{Dic\+Name}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a4448c69bf16c747736a5bbe0a9c076cd}\label{classzbs_1_1_z_m_f_dictionary_a4448c69bf16c747736a5bbe0a9c076cd} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!setModified@{setModified}}
+\index{setModified@{setModified}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{setModified()}{setModified()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZMFDictionary\+::set\+Modified (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8cpp_source_l00050}{50}} of file \mbox{\hyperlink{zmfdictionary_8cpp_source}{zmfdictionary.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zdictionaryfile_8cpp_source_l00112}{zbs\+::\+ZDictionary\+File\+::save\+\_\+xml()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_af1e89d091127bc98d9c9a383126ee47f}\label{classzbs_1_1_z_m_f_dictionary_af1e89d091127bc98d9c9a383126ee47f} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!setVersion@{setVersion}}
+\index{setVersion@{setVersion}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{setVersion()}{setVersion()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZMFDictionary\+::set\+Version (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Version,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Major,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Minor }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00128}{128}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00029}{Version}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_aff70767c354be9475180b08604bc30e5}\label{classzbs_1_1_z_m_f_dictionary_aff70767c354be9475180b08604bc30e5} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!toXml@{toXml}}
+\index{toXml@{toXml}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{toXml()}{toXml()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} ZMFDictionary\+::to\+Xml (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Level,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Comment }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8cpp_source_l00238}{238}} of file \mbox{\hyperlink{zmfdictionary_8cpp_source}{zmfdictionary.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmfdictionary_8h_source_l00027}{Active}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00030}{Creation\+Date}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00033}{Dic\+Name}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{Key\+Dic}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00031}{Modification\+Date}}, \mbox{\hyperlink{zmetadic_8cpp_source_l00547}{zbs\+::\+ZMeta\+Dic\+::to\+Xml()}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00029}{Version}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmfdictionary_8cpp_source_l00229}{Xml\+Save\+To\+String()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_ae03eb2e7d24badb842a0ba4f9955f7ca}\label{classzbs_1_1_z_m_f_dictionary_ae03eb2e7d24badb842a0ba4f9955f7ca} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!XmlLoadFromString@{XmlLoadFromString}}
+\index{XmlLoadFromString@{XmlLoadFromString}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{XmlLoadFromString()}{XmlLoadFromString()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZMFDictionary\+::\+Xml\+Load\+From\+String (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Xml\+String,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Check\+Hash,  }\item[{Zai\+Errors \texorpdfstring{$\ast$}{*}}]{p\+Error\+Log }\end{DoxyParamCaption})}
+
+
+
+Xml\+Save\+To\+String loads the whole master dictionary (\doxylink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}) including its defined keys. 
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8cpp_source_l00290}{290}} of file \mbox{\hyperlink{zmfdictionary_8cpp_source}{zmfdictionary.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zrandomfiletypes_8h_source_l00164}{\+\_\+\+\_\+\+VERSION\+\_\+\+MAX\+\_\+\+\_\+}}, \mbox{\hyperlink{zmf__limits_8h_source_l00015}{\+\_\+\+\_\+\+ZDIC\+\_\+\+FORMER\+\_\+\+VERSION\+\_\+\+\_\+}}, \mbox{\hyperlink{zmfdictionary_8cpp_source_l00372}{from\+Xml()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{group___z_random_file_group_ga4260f69ec231a569bbaacb6fc0a927d2}{get\+Version\+Num()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zdictionaryfile_8cpp_source_l00151}{zbs\+::\+ZDictionary\+File\+::import\+From\+Xml\+String()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_aadf6451961157609c1d721ecbc4dd4a3}\label{classzbs_1_1_z_m_f_dictionary_aadf6451961157609c1d721ecbc4dd4a3} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!XmlSaveToString@{XmlSaveToString}}
+\index{XmlSaveToString@{XmlSaveToString}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{XmlSaveToString()}{XmlSaveToString()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} ZMFDictionary\+::\+Xml\+Save\+To\+String (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Comment }\end{DoxyParamCaption})}
+
+
+
+Xml\+Save\+To\+String saves the whole master dictionary (\doxylink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}) including its defined keys. 
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8cpp_source_l00229}{229}} of file \mbox{\hyperlink{zmfdictionary_8cpp_source}{zmfdictionary.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmf__limits_8h_source_l00016}{\+\_\+\+\_\+\+ZDIC\+\_\+\+VERSION\+\_\+\+\_\+}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zmfdictionary_8cpp_source_l00238}{to\+Xml()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zdictionaryfile_8cpp_source_l00146}{zbs\+::\+ZDictionary\+File\+::export\+To\+Xml\+String()}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_af1cc27c42b65d3812674bb363b485f4f}\label{classzbs_1_1_z_m_f_dictionary_af1cc27c42b65d3812674bb363b485f4f} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!Active@{Active}}
+\index{Active@{Active}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{Active}{Active}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZMFDictionary\+::\+Active =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00027}{27}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmfdictionary_8cpp_source_l00026}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zmfdictionary_8cpp_source_l00372}{from\+Xml()}}, \mbox{\hyperlink{dicedit_8cpp_source_l03970}{Dic\+Edit\+MWn\+::manage\+Dictionary\+Files()}}, \mbox{\hyperlink{dicedit_8cpp_source_l04026}{Dic\+Edit\+MWn\+::save\+Or\+Create\+Dictionary\+File()}}, \mbox{\hyperlink{dicedit_8cpp_source_l04148}{Dic\+Edit\+MWn\+::save\+To\+Dictionary\+File()}}, \mbox{\hyperlink{dicedit_8cpp_source_l04202}{Dic\+Edit\+MWn\+::save\+To\+Xml\+File()}}, \mbox{\hyperlink{zdictionaryfile__zrf_8cpp_source_l00202}{zbs\+::\+ZDictionary\+File\+::search\+And\+Write()}}, and \mbox{\hyperlink{zmfdictionary_8cpp_source_l00238}{to\+Xml()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a17eb8780e80b272fa24826b6cdacdc37}\label{classzbs_1_1_z_m_f_dictionary_a17eb8780e80b272fa24826b6cdacdc37} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!CheckSum@{CheckSum}}
+\index{CheckSum@{CheckSum}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{CheckSum}{CheckSum}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{check\+Sum}}\texorpdfstring{$\ast$}{*} zbs\+::\+ZMFDictionary\+::\+Check\+Sum =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00034}{34}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmfdictionary_8cpp_source_l00026}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00042}{clear\+Data()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00136}{generate\+Check\+Sum()}}, and \mbox{\hyperlink{zmfdictionary_8h_source_l00135}{get\+Check\+Sum()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_aa06016f751f5f8169494f61673ba509a}\label{classzbs_1_1_z_m_f_dictionary_aa06016f751f5f8169494f61673ba509a} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!CreationDate@{CreationDate}}
+\index{CreationDate@{CreationDate}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{CreationDate}{CreationDate}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZDate\+Full}} zbs\+::\+ZMFDictionary\+::\+Creation\+Date}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00030}{30}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmfdictionary_8cpp_source_l00026}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zdictionaryfile_8cpp_source_l00052}{zbs\+::\+ZDictionary\+File\+::create()}}, \mbox{\hyperlink{zmfdictionary_8cpp_source_l00372}{from\+Xml()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l01839}{File\+Generate\+MWn\+::\+Menu\+Action()}}, \mbox{\hyperlink{zmfdictionary_8cpp_source_l00238}{to\+Xml()}}, and \mbox{\hyperlink{zdictionaryfile__zrf_8cpp_source_l00013}{zbs\+::\+ZDictionary\+File\+::zinitalize()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a881fa1193b7e622679b61b04c2008f98}\label{classzbs_1_1_z_m_f_dictionary_a881fa1193b7e622679b61b04c2008f98} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!DicName@{DicName}}
+\index{DicName@{DicName}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{DicName}{DicName}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} zbs\+::\+ZMFDictionary\+::\+Dic\+Name}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00033}{33}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmfdictionary_8cpp_source_l00026}{\+\_\+copy\+From()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l00580}{File\+Generate\+MWn\+::data\+Setup\+From\+Dictionary()}}, \mbox{\hyperlink{zdictionaryfile__zrf_8cpp_source_l00358}{zbs\+::\+ZDictionary\+File\+::find\+Dictionary\+By\+Name()}}, \mbox{\hyperlink{zmfdictionary_8cpp_source_l00372}{from\+Xml()}}, \mbox{\hyperlink{dicedit_8cpp_source_l00450}{Dic\+Edit\+MWn\+::general\+Action\+Event()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l03304}{File\+Generate\+MWn\+::\+Gen\+File()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l00098}{File\+Generate\+MWn\+::init\+Layout()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l02502}{File\+Generate\+MWn\+::load\+External\+Dic\+File()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l02448}{File\+Generate\+MWn\+::load\+External\+Xml\+Dic()}}, \mbox{\hyperlink{dicedit_8cpp_source_l03970}{Dic\+Edit\+MWn\+::manage\+Dictionary\+Files()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l01839}{File\+Generate\+MWn\+::\+Menu\+Action()}}, \mbox{\hyperlink{dicedit_8cpp_source_l04026}{Dic\+Edit\+MWn\+::save\+Or\+Create\+Dictionary\+File()}}, \mbox{\hyperlink{dicedit_8cpp_source_l04148}{Dic\+Edit\+MWn\+::save\+To\+Dictionary\+File()}}, \mbox{\hyperlink{dicedit_8cpp_source_l04202}{Dic\+Edit\+MWn\+::save\+To\+Xml\+File()}}, \mbox{\hyperlink{zdictionaryfile__zrf_8cpp_source_l00202}{zbs\+::\+ZDictionary\+File\+::search\+And\+Write()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00127}{set\+Dic\+Name()}}, and \mbox{\hyperlink{zmfdictionary_8cpp_source_l00238}{to\+Xml()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_a523fa9a70ab50ad91904be6fee459a1f}\label{classzbs_1_1_z_m_f_dictionary_a523fa9a70ab50ad91904be6fee459a1f} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!KeyDic@{KeyDic}}
+\index{KeyDic@{KeyDic}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{KeyDic}{KeyDic}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_array}{ZArray}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey\+Dictionary}}\texorpdfstring{$\ast$}{*}$>$ zbs\+::\+ZMFDictionary\+::\+Key\+Dic}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00038}{38}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmfdictionary_8cpp_source_l00026}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zmfdictionary_8cpp_source_l00127}{\+\_\+export\+Append()}}, \mbox{\hyperlink{zmfdictionary_8cpp_source_l00145}{\+\_\+import()}}, \mbox{\hyperlink{zmfdictionary_8cpp_source_l00087}{add\+Key()}}, \mbox{\hyperlink{zmfdictionary_8cpp_source_l00058}{add\+Key()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00042}{clear\+Data()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l01737}{File\+Generate\+MWn\+::\+Compute()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l00580}{File\+Generate\+MWn\+::data\+Setup\+From\+Dictionary()}}, \mbox{\hyperlink{zmasterfile_8cpp_source_l00180}{zbs\+::\+ZMaster\+File\+::extract\+Key\+Values()}}, \mbox{\hyperlink{zmfdictionary_8cpp_source_l00372}{from\+Xml()}}, \mbox{\hyperlink{zcppgenerate_8cpp_source_l00785}{zbs\+::\+ZCpp\+Generate\+::gen\+Cpp\+Keys()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l03304}{File\+Generate\+MWn\+::\+Gen\+File()}}, \mbox{\hyperlink{zcppgenerate_8cpp_source_l00646}{zbs\+::\+ZCpp\+Generate\+::gen\+Header()}}, \mbox{\hyperlink{zcppgenerate_8cpp_source_l00758}{zbs\+::\+ZCpp\+Generate\+::gen\+Header\+Keys()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l02170}{File\+Generate\+MWn\+::\+Key\+Delete()}}, \mbox{\hyperlink{dicedit_8cpp_source_l01431}{Dic\+Edit\+MWn\+::read\+Write\+Action\+Event()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00112}{remove\+Key()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00104}{remove\+Key()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00119}{remove\+Key()}}, \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00735}{zbs\+::\+ZMaster\+Control\+Block\+::report()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00052}{search\+Key()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00059}{search\+Key\+Case()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00081}{search\+Key\+Field\+Case()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00066}{search\+Key\+Rank()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00073}{search\+Key\+Rank\+Case()}}, and \mbox{\hyperlink{zmfdictionary_8cpp_source_l00238}{to\+Xml()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_af34061dcb86390446f05d6f22b9ea69c}\label{classzbs_1_1_z_m_f_dictionary_af34061dcb86390446f05d6f22b9ea69c} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!ModificationDate@{ModificationDate}}
+\index{ModificationDate@{ModificationDate}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{ModificationDate}{ModificationDate}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZDate\+Full}} zbs\+::\+ZMFDictionary\+::\+Modification\+Date}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00031}{31}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmfdictionary_8cpp_source_l00026}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zdictionaryfile_8cpp_source_l00052}{zbs\+::\+ZDictionary\+File\+::create()}}, \mbox{\hyperlink{zmfdictionary_8cpp_source_l00372}{from\+Xml()}}, \mbox{\hyperlink{zdictionaryfile__zrf_8cpp_source_l00202}{zbs\+::\+ZDictionary\+File\+::search\+And\+Write()}}, \mbox{\hyperlink{zmfdictionary_8cpp_source_l00238}{to\+Xml()}}, and \mbox{\hyperlink{zdictionaryfile__zrf_8cpp_source_l00013}{zbs\+::\+ZDictionary\+File\+::zinitalize()}}.
+
+\Hypertarget{classzbs_1_1_z_m_f_dictionary_abc0aff0119e44bfe53fa17d7bf76b130}\label{classzbs_1_1_z_m_f_dictionary_abc0aff0119e44bfe53fa17d7bf76b130} 
+\index{zbs::ZMFDictionary@{zbs::ZMFDictionary}!Version@{Version}}
+\index{Version@{Version}!zbs::ZMFDictionary@{zbs::ZMFDictionary}}
+\doxysubsubsection{\texorpdfstring{Version}{Version}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} zbs\+::\+ZMFDictionary\+::\+Version = 1000000\+UL}
+
+
+
+Definition at line \mbox{\hyperlink{zmfdictionary_8h_source_l00029}{29}} of file \mbox{\hyperlink{zmfdictionary_8h_source}{zmfdictionary.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmfdictionary_8cpp_source_l00026}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zmfdictionary_8cpp_source_l00372}{from\+Xml()}}, \mbox{\hyperlink{dicedit_8cpp_source_l03970}{Dic\+Edit\+MWn\+::manage\+Dictionary\+Files()}}, \mbox{\hyperlink{filegeneratedlg_8cpp_source_l01839}{File\+Generate\+MWn\+::\+Menu\+Action()}}, \mbox{\hyperlink{dicedit_8cpp_source_l04026}{Dic\+Edit\+MWn\+::save\+Or\+Create\+Dictionary\+File()}}, \mbox{\hyperlink{dicedit_8cpp_source_l04148}{Dic\+Edit\+MWn\+::save\+To\+Dictionary\+File()}}, \mbox{\hyperlink{dicedit_8cpp_source_l04202}{Dic\+Edit\+MWn\+::save\+To\+Xml\+File()}}, \mbox{\hyperlink{zdictionaryfile__zrf_8cpp_source_l00202}{zbs\+::\+ZDictionary\+File\+::search\+And\+Write()}}, \mbox{\hyperlink{zmfdictionary_8h_source_l00128}{set\+Version()}}, and \mbox{\hyperlink{zmfdictionary_8cpp_source_l00238}{to\+Xml()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zmfdictionary_8h}{zmfdictionary.\+h}}\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zmfdictionary_8cpp}{zmfdictionary.\+cpp}}\end{DoxyCompactItemize}

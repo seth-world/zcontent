@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+ <zcppparserrules version = "0.30-0">
+   <!--   apart from builtin conversions 
+ there are possible adhoc conversions with with a given syntax to a ZType (i,e, "DocumentMetaType" gives ZType_AtomicS64)  -->
+   <typeconversiontable>
+      <typeconversion>
+         <syntax>ZAccessRight_t</syntax>
+         <ztype>ZType_AtomicU32 </ztype>
+         <capacity>1</capacity>
+         <headersize>4</headersize>
+         <universalsize>4</universalsize>
+         <naturalsize>4</naturalsize>
+      </typeconversion>
+      <typeconversion>
+         <syntax>utfdescString</syntax>
+         <ztype>ZType_Utf8FixedString</ztype>
+         <capacity>250</capacity>
+         <headersize>4</headersize>
+         <universalsize>250</universalsize>
+         <naturalsize>250</naturalsize>
+      </typeconversion>
+      <typeconversion>
+         <syntax>DataRank_type</syntax>
+         <ztype>ZType_AtomicU64 </ztype>
+         <capacity>1</capacity>
+         <headersize>4</headersize>
+         <universalsize>8</universalsize>
+         <naturalsize>8</naturalsize>
+      </typeconversion>
+      <typeconversion>
+         <syntax>utfcodeString</syntax>
+         <ztype>ZType_Utf8FixedString</ztype>
+         <capacity>250</capacity>
+         <headersize>4</headersize>
+         <universalsize>250</universalsize>
+         <naturalsize>250</naturalsize>
+      </typeconversion>
+      <typeconversion>
+         <syntax>ZResourceCode</syntax>
+         <ztype>ZType_Resource</ztype>
+         <capacity>1</capacity>
+         <headersize>4</headersize>
+         <universalsize>8</universalsize>
+         <naturalsize>8</naturalsize>
+      </typeconversion>
+     <typeconversion>
+         <syntax>ZResource</syntax>
+         <ztype>ZType_Resource</ztype>
+         <capacity>1</capacity>
+         <headersize>4</headersize>
+         <universalsize>8</universalsize>
+         <naturalsize>8</naturalsize>
+      </typeconversion>
+      <typeconversion>
+         <syntax>Storage_t</syntax>
+         <ztype>ZType_AtomicS64</ztype>
+         <capacity>1</capacity>
+         <headersize>4</headersize>
+         <universalsize>9</universalsize>
+         <naturalsize>8</naturalsize>
+      </typeconversion>
+      <typeconversion>
+         <syntax>DocumentMetaType</syntax>
+         <ztype>ZType_AtomicS64 </ztype>
+         <capacity>1</capacity>
+         <headersize>4</headersize>
+         <universalsize>9</universalsize>
+         <naturalsize>8</naturalsize>
+      </typeconversion>
+      <typeconversion>
+         <syntax>DocSize_t</syntax>
+         <ztype>ZType_AtomicU64 </ztype>
+         <capacity>1</capacity>
+         <headersize>4</headersize>
+         <universalsize>8</universalsize>
+         <naturalsize>8</naturalsize>
+      </typeconversion>
+      <typeconversion>
+         <syntax>size_t</syntax>
+         <ztype>ZType_AtomicU64 </ztype>
+         <capacity>1</capacity>
+         <headersize>4</headersize>
+         <universalsize>8</universalsize>
+         <naturalsize>8</naturalsize>
+      </typeconversion>
+      <typeconversion>
+         <syntax>ZDataBuffer</syntax>
+         <ztype>ZType_Blob</ztype>
+         <capacity>1</capacity>
+         <headersize>12</headersize>
+         <universalsize>0</universalsize>
+         <naturalsize>0</naturalsize>
+      </typeconversion>
+   </typeconversiontable>
+ </zcppparserrules>

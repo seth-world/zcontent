@@ -1,0 +1,64 @@
+\doxysection{/home/gerard/\+Development/zbasetools/znet/zmail/zmailabstract.cpp File Reference}
+\hypertarget{zmailabstract_8cpp}{}\label{zmailabstract_8cpp}\index{/home/gerard/Development/zbasetools/znet/zmail/zmailabstract.cpp@{/home/gerard/Development/zbasetools/znet/zmail/zmailabstract.cpp}}
+{\ttfamily \#include "{}zmailabstract.\+h"{}}\newline
+Include dependency graph for zmailabstract.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zmailabstract_8cpp_a3ae302090b04826652474e7db36cbd0b}{get\+ZSMOMIME}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZSMOP}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_z_s_m_o_p___m_i_m_e__struct}{ZSMOP\+\_\+\+MIME\+\_\+struct}} \mbox{\hyperlink{zmailabstract_8cpp_aaee6e3b3552c295e1c4f57ab7f42ee57}{ZSMOPMIME}} \mbox{[}$\,$\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{zmailabstract_8cpp_a3ae302090b04826652474e7db36cbd0b}\label{zmailabstract_8cpp_a3ae302090b04826652474e7db36cbd0b} 
+\index{zmailabstract.cpp@{zmailabstract.cpp}!getZSMOMIME@{getZSMOMIME}}
+\index{getZSMOMIME@{getZSMOMIME}!zmailabstract.cpp@{zmailabstract.cpp}}
+\doxysubsubsection{\texorpdfstring{getZSMOMIME()}{getZSMOMIME()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} get\+ZSMOMIME (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+ZSMOP }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmailabstract_8cpp_source_l00012}{12}} of file \mbox{\hyperlink{zmailabstract_8cpp_source}{zmailabstract.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zmailabstract_8h_source_l00044}{ZSMOP\+\_\+\+MIME\+\_\+struct\+::\+MIME}}, \mbox{\hyperlink{zmailabstract_8h_source_l00043}{ZSMOP\+\_\+\+MIME\+\_\+struct\+::\+ZSMOP}}, \mbox{\hyperlink{zmailabstract_8h_source_l00038}{ZSMOP\+\_\+\+MIME\+\_\+\+Mask}}, \mbox{\hyperlink{zmailabstract_8h_source_l00013}{ZSMOP\+\_\+\+Nothing}}, and \mbox{\hyperlink{zmailabstract_8cpp_source_l00004}{ZSMOPMIME}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsmtp_8cpp_source_l00790}{ZSmtp\+::send\+Mime\+Mail()}}, \mbox{\hyperlink{zsmtp_8cpp_source_l01097}{ZSmtp\+::send\+Mime\+Mail\+Multi()}}, and \mbox{\hyperlink{zsmtp_8cpp_source_l00923}{ZSmtp\+::send\+Mime\+Mail\+Old()}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{zmailabstract_8cpp_aaee6e3b3552c295e1c4f57ab7f42ee57}\label{zmailabstract_8cpp_aaee6e3b3552c295e1c4f57ab7f42ee57} 
+\index{zmailabstract.cpp@{zmailabstract.cpp}!ZSMOPMIME@{ZSMOPMIME}}
+\index{ZSMOPMIME@{ZSMOPMIME}!zmailabstract.cpp@{zmailabstract.cpp}}
+\doxysubsubsection{\texorpdfstring{ZSMOPMIME}{ZSMOPMIME}}
+{\footnotesize\ttfamily \mbox{\hyperlink{struct_z_s_m_o_p___m_i_m_e__struct}{ZSMOP\+\_\+\+MIME\+\_\+struct}} ZSMOPMIME\mbox{[}$\,$\mbox{]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\{}
+\DoxyCodeLine{\ \ \ \ \{\mbox{\hyperlink{zmailabstract_8h_a113c69042ba052bd95022efa082f1fdeac4d1c9b27a0ff7e873968bc7cce43b77}{ZSMOP\_BODYPLAIN}},\textcolor{stringliteral}{"{}text/plain"{}}\},}
+\DoxyCodeLine{\ \ \ \ \{\mbox{\hyperlink{zmailabstract_8h_a113c69042ba052bd95022efa082f1fdeaffc01ff121100a4ccd99d34e77461f9a}{ZSMOP\_BODYRTF}},\textcolor{stringliteral}{"{}text/rtf"{}}\},}
+\DoxyCodeLine{\ \ \ \ \{\mbox{\hyperlink{zmailabstract_8h_a113c69042ba052bd95022efa082f1fdea9b4953ea652a7c71ed528af57c23e37b}{ZSMOP\_BODYHTML}},\textcolor{stringliteral}{"{}text/html"{}}\},}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \ \{\mbox{\hyperlink{zmailabstract_8h_a113c69042ba052bd95022efa082f1fdeaa1530011de8014b6bfde235507454093}{ZSMOP\_Nothing}},\ \textcolor{stringliteral}{"{}text/plain"{}}\}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line \mbox{\hyperlink{zmailabstract_8cpp_source_l00004}{4}} of file \mbox{\hyperlink{zmailabstract_8cpp_source}{zmailabstract.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zmailabstract_8cpp_source_l00012}{get\+ZSMOMIME()}}.
+

@@ -1,0 +1,45 @@
+\doxysection{Physical files naming conventions}
+\hypertarget{group___z_m_f_file_naming}{}\label{group___z_m_f_file_naming}\index{Physical files naming conventions@{Physical files naming conventions}}
+Despite the user sees and uses one file pathname, there are many files that are created and maintained.
+
+It is important to know how names are deduced and generated, and what names are naming.
+
+\begin{DoxyNote}{Note}
+Some extensions cannot be used for naming a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} or a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} because reserved for internal naming purposes. This extension is by default \texorpdfstring{$<$}{<}.zrh\texorpdfstring{$>$}{>} and is defined by a preprocessor parameter named {\bfseries{HEADER\+\_\+\+FILEEXTENSION}} In the same way, it is forbidden to use in a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} main file name the extension given by {\bfseries{ZINDEX\+\_\+\+FILEEXTENSION}}. This extension is by default \texorpdfstring{$<$}{<}.zix\texorpdfstring{$>$}{>} and is reserved to main ZIndex\+File names. Both of these preprocessor parameters are defined in file \doxylink{zrandomfiletypes_8h}{zrandomfiletypes.\+h} .
+\end{DoxyNote}
+\hypertarget{group___z_m_f_file_naming_FNPConventions}{}\doxysubsubsection{\texorpdfstring{Conventions}{Conventions}}\label{group___z_m_f_file_naming_FNPConventions}
+In a full file name /home/mydir/filename.ext
+
+
+\begin{DoxyItemize}
+\item /home/mydir is the directory path
+\item filename is the root name
+\item ext is the extension
+\end{DoxyItemize}\hypertarget{group___z_m_f_file_naming_FNPZRFName}{}\doxysubsubsection{\texorpdfstring{Naming conventions for ZRandom\+File}{Naming conventions for ZRandomFile}}\label{group___z_m_f_file_naming_FNPZRFName}
+For each ZRF, user gives one file name and (its directory path).
+
+This name will apply to ZRF main content file, i. e. the main file where effective data will be stored in.
+
+This file is later on called "{}main file"{} or "{}main ZRF file"{} (or even later "{}main ZMF file"{} for \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}).
+
+Additionnally to this file, \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} adds a file that will contain all infra-\/data describing the main file.
+
+This file is called a "{}header file"{}.
+
+
+\begin{DoxyItemize}
+\item Header file naming convention
+\end{DoxyItemize}
+
+\begin{DoxyVerb}    <ZRandomFile root name>.<__HEADER_FILEEXTENSION__>
+\end{DoxyVerb}
+\hypertarget{group___z_m_f_file_naming_FNPZMFName}{}\doxysubsubsection{\texorpdfstring{Naming conventions for ZMaster\+File}{Naming conventions for ZMasterFile}}\label{group___z_m_f_file_naming_FNPZMFName}
+\doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} main file itself is named with \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} naming conventions.
+
+ZIndex\+File Index files root names generation rule
+
+\begin{DoxyVerb}          <ZMasterFile root name>[<index name>]-<index rank>
+\end{DoxyVerb}
+
+
+As ZIndex\+File file is itself a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}, it then will be subject to \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}\textquotesingle{}s naming conventions. 

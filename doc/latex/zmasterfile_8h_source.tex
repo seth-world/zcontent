@@ -1,0 +1,61 @@
+\doxysection{zmasterfile.\+h}
+\hypertarget{zmasterfile_8h_source}{}\label{zmasterfile_8h_source}\index{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zmasterfile.h@{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zmasterfile.h}}
+\mbox{\hyperlink{zmasterfile_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZMASTERFILE\_H}}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ ZMASTERFILE\_H}}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{zrawmasterfile_8h}{zrawmasterfile.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{zmasterfile__utilities_8h}{zmasterfile\_utilities.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <ztoolset/zlimit.h>}}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <cstdarg>}}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00011}00011\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00014}00014\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_u_r_f_field}{URFField}};}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00015}00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacezbs}{zbs}}\ \{}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00017}\mbox{\hyperlink{classzbs_1_1_z_master_file}{00017}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classzbs_1_1_z_master_file}{ZMasterFile}}\ :\ \textcolor{keyword}{public}\ ZRawMasterFile}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00018}00018\ \{}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00019}00019\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00020}00020\ \ \ \mbox{\hyperlink{classzbs_1_1_z_master_file_a3446f1c645e270fba4ae8a98f6bfbe9b}{ZMasterFile}}();}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00021}00021\ \ \ \mbox{\hyperlink{classzbs_1_1_z_master_file_abe795c65829c7655987b86e2e66f6bff}{\string~ZMasterFile}}();}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00023}00023\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_master_file_a60538950fe01943983711da4f62acb93}{zopen}}\ \ \ \ \ \ \ (\textcolor{keyword}{const}\ uriString\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pURI}},\ \mbox{\hyperlink{group___z_random_file_group_ga56eb3fcb4ae8195c33bd0a42f8347700}{zmode\_type}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMode}}=\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748a0743866dd41df202fe6bd7e46739603d}{ZRF\_All}});\ \textcolor{comment}{//\ shadows\ ZRawMasterFile::zopen}}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00024}\mbox{\hyperlink{classzbs_1_1_z_master_file_ae09f98e736f2c729405431b9b3229aaa}{00024}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_master_file_ae09f98e736f2c729405431b9b3229aaa}{zopen}}\ \ \ \ \ \ \ (\mbox{\hyperlink{group___z_random_file_group_ga56eb3fcb4ae8195c33bd0a42f8347700}{zmode\_type}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMode}}=\mbox{\hyperlink{group___z_random_file_group_gga0ca91adb56325c8089a3650b73138748a0743866dd41df202fe6bd7e46739603d}{ZRF\_All}})\ \{\textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classzbs_1_1_z_master_file_ae09f98e736f2c729405431b9b3229aaa}{zopen}}(getURIContent(),\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMode}}));\}}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00026}00026\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_master_file_a7365eeb7aeddd8da7a0478ce3541126a}{loadDictionary}}\ ();}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00027}00027\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_master_file_a2d5f5d5cb17bf9b2af8a88c9a0cb2910}{setDictionary}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classzbs_1_1_z_m_f_dictionary}{ZMFDictionary}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pDictionary}});}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00028}00028\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_master_file_a7793d2a9e8284a831a96e3b2730b0307}{setExternDictionary}}(\textcolor{keyword}{const}\ uriString\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pDicPath}});}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00030}00030\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{classzbs_1_1_z_master_file_afd10dfbb4b71de83d5163524ee6e86f6}{getDictionaryName}}()\ ;}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00040}00040\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_master_file_a477acede404d4eb4a644ba7d49be51dc}{rebuildIndex}}(\textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIndexRank}},\ \textcolor{keywordtype}{long}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRank}},\ ZaiErrors\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}})\ ;}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00042}00042\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_master_file_ae0e998f4d59e300cf1aa473b2525ff95}{extractKeyValues}}(\textcolor{keyword}{const}\ ZDataBuffer\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRecord}},}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00043}00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ZDataBuffer\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pKeyContent}},}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00044}00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIndexRank}},}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00045}00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ZaiErrors\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}});}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00047}00047\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_master_file_aec6fe0b09192354ae82f1a629555fcae}{extractFieldValue}}(\textcolor{keyword}{const}\ ZDataBuffer\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRecord}},}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ZDataBuffer\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pKeyValue}},}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00049}00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRank}},}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ZaiErrors\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}});}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00052}00052\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_master_file_a77f93edcd2f8f6b3c6fa8c1f810bd20e}{getURFFieldByRank}}(\textcolor{keyword}{const}\ ZDataBuffer\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRecord}},\ \mbox{\hyperlink{class_u_r_f_field}{URFField}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pURFField}},\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRank}},\ ZaiErrors*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pErrorLog}});}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00054}\mbox{\hyperlink{classzbs_1_1_z_master_file_aa4f32c694a58ecfcd6780f01ec965cdf}{00054}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_master_file_aa4f32c694a58ecfcd6780f01ec965cdf}{searchForValue}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pSearchPhrase}});}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00056}00056\ \};}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00058}00058\ \}\textcolor{comment}{//\ namespace\ zbs}}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00060}\mbox{\hyperlink{zmasterfile_8h_add22f43c4f759094c7970e4c3577deb3}{00060}}\ \mbox{\hyperlink{class_u_r_f_field}{URFField}}\ \mbox{\hyperlink{zmasterfile_8h_add22f43c4f759094c7970e4c3577deb3}{getURFField}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}*\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pPtrIn}});}
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{zmasterfile_8h_source_l00062}00062\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZMASTERFILE\_H}}
+
+\end{DoxyCode}

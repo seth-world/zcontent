@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+ <zmasterfileparameters version = "'2.3-1'">
+   <generalparameters>
+      <defaultworkdirectory>/home/gerard/Development/zmftest</defaultworkdirectory>
+      <defaultparamdirectory>/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata</defaultparamdirectory>
+      <defaulticondirectory>/home/gerard/Development/zbasetools/zqt/icons</defaulticondirectory>
+      <fixedfont></fixedfont>
+   </generalparameters>
+ </zmasterfileparameters>

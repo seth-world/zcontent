@@ -1,0 +1,24 @@
+% Headers & footers
+% Gerard POLO 24/01/2017
+\usepackage{fancyhdr}
+\usepackage{datetime}
+\pagestyle{fancyplain}
+\fancyhead[LE]{\fancyplain{}{\bfseries\thepage}}
+\fancyhead[CE]{\fancyplain{}{}}
+\fancyhead[RE]{\fancyplain{}{\bfseries\leftmark}}
+\fancyhead[LO]{\fancyplain{}{\bfseries\rightmark}}
+\fancyhead[CO]{\fancyplain{}{}}
+\fancyhead[RO]{\fancyplain{}{\bfseries\thepage}}
+\fancyfoot[LE]{\fancyplain{}{}}
+\fancyfoot[CE]{\fancyplain{}{\today\ \currenttime}}
+\fancyfoot[RE]{\fancyplain{}{\bfseries\scriptsize Indexed Content Management V 2.0 }}
+\fancyfoot[LO]{\fancyplain{}{\bfseries\scriptsize Indexed Content Management V 2.0 }}
+\fancyfoot[CO]{\fancyplain{}{\today\ \currenttime}}
+\fancyfoot[RO]{\fancyplain{}{}}
+\renewcommand{\footrulewidth}{0.4pt}
+\renewcommand{\chaptermark}[1]{%
+  \markboth{#1}{}%
+}
+\renewcommand{\sectionmark}[1]{%
+  \markright{\thesection\ #1}%
+}

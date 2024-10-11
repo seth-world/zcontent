@@ -18,7 +18,9 @@
 #include <QAction>
 #include <QActionGroup>
 
-#include <QStatusBar>
+//#include <QStatusBar>
+#include <zqt/zqtwidget/zqstatusbar.h>
+
 #include <QLabel>
 
 #include <QTableView>
@@ -53,6 +55,7 @@
 #include "zmfprogressmwn.h"
 
 #include "zhelp.h"
+#include "zquerywizardmwd.h"
 
 #include <zcontent/zindexedfile/zsearchentitycontext.h>
 
@@ -137,6 +140,8 @@ void ZSearchQueryMWd::initLayout()
 {
     menubar = new QMenuBar(this);
     menubar->setGeometry(QRect(0, 0, 814, 20));
+
+    setWindowTitle("Content MasterFile Query");
 
     QHBoxLayout *ButtonBox=nullptr;
 
@@ -350,7 +355,13 @@ void ZSearchQueryMWd::initLayout()
 
     Parser->setEntityDisplayCallBack(std::bind(&ZSearchQueryMWd::DisplayEntity, this,placeholders::_1));
 
-    displayMWn->registerDisplayColorCallBack(&Parser->ErrorLog);
+//    displayMWn->registerDisplayColorCallBack(&Parser->ErrorLog);
+
+    displayMWn->setErrorLog(ErrorLog);
+//    Parser->ErrorLog->setDisplayColorCallBack(std::bind(&textEditMWn::displayColorCallBack,this,std::placeholders::_1,std::placeholders::_2));
+    Parser->ErrorLog.setDisplayColorCallBack(std::bind(&ZSearchQueryMWd::displayErrorColorCB,this,std::placeholders::_1,std::placeholders::_2));
+    ErrorLog->setDisplayColorCallBack(std::bind(&ZSearchQueryMWd::displayErrorColorCB,this,std::placeholders::_1,std::placeholders::_2));
+
     displayMWn->show();
 
     uriString wXMLSymbol = GeneralParameters.getParamDirectory();
@@ -588,13 +599,14 @@ ZSearchQueryMWd::MenuTriggered(QAction* pAction)
     return;
   }
   if (pAction == WizardQAc){
-      ExecuteClicked();
+      QueryWizardMWd = new ZQueryWizardMWd(ErrorLog,this);
+      QueryWizardMWd->show();
       return;
   }
 
   if (pAction == ExecQAc){
-    ExecuteClicked();
-    return;
+      ExecuteClicked();
+      return;
   }
   if (pAction == SaveInstructionsQAc){
     SaveInstructions();
@@ -645,6 +657,7 @@ ZSearchQueryMWd::EntityListLBlClicked ()
 void
 ZSearchQueryMWd::ExecuteClicked ()
 {
+  ErrorLog->setAutoPrintAll();
   ZStatus wSt=ZS_SUCCESS;
   utf8VaryingString wQuery = QueryQTe->getText();
   statusbar->clearMessage();
@@ -705,6 +718,7 @@ ZSearchQueryMWd::ExecuteClicked ()
     }
     if (Parser->ErrorLog.hasSomething())
         statusbar->showMessage(Parser->ErrorLog.last()->Message(),30000); /* timout is expressed in milliseconds */
+    emit (instructionHasBeenExecuted(&wSearchContext));
     return ;
   } // if (wSt!=ZS_SUCCESS)
 
@@ -717,7 +731,7 @@ ZSearchQueryMWd::ExecuteClicked ()
     DisplayCurrentEntity();
   */
   QueryQTe->clear();
-
+  emit (instructionHasBeenExecuted(&wSearchContext));
 } // ZSearchQueryMWd::ExecuteBTnClicked
 
 
@@ -1561,14 +1575,23 @@ void ZSearchQueryMWd::SaveInstructions() {
 }
 
 
-void ZSearchQueryMWd::displayErrorCallBack(const utf8VaryingString& pMessage) {
-  if (displayMWn!=nullptr)
-    displayMWn->appendText(pMessage);
-  else
-    fprintf(stderr,pMessage.toCChar());
+void ZSearchQueryMWd::displayErrorCallBack(const utf8VaryingString& pMessage)
+{
+    if (QueryWizardMWd!=nullptr) {
+        QueryWizardMWd->statusBarMessage(pMessage);
+    }
+    if (displayMWn!=nullptr)
+        displayMWn->appendText(pMessage);
+    else {
+        fprintf(stderr,pMessage.toCChar());
+        }
 }
 
 void ZSearchQueryMWd::displayErrorColorCB(uint8_t pSeverity, const utf8VaryingString& pMessage) {
+
+    if (QueryWizardMWd!=nullptr) {
+        QueryWizardMWd->statusBarMessage(pMessage);
+    }
   if (displayMWn==nullptr) {
      fprintf(stderr,pMessage.toCChar());
     return;

@@ -1,0 +1,26 @@
+\doxysection{Record \& file locking}
+\hypertarget{group___main_lock_group}{}\label{group___main_lock_group}\index{Record \& file locking@{Record \& file locking}}
+\hypertarget{group___main_lock_group_MLockFile}{}\doxysubsubsection{\texorpdfstring{File locking}{File locking}}\label{group___main_lock_group_MLockFile}
+The whole file could be locked using its file header using one of the lock mask. This lock will apply to the entire file.
+
+Only one user-\/process can own a lock on a whole file at a time.\hypertarget{group___main_lock_group_MLockRecord}{}\doxysubsubsection{\texorpdfstring{ZMF record locking}{ZMF record locking}}\label{group___main_lock_group_MLockRecord}
+
+\begin{DoxyItemize}
+\item Adding, suppressing, Modifying indexes File must be open in exclusive mode with read write capabilities \+: ZRF\+\_\+\+Exclusive \texorpdfstring{$\vert$}{|} ZRF\+\_\+\+Write No lock is necessary. Must take care of processes opening the file in file header ZReserved
+\item Creating a ZMF record no special lock
+\item removing ZMF record
+\begin{DoxyItemize}
+\item prepare \+: main file\textquotesingle{}s record is locked at ZLock\+\_\+\+Write \texorpdfstring{$\vert$}{|} ZLock\+\_\+\+Delete
+\item rollback \+: lock is released on the record in the end of rollback and lock is destroyed in the file header\textquotesingle{}s lock table
+\item commit \+: lock is destroyed in the file header\textquotesingle{}s lock table. while marking free block lock is cleared on block.
+\end{DoxyItemize}
+\item modifying a record \+:
+\begin{DoxyItemize}
+\item get \+: an exclusive lock is put on record \+: ZLock\+\_\+\+All
+\item rollback lock is released on the record in the end of rollback and lock is destroyed in the file header\textquotesingle{}s lock table
+\item commit lock is released on the record in the end of rollback and lock is destroyed in the file header\textquotesingle{}s lock table
+\end{DoxyItemize}
+\item Additionally locks can be manually put on records using zlock , zunlock \+: users manages the lock / unlock
+\item in case of failure \+: a full unlock frees all locks for a file
+\item restart after error \+: locks may be destroyed. 
+\end{DoxyItemize}

@@ -1,0 +1,275 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/zcontentvisumain\+\_\+1.h File Reference}
+\hypertarget{zcontentvisumain__1_8h}{}\label{zcontentvisumain__1_8h}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zcontentvisumain\_1.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zcontentvisumain\_1.h}}
+{\ttfamily \#include $<$config/zconfig.\+h$>$}\newline
+{\ttfamily \#include $<$QMain\+Window$>$}\newline
+{\ttfamily \#include $<$ztoolset/zstatus.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/uristring.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zarray.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zrandomfile/zrandomfiletypes.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zrandomfile/zblock.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zrandomfile/zrandomfile.\+h$>$}\newline
+{\ttfamily \#include $<$QModel\+Index$>$}\newline
+{\ttfamily \#include $<$ztoolset/zaierrors.\+h$>$}\newline
+Include dependency graph for zcontentvisumain\+\_\+1.\+h\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_scan_block}{Scan\+Block}}
+\item 
+class \mbox{\hyperlink{class_z_content_visu_main}{ZContent\+Visu\+Main}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_ui}{Ui}}
+\item 
+namespace \mbox{\hyperlink{namespacezbs}{zbs}}
+\begin{DoxyCompactList}\small\item\em ZSIndex\+Field\+\_\+struct Dictionary single field definition \+: one key may be composed of many single fields not necessarily contiguous in the master file\textquotesingle{}s data structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zcontentvisumain__1_8h_a44fdbf40a2b53439e554eb9a4cb46d2b}{\+\_\+\+\_\+\+DISPLAYCALLBACK\+\_\+\+\_\+}}(\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}})~\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}}\&)$>$ \mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zcontentvisumain__1_8h_a4de69cc1826a585669b8b6f020d7006c}{\+\_\+\+\_\+\+PROGRESSCALLBACK\+\_\+\+\_\+}}(\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}})~\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}})$>$ \mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937}{Scan\+Block\+\_\+type}} \+: uint8\+\_\+t \{ \newline
+\mbox{\hyperlink{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937af5a02e5efea01322143b170ddf564f9d}{SBT\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937ac8960ffed7b147c8674f06388be93abf}{SBT\+\_\+\+Correct}} = 1
+, \mbox{\hyperlink{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937aeb15cd8e83f1c0cafc065f5bdb5721a4}{SBT\+\_\+\+Inv\+Header}} = 2
+, \mbox{\hyperlink{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937a0e1cb7ee285399e0ef1ab5974a1978fa}{SBT\+\_\+\+Miss\+EB}} = 4
+, \newline
+\mbox{\hyperlink{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937a23a43826e814a1fa4242cf46b0ae166c}{SBT\+\_\+\+Inv\+Blk\+Size}} = 8
+ \}
+\item 
+enum \mbox{\hyperlink{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5}{Visu\+Mode\+\_\+type}} \+: uint8\+\_\+t \{ \newline
+\mbox{\hyperlink{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5a6d94841cabe507209df5c66729da64a8}{VMD\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5af8af97914ef5ea9aa7032ac3b66eac2a}{VMD\+\_\+\+Raw\+Sequential}} = 1
+, \mbox{\hyperlink{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5a6a71c5b566b9808148486dbe5350bab9}{VMD\+\_\+\+Raw\+Random}} = 2
+, \mbox{\hyperlink{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5a098240f5a64cb87b0d7586deed5b2930}{VMD\+\_\+\+Random}} = 3
+, \newline
+\mbox{\hyperlink{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5acc51fb2bb8382e72ee3bf7c702ef2002}{VMD\+\_\+\+Master}} = 4
+, \mbox{\hyperlink{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5ab6d1505c66395595bf490631c9db6aa3}{VMD\+\_\+\+Header}} = 5
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\+String}} \mbox{\hyperlink{zcontentvisumain__1_8h_af9abafe040bdac79337cb9e08f3ba268}{format\+Size}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{w\+Size}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{zcontentvisumain__1_8h_a318273abd1208deceff13f37748e8752}{\+\_\+search\+Block\+Start}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+\_\+\+FILEHANDLE\+\_\+\+\_\+}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Content\+Fd}}, \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Begin\+Address}}, \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Next\+Address}}, ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Block\+Content}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Payload}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Count}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+File\+Size}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Begin\+Content}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}})
+\begin{DoxyCompactList}\small\item\em \+\_\+search\+Block\+Start scans file pointed by p\+Content\+Fd since p\+Begin\+Address for a start mark (cst\+\_\+\+ZBLOCKSTART 0x\+F5\+F5\+F5\+F5) and returns . address of found mark in p\+Next\+Address (pointing to first byte of start mark), . ZData\+Buffer containing the file space between two start mark or until end of file. Each read access loads p\+Payload bytes from file. p\+Payload is adjusted progressively to block sizes. When found p\+Next\+Address points to the first byte of start mark. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{zcontentvisumain__1_8h_a265f4e949a8f634e9f16c7b359bece9f}{set\+Load\+Max}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Load\+Max}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{zcontentvisumain__1_8h_a6b50e3400123fa1e5a9ad211179fca57}{compute\+Offset\+From\+Coord}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Row}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Col}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{group___z_m_f_s_t_a_t_s_ga7c0040329cceb6c3661245eae9de5b59}{sleep\+Times}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Times}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zcontentvisumain__1_8h_a68ff5dd059a4d74e955297f9fec1c2b8}{cst\+\_\+maxraisonablevalue}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{class_dic_edit_m_wn}{Dic\+Edit\+MWn}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zcontentvisumain__1_8h_ad6ccf9b97101d2a125b68f248d2f7dd5}{Dic\+Edit}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{zcontentvisumain__1_8h_a44fdbf40a2b53439e554eb9a4cb46d2b}\label{zcontentvisumain__1_8h_a44fdbf40a2b53439e554eb9a4cb46d2b} 
+\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!\_\_DISPLAYCALLBACK\_\_@{\_\_DISPLAYCALLBACK\_\_}}
+\index{\_\_DISPLAYCALLBACK\_\_@{\_\_DISPLAYCALLBACK\_\_}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}
+\doxysubsubsection{\texorpdfstring{\_\_DISPLAYCALLBACK\_\_}{\_\_DISPLAYCALLBACK\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+DISPLAYCALLBACK\+\_\+\+\_\+(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}} }\end{DoxyParamCaption})~\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}}\&)$>$ \mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}}}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain__1_8h_source_l00025}{25}} of file \mbox{\hyperlink{zcontentvisumain__1_8h_source}{zcontentvisumain\+\_\+1.\+h}}.
+
+\Hypertarget{zcontentvisumain__1_8h_a4de69cc1826a585669b8b6f020d7006c}\label{zcontentvisumain__1_8h_a4de69cc1826a585669b8b6f020d7006c} 
+\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!\_\_PROGRESSCALLBACK\_\_@{\_\_PROGRESSCALLBACK\_\_}}
+\index{\_\_PROGRESSCALLBACK\_\_@{\_\_PROGRESSCALLBACK\_\_}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}
+\doxysubsubsection{\texorpdfstring{\_\_PROGRESSCALLBACK\_\_}{\_\_PROGRESSCALLBACK\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+PROGRESSCALLBACK\+\_\+\+\_\+(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}} }\end{DoxyParamCaption})~\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}})$>$ \mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}}}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain__1_8h_source_l00026}{26}} of file \mbox{\hyperlink{zcontentvisumain__1_8h_source}{zcontentvisumain\+\_\+1.\+h}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937}\label{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937} 
+\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!ScanBlock\_type@{ScanBlock\_type}}
+\index{ScanBlock\_type@{ScanBlock\_type}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}
+\doxysubsubsection{\texorpdfstring{ScanBlock\_type}{ScanBlock\_type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{zcontentvisumain_8h_a0390ad563bb459341d6a98271c369937}{Scan\+Block\+\_\+type}} \+: \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SBT\_Nothing@{SBT\_Nothing}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!SBT\_Nothing@{SBT\_Nothing}}}\Hypertarget{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937af5a02e5efea01322143b170ddf564f9d}\label{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937af5a02e5efea01322143b170ddf564f9d} 
+SBT\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SBT\_Correct@{SBT\_Correct}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!SBT\_Correct@{SBT\_Correct}}}\Hypertarget{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937ac8960ffed7b147c8674f06388be93abf}\label{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937ac8960ffed7b147c8674f06388be93abf} 
+SBT\+\_\+\+Correct&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SBT\_InvHeader@{SBT\_InvHeader}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!SBT\_InvHeader@{SBT\_InvHeader}}}\Hypertarget{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937aeb15cd8e83f1c0cafc065f5bdb5721a4}\label{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937aeb15cd8e83f1c0cafc065f5bdb5721a4} 
+SBT\+\_\+\+Inv\+Header&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SBT\_MissEB@{SBT\_MissEB}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!SBT\_MissEB@{SBT\_MissEB}}}\Hypertarget{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937a0e1cb7ee285399e0ef1ab5974a1978fa}\label{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937a0e1cb7ee285399e0ef1ab5974a1978fa} 
+SBT\+\_\+\+Miss\+EB&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SBT\_InvBlkSize@{SBT\_InvBlkSize}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!SBT\_InvBlkSize@{SBT\_InvBlkSize}}}\Hypertarget{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937a23a43826e814a1fa4242cf46b0ae166c}\label{zcontentvisumain__1_8h_a0390ad563bb459341d6a98271c369937a23a43826e814a1fa4242cf46b0ae166c} 
+SBT\+\_\+\+Inv\+Blk\+Size&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain__1_8h_source_l00028}{28}} of file \mbox{\hyperlink{zcontentvisumain__1_8h_source}{zcontentvisumain\+\_\+1.\+h}}.
+
+\Hypertarget{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5}\label{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5} 
+\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!VisuMode\_type@{VisuMode\_type}}
+\index{VisuMode\_type@{VisuMode\_type}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}
+\doxysubsubsection{\texorpdfstring{VisuMode\_type}{VisuMode\_type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{zcontentvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5}{Visu\+Mode\+\_\+type}} \+: \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VMD\_Nothing@{VMD\_Nothing}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!VMD\_Nothing@{VMD\_Nothing}}}\Hypertarget{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5a6d94841cabe507209df5c66729da64a8}\label{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5a6d94841cabe507209df5c66729da64a8} 
+VMD\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VMD\_RawSequential@{VMD\_RawSequential}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!VMD\_RawSequential@{VMD\_RawSequential}}}\Hypertarget{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5af8af97914ef5ea9aa7032ac3b66eac2a}\label{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5af8af97914ef5ea9aa7032ac3b66eac2a} 
+VMD\+\_\+\+Raw\+Sequential&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VMD\_RawRandom@{VMD\_RawRandom}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!VMD\_RawRandom@{VMD\_RawRandom}}}\Hypertarget{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5a6a71c5b566b9808148486dbe5350bab9}\label{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5a6a71c5b566b9808148486dbe5350bab9} 
+VMD\+\_\+\+Raw\+Random&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VMD\_Random@{VMD\_Random}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!VMD\_Random@{VMD\_Random}}}\Hypertarget{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5a098240f5a64cb87b0d7586deed5b2930}\label{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5a098240f5a64cb87b0d7586deed5b2930} 
+VMD\+\_\+\+Random&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VMD\_Master@{VMD\_Master}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!VMD\_Master@{VMD\_Master}}}\Hypertarget{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5acc51fb2bb8382e72ee3bf7c702ef2002}\label{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5acc51fb2bb8382e72ee3bf7c702ef2002} 
+VMD\+\_\+\+Master&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VMD\_Header@{VMD\_Header}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!VMD\_Header@{VMD\_Header}}}\Hypertarget{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5ab6d1505c66395595bf490631c9db6aa3}\label{zcontentvisumain__1_8h_a0a9f0a2bdc43550c41659d899d024fc5ab6d1505c66395595bf490631c9db6aa3} 
+VMD\+\_\+\+Header&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain__1_8h_source_l00085}{85}} of file \mbox{\hyperlink{zcontentvisumain__1_8h_source}{zcontentvisumain\+\_\+1.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{zcontentvisumain__1_8h_a318273abd1208deceff13f37748e8752}\label{zcontentvisumain__1_8h_a318273abd1208deceff13f37748e8752} 
+\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!\_searchBlockStart@{\_searchBlockStart}}
+\index{\_searchBlockStart@{\_searchBlockStart}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}
+\doxysubsubsection{\texorpdfstring{\_searchBlockStart()}{\_searchBlockStart()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \+\_\+search\+Block\+Start (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+\_\+\+FILEHANDLE\+\_\+\+\_\+}}}]{p\+Content\+Fd,  }\item[{\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}}}]{p\+Begin\+Address,  }\item[{\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \&}]{p\+Next\+Address,  }\item[{ZData\+Buffer \&}]{p\+Block\+Content,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \&}]{p\+Payload,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \&}]{p\+Count,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \&}]{p\+File\+Size,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{p\+Begin\+Content = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}} }\end{DoxyParamCaption})}
+
+
+
+\+\_\+search\+Block\+Start scans file pointed by p\+Content\+Fd since p\+Begin\+Address for a start mark (cst\+\_\+\+ZBLOCKSTART 0x\+F5\+F5\+F5\+F5) and returns . address of found mark in p\+Next\+Address (pointing to first byte of start mark), . ZData\+Buffer containing the file space between two start mark or until end of file. Each read access loads p\+Payload bytes from file. p\+Payload is adjusted progressively to block sizes. When found p\+Next\+Address points to the first byte of start mark. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Content\+Fd} & File descriptor to search. File must be opened with READ capabilities (O\+\_\+\+RDONLY) \\
+\hline
+{\em p\+Begin\+Address} & address to begin the search. WARNING\+: if p\+Begin\+Address points to a cst\+\_\+\+ZBLOCKSTART block, then this address will be returned as p\+Next\+Address. \\
+\hline
+{\em p\+Next\+Address} & address of first byte of found cst\+\_\+\+START \\
+\hline
+{\em p\+Payload} & number of bytes to read at each read operation \\
+\hline
+{\em p\+File\+Size} & total number of bytes for the file to be scanned \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus
+\begin{DoxyItemize}
+\item ZS\+\_\+\+FOUND start mark has been found. p\+Next\+Address points to first byte of start mark. p\+Block\+Content contains block data since p\+Begin\+Address until next start mark (excluded).
+\item ZS\+\_\+\+EOF no more to read and start mark has not been found since p\+Begin\+Address. p\+Next\+Address is set to the last address processed. p\+Block\+Content contains data since p\+Begin\+Address until Endof\+File.
+\item ZS\+\_\+\+READERROR a low level error has been encountered. ZException is set with appropriate message. p\+Next\+Address is set to the last address processed.
+\item ZS\+\_\+\+FILEERROR a seek operation failed with a low level error. ZException is set with appropriate message. p\+Next\+Address is set to the last address processed. 
+\end{DoxyItemize}
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03379}{3379}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03207}{ZContent\+Visu\+Main\+::surface\+Scan\+Raw()}}.
+
+\Hypertarget{zcontentvisumain__1_8h_a6b50e3400123fa1e5a9ad211179fca57}\label{zcontentvisumain__1_8h_a6b50e3400123fa1e5a9ad211179fca57} 
+\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!computeOffsetFromCoord@{computeOffsetFromCoord}}
+\index{computeOffsetFromCoord@{computeOffsetFromCoord}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}
+\doxysubsubsection{\texorpdfstring{computeOffsetFromCoord()}{computeOffsetFromCoord()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} compute\+Offset\+From\+Coord (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Row,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Col }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03958}{3958}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+
+\Hypertarget{zcontentvisumain__1_8h_af9abafe040bdac79337cb9e08f3ba268}\label{zcontentvisumain__1_8h_af9abafe040bdac79337cb9e08f3ba268} 
+\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!formatSize@{formatSize}}
+\index{formatSize@{formatSize}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}
+\doxysubsubsection{\texorpdfstring{formatSize()}{formatSize()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\+String}} format\+Size (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{w\+Size }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain__1_8cpp_source_l01756}{1756}} of file \mbox{\hyperlink{zcontentvisumain__1_8cpp_source}{zcontentvisumain\+\_\+1.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcontentvisumain_8cpp_source_l02605}{ZContent\+Visu\+Main\+::display\+Fd\+Next\+Raw\+Block()}}, \mbox{\hyperlink{zcontentvisumain_8cpp_source_l02958}{ZContent\+Visu\+Main\+::display\+Raw\+From\+Offset()}}, \mbox{\hyperlink{zcontentvisumain_8cpp_source_l02051}{ZContent\+Visu\+Main\+::get\+File\+Size()}}, \mbox{\hyperlink{zcontentvisumain_8cpp_source_l02058}{ZContent\+Visu\+Main\+::open\+Other()}}, and \mbox{\hyperlink{zcontentvisumain_8cpp_source_l00628}{ZContent\+Visu\+Main\+::set\+Up\+Raw\+File()}}.
+
+\Hypertarget{zcontentvisumain__1_8h_a265f4e949a8f634e9f16c7b359bece9f}\label{zcontentvisumain__1_8h_a265f4e949a8f634e9f16c7b359bece9f} 
+\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!setLoadMax@{setLoadMax}}
+\index{setLoadMax@{setLoadMax}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}
+\doxysubsubsection{\texorpdfstring{setLoadMax()}{setLoadMax()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} set\+Load\+Max (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}}}]{p\+Load\+Max }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03376}{3376}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{zcontentvisumain__1_8h_a68ff5dd059a4d74e955297f9fec1c2b8}\label{zcontentvisumain__1_8h_a68ff5dd059a4d74e955297f9fec1c2b8} 
+\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!cst\_maxraisonablevalue@{cst\_maxraisonablevalue}}
+\index{cst\_maxraisonablevalue@{cst\_maxraisonablevalue}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}
+\doxysubsubsection{\texorpdfstring{cst\_maxraisonablevalue}{cst\_maxraisonablevalue}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} cst\+\_\+maxraisonablevalue\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcontentvisumain_8cpp_source_l02313}{ZContent\+Visu\+Main\+::display\+Pool()}}.
+
+\Hypertarget{zcontentvisumain__1_8h_ad6ccf9b97101d2a125b68f248d2f7dd5}\label{zcontentvisumain__1_8h_ad6ccf9b97101d2a125b68f248d2f7dd5} 
+\index{zcontentvisumain\_1.h@{zcontentvisumain\_1.h}!DicEdit@{DicEdit}}
+\index{DicEdit@{DicEdit}!zcontentvisumain\_1.h@{zcontentvisumain\_1.h}}
+\doxysubsubsection{\texorpdfstring{DicEdit}{DicEdit}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{class_dic_edit_m_wn}{Dic\+Edit\+MWn}}\texorpdfstring{$\ast$}{*} Dic\+Edit\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+

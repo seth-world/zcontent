@@ -1,0 +1,487 @@
+\doxysection{ztokentypedlg.\+cpp}
+\hypertarget{ztokentypedlg_8cpp_source}{}\label{ztokentypedlg_8cpp_source}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/ztokentypedlg.cpp@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/ztokentypedlg.cpp}}
+\mbox{\hyperlink{ztokentypedlg_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ztokentypedlg_8h}{ztokentypedlg.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ <qevent.h>}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <zqt/zqtwidget/zqstandarditemmodel.h>}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <zqt/zqtwidget/zqstandarditem.h>}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <zqt/zqtwidget/zqtwidgettools.h>}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{zfielddlg_8h}{zfielddlg.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00009}00009\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00010}\mbox{\hyperlink{struct_z_type_edit_struct}{00010}}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_z_type_edit_struct}{ZTypeEditStruct}}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00011}00011\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00012}\mbox{\hyperlink{struct_z_type_edit_struct_acc6e33aceca2a0a9f4d2cca6c66d0c8a}{00012}}\ \ \ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}\ \mbox{\hyperlink{struct_z_type_edit_struct_acc6e33aceca2a0a9f4d2cca6c66d0c8a}{Value}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00013}\mbox{\hyperlink{struct_z_type_edit_struct_a6306f241132543c05eda0ed4bf7d2915}{00013}}\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{struct_z_type_edit_struct_a6306f241132543c05eda0ed4bf7d2915}{Name}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00014}\mbox{\hyperlink{struct_z_type_edit_struct_ab38c75f6c525428109218456eb183f3c}{00014}}\ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ \mbox{\hyperlink{struct_z_type_edit_struct_ab38c75f6c525428109218456eb183f3c}{Tooltip}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00015}00015\ \};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#ifdef\ \_\_COMMENT\_\_}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00017}00017\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00018}00018\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_ARRAY}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \ 0x40000000,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00020}00020\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_CLASS}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0x00010110,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00022}00022\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_STRUCT}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0x00010210,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00023}00023\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00024}00024\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_ENUM}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0x00010310,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00025}00025\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_ENUM\_WITHOUT\_ID}}\ \ \ \ \ \ \ \ \ \ =\ 0x00010330,\ \ \ \ \textcolor{comment}{/*\ field\ declaration\ without\ enum\ id\ (cannot\ be\ registered)\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00026}00026\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_ENUM\_OPAQUE}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0x00010314,\ \ \ \textcolor{comment}{/*\ opaque\ declaration\ :\ enum\ must\ be\ registrated\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00027}00027\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_ENUM\_CLASS}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0x00010400,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00031}00031\ \ \ \ \ \textcolor{comment}{/*\ atomic\ data\ types\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00032}00032\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_UNKNOWN\_TYPE}}\ \ \ \ \ =\ 0xF000012000,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00033}00033\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00034}00034\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_NOTHING}}\ =\ 0}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00036}00036\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_LONG}}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00038}00038\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_CHAR}}\ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0x00011003,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00039}00039\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_INTEGER}}\ \ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_CHAR}}\ +\ 1,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00040}00040\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_LONG\_LONG}}\ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_INTEGER}}\ +\ 1,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00041}00041\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_FLOAT}}\ \ \ \ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_LONG\_LONG}}\ +\ 1,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00042}00042\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_DOUBLE}}\ \ \ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_FLOAT}}\ +\ 1,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00043}00043\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_LONG\_DOUBLE}}\ \ \ \ \ \ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_DOUBLE}}\ |\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_LONG}},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00044}00044\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_BOOL}}\ \ \ \ \ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_DOUBLE}}\ +\ 1,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00046}00046\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \ \ ZTTP\_LONG\_DOUBLE\ \ \ \ \ \ =\ ZTTP\_DOUBLE\ +\ 1,}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00047}00047\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00048}00048\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_INT8}}\ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0x00011101,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00049}00049\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_INT16}}\ \ \ \ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_INT8}}+1,\ \ \ \ \textcolor{comment}{/*\ 0x00011102\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00050}00050\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_INT32}}\ \ \ \ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_INT16}}+1,\ \ \ \textcolor{comment}{/*\ 0x00011103\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00051}00051\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_INT64}}\ \ \ \ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_INT32}}+1,\ \ \ \textcolor{comment}{/*\ 0x00011104\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00053}00053\ \ \ \ \ \textcolor{comment}{/*\ methods\ and\ functions\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00056}00056\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_UTF8VARYINGSTRING}}\ =\ 0x10000011,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00057}00057\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_UTF16VARYINGSTRING}}=\ 0x10000012,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00058}00058\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_UTF32VARYINGSTRING}}=\ 0x10000013,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00060}00060\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_URISTRING}}\ \ \ \ \ \ \ \ \ =\ 0x10000031,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00062}00062\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_UTF8FIXEDSTRING}}\ \ \ =\ 0x10000001,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00063}00063\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_UTF16FIXEDSTRING}}\ \ =\ 0x10000002,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00064}00064\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_UTF32FIXEDSTRING}}\ \ =\ 0x10000003,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00065}00065\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00066}00066\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_ZDATEFULL}}\ \ \ \ \ \ \ \ \ =\ 0x10000100,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00067}00067\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_ZDATE}}\ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0x10000200,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00069}00069\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_MD5}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0x10001000,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00070}00070\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_CHECKSUM}}\ \ \ \ \ \ \ \ \ \ \ =\ 0x10002000,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00072}00072\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_ZDATABUFFER}}\ \ \ \ \ \ \ \ =\ 0x10004000,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00074}00074\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_ZBITSET}}\ \ \ \ \ \ \ \ \ \ \ \ =\ 0x10007000,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00076}00076\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_ZRESOURCE}}\ \ \ \ \ \ \ \ \ \ =\ 0x10005000,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00077}00077\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_ZRESOURCECODE}}\ \ \ \ \ \ =\ 0x10006000,}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00078}00078\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZTTP\_STDSTRING}}\ \ \ \ \ \ \ \ \ \ =\ 0x20000000}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00079}00079\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_\_COMMENT\_\_}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00081}\mbox{\hyperlink{ztokentypedlg_8cpp_abc0e12ff9eda2a13a91973613031cf85}{00081}}\ \mbox{\hyperlink{struct_z_type_edit_struct}{ZTypeEditStruct}}\ \mbox{\hyperlink{ztokentypedlg_8cpp_abc0e12ff9eda2a13a91973613031cf85}{ZTokenTypeEdit}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00082}00082\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ae4136cac4aefa8f2edafde522b2e83cc}{ZType\_AtomicUChar}},\textcolor{stringliteral}{"{}ZType\_AtomicUChar"{}},\textcolor{stringliteral}{"{}unsigned\ char\ -\/\ mostly\ used\ for\ encoding/decoding"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00083}00083\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a8d4dc1ecf86c82f3ec2e11e6a8f6a561}{ZType\_AtomicChar}},\textcolor{stringliteral}{"{}ZType\_AtomicChar"{}},\textcolor{stringliteral}{"{}char\ -\/\ a\ single\ ascii\ character\ -\/\ NOT\ SUBJECT\ to\ leading\ byte\ despite\ its\ signed\ status"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00084}00084\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \{ZType\_AtomicWUChar,"{}ZType\_AtomicWUChar"{},"{}unsigned\ wchar\_t\ (is\ a\ char\ and\ an\ uint16\_t)"{}\},}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00085}00085\ \ \ \ \ \textcolor{comment}{//\ \ \ \ \{ZType\_AtomicWChar,"{}ZType\_AtomicWChar"{},"{}wchar\_t\ -\/\ a\ single\ double\ character\ "{}\},}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00086}00086\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a7156da44b19e8f6d132a896610f774da}{ZType\_AtomicU8}},\textcolor{stringliteral}{"{}ZType\_AtomicU8"{}},\textcolor{stringliteral}{"{}arithmetic\ unsigned\ byte\ \ \ \ \ \ not\ subject\ to\ Endian"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00087}00087\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ac43deb9d8373fa570a82cb82aa87a8cc}{ZType\_AtomicS8}},\textcolor{stringliteral}{"{}ZType\_AtomicS8"{}},\textcolor{stringliteral}{"{}arithmetic\ signed\ byte\ \ \ \ \ \ not\ subject\ to\ Endian"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00088}00088\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ad9be89843fed4e754a52ec12c1e60e19}{ZType\_AtomicU16}},\textcolor{stringliteral}{"{}ZType\_AtomicU16"{}},\textcolor{stringliteral}{"{}arithmetic\ 2\ bytes\ value\ unsigned\ (no\ leading\ sign\ byte)"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00089}00089\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ad703e4250083f85f8843f14373b92023}{ZType\_AtomicS16}},\textcolor{stringliteral}{"{}ZType\_AtomicS16"{}},\textcolor{stringliteral}{"{}arithmetic\ 2\ bytes\ value\ signed\ (with\ leading\ sign\ byte)"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00090}00090\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aaa027e749a2cd01675b9b04ce689e54b}{ZType\_AtomicU32}},\textcolor{stringliteral}{"{}ZType\_AtomicU32"{}},\textcolor{stringliteral}{"{}arithmetic\ 4\ bytes\ value\ unsigned\ (no\ leading\ sign\ byte)"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00091}00091\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a6072791764ced7ece46e121cbc0b9e24}{ZType\_AtomicS32}},\textcolor{stringliteral}{"{}ZType\_AtomicS32"{}},\textcolor{stringliteral}{"{}arithmetic\ 4\ bytes\ value\ signed\ (no\ leading\ sign\ byte)"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00092}00092\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a661e3a8f3ce6935f0f70b214c839096c}{ZType\_AtomicU64}},\textcolor{stringliteral}{"{}ZType\_AtomicU64"{}},\textcolor{stringliteral}{"{}arithmetic\ 8\ bytes\ value\ unsigned\ (no\ leading\ sign\ byte)"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00093}00093\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3b34c414329b92de2098352f6498e040}{ZType\_AtomicS64}},\textcolor{stringliteral}{"{}ZType\_AtomicS64"{}},\textcolor{stringliteral}{"{}arithmetic\ 8\ bytes\ value\ signed\ (with\ leading\ sign\ byte)"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00094}00094\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8add1358c629bcb0cc4f010a8be7a7bab4}{ZType\_AtomicFloat}},\textcolor{stringliteral}{"{}ZType\_AtomicFloat"{}},\textcolor{stringliteral}{"{}floating\ point\ (therefore\ signed)"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00095}00095\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ae20a3c9e6b2707a0368cff7a67300c9c}{ZType\_AtomicDouble}},\textcolor{stringliteral}{"{}ZType\_AtomicDouble"{}},\textcolor{stringliteral}{"{}floating\ point\ double\ (therefore\ signed)"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00096}00096\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a0dba586ee25d0784bdec0f064504b560}{ZType\_AtomicLDouble}},\textcolor{stringliteral}{"{}ZType\_AtomicLDouble"{}},\textcolor{stringliteral}{"{}floating\ point\ long\ double\ (therefore\ signed)"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00097}00097\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abc92ffb8ad2a07162468fb7e20dcfed6}{ZType\_Nothing}},\textcolor{stringliteral}{"{}"{}},\textcolor{stringliteral}{"{}"{}}\}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00098}00098\ \};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00099}00099\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00100}\mbox{\hyperlink{ztokentypedlg_8cpp_a0091f8eff62172564d68c74267e479a1}{00100}}\ \mbox{\hyperlink{struct_z_type_edit_struct}{ZTypeEditStruct}}\ \mbox{\hyperlink{ztokentypedlg_8cpp_a0091f8eff62172564d68c74267e479a1}{ZTypeVStringEdit}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00101}00101\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ad62000e25d22f9ab9f1b0d050207d403}{ZType\_CharVaryingString}},\textcolor{stringliteral}{"{}ZType\_CharVaryingString"{}},\textcolor{stringliteral}{"{}a\ varying\ string\ of\ char-\/\ prefer\ using\ utf8\ string."{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00102}00102\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a1e5a9b0b53c2ec983e39737b7970ffca}{ZType\_Utf8VaryingString}},\textcolor{stringliteral}{"{}ZType\_Utf8VaryingString"{}},\textcolor{stringliteral}{"{}a\ varying\ string\ of\ utf8\ characters."{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00103}00103\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab6cb860b103efe3d3bda65f2cf8dd114}{ZType\_Utf16VaryingString}},\textcolor{stringliteral}{"{}ZType\_Utf16VaryingString"{}},\textcolor{stringliteral}{"{}a\ varying\ string\ of\ utf16\ characters.\ "{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00104}00104\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ab0e95862275fdf305e5b4438de597097}{ZType\_Utf32VaryingString}},\textcolor{stringliteral}{"{}ZType\_Utf32VaryingString"{}},\textcolor{stringliteral}{"{}a\ varying\ string\ of\ utf32\ characters.\ "{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00105}00105\ \ \ \ \ \{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZType\_URIString}},\textcolor{stringliteral}{"{}ZType\_URIString"{}},\textcolor{stringliteral}{"{}a\ base\ of\ utf8\ varying\ string\ with\ URI\ capabilities"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00106}00106\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8add37ad335d67d59ec0829fa8569fe61e}{ZType\_StdString}},\textcolor{stringliteral}{"{}ZType\_StdString"{}},\textcolor{stringliteral}{"{}a\ std::string\ class\ varying\ length\ :\ not\ used\ for\ storage,\ only\ for\ conversion"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00107}00107\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abc92ffb8ad2a07162468fb7e20dcfed6}{ZType\_Nothing}},\textcolor{stringliteral}{"{}"{}},\textcolor{stringliteral}{"{}"{}}\}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00108}00108\ \};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00109}\mbox{\hyperlink{ztokentypedlg_8cpp_a67f0dfa2dc6465e02e0afc5bed0da833}{00109}}\ \mbox{\hyperlink{struct_z_type_edit_struct}{ZTypeEditStruct}}\ \mbox{\hyperlink{ztokentypedlg_8cpp_a67f0dfa2dc6465e02e0afc5bed0da833}{ZTypeFStringEdit}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00110}00110\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a1655365214da339d7faef655e1972997}{ZType\_CharFixedString}},\textcolor{stringliteral}{"{}ZType\_CharFixedString"{}},\textcolor{stringliteral}{"{}a\ fixed\ string\ of\ char\ characters.\ Prefer\ using\ utf8\ fixed\ string.\ "{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00111}00111\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a8e62d64e3a98f524f7141699f8376f8a}{ZType\_Utf8FixedString}},\textcolor{stringliteral}{"{}ZType\_Utf8FixedString"{}},\textcolor{stringliteral}{"{}a\ fixed\ string\ of\ utf8\ characters.\ "{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00112}00112\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aa0a15302e555f710735f3dfefed920c9}{ZType\_Utf16FixedString}},\textcolor{stringliteral}{"{}ZType\_Utf16FixedString"{}},\textcolor{stringliteral}{"{}a\ fixed\ string\ of\ utf16\ characters.\ "{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00113}00113\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a57b6c41fae92597b12299ef02ebe6bed}{ZType\_Utf32FixedString}},\textcolor{stringliteral}{"{}ZType\_Utf32FixedString"{}},\textcolor{stringliteral}{"{}a\ fixed\ string\ of\ utf32\ characters.\ "{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00114}00114\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abc92ffb8ad2a07162468fb7e20dcfed6}{ZType\_Nothing}},\textcolor{stringliteral}{"{}"{}},\textcolor{stringliteral}{"{}"{}}\}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00115}00115\ \};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00116}\mbox{\hyperlink{ztokentypedlg_8cpp_af4a6b283586259b36ac501f9b4f4d017}{00116}}\ \mbox{\hyperlink{struct_z_type_edit_struct}{ZTypeEditStruct}}\ \mbox{\hyperlink{ztokentypedlg_8cpp_af4a6b283586259b36ac501f9b4f4d017}{ZTypeOtherEdit}}[]\ =\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00117}00117\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a0b6531b5508c8250edaf089a806d0c9a}{ZType\_bitset}},\textcolor{stringliteral}{"{}ZType\_bitset"{}},\textcolor{stringliteral}{"{}bitset\ is\ a\ set\ of\ atomic\ data\ 'bit'"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00118}00118\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8af7281120fd8f06911844759e157367c0}{ZType\_ZDate}},\textcolor{stringliteral}{"{}ZType\_ZDate"{}},\textcolor{stringliteral}{"{}a\ struct\ giving\ uint32\_t\ \ is\ ZDate\ (export\ and\ import)"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00119}00119\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ac455c7a6a3d453ce5c2145a1ad2d8ed3}{ZType\_ZDateFull}},\textcolor{stringliteral}{"{}ZType\_ZDateFull"{}},\textcolor{stringliteral}{"{}a\ struct\ giving\ uint64\_t\ \ is\ ZDateFull\ (export\ and\ import)"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00120}00120\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a08da51564354cd63f69c32850938874d}{ZType\_CheckSum}},\textcolor{stringliteral}{"{}ZType\_CheckSum"{}},\textcolor{stringliteral}{"{}a\ struct\ containing\ fixed\ array\ of\ unsigned\ char"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00121}00121\ \ \ \ \ \{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZType\_Resource}},\textcolor{stringliteral}{"{}ZType\_Resource"{}},\textcolor{stringliteral}{"{}arithmetic\ 2\ bytes\ value\ unsigned\ (no\ leading\ sign\ byte)"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00122}00122\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8afabd68e127b21c2981dd6df502cb211c}{ZType\_Unknown}},\textcolor{stringliteral}{"{}ZType\_Unknown"{}},\textcolor{stringliteral}{"{}this\ type\ is\ not\ registered\ and\ is\ unknown"{}}\},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00123}00123\ \ \ \ \ \{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abc92ffb8ad2a07162468fb7e20dcfed6}{ZType\_Nothing}},\textcolor{stringliteral}{"{}"{}},\textcolor{stringliteral}{"{}"{}}\}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00124}00124\ \};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00127}00127\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00130}\mbox{\hyperlink{class_z_token_type_d_lg_a49874b4043b013d06624581569e0aacb}{00130}}\ \mbox{\hyperlink{class_z_token_type_d_lg_a49874b4043b013d06624581569e0aacb}{ZTokenTypeDLg::ZTokenTypeDLg}}(\mbox{\hyperlink{class_z_field_d_lg}{ZFieldDLg}}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pParent}})\ :\ QDialog(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pParent}})\textcolor{comment}{//:\ ZQTreeView(pDialog)}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00131}00131\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00132}00132\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{resize}}(900,361);}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00134}00134\ \ \ ArrayCHk\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QCheckBox}}(\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00135}00135\ \ \ ArrayCHk-\/>setObjectName(\textcolor{stringliteral}{"{}ArrayCHk"{}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00136}00136\ \ \ ArrayCHk-\/>setText(QObject::tr(\textcolor{stringliteral}{"{}Check\ to\ create\ an\ array\ of\ atomic\ data\ type"{}},\textcolor{stringliteral}{"{}ZTokenTypeDLg"{}}));}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00137}00137\ \ \ ArrayCHk-\/>setChecked(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00138}00138\ \ \ ArrayCHk-\/>setGeometry(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QRect}}(100,0,400,30));}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00139}00139\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00140}00140\ \ \ AcceptBTn\ =\ \textcolor{keyword}{new}\ QPushButton(\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00141}00141\ \ \ AcceptBTn-\/>setObjectName(\textcolor{stringliteral}{"{}AcceptBTn"{}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00142}00142\ \ \ AcceptBTn-\/>setText(QObject::tr(\textcolor{stringliteral}{"{}Accept"{}},\textcolor{stringliteral}{"{}ZTokenTypeDLg"{}}));}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00143}00143\ \ \ AcceptBTn-\/>setGeometry(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QRect}}(410,5,100,20));}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00144}00144\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00145}00145\ \ \ RejectBTn\ =\ \textcolor{keyword}{new}\ QPushButton(\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00146}00146\ \ \ RejectBTn-\/>setObjectName(\textcolor{stringliteral}{"{}RejectBTn"{}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00147}00147\ \ \ RejectBTn-\/>setText(QObject::tr(\textcolor{stringliteral}{"{}Discard"{}},\textcolor{stringliteral}{"{}ZTokenTypeDLg"{}}));}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00148}00148\ \ \ RejectBTn-\/>setGeometry(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QRect}}(520,5,100,20));}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00149}00149\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00150}00150\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QRect}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRDlg}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{geometry}}();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00151}00151\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QRect}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wR}}=ArrayCHk-\/>geometry();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00152}00152\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00153}00153\ \ \ TreeHeightResizeMargin\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wR}}.height()+1;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00154}00154\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00155}00155\ \ \ TreeView\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZQTreeView}}(\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00156}00156\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00157}00157\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wXpos}}=0;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00158}00158\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wYpos}}=\ TreeHeightResizeMargin;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00159}00159\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wWidth}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRDlg}}.width()-\/1;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00160}00160\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wHeight}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRDlg}}.height()-\/TreeHeightResizeMargin;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00161}00161\ \ \ TreeView-\/>setGeometry(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QRect}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wXpos}},\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wYpos}},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00162}00162\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wWidth}},}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00163}00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wHeight}}));}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00164}00164\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00165}00165\ \ \ TreeView-\/>setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00166}00166\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00167}00167\ \ \ ZQStandardItem::setItemAlignment(Qt::AlignRight);}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00168}00168\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00169}00169\ \ \ \mbox{\hyperlink{class_z_token_type_d_lg_a044a2468d7ee283b85a3720ee204195f}{setupTableView}}(\textcolor{keyword}{true},2);\ \textcolor{comment}{/*\ 2\ columns\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00171}00171\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCol}}=0;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00172}00172\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00173}00173\ \ \ TreeView-\/>ItemModel-\/>setHorizontalHeaderItem(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCol}}++,\mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{createItem}}(QObject::tr(\textcolor{stringliteral}{"{}Code"{}},\textcolor{stringliteral}{"{}ZTokenTypeDLg"{}}).\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{toUtf8}}().data()));}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00174}00174\ \ \ TreeView-\/>ItemModel-\/>setHorizontalHeaderItem(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCol}}++,\mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{createItem}}(QObject::tr(\textcolor{stringliteral}{"{}Symbol"{}},\textcolor{stringliteral}{"{}ZTokenTypeDLg"{}}).\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{toUtf8}}().data()));}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00175}00175\ \ \ ZQStandardItem::setItemAlignment(Qt::AlignLeft);}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00176}00176\ \ \ TreeView-\/>ItemModel-\/>setHorizontalHeaderItem(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wCol}}++,\mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{createItem}}(QObject::tr(\textcolor{stringliteral}{"{}Description"{}},\textcolor{stringliteral}{"{}ZTokenTypeDLg"{}}).\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{toUtf8}}().data()));}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00177}00177\ \ \ ZQStandardItem::setItemAlignment(Qt::AlignRight);}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00178}00178\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00179}00179\ \ \ \mbox{\hyperlink{class_z_token_type_d_lg_a3e8e33a76f51f2f460e74cc860eb6a0a}{dataSetup}}();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00180}00180\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00181}00181\ \ \ QObject::connect(AcceptBTn,\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SIGNAL}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{clicked}}()),\textcolor{keyword}{this},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SLOT}}(AcceptClicked()));}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00182}00182\ \ \ QObject::connect(RejectBTn,\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SIGNAL}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{clicked}}()),\textcolor{keyword}{this},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SLOT}}(RejectClicked()));}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00183}00183\ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00184}00184\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00185}00185\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00186}00186\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00187}\mbox{\hyperlink{class_z_token_type_d_lg_ac387d4e48b2631fb3eb725a6f233f73e}{00187}}\ \mbox{\hyperlink{class_z_token_type_d_lg_ac387d4e48b2631fb3eb725a6f233f73e}{ZTokenTypeDLg::resizeEvent}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QResizeEvent}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pEvent}})}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00188}00188\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00189}00189\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QSize}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRDlg}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pEvent}}-\/>oldSize();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00190}00190\ \ \ QWidget::resize(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pEvent}}-\/>size().width(),\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pEvent}}-\/>size().height());}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00192}00192\ \ \ \textcolor{keywordflow}{if}\ (\_FResizeInitial)\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00193}00193\ \ \ \ \ \_FResizeInitial=\textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00194}00194\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00195}00195\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00196}00196\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QRect}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wR1}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{geometry}}();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00197}00197\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00198}00198\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wWMargin}}\ =\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRDlg}}.width()-\/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wR1}}.width());}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00199}00199\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wVW}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pEvent}}-\/>size().width()\ -\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wWMargin}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00200}00200\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wHMargin}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wRDlg}}.height()\ -\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wR1}}.height();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00201}00201\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wVH}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pEvent}}-\/>size().height()\ -\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wHMargin}}\ ;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00202}00202\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00203}00203\ \ \ TreeView-\/>resize(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wVW}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wVH}});\ \ \textcolor{comment}{/*\ expands\ in\ width\ and\ height\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00204}00204\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00205}00205\ \}\textcolor{comment}{//ZTokenTypeDLg::resizeEvent}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00207}00207\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00208}00208\ ZTokenTypeDLg::AcceptClicked()\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00209}00209\ \ \ \mbox{\hyperlink{class_z_token_type_d_lg_a15a7b72aac0560a94785e1c131626e1f}{AcceptCurrent}}();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00210}00210\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{accept}}();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00211}00211\ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00212}00212\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00213}00213\ ZTokenTypeDLg::RejectClicked()\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00214}00214\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{reject}}();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00215}00215\ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00216}00216\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00217}\mbox{\hyperlink{class_z_token_type_d_lg_a15a7b72aac0560a94785e1c131626e1f}{00217}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_token_type_d_lg_a15a7b72aac0560a94785e1c131626e1f}{ZTokenTypeDLg::AcceptCurrent}}()\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00218}00218\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QModelIndex}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}}=\ TreeView-\/>currentIndex();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00219}00219\ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}}.isValid())}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00220}00220\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00221}00221\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}}.column()!=0)}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00222}00222\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}}.siblingAtColumn(0);}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00223}00223\ \ \ \textcolor{comment}{//\ \ \ \ \ \ wIdx=ItemModel-\/>index(currentIndex().row(),0);}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00224}00224\ \ \ \textcolor{keywordflow}{if}(!\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}}.isValid())}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00225}00225\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00226}00226\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{getValueFromItem<ZTypeBase>}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}},ZType))\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00227}00227\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{accept}}();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00228}00228\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00229}00229\ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00230}00230\ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00232}00232\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00233}00233\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00234}\mbox{\hyperlink{class_z_token_type_d_lg_ab1d558ed6c7c92268e2e2567d0d28c3e}{00234}}\ \mbox{\hyperlink{class_z_token_type_d_lg_ab1d558ed6c7c92268e2e2567d0d28c3e}{ZTokenTypeDLg::KeyFiltered}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pKey}},\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QKeyEvent}}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pEvent}})}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00235}00235\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00236}00236\ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pKey}}\ ==\ Qt::Key\_Escape)}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00237}00237\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00238}00238\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{reject}}();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00239}00239\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00240}00240\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00242}00242\ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pKey}}\ ==\ Qt::Key\_Insert)}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00243}00243\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00244}00244\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00245}00245\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00246}00246\ \ \ \textcolor{keywordflow}{if}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pKey}}\ ==\ Qt::Key\_Delete)}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00247}00247\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00248}00248\ \ \ \ \ \textcolor{comment}{//\ \ \ \ deleteGeneric();}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00249}00249\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00250}00250\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00251}00251\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00252}00252\ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00253}00253\ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00254}00254\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00255}\mbox{\hyperlink{class_z_token_type_d_lg_adc531e0926d1e730dbf20407ab5cdb00}{00255}}\ \mbox{\hyperlink{class_z_token_type_d_lg_adc531e0926d1e730dbf20407ab5cdb00}{ZTokenTypeDLg::MouseFiltered}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pKey}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QMouseEvent}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pEvent}})}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00256}00256\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00257}00257\ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pKey}})}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00258}00258\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00259}00259\ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZEF\_DoubleClickLeft}}:}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00260}00260\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00261}00261\ \ \ \ \ \mbox{\hyperlink{class_z_token_type_d_lg_a15a7b72aac0560a94785e1c131626e1f}{AcceptCurrent}}();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00262}00262\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00263}00263\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00264}00264\ \ \ \ \ \textcolor{comment}{//\ \ case\ ZEF\_SingleClickLeft:}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00265}00265\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00266}00266\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00267}00267\ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00268}00268\ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00270}\mbox{\hyperlink{class_z_token_type_d_lg_a044a2468d7ee283b85a3720ee204195f}{00270}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_token_type_d_lg_a044a2468d7ee283b85a3720ee204195f}{ZTokenTypeDLg::setupTableView}}(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pColumnAutoAdjust}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pColumns}})}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00271}00271\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00272}00272\ \ \ \textcolor{comment}{//\ \ FGeneric=true;}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00273}00273\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wFilter}}\ =\ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZEF\_Escape}}\ |\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZEF\_DoubleClickLeft}}\ ;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00275}00275\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pColumnAutoAdjust}})}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00276}00276\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wFilter}}\ |=\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZEF\_AutoAdjustColumn}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00277}00277\ \ \ \textcolor{comment}{//\ \ GenericTRe\ =\ new\ ZQTreeView((QWidget\ *)this,ZEF\_CommonControlKeys\ |\ ZEF\_AllowDataEnter\ );}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00278}00278\ \ \ \textcolor{comment}{//\ \ keyTRv\ =\ new\ ZQTreeView(this,ZLayout\_Generic,\ wFilter\ );\ //\ no\ data\ enter}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00280}00280\ \ \ TreeView-\/>setZLayout(\mbox{\hyperlink{zcontentutils_2zlayout_8h_abe2a92259c88f8e33c606a5328df5c02aa7cf42a8c780a8bf338fc13db0d61a22}{ZLayout\_TypeDLg}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00281}00281\ \ \ TreeView-\/>setFilterMask(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wFilter}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00282}00282\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00283}00283\ \ \ \textcolor{comment}{//\ \ ui-\/>centralwidget-\/>addWidget(GenericTRv);}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00285}00285\ \ \ TreeView-\/>setSizePolicy(QSizePolicy\ ::Preferred\ ,\ QSizePolicy\ ::Preferred\ );}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00286}00286\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00287}00287\ \ \ TreeView-\/>setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00288}00288\ \ \ TreeView-\/>setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00289}00289\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00290}00290\ \ \ TreeView-\/>setDragEnabled(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00291}00291\ \ \ TreeView-\/>setDropIndicatorShown(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00292}00292\ \ \ TreeView-\/>setDataEnter(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00293}00293\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00294}00294\ \ \ \textcolor{comment}{//\ \ GenericTRv-\/>ItemModel=new\ QStandardItemModel(0,GenericModelColumn,this)\ ;}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00295}00295\ \ \ TreeView-\/>setModel(\textcolor{keyword}{new}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandardItemModel}}(0,\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pColumns}},TreeView));}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00296}00296\ \ \ TreeView-\/>ItemModel-\/>setSortRole(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZSortRole}});\ \ \ \ \ \textcolor{comment}{//\ Key\ to\ have\ a\ model\ sorted\ on\ numeric\ data\ and\ not\ editable\ data}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00297}00297\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00298}00298\ \ \ \textcolor{comment}{//\ registering\ callback\ function\ :\ this\ notation\ allows\ to\ be\ readable}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00299}00299\ \ \ \textcolor{comment}{//}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00300}00300\ \ \ std::function<\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}(\textcolor{keywordtype}{int},\textcolor{keywordtype}{int})>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wKeyFilterCBF}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00301}00301\ \ \ std::function<\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QContextMenuEvent}}\ *)>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wContextMenuCBF}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00302}00302\ \ \ std::function<\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}\ (\textcolor{keywordtype}{int},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZDataReference}}\ *,\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZDataReference}}\ *)>\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wDropEventCBF}}=\textcolor{keyword}{nullptr};\ \ \textcolor{comment}{//\ no\ Drag\ and\ Drop}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00303}00303\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00304}00304\ \ \ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00305}00305\ \textcolor{comment}{\ \ \ wContextMenuCBF\ \ \ =\ std::bind(\&ZTypeClass::FlexMenu,\ this,\_1);\ \ \ \ \ //\ for\ context\ menu\ callback\ for\ ZQTreeView}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00306}00306\ \textcolor{comment}{\ \ wDropEventCBF\ \ \ \ \ =\ std::bind(\&ZTypeClass::DropEvent,\ this,\_1,\_2);\ \ \ \ \ //\ for\ drag\ and\ drop}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00307}00307\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00308}00308\ \ \ TreeView-\/>\_register(std::bind(\&\mbox{\hyperlink{class_z_token_type_d_lg_ab1d558ed6c7c92268e2e2567d0d28c3e}{ZTokenTypeDLg::KeyFiltered}},\ \textcolor{keyword}{this},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_1}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_2}}),}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::bind(\&\mbox{\hyperlink{class_z_token_type_d_lg_adc531e0926d1e730dbf20407ab5cdb00}{ZTokenTypeDLg::MouseFiltered}},\ \textcolor{keyword}{this},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_1}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_2}}),}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00310}00310\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{nullptr},\ \ \ \ \ \ \textcolor{comment}{/*\ no\ contextual\ menu\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{nullptr});\ \ \ \ \ \textcolor{comment}{/*\ no\ drop\ event\ callback\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00312}00312\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00313}00313\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00314}00314\ \ \ TreeView-\/>setSortingEnabled(\textcolor{keyword}{false});\ \ \textcolor{comment}{//\ will\ be\ set\ to\ true\ in\ the\ end\ of\ setup\_effective}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00315}00315\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00316}00316\ \ \ TreeView-\/>setEditTriggers(QAbstractItemView::NoEditTriggers);\ \ \textcolor{comment}{/*\ it\ is\ not\ editable\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00317}00317\ \ \ TreeView-\/>setSelectionBehavior(QAbstractItemView::SelectRows);\ \textcolor{comment}{/*\ select\ line\ per\ line\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00318}00318\ \ \ TreeView-\/>setSelectionMode(QAbstractItemView::SingleSelection);\ \textcolor{comment}{/*\ only\ one\ line\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00319}00319\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00320}00320\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{return}}\ ;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00321}00321\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00322}00322\ \ \ \textcolor{comment}{//\ \ \ \ PerDomainTRe-\/>expandAll();}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00323}00323\ \}\textcolor{comment}{//setupTableView}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00324}00324\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00325}00325\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00326}\mbox{\hyperlink{class_z_token_type_d_lg_a03aa290d7c4f6cf5df6ca3ff35bcaffd}{00326}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_token_type_d_lg_a03aa290d7c4f6cf5df6ca3ff35bcaffd}{ZTokenTypeDLg::set}}(\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZType}})}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00327}00327\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00328}00328\ \ \ ZType=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZType}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00329}00329\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00330}00330\ \ \ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZType}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZType}}\ \&=\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\string~ZType\_Array}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00331}00331\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00332}00332\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QModelIndex}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}}=\mbox{\hyperlink{class_z_token_type_d_lg_a4d56bcf42ba1eee1a096aee7032e7404}{searchZType}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZType}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00333}00333\ \ \ \textcolor{keywordflow}{if}\ (!\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}}.isValid())}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00334}00334\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00336}00336\ \ \ ArrayCHk-\/>setChecked(\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZType}}\ \&\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3dfafdee7071468db6eb2860fe7ae305}{ZType\_Array}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00337}00337\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00338}00338\ \ \ TreeView-\/>setCurrentIndex(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00339}00339\ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00340}00340\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00341}00341\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00342}\mbox{\hyperlink{class_z_token_type_d_lg_a93814e96c87004ca7baefefde5c782b1}{00342}}\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}\ \mbox{\hyperlink{class_z_token_type_d_lg_a93814e96c87004ca7baefefde5c782b1}{ZTokenTypeDLg::get}}()\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00343}00343\ \ \ \textcolor{keywordflow}{if}\ (ArrayCHk-\/>isChecked())}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00344}00344\ \ \ \ \ \textcolor{keywordflow}{return}\ ZType\ |\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3dfafdee7071468db6eb2860fe7ae305}{ZType\_Array}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00345}00345\ \ \ \textcolor{keywordflow}{return}\ ZType;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00346}00346\ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00347}00347\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00348}00348\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00349}\mbox{\hyperlink{class_z_token_type_d_lg_a3e8e33a76f51f2f460e74cc860eb6a0a}{00349}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_token_type_d_lg_a3e8e33a76f51f2f460e74cc860eb6a0a}{ZTokenTypeDLg::dataSetup}}()}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00350}00350\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00351}00351\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QList<QStandardItem*>}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wTypeRow}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00352}00352\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QVariant}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wV}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00353}00353\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandardItem}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00354}00354\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00355}00355\ \ \ ZQStandardItem::setItemAlignment(Qt::AlignRight);}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00356}00356\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00357}00357\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}}=\mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{createItem}}(\textcolor{stringliteral}{"{}Atomic\ data\ types"{}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00358}00358\ \ \ TreeView-\/>ItemModel-\/>appendRow(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00359}00359\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00360}00360\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00361}00361\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00362}00362\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}}=\mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{createItem}}(\textcolor{stringliteral}{"{}Varying\ string\ types"{}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00363}00363\ \ \ TreeView-\/>ItemModel-\/>appendRow(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00364}00364\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00365}00365\ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}=0;\mbox{\hyperlink{ztokentypedlg_8cpp_a0091f8eff62172564d68c74267e479a1}{ZTypeVStringEdit}}[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}].\mbox{\hyperlink{struct_z_type_edit_struct_acc6e33aceca2a0a9f4d2cca6c66d0c8a}{Value}}!=\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abc92ffb8ad2a07162468fb7e20dcfed6}{ZType\_Nothing}};\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}++\ )}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00366}00366\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}}-\/>appendRow(\mbox{\hyperlink{ztokentypedlg_8h_aea73b852b83beb6b4a148b33a6f54d83}{createItemRow}}(\mbox{\hyperlink{ztokentypedlg_8cpp_a0091f8eff62172564d68c74267e479a1}{ZTypeVStringEdit}}[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}]));}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00367}00367\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00368}00368\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}}=\mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{createItem}}(\textcolor{stringliteral}{"{}Fixed\ string\ types"{}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00369}00369\ \ \ TreeView-\/>ItemModel-\/>appendRow(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00370}00370\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00371}00371\ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}=0;\mbox{\hyperlink{ztokentypedlg_8cpp_a67f0dfa2dc6465e02e0afc5bed0da833}{ZTypeFStringEdit}}[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}].\mbox{\hyperlink{struct_z_type_edit_struct_acc6e33aceca2a0a9f4d2cca6c66d0c8a}{Value}}!=\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abc92ffb8ad2a07162468fb7e20dcfed6}{ZType\_Nothing}};\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}++\ )}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00372}00372\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}}-\/>appendRow(\mbox{\hyperlink{ztokentypedlg_8h_aea73b852b83beb6b4a148b33a6f54d83}{createItemRow}}(\mbox{\hyperlink{ztokentypedlg_8cpp_a67f0dfa2dc6465e02e0afc5bed0da833}{ZTypeFStringEdit}}[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}]));}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00373}00373\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00374}00374\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00375}00375\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}}=\mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{createItem}}(\textcolor{stringliteral}{"{}Class\ object\ types"{}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00376}00376\ \ \ TreeView-\/>ItemModel-\/>appendRow(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00377}00377\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00378}00378\ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}=0;\mbox{\hyperlink{ztokentypedlg_8cpp_af4a6b283586259b36ac501f9b4f4d017}{ZTypeOtherEdit}}[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}].\mbox{\hyperlink{struct_z_type_edit_struct_acc6e33aceca2a0a9f4d2cca6c66d0c8a}{Value}}!=\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abc92ffb8ad2a07162468fb7e20dcfed6}{ZType\_Nothing}};\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}++\ )\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00379}00379\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}}-\/>appendRow(\mbox{\hyperlink{ztokentypedlg_8h_aea73b852b83beb6b4a148b33a6f54d83}{createItemRow}}(\mbox{\hyperlink{ztokentypedlg_8cpp_af4a6b283586259b36ac501f9b4f4d017}{ZTypeOtherEdit}}[\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}]));}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00380}00380\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00381}00381\ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}=0;\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}\ <\ 3;\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}++)}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00382}00382\ \ \ \ \ TreeView-\/>resizeColumnToContents(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00383}00383\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00384}00384\ \ \ TreeView-\/>expandAll();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00385}00385\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00386}00386\ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00387}00387\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00388}\mbox{\hyperlink{class_z_token_type_d_lg_a71bb6351b7cae8d2cd97ce6480017d24}{00388}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_token_type_d_lg_a71bb6351b7cae8d2cd97ce6480017d24}{ZTokenTypeDLg::closeEvent}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QCloseEvent}}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{event}})}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00389}00389\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00390}00390\ \ \ TreeView-\/>deleteLater();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00391}00391\ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00392}00392\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00393}00393\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00394}00394\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00395}00395\ \textcolor{comment}{/*\ test\ current\ item\ and\ if\ not\ OK\ get\ children\ recursively\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00396}00396\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QModelIndex}}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00397}\mbox{\hyperlink{class_z_token_type_d_lg_a679b586c3bd5ec5c7e19d24e78e50ebf}{00397}}\ \mbox{\hyperlink{class_z_token_type_d_lg_a679b586c3bd5ec5c7e19d24e78e50ebf}{ZTokenTypeDLg::\_searchZType}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandardItem}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pItem}},\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZType}})}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00398}00398\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00399}00399\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QVariant}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wV}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00400}00400\ \ \ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZType}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00401}00401\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandardItem}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem1}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00402}00402\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QModelIndex}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00403}00403\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00404}00404\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pItem}}==\textcolor{keyword}{nullptr})}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00405}00405\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QModelIndex}}();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00406}00406\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00407}00407\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wV}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pItem}}-\/>data(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZQtValueRole}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00408}00408\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZType}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wV}}.value<\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}>();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00409}00409\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZType}}==\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZType}})}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00410}00410\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pItem}}-\/>index();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00411}00411\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00412}00412\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00413}00413\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem1}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pItem}}-\/>child(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00414}00414\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem1}}\ ==\textcolor{keyword}{nullptr})}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00415}00415\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QModelIndex}}();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00416}00416\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00417}00417\ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem1}}\ \&\&\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi\ <\ pItem-\/>}}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{rowCount}}()))}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00418}00418\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00419}00419\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}}\ =\ \mbox{\hyperlink{class_z_token_type_d_lg_a679b586c3bd5ec5c7e19d24e78e50ebf}{\_searchZType}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem1}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZType}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00420}00420\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}}.isValid())}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00421}00421\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00422}00422\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00423}00423\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wV}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem1}}-\/>data(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZQtValueRole}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00424}00424\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZType}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wV}}.value<\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}>();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00425}00425\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wZType}}==\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZType}})}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00426}00426\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem1}}-\/>index();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00427}00427\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}++;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00428}00428\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem1}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pItem}}-\/>child(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00429}00429\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00430}00430\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QModelIndex}}();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00431}00431\ \}\textcolor{comment}{//\ \_searchZType}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00432}00432\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00433}00433\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00434}00434\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QModelIndex}}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00435}\mbox{\hyperlink{class_z_token_type_d_lg_a4d56bcf42ba1eee1a096aee7032e7404}{00435}}\ \mbox{\hyperlink{class_z_token_type_d_lg_a4d56bcf42ba1eee1a096aee7032e7404}{ZTokenTypeDLg::searchZType}}(\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZType}})}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00436}00436\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00437}00437\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QModelIndex}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}}\ ;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00438}00438\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00439}00439\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandardItem}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}}=\ TreeView-\/>ItemModel-\/>item(0,0)\ ;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00440}00440\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00441}00441\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}\ =\ 0;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00442}00442\ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}}\ \&\&\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi\ <\ wItem-\/>}}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{rowCount}}()))}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00443}00443\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00444}00444\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}}=\ TreeView-\/>ItemModel-\/>item(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}},0)\ ;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00445}00445\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}}=\mbox{\hyperlink{class_z_token_type_d_lg_a679b586c3bd5ec5c7e19d24e78e50ebf}{\_searchZType}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZType}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00446}00446\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}}.isValid())}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00447}00447\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00448}00448\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}++;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00449}00449\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00450}00450\ \ \ \textcolor{comment}{/*\ not\ found\ :\ search\ ZType\_Unknown\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00451}00451\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00452}00452\ \ \ \textcolor{keywordflow}{while}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}}\ \&\&\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi\ <\ wItem-\/>}}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{rowCount}}()))}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00453}00453\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00454}00454\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}}=\ TreeView-\/>ItemModel-\/>item(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}},0)\ ;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00455}00455\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}}=\mbox{\hyperlink{class_z_token_type_d_lg_a679b586c3bd5ec5c7e19d24e78e50ebf}{\_searchZType}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wItem}},\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8afabd68e127b21c2981dd6df502cb211c}{ZType\_Unknown}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00456}00456\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}}.isValid())}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00457}00457\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wIdx}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00458}00458\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wi}}++;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00459}00459\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00460}00460\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00461}00461\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QModelIndex}}();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00462}00462\ \}\textcolor{comment}{//searchZType}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00463}00463\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00464}\mbox{\hyperlink{zstdlistdlg_8h_aea73b852b83beb6b4a148b33a6f54d83}{00464}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QList<QStandardItem*>}}\ \mbox{\hyperlink{ztokentypedlg_8cpp_aea73b852b83beb6b4a148b33a6f54d83}{createItemRow}}\ (\mbox{\hyperlink{struct_z_type_edit_struct}{ZTypeEditStruct}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pTypeStr}})}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00465}00465\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00466}00466\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QList<QStandardItem*>}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wTypeRow}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00467}00467\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QVariant}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wV}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00468}00468\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wTypeRow}}.clear();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00469}00469\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00470}00470\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wTypeRow}}\ <<\ \mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{createItem}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pTypeStr}}.Value,\textcolor{stringliteral}{"{}0x\%08X"{}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00471}00471\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wV}}.setValue<\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}>((\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}})\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pTypeStr}}.Value);}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00472}00472\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wTypeRow}}[0]-\/>setData(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wV}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZQtValueRole}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00473}00473\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wTypeRow}}[0]-\/>setToolTip(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pTypeStr}}.Tooltip);}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00474}00474\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00475}00475\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wTypeRow}}\ <<\ \mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{createItem}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pTypeStr}}.Name);}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00476}00476\ \ \ \textcolor{comment}{//\ \ ZQStandardItem::setItemAlignment(Qt::AlignLeft);}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00477}00477\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wTypeRow}}\ <<\ \mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{createItem}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pTypeStr}}.Tooltip);}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00478}00478\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wTypeRow}}.last()-\/>setData((Qt::TextWordWrap|Qt::AlignLeft),Qt::TextAlignmentRole);}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00479}00479\ \ \ \textcolor{comment}{//\ \ ZQStandardItem::setItemAlignment(Qt::AlignRight);}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00480}00480\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wTypeRow}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8cpp_source_l00481}00481\ \}}
+
+\end{DoxyCode}

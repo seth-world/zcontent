@@ -1,0 +1,73 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/zsearchformula\+\_\+sv.h File Reference}
+\hypertarget{zsearchformula__sv_8h}{}\label{zsearchformula__sv_8h}\index{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zsearchformula\_sv.h@{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zsearchformula\_sv.h}}
+{\ttfamily \#include $<$ztoolset/zarray.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zdatabuffer.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/utfvaryingstring.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/uristring.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zdatefull.\+h$>$}\newline
+{\ttfamily \#include $<$zcontentcommon/zresource.\+h$>$}\newline
+{\ttfamily \#include "{}zsearchparsertype.\+h"{}}\newline
+{\ttfamily \#include "{}zfielddescription.\+h"{}}\newline
+Include dependency graph for zsearchformula\+\_\+sv.\+h\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_z_search_formula}{ZSearch\+Formula}}
+\item 
+class \mbox{\hyperlink{class_z_search_formula_list}{ZSearch\+Formula\+List}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{zsearchformula__sv_8h_a136a470599dd501e411ff7579c816f82}{ZFormula\+Type}} \+: int \{ \mbox{\hyperlink{zsearchformula__sv_8h_a136a470599dd501e411ff7579c816f82a3ee8ff38500d6631c3e17474905f2c7c}{ZFORT\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{zsearchformula__sv_8h_a136a470599dd501e411ff7579c816f82afa290cfbde730781d3ec78d904677176}{ZFORT\+\_\+\+Term}} = 1
+, \mbox{\hyperlink{zsearchformula__sv_8h_a136a470599dd501e411ff7579c816f82ae48e23421ef16382eb5e16624cd05f56}{ZFORT\+\_\+\+Formula}} = 2
+, \mbox{\hyperlink{zsearchformula__sv_8h_a136a470599dd501e411ff7579c816f82a9ba926b526c7687147cee01397235866}{ZFORT\+\_\+\+Arithmetic}} = 3
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zsearchformula__sv_8h_acf745aa1a068ac902e0d3ae9e4e0a8c6}{decode\+\_\+\+ZFormula\+Type}} (\mbox{\hyperlink{namespacezbs_a98c60ec1825a53cda939b887f5c5f2cf}{ZFormula\+Type}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Type}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{zsearchformula__sv_8h_a136a470599dd501e411ff7579c816f82}\label{zsearchformula__sv_8h_a136a470599dd501e411ff7579c816f82} 
+\index{zsearchformula\_sv.h@{zsearchformula\_sv.h}!ZFormulaType@{ZFormulaType}}
+\index{ZFormulaType@{ZFormulaType}!zsearchformula\_sv.h@{zsearchformula\_sv.h}}
+\doxysubsubsection{\texorpdfstring{ZFormulaType}{ZFormulaType}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{namespacezbs_a98c60ec1825a53cda939b887f5c5f2cf}{ZFormula\+Type}} \+: \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZFORT\_Nothing@{ZFORT\_Nothing}!zsearchformula\_sv.h@{zsearchformula\_sv.h}}\index{zsearchformula\_sv.h@{zsearchformula\_sv.h}!ZFORT\_Nothing@{ZFORT\_Nothing}}}\Hypertarget{zsearchformula__sv_8h_a136a470599dd501e411ff7579c816f82a3ee8ff38500d6631c3e17474905f2c7c}\label{zsearchformula__sv_8h_a136a470599dd501e411ff7579c816f82a3ee8ff38500d6631c3e17474905f2c7c} 
+ZFORT\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZFORT\_Term@{ZFORT\_Term}!zsearchformula\_sv.h@{zsearchformula\_sv.h}}\index{zsearchformula\_sv.h@{zsearchformula\_sv.h}!ZFORT\_Term@{ZFORT\_Term}}}\Hypertarget{zsearchformula__sv_8h_a136a470599dd501e411ff7579c816f82afa290cfbde730781d3ec78d904677176}\label{zsearchformula__sv_8h_a136a470599dd501e411ff7579c816f82afa290cfbde730781d3ec78d904677176} 
+ZFORT\+\_\+\+Term&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZFORT\_Formula@{ZFORT\_Formula}!zsearchformula\_sv.h@{zsearchformula\_sv.h}}\index{zsearchformula\_sv.h@{zsearchformula\_sv.h}!ZFORT\_Formula@{ZFORT\_Formula}}}\Hypertarget{zsearchformula__sv_8h_a136a470599dd501e411ff7579c816f82ae48e23421ef16382eb5e16624cd05f56}\label{zsearchformula__sv_8h_a136a470599dd501e411ff7579c816f82ae48e23421ef16382eb5e16624cd05f56} 
+ZFORT\+\_\+\+Formula&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZFORT\_Arithmetic@{ZFORT\_Arithmetic}!zsearchformula\_sv.h@{zsearchformula\_sv.h}}\index{zsearchformula\_sv.h@{zsearchformula\_sv.h}!ZFORT\_Arithmetic@{ZFORT\_Arithmetic}}}\Hypertarget{zsearchformula__sv_8h_a136a470599dd501e411ff7579c816f82a9ba926b526c7687147cee01397235866}\label{zsearchformula__sv_8h_a136a470599dd501e411ff7579c816f82a9ba926b526c7687147cee01397235866} 
+ZFORT\+\_\+\+Arithmetic&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{zsearchformula__sv_8h_source_l00046}{46}} of file \mbox{\hyperlink{zsearchformula__sv_8h_source}{zsearchformula\+\_\+sv.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{zsearchformula__sv_8h_acf745aa1a068ac902e0d3ae9e4e0a8c6}\label{zsearchformula__sv_8h_acf745aa1a068ac902e0d3ae9e4e0a8c6} 
+\index{zsearchformula\_sv.h@{zsearchformula\_sv.h}!decode\_ZFormulaType@{decode\_ZFormulaType}}
+\index{decode\_ZFormulaType@{decode\_ZFormulaType}!zsearchformula\_sv.h@{zsearchformula\_sv.h}}
+\doxysubsubsection{\texorpdfstring{decode\_ZFormulaType()}{decode\_ZFormulaType()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} decode\+\_\+\+ZFormula\+Type (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespacezbs_a98c60ec1825a53cda939b887f5c5f2cf}{ZFormula\+Type}}}]{p\+Type }\end{DoxyParamCaption})}
+

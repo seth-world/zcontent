@@ -1,0 +1,11 @@
+\doxysection{/home/gerard/\+Development/zbasetools/znet/zbasenet/zsslsocketselect.h File Reference}
+\hypertarget{zsslsocketselect_8h}{}\label{zsslsocketselect_8h}\index{/home/gerard/Development/zbasetools/znet/zbasenet/zsslsocketselect.h@{/home/gerard/Development/zbasetools/znet/zbasenet/zsslsocketselect.h}}
+{\ttfamily \#include $<$zbasenet/zsslabstract.\+h$>$}\newline
+{\ttfamily \#include $<$zbasenet/zsocketselect.\+h$>$}\newline
+Include dependency graph for zsslsocketselect.\+h\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_z_s_s_l_socket_select}{ZSSLSocket\+Select}}
+\begin{DoxyCompactList}\small\item\em The \doxylink{class_z_s_s_l_socket_select}{ZSSLSocket\+Select} class This socket is created and used by a SSLServer\+Select to initiate and manage the SSL connection with a remote client endpoint Usage of this socket class is intended to be done within a ZThread thread. Each read operation is conditionned by a \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wait()} putting the thread in dormant state, waiting a wakeup. Before any read operation, Thread event queue is scanned and events are processed. Then read operation occurs. \end{DoxyCompactList}\end{DoxyCompactItemize}

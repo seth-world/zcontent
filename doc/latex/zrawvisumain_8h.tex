@@ -1,0 +1,253 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/zrawvisumain.h File Reference}
+\hypertarget{zrawvisumain_8h}{}\label{zrawvisumain_8h}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zrawvisumain.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zrawvisumain.h}}
+{\ttfamily \#include $<$config/zconfig.\+h$>$}\newline
+{\ttfamily \#include $<$QMain\+Window$>$}\newline
+{\ttfamily \#include $<$ztoolset/zstatus.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/uristring.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zarray.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zrandomfile/zrandomfiletypes.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zrandomfile/zblock.\+h$>$}\newline
+{\ttfamily \#include $<$zcontent/zrandomfile/zrandomfile.\+h$>$}\newline
+{\ttfamily \#include $<$QModel\+Index$>$}\newline
+{\ttfamily \#include $<$ztoolset/zaierrors.\+h$>$}\newline
+Include dependency graph for zrawvisumain.\+h\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_scan_block}{Scan\+Block}}
+\item 
+class \mbox{\hyperlink{class_z_raw_visu_main}{ZRaw\+Visu\+Main}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacezbs}{zbs}}
+\begin{DoxyCompactList}\small\item\em ZSIndex\+Field\+\_\+struct Dictionary single field definition \+: one key may be composed of many single fields not necessarily contiguous in the master file\textquotesingle{}s data structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zrawvisumain_8h_a44fdbf40a2b53439e554eb9a4cb46d2b}{\+\_\+\+\_\+\+DISPLAYCALLBACK\+\_\+\+\_\+}}(\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}})~\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}}\&)$>$ \mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zrawvisumain_8h_a4de69cc1826a585669b8b6f020d7006c}{\+\_\+\+\_\+\+PROGRESSCALLBACK\+\_\+\+\_\+}}(\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}})~\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}})$>$ \mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zrawvisumain_8h_abf1988bd8ae1f33619177cc04d24e534}{\+\_\+\+\_\+\+VISUMODE\+\_\+\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937}{Scan\+Block\+\_\+type}} \+: uint8\+\_\+t \{ \newline
+\mbox{\hyperlink{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937af5a02e5efea01322143b170ddf564f9d}{SBT\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937ac8960ffed7b147c8674f06388be93abf}{SBT\+\_\+\+Correct}} = 1
+, \mbox{\hyperlink{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937aeb15cd8e83f1c0cafc065f5bdb5721a4}{SBT\+\_\+\+Inv\+Header}} = 2
+, \mbox{\hyperlink{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937a0e1cb7ee285399e0ef1ab5974a1978fa}{SBT\+\_\+\+Miss\+EB}} = 4
+, \newline
+\mbox{\hyperlink{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937a23a43826e814a1fa4242cf46b0ae166c}{SBT\+\_\+\+Inv\+Blk\+Size}} = 8
+ \}
+\item 
+enum \mbox{\hyperlink{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5}{Visu\+Mode\+\_\+type}} \+: uint8\+\_\+t \{ \newline
+\mbox{\hyperlink{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5a6d94841cabe507209df5c66729da64a8}{VMD\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5af8af97914ef5ea9aa7032ac3b66eac2a}{VMD\+\_\+\+Raw\+Sequential}} = 1
+, \mbox{\hyperlink{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5a6a71c5b566b9808148486dbe5350bab9}{VMD\+\_\+\+Raw\+Random}} = 2
+, \mbox{\hyperlink{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5a098240f5a64cb87b0d7586deed5b2930}{VMD\+\_\+\+Random}} = 3
+, \newline
+\mbox{\hyperlink{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5acc51fb2bb8382e72ee3bf7c702ef2002}{VMD\+\_\+\+Master}} = 4
+, \mbox{\hyperlink{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5ab6d1505c66395595bf490631c9db6aa3}{VMD\+\_\+\+Header}} = 5
+ \}
+\item 
+enum \mbox{\hyperlink{zrawvisumain_8h_a6303c72eb1ce033c246062928b7313b1}{ZCVM\+\_\+\+Visu\+Type}} \{ \mbox{\hyperlink{zrawvisumain_8h_a6303c72eb1ce033c246062928b7313b1a455a1bf24bf45c6f114f42ac67804d04}{ZCVM\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{zrawvisumain_8h_a6303c72eb1ce033c246062928b7313b1ad7a671a9e77d6257a7806ebbfef9ad1e}{ZCVM\+\_\+\+Raw}} = 1
+, \mbox{\hyperlink{zrawvisumain_8h_a6303c72eb1ce033c246062928b7313b1a7fc9ee0f7777f35153116df96de3b08a}{ZCVM\+\_\+\+Random\+File}} = 2
+, \mbox{\hyperlink{zrawvisumain_8h_a6303c72eb1ce033c246062928b7313b1a6bbc6854550ecbdbd89818c2a26b60ac}{ZCVM\+\_\+\+Master\+File}} = 3
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{zrawvisumain_8h_a265f4e949a8f634e9f16c7b359bece9f}{set\+Load\+Max}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Load\+Max}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{group___z_m_f_s_t_a_t_s_ga7c0040329cceb6c3661245eae9de5b59}{sleep\+Times}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Times}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zrawvisumain_8h_a68ff5dd059a4d74e955297f9fec1c2b8}{cst\+\_\+maxraisonablevalue}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{class_dic_edit_m_wn}{Dic\+Edit\+MWn}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zrawvisumain_8h_ad6ccf9b97101d2a125b68f248d2f7dd5}{Dic\+Edit}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{zrawvisumain_8h_a44fdbf40a2b53439e554eb9a4cb46d2b}\label{zrawvisumain_8h_a44fdbf40a2b53439e554eb9a4cb46d2b} 
+\index{zrawvisumain.h@{zrawvisumain.h}!\_\_DISPLAYCALLBACK\_\_@{\_\_DISPLAYCALLBACK\_\_}}
+\index{\_\_DISPLAYCALLBACK\_\_@{\_\_DISPLAYCALLBACK\_\_}!zrawvisumain.h@{zrawvisumain.h}}
+\doxysubsubsection{\texorpdfstring{\_\_DISPLAYCALLBACK\_\_}{\_\_DISPLAYCALLBACK\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+DISPLAYCALLBACK\+\_\+\+\_\+(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}} }\end{DoxyParamCaption})~\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}}\&)$>$ \mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}}}
+
+
+
+Definition at line \mbox{\hyperlink{zrawvisumain_8h_source_l00025}{25}} of file \mbox{\hyperlink{zrawvisumain_8h_source}{zrawvisumain.\+h}}.
+
+\Hypertarget{zrawvisumain_8h_a4de69cc1826a585669b8b6f020d7006c}\label{zrawvisumain_8h_a4de69cc1826a585669b8b6f020d7006c} 
+\index{zrawvisumain.h@{zrawvisumain.h}!\_\_PROGRESSCALLBACK\_\_@{\_\_PROGRESSCALLBACK\_\_}}
+\index{\_\_PROGRESSCALLBACK\_\_@{\_\_PROGRESSCALLBACK\_\_}!zrawvisumain.h@{zrawvisumain.h}}
+\doxysubsubsection{\texorpdfstring{\_\_PROGRESSCALLBACK\_\_}{\_\_PROGRESSCALLBACK\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+PROGRESSCALLBACK\+\_\+\+\_\+(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}} }\end{DoxyParamCaption})~\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}})$>$ \mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}}}
+
+
+
+Definition at line \mbox{\hyperlink{zrawvisumain_8h_source_l00026}{26}} of file \mbox{\hyperlink{zrawvisumain_8h_source}{zrawvisumain.\+h}}.
+
+\Hypertarget{zrawvisumain_8h_abf1988bd8ae1f33619177cc04d24e534}\label{zrawvisumain_8h_abf1988bd8ae1f33619177cc04d24e534} 
+\index{zrawvisumain.h@{zrawvisumain.h}!\_\_VISUMODE\_\_@{\_\_VISUMODE\_\_}}
+\index{\_\_VISUMODE\_\_@{\_\_VISUMODE\_\_}!zrawvisumain.h@{zrawvisumain.h}}
+\doxysubsubsection{\texorpdfstring{\_\_VISUMODE\_\_}{\_\_VISUMODE\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+VISUMODE\+\_\+\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{zrawvisumain_8h_source_l00086}{86}} of file \mbox{\hyperlink{zrawvisumain_8h_source}{zrawvisumain.\+h}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937}\label{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937} 
+\index{zrawvisumain.h@{zrawvisumain.h}!ScanBlock\_type@{ScanBlock\_type}}
+\index{ScanBlock\_type@{ScanBlock\_type}!zrawvisumain.h@{zrawvisumain.h}}
+\doxysubsubsection{\texorpdfstring{ScanBlock\_type}{ScanBlock\_type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{zcontentvisumain_8h_a0390ad563bb459341d6a98271c369937}{Scan\+Block\+\_\+type}} \+: \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SBT\_Nothing@{SBT\_Nothing}!zrawvisumain.h@{zrawvisumain.h}}\index{zrawvisumain.h@{zrawvisumain.h}!SBT\_Nothing@{SBT\_Nothing}}}\Hypertarget{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937af5a02e5efea01322143b170ddf564f9d}\label{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937af5a02e5efea01322143b170ddf564f9d} 
+SBT\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SBT\_Correct@{SBT\_Correct}!zrawvisumain.h@{zrawvisumain.h}}\index{zrawvisumain.h@{zrawvisumain.h}!SBT\_Correct@{SBT\_Correct}}}\Hypertarget{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937ac8960ffed7b147c8674f06388be93abf}\label{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937ac8960ffed7b147c8674f06388be93abf} 
+SBT\+\_\+\+Correct&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SBT\_InvHeader@{SBT\_InvHeader}!zrawvisumain.h@{zrawvisumain.h}}\index{zrawvisumain.h@{zrawvisumain.h}!SBT\_InvHeader@{SBT\_InvHeader}}}\Hypertarget{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937aeb15cd8e83f1c0cafc065f5bdb5721a4}\label{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937aeb15cd8e83f1c0cafc065f5bdb5721a4} 
+SBT\+\_\+\+Inv\+Header&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SBT\_MissEB@{SBT\_MissEB}!zrawvisumain.h@{zrawvisumain.h}}\index{zrawvisumain.h@{zrawvisumain.h}!SBT\_MissEB@{SBT\_MissEB}}}\Hypertarget{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937a0e1cb7ee285399e0ef1ab5974a1978fa}\label{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937a0e1cb7ee285399e0ef1ab5974a1978fa} 
+SBT\+\_\+\+Miss\+EB&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SBT\_InvBlkSize@{SBT\_InvBlkSize}!zrawvisumain.h@{zrawvisumain.h}}\index{zrawvisumain.h@{zrawvisumain.h}!SBT\_InvBlkSize@{SBT\_InvBlkSize}}}\Hypertarget{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937a23a43826e814a1fa4242cf46b0ae166c}\label{zrawvisumain_8h_a0390ad563bb459341d6a98271c369937a23a43826e814a1fa4242cf46b0ae166c} 
+SBT\+\_\+\+Inv\+Blk\+Size&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{zrawvisumain_8h_source_l00028}{28}} of file \mbox{\hyperlink{zrawvisumain_8h_source}{zrawvisumain.\+h}}.
+
+\Hypertarget{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5}\label{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5} 
+\index{zrawvisumain.h@{zrawvisumain.h}!VisuMode\_type@{VisuMode\_type}}
+\index{VisuMode\_type@{VisuMode\_type}!zrawvisumain.h@{zrawvisumain.h}}
+\doxysubsubsection{\texorpdfstring{VisuMode\_type}{VisuMode\_type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{zcontentvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5}{Visu\+Mode\+\_\+type}} \+: \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VMD\_Nothing@{VMD\_Nothing}!zrawvisumain.h@{zrawvisumain.h}}\index{zrawvisumain.h@{zrawvisumain.h}!VMD\_Nothing@{VMD\_Nothing}}}\Hypertarget{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5a6d94841cabe507209df5c66729da64a8}\label{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5a6d94841cabe507209df5c66729da64a8} 
+VMD\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VMD\_RawSequential@{VMD\_RawSequential}!zrawvisumain.h@{zrawvisumain.h}}\index{zrawvisumain.h@{zrawvisumain.h}!VMD\_RawSequential@{VMD\_RawSequential}}}\Hypertarget{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5af8af97914ef5ea9aa7032ac3b66eac2a}\label{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5af8af97914ef5ea9aa7032ac3b66eac2a} 
+VMD\+\_\+\+Raw\+Sequential&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VMD\_RawRandom@{VMD\_RawRandom}!zrawvisumain.h@{zrawvisumain.h}}\index{zrawvisumain.h@{zrawvisumain.h}!VMD\_RawRandom@{VMD\_RawRandom}}}\Hypertarget{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5a6a71c5b566b9808148486dbe5350bab9}\label{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5a6a71c5b566b9808148486dbe5350bab9} 
+VMD\+\_\+\+Raw\+Random&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VMD\_Random@{VMD\_Random}!zrawvisumain.h@{zrawvisumain.h}}\index{zrawvisumain.h@{zrawvisumain.h}!VMD\_Random@{VMD\_Random}}}\Hypertarget{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5a098240f5a64cb87b0d7586deed5b2930}\label{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5a098240f5a64cb87b0d7586deed5b2930} 
+VMD\+\_\+\+Random&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VMD\_Master@{VMD\_Master}!zrawvisumain.h@{zrawvisumain.h}}\index{zrawvisumain.h@{zrawvisumain.h}!VMD\_Master@{VMD\_Master}}}\Hypertarget{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5acc51fb2bb8382e72ee3bf7c702ef2002}\label{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5acc51fb2bb8382e72ee3bf7c702ef2002} 
+VMD\+\_\+\+Master&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VMD\_Header@{VMD\_Header}!zrawvisumain.h@{zrawvisumain.h}}\index{zrawvisumain.h@{zrawvisumain.h}!VMD\_Header@{VMD\_Header}}}\Hypertarget{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5ab6d1505c66395595bf490631c9db6aa3}\label{zrawvisumain_8h_a0a9f0a2bdc43550c41659d899d024fc5ab6d1505c66395595bf490631c9db6aa3} 
+VMD\+\_\+\+Header&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{zrawvisumain_8h_source_l00088}{88}} of file \mbox{\hyperlink{zrawvisumain_8h_source}{zrawvisumain.\+h}}.
+
+\Hypertarget{zrawvisumain_8h_a6303c72eb1ce033c246062928b7313b1}\label{zrawvisumain_8h_a6303c72eb1ce033c246062928b7313b1} 
+\index{zrawvisumain.h@{zrawvisumain.h}!ZCVM\_VisuType@{ZCVM\_VisuType}}
+\index{ZCVM\_VisuType@{ZCVM\_VisuType}!zrawvisumain.h@{zrawvisumain.h}}
+\doxysubsubsection{\texorpdfstring{ZCVM\_VisuType}{ZCVM\_VisuType}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{zcontentvisumain_8h_a6303c72eb1ce033c246062928b7313b1}{ZCVM\+\_\+\+Visu\+Type}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCVM\_Nothing@{ZCVM\_Nothing}!zrawvisumain.h@{zrawvisumain.h}}\index{zrawvisumain.h@{zrawvisumain.h}!ZCVM\_Nothing@{ZCVM\_Nothing}}}\Hypertarget{zrawvisumain_8h_a6303c72eb1ce033c246062928b7313b1a455a1bf24bf45c6f114f42ac67804d04}\label{zrawvisumain_8h_a6303c72eb1ce033c246062928b7313b1a455a1bf24bf45c6f114f42ac67804d04} 
+ZCVM\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCVM\_Raw@{ZCVM\_Raw}!zrawvisumain.h@{zrawvisumain.h}}\index{zrawvisumain.h@{zrawvisumain.h}!ZCVM\_Raw@{ZCVM\_Raw}}}\Hypertarget{zrawvisumain_8h_a6303c72eb1ce033c246062928b7313b1ad7a671a9e77d6257a7806ebbfef9ad1e}\label{zrawvisumain_8h_a6303c72eb1ce033c246062928b7313b1ad7a671a9e77d6257a7806ebbfef9ad1e} 
+ZCVM\+\_\+\+Raw&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCVM\_RandomFile@{ZCVM\_RandomFile}!zrawvisumain.h@{zrawvisumain.h}}\index{zrawvisumain.h@{zrawvisumain.h}!ZCVM\_RandomFile@{ZCVM\_RandomFile}}}\Hypertarget{zrawvisumain_8h_a6303c72eb1ce033c246062928b7313b1a7fc9ee0f7777f35153116df96de3b08a}\label{zrawvisumain_8h_a6303c72eb1ce033c246062928b7313b1a7fc9ee0f7777f35153116df96de3b08a} 
+ZCVM\+\_\+\+Random\+File&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZCVM\_MasterFile@{ZCVM\_MasterFile}!zrawvisumain.h@{zrawvisumain.h}}\index{zrawvisumain.h@{zrawvisumain.h}!ZCVM\_MasterFile@{ZCVM\_MasterFile}}}\Hypertarget{zrawvisumain_8h_a6303c72eb1ce033c246062928b7313b1a6bbc6854550ecbdbd89818c2a26b60ac}\label{zrawvisumain_8h_a6303c72eb1ce033c246062928b7313b1a6bbc6854550ecbdbd89818c2a26b60ac} 
+ZCVM\+\_\+\+Master\+File&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{zrawvisumain_8h_source_l00121}{121}} of file \mbox{\hyperlink{zrawvisumain_8h_source}{zrawvisumain.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{zrawvisumain_8h_a265f4e949a8f634e9f16c7b359bece9f}\label{zrawvisumain_8h_a265f4e949a8f634e9f16c7b359bece9f} 
+\index{zrawvisumain.h@{zrawvisumain.h}!setLoadMax@{setLoadMax}}
+\index{setLoadMax@{setLoadMax}!zrawvisumain.h@{zrawvisumain.h}}
+\doxysubsubsection{\texorpdfstring{setLoadMax()}{setLoadMax()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} set\+Load\+Max (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}}}]{p\+Load\+Max }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03376}{3376}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03375}{Load\+Max}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{zrawvisumain_8h_a68ff5dd059a4d74e955297f9fec1c2b8}\label{zrawvisumain_8h_a68ff5dd059a4d74e955297f9fec1c2b8} 
+\index{zrawvisumain.h@{zrawvisumain.h}!cst\_maxraisonablevalue@{cst\_maxraisonablevalue}}
+\index{cst\_maxraisonablevalue@{cst\_maxraisonablevalue}!zrawvisumain.h@{zrawvisumain.h}}
+\doxysubsubsection{\texorpdfstring{cst\_maxraisonablevalue}{cst\_maxraisonablevalue}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} cst\+\_\+maxraisonablevalue\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l00090}{90}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zrawvisumain_8cpp_source_l02213}{ZRaw\+Visu\+Main\+::display\+Pool()}}.
+
+\Hypertarget{zrawvisumain_8h_ad6ccf9b97101d2a125b68f248d2f7dd5}\label{zrawvisumain_8h_ad6ccf9b97101d2a125b68f248d2f7dd5} 
+\index{zrawvisumain.h@{zrawvisumain.h}!DicEdit@{DicEdit}}
+\index{DicEdit@{DicEdit}!zrawvisumain.h@{zrawvisumain.h}}
+\doxysubsubsection{\texorpdfstring{DicEdit}{DicEdit}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{class}} \mbox{\hyperlink{class_dic_edit_m_wn}{Dic\+Edit\+MWn}}\texorpdfstring{$\ast$}{*} Dic\+Edit\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+

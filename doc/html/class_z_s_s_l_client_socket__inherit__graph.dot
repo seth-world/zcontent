@@ -1,0 +1,14 @@
+digraph "ZSSLClientSocket"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  Node1 [id="Node000001",label="ZSSLClientSocket",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="The ZSSLClientSocket class This object is used by a remote client to initiate and manage a SSL connec..."];
+  Node2 -> Node1 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="ZSSLAbstract",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",URL="$class_z_s_s_l_abstract.html",tooltip="The ZSSLAbstract class contains all data and routines for SSL support. Socket is managed within ZSock..."];
+  Node3 -> Node1 [id="edge2_Node000001_Node000003",dir="back",color="darkgreen",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="ZClientSocket",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",URL="$class_z_client_socket.html",tooltip="The ZClientSocket class this socket is used to simply connect to a remote server without using ZBase ..."];
+  Node4 -> Node3 [id="edge3_Node000003_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="ZSocket",height=0.2,width=0.4,color="gray40", fillcolor="white", style="filled",tooltip=" "];
+}

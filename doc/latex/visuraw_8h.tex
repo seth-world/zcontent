@@ -1,0 +1,126 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/visuraw.h File Reference}
+\hypertarget{visuraw_8h}{}\label{visuraw_8h}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/visuraw.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/visuraw.h}}
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+{\ttfamily \#include $<$qobject.\+h$>$}\newline
+Include dependency graph for visuraw.\+h\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_visu_raw}{Visu\+Raw}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{visuraw_8h_afc8a68fffd35e31d551d633e999cc850}{Visu\+Raw\+\_\+type}} \{ \newline
+\mbox{\hyperlink{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a351e6c7ece057d28317d8cb741f30fb5}{VRTP\+\_\+\+ZBlock\+Header}}
+, \mbox{\hyperlink{visuraw_8h_afc8a68fffd35e31d551d633e999cc850aadede58711cdc60937bc750375f12824}{VRTP\+\_\+\+URFField}}
+, \mbox{\hyperlink{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a9772a33d8ef2bc5305e23a3bc4651f75}{VRTP\+\_\+\+ZType}}
+, \mbox{\hyperlink{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a83fe8c85f66258392cd9ad9751a4bbaa}{VRTP\+\_\+uint16}}
+, \newline
+\mbox{\hyperlink{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a56783566b5596f7c15eaae211ca37454}{VRTP\+\_\+int16}}
+, \mbox{\hyperlink{visuraw_8h_afc8a68fffd35e31d551d633e999cc850af4fef1e8aa7d84c16bb1639aae162224}{VRTP\+\_\+uint32}}
+, \mbox{\hyperlink{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a135f8c53a8125db3d5aada77f08a52b3}{VRTP\+\_\+int32}}
+, \mbox{\hyperlink{visuraw_8h_afc8a68fffd35e31d551d633e999cc850afd6b26d7530eb0f641e651e048efc1c4}{VRTP\+\_\+uint64}}
+, \newline
+\mbox{\hyperlink{visuraw_8h_afc8a68fffd35e31d551d633e999cc850ada3ae5ecc3c6bcde77f5d20f5ac81ba6}{VRTP\+\_\+int64}}
+, \mbox{\hyperlink{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a8229aea4a463fb7415684f7b4b9e764e}{VRTP\+\_\+sizet}}
+, \mbox{\hyperlink{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a4a1503612529d29bf4e0d7ac98474e5d}{VRTP\+\_\+float}}
+, \mbox{\hyperlink{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a81bf6fa46bcded542680bd2c987d56fa}{VRTP\+\_\+double}}
+, \newline
+\mbox{\hyperlink{visuraw_8h_afc8a68fffd35e31d551d633e999cc850afea721268499d02ae389cdd4f5ad3b9d}{VRTP\+\_\+longdouble}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{visuraw_8h_a6b50e3400123fa1e5a9ad211179fca57}{compute\+Offset\+From\+Coord}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Row}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Col}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{visuraw_8h_afc8a68fffd35e31d551d633e999cc850}\label{visuraw_8h_afc8a68fffd35e31d551d633e999cc850} 
+\index{visuraw.h@{visuraw.h}!VisuRaw\_type@{VisuRaw\_type}}
+\index{VisuRaw\_type@{VisuRaw\_type}!visuraw.h@{visuraw.h}}
+\doxysubsubsection{\texorpdfstring{VisuRaw\_type}{VisuRaw\_type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{visuraw_8h_afc8a68fffd35e31d551d633e999cc850}{Visu\+Raw\+\_\+type}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VRTP\_ZBlockHeader@{VRTP\_ZBlockHeader}!visuraw.h@{visuraw.h}}\index{visuraw.h@{visuraw.h}!VRTP\_ZBlockHeader@{VRTP\_ZBlockHeader}}}\Hypertarget{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a351e6c7ece057d28317d8cb741f30fb5}\label{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a351e6c7ece057d28317d8cb741f30fb5} 
+VRTP\+\_\+\+ZBlock\+Header&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VRTP\_URFField@{VRTP\_URFField}!visuraw.h@{visuraw.h}}\index{visuraw.h@{visuraw.h}!VRTP\_URFField@{VRTP\_URFField}}}\Hypertarget{visuraw_8h_afc8a68fffd35e31d551d633e999cc850aadede58711cdc60937bc750375f12824}\label{visuraw_8h_afc8a68fffd35e31d551d633e999cc850aadede58711cdc60937bc750375f12824} 
+VRTP\+\_\+\+URFField&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VRTP\_ZType@{VRTP\_ZType}!visuraw.h@{visuraw.h}}\index{visuraw.h@{visuraw.h}!VRTP\_ZType@{VRTP\_ZType}}}\Hypertarget{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a9772a33d8ef2bc5305e23a3bc4651f75}\label{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a9772a33d8ef2bc5305e23a3bc4651f75} 
+VRTP\+\_\+\+ZType&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VRTP\_uint16@{VRTP\_uint16}!visuraw.h@{visuraw.h}}\index{visuraw.h@{visuraw.h}!VRTP\_uint16@{VRTP\_uint16}}}\Hypertarget{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a83fe8c85f66258392cd9ad9751a4bbaa}\label{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a83fe8c85f66258392cd9ad9751a4bbaa} 
+VRTP\+\_\+uint16&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VRTP\_int16@{VRTP\_int16}!visuraw.h@{visuraw.h}}\index{visuraw.h@{visuraw.h}!VRTP\_int16@{VRTP\_int16}}}\Hypertarget{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a56783566b5596f7c15eaae211ca37454}\label{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a56783566b5596f7c15eaae211ca37454} 
+VRTP\+\_\+int16&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VRTP\_uint32@{VRTP\_uint32}!visuraw.h@{visuraw.h}}\index{visuraw.h@{visuraw.h}!VRTP\_uint32@{VRTP\_uint32}}}\Hypertarget{visuraw_8h_afc8a68fffd35e31d551d633e999cc850af4fef1e8aa7d84c16bb1639aae162224}\label{visuraw_8h_afc8a68fffd35e31d551d633e999cc850af4fef1e8aa7d84c16bb1639aae162224} 
+VRTP\+\_\+uint32&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VRTP\_int32@{VRTP\_int32}!visuraw.h@{visuraw.h}}\index{visuraw.h@{visuraw.h}!VRTP\_int32@{VRTP\_int32}}}\Hypertarget{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a135f8c53a8125db3d5aada77f08a52b3}\label{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a135f8c53a8125db3d5aada77f08a52b3} 
+VRTP\+\_\+int32&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VRTP\_uint64@{VRTP\_uint64}!visuraw.h@{visuraw.h}}\index{visuraw.h@{visuraw.h}!VRTP\_uint64@{VRTP\_uint64}}}\Hypertarget{visuraw_8h_afc8a68fffd35e31d551d633e999cc850afd6b26d7530eb0f641e651e048efc1c4}\label{visuraw_8h_afc8a68fffd35e31d551d633e999cc850afd6b26d7530eb0f641e651e048efc1c4} 
+VRTP\+\_\+uint64&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VRTP\_int64@{VRTP\_int64}!visuraw.h@{visuraw.h}}\index{visuraw.h@{visuraw.h}!VRTP\_int64@{VRTP\_int64}}}\Hypertarget{visuraw_8h_afc8a68fffd35e31d551d633e999cc850ada3ae5ecc3c6bcde77f5d20f5ac81ba6}\label{visuraw_8h_afc8a68fffd35e31d551d633e999cc850ada3ae5ecc3c6bcde77f5d20f5ac81ba6} 
+VRTP\+\_\+int64&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VRTP\_sizet@{VRTP\_sizet}!visuraw.h@{visuraw.h}}\index{visuraw.h@{visuraw.h}!VRTP\_sizet@{VRTP\_sizet}}}\Hypertarget{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a8229aea4a463fb7415684f7b4b9e764e}\label{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a8229aea4a463fb7415684f7b4b9e764e} 
+VRTP\+\_\+sizet&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VRTP\_float@{VRTP\_float}!visuraw.h@{visuraw.h}}\index{visuraw.h@{visuraw.h}!VRTP\_float@{VRTP\_float}}}\Hypertarget{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a4a1503612529d29bf4e0d7ac98474e5d}\label{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a4a1503612529d29bf4e0d7ac98474e5d} 
+VRTP\+\_\+float&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VRTP\_double@{VRTP\_double}!visuraw.h@{visuraw.h}}\index{visuraw.h@{visuraw.h}!VRTP\_double@{VRTP\_double}}}\Hypertarget{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a81bf6fa46bcded542680bd2c987d56fa}\label{visuraw_8h_afc8a68fffd35e31d551d633e999cc850a81bf6fa46bcded542680bd2c987d56fa} 
+VRTP\+\_\+double&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VRTP\_longdouble@{VRTP\_longdouble}!visuraw.h@{visuraw.h}}\index{visuraw.h@{visuraw.h}!VRTP\_longdouble@{VRTP\_longdouble}}}\Hypertarget{visuraw_8h_afc8a68fffd35e31d551d633e999cc850afea721268499d02ae389cdd4f5ad3b9d}\label{visuraw_8h_afc8a68fffd35e31d551d633e999cc850afea721268499d02ae389cdd4f5ad3b9d} 
+VRTP\+\_\+longdouble&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{visuraw_8h_source_l00013}{13}} of file \mbox{\hyperlink{visuraw_8h_source}{visuraw.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{visuraw_8h_a6b50e3400123fa1e5a9ad211179fca57}\label{visuraw_8h_a6b50e3400123fa1e5a9ad211179fca57} 
+\index{visuraw.h@{visuraw.h}!computeOffsetFromCoord@{computeOffsetFromCoord}}
+\index{computeOffsetFromCoord@{computeOffsetFromCoord}!visuraw.h@{visuraw.h}}
+\doxysubsubsection{\texorpdfstring{computeOffsetFromCoord()}{computeOffsetFromCoord()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} compute\+Offset\+From\+Coord (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Row,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Col }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zcontentvisumain_8cpp_source_l03958}{3958}} of file \mbox{\hyperlink{zcontentvisumain_8cpp_source}{zcontentvisumain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{visuraw_8cpp_source_l00284}{Visu\+Raw\+::visu\+Atomic()}}, \mbox{\hyperlink{visuraw_8cpp_source_l00033}{Visu\+Raw\+::visu\+Block\+Header()}}, and \mbox{\hyperlink{visuraw_8cpp_source_l00188}{Visu\+Raw\+::visu\+URFField()}}.
+

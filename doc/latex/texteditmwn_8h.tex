@@ -1,0 +1,123 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/texteditmwn.h File Reference}
+\hypertarget{texteditmwn_8h}{}\label{texteditmwn_8h}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/texteditmwn.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/texteditmwn.h}}
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$QMain\+Window$>$}\newline
+{\ttfamily \#include $<$ztoolset/zstatus.\+h$>$}\newline
+{\ttfamily \#include $<$functional$>$}\newline
+{\ttfamily \#include $<$QText\+Cursor$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zaierrors.\+h$>$}\newline
+Include dependency graph for texteditmwn.\+h\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classtext_edit_m_wn}{text\+Edit\+MWn}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{texteditmwn_8h_a5bbf7e0e7bc4c21040a05a8fd668bcef}{\+\_\+\+\_\+\+MORE\+\_\+\+CALLBACK\+\_\+\+\_\+}}(\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}})~\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ()$>$ \mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{texteditmwn_8h_a98874471bf67ca9dcac08d312c5b2bcd}{\+\_\+\+\_\+\+FILTRATE\+\_\+\+CALLBACK\+\_\+\+\_\+}}(\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}})~\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}}\&)$>$ \mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{texteditmwn_8h_aabd643906b4104da262384653cc03329}{\+\_\+\+\_\+\+ZTEXTEDITOPTION\+\_\+\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994}{ZText\+Edit\+Option}} \+: uint32\+\_\+t \{ \newline
+\mbox{\hyperlink{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994a474fa38f100f149a87029784f45a9527}{TEOP\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994a19c4e3f70afa445e9f69593f9ef5b8bb}{TEOP\+\_\+\+Close\+Btn\+Hide}} = 0x01
+, \mbox{\hyperlink{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994ad782004be6faaf5ed78f5f8e038dadbe}{TEOP\+\_\+\+Show\+Line\+Numbers}} = 0x04
+, \mbox{\hyperlink{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994a3913cfae171b0eba68598717498bf4bd}{TEOP\+\_\+\+No\+Close\+Btn}} = 0x08
+, \newline
+\mbox{\hyperlink{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994a34f68b3d7fcfb222a8f934f7b7f5032e}{TEOP\+\_\+\+No\+File\+Lab}} = 0x10
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{texteditmwn_8h_adca992d5c44418a18e557b80901a1b84}{cst\+\_\+\+Message\+Duration}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{texteditmwn_8h_a98874471bf67ca9dcac08d312c5b2bcd}\label{texteditmwn_8h_a98874471bf67ca9dcac08d312c5b2bcd} 
+\index{texteditmwn.h@{texteditmwn.h}!\_\_FILTRATE\_CALLBACK\_\_@{\_\_FILTRATE\_CALLBACK\_\_}}
+\index{\_\_FILTRATE\_CALLBACK\_\_@{\_\_FILTRATE\_CALLBACK\_\_}!texteditmwn.h@{texteditmwn.h}}
+\doxysubsubsection{\texorpdfstring{\_\_FILTRATE\_CALLBACK\_\_}{\_\_FILTRATE\_CALLBACK\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+FILTRATE\+\_\+\+CALLBACK\+\_\+\+\_\+(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}} }\end{DoxyParamCaption})~\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}}\&)$>$ \mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}}}
+
+
+
+Definition at line \mbox{\hyperlink{texteditmwn_8h_source_l00016}{16}} of file \mbox{\hyperlink{texteditmwn_8h_source}{texteditmwn.\+h}}.
+
+\Hypertarget{texteditmwn_8h_a5bbf7e0e7bc4c21040a05a8fd668bcef}\label{texteditmwn_8h_a5bbf7e0e7bc4c21040a05a8fd668bcef} 
+\index{texteditmwn.h@{texteditmwn.h}!\_\_MORE\_CALLBACK\_\_@{\_\_MORE\_CALLBACK\_\_}}
+\index{\_\_MORE\_CALLBACK\_\_@{\_\_MORE\_CALLBACK\_\_}!texteditmwn.h@{texteditmwn.h}}
+\doxysubsubsection{\texorpdfstring{\_\_MORE\_CALLBACK\_\_}{\_\_MORE\_CALLBACK\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+MORE\+\_\+\+CALLBACK\+\_\+\+\_\+(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}} }\end{DoxyParamCaption})~\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{std\+::function}}$<$\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ()$>$ \mbox{\hyperlink{zsearchtokenizer_8cpp_a9d160faa34177c34738584bc4db6e228}{\+\_\+\+\_\+\+NAME\+\_\+\+\_\+}}}
+
+
+
+Definition at line \mbox{\hyperlink{texteditmwn_8h_source_l00015}{15}} of file \mbox{\hyperlink{texteditmwn_8h_source}{texteditmwn.\+h}}.
+
+\Hypertarget{texteditmwn_8h_aabd643906b4104da262384653cc03329}\label{texteditmwn_8h_aabd643906b4104da262384653cc03329} 
+\index{texteditmwn.h@{texteditmwn.h}!\_\_ZTEXTEDITOPTION\_\_@{\_\_ZTEXTEDITOPTION\_\_}}
+\index{\_\_ZTEXTEDITOPTION\_\_@{\_\_ZTEXTEDITOPTION\_\_}!texteditmwn.h@{texteditmwn.h}}
+\doxysubsubsection{\texorpdfstring{\_\_ZTEXTEDITOPTION\_\_}{\_\_ZTEXTEDITOPTION\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+ZTEXTEDITOPTION\+\_\+\+\_\+}
+
+
+
+Definition at line \mbox{\hyperlink{texteditmwn_8h_source_l00044}{44}} of file \mbox{\hyperlink{texteditmwn_8h_source}{texteditmwn.\+h}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994}\label{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994} 
+\index{texteditmwn.h@{texteditmwn.h}!ZTextEditOption@{ZTextEditOption}}
+\index{ZTextEditOption@{ZTextEditOption}!texteditmwn.h@{texteditmwn.h}}
+\doxysubsubsection{\texorpdfstring{ZTextEditOption}{ZTextEditOption}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994}{ZText\+Edit\+Option}} \+: \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\+\_\+t}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TEOP\_Nothing@{TEOP\_Nothing}!texteditmwn.h@{texteditmwn.h}}\index{texteditmwn.h@{texteditmwn.h}!TEOP\_Nothing@{TEOP\_Nothing}}}\Hypertarget{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994a474fa38f100f149a87029784f45a9527}\label{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994a474fa38f100f149a87029784f45a9527} 
+TEOP\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TEOP\_CloseBtnHide@{TEOP\_CloseBtnHide}!texteditmwn.h@{texteditmwn.h}}\index{texteditmwn.h@{texteditmwn.h}!TEOP\_CloseBtnHide@{TEOP\_CloseBtnHide}}}\Hypertarget{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994a19c4e3f70afa445e9f69593f9ef5b8bb}\label{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994a19c4e3f70afa445e9f69593f9ef5b8bb} 
+TEOP\+\_\+\+Close\+Btn\+Hide&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TEOP\_ShowLineNumbers@{TEOP\_ShowLineNumbers}!texteditmwn.h@{texteditmwn.h}}\index{texteditmwn.h@{texteditmwn.h}!TEOP\_ShowLineNumbers@{TEOP\_ShowLineNumbers}}}\Hypertarget{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994ad782004be6faaf5ed78f5f8e038dadbe}\label{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994ad782004be6faaf5ed78f5f8e038dadbe} 
+TEOP\+\_\+\+Show\+Line\+Numbers&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TEOP\_NoCloseBtn@{TEOP\_NoCloseBtn}!texteditmwn.h@{texteditmwn.h}}\index{texteditmwn.h@{texteditmwn.h}!TEOP\_NoCloseBtn@{TEOP\_NoCloseBtn}}}\Hypertarget{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994a3913cfae171b0eba68598717498bf4bd}\label{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994a3913cfae171b0eba68598717498bf4bd} 
+TEOP\+\_\+\+No\+Close\+Btn&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TEOP\_NoFileLab@{TEOP\_NoFileLab}!texteditmwn.h@{texteditmwn.h}}\index{texteditmwn.h@{texteditmwn.h}!TEOP\_NoFileLab@{TEOP\_NoFileLab}}}\Hypertarget{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994a34f68b3d7fcfb222a8f934f7b7f5032e}\label{texteditmwn_8h_acdbceca1010a4e053d06656ec9ee4994a34f68b3d7fcfb222a8f934f7b7f5032e} 
+TEOP\+\_\+\+No\+File\+Lab&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{texteditmwn_8h_source_l00045}{45}} of file \mbox{\hyperlink{texteditmwn_8h_source}{texteditmwn.\+h}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{texteditmwn_8h_adca992d5c44418a18e557b80901a1b84}\label{texteditmwn_8h_adca992d5c44418a18e557b80901a1b84} 
+\index{texteditmwn.h@{texteditmwn.h}!cst\_MessageDuration@{cst\_MessageDuration}}
+\index{cst\_MessageDuration@{cst\_MessageDuration}!texteditmwn.h@{texteditmwn.h}}
+\doxysubsubsection{\texorpdfstring{cst\_MessageDuration}{cst\_MessageDuration}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} cst\+\_\+\+Message\+Duration\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Definition at line \mbox{\hyperlink{dicedit_8cpp_source_l00091}{91}} of file \mbox{\hyperlink{dicedit_8cpp_source}{dicedit.\+cpp}}.
+

@@ -1,0 +1,164 @@
+\doxysection{/home/gerard/\+Development/zbasetools/znet/zmail/zmailcommon.cpp File Reference}
+\hypertarget{zmailcommon_8cpp}{}\label{zmailcommon_8cpp}\index{/home/gerard/Development/zbasetools/znet/zmail/zmailcommon.cpp@{/home/gerard/Development/zbasetools/znet/zmail/zmailcommon.cpp}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$zmail/zmailcommon.\+h$>$}\newline
+Include dependency graph for zmailcommon.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zmailcommon_8cpp_a4466600860d941f912e3ad1bef687a2d}{ZMAILCOMMON\+\_\+\+CPP}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zmailcommon_8cpp_a859ddb7f2396a8357232f25175169944}{isnumericdigit}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buf}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Size}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zmailcommon_8cpp_a48c5570e16673dcd46ba8c466239ce6b}{get\+Sequence}} (\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}}, \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Sequence}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{zmailcommon_8cpp_a63743382893d982678f02d6d24ceca5e}{get\+Imap\+Key\+And\+Msg}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}}, \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Imap\+Code}}, \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Imap\+Message}})
+\begin{DoxyCompactList}\small\item\em analyze\+Imap\+Response \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{zmailcommon_8cpp_a050a7266d0b66d2e6fffe29df0c838a5}{get\+Key\+Word}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}}, \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Keyword}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+Next}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{zmailcommon_8cpp_a4ac5135d0887336a84bdae272f522c86}{get\+Sequence}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buffer}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Sequence\+Num}}, \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Sequence}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+Next}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zmailcommon_8cpp_a74d994bc345c2814ee64c9180d17850a}{get\+Imap\+Error}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buf}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zmailcommon_8cpp_aff155df82eaf8e4d8da72b25a6365e20}{get\+Smtp\+Error}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Buf}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{zmailcommon_8cpp_a4466600860d941f912e3ad1bef687a2d}\label{zmailcommon_8cpp_a4466600860d941f912e3ad1bef687a2d} 
+\index{zmailcommon.cpp@{zmailcommon.cpp}!ZMAILCOMMON\_CPP@{ZMAILCOMMON\_CPP}}
+\index{ZMAILCOMMON\_CPP@{ZMAILCOMMON\_CPP}!zmailcommon.cpp@{zmailcommon.cpp}}
+\doxysubsubsection{\texorpdfstring{ZMAILCOMMON\_CPP}{ZMAILCOMMON\_CPP}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} ZMAILCOMMON\+\_\+\+CPP}
+
+
+
+Definition at line \mbox{\hyperlink{zmailcommon_8cpp_source_l00002}{2}} of file \mbox{\hyperlink{zmailcommon_8cpp_source}{zmailcommon.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{zmailcommon_8cpp_a74d994bc345c2814ee64c9180d17850a}\label{zmailcommon_8cpp_a74d994bc345c2814ee64c9180d17850a} 
+\index{zmailcommon.cpp@{zmailcommon.cpp}!getImapError@{getImapError}}
+\index{getImapError@{getImapError}!zmailcommon.cpp@{zmailcommon.cpp}}
+\doxysubsubsection{\texorpdfstring{getImapError()}{getImapError()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} get\+Imap\+Error (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Buf }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmailcommon_8cpp_source_l00252}{252}} of file \mbox{\hyperlink{zmailcommon_8cpp_source}{zmailcommon.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{zmailcommon_8cpp_a63743382893d982678f02d6d24ceca5e}\label{zmailcommon_8cpp_a63743382893d982678f02d6d24ceca5e} 
+\index{zmailcommon.cpp@{zmailcommon.cpp}!getImapKeyAndMsg@{getImapKeyAndMsg}}
+\index{getImapKeyAndMsg@{getImapKeyAndMsg}!zmailcommon.cpp@{zmailcommon.cpp}}
+\doxysubsubsection{\texorpdfstring{getImapKeyAndMsg()}{getImapKeyAndMsg()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} get\+Imap\+Key\+And\+Msg (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Buffer,  }\item[{\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Imap\+Code,  }\item[{\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Imap\+Message }\end{DoxyParamCaption})}
+
+
+
+analyze\+Imap\+Response 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Buffer} & \\
+\hline
+{\em p\+Sequence\+Num} & \\
+\hline
+{\em p\+Sequence} & \\
+\hline
+{\em p\+Error\+Code} & \\
+\hline
+{\em p\+Error\+Message} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+ZS\+\_\+\+SUCCESS if imap return first character is \texorpdfstring{$<$}{<}\texorpdfstring{$\ast$}{*}\texorpdfstring{$>$}{>} or \texorpdfstring{$<$}{<}+\texorpdfstring{$>$}{>} In this case, no sequence is searched and given back ZS\+\_\+\+SUCCESS if imap return is $<$\+OK$>$
+\end{DoxyReturn}
+ZS\+\_\+\+SMTP\+\_\+\+INVPARAM if no sequence is found ZS\+\_\+\+SMTP\+\_\+\+BADPARAM if imap return is $<$\+BAD$>$ 
+
+Definition at line \mbox{\hyperlink{zmailcommon_8cpp_source_l00096}{96}} of file \mbox{\hyperlink{zmailcommon_8cpp_source}{zmailcommon.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{zmailcommon_8cpp_a050a7266d0b66d2e6fffe29df0c838a5}\label{zmailcommon_8cpp_a050a7266d0b66d2e6fffe29df0c838a5} 
+\index{zmailcommon.cpp@{zmailcommon.cpp}!getKeyWord@{getKeyWord}}
+\index{getKeyWord@{getKeyWord}!zmailcommon.cpp@{zmailcommon.cpp}}
+\doxysubsubsection{\texorpdfstring{getKeyWord()}{getKeyWord()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} get\+Key\+Word (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Buffer,  }\item[{\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Keyword,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Ptr\+Next }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmailcommon_8cpp_source_l00117}{117}} of file \mbox{\hyperlink{zmailcommon_8cpp_source}{zmailcommon.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{zmailcommon_8cpp_a4ac5135d0887336a84bdae272f522c86}\label{zmailcommon_8cpp_a4ac5135d0887336a84bdae272f522c86} 
+\index{zmailcommon.cpp@{zmailcommon.cpp}!getSequence@{getSequence}}
+\index{getSequence@{getSequence}!zmailcommon.cpp@{zmailcommon.cpp}}
+\doxysubsubsection{\texorpdfstring{getSequence()}{getSequence()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} get\+Sequence (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Buffer,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \&}]{p\+Sequence\+Num,  }\item[{\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Sequence,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Ptr\+Next }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmailcommon_8cpp_source_l00134}{134}} of file \mbox{\hyperlink{zmailcommon_8cpp_source}{zmailcommon.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{zmailcommon_8cpp_a48c5570e16673dcd46ba8c466239ce6b}\label{zmailcommon_8cpp_a48c5570e16673dcd46ba8c466239ce6b} 
+\index{zmailcommon.cpp@{zmailcommon.cpp}!getSequence@{getSequence}}
+\index{getSequence@{getSequence}!zmailcommon.cpp@{zmailcommon.cpp}}
+\doxysubsubsection{\texorpdfstring{getSequence()}{getSequence()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} get\+Sequence (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Buffer,  }\item[{\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Sequence }\end{DoxyParamCaption})}
+
+imap sequence "{}\+A0001 command..."{} 
+
+Definition at line \mbox{\hyperlink{zmailcommon_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{zmailcommon_8cpp_source}{zmailcommon.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{zmailcommon_8cpp_aff155df82eaf8e4d8da72b25a6365e20}\label{zmailcommon_8cpp_aff155df82eaf8e4d8da72b25a6365e20} 
+\index{zmailcommon.cpp@{zmailcommon.cpp}!getSmtpError@{getSmtpError}}
+\index{getSmtpError@{getSmtpError}!zmailcommon.cpp@{zmailcommon.cpp}}
+\doxysubsubsection{\texorpdfstring{getSmtpError()}{getSmtpError()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} get\+Smtp\+Error (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Buf }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmailcommon_8cpp_source_l00268}{268}} of file \mbox{\hyperlink{zmailcommon_8cpp_source}{zmailcommon.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{zmailcommon_8cpp_a859ddb7f2396a8357232f25175169944}\label{zmailcommon_8cpp_a859ddb7f2396a8357232f25175169944} 
+\index{zmailcommon.cpp@{zmailcommon.cpp}!isnumericdigit@{isnumericdigit}}
+\index{isnumericdigit@{isnumericdigit}!zmailcommon.cpp@{zmailcommon.cpp}}
+\doxysubsubsection{\texorpdfstring{isnumericdigit()}{isnumericdigit()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} isnumericdigit (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Buf,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Size }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zmailcommon_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{zmailcommon_8cpp_source}{zmailcommon.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+

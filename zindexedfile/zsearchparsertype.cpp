@@ -14,7 +14,6 @@ ZArray<ZSearchKeyWord> KeywordList = {
     {"DECLARE",ZSRCH_DECLARE},
     {"SAVE",ZSRCH_SAVE},
     {"LOAD",ZSRCH_LOAD},
-    {"SYMBOL",ZSRCH_SYMBOL},
     {"FILE",ZSRCH_FILE},
 
     {"MODE",ZSRCH_MODE},
@@ -84,6 +83,8 @@ ZArray<ZSearchKeyWord> KeywordList = {
     {"SEC",ZSRCH_SEC},
 
     {"ZRESOURCE",ZSRCH_RESOURCE_LITERAL},
+
+    {"ZDOMAIN", ZSRCH_DOMAIN },
 
     {"ZENTITY",ZSRCH_ZENTITY},
     {"ID",ZSRCH_ID},
@@ -512,6 +513,9 @@ ZSearchTokentype_type encode_ZTokenType(const utf8VaryingString& pIn)
   }
   if (pIn.hasToken((const utf8_t*)"ZSRCH_URISTRING")) {
     wType |= ZSRCH_URISTRING; return wType ;
+  }
+  if (pIn.hasToken((const utf8_t*)"ZSRCH_DOMAIN")) {
+      wType |= ZSRCH_DOMAIN; return wType ;
   }
   if (pIn.hasToken((const utf8_t*)"ZSRCH_UTF8FIXEDSTRING")) {
     wType |= ZSRCH_UTF8FIXEDSTRING; return wType ;

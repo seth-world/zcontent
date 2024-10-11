@@ -1,0 +1,205 @@
+\doxysection{dynsections.\+js}
+\hypertarget{dynsections_8js_source}{}\label{dynsections_8js_source}\index{html/dynsections.js@{html/dynsections.js}}
+\mbox{\hyperlink{dynsections_8js}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00001}00001\ /*}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00002}00002\ \ @licstart\ \ The\ following\ is\ the\ entire\ license\ notice\ for\ the\ JavaScript\ code\ in\ this\ file.}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00004}00004\ \ The\ MIT\ License\ (MIT)}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00006}00006\ \ Copyright\ (C)\ 1997-\/2020\ by\ Dimitri\ van\ Heesch}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00008}00008\ \ Permission\ is\ hereby\ granted,\ free\ of\ charge,\ to\ any\ person\ obtaining\ a\ copy\ of\ this\ software}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00009}00009\ \ and\ associated\ documentation\ files\ (the\ "{}Software"{}),\ to\ deal\ in\ the\ Software\ without\ restriction,}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00010}00010\ \ including\ without\ limitation\ the\ rights\ to\ use,\ copy,\ modify,\ merge,\ publish,\ distribute,}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00011}00011\ \ sublicense,\ and/or\ sell\ copies\ of\ the\ Software,\ and\ to\ permit\ persons\ to\ whom\ the\ Software\ is}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00012}00012\ \ furnished\ to\ do\ so,\ subject\ to\ the\ following\ conditions:}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00014}00014\ \ The\ above\ copyright\ notice\ and\ this\ permission\ notice\ shall\ be\ included\ in\ all\ copies\ or}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00015}00015\ \ substantial\ portions\ of\ the\ Software.}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00017}00017\ \ THE\ SOFTWARE\ IS\ PROVIDED\ "{}AS\ IS"{},\ WITHOUT\ WARRANTY\ OF\ ANY\ KIND,\ EXPRESS\ OR\ IMPLIED,\ INCLUDING}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00018}00018\ \ BUT\ NOT\ LIMITED\ TO\ THE\ WARRANTIES\ OF\ MERCHANTABILITY,\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE\ AND}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00019}00019\ \ NONINFRINGEMENT.\ IN\ NO\ EVENT\ SHALL\ THE\ AUTHORS\ OR\ COPYRIGHT\ HOLDERS\ BE\ LIABLE\ FOR\ ANY\ CLAIM,}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00020}00020\ \ DAMAGES\ OR\ OTHER\ LIABILITY,\ WHETHER\ IN\ AN\ ACTION\ OF\ CONTRACT,\ TORT\ OR\ OTHERWISE,\ ARISING\ FROM,}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00021}00021\ \ OUT\ OF\ OR\ IN\ CONNECTION\ WITH\ THE\ SOFTWARE\ OR\ THE\ USE\ OR\ OTHER\ DEALINGS\ IN\ THE\ SOFTWARE.}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00023}00023\ \ @licend\ \ The\ above\ is\ the\ entire\ license\ notice\ for\ the\ JavaScript\ code\ in\ this\ file}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00024}00024\ \ */}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00025}00025\ function\ toggleVisibility(linkObj)}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00026}00026\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00027}00027\ \ var\ base\ =\ \$(linkObj).attr('id');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00028}00028\ \ var\ summary\ =\ \$('\#'+base+'-\/summary');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00029}00029\ \ var\ content\ =\ \$('\#'+base+'-\/content');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00030}00030\ \ var\ trigger\ =\ \$('\#'+base+'-\/trigger');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00031}00031\ \ var\ src=\$(trigger).attr('src');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00032}00032\ \ if\ (content.is(':visible')===true)\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00033}00033\ \ \ \ content.hide();}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00034}00034\ \ \ \ summary.show();}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00035}00035\ \ \ \ \$(linkObj).addClass('closed').removeClass('opened');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00036}00036\ \ \ \ \$(trigger).attr('src',src.substring(0,src.length-\/8)+'closed.png');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00037}00037\ \ \}\ else\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00038}00038\ \ \ \ content.show();}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00039}00039\ \ \ \ summary.hide();}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00040}00040\ \ \ \ \$(linkObj).removeClass('closed').addClass('opened');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00041}00041\ \ \ \ \$(trigger).attr('src',src.substring(0,src.length-\/10)+'open.png');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00042}00042\ \ \}}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00043}00043\ \ return\ false;}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00044}00044\ \}}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00045}00045\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00046}00046\ function\ updateStripes()}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00047}00047\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00048}00048\ \ \ \$('table.directory\ tr').}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00049}00049\ \ \ \ \ \ \ \ removeClass('even').filter(':visible:even').addClass('even');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00050}00050\ \ \ \$('table.directory\ tr').}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00051}00051\ \ \ \ \ \ \ \ removeClass('odd').filter(':visible:odd').addClass('odd');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00052}00052\ \}}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00054}00054\ function\ toggleLevel(level)}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00055}00055\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00056}00056\ \ \ \$('table.directory\ tr').each(function()\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00057}00057\ \ \ \ \ var\ l\ =\ this.id.split('\_').length-\/1;}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00058}00058\ \ \ \ \ var\ i\ =\ \$('\#img'+this.id.substring(3));}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00059}00059\ \ \ \ \ var\ a\ =\ \$('\#arr'+this.id.substring(3));}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00060}00060\ \ \ \ \ if\ (l<level+1)\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00061}00061\ \ \ \ \ \ \ i.removeClass('iconfopen\ iconfclosed').addClass('iconfopen');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00062}00062\ \ \ \ \ \ \ a.html('\&\#9660;');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00063}00063\ \ \ \ \ \ \ \$(this).show();}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00064}00064\ \ \ \ \ \}\ else\ if\ (l==level+1)\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00065}00065\ \ \ \ \ \ \ i.removeClass('iconfclosed\ iconfopen').addClass('iconfclosed');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00066}00066\ \ \ \ \ \ \ a.html('\&\#9658;');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00067}00067\ \ \ \ \ \ \ \$(this).show();}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00068}00068\ \ \ \ \ \}\ else\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00069}00069\ \ \ \ \ \ \ \$(this).hide();}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00070}00070\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00071}00071\ \ \ \});}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00072}00072\ \ \ updateStripes();}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00073}00073\ \}}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00074}00074\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00075}00075\ function\ toggleFolder(id)}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00076}00076\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00077}00077\ \ \ //\ the\ clicked\ row}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00078}00078\ \ \ var\ currentRow\ =\ \$('\#row\_'+id);}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00080}00080\ \ \ //\ all\ rows\ after\ the\ clicked\ row}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00081}00081\ \ \ var\ rows\ =\ currentRow.nextAll("{}tr"{});}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00083}00083\ \ \ var\ re\ =\ new\ RegExp('\string^row\_'+id+'\(\backslash\)\(\backslash\)d+\_\$',\ "{}i"{});\ //only\ one\ sub}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00085}00085\ \ \ //\ only\ match\ elements\ AFTER\ this\ one\ (can't\ hide\ elements\ before)}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00086}00086\ \ \ var\ childRows\ =\ rows.filter(function()\ \{\ return\ this.id.match(re);\ \});}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00088}00088\ \ \ //\ first\ row\ is\ visible\ we\ are\ HIDING}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00089}00089\ \ \ if\ (childRows.filter(':first').is(':visible')===true)\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00090}00090\ \ \ \ \ //\ replace\ down\ arrow\ by\ right\ arrow\ for\ current\ row}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00091}00091\ \ \ \ \ var\ currentRowSpans\ =\ currentRow.find("{}span"{});}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00092}00092\ \ \ \ \ currentRowSpans.filter("{}.iconfopen"{}).removeClass("{}iconfopen"{}).addClass("{}iconfclosed"{});}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00093}00093\ \ \ \ \ currentRowSpans.filter("{}.arrow"{}).html('\&\#9658;');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00094}00094\ \ \ \ \ rows.filter("{}[id\string^=row\_"{}+id+"{}]"{}).hide();\ //\ hide\ all\ children}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00095}00095\ \ \ \}\ else\ \{\ //\ we\ are\ SHOWING}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00096}00096\ \ \ \ \ //\ replace\ right\ arrow\ by\ down\ arrow\ for\ current\ row}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00097}00097\ \ \ \ \ var\ currentRowSpans\ =\ currentRow.find("{}span"{});}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00098}00098\ \ \ \ \ currentRowSpans.filter("{}.iconfclosed"{}).removeClass("{}iconfclosed"{}).addClass("{}iconfopen"{});}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00099}00099\ \ \ \ \ currentRowSpans.filter("{}.arrow"{}).html('\&\#9660;');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00100}00100\ \ \ \ \ //\ replace\ down\ arrows\ by\ right\ arrows\ for\ child\ rows}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00101}00101\ \ \ \ \ var\ childRowsSpans\ =\ childRows.find("{}span"{});}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00102}00102\ \ \ \ \ childRowsSpans.filter("{}.iconfopen"{}).removeClass("{}iconfopen"{}).addClass("{}iconfclosed"{});}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00103}00103\ \ \ \ \ childRowsSpans.filter("{}.arrow"{}).html('\&\#9658;');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00104}00104\ \ \ \ \ childRows.show();\ //show\ all\ children}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00105}00105\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00106}00106\ \ \ updateStripes();}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00107}00107\ \}}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00108}00108\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00109}00109\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00110}00110\ function\ toggleInherit(id)}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00111}00111\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00112}00112\ \ \ var\ rows\ =\ \$('tr.inherit.'+id);}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00113}00113\ \ \ var\ img\ =\ \$('tr.inherit\_header.'+id+'\ img');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00114}00114\ \ \ var\ src\ =\ \$(img).attr('src');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00115}00115\ \ \ if\ (rows.filter(':first').is(':visible')===true)\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00116}00116\ \ \ \ \ rows.css('display','none');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00117}00117\ \ \ \ \ \$(img).attr('src',src.substring(0,src.length-\/8)+'closed.png');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00118}00118\ \ \ \}\ else\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00119}00119\ \ \ \ \ rows.css('display','table-\/row');\ //\ using\ show()\ causes\ jump\ in\ firefox}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00120}00120\ \ \ \ \ \$(img).attr('src',src.substring(0,src.length-\/10)+'open.png');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00121}00121\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00122}00122\ \}}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00123}00123\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00124}00124\ var\ opened=true;}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00125}00125\ //\ in\ case\ HTML\_COLORSTYLE\ is\ LIGHT\ or\ DARK\ the\ vars\ will\ be\ replaced,\ so\ we\ write\ them\ out\ explicitly\ and\ use\ double\ quotes}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00126}00126\ var\ plusImg\ \ =\ [\ "{}var(-\/-\/fold-\/plus-\/image)"{},\ \ "{}var(-\/-\/fold-\/plus-\/image-\/relpath)"{}\ ];}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00127}00127\ var\ minusImg\ =\ [\ "{}var(-\/-\/fold-\/minus-\/image)"{},\ "{}var(-\/-\/fold-\/minus-\/image-\/relpath)"{}\ ];}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00129}00129\ //\ toggle\ all\ folding\ blocks}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00130}00130\ function\ codefold\_toggle\_all(relPath)\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00131}00131\ \ if\ (opened)\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00132}00132\ \ \ \ \$('\#fold\_all').css('background-\/image',plusImg[relPath]);}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00133}00133\ \ \ \ \$('div[id\string^=foldopen]').hide();}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00134}00134\ \ \ \ \$('div[id\string^=foldclosed]').show();}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00135}00135\ \ \}\ else\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00136}00136\ \ \ \ \$('\#fold\_all').css('background-\/image',minusImg[relPath]);}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00137}00137\ \ \ \ \$('div[id\string^=foldopen]').show();}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00138}00138\ \ \ \ \$('div[id\string^=foldclosed]').hide();}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00139}00139\ \ \}}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00140}00140\ \ opened=!opened;}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00141}00141\ \}}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00142}00142\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00143}00143\ //\ toggle\ single\ folding\ block}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00144}00144\ function\ codefold\_toggle(id)\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00145}00145\ \ \ \$('\#foldopen'+id).toggle();}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00146}00146\ \ \ \$('\#foldclosed'+id).toggle();}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00147}00147\ \}}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00148}00148\ function\ init\_codefold(relPath)\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00149}00149\ \ \ \$('span[class=lineno]').css(}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00150}00150\ \ \ \ \ \{'padding-\/right':'4px',}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00151}00151\ \ \ \ \ \ 'margin-\/right':'2px',}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00152}00152\ \ \ \ \ \ 'display':'inline-\/block',}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00153}00153\ \ \ \ \ \ 'width':'54px',}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00154}00154\ \ \ \ \ \ 'background':'linear-\/gradient(var(-\/-\/fold-\/line-\/color),var(-\/-\/fold-\/line-\/color))\ no-\/repeat\ 46px/2px\ 100\%'}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00155}00155\ \ \ \ \ \});}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00156}00156\ \ \ //\ add\ global\ toggle\ to\ first\ line}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00157}00157\ \ \ \$('span[class=lineno]:first').append('<span\ class="{}fold"{}\ id="{}fold\_all"{}\ '+}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00158}00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 'onclick="{}javascript:codefold\_toggle\_all('+relPath+');"{}\ '+}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00159}00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 'style="{}background-\/image:'+minusImg[relPath]+';"{}></span>');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00160}00160\ \ \ //\ add\ vertical\ lines\ to\ other\ rows}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00161}00161\ \ \ \$('span[class=lineno]').not(':eq(0)').append('<span\ class="{}fold"{}></span>');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00162}00162\ \ \ //\ add\ toggle\ controls\ to\ lines\ with\ fold\ divs}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00163}00163\ \ \ \$('div[class=foldopen]').each(function()\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00164}00164\ \ \ \ \ //\ extract\ specific\ id\ to\ use}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00165}00165\ \ \ \ \ var\ id\ \ \ \ =\ \$(this).attr('id').replace('foldopen','');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00166}00166\ \ \ \ \ //\ extract\ start\ and\ end\ foldable\ fragment\ attributes}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00167}00167\ \ \ \ \ var\ start\ =\ \$(this).attr('data-\/start');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00168}00168\ \ \ \ \ var\ end\ \ \ =\ \$(this).attr('data-\/end');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00169}00169\ \ \ \ \ //\ replace\ normal\ fold\ span\ with\ controls\ for\ the\ first\ line\ of\ a\ foldable\ fragment}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00170}00170\ \ \ \ \ \$(this).find('span[class=fold]:first').replaceWith('<span\ class="{}fold"{}\ '+}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00171}00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 'onclick="{}javascript:codefold\_toggle(\(\backslash\)''+id+'\(\backslash\)');"{}\ '+}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00172}00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 'style="{}background-\/image:'+minusImg[relPath]+';"{}></span>');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00173}00173\ \ \ \ \ //\ append\ div\ for\ folded\ (closed)\ representation}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00174}00174\ \ \ \ \ \$(this).after('<div\ id="{}foldclosed'+id+'"{}\ class="{}foldclosed"{}\ style="{}display:none;"{}></div>');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00175}00175\ \ \ \ \ //\ extract\ the\ first\ line\ from\ the\ "{}open"{}\ section\ to\ represent\ closed\ content}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00176}00176\ \ \ \ \ var\ line\ =\ \$(this).children().first().clone();}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00177}00177\ \ \ \ \ //\ remove\ any\ glow\ that\ might\ still\ be\ active\ on\ the\ original\ line}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00178}00178\ \ \ \ \ \$(line).removeClass('glow');}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00179}00179\ \ \ \ \ if\ (start)\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00180}00180\ \ \ \ \ \ \ //\ if\ line\ already\ ends\ with\ a\ start\ marker\ (e.g.\ trailing\ \{),\ remove\ it}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00181}00181\ \ \ \ \ \ \ \$(line).html(\$(line).html().replace(new\ RegExp('\(\backslash\)\(\backslash\)s*'+start+'\(\backslash\)\(\backslash\)s*\$','g'),''));}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00182}00182\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00183}00183\ \ \ \ \ //\ replace\ minus\ with\ plus\ symbol}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00184}00184\ \ \ \ \ \$(line).find('span[class=fold]').css('background-\/image',plusImg[relPath]);}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00185}00185\ \ \ \ \ //\ append\ ellipsis}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00186}00186\ \ \ \ \ \$(line).append('\ '+start+'<a\ href="{}javascript:codefold\_toggle(\(\backslash\)''+id+'\(\backslash\)')"{}>\&\#8230;</a>'+end);}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00187}00187\ \ \ \ \ //\ insert\ constructed\ line\ into\ closed\ div}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00188}00188\ \ \ \ \ \$('\#foldclosed'+id).html(line);}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00189}00189\ \ \ \});}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00190}00190\ \}}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00191}00191\ }
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00192}00192\ /*\ @license-\/end\ */}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00193}00193\ \$(document).ready(function()\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00194}00194\ \ \ \$('.code,.codeRef').each(function()\ \{}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00195}00195\ \ \ \ \ \$(this).data('powertip',\$('\#a'+\$(this).attr('href').replace(/.*\(\backslash\)//,'').replace(/[\string^a-\/z\_A-\/Z0-\/9]/g,'\_')).html());}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00196}00196\ \ \ \ \ \$.fn.powerTip.smartPlacementLists.s\ =\ [\ 's',\ 'n',\ 'ne',\ 'se'\ ];}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00197}00197\ \ \ \ \ \$(this).powerTip(\{\ placement:\ 's',\ smartPlacement:\ true,\ mouseOnToPopup:\ true\ \});}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00198}00198\ \ \ \});}
+\DoxyCodeLine{\Hypertarget{dynsections_8js_source_l00199}00199\ \});}
+
+\end{DoxyCode}

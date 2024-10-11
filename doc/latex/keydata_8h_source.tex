@@ -1,0 +1,34 @@
+\doxysection{keydata.\+h}
+\hypertarget{keydata_8h_source}{}\label{keydata_8h_source}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/keydata.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/keydata.h}}
+\mbox{\hyperlink{keydata_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ KEYDATA\_H}}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ KEYDATA\_H}}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <stddef.h>}}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <ztoolset/utfvaryingstring.h>}}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zcontentconstants_8h}{zcontent/zcontentcommon/zcontentconstants.h}}>}}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00008}\mbox{\hyperlink{class_key_data}{00008}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_key_data}{KeyData}}\ \{}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00009}00009\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00010}00010\ \ \ \mbox{\hyperlink{class_key_data_af98436cb33d605f5f8182d90d63af1e9}{KeyData}}();}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00011}\mbox{\hyperlink{class_key_data_aeef5f5a216e7f2dda0729b7531b42419}{00011}}\ \ \ \mbox{\hyperlink{class_key_data_aeef5f5a216e7f2dda0729b7531b42419}{KeyData}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_key_data}{KeyData}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIn}})\ \{\mbox{\hyperlink{class_key_data_a153f0ff6983c1fe77f426f3633bf5357}{\_copyFrom}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIn}});\}}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00012}00012\ \ \ \mbox{\hyperlink{class_key_data}{KeyData}}\&\ \mbox{\hyperlink{class_key_data_a153f0ff6983c1fe77f426f3633bf5357}{\_copyFrom}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_key_data}{KeyData}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIn}})\ ;}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00013}\mbox{\hyperlink{class_key_data_a944b8454c3cfedcc04110d52e6f31970}{00013}}\ \ \ \mbox{\hyperlink{class_key_data}{KeyData}}\&\ \mbox{\hyperlink{class_key_data_a944b8454c3cfedcc04110d52e6f31970}{operator\ =\ }}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_key_data}{KeyData}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIn}})\ \{\ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_key_data_a153f0ff6983c1fe77f426f3633bf5357}{\_copyFrom}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIn}});\}}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00014}00014\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_key_data_ae15abea448aeacd8e4cf1a47b904996c}{clear}}();}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00015}\mbox{\hyperlink{class_key_data_ac3e0446b310d30d7dd4880ed6636ad7b}{00015}}\ \ \ \textcolor{keywordtype}{size\_t}\ \ \mbox{\hyperlink{class_key_data_ac3e0446b310d30d7dd4880ed6636ad7b}{KeySize}}=0;}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00016}\mbox{\hyperlink{class_key_data_a31f8b097262c2996d906ef0fdbfc59db}{00016}}\ \ \ \textcolor{keywordtype}{size\_t}\ \ \mbox{\hyperlink{class_key_data_a31f8b097262c2996d906ef0fdbfc59db}{Allocated}}=0;}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00017}\mbox{\hyperlink{class_key_data_a2019abd90481c7c264cd870f7c43f825}{00017}}\ \ \ \textcolor{keywordtype}{size\_t}\ \ \mbox{\hyperlink{class_key_data_a2019abd90481c7c264cd870f7c43f825}{AllocatedSize}}=0;}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00018}\mbox{\hyperlink{class_key_data_acea7ab8aec6a963fa15c0f2112cb3f0a}{00018}}\ \ \ \textcolor{keywordtype}{size\_t}\ \ \mbox{\hyperlink{class_key_data_acea7ab8aec6a963fa15c0f2112cb3f0a}{ExtentQuota}}=0;}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00019}\mbox{\hyperlink{class_key_data_af0dfb810481d1f73857caa73fa011b7d}{00019}}\ \ \ \textcolor{keywordtype}{size\_t}\ \ \mbox{\hyperlink{class_key_data_af0dfb810481d1f73857caa73fa011b7d}{ExtentSize}}=0;}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00020}\mbox{\hyperlink{class_key_data_ad6791dca7abf981c5221d33adc793e19}{00020}}\ \ \ \mbox{\hyperlink{zcontentconstants_8h_a3b02d1f4a8007be50cd643b65bb0cdce}{ZSort\_Type}}\ \ \ \ \mbox{\hyperlink{class_key_data_ad6791dca7abf981c5221d33adc793e19}{Duplicates}}=\mbox{\hyperlink{zcontentconstants_8h_a3b02d1f4a8007be50cd643b65bb0cdcea3e4dd66fd1c47676628be59efd6a56e1}{ZST\_Nothing}};}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00021}\mbox{\hyperlink{class_key_data_ac89cb4ac4f5c50b72b0c49d20e9922bc}{00021}}\ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \mbox{\hyperlink{class_key_data_ac89cb4ac4f5c50b72b0c49d20e9922bc}{GrabFreeSpace}}=\textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00022}\mbox{\hyperlink{class_key_data_a19ec0c9383192f1dda53fef66a6693b7}{00022}}\ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \mbox{\hyperlink{class_key_data_a19ec0c9383192f1dda53fef66a6693b7}{Forced}}=\textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00023}\mbox{\hyperlink{class_key_data_a81a52e7c603bb3e9831e73d2a2fb4573}{00023}}\ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \mbox{\hyperlink{class_key_data_a81a52e7c603bb3e9831e73d2a2fb4573}{HighwaterMarking}}=\textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00024}\mbox{\hyperlink{class_key_data_a47faf5c818d9f0d05b54349e62aac543}{00024}}\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{class_key_data_a47faf5c818d9f0d05b54349e62aac543}{IndexRootName}};}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00025}\mbox{\hyperlink{class_key_data_a96c437fdd251513e9c448f07d29ba4be}{00025}}\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{class_key_data_a96c437fdd251513e9c448f07d29ba4be}{IndexName}};}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00026}00026\ \};}
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{keydata_8h_source_l00028}00028\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ KEYDATA\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,215 @@
+\doxysection{ZClient\+Socket Class Reference}
+\hypertarget{class_z_client_socket}{}\label{class_z_client_socket}\index{ZClientSocket@{ZClientSocket}}
+
+
+The \doxylink{class_z_client_socket}{ZClient\+Socket} class this socket is used to simply connect to a remote server without using ZBase protocol it may use LDAP on top if defined.  
+
+
+
+
+{\ttfamily \#include $<$zclientsocket.\+h$>$}
+
+
+
+Inheritance diagram for ZClient\+Socket\+:
+% FIG 0
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} ZSocket \mbox{\hyperlink{class_z_client_socket_a57901a51a5d3640f7ac64cf9aca239b6}{\+\_\+\+Base}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_z_client_socket_abd1b34c5949e9cda8382b892f42e8827}{ZClient\+Socket}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_client_socket_a426bbacc65728cbaac2aa72017c4a815}{client\+Setup}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Address}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Port}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Family}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{AF\+\_\+\+INET}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Non\+Blocking}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Read\+Timeout}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+\_\+\+CLIENTREADTIMEOUT\+\_\+\+MILLISECONDS\+\_\+\+\_\+}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Write\+Timeout}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+\_\+\+CLIENTWRITETIMEOUT\+\_\+\+MILLISECONDS\+\_\+\+\_\+}})
+\begin{DoxyCompactList}\small\item\em \doxylink{class_z_client_socket_a426bbacc65728cbaac2aa72017c4a815}{ZClient\+Socket\+::client\+Setup}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_client_socket_afefb8687eebec47569302885f3035f66}{client\+Connect}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Username}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Password}})
+\begin{DoxyCompactList}\small\item\em \doxylink{class_z_client_socket_afefb8687eebec47569302885f3035f66}{ZClient\+Socket\+::client\+Connect} network connect over the client socket according ZBase protocol Send credentials for base Authentication. Protocol \+: \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_client_socket_a6a31512d6f751b7a9412e3baa0191075}{client\+Connect\+No\+Authentication}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_client_socket_a299d7d8f501d066670f7064319a131b3}{client\+Connect\+LDAP}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Domain}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Username}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Password}})
+\begin{DoxyCompactList}\small\item\em \doxylink{class_z_client_socket_afefb8687eebec47569302885f3035f66}{ZClient\+Socket\+::client\+Connect} network connect over the client socket. Send credentials. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \mbox{\hyperlink{class_z_client_socket_a201756e624ef105e522bf381915968de}{String\+Address}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The \doxylink{class_z_client_socket}{ZClient\+Socket} class this socket is used to simply connect to a remote server without using ZBase protocol it may use LDAP on top if defined. 
+
+Definition at line \mbox{\hyperlink{zclientsocket_8h_source_l00012}{12}} of file \mbox{\hyperlink{zclientsocket_8h_source}{zclientsocket.\+h}}.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\Hypertarget{class_z_client_socket_a57901a51a5d3640f7ac64cf9aca239b6}\label{class_z_client_socket_a57901a51a5d3640f7ac64cf9aca239b6} 
+\index{ZClientSocket@{ZClientSocket}!\_Base@{\_Base}}
+\index{\_Base@{\_Base}!ZClientSocket@{ZClientSocket}}
+\doxysubsubsection{\texorpdfstring{\_Base}{\_Base}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} ZSocket \mbox{\hyperlink{class_z_client_socket_a57901a51a5d3640f7ac64cf9aca239b6}{ZClient\+Socket\+::\+\_\+\+Base}}}
+
+
+
+Definition at line \mbox{\hyperlink{zclientsocket_8h_source_l00015}{15}} of file \mbox{\hyperlink{zclientsocket_8h_source}{zclientsocket.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_z_client_socket_abd1b34c5949e9cda8382b892f42e8827}\label{class_z_client_socket_abd1b34c5949e9cda8382b892f42e8827} 
+\index{ZClientSocket@{ZClientSocket}!ZClientSocket@{ZClientSocket}}
+\index{ZClientSocket@{ZClientSocket}!ZClientSocket@{ZClientSocket}}
+\doxysubsubsection{\texorpdfstring{ZClientSocket()}{ZClientSocket()}}
+{\footnotesize\ttfamily ZClient\+Socket\+::\+ZClient\+Socket (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zclientsocket_8cpp_source_l00008}{8}} of file \mbox{\hyperlink{zclientsocket_8cpp_source}{zclientsocket.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_z_client_socket_afefb8687eebec47569302885f3035f66}\label{class_z_client_socket_afefb8687eebec47569302885f3035f66} 
+\index{ZClientSocket@{ZClientSocket}!clientConnect@{clientConnect}}
+\index{clientConnect@{clientConnect}!ZClientSocket@{ZClientSocket}}
+\doxysubsubsection{\texorpdfstring{clientConnect()}{clientConnect()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZClient\+Socket\+::client\+Connect (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Username,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Password }\end{DoxyParamCaption})}
+
+
+
+\doxylink{class_z_client_socket_afefb8687eebec47569302885f3035f66}{ZClient\+Socket\+::client\+Connect} network connect over the client socket according ZBase protocol Send credentials for base Authentication. Protocol \+: 
+
+at each written block, server returns a \doxylink{class_z_net_exception}{ZNet\+Exception} object content \+:
+\begin{DoxyItemize}
+\item empty, with Status set to ZS\+\_\+\+SUCCESS if successfull
+\item with server ZException\+Base content, in case of error. 
+\begin{DoxyParams}{Parameters}
+{\em p\+Username} & \\
+\hline
+{\em p\+Password} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+\end{DoxyItemize}
+
+Definition at line \mbox{\hyperlink{zclientsocket_8cpp_source_l00057}{57}} of file \mbox{\hyperlink{zclientsocket_8cpp_source}{zclientsocket.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_source_l01618}{get\+Command()}}, and \mbox{\hyperlink{main__console_8cpp_source_l00364}{main()}}.
+
+\Hypertarget{class_z_client_socket_a299d7d8f501d066670f7064319a131b3}\label{class_z_client_socket_a299d7d8f501d066670f7064319a131b3} 
+\index{ZClientSocket@{ZClientSocket}!clientConnectLDAP@{clientConnectLDAP}}
+\index{clientConnectLDAP@{clientConnectLDAP}!ZClientSocket@{ZClientSocket}}
+\doxysubsubsection{\texorpdfstring{clientConnectLDAP()}{clientConnectLDAP()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZClient\+Socket\+::client\+Connect\+LDAP (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Domain,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Username,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Password }\end{DoxyParamCaption})}
+
+
+
+\doxylink{class_z_client_socket_afefb8687eebec47569302885f3035f66}{ZClient\+Socket\+::client\+Connect} network connect over the client socket. Send credentials. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Username} & \\
+\hline
+{\em p\+Password} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zclientsocket_8cpp_source_l00129}{129}} of file \mbox{\hyperlink{zclientsocket_8cpp_source}{zclientsocket.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_source_l01618}{get\+Command()}}, and \mbox{\hyperlink{main__console_8cpp_source_l00364}{main()}}.
+
+\Hypertarget{class_z_client_socket_a6a31512d6f751b7a9412e3baa0191075}\label{class_z_client_socket_a6a31512d6f751b7a9412e3baa0191075} 
+\index{ZClientSocket@{ZClientSocket}!clientConnectNoAuthentication@{clientConnectNoAuthentication}}
+\index{clientConnectNoAuthentication@{clientConnectNoAuthentication}!ZClientSocket@{ZClientSocket}}
+\doxysubsubsection{\texorpdfstring{clientConnectNoAuthentication()}{clientConnectNoAuthentication()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZClient\+Socket\+::client\+Connect\+No\+Authentication (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zclientsocket_8cpp_source_l00107}{107}} of file \mbox{\hyperlink{zclientsocket_8cpp_source}{zclientsocket.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_z_client_socket_a426bbacc65728cbaac2aa72017c4a815}\label{class_z_client_socket_a426bbacc65728cbaac2aa72017c4a815} 
+\index{ZClientSocket@{ZClientSocket}!clientSetup@{clientSetup}}
+\index{clientSetup@{clientSetup}!ZClientSocket@{ZClientSocket}}
+\doxysubsubsection{\texorpdfstring{clientSetup()}{clientSetup()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZClient\+Socket\+::client\+Setup (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} \&}]{p\+Address,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Port,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Family = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{AF\+\_\+\+INET}}},  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Non\+Blocking = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}},  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Read\+Timeout = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+\_\+\+CLIENTREADTIMEOUT\+\_\+\+MILLISECONDS\+\_\+\+\_\+}}},  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}]{p\+Write\+Timeout = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\+\_\+\+\_\+\+CLIENTWRITETIMEOUT\+\_\+\+MILLISECONDS\+\_\+\+\_\+}}} }\end{DoxyParamCaption})}
+
+
+
+\doxylink{class_z_client_socket_a426bbacc65728cbaac2aa72017c4a815}{ZClient\+Socket\+::client\+Setup}. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em p\+Address} & a utf8\+Varying\+String containing the internet address either IPV6 or IPV4 \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Port} & a utf8\+Varying\+String containing the port number (or service name) \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+ZHAT} & Address format (IPV6 or IPV4) if omitted (ZHAT\+\_\+\+Nothing) then IPV4 is assumed. \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Non\+Blocking} & defines wether socket has to be blocking (false) or non blocking (true) \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Read\+Timeout} & \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Write\+Timeout} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{zclientsocket_8cpp_source_l00021}{21}} of file \mbox{\hyperlink{zclientsocket_8cpp_source}{zclientsocket.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_source_l01618}{get\+Command()}}, \mbox{\hyperlink{main__console_8cpp_source_l00364}{main()}}, and \mbox{\hyperlink{zsslclientsocket_8cpp_source_l00010}{ZSSLClient\+Socket\+::\+SSLclient\+Setup()}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_z_client_socket_a201756e624ef105e522bf381915968de}\label{class_z_client_socket_a201756e624ef105e522bf381915968de} 
+\index{ZClientSocket@{ZClientSocket}!StringAddress@{StringAddress}}
+\index{StringAddress@{StringAddress}!ZClientSocket@{ZClientSocket}}
+\doxysubsubsection{\texorpdfstring{StringAddress}{StringAddress}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8\+Varying\+String}} ZClient\+Socket\+::\+String\+Address}
+
+
+
+Definition at line \mbox{\hyperlink{zclientsocket_8h_source_l00032}{32}} of file \mbox{\hyperlink{zclientsocket_8h_source}{zclientsocket.\+h}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/znet/zbasenet/\mbox{\hyperlink{zclientsocket_8h}{zclientsocket.\+h}}\item 
+/home/gerard/\+Development/zbasetools/znet/zbasenet/\mbox{\hyperlink{zclientsocket_8cpp}{zclientsocket.\+cpp}}\end{DoxyCompactItemize}

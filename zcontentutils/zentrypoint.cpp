@@ -90,6 +90,9 @@
 
 #include <ztoolset/zaierrors.h>
 
+#include "zdomainobjectfinder.h"
+#include "zquerywizardmwd.h"
+
 //const int cst_maxraisonablevalue = 100000;
 
 using namespace std;
@@ -106,9 +109,8 @@ ZEntryPoint::ZEntryPoint(QWidget *parent) :QMainWindow(parent)
 //  setAttribute(Qt::WA_DeleteOnClose , true); // first main window cannot be delete on close otherwise QApplication crashes at exit
 
   mainQAg = new QActionGroup(this);
-  initLayout();
-
   QObject::connect(mainQAg, &QActionGroup::triggered, this, &ZEntryPoint::actionMenuEvent);
+  initLayout();
 
 }
 ZEntryPoint::~ZEntryPoint()
@@ -158,15 +160,16 @@ ZEntryPoint::initLayout()
 
 
     /*----------Leading quit icon--------------*/
-
+/*
     uriString wQuitImg;
     wQuitImg = GeneralParameters.getIconDirectory();
     wQuitImg.addConditionalDirectoryDelimiter();
     wQuitImg += "system-shutdown.png";
     QIcon wQuitICn(wQuitImg.toCChar());
+ */
+    QIcon wQuitICn = ContentObjectBroker.iconFactory("general.iconfactory/system-shutdown.png",&ErrorLog);
 
-    QuitIconQAc = new QAction("",menubar);
-    QuitIconQAc->setIcon(wQuitICn);
+    QuitIconQAc = new QAction(wQuitICn,"",menubar);
 
     menubar->addAction(QuitIconQAc);
     mainQAg->addAction(QuitIconQAc);
@@ -180,13 +183,15 @@ ZEntryPoint::initLayout()
     ParametersQMe=new QMenu(QObject::tr("Parameters"),this);
     generalMEn->addMenu(ParametersQMe);
 
+    ParamChangeQAc=new QAction(QObject::tr("Change"),this);
+    ParametersQMe->addAction(ParamChangeQAc);
+    mainQAg->addAction(ParamChangeQAc);
+
     ParamLoadQAc=new QAction(QObject::tr("Load xml parameter file"),this);
     ParametersQMe->addAction(ParamLoadQAc);
     mainQAg->addAction(ParamLoadQAc);
 
-    ParamChangeQAc=new QAction(QObject::tr("Change current parameters"),this);
-    ParametersQMe->addAction(ParamChangeQAc);
-    mainQAg->addAction(ParamChangeQAc);
+
 
     TextFileVisuQAc = new QAction("Load text file",this);
     generalMEn->addAction(TextFileVisuQAc);
@@ -373,54 +378,17 @@ ZEntryPoint::initLayout()
   menuBar()->addAction(ZMFQueryQAc);
   mainQAg->addAction(ZMFQueryQAc);
 
- /*
-
-    generalMEn->addAction(openZRHQAc);
-    generalMEn->addAction(unlockZRFQAc);
-    generalMEn->addAction(closeQAc);
-    generalMEn->addAction(QuitQAc);
-
-    ZRFMEn->addAction(surfaceScanZRFQAc);
-    ZRFMEn->addAction(RecoveryQAc);
-    ZRFMEn->addAction(clearQAc);
-    ZRFMEn->addAction(cloneQAc);
-    ZRFMEn->addAction(truncateQAc);
-    ZRFMEn->addAction(extendQAc);
-    ZRFMEn->addAction(rebuildHeaderQAc);
-    ZRFMEn->addAction(reorganizeQAc);
-    ZRFMEn->addAction(upgradeZRFtoZMFQAc);
-    ZMFMEn->addAction(listIndexesQAc);
-    ZMFMEn->addAction(menurepair_all_indexes->menuAction());
-    ZMFMEn->addAction(downgradeZMFtoZRFQAc);
-    ZMFMEn->addAction(reorganizeZMFQAc);
-    ZMFMEn->addAction(removeIndexQAc);
-    ZMFMEn->addAction(addIndexQAc);
-    ZMFMEn->addAction(rebuildIndexQAc);
-    ZMFMEn->addAction(extractIndexQAc);
-    ZMFMEn->addAction(extractAllIndexesQAc);
-    ZMFMEn->addAction(MCBReportQAc);
-*/
+  QueryWizardQAc = new QAction("Query wizard",this);
+  menuBar()->addAction(QueryWizardQAc);
+  mainQAg->addAction(QueryWizardQAc);
 
 
+  ObjectSearchQAc = new QAction("Object search",this);
+  menuBar()->addAction(ObjectSearchQAc);
+  mainQAg->addAction(ObjectSearchQAc);
 
 
-
-
-
-
-    /*
-  ZRFVersionLBl->setText(getVersionStr(__ZRF_VERSION__).toCChar());
-  ZMFVersionLBl->setText(getVersionStr(__ZMF_VERSION__).toCChar());
-*/
-/*
-    openZRFQAc = new QAction("Random file",this);
-    menubar->addAction(openZRFQAc);
-*/
-
-
-
-
-} // initSetup
+} // initLayout
 
 
 /*
@@ -463,24 +431,40 @@ ZEntryPoint::actionMenuEvent(QAction* pAction)
       uriString wXmlParams= wFileName.toUtf8().data();
       if (!wXmlParams.exists())
           return;
-      wSt=GeneralParameters.XmlLoad(wXmlParams,nullptr);
+      ErrorLog.setAutoPrintAll();
+      wSt=GeneralParameters.XmlLoad(wXmlParams,&ErrorLog);
       if (wSt!=ZS_SUCCESS) {
-          utf8VaryingString wExcp = ZException.last().formatFullUserMessage().toString();
+/*          utf8VaryingString wExcp = ZException.last().formatFullUserMessage().toString();
           ZExceptionDLg::adhocMessage("Load parameters",Severity_Error,
-                                      nullptr,&wExcp,"Error while loading xml parameter file %s",wXmlParams.toString());
+                                      nullptr,&wExcp,"Error while loading/parsing General xml parameter file %s",wXmlParams.toString());
+*/
+        ZExceptionDLg::adhocMessageErrorLog("Load parameters",Severity_Error,&ErrorLog,
+                                    "Error while loading/parsing General xml parameter file %s",wXmlParams.toString());
+
+        return;
+      }
+      wSt=DomainBroker.XmlLoad(wXmlParams,&ErrorLog);
+      if (wSt!=ZS_SUCCESS) {
+ /*         utf8VaryingString wExcp = ZException.last().formatFullUserMessage().toString();
+          ZExceptionDLg::adhocMessage("Load parameters",Severity_Error,
+                                      nullptr,&wExcp,"Error while loading/parsing Domain xml parameter file %s",wXmlParams.toString());
+*/
+          ZExceptionDLg::adhocMessageErrorLog("Load parameters",Severity_Error,&ErrorLog,
+                                              "Error while loading/parsing loading/parsing Domains xml parameter file %s",wXmlParams.toString());
           return;
       }
+      if (ErrorLog.hasSomething()) {
+          ZExceptionDLg::adhocMessageErrorLog("Load parameters",Severity_Information,&ErrorLog,
+                                              "Some messages have been recorded for xml parameter file %s",wXmlParams.toString());
+      }
+
       return;
   } //ParamLoadQAc
 
   if (pAction==ParamChangeQAc) {
-      ZGeneralParamsDLg* wParamDLg = new ZGeneralParamsDLg(this);
-      wParamDLg->setup(GeneralParameters);
+      ZGeneralParamsWNd* wParamDLg = new ZGeneralParamsWNd(&ErrorLog,this);
+      wParamDLg->setup(GeneralParameters,DomainBroker);
       wParamDLg->show();
-      int wRet=wParamDLg->exec();
-      if (wRet==QDialog::Rejected)
-          return;
-      return;
   }
   /* end general parameters */
   if (pAction==TextFileVisuQAc)
@@ -503,9 +487,8 @@ ZEntryPoint::actionMenuEvent(QAction* pAction)
 
   if ((pAction==QuitQAc)||(pAction==QuitIconQAc))
   {
-      actionClose();
-      //    this->deleteLater();
-      QApplication::quit();
+      Quit();
+
       return;
   }
    /*===============================*/
@@ -657,10 +640,29 @@ ZEntryPoint::actionMenuEvent(QAction* pAction)
   }
 
   if (pAction==ZMFQueryQAc) {
-    QueryMWd= new ZSearchQueryMWd(&ErrorLog, this);
-    QueryMWd->show();
+    ZSearchQueryMWd* wQueryMWd= new ZSearchQueryMWd( &ErrorLog ,this);
+    wQueryMWd->show();
     return;
   }
+  if (pAction==QueryWizardQAc) {
+      ZSearchQueryMWd* wQueryMWd= new ZSearchQueryMWd( &ErrorLog ,this);
+      wQueryMWd->show();
+
+      ZQueryWizardMWd* wQWzd = new ZQueryWizardMWd(&ErrorLog,wQueryMWd);
+      wQWzd->setQueryMain(wQueryMWd);
+      wQueryMWd->setQueryWizard(wQWzd);
+      wQWzd->show();
+      return;
+  }
+
+  if (pAction==ObjectSearchQAc) {
+      ZDomainObjectFinder* FinderMWd = new ZDomainObjectFinder(&ErrorLog, this);
+//      FinderMWd->initLayout();
+      FinderMWd->setup(DomainBroker.getRoot());
+      FinderMWd->show();
+      return;
+  }
+
 
   if (pAction==ZmfDefQAc) {
     FileGenerate= new FileGenerateMWn(this);
@@ -1472,40 +1474,6 @@ ZEntryPoint::Dictionary()
 }
 */
 
-void
-ZEntryPoint::actionClose(bool pChecked)
-{
-    /*
-  displayWidgetBlockOnce=false;
-  if (RandomFile)
-    {
-    RandomFile->zclose();
-    delete RandomFile;
-    RandomFile=nullptr;
-    }
-
-  if (RawMasterFile)
-    {
-      RawMasterFile->zclose();
-      delete RawMasterFile;
-      RawMasterFile=nullptr;
-    }
-  if (Fd >= 0)
-      {
-      ::close(Fd);
-      Fd=-1;
-      }
-
-    rawMEn->setEnabled(false);
-    ZRFMEn->setEnabled(false);
-    ZMFMEn->setEnabled(false);
-
-
-    OpenMode=VMD_Nothing;
-*/
-  return;
-}//actionClose
-
 
 
 
@@ -2264,3 +2232,33 @@ ZEntryPoint::importZMF(QWidget* pParent, ZaiErrors *pErrorLog)
   return wSt;
 } // ZEntryPoint::importZMF
 
+void
+ZEntryPoint::Quit()
+{
+    if (DomainBroker.hasChanged()) {
+        utf8VaryingString wSaveMsg;
+        wSaveMsg.addsprintf("\n\nParameters (domains) have changed.\n"
+                            "Do you really want to ignore changes made <Ignore>?");
+        int wRet=ZExceptionDLg::adhocMessage3B("Save parameters",Severity_Question, "Save","Cancel quit","Ignore and quit",
+                                                 nullptr,nullptr,wSaveMsg.toCChar());
+        if (wRet==QDialog::Rejected) { /* Cancel quit */
+
+            return ;
+        }
+        if (wRet==QDialog::Accepted) { /* Ignore and quit */
+            this->deleteLater();
+            return;
+        }
+        /*  Save button     wRet==ZEDLG_Third */
+        ZStatus wSt=XmlSaveAllParameters(GeneralParameters.XmlSource,&ErrorLog);
+        if (wSt!=ZS_SUCCESS) {
+            ZExceptionDLg::adhocMessageErrorLog("Save parameters",Severity_Error,&ErrorLog,
+                                                "Cannot save parameters.\n"
+                                                "Error saving xml parameter file %s status <%s>",
+                                                GeneralParameters.XmlSource.toString(),decode_ZStatus(wSt));
+            return;
+        }
+    }
+    QApplication::quit();
+    return;
+}

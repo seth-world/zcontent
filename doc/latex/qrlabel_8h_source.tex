@@ -1,0 +1,49 @@
+\doxysection{qrlabel.\+h}
+\hypertarget{qrlabel_8h_source}{}\label{qrlabel_8h_source}\index{/home/gerard/Development/zbasetools/zcontent/ztest\_zindexedfile/testdata/qrlabel.h@{/home/gerard/Development/zbasetools/zcontent/ztest\_zindexedfile/testdata/qrlabel.h}}
+\mbox{\hyperlink{qrlabel_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ QRLABEL\_H}}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ QRLABEL\_H}}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <QObject>}}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <QLabel>}}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <qrcodegen.h>}}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <QColor>}}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <ztoolset/zutfstrings.h>}}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <qpainter.h>}}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00011}00011\ \textcolor{keyword}{using\ namespace\ }qrcodegen;}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00013}\mbox{\hyperlink{class_q_r_label}{00013}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_q_r_label}{QRLabel}}\ :\ \textcolor{keyword}{public}\ QLabel}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00014}00014\ \{}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00015}00015\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Q\_OBJECT}}}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00016}00016\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00017}\mbox{\hyperlink{class_q_r_label_a5c705bf2e2e39a89c8ac1ddcc15b2557}{00017}}\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{class_q_r_label_a5c705bf2e2e39a89c8ac1ddcc15b2557}{QRLabel}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QWidget}}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{parent}}\ =\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00018}\mbox{\hyperlink{class_q_r_label_adb7bbbbfd23a277178de605628dfc135}{00018}}\ \ \ \mbox{\hyperlink{class_q_r_label_adb7bbbbfd23a277178de605628dfc135}{\string~QRLabel}}()}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00019}00019\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00020}00020\ \ \ \textcolor{comment}{//\ \ delete\ Painter;}}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00021}00021\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00023}\mbox{\hyperlink{class_q_r_label_ad026204221be8157dbc35bf6f93ebcc3}{00023}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_q_r_label_ad026204221be8157dbc35bf6f93ebcc3}{setQRString}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8String}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pString}},\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QColor}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pBg}},\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QColor}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pFg}});}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00024}\mbox{\hyperlink{class_q_r_label_ad685452ab510ea532baabec0f1b06ed7}{00024}}\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_q_r_label_ad685452ab510ea532baabec0f1b06ed7}{setQRData}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\_t}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pData}},\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pDataLength}},\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QColor}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pBg}},\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QColor}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pFg}});}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00027}00027\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{signals}}:}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00029}00029\ \textcolor{keyword}{public}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{slots}}:}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00030}00030\ \textcolor{comment}{//\ \ void\ paintEvent\_1(QPaintEvent\ *pPaintEvent)\ ;}}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00031}00031\ \ \textcolor{comment}{//\ void\ paintEvent\_2(QPaintEvent\ *pPaintEvent)\ ;}}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00033}00033\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00034}00034\ \textcolor{comment}{//\ void\ paintEvent(QPaintEvent\ *)\ override;}}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00035}00035\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00036}00036\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QColor}}\ \ Fg\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QColor}}(Qt::black);}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00037}00037\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QColor}}\ \ Bg\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QColor}}(Qt::white);}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00038}00038\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8String}}\ Content;}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00040}00040\ \textcolor{comment}{//\ \ QPainter*\ Painter=nullptr;}}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00041}00041\ \};}
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{qrlabel_8h_source_l00043}00043\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ QRLABEL\_H}}
+
+\end{DoxyCode}

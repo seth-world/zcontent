@@ -1,0 +1,212 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/znaturalfromurf.cpp File Reference}
+\hypertarget{znaturalfromurf_8cpp}{}\label{znaturalfromurf_8cpp}\index{/home/gerard/Development/zbasetools/zcontent/zindexedfile/znaturalfromurf.cpp@{/home/gerard/Development/zbasetools/zcontent/zindexedfile/znaturalfromurf.cpp}}
+{\ttfamily \#include $<$zindexedfile/znaturalfromurf.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/utfvtemplatestring.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/charfixedstring.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/utffixedstring.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/utfvaryingstring.\+h$>$}\newline
+Include dependency graph for znaturalfromurf.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{znaturalfromurf_8cpp_a1e7a5f8e770b75260f3f2c651e3d276c}{ZNATURALFROMURF\+\_\+\+CPP}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{znaturalfromurf_8cpp_a16bf5fb4a1ad6dda19b2fbfa0dc4b352}{\+\_\+get\+Blob\+Nf\+URF}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Natural}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URFIn\+Data}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Target\+Type}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{znaturalfromurf_8cpp_a3aea166df03dea6d8a120e8e807827b6}{\+\_\+get\+URFHeader\+Data}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URF\+\_\+\+Ptr}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZType}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint64\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Universal\+Size}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint64\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Natural\+Size}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Capacity}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Effective\+USize}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint64\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Header\+Size}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URFd\+Data\+Ptr}})
+\begin{DoxyCompactList}\small\item\em \+\_\+get\+URFHeader\+Data Gets the information from URF header data of a field \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{znaturalfromurf_8cpp_a829bf2fa3932edb852fbffe7fc1fd5b5}{get\+\_\+121\+\_\+\+Blob\+Nf\+URF}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Value}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URFData}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{znaturalfromurf_8cpp_a7e395987ca374870984d50de8018a7be}{get\+\_\+121\+\_\+\+ZDate\+Full\+Nf\+URF}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Value}}, ZData\+Buffer \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URFData}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{znaturalfromurf_8cpp_ac7fc8db28c5540033dff6780f9d75def}{get\+\_\+121\+\_\+\+Check\+Sum\+Nf\+URF}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Value}}, ZData\+Buffer \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URFData}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} \mbox{\hyperlink{znaturalfromurf_8cpp_a9fcd68b6b33adf623234a9736073561a}{get\+\_\+\+ZString\+Nf\+URF}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Value}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Type}}, ZData\+Buffer \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URFData}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{znaturalfromurf_8cpp_a0a0644247c39d65e45222771a2759707}{\+\_\+get\+ZDate\+Full\+Nf\+URF}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Value}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URFData}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Target\+Type}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint64\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Target\+NSize}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Target\+Array\+Count}})
+\begin{DoxyCompactList}\small\item\em \+\_\+get\+ZDate\+Full\+NfU gets a ZDate\+Full object from and URF data that could be \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{znaturalfromurf_8cpp_ad4779d5ad5a28677372baa1f618178e1}{\+\_\+get\+Check\+Sum\+Nf\+URF}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Value}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URFData}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Target\+Type}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{znaturalfromurf_8cpp_a1e7a5f8e770b75260f3f2c651e3d276c}\label{znaturalfromurf_8cpp_a1e7a5f8e770b75260f3f2c651e3d276c} 
+\index{znaturalfromurf.cpp@{znaturalfromurf.cpp}!ZNATURALFROMURF\_CPP@{ZNATURALFROMURF\_CPP}}
+\index{ZNATURALFROMURF\_CPP@{ZNATURALFROMURF\_CPP}!znaturalfromurf.cpp@{znaturalfromurf.cpp}}
+\doxysubsubsection{\texorpdfstring{ZNATURALFROMURF\_CPP}{ZNATURALFROMURF\_CPP}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} ZNATURALFROMURF\+\_\+\+CPP}
+
+
+
+Definition at line \mbox{\hyperlink{znaturalfromurf_8cpp_source_l00002}{2}} of file \mbox{\hyperlink{znaturalfromurf_8cpp_source}{znaturalfromurf.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{znaturalfromurf_8cpp_a16bf5fb4a1ad6dda19b2fbfa0dc4b352}\label{znaturalfromurf_8cpp_a16bf5fb4a1ad6dda19b2fbfa0dc4b352} 
+\index{znaturalfromurf.cpp@{znaturalfromurf.cpp}!\_getBlobNfURF@{\_getBlobNfURF}}
+\index{\_getBlobNfURF@{\_getBlobNfURF}!znaturalfromurf.cpp@{znaturalfromurf.cpp}}
+\doxysubsubsection{\texorpdfstring{\_getBlobNfURF()}{\_getBlobNfURF()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \+\_\+get\+Blob\+Nf\+URF (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}}]{p\+Natural,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+URFIn\+Data,  }\item[{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}}}]{p\+Target\+Type }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{znaturalfromurf_8cpp_source_l00014}{14}} of file \mbox{\hyperlink{znaturalfromurf_8cpp_source}{znaturalfromurf.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindextype_8cpp_source_l01352}{decode\+\_\+\+ZType()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00060}{ZType\+\_\+\+Blob}}.
+
+\Hypertarget{znaturalfromurf_8cpp_ad4779d5ad5a28677372baa1f618178e1}\label{znaturalfromurf_8cpp_ad4779d5ad5a28677372baa1f618178e1} 
+\index{znaturalfromurf.cpp@{znaturalfromurf.cpp}!\_getCheckSumNfURF@{\_getCheckSumNfURF}}
+\index{\_getCheckSumNfURF@{\_getCheckSumNfURF}!znaturalfromurf.cpp@{znaturalfromurf.cpp}}
+\doxysubsubsection{\texorpdfstring{\_getCheckSumNfURF()}{\_getCheckSumNfURF()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \+\_\+get\+Check\+Sum\+Nf\+URF (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}}]{p\+Value,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+URFData,  }\item[{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}}}]{p\+Target\+Type }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{znaturalfromurf_8cpp_source_l00688}{688}} of file \mbox{\hyperlink{znaturalfromurf_8cpp_source}{znaturalfromurf.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindextype_8cpp_source_l01352}{decode\+\_\+\+ZType()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00154}{ZType\+\_\+\+Check\+Sum}}.
+
+\Hypertarget{znaturalfromurf_8cpp_a3aea166df03dea6d8a120e8e807827b6}\label{znaturalfromurf_8cpp_a3aea166df03dea6d8a120e8e807827b6} 
+\index{znaturalfromurf.cpp@{znaturalfromurf.cpp}!\_getURFHeaderData@{\_getURFHeaderData}}
+\index{\_getURFHeaderData@{\_getURFHeaderData}!znaturalfromurf.cpp@{znaturalfromurf.cpp}}
+\doxysubsubsection{\texorpdfstring{\_getURFHeaderData()}{\_getURFHeaderData()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \+\_\+get\+URFHeader\+Data (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+URF\+\_\+\+Ptr,  }\item[{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}} \&}]{p\+ZType,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint64\+\_\+t}} \&}]{p\+Universal\+Size,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint64\+\_\+t}} \&}]{p\+Natural\+Size,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\+\_\+t}} \&}]{p\+Capacity,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\+\_\+t}} \&}]{p\+Effective\+USize,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint64\+\_\+t}} \&}]{p\+Header\+Size,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{p\+URFd\+Data\+Ptr }\end{DoxyParamCaption})}
+
+
+
+\+\_\+get\+URFHeader\+Data Gets the information from URF header data of a field 
+
+\begin{DoxyVerb} see <zindexedfile/znaturalfromurf> <ZType_Type vs URF Header sizes>
+\end{DoxyVerb}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+ & {\em \mbox{[}in} & p\+URF\+\_\+\+Ptr Pointer to data with URF format (URF header leading data content) \+: first byte of URF header \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+ZType} & ZType\+Base describing data \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+Universal\+Size} & Universal size in bytes without Header \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+Natural\+Size} & Natural size in bytes without Header \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+Canonical} & ONLY FOR FIXED STRINGS AND ARRAYS \+: FIXED STRINGS\+: Canonical size \+: number of element of array or capacity of a fixed string ARRAYS\+: array count set to 1 otherwise \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+Effective\+USize} & ONLY FOR FIXED STRINGS effective size in bytes of stored data URF header EXCLUDED set to 1 otherwise \\
+\hline
+\mbox{\texttt{ out}}  & {\em p\+Header\+Size} & size in bytes of URF header \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+pointer to start of effective field data as unsigned char\texorpdfstring{$\ast$}{*} (first byte after data header) 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{znaturalfromurf_8cpp_source_l00139}{139}} of file \mbox{\hyperlink{znaturalfromurf_8cpp_source}{znaturalfromurf.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindextype_8cpp_source_l01352}{decode\+\_\+\+ZType()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zdatatype_8cpp_source_l00231}{get\+Atomic\+ZType\+\_\+\+Sizes()}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00038}{ZType\+\_\+\+Array}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00034}{ZType\+\_\+\+Atomic}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00042}{ZType\+\_\+\+Atomic\+Mask}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00060}{ZType\+\_\+\+Blob}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00129}{ZType\+\_\+\+Char\+Fixed\+String}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00154}{ZType\+\_\+\+Check\+Sum}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00046}{ZType\+\_\+\+Structure\+Mask}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00132}{ZType\+\_\+\+Utf16\+Fixed\+String}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00126}{ZType\+\_\+\+Utf16\+Varying\+String}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00133}{ZType\+\_\+\+Utf32\+Fixed\+String}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00127}{ZType\+\_\+\+Utf32\+Varying\+String}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00131}{ZType\+\_\+\+Utf8\+Fixed\+String}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00125}{ZType\+\_\+\+Utf8\+Varying\+String}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00151}{ZType\+\_\+\+ZDate}}, and \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00152}{ZType\+\_\+\+ZDate\+Full}}.
+
+\Hypertarget{znaturalfromurf_8cpp_a0a0644247c39d65e45222771a2759707}\label{znaturalfromurf_8cpp_a0a0644247c39d65e45222771a2759707} 
+\index{znaturalfromurf.cpp@{znaturalfromurf.cpp}!\_getZDateFullNfURF@{\_getZDateFullNfURF}}
+\index{\_getZDateFullNfURF@{\_getZDateFullNfURF}!znaturalfromurf.cpp@{znaturalfromurf.cpp}}
+\doxysubsubsection{\texorpdfstring{\_getZDateFullNfURF()}{\_getZDateFullNfURF()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \+\_\+get\+ZDate\+Full\+Nf\+URF (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}}]{p\+Value,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+URFData,  }\item[{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}}}]{p\+Target\+Type,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint64\+\_\+t}}}]{p\+Target\+NSize,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\+\_\+t}}}]{p\+Target\+Array\+Count }\end{DoxyParamCaption})}
+
+
+
+\+\_\+get\+ZDate\+Full\+NfU gets a ZDate\+Full object from and URF data that could be 
+
+\begin{DoxyVerb} - ZDateFull (121)
+ - ZDate     a conversion is needed
+\end{DoxyVerb}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em p\+Value} & a void pointer to ZDate\+Full object to feed. Pointer must be void. \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+URFData} & URF data to feed ZDate\+Full with \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Target\+Type} & Obviously ZType\+\_\+\+ZDate\+Full \\
+\hline
+\mbox{\texttt{ in}}  & {\em p\+Array\+Count} & non significant \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a ZStatus 
+\end{DoxyReturn}
+
+
+Definition at line \mbox{\hyperlink{znaturalfromurf_8cpp_source_l00520}{520}} of file \mbox{\hyperlink{znaturalfromurf_8cpp_source}{znaturalfromurf.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindextype_8cpp_source_l01352}{decode\+\_\+\+ZType()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00111}{ZType\+\_\+\+Array\+Char}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00126}{ZType\+\_\+\+Utf16\+Varying\+String}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00127}{ZType\+\_\+\+Utf32\+Varying\+String}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00125}{ZType\+\_\+\+Utf8\+Varying\+String}}, and \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00152}{ZType\+\_\+\+ZDate\+Full}}.
+
+\Hypertarget{znaturalfromurf_8cpp_a829bf2fa3932edb852fbffe7fc1fd5b5}\label{znaturalfromurf_8cpp_a829bf2fa3932edb852fbffe7fc1fd5b5} 
+\index{znaturalfromurf.cpp@{znaturalfromurf.cpp}!get\_121\_BlobNfURF@{get\_121\_BlobNfURF}}
+\index{get\_121\_BlobNfURF@{get\_121\_BlobNfURF}!znaturalfromurf.cpp@{znaturalfromurf.cpp}}
+\doxysubsubsection{\texorpdfstring{get\_121\_BlobNfURF()}{get\_121\_BlobNfURF()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} get\+\_\+121\+\_\+\+Blob\+Nf\+URF (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}}]{p\+Value,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+URFData }\end{DoxyParamCaption})}
+
+One to one conversion routines for =====object classes====== Remark\+: Necessary to have a separate routine witn void\texorpdfstring{$\ast$}{*} value statically casted to appropriate class to avoid compilation issues 
+
+Definition at line \mbox{\hyperlink{znaturalfromurf_8cpp_source_l00450}{450}} of file \mbox{\hyperlink{znaturalfromurf_8cpp_source}{znaturalfromurf.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{znaturalfromurf_8cpp_ac7fc8db28c5540033dff6780f9d75def}\label{znaturalfromurf_8cpp_ac7fc8db28c5540033dff6780f9d75def} 
+\index{znaturalfromurf.cpp@{znaturalfromurf.cpp}!get\_121\_CheckSumNfURF@{get\_121\_CheckSumNfURF}}
+\index{get\_121\_CheckSumNfURF@{get\_121\_CheckSumNfURF}!znaturalfromurf.cpp@{znaturalfromurf.cpp}}
+\doxysubsubsection{\texorpdfstring{get\_121\_CheckSumNfURF()}{get\_121\_CheckSumNfURF()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} get\+\_\+121\+\_\+\+Check\+Sum\+Nf\+URF (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}}]{p\+Value,  }\item[{ZData\+Buffer \texorpdfstring{$\ast$}{*}}]{p\+URFData }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{znaturalfromurf_8cpp_source_l00469}{469}} of file \mbox{\hyperlink{znaturalfromurf_8cpp_source}{znaturalfromurf.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{znaturalfromurf_8cpp_a7e395987ca374870984d50de8018a7be}\label{znaturalfromurf_8cpp_a7e395987ca374870984d50de8018a7be} 
+\index{znaturalfromurf.cpp@{znaturalfromurf.cpp}!get\_121\_ZDateFullNfURF@{get\_121\_ZDateFullNfURF}}
+\index{get\_121\_ZDateFullNfURF@{get\_121\_ZDateFullNfURF}!znaturalfromurf.cpp@{znaturalfromurf.cpp}}
+\doxysubsubsection{\texorpdfstring{get\_121\_ZDateFullNfURF()}{get\_121\_ZDateFullNfURF()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} get\+\_\+121\+\_\+\+ZDate\+Full\+Nf\+URF (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}}]{p\+Value,  }\item[{ZData\+Buffer \texorpdfstring{$\ast$}{*}}]{p\+URFData }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{znaturalfromurf_8cpp_source_l00455}{455}} of file \mbox{\hyperlink{znaturalfromurf_8cpp_source}{znaturalfromurf.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{znaturalfromurf_8cpp_a9fcd68b6b33adf623234a9736073561a}\label{znaturalfromurf_8cpp_a9fcd68b6b33adf623234a9736073561a} 
+\index{znaturalfromurf.cpp@{znaturalfromurf.cpp}!get\_ZStringNfURF@{get\_ZStringNfURF}}
+\index{get\_ZStringNfURF@{get\_ZStringNfURF}!znaturalfromurf.cpp@{znaturalfromurf.cpp}}
+\doxysubsubsection{\texorpdfstring{get\_ZStringNfURF()}{get\_ZStringNfURF()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\+\_\+t}} get\+\_\+\+ZString\+Nf\+URF (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \texorpdfstring{$\ast$}{*}}]{p\+Value,  }\item[{\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZType\+Base}}}]{p\+Type,  }\item[{ZData\+Buffer \texorpdfstring{$\ast$}{*}\&}]{p\+URFData }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{znaturalfromurf_8cpp_source_l00476}{476}} of file \mbox{\hyperlink{znaturalfromurf_8cpp_source}{znaturalfromurf.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00042}{ZType\+\_\+\+Atomic\+Mask}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00066}{ZType\+\_\+\+Char}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00075}{ZType\+\_\+\+S16}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00077}{ZType\+\_\+\+S32}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00069}{ZType\+\_\+\+S8}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00070}{ZType\+\_\+\+U16}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00076}{ZType\+\_\+\+U32}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00068}{ZType\+\_\+\+U8}}, \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00065}{ZType\+\_\+\+UChar}}, and \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_source_l00053}{ZType\+\_\+\+Varying\+Length}}.
+

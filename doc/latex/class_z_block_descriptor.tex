@@ -1,0 +1,315 @@
+\doxysection{ZBlock\+Descriptor Class Reference}
+\hypertarget{class_z_block_descriptor}{}\label{class_z_block_descriptor}\index{ZBlockDescriptor@{ZBlockDescriptor}}
+
+
+The \doxylink{class_z_block_descriptor}{ZBlock\+Descriptor} class This class enhance \doxylink{class_z_block_header}{ZBlock\+Header} with Address. This is the main entry for describing file blocks within pools (ZBlock\+Access\+Table, ZFree\+Block\+Pool,...).  
+
+
+
+
+{\ttfamily \#include $<$zblock.\+h$>$}
+
+
+
+Inheritance diagram for ZBlock\+Descriptor\+:
+% FIG 0
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \& \mbox{\hyperlink{class_z_block_descriptor_a926ba8818ad11c7f1933c5941064353a}{\+\_\+copy\+From}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{class_z_block_descriptor_ac0717e438818a475b86d7ba138f95b76}{ZBlock\+Descriptor}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{class_z_block_descriptor_a14bab2876100c8c57502ec49abe4ff3f}{ZBlock\+Descriptor}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{class_z_block_descriptor_a0fb180bad34edb6018291481bc36f1fb}{ZBlock\+Descriptor}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \&\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_z_block_descriptor_adace892de099983b9fd7dbd53020892f}{clear}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \& \mbox{\hyperlink{class_z_block_descriptor_a507b2eb231fc08728015c36711efc01e}{operator=}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \& \mbox{\hyperlink{class_z_block_descriptor_a495e58c4224d2351e611bb571bee5ef1}{operator=}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Block\+Header}})
+\item 
+\mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \& \mbox{\hyperlink{class_z_block_descriptor_ad37426bc1c9a01e4d90238239ec35a73}{operator=}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block}{ZBlock}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Block}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_block_descriptor_a0fc60880da89888e99346fae3ea6ed1f}{\+\_\+import}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}})
+\item 
+ZData\+Buffer \& \mbox{\hyperlink{class_z_block_descriptor_a3a3f1aaa5580e9d99c8e6af4d56b8917}{\+\_\+export\+Append}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZDB}})
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_z_block_header_a39d75fdd27092e886242d72c81ea8593}{ZBlock\+Header}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{class_z_block_header_a0cd3227f1753b59bb758d3b3b29154bd}{ZBlock\+Header}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{class_z_block_header_a0269af7ed5041e2beec826cd8df28a66}{ZBlock\+Header}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}} \&\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_z_block_header_a1abb3a3666c82bfddb18b28a8376c73c}{clear}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}})
+\item 
+\mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}} \& \mbox{\hyperlink{class_z_block_header_addb944fe42816b2f962221754b53f6bc}{\+\_\+copy\+From}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}} \& \mbox{\hyperlink{class_z_block_header_ae2220114300d3f64bbb79ae6564b1310}{\+\_\+\+From\+ZBlock}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block}{ZBlock}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}} \& \mbox{\hyperlink{class_z_block_header_a622e6d2868aa3d241d125d42a69f849f}{\+\_\+\+From\+ZBlock\+Descriptor}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}} \& \mbox{\hyperlink{class_z_block_header_a21520d2e13cb25f6851bc30df3977d49}{operator=}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}} \& \mbox{\hyperlink{class_z_block_header_a03029154d6e91af7c829d2e778d2b1b0}{operator=}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Block\+Descriptor}})
+\item 
+\mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}} \& \mbox{\hyperlink{class_z_block_header_ae4ee62bd22b4875ebbe83b9df5b600c9}{operator=}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block}{ZBlock}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Block}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_block_header_ad992259aaa02d9e57903fb9ef00c5862}{\+\_\+import}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}})
+\item 
+ZData\+Buffer \& \mbox{\hyperlink{class_z_block_header_aab1998eb175b05fbbf3b8d1f6b7333ee}{\+\_\+export\+Append}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZDB}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{static}} \mbox{\hyperlink{class_z_block_descriptor___export}{ZBlock\+Descriptor\+\_\+\+Export}} \mbox{\hyperlink{class_z_block_descriptor_a373948eebe5756fb94095ebda27a4b02}{\+\_\+export\+Convert}} (\mbox{\hyperlink{class_z_block_descriptor___export}{ZBlock\+Descriptor\+\_\+\+Export}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Out}}, \mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{static}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_block_descriptor_adbd8058dfda91ea6b82771cec57528e0}{\+\_\+import\+Convert}} (\mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Out}}, \mbox{\hyperlink{class_z_block_descriptor___export}{ZBlock\+Descriptor\+\_\+\+Export}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{static}} \mbox{\hyperlink{class_z_block_header___export}{ZBlock\+Header\+\_\+\+Export}} \& \mbox{\hyperlink{class_z_block_header_a2ecf537336dbea419edbc4a7984b2982}{\+\_\+export\+Convert}} (\mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}}, \mbox{\hyperlink{class_z_block_header___export}{ZBlock\+Header\+\_\+\+Export}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Out}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{static}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{class_z_block_header_a840d8c82078d8504fa1d965fee3a670c}{\+\_\+import\+Convert}} (\mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Out}}, \mbox{\hyperlink{class_z_block_header___export}{ZBlock\+Header\+\_\+\+Export}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{class_z_block_descriptor_aec15a919e87e856244cf3ba744d3a438}{Address}}
+\begin{DoxyCompactList}\small\item\em Offset from begining of file \+: Physical Address. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zlock_8h_a52960b61c13170a534b26eb24038bcc6}{zsize\+\_\+type}} \mbox{\hyperlink{class_z_block_header_a899bda565b6d16d7703435bc46c63cf6}{Block\+Size}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} \mbox{\hyperlink{class_z_block_header_a5144bbe6abaf8da93e58d66502dd8504}{State}} =0
+\item 
+\mbox{\hyperlink{zlock_8h_a4a8e656c1e153f17de7d0635968b91f1}{zlockmask\+\_\+type}} \mbox{\hyperlink{class_z_block_header_a5286353f7c72f2f4cc8260136ecb2131}{Lock}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pid\+\_\+t}} \mbox{\hyperlink{class_z_block_header_a2edba702fd4d39031d775c5194757566}{Pid}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The \doxylink{class_z_block_descriptor}{ZBlock\+Descriptor} class This class enhance \doxylink{class_z_block_header}{ZBlock\+Header} with Address. This is the main entry for describing file blocks within pools (ZBlock\+Access\+Table, ZFree\+Block\+Pool,...). 
+
+Definition at line \mbox{\hyperlink{zblock_8h_source_l00109}{109}} of file \mbox{\hyperlink{zblock_8h_source}{zblock.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_z_block_descriptor_ac0717e438818a475b86d7ba138f95b76}\label{class_z_block_descriptor_ac0717e438818a475b86d7ba138f95b76} 
+\index{ZBlockDescriptor@{ZBlockDescriptor}!ZBlockDescriptor@{ZBlockDescriptor}}
+\index{ZBlockDescriptor@{ZBlockDescriptor}!ZBlockDescriptor@{ZBlockDescriptor}}
+\doxysubsubsection{\texorpdfstring{ZBlockDescriptor()}{ZBlockDescriptor()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily ZBlock\+Descriptor\+::\+ZBlock\+Descriptor (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zblock_8h_source_l00117}{117}} of file \mbox{\hyperlink{zblock_8h_source}{zblock.\+h}}.
+
+
+
+References \mbox{\hyperlink{zblock_8h_source_l00112}{Address}}, and \mbox{\hyperlink{zblock_8h_source_l00083}{ZBlock\+Header\+::clear()}}.
+
+\Hypertarget{class_z_block_descriptor_a14bab2876100c8c57502ec49abe4ff3f}\label{class_z_block_descriptor_a14bab2876100c8c57502ec49abe4ff3f} 
+\index{ZBlockDescriptor@{ZBlockDescriptor}!ZBlockDescriptor@{ZBlockDescriptor}}
+\index{ZBlockDescriptor@{ZBlockDescriptor}!ZBlockDescriptor@{ZBlockDescriptor}}
+\doxysubsubsection{\texorpdfstring{ZBlockDescriptor()}{ZBlockDescriptor()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily ZBlock\+Descriptor\+::\+ZBlock\+Descriptor (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \&}]{p\+In }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zblock_8h_source_l00118}{118}} of file \mbox{\hyperlink{zblock_8h_source}{zblock.\+h}}.
+
+
+
+References \mbox{\hyperlink{zblock_8cpp_source_l00140}{ZBlock\+Header\+::\+\_\+copy\+From()}}, \mbox{\hyperlink{zblock_8h_source_l00112}{Address}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_z_block_descriptor_a0fb180bad34edb6018291481bc36f1fb}\label{class_z_block_descriptor_a0fb180bad34edb6018291481bc36f1fb} 
+\index{ZBlockDescriptor@{ZBlockDescriptor}!ZBlockDescriptor@{ZBlockDescriptor}}
+\index{ZBlockDescriptor@{ZBlockDescriptor}!ZBlockDescriptor@{ZBlockDescriptor}}
+\doxysubsubsection{\texorpdfstring{ZBlockDescriptor()}{ZBlockDescriptor()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily ZBlock\+Descriptor\+::\+ZBlock\+Descriptor (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \&\&}]{p\+In }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zblock_8h_source_l00119}{119}} of file \mbox{\hyperlink{zblock_8h_source}{zblock.\+h}}.
+
+
+
+References \mbox{\hyperlink{zblock_8cpp_source_l00140}{ZBlock\+Header\+::\+\_\+copy\+From()}}, \mbox{\hyperlink{zblock_8h_source_l00112}{Address}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_z_block_descriptor_a926ba8818ad11c7f1933c5941064353a}\label{class_z_block_descriptor_a926ba8818ad11c7f1933c5941064353a} 
+\index{ZBlockDescriptor@{ZBlockDescriptor}!\_copyFrom@{\_copyFrom}}
+\index{\_copyFrom@{\_copyFrom}!ZBlockDescriptor@{ZBlockDescriptor}}
+\doxysubsubsection{\texorpdfstring{\_copyFrom()}{\_copyFrom()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \& ZBlock\+Descriptor\+::\+\_\+copy\+From (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \&}]{p\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zblock_8cpp_source_l00170}{170}} of file \mbox{\hyperlink{zblock_8cpp_source}{zblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zblock_8cpp_source_l00140}{ZBlock\+Header\+::\+\_\+copy\+From()}}, \mbox{\hyperlink{zblock_8h_source_l00112}{Address}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zblock_8h_source_l00123}{operator=()}}.
+
+\Hypertarget{class_z_block_descriptor_a3a3f1aaa5580e9d99c8e6af4d56b8917}\label{class_z_block_descriptor_a3a3f1aaa5580e9d99c8e6af4d56b8917} 
+\index{ZBlockDescriptor@{ZBlockDescriptor}!\_exportAppend@{\_exportAppend}}
+\index{\_exportAppend@{\_exportAppend}!ZBlockDescriptor@{ZBlockDescriptor}}
+\doxysubsubsection{\texorpdfstring{\_exportAppend()}{\_exportAppend()}}
+{\footnotesize\ttfamily ZData\+Buffer \& ZBlock\+Descriptor\+::\+\_\+export\+Append (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+ZDB }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zblock_8cpp_source_l00215}{215}} of file \mbox{\hyperlink{zblock_8cpp_source}{zblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{zblock_8cpp_source_l00085}{ZBlock\+Descriptor\+\_\+\+Export\+::set()}}.
+
+\Hypertarget{class_z_block_descriptor_a373948eebe5756fb94095ebda27a4b02}\label{class_z_block_descriptor_a373948eebe5756fb94095ebda27a4b02} 
+\index{ZBlockDescriptor@{ZBlockDescriptor}!\_exportConvert@{\_exportConvert}}
+\index{\_exportConvert@{\_exportConvert}!ZBlockDescriptor@{ZBlockDescriptor}}
+\doxysubsubsection{\texorpdfstring{\_exportConvert()}{\_exportConvert()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_z_block_descriptor___export}{ZBlock\+Descriptor\+\_\+\+Export}} ZBlock\+Descriptor\+::\+\_\+export\+Convert (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_z_block_descriptor___export}{ZBlock\+Descriptor\+\_\+\+Export}} \texorpdfstring{$\ast$}{*}}]{p\+Out,  }\item[{\mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \&}]{p\+In }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zblock_8cpp_source_l00225}{225}} of file \mbox{\hyperlink{zblock_8cpp_source}{zblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_z_block_descriptor_a0fc60880da89888e99346fae3ea6ed1f}\label{class_z_block_descriptor_a0fc60880da89888e99346fae3ea6ed1f} 
+\index{ZBlockDescriptor@{ZBlockDescriptor}!\_import@{\_import}}
+\index{\_import@{\_import}!ZBlockDescriptor@{ZBlockDescriptor}}
+\doxysubsubsection{\texorpdfstring{\_import()}{\_import()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZBlock\+Descriptor\+::\+\_\+import (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Ptr\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zblock_8cpp_source_l00191}{191}} of file \mbox{\hyperlink{zblock_8cpp_source}{zblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zblock_8h_source_l00112}{Address}}, \mbox{\hyperlink{zblock_8h_source_l00071}{ZBlock\+Header\+::\+Block\+Size}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zblock_8h_source_l00074}{ZBlock\+Header\+::\+Lock}}, \mbox{\hyperlink{zblock_8h_source_l00076}{ZBlock\+Header\+::\+Pid}}, \mbox{\hyperlink{zblock_8cpp_source_l00092}{ZBlock\+Descriptor\+\_\+\+Export\+::set\+From\+Ptr()}}, and \mbox{\hyperlink{zblock_8h_source_l00073}{ZBlock\+Header\+::\+State}}.
+
+\Hypertarget{class_z_block_descriptor_adbd8058dfda91ea6b82771cec57528e0}\label{class_z_block_descriptor_adbd8058dfda91ea6b82771cec57528e0} 
+\index{ZBlockDescriptor@{ZBlockDescriptor}!\_importConvert@{\_importConvert}}
+\index{\_importConvert@{\_importConvert}!ZBlockDescriptor@{ZBlockDescriptor}}
+\doxysubsubsection{\texorpdfstring{\_importConvert()}{\_importConvert()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZBlock\+Descriptor\+::\+\_\+import\+Convert (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \&}]{p\+Out,  }\item[{\mbox{\hyperlink{class_z_block_descriptor___export}{ZBlock\+Descriptor\+\_\+\+Export}} \texorpdfstring{$\ast$}{*}}]{p\+In }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{zblock_8cpp_source_l00244}{244}} of file \mbox{\hyperlink{zblock_8cpp_source}{zblock.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zblockpool_8cpp_source_l00094}{ZBlock\+Pool\+::\+\_\+import\+Pool()}}.
+
+\Hypertarget{class_z_block_descriptor_adace892de099983b9fd7dbd53020892f}\label{class_z_block_descriptor_adace892de099983b9fd7dbd53020892f} 
+\index{ZBlockDescriptor@{ZBlockDescriptor}!clear@{clear}}
+\index{clear@{clear}!ZBlockDescriptor@{ZBlockDescriptor}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZBlock\+Descriptor\+::clear (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}}}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zblock_8h_source_l00121}{121}} of file \mbox{\hyperlink{zblock_8h_source}{zblock.\+h}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{poolvisu_8cpp_source_l00749}{pool\+Visu\+::data\+Setup()}}.
+
+\Hypertarget{class_z_block_descriptor_ad37426bc1c9a01e4d90238239ec35a73}\label{class_z_block_descriptor_ad37426bc1c9a01e4d90238239ec35a73} 
+\index{ZBlockDescriptor@{ZBlockDescriptor}!operator=@{operator=}}
+\index{operator=@{operator=}!ZBlockDescriptor@{ZBlockDescriptor}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \& ZBlock\+Descriptor\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block}{ZBlock}} \&}]{p\+Block }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zblock_8h_source_l00125}{125}} of file \mbox{\hyperlink{zblock_8h_source}{zblock.\+h}}.
+
+
+
+References \mbox{\hyperlink{zblock_8cpp_source_l00140}{ZBlock\+Header\+::\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_z_block_descriptor_a507b2eb231fc08728015c36711efc01e}\label{class_z_block_descriptor_a507b2eb231fc08728015c36711efc01e} 
+\index{ZBlockDescriptor@{ZBlockDescriptor}!operator=@{operator=}}
+\index{operator=@{operator=}!ZBlockDescriptor@{ZBlockDescriptor}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \& ZBlock\+Descriptor\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \&}]{p\+In }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zblock_8h_source_l00123}{123}} of file \mbox{\hyperlink{zblock_8h_source}{zblock.\+h}}.
+
+
+
+References \mbox{\hyperlink{zblock_8cpp_source_l00170}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_z_block_descriptor_a495e58c4224d2351e611bb571bee5ef1}\label{class_z_block_descriptor_a495e58c4224d2351e611bb571bee5ef1} 
+\index{ZBlockDescriptor@{ZBlockDescriptor}!operator=@{operator=}}
+\index{operator=@{operator=}!ZBlockDescriptor@{ZBlockDescriptor}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_z_block_descriptor}{ZBlock\+Descriptor}} \& ZBlock\+Descriptor\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{class_z_block_header}{ZBlock\+Header}} \&}]{p\+Block\+Header }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zblock_8h_source_l00124}{124}} of file \mbox{\hyperlink{zblock_8h_source}{zblock.\+h}}.
+
+
+
+References \mbox{\hyperlink{zblock_8cpp_source_l00140}{ZBlock\+Header\+::\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_z_block_descriptor_aec15a919e87e856244cf3ba744d3a438}\label{class_z_block_descriptor_aec15a919e87e856244cf3ba744d3a438} 
+\index{ZBlockDescriptor@{ZBlockDescriptor}!Address@{Address}}
+\index{Address@{Address}!ZBlockDescriptor@{ZBlockDescriptor}}
+\doxysubsubsection{\texorpdfstring{Address}{Address}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} ZBlock\+Descriptor\+::\+Address}
+
+
+
+Offset from begining of file \+: Physical Address. 
+
+
+
+Definition at line \mbox{\hyperlink{zblock_8h_source_l00112}{112}} of file \mbox{\hyperlink{zblock_8h_source}{zblock.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zblock_8cpp_source_l00170}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zblock_8cpp_source_l00191}{\+\_\+import()}}, \mbox{\hyperlink{editblockdlg_8cpp_source_l00021}{edit\+Block\+DLg\+::setup()}}, \mbox{\hyperlink{zblock_8h_source_l00119}{ZBlock\+Descriptor()}}, \mbox{\hyperlink{zblock_8h_source_l00118}{ZBlock\+Descriptor()}}, and \mbox{\hyperlink{zblock_8h_source_l00117}{ZBlock\+Descriptor()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/zcontent/zrandomfile/\mbox{\hyperlink{zblock_8h}{zblock.\+h}}\item 
+/home/gerard/\+Development/zbasetools/zcontent/zrandomfile/\mbox{\hyperlink{zblock_8cpp}{zblock.\+cpp}}\end{DoxyCompactItemize}

@@ -185,8 +185,15 @@ HEADERS += \
     $$TOOLSET_BASE/config/zconfig_zrf.h \
     ../../config/zconfig.h \
 #    ../zcontentcommon/zgeneralparameters.h \
+    ../zcontentcommon/zcontentobjectbroker.h \
+    ../zcontentcommon/zdomain.h \
+    ../zcontentcommon/zdomainbroker.h \
+    ../zcontentcommon/zdomainobject.h \
+    ../zcontentcommon/zdomainpath.h \
+    ../zcontentcommon/zdomaintype.h \
     ../zcontentcommon/zgeneralparameters.h \
 #    ../zindexedfile/zcollectionentity.h \
+    ../zcontentcommon/zmfobject.h \
     ../zindexedfile/zsearch.h \
     ../zindexedfile/zsearcharithmeticterm.h \
     ../zindexedfile/zsearchcontext.h \
@@ -255,8 +262,15 @@ SOURCES += \
     $$TOOLSET_CONTENT/zrandomfile/zsearchargument.cpp \
     ../zcontentcommon/zcontentconstants.cpp \
 #    ../zcontentcommon/zgeneralparameters.cpp \
+    ../zcontentcommon/zcontentobjectbroker.cpp \
+    ../zcontentcommon/zdomain.cpp \
+    ../zcontentcommon/zdomainbroker.cpp \
+    ../zcontentcommon/zdomainobject.cpp \
+    ../zcontentcommon/zdomainpath.cpp \
+    ../zcontentcommon/zdomaintype.cpp \
     ../zcontentcommon/zgeneralparameters.cpp \
 #    ../zindexedfile/zcollectionentity.cpp \
+    ../zcontentcommon/zmfobject.cpp \
     ../zindexedfile/zsearch.cpp \
     ../zindexedfile/zsearcharithmeticterm.cpp \
     ../zindexedfile/zsearchcontext.cpp \

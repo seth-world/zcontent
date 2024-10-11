@@ -1,0 +1,11 @@
+\doxysection{Relative rank of a record for a ZRandom\+File or ZMaster\+File.}
+\hypertarget{group__recordranks}{}\label{group__recordranks}\index{Relative rank of a record for a ZRandomFile or ZMasterFile.@{Relative rank of a record for a ZRandomFile or ZMasterFile.}}
+With \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}, the normal record access is made thru record relative position, or record rank.
+
+This rank is given by the record position pointer in the used block records pool ZBlock\+Access\+Table (ZBAT).
+
+The logical relative rank is the user logical rank view and does NOT correspond to physical storage order \+: \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} places the contents according to its size to optimize its behavior, AND NOT necessarily according the record creation order.
+
+\doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} keeps for the current file session a set of indicators that depends on what action has been done on the file. For instance last Physical\+Position and Logical Position accessed as well as the record rank is kept for the process, and allows to navigate through the file. In addition, statistical data is cumulated during a file session. \begin{DoxySeeAlso}{See also}
+\doxylink{group___z_r_f_session}{what is a file session} 
+\end{DoxySeeAlso}

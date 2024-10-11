@@ -1,0 +1,185 @@
+\doxysection{/home/gerard/\+Development/zbasetools/znet/zbasenet/znetcommon.h File Reference}
+\hypertarget{znetcommon_8h}{}\label{znetcommon_8h}\index{/home/gerard/Development/zbasetools/znet/zbasenet/znetcommon.h@{/home/gerard/Development/zbasetools/znet/zbasenet/znetcommon.h}}
+{\ttfamily \#include $<$config/zconfig\+\_\+network.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/utfvaryingstring.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zerror.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zexceptionmin.\+h$>$}\newline
+{\ttfamily \#include $<$arpa/inet.\+h$>$}\newline
+Include dependency graph for znetcommon.\+h\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_z_h_a_t}{ZHAT}}
+\item 
+struct \mbox{\hyperlink{struct_z_protocol}{ZProtocol}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\+\_\+t}} \mbox{\hyperlink{znetcommon_8h_a31e6d7f74f3c4f0f6dada5029f981737}{ZProtocol\+\_\+base}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0d}{ZProtocol\+\_\+type}} \+: ZProtocol\+\_\+base \{ \newline
+\mbox{\hyperlink{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0da5b99e7ec3f4b94c8697f77f2ce0c7ee9}{ZP\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0daebe3d4ff57ccb421aa239d2bec2d6329}{ZP\+\_\+\+Base}} = 0x0001
+, \mbox{\hyperlink{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0da75c26e517105be6fdfc2af7da1821fd5}{ZP\+\_\+\+RPC}} = 0x0002
+, \mbox{\hyperlink{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0da206814339baa241e8ce2f036d4406ff8}{ZP\+\_\+\+Corba}} = 0x0004
+, \newline
+\mbox{\hyperlink{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0dafd6e3b5f33099b2032f2d37cf3da4359}{ZP\+\_\+\+DBus}} = 0x0008
+, \mbox{\hyperlink{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0dab5862848119e93159bcf83e1b2c089bf}{ZP\+\_\+\+XMLRPC}} = 0x0010
+, \mbox{\hyperlink{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0dad8faa43449eef250f2ca6c845d855efc}{ZP\+\_\+\+SSLV5}} = 0x0100
+, \mbox{\hyperlink{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0da9a8e8b53ca007e8ca11833e0fe7fa85e}{ZP\+\_\+\+B64}} = 0x0200
+ \}
+\item 
+enum \mbox{\hyperlink{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3}{ZHost\+Address\+Type}} \+: uint8\+\_\+t \{ \mbox{\hyperlink{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3a3f0c8a1f4e99fd2f7e92f0360701ad4b}{ZHAT\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3a0c2b9368646542ed0f31e910690ac757}{ZHAT\+\_\+\+IPV4}} = AF\+\_\+\+INET
+, \mbox{\hyperlink{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3add1db00ab4cd4105fede32f225e33835}{ZHAT\+\_\+\+IPV6}} = AF\+\_\+\+INET6
+, \mbox{\hyperlink{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3a0b4a9c762965e39402772f18c903b001}{ZHAT\+\_\+\+Default}} = ZHAT\+\_\+\+IPV4
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{znetcommon_8h_a7761bde640a695e391e8dc71d33aa5b2}{decode\+\_\+\+ZJP}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{znetcommon_8h_a31e6d7f74f3c4f0f6dada5029f981737}{ZProtocol\+\_\+base}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Operation}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{znetcommon_8h_abeca6f0b0adc44250ce6219bee09d398}{ZAuthenticate\+\_\+system}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Username}}, ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Password}})
+\begin{DoxyCompactList}\small\item\em ZAuthenticate\+\_\+base authentication method for a server. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{znetcommon_8h_a31e6d7f74f3c4f0f6dada5029f981737}\label{znetcommon_8h_a31e6d7f74f3c4f0f6dada5029f981737} 
+\index{znetcommon.h@{znetcommon.h}!ZProtocol\_base@{ZProtocol\_base}}
+\index{ZProtocol\_base@{ZProtocol\_base}!znetcommon.h@{znetcommon.h}}
+\doxysubsubsection{\texorpdfstring{ZProtocol\_base}{ZProtocol\_base}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint16\+\_\+t}} \mbox{\hyperlink{znetcommon_8h_a31e6d7f74f3c4f0f6dada5029f981737}{ZProtocol\+\_\+base}}}
+
+This file contains the network common content and authentication.
+
+
+\begin{DoxyItemize}
+\item Authentication (used all access methods)
+\begin{DoxyItemize}
+\item base authentication for windows {\bfseries{USE\+\_\+\+WINDOWS}}
+\item base authentication for linux {\bfseries{USE\+\_\+\+LINUX}}
+\item LDAP authentication requires Open\+LDAP {\bfseries{USE\+\_\+\+LDAP}}
+\item LDAP authentication for Active Directory requires Micro\+Soft Active Directory {\bfseries{USE\+\_\+\+LDAP}} and {\bfseries{USE\+\_\+\+WINDOWS}}
+\end{DoxyItemize}
+\item Network access detailed definitions
+\begin{DoxyItemize}
+\item base access . thru base sockets (zremote/zbasenet/zsocket.\+h) . thru sslv5 sockets (zremote/zbasenet/zsslsocket.\+h) requires Open\+SSL (must be installed by default)
+\item RPC access (zremote/zrpc/zrpc.\+h)
+\item CORBA access
+\item Web\+Service access (XML-\/\+RPC and not SOAP) 
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+Definition at line \mbox{\hyperlink{znetcommon_8h_source_l00035}{35}} of file \mbox{\hyperlink{znetcommon_8h_source}{znetcommon.\+h}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3}\label{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3} 
+\index{znetcommon.h@{znetcommon.h}!ZHostAddressType@{ZHostAddressType}}
+\index{ZHostAddressType@{ZHostAddressType}!znetcommon.h@{znetcommon.h}}
+\doxysubsubsection{\texorpdfstring{ZHostAddressType}{ZHostAddressType}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3}{ZHost\+Address\+Type}} \+: \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZHAT\_Nothing@{ZHAT\_Nothing}!znetcommon.h@{znetcommon.h}}\index{znetcommon.h@{znetcommon.h}!ZHAT\_Nothing@{ZHAT\_Nothing}}}\Hypertarget{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3a3f0c8a1f4e99fd2f7e92f0360701ad4b}\label{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3a3f0c8a1f4e99fd2f7e92f0360701ad4b} 
+ZHAT\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZHAT\_IPV4@{ZHAT\_IPV4}!znetcommon.h@{znetcommon.h}}\index{znetcommon.h@{znetcommon.h}!ZHAT\_IPV4@{ZHAT\_IPV4}}}\Hypertarget{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3a0c2b9368646542ed0f31e910690ac757}\label{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3a0c2b9368646542ed0f31e910690ac757} 
+ZHAT\+\_\+\+IPV4&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZHAT\_IPV6@{ZHAT\_IPV6}!znetcommon.h@{znetcommon.h}}\index{znetcommon.h@{znetcommon.h}!ZHAT\_IPV6@{ZHAT\_IPV6}}}\Hypertarget{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3add1db00ab4cd4105fede32f225e33835}\label{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3add1db00ab4cd4105fede32f225e33835} 
+ZHAT\+\_\+\+IPV6&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZHAT\_Default@{ZHAT\_Default}!znetcommon.h@{znetcommon.h}}\index{znetcommon.h@{znetcommon.h}!ZHAT\_Default@{ZHAT\_Default}}}\Hypertarget{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3a0b4a9c762965e39402772f18c903b001}\label{znetcommon_8h_a10903ecc0b08a74195f2d2aa75a401d3a0b4a9c762965e39402772f18c903b001} 
+ZHAT\+\_\+\+Default&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{znetcommon_8h_source_l00048}{48}} of file \mbox{\hyperlink{znetcommon_8h_source}{znetcommon.\+h}}.
+
+\Hypertarget{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0d}\label{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0d} 
+\index{znetcommon.h@{znetcommon.h}!ZProtocol\_type@{ZProtocol\_type}}
+\index{ZProtocol\_type@{ZProtocol\_type}!znetcommon.h@{znetcommon.h}}
+\doxysubsubsection{\texorpdfstring{ZProtocol\_type}{ZProtocol\_type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0d}{ZProtocol\+\_\+type}} \+: \mbox{\hyperlink{znetcommon_8h_a31e6d7f74f3c4f0f6dada5029f981737}{ZProtocol\+\_\+base}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZP\_Nothing@{ZP\_Nothing}!znetcommon.h@{znetcommon.h}}\index{znetcommon.h@{znetcommon.h}!ZP\_Nothing@{ZP\_Nothing}}}\Hypertarget{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0da5b99e7ec3f4b94c8697f77f2ce0c7ee9}\label{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0da5b99e7ec3f4b94c8697f77f2ce0c7ee9} 
+ZP\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZP\_Base@{ZP\_Base}!znetcommon.h@{znetcommon.h}}\index{znetcommon.h@{znetcommon.h}!ZP\_Base@{ZP\_Base}}}\Hypertarget{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0daebe3d4ff57ccb421aa239d2bec2d6329}\label{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0daebe3d4ff57ccb421aa239d2bec2d6329} 
+ZP\+\_\+\+Base&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZP\_RPC@{ZP\_RPC}!znetcommon.h@{znetcommon.h}}\index{znetcommon.h@{znetcommon.h}!ZP\_RPC@{ZP\_RPC}}}\Hypertarget{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0da75c26e517105be6fdfc2af7da1821fd5}\label{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0da75c26e517105be6fdfc2af7da1821fd5} 
+ZP\+\_\+\+RPC&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZP\_Corba@{ZP\_Corba}!znetcommon.h@{znetcommon.h}}\index{znetcommon.h@{znetcommon.h}!ZP\_Corba@{ZP\_Corba}}}\Hypertarget{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0da206814339baa241e8ce2f036d4406ff8}\label{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0da206814339baa241e8ce2f036d4406ff8} 
+ZP\+\_\+\+Corba&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZP\_DBus@{ZP\_DBus}!znetcommon.h@{znetcommon.h}}\index{znetcommon.h@{znetcommon.h}!ZP\_DBus@{ZP\_DBus}}}\Hypertarget{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0dafd6e3b5f33099b2032f2d37cf3da4359}\label{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0dafd6e3b5f33099b2032f2d37cf3da4359} 
+ZP\+\_\+\+DBus&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZP\_XMLRPC@{ZP\_XMLRPC}!znetcommon.h@{znetcommon.h}}\index{znetcommon.h@{znetcommon.h}!ZP\_XMLRPC@{ZP\_XMLRPC}}}\Hypertarget{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0dab5862848119e93159bcf83e1b2c089bf}\label{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0dab5862848119e93159bcf83e1b2c089bf} 
+ZP\+\_\+\+XMLRPC&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZP\_SSLV5@{ZP\_SSLV5}!znetcommon.h@{znetcommon.h}}\index{znetcommon.h@{znetcommon.h}!ZP\_SSLV5@{ZP\_SSLV5}}}\Hypertarget{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0dad8faa43449eef250f2ca6c845d855efc}\label{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0dad8faa43449eef250f2ca6c845d855efc} 
+ZP\+\_\+\+SSLV5&to be ORed with access \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZP\_B64@{ZP\_B64}!znetcommon.h@{znetcommon.h}}\index{znetcommon.h@{znetcommon.h}!ZP\_B64@{ZP\_B64}}}\Hypertarget{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0da9a8e8b53ca007e8ca11833e0fe7fa85e}\label{znetcommon_8h_a9bdd1be2e00043dec32679d31b6afc0da9a8e8b53ca007e8ca11833e0fe7fa85e} 
+ZP\+\_\+\+B64&this is defaulted for any communication of authentication elements over the net \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{znetcommon_8h_source_l00037}{37}} of file \mbox{\hyperlink{znetcommon_8h_source}{znetcommon.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{znetcommon_8h_a7761bde640a695e391e8dc71d33aa5b2}\label{znetcommon_8h_a7761bde640a695e391e8dc71d33aa5b2} 
+\index{znetcommon.h@{znetcommon.h}!decode\_ZJP@{decode\_ZJP}}
+\index{decode\_ZJP@{decode\_ZJP}!znetcommon.h@{znetcommon.h}}
+\doxysubsubsection{\texorpdfstring{decode\_ZJP()}{decode\_ZJP()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} decode\+\_\+\+ZJP (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{znetcommon_8h_a31e6d7f74f3c4f0f6dada5029f981737}{ZProtocol\+\_\+base}}}]{p\+Operation }\end{DoxyParamCaption})}
+
+\Hypertarget{znetcommon_8h_abeca6f0b0adc44250ce6219bee09d398}\label{znetcommon_8h_abeca6f0b0adc44250ce6219bee09d398} 
+\index{znetcommon.h@{znetcommon.h}!ZAuthenticate\_system@{ZAuthenticate\_system}}
+\index{ZAuthenticate\_system@{ZAuthenticate\_system}!znetcommon.h@{znetcommon.h}}
+\doxysubsubsection{\texorpdfstring{ZAuthenticate\_system()}{ZAuthenticate\_system()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} ZAuthenticate\+\_\+system (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Username,  }\item[{ZData\+Buffer \&}]{p\+Password }\end{DoxyParamCaption})}
+
+
+
+ZAuthenticate\+\_\+base authentication method for a server. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Username} & user name B64 coded \\
+\hline
+{\em p\+Password} & password B64 coded \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}

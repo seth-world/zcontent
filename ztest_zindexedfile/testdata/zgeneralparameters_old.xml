@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+ <zmasterfileparameters version = "'2.3-1'">
+   <generalparameters>
+      <verbose>ZVB_Basic | ZVB_Net | ZVB_MemEngine | ZVB_FileEngine | ZVB_SearchEngine | ZVB_Net</verbose>
+      <defaultworkdirectory>/home/gerard/Development/zmftest</defaultworkdirectory>
+      <defaultparamdirectory>/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata</defaultparamdirectory>
+      <defaulticondirectory>/home/gerard/Development/zbasetools/zqt/icons</defaulticondirectory>
+      <defaulthelpdirectory>/home/gerard/Development/zbasetools/zqt/help</defaulthelpdirectory>
+      <fixedfont>Courier 10 Pitch</fixedfont>
+   </generalparameters>
+   <domain>
+     <domain-item>
+        <name>generalparameters</name>
+        <type>ZDOM_PATH|ZDOM_ABSOLUTE|ZDOM_REMOTE</type>
+        <path>/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata</path>
+        <domain-item>
+          <name>iconfactory</name>
+          <type>ZDOM_PATH|ZDOM_ABSOLUTE|ZDOM_REMOTE</type>
+          <path>/home/gerard/Development/zbasetools/zqt/icons</path>
+          <tooltip>Repository of images for building icons using iconfactory.</tooltip>
+        </domain-item>
+     </domain-item>
+     <domain-item>
+       <name>test</name>
+       <type>ZDOM_PATH|ZDOM_ABSOLUTE|ZDOM_REMOTE</type>
+       <path>/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata</path>
+       <domain-item>
+         <!-- domain test.data  corresponding path -->
+        <name>data</name>
+        <type>ZDOM_PATH|ZDOM_RELATIVE|ZDOM_REMOTE</type>
+        <path>data</path>
+       </domain-item>
+       <domain-item>
+        <name>images</name>
+        <type>ZDOM_PATH|ZDOM_RELATIVE|ZDOM_REMOTE</type>
+        <path>images</path>
+       </domain-item>
+     </domain-item>
+     <domain-item>
+       <name>content</name>
+       <type>ZDOM_PATH|ZDOM_ABSOLUTE|ZDOM_REMOTE</type>
+       <path>/home/gerard/Development/zbasetools/zcontent/ztest_zindexedfile/testdata</path>
+       <domain-item>
+        <name>data</name>
+        <type>ZDOM_PATH|ZDOM_RELATIVE|ZDOM_REMOTE</type>
+        <path>data</path>
+       </domain-item>
+       <domain-item>
+        <name>images</name>
+        <type>ZDOM_PATH|ZDOM_RELATIVE|ZDOM_REMOTE</type>
+        <path>images</path>
+       </domain-item>
+     </domain-item>
+   </domain>
+ </zmasterfileparameters>

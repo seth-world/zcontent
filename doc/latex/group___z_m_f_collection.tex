@@ -1,0 +1,97 @@
+\doxysection{Using collection of records with ZMaster\+File}
+\hypertarget{group___z_m_f_collection}{}\label{group___z_m_f_collection}\index{Using collection of records with ZMasterFile@{Using collection of records with ZMasterFile}}
+\hypertarget{group___z_m_f_collection_ZMFCollIntro}{}\doxysubsection{\texorpdfstring{Using collection of records with ZMaster\+File}{Using collection of records with ZMasterFile}}\label{group___z_m_f_collection_ZMFCollIntro}
+Index searches with potentially multiple results are using collections of results using the class \doxylink{classzbs_1_1_z_index_collection}{ZIndex\+Collection}. Collections may be refined later on by sequential free search as per \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} collections see \doxylink{classzbs_1_1_z_r_f_collection}{ZRFCollection}
+
+\doxylink{classzbs_1_1_z_index_collection}{ZIndex\+Collection} is always defined from a ZIndex\+File of a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}, and holds the references from index ranks that have currently been found using a search operation. It may hold the whole index file if no key selection have been mentionned. (IMPLEMENT)
+
+It consists, for its base object, of a \doxylink{classzbs_1_1_z_array}{ZArray} of \doxylink{classzbs_1_1_z_index_result}{ZIndex\+Result} objects mentionning
+\begin{DoxyItemize}
+\item the Index rank (ZIndex\+File relative position) matching the given key content (either exact or partial),
+\item the related \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} record address given by index that allows to get directly ZMF record using ZMaster\+File\+::zget\+By\+Address() method.
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+\doxylink{classzbs_1_1_z_index_collection}{ZIndex\+Collection} is a snapshot of selected ZMasterfile records that correspond at one moment to selection criterias. As it is not a dynamic object, collection is NOT modified accordingly when the \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} to which collection refers to is himself modified
+\begin{DoxyItemize}
+\item record content modification
+\item record suppression
+\item record add So that, in order to preserve collection integrity while other processes are capable of accessing Master\+File origin of the collection, it is utmostly important to lock selected records with the appropriate lock mask using ZIndex\+Collection\+::zlock\+All() or, more simply, in mentionning the appropriate lock mask while creating collection see \doxysectlink{_z_m_f_quick_start_ZMFCollLock}{Collection and record locks}{3}
+\end{DoxyItemize}
+\end{DoxyNote}
+\hypertarget{_z_m_f_quick_start_ZMFCollCreate}{}\doxysubsubsection{\texorpdfstring{Creation and destruction of a collection}{Creation and destruction of a collection}}\label{_z_m_f_quick_start_ZMFCollCreate}
+\begin{DoxyParagraph}{Creation of a collection}
+
+\end{DoxyParagraph}
+Collection object is generated during the first step of Index search operation
+
+
+\begin{DoxyItemize}
+\item search all operations \+: the whole collection object is created and populated at once.
+\item search first operation and search next operation \+: the collection object is created during search first operation, therefore feeded on the flow by successive searches until key content value (exact or partial) is no more found in index.
+\end{DoxyItemize}
+
+\begin{DoxyParagraph}{Destruction of a collection}
+
+\end{DoxyParagraph}
+As a pointer to the generated collection object is returned (created by \textquotesingle{}new\textquotesingle{}), it is up to the caller to delete this object after having used it.\hypertarget{_z_m_f_quick_start_ZMFCollRecursive}{}\doxysubsubsection{\texorpdfstring{Recursive use of collection of records}{Recursive use of collection of records}}\label{_z_m_f_quick_start_ZMFCollRecursive}
+Collections of records may be used recursively, so that you may for instance \+:
+\begin{DoxyItemize}
+\item first generate a collection of records using an interval search on a key values range,
+\item refine this collection of records (and only this collection of record) using free search In this case, collection is mentionned as input collection for the selection method.
+\end{DoxyItemize}\hypertarget{_z_m_f_quick_start_ZMFCollLock}{}\doxysubsubsection{\texorpdfstring{Collection and record locks}{Collection and record locks}}\label{_z_m_f_quick_start_ZMFCollLock}
+If collection is used in a potential multi-\/access (\doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} not opened with an Exclusive access mode) then it could be wise to lock selected records.
+
+This could be done either
+
+
+\begin{DoxyItemize}
+\item in mentionning the appropriate lock mask while creating collection during an index search with multiple results
+\begin{DoxyItemize}
+\item ZMaster\+File\+::zsearch\+All()
+\item ZMaster\+File\+::zsearch\+First()
+\item ZMaster\+File\+::zsearch\+Interval()
+
+for details see ZIndex\+Collection\+::get\+All\+Selected() or ZIndex\+Collection\+::get\+First\+Selected() .
+\end{DoxyItemize}
+\item in specifying the appropriate lock mask using ZIndex\+Collection\+::zlock\+All()
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+As collection could be recursively refined with several rules, lock on \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} records are released as soon as they are rejected from current selection (IMPLEMENT).
+\end{DoxyNote}
+\hypertarget{group___z_m_f_collection_ZMFCollAccess}{}\doxysubsubsubsection{\texorpdfstring{Accessing collection elements}{Accessing collection elements}}\label{group___z_m_f_collection_ZMFCollAccess}
+\begin{DoxyParagraph}{During its creation}
+
+\end{DoxyParagraph}
+During its creation, using \textquotesingle{}on the flow\textquotesingle{} creation methods, ZIndex\+Collection\+::get\+First\+Selected() and ZIndex\+Collection\+::get\+Next\+Selected() a collection returns record content that has been selected as well as its reference with a \doxylink{classzbs_1_1_z_index_result}{ZIndex\+Result} object giving the index rank, and the \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} record address.
+
+\begin{DoxyParagraph}{Using it after it had been fully created}
+
+\end{DoxyParagraph}
+Once having being fully created, collection may be accessed using operator \mbox{[}\mbox{]} and a collection rank. It gives the reference of ZIndex\+File rank and its corresponding \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} record address in the chosen index order. \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} record content may then be accessed using ZMaster\+File\+::zget\+By\+Address() method\+: \begin{DoxyVerb}      <ZMasterFile object>.zgetByAddress(<record ZDataBuffer>,<collection>[rank].ZMFAddress,<lockmask>);
+\end{DoxyVerb}
+
+
+\begin{DoxyNote}{Note}
+a collection is a static snapshot of \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} content at a given moment. \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} is susceptible to be modified by another process that may change existing selected records content, add new records that may correspond to selection criterias, or even suppress (remove) record selected within collection. Locking selected records may be a temporary solution to prevent, at least, these selected records from being changed or deleted by another process. However, it does not prevent another process from adding records that could be validly candidates to be selected within collection.
+\end{DoxyNote}
+\hypertarget{_z_m_f_quick_start_ZMFCollMass}{}\doxysubsubsubsection{\texorpdfstring{Mass operations using collections of record}{Mass operations using collections of record}}\label{_z_m_f_quick_start_ZMFCollMass}
+Once a collection has been created and populated with a set of record, it is possible to use mass operations on established collections.
+
+This means that collection offers methods that allow to process \textquotesingle{}all records at once\textquotesingle{} for specific operations. Basically, main operations are \+:
+\begin{DoxyItemize}
+\item get a whole collection of records \doxylink{classzbs_1_1_z_index_collection_aca3366000a917ee9538f367f0d0ef739}{ZIndex\+Collection\+::zget\+All\+Selected()} This creates the collection content all at once.
+\item mass deletion of selected records \doxylink{classzbs_1_1_z_index_collection_ab25907b2fe9d8acd8339cd8751cc1d5a}{ZIndex\+Collection\+::zremove\+All()} Once collection has been totally created, it removes (delete) all records selected.
+\item mass lock selected records ZIndex\+Collection\+::zlock\+All() Once collection has been totally created, it applies a given lock mask to the whole set of selected records. Apply a given lock mask to the whole set of selected records.
+\item mass unlock selected records ZIndex\+Collection\+::zunlock\+All() Unlocks to the whole set of selected records.
+\item mass change an adhoc field value on all records ZIndex\+Collection\+::zchange\+Field() Modify a given adhoc field with the given value for the whole set of selected records. Adhoc field must neither be part of a defined key nor even be a subfield or an overlapping field.
+\end{DoxyItemize}\hypertarget{_z_m_f_quick_start_ZMFCollRetry}{}\doxysubsubsubsection{\texorpdfstring{Retry operations on collection after status failure ( lock retry management )}{Retry operations on collection after status failure ( lock retry management )}}\label{_z_m_f_quick_start_ZMFCollRetry}
+Collection embeds the capability to retry last attempted operation for continuing the engaged mass operation that fails with a locked status on the remaining set of unprocessed records. When retrying, have to be mentionned
+\begin{DoxyItemize}
+\item a number of times to retry
+\item a number of millisecond to wait after each retry If operation is still not successfull, returned status is
+\item ZS\+\_\+\+LOCKED is sent back if record cannot be access because it is still locked
+\item appropriate low level file access status is sent back in case of other error and ZException is set with appropriate message
+\end{DoxyItemize}\hypertarget{group___z_m_f_collection_ZMFInterval}{}\doxysubsubsection{\texorpdfstring{Searching index with a range of key values -\/ or Interval search}{Searching index with a range of key values - or Interval search}}\label{group___z_m_f_collection_ZMFInterval}
+It is possible to search an index for a range of value. We must then mention the lowest key value to select index values for and the highest value 

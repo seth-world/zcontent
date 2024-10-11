@@ -1,0 +1,92 @@
+\doxysection{zconsolecommand.\+cpp}
+\hypertarget{zconsolecommand_8cpp_source}{}\label{zconsolecommand_8cpp_source}\index{/home/gerard/Development/zbasetools/znet/zbasenet/zconsolecommand.cpp@{/home/gerard/Development/zbasetools/znet/zbasenet/zconsolecommand.cpp}}
+\mbox{\hyperlink{zconsolecommand_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZCONSOLECOMMAND\_CPP}}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00002}\mbox{\hyperlink{zconsolecommand_8cpp_ab166b796b5fc7e41733c05ef860c99d8}{00002}}\ \textcolor{preprocessor}{\#define\ ZCONSOLECOMMAND\_CPP}}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <cstring>}}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <ztoolset/utfvaryingstring.h>}}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zconsolecommand_8h}{zbasenet/zconsolecommand.h}}>}}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00007}00007\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00008}\mbox{\hyperlink{zconsolecommand_8cpp_ac77b3073bf51e53862943d3fd23993fa}{00008}}\ \mbox{\hyperlink{zconsolecommand_8cpp_ac77b3073bf51e53862943d3fd23993fa}{decode\_ZCMD}}(\mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92}{ZConsoleCommand\_type}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZTSG}})}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00009}00009\ \{}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00010}00010\ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZTSG}})}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00011}00011\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00013}00013\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92ab36d7c80322cf41574f2ddf1906d38f6}{ZCMD\_listClients}}:}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00014}00014\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}ZCMD\_listClients"{}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00015}00015\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a427333825c5c729cf457a1b1026fa7fa}{ZCMD\_cancelClient}}:}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00016}00016\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}ZCMD\_cancelClient"{}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00017}00017\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92ac9cb348961ec206122a387ec3ffed2be}{ZCMD\_setClientSleep}}:}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}ZCMD\_setClientSleep"{}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00019}00019\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92abb17d643cc3d7abeb674ab1dd45e8f9f}{ZCMD\_setClientExecute}}:}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}ZCMD\_setClientExecute"{}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00021}00021\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a8596b32ddf2271c4b33586c846d19b4e}{ZCMD\_sendServerPMS}}:}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00022}00022\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}ZCMD\_sendServerPMS"{}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00023}00023\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92aa6257e21b20f0ae8fc1fa8873ed8e3f1}{ZCMD\_sendAllPMS}}:}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}ZCMD\_sendAllPMS"{}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00025}00025\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a90ae2456599bc8a7e3545e592a7a7864}{ZCMD\_sendClientPMS}}:}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}ZCMD\_sendClientPMS"{}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00027}00027\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a9d92ba6c8f02a996f1d3936147d6a61c}{ZCMD\_sendConsoleClientPMS}}:}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00028}00028\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}ZCMD\_sendConsoleClientPMS"{}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00029}00029\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92ab125ec2d40acdae00fd71c76ad907161}{ZCMD\_sendConsoleServerPMS}}:}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00030}00030\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}ZCMD\_sendConsoleServerPMS"{}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00031}00031\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a4e92582073333c60b101b76e03174877}{ZCMD\_exitConsole}}:}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00032}00032\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}ZCMD\_exitConsole"{}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00033}00033\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a84285feab5e82099488f6986c587f582}{ZCMD\_shutdown}}:}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00034}00034\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}ZCMD\_shutdown"{}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00036}00036\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00037}00037\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{stringliteral}{"{}Unknown\ console\ command"{}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00038}00038\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00039}00039\ \}\textcolor{comment}{//\ decodeZCM}}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00042}\mbox{\hyperlink{zconsolecommand_8cpp_a2157c778acf0a1263d8fa44c32d3baf2}{00042}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int32\_t}}\ \mbox{\hyperlink{zconsolecommand_8cpp_a2157c778acf0a1263d8fa44c32d3baf2}{encode\_ZCMD}}(\textcolor{keywordtype}{char}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pString}})}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00043}00043\ \{}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00044}00044\ \ \textcolor{keywordtype}{int}\ \ \ State\ =\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a7d475a00e4487ac3398e96edd61d3717}{ZCMD\_Nothing}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00045}00045\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pString}}==\textcolor{keyword}{nullptr})}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00046}00046\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00047}00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ State;}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00048}00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00049}00049\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{strlen}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pString}})==0)}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00050}00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00051}00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ State;}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00052}00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00053}00053\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wBuf}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00054}00054\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wBuf}}.clear();}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00055}00055\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wBuf}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pString}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00056}00056\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wBuf}}.toUpper();}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00057}00057\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wBuf}}==\textcolor{stringliteral}{"{}ZCMD\_NOTHING"{}})}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00058}00058\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00059}00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ State;}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00060}00060\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00062}00062\ \textcolor{comment}{//=============\ Console\ signals===================================}}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00063}00063\ }
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00065}00065\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wBuf}}.contains((\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\_t}}*)\textcolor{stringliteral}{"{}ZCMD\_LISTCLIENTS"{}}))}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00066}00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ State\ |=\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92ab36d7c80322cf41574f2ddf1906d38f6}{ZCMD\_listClients}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00067}00067\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wBuf}}.contains((\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\_t}}*)\textcolor{stringliteral}{"{}ZCMD\_CANCELCLIENT"{}}))}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00068}00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ State\ |=\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a427333825c5c729cf457a1b1026fa7fa}{ZCMD\_cancelClient}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00069}00069\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wBuf}}.contains((\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\_t}}*)\textcolor{stringliteral}{"{}ZCMD\_SETCLIENTSLEEP"{}}))}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00070}00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ State\ |=\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92ac9cb348961ec206122a387ec3ffed2be}{ZCMD\_setClientSleep}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00071}00071\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wBuf}}.contains((\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\_t}}*)\textcolor{stringliteral}{"{}ZCMD\_SETCLIENTEXECUTE"{}}))}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00072}00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ State\ |=\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92abb17d643cc3d7abeb674ab1dd45e8f9f}{ZCMD\_setClientExecute}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00073}00073\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wBuf}}.contains((\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\_t}}*)\textcolor{stringliteral}{"{}ZCMD\_SENDSERVERPMS"{}}))}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00074}00074\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ State\ |=\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a8596b32ddf2271c4b33586c846d19b4e}{ZCMD\_sendServerPMS}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00075}00075\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wBuf}}.contains((\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\_t}}*)\textcolor{stringliteral}{"{}ZCMD\_SENDALLPMS"{}}))}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00076}00076\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ State\ |=\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92aa6257e21b20f0ae8fc1fa8873ed8e3f1}{ZCMD\_sendAllPMS}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00077}00077\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wBuf}}.contains((\textcolor{keyword}{const}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{utf8\_t}}*)\textcolor{stringliteral}{"{}ZCMD\_SENDCLIENTPMS"{}}))}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00078}00078\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ State\ |=\ \mbox{\hyperlink{zconsolecommand_8h_a27584b4ae3f1b4b7f3df08a6ef41fa92a90ae2456599bc8a7e3545e592a7a7864}{ZCMD\_sendClientPMS}};}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00079}00079\ \ \ \ \ \textcolor{keywordflow}{return}\ State;}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00080}00080\ }
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00081}00081\ \}\textcolor{comment}{//\ encode\_ZCMD}}
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00085}00085\ }
+\DoxyCodeLine{\Hypertarget{zconsolecommand_8cpp_source_l00086}00086\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZCONSOLECOMMAND\_CPP}}
+
+\end{DoxyCode}

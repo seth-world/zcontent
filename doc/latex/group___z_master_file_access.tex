@@ -1,0 +1,93 @@
+\doxysubsection{Accessing ZMaster\+File and its indexes}
+\hypertarget{group___z_master_file_access}{}\label{group___z_master_file_access}\index{Accessing ZMasterFile and its indexes@{Accessing ZMasterFile and its indexes}}
+Due to the necessity of updating all dependant indexes, update for Master File uses 2 phases commit mechanism.\hypertarget{group___z_master_file_access_ZMFFAAdd}{}\doxysubsubsubsection{\texorpdfstring{Adding records}{Adding records}}\label{group___z_master_file_access_ZMFFAAdd}
+Only record content is provided by the user. Indexes will be updated appropriately after key content extraction in prepare phase.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{classzbs_1_1_z_master_file}{ZMasterFile}}\ \mbox{\hyperlink{classzbs_1_1_z_random_file}{ZRandomFile}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ZIndexFile\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_random_file}{ZRandomFile}}\ ZIndexFile\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Base}}}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{method}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{method}}}
+\DoxyCodeLine{-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_add2PhasesCommit\_Prepare}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_add\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_insert}
+\DoxyCodeLine{-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_add2PhasesCommit\_Rollback}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \_add}
+\DoxyCodeLine{-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_add2PhasesCommit\_Commit}}}
+\DoxyCodeLine{}
+\DoxyCodeLine{-\/\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_add\_RollbackIndexes}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_addRollBackIndex}}}
+
+\end{DoxyCode}
+\hypertarget{group___z_master_file_access_ZMFFARemove}{}\doxysubsubsubsection{\texorpdfstring{Removing records}{Removing records}}\label{group___z_master_file_access_ZMFFARemove}
+There are many ways to remove records from a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}.
+\begin{DoxyItemize}
+\item remove by rank \+: argument is p\+Rank mentionning the relative position of record to remove within \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}. \begin{DoxySeeAlso}{See also}
+\doxylink{group__recordranks}{Relative rank of a record for a ZRandom\+File or ZMaster\+File.}
+\end{DoxySeeAlso}
+
+\end{DoxyItemize}
+
+remove by index \+: Key is extracted from the record and searched within Index. \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} Record corresponding to first value found is then removed from \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}. Arguments \+:
+\begin{DoxyItemize}
+\item ZData\+Buffer containing \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} Record
+\item const long with index key number to search for.
+\end{DoxyItemize}
+
+remove by address \+: argument is the logical address for the block containing the record to be removed.
+\begin{DoxyItemize}
+\item Remove with return \+: same routines as above but returning deleted record content.
+\end{DoxyItemize}\hypertarget{group___z_master_file_access_ZMFFASearch}{}\doxysubsubsubsection{\texorpdfstring{search for records content}{search for records content}}\label{group___z_master_file_access_ZMFFASearch}
+\hypertarget{group___z_master_file_access_search}{}\doxysubsubsubsubsection{\texorpdfstring{per relative position \+:}{per relative position :}}\label{group___z_master_file_access_search}
+We can use the \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} search facilities per relative positionning (rank). Free sequential search using adhoc fields may also be used through a ZCollection\+\_\+\+Rank object. In this case, \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} is considered as a \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} (this is possible as far as file is open with ZRF\+\_\+\+Read\+\_\+\+Only mode).
+
+
+\begin{DoxyItemize}
+\item search first index matching a key content \+: ZMaster\+File\+::zsearch() Search have to be made using \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} object in specifying \+:
+\begin{DoxyItemize}
+\item index number \+: the rank of the index for \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} (rank within \doxylink{classzbs_1_1_z_master_control_block}{ZMaster\+Control\+Block} )
+\item index key content \+: a ZData\+Buffer containing index data to search converted to ZIndex internal key format. \begin{DoxyNote}{Note}
+it is up to the user to insure the data conversion to appropriate key fields data type.
+\end{DoxyNote}
+
+\end{DoxyItemize}
+\item search using a ZKey object This is the recommendended (simplest -\/ errorless) way of searching a \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} with indexes.
+
+ZKey object is obtained using ZMaster\+File\+::create\+ZKey() or ZMaster\+File\+::create\+ZKey\+By\+Name().
+
+\begin{DoxyNote}{Note}
+ZKey can be instantiated independantly from \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File}.
+\end{DoxyNote}
+Using ZKey object you may then \+:
+\begin{DoxyItemize}
+\item load key fields with your desired values. ZKey insures the data conversion (type cast) whenever necessary to the appropriate key field data type before converting to key internal format. \begin{DoxySeeAlso}{See also}
+ZKey\+::set\+Field\+Value()
+\end{DoxySeeAlso}
+
+\item verify key current content. Printing its fields values per field in "{}human readable"{} format. \begin{DoxySeeAlso}{See also}
+ZKey\+::zprint\+Key\+Fields\+Values()
+\end{DoxySeeAlso}
+
+\item search \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} content using ZKey \begin{DoxySeeAlso}{See also}
+\doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey\+Group} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey}
+\end{DoxySeeAlso}
+By default, the first occurrence of record with a corresponding key matching the mentionned key content will be returned.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+When using search\+All set of methods, then a list of logical addresses corresponding to records matching the given key content is returned. Records can then be accessed using their logical address.
+
+A ZKey object may be defined and used to search for key values.
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey\+Group} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZKey} \doxylink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{gathers}
+\end{DoxySeeAlso}
+
+\begin{DoxyItemize}
+\item free search \+:
+
+There is a possibility to search through any \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} record for a given value \+:
+\begin{DoxyItemize}
+\item either structured free search \+: from a given Field (or segment of data) offset within \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} records, with the specified length
+\item RFFU\+: or unstructured free search \+: wherever the given sequence could be found within all records.
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+Performance warning \+: these two methods have to be carefully used because of the performance issues it may induce. 
+\end{DoxyNote}

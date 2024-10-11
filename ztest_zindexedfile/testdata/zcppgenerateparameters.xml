@@ -1,0 +1,202 @@
+<?xml version='1.0' encoding='UTF-8'?>
+ <zcppgenerate version = "'0.1-1'">
+     <generalparameters>
+     <targetdirectorypath>/home/gerard/Development/zbasetools/zcontent/test_zrawfile</targetdirectorypath>
+     </generalparameters>
+     <includefiles>
+         <object>
+            <ztype>ZType_Atomic</ztype>
+            <file>stdint.h</file>
+         </object>
+         <!--  Fixed strings  -->
+        <object>
+            <ztype>ZType_Utf8FixedString</ztype>
+            <file>ztoolset/utffixedstring.h</file>
+         </object>
+         <object>
+            <ztype>ZType_Utf32FixedString</ztype>
+            <file>ztoolset/utffixedstring.h</file>
+         </object>
+         <object>
+            <ztype>ZType_Utf16FixedString</ztype>
+            <file>ztoolset/utffixedstring.h</file>
+         </object>
+         <object>
+            <ztype>ZType_Utf32FixedString</ztype>
+            <file>ztoolset/utffixedstring.h</file>
+         </object>
+         
+         <!--  Varying strings  -->
+         <object>
+            <ztype>ZType_Utf8VaryingString</ztype>
+            <file>ztoolset/utfvaryingstring.h</file>
+         </object>
+         <object>
+            <ztype>ZType_Utf16VaryingString</ztype>
+            <file>ztoolset/utfvaryingstring.h</file>
+         </object>
+         <object>
+            <ztype>ZType_Utf32VaryingString</ztype>
+            <file>ztoolset/utfvaryingstring.h</file>
+         </object>
+        <object>
+            <ztype>ZType_URIString</ztype>
+            <file>ztoolset/uristring.h</file>
+         </object>
+         
+         <!--  Particular case of uriString  -->
+         <object>
+            <ztype>ZType_URIString</ztype>
+            <file>ztoolset/uristring.h</file>
+         </object>
+         
+         
+         <!--  standard strings  -->
+         
+         <object>
+            <ztype>ZType_StdString</ztype>
+            <file>string</file> <!--  do not include <string.h> only <string> -->
+         </object>
+         
+         <object>
+            <ztype>ZType_StdWString</ztype>
+            <file>string</file> <!--  do not include <string.h> only <string> -->
+         </object>
+         
+         <!--  Various objects  -->
+         
+         <object>
+            <ztype>ZType_bitset</ztype>
+            <file>ztoolset/zbitset.h</file>
+         </object>
+         
+         
+         <object>
+            <ztype>ZType_bitsetFull</ztype> <!--  Deprecated  -->
+            <file>ztoolset/zbitset.h</file>
+         </object>
+         
+         <!--  Date structures  -->
+         <!-- Deprecated
+         <object>
+            <ztype>ZType_ZDate</ztype>
+            <file>ztoolset/zdate.h</file>
+         </object>
+         -->
+         <object>
+            <ztype>ZType_ZDateFull</ztype>
+            <file>ztoolset/zdatefull.h</file>
+         </object>
+         
+         <!--  Checksums  -->
+         
+         <object>
+            <ztype>ZType_CheckSum</ztype>
+            <file>zcrypt/checksum.h</file>
+         </object>
+         
+         <object>
+            <ztype>ZType_CheckSum</ztype>
+            <file>zcrypt/checksum.h</file>
+         </object>
+         
+         <object>
+            <ztype>ZType_MD5</ztype>
+            <file>zcrypt/md5.h</file>
+         </object>
+         
+         <!--  Application dependant  -->
+         
+         <object>
+            <ztype>ZType_Resource</ztype>
+            <file>zcontentcommon/zresource.h</file>
+         </object>
+
+     </includefiles> 
+     
+     <commentbanner>
+         /**\n
+  @defgroup DATA_FORMAT Natural vs Universal vs UVF vs URF\n
+\n
+  Natural format :\n
+\n
+    Data format internally stored on computer. Subject to Endianness (if system is little endian) an Sign (if data is signed)\n
+\n
+  Universal format :\n
+    Data format internally stored on computer. Subject to Endianness (if system is little endian) an Sign (if data is signed)\n
+\n
+\n    Data format as it is stored as a key field : it may be sorted\n
+\n
+    Data is stored independantly of Endianness, with a preceeding byte sign if data is signed\n
+    Universal format must be mandatorily coupled with\n
+        - ZType_type  : enough for ZType_Atomic and ZType_Class (ZType_Date, ZType_Checksum,etc.) : size is deduced from type\n
+        - if not atomic or class (ZType_Array and ZType_Strings) effective array count\n
+\n
+  Universal Varying Format (UVF) : concerns fixed strings (and only fixed strings)\n
+\n
+    Data format as it is stored within exported blocks in files headers (ZRF, ZMF, ZIF)\n
+    string content is preceeded with an int16_t mentionning length of the string\n
+\n
+\n
+ Universal Record Format (URF)\n
+\n
+    Data format as it is stored within a file.\n
+    Data is preceeded with a header describing the data.\n
+    This header changes according ZType_type of data.\n
+\n
+\n
+  ZType_Type vs URF Header sizes\n
+\n
+  ZType_Atomic          ZTypeBase\n
+  ------------          data size is deduced from atomic type size\n
+                        see : getAtomicZType_Sizes() function [zindexedfile/zdatatype.h]\n
+\n
+  ZType_Class\n
+  -----------\n
+  ZType_Date            ZTypeBase\n
+                        data size is deduced from object class size.\n
+                        size is sizeof (uint32_t)\n
+\n
+  ZType_DateFull        ZTypeBase\n
+                        data size is deduced from object class size\n
+                        size is sizeof (uint64_t)\n
+\n
+  ZType_CheckSum        ZTypeBase\n
+                        data size is deduced from object class size\n
+                        size is sizeof (cst_checksum)\n
+  ZType_String\n
+  ------------\n
+  ZType_utfxxFixedString    ZTypeBase : gives the object type and the size of character unit i.e. ZType_Char, ZType_U8, ZType_U16, ZType_U32\n
+                            uint16_t :  canonical size (capacity) : capacity of string class (maximum number of character units)\n
+                            uint16_t : Effective Universal size in bytes : universal size in bytes of stored data (excluding URF header)\n
+                                    NB: this size differs from canonical size representing the capacity of the string in character units\n
+\n
+                        NB: Maximum number of bytes is 65'534. Maximum number of characters depends on atomic type.\n
+\n
+  ZType_FixedWString    ZTypeBase\n
+                        uint16_t : canonical size : capacity of string class (number of characters)\n
+                        uint16_t : Effective Universal size : universal size in bytes of stored data\n
+                                    NB: this size differs from canonical size representing the capacity of the string in char\n
+\n
+                        NB: Maximum number of characters is 32'765.\n
+\n
+  ZType_utfxxVaryingString  ZTypeBase  : gives the size of character unit i.e. ZType_U8, ZType_U16, ZType_U32\n
+                            uint64_t : data byte size\n
+                            warning :  data byte size WITHOUT Header Size\n
+\n
+  ZType_VaryingWString  ZTypeBase\n
+                        uint64_t : data byte size\n
+                        warning :   Number of characters is [data byte size / sizeof(wchar_t)]\n
+                                    data byte size WITHOUT Header Size\n
+\n
+  ZType_Array           ZTypeBase  : gives the size of character unit i.e. ZType_U8, ZType_U16, ZType_U32\n
+  -----------           uint32_t : Canonical (Array) count\n
+                        warning : number of bytes is (Array Count * atomic data size) WITHOUT Header Size\n
+\n
+  ZType_Blob            ZTypeBase\n
+  ----------            uint64_t : data byte size WITHOUT Header Size\n
+\n
+  */\n
+     </commentbanner>
+     
+</zcppgenerate>

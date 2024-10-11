@@ -1,0 +1,269 @@
+<?xml version='1.0' encoding='UTF-8'?>
+ <zmfdictionary version = "'0.30-0'">
+   <dictionary>
+      <active>true</active>
+      <keycount>1</keycount>
+      <metadictionary>
+         <version>'1.0-0'</version><!--  <version> field is the local version to the dictionary data (not to be confused with software version). -->
+         <creationdate>2023-10-11T22:08:59.000Z</creationdate><!--  <creationdate>  when dictionary has been firstly created. -->
+         <modificationdate>2023-10-11T22:08:59.000Z</modificationdate><!--  <modificationdate>  when dictionary has lastly being saved. -->
+         <dicname>Physical document one key</dicname>
+         <dicfields>
+            <field>
+               <name>Documentid</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>536870913</ztype><!--  ZType_type <ZType_Resource > converted to its value number -->
+               <capacity>1</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>4</headersize><!--  size of field header -->
+               <universalsize>8</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>8</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>9BB826EC7A0861B6C5ABA46462214FED</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <tooltip>Unique document identifier - given by system resource allocator</tooltip><!-- Custom help -->
+            </field>
+            <field>
+               <name>DataRank</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>17825824</ztype><!--  ZType_type <ZType_AtomicU64 > converted to its value number -->
+               <capacity>1</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>4</headersize><!--  size of field header -->
+               <universalsize>8</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>8</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>A1D20B1AA385BCCFB2787E98F22A18F0</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <!-- /tooltip/ is missing -->
+            </field>
+            <field>
+               <name>Short</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>1073741828</ztype><!--  ZType_type <ZType_Utf8FixedString > converted to its value number -->
+               <capacity>150</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>4</headersize><!--  size of field header -->
+               <universalsize>150</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>150</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>3BD567D96D458606431A165865AFD1E5</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <tooltip>Short description of the document. Used for fast access-</tooltip><!-- Custom help -->
+            </field>
+            <field>
+               <name>Desc</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>1073745924</ztype><!--  ZType_type <ZType_Utf8VaryingString > converted to its value number -->
+               <capacity>0</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>12</headersize><!--  size of field header -->
+               <universalsize>0</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>0</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>BDF5DEA27542BDC04855DCD8581D29D6</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <!-- /tooltip/ is missing -->
+            </field>
+            <field>
+               <name>DocMetaType</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>17891360</ztype><!--  ZType_type <ZType_AtomicS64 > converted to its value number -->
+               <capacity>1</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>4</headersize><!--  size of field header -->
+               <universalsize>9</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>8</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>D687110F7387C963B3FD60919850C969</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <!-- /tooltip/ is missing -->
+            </field>
+            <field>
+               <name>Storage</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>17891360</ztype><!--  ZType_type <ZType_AtomicS64 > converted to its value number -->
+               <capacity>1</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>4</headersize><!--  size of field header -->
+               <universalsize>9</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>8</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>2E3B78A032EA7378EFF118E9904B9195</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <!-- /tooltip/ is missing -->
+            </field>
+            <field>
+               <name>MimeName</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>1073741828</ztype><!--  ZType_type <ZType_Utf8FixedString > converted to its value number -->
+               <capacity>150</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>4</headersize><!--  size of field header -->
+               <universalsize>150</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>150</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>44C512164E4574EB476E11A5653AA489</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <!-- /tooltip/ is missing -->
+            </field>
+            <field>
+               <name>URI</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>1879052292</ztype><!--  ZType_type <ZType_URIString > converted to its value number -->
+               <capacity>0</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>12</headersize><!--  size of field header -->
+               <universalsize>0</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>0</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>false</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>77A8E77192D0B3B4C29C56C8203CC92B</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <!-- /tooltip/ is missing -->
+            </field>
+            <field>
+               <name>DocSize</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>17825824</ztype><!--  ZType_type <ZType_AtomicU64 > converted to its value number -->
+               <capacity>1</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>4</headersize><!--  size of field header -->
+               <universalsize>8</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>8</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>AE3FF17F9AF953AD5374AF17E108CE51</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <!-- /tooltip/ is missing -->
+            </field>
+            <field>
+               <name>Created</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>537919520</ztype><!--  ZType_type <ZType_ZDateFull > converted to its value number -->
+               <capacity>1</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>4</headersize><!--  size of field header -->
+               <universalsize>8</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>8</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>CDA2F3EBE14638973786A6AACD1FB4EF</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <!-- /tooltip/ is missing -->
+            </field>
+            <field>
+               <name>Registrated</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>537919520</ztype><!--  ZType_type <ZType_ZDateFull > converted to its value number -->
+               <capacity>1</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>4</headersize><!--  size of field header -->
+               <universalsize>8</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>8</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>CB1BD7058A66E641091DEAFC0671D4C0</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <!-- /tooltip/ is missing -->
+            </field>
+            <field>
+               <name>LastModified</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>537919520</ztype><!--  ZType_type <ZType_ZDateFull > converted to its value number -->
+               <capacity>1</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>4</headersize><!--  size of field header -->
+               <universalsize>8</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>8</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>CF19B579FBA512F6A2F69657C98E9D06</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <!-- /tooltip/ is missing -->
+            </field>
+            <field>
+               <name>OwnerOrigin</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>536870913</ztype><!--  ZType_type <ZType_Resource > converted to its value number -->
+               <capacity>1</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>4</headersize><!--  size of field header -->
+               <universalsize>8</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>8</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>6A6C40082C566472055671A7140409C5</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <!-- /tooltip/ is missing -->
+            </field>
+            <field>
+               <name>AccessRights</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>17825808</ztype><!--  ZType_type <ZType_AtomicU32 > converted to its value number -->
+               <capacity>1</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>4</headersize><!--  size of field header -->
+               <universalsize>4</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>4</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>86A62F073E00441B8DB8AC5CDF9C81C2</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <!-- /tooltip/ is missing -->
+            </field>
+            <field>
+               <name>CheckSum</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>536870914</ztype><!--  ZType_type <ZType_CheckSum > converted to its value number -->
+               <capacity>1</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>4</headersize><!--  size of field header -->
+               <universalsize>32</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>32</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>A57732204DCCDD80A712F58E59F772C1</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <!-- /tooltip/ is missing -->
+            </field>
+            <field>
+               <name>Temporary</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>16777220</ztype><!--  ZType_type <ZType_AtomicU8 > converted to its value number -->
+               <capacity>1</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>4</headersize><!--  size of field header -->
+               <universalsize>1</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>1</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>CEE729581D95007F5583DCBDA8702315</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <!-- /tooltip/ is missing -->
+            </field>
+            <field>
+               <name>Ownerid</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>536870913</ztype><!--  ZType_type <ZType_Resource > converted to its value number -->
+               <capacity>1</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>4</headersize><!--  size of field header -->
+               <universalsize>8</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>8</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>9174DCE22269EB3633290480F235537B</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <!-- /tooltip/ is missing -->
+            </field>
+            <field>
+               <name>Vaultid</name><!--  Name of the dictionary field : it must be unique. -->
+               <ztype>536870913</ztype><!--  ZType_type <ZType_Resource > converted to its value number -->
+               <capacity>1</capacity><!--  if Array : number of rows, if Fixed string: capacity expressed in character units, 1 if atomic -->
+               <headersize>4</headersize><!--  size of field header -->
+               <universalsize>8</universalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <naturalsize>8</naturalsize><!--  Only if ZType is fixed length. Otherwise set to 0 -->
+               <keyelibible>true</keyelibible><!--  May be used as Key field (true) or not (false) -->
+               <hash>
+                  <md5>D7FC9489048E7024DDE0BCADA1E63E8E</md5>
+               </hash><!--  unique hashcode value for the field. -->
+               <!-- /tooltip/ is missing -->
+            </field>
+         </dicfields>
+      </metadictionary>
+      <keydictionary>
+         <key>
+            <keyname>Primary key</keyname><!--  linked to index control block indexname field  -->
+            <duplicates>false</duplicates><!--  If set, key allows duplicates. if not - key must be unique  -->
+            <tooltip>Unique document identifier access</tooltip>
+            <keyfields>
+               <field>
+                  <mdicrank>0</mdicrank>
+                  <hash>
+                     <md5>9BB826EC7A0861B6C5ABA46462214FED</md5>
+                  </hash>
+                  <keyoffset>0</keyoffset>
+                  <!--  hereafter optional fields from MetaDic describing key field  -->
+                  <name>Documentid</name>
+                  <ztype>536870913</ztype><!--  ZType_type <ZType_Resource > converted to its value number -->
+                  <universalsize>8</universalsize>
+               </field>
+            </keyfields>
+         </key>
+      </keydictionary>
+   </dictionary>
+ </zmfdictionary>

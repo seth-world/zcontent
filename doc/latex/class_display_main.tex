@@ -1,0 +1,614 @@
+\doxysection{Display\+Main Class Reference}
+\hypertarget{class_display_main}{}\label{class_display_main}\index{DisplayMain@{DisplayMain}}
+
+
+{\ttfamily \#include $<$displaymain.\+h$>$}
+
+
+
+Inheritance diagram for Display\+Main\+:
+% FIG 0
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{class_display_main_a0148970145f785c8041d8565dc7ebdd8}{Display\+What}} \{ \newline
+\mbox{\hyperlink{class_display_main_a0148970145f785c8041d8565dc7ebdd8a3fbbf56b7d9112160744e1d9a32227f2}{ZDW\+\_\+\+Nothing}} = 0
+, \mbox{\hyperlink{class_display_main_a0148970145f785c8041d8565dc7ebdd8a66f2ea2bd55a5d468426c3a1db4e413e}{ZDW\+\_\+\+HCB}} = 1
+, \mbox{\hyperlink{class_display_main_a0148970145f785c8041d8565dc7ebdd8a87def73870ea76c19c408e82060ebad4}{ZDW\+\_\+\+FCB}} = 2
+, \mbox{\hyperlink{class_display_main_a0148970145f785c8041d8565dc7ebdd8a6dd4034330b1ca44de7db288e1f51760}{ZDW\+\_\+\+MCB}} = 3
+, \newline
+\mbox{\hyperlink{class_display_main_a0148970145f785c8041d8565dc7ebdd8a5bc620560a30b7b962e2328282760dbf}{ZDW\+\_\+\+ICB}} = 4
+, \mbox{\hyperlink{class_display_main_a0148970145f785c8041d8565dc7ebdd8a4a66adcb8301d9768996358bdf8d6481}{ZDW\+\_\+\+POOL}} = 5
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_display_main_ab49a3bec032a9abab6be5a8b7ae579e8}{Display\+Main}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+URIContent}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QWidget}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{parent}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}})
+\item 
+\mbox{\hyperlink{class_display_main_a45f367da86c27dd13d693f578deefac3}{\texorpdfstring{$\sim$}{\string~}\+Display\+Main}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_a50f15a5d99f95618c0586e5b0384bfca}{init\+Layout}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_a7cb07bf0bcc7933b711b041502175d31}{set\+File\+Closed}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Yes\+No}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_a4e87319690f9668611635d07521026fa}{set\+Offset}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Offset}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Max}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_a734d228337f57407f3d59f1e65bb5ef8}{display\+HCB}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Data}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_a41e390e8b4c73ac07fd4e44c3502fba0}{display\+FCB}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Data}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_afd597eb9e39929ae38d622e540c4b3c9}{display\+MCB}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Data}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_a5ac48dd9971e9d857dac95e74baa0801}{display\+ICBs}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Data}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_aba254f72f9dc44ab2d677a39556c8fff}{display\+Pool}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Data}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_a176a9660864d584e2dde204ab6f1baf2}{display\+HCBValues}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_a2ebcc118d8e3913088c424b4e506f0d1}{display\+FCBValues}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_a204e0fc1d229b6e6965947857b065d38}{display\+MCBValues}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_a41378e8c48fe7fec0e36b7b6045cf7c1}{display\+ICBValues}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{class_display_main_aec801a8922c70da0e5f09949008a601d}{display\+Single\+ICBValues}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Offset}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{w\+Row}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_ab22bee08998f8753c609fffa013d70a7}{display\+Pool\+Values}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_a5a82a4df31903affee84f1743656d816}{display\+All}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_a6a1d83874e8b7d2e9ac67f80b345fb51}{load}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Ptr\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_ab3935fbc63dff297b773bedcdb211846}{get\+MCB}} (ZData\+Buffer \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Data}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_a18e6ef695e7fe07f204b2b5fcc3bfa32}{create\+Margin\+Item}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Value}}, \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Row}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_af67c593b27bd2df39d10b3c592c97084}{resize\+Event}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QResize\+Event}} \texorpdfstring{$\ast$}{*}) \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{override}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{class_display_main_a4a06e97254c7394b0905067ebb9c33eb}{clear}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item\+Model}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_display_main_a7b0431e92d4a7c9688497719d498e0bd}{display\+Item\+Model}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{class_display_main_a3ca21094be6b4a3fdc063f05972d76d1}{FResize\+Initial}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}}
+\item 
+ZData\+Buffer \mbox{\hyperlink{class_display_main_a2d038f690977e4ed0bebe382075b3f91}{Content\+To\+Dump}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \mbox{\hyperlink{class_display_main_a8a7e5065ab4b6a62896917928c367a36}{Offset}} =0
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_display_main_aff3286f377ec10ff869ee0bb6269c52f}{Ptr\+In}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_display_main_ae66b42b5914e10d989588e8598d5873b}{URIContent}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}
+\item 
+ZData\+Buffer \mbox{\hyperlink{class_display_main_a3eb653eb20af546770eea9474c4242f1}{Raw\+Data}}
+\item 
+\mbox{\hyperlink{class_display_main_a0148970145f785c8041d8565dc7ebdd8}{Display\+What}} \mbox{\hyperlink{class_display_main_ac2441b807588588a7fff253b64665e33}{Current\+Display}} =\mbox{\hyperlink{class_display_main_a0148970145f785c8041d8565dc7ebdd8a3fbbf56b7d9112160744e1d9a32227f2}{ZDW\+\_\+\+Nothing}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{displaymain_8h_source_l00023}{23}} of file \mbox{\hyperlink{displaymain_8h_source}{displaymain.\+h}}.
+
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{class_display_main_a0148970145f785c8041d8565dc7ebdd8}\label{class_display_main_a0148970145f785c8041d8565dc7ebdd8} 
+\index{DisplayMain@{DisplayMain}!DisplayWhat@{DisplayWhat}}
+\index{DisplayWhat@{DisplayWhat}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{DisplayWhat}{DisplayWhat}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{class_display_main_a0148970145f785c8041d8565dc7ebdd8}{Display\+Main\+::\+Display\+What}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZDW\_Nothing@{ZDW\_Nothing}!DisplayMain@{DisplayMain}}\index{DisplayMain@{DisplayMain}!ZDW\_Nothing@{ZDW\_Nothing}}}\Hypertarget{class_display_main_a0148970145f785c8041d8565dc7ebdd8a3fbbf56b7d9112160744e1d9a32227f2}\label{class_display_main_a0148970145f785c8041d8565dc7ebdd8a3fbbf56b7d9112160744e1d9a32227f2} 
+ZDW\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZDW\_HCB@{ZDW\_HCB}!DisplayMain@{DisplayMain}}\index{DisplayMain@{DisplayMain}!ZDW\_HCB@{ZDW\_HCB}}}\Hypertarget{class_display_main_a0148970145f785c8041d8565dc7ebdd8a66f2ea2bd55a5d468426c3a1db4e413e}\label{class_display_main_a0148970145f785c8041d8565dc7ebdd8a66f2ea2bd55a5d468426c3a1db4e413e} 
+ZDW\+\_\+\+HCB&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZDW\_FCB@{ZDW\_FCB}!DisplayMain@{DisplayMain}}\index{DisplayMain@{DisplayMain}!ZDW\_FCB@{ZDW\_FCB}}}\Hypertarget{class_display_main_a0148970145f785c8041d8565dc7ebdd8a87def73870ea76c19c408e82060ebad4}\label{class_display_main_a0148970145f785c8041d8565dc7ebdd8a87def73870ea76c19c408e82060ebad4} 
+ZDW\+\_\+\+FCB&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZDW\_MCB@{ZDW\_MCB}!DisplayMain@{DisplayMain}}\index{DisplayMain@{DisplayMain}!ZDW\_MCB@{ZDW\_MCB}}}\Hypertarget{class_display_main_a0148970145f785c8041d8565dc7ebdd8a6dd4034330b1ca44de7db288e1f51760}\label{class_display_main_a0148970145f785c8041d8565dc7ebdd8a6dd4034330b1ca44de7db288e1f51760} 
+ZDW\+\_\+\+MCB&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZDW\_ICB@{ZDW\_ICB}!DisplayMain@{DisplayMain}}\index{DisplayMain@{DisplayMain}!ZDW\_ICB@{ZDW\_ICB}}}\Hypertarget{class_display_main_a0148970145f785c8041d8565dc7ebdd8a5bc620560a30b7b962e2328282760dbf}\label{class_display_main_a0148970145f785c8041d8565dc7ebdd8a5bc620560a30b7b962e2328282760dbf} 
+ZDW\+\_\+\+ICB&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZDW\_POOL@{ZDW\_POOL}!DisplayMain@{DisplayMain}}\index{DisplayMain@{DisplayMain}!ZDW\_POOL@{ZDW\_POOL}}}\Hypertarget{class_display_main_a0148970145f785c8041d8565dc7ebdd8a4a66adcb8301d9768996358bdf8d6481}\label{class_display_main_a0148970145f785c8041d8565dc7ebdd8a4a66adcb8301d9768996358bdf8d6481} 
+ZDW\+\_\+\+POOL&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{displaymain_8h_source_l00070}{70}} of file \mbox{\hyperlink{displaymain_8h_source}{displaymain.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_display_main_ab49a3bec032a9abab6be5a8b7ae579e8}\label{class_display_main_ab49a3bec032a9abab6be5a8b7ae579e8} 
+\index{DisplayMain@{DisplayMain}!DisplayMain@{DisplayMain}}
+\index{DisplayMain@{DisplayMain}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{DisplayMain()}{DisplayMain()}}
+{\footnotesize\ttfamily Display\+Main\+::\+Display\+Main (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String \texorpdfstring{$\ast$}{*}}]{p\+URIContent,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QWidget}} \texorpdfstring{$\ast$}{*}}]{parent = {\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [explicit]}}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00036}{36}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00043}{init\+Layout()}}, and \mbox{\hyperlink{displaymain_8h_source_l00067}{URIContent}}.
+
+\Hypertarget{class_display_main_a45f367da86c27dd13d693f578deefac3}\label{class_display_main_a45f367da86c27dd13d693f578deefac3} 
+\index{DisplayMain@{DisplayMain}!````~DisplayMain@{\texorpdfstring{$\sim$}{\string~}DisplayMain}}
+\index{````~DisplayMain@{\texorpdfstring{$\sim$}{\string~}DisplayMain}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}DisplayMain()}{\string~DisplayMain()}}
+{\footnotesize\ttfamily Display\+Main\+::\texorpdfstring{$\sim$}{\string~}\+Display\+Main (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l01527}{1527}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_display_main_a4a06e97254c7394b0905067ebb9c33eb}\label{class_display_main_a4a06e97254c7394b0905067ebb9c33eb} 
+\index{DisplayMain@{DisplayMain}!clear@{clear}}
+\index{clear@{clear}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l01514}{1514}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{displaymain_8h_source_l00034}{display\+Item\+Model}}, \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00030}{Ui\+\_\+\+Display\+Main\+::\+Offset\+LBl}}, and \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00034}{Ui\+\_\+\+Display\+Main\+::offset\+SBx}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l00297}{display\+All()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00141}{display\+FCB()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00095}{display\+HCB()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00254}{display\+MCB()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00201}{display\+Pool()}}, and \mbox{\hyperlink{displaymain_8cpp_source_l00212}{get\+MCB()}}.
+
+\Hypertarget{class_display_main_a18e6ef695e7fe07f204b2b5fcc3bfa32}\label{class_display_main_a18e6ef695e7fe07f204b2b5fcc3bfa32} 
+\index{DisplayMain@{DisplayMain}!createMarginItem@{createMarginItem}}
+\index{createMarginItem@{createMarginItem}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{createMarginItem()}{createMarginItem()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::create\+Margin\+Item (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Value,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Row }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00617}{617}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{create\+Item()}}, \mbox{\hyperlink{displaymain_8h_source_l00034}{display\+Item\+Model}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l01140}{display\+FCBValues()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00346}{display\+HCBValues()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00880}{display\+MCBValues()}}, and \mbox{\hyperlink{displaymain_8cpp_source_l00629}{display\+Single\+ICBValues()}}.
+
+\Hypertarget{class_display_main_a5a82a4df31903affee84f1743656d816}\label{class_display_main_a5a82a4df31903affee84f1743656d816} 
+\index{DisplayMain@{DisplayMain}!displayAll@{displayAll}}
+\index{displayAll@{displayAll}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{displayAll()}{displayAll()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::display\+All (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Ptr\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00297}{297}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{displaymain_8cpp_source_l01514}{clear()}}, \mbox{\hyperlink{displaymain_8cpp_source_l01140}{display\+FCBValues()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00346}{display\+HCBValues()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00880}{display\+MCBValues()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{displaymain_8h_source_l00065}{Ptr\+In}}.
+
+\Hypertarget{class_display_main_a41e390e8b4c73ac07fd4e44c3502fba0}\label{class_display_main_a41e390e8b4c73ac07fd4e44c3502fba0} 
+\index{DisplayMain@{DisplayMain}!displayFCB@{displayFCB}}
+\index{displayFCB@{displayFCB}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{displayFCB()}{displayFCB()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::display\+FCB (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Data }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00141}{141}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{displaymain_8cpp_source_l01514}{clear()}}, \mbox{\hyperlink{displaymain_8h_source_l00063}{Content\+To\+Dump}}, \mbox{\hyperlink{displaymain_8h_source_l00079}{Current\+Display}}, \mbox{\hyperlink{zexceptiondlg_8cpp_source_l01040}{ZException\+DLg\+::display2\+B()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00141}{display\+FCB()}}, \mbox{\hyperlink{displaymain_8cpp_source_l01140}{display\+FCBValues()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00613}{ZException\+DLg\+::message()}}, \mbox{\hyperlink{displaymain_8h_source_l00065}{Ptr\+In}}, \mbox{\hyperlink{displaymain_8h_source_l00068}{Raw\+Data}}, \mbox{\hyperlink{displaymain_8cpp_source_l00123}{set\+Offset()}}, \mbox{\hyperlink{displaymain_8h_source_l00067}{URIContent}}, \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_source_l00851}{w\+Ret}}, \mbox{\hyperlink{displaymain_8h_source_l00073}{ZDW\+\_\+\+FCB}}, and \mbox{\hyperlink{zexceptiondlg_8h_source_l00056}{ZEDLG\+\_\+\+Rejected}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcontentvisumain_8cpp_source_l02207}{ZContent\+Visu\+Main\+::display\+FCB()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01142}{ZEntry\+Point\+::display\+FCB()}}, \mbox{\hyperlink{zrawvisumain_8cpp_source_l02107}{ZRaw\+Visu\+Main\+::display\+FCB()}}, and \mbox{\hyperlink{displaymain_8cpp_source_l00141}{display\+FCB()}}.
+
+\Hypertarget{class_display_main_a2ebcc118d8e3913088c424b4e506f0d1}\label{class_display_main_a2ebcc118d8e3913088c424b4e506f0d1} 
+\index{DisplayMain@{DisplayMain}!displayFCBValues@{displayFCBValues}}
+\index{displayFCBValues@{displayFCBValues}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{displayFCBValues()}{displayFCBValues()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::display\+FCBValues (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Ptr\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l01140}{1140}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{create\+Item()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00617}{create\+Margin\+Item()}}, \mbox{\hyperlink{zblock_8cpp_source_l00340}{decode\+\_\+\+Block\+Id()}}, \mbox{\hyperlink{displaymain_8h_source_l00034}{display\+Item\+Model}}, \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00035}{Ui\+\_\+\+Display\+Main\+::display\+TBv}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{displaymain_8h_source_l00064}{Offset}}, and \mbox{\hyperlink{displaymain_8h_source_l00067}{URIContent}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l00297}{display\+All()}}, and \mbox{\hyperlink{displaymain_8cpp_source_l00141}{display\+FCB()}}.
+
+\Hypertarget{class_display_main_a734d228337f57407f3d59f1e65bb5ef8}\label{class_display_main_a734d228337f57407f3d59f1e65bb5ef8} 
+\index{DisplayMain@{DisplayMain}!displayHCB@{displayHCB}}
+\index{displayHCB@{displayHCB}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{displayHCB()}{displayHCB()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::display\+HCB (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Data }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00095}{95}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{displaymain_8cpp_source_l01514}{clear()}}, \mbox{\hyperlink{displaymain_8h_source_l00063}{Content\+To\+Dump}}, \mbox{\hyperlink{displaymain_8h_source_l00079}{Current\+Display}}, \mbox{\hyperlink{displaymain_8cpp_source_l00346}{display\+HCBValues()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00613}{ZException\+DLg\+::message()}}, \mbox{\hyperlink{displaymain_8h_source_l00064}{Offset}}, \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00034}{Ui\+\_\+\+Display\+Main\+::offset\+SBx}}, \mbox{\hyperlink{displaymain_8h_source_l00065}{Ptr\+In}}, and \mbox{\hyperlink{displaymain_8h_source_l00072}{ZDW\+\_\+\+HCB}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcontentvisumain_8cpp_source_l02196}{ZContent\+Visu\+Main\+::display\+HCB()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01123}{ZEntry\+Point\+::display\+HCB()}}, and \mbox{\hyperlink{zrawvisumain_8cpp_source_l02096}{ZRaw\+Visu\+Main\+::display\+HCB()}}.
+
+\Hypertarget{class_display_main_a176a9660864d584e2dde204ab6f1baf2}\label{class_display_main_a176a9660864d584e2dde204ab6f1baf2} 
+\index{DisplayMain@{DisplayMain}!displayHCBValues@{displayHCBValues}}
+\index{displayHCBValues@{displayHCBValues}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{displayHCBValues()}{displayHCBValues()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::display\+HCBValues (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Ptr\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00346}{346}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{create\+Item()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00617}{create\+Margin\+Item()}}, \mbox{\hyperlink{zblock_8cpp_source_l00340}{decode\+\_\+\+Block\+Id()}}, \mbox{\hyperlink{zrandomfile_8cpp_source_l10037}{decode\+\_\+\+ZFile\+\_\+type()}}, \mbox{\hyperlink{zlock_8cpp_source_l00055}{decode\+\_\+\+ZLock\+Mask()}}, \mbox{\hyperlink{displaymain_8h_source_l00034}{display\+Item\+Model}}, \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00035}{Ui\+\_\+\+Display\+Main\+::display\+TBv}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{group___z_random_file_group_gafcc62763c2dd7ef17affe0c96ea31e3c}{get\+Version\+Str()}}, \mbox{\hyperlink{displaymain_8h_source_l00064}{Offset}}, and \mbox{\hyperlink{displaymain_8h_source_l00067}{URIContent}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l00297}{display\+All()}}, and \mbox{\hyperlink{displaymain_8cpp_source_l00095}{display\+HCB()}}.
+
+\Hypertarget{class_display_main_a5ac48dd9971e9d857dac95e74baa0801}\label{class_display_main_a5ac48dd9971e9d857dac95e74baa0801} 
+\index{DisplayMain@{DisplayMain}!displayICBs@{displayICBs}}
+\index{displayICBs@{displayICBs}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{displayICBs()}{displayICBs()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::display\+ICBs (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Data }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00560}{560}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00741}{ZException\+DLg\+::adhoc\+Message()}}, \mbox{\hyperlink{displaymain_8h_source_l00063}{Content\+To\+Dump}}, \mbox{\hyperlink{displaymain_8h_source_l00079}{Current\+Display}}, \mbox{\hyperlink{displaymain_8cpp_source_l00591}{display\+ICBValues()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{displaymain_8h_source_l00064}{Offset}}, \mbox{\hyperlink{displaymain_8cpp_source_l00123}{set\+Offset()}}, and \mbox{\hyperlink{displaymain_8h_source_l00075}{ZDW\+\_\+\+ICB}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcontentvisumain_8cpp_source_l02230}{ZContent\+Visu\+Main\+::display\+ICBs()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01180}{ZEntry\+Point\+::display\+ICBs()}}, and \mbox{\hyperlink{zrawvisumain_8cpp_source_l02130}{ZRaw\+Visu\+Main\+::display\+ICBs()}}.
+
+\Hypertarget{class_display_main_a41378e8c48fe7fec0e36b7b6045cf7c1}\label{class_display_main_a41378e8c48fe7fec0e36b7b6045cf7c1} 
+\index{DisplayMain@{DisplayMain}!displayICBValues@{displayICBValues}}
+\index{displayICBValues@{displayICBValues}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{displayICBValues()}{displayICBValues()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::display\+ICBValues (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Ptr\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00591}{591}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{displaymain_8h_source_l00034}{display\+Item\+Model}}, \mbox{\hyperlink{displaymain_8cpp_source_l00629}{display\+Single\+ICBValues()}}, \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00035}{Ui\+\_\+\+Display\+Main\+::display\+TBv}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{displaymain_8h_source_l00064}{Offset}}, \mbox{\hyperlink{displaymain_8h_source_l00067}{URIContent}}, and \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_source_l00851}{w\+Ret}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l00560}{display\+ICBs()}}.
+
+\Hypertarget{class_display_main_afd597eb9e39929ae38d622e540c4b3c9}\label{class_display_main_afd597eb9e39929ae38d622e540c4b3c9} 
+\index{DisplayMain@{DisplayMain}!displayMCB@{displayMCB}}
+\index{displayMCB@{displayMCB}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{displayMCB()}{displayMCB()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::display\+MCB (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Data }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00254}{254}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{displaymain_8cpp_source_l01514}{clear()}}, \mbox{\hyperlink{displaymain_8h_source_l00063}{Content\+To\+Dump}}, \mbox{\hyperlink{displaymain_8h_source_l00079}{Current\+Display}}, \mbox{\hyperlink{displaymain_8cpp_source_l00880}{display\+MCBValues()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00613}{ZException\+DLg\+::message()}}, \mbox{\hyperlink{displaymain_8h_source_l00065}{Ptr\+In}}, \mbox{\hyperlink{displaymain_8cpp_source_l00123}{set\+Offset()}}, and \mbox{\hyperlink{displaymain_8h_source_l00074}{ZDW\+\_\+\+MCB}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcontentvisumain_8cpp_source_l02218}{ZContent\+Visu\+Main\+::display\+MCB()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01160}{ZEntry\+Point\+::display\+MCB()}}, and \mbox{\hyperlink{zrawvisumain_8cpp_source_l02118}{ZRaw\+Visu\+Main\+::display\+MCB()}}.
+
+\Hypertarget{class_display_main_a204e0fc1d229b6e6965947857b065d38}\label{class_display_main_a204e0fc1d229b6e6965947857b065d38} 
+\index{DisplayMain@{DisplayMain}!displayMCBValues@{displayMCBValues}}
+\index{displayMCBValues@{displayMCBValues}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{displayMCBValues()}{displayMCBValues()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::display\+MCBValues (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Ptr\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00880}{880}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zmastercontrolblock_8cpp_source_l00122}{zbs\+::\+ZMCB\+\_\+\+Export\+::\+\_\+import()}}, \mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{create\+Item()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00617}{create\+Margin\+Item()}}, \mbox{\hyperlink{zblock_8cpp_source_l00340}{decode\+\_\+\+Block\+Id()}}, \mbox{\hyperlink{displaymain_8h_source_l00034}{display\+Item\+Model}}, \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00035}{Ui\+\_\+\+Display\+Main\+::display\+TBv}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{group___z_random_file_group_gafcc62763c2dd7ef17affe0c96ea31e3c}{get\+Version\+Str()}}, \mbox{\hyperlink{displaymain_8h_source_l00064}{Offset}}, and \mbox{\hyperlink{displaymain_8h_source_l00067}{URIContent}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l00297}{display\+All()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00254}{display\+MCB()}}, and \mbox{\hyperlink{displaymain_8cpp_source_l00212}{get\+MCB()}}.
+
+\Hypertarget{class_display_main_aba254f72f9dc44ab2d677a39556c8fff}\label{class_display_main_aba254f72f9dc44ab2d677a39556c8fff} 
+\index{DisplayMain@{DisplayMain}!displayPool@{displayPool}}
+\index{displayPool@{displayPool}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{displayPool()}{displayPool()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::display\+Pool (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Data }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00201}{201}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{displaymain_8cpp_source_l01514}{clear()}}, \mbox{\hyperlink{displaymain_8h_source_l00079}{Current\+Display}}, \mbox{\hyperlink{displaymain_8cpp_source_l00548}{display\+Pool\+Values()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{displaymain_8h_source_l00065}{Ptr\+In}}, and \mbox{\hyperlink{displaymain_8h_source_l00076}{ZDW\+\_\+\+POOL}}.
+
+\Hypertarget{class_display_main_ab22bee08998f8753c609fffa013d70a7}\label{class_display_main_ab22bee08998f8753c609fffa013d70a7} 
+\index{DisplayMain@{DisplayMain}!displayPoolValues@{displayPoolValues}}
+\index{displayPoolValues@{displayPoolValues}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{displayPoolValues()}{displayPoolValues()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::display\+Pool\+Values (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Ptr\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00548}{548}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l00201}{display\+Pool()}}.
+
+\Hypertarget{class_display_main_aec801a8922c70da0e5f09949008a601d}\label{class_display_main_aec801a8922c70da0e5f09949008a601d} 
+\index{DisplayMain@{DisplayMain}!displaySingleICBValues@{displaySingleICBValues}}
+\index{displaySingleICBValues@{displaySingleICBValues}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{displaySingleICBValues()}{displaySingleICBValues()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} Display\+Main\+::display\+Single\+ICBValues (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}\&}]{p\+Ptr\+In,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} \&}]{p\+Display\+Offset,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \&}]{w\+Row }\end{DoxyParamCaption})}
+
+p\+Ptr\+In is supposed to point to first ICB. p\+Offset is offset to be displayed (since beginning of file) 
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00629}{629}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindexcontrolblock_8cpp_source_l00018}{zbs\+::\+ZICB\+\_\+\+Export\+::clear()}}, \mbox{\hyperlink{zcu__common_8h_a550d417c208cfa0422797074cc411505}{create\+Item()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00617}{create\+Margin\+Item()}}, \mbox{\hyperlink{zblock_8cpp_source_l00340}{decode\+\_\+\+Block\+Id()}}, \mbox{\hyperlink{zcontentconstants_8cpp_source_l00059}{decode\+\_\+\+ZST()}}, \mbox{\hyperlink{displaymain_8h_source_l00034}{display\+Item\+Model}}, \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00035}{Ui\+\_\+\+Display\+Main\+::display\+TBv}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, and \mbox{\hyperlink{group___z_random_file_group_gafcc62763c2dd7ef17affe0c96ea31e3c}{get\+Version\+Str()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zcontentvisumain_8cpp_source_l02230}{ZContent\+Visu\+Main\+::display\+ICBs()}}, \mbox{\hyperlink{zentrypoint_8cpp_source_l01180}{ZEntry\+Point\+::display\+ICBs()}}, \mbox{\hyperlink{zrawvisumain_8cpp_source_l02130}{ZRaw\+Visu\+Main\+::display\+ICBs()}}, and \mbox{\hyperlink{displaymain_8cpp_source_l00591}{display\+ICBValues()}}.
+
+\Hypertarget{class_display_main_ab3935fbc63dff297b773bedcdb211846}\label{class_display_main_ab3935fbc63dff297b773bedcdb211846} 
+\index{DisplayMain@{DisplayMain}!getMCB@{getMCB}}
+\index{getMCB@{getMCB}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{getMCB()}{getMCB()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::get\+MCB (\begin{DoxyParamCaption}\item[{ZData\+Buffer \&}]{p\+Data }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00212}{212}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{displaymain_8cpp_source_l01514}{clear()}}, \mbox{\hyperlink{displaymain_8h_source_l00079}{Current\+Display}}, \mbox{\hyperlink{displaymain_8cpp_source_l00880}{display\+MCBValues()}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00613}{ZException\+DLg\+::message()}}, \mbox{\hyperlink{displaymain_8h_source_l00065}{Ptr\+In}}, \mbox{\hyperlink{displaymain_8cpp_source_l00123}{set\+Offset()}}, and \mbox{\hyperlink{displaymain_8h_source_l00074}{ZDW\+\_\+\+MCB}}.
+
+\Hypertarget{class_display_main_a50f15a5d99f95618c0586e5b0384bfca}\label{class_display_main_a50f15a5d99f95618c0586e5b0384bfca} 
+\index{DisplayMain@{DisplayMain}!initLayout@{initLayout}}
+\index{initLayout@{initLayout}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{initLayout()}{initLayout()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::init\+Layout (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00043}{43}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00033}{Ui\+\_\+\+Display\+Main\+::\+Closed\+LBl}}, \mbox{\hyperlink{displaymain_8h_source_l00034}{display\+Item\+Model}}, \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00035}{Ui\+\_\+\+Display\+Main\+::display\+TBv}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00030}{Ui\+\_\+\+Display\+Main\+::\+Offset\+LBl}}, \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00034}{Ui\+\_\+\+Display\+Main\+::offset\+SBx}}, and \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00038}{Ui\+\_\+\+Display\+Main\+::setup\+Ui()}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l00036}{Display\+Main()}}.
+
+\Hypertarget{class_display_main_a6a1d83874e8b7d2e9ac67f80b345fb51}\label{class_display_main_a6a1d83874e8b7d2e9ac67f80b345fb51} 
+\index{DisplayMain@{DisplayMain}!load@{load}}
+\index{load@{load}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{load()}{load()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::load (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*}}]{p\+Ptr\+In }\end{DoxyParamCaption})}
+
+\Hypertarget{class_display_main_af67c593b27bd2df39d10b3c592c97084}\label{class_display_main_af67c593b27bd2df39d10b3c592c97084} 
+\index{DisplayMain@{DisplayMain}!resizeEvent@{resizeEvent}}
+\index{resizeEvent@{resizeEvent}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{resizeEvent()}{resizeEvent()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::resize\+Event (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QResize\+Event}} \texorpdfstring{$\ast$}{*}}]{p\+Event }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l01534}{1534}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00028}{Ui\+\_\+\+Display\+Main\+::centralwidget}}, \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00035}{Ui\+\_\+\+Display\+Main\+::display\+TBv}}, \mbox{\hyperlink{displaymain_8h_source_l00061}{FResize\+Initial}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_display_main_a7cb07bf0bcc7933b711b041502175d31}\label{class_display_main_a7cb07bf0bcc7933b711b041502175d31} 
+\index{DisplayMain@{DisplayMain}!setFileClosed@{setFileClosed}}
+\index{setFileClosed@{setFileClosed}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{setFileClosed()}{setFileClosed()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::set\+File\+Closed (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}}}]{p\+Yes\+No }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00089}{89}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00033}{Ui\+\_\+\+Display\+Main\+::\+Closed\+LBl}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{class_display_main_a4e87319690f9668611635d07521026fa}\label{class_display_main_a4e87319690f9668611635d07521026fa} 
+\index{DisplayMain@{DisplayMain}!setOffset@{setOffset}}
+\index{setOffset@{setOffset}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{setOffset()}{setOffset()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} Display\+Main\+::set\+Offset (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Offset,  }\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}}}]{p\+Max }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8cpp_source_l00123}{123}} of file \mbox{\hyperlink{displaymain_8cpp_source}{displaymain.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{displaymain_8h_source_l00064}{Offset}}, \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00030}{Ui\+\_\+\+Display\+Main\+::\+Offset\+LBl}}, and \mbox{\hyperlink{build-zcontentutils-_desktop___qt__6__7__0___g_c_c__64bit-_profile_2ui__displaymain_8h_source_l00034}{Ui\+\_\+\+Display\+Main\+::offset\+SBx}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l00141}{display\+FCB()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00560}{display\+ICBs()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00254}{display\+MCB()}}, and \mbox{\hyperlink{displaymain_8cpp_source_l00212}{get\+MCB()}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_display_main_a2d038f690977e4ed0bebe382075b3f91}\label{class_display_main_a2d038f690977e4ed0bebe382075b3f91} 
+\index{DisplayMain@{DisplayMain}!ContentToDump@{ContentToDump}}
+\index{ContentToDump@{ContentToDump}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{ContentToDump}{ContentToDump}}
+{\footnotesize\ttfamily ZData\+Buffer Display\+Main\+::\+Content\+To\+Dump}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8h_source_l00063}{63}} of file \mbox{\hyperlink{displaymain_8h_source}{displaymain.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l00141}{display\+FCB()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00095}{display\+HCB()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00560}{display\+ICBs()}}, and \mbox{\hyperlink{displaymain_8cpp_source_l00254}{display\+MCB()}}.
+
+\Hypertarget{class_display_main_ac2441b807588588a7fff253b64665e33}\label{class_display_main_ac2441b807588588a7fff253b64665e33} 
+\index{DisplayMain@{DisplayMain}!CurrentDisplay@{CurrentDisplay}}
+\index{CurrentDisplay@{CurrentDisplay}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{CurrentDisplay}{CurrentDisplay}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_display_main_a0148970145f785c8041d8565dc7ebdd8}{Display\+What}} Display\+Main\+::\+Current\+Display =\mbox{\hyperlink{class_display_main_a0148970145f785c8041d8565dc7ebdd8a3fbbf56b7d9112160744e1d9a32227f2}{ZDW\+\_\+\+Nothing}}}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8h_source_l00079}{79}} of file \mbox{\hyperlink{displaymain_8h_source}{displaymain.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l00141}{display\+FCB()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00095}{display\+HCB()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00560}{display\+ICBs()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00254}{display\+MCB()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00201}{display\+Pool()}}, and \mbox{\hyperlink{displaymain_8cpp_source_l00212}{get\+MCB()}}.
+
+\Hypertarget{class_display_main_a7b0431e92d4a7c9688497719d498e0bd}\label{class_display_main_a7b0431e92d4a7c9688497719d498e0bd} 
+\index{DisplayMain@{DisplayMain}!displayItemModel@{displayItemModel}}
+\index{displayItemModel@{displayItemModel}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{displayItemModel}{displayItemModel}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandard\+Item\+Model}}\texorpdfstring{$\ast$}{*} Display\+Main\+::display\+Item\+Model =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8h_source_l00034}{34}} of file \mbox{\hyperlink{displaymain_8h_source}{displaymain.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l01514}{clear()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00617}{create\+Margin\+Item()}}, \mbox{\hyperlink{displaymain_8cpp_source_l01140}{display\+FCBValues()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00346}{display\+HCBValues()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00591}{display\+ICBValues()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00880}{display\+MCBValues()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00629}{display\+Single\+ICBValues()}}, and \mbox{\hyperlink{displaymain_8cpp_source_l00043}{init\+Layout()}}.
+
+\Hypertarget{class_display_main_a3ca21094be6b4a3fdc063f05972d76d1}\label{class_display_main_a3ca21094be6b4a3fdc063f05972d76d1} 
+\index{DisplayMain@{DisplayMain}!FResizeInitial@{FResizeInitial}}
+\index{FResizeInitial@{FResizeInitial}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{FResizeInitial}{FResizeInitial}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} Display\+Main\+::\+FResize\+Initial =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{true}}}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8h_source_l00061}{61}} of file \mbox{\hyperlink{displaymain_8h_source}{displaymain.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l01534}{resize\+Event()}}.
+
+\Hypertarget{class_display_main_a8a7e5065ab4b6a62896917928c367a36}\label{class_display_main_a8a7e5065ab4b6a62896917928c367a36} 
+\index{DisplayMain@{DisplayMain}!Offset@{Offset}}
+\index{Offset@{Offset}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{Offset}{Offset}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{size\+\_\+t}} Display\+Main\+::\+Offset =0}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8h_source_l00064}{64}} of file \mbox{\hyperlink{displaymain_8h_source}{displaymain.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l01140}{display\+FCBValues()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00095}{display\+HCB()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00346}{display\+HCBValues()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00560}{display\+ICBs()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00591}{display\+ICBValues()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00880}{display\+MCBValues()}}, and \mbox{\hyperlink{displaymain_8cpp_source_l00123}{set\+Offset()}}.
+
+\Hypertarget{class_display_main_aff3286f377ec10ff869ee0bb6269c52f}\label{class_display_main_aff3286f377ec10ff869ee0bb6269c52f} 
+\index{DisplayMain@{DisplayMain}!PtrIn@{PtrIn}}
+\index{PtrIn@{PtrIn}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{PtrIn}{PtrIn}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{unsigned}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}}\texorpdfstring{$\ast$}{*} Display\+Main\+::\+Ptr\+In =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8h_source_l00065}{65}} of file \mbox{\hyperlink{displaymain_8h_source}{displaymain.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l00297}{display\+All()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00141}{display\+FCB()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00095}{display\+HCB()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00254}{display\+MCB()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00201}{display\+Pool()}}, and \mbox{\hyperlink{displaymain_8cpp_source_l00212}{get\+MCB()}}.
+
+\Hypertarget{class_display_main_a3eb653eb20af546770eea9474c4242f1}\label{class_display_main_a3eb653eb20af546770eea9474c4242f1} 
+\index{DisplayMain@{DisplayMain}!RawData@{RawData}}
+\index{RawData@{RawData}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{RawData}{RawData}}
+{\footnotesize\ttfamily ZData\+Buffer Display\+Main\+::\+Raw\+Data}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8h_source_l00068}{68}} of file \mbox{\hyperlink{displaymain_8h_source}{displaymain.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l00141}{display\+FCB()}}.
+
+\Hypertarget{class_display_main_ae66b42b5914e10d989588e8598d5873b}\label{class_display_main_ae66b42b5914e10d989588e8598d5873b} 
+\index{DisplayMain@{DisplayMain}!URIContent@{URIContent}}
+\index{URIContent@{URIContent}!DisplayMain@{DisplayMain}}
+\doxysubsubsection{\texorpdfstring{URIContent}{URIContent}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} uri\+String\texorpdfstring{$\ast$}{*} Display\+Main\+::\+URIContent =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{nullptr}}}
+
+
+
+Definition at line \mbox{\hyperlink{displaymain_8h_source_l00067}{67}} of file \mbox{\hyperlink{displaymain_8h_source}{displaymain.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{displaymain_8cpp_source_l00141}{display\+FCB()}}, \mbox{\hyperlink{displaymain_8cpp_source_l01140}{display\+FCBValues()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00346}{display\+HCBValues()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00591}{display\+ICBValues()}}, \mbox{\hyperlink{displaymain_8cpp_source_l00036}{Display\+Main()}}, and \mbox{\hyperlink{displaymain_8cpp_source_l00880}{display\+MCBValues()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/\mbox{\hyperlink{displaymain_8h}{displaymain.\+h}}\item 
+/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/\mbox{\hyperlink{displaymain_8cpp}{displaymain.\+cpp}}\end{DoxyCompactItemize}

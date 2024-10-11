@@ -1,0 +1,216 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/zjournal.h File Reference}
+\hypertarget{zjournal_8h}{}\label{zjournal_8h}\index{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zjournal.h@{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zjournal.h}}
+{\ttfamily \#include $<$cstdarg$>$}\newline
+{\ttfamily \#include $<$zrandomfile/zrandomfile.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zbasedatatypes.\+h$>$}\newline
+{\ttfamily \#include $<$znet/zbasenet/znetcommon.\+h$>$}\newline
+Include dependency graph for zjournal.\+h\+:
+% FIG 0
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_z_j_state}{ZJState}}
+\item 
+class \mbox{\hyperlink{classzbs_1_1_z_j_event}{zbs\+::\+ZJEvent}}
+\item 
+struct \mbox{\hyperlink{structzbs_1_1_z_j_event_1_1_z_j_e___header}{zbs\+::\+ZJEvent\+::\+ZJE\+\_\+\+Header}}
+\item 
+class \mbox{\hyperlink{classzbs_1_1_z_j_event_queue}{zbs\+::\+ZJEvent\+Queue}}
+\item 
+class \mbox{\hyperlink{classzbs_1_1_z_s_journal}{zbs\+::\+ZSJournal}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacezbs}{zbs}}
+\begin{DoxyCompactList}\small\item\em ZSIndex\+Field\+\_\+struct Dictionary single field definition \+: one key may be composed of many single fields not necessarily contiguous in the master file\textquotesingle{}s data structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zjournal_8h_aa7c658420c5a7a85171ab690dbb4b2c1}{\+\_\+\+\_\+\+JOURNAL\+\_\+\+EXT\+\_\+\+\_\+}}~"{}jnl"{}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zjournal_8h_adf277cca42895977367da9440a374513}{\+\_\+\+\_\+\+JOURNAL\+\_\+\+ENDOFFILEPATH\+\_\+\+\_\+}}~"{}\+\_\+jnl.\+jnl"{}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} \mbox{\hyperlink{zjournal_8h_a28ec843e72f2f87e88986d4bc8434027}{ZJState\+\_\+base}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3c}{ZJOperation}} \+: long \{ \newline
+\mbox{\hyperlink{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3ca367db27eefa14051882aaa006924f484}{ZJOP\+\_\+\+Nothing}} =0x0
+, \mbox{\hyperlink{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3cac7fa56ead48ae5e5fb7a487bfae3b6d6}{ZJOP\+\_\+\+Add}} =0x00000001
+, \mbox{\hyperlink{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3cae0b804915a47724140eb51bd19afe279}{ZJOP\+\_\+\+Insert}} =0x00000002
+, \mbox{\hyperlink{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3cafee86bf6b7f8f06b4295676e2ad12b5e}{ZJOP\+\_\+\+Remove\+By\+Rank}} =0x00000004
+, \newline
+\mbox{\hyperlink{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3cabf1f4cf2728b8ac180841a390a2c8e9b}{ZJOP\+\_\+\+Remove\+By\+Address}} =0x00000008
+, \mbox{\hyperlink{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3ca89376c52236822e2bca3aff69359f913}{ZJOP\+\_\+\+Chg\+Fld}} =0x00000100
+, \mbox{\hyperlink{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3ca86143eaac0a644d7c274146fb45d8bff}{ZJOP\+\_\+\+Roll\+Back}} =0x00000010
+, \mbox{\hyperlink{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3cadabcdbad1b8b42c06d238e1568e0ede7}{ZJOP\+\_\+\+Close}} =0x0000ffff
+ \}
+\item 
+enum \mbox{\hyperlink{zjournal_8h_a711ca1dc4ffc20202dbc544c923a0c71}{ZJState\+\_\+type}} \+: ZJState\+\_\+base \{ \mbox{\hyperlink{zjournal_8h_a711ca1dc4ffc20202dbc544c923a0c71ad8da1100a164b89094a61b5153c6a50f}{ZJS\+\_\+\+Nothing}} =0x0
+, \mbox{\hyperlink{zjournal_8h_a711ca1dc4ffc20202dbc544c923a0c71a76d59ba9631ea5c09b5def08d5d79bdd}{ZJS\+\_\+\+Created}} =0x01
+, \mbox{\hyperlink{zjournal_8h_a711ca1dc4ffc20202dbc544c923a0c71afd07776331fce28313f9f67cb4405ae6}{ZJS\+\_\+\+Rolled\+Back}} =0x04
+, \mbox{\hyperlink{zjournal_8h_a711ca1dc4ffc20202dbc544c923a0c71af6ac825c6cfe67b505d13b7aa862aa01}{ZJS\+\_\+\+Exported}} =0x10
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zjournal_8h_a53405591a135ef9e78edda696fbc5fb9}{decode\+\_\+\+ZJOP}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3c}{ZJOperation}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Operation}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{zjournal_8h_a59f95c851fe25be006ce6be758cb1675}{generate\+Journal\+Name}} (uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+ZMFName}}, uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Journaling\+Path}}, uri\+String \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Journal\+Name}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{zjournal_8h_adf277cca42895977367da9440a374513}\label{zjournal_8h_adf277cca42895977367da9440a374513} 
+\index{zjournal.h@{zjournal.h}!\_\_JOURNAL\_ENDOFFILEPATH\_\_@{\_\_JOURNAL\_ENDOFFILEPATH\_\_}}
+\index{\_\_JOURNAL\_ENDOFFILEPATH\_\_@{\_\_JOURNAL\_ENDOFFILEPATH\_\_}!zjournal.h@{zjournal.h}}
+\doxysubsubsection{\texorpdfstring{\_\_JOURNAL\_ENDOFFILEPATH\_\_}{\_\_JOURNAL\_ENDOFFILEPATH\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+JOURNAL\+\_\+\+ENDOFFILEPATH\+\_\+\+\_\+~"{}\+\_\+jnl.\+jnl"{}}
+
+
+
+Definition at line \mbox{\hyperlink{zjournal_8h_source_l00011}{11}} of file \mbox{\hyperlink{zjournal_8h_source}{zjournal.\+h}}.
+
+\Hypertarget{zjournal_8h_aa7c658420c5a7a85171ab690dbb4b2c1}\label{zjournal_8h_aa7c658420c5a7a85171ab690dbb4b2c1} 
+\index{zjournal.h@{zjournal.h}!\_\_JOURNAL\_EXT\_\_@{\_\_JOURNAL\_EXT\_\_}}
+\index{\_\_JOURNAL\_EXT\_\_@{\_\_JOURNAL\_EXT\_\_}!zjournal.h@{zjournal.h}}
+\doxysubsubsection{\texorpdfstring{\_\_JOURNAL\_EXT\_\_}{\_\_JOURNAL\_EXT\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+JOURNAL\+\_\+\+EXT\+\_\+\+\_\+~"{}jnl"{}}
+
+
+
+Definition at line \mbox{\hyperlink{zjournal_8h_source_l00010}{10}} of file \mbox{\hyperlink{zjournal_8h_source}{zjournal.\+h}}.
+
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{zjournal_8h_a28ec843e72f2f87e88986d4bc8434027}\label{zjournal_8h_a28ec843e72f2f87e88986d4bc8434027} 
+\index{zjournal.h@{zjournal.h}!ZJState\_base@{ZJState\_base}}
+\index{ZJState\_base@{ZJState\_base}!zjournal.h@{zjournal.h}}
+\doxysubsubsection{\texorpdfstring{ZJState\_base}{ZJState\_base}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{typedef}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint8\+\_\+t}} \mbox{\hyperlink{zjournal_8h_a28ec843e72f2f87e88986d4bc8434027}{ZJState\+\_\+base}}}
+
+
+
+Definition at line \mbox{\hyperlink{zjournal_8h_source_l00026}{26}} of file \mbox{\hyperlink{zjournal_8h_source}{zjournal.\+h}}.
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3c}\label{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3c} 
+\index{zjournal.h@{zjournal.h}!ZJOperation@{ZJOperation}}
+\index{ZJOperation@{ZJOperation}!zjournal.h@{zjournal.h}}
+\doxysubsubsection{\texorpdfstring{ZJOperation}{ZJOperation}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3c}{ZJOperation}} \+: \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{long}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZJOP\_Nothing@{ZJOP\_Nothing}!zjournal.h@{zjournal.h}}\index{zjournal.h@{zjournal.h}!ZJOP\_Nothing@{ZJOP\_Nothing}}}\Hypertarget{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3ca367db27eefa14051882aaa006924f484}\label{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3ca367db27eefa14051882aaa006924f484} 
+ZJOP\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZJOP\_Add@{ZJOP\_Add}!zjournal.h@{zjournal.h}}\index{zjournal.h@{zjournal.h}!ZJOP\_Add@{ZJOP\_Add}}}\Hypertarget{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3cac7fa56ead48ae5e5fb7a487bfae3b6d6}\label{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3cac7fa56ead48ae5e5fb7a487bfae3b6d6} 
+ZJOP\+\_\+\+Add&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZJOP\_Insert@{ZJOP\_Insert}!zjournal.h@{zjournal.h}}\index{zjournal.h@{zjournal.h}!ZJOP\_Insert@{ZJOP\_Insert}}}\Hypertarget{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3cae0b804915a47724140eb51bd19afe279}\label{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3cae0b804915a47724140eb51bd19afe279} 
+ZJOP\+\_\+\+Insert&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZJOP\_RemoveByRank@{ZJOP\_RemoveByRank}!zjournal.h@{zjournal.h}}\index{zjournal.h@{zjournal.h}!ZJOP\_RemoveByRank@{ZJOP\_RemoveByRank}}}\Hypertarget{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3cafee86bf6b7f8f06b4295676e2ad12b5e}\label{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3cafee86bf6b7f8f06b4295676e2ad12b5e} 
+ZJOP\+\_\+\+Remove\+By\+Rank&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZJOP\_RemoveByAddress@{ZJOP\_RemoveByAddress}!zjournal.h@{zjournal.h}}\index{zjournal.h@{zjournal.h}!ZJOP\_RemoveByAddress@{ZJOP\_RemoveByAddress}}}\Hypertarget{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3cabf1f4cf2728b8ac180841a390a2c8e9b}\label{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3cabf1f4cf2728b8ac180841a390a2c8e9b} 
+ZJOP\+\_\+\+Remove\+By\+Address&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZJOP\_ChgFld@{ZJOP\_ChgFld}!zjournal.h@{zjournal.h}}\index{zjournal.h@{zjournal.h}!ZJOP\_ChgFld@{ZJOP\_ChgFld}}}\Hypertarget{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3ca89376c52236822e2bca3aff69359f913}\label{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3ca89376c52236822e2bca3aff69359f913} 
+ZJOP\+\_\+\+Chg\+Fld&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZJOP\_RollBack@{ZJOP\_RollBack}!zjournal.h@{zjournal.h}}\index{zjournal.h@{zjournal.h}!ZJOP\_RollBack@{ZJOP\_RollBack}}}\Hypertarget{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3ca86143eaac0a644d7c274146fb45d8bff}\label{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3ca86143eaac0a644d7c274146fb45d8bff} 
+ZJOP\+\_\+\+Roll\+Back&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZJOP\_Close@{ZJOP\_Close}!zjournal.h@{zjournal.h}}\index{zjournal.h@{zjournal.h}!ZJOP\_Close@{ZJOP\_Close}}}\Hypertarget{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3cadabcdbad1b8b42c06d238e1568e0ede7}\label{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3cadabcdbad1b8b42c06d238e1568e0ede7} 
+ZJOP\+\_\+\+Close&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{zjournal_8h_source_l00013}{13}} of file \mbox{\hyperlink{zjournal_8h_source}{zjournal.\+h}}.
+
+\Hypertarget{zjournal_8h_a711ca1dc4ffc20202dbc544c923a0c71}\label{zjournal_8h_a711ca1dc4ffc20202dbc544c923a0c71} 
+\index{zjournal.h@{zjournal.h}!ZJState\_type@{ZJState\_type}}
+\index{ZJState\_type@{ZJState\_type}!zjournal.h@{zjournal.h}}
+\doxysubsubsection{\texorpdfstring{ZJState\_type}{ZJState\_type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{enum}} \mbox{\hyperlink{zjournal_8h_a711ca1dc4ffc20202dbc544c923a0c71}{ZJState\+\_\+type}} \+: \mbox{\hyperlink{zjournal_8h_a28ec843e72f2f87e88986d4bc8434027}{ZJState\+\_\+base}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZJS\_Nothing@{ZJS\_Nothing}!zjournal.h@{zjournal.h}}\index{zjournal.h@{zjournal.h}!ZJS\_Nothing@{ZJS\_Nothing}}}\Hypertarget{zjournal_8h_a711ca1dc4ffc20202dbc544c923a0c71ad8da1100a164b89094a61b5153c6a50f}\label{zjournal_8h_a711ca1dc4ffc20202dbc544c923a0c71ad8da1100a164b89094a61b5153c6a50f} 
+ZJS\+\_\+\+Nothing&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZJS\_Created@{ZJS\_Created}!zjournal.h@{zjournal.h}}\index{zjournal.h@{zjournal.h}!ZJS\_Created@{ZJS\_Created}}}\Hypertarget{zjournal_8h_a711ca1dc4ffc20202dbc544c923a0c71a76d59ba9631ea5c09b5def08d5d79bdd}\label{zjournal_8h_a711ca1dc4ffc20202dbc544c923a0c71a76d59ba9631ea5c09b5def08d5d79bdd} 
+ZJS\+\_\+\+Created&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZJS\_RolledBack@{ZJS\_RolledBack}!zjournal.h@{zjournal.h}}\index{zjournal.h@{zjournal.h}!ZJS\_RolledBack@{ZJS\_RolledBack}}}\Hypertarget{zjournal_8h_a711ca1dc4ffc20202dbc544c923a0c71afd07776331fce28313f9f67cb4405ae6}\label{zjournal_8h_a711ca1dc4ffc20202dbc544c923a0c71afd07776331fce28313f9f67cb4405ae6} 
+ZJS\+\_\+\+Rolled\+Back&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ZJS\_Exported@{ZJS\_Exported}!zjournal.h@{zjournal.h}}\index{zjournal.h@{zjournal.h}!ZJS\_Exported@{ZJS\_Exported}}}\Hypertarget{zjournal_8h_a711ca1dc4ffc20202dbc544c923a0c71af6ac825c6cfe67b505d13b7aa862aa01}\label{zjournal_8h_a711ca1dc4ffc20202dbc544c923a0c71af6ac825c6cfe67b505d13b7aa862aa01} 
+ZJS\+\_\+\+Exported&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+Definition at line \mbox{\hyperlink{zjournal_8h_source_l00028}{28}} of file \mbox{\hyperlink{zjournal_8h_source}{zjournal.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{zjournal_8h_a53405591a135ef9e78edda696fbc5fb9}\label{zjournal_8h_a53405591a135ef9e78edda696fbc5fb9} 
+\index{zjournal.h@{zjournal.h}!decode\_ZJOP@{decode\_ZJOP}}
+\index{decode\_ZJOP@{decode\_ZJOP}!zjournal.h@{zjournal.h}}
+\doxysubsubsection{\texorpdfstring{decode\_ZJOP()}{decode\_ZJOP()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} decode\+\_\+\+ZJOP (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zjournal_8h_ad712455dee3a733f05922b3a5c8b5c3c}{ZJOperation}}}]{p\+Operation }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zjournal_8cpp_source_l00599}{599}} of file \mbox{\hyperlink{zjournal_8cpp_source}{zjournal.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zjournal_8h_source_l00015}{ZJOP\+\_\+\+Add}}, \mbox{\hyperlink{zjournal_8h_source_l00019}{ZJOP\+\_\+\+Chg\+Fld}}, \mbox{\hyperlink{zjournal_8h_source_l00021}{ZJOP\+\_\+\+Close}}, \mbox{\hyperlink{zjournal_8h_source_l00016}{ZJOP\+\_\+\+Insert}}, \mbox{\hyperlink{zjournal_8h_source_l00014}{ZJOP\+\_\+\+Nothing}}, \mbox{\hyperlink{zjournal_8h_source_l00018}{ZJOP\+\_\+\+Remove\+By\+Address}}, \mbox{\hyperlink{zjournal_8h_source_l00017}{ZJOP\+\_\+\+Remove\+By\+Rank}}, and \mbox{\hyperlink{zjournal_8h_source_l00020}{ZJOP\+\_\+\+Roll\+Back}}.
+
+
+
+Referenced by \mbox{\hyperlink{zjournal_8cpp_source_l00499}{zbs\+::\+ZSJournal\+::report()}}.
+
+\Hypertarget{zjournal_8h_a59f95c851fe25be006ce6be758cb1675}\label{zjournal_8h_a59f95c851fe25be006ce6be758cb1675} 
+\index{zjournal.h@{zjournal.h}!generateJournalName@{generateJournalName}}
+\index{generateJournalName@{generateJournalName}!zjournal.h@{zjournal.h}}
+\doxysubsubsection{\texorpdfstring{generateJournalName()}{generateJournalName()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} generate\+Journal\+Name (\begin{DoxyParamCaption}\item[{uri\+String \&}]{p\+ZMFName,  }\item[{uri\+String \&}]{p\+Journaling\+Path,  }\item[{uri\+String \&}]{p\+Journal\+Name }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zjournal_8cpp_source_l00572}{572}} of file \mbox{\hyperlink{zjournal_8cpp_source}{zjournal.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zjournal_8h_source_l00010}{\+\_\+\+\_\+\+JOURNAL\+\_\+\+EXT\+\_\+\+\_\+}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zjournal_8cpp_source_l00200}{zbs\+::\+ZSJournal\+::set\+Journal\+Local\+Directory\+Path()}}.
+

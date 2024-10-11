@@ -1,0 +1,469 @@
+\doxysection{zfielddlg.\+cpp}
+\hypertarget{zfielddlg_8cpp_source}{}\label{zfielddlg_8cpp_source}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zfielddlg.cpp@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zfielddlg.cpp}}
+\mbox{\hyperlink{zfielddlg_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{zfielddlg_8h}{zfielddlg.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00002}00002\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{zcontentutils_2ui__zfielddlg_8h}{ui\_zfielddlg.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00003}00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{ztypedlg_8h}{ztypedlg.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00004}00004\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{ztypelistbutton_8h}{zcontent/zcontentutils/ztypelistbutton.h}}>}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zexceptiondlg_8h}{zexceptiondlg.h}}>}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <qevent.h>}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <zqt/zqtwidget/zqstandarditemmodel.h>}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00010}00010\ \textcolor{preprocessor}{\#include\ <zqt/zqtwidget/zqstandarditem.h>}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00011}00011\ \textcolor{preprocessor}{\#include\ <zqt/zqtwidget/zqtwidgettools.h>}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00013}00013\ \textcolor{preprocessor}{\#include\ <ztoolset/ztypetype.h>}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00014}00014\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zdatatype_8h}{zcontent/zindexedfile/zdatatype.h}}>}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00015}00015\ \textcolor{preprocessor}{\#include\ <QStatusBar>}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00016}00016\ \textcolor{preprocessor}{\#include\ <qtooltip.h>}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00017}00017\ \textcolor{preprocessor}{\#include\ <qevent.h>}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00019}00019\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{zdataconversion_8h}{zindexedfile/zdataconversion.h}}>}\textcolor{comment}{//\ for\ \_getURFHeaderSize}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00022}\mbox{\hyperlink{zfielddlg_8cpp_a63e04438a464110df813286c756d2a84}{00022}}\ \textcolor{preprocessor}{\#define\ \_\_ICON\_PATH\_\_\ "{}/home/gerard/Development/zbasetools/zqt/icons/"{}}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00023}\mbox{\hyperlink{zfielddlg_8cpp_addf30b83d4ea675296fc86f3912daf36}{00023}}\ \textcolor{preprocessor}{\#define\ \_\_HASH\_OK\_ICON\_\_\ \ \ \ \ \ "{}HashcodeOk.png"{}}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00024}\mbox{\hyperlink{zfielddlg_8cpp_aed0d5c4e302eec935a363a3ec1dca65e}{00024}}\ \textcolor{preprocessor}{\#define\ \_\_HASH\_WRONG\_ICON\_\_\ \ \ "{}HashcodeWrong.png"{}}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00026}\mbox{\hyperlink{class_z_field_d_lg_ad7156fa1409521646842b8ccece6c4bc}{00026}}\ \mbox{\hyperlink{class_z_field_d_lg_ad7156fa1409521646842b8ccece6c4bc}{ZFieldDLg::ZFieldDLg}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QWidget}}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{parent}})\ :\ QDialog(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{parent}}),\ ui(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{new}}\ \mbox{\hyperlink{namespace_ui}{Ui}}::\mbox{\hyperlink{class_z_field_d_lg}{ZFieldDLg}})}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00027}00027\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00028}00028\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a781063c0bafae82ffb15339ded742aca}{setupUi}}(\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00030}00030\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a91be8bef3a23827035e2d436b0b20a32}{CommentLBl}}-\/>clear();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00032}00032\ \ \ uriString\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wImgFile}}\ =\ \mbox{\hyperlink{zexceptiondlg_8cpp_a63e04438a464110df813286c756d2a84}{\_\_ICON\_PATH\_\_}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00033}00033\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wImgFile}}\ +=\ \mbox{\hyperlink{zfielddlg_8cpp_addf30b83d4ea675296fc86f3912daf36}{\_\_HASH\_OK\_ICON\_\_}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00034}00034\ \ \ \mbox{\hyperlink{class_z_field_d_lg_a40bdba01daece2da2839c823c324fecf}{HashOKPXm}}.load(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wImgFile}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00036}00036\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wImgFile}}\ =\ \mbox{\hyperlink{zexceptiondlg_8cpp_a63e04438a464110df813286c756d2a84}{\_\_ICON\_PATH\_\_}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00037}00037\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wImgFile}}\ +=\ \mbox{\hyperlink{zfielddlg_8cpp_aed0d5c4e302eec935a363a3ec1dca65e}{\_\_HASH\_WRONG\_ICON\_\_}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00038}00038\ \ \ \mbox{\hyperlink{class_z_field_d_lg_a671b05f279328491d2a5904b4a569ffb}{HashWrongPXm}}.load(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wImgFile}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00040}00040\ \textcolor{comment}{//\ \ ui-\/>HashIconLBl-\/>setScaledContents(true);}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00041}00041\ \textcolor{comment}{//\ \ ui-\/>HashIconLBl-\/>setPixmap(HashWrongPXm);}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00043}00043\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{setWindowTitle}}(QObject::tr(\textcolor{stringliteral}{"{}Dictionary\ field"{}},\textcolor{stringliteral}{"{}DicEdit"{}}));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00045}00045\ \ \ \mbox{\hyperlink{class_z_field_d_lg_a7d402c1dfb6607f704ee2c723e2599fa}{TypeListBtn}}=\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_z_type_list_button}{ZTypeListButton}}(ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_af3f7adcb2c8ca600a295a8d0e35d7594}{ZTypeListWDg}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00046}00046\ \ \ \mbox{\hyperlink{class_z_field_d_lg_a7d402c1dfb6607f704ee2c723e2599fa}{TypeListBtn}}-\/>setObjectName(QString::fromUtf8(\textcolor{stringliteral}{"{}wTypeListBtn"{}}));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00047}00047\ \ \ \mbox{\hyperlink{class_z_field_d_lg_a7d402c1dfb6607f704ee2c723e2599fa}{TypeListBtn}}-\/>setGeometry(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QRect}}(10,\ 10,\ 51,\ 23));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00048}00048\ \ \ \mbox{\hyperlink{class_z_field_d_lg_a7d402c1dfb6607f704ee2c723e2599fa}{TypeListBtn}}-\/>setText(QObject::tr(\textcolor{stringliteral}{"{}List"{}},\textcolor{stringliteral}{"{}DicEdit"{}}));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00050}00050\ \ \ QWidget::setTabOrder(ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a318b03da881f813629a73450c5b1ea00}{FieldNameLEd}},\ \mbox{\hyperlink{class_z_field_d_lg_a7d402c1dfb6607f704ee2c723e2599fa}{TypeListBtn}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00051}00051\ \ \ QWidget::setTabOrder(\mbox{\hyperlink{class_z_field_d_lg_a7d402c1dfb6607f704ee2c723e2599fa}{TypeListBtn}},\ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a74c394f05052cad43a3f1b4b5e7c2447}{UniversalLEd}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00053}00053\ \textcolor{comment}{//\ \ QObject::connect(ui-\/>ZTypeLEd,SIGNAL(sigFocusIn(QFocusEvent*)),this,SLOT(ZTypeFocusIn(QFocusEvent*)));}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00054}00054\ \ \ QObject::connect(\mbox{\hyperlink{class_z_field_d_lg_a7d402c1dfb6607f704ee2c723e2599fa}{TypeListBtn}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SIGNAL}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{clicked}}()),\textcolor{keyword}{this},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SLOT}}(\mbox{\hyperlink{class_z_field_d_lg_acff82b9e0670c71b45b10f3a506ad411}{ZTypeListClicked}}()));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00055}00055\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00056}00056\ \ \ QObject::connect(ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_ad1aa4d08ed69bf00211df9a01ea0e232}{DiscardBTn}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SIGNAL}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{clicked}}()),\textcolor{keyword}{this},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SLOT}}(\mbox{\hyperlink{class_z_field_d_lg_afc07c74d25cd21a6632d61b07f7fd70c}{DiscardClicked}}()));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00057}00057\ \ \ QObject::connect(ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_ab48ce884c135d1383288f7fc16591c90}{AcceptBTn}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SIGNAL}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{clicked}}()),\textcolor{keyword}{this},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SLOT}}(\mbox{\hyperlink{class_z_field_d_lg_a4c047d760bc06b490418eafae6fd65f6}{AcceptClicked}}()));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00059}00059\ \ \ QObject::connect(ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a3bd2b6feaeefb3381e4da5a0195de1ea}{ComputeBTn}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SIGNAL}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{clicked}}()),\textcolor{keyword}{this},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SLOT}}(\mbox{\hyperlink{class_z_field_d_lg_a2dced21cf0aa7a84922ef73d8a2e446a}{ComputeClicked}}()));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00060}00060\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00061}00061\ \ \ QObject::connect(ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_add0992641b403008b6b3722e060607ba}{CreateArrayBTn}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SIGNAL}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{clicked}}()),\textcolor{keyword}{this},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SLOT}}(\mbox{\hyperlink{class_z_field_d_lg_aad4fc350b486c23fb4583d7d3c45e066}{ArrayClicked}}()));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00062}00062\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00063}00063\ \ \ QObject::connect(ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a5aa6f95571ee6e8d9cf21dc5f72037f7}{KeyEligibleCHk}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SIGNAL}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{stateChanged}}(\textcolor{keywordtype}{int})),\textcolor{keyword}{this},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{SLOT}}(\mbox{\hyperlink{class_z_field_d_lg_ad6f741a648d6b806ed697430798e3781}{setKeyEligibleToolTip}}(\textcolor{keywordtype}{int})));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00065}00065\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_add0992641b403008b6b3722e060607ba}{CreateArrayBTn}}-\/>setVisible(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00067}00067\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_ab48ce884c135d1383288f7fc16591c90}{AcceptBTn}}-\/>setDefault(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00069}00069\ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00071}\mbox{\hyperlink{class_z_field_d_lg_ac3aa19ed52edafde891da0b7b5103f33}{00071}}\ \mbox{\hyperlink{class_z_field_d_lg_ac3aa19ed52edafde891da0b7b5103f33}{ZFieldDLg::\string~ZFieldDLg}}()}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00072}00072\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00073}00073\ \ \ \textcolor{keyword}{delete}\ ui;}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00074}00074\ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00076}\mbox{\hyperlink{class_z_field_d_lg_a73b6a3455dbf29c3cd71e9f785114001}{00076}}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_z_field_d_lg_a73b6a3455dbf29c3cd71e9f785114001}{ZFieldDLg::exec}}()}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00077}00077\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00078}00078\ \textcolor{comment}{//\ \ if\ (Field==nullptr)}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00079}00079\ \textcolor{comment}{//\ \ \ \ reject();}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00080}00080\ \ \ \textcolor{keywordflow}{return}\ QDialog::exec();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00081}00081\ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00083}00083\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00084}00084\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00085}\mbox{\hyperlink{class_z_field_d_lg_acff82b9e0670c71b45b10f3a506ad411}{00085}}\ \mbox{\hyperlink{class_z_field_d_lg_acff82b9e0670c71b45b10f3a506ad411}{ZFieldDLg::ZTypeListClicked}}()}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00086}00086\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00087}00087\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00088}00088\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_z_field_d_lg_a237322a57fec1bb89db37e8972c5151e}{ZTypeTRv}}==\textcolor{keyword}{nullptr})}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00089}00089\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00090}00090\ \ \ \ \ \mbox{\hyperlink{class_z_field_d_lg_a237322a57fec1bb89db37e8972c5151e}{ZTypeTRv}}=\textcolor{keyword}{new}\ \mbox{\hyperlink{class_z_type_d_lg}{ZTypeDLg}}(\textcolor{keyword}{this});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00091}00091\ \ \ \ \ \mbox{\hyperlink{class_z_field_d_lg_a237322a57fec1bb89db37e8972c5151e}{ZTypeTRv}}-\/>setWindowTitle(QObject::tr(\textcolor{stringliteral}{"{}Data\ types"{}},\textcolor{stringliteral}{"{}ZFieldDLg"{}}));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00092}00092\ \ \ \ \ \mbox{\hyperlink{class_z_field_d_lg_a237322a57fec1bb89db37e8972c5151e}{ZTypeTRv}}-\/>setModal(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00093}00093\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00094}00094\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00095}00095\ \ \ \mbox{\hyperlink{class_z_field_d_lg_a237322a57fec1bb89db37e8972c5151e}{ZTypeTRv}}-\/>\mbox{\hyperlink{class_z_type_d_lg_a4cdf972a663ae690d3d70caf208edda7}{set}}(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00096}00096\ \ \ \textcolor{keywordflow}{while}\ (\textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00097}00097\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_a2c56c55b930f51337c2f5ab19ec02240}{wRet}}=\mbox{\hyperlink{class_z_field_d_lg_a237322a57fec1bb89db37e8972c5151e}{ZTypeTRv}}-\/>exec();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00098}00098\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{znet_2znetconsole_2main_8cpp_a2c56c55b930f51337c2f5ab19ec02240}{wRet}}==QDialog::Rejected)\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00099}00099\ \ \ \ \ \ \ \mbox{\hyperlink{class_z_field_d_lg_a237322a57fec1bb89db37e8972c5151e}{ZTypeTRv}}-\/>deleteLater();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00100}00100\ \ \ \ \ \ \ \mbox{\hyperlink{class_z_field_d_lg_a237322a57fec1bb89db37e8972c5151e}{ZTypeTRv}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00101}00101\ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00102}00102\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00103}00103\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00104}00104\ \ \ \ \ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wType}}\ =\ \mbox{\hyperlink{class_z_field_d_lg_a237322a57fec1bb89db37e8972c5151e}{ZTypeTRv}}-\/>\mbox{\hyperlink{class_z_type_d_lg_a1c32e0aef0ed4238347c90f1fa3c866e}{get}}();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00105}00105\ \ \ \ \ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wType2}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wType}}\ \&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\string~ZType\_Array}}\ ;}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00106}00106\ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wType}}\ \&\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3dfafdee7071468db6eb2860fe7ae305}{ZType\_Array}})\ \&\&\ !isAtomic(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wType2}}))\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00107}00107\ \ \ \ \ \ \ \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_a2c56c55b930f51337c2f5ab19ec02240}{wRet}}=\mbox{\hyperlink{class_z_exception_d_lg_a970b05e695c148d2ab548e33189a2f9a}{ZExceptionDLg::message2B}}(\textcolor{stringliteral}{"{}ZFieldDLg"{}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_INVTYPE}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Severity\_Error}},}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00108}00108\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Quit"{}},\textcolor{stringliteral}{"{}Retry"{}},}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00109}00109\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}An\ array\ must\ concern\ uniquely\ atomic\ data\ types.\(\backslash\)n0X\%X-\/<\%s>\ is\ an\ invalid\ data\ type."{}},}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00110}00110\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wType}},\mbox{\hyperlink{zindextype_8cpp_ad6f3108f2578cb9401cc43f94e9fd46c}{decode\_ZType}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wType}}));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00111}00111\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{znet_2znetconsole_2main_8cpp_a2c56c55b930f51337c2f5ab19ec02240}{wRet}}==QDialog::Rejected)\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00112}00112\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_z_field_d_lg_a237322a57fec1bb89db37e8972c5151e}{ZTypeTRv}}-\/>deleteLater();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00113}00113\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_z_field_d_lg_a237322a57fec1bb89db37e8972c5151e}{ZTypeTRv}}=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00114}00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00115}00115\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00116}00116\ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00117}00117\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00118}00118\ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00119}00119\ \ \ \}\textcolor{comment}{//while\ true}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00121}00121\ \ \ \mbox{\hyperlink{class_z_field_d_lg_a7d402c1dfb6607f704ee2c723e2599fa}{TypeListBtn}}-\/>\mbox{\hyperlink{class_z_type_list_button_a911bcc8c7900bc0f18f207259dbce4d4}{ZType}}\ =\ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}}\ =\ \mbox{\hyperlink{class_z_field_d_lg_a237322a57fec1bb89db37e8972c5151e}{ZTypeTRv}}-\/>\mbox{\hyperlink{class_z_type_d_lg_a1c32e0aef0ed4238347c90f1fa3c866e}{get}}();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00122}00122\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00123}00123\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}0x\%08X"{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00124}00124\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a0f6dc0e41a490795ee48ba7b7b8d18b0}{ZTypeLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00125}00125\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a0f6dc0e41a490795ee48ba7b7b8d18b0}{ZTypeLEd}}-\/>setReadOnly(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00127}00127\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_af4e7ca730fadb69fcafc4a9647bdecb0}{ZTypeStrLEd}}-\/>setText(\mbox{\hyperlink{zindextype_8cpp_ad6f3108f2578cb9401cc43f94e9fd46c}{decode\_ZType}}(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}}));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00128}00128\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_af4e7ca730fadb69fcafc4a9647bdecb0}{ZTypeStrLEd}}-\/>setReadOnly(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00130}00130\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a7242c09907ab98f6fd6061df79a7800e}{HeaderSize}}\ =\ \mbox{\hyperlink{zdataconversion_8cpp_ab29a3e263d0189b4be544983ed0d35da}{getURFHeaderSize}}(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00131}00131\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a7242c09907ab98f6fd6061df79a7800e}{HeaderSize}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00132}00132\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_ad00d268a5007d89958cc0d2ec7b4224f}{HeaderSizeLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00133}00133\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00134}00134\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00135}00135\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a5aa6f95571ee6e8d9cf21dc5f72037f7}{KeyEligibleCHk}}-\/>setChecked(!(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}}\ \&\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8ac932cc14aa2d122825a8e5439860c8f8}{ZType\_VaryingLength}}));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00137}00137\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}}\ \&\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8abf42bb9aa165c8e5c65b82fbd8f5399e}{ZType\_Atomic}})\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00138}00138\ \ \ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_add0992641b403008b6b3722e060607ba}{CreateArrayBTn}}-\/>setVisible(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00139}00139\ \ \ \ \ \mbox{\hyperlink{zdatatype_8cpp_af8656bf28c41a780e5d115fedc98dcb8}{getAtomicZType\_Sizes}}(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_acef4036bb4c4a935186ad1c4978f1c0b}{NaturalSize}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_af4356c4face3d46bcd84f76dc136a1f3}{UniversalSize}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00141}00141\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_acef4036bb4c4a935186ad1c4978f1c0b}{NaturalSize}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00142}00142\ \ \ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_af533bb1017b8557c4ac46cf8259b042a}{NaturalLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00143}00143\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00144}00144\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_af4356c4face3d46bcd84f76dc136a1f3}{UniversalSize}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00145}00145\ \ \ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a74c394f05052cad43a3f1b4b5e7c2447}{UniversalLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00146}00146\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00147}00147\ \ \ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a74609c334dd4c66a6674de11bdbe8dbb}{Capacity}}=1;}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00148}00148\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a74609c334dd4c66a6674de11bdbe8dbb}{Capacity}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00149}00149\ \ \ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a65ddeb15d7a0a74180a3f775413e82a4}{CapacityLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00150}00150\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00151}00151\ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00152}00152\ \ \ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_add0992641b403008b6b3722e060607ba}{CreateArrayBTn}}-\/>setVisible(\textcolor{keyword}{false});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00154}00154\ \}\textcolor{comment}{//ListClicked}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00155}00155\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00156}00156\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00157}\mbox{\hyperlink{class_z_field_d_lg_a4c047d760bc06b490418eafae6fd65f6}{00157}}\ \mbox{\hyperlink{class_z_field_d_lg_a4c047d760bc06b490418eafae6fd65f6}{ZFieldDLg::AcceptClicked}}()}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00158}00158\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00159}00159\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa2d7465434c229c3628f0957778bee40}{refresh}}();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00160}00160\ \ \ \textcolor{keywordflow}{if}\ (FCreate)}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00161}00161\ \ \ \ \ \mbox{\hyperlink{class_z_field_d_lg_a2dced21cf0aa7a84922ef73d8a2e446a}{ComputeClicked}}();\textcolor{comment}{/*\ if\ creation\ then\ compute\ hashcode\ for\ first\ time\ and\ set\ up\ indicators\ */}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00162}00162\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00163}00163\ \ \ \textcolor{keywordflow}{if}\ (RawField)\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00164}00164\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{accept}}();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00165}00165\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00166}00166\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00167}00167\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_z_field_d_lg_a641686e43598f7c792155b983f552739}{controlField}}())}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00168}00168\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{accept}}();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00169}00169\ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00170}00170\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00171}00171\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00172}\mbox{\hyperlink{class_z_field_d_lg_afc07c74d25cd21a6632d61b07f7fd70c}{00172}}\ \mbox{\hyperlink{class_z_field_d_lg_afc07c74d25cd21a6632d61b07f7fd70c}{ZFieldDLg::DiscardClicked}}()}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00173}00173\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00174}00174\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{reject}}();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00175}00175\ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00176}00176\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00177}00177\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00178}00178\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00179}\mbox{\hyperlink{class_z_field_d_lg_aad4fc350b486c23fb4583d7d3c45e066}{00179}}\ \mbox{\hyperlink{class_z_field_d_lg_aad4fc350b486c23fb4583d7d3c45e066}{ZFieldDLg::ArrayClicked}}()\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00180}00180\ \textcolor{comment}{/*\ This\ button\ is\ set\ visible\ if\ ZType\ is\ atomic}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00181}00181\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00182}00182\ \textcolor{comment}{\ *\ 0-\/\ check\ ZType\ is\ atomic\ -\/\ check\ Capacity\ is\ non\ zero}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00183}00183\ \textcolor{comment}{\ *\ 1-\/\ get\ universal\ and\ natural\ values\ from\ ZType}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00184}00184\ \textcolor{comment}{\ *\ 2-\/\ compute\ natural\ and\ universal\ values}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00185}00185\ \textcolor{comment}{\ *\ 3-\/\ put\ comment\ :\ array\ created\ with\ xxx\ occurence\ of\ natural\ xxxx\ and\ universal\ xxx\ each}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00186}00186\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00188}00188\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa2d7465434c229c3628f0957778bee40}{refresh}}();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00190}00190\ \ \ \textcolor{keywordflow}{if}\ \ (\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a74609c334dd4c66a6674de11bdbe8dbb}{Capacity}}==0)\ \ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00191}00191\ \ \ \ \ \mbox{\hyperlink{class_z_exception_d_lg_a50c75c38e4e58da84204e4d61d600e09}{ZExceptionDLg::message}}(\textcolor{stringliteral}{"{}ZFieldDLg::ArrayClicked"{}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_INVOP}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Severity\_Error}},\textcolor{stringliteral}{"{}Cannot\ create\ an\ array.Capacity\ must\ reflect\ the\ number\ of\ array\ occurences."{}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00192}00192\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00193}00193\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00194}00194\ \ \ \textcolor{keywordflow}{if}\ (!isAtomic(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}}\ ))\ \ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00195}00195\ \ \ \ \ \mbox{\hyperlink{class_z_exception_d_lg_a50c75c38e4e58da84204e4d61d600e09}{ZExceptionDLg::message}}(\textcolor{stringliteral}{"{}ZFieldDLg::ArrayClicked"{}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_INVOP}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Severity\_Error}},\textcolor{stringliteral}{"{}Cannot\ create\ an\ array.\ Data\ type\ must\ be\ atomic."{}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00196}00196\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00197}00197\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00198}00198\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00199}00199\ \ \ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wType}}=\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00200}00200\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00201}00201\ \ \ \textcolor{comment}{/*\ already\ an\ Array\ ?\ */}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00202}00202\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}}\ \&\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3dfafdee7071468db6eb2860fe7ae305}{ZType\_Array}}\ )\ \ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00203}00203\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wType}}\ \&=\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\string~\ ZType\_Array}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00204}00204\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00205}00205\ \ \ \textcolor{comment}{/*\ get\ universal\ and\ natural\ values\ from\ ZType\ */}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00206}00206\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00207}00207\ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wUV}}=0,\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wNV}}=0;}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00209}00209\ \ \ \mbox{\hyperlink{zdatatype_8cpp_af8656bf28c41a780e5d115fedc98dcb8}{getAtomicZType\_Sizes}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wType}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wNV}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wUV}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00210}00210\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00211}00211\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_acef4036bb4c4a935186ad1c4978f1c0b}{NaturalSize}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wNV}}\ *\ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a74609c334dd4c66a6674de11bdbe8dbb}{Capacity}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00212}00212\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_af4356c4face3d46bcd84f76dc136a1f3}{UniversalSize}}\ =\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wNV}}\ *\ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a74609c334dd4c66a6674de11bdbe8dbb}{Capacity}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00214}00214\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}}\ |=\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3dfafdee7071468db6eb2860fe7ae305}{ZType\_Array}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00216}00216\ \ \ \mbox{\hyperlink{class_z_field_d_lg_ac6f00056761b56511ac10c8711be9d03}{setup}}(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}},RawField);}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00217}00217\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00218}00218\ \ \ \textcolor{comment}{/*\ put\ comment\ */}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00219}00219\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wComment}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00220}00220\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wComment}}.sprintf(\textcolor{stringliteral}{"{}Created\ an\ array\ of\ \%d.Sizes:\ natural\ \%ld\ universal\ \%ld."{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a74609c334dd4c66a6674de11bdbe8dbb}{Capacity}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wNV}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wNV}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00221}00221\ \ \ \mbox{\hyperlink{class_z_field_d_lg_a5d8bac42685a7c475a355a27f0555623}{setComment}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wComment}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00223}00223\ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00224}00224\ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00225}00225\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00226}00226\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00227}\mbox{\hyperlink{class_z_field_d_lg_a2dced21cf0aa7a84922ef73d8a2e446a}{00227}}\ \mbox{\hyperlink{class_z_field_d_lg_a2dced21cf0aa7a84922ef73d8a2e446a}{ZFieldDLg::ComputeClicked}}()}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00228}00228\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00229}00229\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa2d7465434c229c3628f0957778bee40}{refresh}}();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00230}00230\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_ae91b89e3a752b064cc43dfb7f14abca3}{computeMd5}}();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00231}00231\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a9d31db4eeed1542d97f176e46c0a2994}{HashcodeLEd}}-\/>setText(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a06205313c6058d80909c78ad988aa0d1}{Hash}}.toHexa().toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00232}00232\ \textcolor{comment}{//\ \ ui-\/>HashIconLBl-\/>setScaledContents(true);}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00233}00233\ \textcolor{comment}{//\ \ ui-\/>HashIconLBl-\/>setPixmap(HashOKPXm);}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00234}00234\ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00235}00235\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00236}00236\ \textcolor{keywordtype}{bool}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00237}\mbox{\hyperlink{class_z_field_d_lg_adc720def7d263c3c4440ebed82eef818}{00237}}\ \mbox{\hyperlink{class_z_field_d_lg_adc720def7d263c3c4440ebed82eef818}{ZFieldDLg::HashCodeCompare}}()}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00238}00238\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00239}00239\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa2d7465434c229c3628f0957778bee40}{refresh}}();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00240}00240\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a4ef8e1830079974626af0322aae86261}{checkHashcode}}())}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00241}00241\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00242}00242\ \textcolor{comment}{//\ \ \ \ \ \ ui-\/>HashIconLBl-\/>setPixmap(HashOKPXm);}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00243}00243\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00244}00244\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00245}00245\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00246}00246\ \textcolor{comment}{//\ \ ui-\/>HashIconLBl-\/>setPixmap(HashWrongPXm);}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00247}00247\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00248}00248\ \}\textcolor{comment}{//HashCodeCompare}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00249}00249\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00250}\mbox{\hyperlink{class_z_field_d_lg_ac6f00056761b56511ac10c8711be9d03}{00250}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_field_d_lg_ac6f00056761b56511ac10c8711be9d03}{ZFieldDLg::setup}}(\mbox{\hyperlink{classzbs_1_1_z_field_description}{ZFieldDescription}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pField}},\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRawFields}})}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00251}00251\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00252}00252\ \ \ FCreate=\textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00253}00253\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pField}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00254}00254\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00255}00255\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00256}00256\ \ \ RawField=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRawFields}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00257}00257\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00258}00258\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a318b03da881f813629a73450c5b1ea00}{FieldNameLEd}}-\/>setText(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_aa3b8c365c6d8a0314a9380054a5375b3}{getName}}().toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00259}00259\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00260}00260\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}0x\%08X"{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00261}00261\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a0f6dc0e41a490795ee48ba7b7b8d18b0}{ZTypeLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00262}00262\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00263}00263\ \ \ \mbox{\hyperlink{class_z_field_d_lg_a7d402c1dfb6607f704ee2c723e2599fa}{TypeListBtn}}-\/>\mbox{\hyperlink{class_z_type_list_button_a911bcc8c7900bc0f18f207259dbce4d4}{ZType}}\ =\ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00264}00264\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00265}00265\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_af4e7ca730fadb69fcafc4a9647bdecb0}{ZTypeStrLEd}}-\/>setText(\mbox{\hyperlink{zindextype_8cpp_ad6f3108f2578cb9401cc43f94e9fd46c}{decode\_ZType}}(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}}));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00266}00266\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_af4e7ca730fadb69fcafc4a9647bdecb0}{ZTypeStrLEd}}-\/>setReadOnly(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00267}00267\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00268}00268\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a5aa6f95571ee6e8d9cf21dc5f72037f7}{KeyEligibleCHk}}-\/>setChecked(\mbox{\hyperlink{zindextype_8cpp_ad6f3108f2578cb9401cc43f94e9fd46c}{decode\_ZType}}(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a3ffb2617b86e845c276e3dc7c255d0c0}{KeyEligible}}));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00269}00269\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00270}00270\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_acef4036bb4c4a935186ad1c4978f1c0b}{NaturalSize}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00271}00271\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_af533bb1017b8557c4ac46cf8259b042a}{NaturalLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00272}00272\ \textcolor{comment}{//\ \ ui-\/>NaturalLEd-\/>setEnabled(false);}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00273}00273\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_af533bb1017b8557c4ac46cf8259b042a}{NaturalLEd}}-\/>setEnabled(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00274}00274\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00275}00275\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_af4356c4face3d46bcd84f76dc136a1f3}{UniversalSize}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00276}00276\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a74c394f05052cad43a3f1b4b5e7c2447}{UniversalLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00277}00277\ \textcolor{comment}{//\ \ ui-\/>UniversalLEd-\/>setEnabled(false);}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00278}00278\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a74c394f05052cad43a3f1b4b5e7c2447}{UniversalLEd}}-\/>setEnabled(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00279}00279\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00280}00280\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a7242c09907ab98f6fd6061df79a7800e}{HeaderSize}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00281}00281\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_ad00d268a5007d89958cc0d2ec7b4224f}{HeaderSizeLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00282}00282\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_ad00d268a5007d89958cc0d2ec7b4224f}{HeaderSizeLEd}}-\/>setReadOnly(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00283}00283\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00284}00284\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a74609c334dd4c66a6674de11bdbe8dbb}{Capacity}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00285}00285\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a65ddeb15d7a0a74180a3f775413e82a4}{CapacityLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00286}00286\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00287}00287\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wEnableSizeFRm}}=!RawField;}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00288}00288\ \textcolor{preprocessor}{\#ifdef\ \_\_COMMENT\_\_}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00289}00289\ \ \ \textcolor{comment}{/*\ for\ all\ fixed\ string\ */}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00290}00290\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00291}00291\ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}})\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00292}00292\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a1655365214da339d7faef655e1972997}{ZType\_CharFixedString}}\ \ :}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00293}00293\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a8e62d64e3a98f524f7141699f8376f8a}{ZType\_Utf8FixedString}}\ \ :}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00294}00294\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8aa0a15302e555f710735f3dfefed920c9}{ZType\_Utf16FixedString}}\ \ :}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00295}00295\ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a57b6c41fae92597b12299ef02ebe6bed}{ZType\_Utf32FixedString}}\ \ :}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00296}00296\ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wEnableSizeFRm}}=\textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00297}00297\ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00298}00298\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00299}00299\ \ \ \ \ \textcolor{keywordflow}{default}:\ \textcolor{comment}{/*\ for\ arrays\ */}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00300}00300\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}}\ \&\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3dfafdee7071468db6eb2860fe7ae305}{ZType\_Array}})==\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8a3dfafdee7071468db6eb2860fe7ae305}{ZType\_Array}})\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wEnableSizeFRm}}=\textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00302}00302\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00303}00303\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00304}00304\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00305}00305\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00306}00306\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00307}00307\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_af6a0ac9d35a33935cf87b1375c150085}{SizeFRm}}-\/>setEnabled(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wEnableSizeFRm}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00308}00308\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00309}00309\ \textcolor{comment}{//\ \ ui-\/>SizeFRm-\/>setEnabled(!RawField);}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00310}00310\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \_\_COMMENT\_\_}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00311}00311\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_af6a0ac9d35a33935cf87b1375c150085}{SizeFRm}}-\/>setEnabled(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00312}00312\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00313}00313\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_af5cbbf1be713fce127acc16cee3c6bd8}{HashcodeFRm}}-\/>setVisible(!RawField);}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00314}00314\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00315}00315\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a9d31db4eeed1542d97f176e46c0a2994}{HashcodeLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pField}}.Hash.toHexa().toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00316}00316\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a9d31db4eeed1542d97f176e46c0a2994}{HashcodeLEd}}-\/>setReadOnly(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00317}00317\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00318}00318\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a318b03da881f813629a73450c5b1ea00}{FieldNameLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pField}}.getName().toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00319}00319\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a318b03da881f813629a73450c5b1ea00}{FieldNameLEd}}-\/>setSelection(0,\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_aa3b8c365c6d8a0314a9380054a5375b3}{getName}}().UnitCount);}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00320}00320\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00321}00321\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pField}}.ToolTip.isEmpty())}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00322}00322\ \ \ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a8a5e6adabd9c37e5333dc4a15a0d960a}{TooltipLEd}}-\/>setText(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00323}00323\ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00324}00324\ \ \ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a8a5e6adabd9c37e5333dc4a15a0d960a}{TooltipLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pField}}.ToolTip.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00325}00325\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00326}00326\ \}\textcolor{comment}{//ZFieldDLg::setup}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00327}00327\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00328}\mbox{\hyperlink{class_z_field_d_lg_a388ed753838e90ced6007e71f1c0ceba}{00328}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_field_d_lg_a388ed753838e90ced6007e71f1c0ceba}{ZFieldDLg::setCreate}}(\ )}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00329}00329\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00330}00330\ \ \ FCreate=\textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00331}00331\ \textcolor{comment}{//\ \ ui-\/>HashIconLBl-\/>setPixmap(HashWrongPXm);}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00332}00332\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00333}00333\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a9f017ea6121bf62615b58dbb38d6a979}{clear}}();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00334}00334\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a06b89982e9bf194e6efe4dfc11c77517}{setFieldName}}(\mbox{\hyperlink{zfielddlg_8h_aedda9f5eb788fa732b840844e2fabe1f}{\_\_NEW\_FIELDNAME\_\_}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00336}00336\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00337}00337\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00338}00338\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a318b03da881f813629a73450c5b1ea00}{FieldNameLEd}}-\/>setText(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_aa3b8c365c6d8a0314a9380054a5375b3}{getName}}().toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00339}00339\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00340}00340\ \ \ \mbox{\hyperlink{class_z_field_d_lg_a7d402c1dfb6607f704ee2c723e2599fa}{TypeListBtn}}-\/>\mbox{\hyperlink{class_z_type_list_button_a911bcc8c7900bc0f18f207259dbce4d4}{ZType}}\ =\ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00341}00341\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00342}00342\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}0x\%08X"{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00343}00343\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a0f6dc0e41a490795ee48ba7b7b8d18b0}{ZTypeLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00344}00344\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00345}00345\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_af4e7ca730fadb69fcafc4a9647bdecb0}{ZTypeStrLEd}}-\/>setText(\mbox{\hyperlink{zindextype_8cpp_ad6f3108f2578cb9401cc43f94e9fd46c}{decode\_ZType}}(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}}));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00346}00346\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_af4e7ca730fadb69fcafc4a9647bdecb0}{ZTypeStrLEd}}-\/>setReadOnly(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00347}00347\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00348}00348\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a5aa6f95571ee6e8d9cf21dc5f72037f7}{KeyEligibleCHk}}-\/>setChecked(\mbox{\hyperlink{zindextype_8cpp_ad6f3108f2578cb9401cc43f94e9fd46c}{decode\_ZType}}(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a3ffb2617b86e845c276e3dc7c255d0c0}{KeyEligible}}));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00349}00349\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00350}00350\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_acef4036bb4c4a935186ad1c4978f1c0b}{NaturalSize}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00351}00351\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_af533bb1017b8557c4ac46cf8259b042a}{NaturalLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00352}00352\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00353}00353\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_af4356c4face3d46bcd84f76dc136a1f3}{UniversalSize}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00354}00354\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a74c394f05052cad43a3f1b4b5e7c2447}{UniversalLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00355}00355\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00356}00356\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a7242c09907ab98f6fd6061df79a7800e}{HeaderSize}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00357}00357\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_ad00d268a5007d89958cc0d2ec7b4224f}{HeaderSizeLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00358}00358\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_ad00d268a5007d89958cc0d2ec7b4224f}{HeaderSizeLEd}}-\/>setReadOnly(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00359}00359\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00360}00360\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a74609c334dd4c66a6674de11bdbe8dbb}{Capacity}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00361}00361\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a65ddeb15d7a0a74180a3f775413e82a4}{CapacityLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00362}00362\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00363}00363\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a9d31db4eeed1542d97f176e46c0a2994}{HashcodeLEd}}-\/>setText(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a06205313c6058d80909c78ad988aa0d1}{Hash}}.toHexa().toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00364}00364\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a9d31db4eeed1542d97f176e46c0a2994}{HashcodeLEd}}-\/>setReadOnly(\textcolor{keyword}{true});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00365}00365\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00366}00366\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a318b03da881f813629a73450c5b1ea00}{FieldNameLEd}}-\/>setText(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_aa3b8c365c6d8a0314a9380054a5375b3}{getName}}().toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00367}00367\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a318b03da881f813629a73450c5b1ea00}{FieldNameLEd}}-\/>setSelection(0,\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_aa3b8c365c6d8a0314a9380054a5375b3}{getName}}().UnitCount);}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00368}00368\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00369}00369\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_ab631951045bfa94b13157316fbb1f4fa}{ToolTip}}.isEmpty())}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00370}00370\ \ \ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a8a5e6adabd9c37e5333dc4a15a0d960a}{TooltipLEd}}-\/>setText(\textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00371}00371\ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00372}00372\ \ \ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a8a5e6adabd9c37e5333dc4a15a0d960a}{TooltipLEd}}-\/>setText(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_ab631951045bfa94b13157316fbb1f4fa}{ToolTip}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00373}00373\ \}\textcolor{comment}{//ZFieldDLg::create}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00374}00374\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00375}\mbox{\hyperlink{class_z_field_d_lg_a29996f8b75c0f447032ed59645e6f2f8}{00375}}\ \mbox{\hyperlink{classzbs_1_1_z_field_description}{ZFieldDescription}}\ \mbox{\hyperlink{class_z_field_d_lg_a29996f8b75c0f447032ed59645e6f2f8}{ZFieldDLg::getFieldDescription}}()}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00376}00376\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00377}00377\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa2d7465434c229c3628f0957778bee40}{refresh}}();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00378}00378\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_ae91b89e3a752b064cc43dfb7f14abca3}{computeMd5}}();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00379}00379\ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00380}00380\ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00381}00381\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00382}\mbox{\hyperlink{class_z_field_d_lg_aa2d7465434c229c3628f0957778bee40}{00382}}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_field_d_lg_aa2d7465434c229c3628f0957778bee40}{ZFieldDLg::refresh}}()}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00383}00383\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00384}00384\ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00385}00385\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00386}00386\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a06b89982e9bf194e6efe4dfc11c77517}{setFieldName}}(ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a318b03da881f813629a73450c5b1ea00}{FieldNameLEd}}-\/>text().toUtf8().data());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00387}00387\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00388}00388\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}}\ =\ \mbox{\hyperlink{class_z_field_d_lg_a7d402c1dfb6607f704ee2c723e2599fa}{TypeListBtn}}-\/>\mbox{\hyperlink{class_z_type_list_button_a911bcc8c7900bc0f18f207259dbce4d4}{ZType}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00389}00389\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00390}00390\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a3ffb2617b86e845c276e3dc7c255d0c0}{KeyEligible}}\ =\ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a5aa6f95571ee6e8d9cf21dc5f72037f7}{KeyEligibleCHk}}-\/>isChecked();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00391}00391\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00392}00392\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}=ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a65ddeb15d7a0a74180a3f775413e82a4}{CapacityLEd}}-\/>text().toUtf8().data();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00393}00393\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a74609c334dd4c66a6674de11bdbe8dbb}{Capacity}}\ =\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{URF\_Capacity\_type}})\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toInt();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00394}00394\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00395}00395\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}=ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_af533bb1017b8557c4ac46cf8259b042a}{NaturalLEd}}-\/>text().toUtf8().data();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00396}00396\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_acef4036bb4c4a935186ad1c4978f1c0b}{NaturalSize}}\ =\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint64\_t}})\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toULong();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00397}00397\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00398}00398\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}=ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a74c394f05052cad43a3f1b4b5e7c2447}{UniversalLEd}}-\/>text().toUtf8().data();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00399}00399\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_af4356c4face3d46bcd84f76dc136a1f3}{UniversalSize}}\ =\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint64\_t}})\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toULong();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00400}00400\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00401}00401\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}=ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a74c394f05052cad43a3f1b4b5e7c2447}{UniversalLEd}}-\/>text().toUtf8().data();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00402}00402\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_af4356c4face3d46bcd84f76dc136a1f3}{UniversalSize}}\ =\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint64\_t}})\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toULong();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00403}00403\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00404}00404\ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_ab631951045bfa94b13157316fbb1f4fa}{ToolTip}}\ =\ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a8a5e6adabd9c37e5333dc4a15a0d960a}{TooltipLEd}}-\/>text().toUtf8().data();}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00405}00405\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00406}00406\ \ \textcolor{comment}{//\ Field.Hash.fromHexa(ui-\/>HashcodeLEd-\/>text().toUtf8().data());}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00407}00407\ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00408}00408\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00409}00409\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00410}\mbox{\hyperlink{class_z_field_d_lg_a5d8bac42685a7c475a355a27f0555623}{00410}}\ \mbox{\hyperlink{class_z_field_d_lg_a5d8bac42685a7c475a355a27f0555623}{ZFieldDLg::setComment}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pComment}})\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00411}00411\ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a91be8bef3a23827035e2d436b0b20a32}{CommentLBl}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pComment}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00412}00412\ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00413}00413\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00414}00414\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00415}00415\ \textcolor{keywordtype}{void}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00416}\mbox{\hyperlink{class_z_field_d_lg_ad6f741a648d6b806ed697430798e3781}{00416}}\ \mbox{\hyperlink{class_z_field_d_lg_ad6f741a648d6b806ed697430798e3781}{ZFieldDLg::setKeyEligibleToolTip}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pState}})\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00417}00417\ \ \ \textcolor{keywordflow}{if}\ (ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a5aa6f95571ee6e8d9cf21dc5f72037f7}{KeyEligibleCHk}}-\/>isChecked())}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00418}00418\ \ \ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a73a029bb2ccbce3e525034f3d04e9353}{KeyEligibleLBl}}-\/>setText(QObject::tr(\textcolor{stringliteral}{"{}Field\ may\ be\ part\ of\ a\ key."{}},\textcolor{stringliteral}{"{}ZFieldDLg"{}}));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00419}00419\ \ \ \textcolor{keywordflow}{else}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00420}00420\ \ \ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_a73a029bb2ccbce3e525034f3d04e9353}{KeyEligibleLBl}}-\/>setText(QObject::tr(\textcolor{stringliteral}{"{}Field\ cannot\ be\ part\ of\ a\ key."{}},\textcolor{stringliteral}{"{}ZFieldDLg"{}}));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00421}00421\ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00422}00422\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00423}\mbox{\hyperlink{class_z_field_d_lg_a641686e43598f7c792155b983f552739}{00423}}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_z_field_d_lg_a641686e43598f7c792155b983f552739}{ZFieldDLg::controlField}}()\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00424}00424\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_aa3b8c365c6d8a0314a9380054a5375b3}{getName}}()==\mbox{\hyperlink{zfielddlg_8h_aedda9f5eb788fa732b840844e2fabe1f}{\_\_NEW\_FIELDNAME\_\_}})}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00425}00425\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00426}00426\ \ \ \ \ \mbox{\hyperlink{class_z_exception_d_lg_a50c75c38e4e58da84204e4d61d600e09}{ZExceptionDLg::message}}(\textcolor{stringliteral}{"{}ZFieldDLg::controlField"{}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_INVNAME}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Severity\_Error}},}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00427}00427\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Field\ name\ <\%s>\ is\ invalid.\ Please\ enter\ a\ valid\ field\ name."{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_aa3b8c365c6d8a0314a9380054a5375b3}{getName}}().toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00428}00428\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00429}00429\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00430}00430\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}}==\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8afabd68e127b21c2981dd6df502cb211c}{ZType\_Unknown}})}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00431}00431\ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00432}00432\ \ \ \ \ \mbox{\hyperlink{class_z_exception_d_lg_a50c75c38e4e58da84204e4d61d600e09}{ZExceptionDLg::message}}(\textcolor{stringliteral}{"{}DicEdit::controlField"{}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_INVTYPE}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Severity\_Error}},}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00433}00433\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Field\ type\ 0x\%08X\ <\%s>\ is\ invalid.\ Please\ enter\ a\ valid\ field\ type."{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}},\mbox{\hyperlink{zindextype_8cpp_ad6f3108f2578cb9401cc43f94e9fd46c}{decode\_ZType}}(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}}));}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00434}00434\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{false};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00435}00435\ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00436}00436\ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a7242c09907ab98f6fd6061df79a7800e}{HeaderSize}}!=\mbox{\hyperlink{zdataconversion_8cpp_ab29a3e263d0189b4be544983ed0d35da}{getURFHeaderSize}}(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}}))}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00437}00437\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00438}00438\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{znet_2znetconsole_2main_8cpp_a2c56c55b930f51337c2f5ab19ec02240}{wRet}}=\mbox{\hyperlink{class_z_exception_d_lg_a970b05e695c148d2ab548e33189a2f9a}{ZExceptionDLg::message2B}}(\textcolor{stringliteral}{"{}ZFieldDLg::controlField"{}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_INVVALUE}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Severity\_Warning}},\ \textcolor{stringliteral}{"{}Force"{}},\textcolor{stringliteral}{"{}Modify"{}},}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00439}00439\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}Field\ type\ 0x\%08X\ <\%s>\ has\ a\ specified\ header\ size\ of\ <\%ld>\ while\ you\ entered\ <\%ld>.\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00440}00440\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}\ Please\ confirm\ <Force>\ or\ set\ to\ standard\ value\ <Modify>."{}},}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00441}00441\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}},\mbox{\hyperlink{zindextype_8cpp_ad6f3108f2578cb9401cc43f94e9fd46c}{decode\_ZType}}(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}}),}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00442}00442\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8cpp_ab29a3e263d0189b4be544983ed0d35da}{getURFHeaderSize}}(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}}),\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a7242c09907ab98f6fd6061df79a7800e}{HeaderSize}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00443}00443\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{znet_2znetconsole_2main_8cpp_a2c56c55b930f51337c2f5ab19ec02240}{wRet}}==QDialog::Accepted)\ \{}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00444}00444\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a7242c09907ab98f6fd6061df79a7800e}{HeaderSize}}\ =\ \mbox{\hyperlink{zdataconversion_8cpp_ab29a3e263d0189b4be544983ed0d35da}{getURFHeaderSize}}(\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a37d1e65f9efef1c26502a49a9f4c0ccf}{ZType}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00445}00445\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00446}00446\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.sprintf(\textcolor{stringliteral}{"{}\%ld"{}},\mbox{\hyperlink{class_z_field_d_lg_aa87a62a305f8acfc57b04c1f06e732e1}{Field}}.\mbox{\hyperlink{classzbs_1_1_z_field_description_a7242c09907ab98f6fd6061df79a7800e}{HeaderSize}});}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00447}00447\ \ \ \ \ \ \ \ \ ui-\/>\mbox{\hyperlink{class_ui___z_field_d_lg_ad00d268a5007d89958cc0d2ec7b4224f}{HeaderSizeLEd}}-\/>setText(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wStr}}.toCChar());}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00448}00448\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00449}00449\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00450}00450\ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00451}00451\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00452}00452\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00453}00453\ \textcolor{comment}{\ \ if\ (FCreate\ ||\ HashCodeCompare())}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00454}00454\ \textcolor{comment}{\ \ \ \ return\ true;}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00455}00455\ \textcolor{comment}{\ \ ZExceptionDLg::message("{}ZFieldDLg::controlField"{},ZS\_INVVALUE,Severity\_Error,}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00456}00456\ \textcolor{comment}{\ \ \ \ \ \ "{}Hashcode\ control\ does\ not\ match\ between\ computed\ hashcode\ and\ current\ hashcode.\(\backslash\)n"{}}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00457}00457\ \textcolor{comment}{\ \ \ \ \ \ "{}May\ be\ you\ changed\ some\ data\ into\ this\ field\ (even\ slight\ thing\ like\ a\ space)\ that\ makes\ it\ different."{});}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00458}00458\ \textcolor{comment}{\ \ return\ false;}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00459}00459\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00460}00460\ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00461}00461\ \}\ \textcolor{comment}{//controlField}}
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00462}00462\ }
+\DoxyCodeLine{\Hypertarget{zfielddlg_8cpp_source_l00463}00463\ }
+
+\end{DoxyCode}

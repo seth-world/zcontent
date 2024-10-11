@@ -3,7 +3,6 @@
 
 #include <zcontentcommon/zresource.h>
 #include <ztoolset/zdatefull.h>
-
 #include "zsearchparsertype.h"
 
 #include "zmetadic.h"
@@ -11,6 +10,9 @@
 #include <zcontent/zcontentcommon/urfparser.h>
 
 #include "zsearchentitycontext.h"
+
+#include <zcontent/zcontentcommon/zdomainpath.h>
+
 
 ZSearchOperandType getZSTOFromZType(ZTypeBase pZType);
 
@@ -112,11 +114,18 @@ public:
   ZStatus setString(utf8_t *pValue);
   void replaceWithString(utf8VaryingString pValue);
 
+  ZDomainPath* getDomain();
+  //  void setURI(uriString& pValue);
+  ZStatus setDomain(ZDomainPath* pValue);
+  void replaceWithDomain(ZDomainPath* pValue);
+
 
   uriString getURI();
 //  void setURI(uriString& pValue);
   ZStatus setURI(uriString pValue);
   void replaceWithURI(uriString pValue);
+
+
 
   ZDateFull getDate();
   ZStatus setDate(ZDateFull pValue);

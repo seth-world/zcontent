@@ -1,0 +1,161 @@
+\doxysection{/home/gerard/\+Development/zbasetools/zcontent/zcontentutils/zexceptiondlg.cpp File Reference}
+\hypertarget{zexceptiondlg_8cpp}{}\label{zexceptiondlg_8cpp}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zexceptiondlg.cpp@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zexceptiondlg.cpp}}
+{\ttfamily \#include "{}zexceptiondlg.\+h"{}}\newline
+{\ttfamily \#include $<$QFrame$>$}\newline
+{\ttfamily \#include $<$QHBox\+Layout$>$}\newline
+{\ttfamily \#include $<$QVBox\+Layout$>$}\newline
+{\ttfamily \#include $<$QSpacer\+Item$>$}\newline
+{\ttfamily \#include $<$QRect$>$}\newline
+{\ttfamily \#include $<$QPush\+Button$>$}\newline
+{\ttfamily \#include $<$QLabel$>$}\newline
+{\ttfamily \#include $<$QText\+Edit$>$}\newline
+{\ttfamily \#include $<$QCheck\+Box$>$}\newline
+{\ttfamily \#include $<$QCore\+Application$>$}\newline
+{\ttfamily \#include $<$QGui\+Application$>$}\newline
+{\ttfamily \#include "{}ui\+\_\+zexceptiondlg.\+h"{}}\newline
+{\ttfamily \#include $<$ztoolset/zexceptionmin.\+h$>$}\newline
+{\ttfamily \#include $<$texteditmwn.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zaierrors.\+h$>$}\newline
+{\ttfamily \#include $<$qevent.\+h$>$}\newline
+Include dependency graph for zexceptiondlg.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zexceptiondlg_8cpp_a63e04438a464110df813286c756d2a84}{\+\_\+\+\_\+\+ICON\+\_\+\+PATH\+\_\+\+\_\+}}~"{}/home/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{gerard}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Development}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zbasetools}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zqt}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{icons}}/"{}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zexceptiondlg_8cpp_a68b86f86ead01b44a737bf13b423ff90}{\+\_\+\+\_\+\+INFO\+\_\+\+ICON\+\_\+\+\_\+}}~"{}info.\+png"{}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zexceptiondlg_8cpp_afbac29cd0a9ebc7f120e205df133f5dd}{\+\_\+\+\_\+\+QUESTION\+\_\+\+ICON\+\_\+\+\_\+}}~"{}question.\+png"{}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zexceptiondlg_8cpp_a480d8f9552ea7c2d0598f15434c87a18}{\+\_\+\+\_\+\+WARNING\+\_\+\+ICON\+\_\+\+\_\+}}~"{}warning.\+png"{}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zexceptiondlg_8cpp_ab6eaea4fb602d3506779eec6a05f8c77}{\+\_\+\+\_\+\+ERROR\+\_\+\+ICON\+\_\+\+\_\+}}~"{}error.\+png"{}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zexceptiondlg_8cpp_a5405eea8f8caec510190822ab57421c4}{\+\_\+\+\_\+\+SEVERE\+\_\+\+ICON\+\_\+\+\_\+}}~"{}errorcross.\+png"{}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zexceptiondlg_8cpp_a2ec7a5085a010ec23e5e0db38df9fcbe}{\+\_\+\+\_\+\+FATAL\+\_\+\+ICON\+\_\+\+\_\+}}~"{}skullhead.\+png"{}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zexceptiondlg_8cpp_af16acf01ba88bec9522199db7fa877f8}{\+\_\+\+\_\+\+HIGHEST\+\_\+\+ICON\+\_\+\+\_\+}}~"{}graverip.\+png"{}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{zexceptiondlg_8cpp_ab55b3dc22592b36851b5bb02c0ce2b6e}{Fixed\+Font}} = \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} \mbox{\hyperlink{zexceptiondlg_8cpp_a26f7f3357715d7a57aabb786aa8a7494}{Dont\+Show\+Status}} =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\+\_\+\+NOTHING}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{zexceptiondlg_8cpp_ab6eaea4fb602d3506779eec6a05f8c77}\label{zexceptiondlg_8cpp_ab6eaea4fb602d3506779eec6a05f8c77} 
+\index{zexceptiondlg.cpp@{zexceptiondlg.cpp}!\_\_ERROR\_ICON\_\_@{\_\_ERROR\_ICON\_\_}}
+\index{\_\_ERROR\_ICON\_\_@{\_\_ERROR\_ICON\_\_}!zexceptiondlg.cpp@{zexceptiondlg.cpp}}
+\doxysubsubsection{\texorpdfstring{\_\_ERROR\_ICON\_\_}{\_\_ERROR\_ICON\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+ERROR\+\_\+\+ICON\+\_\+\+\_\+~"{}error.\+png"{}}
+
+
+
+Definition at line \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00030}{30}} of file \mbox{\hyperlink{zexceptiondlg_8cpp_source}{zexceptiondlg.\+cpp}}.
+
+\Hypertarget{zexceptiondlg_8cpp_a2ec7a5085a010ec23e5e0db38df9fcbe}\label{zexceptiondlg_8cpp_a2ec7a5085a010ec23e5e0db38df9fcbe} 
+\index{zexceptiondlg.cpp@{zexceptiondlg.cpp}!\_\_FATAL\_ICON\_\_@{\_\_FATAL\_ICON\_\_}}
+\index{\_\_FATAL\_ICON\_\_@{\_\_FATAL\_ICON\_\_}!zexceptiondlg.cpp@{zexceptiondlg.cpp}}
+\doxysubsubsection{\texorpdfstring{\_\_FATAL\_ICON\_\_}{\_\_FATAL\_ICON\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+FATAL\+\_\+\+ICON\+\_\+\+\_\+~"{}skullhead.\+png"{}}
+
+
+
+Definition at line \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00032}{32}} of file \mbox{\hyperlink{zexceptiondlg_8cpp_source}{zexceptiondlg.\+cpp}}.
+
+\Hypertarget{zexceptiondlg_8cpp_af16acf01ba88bec9522199db7fa877f8}\label{zexceptiondlg_8cpp_af16acf01ba88bec9522199db7fa877f8} 
+\index{zexceptiondlg.cpp@{zexceptiondlg.cpp}!\_\_HIGHEST\_ICON\_\_@{\_\_HIGHEST\_ICON\_\_}}
+\index{\_\_HIGHEST\_ICON\_\_@{\_\_HIGHEST\_ICON\_\_}!zexceptiondlg.cpp@{zexceptiondlg.cpp}}
+\doxysubsubsection{\texorpdfstring{\_\_HIGHEST\_ICON\_\_}{\_\_HIGHEST\_ICON\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+HIGHEST\+\_\+\+ICON\+\_\+\+\_\+~"{}graverip.\+png"{}}
+
+
+
+Definition at line \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00033}{33}} of file \mbox{\hyperlink{zexceptiondlg_8cpp_source}{zexceptiondlg.\+cpp}}.
+
+\Hypertarget{zexceptiondlg_8cpp_a63e04438a464110df813286c756d2a84}\label{zexceptiondlg_8cpp_a63e04438a464110df813286c756d2a84} 
+\index{zexceptiondlg.cpp@{zexceptiondlg.cpp}!\_\_ICON\_PATH\_\_@{\_\_ICON\_PATH\_\_}}
+\index{\_\_ICON\_PATH\_\_@{\_\_ICON\_PATH\_\_}!zexceptiondlg.cpp@{zexceptiondlg.cpp}}
+\doxysubsubsection{\texorpdfstring{\_\_ICON\_PATH\_\_}{\_\_ICON\_PATH\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+ICON\+\_\+\+PATH\+\_\+\+\_\+~"{}/home/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{gerard}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Development}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zbasetools}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{zqt}}/\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{icons}}/"{}}
+
+
+
+Definition at line \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00026}{26}} of file \mbox{\hyperlink{zexceptiondlg_8cpp_source}{zexceptiondlg.\+cpp}}.
+
+\Hypertarget{zexceptiondlg_8cpp_a68b86f86ead01b44a737bf13b423ff90}\label{zexceptiondlg_8cpp_a68b86f86ead01b44a737bf13b423ff90} 
+\index{zexceptiondlg.cpp@{zexceptiondlg.cpp}!\_\_INFO\_ICON\_\_@{\_\_INFO\_ICON\_\_}}
+\index{\_\_INFO\_ICON\_\_@{\_\_INFO\_ICON\_\_}!zexceptiondlg.cpp@{zexceptiondlg.cpp}}
+\doxysubsubsection{\texorpdfstring{\_\_INFO\_ICON\_\_}{\_\_INFO\_ICON\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+INFO\+\_\+\+ICON\+\_\+\+\_\+~"{}info.\+png"{}}
+
+
+
+Definition at line \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00027}{27}} of file \mbox{\hyperlink{zexceptiondlg_8cpp_source}{zexceptiondlg.\+cpp}}.
+
+\Hypertarget{zexceptiondlg_8cpp_afbac29cd0a9ebc7f120e205df133f5dd}\label{zexceptiondlg_8cpp_afbac29cd0a9ebc7f120e205df133f5dd} 
+\index{zexceptiondlg.cpp@{zexceptiondlg.cpp}!\_\_QUESTION\_ICON\_\_@{\_\_QUESTION\_ICON\_\_}}
+\index{\_\_QUESTION\_ICON\_\_@{\_\_QUESTION\_ICON\_\_}!zexceptiondlg.cpp@{zexceptiondlg.cpp}}
+\doxysubsubsection{\texorpdfstring{\_\_QUESTION\_ICON\_\_}{\_\_QUESTION\_ICON\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+QUESTION\+\_\+\+ICON\+\_\+\+\_\+~"{}question.\+png"{}}
+
+
+
+Definition at line \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00028}{28}} of file \mbox{\hyperlink{zexceptiondlg_8cpp_source}{zexceptiondlg.\+cpp}}.
+
+\Hypertarget{zexceptiondlg_8cpp_a5405eea8f8caec510190822ab57421c4}\label{zexceptiondlg_8cpp_a5405eea8f8caec510190822ab57421c4} 
+\index{zexceptiondlg.cpp@{zexceptiondlg.cpp}!\_\_SEVERE\_ICON\_\_@{\_\_SEVERE\_ICON\_\_}}
+\index{\_\_SEVERE\_ICON\_\_@{\_\_SEVERE\_ICON\_\_}!zexceptiondlg.cpp@{zexceptiondlg.cpp}}
+\doxysubsubsection{\texorpdfstring{\_\_SEVERE\_ICON\_\_}{\_\_SEVERE\_ICON\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+SEVERE\+\_\+\+ICON\+\_\+\+\_\+~"{}errorcross.\+png"{}}
+
+
+
+Definition at line \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00031}{31}} of file \mbox{\hyperlink{zexceptiondlg_8cpp_source}{zexceptiondlg.\+cpp}}.
+
+\Hypertarget{zexceptiondlg_8cpp_a480d8f9552ea7c2d0598f15434c87a18}\label{zexceptiondlg_8cpp_a480d8f9552ea7c2d0598f15434c87a18} 
+\index{zexceptiondlg.cpp@{zexceptiondlg.cpp}!\_\_WARNING\_ICON\_\_@{\_\_WARNING\_ICON\_\_}}
+\index{\_\_WARNING\_ICON\_\_@{\_\_WARNING\_ICON\_\_}!zexceptiondlg.cpp@{zexceptiondlg.cpp}}
+\doxysubsubsection{\texorpdfstring{\_\_WARNING\_ICON\_\_}{\_\_WARNING\_ICON\_\_}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \+\_\+\+\_\+\+WARNING\+\_\+\+ICON\+\_\+\+\_\+~"{}warning.\+png"{}}
+
+
+
+Definition at line \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00029}{29}} of file \mbox{\hyperlink{zexceptiondlg_8cpp_source}{zexceptiondlg.\+cpp}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{zexceptiondlg_8cpp_a26f7f3357715d7a57aabb786aa8a7494}\label{zexceptiondlg_8cpp_a26f7f3357715d7a57aabb786aa8a7494} 
+\index{zexceptiondlg.cpp@{zexceptiondlg.cpp}!DontShowStatus@{DontShowStatus}}
+\index{DontShowStatus@{DontShowStatus}!zexceptiondlg.cpp@{zexceptiondlg.cpp}}
+\doxysubsubsection{\texorpdfstring{DontShowStatus}{DontShowStatus}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}} Dont\+Show\+Status =\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\+\_\+\+NOTHING}}}
+
+
+
+Definition at line \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00037}{37}} of file \mbox{\hyperlink{zexceptiondlg_8cpp_source}{zexceptiondlg.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00339}{ZException\+DLg\+::\+Dont\+Show\+Clicked()}}, \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00334}{ZException\+DLg\+::reset\+Dont\+Show()}}, and \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00074}{ZException\+DLg\+::\+ZException\+DLg()}}.
+
+\Hypertarget{zexceptiondlg_8cpp_ab55b3dc22592b36851b5bb02c0ce2b6e}\label{zexceptiondlg_8cpp_ab55b3dc22592b36851b5bb02c0ce2b6e} 
+\index{zexceptiondlg.cpp@{zexceptiondlg.cpp}!FixedFont@{FixedFont}}
+\index{FixedFont@{FixedFont}!zexceptiondlg.cpp@{zexceptiondlg.cpp}}
+\doxysubsubsection{\texorpdfstring{FixedFont}{FixedFont}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} Fixed\+Font = \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{false}}}
+
+
+
+Definition at line \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00025}{25}} of file \mbox{\hyperlink{zexceptiondlg_8cpp_source}{zexceptiondlg.\+cpp}}.
+
+
+
+Referenced by \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00780}{ZException\+DLg\+::\+\_\+adhoc\+Message()}}, \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00863}{ZException\+DLg\+::\+\_\+adhoc\+Message2\+B()}}, \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00947}{ZException\+DLg\+::\+\_\+adhoc\+Message3\+B()}}, \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00988}{ZException\+DLg\+::display()}}, \mbox{\hyperlink{zexceptiondlg_8cpp_source_l01040}{ZException\+DLg\+::display2\+B()}}, \mbox{\hyperlink{zexceptiondlg_8cpp_source_l01097}{ZException\+DLg\+::display3\+B()}}, \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00130}{ZException\+DLg\+::layout\+Setup()}}, and \mbox{\hyperlink{zexceptiondlg_8cpp_source_l00287}{ZException\+DLg\+::set\+Fixed\+Font()}}.
+

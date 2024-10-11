@@ -1,0 +1,21 @@
+Raw Master File test plan
+
+create 20 element of generated ZDocPhysical
+
+use same creation dates and modification dates for 5 elements
+
+use same creation date for 10 elements but with different modifcation dates
+
+test key collision on unique primary key  (ZResource)
+ 
+
+tests
+
+    string search (description)
+
+    primary key search
+
+    search on partial key
+
+
+Journaling tests

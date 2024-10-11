@@ -1,0 +1,59 @@
+\doxysection{zclearfiledlg.\+h}
+\hypertarget{zclearfiledlg_8h_source}{}\label{zclearfiledlg_8h_source}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zclearfiledlg.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/zclearfiledlg.h}}
+\mbox{\hyperlink{zclearfiledlg_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZCLEARFILEDLG\_H}}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ ZCLEARFILEDLG\_H}}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <QDialog>}}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00007}00007\ \textcolor{keyword}{class\ }QLabel;}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00008}00008\ \textcolor{keyword}{class\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QLineEdit}};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00009}00009\ \textcolor{keyword}{class\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QCheckBox}};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00010}00010\ \textcolor{keyword}{class\ }QPushButton;}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00011}00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacezbs}{zbs}}\ \{}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00012}00012\ \textcolor{keyword}{class\ }ZRawMasterFile;}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00013}00013\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classzbs_1_1_z_random_file}{ZRandomFile}};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00014}00014\ \}}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00015}00015\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacezbs}{zbs}};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00016}00016\ }
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00017}\mbox{\hyperlink{class_z_clear_file_d_lg}{00017}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_z_clear_file_d_lg}{ZClearFileDLg}}\ :\ \textcolor{keyword}{public}\ QDialog}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00018}00018\ \{}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00019}00019\ }
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00020}00020\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00021}00021\ \ \ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{class_z_clear_file_d_lg}{ZClearFileDLg}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QWidget}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pParent}})\ ;}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00023}00023\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_clear_file_d_lg_af123ce572e56cb4db875d939a30327a5}{initLayout}}();}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00024}00024\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_clear_file_d_lg_af5e1a4a27ad9af520c2e603417b6ce93}{setup}}(ZRawMasterFile*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pURIFile}});}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00025}00025\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_clear_file_d_lg_af5e1a4a27ad9af520c2e603417b6ce93}{setup}}(\mbox{\hyperlink{classzbs_1_1_z_random_file}{ZRandomFile}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pURIFile}});}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00026}00026\ }
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00027}00027\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_z_clear_file_d_lg_af2bad5bad97aefba97f4badea0bacdd8}{getHighwater}}();}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00028}00028\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ssize\_t}}\ \mbox{\hyperlink{class_z_clear_file_d_lg_adfb88a492e3c1db2dfca813f6a384e9b}{getSizeToKeep}}()\ ;}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00029}00029\ \textcolor{keyword}{private}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{slots}}:}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00030}00030\ \ \ \ \ \textcolor{keywordtype}{void}\ OkBTnClicked();}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00031}00031\ \ \ \ \ \textcolor{keywordtype}{void}\ AlignSizeCHkChanged(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pChecked}});}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00033}00033\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00034}00034\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ wSizeToKeep=-\/1;}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00035}00035\ \ \ \ \ \textcolor{comment}{//\ \ \ QWidget*\ MainWidget=nullptr;}}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00036}00036\ \ \ \ \ QLabel*\ FileTypeLBl=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00037}00037\ \ \ \ \ QLabel\ *FileDescriptionLBl\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00038}00038\ \ \ \ \ QLabel*\ CurrentFileSizeLBl=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00039}00039\ \ \ \ \ QLabel*\ BlockTargetSizeLBl=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00040}00040\ \ \ \ \ QLabel*\ UsedBlocksLBl=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00041}00041\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QLineEdit}}*\ SizeToKeepLEd=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00042}00042\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QCheckBox}}*\ AlignSizeCHk=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00043}00043\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QCheckBox}}*\ HighwaterCHk=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00044}00044\ \ \ \ \ QPushButton*\ OkBTn=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00045}00045\ \ \ \ \ QPushButton*\ CancelBTn=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00047}00047\ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_random_file}{ZRandomFile}}*\ \ \ \ RandomFile=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00048}00048\ \ \ \ \ ZRawMasterFile*\ RawMasterFile=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00049}00049\ \};}
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00050}00050\ }
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00051}00051\ }
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{zclearfiledlg_8h_source_l00053}00053\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZCLEARFILEDLG\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,28 @@
+\doxysection{ZRandom\+File Todo list}
+\hypertarget{group___z_r_f_to_do_list}{}\label{group___z_r_f_to_do_list}\index{ZRandomFile Todo list@{ZRandomFile Todo list}}
+
+\begin{DoxyItemize}
+\item Implement zreorg (done) {$\surd$}
+\item zreorg static (done) {$\surd$}
+\item test zreorg
+\item Implement option zmode exclusive \+: impacts on rewrite of file header \+: (done){$\surd$} No access to file header when it is open in exclusive mode. Access is only done in 2 times \+: at open time (read file header) at close time (write file header) This should be transparent \+: in \+\_\+get\+File\+Header and in \+\_\+write\+File\+Header. (add a boolean for effective read and effective write)
+\item Implement ztruncate (done) {$\surd$}
+\item Implement posix\+\_\+fallocate at creation time (done) {$\surd$}
+\item implement zclone\+File (done) {$\surd$} duplicates the file structure and the data
+\item same structure, same parameters
+\item however copy is done in reorganizing blocks in the order of relative ranks
+\item size is set using \+: used size + p\+Free\+Block (fallocate) Only one free block of size p\+Free\+Block is added at the end of physical file if p\+Free\+Blocks = -\/1 (default) then Block\+Target\+Size is taken.
+\item implement zreog\+External \+: of no use, zclone\+File is better
+\item implement zheader\+Rebuild (done) {$\surd$}
+\begin{DoxyItemize}
+\item scan surface for content file and report
+\item create header file
+\item search physical block after physical block \+:
+\begin{DoxyItemize}
+\item block is ZBS\+\_\+\+Used create an entry in ZBAT
+\item block is ZBS\+\_\+\+Free create an entry in ZFBT
+\item block is ZBS\+\_\+\+Hole create an entry in ZHOT DEPRECATED \mbox{[}-\/ block is ZBS\+\_\+\+Deleted create an entry in ZDBT\mbox{]}
+\end{DoxyItemize}
+\item test it (done) {$\surd$} 
+\end{DoxyItemize}
+\end{DoxyItemize}

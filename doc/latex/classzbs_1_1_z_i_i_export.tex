@@ -1,0 +1,294 @@
+\doxysection{zbs\+::ZIIExport Class Reference}
+\hypertarget{classzbs_1_1_z_i_i_export}{}\label{classzbs_1_1_z_i_i_export}\index{zbs::ZIIExport@{zbs::ZIIExport}}
+
+
+{\ttfamily \#include $<$zindexitem.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_i_i_export_a9e9277d79b284653bacfad9a63a97e64}{ZIIExport}} ()=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{default}}
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_i_i_export_a8444bd4f6854db95b5d18cb0e2122db0}{\texorpdfstring{$\sim$}{\string~}\+ZIIExport}} ()
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_i_i_export_a8ca4f62e3e2a05273183e671b49b5246}{ZIIExport}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_i_i_export}{ZIIExport}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_i_i_export}{ZIIExport}} \& \mbox{\hyperlink{classzbs_1_1_z_i_i_export_a563939607983425900730208987738cf}{\+\_\+copy\+From}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_i_i_export}{ZIIExport}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{classzbs_1_1_z_i_i_export}{ZIIExport}} \& \mbox{\hyperlink{classzbs_1_1_z_i_i_export_a41d5ed100d38fd7b0f51515bc6b8eecb}{operator=}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_i_i_export}{ZIIExport}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} \mbox{\hyperlink{classzbs_1_1_z_i_i_export_a237c407c75a04014048f951489708c88}{is\+Reversed}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_i_i_export_aaa5bd8fe8856832e3d16e279193f21bc}{set}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_index_item}{ZIndex\+Item}} \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+In}})
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_i_i_export_a91d2261d1a26828efd80b966985eb80d}{reverse}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_i_i_export_a46c5d370410e39426be83b6570de6382}{serialize}} ()
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} \mbox{\hyperlink{classzbs_1_1_z_i_i_export_a72839fb5b15b8ef67cd60dd1a23429a1}{deserialize}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\+\_\+t}} \mbox{\hyperlink{classzbs_1_1_z_i_i_export_aa30fab576482ce3d4bb1afc72adc9d99}{Endian\+Check}} = \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{cst\+\_\+\+Endian\+Check\+\_\+\+Normal}}
+\item 
+\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{classzbs_1_1_z_i_i_export_a3c842242801f312f4289c758d2675407}{ZMFaddress}}
+\begin{DoxyCompactList}\small\item\em Master file block record address to link index key with. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} \mbox{\hyperlink{classzbs_1_1_z_i_i_export_ae13fd543f92554d83901efbe59695102}{Index\+Address}}
+\begin{DoxyCompactList}\small\item\em Index record address \+: to be stored in ZMF record. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zoperation_8h_aa5848cdadec6353eefafe55df2aa8520}{ZOp\+\_\+type}} \mbox{\hyperlink{classzbs_1_1_z_i_i_export_ab67750530f183a3aac385fdd27764dda}{Operation}}
+\begin{DoxyCompactList}\small\item\em this is NOT stored on index file (see to\+File\+Key() method) but only for history \& journaling purpose \end{DoxyCompactList}\item 
+\mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} \mbox{\hyperlink{classzbs_1_1_z_i_i_export_a58e765b165f87cdb64b3db6adf4b13a7}{Index\+Rank}}
+\begin{DoxyCompactList}\small\item\em index rank for the on going operation \+: set by prepare operation and used in commit rollback and hardrollback operations \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{zindexitem_8h_source_l00100}{100}} of file \mbox{\hyperlink{zindexitem_8h_source}{zindexitem.\+h}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classzbs_1_1_z_i_i_export_a9e9277d79b284653bacfad9a63a97e64}\label{classzbs_1_1_z_i_i_export_a9e9277d79b284653bacfad9a63a97e64} 
+\index{zbs::ZIIExport@{zbs::ZIIExport}!ZIIExport@{ZIIExport}}
+\index{ZIIExport@{ZIIExport}!zbs::ZIIExport@{zbs::ZIIExport}}
+\doxysubsubsection{\texorpdfstring{ZIIExport()}{ZIIExport()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily zbs\+::\+ZIIExport\+::\+ZIIExport (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+\Hypertarget{classzbs_1_1_z_i_i_export_a8444bd4f6854db95b5d18cb0e2122db0}\label{classzbs_1_1_z_i_i_export_a8444bd4f6854db95b5d18cb0e2122db0} 
+\index{zbs::ZIIExport@{zbs::ZIIExport}!````~ZIIExport@{\texorpdfstring{$\sim$}{\string~}ZIIExport}}
+\index{````~ZIIExport@{\texorpdfstring{$\sim$}{\string~}ZIIExport}!zbs::ZIIExport@{zbs::ZIIExport}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ZIIExport()}{\string~ZIIExport()}}
+{\footnotesize\ttfamily zbs\+::\+ZIIExport\+::\texorpdfstring{$\sim$}{\string~}\+ZIIExport (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zindexitem_8h_source_l00103}{103}} of file \mbox{\hyperlink{zindexitem_8h_source}{zindexitem.\+h}}.
+
+\Hypertarget{classzbs_1_1_z_i_i_export_a8ca4f62e3e2a05273183e671b49b5246}\label{classzbs_1_1_z_i_i_export_a8ca4f62e3e2a05273183e671b49b5246} 
+\index{zbs::ZIIExport@{zbs::ZIIExport}!ZIIExport@{ZIIExport}}
+\index{ZIIExport@{ZIIExport}!zbs::ZIIExport@{zbs::ZIIExport}}
+\doxysubsubsection{\texorpdfstring{ZIIExport()}{ZIIExport()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily zbs\+::\+ZIIExport\+::\+ZIIExport (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_i_i_export}{ZIIExport}} \&}]{p\+In }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zindexitem_8h_source_l00104}{104}} of file \mbox{\hyperlink{zindexitem_8h_source}{zindexitem.\+h}}.
+
+
+
+References \mbox{\hyperlink{zindexitem_8cpp_source_l00116}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classzbs_1_1_z_i_i_export_a563939607983425900730208987738cf}\label{classzbs_1_1_z_i_i_export_a563939607983425900730208987738cf} 
+\index{zbs::ZIIExport@{zbs::ZIIExport}!\_copyFrom@{\_copyFrom}}
+\index{\_copyFrom@{\_copyFrom}!zbs::ZIIExport@{zbs::ZIIExport}}
+\doxysubsubsection{\texorpdfstring{\_copyFrom()}{\_copyFrom()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_i_i_export}{ZIIExport}} \& ZIIExport\+::\+\_\+copy\+From (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_i_i_export}{ZIIExport}} \&}]{p\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zindexitem_8cpp_source_l00116}{116}} of file \mbox{\hyperlink{zindexitem_8cpp_source}{zindexitem.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindexitem_8h_source_l00106}{Endian\+Check}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexitem_8h_source_l00108}{Index\+Address}}, \mbox{\hyperlink{zindexitem_8h_source_l00110}{Index\+Rank}}, \mbox{\hyperlink{zindexitem_8h_source_l00109}{Operation}}, and \mbox{\hyperlink{zindexitem_8h_source_l00107}{ZMFaddress}}.
+
+
+
+Referenced by \mbox{\hyperlink{zindexitem_8h_source_l00114}{operator=()}}, and \mbox{\hyperlink{zindexitem_8h_source_l00104}{ZIIExport()}}.
+
+\Hypertarget{classzbs_1_1_z_i_i_export_a72839fb5b15b8ef67cd60dd1a23429a1}\label{classzbs_1_1_z_i_i_export_a72839fb5b15b8ef67cd60dd1a23429a1} 
+\index{zbs::ZIIExport@{zbs::ZIIExport}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!zbs::ZIIExport@{zbs::ZIIExport}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZIIExport\+::deserialize (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zindexitem_8h_source_l00124}{124}} of file \mbox{\hyperlink{zindexitem_8h_source}{zindexitem.\+h}}.
+
+
+
+References \mbox{\hyperlink{zindexitem_8h_source_l00116}{is\+Reversed()}}, and \mbox{\hyperlink{zindexitem_8cpp_source_l00125}{reverse()}}.
+
+\Hypertarget{classzbs_1_1_z_i_i_export_a237c407c75a04014048f951489708c88}\label{classzbs_1_1_z_i_i_export_a237c407c75a04014048f951489708c88} 
+\index{zbs::ZIIExport@{zbs::ZIIExport}!isReversed@{isReversed}}
+\index{isReversed@{isReversed}!zbs::ZIIExport@{zbs::ZIIExport}}
+\doxysubsubsection{\texorpdfstring{isReversed()}{isReversed()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{bool}} zbs\+::\+ZIIExport\+::is\+Reversed (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zindexitem_8h_source_l00116}{116}} of file \mbox{\hyperlink{zindexitem_8h_source}{zindexitem.\+h}}.
+
+
+
+References \mbox{\hyperlink{zindexitem_8h_source_l00106}{Endian\+Check}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zindexitem_8h_source_l00124}{deserialize()}}, and \mbox{\hyperlink{zindexitem_8h_source_l00119}{serialize()}}.
+
+\Hypertarget{classzbs_1_1_z_i_i_export_a41d5ed100d38fd7b0f51515bc6b8eecb}\label{classzbs_1_1_z_i_i_export_a41d5ed100d38fd7b0f51515bc6b8eecb} 
+\index{zbs::ZIIExport@{zbs::ZIIExport}!operator=@{operator=}}
+\index{operator=@{operator=}!zbs::ZIIExport@{zbs::ZIIExport}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classzbs_1_1_z_i_i_export}{ZIIExport}} \& zbs\+::\+ZIIExport\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_i_i_export}{ZIIExport}} \&}]{p\+In }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zindexitem_8h_source_l00114}{114}} of file \mbox{\hyperlink{zindexitem_8h_source}{zindexitem.\+h}}.
+
+
+
+References \mbox{\hyperlink{zindexitem_8cpp_source_l00116}{\+\_\+copy\+From()}}, and \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+\Hypertarget{classzbs_1_1_z_i_i_export_a91d2261d1a26828efd80b966985eb80d}\label{classzbs_1_1_z_i_i_export_a91d2261d1a26828efd80b966985eb80d} 
+\index{zbs::ZIIExport@{zbs::ZIIExport}!reverse@{reverse}}
+\index{reverse@{reverse}!zbs::ZIIExport@{zbs::ZIIExport}}
+\doxysubsubsection{\texorpdfstring{reverse()}{reverse()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZIIExport\+::reverse (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zindexitem_8cpp_source_l00125}{125}} of file \mbox{\hyperlink{zindexitem_8cpp_source}{zindexitem.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindexitem_8h_source_l00106}{Endian\+Check}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexitem_8h_source_l00108}{Index\+Address}}, \mbox{\hyperlink{zindexitem_8h_source_l00110}{Index\+Rank}}, \mbox{\hyperlink{zindexitem_8h_source_l00109}{Operation}}, and \mbox{\hyperlink{zindexitem_8h_source_l00107}{ZMFaddress}}.
+
+
+
+Referenced by \mbox{\hyperlink{zindexitem_8h_source_l00124}{deserialize()}}, and \mbox{\hyperlink{zindexitem_8h_source_l00119}{serialize()}}.
+
+\Hypertarget{classzbs_1_1_z_i_i_export_a46c5d370410e39426be83b6570de6382}\label{classzbs_1_1_z_i_i_export_a46c5d370410e39426be83b6570de6382} 
+\index{zbs::ZIIExport@{zbs::ZIIExport}!serialize@{serialize}}
+\index{serialize@{serialize}!zbs::ZIIExport@{zbs::ZIIExport}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} zbs\+::\+ZIIExport\+::serialize (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line \mbox{\hyperlink{zindexitem_8h_source_l00119}{119}} of file \mbox{\hyperlink{zindexitem_8h_source}{zindexitem.\+h}}.
+
+
+
+References \mbox{\hyperlink{zindexitem_8h_source_l00116}{is\+Reversed()}}, and \mbox{\hyperlink{zindexitem_8cpp_source_l00125}{reverse()}}.
+
+\Hypertarget{classzbs_1_1_z_i_i_export_aaa5bd8fe8856832e3d16e279193f21bc}\label{classzbs_1_1_z_i_i_export_aaa5bd8fe8856832e3d16e279193f21bc} 
+\index{zbs::ZIIExport@{zbs::ZIIExport}!set@{set}}
+\index{set@{set}!zbs::ZIIExport@{zbs::ZIIExport}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{void}} ZIIExport\+::set (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{classzbs_1_1_z_index_item}{ZIndex\+Item}} \&}]{p\+In }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zindexitem_8cpp_source_l00134}{134}} of file \mbox{\hyperlink{zindexitem_8cpp_source}{zindexitem.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zindexitem_8h_source_l00106}{Endian\+Check}}, \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}, \mbox{\hyperlink{zindexitem_8h_source_l00108}{Index\+Address}}, \mbox{\hyperlink{zindexitem_8h_source_l00110}{Index\+Rank}}, \mbox{\hyperlink{zindexitem_8h_source_l00109}{Operation}}, and \mbox{\hyperlink{zindexitem_8h_source_l00107}{ZMFaddress}}.
+
+
+
+Referenced by \mbox{\hyperlink{zindexitem_8cpp_source_l00093}{zbs\+::\+ZIndex\+Item\+List\+::\+\_\+export\+Append()}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classzbs_1_1_z_i_i_export_aa30fab576482ce3d4bb1afc72adc9d99}\label{classzbs_1_1_z_i_i_export_aa30fab576482ce3d4bb1afc72adc9d99} 
+\index{zbs::ZIIExport@{zbs::ZIIExport}!EndianCheck@{EndianCheck}}
+\index{EndianCheck@{EndianCheck}!zbs::ZIIExport@{zbs::ZIIExport}}
+\doxysubsubsection{\texorpdfstring{EndianCheck}{EndianCheck}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{uint32\+\_\+t}} zbs\+::\+ZIIExport\+::\+Endian\+Check = \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{cst\+\_\+\+Endian\+Check\+\_\+\+Normal}}}
+
+
+
+Definition at line \mbox{\hyperlink{zindexitem_8h_source_l00106}{106}} of file \mbox{\hyperlink{zindexitem_8h_source}{zindexitem.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zindexitem_8cpp_source_l00116}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zindexitem_8h_source_l00116}{is\+Reversed()}}, \mbox{\hyperlink{zindexitem_8cpp_source_l00125}{reverse()}}, and \mbox{\hyperlink{zindexitem_8cpp_source_l00134}{set()}}.
+
+\Hypertarget{classzbs_1_1_z_i_i_export_ae13fd543f92554d83901efbe59695102}\label{classzbs_1_1_z_i_i_export_ae13fd543f92554d83901efbe59695102} 
+\index{zbs::ZIIExport@{zbs::ZIIExport}!IndexAddress@{IndexAddress}}
+\index{IndexAddress@{IndexAddress}!zbs::ZIIExport@{zbs::ZIIExport}}
+\doxysubsubsection{\texorpdfstring{IndexAddress}{IndexAddress}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} zbs\+::\+ZIIExport\+::\+Index\+Address}
+
+
+
+Index record address \+: to be stored in ZMF record. 
+
+
+
+Definition at line \mbox{\hyperlink{zindexitem_8h_source_l00108}{108}} of file \mbox{\hyperlink{zindexitem_8h_source}{zindexitem.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zindexitem_8cpp_source_l00116}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zindexitem_8cpp_source_l00125}{reverse()}}, and \mbox{\hyperlink{zindexitem_8cpp_source_l00134}{set()}}.
+
+\Hypertarget{classzbs_1_1_z_i_i_export_a58e765b165f87cdb64b3db6adf4b13a7}\label{classzbs_1_1_z_i_i_export_a58e765b165f87cdb64b3db6adf4b13a7} 
+\index{zbs::ZIIExport@{zbs::ZIIExport}!IndexRank@{IndexRank}}
+\index{IndexRank@{IndexRank}!zbs::ZIIExport@{zbs::ZIIExport}}
+\doxysubsubsection{\texorpdfstring{IndexRank}{IndexRank}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zlock_8h_a1e0bc1fa42a7f3b8aeedefb7791ef853}{zrank\+\_\+type}} zbs\+::\+ZIIExport\+::\+Index\+Rank}
+
+
+
+index rank for the on going operation \+: set by prepare operation and used in commit rollback and hardrollback operations 
+
+
+
+Definition at line \mbox{\hyperlink{zindexitem_8h_source_l00110}{110}} of file \mbox{\hyperlink{zindexitem_8h_source}{zindexitem.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zindexitem_8cpp_source_l00116}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zindexitem_8cpp_source_l00125}{reverse()}}, and \mbox{\hyperlink{zindexitem_8cpp_source_l00134}{set()}}.
+
+\Hypertarget{classzbs_1_1_z_i_i_export_ab67750530f183a3aac385fdd27764dda}\label{classzbs_1_1_z_i_i_export_ab67750530f183a3aac385fdd27764dda} 
+\index{zbs::ZIIExport@{zbs::ZIIExport}!Operation@{Operation}}
+\index{Operation@{Operation}!zbs::ZIIExport@{zbs::ZIIExport}}
+\doxysubsubsection{\texorpdfstring{Operation}{Operation}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zoperation_8h_aa5848cdadec6353eefafe55df2aa8520}{ZOp\+\_\+type}} zbs\+::\+ZIIExport\+::\+Operation}
+
+
+
+this is NOT stored on index file (see to\+File\+Key() method) but only for history \& journaling purpose 
+
+
+
+Definition at line \mbox{\hyperlink{zindexitem_8h_source_l00109}{109}} of file \mbox{\hyperlink{zindexitem_8h_source}{zindexitem.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zindexitem_8cpp_source_l00116}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zindexitem_8cpp_source_l00125}{reverse()}}, and \mbox{\hyperlink{zindexitem_8cpp_source_l00134}{set()}}.
+
+\Hypertarget{classzbs_1_1_z_i_i_export_a3c842242801f312f4289c758d2675407}\label{classzbs_1_1_z_i_i_export_a3c842242801f312f4289c758d2675407} 
+\index{zbs::ZIIExport@{zbs::ZIIExport}!ZMFaddress@{ZMFaddress}}
+\index{ZMFaddress@{ZMFaddress}!zbs::ZIIExport@{zbs::ZIIExport}}
+\doxysubsubsection{\texorpdfstring{ZMFaddress}{ZMFaddress}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\+\_\+type}} zbs\+::\+ZIIExport\+::\+ZMFaddress}
+
+
+
+Master file block record address to link index key with. 
+
+
+
+Definition at line \mbox{\hyperlink{zindexitem_8h_source_l00107}{107}} of file \mbox{\hyperlink{zindexitem_8h_source}{zindexitem.\+h}}.
+
+
+
+Referenced by \mbox{\hyperlink{zindexitem_8cpp_source_l00116}{\+\_\+copy\+From()}}, \mbox{\hyperlink{zindexitem_8cpp_source_l00125}{reverse()}}, and \mbox{\hyperlink{zindexitem_8cpp_source_l00134}{set()}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zindexitem_8h}{zindexitem.\+h}}\item 
+/home/gerard/\+Development/zbasetools/zcontent/zindexedfile/\mbox{\hyperlink{zindexitem_8cpp}{zindexitem.\+cpp}}\end{DoxyCompactItemize}

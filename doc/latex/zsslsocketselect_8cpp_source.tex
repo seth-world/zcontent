@@ -1,0 +1,47 @@
+\doxysection{zsslsocketselect.\+cpp}
+\hypertarget{zsslsocketselect_8cpp_source}{}\label{zsslsocketselect_8cpp_source}\index{/home/gerard/Development/zbasetools/znet/zbasenet/zsslsocketselect.cpp@{/home/gerard/Development/zbasetools/znet/zbasenet/zsslsocketselect.cpp}}
+\mbox{\hyperlink{zsslsocketselect_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZSSLSOCKETSELECT\_CPP}}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00002}\mbox{\hyperlink{zsslsocketselect_8cpp_af2c0dbce0be09378b8e4aeb40559d68e}{00002}}\ \textcolor{preprocessor}{\#define\ ZSSLSOCKETSELECT\_CPP}}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00004}00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{zsslsocketselect_8h}{zsslsocketselect.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00005}00005\ }
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00007}00007\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00008}\mbox{\hyperlink{class_z_s_s_l_socket_select_a91f3c183177904ba76aed3f253c48b95}{00008}}\ \mbox{\hyperlink{class_z_s_s_l_socket_select_a91f3c183177904ba76aed3f253c48b95}{ZSSLSocketSelect::zbaseread}}(ZDataBuffer\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pBuffer}})}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00009}00009\ \{}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00010}00010\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00011}00011\ \textcolor{comment}{/*\ wait\ until}}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00012}00012\ \textcolor{comment}{\ *\ \ \ \ \ \ -\/\ a\ read\ operation\ signaled\ by\ select\ is\ transmitted\ by\ server\ process\ (then\ wakeup\ issued)}}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00013}00013\ \textcolor{comment}{\ *\ Or\ another\ instruction\ have\ be\ transmitted}}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00014}00014\ \textcolor{comment}{\ *\ \ \ \ \ \ -\/\ an\ event\ has\ been\ queued}}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00015}00015\ \textcolor{comment}{}}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00016}00016\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00017}00017\ \ \ \ \ \textcolor{keywordflow}{if}\ (PerfFlag)}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00018}00018\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00019}00019\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_z_s_s_l_abstract_a13eab9b152a68c7b93f25d4a3627fcd5}{Socket}}-\/>SocketPMS-\/>Timer.start();}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00020}00020\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00021}00021\ \ \ \ \ \mbox{\hyperlink{class_z_socket_select_a2bc29eeb13e801f7794d813cef7bbfdb}{Thread}}-\/>setDormant();}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00022}00022\ \ \ \ \ \textcolor{keywordflow}{if}\ (PerfFlag)}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00023}00023\ \ \ \ \ \ \ \ \ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00024}00024\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_z_s_s_l_abstract_a13eab9b152a68c7b93f25d4a3627fcd5}{Socket}}-\/>SocketPMS-\/>Timer.end();}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00025}00025\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_z_s_s_l_abstract_a13eab9b152a68c7b93f25d4a3627fcd5}{Socket}}-\/>SocketPMS-\/>WaitRead\ +=\mbox{\hyperlink{class_z_s_s_l_abstract_a13eab9b152a68c7b93f25d4a3627fcd5}{Socket}}-\/>SocketPMS-\/>Timer.getDeltaTime();}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00026}00026\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00027}00027\ }
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00028}00028\ \textcolor{comment}{//\ before\ anything,\ treat\ any\ event\ that\ may\ have\ been\ queued\ in\ ZThread}}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00029}00029\ }
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00030}00030\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}=\ \mbox{\hyperlink{class_z_socket_select_a2bc29eeb13e801f7794d813cef7bbfdb}{Thread}}-\/>processEventQueue();}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00032}00032\ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}}!=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZS\_SUCCESS}})}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00033}00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{wSt}};}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00035}00035\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{class_z_s_s_l_abstract_a5085218601b5e01dd0fe2fe71cf34921}{ZSSLAbstract::zbaseread}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pBuffer}});\ \ \ \textcolor{comment}{//\ then\ effectively\ read\ the\ socket}}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00036}00036\ \}\textcolor{comment}{//ZSSLread}}
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00039}00039\ }
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{zsslsocketselect_8cpp_source_l00041}00041\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZSSLSOCKETSELECT\_CPP}}
+
+\end{DoxyCode}

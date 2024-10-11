@@ -1,0 +1,25 @@
+\doxysection{Accessing a ZRandom\+File by Field (Segment of record)}
+\hypertarget{group___z_r_f_field_access}{}\label{group___z_r_f_field_access}\index{Accessing a ZRandomFile by Field (Segment of record)@{Accessing a ZRandomFile by Field (Segment of record)}}
+\doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} manage a compound content and does not offers to access content through a dictionary. However, it is possible to access its user content (records) by adhoc fields definition.
+
+A \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} field is a segment of record defined by
+\begin{DoxyItemize}
+\item its offset from the beginning of the user record,
+\item a length.
+\end{DoxyItemize}
+
+As it is possible to search for values for a field, it is possible to access directly the field content\+:
+\begin{DoxyItemize}
+\item to read its content
+\item to write its content
+\end{DoxyItemize}
+
+In both cases, only the file segment corresponding to the given field will be accessed, so that you may, for example, change only the segment of record corresponding to the defined field.
+
+This is possible using the below two \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} methods
+
+\doxylink{group___z_random_file_group_gad722a3ceb0962ee07c8433029ea5e115}{ZRandom\+File\+::zget\+Single\+Field()} \doxylink{group___z_random_file_group_ga243179a8bebc471d4dc8667b996917cd}{ZRandom\+File\+::zwrite\+Single\+Field()}
+
+\begin{DoxyNote}{Note}
+Record data integrity AND data format is left to user\textquotesingle{}s responsibility. 
+\end{DoxyNote}

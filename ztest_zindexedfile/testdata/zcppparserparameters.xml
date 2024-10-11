@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+ <zcppparserrules version = "'0.30-0'">
+     <skip>
+        <skiplist> <!--  this list contains single keywords (and only single keywords- not clauses) that may be skipped while parsing without impact  -->
+            <keyword>
+                <name>static</name>
+            </keyword>
+            <keyword>
+                <name>explicit</name>
+            </keyword>
+            <keyword>
+                <name>virtual</name>
+            </keyword>
+            <keyword>
+                <name>const</name>
+            </keyword>
+            <keyword>
+                <name>Q_OBJECT</name>
+            </keyword>
+            <keyword>
+                <name>Q_SLOT</name>
+            </keyword>
+        </skiplist>
+        
+        <skipclause> <!--  this list contains clauses that may be skipped starting at <identifier> until <endtoken> included  -->
+<!--            
+            Do not include these clauses : they are processed by parsing main engine.
+            Including them will induce an ill behavior
+            
+            <clause>
+                <identifier>public</identifier>
+                <endtoken>:</endtoken>
+            </clause>
+            <clause>
+                <identifier>private</identifier>
+                <endtoken>:</endtoken>
+            </clause>
+            <clause>
+                <identifier>protected</identifier>
+                <endtoken>:</endtoken>
+            </clause>
+            -->
+            <clause>
+                <identifier>Q_SLOT</identifier>
+                <endtoken>:</endtoken>
+            </clause>
+            <clause>
+                <identifier>slots</identifier>
+                <endtoken>:</endtoken>
+            </clause>
+        </skipclause>
+    </skip>
+    
+    
+    <!--  apart from builtin conversions there are possible conversions 
+    either directly 
+    - from a given source type tokentype (ZTTP_URISTRING by example) without syntax 
+    - without source type tokentype (ZTTP_UNKNOWN by example) but with a given syntax (i.e.DataRank_type)  
+    - with tokentype  (ZTTP_UNKNOWN by example) and with a syntax 
+    
+    to a ZType (i,e, ZType_AtomicS64) -->
+    <typeconversiontable>
+        <typeconversion>
+            <tokentype>ZTTP_ZRESOURCE</tokentype>
+            <ztype>ZType_Resource</ztype>
+        </typeconversion> 
+        <typeconversion>
+            <tokentype>ZTTP_ZRESOURCECODE</tokentype>
+            <ztype>ZType_Resource</ztype>
+        </typeconversion> 
+        <typeconversion>
+            <tokentype>ZTTP_UNKNOWN_TYPE</tokentype>
+            <syntax>DataRank_type</syntax>
+            <ztype>ZType_AtomicS64</ztype>
+            <capacity></capacity>
+        </typeconversion>
+        <typeconversion>
+            <tokentype>ZTTP_UNKNOWN_TYPE</tokentype>
+            <syntax>Storage_t</syntax>
+            <ztype>ZType_AtomicS64</ztype>
+            <capacity></capacity>
+        </typeconversion>
+        <typeconversion>
+            <tokentype>ZTTP_UNKNOWN_TYPE</tokentype>
+            <syntax>DocumentMetaType</syntax>
+            <ztype>ZType_AtomicS64</ztype>
+            <capacity>1</capacity>
+            <universalsize>0</universalsize>
+            <naturalsize>0</naturalsize>
+        </typeconversion>
+    </typeconversiontable> 
+    
+</zcppparserrules>
+ 
+ 

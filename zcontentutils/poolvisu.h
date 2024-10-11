@@ -113,7 +113,7 @@ public:
   QVariant          DefaultBackGround;
   QVariant          WrongBackGround = QVariant(QBrush(Qt::yellow));
 
-  void poolMouseCallback(int pZEF, QMouseEvent *pEvent);
+  bool poolMouseCallback(int pZEF, QMouseEvent *pEvent);
   ZStatus updateHeader();
 
   bool isIndexFile=false;

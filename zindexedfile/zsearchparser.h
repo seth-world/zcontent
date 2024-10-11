@@ -41,7 +41,6 @@
 
 #include <ztoolset/utfmetafunctions.h>
 
-
 namespace zbs {
 
 
@@ -279,6 +278,7 @@ public:
 class ZSearchFieldOperandOwnData;
 class ZSearchOperandBase;
 class ZSearchArithmeticTerm;
+class ZMFObject;
 
 //class ZSearchParser : public ZaiErrors, public ZSearchParserState
 //class ZSearchParser : public ZaiErrors
@@ -345,16 +345,11 @@ public:
     return ZSearchContext(this);
   }
 
-//  ZStatus parse(const utf8VaryingString &pContent,std::shared_ptr<ZSearchEntity> &pCollection) ;
 
   /* parsing main loop : parse a single instruction or a set of instructions delimited with semi-colon sign */
   ZStatus parse(const utf8VaryingString &pContent, ZSearchContext& pSearchContext);
 
-
   bool searchKeyword(ZSearchToken* pToken) ;
-
-
-//  ZStatus _parse(ZSearchContext& pContext);
 
 
   ZStatus parseAllocationFormula(const utf8VaryingString* pEntity,const utf8VaryingString& pSelectionPhrase);
@@ -388,6 +383,8 @@ public:
   ZStatus _parseContextDeclare(ZSearchContext & pContext);
   /* parse file entity */
   ZStatus _parseContextDeclareFile(ZSearchContext & pContext);
+  /* parse domain object (zmf file or other object declared with a valid domain path in ContentObjectBroker */
+  ZStatus _parseContextDeclareDomainObject(ZSearchContext &pContext);
   /* parse a new entity either collection or join */
   ZStatus _parseContextDeclareEntity(ZSearchContext &pContext);
   /* parse a single entity either collection-single entity or component of a join entity */
@@ -654,6 +651,8 @@ public:
   ZSearchEntityList                                 EntityList;
 //  ZArray<std::shared_ptr<ZSearchMasterFile>>      MasterFileList;
   ZArray<ZMasterFileItem>                           MasterFileList;
+
+  ZArray<std::shared_ptr<ZMFObject>>                                 ZMFObjectList;
 
 
   ZSearchHistory                  History;

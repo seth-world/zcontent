@@ -24,8 +24,8 @@ public:
   void setupTableView( bool pColumnAutoAdjust, int pColumns);
   void dataSetup();
 
-  void KeyFiltered(int pKey,QKeyEvent* pEvent);
-  void MouseFiltered(int pMouseFlag,QMouseEvent * event);
+  bool KeyFiltered(int pKey,QKeyEvent* pEvent);
+  bool MouseFiltered(int pMouseFlag,QMouseEvent * event);
 
   void set(ZTypeBase pZType) ;
   ZTypeBase get() ;
@@ -34,7 +34,7 @@ public:
   QModelIndex _searchZType(QStandardItem* pItem, ZTypeBase pZType);
 
 
-  void AcceptCurrent();
+  bool AcceptCurrent();
 
 protected:
   void closeEvent(QCloseEvent *event) override ;

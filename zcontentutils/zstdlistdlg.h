@@ -94,8 +94,8 @@ public:
   void tableViewSetup( bool pColumnAutoAdjust, int pColumns);
   void dataSetup(const ZStdListDLgLine& pTitle,const ZStdListDLgContent& pContent);
 
-  void KeyFiltered(int pKey,QKeyEvent* pEvent);
-  void MouseFiltered(int pMouseFlag,QMouseEvent * event);
+  bool KeyFiltered(int pKey,QKeyEvent* pEvent);
+  bool MouseFiltered(int pMouseFlag,QMouseEvent * event);
 
   void insertRow(const ZStdListDLgLine &pContent, int pRow);
   void appendRow(const ZStdListDLgLine& pContent);

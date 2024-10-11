@@ -1317,15 +1317,15 @@ void poolVisu::viewBlock(zaddress_type pAddress, zrank_type pRank) {
 }
 
 
-void poolVisu::poolMouseCallback(int pZEF, QMouseEvent *pEvent)
+bool poolVisu::poolMouseCallback(int pZEF, QMouseEvent *pEvent)
 {
 
   QModelIndex wIdx=ContentTBv->currentIndex();
   if (!wIdx.isValid())
-    return;
+    return true;
 
   if (pZEF!= ZEF_DoubleClickLeft){
-    return;
+    return true;
   }
 
   QVariant wV;
@@ -1341,7 +1341,7 @@ void poolVisu::poolMouseCallback(int pZEF, QMouseEvent *pEvent)
   ContentVisu->setViewModeRaw();
 
   ContentVisu->show();
-
+  return true;
 }//VisuMouseCallback
 
 

@@ -1,0 +1,95 @@
+\doxysection{zcollectionentity.\+h}
+\hypertarget{zcollectionentity_8h_source}{}\label{zcollectionentity_8h_source}\index{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zcollectionentity.h@{/home/gerard/Development/zbasetools/zcontent/zindexedfile/zcollectionentity.h}}
+\mbox{\hyperlink{zcollectionentity_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZCOLLECTIONENTITY\_H}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ ZCOLLECTIONENTITY\_H}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <memory>}\ \textcolor{comment}{//\ for\ shared\ pointers}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <ztoolset/utfvaryingstring.h>}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00006}00006\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <\mbox{\hyperlink{urfparser_8h}{zcontentcommon/urfparser.h}}>}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00008}00008\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00009}00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{zsearchdictionary_8h}{zsearchdictionary.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00011}00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{zsearchcontext_8h}{zsearchcontext.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00013}00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacezbs}{zbs}}\ \{}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00015}00015\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classzbs_1_1_z_search_logical_term}{ZSearchLogicalTerm}};}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00016}00016\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classzbs_1_1_z_search_entity}{ZSearchEntity}};}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00017}00017\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classzbs_1_1_z_search_token}{ZSearchToken}};}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00019}\mbox{\hyperlink{classzbs_1_1_z_collection_entity}{00019}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classzbs_1_1_z_collection_entity}{ZCollectionEntity}}\ :\ \textcolor{keyword}{public}\ std::enable\_shared\_from\_this\ <ZCollectionEntity>}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00020}00020\ \{}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00021}00021\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00022}00022\ \ \ \ \ \textcolor{comment}{//\ \ ZSearchEntity()\ \{\}}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00023}\mbox{\hyperlink{classzbs_1_1_z_collection_entity_a3a423cd04b4544ea564f1c8a78bfa72d}{00023}}\ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_a3a423cd04b4544ea564f1c8a78bfa72d}{ZCollectionEntity}}(\ std::shared\_ptr<ZSearchEntity>\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pBaseEntity}})}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00024}00024\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00025}00025\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_a06fdab943e0d7080e3bd1cc27ee2f663}{\_BaseEntity}}=\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pBaseEntity}};}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00026}00026\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ Do\ not\ set\ URFParser\ from\ base\ entity\ :\ it\ might\ be\ shared\ by\ many\ others}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00027}00027\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ Set\ URFParser\ from\ father\ ZSearchEntity\ that\ instantiate\ collection\ \ (see\ ZSearchEntity).}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00028}00028\ \textcolor{comment}{\ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00029}00029\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00030}00030\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00031}\mbox{\hyperlink{classzbs_1_1_z_collection_entity_afd3d00aafe13a9e7f37bc34cba2c576b}{00031}}\ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_afd3d00aafe13a9e7f37bc34cba2c576b}{ZCollectionEntity}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity}{ZCollectionEntity}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIn}})\ \{\mbox{\hyperlink{classzbs_1_1_z_collection_entity_a189c96c55a5b90dc6f8bf466bba16a98}{\_copyFrom}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIn}});\}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00032}00032\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00033}\mbox{\hyperlink{classzbs_1_1_z_collection_entity_a1e4bbdf5bfe0e6928d8067b869e3dec9}{00033}}\ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_a1e4bbdf5bfe0e6928d8067b869e3dec9}{\string~ZCollectionEntity}}()}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00034}00034\ \ \ \ \ \{}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00035}00035\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{classzbs_1_1_z_collection_entity_afa7c43c0e2ade310855257f555cdfd05}{LogicalTerm}}\ !=\ \textcolor{keyword}{nullptr})}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00036}00036\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_afa7c43c0e2ade310855257f555cdfd05}{LogicalTerm}};}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00037}00037\ \ \ \ \ \}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00038}00038\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00039}00039\ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_collection_entity}{ZCollectionEntity}}\&\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_a189c96c55a5b90dc6f8bf466bba16a98}{\_copyFrom}}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity}{ZCollectionEntity}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIn}})\ ;}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00040}00040\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00041}\mbox{\hyperlink{classzbs_1_1_z_collection_entity_aa67e05efc9b9732bda6236509f496f99}{00041}}\ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_collection_entity}{ZCollectionEntity}}\&\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_aa67e05efc9b9732bda6236509f496f99}{operator\ =\ }}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity}{ZCollectionEntity}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIn}})\ \{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_a189c96c55a5b90dc6f8bf466bba16a98}{\_copyFrom}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pIn}});\}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00042}00042\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00043}\mbox{\hyperlink{classzbs_1_1_z_collection_entity_aec7cb3142a3683d5683edbb080668475}{00043}}\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_aec7cb3142a3683d5683edbb080668475}{isValid}}()\ \{\textcolor{keywordflow}{return}\ (\mbox{\hyperlink{classzbs_1_1_z_collection_entity_a06fdab943e0d7080e3bd1cc27ee2f663}{\_BaseEntity}}\ !=\ \textcolor{keyword}{nullptr}\ );\}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00044}00044\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00045}\mbox{\hyperlink{classzbs_1_1_z_collection_entity_a9fd385cf46aad6c5829ef1f04918bcd0}{00045}}\ \ \ \ \ std::shared\_ptr<ZCollectionEntity>\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_a9fd385cf46aad6c5829ef1f04918bcd0}{getSharedPtr}}()\ \{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{shared\_from\_this}}();\}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00046}00046\ \textcolor{comment}{/*}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00047}00047\ \textcolor{comment}{\ \ \ \ static\ std::shared\_ptr<ZCollectionEntity>\ construct(\ std::shared\_ptr<ZSearchEntity>\ pBaseEntity)}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00048}00048\ \textcolor{comment}{\ \ \ \ \{}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00049}00049\ \textcolor{comment}{\ \ \ \ \ \ \ \ std::shared\_ptr<ZCollectionEntity>\ wOut\ =\ std::make\_shared<ZCollectionEntity>(pBaseEntity);}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00050}00050\ \textcolor{comment}{\ \ \ \ \ \ \ \ return\ wOut;}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00051}00051\ \textcolor{comment}{\ \ \ \ \}}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00052}00052\ \textcolor{comment}{*/}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00053}00053\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00054}00054\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00055}00055\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_a67269cffdc4289bf22f5935a6938bf53}{setLogicalTerm}}(\mbox{\hyperlink{classzbs_1_1_z_search_logical_term}{ZSearchLogicalTerm}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pTerm}});}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00056}00056\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00057}\mbox{\hyperlink{classzbs_1_1_z_collection_entity_aed8731a44c3380eec384dd98a8f5c00b}{00057}}\ \ \ \ \ \mbox{\hyperlink{zexceptiondlg_8h_af505c03d2040e09c5e4971b7dc08a838}{utf8VaryingString}}\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_aed8731a44c3380eec384dd98a8f5c00b}{getEntityName}}(\ )\ \textcolor{keyword}{const}\ ;}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00059}00059\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00060}00060\ \ \ \ \ \textcolor{comment}{/*\ returns\ AddressList\ count\ */}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00061}00061\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_a9ec69e4ff6a1dd376cb4e865211d0a7a}{getCount}}()\ ;}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00062}00062\ \ \ \ \ \textcolor{comment}{/*\ returns\ getCount\ from\ underneath\ entity\ (\_BaseEntity)\ */}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00063}00063\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_a215573dad8ab27a388e610e920cffdce}{\_baseGetCount}}();}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00065}00065\ \ \ \ \ ZaiErrors*\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_a26745103c43df6c7b9b72bd47329fec6}{\_getErrorLog}}()\ ;}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00066}00066\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00067}\mbox{\hyperlink{classzbs_1_1_z_collection_entity_abf18fc575f427a88f7fc0e9dae026fd1}{00067}}\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_abf18fc575f427a88f7fc0e9dae026fd1}{executeFind}}\ ();}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00068}00068\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00069}00069\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_a5684feeebe260734f31f05af5c9a0503}{evaluateRecord}}(\textcolor{keywordtype}{bool}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pOutResult}},\ \textcolor{keyword}{const}\ ZDataBuffer\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRecord}});}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00070}00070\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00071}00071\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00072}00072\ \ \ \ \textcolor{comment}{/*\ gets\ from\ immediate\ entity\ :}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00073}00073\ \textcolor{comment}{\ \ \ *\ \ \ \ if\ Entity\ is\ file\ entity,\ returns\ values\ from\ file\ at\ pRank}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00074}00074\ \textcolor{comment}{\ \ \ *\ \ \ \ if\ Entity\ is\ collection\ entity,\ returns\ values\ from\ AddressList\ at\ pRank}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00075}00075\ \textcolor{comment}{\ \ \ */}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00076}00076\ \ \ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZStatus}}\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_ade016cb0e3069b313202f82e73708f79}{get}}(ZDataBuffer\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRecord}},\textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pRank}},\mbox{\hyperlink{zlock_8h_a85209bd49bbe6d0e72eab1fe6c185f86}{zaddress\_type}}\&\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pAddress}});}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00077}00077\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00078}\mbox{\hyperlink{classzbs_1_1_z_collection_entity_a00a00ffdd3b484a6e572efb22e1735be}{00078}}\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_a00a00ffdd3b484a6e572efb22e1735be}{setURFParser}}(\mbox{\hyperlink{class_u_r_f_parser}{URFParser}}*\ pParser)\ \ \ \ \ \ \ \{\mbox{\hyperlink{classzbs_1_1_z_collection_entity_a382c226910dd4266104565134f7f2ad2}{\_URFParser}}\ =\ pParser;\ \}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00080}\mbox{\hyperlink{classzbs_1_1_z_collection_entity_a382c226910dd4266104565134f7f2ad2}{00080}}\ \ \ \ \ \mbox{\hyperlink{class_u_r_f_parser}{URFParser}}*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_a382c226910dd4266104565134f7f2ad2}{\_URFParser}}=\textcolor{keyword}{nullptr};\ \ \textcolor{comment}{/*\ set\ by\ father\ ZSearchEntity\ who\ owns\ the\ parser\ object\ */}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00082}00082\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00083}\mbox{\hyperlink{classzbs_1_1_z_collection_entity_a06fdab943e0d7080e3bd1cc27ee2f663}{00083}}\ \ \ \ \ std::shared\_ptr\ <ZSearchEntity>\ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_a06fdab943e0d7080e3bd1cc27ee2f663}{\_BaseEntity}}\ =\ \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00084}\mbox{\hyperlink{classzbs_1_1_z_collection_entity_a80be523c771f9a089137745a1c14dafe}{00084}}\ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_array}{ZArray<zaddress\_type>}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_a80be523c771f9a089137745a1c14dafe}{AddressList}};}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00085}\mbox{\hyperlink{classzbs_1_1_z_collection_entity_afa7c43c0e2ade310855257f555cdfd05}{00085}}\ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_search_logical_term}{ZSearchLogicalTerm}}*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classzbs_1_1_z_collection_entity_afa7c43c0e2ade310855257f555cdfd05}{LogicalTerm}}=\textcolor{keyword}{nullptr};\ \ \textcolor{comment}{/*\ entity\ selection\ phrase\ */}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00086}00086\ \};}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00087}00087\ }
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00088}00088\ \}\ \textcolor{comment}{//namespace\ zbs}}
+\DoxyCodeLine{\Hypertarget{zcollectionentity_8h_source_l00089}00089\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZCOLLECTIONENTITY\_H}}
+
+\end{DoxyCode}

@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+ <zsearchparsersymbol version = "'1.0-0'">
+    <!--  Symbols table : defines symbols that points to a valid full file path -->
+    <symboltable>
+        <symbolitem>
+            <type>ZSTO_UriString</type>
+            <content>/home/gerard/Development/zmftest/zdocphysical.zmf</content>
+            <name>zdocphysical</name>
+        </symbolitem>
+        <symbolitem>
+            <type>ZSTO_Resource</type>
+            <content>
+                <zresource>
+                <id>1</id>
+                <entity>4097</entity>
+                </zresource>
+            </content>
+            <name>wResource</name>
+        </symbolitem>
+    </symboltable>
+
+</zsearchparsersymbol>

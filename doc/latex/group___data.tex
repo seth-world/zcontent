@@ -1,0 +1,58 @@
+\doxysubsubsection{conversion from natural to universal format et from universal format to natural}
+\hypertarget{group___data}{}\label{group___data}\index{conversion from natural to universal format et from universal format to natural@{conversion from natural to universal format et from universal format to natural}}
+\begin{DoxyParagraph}{data formats \+: Natural vs Universal}
+
+\end{DoxyParagraph}
+Because of Endian conversion, because of sign bit, numeric data cannot be sorted widely. It has been necessary to define a universal data format that gets rid of those elements
+
+
+\begin{DoxyItemize}
+\item Natural \+: format of data used by local computer for the object. Subject to endian. Not capable of being binary sorted appropriately.
+\item Universal \+: format used to store data on file and index in an independant way. Not subject to endian \+: Universal format is big endian regardless the endianness of the current platform. May be sorted even as an agregate of data. \texorpdfstring{$<$}{<}-- Important Is used for index field(s).
+\item Universal Record Format \+: format used to store fields content It is composed of an URF header describing the data, followed by data in natural format.
+\item Universal Varying Format \+: Used for storing Fixed strings (and only strings). (see utftemplatestring.\+h \+\_\+export\+UVF This is a simplified URF format. It is used to save memory and faster the usage. Universal Varying Format stores fixed string data into a varying length string container excluding \textquotesingle{}\textbackslash{}0\textquotesingle{} character terminator leaded by an uint16\+\_\+t mentionning the number of character units of the string that follows.
+
+for more see @\+DATA\+\_\+\+FORMAT (file \doxylink{znaturalfromurf_8h}{znaturalfromurf.\+h} )
+\end{DoxyItemize}
+
+\begin{DoxyParagraph}{Data conversion}
+
+\end{DoxyParagraph}
+1-\/Get the type (ZType\+\_\+type) of data to convert\+: 1.\+1-\/ from natural data to universal Type is deduced from data using specific routines \+: main entry point is template zget\+ZType
+
+1.\+2-\/ from universal to natural Type must be given.
+
+2-\/ Conversion
+
+2.\+1-\/ ad\+Hoc conversion \+: target ZType\+\_\+type \mbox{[}and Array Count\mbox{]} is reputed to be same as source data to be converted. Source = Target
+
+2.\+2-\/ conversion against a dictionary (key dictionary, record dictionary)
+
+-\/source data type has to be casted to target type if data types are different. -\/For arrays (and adhoc pointers)\+: Source array count is compared to target array count and eventually truncated. Unary data is casted to target type whenever necessary (see preceeding)
+
+B/ Universal Storage format
+
+In addition to preceeding, file record data is stored using an appropriate header that mentions
+
+
+\begin{DoxyItemize}
+\item ZType\+\_\+type in any case
+\item Eventually (data is not atomic) its total size \+: . for an array \+: array count is deduced from total size \+: array count = total size/sizeof(atomic data)
+\item for a blob (byteseq), size is int64\+\_\+t
+\end{DoxyItemize}
+
+Conversion routines
+
+Main entry points
+
+1-\/ Adhoc conversion
+
+zget\+Universal\+From\+Natural \+: converts a natural data into Universal format
+
+zget\+Naturalfrom\+Universal \+: converts back a Universal data to its natural format according its ZType\+\_\+type
+
+2-\/ With dictionary constraints
+
+zget\+Universal\+From\+Natural\+\_\+W
+
+zget\+Naturalfrom\+Universal\+\_\+W 

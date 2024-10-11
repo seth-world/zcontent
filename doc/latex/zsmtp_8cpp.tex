@@ -1,0 +1,57 @@
+\doxysection{/home/gerard/\+Development/zbasetools/znet/zmail/zsmtp.cpp File Reference}
+\hypertarget{zsmtp_8cpp}{}\label{zsmtp_8cpp}\index{/home/gerard/Development/zbasetools/znet/zmail/zsmtp.cpp@{/home/gerard/Development/zbasetools/znet/zmail/zsmtp.cpp}}
+{\ttfamily \#include $<$netdb.\+h$>$}\newline
+{\ttfamily \#include $<$arpa/inet.\+h$>$}\newline
+{\ttfamily \#include $<$sys/socket.\+h$>$}\newline
+{\ttfamily \#include "{}zsmtp.\+h"{}}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$zmail/zmailcommon.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zexceptionmin.\+h$>$}\newline
+{\ttfamily \#include $<$ztoolset/zstatus.\+h$>$}\newline
+{\ttfamily \#include $<$stdarg.\+h$>$}\newline
+Include dependency graph for zsmtp.\+cpp\+:
+% FIG 0
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} \mbox{\hyperlink{zsmtp_8cpp_a3a141459fdfe01da7452fb8968fa6623}{ZSMTP\+\_\+\+CPP}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{zsmtp_8cpp_a2346a95a4e71b163d7ffbcb9677132b3}{decode\+\_\+\+Smtp\+Code}} (\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{p\+Response}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{zsmtp_8cpp_a3a141459fdfe01da7452fb8968fa6623}\label{zsmtp_8cpp_a3a141459fdfe01da7452fb8968fa6623} 
+\index{zsmtp.cpp@{zsmtp.cpp}!ZSMTP\_CPP@{ZSMTP\_CPP}}
+\index{ZSMTP\_CPP@{ZSMTP\_CPP}!zsmtp.cpp@{zsmtp.cpp}}
+\doxysubsubsection{\texorpdfstring{ZSMTP\_CPP}{ZSMTP\_CPP}}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{define}} ZSMTP\+\_\+\+CPP}
+
+
+
+Definition at line \mbox{\hyperlink{zsmtp_8cpp_source_l00002}{2}} of file \mbox{\hyperlink{zsmtp_8cpp_source}{zsmtp.\+cpp}}.
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{zsmtp_8cpp_a2346a95a4e71b163d7ffbcb9677132b3}\label{zsmtp_8cpp_a2346a95a4e71b163d7ffbcb9677132b3} 
+\index{zsmtp.cpp@{zsmtp.cpp}!decode\_SmtpCode@{decode\_SmtpCode}}
+\index{decode\_SmtpCode@{decode\_SmtpCode}!zsmtp.cpp@{zsmtp.cpp}}
+\doxysubsubsection{\texorpdfstring{decode\_SmtpCode()}{decode\_SmtpCode()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{const}} \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{char}} \texorpdfstring{$\ast$}{*} decode\+\_\+\+Smtp\+Code (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{int}}}]{p\+Response }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{zsmtp_8cpp_source_l00177}{177}} of file \mbox{\hyperlink{zsmtp_8cpp_source}{zsmtp.\+cpp}}.
+
+
+
+References \mbox{\hyperlink{zdataconversion_8h_source_l00726}{get\+Atomic\+URFSize()}}.
+
+
+
+Referenced by \mbox{\hyperlink{zsmtp_8cpp_source_l00790}{ZSmtp\+::send\+Mime\+Mail()}}, \mbox{\hyperlink{zsmtp_8cpp_source_l01097}{ZSmtp\+::send\+Mime\+Mail\+Multi()}}, \mbox{\hyperlink{zsmtp_8cpp_source_l00923}{ZSmtp\+::send\+Mime\+Mail\+Old()}}, \mbox{\hyperlink{zsmtp_8cpp_source_l00700}{ZSmtp\+::send\+Simple\+Mail()}}, \mbox{\hyperlink{zsmtp_8cpp_source_l00356}{ZSmtp\+::smtp\+Send\+Instruction()}}, and \mbox{\hyperlink{zsmtp_8cpp_source_l00231}{ZSmtp\+::smtp\+SSLRead\+Response()}}.
+

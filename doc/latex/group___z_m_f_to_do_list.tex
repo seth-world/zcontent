@@ -1,0 +1,45 @@
+\doxysection{ZMaster\+File Todo list}
+\hypertarget{group___z_m_f_to_do_list}{}\label{group___z_m_f_to_do_list}\index{ZMasterFile Todo list@{ZMasterFile Todo list}}
+
+\begin{DoxyItemize}
+\item implement ZIndex zrebuild\+Index (done) {$\surd$}
+\item implement zreorg\+File for \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} (done) {$\surd$}
+\item test it (done) {$\surd$}
+\item implement ZPMS as a pointer to zstatistics
+\item implement ZKey facitilies
+\begin{DoxyItemize}
+\item ZKey field extraction for query
+\begin{DoxyItemize}
+\item ZType analyzis for fields (done) {$\surd$}
+\item fields value extraction and key setup with content (done) {$\surd$}
+\item define partial key capabilities
+\end{DoxyItemize}
+\item ZKey integration into \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} ZIndex\+File usage
+\end{DoxyItemize}
+\item implement in ZType\+\_\+type "{}\+Byte sequence"{} \+: Byte\+Seq
+\item implement zsearch Search the first occurrence of a key value and return the corresponding ZMF address
+\item zget\+By\+Key (index rank, key value) returns the first occurrence of ZMF record that matches the given key value for fiven index rank
+\item implement zsearch\+All (done) {$\surd$} searches all occurrences of key value and return a \doxylink{classzbs_1_1_z_array}{ZArray} with the matching ZMF addresses
+\item implement zget\+By\+Address(done) {$\surd$} returns a ZMF record using its address
+\item implement zsearch\+All\+Partial \& zsearch\+Next\+Partial
+\begin{DoxyItemize}
+\item raw with ZData\+Buffer
+\item using ZKey \+: implement operators
+\end{DoxyItemize}
+\item implement zsearch\+Next\+Par
+\item implement \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File} to \doxylink{classzbs_1_1_z_master_file}{ZMaster\+File} conversion immediate conversion \+: no need of special conversion.
+\item implement zremove\+By\+Key Remove a record or a set of records using a key value
+\item implement zremove\+By\+Address
+\item 
+\item journaling for ZMF
+\begin{DoxyItemize}
+\item define journaling class as \doxylink{classzbs_1_1_z_random_file}{ZRandom\+File}
+\item define journaling life cycle \+: creation, storage, purge
+\end{DoxyItemize}
+\item remote mirroring for ZMF (from journaling)
+\begin{DoxyItemize}
+\item store mirroring info in ZReserved.
+\item define parameters \+: port, host, username, password
+\item define ZMF mirroring service on target host. 
+\end{DoxyItemize}
+\end{DoxyItemize}

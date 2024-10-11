@@ -1,0 +1,88 @@
+\doxysection{ztokentypedlg.\+h}
+\hypertarget{ztokentypedlg_8h_source}{}\label{ztokentypedlg_8h_source}\index{/home/gerard/Development/zbasetools/zcontent/zcontentutils/ztokentypedlg.h@{/home/gerard/Development/zbasetools/zcontent/zcontentutils/ztokentypedlg.h}}
+\mbox{\hyperlink{ztokentypedlg_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00001}00001\ \textcolor{preprocessor}{\#ifndef\ ZTOKENTYPEDLG\_H}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00002}00002\ \textcolor{preprocessor}{\#define\ ZTOKENTYPEDLG\_H}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00004}00004\ \textcolor{preprocessor}{\#include\ <QObject>}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00005}00005\ \textcolor{preprocessor}{\#include\ <QDialog>}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00006}00006\ \textcolor{preprocessor}{\#include\ <QPushButton>}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00007}00007\ \textcolor{preprocessor}{\#include\ <qcheckbox.h>}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00008}00008\ \textcolor{preprocessor}{\#include\ <zqt/zqtwidget/zqtreeview.h>}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00009}00009\ \textcolor{preprocessor}{\#include\ <zqt/zqtwidget/zqtwidgettools.h>}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00011}00011\ \textcolor{keyword}{class\ }\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QMouseEvent}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00012}00012\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_z_field_d_lg}{ZFieldDLg}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00013}00013\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_z_type_edit_struct}{ZTypeEditStruct}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00014}00014\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00015}\mbox{\hyperlink{class_z_token_type_d_lg}{00015}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_z_token_type_d_lg}{ZTokenTypeDLg}}\ :\ \textcolor{keyword}{public}\ QDialog\textcolor{comment}{//:\ public\ ZQTreeView}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00016}00016\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00017}00017\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Q\_OBJECT}}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00018}00018\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00019}00019\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00020}00020\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00021}00021\ \ \ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{class_z_token_type_d_lg}{ZTokenTypeDLg}}(\mbox{\hyperlink{class_z_field_d_lg}{ZFieldDLg}}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pParent}}=\textcolor{keyword}{nullptr})\ ;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00023}00023\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_token_type_d_lg_a044a2468d7ee283b85a3720ee204195f}{setupTableView}}(\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pColumnAutoAdjust}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pColumns}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00024}00024\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_token_type_d_lg_a3e8e33a76f51f2f460e74cc860eb6a0a}{dataSetup}}();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00025}00025\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00026}00026\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_token_type_d_lg_ab1d558ed6c7c92268e2e2567d0d28c3e}{KeyFiltered}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pKey}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QKeyEvent}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pEvent}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00027}00027\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_token_type_d_lg_adc531e0926d1e730dbf20407ab5cdb00}{MouseFiltered}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pMouseFlag}},\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QMouseEvent}}\ *\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{event}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00028}00028\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00029}00029\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_token_type_d_lg_a03aa290d7c4f6cf5df6ca3ff35bcaffd}{set}}(\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZType}})\ ;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00030}00030\ \ \ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}\ \mbox{\hyperlink{class_z_token_type_d_lg_a93814e96c87004ca7baefefde5c782b1}{get}}()\ ;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00031}00031\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00032}00032\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QModelIndex}}\ \mbox{\hyperlink{class_z_token_type_d_lg_a4d56bcf42ba1eee1a096aee7032e7404}{searchZType}}(\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZType}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00033}00033\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QModelIndex}}\ \mbox{\hyperlink{class_z_token_type_d_lg_a679b586c3bd5ec5c7e19d24e78e50ebf}{\_searchZType}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QStandardItem}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pItem}},\ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pZType}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00034}00034\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00035}00035\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00036}00036\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_token_type_d_lg_a15a7b72aac0560a94785e1c131626e1f}{AcceptCurrent}}();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00037}00037\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00038}00038\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00039}00039\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_token_type_d_lg_a71bb6351b7cae8d2cd97ce6480017d24}{closeEvent}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QCloseEvent}}\ *\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{event}})\ \textcolor{keyword}{override}\ ;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00040}00040\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_z_token_type_d_lg_ac387d4e48b2631fb3eb725a6f233f73e}{resizeEvent}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QResizeEvent}}\ *)\ \textcolor{keyword}{override}\ ;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00041}00041\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00042}00042\ \textcolor{keyword}{private}\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{slots}}:}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00043}00043\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00044}00044\ \ \ \textcolor{keywordtype}{void}\ AcceptClicked();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00045}00045\ \ \ \textcolor{keywordtype}{void}\ RejectClicked();}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00046}00046\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00047}00047\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00048}00048\ \ \ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}\ \ ZType=\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8afabd68e127b21c2981dd6df502cb211c}{ZType\_Unknown}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00050}00050\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QCheckBox}}*\ \ \ \ ArrayCHk=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00051}00051\ \ \ QPushButton*\ \ AcceptBTn=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00052}00052\ \ \ QPushButton*\ \ RejectBTn=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00053}00053\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{ZQTreeView}}*\ \ \ TreeView=\textcolor{keyword}{nullptr};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00054}00054\ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \_FResizeInitial=\textcolor{keyword}{true};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00055}00055\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \ \ \ \ TreeHeightResizeMargin=0;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00056}00056\ \};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00057}00057\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00058}00058\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00059}00059\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_z_type_list_button}{ZTypeListButton}}\ :\ \textcolor{keyword}{public}\ \ QPushButton}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00060}00060\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00061}00061\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Q\_OBJECT}}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00062}00062\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00063}\mbox{\hyperlink{class_z_type_list_button_a013dc5dea689d112d4788c1a6a3a4f67}{00063}}\ \ \ \mbox{\hyperlink{class_z_type_list_button_a013dc5dea689d112d4788c1a6a3a4f67}{ZTypeListButton}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QWidget}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pParent}}):QPushButton(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pParent}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00065}00065\ \ \ \mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a42398467f690862fb5345fe30c72f80a}{ZTypeBase}}\ \mbox{\hyperlink{class_z_type_list_button_a911bcc8c7900bc0f18f207259dbce4d4}{ZType}}=\mbox{\hyperlink{zindexedfile_2ztypetype__old__tobe__deleted_8h_a9e2a9f93afe06c279c78b5606731f3e8afabd68e127b21c2981dd6df502cb211c}{ZType\_Unknown}};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00066}00066\ \};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00068}00068\ \textcolor{comment}{/*\ allows\ to\ store\ a\ value\ within\ the\ button\ */}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00069}00069\ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ \_Tp>}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00070}\mbox{\hyperlink{class_z_list_button}{00070}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_z_list_button}{ZListButton}}\ :\ \textcolor{keyword}{public}\ \ QPushButton}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00071}00071\ \{}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00072}00072\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{Q\_OBJECT}}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00073}00073\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00074}\mbox{\hyperlink{class_z_list_button_a9a2180929a86e7628ad911291205cbf4}{00074}}\ \ \ \mbox{\hyperlink{class_z_list_button_a9a2180929a86e7628ad911291205cbf4}{ZListButton}}(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QWidget}}*\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pParent}}):QPushButton(\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pParent}})\ \{\}}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00075}00075\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00076}\mbox{\hyperlink{class_z_list_button_ad7f9136fa1510d314a108a55910aa289}{00076}}\ \ \ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{\_Tp}}\ \mbox{\hyperlink{class_z_list_button_ad7f9136fa1510d314a108a55910aa289}{ZType}}\ ;}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00077}00077\ \};}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00079}00079\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00080}00080\ \mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{QList<QStandardItem*>}}\ \mbox{\hyperlink{ztokentypedlg_8h_aea73b852b83beb6b4a148b33a6f54d83}{createItemRow}}\ (\mbox{\hyperlink{struct_z_type_edit_struct}{ZTypeEditStruct}}\ \&\mbox{\hyperlink{zdataconversion_8h_abca6a6e5a79bb4856b5a33f58812c899}{pTypeStr}});}
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00081}00081\ }
+\DoxyCodeLine{\Hypertarget{ztokentypedlg_8h_source_l00082}00082\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ ZTOKENTYPEDLG\_H}}
+
+\end{DoxyCode}
